@@ -6,11 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.CssTransitions
+import Lasm.JS.Web.Types.CssTransitions2
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary TransitionEventInit : EventInit` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TransitionEventInit where
@@ -28,154 +36,209 @@ structure TransitionEventInit where
   pseudoElement : Option String := none
   /-- `CSSTransition? animation = null` -/
   animation : Option CSSTransition := none
-instance : ToJS TransitionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("propertyName", Support.optional d.propertyName),
-    ("elapsedTime", Support.optional d.elapsedTime),
-    ("pseudoElement", Support.optional d.pseudoElement),
-    ("animation", Support.optional d.animation)]⟩
+instance : ToJS TransitionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("propertyName", Internal.optional d.propertyName),
+    ("elapsedTime", Internal.optional d.elapsedTime),
+    ("pseudoElement", Internal.optional d.pseudoElement),
+    ("animation", Internal.optional d.animation)]⟩
 
 /-- `v instanceof TransitionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TransitionEvent`). -/
-def TransitionEvent.cast? (v : Value) : IO (Option TransitionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TransitionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TransitionEvent.cast? (v : Value) : IO (Option TransitionEvent) := Internal.api "Lasm.JS.Web.TransitionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TransitionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CSSOMString type, optional TransitionEventInit transitionEventInitDict)` -/
-def TransitionEvent.new (type : String) (transitionEventInitDict : Option TransitionEventInit := none) : IO TransitionEvent :=
+@[macro_inline] def TransitionEvent.new (type : String) (transitionEventInitDict : Option TransitionEventInit := none) : IO TransitionEvent := Internal.api "Lasm.JS.Web.TransitionEvent.new" do
   Lasm.JS.Binding.invoke TransitionEvent { name := "Lasm.JS.Web.TransitionEvent.new", module := "globalThis", path := "TransitionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional transitionEventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional transitionEventInitDict]) (await := false)
 
 /-- `readonly attribute CSSOMString propertyName` -/
-def TransitionEvent.propertyName (self : TransitionEvent) : IO String := self.val.get "propertyName" String
+@[macro_inline] def TransitionEvent.propertyName (self : TransitionEvent) : IO String := Internal.api "Lasm.JS.Web.TransitionEvent.propertyName" do
+  self.val.get "propertyName" String
 
 /-- `readonly attribute double elapsedTime` -/
-def TransitionEvent.elapsedTime (self : TransitionEvent) : IO Float := self.val.get "elapsedTime" Float
+@[macro_inline] def TransitionEvent.elapsedTime (self : TransitionEvent) : IO Float := Internal.api "Lasm.JS.Web.TransitionEvent.elapsedTime" do
+  self.val.get "elapsedTime" Float
 
 /-- `readonly attribute CSSOMString pseudoElement` -/
-def TransitionEvent.pseudoElement (self : TransitionEvent) : IO String := self.val.get "pseudoElement" String
+@[macro_inline] def TransitionEvent.pseudoElement (self : TransitionEvent) : IO String := Internal.api "Lasm.JS.Web.TransitionEvent.pseudoElement" do
+  self.val.get "pseudoElement" String
 
 /-- `attribute EventHandler ontransitionrun` -/
-def Document.ontransitionrun (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionrun" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontransitionrun (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontransitionrun" do
+  self.val.get "ontransitionrun" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionrun`: `attribute EventHandler ontransitionrun` -/
-def Document.setOntransitionrun (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntransitionrun (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntransitionrun" do
   self.val.set "ontransitionrun" (toJS value)
 
 /-- `attribute EventHandler ontransitionstart` -/
-def Document.ontransitionstart (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionstart" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontransitionstart (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontransitionstart" do
+  self.val.get "ontransitionstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionstart`: `attribute EventHandler ontransitionstart` -/
-def Document.setOntransitionstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntransitionstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntransitionstart" do
   self.val.set "ontransitionstart" (toJS value)
 
 /-- `attribute EventHandler ontransitionend` -/
-def Document.ontransitionend (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontransitionend (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontransitionend" do
+  self.val.get "ontransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionend`: `attribute EventHandler ontransitionend` -/
-def Document.setOntransitionend (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntransitionend (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntransitionend" do
   self.val.set "ontransitionend" (toJS value)
 
 /-- `attribute EventHandler ontransitioncancel` -/
-def Document.ontransitioncancel (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontransitioncancel (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontransitioncancel" do
+  self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitioncancel`: `attribute EventHandler ontransitioncancel` -/
-def Document.setOntransitioncancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntransitioncancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntransitioncancel" do
   self.val.set "ontransitioncancel" (toJS value)
 
 /-- `attribute EventHandler ontransitionrun` -/
-def HTMLElement.ontransitionrun (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionrun" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontransitionrun (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontransitionrun" do
+  self.val.get "ontransitionrun" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionrun`: `attribute EventHandler ontransitionrun` -/
-def HTMLElement.setOntransitionrun (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntransitionrun (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntransitionrun" do
   self.val.set "ontransitionrun" (toJS value)
 
 /-- `attribute EventHandler ontransitionstart` -/
-def HTMLElement.ontransitionstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionstart" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontransitionstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontransitionstart" do
+  self.val.get "ontransitionstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionstart`: `attribute EventHandler ontransitionstart` -/
-def HTMLElement.setOntransitionstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntransitionstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntransitionstart" do
   self.val.set "ontransitionstart" (toJS value)
 
 /-- `attribute EventHandler ontransitionend` -/
-def HTMLElement.ontransitionend (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontransitionend (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontransitionend" do
+  self.val.get "ontransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionend`: `attribute EventHandler ontransitionend` -/
-def HTMLElement.setOntransitionend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntransitionend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntransitionend" do
   self.val.set "ontransitionend" (toJS value)
 
 /-- `attribute EventHandler ontransitioncancel` -/
-def HTMLElement.ontransitioncancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontransitioncancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontransitioncancel" do
+  self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitioncancel`: `attribute EventHandler ontransitioncancel` -/
-def HTMLElement.setOntransitioncancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntransitioncancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntransitioncancel" do
   self.val.set "ontransitioncancel" (toJS value)
 
 /-- `attribute EventHandler ontransitionrun` -/
-def MathMLElement.ontransitionrun (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionrun" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontransitionrun (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontransitionrun" do
+  self.val.get "ontransitionrun" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionrun`: `attribute EventHandler ontransitionrun` -/
-def MathMLElement.setOntransitionrun (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntransitionrun (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntransitionrun" do
   self.val.set "ontransitionrun" (toJS value)
 
 /-- `attribute EventHandler ontransitionstart` -/
-def MathMLElement.ontransitionstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontransitionstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontransitionstart" do
+  self.val.get "ontransitionstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionstart`: `attribute EventHandler ontransitionstart` -/
-def MathMLElement.setOntransitionstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntransitionstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntransitionstart" do
   self.val.set "ontransitionstart" (toJS value)
 
 /-- `attribute EventHandler ontransitionend` -/
-def MathMLElement.ontransitionend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontransitionend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontransitionend" do
+  self.val.get "ontransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionend`: `attribute EventHandler ontransitionend` -/
-def MathMLElement.setOntransitionend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntransitionend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntransitionend" do
   self.val.set "ontransitionend" (toJS value)
 
 /-- `attribute EventHandler ontransitioncancel` -/
-def MathMLElement.ontransitioncancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontransitioncancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontransitioncancel" do
+  self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitioncancel`: `attribute EventHandler ontransitioncancel` -/
-def MathMLElement.setOntransitioncancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntransitioncancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntransitioncancel" do
   self.val.set "ontransitioncancel" (toJS value)
 
 /-- `attribute EventHandler ontransitionrun` -/
-def SVGElement.ontransitionrun (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionrun" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontransitionrun (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontransitionrun" do
+  self.val.get "ontransitionrun" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionrun`: `attribute EventHandler ontransitionrun` -/
-def SVGElement.setOntransitionrun (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntransitionrun (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntransitionrun" do
   self.val.set "ontransitionrun" (toJS value)
 
 /-- `attribute EventHandler ontransitionstart` -/
-def SVGElement.ontransitionstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontransitionstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontransitionstart" do
+  self.val.get "ontransitionstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionstart`: `attribute EventHandler ontransitionstart` -/
-def SVGElement.setOntransitionstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntransitionstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntransitionstart" do
   self.val.set "ontransitionstart" (toJS value)
 
 /-- `attribute EventHandler ontransitionend` -/
-def SVGElement.ontransitionend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontransitionend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontransitionend" do
+  self.val.get "ontransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitionend`: `attribute EventHandler ontransitionend` -/
-def SVGElement.setOntransitionend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntransitionend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntransitionend" do
   self.val.set "ontransitionend" (toJS value)
 
 /-- `attribute EventHandler ontransitioncancel` -/
-def SVGElement.ontransitioncancel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontransitioncancel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontransitioncancel" do
+  self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontransitioncancel`: `attribute EventHandler ontransitioncancel` -/
-def SVGElement.setOntransitioncancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntransitioncancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntransitioncancel" do
+  self.val.set "ontransitioncancel" (toJS value)
+
+/-- `attribute EventHandler ontransitionrun` -/
+@[macro_inline] def Window.ontransitionrun (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontransitionrun" do
+  self.val.get "ontransitionrun" (Option EventHandlerNonNull)
+
+/-- Sets `ontransitionrun`: `attribute EventHandler ontransitionrun` -/
+@[macro_inline] def Window.setOntransitionrun (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntransitionrun" do
+  self.val.set "ontransitionrun" (toJS value)
+
+/-- `attribute EventHandler ontransitionstart` -/
+@[macro_inline] def Window.ontransitionstart (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontransitionstart" do
+  self.val.get "ontransitionstart" (Option EventHandlerNonNull)
+
+/-- Sets `ontransitionstart`: `attribute EventHandler ontransitionstart` -/
+@[macro_inline] def Window.setOntransitionstart (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntransitionstart" do
+  self.val.set "ontransitionstart" (toJS value)
+
+/-- `attribute EventHandler ontransitionend` -/
+@[macro_inline] def Window.ontransitionend (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontransitionend" do
+  self.val.get "ontransitionend" (Option EventHandlerNonNull)
+
+/-- Sets `ontransitionend`: `attribute EventHandler ontransitionend` -/
+@[macro_inline] def Window.setOntransitionend (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntransitionend" do
+  self.val.set "ontransitionend" (toJS value)
+
+/-- `attribute EventHandler ontransitioncancel` -/
+@[macro_inline] def Window.ontransitioncancel (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontransitioncancel" do
+  self.val.get "ontransitioncancel" (Option EventHandlerNonNull)
+
+/-- Sets `ontransitioncancel`: `attribute EventHandler ontransitioncancel` -/
+@[macro_inline] def Window.setOntransitioncancel (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntransitioncancel" do
   self.val.set "ontransitioncancel" (toJS value)
 
 /-- `attribute EventHandler ontransitionrun` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
-def ontransitionrun : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontransitionrun"] (Option EventHandlerNonNull)
+@[macro_inline] def ontransitionrun : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionrun" do
+  Internal.getGlobal ["ontransitionrun"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontransitionstart` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
-def ontransitionstart : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontransitionstart"] (Option EventHandlerNonNull)
+@[macro_inline] def ontransitionstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionstart" do
+  Internal.getGlobal ["ontransitionstart"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontransitionend` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
-def ontransitionend : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontransitionend"] (Option EventHandlerNonNull)
+@[macro_inline] def ontransitionend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionend" do
+  Internal.getGlobal ["ontransitionend"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontransitioncancel` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
-def ontransitioncancel : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontransitioncancel"] (Option EventHandlerNonNull)
+@[macro_inline] def ontransitioncancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitioncancel" do
+  Internal.getGlobal ["ontransitioncancel"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

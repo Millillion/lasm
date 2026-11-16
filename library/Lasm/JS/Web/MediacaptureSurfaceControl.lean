@@ -6,40 +6,46 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ScreenCapture
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute long? zoomLevel` -/
-def CaptureController.zoomLevel (self : CaptureController) : IO (Option Int) := self.val.get "zoomLevel" (Option Int)
+@[macro_inline] def CaptureController.zoomLevel (self : CaptureController) : IO (Option Int) := Internal.api "Lasm.JS.Web.CaptureController.zoomLevel" do
+  self.val.get "zoomLevel" (Option Int)
 
 /-- `attribute EventHandler onzoomlevelchange` -/
-def CaptureController.onzoomlevelchange (self : CaptureController) : IO (Option EventHandlerNonNull) := self.val.get "onzoomlevelchange" (Option EventHandlerNonNull)
+@[macro_inline] def CaptureController.onzoomlevelchange (self : CaptureController) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.CaptureController.onzoomlevelchange" do
+  self.val.get "onzoomlevelchange" (Option EventHandlerNonNull)
 
 /-- Sets `onzoomlevelchange`: `attribute EventHandler onzoomlevelchange` -/
-def CaptureController.setOnzoomlevelchange (self : CaptureController) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def CaptureController.setOnzoomlevelchange (self : CaptureController) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.CaptureController.setOnzoomlevelchange" do
   self.val.set "onzoomlevelchange" (toJS value)
 
 /-- `sequence<long> getSupportedZoomLevels()` -/
-def CaptureController.getSupportedZoomLevels (self : CaptureController) : IO (Array Int) :=
-  self.val.callMethod "getSupportedZoomLevels" (Support.args #[]) (Array Int)
+@[macro_inline] def CaptureController.getSupportedZoomLevels (self : CaptureController) : IO (Array Int) := Internal.api "Lasm.JS.Web.CaptureController.getSupportedZoomLevels" do
+  self.val.callMethod "getSupportedZoomLevels" (Internal.args #[]) (Array Int)
 
 /-- `Promise<undefined> increaseZoomLevel()` -/
-def CaptureController.increaseZoomLevel (self : CaptureController) : Async Unit :=
-  self.val.callMethodAwait "increaseZoomLevel" (Support.args #[]) Unit
+@[macro_inline] def CaptureController.increaseZoomLevel (self : CaptureController) : Async Unit := Internal.api "Lasm.JS.Web.CaptureController.increaseZoomLevel" do
+  self.val.callMethodAwait "increaseZoomLevel" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> decreaseZoomLevel()` -/
-def CaptureController.decreaseZoomLevel (self : CaptureController) : Async Unit :=
-  self.val.callMethodAwait "decreaseZoomLevel" (Support.args #[]) Unit
+@[macro_inline] def CaptureController.decreaseZoomLevel (self : CaptureController) : Async Unit := Internal.api "Lasm.JS.Web.CaptureController.decreaseZoomLevel" do
+  self.val.callMethodAwait "decreaseZoomLevel" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> resetZoomLevel()` -/
-def CaptureController.resetZoomLevel (self : CaptureController) : Async Unit :=
-  self.val.callMethodAwait "resetZoomLevel" (Support.args #[]) Unit
+@[macro_inline] def CaptureController.resetZoomLevel (self : CaptureController) : Async Unit := Internal.api "Lasm.JS.Web.CaptureController.resetZoomLevel" do
+  self.val.callMethodAwait "resetZoomLevel" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> forwardWheel(HTMLElement? element)` -/
-def CaptureController.forwardWheel (self : CaptureController) (element : Option HTMLElement) : Async Unit :=
-  self.val.callMethodAwait "forwardWheel" (Support.args #[toJS element]) Unit
+@[macro_inline] def CaptureController.forwardWheel (self : CaptureController) (element : Option HTMLElement) : Async Unit := Internal.api "Lasm.JS.Web.CaptureController.forwardWheel" do
+  self.val.callMethodAwait "forwardWheel" (Internal.args #[toJS element]) Unit
 
 end Lasm.JS.Web

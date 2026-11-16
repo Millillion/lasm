@@ -6,47 +6,60 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.EventTiming
+import Lasm.JS.Web.Types.HrTime
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof EventCounts`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventCounts`). -/
-def EventCounts.cast? (v : Value) : IO (Option EventCounts) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EventCounts"] Value) v) then some { val := v } else none
+@[macro_inline] def EventCounts.cast? (v : Value) : IO (Option EventCounts) := Internal.api "Lasm.JS.Web.EventCounts.cast?" do
+  Internal.cast (Internal.getGlobal ["EventCounts"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof PerformanceEventTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceEventTiming`). -/
-def PerformanceEventTiming.cast? (v : Value) : IO (Option PerformanceEventTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceEventTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceEventTiming.cast? (v : Value) : IO (Option PerformanceEventTiming) := Internal.api "Lasm.JS.Web.PerformanceEventTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceEventTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp processingStart` -/
-def PerformanceEventTiming.processingStart (self : PerformanceEventTiming) : IO Float := self.val.get "processingStart" Float
+@[macro_inline] def PerformanceEventTiming.processingStart (self : PerformanceEventTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceEventTiming.processingStart" do
+  self.val.get "processingStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp processingEnd` -/
-def PerformanceEventTiming.processingEnd (self : PerformanceEventTiming) : IO Float := self.val.get "processingEnd" Float
+@[macro_inline] def PerformanceEventTiming.processingEnd (self : PerformanceEventTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceEventTiming.processingEnd" do
+  self.val.get "processingEnd" Float
 
 /-- `readonly attribute boolean cancelable` -/
-def PerformanceEventTiming.cancelable (self : PerformanceEventTiming) : IO Bool := self.val.get "cancelable" Bool
+@[macro_inline] def PerformanceEventTiming.cancelable (self : PerformanceEventTiming) : IO Bool := Internal.api "Lasm.JS.Web.PerformanceEventTiming.cancelable" do
+  self.val.get "cancelable" Bool
 
 /-- `readonly attribute Node? target` -/
-def PerformanceEventTiming.target (self : PerformanceEventTiming) : IO (Option Node) := self.val.get "target" (Option Node)
+@[macro_inline] def PerformanceEventTiming.target (self : PerformanceEventTiming) : IO (Option Node) := Internal.api "Lasm.JS.Web.PerformanceEventTiming.target" do
+  self.val.get "target" (Option Node)
 
 /-- `readonly attribute DOMString targetSelector` -/
-def PerformanceEventTiming.targetSelector (self : PerformanceEventTiming) : IO String := self.val.get "targetSelector" String
+@[macro_inline] def PerformanceEventTiming.targetSelector (self : PerformanceEventTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceEventTiming.targetSelector" do
+  self.val.get "targetSelector" String
 
 /-- `readonly attribute unsigned long long interactionId` -/
-def PerformanceEventTiming.interactionId (self : PerformanceEventTiming) : IO Nat := self.val.get "interactionId" Nat
+@[macro_inline] def PerformanceEventTiming.interactionId (self : PerformanceEventTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceEventTiming.interactionId" do
+  self.val.get "interactionId" Nat
 
 /-- `object toJSON()` -/
-def PerformanceEventTiming.toJSON (self : PerformanceEventTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceEventTiming.toJSON (self : PerformanceEventTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceEventTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `readonly attribute EventCounts eventCounts` -/
-def Performance.eventCounts (self : Performance) : IO EventCounts := do
+@[macro_inline] def Performance.eventCounts (self : Performance) : IO EventCounts := Internal.api "Lasm.JS.Web.Performance.eventCounts" do
   let r ← self.val.get "eventCounts" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long long interactionCount` -/
-def Performance.interactionCount (self : Performance) : IO Nat := self.val.get "interactionCount" Nat
+@[macro_inline] def Performance.interactionCount (self : Performance) : IO Nat := Internal.api "Lasm.JS.Web.Performance.interactionCount" do
+  self.val.get "interactionCount" Nat
 
 end Lasm.JS.Web

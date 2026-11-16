@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.EXTDisjointTimerQuery
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum QUERY_COUNTER_BITS_EXT = 0x8864` -/
 def EXT_disjoint_timer_query.QUERY_COUNTER_BITS_EXT : Nat := 0x8864
@@ -33,36 +37,36 @@ def EXT_disjoint_timer_query.TIMESTAMP_EXT : Nat := 0x8E28
 def EXT_disjoint_timer_query.GPU_DISJOINT_EXT : Nat := 0x8FBB
 
 /-- `WebGLTimerQueryEXT createQueryEXT()` -/
-def EXT_disjoint_timer_query.createQueryEXT (self : EXT_disjoint_timer_query) : IO WebGLTimerQueryEXT := do
-  let r ← self.val.callMethod "createQueryEXT" (Support.args #[]) Value
+@[macro_inline] def EXT_disjoint_timer_query.createQueryEXT (self : EXT_disjoint_timer_query) : IO WebGLTimerQueryEXT := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.createQueryEXT" do
+  let r ← self.val.callMethod "createQueryEXT" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined deleteQueryEXT(WebGLTimerQueryEXT? query)` -/
-def EXT_disjoint_timer_query.deleteQueryEXT (self : EXT_disjoint_timer_query) (query : Option WebGLTimerQueryEXT) : IO Unit :=
-  self.val.callMethod "deleteQueryEXT" (Support.args #[toJS query]) Unit
+@[macro_inline] def EXT_disjoint_timer_query.deleteQueryEXT (self : EXT_disjoint_timer_query) (query : Option WebGLTimerQueryEXT) : IO Unit := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.deleteQueryEXT" do
+  self.val.callMethod "deleteQueryEXT" (Internal.args #[toJS query]) Unit
 
 /-- `boolean isQueryEXT(WebGLTimerQueryEXT? query)` -/
-def EXT_disjoint_timer_query.isQueryEXT (self : EXT_disjoint_timer_query) (query : Option WebGLTimerQueryEXT) : IO Bool :=
-  self.val.callMethod "isQueryEXT" (Support.args #[toJS query]) Bool
+@[macro_inline] def EXT_disjoint_timer_query.isQueryEXT (self : EXT_disjoint_timer_query) (query : Option WebGLTimerQueryEXT) : IO Bool := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.isQueryEXT" do
+  self.val.callMethod "isQueryEXT" (Internal.args #[toJS query]) Bool
 
 /-- `undefined beginQueryEXT(GLenum target, WebGLTimerQueryEXT query)` -/
-def EXT_disjoint_timer_query.beginQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) (query : WebGLTimerQueryEXT) : IO Unit :=
-  self.val.callMethod "beginQueryEXT" (Support.args #[toJS target, toJS query]) Unit
+@[macro_inline] def EXT_disjoint_timer_query.beginQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) (query : WebGLTimerQueryEXT) : IO Unit := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.beginQueryEXT" do
+  self.val.callMethod "beginQueryEXT" (Internal.args #[toJS target, toJS query]) Unit
 
 /-- `undefined endQueryEXT(GLenum target)` -/
-def EXT_disjoint_timer_query.endQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) : IO Unit :=
-  self.val.callMethod "endQueryEXT" (Support.args #[toJS target]) Unit
+@[macro_inline] def EXT_disjoint_timer_query.endQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) : IO Unit := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.endQueryEXT" do
+  self.val.callMethod "endQueryEXT" (Internal.args #[toJS target]) Unit
 
 /-- `undefined queryCounterEXT(WebGLTimerQueryEXT query, GLenum target)` -/
-def EXT_disjoint_timer_query.queryCounterEXT (self : EXT_disjoint_timer_query) (query : WebGLTimerQueryEXT) (target : Nat) : IO Unit :=
-  self.val.callMethod "queryCounterEXT" (Support.args #[toJS query, toJS target]) Unit
+@[macro_inline] def EXT_disjoint_timer_query.queryCounterEXT (self : EXT_disjoint_timer_query) (query : WebGLTimerQueryEXT) (target : Nat) : IO Unit := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.queryCounterEXT" do
+  self.val.callMethod "queryCounterEXT" (Internal.args #[toJS query, toJS target]) Unit
 
 /-- `any getQueryEXT(GLenum target, GLenum pname)` -/
-def EXT_disjoint_timer_query.getQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getQueryEXT" (Support.args #[toJS target, toJS pname]) Data
+@[macro_inline] def EXT_disjoint_timer_query.getQueryEXT (self : EXT_disjoint_timer_query) (target : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.getQueryEXT" do
+  self.val.callMethod "getQueryEXT" (Internal.args #[toJS target, toJS pname]) Data
 
 /-- `any getQueryObjectEXT(WebGLTimerQueryEXT query, GLenum pname)` -/
-def EXT_disjoint_timer_query.getQueryObjectEXT (self : EXT_disjoint_timer_query) (query : WebGLTimerQueryEXT) (pname : Nat) : IO Data :=
-  self.val.callMethod "getQueryObjectEXT" (Support.args #[toJS query, toJS pname]) Data
+@[macro_inline] def EXT_disjoint_timer_query.getQueryObjectEXT (self : EXT_disjoint_timer_query) (query : WebGLTimerQueryEXT) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query.getQueryObjectEXT" do
+  self.val.callMethod "getQueryObjectEXT" (Internal.args #[toJS query, toJS pname]) Data
 
 end Lasm.JS.Web

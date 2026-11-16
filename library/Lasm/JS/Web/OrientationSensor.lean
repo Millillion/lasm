@@ -6,27 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.GenericSensor
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.OrientationSensor
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum OrientationSensorLocalCoordinateSystem` (Orientation Sensor (https://w3c.github.io/orientation-sensor/)): "device", "screen". -/
-inductive OrientationSensorLocalCoordinateSystem where
-  /-- "device" -/
-  | device
-  /-- "screen" -/
-  | screen
-  deriving BEq, Repr, Inhabited
-instance : ToJS OrientationSensorLocalCoordinateSystem := ⟨fun
-  | .device => .string "device"
-  | .screen => .string "screen"⟩
-instance : FromJS OrientationSensorLocalCoordinateSystem where
-  fromJS
-    | .string "device" => .ok .device
-    | .string "screen" => .ok .screen
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.OrientationSensorLocalCoordinateSystem"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef Float32Array or Float64Array or DOMMatrix RotationMatrixType`: one constructor per member type. -/
 inductive RotationMatrixType where
@@ -48,36 +36,37 @@ structure OrientationSensorOptions where
   frequency : Option Float := none
   /-- `OrientationSensorLocalCoordinateSystem referenceFrame = "device"` -/
   referenceFrame : Option OrientationSensorLocalCoordinateSystem := none
-instance : ToJS OrientationSensorOptions := ⟨fun d => Support.fields #[("frequency", Support.optional d.frequency),
-    ("referenceFrame", Support.optional d.referenceFrame)]⟩
+instance : ToJS OrientationSensorOptions := ⟨fun d => Internal.fields #[("frequency", Internal.optional d.frequency),
+    ("referenceFrame", Internal.optional d.referenceFrame)]⟩
 
 /-- `v instanceof OrientationSensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OrientationSensor`). -/
-def OrientationSensor.cast? (v : Value) : IO (Option OrientationSensor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["OrientationSensor"] Value) v) then some { val := v } else none
+@[macro_inline] def OrientationSensor.cast? (v : Value) : IO (Option OrientationSensor) := Internal.api "Lasm.JS.Web.OrientationSensor.cast?" do
+  Internal.cast (Internal.getGlobal ["OrientationSensor"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<double>? quaternion` -/
-def OrientationSensor.quaternion (self : OrientationSensor) : IO (Option (Array Float)) := self.val.get "quaternion" (Option (Array Float))
+@[macro_inline] def OrientationSensor.quaternion (self : OrientationSensor) : IO (Option (Array Float)) := Internal.api "Lasm.JS.Web.OrientationSensor.quaternion" do
+  self.val.get "quaternion" (Option (Array Float))
 
 /-- `undefined populateMatrix(RotationMatrixType targetMatrix)` -/
-def OrientationSensor.populateMatrix (self : OrientationSensor) (targetMatrix : RotationMatrixType) : IO Unit :=
-  self.val.callMethod "populateMatrix" (Support.args #[toJS targetMatrix]) Unit
+@[macro_inline] def OrientationSensor.populateMatrix (self : OrientationSensor) (targetMatrix : RotationMatrixType) : IO Unit := Internal.api "Lasm.JS.Web.OrientationSensor.populateMatrix" do
+  self.val.callMethod "populateMatrix" (Internal.args #[toJS targetMatrix]) Unit
 
 /-- `v instanceof AbsoluteOrientationSensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbsoluteOrientationSensor`). -/
-def AbsoluteOrientationSensor.cast? (v : Value) : IO (Option AbsoluteOrientationSensor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbsoluteOrientationSensor"] Value) v) then some { val := v } else none
+@[macro_inline] def AbsoluteOrientationSensor.cast? (v : Value) : IO (Option AbsoluteOrientationSensor) := Internal.api "Lasm.JS.Web.AbsoluteOrientationSensor.cast?" do
+  Internal.cast (Internal.getGlobal ["AbsoluteOrientationSensor"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional OrientationSensorOptions sensorOptions)` -/
-def AbsoluteOrientationSensor.new (sensorOptions : Option OrientationSensorOptions := none) : IO AbsoluteOrientationSensor :=
+@[macro_inline] def AbsoluteOrientationSensor.new (sensorOptions : Option OrientationSensorOptions := none) : IO AbsoluteOrientationSensor := Internal.api "Lasm.JS.Web.AbsoluteOrientationSensor.new" do
   Lasm.JS.Binding.invoke AbsoluteOrientationSensor { name := "Lasm.JS.Web.AbsoluteOrientationSensor.new", module := "globalThis", path := "AbsoluteOrientationSensor", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 /-- `v instanceof RelativeOrientationSensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RelativeOrientationSensor`). -/
-def RelativeOrientationSensor.cast? (v : Value) : IO (Option RelativeOrientationSensor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RelativeOrientationSensor"] Value) v) then some { val := v } else none
+@[macro_inline] def RelativeOrientationSensor.cast? (v : Value) : IO (Option RelativeOrientationSensor) := Internal.api "Lasm.JS.Web.RelativeOrientationSensor.cast?" do
+  Internal.cast (Internal.getGlobal ["RelativeOrientationSensor"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional OrientationSensorOptions sensorOptions)` -/
-def RelativeOrientationSensor.new (sensorOptions : Option OrientationSensorOptions := none) : IO RelativeOrientationSensor :=
+@[macro_inline] def RelativeOrientationSensor.new (sensorOptions : Option OrientationSensorOptions := none) : IO RelativeOrientationSensor := Internal.api "Lasm.JS.Web.RelativeOrientationSensor.new" do
   Lasm.JS.Binding.invoke RelativeOrientationSensor { name := "Lasm.JS.Web.RelativeOrientationSensor.new", module := "globalThis", path := "RelativeOrientationSensor", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 end Lasm.JS.Web

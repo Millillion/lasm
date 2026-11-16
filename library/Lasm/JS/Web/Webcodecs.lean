@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.MediastreamRecording
+import Lasm.JS.Web.Types.Webcodecs
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.MediacaptureExtensions
-import Lasm.JS.Web.MediastreamRecording
 import Lasm.JS.Web.WebcodecsAacCodecRegistration
 import Lasm.JS.Web.WebcodecsAv1CodecRegistration
 import Lasm.JS.Web.WebcodecsAvcCodecRegistration
@@ -21,370 +26,9 @@ import Lasm.JS.Web.WebcodecsVp9CodecRegistration
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AudioSampleFormat` (WebCodecs (https://w3c.github.io/webcodecs/)): "u8", "s16", "s32", "f32", "u8-planar", "s16-planar", "s32-planar", "f32-planar". -/
-inductive AudioSampleFormat where
-  /-- "u8" -/
-  | u8
-  /-- "s16" -/
-  | s16
-  /-- "s32" -/
-  | s32
-  /-- "f32" -/
-  | f32
-  /-- "u8-planar" -/
-  | u8Planar
-  /-- "s16-planar" -/
-  | s16Planar
-  /-- "s32-planar" -/
-  | s32Planar
-  /-- "f32-planar" -/
-  | f32Planar
-  deriving BEq, Repr, Inhabited
-instance : ToJS AudioSampleFormat := ⟨fun
-  | .u8 => .string "u8"
-  | .s16 => .string "s16"
-  | .s32 => .string "s32"
-  | .f32 => .string "f32"
-  | .u8Planar => .string "u8-planar"
-  | .s16Planar => .string "s16-planar"
-  | .s32Planar => .string "s32-planar"
-  | .f32Planar => .string "f32-planar"⟩
-instance : FromJS AudioSampleFormat where
-  fromJS
-    | .string "u8" => .ok .u8
-    | .string "s16" => .ok .s16
-    | .string "s32" => .ok .s32
-    | .string "f32" => .ok .f32
-    | .string "u8-planar" => .ok .u8Planar
-    | .string "s16-planar" => .ok .s16Planar
-    | .string "s32-planar" => .ok .s32Planar
-    | .string "f32-planar" => .ok .f32Planar
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AudioSampleFormat"
-
-/-- `enum CodecState` (WebCodecs (https://w3c.github.io/webcodecs/)): "unconfigured", "configured", "closed". -/
-inductive CodecState where
-  /-- "unconfigured" -/
-  | unconfigured
-  /-- "configured" -/
-  | configured
-  /-- "closed" -/
-  | closed
-  deriving BEq, Repr, Inhabited
-instance : ToJS CodecState := ⟨fun
-  | .unconfigured => .string "unconfigured"
-  | .configured => .string "configured"
-  | .closed => .string "closed"⟩
-instance : FromJS CodecState where
-  fromJS
-    | .string "unconfigured" => .ok .unconfigured
-    | .string "configured" => .ok .configured
-    | .string "closed" => .ok .closed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CodecState"
-
-/-- `enum EncodedAudioChunkType` (WebCodecs (https://w3c.github.io/webcodecs/)): "key", "delta". -/
-inductive EncodedAudioChunkType where
-  /-- "key" -/
-  | key
-  /-- "delta" -/
-  | delta
-  deriving BEq, Repr, Inhabited
-instance : ToJS EncodedAudioChunkType := ⟨fun
-  | .key => .string "key"
-  | .delta => .string "delta"⟩
-instance : FromJS EncodedAudioChunkType where
-  fromJS
-    | .string "key" => .ok .key
-    | .string "delta" => .ok .delta
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.EncodedAudioChunkType"
-
-/-- `enum EncodedVideoChunkType` (WebCodecs (https://w3c.github.io/webcodecs/)): "key", "delta". -/
-inductive EncodedVideoChunkType where
-  /-- "key" -/
-  | key
-  /-- "delta" -/
-  | delta
-  deriving BEq, Repr, Inhabited
-instance : ToJS EncodedVideoChunkType := ⟨fun
-  | .key => .string "key"
-  | .delta => .string "delta"⟩
-instance : FromJS EncodedVideoChunkType where
-  fromJS
-    | .string "key" => .ok .key
-    | .string "delta" => .ok .delta
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.EncodedVideoChunkType"
-
-/-- `enum VideoColorPrimaries` (WebCodecs (https://w3c.github.io/webcodecs/)): "bt709", "bt470bg", "smpte170m", "bt2020", "smpte432". -/
-inductive VideoColorPrimaries where
-  /-- "bt709" -/
-  | bt709
-  /-- "bt470bg" -/
-  | bt470bg
-  /-- "smpte170m" -/
-  | smpte170m
-  /-- "bt2020" -/
-  | bt2020
-  /-- "smpte432" -/
-  | smpte432
-  deriving BEq, Repr, Inhabited
-instance : ToJS VideoColorPrimaries := ⟨fun
-  | .bt709 => .string "bt709"
-  | .bt470bg => .string "bt470bg"
-  | .smpte170m => .string "smpte170m"
-  | .bt2020 => .string "bt2020"
-  | .smpte432 => .string "smpte432"⟩
-instance : FromJS VideoColorPrimaries where
-  fromJS
-    | .string "bt709" => .ok .bt709
-    | .string "bt470bg" => .ok .bt470bg
-    | .string "smpte170m" => .ok .smpte170m
-    | .string "bt2020" => .ok .bt2020
-    | .string "smpte432" => .ok .smpte432
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.VideoColorPrimaries"
-
-/-- `enum VideoTransferCharacteristics` (WebCodecs (https://w3c.github.io/webcodecs/)): "bt709", "smpte170m", "iec61966-2-1", "linear", "pq", "hlg". -/
-inductive VideoTransferCharacteristics where
-  /-- "bt709" -/
-  | bt709
-  /-- "smpte170m" -/
-  | smpte170m
-  /-- "iec61966-2-1" -/
-  | iec6196621
-  /-- "linear" -/
-  | linear
-  /-- "pq" -/
-  | pq
-  /-- "hlg" -/
-  | hlg
-  deriving BEq, Repr, Inhabited
-instance : ToJS VideoTransferCharacteristics := ⟨fun
-  | .bt709 => .string "bt709"
-  | .smpte170m => .string "smpte170m"
-  | .iec6196621 => .string "iec61966-2-1"
-  | .linear => .string "linear"
-  | .pq => .string "pq"
-  | .hlg => .string "hlg"⟩
-instance : FromJS VideoTransferCharacteristics where
-  fromJS
-    | .string "bt709" => .ok .bt709
-    | .string "smpte170m" => .ok .smpte170m
-    | .string "iec61966-2-1" => .ok .iec6196621
-    | .string "linear" => .ok .linear
-    | .string "pq" => .ok .pq
-    | .string "hlg" => .ok .hlg
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.VideoTransferCharacteristics"
-
-/-- `enum VideoMatrixCoefficients` (WebCodecs (https://w3c.github.io/webcodecs/)): "rgb", "bt709", "bt470bg", "smpte170m", "bt2020-ncl". -/
-inductive VideoMatrixCoefficients where
-  /-- "rgb" -/
-  | rgb
-  /-- "bt709" -/
-  | bt709
-  /-- "bt470bg" -/
-  | bt470bg
-  /-- "smpte170m" -/
-  | smpte170m
-  /-- "bt2020-ncl" -/
-  | bt2020Ncl
-  deriving BEq, Repr, Inhabited
-instance : ToJS VideoMatrixCoefficients := ⟨fun
-  | .rgb => .string "rgb"
-  | .bt709 => .string "bt709"
-  | .bt470bg => .string "bt470bg"
-  | .smpte170m => .string "smpte170m"
-  | .bt2020Ncl => .string "bt2020-ncl"⟩
-instance : FromJS VideoMatrixCoefficients where
-  fromJS
-    | .string "rgb" => .ok .rgb
-    | .string "bt709" => .ok .bt709
-    | .string "bt470bg" => .ok .bt470bg
-    | .string "smpte170m" => .ok .smpte170m
-    | .string "bt2020-ncl" => .ok .bt2020Ncl
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.VideoMatrixCoefficients"
-
-/-- `enum HardwareAcceleration` (WebCodecs (https://w3c.github.io/webcodecs/)): "no-preference", "prefer-hardware", "prefer-software". -/
-inductive HardwareAcceleration where
-  /-- "no-preference" -/
-  | noPreference
-  /-- "prefer-hardware" -/
-  | preferHardware
-  /-- "prefer-software" -/
-  | preferSoftware
-  deriving BEq, Repr, Inhabited
-instance : ToJS HardwareAcceleration := ⟨fun
-  | .noPreference => .string "no-preference"
-  | .preferHardware => .string "prefer-hardware"
-  | .preferSoftware => .string "prefer-software"⟩
-instance : FromJS HardwareAcceleration where
-  fromJS
-    | .string "no-preference" => .ok .noPreference
-    | .string "prefer-hardware" => .ok .preferHardware
-    | .string "prefer-software" => .ok .preferSoftware
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HardwareAcceleration"
-
-/-- `enum AlphaOption` (WebCodecs (https://w3c.github.io/webcodecs/)): "keep", "discard". -/
-inductive AlphaOption where
-  /-- "keep" -/
-  | keep
-  /-- "discard" -/
-  | discard
-  deriving BEq, Repr, Inhabited
-instance : ToJS AlphaOption := ⟨fun
-  | .keep => .string "keep"
-  | .discard => .string "discard"⟩
-instance : FromJS AlphaOption where
-  fromJS
-    | .string "keep" => .ok .keep
-    | .string "discard" => .ok .discard
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AlphaOption"
-
-/-- `enum VideoEncoderBitrateMode` (WebCodecs (https://w3c.github.io/webcodecs/)): "constant", "variable", "quantizer". -/
-inductive VideoEncoderBitrateMode where
-  /-- "constant" -/
-  | constant
-  /-- "variable" -/
-  | «variable»
-  /-- "quantizer" -/
-  | quantizer
-  deriving BEq, Repr, Inhabited
-instance : ToJS VideoEncoderBitrateMode := ⟨fun
-  | .constant => .string "constant"
-  | .«variable» => .string "variable"
-  | .quantizer => .string "quantizer"⟩
-instance : FromJS VideoEncoderBitrateMode where
-  fromJS
-    | .string "constant" => .ok .constant
-    | .string "variable" => .ok .«variable»
-    | .string "quantizer" => .ok .quantizer
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.VideoEncoderBitrateMode"
-
-/-- `enum LatencyMode` (WebCodecs (https://w3c.github.io/webcodecs/)): "quality", "realtime". -/
-inductive LatencyMode where
-  /-- "quality" -/
-  | quality
-  /-- "realtime" -/
-  | realtime
-  deriving BEq, Repr, Inhabited
-instance : ToJS LatencyMode := ⟨fun
-  | .quality => .string "quality"
-  | .realtime => .string "realtime"⟩
-instance : FromJS LatencyMode where
-  fromJS
-    | .string "quality" => .ok .quality
-    | .string "realtime" => .ok .realtime
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LatencyMode"
-
-/-- `enum VideoPixelFormat` (WebCodecs (https://w3c.github.io/webcodecs/)): "I420", "I420P10", "I420P12", "I420A", "I420AP10", "I420AP12", "I422", "I422P10", "I422P12", "I422A", "I422AP10", "I422AP12", "I444", "I444P10", "I444P12", "I444A", "I444AP10", "I444AP12", "NV12", "RGBA", "RGBX", "BGRA", "BGRX". -/
-inductive VideoPixelFormat where
-  /-- "I420" -/
-  | i420
-  /-- "I420P10" -/
-  | i420P10
-  /-- "I420P12" -/
-  | i420P12
-  /-- "I420A" -/
-  | i420A
-  /-- "I420AP10" -/
-  | i420AP10
-  /-- "I420AP12" -/
-  | i420AP12
-  /-- "I422" -/
-  | i422
-  /-- "I422P10" -/
-  | i422P10
-  /-- "I422P12" -/
-  | i422P12
-  /-- "I422A" -/
-  | i422A
-  /-- "I422AP10" -/
-  | i422AP10
-  /-- "I422AP12" -/
-  | i422AP12
-  /-- "I444" -/
-  | i444
-  /-- "I444P10" -/
-  | i444P10
-  /-- "I444P12" -/
-  | i444P12
-  /-- "I444A" -/
-  | i444A
-  /-- "I444AP10" -/
-  | i444AP10
-  /-- "I444AP12" -/
-  | i444AP12
-  /-- "NV12" -/
-  | nV12
-  /-- "RGBA" -/
-  | rGBA
-  /-- "RGBX" -/
-  | rGBX
-  /-- "BGRA" -/
-  | bGRA
-  /-- "BGRX" -/
-  | bGRX
-  deriving BEq, Repr, Inhabited
-instance : ToJS VideoPixelFormat := ⟨fun
-  | .i420 => .string "I420"
-  | .i420P10 => .string "I420P10"
-  | .i420P12 => .string "I420P12"
-  | .i420A => .string "I420A"
-  | .i420AP10 => .string "I420AP10"
-  | .i420AP12 => .string "I420AP12"
-  | .i422 => .string "I422"
-  | .i422P10 => .string "I422P10"
-  | .i422P12 => .string "I422P12"
-  | .i422A => .string "I422A"
-  | .i422AP10 => .string "I422AP10"
-  | .i422AP12 => .string "I422AP12"
-  | .i444 => .string "I444"
-  | .i444P10 => .string "I444P10"
-  | .i444P12 => .string "I444P12"
-  | .i444A => .string "I444A"
-  | .i444AP10 => .string "I444AP10"
-  | .i444AP12 => .string "I444AP12"
-  | .nV12 => .string "NV12"
-  | .rGBA => .string "RGBA"
-  | .rGBX => .string "RGBX"
-  | .bGRA => .string "BGRA"
-  | .bGRX => .string "BGRX"⟩
-instance : FromJS VideoPixelFormat where
-  fromJS
-    | .string "I420" => .ok .i420
-    | .string "I420P10" => .ok .i420P10
-    | .string "I420P12" => .ok .i420P12
-    | .string "I420A" => .ok .i420A
-    | .string "I420AP10" => .ok .i420AP10
-    | .string "I420AP12" => .ok .i420AP12
-    | .string "I422" => .ok .i422
-    | .string "I422P10" => .ok .i422P10
-    | .string "I422P12" => .ok .i422P12
-    | .string "I422A" => .ok .i422A
-    | .string "I422AP10" => .ok .i422AP10
-    | .string "I422AP12" => .ok .i422AP12
-    | .string "I444" => .ok .i444
-    | .string "I444P10" => .ok .i444P10
-    | .string "I444P12" => .ok .i444P12
-    | .string "I444A" => .ok .i444A
-    | .string "I444AP10" => .ok .i444AP10
-    | .string "I444AP12" => .ok .i444AP12
-    | .string "NV12" => .ok .nV12
-    | .string "RGBA" => .ok .rGBA
-    | .string "RGBX" => .ok .rGBX
-    | .string "BGRA" => .ok .bGRA
-    | .string "BGRX" => .ok .bGRX
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.VideoPixelFormat"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AudioDataInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioDataInit where
@@ -402,13 +46,13 @@ structure AudioDataInit where
   data : ByteArray
   /-- `sequence<ArrayBuffer> transfer = []` -/
   transfer : Option (Array ByteArray) := none
-instance : ToJS AudioDataInit := ⟨fun d => Support.fields #[("format", toJS d.format),
+instance : ToJS AudioDataInit := ⟨fun d => Internal.fields #[("format", toJS d.format),
     ("sampleRate", toJS d.sampleRate),
     ("numberOfFrames", toJS d.numberOfFrames),
     ("numberOfChannels", toJS d.numberOfChannels),
     ("timestamp", toJS d.timestamp),
     ("data", toJS d.data),
-    ("transfer", Support.optional d.transfer)]⟩
+    ("transfer", Internal.optional d.transfer)]⟩
 
 /-- `dictionary AudioDataCopyToOptions` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioDataCopyToOptions where
@@ -420,10 +64,10 @@ structure AudioDataCopyToOptions where
   frameCount : Option Nat := none
   /-- `AudioSampleFormat format` -/
   format : Option AudioSampleFormat := none
-instance : ToJS AudioDataCopyToOptions := ⟨fun d => Support.fields #[("planeIndex", toJS d.planeIndex),
-    ("frameOffset", Support.optional d.frameOffset),
-    ("frameCount", Support.optional d.frameCount),
-    ("format", Support.optional d.format)]⟩
+instance : ToJS AudioDataCopyToOptions := ⟨fun d => Internal.fields #[("planeIndex", toJS d.planeIndex),
+    ("frameOffset", Internal.optional d.frameOffset),
+    ("frameCount", Internal.optional d.frameCount),
+    ("format", Internal.optional d.format)]⟩
 
 /-- `callback AudioDataOutputCallback = undefined (AudioData output)` (WebCodecs (https://w3c.github.io/webcodecs/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure AudioDataOutputCallback where
@@ -434,10 +78,10 @@ instance : ToJS AudioDataOutputCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AudioDataOutputCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.AudioDataOutputCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def AudioDataOutputCallback.ofFn (f : AudioData → Async Unit) : IO AudioDataOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg AudioData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg AudioData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def AudioDataOutputCallback.ofSyncFn (f : AudioData → IO Unit) : IO AudioDataOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg AudioData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg AudioData args 0)) }
 
 /-- `callback WebCodecsErrorCallback = undefined (DOMException error)` (WebCodecs (https://w3c.github.io/webcodecs/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WebCodecsErrorCallback where
@@ -448,10 +92,10 @@ instance : ToJS WebCodecsErrorCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS WebCodecsErrorCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.WebCodecsErrorCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def WebCodecsErrorCallback.ofFn (f : DOMException → Async Unit) : IO WebCodecsErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def WebCodecsErrorCallback.ofSyncFn (f : DOMException → IO Unit) : IO WebCodecsErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 
 /-- `dictionary AudioDecoderInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioDecoderInit where
@@ -459,7 +103,7 @@ structure AudioDecoderInit where
   output : AudioDataOutputCallback
   /-- `required WebCodecsErrorCallback error` -/
   error : WebCodecsErrorCallback
-instance : ToJS AudioDecoderInit := ⟨fun d => Support.fields #[("output", toJS d.output),
+instance : ToJS AudioDecoderInit := ⟨fun d => Internal.fields #[("output", toJS d.output),
     ("error", toJS d.error)]⟩
 
 /-- `dictionary AudioDecoderConfig` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -472,10 +116,10 @@ structure AudioDecoderConfig where
   numberOfChannels : Nat
   /-- `AllowSharedBufferSource description` -/
   description : Option ByteArray := none
-instance : ToJS AudioDecoderConfig := ⟨fun d => Support.fields #[("codec", toJS d.codec),
+instance : ToJS AudioDecoderConfig := ⟨fun d => Internal.fields #[("codec", toJS d.codec),
     ("sampleRate", toJS d.sampleRate),
     ("numberOfChannels", toJS d.numberOfChannels),
-    ("description", Support.optional d.description)]⟩
+    ("description", Internal.optional d.description)]⟩
 
 /-- `dictionary AudioDecoderSupport` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioDecoderSupport where
@@ -483,11 +127,14 @@ structure AudioDecoderSupport where
   supported : Option Bool := none
   /-- `AudioDecoderConfig config` -/
   config : Option AudioDecoderConfig := none
+instance : ToJS AudioDecoderSupport := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("config", Internal.optional d.config)]⟩
 
 /-- `dictionary EncodedAudioChunkMetadata` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EncodedAudioChunkMetadata where
   /-- `AudioDecoderConfig decoderConfig` -/
   decoderConfig : Option AudioDecoderConfig := none
+instance : ToJS EncodedAudioChunkMetadata := ⟨fun d => Internal.fields #[("decoderConfig", Internal.optional d.decoderConfig)]⟩
 
 /-- `callback EncodedAudioChunkOutputCallback = undefined (EncodedAudioChunk output, optional EncodedAudioChunkMetadata metadata)` (WebCodecs (https://w3c.github.io/webcodecs/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure EncodedAudioChunkOutputCallback where
@@ -498,10 +145,10 @@ instance : ToJS EncodedAudioChunkOutputCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS EncodedAudioChunkOutputCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.EncodedAudioChunkOutputCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def EncodedAudioChunkOutputCallback.ofFn (f : EncodedAudioChunk → Data → Async Unit) : IO EncodedAudioChunkOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg EncodedAudioChunk args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg EncodedAudioChunk args 0) (← Internal.arg Data args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def EncodedAudioChunkOutputCallback.ofSyncFn (f : EncodedAudioChunk → Data → IO Unit) : IO EncodedAudioChunkOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg EncodedAudioChunk args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg EncodedAudioChunk args 0) (← Internal.arg Data args 1)) }
 
 /-- `dictionary AudioEncoderInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioEncoderInit where
@@ -509,7 +156,7 @@ structure AudioEncoderInit where
   output : EncodedAudioChunkOutputCallback
   /-- `required WebCodecsErrorCallback error` -/
   error : WebCodecsErrorCallback
-instance : ToJS AudioEncoderInit := ⟨fun d => Support.fields #[("output", toJS d.output),
+instance : ToJS AudioEncoderInit := ⟨fun d => Internal.fields #[("output", toJS d.output),
     ("error", toJS d.error)]⟩
 
 /-- `dictionary AudioEncoderConfig` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -530,14 +177,14 @@ structure AudioEncoderConfig where
   flac : Option FlacEncoderConfig := none
   /-- `OpusEncoderConfig opus` -/
   opus : Option OpusEncoderConfig := none
-instance : ToJS AudioEncoderConfig := ⟨fun d => Support.fields #[("codec", toJS d.codec),
+instance : ToJS AudioEncoderConfig := ⟨fun d => Internal.fields #[("codec", toJS d.codec),
     ("sampleRate", toJS d.sampleRate),
     ("numberOfChannels", toJS d.numberOfChannels),
-    ("bitrate", Support.optional d.bitrate),
-    ("bitrateMode", Support.optional d.bitrateMode),
-    ("aac", Support.optional d.aac),
-    ("flac", Support.optional d.flac),
-    ("opus", Support.optional d.opus)]⟩
+    ("bitrate", Internal.optional d.bitrate),
+    ("bitrateMode", Internal.optional d.bitrateMode),
+    ("aac", Internal.optional d.aac),
+    ("flac", Internal.optional d.flac),
+    ("opus", Internal.optional d.opus)]⟩
 instance : FromJS AudioEncoderConfig where
   fromJS d := do return {
     codec := ← Lasm.JS.readField String d "codec",
@@ -556,6 +203,8 @@ structure AudioEncoderSupport where
   supported : Option Bool := none
   /-- `AudioEncoderConfig config` -/
   config : Option AudioEncoderConfig := none
+instance : ToJS AudioEncoderSupport := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("config", Internal.optional d.config)]⟩
 instance : FromJS AudioEncoderSupport where
   fromJS d := do return {
     supported := ← Lasm.JS.readField (Option Bool) d "supported",
@@ -574,11 +223,11 @@ structure EncodedAudioChunkInit where
   data : ByteArray
   /-- `sequence<ArrayBuffer> transfer = []` -/
   transfer : Option (Array ByteArray) := none
-instance : ToJS EncodedAudioChunkInit := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS EncodedAudioChunkInit := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("timestamp", toJS d.timestamp),
-    ("duration", Support.optional d.duration),
+    ("duration", Internal.optional d.duration),
     ("data", toJS d.data),
-    ("transfer", Support.optional d.transfer)]⟩
+    ("transfer", Internal.optional d.transfer)]⟩
 
 /-- `dictionary EncodedVideoChunkInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EncodedVideoChunkInit where
@@ -592,11 +241,11 @@ structure EncodedVideoChunkInit where
   data : ByteArray
   /-- `sequence<ArrayBuffer> transfer = []` -/
   transfer : Option (Array ByteArray) := none
-instance : ToJS EncodedVideoChunkInit := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS EncodedVideoChunkInit := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("timestamp", toJS d.timestamp),
-    ("duration", Support.optional d.duration),
+    ("duration", Internal.optional d.duration),
     ("data", toJS d.data),
-    ("transfer", Support.optional d.transfer)]⟩
+    ("transfer", Internal.optional d.transfer)]⟩
 
 /-- `typedef AllowSharedBufferSource or ReadableStream ImageBufferSource`: one constructor per member type. -/
 inductive ImageBufferSource where
@@ -626,13 +275,13 @@ structure ImageDecoderInit where
   preferAnimation : Option Bool := none
   /-- `sequence<ArrayBuffer> transfer = []` -/
   transfer : Option (Array ByteArray) := none
-instance : ToJS ImageDecoderInit := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS ImageDecoderInit := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("data", toJS d.data),
-    ("colorSpaceConversion", Support.optional d.colorSpaceConversion),
-    ("desiredWidth", Support.optional d.desiredWidth),
-    ("desiredHeight", Support.optional d.desiredHeight),
-    ("preferAnimation", Support.optional d.preferAnimation),
-    ("transfer", Support.optional d.transfer)]⟩
+    ("colorSpaceConversion", Internal.optional d.colorSpaceConversion),
+    ("desiredWidth", Internal.optional d.desiredWidth),
+    ("desiredHeight", Internal.optional d.desiredHeight),
+    ("preferAnimation", Internal.optional d.preferAnimation),
+    ("transfer", Internal.optional d.transfer)]⟩
 
 /-- `dictionary ImageDecodeOptions` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageDecodeOptions where
@@ -640,8 +289,8 @@ structure ImageDecodeOptions where
   frameIndex : Option Nat := none
   /-- `boolean completeFramesOnly = true` -/
   completeFramesOnly : Option Bool := none
-instance : ToJS ImageDecodeOptions := ⟨fun d => Support.fields #[("frameIndex", Support.optional d.frameIndex),
-    ("completeFramesOnly", Support.optional d.completeFramesOnly)]⟩
+instance : ToJS ImageDecodeOptions := ⟨fun d => Internal.fields #[("frameIndex", Internal.optional d.frameIndex),
+    ("completeFramesOnly", Internal.optional d.completeFramesOnly)]⟩
 
 /-- `dictionary ImageDecodeResult` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageDecodeResult where
@@ -649,6 +298,8 @@ structure ImageDecodeResult where
   image : VideoFrame
   /-- `required boolean complete` -/
   complete : Bool
+instance : ToJS ImageDecodeResult := ⟨fun d => Internal.fields #[("image", toJS d.image),
+    ("complete", toJS d.complete)]⟩
 instance : FromJS ImageDecodeResult where
   fromJS d := do return {
     image := ← Lasm.JS.readField VideoFrame d "image",
@@ -665,10 +316,10 @@ structure VideoColorSpaceInit where
   matrix : Option VideoMatrixCoefficients := none
   /-- `boolean? fullRange = null` -/
   fullRange : Option Bool := none
-instance : ToJS VideoColorSpaceInit := ⟨fun d => Support.fields #[("primaries", Support.optional d.primaries),
-    ("transfer", Support.optional d.transfer),
-    ("matrix", Support.optional d.matrix),
-    ("fullRange", Support.optional d.fullRange)]⟩
+instance : ToJS VideoColorSpaceInit := ⟨fun d => Internal.fields #[("primaries", Internal.optional d.primaries),
+    ("transfer", Internal.optional d.transfer),
+    ("matrix", Internal.optional d.matrix),
+    ("fullRange", Internal.optional d.fullRange)]⟩
 instance : FromJS VideoColorSpaceInit where
   fromJS d := do return {
     primaries := ← Lasm.JS.readField (Option VideoColorPrimaries) d "primaries",
@@ -686,10 +337,10 @@ instance : ToJS VideoFrameOutputCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS VideoFrameOutputCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.VideoFrameOutputCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def VideoFrameOutputCallback.ofFn (f : VideoFrame → Async Unit) : IO VideoFrameOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg VideoFrame args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg VideoFrame args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def VideoFrameOutputCallback.ofSyncFn (f : VideoFrame → IO Unit) : IO VideoFrameOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg VideoFrame args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg VideoFrame args 0)) }
 
 /-- `dictionary VideoDecoderInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoDecoderInit where
@@ -697,7 +348,7 @@ structure VideoDecoderInit where
   output : VideoFrameOutputCallback
   /-- `required WebCodecsErrorCallback error` -/
   error : WebCodecsErrorCallback
-instance : ToJS VideoDecoderInit := ⟨fun d => Support.fields #[("output", toJS d.output),
+instance : ToJS VideoDecoderInit := ⟨fun d => Internal.fields #[("output", toJS d.output),
     ("error", toJS d.error)]⟩
 
 /-- `dictionary VideoDecoderConfig` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -724,17 +375,17 @@ structure VideoDecoderConfig where
   rotation : Option Float := none
   /-- `boolean flip = false` -/
   flip : Option Bool := none
-instance : ToJS VideoDecoderConfig := ⟨fun d => Support.fields #[("codec", toJS d.codec),
-    ("description", Support.optional d.description),
-    ("codedWidth", Support.optional d.codedWidth),
-    ("codedHeight", Support.optional d.codedHeight),
-    ("displayAspectWidth", Support.optional d.displayAspectWidth),
-    ("displayAspectHeight", Support.optional d.displayAspectHeight),
-    ("colorSpace", Support.optional d.colorSpace),
-    ("hardwareAcceleration", Support.optional d.hardwareAcceleration),
-    ("optimizeForLatency", Support.optional d.optimizeForLatency),
-    ("rotation", Support.optional d.rotation),
-    ("flip", Support.optional d.flip)]⟩
+instance : ToJS VideoDecoderConfig := ⟨fun d => Internal.fields #[("codec", toJS d.codec),
+    ("description", Internal.optional d.description),
+    ("codedWidth", Internal.optional d.codedWidth),
+    ("codedHeight", Internal.optional d.codedHeight),
+    ("displayAspectWidth", Internal.optional d.displayAspectWidth),
+    ("displayAspectHeight", Internal.optional d.displayAspectHeight),
+    ("colorSpace", Internal.optional d.colorSpace),
+    ("hardwareAcceleration", Internal.optional d.hardwareAcceleration),
+    ("optimizeForLatency", Internal.optional d.optimizeForLatency),
+    ("rotation", Internal.optional d.rotation),
+    ("flip", Internal.optional d.flip)]⟩
 
 /-- `dictionary VideoDecoderSupport` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoDecoderSupport where
@@ -742,11 +393,14 @@ structure VideoDecoderSupport where
   supported : Option Bool := none
   /-- `VideoDecoderConfig config` -/
   config : Option VideoDecoderConfig := none
+instance : ToJS VideoDecoderSupport := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("config", Internal.optional d.config)]⟩
 
 /-- `dictionary SvcOutputMetadata` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SvcOutputMetadata where
   /-- `unsigned long temporalLayerId` -/
   temporalLayerId : Option Nat := none
+instance : ToJS SvcOutputMetadata := ⟨fun d => Internal.fields #[("temporalLayerId", Internal.optional d.temporalLayerId)]⟩
 instance : FromJS SvcOutputMetadata where
   fromJS d := do return {
     temporalLayerId := ← Lasm.JS.readField (Option Nat) d "temporalLayerId" }
@@ -760,6 +414,9 @@ structure EncodedVideoChunkMetadata where
   svc : Option SvcOutputMetadata := none
   /-- `BufferSource alphaSideData` -/
   alphaSideData : Option ByteArray := none
+instance : ToJS EncodedVideoChunkMetadata := ⟨fun d => Internal.fields #[("decoderConfig", Internal.optional d.decoderConfig),
+    ("svc", Internal.optional d.svc),
+    ("alphaSideData", Internal.optional d.alphaSideData)]⟩
 
 /-- `callback EncodedVideoChunkOutputCallback = undefined (EncodedVideoChunk chunk, optional EncodedVideoChunkMetadata metadata)` (WebCodecs (https://w3c.github.io/webcodecs/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure EncodedVideoChunkOutputCallback where
@@ -770,10 +427,10 @@ instance : ToJS EncodedVideoChunkOutputCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS EncodedVideoChunkOutputCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.EncodedVideoChunkOutputCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def EncodedVideoChunkOutputCallback.ofFn (f : EncodedVideoChunk → Data → Async Unit) : IO EncodedVideoChunkOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg EncodedVideoChunk args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg EncodedVideoChunk args 0) (← Internal.arg Data args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def EncodedVideoChunkOutputCallback.ofSyncFn (f : EncodedVideoChunk → Data → IO Unit) : IO EncodedVideoChunkOutputCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg EncodedVideoChunk args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg EncodedVideoChunk args 0) (← Internal.arg Data args 1)) }
 
 /-- `dictionary VideoEncoderInit` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoEncoderInit where
@@ -781,7 +438,7 @@ structure VideoEncoderInit where
   output : EncodedVideoChunkOutputCallback
   /-- `required WebCodecsErrorCallback error` -/
   error : WebCodecsErrorCallback
-instance : ToJS VideoEncoderInit := ⟨fun d => Support.fields #[("output", toJS d.output),
+instance : ToJS VideoEncoderInit := ⟨fun d => Internal.fields #[("output", toJS d.output),
     ("error", toJS d.error)]⟩
 
 /-- `dictionary VideoEncoderConfig` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -816,21 +473,21 @@ structure VideoEncoderConfig where
   avc : Option AvcEncoderConfig := none
   /-- `HevcEncoderConfig hevc` -/
   hevc : Option HevcEncoderConfig := none
-instance : ToJS VideoEncoderConfig := ⟨fun d => Support.fields #[("codec", toJS d.codec),
+instance : ToJS VideoEncoderConfig := ⟨fun d => Internal.fields #[("codec", toJS d.codec),
     ("width", toJS d.width),
     ("height", toJS d.height),
-    ("displayWidth", Support.optional d.displayWidth),
-    ("displayHeight", Support.optional d.displayHeight),
-    ("bitrate", Support.optional d.bitrate),
-    ("framerate", Support.optional d.framerate),
-    ("hardwareAcceleration", Support.optional d.hardwareAcceleration),
-    ("alpha", Support.optional d.alpha),
-    ("scalabilityMode", Support.optional d.scalabilityMode),
-    ("bitrateMode", Support.optional d.bitrateMode),
-    ("latencyMode", Support.optional d.latencyMode),
-    ("contentHint", Support.optional d.contentHint),
-    ("avc", Support.optional d.avc),
-    ("hevc", Support.optional d.hevc)]⟩
+    ("displayWidth", Internal.optional d.displayWidth),
+    ("displayHeight", Internal.optional d.displayHeight),
+    ("bitrate", Internal.optional d.bitrate),
+    ("framerate", Internal.optional d.framerate),
+    ("hardwareAcceleration", Internal.optional d.hardwareAcceleration),
+    ("alpha", Internal.optional d.alpha),
+    ("scalabilityMode", Internal.optional d.scalabilityMode),
+    ("bitrateMode", Internal.optional d.bitrateMode),
+    ("latencyMode", Internal.optional d.latencyMode),
+    ("contentHint", Internal.optional d.contentHint),
+    ("avc", Internal.optional d.avc),
+    ("hevc", Internal.optional d.hevc)]⟩
 instance : FromJS VideoEncoderConfig where
   fromJS d := do return {
     codec := ← Lasm.JS.readField String d "codec",
@@ -862,11 +519,11 @@ structure VideoEncoderEncodeOptions where
   hevc : Option VideoEncoderEncodeOptionsForHevc := none
   /-- `VideoEncoderEncodeOptionsForVp9 vp9` -/
   vp9 : Option VideoEncoderEncodeOptionsForVp9 := none
-instance : ToJS VideoEncoderEncodeOptions := ⟨fun d => Support.fields #[("keyFrame", Support.optional d.keyFrame),
-    ("av1", Support.optional d.av1),
-    ("avc", Support.optional d.avc),
-    ("hevc", Support.optional d.hevc),
-    ("vp9", Support.optional d.vp9)]⟩
+instance : ToJS VideoEncoderEncodeOptions := ⟨fun d => Internal.fields #[("keyFrame", Internal.optional d.keyFrame),
+    ("av1", Internal.optional d.av1),
+    ("avc", Internal.optional d.avc),
+    ("hevc", Internal.optional d.hevc),
+    ("vp9", Internal.optional d.vp9)]⟩
 
 /-- `dictionary VideoEncoderSupport` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoEncoderSupport where
@@ -874,6 +531,8 @@ structure VideoEncoderSupport where
   supported : Option Bool := none
   /-- `VideoEncoderConfig config` -/
   config : Option VideoEncoderConfig := none
+instance : ToJS VideoEncoderSupport := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("config", Internal.optional d.config)]⟩
 instance : FromJS VideoEncoderSupport where
   fromJS d := do return {
     supported := ← Lasm.JS.readField (Option Bool) d "supported",
@@ -888,9 +547,9 @@ structure VideoFrameMetadata where
   backgroundBlur : Option BackgroundBlur := none
   /-- `ImageBitmap backgroundSegmentationMask` -/
   backgroundSegmentationMask : Option ImageBitmap := none
-instance : ToJS VideoFrameMetadata := ⟨fun d => Support.fields #[("segments", Support.optional d.segments),
-    ("backgroundBlur", Support.optional d.backgroundBlur),
-    ("backgroundSegmentationMask", Support.optional d.backgroundSegmentationMask)]⟩
+instance : ToJS VideoFrameMetadata := ⟨fun d => Internal.fields #[("segments", Internal.optional d.segments),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask)]⟩
 instance : FromJS VideoFrameMetadata where
   fromJS d := do return {
     segments := ← Lasm.JS.readField (Option (Array Segment)) d "segments",
@@ -918,15 +577,15 @@ structure VideoFrameInit where
   displayHeight : Option Nat := none
   /-- `VideoFrameMetadata metadata` -/
   metadata : Option VideoFrameMetadata := none
-instance : ToJS VideoFrameInit := ⟨fun d => Support.fields #[("duration", Support.optional d.duration),
-    ("timestamp", Support.optional d.timestamp),
-    ("alpha", Support.optional d.alpha),
-    ("visibleRect", Support.optional d.visibleRect),
-    ("rotation", Support.optional d.rotation),
-    ("flip", Support.optional d.flip),
-    ("displayWidth", Support.optional d.displayWidth),
-    ("displayHeight", Support.optional d.displayHeight),
-    ("metadata", Support.optional d.metadata)]⟩
+instance : ToJS VideoFrameInit := ⟨fun d => Internal.fields #[("duration", Internal.optional d.duration),
+    ("timestamp", Internal.optional d.timestamp),
+    ("alpha", Internal.optional d.alpha),
+    ("visibleRect", Internal.optional d.visibleRect),
+    ("rotation", Internal.optional d.rotation),
+    ("flip", Internal.optional d.flip),
+    ("displayWidth", Internal.optional d.displayWidth),
+    ("displayHeight", Internal.optional d.displayHeight),
+    ("metadata", Internal.optional d.metadata)]⟩
 
 /-- `dictionary PlaneLayout` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PlaneLayout where
@@ -934,7 +593,7 @@ structure PlaneLayout where
   offset : Nat
   /-- `required unsigned long stride` -/
   stride : Nat
-instance : ToJS PlaneLayout := ⟨fun d => Support.fields #[("offset", toJS d.offset),
+instance : ToJS PlaneLayout := ⟨fun d => Internal.fields #[("offset", toJS d.offset),
     ("stride", toJS d.stride)]⟩
 instance : FromJS PlaneLayout where
   fromJS d := do return {
@@ -972,20 +631,20 @@ structure VideoFrameBufferInit where
   transfer : Option (Array ByteArray) := none
   /-- `VideoFrameMetadata metadata` -/
   metadata : Option VideoFrameMetadata := none
-instance : ToJS VideoFrameBufferInit := ⟨fun d => Support.fields #[("format", toJS d.format),
+instance : ToJS VideoFrameBufferInit := ⟨fun d => Internal.fields #[("format", toJS d.format),
     ("codedWidth", toJS d.codedWidth),
     ("codedHeight", toJS d.codedHeight),
     ("timestamp", toJS d.timestamp),
-    ("duration", Support.optional d.duration),
-    ("layout", Support.optional d.layout),
-    ("visibleRect", Support.optional d.visibleRect),
-    ("rotation", Support.optional d.rotation),
-    ("flip", Support.optional d.flip),
-    ("displayWidth", Support.optional d.displayWidth),
-    ("displayHeight", Support.optional d.displayHeight),
-    ("colorSpace", Support.optional d.colorSpace),
-    ("transfer", Support.optional d.transfer),
-    ("metadata", Support.optional d.metadata)]⟩
+    ("duration", Internal.optional d.duration),
+    ("layout", Internal.optional d.layout),
+    ("visibleRect", Internal.optional d.visibleRect),
+    ("rotation", Internal.optional d.rotation),
+    ("flip", Internal.optional d.flip),
+    ("displayWidth", Internal.optional d.displayWidth),
+    ("displayHeight", Internal.optional d.displayHeight),
+    ("colorSpace", Internal.optional d.colorSpace),
+    ("transfer", Internal.optional d.transfer),
+    ("metadata", Internal.optional d.metadata)]⟩
 
 /-- `dictionary VideoFrameCopyToOptions` (WebCodecs (https://w3c.github.io/webcodecs/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoFrameCopyToOptions where
@@ -997,469 +656,519 @@ structure VideoFrameCopyToOptions where
   format : Option VideoPixelFormat := none
   /-- `PredefinedColorSpace colorSpace` -/
   colorSpace : Option PredefinedColorSpace := none
-instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Support.fields #[("rect", Support.optional d.rect),
-    ("layout", Support.optional d.layout),
-    ("format", Support.optional d.format),
-    ("colorSpace", Support.optional d.colorSpace)]⟩
+instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect", Internal.optional d.rect),
+    ("layout", Internal.optional d.layout),
+    ("format", Internal.optional d.format),
+    ("colorSpace", Internal.optional d.colorSpace)]⟩
 
 /-- `v instanceof AudioData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioData`). -/
-def AudioData.cast? (v : Value) : IO (Option AudioData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AudioData"] Value) v) then some { val := v } else none
+@[macro_inline] def AudioData.cast? (v : Value) : IO (Option AudioData) := Internal.api "Lasm.JS.Web.AudioData.cast?" do
+  Internal.cast (Internal.getGlobal ["AudioData"] Value) (fun x => { val := x }) v
 
 /-- `constructor(AudioDataInit init)` -/
-def AudioData.new (init : AudioDataInit) : IO AudioData :=
+@[macro_inline] def AudioData.new (init : AudioDataInit) : IO AudioData := Internal.api "Lasm.JS.Web.AudioData.new" do
   Lasm.JS.Binding.invoke AudioData { name := "Lasm.JS.Web.AudioData.new", module := "globalThis", path := "AudioData", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute AudioSampleFormat? format` -/
-def AudioData.format (self : AudioData) : IO (Option AudioSampleFormat) := self.val.get "format" (Option AudioSampleFormat)
+@[macro_inline] def AudioData.format (self : AudioData) : IO (Option AudioSampleFormat) := Internal.api "Lasm.JS.Web.AudioData.format" do
+  self.val.get "format" (Option AudioSampleFormat)
 
 /-- `readonly attribute float sampleRate` -/
-def AudioData.sampleRate (self : AudioData) : IO Float := self.val.get "sampleRate" Float
+@[macro_inline] def AudioData.sampleRate (self : AudioData) : IO Float := Internal.api "Lasm.JS.Web.AudioData.sampleRate" do
+  self.val.get "sampleRate" Float
 
 /-- `readonly attribute unsigned long numberOfFrames` -/
-def AudioData.numberOfFrames (self : AudioData) : IO Nat := self.val.get "numberOfFrames" Nat
+@[macro_inline] def AudioData.numberOfFrames (self : AudioData) : IO Nat := Internal.api "Lasm.JS.Web.AudioData.numberOfFrames" do
+  self.val.get "numberOfFrames" Nat
 
 /-- `readonly attribute unsigned long numberOfChannels` -/
-def AudioData.numberOfChannels (self : AudioData) : IO Nat := self.val.get "numberOfChannels" Nat
+@[macro_inline] def AudioData.numberOfChannels (self : AudioData) : IO Nat := Internal.api "Lasm.JS.Web.AudioData.numberOfChannels" do
+  self.val.get "numberOfChannels" Nat
 
 /-- `readonly attribute unsigned long long duration` -/
-def AudioData.duration (self : AudioData) : IO Nat := self.val.get "duration" Nat
+@[macro_inline] def AudioData.duration (self : AudioData) : IO Nat := Internal.api "Lasm.JS.Web.AudioData.duration" do
+  self.val.get "duration" Nat
 
 /-- `readonly attribute long long timestamp` -/
-def AudioData.timestamp (self : AudioData) : IO Int := self.val.get "timestamp" Int
+@[macro_inline] def AudioData.timestamp (self : AudioData) : IO Int := Internal.api "Lasm.JS.Web.AudioData.timestamp" do
+  self.val.get "timestamp" Int
 
 /-- `unsigned long allocationSize(AudioDataCopyToOptions options)` -/
-def AudioData.allocationSize (self : AudioData) (options : AudioDataCopyToOptions) : IO Nat :=
-  self.val.callMethod "allocationSize" (Support.args #[toJS options]) Nat
+@[macro_inline] def AudioData.allocationSize (self : AudioData) (options : AudioDataCopyToOptions) : IO Nat := Internal.api "Lasm.JS.Web.AudioData.allocationSize" do
+  self.val.callMethod "allocationSize" (Internal.args #[toJS options]) Nat
 
 /-- `undefined copyTo(AllowSharedBufferSource destination, AudioDataCopyToOptions options)` -/
-def AudioData.copyTo (self : AudioData) (destination : ByteArray) (options : AudioDataCopyToOptions) : IO Unit :=
-  self.val.callMethod "copyTo" (Support.args #[toJS destination, toJS options]) Unit
+@[macro_inline] def AudioData.copyTo (self : AudioData) (destination : ByteArray) (options : AudioDataCopyToOptions) : IO Unit := Internal.api "Lasm.JS.Web.AudioData.copyTo" do
+  self.val.callMethod "copyTo" (Internal.args #[toJS destination, toJS options]) Unit
 
 /-- `AudioData clone()` -/
-def AudioData.clone (self : AudioData) : IO AudioData := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def AudioData.clone (self : AudioData) : IO AudioData := Internal.api "Lasm.JS.Web.AudioData.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined close()` -/
-def AudioData.close (self : AudioData) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def AudioData.close (self : AudioData) : IO Unit := Internal.api "Lasm.JS.Web.AudioData.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `v instanceof AudioDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioDecoder`). -/
-def AudioDecoder.cast? (v : Value) : IO (Option AudioDecoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AudioDecoder"] Value) v) then some { val := v } else none
+@[macro_inline] def AudioDecoder.cast? (v : Value) : IO (Option AudioDecoder) := Internal.api "Lasm.JS.Web.AudioDecoder.cast?" do
+  Internal.cast (Internal.getGlobal ["AudioDecoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(AudioDecoderInit init)` -/
-def AudioDecoder.new (init : AudioDecoderInit) : IO AudioDecoder :=
+@[macro_inline] def AudioDecoder.new (init : AudioDecoderInit) : IO AudioDecoder := Internal.api "Lasm.JS.Web.AudioDecoder.new" do
   Lasm.JS.Binding.invoke AudioDecoder { name := "Lasm.JS.Web.AudioDecoder.new", module := "globalThis", path := "AudioDecoder", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute CodecState state` -/
-def AudioDecoder.state (self : AudioDecoder) : IO CodecState := self.val.get "state" CodecState
+@[macro_inline] def AudioDecoder.state (self : AudioDecoder) : IO CodecState := Internal.api "Lasm.JS.Web.AudioDecoder.state" do
+  self.val.get "state" CodecState
 
 /-- `readonly attribute unsigned long decodeQueueSize` -/
-def AudioDecoder.decodeQueueSize (self : AudioDecoder) : IO Nat := self.val.get "decodeQueueSize" Nat
+@[macro_inline] def AudioDecoder.decodeQueueSize (self : AudioDecoder) : IO Nat := Internal.api "Lasm.JS.Web.AudioDecoder.decodeQueueSize" do
+  self.val.get "decodeQueueSize" Nat
 
 /-- `attribute EventHandler ondequeue` -/
-def AudioDecoder.ondequeue (self : AudioDecoder) : IO (Option EventHandlerNonNull) := self.val.get "ondequeue" (Option EventHandlerNonNull)
+@[macro_inline] def AudioDecoder.ondequeue (self : AudioDecoder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AudioDecoder.ondequeue" do
+  self.val.get "ondequeue" (Option EventHandlerNonNull)
 
 /-- Sets `ondequeue`: `attribute EventHandler ondequeue` -/
-def AudioDecoder.setOndequeue (self : AudioDecoder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def AudioDecoder.setOndequeue (self : AudioDecoder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AudioDecoder.setOndequeue" do
   self.val.set "ondequeue" (toJS value)
 
 /-- `undefined configure(AudioDecoderConfig config)` -/
-def AudioDecoder.configure (self : AudioDecoder) (config : AudioDecoderConfig) : IO Unit :=
-  self.val.callMethod "configure" (Support.args #[toJS config]) Unit
+@[macro_inline] def AudioDecoder.configure (self : AudioDecoder) (config : AudioDecoderConfig) : IO Unit := Internal.api "Lasm.JS.Web.AudioDecoder.configure" do
+  self.val.callMethod "configure" (Internal.args #[toJS config]) Unit
 
 /-- `undefined decode(EncodedAudioChunk chunk)` -/
-def AudioDecoder.decode (self : AudioDecoder) (chunk : EncodedAudioChunk) : IO Unit :=
-  self.val.callMethod "decode" (Support.args #[toJS chunk]) Unit
+@[macro_inline] def AudioDecoder.decode (self : AudioDecoder) (chunk : EncodedAudioChunk) : IO Unit := Internal.api "Lasm.JS.Web.AudioDecoder.decode" do
+  self.val.callMethod "decode" (Internal.args #[toJS chunk]) Unit
 
 /-- `Promise<undefined> flush()` -/
-def AudioDecoder.flush (self : AudioDecoder) : Async Unit :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Unit
+@[macro_inline] def AudioDecoder.flush (self : AudioDecoder) : Async Unit := Internal.api "Lasm.JS.Web.AudioDecoder.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def AudioDecoder.reset (self : AudioDecoder) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def AudioDecoder.reset (self : AudioDecoder) : IO Unit := Internal.api "Lasm.JS.Web.AudioDecoder.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def AudioDecoder.close (self : AudioDecoder) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def AudioDecoder.close (self : AudioDecoder) : IO Unit := Internal.api "Lasm.JS.Web.AudioDecoder.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<AudioDecoderSupport> isConfigSupported(AudioDecoderConfig config)` -/
-def AudioDecoder.isConfigSupported (config : AudioDecoderConfig) : Async Data :=
+@[macro_inline] def AudioDecoder.isConfigSupported (config : AudioDecoderConfig) : Async Data := Internal.api "Lasm.JS.Web.AudioDecoder.isConfigSupported" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.AudioDecoder.isConfigSupported", module := "globalThis", path := "AudioDecoder.isConfigSupported", construct := false, arity := 1 }
-    (Support.args #[toJS config])
+    (Internal.args #[toJS config])
 
 /-- `v instanceof AudioEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioEncoder`). -/
-def AudioEncoder.cast? (v : Value) : IO (Option AudioEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AudioEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def AudioEncoder.cast? (v : Value) : IO (Option AudioEncoder) := Internal.api "Lasm.JS.Web.AudioEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["AudioEncoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(AudioEncoderInit init)` -/
-def AudioEncoder.new (init : AudioEncoderInit) : IO AudioEncoder :=
+@[macro_inline] def AudioEncoder.new (init : AudioEncoderInit) : IO AudioEncoder := Internal.api "Lasm.JS.Web.AudioEncoder.new" do
   Lasm.JS.Binding.invoke AudioEncoder { name := "Lasm.JS.Web.AudioEncoder.new", module := "globalThis", path := "AudioEncoder", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute CodecState state` -/
-def AudioEncoder.state (self : AudioEncoder) : IO CodecState := self.val.get "state" CodecState
+@[macro_inline] def AudioEncoder.state (self : AudioEncoder) : IO CodecState := Internal.api "Lasm.JS.Web.AudioEncoder.state" do
+  self.val.get "state" CodecState
 
 /-- `readonly attribute unsigned long encodeQueueSize` -/
-def AudioEncoder.encodeQueueSize (self : AudioEncoder) : IO Nat := self.val.get "encodeQueueSize" Nat
+@[macro_inline] def AudioEncoder.encodeQueueSize (self : AudioEncoder) : IO Nat := Internal.api "Lasm.JS.Web.AudioEncoder.encodeQueueSize" do
+  self.val.get "encodeQueueSize" Nat
 
 /-- `attribute EventHandler ondequeue` -/
-def AudioEncoder.ondequeue (self : AudioEncoder) : IO (Option EventHandlerNonNull) := self.val.get "ondequeue" (Option EventHandlerNonNull)
+@[macro_inline] def AudioEncoder.ondequeue (self : AudioEncoder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AudioEncoder.ondequeue" do
+  self.val.get "ondequeue" (Option EventHandlerNonNull)
 
 /-- Sets `ondequeue`: `attribute EventHandler ondequeue` -/
-def AudioEncoder.setOndequeue (self : AudioEncoder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def AudioEncoder.setOndequeue (self : AudioEncoder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AudioEncoder.setOndequeue" do
   self.val.set "ondequeue" (toJS value)
 
 /-- `undefined configure(AudioEncoderConfig config)` -/
-def AudioEncoder.configure (self : AudioEncoder) (config : AudioEncoderConfig) : IO Unit :=
-  self.val.callMethod "configure" (Support.args #[toJS config]) Unit
+@[macro_inline] def AudioEncoder.configure (self : AudioEncoder) (config : AudioEncoderConfig) : IO Unit := Internal.api "Lasm.JS.Web.AudioEncoder.configure" do
+  self.val.callMethod "configure" (Internal.args #[toJS config]) Unit
 
 /-- `undefined encode(AudioData data)` -/
-def AudioEncoder.encode (self : AudioEncoder) (data : AudioData) : IO Unit :=
-  self.val.callMethod "encode" (Support.args #[toJS data]) Unit
+@[macro_inline] def AudioEncoder.encode (self : AudioEncoder) (data : AudioData) : IO Unit := Internal.api "Lasm.JS.Web.AudioEncoder.encode" do
+  self.val.callMethod "encode" (Internal.args #[toJS data]) Unit
 
 /-- `Promise<undefined> flush()` -/
-def AudioEncoder.flush (self : AudioEncoder) : Async Unit :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Unit
+@[macro_inline] def AudioEncoder.flush (self : AudioEncoder) : Async Unit := Internal.api "Lasm.JS.Web.AudioEncoder.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def AudioEncoder.reset (self : AudioEncoder) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def AudioEncoder.reset (self : AudioEncoder) : IO Unit := Internal.api "Lasm.JS.Web.AudioEncoder.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def AudioEncoder.close (self : AudioEncoder) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def AudioEncoder.close (self : AudioEncoder) : IO Unit := Internal.api "Lasm.JS.Web.AudioEncoder.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<AudioEncoderSupport> isConfigSupported(AudioEncoderConfig config)` -/
-def AudioEncoder.isConfigSupported (config : AudioEncoderConfig) : Async AudioEncoderSupport :=
+@[macro_inline] def AudioEncoder.isConfigSupported (config : AudioEncoderConfig) : Async AudioEncoderSupport := Internal.api "Lasm.JS.Web.AudioEncoder.isConfigSupported" do
   Lasm.JS.Binding.invokeAsync AudioEncoderSupport { name := "Lasm.JS.Web.AudioEncoder.isConfigSupported", module := "globalThis", path := "AudioEncoder.isConfigSupported", construct := false, arity := 1 }
-    (Support.args #[toJS config])
+    (Internal.args #[toJS config])
 
 /-- `v instanceof EncodedAudioChunk`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EncodedAudioChunk`). -/
-def EncodedAudioChunk.cast? (v : Value) : IO (Option EncodedAudioChunk) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EncodedAudioChunk"] Value) v) then some { val := v } else none
+@[macro_inline] def EncodedAudioChunk.cast? (v : Value) : IO (Option EncodedAudioChunk) := Internal.api "Lasm.JS.Web.EncodedAudioChunk.cast?" do
+  Internal.cast (Internal.getGlobal ["EncodedAudioChunk"] Value) (fun x => { val := x }) v
 
 /-- `constructor(EncodedAudioChunkInit init)` -/
-def EncodedAudioChunk.new (init : EncodedAudioChunkInit) : IO EncodedAudioChunk :=
+@[macro_inline] def EncodedAudioChunk.new (init : EncodedAudioChunkInit) : IO EncodedAudioChunk := Internal.api "Lasm.JS.Web.EncodedAudioChunk.new" do
   Lasm.JS.Binding.invoke EncodedAudioChunk { name := "Lasm.JS.Web.EncodedAudioChunk.new", module := "globalThis", path := "EncodedAudioChunk", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute EncodedAudioChunkType type` -/
-def EncodedAudioChunk.type (self : EncodedAudioChunk) : IO EncodedAudioChunkType := self.val.get "type" EncodedAudioChunkType
+@[macro_inline] def EncodedAudioChunk.type (self : EncodedAudioChunk) : IO EncodedAudioChunkType := Internal.api "Lasm.JS.Web.EncodedAudioChunk.type" do
+  self.val.get "type" EncodedAudioChunkType
 
 /-- `readonly attribute long long timestamp` -/
-def EncodedAudioChunk.timestamp (self : EncodedAudioChunk) : IO Int := self.val.get "timestamp" Int
+@[macro_inline] def EncodedAudioChunk.timestamp (self : EncodedAudioChunk) : IO Int := Internal.api "Lasm.JS.Web.EncodedAudioChunk.timestamp" do
+  self.val.get "timestamp" Int
 
 /-- `readonly attribute unsigned long long? duration` -/
-def EncodedAudioChunk.duration (self : EncodedAudioChunk) : IO (Option Nat) := self.val.get "duration" (Option Nat)
+@[macro_inline] def EncodedAudioChunk.duration (self : EncodedAudioChunk) : IO (Option Nat) := Internal.api "Lasm.JS.Web.EncodedAudioChunk.duration" do
+  self.val.get "duration" (Option Nat)
 
 /-- `readonly attribute unsigned long byteLength` -/
-def EncodedAudioChunk.byteLength (self : EncodedAudioChunk) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def EncodedAudioChunk.byteLength (self : EncodedAudioChunk) : IO Nat := Internal.api "Lasm.JS.Web.EncodedAudioChunk.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `undefined copyTo(AllowSharedBufferSource destination)` -/
-def EncodedAudioChunk.copyTo (self : EncodedAudioChunk) (destination : ByteArray) : IO Unit :=
-  self.val.callMethod "copyTo" (Support.args #[toJS destination]) Unit
+@[macro_inline] def EncodedAudioChunk.copyTo (self : EncodedAudioChunk) (destination : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.EncodedAudioChunk.copyTo" do
+  self.val.callMethod "copyTo" (Internal.args #[toJS destination]) Unit
 
 /-- `v instanceof EncodedVideoChunk`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EncodedVideoChunk`). -/
-def EncodedVideoChunk.cast? (v : Value) : IO (Option EncodedVideoChunk) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EncodedVideoChunk"] Value) v) then some { val := v } else none
+@[macro_inline] def EncodedVideoChunk.cast? (v : Value) : IO (Option EncodedVideoChunk) := Internal.api "Lasm.JS.Web.EncodedVideoChunk.cast?" do
+  Internal.cast (Internal.getGlobal ["EncodedVideoChunk"] Value) (fun x => { val := x }) v
 
 /-- `constructor(EncodedVideoChunkInit init)` -/
-def EncodedVideoChunk.new (init : EncodedVideoChunkInit) : IO EncodedVideoChunk :=
+@[macro_inline] def EncodedVideoChunk.new (init : EncodedVideoChunkInit) : IO EncodedVideoChunk := Internal.api "Lasm.JS.Web.EncodedVideoChunk.new" do
   Lasm.JS.Binding.invoke EncodedVideoChunk { name := "Lasm.JS.Web.EncodedVideoChunk.new", module := "globalThis", path := "EncodedVideoChunk", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute EncodedVideoChunkType type` -/
-def EncodedVideoChunk.type (self : EncodedVideoChunk) : IO EncodedVideoChunkType := self.val.get "type" EncodedVideoChunkType
+@[macro_inline] def EncodedVideoChunk.type (self : EncodedVideoChunk) : IO EncodedVideoChunkType := Internal.api "Lasm.JS.Web.EncodedVideoChunk.type" do
+  self.val.get "type" EncodedVideoChunkType
 
 /-- `readonly attribute long long timestamp` -/
-def EncodedVideoChunk.timestamp (self : EncodedVideoChunk) : IO Int := self.val.get "timestamp" Int
+@[macro_inline] def EncodedVideoChunk.timestamp (self : EncodedVideoChunk) : IO Int := Internal.api "Lasm.JS.Web.EncodedVideoChunk.timestamp" do
+  self.val.get "timestamp" Int
 
 /-- `readonly attribute unsigned long long? duration` -/
-def EncodedVideoChunk.duration (self : EncodedVideoChunk) : IO (Option Nat) := self.val.get "duration" (Option Nat)
+@[macro_inline] def EncodedVideoChunk.duration (self : EncodedVideoChunk) : IO (Option Nat) := Internal.api "Lasm.JS.Web.EncodedVideoChunk.duration" do
+  self.val.get "duration" (Option Nat)
 
 /-- `readonly attribute unsigned long byteLength` -/
-def EncodedVideoChunk.byteLength (self : EncodedVideoChunk) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def EncodedVideoChunk.byteLength (self : EncodedVideoChunk) : IO Nat := Internal.api "Lasm.JS.Web.EncodedVideoChunk.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `undefined copyTo(AllowSharedBufferSource destination)` -/
-def EncodedVideoChunk.copyTo (self : EncodedVideoChunk) (destination : ByteArray) : IO Unit :=
-  self.val.callMethod "copyTo" (Support.args #[toJS destination]) Unit
+@[macro_inline] def EncodedVideoChunk.copyTo (self : EncodedVideoChunk) (destination : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.EncodedVideoChunk.copyTo" do
+  self.val.callMethod "copyTo" (Internal.args #[toJS destination]) Unit
 
 /-- `v instanceof ImageDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageDecoder`). -/
-def ImageDecoder.cast? (v : Value) : IO (Option ImageDecoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ImageDecoder"] Value) v) then some { val := v } else none
+@[macro_inline] def ImageDecoder.cast? (v : Value) : IO (Option ImageDecoder) := Internal.api "Lasm.JS.Web.ImageDecoder.cast?" do
+  Internal.cast (Internal.getGlobal ["ImageDecoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ImageDecoderInit init)` -/
-def ImageDecoder.new (init : ImageDecoderInit) : IO ImageDecoder :=
+@[macro_inline] def ImageDecoder.new (init : ImageDecoderInit) : IO ImageDecoder := Internal.api "Lasm.JS.Web.ImageDecoder.new" do
   Lasm.JS.Binding.invoke ImageDecoder { name := "Lasm.JS.Web.ImageDecoder.new", module := "globalThis", path := "ImageDecoder", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute DOMString type` -/
-def ImageDecoder.type (self : ImageDecoder) : IO String := self.val.get "type" String
+@[macro_inline] def ImageDecoder.type (self : ImageDecoder) : IO String := Internal.api "Lasm.JS.Web.ImageDecoder.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute boolean complete` -/
-def ImageDecoder.complete (self : ImageDecoder) : IO Bool := self.val.get "complete" Bool
+@[macro_inline] def ImageDecoder.complete (self : ImageDecoder) : IO Bool := Internal.api "Lasm.JS.Web.ImageDecoder.complete" do
+  self.val.get "complete" Bool
 
 /-- `readonly attribute Promise<undefined> completed` -/
-def ImageDecoder.completed (self : ImageDecoder) : Async Unit := do
+@[macro_inline] def ImageDecoder.completed (self : ImageDecoder) : Async Unit := Internal.api "Lasm.JS.Web.ImageDecoder.completed" do
   let p ← self.val.get "completed" Value
   p.await Unit
 
 /-- `readonly attribute ImageTrackList tracks` -/
-def ImageDecoder.tracks (self : ImageDecoder) : IO ImageTrackList := do
+@[macro_inline] def ImageDecoder.tracks (self : ImageDecoder) : IO ImageTrackList := Internal.api "Lasm.JS.Web.ImageDecoder.tracks" do
   let r ← self.val.get "tracks" Value
   pure { val := r }
 
 /-- `Promise<ImageDecodeResult> decode(optional ImageDecodeOptions options)` -/
-def ImageDecoder.decode (self : ImageDecoder) (options : Option ImageDecodeOptions := none) : Async ImageDecodeResult :=
-  self.val.callMethodAwait "decode" (Support.args #[Support.optional options]) ImageDecodeResult
+@[macro_inline] def ImageDecoder.decode (self : ImageDecoder) (options : Option ImageDecodeOptions := none) : Async ImageDecodeResult := Internal.api "Lasm.JS.Web.ImageDecoder.decode" do
+  self.val.callMethodAwait "decode" (Internal.args #[Internal.optional options]) ImageDecodeResult
 
 /-- `undefined reset()` -/
-def ImageDecoder.reset (self : ImageDecoder) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def ImageDecoder.reset (self : ImageDecoder) : IO Unit := Internal.api "Lasm.JS.Web.ImageDecoder.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def ImageDecoder.close (self : ImageDecoder) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def ImageDecoder.close (self : ImageDecoder) : IO Unit := Internal.api "Lasm.JS.Web.ImageDecoder.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<boolean> isTypeSupported(DOMString type)` -/
-def ImageDecoder.isTypeSupported (type : String) : Async Bool :=
+@[macro_inline] def ImageDecoder.isTypeSupported (type : String) : Async Bool := Internal.api "Lasm.JS.Web.ImageDecoder.isTypeSupported" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.ImageDecoder.isTypeSupported", module := "globalThis", path := "ImageDecoder.isTypeSupported", construct := false, arity := 1 }
-    (Support.args #[toJS type])
+    (Internal.args #[toJS type])
 
 /-- `v instanceof ImageTrack`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageTrack`). -/
-def ImageTrack.cast? (v : Value) : IO (Option ImageTrack) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ImageTrack"] Value) v) then some { val := v } else none
+@[macro_inline] def ImageTrack.cast? (v : Value) : IO (Option ImageTrack) := Internal.api "Lasm.JS.Web.ImageTrack.cast?" do
+  Internal.cast (Internal.getGlobal ["ImageTrack"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean animated` -/
-def ImageTrack.animated (self : ImageTrack) : IO Bool := self.val.get "animated" Bool
+@[macro_inline] def ImageTrack.animated (self : ImageTrack) : IO Bool := Internal.api "Lasm.JS.Web.ImageTrack.animated" do
+  self.val.get "animated" Bool
 
 /-- `readonly attribute unsigned long frameCount` -/
-def ImageTrack.frameCount (self : ImageTrack) : IO Nat := self.val.get "frameCount" Nat
+@[macro_inline] def ImageTrack.frameCount (self : ImageTrack) : IO Nat := Internal.api "Lasm.JS.Web.ImageTrack.frameCount" do
+  self.val.get "frameCount" Nat
 
 /-- `readonly attribute unrestricted float repetitionCount` -/
-def ImageTrack.repetitionCount (self : ImageTrack) : IO Float := self.val.get "repetitionCount" Float
+@[macro_inline] def ImageTrack.repetitionCount (self : ImageTrack) : IO Float := Internal.api "Lasm.JS.Web.ImageTrack.repetitionCount" do
+  self.val.get "repetitionCount" Float
 
 /-- `attribute boolean selected` -/
-def ImageTrack.selected (self : ImageTrack) : IO Bool := self.val.get "selected" Bool
+@[macro_inline] def ImageTrack.selected (self : ImageTrack) : IO Bool := Internal.api "Lasm.JS.Web.ImageTrack.selected" do
+  self.val.get "selected" Bool
 
 /-- Sets `selected`: `attribute boolean selected` -/
-def ImageTrack.setSelected (self : ImageTrack) (value : Bool) : IO Unit :=
+@[macro_inline] def ImageTrack.setSelected (self : ImageTrack) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.ImageTrack.setSelected" do
   self.val.set "selected" (toJS value)
 
 /-- `v instanceof ImageTrackList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageTrackList`). -/
-def ImageTrackList.cast? (v : Value) : IO (Option ImageTrackList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ImageTrackList"] Value) v) then some { val := v } else none
+@[macro_inline] def ImageTrackList.cast? (v : Value) : IO (Option ImageTrackList) := Internal.api "Lasm.JS.Web.ImageTrackList.cast?" do
+  Internal.cast (Internal.getGlobal ["ImageTrackList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Promise<undefined> ready` -/
-def ImageTrackList.ready (self : ImageTrackList) : Async Unit := do
+@[macro_inline] def ImageTrackList.ready (self : ImageTrackList) : Async Unit := Internal.api "Lasm.JS.Web.ImageTrackList.ready" do
   let p ← self.val.get "ready" Value
   p.await Unit
 
 /-- `readonly attribute unsigned long length` -/
-def ImageTrackList.length (self : ImageTrackList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def ImageTrackList.length (self : ImageTrackList) : IO Nat := Internal.api "Lasm.JS.Web.ImageTrackList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute long selectedIndex` -/
-def ImageTrackList.selectedIndex (self : ImageTrackList) : IO Int := self.val.get "selectedIndex" Int
+@[macro_inline] def ImageTrackList.selectedIndex (self : ImageTrackList) : IO Int := Internal.api "Lasm.JS.Web.ImageTrackList.selectedIndex" do
+  self.val.get "selectedIndex" Int
 
 /-- `readonly attribute ImageTrack? selectedTrack` -/
-def ImageTrackList.selectedTrack (self : ImageTrackList) : IO (Option ImageTrack) := self.val.get "selectedTrack" (Option ImageTrack)
+@[macro_inline] def ImageTrackList.selectedTrack (self : ImageTrackList) : IO (Option ImageTrack) := Internal.api "Lasm.JS.Web.ImageTrackList.selectedTrack" do
+  self.val.get "selectedTrack" (Option ImageTrack)
 
 /-- `v instanceof VideoColorSpace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoColorSpace`). -/
-def VideoColorSpace.cast? (v : Value) : IO (Option VideoColorSpace) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoColorSpace"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoColorSpace.cast? (v : Value) : IO (Option VideoColorSpace) := Internal.api "Lasm.JS.Web.VideoColorSpace.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoColorSpace"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional VideoColorSpaceInit init)` -/
-def VideoColorSpace.new (init : Option VideoColorSpaceInit := none) : IO VideoColorSpace :=
+@[macro_inline] def VideoColorSpace.new (init : Option VideoColorSpaceInit := none) : IO VideoColorSpace := Internal.api "Lasm.JS.Web.VideoColorSpace.new" do
   Lasm.JS.Binding.invoke VideoColorSpace { name := "Lasm.JS.Web.VideoColorSpace.new", module := "globalThis", path := "VideoColorSpace", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute VideoColorPrimaries? primaries` -/
-def VideoColorSpace.primaries (self : VideoColorSpace) : IO (Option VideoColorPrimaries) := self.val.get "primaries" (Option VideoColorPrimaries)
+@[macro_inline] def VideoColorSpace.primaries (self : VideoColorSpace) : IO (Option VideoColorPrimaries) := Internal.api "Lasm.JS.Web.VideoColorSpace.primaries" do
+  self.val.get "primaries" (Option VideoColorPrimaries)
 
 /-- `readonly attribute VideoTransferCharacteristics? transfer` -/
-def VideoColorSpace.transfer (self : VideoColorSpace) : IO (Option VideoTransferCharacteristics) := self.val.get "transfer" (Option VideoTransferCharacteristics)
+@[macro_inline] def VideoColorSpace.transfer (self : VideoColorSpace) : IO (Option VideoTransferCharacteristics) := Internal.api "Lasm.JS.Web.VideoColorSpace.transfer" do
+  self.val.get "transfer" (Option VideoTransferCharacteristics)
 
 /-- `readonly attribute VideoMatrixCoefficients? matrix` -/
-def VideoColorSpace.matrix (self : VideoColorSpace) : IO (Option VideoMatrixCoefficients) := self.val.get "matrix" (Option VideoMatrixCoefficients)
+@[macro_inline] def VideoColorSpace.matrix (self : VideoColorSpace) : IO (Option VideoMatrixCoefficients) := Internal.api "Lasm.JS.Web.VideoColorSpace.matrix" do
+  self.val.get "matrix" (Option VideoMatrixCoefficients)
 
 /-- `readonly attribute boolean? fullRange` -/
-def VideoColorSpace.fullRange (self : VideoColorSpace) : IO (Option Bool) := self.val.get "fullRange" (Option Bool)
+@[macro_inline] def VideoColorSpace.fullRange (self : VideoColorSpace) : IO (Option Bool) := Internal.api "Lasm.JS.Web.VideoColorSpace.fullRange" do
+  self.val.get "fullRange" (Option Bool)
 
 /-- `VideoColorSpaceInit toJSON()` -/
-def VideoColorSpace.toJSON (self : VideoColorSpace) : IO VideoColorSpaceInit :=
-  self.val.callMethod "toJSON" (Support.args #[]) VideoColorSpaceInit
+@[macro_inline] def VideoColorSpace.toJSON (self : VideoColorSpace) : IO VideoColorSpaceInit := Internal.api "Lasm.JS.Web.VideoColorSpace.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) VideoColorSpaceInit
 
 /-- `v instanceof VideoDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoDecoder`). -/
-def VideoDecoder.cast? (v : Value) : IO (Option VideoDecoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoDecoder"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoDecoder.cast? (v : Value) : IO (Option VideoDecoder) := Internal.api "Lasm.JS.Web.VideoDecoder.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoDecoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(VideoDecoderInit init)` -/
-def VideoDecoder.new (init : VideoDecoderInit) : IO VideoDecoder :=
+@[macro_inline] def VideoDecoder.new (init : VideoDecoderInit) : IO VideoDecoder := Internal.api "Lasm.JS.Web.VideoDecoder.new" do
   Lasm.JS.Binding.invoke VideoDecoder { name := "Lasm.JS.Web.VideoDecoder.new", module := "globalThis", path := "VideoDecoder", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute CodecState state` -/
-def VideoDecoder.state (self : VideoDecoder) : IO CodecState := self.val.get "state" CodecState
+@[macro_inline] def VideoDecoder.state (self : VideoDecoder) : IO CodecState := Internal.api "Lasm.JS.Web.VideoDecoder.state" do
+  self.val.get "state" CodecState
 
 /-- `readonly attribute unsigned long decodeQueueSize` -/
-def VideoDecoder.decodeQueueSize (self : VideoDecoder) : IO Nat := self.val.get "decodeQueueSize" Nat
+@[macro_inline] def VideoDecoder.decodeQueueSize (self : VideoDecoder) : IO Nat := Internal.api "Lasm.JS.Web.VideoDecoder.decodeQueueSize" do
+  self.val.get "decodeQueueSize" Nat
 
 /-- `attribute EventHandler ondequeue` -/
-def VideoDecoder.ondequeue (self : VideoDecoder) : IO (Option EventHandlerNonNull) := self.val.get "ondequeue" (Option EventHandlerNonNull)
+@[macro_inline] def VideoDecoder.ondequeue (self : VideoDecoder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VideoDecoder.ondequeue" do
+  self.val.get "ondequeue" (Option EventHandlerNonNull)
 
 /-- Sets `ondequeue`: `attribute EventHandler ondequeue` -/
-def VideoDecoder.setOndequeue (self : VideoDecoder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VideoDecoder.setOndequeue (self : VideoDecoder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VideoDecoder.setOndequeue" do
   self.val.set "ondequeue" (toJS value)
 
 /-- `undefined configure(VideoDecoderConfig config)` -/
-def VideoDecoder.configure (self : VideoDecoder) (config : VideoDecoderConfig) : IO Unit :=
-  self.val.callMethod "configure" (Support.args #[toJS config]) Unit
+@[macro_inline] def VideoDecoder.configure (self : VideoDecoder) (config : VideoDecoderConfig) : IO Unit := Internal.api "Lasm.JS.Web.VideoDecoder.configure" do
+  self.val.callMethod "configure" (Internal.args #[toJS config]) Unit
 
 /-- `undefined decode(EncodedVideoChunk chunk)` -/
-def VideoDecoder.decode (self : VideoDecoder) (chunk : EncodedVideoChunk) : IO Unit :=
-  self.val.callMethod "decode" (Support.args #[toJS chunk]) Unit
+@[macro_inline] def VideoDecoder.decode (self : VideoDecoder) (chunk : EncodedVideoChunk) : IO Unit := Internal.api "Lasm.JS.Web.VideoDecoder.decode" do
+  self.val.callMethod "decode" (Internal.args #[toJS chunk]) Unit
 
 /-- `Promise<undefined> flush()` -/
-def VideoDecoder.flush (self : VideoDecoder) : Async Unit :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Unit
+@[macro_inline] def VideoDecoder.flush (self : VideoDecoder) : Async Unit := Internal.api "Lasm.JS.Web.VideoDecoder.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def VideoDecoder.reset (self : VideoDecoder) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def VideoDecoder.reset (self : VideoDecoder) : IO Unit := Internal.api "Lasm.JS.Web.VideoDecoder.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def VideoDecoder.close (self : VideoDecoder) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def VideoDecoder.close (self : VideoDecoder) : IO Unit := Internal.api "Lasm.JS.Web.VideoDecoder.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<VideoDecoderSupport> isConfigSupported(VideoDecoderConfig config)` -/
-def VideoDecoder.isConfigSupported (config : VideoDecoderConfig) : Async Data :=
+@[macro_inline] def VideoDecoder.isConfigSupported (config : VideoDecoderConfig) : Async Data := Internal.api "Lasm.JS.Web.VideoDecoder.isConfigSupported" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.VideoDecoder.isConfigSupported", module := "globalThis", path := "VideoDecoder.isConfigSupported", construct := false, arity := 1 }
-    (Support.args #[toJS config])
+    (Internal.args #[toJS config])
 
 /-- `v instanceof VideoEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoEncoder`). -/
-def VideoEncoder.cast? (v : Value) : IO (Option VideoEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoEncoder.cast? (v : Value) : IO (Option VideoEncoder) := Internal.api "Lasm.JS.Web.VideoEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoEncoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(VideoEncoderInit init)` -/
-def VideoEncoder.new (init : VideoEncoderInit) : IO VideoEncoder :=
+@[macro_inline] def VideoEncoder.new (init : VideoEncoderInit) : IO VideoEncoder := Internal.api "Lasm.JS.Web.VideoEncoder.new" do
   Lasm.JS.Binding.invoke VideoEncoder { name := "Lasm.JS.Web.VideoEncoder.new", module := "globalThis", path := "VideoEncoder", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute CodecState state` -/
-def VideoEncoder.state (self : VideoEncoder) : IO CodecState := self.val.get "state" CodecState
+@[macro_inline] def VideoEncoder.state (self : VideoEncoder) : IO CodecState := Internal.api "Lasm.JS.Web.VideoEncoder.state" do
+  self.val.get "state" CodecState
 
 /-- `readonly attribute unsigned long encodeQueueSize` -/
-def VideoEncoder.encodeQueueSize (self : VideoEncoder) : IO Nat := self.val.get "encodeQueueSize" Nat
+@[macro_inline] def VideoEncoder.encodeQueueSize (self : VideoEncoder) : IO Nat := Internal.api "Lasm.JS.Web.VideoEncoder.encodeQueueSize" do
+  self.val.get "encodeQueueSize" Nat
 
 /-- `attribute EventHandler ondequeue` -/
-def VideoEncoder.ondequeue (self : VideoEncoder) : IO (Option EventHandlerNonNull) := self.val.get "ondequeue" (Option EventHandlerNonNull)
+@[macro_inline] def VideoEncoder.ondequeue (self : VideoEncoder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VideoEncoder.ondequeue" do
+  self.val.get "ondequeue" (Option EventHandlerNonNull)
 
 /-- Sets `ondequeue`: `attribute EventHandler ondequeue` -/
-def VideoEncoder.setOndequeue (self : VideoEncoder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VideoEncoder.setOndequeue (self : VideoEncoder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VideoEncoder.setOndequeue" do
   self.val.set "ondequeue" (toJS value)
 
 /-- `undefined configure(VideoEncoderConfig config)` -/
-def VideoEncoder.configure (self : VideoEncoder) (config : VideoEncoderConfig) : IO Unit :=
-  self.val.callMethod "configure" (Support.args #[toJS config]) Unit
+@[macro_inline] def VideoEncoder.configure (self : VideoEncoder) (config : VideoEncoderConfig) : IO Unit := Internal.api "Lasm.JS.Web.VideoEncoder.configure" do
+  self.val.callMethod "configure" (Internal.args #[toJS config]) Unit
 
 /-- `undefined encode(VideoFrame frame, optional VideoEncoderEncodeOptions options)` -/
-def VideoEncoder.encode (self : VideoEncoder) (frame : VideoFrame) (options : Option VideoEncoderEncodeOptions := none) : IO Unit :=
-  self.val.callMethod "encode" (Support.args #[toJS frame, Support.optional options]) Unit
+@[macro_inline] def VideoEncoder.encode (self : VideoEncoder) (frame : VideoFrame) (options : Option VideoEncoderEncodeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.VideoEncoder.encode" do
+  self.val.callMethod "encode" (Internal.args #[toJS frame, Internal.optional options]) Unit
 
 /-- `Promise<undefined> flush()` -/
-def VideoEncoder.flush (self : VideoEncoder) : Async Unit :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Unit
+@[macro_inline] def VideoEncoder.flush (self : VideoEncoder) : Async Unit := Internal.api "Lasm.JS.Web.VideoEncoder.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def VideoEncoder.reset (self : VideoEncoder) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def VideoEncoder.reset (self : VideoEncoder) : IO Unit := Internal.api "Lasm.JS.Web.VideoEncoder.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def VideoEncoder.close (self : VideoEncoder) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def VideoEncoder.close (self : VideoEncoder) : IO Unit := Internal.api "Lasm.JS.Web.VideoEncoder.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<VideoEncoderSupport> isConfigSupported(VideoEncoderConfig config)` -/
-def VideoEncoder.isConfigSupported (config : VideoEncoderConfig) : Async VideoEncoderSupport :=
+@[macro_inline] def VideoEncoder.isConfigSupported (config : VideoEncoderConfig) : Async VideoEncoderSupport := Internal.api "Lasm.JS.Web.VideoEncoder.isConfigSupported" do
   Lasm.JS.Binding.invokeAsync VideoEncoderSupport { name := "Lasm.JS.Web.VideoEncoder.isConfigSupported", module := "globalThis", path := "VideoEncoder.isConfigSupported", construct := false, arity := 1 }
-    (Support.args #[toJS config])
+    (Internal.args #[toJS config])
 
 /-- `v instanceof VideoFrame`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoFrame`). -/
-def VideoFrame.cast? (v : Value) : IO (Option VideoFrame) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoFrame"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoFrame.cast? (v : Value) : IO (Option VideoFrame) := Internal.api "Lasm.JS.Web.VideoFrame.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoFrame"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CanvasImageSource image, optional VideoFrameInit init)` -/
-def VideoFrame.new (image : CanvasImageSource) (init : Option VideoFrameInit := none) : IO VideoFrame :=
+@[macro_inline] def VideoFrame.new (image : CanvasImageSource) (init : Option VideoFrameInit := none) : IO VideoFrame := Internal.api "Lasm.JS.Web.VideoFrame.new" do
   Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.new", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
-    (Support.args #[toJS image, Support.optional init]) (await := false)
+    (Internal.args #[toJS image, Internal.optional init]) (await := false)
 
 /-- `constructor(AllowSharedBufferSource data, VideoFrameBufferInit init)` -/
-def VideoFrame.newWithData (data : ByteArray) (init : VideoFrameBufferInit) : IO VideoFrame :=
+@[macro_inline] def VideoFrame.newWithData (data : ByteArray) (init : VideoFrameBufferInit) : IO VideoFrame := Internal.api "Lasm.JS.Web.VideoFrame.newWithData" do
   Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.newWithData", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
-    (Support.args #[toJS data, toJS init]) (await := false)
+    (Internal.args #[toJS data, toJS init]) (await := false)
 
 /-- `readonly attribute VideoPixelFormat? format` -/
-def VideoFrame.format (self : VideoFrame) : IO (Option VideoPixelFormat) := self.val.get "format" (Option VideoPixelFormat)
+@[macro_inline] def VideoFrame.format (self : VideoFrame) : IO (Option VideoPixelFormat) := Internal.api "Lasm.JS.Web.VideoFrame.format" do
+  self.val.get "format" (Option VideoPixelFormat)
 
 /-- `readonly attribute unsigned long codedWidth` -/
-def VideoFrame.codedWidth (self : VideoFrame) : IO Nat := self.val.get "codedWidth" Nat
+@[macro_inline] def VideoFrame.codedWidth (self : VideoFrame) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.codedWidth" do
+  self.val.get "codedWidth" Nat
 
 /-- `readonly attribute unsigned long codedHeight` -/
-def VideoFrame.codedHeight (self : VideoFrame) : IO Nat := self.val.get "codedHeight" Nat
+@[macro_inline] def VideoFrame.codedHeight (self : VideoFrame) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.codedHeight" do
+  self.val.get "codedHeight" Nat
 
 /-- `readonly attribute DOMRectReadOnly? codedRect` -/
-def VideoFrame.codedRect (self : VideoFrame) : IO (Option DOMRectReadOnly) := self.val.get "codedRect" (Option DOMRectReadOnly)
+@[macro_inline] def VideoFrame.codedRect (self : VideoFrame) : IO (Option DOMRectReadOnly) := Internal.api "Lasm.JS.Web.VideoFrame.codedRect" do
+  self.val.get "codedRect" (Option DOMRectReadOnly)
 
 /-- `readonly attribute DOMRectReadOnly? visibleRect` -/
-def VideoFrame.visibleRect (self : VideoFrame) : IO (Option DOMRectReadOnly) := self.val.get "visibleRect" (Option DOMRectReadOnly)
+@[macro_inline] def VideoFrame.visibleRect (self : VideoFrame) : IO (Option DOMRectReadOnly) := Internal.api "Lasm.JS.Web.VideoFrame.visibleRect" do
+  self.val.get "visibleRect" (Option DOMRectReadOnly)
 
 /-- `readonly attribute double rotation` -/
-def VideoFrame.rotation (self : VideoFrame) : IO Float := self.val.get "rotation" Float
+@[macro_inline] def VideoFrame.rotation (self : VideoFrame) : IO Float := Internal.api "Lasm.JS.Web.VideoFrame.rotation" do
+  self.val.get "rotation" Float
 
 /-- `readonly attribute boolean flip` -/
-def VideoFrame.flip (self : VideoFrame) : IO Bool := self.val.get "flip" Bool
+@[macro_inline] def VideoFrame.flip (self : VideoFrame) : IO Bool := Internal.api "Lasm.JS.Web.VideoFrame.flip" do
+  self.val.get "flip" Bool
 
 /-- `readonly attribute unsigned long displayWidth` -/
-def VideoFrame.displayWidth (self : VideoFrame) : IO Nat := self.val.get "displayWidth" Nat
+@[macro_inline] def VideoFrame.displayWidth (self : VideoFrame) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.displayWidth" do
+  self.val.get "displayWidth" Nat
 
 /-- `readonly attribute unsigned long displayHeight` -/
-def VideoFrame.displayHeight (self : VideoFrame) : IO Nat := self.val.get "displayHeight" Nat
+@[macro_inline] def VideoFrame.displayHeight (self : VideoFrame) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.displayHeight" do
+  self.val.get "displayHeight" Nat
 
 /-- `readonly attribute unsigned long long? duration` -/
-def VideoFrame.duration (self : VideoFrame) : IO (Option Nat) := self.val.get "duration" (Option Nat)
+@[macro_inline] def VideoFrame.duration (self : VideoFrame) : IO (Option Nat) := Internal.api "Lasm.JS.Web.VideoFrame.duration" do
+  self.val.get "duration" (Option Nat)
 
 /-- `readonly attribute long long timestamp` -/
-def VideoFrame.timestamp (self : VideoFrame) : IO Int := self.val.get "timestamp" Int
+@[macro_inline] def VideoFrame.timestamp (self : VideoFrame) : IO Int := Internal.api "Lasm.JS.Web.VideoFrame.timestamp" do
+  self.val.get "timestamp" Int
 
 /-- `readonly attribute VideoColorSpace colorSpace` -/
-def VideoFrame.colorSpace (self : VideoFrame) : IO VideoColorSpace := do
+@[macro_inline] def VideoFrame.colorSpace (self : VideoFrame) : IO VideoColorSpace := Internal.api "Lasm.JS.Web.VideoFrame.colorSpace" do
   let r ← self.val.get "colorSpace" Value
   pure { val := r }
 
 /-- `VideoFrameMetadata metadata()` -/
-def VideoFrame.metadata (self : VideoFrame) : IO VideoFrameMetadata :=
-  self.val.callMethod "metadata" (Support.args #[]) VideoFrameMetadata
+@[macro_inline] def VideoFrame.metadata (self : VideoFrame) : IO VideoFrameMetadata := Internal.api "Lasm.JS.Web.VideoFrame.metadata" do
+  self.val.callMethod "metadata" (Internal.args #[]) VideoFrameMetadata
 
 /-- `unsigned long allocationSize(optional VideoFrameCopyToOptions options)` -/
-def VideoFrame.allocationSize (self : VideoFrame) (options : Option VideoFrameCopyToOptions := none) : IO Nat :=
-  self.val.callMethod "allocationSize" (Support.args #[Support.optional options]) Nat
+@[macro_inline] def VideoFrame.allocationSize (self : VideoFrame) (options : Option VideoFrameCopyToOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.allocationSize" do
+  self.val.callMethod "allocationSize" (Internal.args #[Internal.optional options]) Nat
 
 /-- `Promise<sequence<PlaneLayout>> copyTo(AllowSharedBufferSource destination, optional VideoFrameCopyToOptions options)` -/
-def VideoFrame.copyTo (self : VideoFrame) (destination : ByteArray) (options : Option VideoFrameCopyToOptions := none) : Async (Array PlaneLayout) :=
-  self.val.callMethodAwait "copyTo" (Support.args #[toJS destination, Support.optional options]) (Array PlaneLayout)
+@[macro_inline] def VideoFrame.copyTo (self : VideoFrame) (destination : ByteArray) (options : Option VideoFrameCopyToOptions := none) : Async (Array PlaneLayout) := Internal.api "Lasm.JS.Web.VideoFrame.copyTo" do
+  self.val.callMethodAwait "copyTo" (Internal.args #[toJS destination, Internal.optional options]) (Array PlaneLayout)
 
 /-- `VideoFrame clone()` -/
-def VideoFrame.clone (self : VideoFrame) : IO VideoFrame := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def VideoFrame.clone (self : VideoFrame) : IO VideoFrame := Internal.api "Lasm.JS.Web.VideoFrame.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined close()` -/
-def VideoFrame.close (self : VideoFrame) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def VideoFrame.close (self : VideoFrame) : IO Unit := Internal.api "Lasm.JS.Web.VideoFrame.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

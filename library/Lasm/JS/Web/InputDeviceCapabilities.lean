@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.InputDeviceCapabilities
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary InputDeviceCapabilitiesInit` (Input Device Capabilities (https://wicg.github.io/input-device-capabilities/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InputDeviceCapabilitiesInit where
@@ -17,25 +21,28 @@ structure InputDeviceCapabilitiesInit where
   firesTouchEvents : Option Bool := none
   /-- `boolean pointerMovementScrolls = false` -/
   pointerMovementScrolls : Option Bool := none
-instance : ToJS InputDeviceCapabilitiesInit := ⟨fun d => Support.fields #[("firesTouchEvents", Support.optional d.firesTouchEvents),
-    ("pointerMovementScrolls", Support.optional d.pointerMovementScrolls)]⟩
+instance : ToJS InputDeviceCapabilitiesInit := ⟨fun d => Internal.fields #[("firesTouchEvents", Internal.optional d.firesTouchEvents),
+    ("pointerMovementScrolls", Internal.optional d.pointerMovementScrolls)]⟩
 
 /-- `v instanceof InputDeviceCapabilities`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InputDeviceCapabilities`). -/
-def InputDeviceCapabilities.cast? (v : Value) : IO (Option InputDeviceCapabilities) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InputDeviceCapabilities"] Value) v) then some { val := v } else none
+@[macro_inline] def InputDeviceCapabilities.cast? (v : Value) : IO (Option InputDeviceCapabilities) := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.cast?" do
+  Internal.cast (Internal.getGlobal ["InputDeviceCapabilities"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional InputDeviceCapabilitiesInit deviceInitDict)` -/
-def InputDeviceCapabilities.new (deviceInitDict : Option InputDeviceCapabilitiesInit := none) : IO InputDeviceCapabilities :=
+@[macro_inline] def InputDeviceCapabilities.new (deviceInitDict : Option InputDeviceCapabilitiesInit := none) : IO InputDeviceCapabilities := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.new" do
   Lasm.JS.Binding.invoke InputDeviceCapabilities { name := "Lasm.JS.Web.InputDeviceCapabilities.new", module := "globalThis", path := "InputDeviceCapabilities", construct := true, arity := 1 }
-    (Support.args #[Support.optional deviceInitDict]) (await := false)
+    (Internal.args #[Internal.optional deviceInitDict]) (await := false)
 
 /-- `readonly attribute boolean firesTouchEvents` -/
-def InputDeviceCapabilities.firesTouchEvents (self : InputDeviceCapabilities) : IO Bool := self.val.get "firesTouchEvents" Bool
+@[macro_inline] def InputDeviceCapabilities.firesTouchEvents (self : InputDeviceCapabilities) : IO Bool := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.firesTouchEvents" do
+  self.val.get "firesTouchEvents" Bool
 
 /-- `readonly attribute boolean pointerMovementScrolls` -/
-def InputDeviceCapabilities.pointerMovementScrolls (self : InputDeviceCapabilities) : IO Bool := self.val.get "pointerMovementScrolls" Bool
+@[macro_inline] def InputDeviceCapabilities.pointerMovementScrolls (self : InputDeviceCapabilities) : IO Bool := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.pointerMovementScrolls" do
+  self.val.get "pointerMovementScrolls" Bool
 
 /-- `readonly attribute InputDeviceCapabilities? sourceCapabilities` -/
-def UIEvent.sourceCapabilities (self : UIEvent) : IO (Option InputDeviceCapabilities) := self.val.get "sourceCapabilities" (Option InputDeviceCapabilities)
+@[macro_inline] def UIEvent.sourceCapabilities (self : UIEvent) : IO (Option InputDeviceCapabilities) := Internal.api "Lasm.JS.Web.UIEvent.sourceCapabilities" do
+  self.val.get "sourceCapabilities" (Option InputDeviceCapabilities)
 
 end Lasm.JS.Web

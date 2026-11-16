@@ -6,48 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Hid
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum HIDUnitSystem` (WebHID API (https://hid.spec.whatwg.org/)): "none", "si-linear", "si-rotation", "english-linear", "english-rotation", "vendor-defined", "reserved". -/
-inductive HIDUnitSystem where
-  /-- "none" -/
-  | none
-  /-- "si-linear" -/
-  | siLinear
-  /-- "si-rotation" -/
-  | siRotation
-  /-- "english-linear" -/
-  | englishLinear
-  /-- "english-rotation" -/
-  | englishRotation
-  /-- "vendor-defined" -/
-  | vendorDefined
-  /-- "reserved" -/
-  | reserved
-  deriving BEq, Repr, Inhabited
-instance : ToJS HIDUnitSystem := ⟨fun
-  | .none => .string "none"
-  | .siLinear => .string "si-linear"
-  | .siRotation => .string "si-rotation"
-  | .englishLinear => .string "english-linear"
-  | .englishRotation => .string "english-rotation"
-  | .vendorDefined => .string "vendor-defined"
-  | .reserved => .string "reserved"⟩
-instance : FromJS HIDUnitSystem where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "si-linear" => .ok .siLinear
-    | .string "si-rotation" => .ok .siRotation
-    | .string "english-linear" => .ok .englishLinear
-    | .string "english-rotation" => .ok .englishRotation
-    | .string "vendor-defined" => .ok .vendorDefined
-    | .string "reserved" => .ok .reserved
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HIDUnitSystem"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HIDDeviceFilter` (WebHID API (https://hid.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HIDDeviceFilter where
@@ -59,10 +27,10 @@ structure HIDDeviceFilter where
   usagePage : Option Nat := none
   /-- `unsigned short usage` -/
   usage : Option Nat := none
-instance : ToJS HIDDeviceFilter := ⟨fun d => Support.fields #[("vendorId", Support.optional d.vendorId),
-    ("productId", Support.optional d.productId),
-    ("usagePage", Support.optional d.usagePage),
-    ("usage", Support.optional d.usage)]⟩
+instance : ToJS HIDDeviceFilter := ⟨fun d => Internal.fields #[("vendorId", Internal.optional d.vendorId),
+    ("productId", Internal.optional d.productId),
+    ("usagePage", Internal.optional d.usagePage),
+    ("usage", Internal.optional d.usage)]⟩
 
 /-- `dictionary HIDDeviceRequestOptions` (WebHID API (https://hid.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HIDDeviceRequestOptions where
@@ -70,8 +38,8 @@ structure HIDDeviceRequestOptions where
   filters : Array HIDDeviceFilter
   /-- `sequence<HIDDeviceFilter> exclusionFilters` -/
   exclusionFilters : Option (Array HIDDeviceFilter) := none
-instance : ToJS HIDDeviceRequestOptions := ⟨fun d => Support.fields #[("filters", toJS d.filters),
-    ("exclusionFilters", Support.optional d.exclusionFilters)]⟩
+instance : ToJS HIDDeviceRequestOptions := ⟨fun d => Internal.fields #[("filters", toJS d.filters),
+    ("exclusionFilters", Internal.optional d.exclusionFilters)]⟩
 
 /-- `dictionary HIDConnectionEventInit : EventInit` (WebHID API (https://hid.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HIDConnectionEventInit where
@@ -83,9 +51,9 @@ structure HIDConnectionEventInit where
   composed : Option Bool := none
   /-- `required HIDDevice device` -/
   device : HIDDevice
-instance : ToJS HIDConnectionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS HIDConnectionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("device", toJS d.device)]⟩
 
 /-- `dictionary HIDReportItem` (WebHID API (https://hid.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -146,6 +114,34 @@ structure HIDReportItem where
   physicalMaximum : Option Int := none
   /-- `sequence<DOMString> strings` -/
   strings : Option (Array String) := none
+instance : ToJS HIDReportItem := ⟨fun d => Internal.fields #[("isAbsolute", Internal.optional d.isAbsolute),
+    ("isArray", Internal.optional d.isArray),
+    ("isBufferedBytes", Internal.optional d.isBufferedBytes),
+    ("isConstant", Internal.optional d.isConstant),
+    ("isLinear", Internal.optional d.isLinear),
+    ("isRange", Internal.optional d.isRange),
+    ("isVolatile", Internal.optional d.isVolatile),
+    ("hasNull", Internal.optional d.hasNull),
+    ("hasPreferredState", Internal.optional d.hasPreferredState),
+    ("wrap", Internal.optional d.wrap),
+    ("usages", Internal.optional d.usages),
+    ("usageMinimum", Internal.optional d.usageMinimum),
+    ("usageMaximum", Internal.optional d.usageMaximum),
+    ("reportSize", Internal.optional d.reportSize),
+    ("reportCount", Internal.optional d.reportCount),
+    ("unitExponent", Internal.optional d.unitExponent),
+    ("unitSystem", Internal.optional d.unitSystem),
+    ("unitFactorLengthExponent", Internal.optional d.unitFactorLengthExponent),
+    ("unitFactorMassExponent", Internal.optional d.unitFactorMassExponent),
+    ("unitFactorTimeExponent", Internal.optional d.unitFactorTimeExponent),
+    ("unitFactorTemperatureExponent", Internal.optional d.unitFactorTemperatureExponent),
+    ("unitFactorCurrentExponent", Internal.optional d.unitFactorCurrentExponent),
+    ("unitFactorLuminousIntensityExponent", Internal.optional d.unitFactorLuminousIntensityExponent),
+    ("logicalMinimum", Internal.optional d.logicalMinimum),
+    ("logicalMaximum", Internal.optional d.logicalMaximum),
+    ("physicalMinimum", Internal.optional d.physicalMinimum),
+    ("physicalMaximum", Internal.optional d.physicalMaximum),
+    ("strings", Internal.optional d.strings)]⟩
 instance : FromJS HIDReportItem where
   fromJS d := do return {
     isAbsolute := ← Lasm.JS.readField (Option Bool) d "isAbsolute",
@@ -184,6 +180,8 @@ structure HIDReportInfo where
   reportId : Option Nat := none
   /-- `sequence<HIDReportItem> items` -/
   items : Option (Array HIDReportItem) := none
+instance : ToJS HIDReportInfo := ⟨fun d => Internal.fields #[("reportId", Internal.optional d.reportId),
+    ("items", Internal.optional d.items)]⟩
 instance : FromJS HIDReportInfo where
   fromJS d := do return {
     reportId := ← Lasm.JS.readField (Option Nat) d "reportId",
@@ -206,6 +204,13 @@ structure HIDCollectionInfo where
   outputReports : Option (Array HIDReportInfo) := none
   /-- `sequence<HIDReportInfo> featureReports` -/
   featureReports : Option (Array HIDReportInfo) := none
+instance : ToJS HIDCollectionInfo := ⟨fun d => Internal.fields #[("usagePage", Internal.optional d.usagePage),
+    ("usage", Internal.optional d.usage),
+    ("type", Internal.optional d.type),
+    ("children", Internal.optional d.children),
+    ("inputReports", Internal.optional d.inputReports),
+    ("outputReports", Internal.optional d.outputReports),
+    ("featureReports", Internal.optional d.featureReports)]⟩
 instance : FromJS HIDCollectionInfo where
   fromJS d := do return {
     usagePage := ← Lasm.JS.readField (Option Nat) d "usagePage",
@@ -231,133 +236,142 @@ structure HIDInputReportEventInit where
   reportId : Nat
   /-- `required DataView data` -/
   data : ByteArray
-instance : ToJS HIDInputReportEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS HIDInputReportEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("device", toJS d.device),
     ("reportId", toJS d.reportId),
     ("data", toJS d.data)]⟩
 
 /-- `v instanceof HID`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HID`). -/
-def HID.cast? (v : Value) : IO (Option HID) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HID"] Value) v) then some { val := v } else none
+@[macro_inline] def HID.cast? (v : Value) : IO (Option HID) := Internal.api "Lasm.JS.Web.HID.cast?" do
+  Internal.cast (Internal.getGlobal ["HID"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onconnect` -/
-def HID.onconnect (self : HID) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def HID.onconnect (self : HID) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HID.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def HID.setOnconnect (self : HID) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HID.setOnconnect (self : HID) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HID.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler ondisconnect` -/
-def HID.ondisconnect (self : HID) : IO (Option EventHandlerNonNull) := self.val.get "ondisconnect" (Option EventHandlerNonNull)
+@[macro_inline] def HID.ondisconnect (self : HID) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HID.ondisconnect" do
+  self.val.get "ondisconnect" (Option EventHandlerNonNull)
 
 /-- Sets `ondisconnect`: `attribute EventHandler ondisconnect` -/
-def HID.setOndisconnect (self : HID) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HID.setOndisconnect (self : HID) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HID.setOndisconnect" do
   self.val.set "ondisconnect" (toJS value)
 
 /-- `Promise<sequence<HIDDevice>> getDevices()` -/
-def HID.getDevices (self : HID) : Async (Array HIDDevice) :=
-  self.val.callMethodAwait "getDevices" (Support.args #[]) (Array HIDDevice)
+@[macro_inline] def HID.getDevices (self : HID) : Async (Array HIDDevice) := Internal.api "Lasm.JS.Web.HID.getDevices" do
+  self.val.callMethodAwait "getDevices" (Internal.args #[]) (Array HIDDevice)
 
 /-- `Promise<sequence<HIDDevice>> requestDevice(HIDDeviceRequestOptions options)` -/
-def HID.requestDevice (self : HID) (options : HIDDeviceRequestOptions) : Async (Array HIDDevice) :=
-  self.val.callMethodAwait "requestDevice" (Support.args #[toJS options]) (Array HIDDevice)
+@[macro_inline] def HID.requestDevice (self : HID) (options : HIDDeviceRequestOptions) : Async (Array HIDDevice) := Internal.api "Lasm.JS.Web.HID.requestDevice" do
+  self.val.callMethodAwait "requestDevice" (Internal.args #[toJS options]) (Array HIDDevice)
 
 /-- `v instanceof HIDConnectionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HIDConnectionEvent`). -/
-def HIDConnectionEvent.cast? (v : Value) : IO (Option HIDConnectionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HIDConnectionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def HIDConnectionEvent.cast? (v : Value) : IO (Option HIDConnectionEvent) := Internal.api "Lasm.JS.Web.HIDConnectionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["HIDConnectionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, HIDConnectionEventInit eventInitDict)` -/
-def HIDConnectionEvent.new (type : String) (eventInitDict : HIDConnectionEventInit) : IO HIDConnectionEvent :=
+@[macro_inline] def HIDConnectionEvent.new (type : String) (eventInitDict : HIDConnectionEventInit) : IO HIDConnectionEvent := Internal.api "Lasm.JS.Web.HIDConnectionEvent.new" do
   Lasm.JS.Binding.invoke HIDConnectionEvent { name := "Lasm.JS.Web.HIDConnectionEvent.new", module := "globalThis", path := "HIDConnectionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute HIDDevice device` -/
-def HIDConnectionEvent.device (self : HIDConnectionEvent) : IO HIDDevice := do
+@[macro_inline] def HIDConnectionEvent.device (self : HIDConnectionEvent) : IO HIDDevice := Internal.api "Lasm.JS.Web.HIDConnectionEvent.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `v instanceof HIDDevice`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HIDDevice`). -/
-def HIDDevice.cast? (v : Value) : IO (Option HIDDevice) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HIDDevice"] Value) v) then some { val := v } else none
+@[macro_inline] def HIDDevice.cast? (v : Value) : IO (Option HIDDevice) := Internal.api "Lasm.JS.Web.HIDDevice.cast?" do
+  Internal.cast (Internal.getGlobal ["HIDDevice"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler oninputreport` -/
-def HIDDevice.oninputreport (self : HIDDevice) : IO (Option EventHandlerNonNull) := self.val.get "oninputreport" (Option EventHandlerNonNull)
+@[macro_inline] def HIDDevice.oninputreport (self : HIDDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HIDDevice.oninputreport" do
+  self.val.get "oninputreport" (Option EventHandlerNonNull)
 
 /-- Sets `oninputreport`: `attribute EventHandler oninputreport` -/
-def HIDDevice.setOninputreport (self : HIDDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HIDDevice.setOninputreport (self : HIDDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HIDDevice.setOninputreport" do
   self.val.set "oninputreport" (toJS value)
 
 /-- `readonly attribute boolean opened` -/
-def HIDDevice.opened (self : HIDDevice) : IO Bool := self.val.get "opened" Bool
+@[macro_inline] def HIDDevice.opened (self : HIDDevice) : IO Bool := Internal.api "Lasm.JS.Web.HIDDevice.opened" do
+  self.val.get "opened" Bool
 
 /-- `readonly attribute unsigned short vendorId` -/
-def HIDDevice.vendorId (self : HIDDevice) : IO Nat := self.val.get "vendorId" Nat
+@[macro_inline] def HIDDevice.vendorId (self : HIDDevice) : IO Nat := Internal.api "Lasm.JS.Web.HIDDevice.vendorId" do
+  self.val.get "vendorId" Nat
 
 /-- `readonly attribute unsigned short productId` -/
-def HIDDevice.productId (self : HIDDevice) : IO Nat := self.val.get "productId" Nat
+@[macro_inline] def HIDDevice.productId (self : HIDDevice) : IO Nat := Internal.api "Lasm.JS.Web.HIDDevice.productId" do
+  self.val.get "productId" Nat
 
 /-- `readonly attribute DOMString productName` -/
-def HIDDevice.productName (self : HIDDevice) : IO String := self.val.get "productName" String
+@[macro_inline] def HIDDevice.productName (self : HIDDevice) : IO String := Internal.api "Lasm.JS.Web.HIDDevice.productName" do
+  self.val.get "productName" String
 
 /-- `readonly attribute FrozenArray<HIDCollectionInfo> collections` -/
-def HIDDevice.collections (self : HIDDevice) : IO (Array HIDCollectionInfo) := self.val.get "collections" (Array HIDCollectionInfo)
+@[macro_inline] def HIDDevice.collections (self : HIDDevice) : IO (Array HIDCollectionInfo) := Internal.api "Lasm.JS.Web.HIDDevice.collections" do
+  self.val.get "collections" (Array HIDCollectionInfo)
 
 /-- `Promise<undefined> open()` -/
-def HIDDevice.«open» (self : HIDDevice) : Async Unit :=
-  self.val.callMethodAwait "open" (Support.args #[]) Unit
+@[macro_inline] def HIDDevice.«open» (self : HIDDevice) : Async Unit := Internal.api "Lasm.JS.Web.HIDDevice.open" do
+  self.val.callMethodAwait "open" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> close()` -/
-def HIDDevice.close (self : HIDDevice) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def HIDDevice.close (self : HIDDevice) : Async Unit := Internal.api "Lasm.JS.Web.HIDDevice.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> forget()` -/
-def HIDDevice.forget (self : HIDDevice) : Async Unit :=
-  self.val.callMethodAwait "forget" (Support.args #[]) Unit
+@[macro_inline] def HIDDevice.forget (self : HIDDevice) : Async Unit := Internal.api "Lasm.JS.Web.HIDDevice.forget" do
+  self.val.callMethodAwait "forget" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> sendReport(octet reportId, BufferSource data)` -/
-def HIDDevice.sendReport (self : HIDDevice) (reportId : Nat) (data : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "sendReport" (Support.args #[toJS reportId, toJS data]) Unit
+@[macro_inline] def HIDDevice.sendReport (self : HIDDevice) (reportId : Nat) (data : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.HIDDevice.sendReport" do
+  self.val.callMethodAwait "sendReport" (Internal.args #[toJS reportId, toJS data]) Unit
 
 /-- `Promise<undefined> sendFeatureReport(octet reportId, BufferSource data)` -/
-def HIDDevice.sendFeatureReport (self : HIDDevice) (reportId : Nat) (data : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "sendFeatureReport" (Support.args #[toJS reportId, toJS data]) Unit
+@[macro_inline] def HIDDevice.sendFeatureReport (self : HIDDevice) (reportId : Nat) (data : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.HIDDevice.sendFeatureReport" do
+  self.val.callMethodAwait "sendFeatureReport" (Internal.args #[toJS reportId, toJS data]) Unit
 
 /-- `Promise<DataView> receiveFeatureReport(octet reportId)` -/
-def HIDDevice.receiveFeatureReport (self : HIDDevice) (reportId : Nat) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "receiveFeatureReport" (Support.args #[toJS reportId]) Data
-  Support.viewBytes r
+@[macro_inline] def HIDDevice.receiveFeatureReport (self : HIDDevice) (reportId : Nat) : Async ByteArray := Internal.api "Lasm.JS.Web.HIDDevice.receiveFeatureReport" do
+  let r ← self.val.callMethodAwait "receiveFeatureReport" (Internal.args #[toJS reportId]) Data
+  Internal.viewBytes r
 
 /-- `v instanceof HIDInputReportEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HIDInputReportEvent`). -/
-def HIDInputReportEvent.cast? (v : Value) : IO (Option HIDInputReportEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HIDInputReportEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def HIDInputReportEvent.cast? (v : Value) : IO (Option HIDInputReportEvent) := Internal.api "Lasm.JS.Web.HIDInputReportEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["HIDInputReportEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, HIDInputReportEventInit eventInitDict)` -/
-def HIDInputReportEvent.new (type : String) (eventInitDict : HIDInputReportEventInit) : IO HIDInputReportEvent :=
+@[macro_inline] def HIDInputReportEvent.new (type : String) (eventInitDict : HIDInputReportEventInit) : IO HIDInputReportEvent := Internal.api "Lasm.JS.Web.HIDInputReportEvent.new" do
   Lasm.JS.Binding.invoke HIDInputReportEvent { name := "Lasm.JS.Web.HIDInputReportEvent.new", module := "globalThis", path := "HIDInputReportEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute HIDDevice device` -/
-def HIDInputReportEvent.device (self : HIDInputReportEvent) : IO HIDDevice := do
+@[macro_inline] def HIDInputReportEvent.device (self : HIDInputReportEvent) : IO HIDDevice := Internal.api "Lasm.JS.Web.HIDInputReportEvent.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `readonly attribute octet reportId` -/
-def HIDInputReportEvent.reportId (self : HIDInputReportEvent) : IO Nat := self.val.get "reportId" Nat
+@[macro_inline] def HIDInputReportEvent.reportId (self : HIDInputReportEvent) : IO Nat := Internal.api "Lasm.JS.Web.HIDInputReportEvent.reportId" do
+  self.val.get "reportId" Nat
 
 /-- `readonly attribute DataView data` -/
-def HIDInputReportEvent.data (self : HIDInputReportEvent) : IO ByteArray := do
+@[macro_inline] def HIDInputReportEvent.data (self : HIDInputReportEvent) : IO ByteArray := Internal.api "Lasm.JS.Web.HIDInputReportEvent.data" do
   let r ← self.val.get "data" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute HID hid` -/
-def Navigator.hid (self : Navigator) : IO HID := do
+@[macro_inline] def Navigator.hid (self : Navigator) : IO HID := Internal.api "Lasm.JS.Web.Navigator.hid" do
   let r ← self.val.get "hid" Value
   pure { val := r }
 
 /-- `readonly attribute HID hid` -/
-def WorkerNavigator.hid (self : WorkerNavigator) : IO HID := do
+@[macro_inline] def WorkerNavigator.hid (self : WorkerNavigator) : IO HID := Internal.api "Lasm.JS.Web.WorkerNavigator.hid" do
   let r ← self.val.get "hid" Value
   pure { val := r }
 

@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CapturedMouseEvents
+import Lasm.JS.Web.Types.ScreenCapture
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CapturedMouseEventInit : EventInit` (Captured Mouse Events (https://screen-share.github.io/captured-mouse-events/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CapturedMouseEventInit where
@@ -24,32 +29,35 @@ structure CapturedMouseEventInit where
   surfaceX : Option Int := none
   /-- `long surfaceY = -1` -/
   surfaceY : Option Int := none
-instance : ToJS CapturedMouseEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("surfaceX", Support.optional d.surfaceX),
-    ("surfaceY", Support.optional d.surfaceY)]⟩
+instance : ToJS CapturedMouseEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("surfaceX", Internal.optional d.surfaceX),
+    ("surfaceY", Internal.optional d.surfaceY)]⟩
 
 /-- `v instanceof CapturedMouseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CapturedMouseEvent`). -/
-def CapturedMouseEvent.cast? (v : Value) : IO (Option CapturedMouseEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CapturedMouseEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CapturedMouseEvent.cast? (v : Value) : IO (Option CapturedMouseEvent) := Internal.api "Lasm.JS.Web.CapturedMouseEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CapturedMouseEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CapturedMouseEventInit eventInitDict)` -/
-def CapturedMouseEvent.new (type : String) (eventInitDict : Option CapturedMouseEventInit := none) : IO CapturedMouseEvent :=
+@[macro_inline] def CapturedMouseEvent.new (type : String) (eventInitDict : Option CapturedMouseEventInit := none) : IO CapturedMouseEvent := Internal.api "Lasm.JS.Web.CapturedMouseEvent.new" do
   Lasm.JS.Binding.invoke CapturedMouseEvent { name := "Lasm.JS.Web.CapturedMouseEvent.new", module := "globalThis", path := "CapturedMouseEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute long surfaceX` -/
-def CapturedMouseEvent.surfaceX (self : CapturedMouseEvent) : IO Int := self.val.get "surfaceX" Int
+@[macro_inline] def CapturedMouseEvent.surfaceX (self : CapturedMouseEvent) : IO Int := Internal.api "Lasm.JS.Web.CapturedMouseEvent.surfaceX" do
+  self.val.get "surfaceX" Int
 
 /-- `readonly attribute long surfaceY` -/
-def CapturedMouseEvent.surfaceY (self : CapturedMouseEvent) : IO Int := self.val.get "surfaceY" Int
+@[macro_inline] def CapturedMouseEvent.surfaceY (self : CapturedMouseEvent) : IO Int := Internal.api "Lasm.JS.Web.CapturedMouseEvent.surfaceY" do
+  self.val.get "surfaceY" Int
 
 /-- `attribute EventHandler oncapturedmousechange` -/
-def CaptureController.oncapturedmousechange (self : CaptureController) : IO (Option EventHandlerNonNull) := self.val.get "oncapturedmousechange" (Option EventHandlerNonNull)
+@[macro_inline] def CaptureController.oncapturedmousechange (self : CaptureController) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.CaptureController.oncapturedmousechange" do
+  self.val.get "oncapturedmousechange" (Option EventHandlerNonNull)
 
 /-- Sets `oncapturedmousechange`: `attribute EventHandler oncapturedmousechange` -/
-def CaptureController.setOncapturedmousechange (self : CaptureController) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def CaptureController.setOncapturedmousechange (self : CaptureController) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.CaptureController.setOncapturedmousechange" do
   self.val.set "oncapturedmousechange" (toJS value)
 
 end Lasm.JS.Web

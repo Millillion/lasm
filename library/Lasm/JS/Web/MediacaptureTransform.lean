@@ -6,10 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureTransform
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef MediaStreamTrack or MediaStreamTrackHandle MediaStreamTrackOrHandle`: one constructor per member type. -/
 inductive MediaStreamTrackOrHandle where
@@ -29,61 +34,64 @@ structure MediaStreamTrackProcessorInit where
   track : MediaStreamTrackOrHandle
   /-- `unsigned short maxBufferSize` -/
   maxBufferSize : Option Nat := none
-instance : ToJS MediaStreamTrackProcessorInit := ⟨fun d => Support.fields #[("track", toJS d.track),
-    ("maxBufferSize", Support.optional d.maxBufferSize)]⟩
+instance : ToJS MediaStreamTrackProcessorInit := ⟨fun d => Internal.fields #[("track", toJS d.track),
+    ("maxBufferSize", Internal.optional d.maxBufferSize)]⟩
 
 /-- `v instanceof MediaStreamTrackHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackHandle`). -/
-def MediaStreamTrackHandle.cast? (v : Value) : IO (Option MediaStreamTrackHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrackHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrackHandle.cast? (v : Value) : IO (Option MediaStreamTrackHandle) := Internal.api "Lasm.JS.Web.MediaStreamTrackHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrackHandle"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MediaStreamTrack track)` -/
-def MediaStreamTrackHandle.new (track : MediaStreamTrack) : IO MediaStreamTrackHandle :=
+@[macro_inline] def MediaStreamTrackHandle.new (track : MediaStreamTrack) : IO MediaStreamTrackHandle := Internal.api "Lasm.JS.Web.MediaStreamTrackHandle.new" do
   Lasm.JS.Binding.invoke MediaStreamTrackHandle { name := "Lasm.JS.Web.MediaStreamTrackHandle.new", module := "globalThis", path := "MediaStreamTrackHandle", construct := true, arity := 1 }
-    (Support.args #[toJS track]) (await := false)
+    (Internal.args #[toJS track]) (await := false)
 
 /-- `v instanceof MediaStreamTrackProcessor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackProcessor`). -/
-def MediaStreamTrackProcessor.cast? (v : Value) : IO (Option MediaStreamTrackProcessor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrackProcessor"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrackProcessor.cast? (v : Value) : IO (Option MediaStreamTrackProcessor) := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrackProcessor"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MediaStreamTrackProcessorInit init)` -/
-def MediaStreamTrackProcessor.new (init : MediaStreamTrackProcessorInit) : IO MediaStreamTrackProcessor :=
+@[macro_inline] def MediaStreamTrackProcessor.new (init : MediaStreamTrackProcessorInit) : IO MediaStreamTrackProcessor := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.new" do
   Lasm.JS.Binding.invoke MediaStreamTrackProcessor { name := "Lasm.JS.Web.MediaStreamTrackProcessor.new", module := "globalThis", path := "MediaStreamTrackProcessor", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def MediaStreamTrackProcessor.readable (self : MediaStreamTrackProcessor) : IO ReadableStream := do
+@[macro_inline] def MediaStreamTrackProcessor.readable (self : MediaStreamTrackProcessor) : IO ReadableStream := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long long discardedFrames` -/
-def MediaStreamTrackProcessor.discardedFrames (self : MediaStreamTrackProcessor) : IO Nat := self.val.get "discardedFrames" Nat
+@[macro_inline] def MediaStreamTrackProcessor.discardedFrames (self : MediaStreamTrackProcessor) : IO Nat := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.discardedFrames" do
+  self.val.get "discardedFrames" Nat
 
 /-- `readonly attribute unsigned long long totalFrames` -/
-def MediaStreamTrackProcessor.totalFrames (self : MediaStreamTrackProcessor) : IO Nat := self.val.get "totalFrames" Nat
+@[macro_inline] def MediaStreamTrackProcessor.totalFrames (self : MediaStreamTrackProcessor) : IO Nat := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.totalFrames" do
+  self.val.get "totalFrames" Nat
 
 /-- `v instanceof VideoTrackGenerator`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoTrackGenerator`). -/
-def VideoTrackGenerator.cast? (v : Value) : IO (Option VideoTrackGenerator) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoTrackGenerator"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoTrackGenerator.cast? (v : Value) : IO (Option VideoTrackGenerator) := Internal.api "Lasm.JS.Web.VideoTrackGenerator.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoTrackGenerator"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def VideoTrackGenerator.new : IO VideoTrackGenerator :=
+@[macro_inline] def VideoTrackGenerator.new : IO VideoTrackGenerator := Internal.api "Lasm.JS.Web.VideoTrackGenerator.new" do
   Lasm.JS.Binding.invoke VideoTrackGenerator { name := "Lasm.JS.Web.VideoTrackGenerator.new", module := "globalThis", path := "VideoTrackGenerator", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute WritableStream writable` -/
-def VideoTrackGenerator.writable (self : VideoTrackGenerator) : IO WritableStream := do
+@[macro_inline] def VideoTrackGenerator.writable (self : VideoTrackGenerator) : IO WritableStream := Internal.api "Lasm.JS.Web.VideoTrackGenerator.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `attribute boolean muted` -/
-def VideoTrackGenerator.muted (self : VideoTrackGenerator) : IO Bool := self.val.get "muted" Bool
+@[macro_inline] def VideoTrackGenerator.muted (self : VideoTrackGenerator) : IO Bool := Internal.api "Lasm.JS.Web.VideoTrackGenerator.muted" do
+  self.val.get "muted" Bool
 
 /-- Sets `muted`: `attribute boolean muted` -/
-def VideoTrackGenerator.setMuted (self : VideoTrackGenerator) (value : Bool) : IO Unit :=
+@[macro_inline] def VideoTrackGenerator.setMuted (self : VideoTrackGenerator) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.VideoTrackGenerator.setMuted" do
   self.val.set "muted" (toJS value)
 
 /-- `readonly attribute MediaStreamTrack track` -/
-def VideoTrackGenerator.track (self : VideoTrackGenerator) : IO MediaStreamTrack := do
+@[macro_inline] def VideoTrackGenerator.track (self : VideoTrackGenerator) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.VideoTrackGenerator.track" do
   let r ← self.val.get "track" Value
   pure { val := r }
 

@@ -6,27 +6,32 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AudioOutputOptions` (Audio Output Devices API (https://w3c.github.io/mediacapture-output/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AudioOutputOptions where
   /-- `DOMString deviceId = ""` -/
   deviceId : Option String := none
-instance : ToJS AudioOutputOptions := ⟨fun d => Support.fields #[("deviceId", Support.optional d.deviceId)]⟩
+instance : ToJS AudioOutputOptions := ⟨fun d => Internal.fields #[("deviceId", Internal.optional d.deviceId)]⟩
 
 /-- `readonly attribute DOMString sinkId` -/
-def HTMLMediaElement.sinkId (self : HTMLMediaElement) : IO String := self.val.get "sinkId" String
+@[macro_inline] def HTMLMediaElement.sinkId (self : HTMLMediaElement) : IO String := Internal.api "Lasm.JS.Web.HTMLMediaElement.sinkId" do
+  self.val.get "sinkId" String
 
 /-- `Promise<undefined> setSinkId(DOMString sinkId)` -/
-def HTMLMediaElement.setSinkId (self : HTMLMediaElement) (sinkId : String) : Async Unit :=
-  self.val.callMethodAwait "setSinkId" (Support.args #[toJS sinkId]) Unit
+@[macro_inline] def HTMLMediaElement.setSinkId (self : HTMLMediaElement) (sinkId : String) : Async Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setSinkId" do
+  self.val.callMethodAwait "setSinkId" (Internal.args #[toJS sinkId]) Unit
 
 /-- `Promise<MediaDeviceInfo> selectAudioOutput(optional AudioOutputOptions options)` -/
-def MediaDevices.selectAudioOutput (self : MediaDevices) (options : Option AudioOutputOptions := none) : Async MediaDeviceInfo := do
-  let r ← self.val.callMethodAwait "selectAudioOutput" (Support.args #[Support.optional options]) Value
+@[macro_inline] def MediaDevices.selectAudioOutput (self : MediaDevices) (options : Option AudioOutputOptions := none) : Async MediaDeviceInfo := Internal.api "Lasm.JS.Web.MediaDevices.selectAudioOutput" do
+  let r ← self.val.callMethodAwait "selectAudioOutput" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

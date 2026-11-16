@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.Bluetooth
+import Lasm.JS.Web.Types.BluetoothScanning
 import Lasm.JS.Web.Bluetooth
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BluetoothLEScanOptions` (Web Bluetooth Scanning (https://bluetooth.spec.whatwg.org/scanning.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BluetoothLEScanOptions where
@@ -20,109 +25,132 @@ structure BluetoothLEScanOptions where
   keepRepeatedDevices : Option Bool := none
   /-- `boolean acceptAllAdvertisements = false` -/
   acceptAllAdvertisements : Option Bool := none
-instance : ToJS BluetoothLEScanOptions := ⟨fun d => Support.fields #[("filters", Support.optional d.filters),
-    ("keepRepeatedDevices", Support.optional d.keepRepeatedDevices),
-    ("acceptAllAdvertisements", Support.optional d.acceptAllAdvertisements)]⟩
+instance : ToJS BluetoothLEScanOptions := ⟨fun d => Internal.fields #[("filters", Internal.optional d.filters),
+    ("keepRepeatedDevices", Internal.optional d.keepRepeatedDevices),
+    ("acceptAllAdvertisements", Internal.optional d.acceptAllAdvertisements)]⟩
+
+/-- `dictionary BluetoothLEScanPermissionDescriptor : PermissionDescriptor` (Web Bluetooth Scanning (https://bluetooth.spec.whatwg.org/scanning.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BluetoothLEScanPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `sequence<BluetoothLEScanFilterInit> filters` -/
+  filters : Option (Array BluetoothLEScanFilterInit) := none
+  /-- `boolean keepRepeatedDevices = false` -/
+  keepRepeatedDevices : Option Bool := none
+  /-- `boolean acceptAllAdvertisements = false` -/
+  acceptAllAdvertisements : Option Bool := none
+instance : ToJS BluetoothLEScanPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("filters", Internal.optional d.filters),
+    ("keepRepeatedDevices", Internal.optional d.keepRepeatedDevices),
+    ("acceptAllAdvertisements", Internal.optional d.acceptAllAdvertisements)]⟩
 
 /-- `v instanceof BluetoothDataFilter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothDataFilter`). -/
-def BluetoothDataFilter.cast? (v : Value) : IO (Option BluetoothDataFilter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothDataFilter"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothDataFilter.cast? (v : Value) : IO (Option BluetoothDataFilter) := Internal.api "Lasm.JS.Web.BluetoothDataFilter.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothDataFilter"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional BluetoothDataFilterInit init)` -/
-def BluetoothDataFilter.new (init : Option BluetoothDataFilterInit := none) : IO BluetoothDataFilter :=
+@[macro_inline] def BluetoothDataFilter.new (init : Option BluetoothDataFilterInit := none) : IO BluetoothDataFilter := Internal.api "Lasm.JS.Web.BluetoothDataFilter.new" do
   Lasm.JS.Binding.invoke BluetoothDataFilter { name := "Lasm.JS.Web.BluetoothDataFilter.new", module := "globalThis", path := "BluetoothDataFilter", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute ArrayBuffer dataPrefix` -/
-def BluetoothDataFilter.dataPrefix (self : BluetoothDataFilter) : IO ByteArray := do
+@[macro_inline] def BluetoothDataFilter.dataPrefix (self : BluetoothDataFilter) : IO ByteArray := Internal.api "Lasm.JS.Web.BluetoothDataFilter.dataPrefix" do
   let r ← self.val.get "dataPrefix" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `readonly attribute ArrayBuffer mask` -/
-def BluetoothDataFilter.mask (self : BluetoothDataFilter) : IO ByteArray := do
+@[macro_inline] def BluetoothDataFilter.mask (self : BluetoothDataFilter) : IO ByteArray := Internal.api "Lasm.JS.Web.BluetoothDataFilter.mask" do
   let r ← self.val.get "mask" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `v instanceof BluetoothLEScan`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothLEScan`). -/
-def BluetoothLEScan.cast? (v : Value) : IO (Option BluetoothLEScan) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothLEScan"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothLEScan.cast? (v : Value) : IO (Option BluetoothLEScan) := Internal.api "Lasm.JS.Web.BluetoothLEScan.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothLEScan"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<BluetoothLEScanFilter> filters` -/
-def BluetoothLEScan.filters (self : BluetoothLEScan) : IO (Array BluetoothLEScanFilter) := self.val.get "filters" (Array BluetoothLEScanFilter)
+@[macro_inline] def BluetoothLEScan.filters (self : BluetoothLEScan) : IO (Array BluetoothLEScanFilter) := Internal.api "Lasm.JS.Web.BluetoothLEScan.filters" do
+  self.val.get "filters" (Array BluetoothLEScanFilter)
 
 /-- `readonly attribute boolean keepRepeatedDevices` -/
-def BluetoothLEScan.keepRepeatedDevices (self : BluetoothLEScan) : IO Bool := self.val.get "keepRepeatedDevices" Bool
+@[macro_inline] def BluetoothLEScan.keepRepeatedDevices (self : BluetoothLEScan) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothLEScan.keepRepeatedDevices" do
+  self.val.get "keepRepeatedDevices" Bool
 
 /-- `readonly attribute boolean acceptAllAdvertisements` -/
-def BluetoothLEScan.acceptAllAdvertisements (self : BluetoothLEScan) : IO Bool := self.val.get "acceptAllAdvertisements" Bool
+@[macro_inline] def BluetoothLEScan.acceptAllAdvertisements (self : BluetoothLEScan) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothLEScan.acceptAllAdvertisements" do
+  self.val.get "acceptAllAdvertisements" Bool
 
 /-- `readonly attribute boolean active` -/
-def BluetoothLEScan.active (self : BluetoothLEScan) : IO Bool := self.val.get "active" Bool
+@[macro_inline] def BluetoothLEScan.active (self : BluetoothLEScan) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothLEScan.active" do
+  self.val.get "active" Bool
 
 /-- `undefined stop()` -/
-def BluetoothLEScan.stop (self : BluetoothLEScan) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def BluetoothLEScan.stop (self : BluetoothLEScan) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothLEScan.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `v instanceof BluetoothLEScanFilter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothLEScanFilter`). -/
-def BluetoothLEScanFilter.cast? (v : Value) : IO (Option BluetoothLEScanFilter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothLEScanFilter"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothLEScanFilter.cast? (v : Value) : IO (Option BluetoothLEScanFilter) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothLEScanFilter"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional BluetoothLEScanFilterInit init)` -/
-def BluetoothLEScanFilter.new (init : Option BluetoothLEScanFilterInit := none) : IO BluetoothLEScanFilter :=
+@[macro_inline] def BluetoothLEScanFilter.new (init : Option BluetoothLEScanFilterInit := none) : IO BluetoothLEScanFilter := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.new" do
   Lasm.JS.Binding.invoke BluetoothLEScanFilter { name := "Lasm.JS.Web.BluetoothLEScanFilter.new", module := "globalThis", path := "BluetoothLEScanFilter", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute DOMString? name` -/
-def BluetoothLEScanFilter.name (self : BluetoothLEScanFilter) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def BluetoothLEScanFilter.name (self : BluetoothLEScanFilter) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly attribute DOMString? namePrefix` -/
-def BluetoothLEScanFilter.namePrefix (self : BluetoothLEScanFilter) : IO (Option String) := self.val.get "namePrefix" (Option String)
+@[macro_inline] def BluetoothLEScanFilter.namePrefix (self : BluetoothLEScanFilter) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.namePrefix" do
+  self.val.get "namePrefix" (Option String)
 
 /-- `readonly attribute FrozenArray<UUID> services` -/
-def BluetoothLEScanFilter.services (self : BluetoothLEScanFilter) : IO (Array String) := self.val.get "services" (Array String)
+@[macro_inline] def BluetoothLEScanFilter.services (self : BluetoothLEScanFilter) : IO (Array String) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.services" do
+  self.val.get "services" (Array String)
 
 /-- `readonly attribute BluetoothManufacturerDataFilter manufacturerData` -/
-def BluetoothLEScanFilter.manufacturerData (self : BluetoothLEScanFilter) : IO BluetoothManufacturerDataFilter := do
+@[macro_inline] def BluetoothLEScanFilter.manufacturerData (self : BluetoothLEScanFilter) : IO BluetoothManufacturerDataFilter := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.manufacturerData" do
   let r ← self.val.get "manufacturerData" Value
   pure { val := r }
 
 /-- `readonly attribute BluetoothServiceDataFilter serviceData` -/
-def BluetoothLEScanFilter.serviceData (self : BluetoothLEScanFilter) : IO BluetoothServiceDataFilter := do
+@[macro_inline] def BluetoothLEScanFilter.serviceData (self : BluetoothLEScanFilter) : IO BluetoothServiceDataFilter := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.serviceData" do
   let r ← self.val.get "serviceData" Value
   pure { val := r }
 
 /-- `v instanceof BluetoothLEScanPermissionResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothLEScanPermissionResult`). -/
-def BluetoothLEScanPermissionResult.cast? (v : Value) : IO (Option BluetoothLEScanPermissionResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothLEScanPermissionResult"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothLEScanPermissionResult.cast? (v : Value) : IO (Option BluetoothLEScanPermissionResult) := Internal.api "Lasm.JS.Web.BluetoothLEScanPermissionResult.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothLEScanPermissionResult"] Value) (fun x => { val := x }) v
 
 /-- `attribute FrozenArray<BluetoothLEScan> scans` -/
-def BluetoothLEScanPermissionResult.scans (self : BluetoothLEScanPermissionResult) : IO (Array BluetoothLEScan) := self.val.get "scans" (Array BluetoothLEScan)
+@[macro_inline] def BluetoothLEScanPermissionResult.scans (self : BluetoothLEScanPermissionResult) : IO (Array BluetoothLEScan) := Internal.api "Lasm.JS.Web.BluetoothLEScanPermissionResult.scans" do
+  self.val.get "scans" (Array BluetoothLEScan)
 
 /-- Sets `scans`: `attribute FrozenArray<BluetoothLEScan> scans` -/
-def BluetoothLEScanPermissionResult.setScans (self : BluetoothLEScanPermissionResult) (value : Array BluetoothLEScan) : IO Unit :=
+@[macro_inline] def BluetoothLEScanPermissionResult.setScans (self : BluetoothLEScanPermissionResult) (value : Array BluetoothLEScan) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothLEScanPermissionResult.setScans" do
   self.val.set "scans" (toJS value)
 
 /-- `v instanceof BluetoothManufacturerDataFilter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothManufacturerDataFilter`). -/
-def BluetoothManufacturerDataFilter.cast? (v : Value) : IO (Option BluetoothManufacturerDataFilter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothManufacturerDataFilter"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothManufacturerDataFilter.cast? (v : Value) : IO (Option BluetoothManufacturerDataFilter) := Internal.api "Lasm.JS.Web.BluetoothManufacturerDataFilter.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothManufacturerDataFilter"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional object init)` -/
-def BluetoothManufacturerDataFilter.new (init : Data := .undefined) : IO BluetoothManufacturerDataFilter :=
+@[macro_inline] def BluetoothManufacturerDataFilter.new (init : Data := .undefined) : IO BluetoothManufacturerDataFilter := Internal.api "Lasm.JS.Web.BluetoothManufacturerDataFilter.new" do
   Lasm.JS.Binding.invoke BluetoothManufacturerDataFilter { name := "Lasm.JS.Web.BluetoothManufacturerDataFilter.new", module := "globalThis", path := "BluetoothManufacturerDataFilter", construct := true, arity := 1 }
-    (Support.args #[init]) (await := false)
+    (Internal.args #[init]) (await := false)
 
 /-- `v instanceof BluetoothServiceDataFilter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothServiceDataFilter`). -/
-def BluetoothServiceDataFilter.cast? (v : Value) : IO (Option BluetoothServiceDataFilter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothServiceDataFilter"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothServiceDataFilter.cast? (v : Value) : IO (Option BluetoothServiceDataFilter) := Internal.api "Lasm.JS.Web.BluetoothServiceDataFilter.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothServiceDataFilter"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional object init)` -/
-def BluetoothServiceDataFilter.new (init : Data := .undefined) : IO BluetoothServiceDataFilter :=
+@[macro_inline] def BluetoothServiceDataFilter.new (init : Data := .undefined) : IO BluetoothServiceDataFilter := Internal.api "Lasm.JS.Web.BluetoothServiceDataFilter.new" do
   Lasm.JS.Binding.invoke BluetoothServiceDataFilter { name := "Lasm.JS.Web.BluetoothServiceDataFilter.new", module := "globalThis", path := "BluetoothServiceDataFilter", construct := true, arity := 1 }
-    (Support.args #[init]) (await := false)
+    (Internal.args #[init]) (await := false)
 
 /-- `Promise<BluetoothLEScan> requestLEScan(optional BluetoothLEScanOptions options)` -/
-def Bluetooth.requestLEScan (self : Bluetooth) (options : Option BluetoothLEScanOptions := none) : Async BluetoothLEScan := do
-  let r ← self.val.callMethodAwait "requestLEScan" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Bluetooth.requestLEScan (self : Bluetooth) (options : Option BluetoothLEScanOptions := none) : Async BluetoothLEScan := Internal.api "Lasm.JS.Web.Bluetooth.requestLEScan" do
+  let r ← self.val.callMethodAwait "requestLEScan" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

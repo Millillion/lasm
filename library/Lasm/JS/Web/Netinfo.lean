@@ -6,115 +6,56 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Netinfo
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ConnectionType` (Network Information API (https://wicg.github.io/netinfo/)): "bluetooth", "cellular", "ethernet", "mixed", "none", "other", "unknown", "wifi", "wimax". -/
-inductive ConnectionType where
-  /-- "bluetooth" -/
-  | bluetooth
-  /-- "cellular" -/
-  | cellular
-  /-- "ethernet" -/
-  | ethernet
-  /-- "mixed" -/
-  | mixed
-  /-- "none" -/
-  | none
-  /-- "other" -/
-  | other
-  /-- "unknown" -/
-  | unknown
-  /-- "wifi" -/
-  | wifi
-  /-- "wimax" -/
-  | wimax
-  deriving BEq, Repr, Inhabited
-instance : ToJS ConnectionType := ⟨fun
-  | .bluetooth => .string "bluetooth"
-  | .cellular => .string "cellular"
-  | .ethernet => .string "ethernet"
-  | .mixed => .string "mixed"
-  | .none => .string "none"
-  | .other => .string "other"
-  | .unknown => .string "unknown"
-  | .wifi => .string "wifi"
-  | .wimax => .string "wimax"⟩
-instance : FromJS ConnectionType where
-  fromJS
-    | .string "bluetooth" => .ok .bluetooth
-    | .string "cellular" => .ok .cellular
-    | .string "ethernet" => .ok .ethernet
-    | .string "mixed" => .ok .mixed
-    | .string "none" => .ok .none
-    | .string "other" => .ok .other
-    | .string "unknown" => .ok .unknown
-    | .string "wifi" => .ok .wifi
-    | .string "wimax" => .ok .wimax
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ConnectionType"
-
-/-- `enum EffectiveConnectionType` (Network Information API (https://wicg.github.io/netinfo/)): "2g", "3g", "4g", "slow-2g". -/
-inductive EffectiveConnectionType where
-  /-- "2g" -/
-  | v2g
-  /-- "3g" -/
-  | v3g
-  /-- "4g" -/
-  | v4g
-  /-- "slow-2g" -/
-  | slow2g
-  deriving BEq, Repr, Inhabited
-instance : ToJS EffectiveConnectionType := ⟨fun
-  | .v2g => .string "2g"
-  | .v3g => .string "3g"
-  | .v4g => .string "4g"
-  | .slow2g => .string "slow-2g"⟩
-instance : FromJS EffectiveConnectionType where
-  fromJS
-    | .string "2g" => .ok .v2g
-    | .string "3g" => .ok .v3g
-    | .string "4g" => .ok .v4g
-    | .string "slow-2g" => .ok .slow2g
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.EffectiveConnectionType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof NetworkInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NetworkInformation`). -/
-def NetworkInformation.cast? (v : Value) : IO (Option NetworkInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NetworkInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def NetworkInformation.cast? (v : Value) : IO (Option NetworkInformation) := Internal.api "Lasm.JS.Web.NetworkInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["NetworkInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ConnectionType type` -/
-def NetworkInformation.type (self : NetworkInformation) : IO ConnectionType := self.val.get "type" ConnectionType
+@[macro_inline] def NetworkInformation.type (self : NetworkInformation) : IO ConnectionType := Internal.api "Lasm.JS.Web.NetworkInformation.type" do
+  self.val.get "type" ConnectionType
 
 /-- `readonly attribute EffectiveConnectionType effectiveType` -/
-def NetworkInformation.effectiveType (self : NetworkInformation) : IO EffectiveConnectionType := self.val.get "effectiveType" EffectiveConnectionType
+@[macro_inline] def NetworkInformation.effectiveType (self : NetworkInformation) : IO EffectiveConnectionType := Internal.api "Lasm.JS.Web.NetworkInformation.effectiveType" do
+  self.val.get "effectiveType" EffectiveConnectionType
 
 /-- `readonly attribute Megabit downlinkMax` -/
-def NetworkInformation.downlinkMax (self : NetworkInformation) : IO Float := self.val.get "downlinkMax" Float
+@[macro_inline] def NetworkInformation.downlinkMax (self : NetworkInformation) : IO Float := Internal.api "Lasm.JS.Web.NetworkInformation.downlinkMax" do
+  self.val.get "downlinkMax" Float
 
 /-- `readonly attribute Megabit downlink` -/
-def NetworkInformation.downlink (self : NetworkInformation) : IO Float := self.val.get "downlink" Float
+@[macro_inline] def NetworkInformation.downlink (self : NetworkInformation) : IO Float := Internal.api "Lasm.JS.Web.NetworkInformation.downlink" do
+  self.val.get "downlink" Float
 
 /-- `readonly attribute Millisecond rtt` -/
-def NetworkInformation.rtt (self : NetworkInformation) : IO Nat := self.val.get "rtt" Nat
+@[macro_inline] def NetworkInformation.rtt (self : NetworkInformation) : IO Nat := Internal.api "Lasm.JS.Web.NetworkInformation.rtt" do
+  self.val.get "rtt" Nat
 
 /-- `attribute EventHandler onchange` -/
-def NetworkInformation.onchange (self : NetworkInformation) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def NetworkInformation.onchange (self : NetworkInformation) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.NetworkInformation.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def NetworkInformation.setOnchange (self : NetworkInformation) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def NetworkInformation.setOnchange (self : NetworkInformation) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.NetworkInformation.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `readonly attribute NetworkInformation connection` -/
-def Navigator.connection (self : Navigator) : IO NetworkInformation := do
+@[macro_inline] def Navigator.connection (self : Navigator) : IO NetworkInformation := Internal.api "Lasm.JS.Web.Navigator.connection" do
   let r ← self.val.get "connection" Value
   pure { val := r }
 
 /-- `readonly attribute NetworkInformation connection` -/
-def WorkerNavigator.connection (self : WorkerNavigator) : IO NetworkInformation := do
+@[macro_inline] def WorkerNavigator.connection (self : WorkerNavigator) : IO NetworkInformation := Internal.api "Lasm.JS.Web.WorkerNavigator.connection" do
   let r ← self.val.get "connection" Value
   pure { val := r }
 

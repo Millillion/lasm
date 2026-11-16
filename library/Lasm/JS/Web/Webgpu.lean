@@ -6,1433 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webcodecs
+import Lasm.JS.Web.Types.Webgpu
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum GPUPowerPreference` (WebGPU (https://gpuweb.github.io/gpuweb/)): "low-power", "high-performance". -/
-inductive GPUPowerPreference where
-  /-- "low-power" -/
-  | lowPower
-  /-- "high-performance" -/
-  | highPerformance
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUPowerPreference := ⟨fun
-  | .lowPower => .string "low-power"
-  | .highPerformance => .string "high-performance"⟩
-instance : FromJS GPUPowerPreference where
-  fromJS
-    | .string "low-power" => .ok .lowPower
-    | .string "high-performance" => .ok .highPerformance
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUPowerPreference"
-
-/-- `enum GPUTextureFormat` (WebGPU (https://gpuweb.github.io/gpuweb/)): "r8unorm", "r8snorm", "r8uint", "r8sint", "r16unorm", "r16snorm", "r16uint", "r16sint", "r16float", "rg8unorm", "rg8snorm", "rg8uint", "rg8sint", "r32uint", "r32sint", "r32float", "rg16unorm", "rg16snorm", "rg16uint", "rg16sint", "rg16float", "rgba8unorm", "rgba8unorm-srgb", "rgba8snorm", "rgba8uint", "rgba8sint", "bgra8unorm", "bgra8unorm-srgb", "rgb9e5ufloat", "rgb10a2uint", "rgb10a2unorm", "rg11b10ufloat", "rg32uint", "rg32sint", "rg32float", "rgba16unorm", "rgba16snorm", "rgba16uint", "rgba16sint", "rgba16float", "rgba32uint", "rgba32sint", "rgba32float", "stencil8", "depth16unorm", "depth24plus", "depth24plus-stencil8", "depth32float", "depth32float-stencil8", "bc1-rgba-unorm", "bc1-rgba-unorm-srgb", "bc2-rgba-unorm", "bc2-rgba-unorm-srgb", "bc3-rgba-unorm", "bc3-rgba-unorm-srgb", "bc4-r-unorm", "bc4-r-snorm", "bc5-rg-unorm", "bc5-rg-snorm", "bc6h-rgb-ufloat", "bc6h-rgb-float", "bc7-rgba-unorm", "bc7-rgba-unorm-srgb", "etc2-rgb8unorm", "etc2-rgb8unorm-srgb", "etc2-rgb8a1unorm", "etc2-rgb8a1unorm-srgb", "etc2-rgba8unorm", "etc2-rgba8unorm-srgb", "eac-r11unorm", "eac-r11snorm", "eac-rg11unorm", "eac-rg11snorm", "astc-4x4-unorm", "astc-4x4-unorm-srgb", "astc-5x4-unorm", "astc-5x4-unorm-srgb", "astc-5x5-unorm", "astc-5x5-unorm-srgb", "astc-6x5-unorm", "astc-6x5-unorm-srgb", "astc-6x6-unorm", "astc-6x6-unorm-srgb", "astc-8x5-unorm", "astc-8x5-unorm-srgb", "astc-8x6-unorm", "astc-8x6-unorm-srgb", "astc-8x8-unorm", "astc-8x8-unorm-srgb", "astc-10x5-unorm", "astc-10x5-unorm-srgb", "astc-10x6-unorm", "astc-10x6-unorm-srgb", "astc-10x8-unorm", "astc-10x8-unorm-srgb", "astc-10x10-unorm", "astc-10x10-unorm-srgb", "astc-12x10-unorm", "astc-12x10-unorm-srgb", "astc-12x12-unorm", "astc-12x12-unorm-srgb". -/
-inductive GPUTextureFormat where
-  /-- "r8unorm" -/
-  | r8unorm
-  /-- "r8snorm" -/
-  | r8snorm
-  /-- "r8uint" -/
-  | r8uint
-  /-- "r8sint" -/
-  | r8sint
-  /-- "r16unorm" -/
-  | r16unorm
-  /-- "r16snorm" -/
-  | r16snorm
-  /-- "r16uint" -/
-  | r16uint
-  /-- "r16sint" -/
-  | r16sint
-  /-- "r16float" -/
-  | r16float
-  /-- "rg8unorm" -/
-  | rg8unorm
-  /-- "rg8snorm" -/
-  | rg8snorm
-  /-- "rg8uint" -/
-  | rg8uint
-  /-- "rg8sint" -/
-  | rg8sint
-  /-- "r32uint" -/
-  | r32uint
-  /-- "r32sint" -/
-  | r32sint
-  /-- "r32float" -/
-  | r32float
-  /-- "rg16unorm" -/
-  | rg16unorm
-  /-- "rg16snorm" -/
-  | rg16snorm
-  /-- "rg16uint" -/
-  | rg16uint
-  /-- "rg16sint" -/
-  | rg16sint
-  /-- "rg16float" -/
-  | rg16float
-  /-- "rgba8unorm" -/
-  | rgba8unorm
-  /-- "rgba8unorm-srgb" -/
-  | rgba8unormSrgb
-  /-- "rgba8snorm" -/
-  | rgba8snorm
-  /-- "rgba8uint" -/
-  | rgba8uint
-  /-- "rgba8sint" -/
-  | rgba8sint
-  /-- "bgra8unorm" -/
-  | bgra8unorm
-  /-- "bgra8unorm-srgb" -/
-  | bgra8unormSrgb
-  /-- "rgb9e5ufloat" -/
-  | rgb9e5ufloat
-  /-- "rgb10a2uint" -/
-  | rgb10a2uint
-  /-- "rgb10a2unorm" -/
-  | rgb10a2unorm
-  /-- "rg11b10ufloat" -/
-  | rg11b10ufloat
-  /-- "rg32uint" -/
-  | rg32uint
-  /-- "rg32sint" -/
-  | rg32sint
-  /-- "rg32float" -/
-  | rg32float
-  /-- "rgba16unorm" -/
-  | rgba16unorm
-  /-- "rgba16snorm" -/
-  | rgba16snorm
-  /-- "rgba16uint" -/
-  | rgba16uint
-  /-- "rgba16sint" -/
-  | rgba16sint
-  /-- "rgba16float" -/
-  | rgba16float
-  /-- "rgba32uint" -/
-  | rgba32uint
-  /-- "rgba32sint" -/
-  | rgba32sint
-  /-- "rgba32float" -/
-  | rgba32float
-  /-- "stencil8" -/
-  | stencil8
-  /-- "depth16unorm" -/
-  | depth16unorm
-  /-- "depth24plus" -/
-  | depth24plus
-  /-- "depth24plus-stencil8" -/
-  | depth24plusStencil8
-  /-- "depth32float" -/
-  | depth32float
-  /-- "depth32float-stencil8" -/
-  | depth32floatStencil8
-  /-- "bc1-rgba-unorm" -/
-  | bc1RgbaUnorm
-  /-- "bc1-rgba-unorm-srgb" -/
-  | bc1RgbaUnormSrgb
-  /-- "bc2-rgba-unorm" -/
-  | bc2RgbaUnorm
-  /-- "bc2-rgba-unorm-srgb" -/
-  | bc2RgbaUnormSrgb
-  /-- "bc3-rgba-unorm" -/
-  | bc3RgbaUnorm
-  /-- "bc3-rgba-unorm-srgb" -/
-  | bc3RgbaUnormSrgb
-  /-- "bc4-r-unorm" -/
-  | bc4RUnorm
-  /-- "bc4-r-snorm" -/
-  | bc4RSnorm
-  /-- "bc5-rg-unorm" -/
-  | bc5RgUnorm
-  /-- "bc5-rg-snorm" -/
-  | bc5RgSnorm
-  /-- "bc6h-rgb-ufloat" -/
-  | bc6hRgbUfloat
-  /-- "bc6h-rgb-float" -/
-  | bc6hRgbFloat
-  /-- "bc7-rgba-unorm" -/
-  | bc7RgbaUnorm
-  /-- "bc7-rgba-unorm-srgb" -/
-  | bc7RgbaUnormSrgb
-  /-- "etc2-rgb8unorm" -/
-  | etc2Rgb8unorm
-  /-- "etc2-rgb8unorm-srgb" -/
-  | etc2Rgb8unormSrgb
-  /-- "etc2-rgb8a1unorm" -/
-  | etc2Rgb8a1unorm
-  /-- "etc2-rgb8a1unorm-srgb" -/
-  | etc2Rgb8a1unormSrgb
-  /-- "etc2-rgba8unorm" -/
-  | etc2Rgba8unorm
-  /-- "etc2-rgba8unorm-srgb" -/
-  | etc2Rgba8unormSrgb
-  /-- "eac-r11unorm" -/
-  | eacR11unorm
-  /-- "eac-r11snorm" -/
-  | eacR11snorm
-  /-- "eac-rg11unorm" -/
-  | eacRg11unorm
-  /-- "eac-rg11snorm" -/
-  | eacRg11snorm
-  /-- "astc-4x4-unorm" -/
-  | astc4x4Unorm
-  /-- "astc-4x4-unorm-srgb" -/
-  | astc4x4UnormSrgb
-  /-- "astc-5x4-unorm" -/
-  | astc5x4Unorm
-  /-- "astc-5x4-unorm-srgb" -/
-  | astc5x4UnormSrgb
-  /-- "astc-5x5-unorm" -/
-  | astc5x5Unorm
-  /-- "astc-5x5-unorm-srgb" -/
-  | astc5x5UnormSrgb
-  /-- "astc-6x5-unorm" -/
-  | astc6x5Unorm
-  /-- "astc-6x5-unorm-srgb" -/
-  | astc6x5UnormSrgb
-  /-- "astc-6x6-unorm" -/
-  | astc6x6Unorm
-  /-- "astc-6x6-unorm-srgb" -/
-  | astc6x6UnormSrgb
-  /-- "astc-8x5-unorm" -/
-  | astc8x5Unorm
-  /-- "astc-8x5-unorm-srgb" -/
-  | astc8x5UnormSrgb
-  /-- "astc-8x6-unorm" -/
-  | astc8x6Unorm
-  /-- "astc-8x6-unorm-srgb" -/
-  | astc8x6UnormSrgb
-  /-- "astc-8x8-unorm" -/
-  | astc8x8Unorm
-  /-- "astc-8x8-unorm-srgb" -/
-  | astc8x8UnormSrgb
-  /-- "astc-10x5-unorm" -/
-  | astc10x5Unorm
-  /-- "astc-10x5-unorm-srgb" -/
-  | astc10x5UnormSrgb
-  /-- "astc-10x6-unorm" -/
-  | astc10x6Unorm
-  /-- "astc-10x6-unorm-srgb" -/
-  | astc10x6UnormSrgb
-  /-- "astc-10x8-unorm" -/
-  | astc10x8Unorm
-  /-- "astc-10x8-unorm-srgb" -/
-  | astc10x8UnormSrgb
-  /-- "astc-10x10-unorm" -/
-  | astc10x10Unorm
-  /-- "astc-10x10-unorm-srgb" -/
-  | astc10x10UnormSrgb
-  /-- "astc-12x10-unorm" -/
-  | astc12x10Unorm
-  /-- "astc-12x10-unorm-srgb" -/
-  | astc12x10UnormSrgb
-  /-- "astc-12x12-unorm" -/
-  | astc12x12Unorm
-  /-- "astc-12x12-unorm-srgb" -/
-  | astc12x12UnormSrgb
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUTextureFormat := ⟨fun
-  | .r8unorm => .string "r8unorm"
-  | .r8snorm => .string "r8snorm"
-  | .r8uint => .string "r8uint"
-  | .r8sint => .string "r8sint"
-  | .r16unorm => .string "r16unorm"
-  | .r16snorm => .string "r16snorm"
-  | .r16uint => .string "r16uint"
-  | .r16sint => .string "r16sint"
-  | .r16float => .string "r16float"
-  | .rg8unorm => .string "rg8unorm"
-  | .rg8snorm => .string "rg8snorm"
-  | .rg8uint => .string "rg8uint"
-  | .rg8sint => .string "rg8sint"
-  | .r32uint => .string "r32uint"
-  | .r32sint => .string "r32sint"
-  | .r32float => .string "r32float"
-  | .rg16unorm => .string "rg16unorm"
-  | .rg16snorm => .string "rg16snorm"
-  | .rg16uint => .string "rg16uint"
-  | .rg16sint => .string "rg16sint"
-  | .rg16float => .string "rg16float"
-  | .rgba8unorm => .string "rgba8unorm"
-  | .rgba8unormSrgb => .string "rgba8unorm-srgb"
-  | .rgba8snorm => .string "rgba8snorm"
-  | .rgba8uint => .string "rgba8uint"
-  | .rgba8sint => .string "rgba8sint"
-  | .bgra8unorm => .string "bgra8unorm"
-  | .bgra8unormSrgb => .string "bgra8unorm-srgb"
-  | .rgb9e5ufloat => .string "rgb9e5ufloat"
-  | .rgb10a2uint => .string "rgb10a2uint"
-  | .rgb10a2unorm => .string "rgb10a2unorm"
-  | .rg11b10ufloat => .string "rg11b10ufloat"
-  | .rg32uint => .string "rg32uint"
-  | .rg32sint => .string "rg32sint"
-  | .rg32float => .string "rg32float"
-  | .rgba16unorm => .string "rgba16unorm"
-  | .rgba16snorm => .string "rgba16snorm"
-  | .rgba16uint => .string "rgba16uint"
-  | .rgba16sint => .string "rgba16sint"
-  | .rgba16float => .string "rgba16float"
-  | .rgba32uint => .string "rgba32uint"
-  | .rgba32sint => .string "rgba32sint"
-  | .rgba32float => .string "rgba32float"
-  | .stencil8 => .string "stencil8"
-  | .depth16unorm => .string "depth16unorm"
-  | .depth24plus => .string "depth24plus"
-  | .depth24plusStencil8 => .string "depth24plus-stencil8"
-  | .depth32float => .string "depth32float"
-  | .depth32floatStencil8 => .string "depth32float-stencil8"
-  | .bc1RgbaUnorm => .string "bc1-rgba-unorm"
-  | .bc1RgbaUnormSrgb => .string "bc1-rgba-unorm-srgb"
-  | .bc2RgbaUnorm => .string "bc2-rgba-unorm"
-  | .bc2RgbaUnormSrgb => .string "bc2-rgba-unorm-srgb"
-  | .bc3RgbaUnorm => .string "bc3-rgba-unorm"
-  | .bc3RgbaUnormSrgb => .string "bc3-rgba-unorm-srgb"
-  | .bc4RUnorm => .string "bc4-r-unorm"
-  | .bc4RSnorm => .string "bc4-r-snorm"
-  | .bc5RgUnorm => .string "bc5-rg-unorm"
-  | .bc5RgSnorm => .string "bc5-rg-snorm"
-  | .bc6hRgbUfloat => .string "bc6h-rgb-ufloat"
-  | .bc6hRgbFloat => .string "bc6h-rgb-float"
-  | .bc7RgbaUnorm => .string "bc7-rgba-unorm"
-  | .bc7RgbaUnormSrgb => .string "bc7-rgba-unorm-srgb"
-  | .etc2Rgb8unorm => .string "etc2-rgb8unorm"
-  | .etc2Rgb8unormSrgb => .string "etc2-rgb8unorm-srgb"
-  | .etc2Rgb8a1unorm => .string "etc2-rgb8a1unorm"
-  | .etc2Rgb8a1unormSrgb => .string "etc2-rgb8a1unorm-srgb"
-  | .etc2Rgba8unorm => .string "etc2-rgba8unorm"
-  | .etc2Rgba8unormSrgb => .string "etc2-rgba8unorm-srgb"
-  | .eacR11unorm => .string "eac-r11unorm"
-  | .eacR11snorm => .string "eac-r11snorm"
-  | .eacRg11unorm => .string "eac-rg11unorm"
-  | .eacRg11snorm => .string "eac-rg11snorm"
-  | .astc4x4Unorm => .string "astc-4x4-unorm"
-  | .astc4x4UnormSrgb => .string "astc-4x4-unorm-srgb"
-  | .astc5x4Unorm => .string "astc-5x4-unorm"
-  | .astc5x4UnormSrgb => .string "astc-5x4-unorm-srgb"
-  | .astc5x5Unorm => .string "astc-5x5-unorm"
-  | .astc5x5UnormSrgb => .string "astc-5x5-unorm-srgb"
-  | .astc6x5Unorm => .string "astc-6x5-unorm"
-  | .astc6x5UnormSrgb => .string "astc-6x5-unorm-srgb"
-  | .astc6x6Unorm => .string "astc-6x6-unorm"
-  | .astc6x6UnormSrgb => .string "astc-6x6-unorm-srgb"
-  | .astc8x5Unorm => .string "astc-8x5-unorm"
-  | .astc8x5UnormSrgb => .string "astc-8x5-unorm-srgb"
-  | .astc8x6Unorm => .string "astc-8x6-unorm"
-  | .astc8x6UnormSrgb => .string "astc-8x6-unorm-srgb"
-  | .astc8x8Unorm => .string "astc-8x8-unorm"
-  | .astc8x8UnormSrgb => .string "astc-8x8-unorm-srgb"
-  | .astc10x5Unorm => .string "astc-10x5-unorm"
-  | .astc10x5UnormSrgb => .string "astc-10x5-unorm-srgb"
-  | .astc10x6Unorm => .string "astc-10x6-unorm"
-  | .astc10x6UnormSrgb => .string "astc-10x6-unorm-srgb"
-  | .astc10x8Unorm => .string "astc-10x8-unorm"
-  | .astc10x8UnormSrgb => .string "astc-10x8-unorm-srgb"
-  | .astc10x10Unorm => .string "astc-10x10-unorm"
-  | .astc10x10UnormSrgb => .string "astc-10x10-unorm-srgb"
-  | .astc12x10Unorm => .string "astc-12x10-unorm"
-  | .astc12x10UnormSrgb => .string "astc-12x10-unorm-srgb"
-  | .astc12x12Unorm => .string "astc-12x12-unorm"
-  | .astc12x12UnormSrgb => .string "astc-12x12-unorm-srgb"⟩
-instance : FromJS GPUTextureFormat where
-  fromJS
-    | .string "r8unorm" => .ok .r8unorm
-    | .string "r8snorm" => .ok .r8snorm
-    | .string "r8uint" => .ok .r8uint
-    | .string "r8sint" => .ok .r8sint
-    | .string "r16unorm" => .ok .r16unorm
-    | .string "r16snorm" => .ok .r16snorm
-    | .string "r16uint" => .ok .r16uint
-    | .string "r16sint" => .ok .r16sint
-    | .string "r16float" => .ok .r16float
-    | .string "rg8unorm" => .ok .rg8unorm
-    | .string "rg8snorm" => .ok .rg8snorm
-    | .string "rg8uint" => .ok .rg8uint
-    | .string "rg8sint" => .ok .rg8sint
-    | .string "r32uint" => .ok .r32uint
-    | .string "r32sint" => .ok .r32sint
-    | .string "r32float" => .ok .r32float
-    | .string "rg16unorm" => .ok .rg16unorm
-    | .string "rg16snorm" => .ok .rg16snorm
-    | .string "rg16uint" => .ok .rg16uint
-    | .string "rg16sint" => .ok .rg16sint
-    | .string "rg16float" => .ok .rg16float
-    | .string "rgba8unorm" => .ok .rgba8unorm
-    | .string "rgba8unorm-srgb" => .ok .rgba8unormSrgb
-    | .string "rgba8snorm" => .ok .rgba8snorm
-    | .string "rgba8uint" => .ok .rgba8uint
-    | .string "rgba8sint" => .ok .rgba8sint
-    | .string "bgra8unorm" => .ok .bgra8unorm
-    | .string "bgra8unorm-srgb" => .ok .bgra8unormSrgb
-    | .string "rgb9e5ufloat" => .ok .rgb9e5ufloat
-    | .string "rgb10a2uint" => .ok .rgb10a2uint
-    | .string "rgb10a2unorm" => .ok .rgb10a2unorm
-    | .string "rg11b10ufloat" => .ok .rg11b10ufloat
-    | .string "rg32uint" => .ok .rg32uint
-    | .string "rg32sint" => .ok .rg32sint
-    | .string "rg32float" => .ok .rg32float
-    | .string "rgba16unorm" => .ok .rgba16unorm
-    | .string "rgba16snorm" => .ok .rgba16snorm
-    | .string "rgba16uint" => .ok .rgba16uint
-    | .string "rgba16sint" => .ok .rgba16sint
-    | .string "rgba16float" => .ok .rgba16float
-    | .string "rgba32uint" => .ok .rgba32uint
-    | .string "rgba32sint" => .ok .rgba32sint
-    | .string "rgba32float" => .ok .rgba32float
-    | .string "stencil8" => .ok .stencil8
-    | .string "depth16unorm" => .ok .depth16unorm
-    | .string "depth24plus" => .ok .depth24plus
-    | .string "depth24plus-stencil8" => .ok .depth24plusStencil8
-    | .string "depth32float" => .ok .depth32float
-    | .string "depth32float-stencil8" => .ok .depth32floatStencil8
-    | .string "bc1-rgba-unorm" => .ok .bc1RgbaUnorm
-    | .string "bc1-rgba-unorm-srgb" => .ok .bc1RgbaUnormSrgb
-    | .string "bc2-rgba-unorm" => .ok .bc2RgbaUnorm
-    | .string "bc2-rgba-unorm-srgb" => .ok .bc2RgbaUnormSrgb
-    | .string "bc3-rgba-unorm" => .ok .bc3RgbaUnorm
-    | .string "bc3-rgba-unorm-srgb" => .ok .bc3RgbaUnormSrgb
-    | .string "bc4-r-unorm" => .ok .bc4RUnorm
-    | .string "bc4-r-snorm" => .ok .bc4RSnorm
-    | .string "bc5-rg-unorm" => .ok .bc5RgUnorm
-    | .string "bc5-rg-snorm" => .ok .bc5RgSnorm
-    | .string "bc6h-rgb-ufloat" => .ok .bc6hRgbUfloat
-    | .string "bc6h-rgb-float" => .ok .bc6hRgbFloat
-    | .string "bc7-rgba-unorm" => .ok .bc7RgbaUnorm
-    | .string "bc7-rgba-unorm-srgb" => .ok .bc7RgbaUnormSrgb
-    | .string "etc2-rgb8unorm" => .ok .etc2Rgb8unorm
-    | .string "etc2-rgb8unorm-srgb" => .ok .etc2Rgb8unormSrgb
-    | .string "etc2-rgb8a1unorm" => .ok .etc2Rgb8a1unorm
-    | .string "etc2-rgb8a1unorm-srgb" => .ok .etc2Rgb8a1unormSrgb
-    | .string "etc2-rgba8unorm" => .ok .etc2Rgba8unorm
-    | .string "etc2-rgba8unorm-srgb" => .ok .etc2Rgba8unormSrgb
-    | .string "eac-r11unorm" => .ok .eacR11unorm
-    | .string "eac-r11snorm" => .ok .eacR11snorm
-    | .string "eac-rg11unorm" => .ok .eacRg11unorm
-    | .string "eac-rg11snorm" => .ok .eacRg11snorm
-    | .string "astc-4x4-unorm" => .ok .astc4x4Unorm
-    | .string "astc-4x4-unorm-srgb" => .ok .astc4x4UnormSrgb
-    | .string "astc-5x4-unorm" => .ok .astc5x4Unorm
-    | .string "astc-5x4-unorm-srgb" => .ok .astc5x4UnormSrgb
-    | .string "astc-5x5-unorm" => .ok .astc5x5Unorm
-    | .string "astc-5x5-unorm-srgb" => .ok .astc5x5UnormSrgb
-    | .string "astc-6x5-unorm" => .ok .astc6x5Unorm
-    | .string "astc-6x5-unorm-srgb" => .ok .astc6x5UnormSrgb
-    | .string "astc-6x6-unorm" => .ok .astc6x6Unorm
-    | .string "astc-6x6-unorm-srgb" => .ok .astc6x6UnormSrgb
-    | .string "astc-8x5-unorm" => .ok .astc8x5Unorm
-    | .string "astc-8x5-unorm-srgb" => .ok .astc8x5UnormSrgb
-    | .string "astc-8x6-unorm" => .ok .astc8x6Unorm
-    | .string "astc-8x6-unorm-srgb" => .ok .astc8x6UnormSrgb
-    | .string "astc-8x8-unorm" => .ok .astc8x8Unorm
-    | .string "astc-8x8-unorm-srgb" => .ok .astc8x8UnormSrgb
-    | .string "astc-10x5-unorm" => .ok .astc10x5Unorm
-    | .string "astc-10x5-unorm-srgb" => .ok .astc10x5UnormSrgb
-    | .string "astc-10x6-unorm" => .ok .astc10x6Unorm
-    | .string "astc-10x6-unorm-srgb" => .ok .astc10x6UnormSrgb
-    | .string "astc-10x8-unorm" => .ok .astc10x8Unorm
-    | .string "astc-10x8-unorm-srgb" => .ok .astc10x8UnormSrgb
-    | .string "astc-10x10-unorm" => .ok .astc10x10Unorm
-    | .string "astc-10x10-unorm-srgb" => .ok .astc10x10UnormSrgb
-    | .string "astc-12x10-unorm" => .ok .astc12x10Unorm
-    | .string "astc-12x10-unorm-srgb" => .ok .astc12x10UnormSrgb
-    | .string "astc-12x12-unorm" => .ok .astc12x12Unorm
-    | .string "astc-12x12-unorm-srgb" => .ok .astc12x12UnormSrgb
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUTextureFormat"
-
-/-- `enum GPUFeatureName` (WebGPU (https://gpuweb.github.io/gpuweb/)): "core-features-and-limits", "depth-clip-control", "depth32float-stencil8", "texture-compression-bc", "texture-compression-bc-sliced-3d", "texture-compression-etc2", "texture-compression-astc", "texture-compression-astc-sliced-3d", "timestamp-query", "indirect-first-instance", "shader-f16", "rg11b10ufloat-renderable", "bgra8unorm-storage", "float32-filterable", "float32-blendable", "clip-distances", "dual-source-blending", "subgroups", "texture-formats-tier1", "texture-formats-tier2", "primitive-index", "texture-component-swizzle", "subgroup-size-control", "texture-compression-unaligned", "atomic-vec2u-min-max". -/
-inductive GPUFeatureName where
-  /-- "core-features-and-limits" -/
-  | coreFeaturesAndLimits
-  /-- "depth-clip-control" -/
-  | depthClipControl
-  /-- "depth32float-stencil8" -/
-  | depth32floatStencil8
-  /-- "texture-compression-bc" -/
-  | textureCompressionBc
-  /-- "texture-compression-bc-sliced-3d" -/
-  | textureCompressionBcSliced3d
-  /-- "texture-compression-etc2" -/
-  | textureCompressionEtc2
-  /-- "texture-compression-astc" -/
-  | textureCompressionAstc
-  /-- "texture-compression-astc-sliced-3d" -/
-  | textureCompressionAstcSliced3d
-  /-- "timestamp-query" -/
-  | timestampQuery
-  /-- "indirect-first-instance" -/
-  | indirectFirstInstance
-  /-- "shader-f16" -/
-  | shaderF16
-  /-- "rg11b10ufloat-renderable" -/
-  | rg11b10ufloatRenderable
-  /-- "bgra8unorm-storage" -/
-  | bgra8unormStorage
-  /-- "float32-filterable" -/
-  | float32Filterable
-  /-- "float32-blendable" -/
-  | float32Blendable
-  /-- "clip-distances" -/
-  | clipDistances
-  /-- "dual-source-blending" -/
-  | dualSourceBlending
-  /-- "subgroups" -/
-  | subgroups
-  /-- "texture-formats-tier1" -/
-  | textureFormatsTier1
-  /-- "texture-formats-tier2" -/
-  | textureFormatsTier2
-  /-- "primitive-index" -/
-  | primitiveIndex
-  /-- "texture-component-swizzle" -/
-  | textureComponentSwizzle
-  /-- "subgroup-size-control" -/
-  | subgroupSizeControl
-  /-- "texture-compression-unaligned" -/
-  | textureCompressionUnaligned
-  /-- "atomic-vec2u-min-max" -/
-  | atomicVec2uMinMax
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUFeatureName := ⟨fun
-  | .coreFeaturesAndLimits => .string "core-features-and-limits"
-  | .depthClipControl => .string "depth-clip-control"
-  | .depth32floatStencil8 => .string "depth32float-stencil8"
-  | .textureCompressionBc => .string "texture-compression-bc"
-  | .textureCompressionBcSliced3d => .string "texture-compression-bc-sliced-3d"
-  | .textureCompressionEtc2 => .string "texture-compression-etc2"
-  | .textureCompressionAstc => .string "texture-compression-astc"
-  | .textureCompressionAstcSliced3d => .string "texture-compression-astc-sliced-3d"
-  | .timestampQuery => .string "timestamp-query"
-  | .indirectFirstInstance => .string "indirect-first-instance"
-  | .shaderF16 => .string "shader-f16"
-  | .rg11b10ufloatRenderable => .string "rg11b10ufloat-renderable"
-  | .bgra8unormStorage => .string "bgra8unorm-storage"
-  | .float32Filterable => .string "float32-filterable"
-  | .float32Blendable => .string "float32-blendable"
-  | .clipDistances => .string "clip-distances"
-  | .dualSourceBlending => .string "dual-source-blending"
-  | .subgroups => .string "subgroups"
-  | .textureFormatsTier1 => .string "texture-formats-tier1"
-  | .textureFormatsTier2 => .string "texture-formats-tier2"
-  | .primitiveIndex => .string "primitive-index"
-  | .textureComponentSwizzle => .string "texture-component-swizzle"
-  | .subgroupSizeControl => .string "subgroup-size-control"
-  | .textureCompressionUnaligned => .string "texture-compression-unaligned"
-  | .atomicVec2uMinMax => .string "atomic-vec2u-min-max"⟩
-instance : FromJS GPUFeatureName where
-  fromJS
-    | .string "core-features-and-limits" => .ok .coreFeaturesAndLimits
-    | .string "depth-clip-control" => .ok .depthClipControl
-    | .string "depth32float-stencil8" => .ok .depth32floatStencil8
-    | .string "texture-compression-bc" => .ok .textureCompressionBc
-    | .string "texture-compression-bc-sliced-3d" => .ok .textureCompressionBcSliced3d
-    | .string "texture-compression-etc2" => .ok .textureCompressionEtc2
-    | .string "texture-compression-astc" => .ok .textureCompressionAstc
-    | .string "texture-compression-astc-sliced-3d" => .ok .textureCompressionAstcSliced3d
-    | .string "timestamp-query" => .ok .timestampQuery
-    | .string "indirect-first-instance" => .ok .indirectFirstInstance
-    | .string "shader-f16" => .ok .shaderF16
-    | .string "rg11b10ufloat-renderable" => .ok .rg11b10ufloatRenderable
-    | .string "bgra8unorm-storage" => .ok .bgra8unormStorage
-    | .string "float32-filterable" => .ok .float32Filterable
-    | .string "float32-blendable" => .ok .float32Blendable
-    | .string "clip-distances" => .ok .clipDistances
-    | .string "dual-source-blending" => .ok .dualSourceBlending
-    | .string "subgroups" => .ok .subgroups
-    | .string "texture-formats-tier1" => .ok .textureFormatsTier1
-    | .string "texture-formats-tier2" => .ok .textureFormatsTier2
-    | .string "primitive-index" => .ok .primitiveIndex
-    | .string "texture-component-swizzle" => .ok .textureComponentSwizzle
-    | .string "subgroup-size-control" => .ok .subgroupSizeControl
-    | .string "texture-compression-unaligned" => .ok .textureCompressionUnaligned
-    | .string "atomic-vec2u-min-max" => .ok .atomicVec2uMinMax
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUFeatureName"
-
-/-- `enum GPUBufferMapState` (WebGPU (https://gpuweb.github.io/gpuweb/)): "unmapped", "pending", "mapped". -/
-inductive GPUBufferMapState where
-  /-- "unmapped" -/
-  | unmapped
-  /-- "pending" -/
-  | pending
-  /-- "mapped" -/
-  | mapped
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUBufferMapState := ⟨fun
-  | .unmapped => .string "unmapped"
-  | .pending => .string "pending"
-  | .mapped => .string "mapped"⟩
-instance : FromJS GPUBufferMapState where
-  fromJS
-    | .string "unmapped" => .ok .unmapped
-    | .string "pending" => .ok .pending
-    | .string "mapped" => .ok .mapped
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUBufferMapState"
-
-/-- `enum GPUCanvasToneMappingMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "standard", "extended". -/
-inductive GPUCanvasToneMappingMode where
-  /-- "standard" -/
-  | standard
-  /-- "extended" -/
-  | extended
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUCanvasToneMappingMode := ⟨fun
-  | .standard => .string "standard"
-  | .extended => .string "extended"⟩
-instance : FromJS GPUCanvasToneMappingMode where
-  fromJS
-    | .string "standard" => .ok .standard
-    | .string "extended" => .ok .extended
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUCanvasToneMappingMode"
-
-/-- `enum GPUCanvasAlphaMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "opaque", "premultiplied". -/
-inductive GPUCanvasAlphaMode where
-  /-- "opaque" -/
-  | «opaque»
-  /-- "premultiplied" -/
-  | premultiplied
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUCanvasAlphaMode := ⟨fun
-  | .«opaque» => .string "opaque"
-  | .premultiplied => .string "premultiplied"⟩
-instance : FromJS GPUCanvasAlphaMode where
-  fromJS
-    | .string "opaque" => .ok .«opaque»
-    | .string "premultiplied" => .ok .premultiplied
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUCanvasAlphaMode"
-
-/-- `enum GPULoadOp` (WebGPU (https://gpuweb.github.io/gpuweb/)): "load", "clear". -/
-inductive GPULoadOp where
-  /-- "load" -/
-  | load
-  /-- "clear" -/
-  | clear
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPULoadOp := ⟨fun
-  | .load => .string "load"
-  | .clear => .string "clear"⟩
-instance : FromJS GPULoadOp where
-  fromJS
-    | .string "load" => .ok .load
-    | .string "clear" => .ok .clear
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPULoadOp"
-
-/-- `enum GPUStoreOp` (WebGPU (https://gpuweb.github.io/gpuweb/)): "store", "discard". -/
-inductive GPUStoreOp where
-  /-- "store" -/
-  | store
-  /-- "discard" -/
-  | discard
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUStoreOp := ⟨fun
-  | .store => .string "store"
-  | .discard => .string "discard"⟩
-instance : FromJS GPUStoreOp where
-  fromJS
-    | .string "store" => .ok .store
-    | .string "discard" => .ok .discard
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUStoreOp"
-
-/-- `enum GPUTextureAspect` (WebGPU (https://gpuweb.github.io/gpuweb/)): "all", "stencil-only", "depth-only". -/
-inductive GPUTextureAspect where
-  /-- "all" -/
-  | all
-  /-- "stencil-only" -/
-  | stencilOnly
-  /-- "depth-only" -/
-  | depthOnly
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUTextureAspect := ⟨fun
-  | .all => .string "all"
-  | .stencilOnly => .string "stencil-only"
-  | .depthOnly => .string "depth-only"⟩
-instance : FromJS GPUTextureAspect where
-  fromJS
-    | .string "all" => .ok .all
-    | .string "stencil-only" => .ok .stencilOnly
-    | .string "depth-only" => .ok .depthOnly
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUTextureAspect"
-
-/-- `enum GPUCompilationMessageType` (WebGPU (https://gpuweb.github.io/gpuweb/)): "error", "warning", "info". -/
-inductive GPUCompilationMessageType where
-  /-- "error" -/
-  | error
-  /-- "warning" -/
-  | warning
-  /-- "info" -/
-  | info
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUCompilationMessageType := ⟨fun
-  | .error => .string "error"
-  | .warning => .string "warning"
-  | .info => .string "info"⟩
-instance : FromJS GPUCompilationMessageType where
-  fromJS
-    | .string "error" => .ok .error
-    | .string "warning" => .ok .warning
-    | .string "info" => .ok .info
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUCompilationMessageType"
-
-/-- `enum GPUTextureDimension` (WebGPU (https://gpuweb.github.io/gpuweb/)): "1d", "2d", "3d". -/
-inductive GPUTextureDimension where
-  /-- "1d" -/
-  | v1d
-  /-- "2d" -/
-  | v2d
-  /-- "3d" -/
-  | v3d
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUTextureDimension := ⟨fun
-  | .v1d => .string "1d"
-  | .v2d => .string "2d"
-  | .v3d => .string "3d"⟩
-instance : FromJS GPUTextureDimension where
-  fromJS
-    | .string "1d" => .ok .v1d
-    | .string "2d" => .ok .v2d
-    | .string "3d" => .ok .v3d
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUTextureDimension"
-
-/-- `enum GPUTextureViewDimension` (WebGPU (https://gpuweb.github.io/gpuweb/)): "1d", "2d", "2d-array", "cube", "cube-array", "3d". -/
-inductive GPUTextureViewDimension where
-  /-- "1d" -/
-  | v1d
-  /-- "2d" -/
-  | v2d
-  /-- "2d-array" -/
-  | v2dArray
-  /-- "cube" -/
-  | cube
-  /-- "cube-array" -/
-  | cubeArray
-  /-- "3d" -/
-  | v3d
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUTextureViewDimension := ⟨fun
-  | .v1d => .string "1d"
-  | .v2d => .string "2d"
-  | .v2dArray => .string "2d-array"
-  | .cube => .string "cube"
-  | .cubeArray => .string "cube-array"
-  | .v3d => .string "3d"⟩
-instance : FromJS GPUTextureViewDimension where
-  fromJS
-    | .string "1d" => .ok .v1d
-    | .string "2d" => .ok .v2d
-    | .string "2d-array" => .ok .v2dArray
-    | .string "cube" => .ok .cube
-    | .string "cube-array" => .ok .cubeArray
-    | .string "3d" => .ok .v3d
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUTextureViewDimension"
-
-/-- `enum GPUAddressMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "clamp-to-edge", "repeat", "mirror-repeat". -/
-inductive GPUAddressMode where
-  /-- "clamp-to-edge" -/
-  | clampToEdge
-  /-- "repeat" -/
-  | «repeat»
-  /-- "mirror-repeat" -/
-  | mirrorRepeat
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUAddressMode := ⟨fun
-  | .clampToEdge => .string "clamp-to-edge"
-  | .«repeat» => .string "repeat"
-  | .mirrorRepeat => .string "mirror-repeat"⟩
-instance : FromJS GPUAddressMode where
-  fromJS
-    | .string "clamp-to-edge" => .ok .clampToEdge
-    | .string "repeat" => .ok .«repeat»
-    | .string "mirror-repeat" => .ok .mirrorRepeat
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUAddressMode"
-
-/-- `enum GPUFilterMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "nearest", "linear". -/
-inductive GPUFilterMode where
-  /-- "nearest" -/
-  | nearest
-  /-- "linear" -/
-  | linear
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUFilterMode := ⟨fun
-  | .nearest => .string "nearest"
-  | .linear => .string "linear"⟩
-instance : FromJS GPUFilterMode where
-  fromJS
-    | .string "nearest" => .ok .nearest
-    | .string "linear" => .ok .linear
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUFilterMode"
-
-/-- `enum GPUMipmapFilterMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "nearest", "linear". -/
-inductive GPUMipmapFilterMode where
-  /-- "nearest" -/
-  | nearest
-  /-- "linear" -/
-  | linear
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUMipmapFilterMode := ⟨fun
-  | .nearest => .string "nearest"
-  | .linear => .string "linear"⟩
-instance : FromJS GPUMipmapFilterMode where
-  fromJS
-    | .string "nearest" => .ok .nearest
-    | .string "linear" => .ok .linear
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUMipmapFilterMode"
-
-/-- `enum GPUCompareFunction` (WebGPU (https://gpuweb.github.io/gpuweb/)): "never", "less", "equal", "less-equal", "greater", "not-equal", "greater-equal", "always". -/
-inductive GPUCompareFunction where
-  /-- "never" -/
-  | never
-  /-- "less" -/
-  | less
-  /-- "equal" -/
-  | equal
-  /-- "less-equal" -/
-  | lessEqual
-  /-- "greater" -/
-  | greater
-  /-- "not-equal" -/
-  | notEqual
-  /-- "greater-equal" -/
-  | greaterEqual
-  /-- "always" -/
-  | always
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUCompareFunction := ⟨fun
-  | .never => .string "never"
-  | .less => .string "less"
-  | .equal => .string "equal"
-  | .lessEqual => .string "less-equal"
-  | .greater => .string "greater"
-  | .notEqual => .string "not-equal"
-  | .greaterEqual => .string "greater-equal"
-  | .always => .string "always"⟩
-instance : FromJS GPUCompareFunction where
-  fromJS
-    | .string "never" => .ok .never
-    | .string "less" => .ok .less
-    | .string "equal" => .ok .equal
-    | .string "less-equal" => .ok .lessEqual
-    | .string "greater" => .ok .greater
-    | .string "not-equal" => .ok .notEqual
-    | .string "greater-equal" => .ok .greaterEqual
-    | .string "always" => .ok .always
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUCompareFunction"
-
-/-- `enum GPUBufferBindingType` (WebGPU (https://gpuweb.github.io/gpuweb/)): "uniform", "storage", "read-only-storage". -/
-inductive GPUBufferBindingType where
-  /-- "uniform" -/
-  | uniform
-  /-- "storage" -/
-  | storage
-  /-- "read-only-storage" -/
-  | readOnlyStorage
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUBufferBindingType := ⟨fun
-  | .uniform => .string "uniform"
-  | .storage => .string "storage"
-  | .readOnlyStorage => .string "read-only-storage"⟩
-instance : FromJS GPUBufferBindingType where
-  fromJS
-    | .string "uniform" => .ok .uniform
-    | .string "storage" => .ok .storage
-    | .string "read-only-storage" => .ok .readOnlyStorage
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUBufferBindingType"
-
-/-- `enum GPUSamplerBindingType` (WebGPU (https://gpuweb.github.io/gpuweb/)): "filtering", "non-filtering", "comparison". -/
-inductive GPUSamplerBindingType where
-  /-- "filtering" -/
-  | filtering
-  /-- "non-filtering" -/
-  | nonFiltering
-  /-- "comparison" -/
-  | comparison
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUSamplerBindingType := ⟨fun
-  | .filtering => .string "filtering"
-  | .nonFiltering => .string "non-filtering"
-  | .comparison => .string "comparison"⟩
-instance : FromJS GPUSamplerBindingType where
-  fromJS
-    | .string "filtering" => .ok .filtering
-    | .string "non-filtering" => .ok .nonFiltering
-    | .string "comparison" => .ok .comparison
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUSamplerBindingType"
-
-/-- `enum GPUTextureSampleType` (WebGPU (https://gpuweb.github.io/gpuweb/)): "float", "unfilterable-float", "depth", "sint", "uint". -/
-inductive GPUTextureSampleType where
-  /-- "float" -/
-  | float
-  /-- "unfilterable-float" -/
-  | unfilterableFloat
-  /-- "depth" -/
-  | depth
-  /-- "sint" -/
-  | sint
-  /-- "uint" -/
-  | uint
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUTextureSampleType := ⟨fun
-  | .float => .string "float"
-  | .unfilterableFloat => .string "unfilterable-float"
-  | .depth => .string "depth"
-  | .sint => .string "sint"
-  | .uint => .string "uint"⟩
-instance : FromJS GPUTextureSampleType where
-  fromJS
-    | .string "float" => .ok .float
-    | .string "unfilterable-float" => .ok .unfilterableFloat
-    | .string "depth" => .ok .depth
-    | .string "sint" => .ok .sint
-    | .string "uint" => .ok .uint
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUTextureSampleType"
-
-/-- `enum GPUStorageTextureAccess` (WebGPU (https://gpuweb.github.io/gpuweb/)): "write-only", "read-only", "read-write". -/
-inductive GPUStorageTextureAccess where
-  /-- "write-only" -/
-  | writeOnly
-  /-- "read-only" -/
-  | readOnly
-  /-- "read-write" -/
-  | readWrite
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUStorageTextureAccess := ⟨fun
-  | .writeOnly => .string "write-only"
-  | .readOnly => .string "read-only"
-  | .readWrite => .string "read-write"⟩
-instance : FromJS GPUStorageTextureAccess where
-  fromJS
-    | .string "write-only" => .ok .writeOnly
-    | .string "read-only" => .ok .readOnly
-    | .string "read-write" => .ok .readWrite
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUStorageTextureAccess"
-
-/-- `enum GPUAutoLayoutMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "auto". -/
-inductive GPUAutoLayoutMode where
-  /-- "auto" -/
-  | auto
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUAutoLayoutMode := ⟨fun
-  | .auto => .string "auto"⟩
-instance : FromJS GPUAutoLayoutMode where
-  fromJS
-    | .string "auto" => .ok .auto
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUAutoLayoutMode"
-
-/-- `enum GPUVertexStepMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "vertex", "instance". -/
-inductive GPUVertexStepMode where
-  /-- "vertex" -/
-  | vertex
-  /-- "instance" -/
-  | «instance»
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUVertexStepMode := ⟨fun
-  | .vertex => .string "vertex"
-  | .«instance» => .string "instance"⟩
-instance : FromJS GPUVertexStepMode where
-  fromJS
-    | .string "vertex" => .ok .vertex
-    | .string "instance" => .ok .«instance»
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUVertexStepMode"
-
-/-- `enum GPUVertexFormat` (WebGPU (https://gpuweb.github.io/gpuweb/)): "uint8", "uint8x2", "uint8x4", "sint8", "sint8x2", "sint8x4", "unorm8", "unorm8x2", "unorm8x4", "snorm8", "snorm8x2", "snorm8x4", "uint16", "uint16x2", "uint16x4", "sint16", "sint16x2", "sint16x4", "unorm16", "unorm16x2", "unorm16x4", "snorm16", "snorm16x2", "snorm16x4", "float16", "float16x2", "float16x4", "float32", "float32x2", "float32x3", "float32x4", "uint32", "uint32x2", "uint32x3", "uint32x4", "sint32", "sint32x2", "sint32x3", "sint32x4", "unorm10-10-10-2", "unorm8x4-bgra", "snorm10-10-10-2". -/
-inductive GPUVertexFormat where
-  /-- "uint8" -/
-  | uint8
-  /-- "uint8x2" -/
-  | uint8x2
-  /-- "uint8x4" -/
-  | uint8x4
-  /-- "sint8" -/
-  | sint8
-  /-- "sint8x2" -/
-  | sint8x2
-  /-- "sint8x4" -/
-  | sint8x4
-  /-- "unorm8" -/
-  | unorm8
-  /-- "unorm8x2" -/
-  | unorm8x2
-  /-- "unorm8x4" -/
-  | unorm8x4
-  /-- "snorm8" -/
-  | snorm8
-  /-- "snorm8x2" -/
-  | snorm8x2
-  /-- "snorm8x4" -/
-  | snorm8x4
-  /-- "uint16" -/
-  | uint16
-  /-- "uint16x2" -/
-  | uint16x2
-  /-- "uint16x4" -/
-  | uint16x4
-  /-- "sint16" -/
-  | sint16
-  /-- "sint16x2" -/
-  | sint16x2
-  /-- "sint16x4" -/
-  | sint16x4
-  /-- "unorm16" -/
-  | unorm16
-  /-- "unorm16x2" -/
-  | unorm16x2
-  /-- "unorm16x4" -/
-  | unorm16x4
-  /-- "snorm16" -/
-  | snorm16
-  /-- "snorm16x2" -/
-  | snorm16x2
-  /-- "snorm16x4" -/
-  | snorm16x4
-  /-- "float16" -/
-  | float16
-  /-- "float16x2" -/
-  | float16x2
-  /-- "float16x4" -/
-  | float16x4
-  /-- "float32" -/
-  | float32
-  /-- "float32x2" -/
-  | float32x2
-  /-- "float32x3" -/
-  | float32x3
-  /-- "float32x4" -/
-  | float32x4
-  /-- "uint32" -/
-  | uint32
-  /-- "uint32x2" -/
-  | uint32x2
-  /-- "uint32x3" -/
-  | uint32x3
-  /-- "uint32x4" -/
-  | uint32x4
-  /-- "sint32" -/
-  | sint32
-  /-- "sint32x2" -/
-  | sint32x2
-  /-- "sint32x3" -/
-  | sint32x3
-  /-- "sint32x4" -/
-  | sint32x4
-  /-- "unorm10-10-10-2" -/
-  | unorm1010102
-  /-- "unorm8x4-bgra" -/
-  | unorm8x4Bgra
-  /-- "snorm10-10-10-2" -/
-  | snorm1010102
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUVertexFormat := ⟨fun
-  | .uint8 => .string "uint8"
-  | .uint8x2 => .string "uint8x2"
-  | .uint8x4 => .string "uint8x4"
-  | .sint8 => .string "sint8"
-  | .sint8x2 => .string "sint8x2"
-  | .sint8x4 => .string "sint8x4"
-  | .unorm8 => .string "unorm8"
-  | .unorm8x2 => .string "unorm8x2"
-  | .unorm8x4 => .string "unorm8x4"
-  | .snorm8 => .string "snorm8"
-  | .snorm8x2 => .string "snorm8x2"
-  | .snorm8x4 => .string "snorm8x4"
-  | .uint16 => .string "uint16"
-  | .uint16x2 => .string "uint16x2"
-  | .uint16x4 => .string "uint16x4"
-  | .sint16 => .string "sint16"
-  | .sint16x2 => .string "sint16x2"
-  | .sint16x4 => .string "sint16x4"
-  | .unorm16 => .string "unorm16"
-  | .unorm16x2 => .string "unorm16x2"
-  | .unorm16x4 => .string "unorm16x4"
-  | .snorm16 => .string "snorm16"
-  | .snorm16x2 => .string "snorm16x2"
-  | .snorm16x4 => .string "snorm16x4"
-  | .float16 => .string "float16"
-  | .float16x2 => .string "float16x2"
-  | .float16x4 => .string "float16x4"
-  | .float32 => .string "float32"
-  | .float32x2 => .string "float32x2"
-  | .float32x3 => .string "float32x3"
-  | .float32x4 => .string "float32x4"
-  | .uint32 => .string "uint32"
-  | .uint32x2 => .string "uint32x2"
-  | .uint32x3 => .string "uint32x3"
-  | .uint32x4 => .string "uint32x4"
-  | .sint32 => .string "sint32"
-  | .sint32x2 => .string "sint32x2"
-  | .sint32x3 => .string "sint32x3"
-  | .sint32x4 => .string "sint32x4"
-  | .unorm1010102 => .string "unorm10-10-10-2"
-  | .unorm8x4Bgra => .string "unorm8x4-bgra"
-  | .snorm1010102 => .string "snorm10-10-10-2"⟩
-instance : FromJS GPUVertexFormat where
-  fromJS
-    | .string "uint8" => .ok .uint8
-    | .string "uint8x2" => .ok .uint8x2
-    | .string "uint8x4" => .ok .uint8x4
-    | .string "sint8" => .ok .sint8
-    | .string "sint8x2" => .ok .sint8x2
-    | .string "sint8x4" => .ok .sint8x4
-    | .string "unorm8" => .ok .unorm8
-    | .string "unorm8x2" => .ok .unorm8x2
-    | .string "unorm8x4" => .ok .unorm8x4
-    | .string "snorm8" => .ok .snorm8
-    | .string "snorm8x2" => .ok .snorm8x2
-    | .string "snorm8x4" => .ok .snorm8x4
-    | .string "uint16" => .ok .uint16
-    | .string "uint16x2" => .ok .uint16x2
-    | .string "uint16x4" => .ok .uint16x4
-    | .string "sint16" => .ok .sint16
-    | .string "sint16x2" => .ok .sint16x2
-    | .string "sint16x4" => .ok .sint16x4
-    | .string "unorm16" => .ok .unorm16
-    | .string "unorm16x2" => .ok .unorm16x2
-    | .string "unorm16x4" => .ok .unorm16x4
-    | .string "snorm16" => .ok .snorm16
-    | .string "snorm16x2" => .ok .snorm16x2
-    | .string "snorm16x4" => .ok .snorm16x4
-    | .string "float16" => .ok .float16
-    | .string "float16x2" => .ok .float16x2
-    | .string "float16x4" => .ok .float16x4
-    | .string "float32" => .ok .float32
-    | .string "float32x2" => .ok .float32x2
-    | .string "float32x3" => .ok .float32x3
-    | .string "float32x4" => .ok .float32x4
-    | .string "uint32" => .ok .uint32
-    | .string "uint32x2" => .ok .uint32x2
-    | .string "uint32x3" => .ok .uint32x3
-    | .string "uint32x4" => .ok .uint32x4
-    | .string "sint32" => .ok .sint32
-    | .string "sint32x2" => .ok .sint32x2
-    | .string "sint32x3" => .ok .sint32x3
-    | .string "sint32x4" => .ok .sint32x4
-    | .string "unorm10-10-10-2" => .ok .unorm1010102
-    | .string "unorm8x4-bgra" => .ok .unorm8x4Bgra
-    | .string "snorm10-10-10-2" => .ok .snorm1010102
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUVertexFormat"
-
-/-- `enum GPUPrimitiveTopology` (WebGPU (https://gpuweb.github.io/gpuweb/)): "point-list", "line-list", "line-strip", "triangle-list", "triangle-strip". -/
-inductive GPUPrimitiveTopology where
-  /-- "point-list" -/
-  | pointList
-  /-- "line-list" -/
-  | lineList
-  /-- "line-strip" -/
-  | lineStrip
-  /-- "triangle-list" -/
-  | triangleList
-  /-- "triangle-strip" -/
-  | triangleStrip
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUPrimitiveTopology := ⟨fun
-  | .pointList => .string "point-list"
-  | .lineList => .string "line-list"
-  | .lineStrip => .string "line-strip"
-  | .triangleList => .string "triangle-list"
-  | .triangleStrip => .string "triangle-strip"⟩
-instance : FromJS GPUPrimitiveTopology where
-  fromJS
-    | .string "point-list" => .ok .pointList
-    | .string "line-list" => .ok .lineList
-    | .string "line-strip" => .ok .lineStrip
-    | .string "triangle-list" => .ok .triangleList
-    | .string "triangle-strip" => .ok .triangleStrip
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUPrimitiveTopology"
-
-/-- `enum GPUIndexFormat` (WebGPU (https://gpuweb.github.io/gpuweb/)): "uint16", "uint32". -/
-inductive GPUIndexFormat where
-  /-- "uint16" -/
-  | uint16
-  /-- "uint32" -/
-  | uint32
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUIndexFormat := ⟨fun
-  | .uint16 => .string "uint16"
-  | .uint32 => .string "uint32"⟩
-instance : FromJS GPUIndexFormat where
-  fromJS
-    | .string "uint16" => .ok .uint16
-    | .string "uint32" => .ok .uint32
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUIndexFormat"
-
-/-- `enum GPUFrontFace` (WebGPU (https://gpuweb.github.io/gpuweb/)): "ccw", "cw". -/
-inductive GPUFrontFace where
-  /-- "ccw" -/
-  | ccw
-  /-- "cw" -/
-  | cw
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUFrontFace := ⟨fun
-  | .ccw => .string "ccw"
-  | .cw => .string "cw"⟩
-instance : FromJS GPUFrontFace where
-  fromJS
-    | .string "ccw" => .ok .ccw
-    | .string "cw" => .ok .cw
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUFrontFace"
-
-/-- `enum GPUCullMode` (WebGPU (https://gpuweb.github.io/gpuweb/)): "none", "front", "back". -/
-inductive GPUCullMode where
-  /-- "none" -/
-  | none
-  /-- "front" -/
-  | front
-  /-- "back" -/
-  | back
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUCullMode := ⟨fun
-  | .none => .string "none"
-  | .front => .string "front"
-  | .back => .string "back"⟩
-instance : FromJS GPUCullMode where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "front" => .ok .front
-    | .string "back" => .ok .back
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUCullMode"
-
-/-- `enum GPUStencilOperation` (WebGPU (https://gpuweb.github.io/gpuweb/)): "keep", "zero", "replace", "invert", "increment-clamp", "decrement-clamp", "increment-wrap", "decrement-wrap". -/
-inductive GPUStencilOperation where
-  /-- "keep" -/
-  | keep
-  /-- "zero" -/
-  | zero
-  /-- "replace" -/
-  | replace
-  /-- "invert" -/
-  | invert
-  /-- "increment-clamp" -/
-  | incrementClamp
-  /-- "decrement-clamp" -/
-  | decrementClamp
-  /-- "increment-wrap" -/
-  | incrementWrap
-  /-- "decrement-wrap" -/
-  | decrementWrap
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUStencilOperation := ⟨fun
-  | .keep => .string "keep"
-  | .zero => .string "zero"
-  | .replace => .string "replace"
-  | .invert => .string "invert"
-  | .incrementClamp => .string "increment-clamp"
-  | .decrementClamp => .string "decrement-clamp"
-  | .incrementWrap => .string "increment-wrap"
-  | .decrementWrap => .string "decrement-wrap"⟩
-instance : FromJS GPUStencilOperation where
-  fromJS
-    | .string "keep" => .ok .keep
-    | .string "zero" => .ok .zero
-    | .string "replace" => .ok .replace
-    | .string "invert" => .ok .invert
-    | .string "increment-clamp" => .ok .incrementClamp
-    | .string "decrement-clamp" => .ok .decrementClamp
-    | .string "increment-wrap" => .ok .incrementWrap
-    | .string "decrement-wrap" => .ok .decrementWrap
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUStencilOperation"
-
-/-- `enum GPUBlendOperation` (WebGPU (https://gpuweb.github.io/gpuweb/)): "add", "subtract", "reverse-subtract", "min", "max". -/
-inductive GPUBlendOperation where
-  /-- "add" -/
-  | add
-  /-- "subtract" -/
-  | subtract
-  /-- "reverse-subtract" -/
-  | reverseSubtract
-  /-- "min" -/
-  | min
-  /-- "max" -/
-  | max
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUBlendOperation := ⟨fun
-  | .add => .string "add"
-  | .subtract => .string "subtract"
-  | .reverseSubtract => .string "reverse-subtract"
-  | .min => .string "min"
-  | .max => .string "max"⟩
-instance : FromJS GPUBlendOperation where
-  fromJS
-    | .string "add" => .ok .add
-    | .string "subtract" => .ok .subtract
-    | .string "reverse-subtract" => .ok .reverseSubtract
-    | .string "min" => .ok .min
-    | .string "max" => .ok .max
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUBlendOperation"
-
-/-- `enum GPUBlendFactor` (WebGPU (https://gpuweb.github.io/gpuweb/)): "zero", "one", "src", "one-minus-src", "src-alpha", "one-minus-src-alpha", "dst", "one-minus-dst", "dst-alpha", "one-minus-dst-alpha", "src-alpha-saturated", "constant", "one-minus-constant", "src1", "one-minus-src1", "src1-alpha", "one-minus-src1-alpha". -/
-inductive GPUBlendFactor where
-  /-- "zero" -/
-  | zero
-  /-- "one" -/
-  | one
-  /-- "src" -/
-  | src
-  /-- "one-minus-src" -/
-  | oneMinusSrc
-  /-- "src-alpha" -/
-  | srcAlpha
-  /-- "one-minus-src-alpha" -/
-  | oneMinusSrcAlpha
-  /-- "dst" -/
-  | dst
-  /-- "one-minus-dst" -/
-  | oneMinusDst
-  /-- "dst-alpha" -/
-  | dstAlpha
-  /-- "one-minus-dst-alpha" -/
-  | oneMinusDstAlpha
-  /-- "src-alpha-saturated" -/
-  | srcAlphaSaturated
-  /-- "constant" -/
-  | constant
-  /-- "one-minus-constant" -/
-  | oneMinusConstant
-  /-- "src1" -/
-  | src1
-  /-- "one-minus-src1" -/
-  | oneMinusSrc1
-  /-- "src1-alpha" -/
-  | src1Alpha
-  /-- "one-minus-src1-alpha" -/
-  | oneMinusSrc1Alpha
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUBlendFactor := ⟨fun
-  | .zero => .string "zero"
-  | .one => .string "one"
-  | .src => .string "src"
-  | .oneMinusSrc => .string "one-minus-src"
-  | .srcAlpha => .string "src-alpha"
-  | .oneMinusSrcAlpha => .string "one-minus-src-alpha"
-  | .dst => .string "dst"
-  | .oneMinusDst => .string "one-minus-dst"
-  | .dstAlpha => .string "dst-alpha"
-  | .oneMinusDstAlpha => .string "one-minus-dst-alpha"
-  | .srcAlphaSaturated => .string "src-alpha-saturated"
-  | .constant => .string "constant"
-  | .oneMinusConstant => .string "one-minus-constant"
-  | .src1 => .string "src1"
-  | .oneMinusSrc1 => .string "one-minus-src1"
-  | .src1Alpha => .string "src1-alpha"
-  | .oneMinusSrc1Alpha => .string "one-minus-src1-alpha"⟩
-instance : FromJS GPUBlendFactor where
-  fromJS
-    | .string "zero" => .ok .zero
-    | .string "one" => .ok .one
-    | .string "src" => .ok .src
-    | .string "one-minus-src" => .ok .oneMinusSrc
-    | .string "src-alpha" => .ok .srcAlpha
-    | .string "one-minus-src-alpha" => .ok .oneMinusSrcAlpha
-    | .string "dst" => .ok .dst
-    | .string "one-minus-dst" => .ok .oneMinusDst
-    | .string "dst-alpha" => .ok .dstAlpha
-    | .string "one-minus-dst-alpha" => .ok .oneMinusDstAlpha
-    | .string "src-alpha-saturated" => .ok .srcAlphaSaturated
-    | .string "constant" => .ok .constant
-    | .string "one-minus-constant" => .ok .oneMinusConstant
-    | .string "src1" => .ok .src1
-    | .string "one-minus-src1" => .ok .oneMinusSrc1
-    | .string "src1-alpha" => .ok .src1Alpha
-    | .string "one-minus-src1-alpha" => .ok .oneMinusSrc1Alpha
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUBlendFactor"
-
-/-- `enum GPUQueryType` (WebGPU (https://gpuweb.github.io/gpuweb/)): "occlusion", "timestamp". -/
-inductive GPUQueryType where
-  /-- "occlusion" -/
-  | occlusion
-  /-- "timestamp" -/
-  | timestamp
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUQueryType := ⟨fun
-  | .occlusion => .string "occlusion"
-  | .timestamp => .string "timestamp"⟩
-instance : FromJS GPUQueryType where
-  fromJS
-    | .string "occlusion" => .ok .occlusion
-    | .string "timestamp" => .ok .timestamp
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUQueryType"
-
-/-- `enum GPUErrorFilter` (WebGPU (https://gpuweb.github.io/gpuweb/)): "validation", "out-of-memory", "internal". -/
-inductive GPUErrorFilter where
-  /-- "validation" -/
-  | validation
-  /-- "out-of-memory" -/
-  | outOfMemory
-  /-- "internal" -/
-  | internal
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUErrorFilter := ⟨fun
-  | .validation => .string "validation"
-  | .outOfMemory => .string "out-of-memory"
-  | .internal => .string "internal"⟩
-instance : FromJS GPUErrorFilter where
-  fromJS
-    | .string "validation" => .ok .validation
-    | .string "out-of-memory" => .ok .outOfMemory
-    | .string "internal" => .ok .internal
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUErrorFilter"
-
-/-- `enum GPUDeviceLostReason` (WebGPU (https://gpuweb.github.io/gpuweb/)): "unknown", "destroyed". -/
-inductive GPUDeviceLostReason where
-  /-- "unknown" -/
-  | unknown
-  /-- "destroyed" -/
-  | destroyed
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUDeviceLostReason := ⟨fun
-  | .unknown => .string "unknown"
-  | .destroyed => .string "destroyed"⟩
-instance : FromJS GPUDeviceLostReason where
-  fromJS
-    | .string "unknown" => .ok .unknown
-    | .string "destroyed" => .ok .destroyed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUDeviceLostReason"
-
-/-- `enum GPUPipelineErrorReason` (WebGPU (https://gpuweb.github.io/gpuweb/)): "validation", "internal". -/
-inductive GPUPipelineErrorReason where
-  /-- "validation" -/
-  | validation
-  /-- "internal" -/
-  | internal
-  deriving BEq, Repr, Inhabited
-instance : ToJS GPUPipelineErrorReason := ⟨fun
-  | .validation => .string "validation"
-  | .internal => .string "internal"⟩
-instance : FromJS GPUPipelineErrorReason where
-  fromJS
-    | .string "validation" => .ok .validation
-    | .string "internal" => .ok .internal
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GPUPipelineErrorReason"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary GPURequestAdapterOptions` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPURequestAdapterOptions where
@@ -1444,16 +29,16 @@ structure GPURequestAdapterOptions where
   forceFallbackAdapter : Option Bool := none
   /-- `boolean xrCompatible = false` -/
   xrCompatible : Option Bool := none
-instance : ToJS GPURequestAdapterOptions := ⟨fun d => Support.fields #[("featureLevel", Support.optional d.featureLevel),
-    ("powerPreference", Support.optional d.powerPreference),
-    ("forceFallbackAdapter", Support.optional d.forceFallbackAdapter),
-    ("xrCompatible", Support.optional d.xrCompatible)]⟩
+instance : ToJS GPURequestAdapterOptions := ⟨fun d => Internal.fields #[("featureLevel", Internal.optional d.featureLevel),
+    ("powerPreference", Internal.optional d.powerPreference),
+    ("forceFallbackAdapter", Internal.optional d.forceFallbackAdapter),
+    ("xrCompatible", Internal.optional d.xrCompatible)]⟩
 
 /-- `dictionary GPUQueueDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUQueueDescriptor where
   /-- `USVString label = ""` -/
   label : Option String := none
-instance : ToJS GPUQueueDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label)]⟩
+instance : ToJS GPUQueueDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
 
 /-- `dictionary GPUDeviceDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUDeviceDescriptor where
@@ -1465,16 +50,16 @@ structure GPUDeviceDescriptor where
   requiredLimits : Option (Record (Option Nat)) := none
   /-- `GPUQueueDescriptor defaultQueue = {}` -/
   defaultQueue : Option GPUQueueDescriptor := none
-instance : ToJS GPUDeviceDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("requiredFeatures", Support.optional d.requiredFeatures),
-    ("requiredLimits", Support.optional d.requiredLimits),
-    ("defaultQueue", Support.optional d.defaultQueue)]⟩
+instance : ToJS GPUDeviceDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("requiredFeatures", Internal.optional d.requiredFeatures),
+    ("requiredLimits", Internal.optional d.requiredLimits),
+    ("defaultQueue", Internal.optional d.defaultQueue)]⟩
 
 /-- `dictionary GPUCanvasToneMapping` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUCanvasToneMapping where
   /-- `GPUCanvasToneMappingMode mode = "standard"` -/
   mode : Option GPUCanvasToneMappingMode := none
-instance : ToJS GPUCanvasToneMapping := ⟨fun d => Support.fields #[("mode", Support.optional d.mode)]⟩
+instance : ToJS GPUCanvasToneMapping := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode)]⟩
 instance : FromJS GPUCanvasToneMapping where
   fromJS d := do return {
     mode := ← Lasm.JS.readField (Option GPUCanvasToneMappingMode) d "mode" }
@@ -1496,13 +81,13 @@ structure GPUCanvasConfiguration where
   toneMapping : Option GPUCanvasToneMapping := none
   /-- `GPUCanvasAlphaMode alphaMode = "opaque"` -/
   alphaMode : Option GPUCanvasAlphaMode := none
-instance : ToJS GPUCanvasConfiguration := ⟨fun d => Support.fields #[("device", toJS d.device),
+instance : ToJS GPUCanvasConfiguration := ⟨fun d => Internal.fields #[("device", toJS d.device),
     ("format", toJS d.format),
-    ("usage", Support.optional d.usage),
-    ("viewFormats", Support.optional d.viewFormats),
-    ("colorSpace", Support.optional d.colorSpace),
-    ("toneMapping", Support.optional d.toneMapping),
-    ("alphaMode", Support.optional d.alphaMode)]⟩
+    ("usage", Internal.optional d.usage),
+    ("viewFormats", Internal.optional d.viewFormats),
+    ("colorSpace", Internal.optional d.colorSpace),
+    ("toneMapping", Internal.optional d.toneMapping),
+    ("alphaMode", Internal.optional d.alphaMode)]⟩
 instance : FromJS GPUCanvasConfiguration where
   fromJS d := do return {
     device := ← Lasm.JS.readField GPUDevice d "device",
@@ -1536,7 +121,7 @@ structure GPUColorDict where
   b : Float
   /-- `required double a` -/
   a : Float
-instance : ToJS GPUColorDict := ⟨fun d => Support.fields #[("r", toJS d.r),
+instance : ToJS GPUColorDict := ⟨fun d => Internal.fields #[("r", toJS d.r),
     ("g", toJS d.g),
     ("b", toJS d.b),
     ("a", toJS d.a)]⟩
@@ -1567,10 +152,10 @@ structure GPURenderPassColorAttachment where
   loadOp : GPULoadOp
   /-- `required GPUStoreOp storeOp` -/
   storeOp : GPUStoreOp
-instance : ToJS GPURenderPassColorAttachment := ⟨fun d => Support.fields #[("view", toJS d.view),
-    ("depthSlice", Support.optional d.depthSlice),
-    ("resolveTarget", Support.optional d.resolveTarget),
-    ("clearValue", Support.optional d.clearValue),
+instance : ToJS GPURenderPassColorAttachment := ⟨fun d => Internal.fields #[("view", toJS d.view),
+    ("depthSlice", Internal.optional d.depthSlice),
+    ("resolveTarget", Internal.optional d.resolveTarget),
+    ("clearValue", Internal.optional d.clearValue),
     ("loadOp", toJS d.loadOp),
     ("storeOp", toJS d.storeOp)]⟩
 
@@ -1594,15 +179,15 @@ structure GPURenderPassDepthStencilAttachment where
   stencilStoreOp : Option GPUStoreOp := none
   /-- `boolean stencilReadOnly = false` -/
   stencilReadOnly : Option Bool := none
-instance : ToJS GPURenderPassDepthStencilAttachment := ⟨fun d => Support.fields #[("view", toJS d.view),
-    ("depthClearValue", Support.optional d.depthClearValue),
-    ("depthLoadOp", Support.optional d.depthLoadOp),
-    ("depthStoreOp", Support.optional d.depthStoreOp),
-    ("depthReadOnly", Support.optional d.depthReadOnly),
-    ("stencilClearValue", Support.optional d.stencilClearValue),
-    ("stencilLoadOp", Support.optional d.stencilLoadOp),
-    ("stencilStoreOp", Support.optional d.stencilStoreOp),
-    ("stencilReadOnly", Support.optional d.stencilReadOnly)]⟩
+instance : ToJS GPURenderPassDepthStencilAttachment := ⟨fun d => Internal.fields #[("view", toJS d.view),
+    ("depthClearValue", Internal.optional d.depthClearValue),
+    ("depthLoadOp", Internal.optional d.depthLoadOp),
+    ("depthStoreOp", Internal.optional d.depthStoreOp),
+    ("depthReadOnly", Internal.optional d.depthReadOnly),
+    ("stencilClearValue", Internal.optional d.stencilClearValue),
+    ("stencilLoadOp", Internal.optional d.stencilLoadOp),
+    ("stencilStoreOp", Internal.optional d.stencilStoreOp),
+    ("stencilReadOnly", Internal.optional d.stencilReadOnly)]⟩
 
 /-- `dictionary GPURenderPassTimestampWrites` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPURenderPassTimestampWrites where
@@ -1612,9 +197,9 @@ structure GPURenderPassTimestampWrites where
   beginningOfPassWriteIndex : Option Nat := none
   /-- `GPUSize32 endOfPassWriteIndex` -/
   endOfPassWriteIndex : Option Nat := none
-instance : ToJS GPURenderPassTimestampWrites := ⟨fun d => Support.fields #[("querySet", toJS d.querySet),
-    ("beginningOfPassWriteIndex", Support.optional d.beginningOfPassWriteIndex),
-    ("endOfPassWriteIndex", Support.optional d.endOfPassWriteIndex)]⟩
+instance : ToJS GPURenderPassTimestampWrites := ⟨fun d => Internal.fields #[("querySet", toJS d.querySet),
+    ("beginningOfPassWriteIndex", Internal.optional d.beginningOfPassWriteIndex),
+    ("endOfPassWriteIndex", Internal.optional d.endOfPassWriteIndex)]⟩
 
 /-- `dictionary GPURenderPassDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPURenderPassDescriptor where
@@ -1630,12 +215,12 @@ structure GPURenderPassDescriptor where
   timestampWrites : Option GPURenderPassTimestampWrites := none
   /-- `GPUSize64 maxDrawCount = 50000000` -/
   maxDrawCount : Option Nat := none
-instance : ToJS GPURenderPassDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPURenderPassDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("colorAttachments", toJS d.colorAttachments),
-    ("depthStencilAttachment", Support.optional d.depthStencilAttachment),
-    ("occlusionQuerySet", Support.optional d.occlusionQuerySet),
-    ("timestampWrites", Support.optional d.timestampWrites),
-    ("maxDrawCount", Support.optional d.maxDrawCount)]⟩
+    ("depthStencilAttachment", Internal.optional d.depthStencilAttachment),
+    ("occlusionQuerySet", Internal.optional d.occlusionQuerySet),
+    ("timestampWrites", Internal.optional d.timestampWrites),
+    ("maxDrawCount", Internal.optional d.maxDrawCount)]⟩
 
 /-- `dictionary GPUComputePassTimestampWrites` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUComputePassTimestampWrites where
@@ -1645,9 +230,9 @@ structure GPUComputePassTimestampWrites where
   beginningOfPassWriteIndex : Option Nat := none
   /-- `GPUSize32 endOfPassWriteIndex` -/
   endOfPassWriteIndex : Option Nat := none
-instance : ToJS GPUComputePassTimestampWrites := ⟨fun d => Support.fields #[("querySet", toJS d.querySet),
-    ("beginningOfPassWriteIndex", Support.optional d.beginningOfPassWriteIndex),
-    ("endOfPassWriteIndex", Support.optional d.endOfPassWriteIndex)]⟩
+instance : ToJS GPUComputePassTimestampWrites := ⟨fun d => Internal.fields #[("querySet", toJS d.querySet),
+    ("beginningOfPassWriteIndex", Internal.optional d.beginningOfPassWriteIndex),
+    ("endOfPassWriteIndex", Internal.optional d.endOfPassWriteIndex)]⟩
 
 /-- `dictionary GPUComputePassDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUComputePassDescriptor where
@@ -1655,8 +240,8 @@ structure GPUComputePassDescriptor where
   label : Option String := none
   /-- `GPUComputePassTimestampWrites timestampWrites` -/
   timestampWrites : Option GPUComputePassTimestampWrites := none
-instance : ToJS GPUComputePassDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("timestampWrites", Support.optional d.timestampWrites)]⟩
+instance : ToJS GPUComputePassDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("timestampWrites", Internal.optional d.timestampWrites)]⟩
 
 /-- `dictionary GPUTexelCopyBufferInfo : GPUTexelCopyBufferLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUTexelCopyBufferInfo where
@@ -1668,9 +253,9 @@ structure GPUTexelCopyBufferInfo where
   rowsPerImage : Option Nat := none
   /-- `required GPUBuffer buffer` -/
   buffer : GPUBuffer
-instance : ToJS GPUTexelCopyBufferInfo := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("bytesPerRow", Support.optional d.bytesPerRow),
-    ("rowsPerImage", Support.optional d.rowsPerImage),
+instance : ToJS GPUTexelCopyBufferInfo := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("bytesPerRow", Internal.optional d.bytesPerRow),
+    ("rowsPerImage", Internal.optional d.rowsPerImage),
     ("buffer", toJS d.buffer)]⟩
 
 /-- `dictionary GPUOrigin3DDict` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1681,9 +266,9 @@ structure GPUOrigin3DDict where
   y : Option Nat := none
   /-- `GPUIntegerCoordinate z = 0` -/
   z : Option Nat := none
-instance : ToJS GPUOrigin3DDict := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("z", Support.optional d.z)]⟩
+instance : ToJS GPUOrigin3DDict := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("z", Internal.optional d.z)]⟩
 
 /-- `typedef sequence<GPUIntegerCoordinate> or GPUOrigin3DDict GPUOrigin3D`: one constructor per member type. -/
 inductive GPUOrigin3D where
@@ -1707,10 +292,10 @@ structure GPUTexelCopyTextureInfo where
   origin : Option GPUOrigin3D := none
   /-- `GPUTextureAspect aspect = "all"` -/
   aspect : Option GPUTextureAspect := none
-instance : ToJS GPUTexelCopyTextureInfo := ⟨fun d => Support.fields #[("texture", toJS d.texture),
-    ("mipLevel", Support.optional d.mipLevel),
-    ("origin", Support.optional d.origin),
-    ("aspect", Support.optional d.aspect)]⟩
+instance : ToJS GPUTexelCopyTextureInfo := ⟨fun d => Internal.fields #[("texture", toJS d.texture),
+    ("mipLevel", Internal.optional d.mipLevel),
+    ("origin", Internal.optional d.origin),
+    ("aspect", Internal.optional d.aspect)]⟩
 
 /-- `dictionary GPUExtent3DDict` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUExtent3DDict where
@@ -1720,9 +305,9 @@ structure GPUExtent3DDict where
   height : Option Nat := none
   /-- `GPUIntegerCoordinate depthOrArrayLayers = 1` -/
   depthOrArrayLayers : Option Nat := none
-instance : ToJS GPUExtent3DDict := ⟨fun d => Support.fields #[("width", toJS d.width),
-    ("height", Support.optional d.height),
-    ("depthOrArrayLayers", Support.optional d.depthOrArrayLayers)]⟩
+instance : ToJS GPUExtent3DDict := ⟨fun d => Internal.fields #[("width", toJS d.width),
+    ("height", Internal.optional d.height),
+    ("depthOrArrayLayers", Internal.optional d.depthOrArrayLayers)]⟩
 
 /-- `typedef sequence<GPUIntegerCoordinate> or GPUExtent3DDict GPUExtent3D`: one constructor per member type. -/
 inductive GPUExtent3D where
@@ -1740,7 +325,7 @@ instance : Coe GPUExtent3DDict GPUExtent3D := ⟨.gpuExtent3DDict⟩
 structure GPUCommandBufferDescriptor where
   /-- `USVString label = ""` -/
   label : Option String := none
-instance : ToJS GPUCommandBufferDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label)]⟩
+instance : ToJS GPUCommandBufferDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
 
 /-- `dictionary GPUBufferDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBufferDescriptor where
@@ -1752,10 +337,10 @@ structure GPUBufferDescriptor where
   usage : Nat
   /-- `boolean mappedAtCreation = false` -/
   mappedAtCreation : Option Bool := none
-instance : ToJS GPUBufferDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUBufferDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("size", toJS d.size),
     ("usage", toJS d.usage),
-    ("mappedAtCreation", Support.optional d.mappedAtCreation)]⟩
+    ("mappedAtCreation", Internal.optional d.mappedAtCreation)]⟩
 
 /-- `dictionary GPUTextureDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUTextureDescriptor where
@@ -1777,15 +362,15 @@ structure GPUTextureDescriptor where
   viewFormats : Option (Array GPUTextureFormat) := none
   /-- `GPUTextureViewDimension textureBindingViewDimension` -/
   textureBindingViewDimension : Option GPUTextureViewDimension := none
-instance : ToJS GPUTextureDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUTextureDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("size", toJS d.size),
-    ("mipLevelCount", Support.optional d.mipLevelCount),
-    ("sampleCount", Support.optional d.sampleCount),
-    ("dimension", Support.optional d.dimension),
+    ("mipLevelCount", Internal.optional d.mipLevelCount),
+    ("sampleCount", Internal.optional d.sampleCount),
+    ("dimension", Internal.optional d.dimension),
     ("format", toJS d.format),
     ("usage", toJS d.usage),
-    ("viewFormats", Support.optional d.viewFormats),
-    ("textureBindingViewDimension", Support.optional d.textureBindingViewDimension)]⟩
+    ("viewFormats", Internal.optional d.viewFormats),
+    ("textureBindingViewDimension", Internal.optional d.textureBindingViewDimension)]⟩
 
 /-- `dictionary GPUSamplerDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUSamplerDescriptor where
@@ -1811,17 +396,17 @@ structure GPUSamplerDescriptor where
   compare : Option GPUCompareFunction := none
   /-- `unsigned short maxAnisotropy = 1` -/
   maxAnisotropy : Option Nat := none
-instance : ToJS GPUSamplerDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("addressModeU", Support.optional d.addressModeU),
-    ("addressModeV", Support.optional d.addressModeV),
-    ("addressModeW", Support.optional d.addressModeW),
-    ("magFilter", Support.optional d.magFilter),
-    ("minFilter", Support.optional d.minFilter),
-    ("mipmapFilter", Support.optional d.mipmapFilter),
-    ("lodMinClamp", Support.optional d.lodMinClamp),
-    ("lodMaxClamp", Support.optional d.lodMaxClamp),
-    ("compare", Support.optional d.compare),
-    ("maxAnisotropy", Support.optional d.maxAnisotropy)]⟩
+instance : ToJS GPUSamplerDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("addressModeU", Internal.optional d.addressModeU),
+    ("addressModeV", Internal.optional d.addressModeV),
+    ("addressModeW", Internal.optional d.addressModeW),
+    ("magFilter", Internal.optional d.magFilter),
+    ("minFilter", Internal.optional d.minFilter),
+    ("mipmapFilter", Internal.optional d.mipmapFilter),
+    ("lodMinClamp", Internal.optional d.lodMinClamp),
+    ("lodMaxClamp", Internal.optional d.lodMaxClamp),
+    ("compare", Internal.optional d.compare),
+    ("maxAnisotropy", Internal.optional d.maxAnisotropy)]⟩
 
 /-- `(HTMLVideoElement or VideoFrame)`: one constructor per member type. -/
 inductive HTMLVideoElementOrVideoFrame where
@@ -1843,9 +428,9 @@ structure GPUExternalTextureDescriptor where
   source : HTMLVideoElementOrVideoFrame
   /-- `PredefinedColorSpace colorSpace = "srgb"` -/
   colorSpace : Option PredefinedColorSpace := none
-instance : ToJS GPUExternalTextureDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUExternalTextureDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("source", toJS d.source),
-    ("colorSpace", Support.optional d.colorSpace)]⟩
+    ("colorSpace", Internal.optional d.colorSpace)]⟩
 
 /-- `dictionary GPUBufferBindingLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBufferBindingLayout where
@@ -1855,15 +440,15 @@ structure GPUBufferBindingLayout where
   hasDynamicOffset : Option Bool := none
   /-- `GPUSize64 minBindingSize = 0` -/
   minBindingSize : Option Nat := none
-instance : ToJS GPUBufferBindingLayout := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("hasDynamicOffset", Support.optional d.hasDynamicOffset),
-    ("minBindingSize", Support.optional d.minBindingSize)]⟩
+instance : ToJS GPUBufferBindingLayout := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("hasDynamicOffset", Internal.optional d.hasDynamicOffset),
+    ("minBindingSize", Internal.optional d.minBindingSize)]⟩
 
 /-- `dictionary GPUSamplerBindingLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUSamplerBindingLayout where
   /-- `GPUSamplerBindingType type = "filtering"` -/
   type : Option GPUSamplerBindingType := none
-instance : ToJS GPUSamplerBindingLayout := ⟨fun d => Support.fields #[("type", Support.optional d.type)]⟩
+instance : ToJS GPUSamplerBindingLayout := ⟨fun d => Internal.fields #[("type", Internal.optional d.type)]⟩
 
 /-- `dictionary GPUTextureBindingLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUTextureBindingLayout where
@@ -1873,9 +458,9 @@ structure GPUTextureBindingLayout where
   viewDimension : Option GPUTextureViewDimension := none
   /-- `boolean multisampled = false` -/
   multisampled : Option Bool := none
-instance : ToJS GPUTextureBindingLayout := ⟨fun d => Support.fields #[("sampleType", Support.optional d.sampleType),
-    ("viewDimension", Support.optional d.viewDimension),
-    ("multisampled", Support.optional d.multisampled)]⟩
+instance : ToJS GPUTextureBindingLayout := ⟨fun d => Internal.fields #[("sampleType", Internal.optional d.sampleType),
+    ("viewDimension", Internal.optional d.viewDimension),
+    ("multisampled", Internal.optional d.multisampled)]⟩
 
 /-- `dictionary GPUStorageTextureBindingLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUStorageTextureBindingLayout where
@@ -1885,13 +470,13 @@ structure GPUStorageTextureBindingLayout where
   format : GPUTextureFormat
   /-- `GPUTextureViewDimension viewDimension = "2d"` -/
   viewDimension : Option GPUTextureViewDimension := none
-instance : ToJS GPUStorageTextureBindingLayout := ⟨fun d => Support.fields #[("access", Support.optional d.access),
+instance : ToJS GPUStorageTextureBindingLayout := ⟨fun d => Internal.fields #[("access", Internal.optional d.access),
     ("format", toJS d.format),
-    ("viewDimension", Support.optional d.viewDimension)]⟩
+    ("viewDimension", Internal.optional d.viewDimension)]⟩
 
 /-- `dictionary GPUExternalTextureBindingLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUExternalTextureBindingLayout where
-instance : ToJS GPUExternalTextureBindingLayout := ⟨fun _ => Support.fields #[]⟩
+instance : ToJS GPUExternalTextureBindingLayout := ⟨fun _ => Internal.fields #[]⟩
 
 /-- `dictionary GPUBindGroupLayoutEntry` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBindGroupLayoutEntry where
@@ -1909,13 +494,13 @@ structure GPUBindGroupLayoutEntry where
   storageTexture : Option GPUStorageTextureBindingLayout := none
   /-- `GPUExternalTextureBindingLayout externalTexture` -/
   externalTexture : Option GPUExternalTextureBindingLayout := none
-instance : ToJS GPUBindGroupLayoutEntry := ⟨fun d => Support.fields #[("binding", toJS d.binding),
+instance : ToJS GPUBindGroupLayoutEntry := ⟨fun d => Internal.fields #[("binding", toJS d.binding),
     ("visibility", toJS d.visibility),
-    ("buffer", Support.optional d.buffer),
-    ("sampler", Support.optional d.sampler),
-    ("texture", Support.optional d.texture),
-    ("storageTexture", Support.optional d.storageTexture),
-    ("externalTexture", Support.optional d.externalTexture)]⟩
+    ("buffer", Internal.optional d.buffer),
+    ("sampler", Internal.optional d.sampler),
+    ("texture", Internal.optional d.texture),
+    ("storageTexture", Internal.optional d.storageTexture),
+    ("externalTexture", Internal.optional d.externalTexture)]⟩
 
 /-- `dictionary GPUBindGroupLayoutDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBindGroupLayoutDescriptor where
@@ -1923,7 +508,7 @@ structure GPUBindGroupLayoutDescriptor where
   label : Option String := none
   /-- `required sequence<GPUBindGroupLayoutEntry> entries` -/
   entries : Array GPUBindGroupLayoutEntry
-instance : ToJS GPUBindGroupLayoutDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUBindGroupLayoutDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("entries", toJS d.entries)]⟩
 
 /-- `dictionary GPUPipelineLayoutDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1934,9 +519,9 @@ structure GPUPipelineLayoutDescriptor where
   bindGroupLayouts : Array (Option GPUBindGroupLayout)
   /-- `GPUSize32 immediateSize = 0` -/
   immediateSize : Option Nat := none
-instance : ToJS GPUPipelineLayoutDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUPipelineLayoutDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("bindGroupLayouts", toJS d.bindGroupLayouts),
-    ("immediateSize", Support.optional d.immediateSize)]⟩
+    ("immediateSize", Internal.optional d.immediateSize)]⟩
 
 /-- `dictionary GPUBufferBinding` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBufferBinding where
@@ -1946,9 +531,9 @@ structure GPUBufferBinding where
   offset : Option Nat := none
   /-- `GPUSize64 size` -/
   size : Option Nat := none
-instance : ToJS GPUBufferBinding := ⟨fun d => Support.fields #[("buffer", toJS d.buffer),
-    ("offset", Support.optional d.offset),
-    ("size", Support.optional d.size)]⟩
+instance : ToJS GPUBufferBinding := ⟨fun d => Internal.fields #[("buffer", toJS d.buffer),
+    ("offset", Internal.optional d.offset),
+    ("size", Internal.optional d.size)]⟩
 
 /-- `typedef GPUSampler or GPUTexture or GPUTextureView or GPUBuffer or GPUBufferBinding or GPUExternalTexture GPUBindingResource`: one constructor per member type. -/
 inductive GPUBindingResource where
@@ -1984,7 +569,7 @@ structure GPUBindGroupEntry where
   binding : Nat
   /-- `required GPUBindingResource resource` -/
   resource : GPUBindingResource
-instance : ToJS GPUBindGroupEntry := ⟨fun d => Support.fields #[("binding", toJS d.binding),
+instance : ToJS GPUBindGroupEntry := ⟨fun d => Internal.fields #[("binding", toJS d.binding),
     ("resource", toJS d.resource)]⟩
 
 /-- `dictionary GPUBindGroupDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1995,7 +580,7 @@ structure GPUBindGroupDescriptor where
   layout : GPUBindGroupLayout
   /-- `required sequence<GPUBindGroupEntry> entries` -/
   entries : Array GPUBindGroupEntry
-instance : ToJS GPUBindGroupDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUBindGroupDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("layout", toJS d.layout),
     ("entries", toJS d.entries)]⟩
 
@@ -2017,8 +602,8 @@ structure GPUShaderModuleCompilationHint where
   entryPoint : String
   /-- `(GPUPipelineLayout or GPUAutoLayoutMode) layout` -/
   layout : Option GPUPipelineLayoutOrGPUAutoLayoutMode := none
-instance : ToJS GPUShaderModuleCompilationHint := ⟨fun d => Support.fields #[("entryPoint", toJS d.entryPoint),
-    ("layout", Support.optional d.layout)]⟩
+instance : ToJS GPUShaderModuleCompilationHint := ⟨fun d => Internal.fields #[("entryPoint", toJS d.entryPoint),
+    ("layout", Internal.optional d.layout)]⟩
 
 /-- `dictionary GPUShaderModuleDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUShaderModuleDescriptor where
@@ -2028,9 +613,9 @@ structure GPUShaderModuleDescriptor where
   code : String
   /-- `sequence<GPUShaderModuleCompilationHint> compilationHints = []` -/
   compilationHints : Option (Array GPUShaderModuleCompilationHint) := none
-instance : ToJS GPUShaderModuleDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUShaderModuleDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("code", toJS d.code),
-    ("compilationHints", Support.optional d.compilationHints)]⟩
+    ("compilationHints", Internal.optional d.compilationHints)]⟩
 
 /-- `dictionary GPUProgrammableStage` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUProgrammableStage where
@@ -2040,9 +625,9 @@ structure GPUProgrammableStage where
   entryPoint : Option String := none
   /-- `record<USVString, GPUPipelineConstantValue> constants = {}` -/
   constants : Option (Record Float) := none
-instance : ToJS GPUProgrammableStage := ⟨fun d => Support.fields #[("module", toJS d.«module»),
-    ("entryPoint", Support.optional d.entryPoint),
-    ("constants", Support.optional d.constants)]⟩
+instance : ToJS GPUProgrammableStage := ⟨fun d => Internal.fields #[("module", toJS d.«module»),
+    ("entryPoint", Internal.optional d.entryPoint),
+    ("constants", Internal.optional d.constants)]⟩
 
 /-- `dictionary GPUComputePipelineDescriptor : GPUPipelineDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUComputePipelineDescriptor where
@@ -2052,7 +637,7 @@ structure GPUComputePipelineDescriptor where
   layout : GPUPipelineLayoutOrGPUAutoLayoutMode
   /-- `required GPUProgrammableStage compute` -/
   compute : GPUProgrammableStage
-instance : ToJS GPUComputePipelineDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUComputePipelineDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("layout", toJS d.layout),
     ("compute", toJS d.compute)]⟩
 
@@ -2064,7 +649,7 @@ structure GPUVertexAttribute where
   offset : Nat
   /-- `required GPUIndex32 shaderLocation` -/
   shaderLocation : Nat
-instance : ToJS GPUVertexAttribute := ⟨fun d => Support.fields #[("format", toJS d.format),
+instance : ToJS GPUVertexAttribute := ⟨fun d => Internal.fields #[("format", toJS d.format),
     ("offset", toJS d.offset),
     ("shaderLocation", toJS d.shaderLocation)]⟩
 
@@ -2076,8 +661,8 @@ structure GPUVertexBufferLayout where
   stepMode : Option GPUVertexStepMode := none
   /-- `required sequence<GPUVertexAttribute> attributes` -/
   attributes : Array GPUVertexAttribute
-instance : ToJS GPUVertexBufferLayout := ⟨fun d => Support.fields #[("arrayStride", toJS d.arrayStride),
-    ("stepMode", Support.optional d.stepMode),
+instance : ToJS GPUVertexBufferLayout := ⟨fun d => Internal.fields #[("arrayStride", toJS d.arrayStride),
+    ("stepMode", Internal.optional d.stepMode),
     ("attributes", toJS d.attributes)]⟩
 
 /-- `dictionary GPUVertexState : GPUProgrammableStage` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -2090,10 +675,10 @@ structure GPUVertexState where
   constants : Option (Record Float) := none
   /-- `sequence<GPUVertexBufferLayout?> buffers = []` -/
   buffers : Option (Array (Option GPUVertexBufferLayout)) := none
-instance : ToJS GPUVertexState := ⟨fun d => Support.fields #[("module", toJS d.«module»),
-    ("entryPoint", Support.optional d.entryPoint),
-    ("constants", Support.optional d.constants),
-    ("buffers", Support.optional d.buffers)]⟩
+instance : ToJS GPUVertexState := ⟨fun d => Internal.fields #[("module", toJS d.«module»),
+    ("entryPoint", Internal.optional d.entryPoint),
+    ("constants", Internal.optional d.constants),
+    ("buffers", Internal.optional d.buffers)]⟩
 
 /-- `dictionary GPUPrimitiveState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUPrimitiveState where
@@ -2107,11 +692,11 @@ structure GPUPrimitiveState where
   cullMode : Option GPUCullMode := none
   /-- `boolean unclippedDepth = false` -/
   unclippedDepth : Option Bool := none
-instance : ToJS GPUPrimitiveState := ⟨fun d => Support.fields #[("topology", Support.optional d.topology),
-    ("stripIndexFormat", Support.optional d.stripIndexFormat),
-    ("frontFace", Support.optional d.frontFace),
-    ("cullMode", Support.optional d.cullMode),
-    ("unclippedDepth", Support.optional d.unclippedDepth)]⟩
+instance : ToJS GPUPrimitiveState := ⟨fun d => Internal.fields #[("topology", Internal.optional d.topology),
+    ("stripIndexFormat", Internal.optional d.stripIndexFormat),
+    ("frontFace", Internal.optional d.frontFace),
+    ("cullMode", Internal.optional d.cullMode),
+    ("unclippedDepth", Internal.optional d.unclippedDepth)]⟩
 
 /-- `dictionary GPUStencilFaceState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUStencilFaceState where
@@ -2123,10 +708,10 @@ structure GPUStencilFaceState where
   depthFailOp : Option GPUStencilOperation := none
   /-- `GPUStencilOperation passOp = "keep"` -/
   passOp : Option GPUStencilOperation := none
-instance : ToJS GPUStencilFaceState := ⟨fun d => Support.fields #[("compare", Support.optional d.compare),
-    ("failOp", Support.optional d.failOp),
-    ("depthFailOp", Support.optional d.depthFailOp),
-    ("passOp", Support.optional d.passOp)]⟩
+instance : ToJS GPUStencilFaceState := ⟨fun d => Internal.fields #[("compare", Internal.optional d.compare),
+    ("failOp", Internal.optional d.failOp),
+    ("depthFailOp", Internal.optional d.depthFailOp),
+    ("passOp", Internal.optional d.passOp)]⟩
 
 /-- `dictionary GPUDepthStencilState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUDepthStencilState where
@@ -2150,16 +735,16 @@ structure GPUDepthStencilState where
   depthBiasSlopeScale : Option Float := none
   /-- `float depthBiasClamp = 0` -/
   depthBiasClamp : Option Float := none
-instance : ToJS GPUDepthStencilState := ⟨fun d => Support.fields #[("format", toJS d.format),
-    ("depthWriteEnabled", Support.optional d.depthWriteEnabled),
-    ("depthCompare", Support.optional d.depthCompare),
-    ("stencilFront", Support.optional d.stencilFront),
-    ("stencilBack", Support.optional d.stencilBack),
-    ("stencilReadMask", Support.optional d.stencilReadMask),
-    ("stencilWriteMask", Support.optional d.stencilWriteMask),
-    ("depthBias", Support.optional d.depthBias),
-    ("depthBiasSlopeScale", Support.optional d.depthBiasSlopeScale),
-    ("depthBiasClamp", Support.optional d.depthBiasClamp)]⟩
+instance : ToJS GPUDepthStencilState := ⟨fun d => Internal.fields #[("format", toJS d.format),
+    ("depthWriteEnabled", Internal.optional d.depthWriteEnabled),
+    ("depthCompare", Internal.optional d.depthCompare),
+    ("stencilFront", Internal.optional d.stencilFront),
+    ("stencilBack", Internal.optional d.stencilBack),
+    ("stencilReadMask", Internal.optional d.stencilReadMask),
+    ("stencilWriteMask", Internal.optional d.stencilWriteMask),
+    ("depthBias", Internal.optional d.depthBias),
+    ("depthBiasSlopeScale", Internal.optional d.depthBiasSlopeScale),
+    ("depthBiasClamp", Internal.optional d.depthBiasClamp)]⟩
 
 /-- `dictionary GPUMultisampleState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUMultisampleState where
@@ -2169,9 +754,9 @@ structure GPUMultisampleState where
   mask : Option Nat := none
   /-- `boolean alphaToCoverageEnabled = false` -/
   alphaToCoverageEnabled : Option Bool := none
-instance : ToJS GPUMultisampleState := ⟨fun d => Support.fields #[("count", Support.optional d.count),
-    ("mask", Support.optional d.mask),
-    ("alphaToCoverageEnabled", Support.optional d.alphaToCoverageEnabled)]⟩
+instance : ToJS GPUMultisampleState := ⟨fun d => Internal.fields #[("count", Internal.optional d.count),
+    ("mask", Internal.optional d.mask),
+    ("alphaToCoverageEnabled", Internal.optional d.alphaToCoverageEnabled)]⟩
 
 /-- `dictionary GPUBlendComponent` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBlendComponent where
@@ -2181,9 +766,9 @@ structure GPUBlendComponent where
   srcFactor : Option GPUBlendFactor := none
   /-- `GPUBlendFactor dstFactor = "zero"` -/
   dstFactor : Option GPUBlendFactor := none
-instance : ToJS GPUBlendComponent := ⟨fun d => Support.fields #[("operation", Support.optional d.operation),
-    ("srcFactor", Support.optional d.srcFactor),
-    ("dstFactor", Support.optional d.dstFactor)]⟩
+instance : ToJS GPUBlendComponent := ⟨fun d => Internal.fields #[("operation", Internal.optional d.operation),
+    ("srcFactor", Internal.optional d.srcFactor),
+    ("dstFactor", Internal.optional d.dstFactor)]⟩
 
 /-- `dictionary GPUBlendState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUBlendState where
@@ -2191,7 +776,7 @@ structure GPUBlendState where
   color : GPUBlendComponent
   /-- `required GPUBlendComponent alpha` -/
   alpha : GPUBlendComponent
-instance : ToJS GPUBlendState := ⟨fun d => Support.fields #[("color", toJS d.color),
+instance : ToJS GPUBlendState := ⟨fun d => Internal.fields #[("color", toJS d.color),
     ("alpha", toJS d.alpha)]⟩
 
 /-- `dictionary GPUColorTargetState` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -2202,9 +787,9 @@ structure GPUColorTargetState where
   blend : Option GPUBlendState := none
   /-- `GPUColorWriteFlags writeMask = 0xF` -/
   writeMask : Option Nat := none
-instance : ToJS GPUColorTargetState := ⟨fun d => Support.fields #[("format", toJS d.format),
-    ("blend", Support.optional d.blend),
-    ("writeMask", Support.optional d.writeMask)]⟩
+instance : ToJS GPUColorTargetState := ⟨fun d => Internal.fields #[("format", toJS d.format),
+    ("blend", Internal.optional d.blend),
+    ("writeMask", Internal.optional d.writeMask)]⟩
 
 /-- `dictionary GPUFragmentState : GPUProgrammableStage` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUFragmentState where
@@ -2216,9 +801,9 @@ structure GPUFragmentState where
   constants : Option (Record Float) := none
   /-- `required sequence<GPUColorTargetState?> targets` -/
   targets : Array (Option GPUColorTargetState)
-instance : ToJS GPUFragmentState := ⟨fun d => Support.fields #[("module", toJS d.«module»),
-    ("entryPoint", Support.optional d.entryPoint),
-    ("constants", Support.optional d.constants),
+instance : ToJS GPUFragmentState := ⟨fun d => Internal.fields #[("module", toJS d.«module»),
+    ("entryPoint", Internal.optional d.entryPoint),
+    ("constants", Internal.optional d.constants),
     ("targets", toJS d.targets)]⟩
 
 /-- `dictionary GPURenderPipelineDescriptor : GPUPipelineDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -2237,19 +822,19 @@ structure GPURenderPipelineDescriptor where
   multisample : Option GPUMultisampleState := none
   /-- `GPUFragmentState fragment` -/
   fragment : Option GPUFragmentState := none
-instance : ToJS GPURenderPipelineDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPURenderPipelineDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("layout", toJS d.layout),
     ("vertex", toJS d.vertex),
-    ("primitive", Support.optional d.primitive),
-    ("depthStencil", Support.optional d.depthStencil),
-    ("multisample", Support.optional d.multisample),
-    ("fragment", Support.optional d.fragment)]⟩
+    ("primitive", Internal.optional d.primitive),
+    ("depthStencil", Internal.optional d.depthStencil),
+    ("multisample", Internal.optional d.multisample),
+    ("fragment", Internal.optional d.fragment)]⟩
 
 /-- `dictionary GPUCommandEncoderDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUCommandEncoderDescriptor where
   /-- `USVString label = ""` -/
   label : Option String := none
-instance : ToJS GPUCommandEncoderDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label)]⟩
+instance : ToJS GPUCommandEncoderDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
 
 /-- `dictionary GPURenderBundleEncoderDescriptor : GPURenderPassLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPURenderBundleEncoderDescriptor where
@@ -2265,12 +850,12 @@ structure GPURenderBundleEncoderDescriptor where
   depthReadOnly : Option Bool := none
   /-- `boolean stencilReadOnly = false` -/
   stencilReadOnly : Option Bool := none
-instance : ToJS GPURenderBundleEncoderDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPURenderBundleEncoderDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("colorFormats", toJS d.colorFormats),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("sampleCount", Support.optional d.sampleCount),
-    ("depthReadOnly", Support.optional d.depthReadOnly),
-    ("stencilReadOnly", Support.optional d.stencilReadOnly)]⟩
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("sampleCount", Internal.optional d.sampleCount),
+    ("depthReadOnly", Internal.optional d.depthReadOnly),
+    ("stencilReadOnly", Internal.optional d.stencilReadOnly)]⟩
 
 /-- `dictionary GPUQuerySetDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUQuerySetDescriptor where
@@ -2280,7 +865,7 @@ structure GPUQuerySetDescriptor where
   type : GPUQueryType
   /-- `required GPUSize32 count` -/
   count : Nat
-instance : ToJS GPUQuerySetDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
+instance : ToJS GPUQuerySetDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
     ("type", toJS d.type),
     ("count", toJS d.count)]⟩
 
@@ -2288,7 +873,7 @@ instance : ToJS GPUQuerySetDescriptor := ⟨fun d => Support.fields #[("label", 
 structure GPUPipelineErrorInit where
   /-- `required GPUPipelineErrorReason reason` -/
   reason : GPUPipelineErrorReason
-instance : ToJS GPUPipelineErrorInit := ⟨fun d => Support.fields #[("reason", toJS d.reason)]⟩
+instance : ToJS GPUPipelineErrorInit := ⟨fun d => Internal.fields #[("reason", toJS d.reason)]⟩
 
 /-- `dictionary GPUTexelCopyBufferLayout` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUTexelCopyBufferLayout where
@@ -2298,9 +883,9 @@ structure GPUTexelCopyBufferLayout where
   bytesPerRow : Option Nat := none
   /-- `GPUSize32 rowsPerImage` -/
   rowsPerImage : Option Nat := none
-instance : ToJS GPUTexelCopyBufferLayout := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("bytesPerRow", Support.optional d.bytesPerRow),
-    ("rowsPerImage", Support.optional d.rowsPerImage)]⟩
+instance : ToJS GPUTexelCopyBufferLayout := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("bytesPerRow", Internal.optional d.bytesPerRow),
+    ("rowsPerImage", Internal.optional d.rowsPerImage)]⟩
 
 /-- `typedef ImageBitmap or ImageData or HTMLImageElement or HTMLVideoElement or VideoFrame or HTMLCanvasElement or OffscreenCanvas GPUCopyExternalImageSource`: one constructor per member type. -/
 inductive GPUCopyExternalImageSource where
@@ -2340,8 +925,8 @@ structure GPUOrigin2DDict where
   x : Option Nat := none
   /-- `GPUIntegerCoordinate y = 0` -/
   y : Option Nat := none
-instance : ToJS GPUOrigin2DDict := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y)]⟩
+instance : ToJS GPUOrigin2DDict := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y)]⟩
 
 /-- `typedef sequence<GPUIntegerCoordinate> or GPUOrigin2DDict GPUOrigin2D`: one constructor per member type. -/
 inductive GPUOrigin2D where
@@ -2363,9 +948,9 @@ structure GPUCopyExternalImageSourceInfo where
   origin : Option GPUOrigin2D := none
   /-- `boolean flipY = false` -/
   flipY : Option Bool := none
-instance : ToJS GPUCopyExternalImageSourceInfo := ⟨fun d => Support.fields #[("source", toJS d.source),
-    ("origin", Support.optional d.origin),
-    ("flipY", Support.optional d.flipY)]⟩
+instance : ToJS GPUCopyExternalImageSourceInfo := ⟨fun d => Internal.fields #[("source", toJS d.source),
+    ("origin", Internal.optional d.origin),
+    ("flipY", Internal.optional d.flipY)]⟩
 
 /-- `dictionary GPUCopyExternalImageDestInfo : GPUTexelCopyTextureInfo` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUCopyExternalImageDestInfo where
@@ -2381,18 +966,18 @@ structure GPUCopyExternalImageDestInfo where
   colorSpace : Option PredefinedColorSpace := none
   /-- `boolean premultipliedAlpha = false` -/
   premultipliedAlpha : Option Bool := none
-instance : ToJS GPUCopyExternalImageDestInfo := ⟨fun d => Support.fields #[("texture", toJS d.texture),
-    ("mipLevel", Support.optional d.mipLevel),
-    ("origin", Support.optional d.origin),
-    ("aspect", Support.optional d.aspect),
-    ("colorSpace", Support.optional d.colorSpace),
-    ("premultipliedAlpha", Support.optional d.premultipliedAlpha)]⟩
+instance : ToJS GPUCopyExternalImageDestInfo := ⟨fun d => Internal.fields #[("texture", toJS d.texture),
+    ("mipLevel", Internal.optional d.mipLevel),
+    ("origin", Internal.optional d.origin),
+    ("aspect", Internal.optional d.aspect),
+    ("colorSpace", Internal.optional d.colorSpace),
+    ("premultipliedAlpha", Internal.optional d.premultipliedAlpha)]⟩
 
 /-- `dictionary GPURenderBundleDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPURenderBundleDescriptor where
   /-- `USVString label = ""` -/
   label : Option String := none
-instance : ToJS GPURenderBundleDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label)]⟩
+instance : ToJS GPURenderBundleDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
 
 /-- `dictionary GPUTextureViewDescriptor : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GPUTextureViewDescriptor where
@@ -2416,16 +1001,16 @@ structure GPUTextureViewDescriptor where
   arrayLayerCount : Option Nat := none
   /-- `DOMString swizzle = "rgba"` -/
   swizzle : Option String := none
-instance : ToJS GPUTextureViewDescriptor := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("format", Support.optional d.format),
-    ("dimension", Support.optional d.dimension),
-    ("usage", Support.optional d.usage),
-    ("aspect", Support.optional d.aspect),
-    ("baseMipLevel", Support.optional d.baseMipLevel),
-    ("mipLevelCount", Support.optional d.mipLevelCount),
-    ("baseArrayLayer", Support.optional d.baseArrayLayer),
-    ("arrayLayerCount", Support.optional d.arrayLayerCount),
-    ("swizzle", Support.optional d.swizzle)]⟩
+instance : ToJS GPUTextureViewDescriptor := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("format", Internal.optional d.format),
+    ("dimension", Internal.optional d.dimension),
+    ("usage", Internal.optional d.usage),
+    ("aspect", Internal.optional d.aspect),
+    ("baseMipLevel", Internal.optional d.baseMipLevel),
+    ("mipLevelCount", Internal.optional d.mipLevelCount),
+    ("baseArrayLayer", Internal.optional d.baseArrayLayer),
+    ("arrayLayerCount", Internal.optional d.arrayLayerCount),
+    ("swizzle", Internal.optional d.swizzle)]⟩
 instance : FromJS GPUTextureViewDescriptor where
   fromJS d := do return {
     label := ← Lasm.JS.readField (Option String) d "label",
@@ -2450,1013 +1035,1133 @@ structure GPUUncapturedErrorEventInit where
   composed : Option Bool := none
   /-- `required GPUError error` -/
   error : GPUError
-instance : ToJS GPUUncapturedErrorEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS GPUUncapturedErrorEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("error", toJS d.error)]⟩
 
+/-- `dictionary GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure GPUObjectDescriptorBase where
+  /-- `USVString label = ""` -/
+  label : Option String := none
+instance : ToJS GPUObjectDescriptorBase := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
+
+/-- `dictionary GPUPipelineDescriptorBase : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure GPUPipelineDescriptorBase where
+  /-- `USVString label = ""` -/
+  label : Option String := none
+  /-- `required (GPUPipelineLayout or GPUAutoLayoutMode) layout` -/
+  layout : GPUPipelineLayoutOrGPUAutoLayoutMode
+instance : ToJS GPUPipelineDescriptorBase := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("layout", toJS d.layout)]⟩
+
+/-- `dictionary GPURenderPassLayout : GPUObjectDescriptorBase` (WebGPU (https://gpuweb.github.io/gpuweb/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure GPURenderPassLayout where
+  /-- `USVString label = ""` -/
+  label : Option String := none
+  /-- `required sequence<GPUTextureFormat?> colorFormats` -/
+  colorFormats : Array (Option GPUTextureFormat)
+  /-- `GPUTextureFormat depthStencilFormat` -/
+  depthStencilFormat : Option GPUTextureFormat := none
+  /-- `GPUSize32 sampleCount = 1` -/
+  sampleCount : Option Nat := none
+instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("colorFormats", toJS d.colorFormats),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("sampleCount", Internal.optional d.sampleCount)]⟩
+
 /-- `v instanceof GPU`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPU`). -/
-def GPU.cast? (v : Value) : IO (Option GPU) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPU"] Value) v) then some { val := v } else none
+@[macro_inline] def GPU.cast? (v : Value) : IO (Option GPU) := Internal.api "Lasm.JS.Web.GPU.cast?" do
+  Internal.cast (Internal.getGlobal ["GPU"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute WGSLLanguageFeatures wgslLanguageFeatures` -/
-def GPU.wgslLanguageFeatures (self : GPU) : IO WGSLLanguageFeatures := do
+@[macro_inline] def GPU.wgslLanguageFeatures (self : GPU) : IO WGSLLanguageFeatures := Internal.api "Lasm.JS.Web.GPU.wgslLanguageFeatures" do
   let r ← self.val.get "wgslLanguageFeatures" Value
   pure { val := r }
 
 /-- `Promise<GPUAdapter?> requestAdapter(optional GPURequestAdapterOptions options)` -/
-def GPU.requestAdapter (self : GPU) (options : Option GPURequestAdapterOptions := none) : Async (Option GPUAdapter) :=
-  self.val.callMethodAwait "requestAdapter" (Support.args #[Support.optional options]) (Option GPUAdapter)
+@[macro_inline] def GPU.requestAdapter (self : GPU) (options : Option GPURequestAdapterOptions := none) : Async (Option GPUAdapter) := Internal.api "Lasm.JS.Web.GPU.requestAdapter" do
+  self.val.callMethodAwait "requestAdapter" (Internal.args #[Internal.optional options]) (Option GPUAdapter)
 
 /-- `GPUTextureFormat getPreferredCanvasFormat()` -/
-def GPU.getPreferredCanvasFormat (self : GPU) : IO GPUTextureFormat :=
-  self.val.callMethod "getPreferredCanvasFormat" (Support.args #[]) GPUTextureFormat
+@[macro_inline] def GPU.getPreferredCanvasFormat (self : GPU) : IO GPUTextureFormat := Internal.api "Lasm.JS.Web.GPU.getPreferredCanvasFormat" do
+  self.val.callMethod "getPreferredCanvasFormat" (Internal.args #[]) GPUTextureFormat
 
 /-- `v instanceof GPUAdapter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUAdapter`). -/
-def GPUAdapter.cast? (v : Value) : IO (Option GPUAdapter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUAdapter"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUAdapter.cast? (v : Value) : IO (Option GPUAdapter) := Internal.api "Lasm.JS.Web.GPUAdapter.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUAdapter"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUSupportedFeatures features` -/
-def GPUAdapter.features (self : GPUAdapter) : IO GPUSupportedFeatures := do
+@[macro_inline] def GPUAdapter.features (self : GPUAdapter) : IO GPUSupportedFeatures := Internal.api "Lasm.JS.Web.GPUAdapter.features" do
   let r ← self.val.get "features" Value
   pure { val := r }
 
 /-- `readonly attribute GPUSupportedLimits limits` -/
-def GPUAdapter.limits (self : GPUAdapter) : IO GPUSupportedLimits := do
+@[macro_inline] def GPUAdapter.limits (self : GPUAdapter) : IO GPUSupportedLimits := Internal.api "Lasm.JS.Web.GPUAdapter.limits" do
   let r ← self.val.get "limits" Value
   pure { val := r }
 
 /-- `readonly attribute GPUAdapterInfo info` -/
-def GPUAdapter.info (self : GPUAdapter) : IO GPUAdapterInfo := do
+@[macro_inline] def GPUAdapter.info (self : GPUAdapter) : IO GPUAdapterInfo := Internal.api "Lasm.JS.Web.GPUAdapter.info" do
   let r ← self.val.get "info" Value
   pure { val := r }
 
 /-- `Promise<GPUDevice> requestDevice(optional GPUDeviceDescriptor descriptor)` -/
-def GPUAdapter.requestDevice (self : GPUAdapter) (descriptor : Option GPUDeviceDescriptor := none) : Async GPUDevice := do
-  let r ← self.val.callMethodAwait "requestDevice" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUAdapter.requestDevice (self : GPUAdapter) (descriptor : Option GPUDeviceDescriptor := none) : Async GPUDevice := Internal.api "Lasm.JS.Web.GPUAdapter.requestDevice" do
+  let r ← self.val.callMethodAwait "requestDevice" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `v instanceof GPUAdapterInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUAdapterInfo`). -/
-def GPUAdapterInfo.cast? (v : Value) : IO (Option GPUAdapterInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUAdapterInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUAdapterInfo.cast? (v : Value) : IO (Option GPUAdapterInfo) := Internal.api "Lasm.JS.Web.GPUAdapterInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUAdapterInfo"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString vendor` -/
-def GPUAdapterInfo.vendor (self : GPUAdapterInfo) : IO String := self.val.get "vendor" String
+@[macro_inline] def GPUAdapterInfo.vendor (self : GPUAdapterInfo) : IO String := Internal.api "Lasm.JS.Web.GPUAdapterInfo.vendor" do
+  self.val.get "vendor" String
 
 /-- `readonly attribute DOMString architecture` -/
-def GPUAdapterInfo.architecture (self : GPUAdapterInfo) : IO String := self.val.get "architecture" String
+@[macro_inline] def GPUAdapterInfo.architecture (self : GPUAdapterInfo) : IO String := Internal.api "Lasm.JS.Web.GPUAdapterInfo.architecture" do
+  self.val.get "architecture" String
 
 /-- `readonly attribute DOMString device` -/
-def GPUAdapterInfo.device (self : GPUAdapterInfo) : IO String := self.val.get "device" String
+@[macro_inline] def GPUAdapterInfo.device (self : GPUAdapterInfo) : IO String := Internal.api "Lasm.JS.Web.GPUAdapterInfo.device" do
+  self.val.get "device" String
 
 /-- `readonly attribute DOMString description` -/
-def GPUAdapterInfo.description (self : GPUAdapterInfo) : IO String := self.val.get "description" String
+@[macro_inline] def GPUAdapterInfo.description (self : GPUAdapterInfo) : IO String := Internal.api "Lasm.JS.Web.GPUAdapterInfo.description" do
+  self.val.get "description" String
 
 /-- `readonly attribute unsigned long subgroupMinSize` -/
-def GPUAdapterInfo.subgroupMinSize (self : GPUAdapterInfo) : IO Nat := self.val.get "subgroupMinSize" Nat
+@[macro_inline] def GPUAdapterInfo.subgroupMinSize (self : GPUAdapterInfo) : IO Nat := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMinSize" do
+  self.val.get "subgroupMinSize" Nat
 
 /-- `readonly attribute unsigned long subgroupMaxSize` -/
-def GPUAdapterInfo.subgroupMaxSize (self : GPUAdapterInfo) : IO Nat := self.val.get "subgroupMaxSize" Nat
+@[macro_inline] def GPUAdapterInfo.subgroupMaxSize (self : GPUAdapterInfo) : IO Nat := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMaxSize" do
+  self.val.get "subgroupMaxSize" Nat
 
 /-- `readonly attribute boolean isFallbackAdapter` -/
-def GPUAdapterInfo.isFallbackAdapter (self : GPUAdapterInfo) : IO Bool := self.val.get "isFallbackAdapter" Bool
+@[macro_inline] def GPUAdapterInfo.isFallbackAdapter (self : GPUAdapterInfo) : IO Bool := Internal.api "Lasm.JS.Web.GPUAdapterInfo.isFallbackAdapter" do
+  self.val.get "isFallbackAdapter" Bool
 
 /-- `v instanceof GPUBindGroup`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUBindGroup`). -/
-def GPUBindGroup.cast? (v : Value) : IO (Option GPUBindGroup) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUBindGroup"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUBindGroup.cast? (v : Value) : IO (Option GPUBindGroup) := Internal.api "Lasm.JS.Web.GPUBindGroup.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUBindGroup"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUBindGroup.label (self : GPUBindGroup) : IO String := self.val.get "label" String
+@[macro_inline] def GPUBindGroup.label (self : GPUBindGroup) : IO String := Internal.api "Lasm.JS.Web.GPUBindGroup.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUBindGroup.setLabel (self : GPUBindGroup) (value : String) : IO Unit :=
+@[macro_inline] def GPUBindGroup.setLabel (self : GPUBindGroup) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUBindGroup.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUBindGroupLayout`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUBindGroupLayout`). -/
-def GPUBindGroupLayout.cast? (v : Value) : IO (Option GPUBindGroupLayout) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUBindGroupLayout"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUBindGroupLayout.cast? (v : Value) : IO (Option GPUBindGroupLayout) := Internal.api "Lasm.JS.Web.GPUBindGroupLayout.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUBindGroupLayout"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUBindGroupLayout.label (self : GPUBindGroupLayout) : IO String := self.val.get "label" String
+@[macro_inline] def GPUBindGroupLayout.label (self : GPUBindGroupLayout) : IO String := Internal.api "Lasm.JS.Web.GPUBindGroupLayout.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUBindGroupLayout.setLabel (self : GPUBindGroupLayout) (value : String) : IO Unit :=
+@[macro_inline] def GPUBindGroupLayout.setLabel (self : GPUBindGroupLayout) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUBindGroupLayout.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUBuffer`). -/
-def GPUBuffer.cast? (v : Value) : IO (Option GPUBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUBuffer.cast? (v : Value) : IO (Option GPUBuffer) := Internal.api "Lasm.JS.Web.GPUBuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUBuffer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUSize64Out size` -/
-def GPUBuffer.size (self : GPUBuffer) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def GPUBuffer.size (self : GPUBuffer) : IO Nat := Internal.api "Lasm.JS.Web.GPUBuffer.size" do
+  self.val.get "size" Nat
 
 /-- `readonly attribute GPUFlagsConstant usage` -/
-def GPUBuffer.usage (self : GPUBuffer) : IO Nat := self.val.get "usage" Nat
+@[macro_inline] def GPUBuffer.usage (self : GPUBuffer) : IO Nat := Internal.api "Lasm.JS.Web.GPUBuffer.usage" do
+  self.val.get "usage" Nat
 
 /-- `readonly attribute GPUBufferMapState mapState` -/
-def GPUBuffer.mapState (self : GPUBuffer) : IO GPUBufferMapState := self.val.get "mapState" GPUBufferMapState
+@[macro_inline] def GPUBuffer.mapState (self : GPUBuffer) : IO GPUBufferMapState := Internal.api "Lasm.JS.Web.GPUBuffer.mapState" do
+  self.val.get "mapState" GPUBufferMapState
 
 /-- `attribute USVString label` -/
-def GPUBuffer.label (self : GPUBuffer) : IO String := self.val.get "label" String
+@[macro_inline] def GPUBuffer.label (self : GPUBuffer) : IO String := Internal.api "Lasm.JS.Web.GPUBuffer.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUBuffer.setLabel (self : GPUBuffer) (value : String) : IO Unit :=
+@[macro_inline] def GPUBuffer.setLabel (self : GPUBuffer) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUBuffer.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `Promise<undefined> mapAsync(GPUMapModeFlags mode, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPUBuffer.mapAsync (self : GPUBuffer) (mode : Nat) (offset : Option Nat := none) (size : Option Nat := none) : Async Unit :=
-  self.val.callMethodAwait "mapAsync" (Support.args #[toJS mode, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPUBuffer.mapAsync (self : GPUBuffer) (mode : Nat) (offset : Option Nat := none) (size : Option Nat := none) : Async Unit := Internal.api "Lasm.JS.Web.GPUBuffer.mapAsync" do
+  self.val.callMethodAwait "mapAsync" (Internal.args #[toJS mode, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `ArrayBuffer getMappedRange(optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPUBuffer.getMappedRange (self : GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO ByteArray := do
-  let r ← self.val.callMethod "getMappedRange" (Support.args #[Support.optional offset, Support.optional size]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def GPUBuffer.getMappedRange (self : GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO ByteArray := Internal.api "Lasm.JS.Web.GPUBuffer.getMappedRange" do
+  let r ← self.val.callMethod "getMappedRange" (Internal.args #[Internal.optional offset, Internal.optional size]) Value
+  Internal.arrayBufferBytes r
 
 /-- `undefined unmap()` -/
-def GPUBuffer.unmap (self : GPUBuffer) : IO Unit :=
-  self.val.callMethod "unmap" (Support.args #[]) Unit
+@[macro_inline] def GPUBuffer.unmap (self : GPUBuffer) : IO Unit := Internal.api "Lasm.JS.Web.GPUBuffer.unmap" do
+  self.val.callMethod "unmap" (Internal.args #[]) Unit
 
 /-- `undefined destroy()` -/
-def GPUBuffer.destroy (self : GPUBuffer) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def GPUBuffer.destroy (self : GPUBuffer) : IO Unit := Internal.api "Lasm.JS.Web.GPUBuffer.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof GPUCanvasContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCanvasContext`). -/
-def GPUCanvasContext.cast? (v : Value) : IO (Option GPUCanvasContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUCanvasContext"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUCanvasContext.cast? (v : Value) : IO (Option GPUCanvasContext) := Internal.api "Lasm.JS.Web.GPUCanvasContext.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUCanvasContext"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute (HTMLCanvasElement or OffscreenCanvas) canvas` -/
-def GPUCanvasContext.canvas (self : GPUCanvasContext) : IO Value := self.val.get "canvas" Value
+@[macro_inline] def GPUCanvasContext.canvas (self : GPUCanvasContext) : IO Value := Internal.api "Lasm.JS.Web.GPUCanvasContext.canvas" do
+  self.val.get "canvas" Value
 
 /-- `undefined configure(GPUCanvasConfiguration configuration)` -/
-def GPUCanvasContext.configure (self : GPUCanvasContext) (configuration : GPUCanvasConfiguration) : IO Unit :=
-  self.val.callMethod "configure" (Support.args #[toJS configuration]) Unit
+@[macro_inline] def GPUCanvasContext.configure (self : GPUCanvasContext) (configuration : GPUCanvasConfiguration) : IO Unit := Internal.api "Lasm.JS.Web.GPUCanvasContext.configure" do
+  self.val.callMethod "configure" (Internal.args #[toJS configuration]) Unit
 
 /-- `undefined unconfigure()` -/
-def GPUCanvasContext.unconfigure (self : GPUCanvasContext) : IO Unit :=
-  self.val.callMethod "unconfigure" (Support.args #[]) Unit
+@[macro_inline] def GPUCanvasContext.unconfigure (self : GPUCanvasContext) : IO Unit := Internal.api "Lasm.JS.Web.GPUCanvasContext.unconfigure" do
+  self.val.callMethod "unconfigure" (Internal.args #[]) Unit
 
 /-- `GPUCanvasConfiguration? getConfiguration()` -/
-def GPUCanvasContext.getConfiguration (self : GPUCanvasContext) : IO (Option GPUCanvasConfiguration) :=
-  self.val.callMethod "getConfiguration" (Support.args #[]) (Option GPUCanvasConfiguration)
+@[macro_inline] def GPUCanvasContext.getConfiguration (self : GPUCanvasContext) : IO (Option GPUCanvasConfiguration) := Internal.api "Lasm.JS.Web.GPUCanvasContext.getConfiguration" do
+  self.val.callMethod "getConfiguration" (Internal.args #[]) (Option GPUCanvasConfiguration)
 
 /-- `GPUTexture getCurrentTexture()` -/
-def GPUCanvasContext.getCurrentTexture (self : GPUCanvasContext) : IO GPUTexture := do
-  let r ← self.val.callMethod "getCurrentTexture" (Support.args #[]) Value
+@[macro_inline] def GPUCanvasContext.getCurrentTexture (self : GPUCanvasContext) : IO GPUTexture := Internal.api "Lasm.JS.Web.GPUCanvasContext.getCurrentTexture" do
+  let r ← self.val.callMethod "getCurrentTexture" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof GPUCommandBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCommandBuffer`). -/
-def GPUCommandBuffer.cast? (v : Value) : IO (Option GPUCommandBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUCommandBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUCommandBuffer.cast? (v : Value) : IO (Option GPUCommandBuffer) := Internal.api "Lasm.JS.Web.GPUCommandBuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUCommandBuffer"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUCommandBuffer.label (self : GPUCommandBuffer) : IO String := self.val.get "label" String
+@[macro_inline] def GPUCommandBuffer.label (self : GPUCommandBuffer) : IO String := Internal.api "Lasm.JS.Web.GPUCommandBuffer.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUCommandBuffer.setLabel (self : GPUCommandBuffer) (value : String) : IO Unit :=
+@[macro_inline] def GPUCommandBuffer.setLabel (self : GPUCommandBuffer) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandBuffer.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUCommandEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCommandEncoder`). -/
-def GPUCommandEncoder.cast? (v : Value) : IO (Option GPUCommandEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUCommandEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUCommandEncoder.cast? (v : Value) : IO (Option GPUCommandEncoder) := Internal.api "Lasm.JS.Web.GPUCommandEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUCommandEncoder"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUCommandEncoder.label (self : GPUCommandEncoder) : IO String := self.val.get "label" String
+@[macro_inline] def GPUCommandEncoder.label (self : GPUCommandEncoder) : IO String := Internal.api "Lasm.JS.Web.GPUCommandEncoder.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUCommandEncoder.setLabel (self : GPUCommandEncoder) (value : String) : IO Unit :=
+@[macro_inline] def GPUCommandEncoder.setLabel (self : GPUCommandEncoder) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `GPURenderPassEncoder beginRenderPass(GPURenderPassDescriptor descriptor)` -/
-def GPUCommandEncoder.beginRenderPass (self : GPUCommandEncoder) (descriptor : GPURenderPassDescriptor) : IO GPURenderPassEncoder := do
-  let r ← self.val.callMethod "beginRenderPass" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUCommandEncoder.beginRenderPass (self : GPUCommandEncoder) (descriptor : GPURenderPassDescriptor) : IO GPURenderPassEncoder := Internal.api "Lasm.JS.Web.GPUCommandEncoder.beginRenderPass" do
+  let r ← self.val.callMethod "beginRenderPass" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUComputePassEncoder beginComputePass(optional GPUComputePassDescriptor descriptor)` -/
-def GPUCommandEncoder.beginComputePass (self : GPUCommandEncoder) (descriptor : Option GPUComputePassDescriptor := none) : IO GPUComputePassEncoder := do
-  let r ← self.val.callMethod "beginComputePass" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUCommandEncoder.beginComputePass (self : GPUCommandEncoder) (descriptor : Option GPUComputePassDescriptor := none) : IO GPUComputePassEncoder := Internal.api "Lasm.JS.Web.GPUCommandEncoder.beginComputePass" do
+  let r ← self.val.callMethod "beginComputePass" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `undefined copyBufferToBuffer(GPUBuffer source, GPUBuffer destination, optional GPUSize64 size)` -/
-def GPUCommandEncoder.copyBufferToBuffer (self : GPUCommandEncoder) (source : GPUBuffer) (destination : GPUBuffer) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "copyBufferToBuffer" (Support.args #[toJS source, toJS destination, Support.optional size]) Unit
+@[macro_inline] def GPUCommandEncoder.copyBufferToBuffer (self : GPUCommandEncoder) (source : GPUBuffer) (destination : GPUBuffer) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.copyBufferToBuffer" do
+  self.val.callMethod "copyBufferToBuffer" (Internal.args #[toJS source, toJS destination, Internal.optional size]) Unit
 
 /-- `undefined copyBufferToBuffer(GPUBuffer source, GPUSize64 sourceOffset, GPUBuffer destination, GPUSize64 destinationOffset, optional GPUSize64 size)` -/
-def GPUCommandEncoder.copyBufferToBufferWithSourceOffset (self : GPUCommandEncoder) (source : GPUBuffer) (sourceOffset : Nat) (destination : GPUBuffer) (destinationOffset : Nat) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "copyBufferToBuffer" (Support.args #[toJS source, toJS sourceOffset, toJS destination, toJS destinationOffset, Support.optional size]) Unit
+@[macro_inline] def GPUCommandEncoder.copyBufferToBufferWithSourceOffset (self : GPUCommandEncoder) (source : GPUBuffer) (sourceOffset : Nat) (destination : GPUBuffer) (destinationOffset : Nat) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.copyBufferToBufferWithSourceOffset" do
+  self.val.callMethod "copyBufferToBuffer" (Internal.args #[toJS source, toJS sourceOffset, toJS destination, toJS destinationOffset, Internal.optional size]) Unit
 
 /-- `undefined copyBufferToTexture(GPUTexelCopyBufferInfo source, GPUTexelCopyTextureInfo destination, GPUExtent3D copySize)` -/
-def GPUCommandEncoder.copyBufferToTexture (self : GPUCommandEncoder) (source : GPUTexelCopyBufferInfo) (destination : GPUTexelCopyTextureInfo) (copySize : GPUExtent3D) : IO Unit :=
-  self.val.callMethod "copyBufferToTexture" (Support.args #[toJS source, toJS destination, toJS copySize]) Unit
+@[macro_inline] def GPUCommandEncoder.copyBufferToTexture (self : GPUCommandEncoder) (source : GPUTexelCopyBufferInfo) (destination : GPUTexelCopyTextureInfo) (copySize : GPUExtent3D) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.copyBufferToTexture" do
+  self.val.callMethod "copyBufferToTexture" (Internal.args #[toJS source, toJS destination, toJS copySize]) Unit
 
 /-- `undefined copyTextureToBuffer(GPUTexelCopyTextureInfo source, GPUTexelCopyBufferInfo destination, GPUExtent3D copySize)` -/
-def GPUCommandEncoder.copyTextureToBuffer (self : GPUCommandEncoder) (source : GPUTexelCopyTextureInfo) (destination : GPUTexelCopyBufferInfo) (copySize : GPUExtent3D) : IO Unit :=
-  self.val.callMethod "copyTextureToBuffer" (Support.args #[toJS source, toJS destination, toJS copySize]) Unit
+@[macro_inline] def GPUCommandEncoder.copyTextureToBuffer (self : GPUCommandEncoder) (source : GPUTexelCopyTextureInfo) (destination : GPUTexelCopyBufferInfo) (copySize : GPUExtent3D) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.copyTextureToBuffer" do
+  self.val.callMethod "copyTextureToBuffer" (Internal.args #[toJS source, toJS destination, toJS copySize]) Unit
 
 /-- `undefined copyTextureToTexture(GPUTexelCopyTextureInfo source, GPUTexelCopyTextureInfo destination, GPUExtent3D copySize)` -/
-def GPUCommandEncoder.copyTextureToTexture (self : GPUCommandEncoder) (source : GPUTexelCopyTextureInfo) (destination : GPUTexelCopyTextureInfo) (copySize : GPUExtent3D) : IO Unit :=
-  self.val.callMethod "copyTextureToTexture" (Support.args #[toJS source, toJS destination, toJS copySize]) Unit
+@[macro_inline] def GPUCommandEncoder.copyTextureToTexture (self : GPUCommandEncoder) (source : GPUTexelCopyTextureInfo) (destination : GPUTexelCopyTextureInfo) (copySize : GPUExtent3D) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.copyTextureToTexture" do
+  self.val.callMethod "copyTextureToTexture" (Internal.args #[toJS source, toJS destination, toJS copySize]) Unit
 
 /-- `undefined clearBuffer(GPUBuffer buffer, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPUCommandEncoder.clearBuffer (self : GPUCommandEncoder) (buffer : GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "clearBuffer" (Support.args #[toJS buffer, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPUCommandEncoder.clearBuffer (self : GPUCommandEncoder) (buffer : GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.clearBuffer" do
+  self.val.callMethod "clearBuffer" (Internal.args #[toJS buffer, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `undefined resolveQuerySet(GPUQuerySet querySet, GPUSize32 firstQuery, GPUSize32 queryCount, GPUBuffer destination, GPUSize64 destinationOffset)` -/
-def GPUCommandEncoder.resolveQuerySet (self : GPUCommandEncoder) (querySet : GPUQuerySet) (firstQuery : Nat) (queryCount : Nat) (destination : GPUBuffer) (destinationOffset : Nat) : IO Unit :=
-  self.val.callMethod "resolveQuerySet" (Support.args #[toJS querySet, toJS firstQuery, toJS queryCount, toJS destination, toJS destinationOffset]) Unit
+@[macro_inline] def GPUCommandEncoder.resolveQuerySet (self : GPUCommandEncoder) (querySet : GPUQuerySet) (firstQuery : Nat) (queryCount : Nat) (destination : GPUBuffer) (destinationOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.resolveQuerySet" do
+  self.val.callMethod "resolveQuerySet" (Internal.args #[toJS querySet, toJS firstQuery, toJS queryCount, toJS destination, toJS destinationOffset]) Unit
 
 /-- `GPUCommandBuffer finish(optional GPUCommandBufferDescriptor descriptor)` -/
-def GPUCommandEncoder.finish (self : GPUCommandEncoder) (descriptor : Option GPUCommandBufferDescriptor := none) : IO GPUCommandBuffer := do
-  let r ← self.val.callMethod "finish" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUCommandEncoder.finish (self : GPUCommandEncoder) (descriptor : Option GPUCommandBufferDescriptor := none) : IO GPUCommandBuffer := Internal.api "Lasm.JS.Web.GPUCommandEncoder.finish" do
+  let r ← self.val.callMethod "finish" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `undefined pushDebugGroup(USVString groupLabel)` -/
-def GPUCommandEncoder.pushDebugGroup (self : GPUCommandEncoder) (groupLabel : String) : IO Unit :=
-  self.val.callMethod "pushDebugGroup" (Support.args #[toJS groupLabel]) Unit
+@[macro_inline] def GPUCommandEncoder.pushDebugGroup (self : GPUCommandEncoder) (groupLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.pushDebugGroup" do
+  self.val.callMethod "pushDebugGroup" (Internal.args #[toJS groupLabel]) Unit
 
 /-- `undefined popDebugGroup()` -/
-def GPUCommandEncoder.popDebugGroup (self : GPUCommandEncoder) : IO Unit :=
-  self.val.callMethod "popDebugGroup" (Support.args #[]) Unit
+@[macro_inline] def GPUCommandEncoder.popDebugGroup (self : GPUCommandEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.popDebugGroup" do
+  self.val.callMethod "popDebugGroup" (Internal.args #[]) Unit
 
 /-- `undefined insertDebugMarker(USVString markerLabel)` -/
-def GPUCommandEncoder.insertDebugMarker (self : GPUCommandEncoder) (markerLabel : String) : IO Unit :=
-  self.val.callMethod "insertDebugMarker" (Support.args #[toJS markerLabel]) Unit
+@[macro_inline] def GPUCommandEncoder.insertDebugMarker (self : GPUCommandEncoder) (markerLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUCommandEncoder.insertDebugMarker" do
+  self.val.callMethod "insertDebugMarker" (Internal.args #[toJS markerLabel]) Unit
 
 /-- `v instanceof GPUCompilationInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCompilationInfo`). -/
-def GPUCompilationInfo.cast? (v : Value) : IO (Option GPUCompilationInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUCompilationInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUCompilationInfo.cast? (v : Value) : IO (Option GPUCompilationInfo) := Internal.api "Lasm.JS.Web.GPUCompilationInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUCompilationInfo"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<GPUCompilationMessage> messages` -/
-def GPUCompilationInfo.messages (self : GPUCompilationInfo) : IO (Array GPUCompilationMessage) := self.val.get "messages" (Array GPUCompilationMessage)
+@[macro_inline] def GPUCompilationInfo.messages (self : GPUCompilationInfo) : IO (Array GPUCompilationMessage) := Internal.api "Lasm.JS.Web.GPUCompilationInfo.messages" do
+  self.val.get "messages" (Array GPUCompilationMessage)
 
 /-- `v instanceof GPUCompilationMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCompilationMessage`). -/
-def GPUCompilationMessage.cast? (v : Value) : IO (Option GPUCompilationMessage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUCompilationMessage"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUCompilationMessage.cast? (v : Value) : IO (Option GPUCompilationMessage) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUCompilationMessage"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString message` -/
-def GPUCompilationMessage.message (self : GPUCompilationMessage) : IO String := self.val.get "message" String
+@[macro_inline] def GPUCompilationMessage.message (self : GPUCompilationMessage) : IO String := Internal.api "Lasm.JS.Web.GPUCompilationMessage.message" do
+  self.val.get "message" String
 
 /-- `readonly attribute GPUCompilationMessageType type` -/
-def GPUCompilationMessage.type (self : GPUCompilationMessage) : IO GPUCompilationMessageType := self.val.get "type" GPUCompilationMessageType
+@[macro_inline] def GPUCompilationMessage.type (self : GPUCompilationMessage) : IO GPUCompilationMessageType := Internal.api "Lasm.JS.Web.GPUCompilationMessage.type" do
+  self.val.get "type" GPUCompilationMessageType
 
 /-- `readonly attribute unsigned long long lineNum` -/
-def GPUCompilationMessage.lineNum (self : GPUCompilationMessage) : IO Nat := self.val.get "lineNum" Nat
+@[macro_inline] def GPUCompilationMessage.lineNum (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.lineNum" do
+  self.val.get "lineNum" Nat
 
 /-- `readonly attribute unsigned long long linePos` -/
-def GPUCompilationMessage.linePos (self : GPUCompilationMessage) : IO Nat := self.val.get "linePos" Nat
+@[macro_inline] def GPUCompilationMessage.linePos (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.linePos" do
+  self.val.get "linePos" Nat
 
 /-- `readonly attribute unsigned long long offset` -/
-def GPUCompilationMessage.offset (self : GPUCompilationMessage) : IO Nat := self.val.get "offset" Nat
+@[macro_inline] def GPUCompilationMessage.offset (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.offset" do
+  self.val.get "offset" Nat
 
 /-- `readonly attribute unsigned long long length` -/
-def GPUCompilationMessage.length (self : GPUCompilationMessage) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def GPUCompilationMessage.length (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.length" do
+  self.val.get "length" Nat
 
 /-- `v instanceof GPUComputePassEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUComputePassEncoder`). -/
-def GPUComputePassEncoder.cast? (v : Value) : IO (Option GPUComputePassEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUComputePassEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUComputePassEncoder.cast? (v : Value) : IO (Option GPUComputePassEncoder) := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUComputePassEncoder"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUComputePassEncoder.label (self : GPUComputePassEncoder) : IO String := self.val.get "label" String
+@[macro_inline] def GPUComputePassEncoder.label (self : GPUComputePassEncoder) : IO String := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUComputePassEncoder.setLabel (self : GPUComputePassEncoder) (value : String) : IO Unit :=
+@[macro_inline] def GPUComputePassEncoder.setLabel (self : GPUComputePassEncoder) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `undefined setPipeline(GPUComputePipeline pipeline)` -/
-def GPUComputePassEncoder.setPipeline (self : GPUComputePassEncoder) (pipeline : GPUComputePipeline) : IO Unit :=
-  self.val.callMethod "setPipeline" (Support.args #[toJS pipeline]) Unit
+@[macro_inline] def GPUComputePassEncoder.setPipeline (self : GPUComputePassEncoder) (pipeline : GPUComputePipeline) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setPipeline" do
+  self.val.callMethod "setPipeline" (Internal.args #[toJS pipeline]) Unit
 
 /-- `undefined dispatchWorkgroups(GPUSize32 workgroupCountX, optional GPUSize32 workgroupCountY, optional GPUSize32 workgroupCountZ)` -/
-def GPUComputePassEncoder.dispatchWorkgroups (self : GPUComputePassEncoder) (workgroupCountX : Nat) (workgroupCountY : Option Nat := none) (workgroupCountZ : Option Nat := none) : IO Unit :=
-  self.val.callMethod "dispatchWorkgroups" (Support.args #[toJS workgroupCountX, Support.optional workgroupCountY, Support.optional workgroupCountZ]) Unit
+@[macro_inline] def GPUComputePassEncoder.dispatchWorkgroups (self : GPUComputePassEncoder) (workgroupCountX : Nat) (workgroupCountY : Option Nat := none) (workgroupCountZ : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.dispatchWorkgroups" do
+  self.val.callMethod "dispatchWorkgroups" (Internal.args #[toJS workgroupCountX, Internal.optional workgroupCountY, Internal.optional workgroupCountZ]) Unit
 
 /-- `undefined dispatchWorkgroupsIndirect(GPUBuffer indirectBuffer, GPUSize64 indirectOffset)` -/
-def GPUComputePassEncoder.dispatchWorkgroupsIndirect (self : GPUComputePassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit :=
-  self.val.callMethod "dispatchWorkgroupsIndirect" (Support.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
+@[macro_inline] def GPUComputePassEncoder.dispatchWorkgroupsIndirect (self : GPUComputePassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.dispatchWorkgroupsIndirect" do
+  self.val.callMethod "dispatchWorkgroupsIndirect" (Internal.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
 
 /-- `undefined end()` -/
-def GPUComputePassEncoder.«end» (self : GPUComputePassEncoder) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def GPUComputePassEncoder.«end» (self : GPUComputePassEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.end" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- `undefined pushDebugGroup(USVString groupLabel)` -/
-def GPUComputePassEncoder.pushDebugGroup (self : GPUComputePassEncoder) (groupLabel : String) : IO Unit :=
-  self.val.callMethod "pushDebugGroup" (Support.args #[toJS groupLabel]) Unit
+@[macro_inline] def GPUComputePassEncoder.pushDebugGroup (self : GPUComputePassEncoder) (groupLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.pushDebugGroup" do
+  self.val.callMethod "pushDebugGroup" (Internal.args #[toJS groupLabel]) Unit
 
 /-- `undefined popDebugGroup()` -/
-def GPUComputePassEncoder.popDebugGroup (self : GPUComputePassEncoder) : IO Unit :=
-  self.val.callMethod "popDebugGroup" (Support.args #[]) Unit
+@[macro_inline] def GPUComputePassEncoder.popDebugGroup (self : GPUComputePassEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.popDebugGroup" do
+  self.val.callMethod "popDebugGroup" (Internal.args #[]) Unit
 
 /-- `undefined insertDebugMarker(USVString markerLabel)` -/
-def GPUComputePassEncoder.insertDebugMarker (self : GPUComputePassEncoder) (markerLabel : String) : IO Unit :=
-  self.val.callMethod "insertDebugMarker" (Support.args #[toJS markerLabel]) Unit
+@[macro_inline] def GPUComputePassEncoder.insertDebugMarker (self : GPUComputePassEncoder) (markerLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.insertDebugMarker" do
+  self.val.callMethod "insertDebugMarker" (Internal.args #[toJS markerLabel]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, optional sequence<GPUBufferDynamicOffset> dynamicOffsets)` -/
-def GPUComputePassEncoder.setBindGroup (self : GPUComputePassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit :=
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, Support.optional dynamicOffsets]) Unit
+@[macro_inline] def GPUComputePassEncoder.setBindGroup (self : GPUComputePassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setBindGroup" do
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, Internal.optional dynamicOffsets]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, Uint32Array dynamicOffsetsData, GPUSize64 dynamicOffsetsDataStart, GPUSize32 dynamicOffsetsDataLength)` -/
-def GPUComputePassEncoder.setBindGroupWithDynamicOffsetsData (self : GPUComputePassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := do
-  let dynamicOffsetsDataView ← Support.typedArray "Uint32Array" dynamicOffsetsData
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
+@[macro_inline] def GPUComputePassEncoder.setBindGroupWithDynamicOffsetsData (self : GPUComputePassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setBindGroupWithDynamicOffsetsData" do
+  let dynamicOffsetsDataView ← Internal.typedArray "Uint32Array" dynamicOffsetsData
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
 
 /-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` -/
-def GPUComputePassEncoder.setImmediates (self : GPUComputePassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setImmediates" (Support.args #[toJS rangeOffset, toJS data, Support.optional dataOffset, Support.optional dataSize]) Unit
+@[macro_inline] def GPUComputePassEncoder.setImmediates (self : GPUComputePassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setImmediates" do
+  self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
 
 /-- `v instanceof GPUComputePipeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUComputePipeline`). -/
-def GPUComputePipeline.cast? (v : Value) : IO (Option GPUComputePipeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUComputePipeline"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUComputePipeline.cast? (v : Value) : IO (Option GPUComputePipeline) := Internal.api "Lasm.JS.Web.GPUComputePipeline.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUComputePipeline"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUComputePipeline.label (self : GPUComputePipeline) : IO String := self.val.get "label" String
+@[macro_inline] def GPUComputePipeline.label (self : GPUComputePipeline) : IO String := Internal.api "Lasm.JS.Web.GPUComputePipeline.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUComputePipeline.setLabel (self : GPUComputePipeline) (value : String) : IO Unit :=
+@[macro_inline] def GPUComputePipeline.setLabel (self : GPUComputePipeline) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePipeline.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `GPUBindGroupLayout getBindGroupLayout(unsigned long index)` -/
-def GPUComputePipeline.getBindGroupLayout (self : GPUComputePipeline) (index : Nat) : IO GPUBindGroupLayout := do
-  let r ← self.val.callMethod "getBindGroupLayout" (Support.args #[toJS index]) Value
+@[macro_inline] def GPUComputePipeline.getBindGroupLayout (self : GPUComputePipeline) (index : Nat) : IO GPUBindGroupLayout := Internal.api "Lasm.JS.Web.GPUComputePipeline.getBindGroupLayout" do
+  let r ← self.val.callMethod "getBindGroupLayout" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `v instanceof GPUDevice`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUDevice`). -/
-def GPUDevice.cast? (v : Value) : IO (Option GPUDevice) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUDevice"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUDevice.cast? (v : Value) : IO (Option GPUDevice) := Internal.api "Lasm.JS.Web.GPUDevice.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUDevice"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUSupportedFeatures features` -/
-def GPUDevice.features (self : GPUDevice) : IO GPUSupportedFeatures := do
+@[macro_inline] def GPUDevice.features (self : GPUDevice) : IO GPUSupportedFeatures := Internal.api "Lasm.JS.Web.GPUDevice.features" do
   let r ← self.val.get "features" Value
   pure { val := r }
 
 /-- `readonly attribute GPUSupportedLimits limits` -/
-def GPUDevice.limits (self : GPUDevice) : IO GPUSupportedLimits := do
+@[macro_inline] def GPUDevice.limits (self : GPUDevice) : IO GPUSupportedLimits := Internal.api "Lasm.JS.Web.GPUDevice.limits" do
   let r ← self.val.get "limits" Value
   pure { val := r }
 
 /-- `readonly attribute GPUAdapterInfo adapterInfo` -/
-def GPUDevice.adapterInfo (self : GPUDevice) : IO GPUAdapterInfo := do
+@[macro_inline] def GPUDevice.adapterInfo (self : GPUDevice) : IO GPUAdapterInfo := Internal.api "Lasm.JS.Web.GPUDevice.adapterInfo" do
   let r ← self.val.get "adapterInfo" Value
   pure { val := r }
 
 /-- `readonly attribute GPUQueue queue` -/
-def GPUDevice.queue (self : GPUDevice) : IO GPUQueue := do
+@[macro_inline] def GPUDevice.queue (self : GPUDevice) : IO GPUQueue := Internal.api "Lasm.JS.Web.GPUDevice.queue" do
   let r ← self.val.get "queue" Value
   pure { val := r }
 
 /-- `readonly attribute Promise<GPUDeviceLostInfo> lost` -/
-def GPUDevice.lost (self : GPUDevice) : Async GPUDeviceLostInfo := do
+@[macro_inline] def GPUDevice.lost (self : GPUDevice) : Async GPUDeviceLostInfo := Internal.api "Lasm.JS.Web.GPUDevice.lost" do
   let p ← self.val.get "lost" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `attribute EventHandler onuncapturederror` -/
-def GPUDevice.onuncapturederror (self : GPUDevice) : IO (Option EventHandlerNonNull) := self.val.get "onuncapturederror" (Option EventHandlerNonNull)
+@[macro_inline] def GPUDevice.onuncapturederror (self : GPUDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.GPUDevice.onuncapturederror" do
+  self.val.get "onuncapturederror" (Option EventHandlerNonNull)
 
 /-- Sets `onuncapturederror`: `attribute EventHandler onuncapturederror` -/
-def GPUDevice.setOnuncapturederror (self : GPUDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def GPUDevice.setOnuncapturederror (self : GPUDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.GPUDevice.setOnuncapturederror" do
   self.val.set "onuncapturederror" (toJS value)
 
 /-- `attribute USVString label` -/
-def GPUDevice.label (self : GPUDevice) : IO String := self.val.get "label" String
+@[macro_inline] def GPUDevice.label (self : GPUDevice) : IO String := Internal.api "Lasm.JS.Web.GPUDevice.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUDevice.setLabel (self : GPUDevice) (value : String) : IO Unit :=
+@[macro_inline] def GPUDevice.setLabel (self : GPUDevice) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUDevice.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `undefined destroy()` -/
-def GPUDevice.destroy (self : GPUDevice) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def GPUDevice.destroy (self : GPUDevice) : IO Unit := Internal.api "Lasm.JS.Web.GPUDevice.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `GPUBuffer createBuffer(GPUBufferDescriptor descriptor)` -/
-def GPUDevice.createBuffer (self : GPUDevice) (descriptor : GPUBufferDescriptor) : IO GPUBuffer := do
-  let r ← self.val.callMethod "createBuffer" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createBuffer (self : GPUDevice) (descriptor : GPUBufferDescriptor) : IO GPUBuffer := Internal.api "Lasm.JS.Web.GPUDevice.createBuffer" do
+  let r ← self.val.callMethod "createBuffer" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUTexture createTexture(GPUTextureDescriptor descriptor)` -/
-def GPUDevice.createTexture (self : GPUDevice) (descriptor : GPUTextureDescriptor) : IO GPUTexture := do
-  let r ← self.val.callMethod "createTexture" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createTexture (self : GPUDevice) (descriptor : GPUTextureDescriptor) : IO GPUTexture := Internal.api "Lasm.JS.Web.GPUDevice.createTexture" do
+  let r ← self.val.callMethod "createTexture" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUSampler createSampler(optional GPUSamplerDescriptor descriptor)` -/
-def GPUDevice.createSampler (self : GPUDevice) (descriptor : Option GPUSamplerDescriptor := none) : IO GPUSampler := do
-  let r ← self.val.callMethod "createSampler" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUDevice.createSampler (self : GPUDevice) (descriptor : Option GPUSamplerDescriptor := none) : IO GPUSampler := Internal.api "Lasm.JS.Web.GPUDevice.createSampler" do
+  let r ← self.val.callMethod "createSampler" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `GPUExternalTexture importExternalTexture(GPUExternalTextureDescriptor descriptor)` -/
-def GPUDevice.importExternalTexture (self : GPUDevice) (descriptor : GPUExternalTextureDescriptor) : IO GPUExternalTexture := do
-  let r ← self.val.callMethod "importExternalTexture" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.importExternalTexture (self : GPUDevice) (descriptor : GPUExternalTextureDescriptor) : IO GPUExternalTexture := Internal.api "Lasm.JS.Web.GPUDevice.importExternalTexture" do
+  let r ← self.val.callMethod "importExternalTexture" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUBindGroupLayout createBindGroupLayout(GPUBindGroupLayoutDescriptor descriptor)` -/
-def GPUDevice.createBindGroupLayout (self : GPUDevice) (descriptor : GPUBindGroupLayoutDescriptor) : IO GPUBindGroupLayout := do
-  let r ← self.val.callMethod "createBindGroupLayout" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createBindGroupLayout (self : GPUDevice) (descriptor : GPUBindGroupLayoutDescriptor) : IO GPUBindGroupLayout := Internal.api "Lasm.JS.Web.GPUDevice.createBindGroupLayout" do
+  let r ← self.val.callMethod "createBindGroupLayout" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUPipelineLayout createPipelineLayout(GPUPipelineLayoutDescriptor descriptor)` -/
-def GPUDevice.createPipelineLayout (self : GPUDevice) (descriptor : GPUPipelineLayoutDescriptor) : IO GPUPipelineLayout := do
-  let r ← self.val.callMethod "createPipelineLayout" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createPipelineLayout (self : GPUDevice) (descriptor : GPUPipelineLayoutDescriptor) : IO GPUPipelineLayout := Internal.api "Lasm.JS.Web.GPUDevice.createPipelineLayout" do
+  let r ← self.val.callMethod "createPipelineLayout" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUBindGroup createBindGroup(GPUBindGroupDescriptor descriptor)` -/
-def GPUDevice.createBindGroup (self : GPUDevice) (descriptor : GPUBindGroupDescriptor) : IO GPUBindGroup := do
-  let r ← self.val.callMethod "createBindGroup" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createBindGroup (self : GPUDevice) (descriptor : GPUBindGroupDescriptor) : IO GPUBindGroup := Internal.api "Lasm.JS.Web.GPUDevice.createBindGroup" do
+  let r ← self.val.callMethod "createBindGroup" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUShaderModule createShaderModule(GPUShaderModuleDescriptor descriptor)` -/
-def GPUDevice.createShaderModule (self : GPUDevice) (descriptor : GPUShaderModuleDescriptor) : IO GPUShaderModule := do
-  let r ← self.val.callMethod "createShaderModule" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createShaderModule (self : GPUDevice) (descriptor : GPUShaderModuleDescriptor) : IO GPUShaderModule := Internal.api "Lasm.JS.Web.GPUDevice.createShaderModule" do
+  let r ← self.val.callMethod "createShaderModule" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUComputePipeline createComputePipeline(GPUComputePipelineDescriptor descriptor)` -/
-def GPUDevice.createComputePipeline (self : GPUDevice) (descriptor : GPUComputePipelineDescriptor) : IO GPUComputePipeline := do
-  let r ← self.val.callMethod "createComputePipeline" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createComputePipeline (self : GPUDevice) (descriptor : GPUComputePipelineDescriptor) : IO GPUComputePipeline := Internal.api "Lasm.JS.Web.GPUDevice.createComputePipeline" do
+  let r ← self.val.callMethod "createComputePipeline" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPURenderPipeline createRenderPipeline(GPURenderPipelineDescriptor descriptor)` -/
-def GPUDevice.createRenderPipeline (self : GPUDevice) (descriptor : GPURenderPipelineDescriptor) : IO GPURenderPipeline := do
-  let r ← self.val.callMethod "createRenderPipeline" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createRenderPipeline (self : GPUDevice) (descriptor : GPURenderPipelineDescriptor) : IO GPURenderPipeline := Internal.api "Lasm.JS.Web.GPUDevice.createRenderPipeline" do
+  let r ← self.val.callMethod "createRenderPipeline" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `Promise<GPUComputePipeline> createComputePipelineAsync(GPUComputePipelineDescriptor descriptor)` -/
-def GPUDevice.createComputePipelineAsync (self : GPUDevice) (descriptor : GPUComputePipelineDescriptor) : Async GPUComputePipeline := do
-  let r ← self.val.callMethodAwait "createComputePipelineAsync" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createComputePipelineAsync (self : GPUDevice) (descriptor : GPUComputePipelineDescriptor) : Async GPUComputePipeline := Internal.api "Lasm.JS.Web.GPUDevice.createComputePipelineAsync" do
+  let r ← self.val.callMethodAwait "createComputePipelineAsync" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `Promise<GPURenderPipeline> createRenderPipelineAsync(GPURenderPipelineDescriptor descriptor)` -/
-def GPUDevice.createRenderPipelineAsync (self : GPUDevice) (descriptor : GPURenderPipelineDescriptor) : Async GPURenderPipeline := do
-  let r ← self.val.callMethodAwait "createRenderPipelineAsync" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createRenderPipelineAsync (self : GPUDevice) (descriptor : GPURenderPipelineDescriptor) : Async GPURenderPipeline := Internal.api "Lasm.JS.Web.GPUDevice.createRenderPipelineAsync" do
+  let r ← self.val.callMethodAwait "createRenderPipelineAsync" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUCommandEncoder createCommandEncoder(optional GPUCommandEncoderDescriptor descriptor)` -/
-def GPUDevice.createCommandEncoder (self : GPUDevice) (descriptor : Option GPUCommandEncoderDescriptor := none) : IO GPUCommandEncoder := do
-  let r ← self.val.callMethod "createCommandEncoder" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUDevice.createCommandEncoder (self : GPUDevice) (descriptor : Option GPUCommandEncoderDescriptor := none) : IO GPUCommandEncoder := Internal.api "Lasm.JS.Web.GPUDevice.createCommandEncoder" do
+  let r ← self.val.callMethod "createCommandEncoder" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `GPURenderBundleEncoder createRenderBundleEncoder(GPURenderBundleEncoderDescriptor descriptor)` -/
-def GPUDevice.createRenderBundleEncoder (self : GPUDevice) (descriptor : GPURenderBundleEncoderDescriptor) : IO GPURenderBundleEncoder := do
-  let r ← self.val.callMethod "createRenderBundleEncoder" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createRenderBundleEncoder (self : GPUDevice) (descriptor : GPURenderBundleEncoderDescriptor) : IO GPURenderBundleEncoder := Internal.api "Lasm.JS.Web.GPUDevice.createRenderBundleEncoder" do
+  let r ← self.val.callMethod "createRenderBundleEncoder" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `GPUQuerySet createQuerySet(GPUQuerySetDescriptor descriptor)` -/
-def GPUDevice.createQuerySet (self : GPUDevice) (descriptor : GPUQuerySetDescriptor) : IO GPUQuerySet := do
-  let r ← self.val.callMethod "createQuerySet" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def GPUDevice.createQuerySet (self : GPUDevice) (descriptor : GPUQuerySetDescriptor) : IO GPUQuerySet := Internal.api "Lasm.JS.Web.GPUDevice.createQuerySet" do
+  let r ← self.val.callMethod "createQuerySet" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `undefined pushErrorScope(GPUErrorFilter filter)` -/
-def GPUDevice.pushErrorScope (self : GPUDevice) (filter : GPUErrorFilter) : IO Unit :=
-  self.val.callMethod "pushErrorScope" (Support.args #[toJS filter]) Unit
+@[macro_inline] def GPUDevice.pushErrorScope (self : GPUDevice) (filter : GPUErrorFilter) : IO Unit := Internal.api "Lasm.JS.Web.GPUDevice.pushErrorScope" do
+  self.val.callMethod "pushErrorScope" (Internal.args #[toJS filter]) Unit
 
 /-- `Promise<GPUError?> popErrorScope()` -/
-def GPUDevice.popErrorScope (self : GPUDevice) : Async (Option GPUError) :=
-  self.val.callMethodAwait "popErrorScope" (Support.args #[]) (Option GPUError)
+@[macro_inline] def GPUDevice.popErrorScope (self : GPUDevice) : Async (Option GPUError) := Internal.api "Lasm.JS.Web.GPUDevice.popErrorScope" do
+  self.val.callMethodAwait "popErrorScope" (Internal.args #[]) (Option GPUError)
 
 /-- `v instanceof GPUDeviceLostInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUDeviceLostInfo`). -/
-def GPUDeviceLostInfo.cast? (v : Value) : IO (Option GPUDeviceLostInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUDeviceLostInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUDeviceLostInfo.cast? (v : Value) : IO (Option GPUDeviceLostInfo) := Internal.api "Lasm.JS.Web.GPUDeviceLostInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUDeviceLostInfo"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUDeviceLostReason reason` -/
-def GPUDeviceLostInfo.reason (self : GPUDeviceLostInfo) : IO GPUDeviceLostReason := self.val.get "reason" GPUDeviceLostReason
+@[macro_inline] def GPUDeviceLostInfo.reason (self : GPUDeviceLostInfo) : IO GPUDeviceLostReason := Internal.api "Lasm.JS.Web.GPUDeviceLostInfo.reason" do
+  self.val.get "reason" GPUDeviceLostReason
 
 /-- `readonly attribute DOMString message` -/
-def GPUDeviceLostInfo.message (self : GPUDeviceLostInfo) : IO String := self.val.get "message" String
+@[macro_inline] def GPUDeviceLostInfo.message (self : GPUDeviceLostInfo) : IO String := Internal.api "Lasm.JS.Web.GPUDeviceLostInfo.message" do
+  self.val.get "message" String
 
 /-- `v instanceof GPUError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUError`). -/
-def GPUError.cast? (v : Value) : IO (Option GPUError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUError"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUError.cast? (v : Value) : IO (Option GPUError) := Internal.api "Lasm.JS.Web.GPUError.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUError"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString message` -/
-def GPUError.message (self : GPUError) : IO String := self.val.get "message" String
+@[macro_inline] def GPUError.message (self : GPUError) : IO String := Internal.api "Lasm.JS.Web.GPUError.message" do
+  self.val.get "message" String
 
 /-- `v instanceof GPUExternalTexture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUExternalTexture`). -/
-def GPUExternalTexture.cast? (v : Value) : IO (Option GPUExternalTexture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUExternalTexture"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUExternalTexture.cast? (v : Value) : IO (Option GPUExternalTexture) := Internal.api "Lasm.JS.Web.GPUExternalTexture.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUExternalTexture"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUExternalTexture.label (self : GPUExternalTexture) : IO String := self.val.get "label" String
+@[macro_inline] def GPUExternalTexture.label (self : GPUExternalTexture) : IO String := Internal.api "Lasm.JS.Web.GPUExternalTexture.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUExternalTexture.setLabel (self : GPUExternalTexture) (value : String) : IO Unit :=
+@[macro_inline] def GPUExternalTexture.setLabel (self : GPUExternalTexture) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUExternalTexture.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUPipelineError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUPipelineError`). -/
-def GPUPipelineError.cast? (v : Value) : IO (Option GPUPipelineError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUPipelineError"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUPipelineError.cast? (v : Value) : IO (Option GPUPipelineError) := Internal.api "Lasm.JS.Web.GPUPipelineError.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUPipelineError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message, GPUPipelineErrorInit options)` -/
-def GPUPipelineError.new (message : Option String := none) (options : GPUPipelineErrorInit) : IO GPUPipelineError :=
+@[macro_inline] def GPUPipelineError.new (message : Option String := none) (options : GPUPipelineErrorInit) : IO GPUPipelineError := Internal.api "Lasm.JS.Web.GPUPipelineError.new" do
   Lasm.JS.Binding.invoke GPUPipelineError { name := "Lasm.JS.Web.GPUPipelineError.new", module := "globalThis", path := "GPUPipelineError", construct := true, arity := 2 }
-    (Support.args #[Support.optional message, toJS options]) (await := false)
+    (Internal.args #[Internal.optional message, toJS options]) (await := false)
 
 /-- `readonly attribute GPUPipelineErrorReason reason` -/
-def GPUPipelineError.reason (self : GPUPipelineError) : IO GPUPipelineErrorReason := self.val.get "reason" GPUPipelineErrorReason
+@[macro_inline] def GPUPipelineError.reason (self : GPUPipelineError) : IO GPUPipelineErrorReason := Internal.api "Lasm.JS.Web.GPUPipelineError.reason" do
+  self.val.get "reason" GPUPipelineErrorReason
 
 /-- `v instanceof GPUPipelineLayout`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUPipelineLayout`). -/
-def GPUPipelineLayout.cast? (v : Value) : IO (Option GPUPipelineLayout) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUPipelineLayout"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUPipelineLayout.cast? (v : Value) : IO (Option GPUPipelineLayout) := Internal.api "Lasm.JS.Web.GPUPipelineLayout.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUPipelineLayout"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUPipelineLayout.label (self : GPUPipelineLayout) : IO String := self.val.get "label" String
+@[macro_inline] def GPUPipelineLayout.label (self : GPUPipelineLayout) : IO String := Internal.api "Lasm.JS.Web.GPUPipelineLayout.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUPipelineLayout.setLabel (self : GPUPipelineLayout) (value : String) : IO Unit :=
+@[macro_inline] def GPUPipelineLayout.setLabel (self : GPUPipelineLayout) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUPipelineLayout.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUQuerySet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUQuerySet`). -/
-def GPUQuerySet.cast? (v : Value) : IO (Option GPUQuerySet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUQuerySet"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUQuerySet.cast? (v : Value) : IO (Option GPUQuerySet) := Internal.api "Lasm.JS.Web.GPUQuerySet.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUQuerySet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUQueryType type` -/
-def GPUQuerySet.type (self : GPUQuerySet) : IO GPUQueryType := self.val.get "type" GPUQueryType
+@[macro_inline] def GPUQuerySet.type (self : GPUQuerySet) : IO GPUQueryType := Internal.api "Lasm.JS.Web.GPUQuerySet.type" do
+  self.val.get "type" GPUQueryType
 
 /-- `readonly attribute GPUSize32Out count` -/
-def GPUQuerySet.count (self : GPUQuerySet) : IO Nat := self.val.get "count" Nat
+@[macro_inline] def GPUQuerySet.count (self : GPUQuerySet) : IO Nat := Internal.api "Lasm.JS.Web.GPUQuerySet.count" do
+  self.val.get "count" Nat
 
 /-- `attribute USVString label` -/
-def GPUQuerySet.label (self : GPUQuerySet) : IO String := self.val.get "label" String
+@[macro_inline] def GPUQuerySet.label (self : GPUQuerySet) : IO String := Internal.api "Lasm.JS.Web.GPUQuerySet.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUQuerySet.setLabel (self : GPUQuerySet) (value : String) : IO Unit :=
+@[macro_inline] def GPUQuerySet.setLabel (self : GPUQuerySet) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUQuerySet.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `undefined destroy()` -/
-def GPUQuerySet.destroy (self : GPUQuerySet) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def GPUQuerySet.destroy (self : GPUQuerySet) : IO Unit := Internal.api "Lasm.JS.Web.GPUQuerySet.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof GPUQueue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUQueue`). -/
-def GPUQueue.cast? (v : Value) : IO (Option GPUQueue) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUQueue"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUQueue.cast? (v : Value) : IO (Option GPUQueue) := Internal.api "Lasm.JS.Web.GPUQueue.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUQueue"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUQueue.label (self : GPUQueue) : IO String := self.val.get "label" String
+@[macro_inline] def GPUQueue.label (self : GPUQueue) : IO String := Internal.api "Lasm.JS.Web.GPUQueue.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUQueue.setLabel (self : GPUQueue) (value : String) : IO Unit :=
+@[macro_inline] def GPUQueue.setLabel (self : GPUQueue) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUQueue.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `undefined submit(sequence<GPUCommandBuffer> commandBuffers)` -/
-def GPUQueue.submit (self : GPUQueue) (commandBuffers : Array GPUCommandBuffer) : IO Unit :=
-  self.val.callMethod "submit" (Support.args #[toJS commandBuffers]) Unit
+@[macro_inline] def GPUQueue.submit (self : GPUQueue) (commandBuffers : Array GPUCommandBuffer) : IO Unit := Internal.api "Lasm.JS.Web.GPUQueue.submit" do
+  self.val.callMethod "submit" (Internal.args #[toJS commandBuffers]) Unit
 
 /-- `Promise<undefined> onSubmittedWorkDone()` -/
-def GPUQueue.onSubmittedWorkDone (self : GPUQueue) : Async Unit :=
-  self.val.callMethodAwait "onSubmittedWorkDone" (Support.args #[]) Unit
+@[macro_inline] def GPUQueue.onSubmittedWorkDone (self : GPUQueue) : Async Unit := Internal.api "Lasm.JS.Web.GPUQueue.onSubmittedWorkDone" do
+  self.val.callMethodAwait "onSubmittedWorkDone" (Internal.args #[]) Unit
 
 /-- `undefined writeBuffer(GPUBuffer buffer, GPUSize64 bufferOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 size)` -/
-def GPUQueue.writeBuffer (self : GPUQueue) (buffer : GPUBuffer) (bufferOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "writeBuffer" (Support.args #[toJS buffer, toJS bufferOffset, toJS data, Support.optional dataOffset, Support.optional size]) Unit
+@[macro_inline] def GPUQueue.writeBuffer (self : GPUQueue) (buffer : GPUBuffer) (bufferOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUQueue.writeBuffer" do
+  self.val.callMethod "writeBuffer" (Internal.args #[toJS buffer, toJS bufferOffset, toJS data, Internal.optional dataOffset, Internal.optional size]) Unit
 
 /-- `undefined writeTexture(GPUTexelCopyTextureInfo destination, AllowSharedBufferSource data, GPUTexelCopyBufferLayout dataLayout, GPUExtent3D size)` -/
-def GPUQueue.writeTexture (self : GPUQueue) (destination : GPUTexelCopyTextureInfo) (data : ByteArray) (dataLayout : GPUTexelCopyBufferLayout) (size : GPUExtent3D) : IO Unit :=
-  self.val.callMethod "writeTexture" (Support.args #[toJS destination, toJS data, toJS dataLayout, toJS size]) Unit
+@[macro_inline] def GPUQueue.writeTexture (self : GPUQueue) (destination : GPUTexelCopyTextureInfo) (data : ByteArray) (dataLayout : GPUTexelCopyBufferLayout) (size : GPUExtent3D) : IO Unit := Internal.api "Lasm.JS.Web.GPUQueue.writeTexture" do
+  self.val.callMethod "writeTexture" (Internal.args #[toJS destination, toJS data, toJS dataLayout, toJS size]) Unit
 
 /-- `undefined copyExternalImageToTexture(GPUCopyExternalImageSourceInfo source, GPUCopyExternalImageDestInfo destination, GPUExtent3D copySize)` -/
-def GPUQueue.copyExternalImageToTexture (self : GPUQueue) (source : GPUCopyExternalImageSourceInfo) (destination : GPUCopyExternalImageDestInfo) (copySize : GPUExtent3D) : IO Unit :=
-  self.val.callMethod "copyExternalImageToTexture" (Support.args #[toJS source, toJS destination, toJS copySize]) Unit
+@[macro_inline] def GPUQueue.copyExternalImageToTexture (self : GPUQueue) (source : GPUCopyExternalImageSourceInfo) (destination : GPUCopyExternalImageDestInfo) (copySize : GPUExtent3D) : IO Unit := Internal.api "Lasm.JS.Web.GPUQueue.copyExternalImageToTexture" do
+  self.val.callMethod "copyExternalImageToTexture" (Internal.args #[toJS source, toJS destination, toJS copySize]) Unit
 
 /-- `v instanceof GPURenderBundle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPURenderBundle`). -/
-def GPURenderBundle.cast? (v : Value) : IO (Option GPURenderBundle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPURenderBundle"] Value) v) then some { val := v } else none
+@[macro_inline] def GPURenderBundle.cast? (v : Value) : IO (Option GPURenderBundle) := Internal.api "Lasm.JS.Web.GPURenderBundle.cast?" do
+  Internal.cast (Internal.getGlobal ["GPURenderBundle"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPURenderBundle.label (self : GPURenderBundle) : IO String := self.val.get "label" String
+@[macro_inline] def GPURenderBundle.label (self : GPURenderBundle) : IO String := Internal.api "Lasm.JS.Web.GPURenderBundle.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPURenderBundle.setLabel (self : GPURenderBundle) (value : String) : IO Unit :=
+@[macro_inline] def GPURenderBundle.setLabel (self : GPURenderBundle) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundle.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPURenderBundleEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPURenderBundleEncoder`). -/
-def GPURenderBundleEncoder.cast? (v : Value) : IO (Option GPURenderBundleEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPURenderBundleEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def GPURenderBundleEncoder.cast? (v : Value) : IO (Option GPURenderBundleEncoder) := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["GPURenderBundleEncoder"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPURenderBundleEncoder.label (self : GPURenderBundleEncoder) : IO String := self.val.get "label" String
+@[macro_inline] def GPURenderBundleEncoder.label (self : GPURenderBundleEncoder) : IO String := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPURenderBundleEncoder.setLabel (self : GPURenderBundleEncoder) (value : String) : IO Unit :=
+@[macro_inline] def GPURenderBundleEncoder.setLabel (self : GPURenderBundleEncoder) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `GPURenderBundle finish(optional GPURenderBundleDescriptor descriptor)` -/
-def GPURenderBundleEncoder.finish (self : GPURenderBundleEncoder) (descriptor : Option GPURenderBundleDescriptor := none) : IO GPURenderBundle := do
-  let r ← self.val.callMethod "finish" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPURenderBundleEncoder.finish (self : GPURenderBundleEncoder) (descriptor : Option GPURenderBundleDescriptor := none) : IO GPURenderBundle := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.finish" do
+  let r ← self.val.callMethod "finish" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `undefined pushDebugGroup(USVString groupLabel)` -/
-def GPURenderBundleEncoder.pushDebugGroup (self : GPURenderBundleEncoder) (groupLabel : String) : IO Unit :=
-  self.val.callMethod "pushDebugGroup" (Support.args #[toJS groupLabel]) Unit
+@[macro_inline] def GPURenderBundleEncoder.pushDebugGroup (self : GPURenderBundleEncoder) (groupLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.pushDebugGroup" do
+  self.val.callMethod "pushDebugGroup" (Internal.args #[toJS groupLabel]) Unit
 
 /-- `undefined popDebugGroup()` -/
-def GPURenderBundleEncoder.popDebugGroup (self : GPURenderBundleEncoder) : IO Unit :=
-  self.val.callMethod "popDebugGroup" (Support.args #[]) Unit
+@[macro_inline] def GPURenderBundleEncoder.popDebugGroup (self : GPURenderBundleEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.popDebugGroup" do
+  self.val.callMethod "popDebugGroup" (Internal.args #[]) Unit
 
 /-- `undefined insertDebugMarker(USVString markerLabel)` -/
-def GPURenderBundleEncoder.insertDebugMarker (self : GPURenderBundleEncoder) (markerLabel : String) : IO Unit :=
-  self.val.callMethod "insertDebugMarker" (Support.args #[toJS markerLabel]) Unit
+@[macro_inline] def GPURenderBundleEncoder.insertDebugMarker (self : GPURenderBundleEncoder) (markerLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.insertDebugMarker" do
+  self.val.callMethod "insertDebugMarker" (Internal.args #[toJS markerLabel]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, optional sequence<GPUBufferDynamicOffset> dynamicOffsets)` -/
-def GPURenderBundleEncoder.setBindGroup (self : GPURenderBundleEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit :=
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, Support.optional dynamicOffsets]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setBindGroup (self : GPURenderBundleEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setBindGroup" do
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, Internal.optional dynamicOffsets]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, Uint32Array dynamicOffsetsData, GPUSize64 dynamicOffsetsDataStart, GPUSize32 dynamicOffsetsDataLength)` -/
-def GPURenderBundleEncoder.setBindGroupWithDynamicOffsetsData (self : GPURenderBundleEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := do
-  let dynamicOffsetsDataView ← Support.typedArray "Uint32Array" dynamicOffsetsData
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setBindGroupWithDynamicOffsetsData (self : GPURenderBundleEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setBindGroupWithDynamicOffsetsData" do
+  let dynamicOffsetsDataView ← Internal.typedArray "Uint32Array" dynamicOffsetsData
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
 
 /-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` -/
-def GPURenderBundleEncoder.setImmediates (self : GPURenderBundleEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setImmediates" (Support.args #[toJS rangeOffset, toJS data, Support.optional dataOffset, Support.optional dataSize]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setImmediates (self : GPURenderBundleEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setImmediates" do
+  self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
 
 /-- `undefined setPipeline(GPURenderPipeline pipeline)` -/
-def GPURenderBundleEncoder.setPipeline (self : GPURenderBundleEncoder) (pipeline : GPURenderPipeline) : IO Unit :=
-  self.val.callMethod "setPipeline" (Support.args #[toJS pipeline]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setPipeline (self : GPURenderBundleEncoder) (pipeline : GPURenderPipeline) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setPipeline" do
+  self.val.callMethod "setPipeline" (Internal.args #[toJS pipeline]) Unit
 
 /-- `undefined setIndexBuffer(GPUBuffer buffer, GPUIndexFormat indexFormat, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPURenderBundleEncoder.setIndexBuffer (self : GPURenderBundleEncoder) (buffer : GPUBuffer) (indexFormat : GPUIndexFormat) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setIndexBuffer" (Support.args #[toJS buffer, toJS indexFormat, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setIndexBuffer (self : GPURenderBundleEncoder) (buffer : GPUBuffer) (indexFormat : GPUIndexFormat) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setIndexBuffer" do
+  self.val.callMethod "setIndexBuffer" (Internal.args #[toJS buffer, toJS indexFormat, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `undefined setVertexBuffer(GPUIndex32 slot, GPUBuffer? buffer, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPURenderBundleEncoder.setVertexBuffer (self : GPURenderBundleEncoder) (slot : Nat) (buffer : Option GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setVertexBuffer" (Support.args #[toJS slot, toJS buffer, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPURenderBundleEncoder.setVertexBuffer (self : GPURenderBundleEncoder) (slot : Nat) (buffer : Option GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setVertexBuffer" do
+  self.val.callMethod "setVertexBuffer" (Internal.args #[toJS slot, toJS buffer, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `undefined draw(GPUSize32 vertexCount, optional GPUSize32 instanceCount, optional GPUSize32 firstVertex, optional GPUSize32 firstInstance)` -/
-def GPURenderBundleEncoder.draw (self : GPURenderBundleEncoder) (vertexCount : Nat) (instanceCount : Option Nat := none) (firstVertex : Option Nat := none) (firstInstance : Option Nat := none) : IO Unit :=
-  self.val.callMethod "draw" (Support.args #[toJS vertexCount, Support.optional instanceCount, Support.optional firstVertex, Support.optional firstInstance]) Unit
+@[macro_inline] def GPURenderBundleEncoder.draw (self : GPURenderBundleEncoder) (vertexCount : Nat) (instanceCount : Option Nat := none) (firstVertex : Option Nat := none) (firstInstance : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.draw" do
+  self.val.callMethod "draw" (Internal.args #[toJS vertexCount, Internal.optional instanceCount, Internal.optional firstVertex, Internal.optional firstInstance]) Unit
 
 /-- `undefined drawIndexed(GPUSize32 indexCount, optional GPUSize32 instanceCount, optional GPUSize32 firstIndex, optional GPUSignedOffset32 baseVertex, optional GPUSize32 firstInstance)` -/
-def GPURenderBundleEncoder.drawIndexed (self : GPURenderBundleEncoder) (indexCount : Nat) (instanceCount : Option Nat := none) (firstIndex : Option Nat := none) (baseVertex : Option Int := none) (firstInstance : Option Nat := none) : IO Unit :=
-  self.val.callMethod "drawIndexed" (Support.args #[toJS indexCount, Support.optional instanceCount, Support.optional firstIndex, Support.optional baseVertex, Support.optional firstInstance]) Unit
+@[macro_inline] def GPURenderBundleEncoder.drawIndexed (self : GPURenderBundleEncoder) (indexCount : Nat) (instanceCount : Option Nat := none) (firstIndex : Option Nat := none) (baseVertex : Option Int := none) (firstInstance : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.drawIndexed" do
+  self.val.callMethod "drawIndexed" (Internal.args #[toJS indexCount, Internal.optional instanceCount, Internal.optional firstIndex, Internal.optional baseVertex, Internal.optional firstInstance]) Unit
 
 /-- `undefined drawIndirect(GPUBuffer indirectBuffer, GPUSize64 indirectOffset)` -/
-def GPURenderBundleEncoder.drawIndirect (self : GPURenderBundleEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit :=
-  self.val.callMethod "drawIndirect" (Support.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
+@[macro_inline] def GPURenderBundleEncoder.drawIndirect (self : GPURenderBundleEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.drawIndirect" do
+  self.val.callMethod "drawIndirect" (Internal.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
 
 /-- `undefined drawIndexedIndirect(GPUBuffer indirectBuffer, GPUSize64 indirectOffset)` -/
-def GPURenderBundleEncoder.drawIndexedIndirect (self : GPURenderBundleEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit :=
-  self.val.callMethod "drawIndexedIndirect" (Support.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
+@[macro_inline] def GPURenderBundleEncoder.drawIndexedIndirect (self : GPURenderBundleEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.drawIndexedIndirect" do
+  self.val.callMethod "drawIndexedIndirect" (Internal.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
 
 /-- `v instanceof GPURenderPassEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPURenderPassEncoder`). -/
-def GPURenderPassEncoder.cast? (v : Value) : IO (Option GPURenderPassEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPURenderPassEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def GPURenderPassEncoder.cast? (v : Value) : IO (Option GPURenderPassEncoder) := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["GPURenderPassEncoder"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPURenderPassEncoder.label (self : GPURenderPassEncoder) : IO String := self.val.get "label" String
+@[macro_inline] def GPURenderPassEncoder.label (self : GPURenderPassEncoder) : IO String := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPURenderPassEncoder.setLabel (self : GPURenderPassEncoder) (value : String) : IO Unit :=
+@[macro_inline] def GPURenderPassEncoder.setLabel (self : GPURenderPassEncoder) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `undefined setViewport(float x, float y, float width, float height, float minDepth, float maxDepth)` -/
-def GPURenderPassEncoder.setViewport (self : GPURenderPassEncoder) (x : Float) (y : Float) (width : Float) (height : Float) (minDepth : Float) (maxDepth : Float) : IO Unit :=
-  self.val.callMethod "setViewport" (Support.args #[toJS x, toJS y, toJS width, toJS height, toJS minDepth, toJS maxDepth]) Unit
+@[macro_inline] def GPURenderPassEncoder.setViewport (self : GPURenderPassEncoder) (x : Float) (y : Float) (width : Float) (height : Float) (minDepth : Float) (maxDepth : Float) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setViewport" do
+  self.val.callMethod "setViewport" (Internal.args #[toJS x, toJS y, toJS width, toJS height, toJS minDepth, toJS maxDepth]) Unit
 
 /-- `undefined setScissorRect(GPUIntegerCoordinate x, GPUIntegerCoordinate y, GPUIntegerCoordinate width, GPUIntegerCoordinate height)` -/
-def GPURenderPassEncoder.setScissorRect (self : GPURenderPassEncoder) (x : Nat) (y : Nat) (width : Nat) (height : Nat) : IO Unit :=
-  self.val.callMethod "setScissorRect" (Support.args #[toJS x, toJS y, toJS width, toJS height]) Unit
+@[macro_inline] def GPURenderPassEncoder.setScissorRect (self : GPURenderPassEncoder) (x : Nat) (y : Nat) (width : Nat) (height : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setScissorRect" do
+  self.val.callMethod "setScissorRect" (Internal.args #[toJS x, toJS y, toJS width, toJS height]) Unit
 
 /-- `undefined setBlendConstant(GPUColor color)` -/
-def GPURenderPassEncoder.setBlendConstant (self : GPURenderPassEncoder) (color : GPUColor) : IO Unit :=
-  self.val.callMethod "setBlendConstant" (Support.args #[toJS color]) Unit
+@[macro_inline] def GPURenderPassEncoder.setBlendConstant (self : GPURenderPassEncoder) (color : GPUColor) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setBlendConstant" do
+  self.val.callMethod "setBlendConstant" (Internal.args #[toJS color]) Unit
 
 /-- `undefined setStencilReference(GPUStencilValue reference)` -/
-def GPURenderPassEncoder.setStencilReference (self : GPURenderPassEncoder) (reference : Nat) : IO Unit :=
-  self.val.callMethod "setStencilReference" (Support.args #[toJS reference]) Unit
+@[macro_inline] def GPURenderPassEncoder.setStencilReference (self : GPURenderPassEncoder) (reference : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setStencilReference" do
+  self.val.callMethod "setStencilReference" (Internal.args #[toJS reference]) Unit
 
 /-- `undefined beginOcclusionQuery(GPUSize32 queryIndex)` -/
-def GPURenderPassEncoder.beginOcclusionQuery (self : GPURenderPassEncoder) (queryIndex : Nat) : IO Unit :=
-  self.val.callMethod "beginOcclusionQuery" (Support.args #[toJS queryIndex]) Unit
+@[macro_inline] def GPURenderPassEncoder.beginOcclusionQuery (self : GPURenderPassEncoder) (queryIndex : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.beginOcclusionQuery" do
+  self.val.callMethod "beginOcclusionQuery" (Internal.args #[toJS queryIndex]) Unit
 
 /-- `undefined endOcclusionQuery()` -/
-def GPURenderPassEncoder.endOcclusionQuery (self : GPURenderPassEncoder) : IO Unit :=
-  self.val.callMethod "endOcclusionQuery" (Support.args #[]) Unit
+@[macro_inline] def GPURenderPassEncoder.endOcclusionQuery (self : GPURenderPassEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.endOcclusionQuery" do
+  self.val.callMethod "endOcclusionQuery" (Internal.args #[]) Unit
 
 /-- `undefined executeBundles(sequence<GPURenderBundle> bundles)` -/
-def GPURenderPassEncoder.executeBundles (self : GPURenderPassEncoder) (bundles : Array GPURenderBundle) : IO Unit :=
-  self.val.callMethod "executeBundles" (Support.args #[toJS bundles]) Unit
+@[macro_inline] def GPURenderPassEncoder.executeBundles (self : GPURenderPassEncoder) (bundles : Array GPURenderBundle) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.executeBundles" do
+  self.val.callMethod "executeBundles" (Internal.args #[toJS bundles]) Unit
 
 /-- `undefined end()` -/
-def GPURenderPassEncoder.«end» (self : GPURenderPassEncoder) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def GPURenderPassEncoder.«end» (self : GPURenderPassEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.end" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- `undefined pushDebugGroup(USVString groupLabel)` -/
-def GPURenderPassEncoder.pushDebugGroup (self : GPURenderPassEncoder) (groupLabel : String) : IO Unit :=
-  self.val.callMethod "pushDebugGroup" (Support.args #[toJS groupLabel]) Unit
+@[macro_inline] def GPURenderPassEncoder.pushDebugGroup (self : GPURenderPassEncoder) (groupLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.pushDebugGroup" do
+  self.val.callMethod "pushDebugGroup" (Internal.args #[toJS groupLabel]) Unit
 
 /-- `undefined popDebugGroup()` -/
-def GPURenderPassEncoder.popDebugGroup (self : GPURenderPassEncoder) : IO Unit :=
-  self.val.callMethod "popDebugGroup" (Support.args #[]) Unit
+@[macro_inline] def GPURenderPassEncoder.popDebugGroup (self : GPURenderPassEncoder) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.popDebugGroup" do
+  self.val.callMethod "popDebugGroup" (Internal.args #[]) Unit
 
 /-- `undefined insertDebugMarker(USVString markerLabel)` -/
-def GPURenderPassEncoder.insertDebugMarker (self : GPURenderPassEncoder) (markerLabel : String) : IO Unit :=
-  self.val.callMethod "insertDebugMarker" (Support.args #[toJS markerLabel]) Unit
+@[macro_inline] def GPURenderPassEncoder.insertDebugMarker (self : GPURenderPassEncoder) (markerLabel : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.insertDebugMarker" do
+  self.val.callMethod "insertDebugMarker" (Internal.args #[toJS markerLabel]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, optional sequence<GPUBufferDynamicOffset> dynamicOffsets)` -/
-def GPURenderPassEncoder.setBindGroup (self : GPURenderPassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit :=
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, Support.optional dynamicOffsets]) Unit
+@[macro_inline] def GPURenderPassEncoder.setBindGroup (self : GPURenderPassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsets : Option (Array Nat) := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setBindGroup" do
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, Internal.optional dynamicOffsets]) Unit
 
 /-- `undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup, Uint32Array dynamicOffsetsData, GPUSize64 dynamicOffsetsDataStart, GPUSize32 dynamicOffsetsDataLength)` -/
-def GPURenderPassEncoder.setBindGroupWithDynamicOffsetsData (self : GPURenderPassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := do
-  let dynamicOffsetsDataView ← Support.typedArray "Uint32Array" dynamicOffsetsData
-  self.val.callMethod "setBindGroup" (Support.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
+@[macro_inline] def GPURenderPassEncoder.setBindGroupWithDynamicOffsetsData (self : GPURenderPassEncoder) (index : Nat) (bindGroup : Option GPUBindGroup) (dynamicOffsetsData : ByteArray) (dynamicOffsetsDataStart : Nat) (dynamicOffsetsDataLength : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setBindGroupWithDynamicOffsetsData" do
+  let dynamicOffsetsDataView ← Internal.typedArray "Uint32Array" dynamicOffsetsData
+  self.val.callMethod "setBindGroup" (Internal.args #[toJS index, toJS bindGroup, .ref dynamicOffsetsDataView "", toJS dynamicOffsetsDataStart, toJS dynamicOffsetsDataLength]) Unit
 
 /-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` -/
-def GPURenderPassEncoder.setImmediates (self : GPURenderPassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setImmediates" (Support.args #[toJS rangeOffset, toJS data, Support.optional dataOffset, Support.optional dataSize]) Unit
+@[macro_inline] def GPURenderPassEncoder.setImmediates (self : GPURenderPassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setImmediates" do
+  self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
 
 /-- `undefined setPipeline(GPURenderPipeline pipeline)` -/
-def GPURenderPassEncoder.setPipeline (self : GPURenderPassEncoder) (pipeline : GPURenderPipeline) : IO Unit :=
-  self.val.callMethod "setPipeline" (Support.args #[toJS pipeline]) Unit
+@[macro_inline] def GPURenderPassEncoder.setPipeline (self : GPURenderPassEncoder) (pipeline : GPURenderPipeline) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setPipeline" do
+  self.val.callMethod "setPipeline" (Internal.args #[toJS pipeline]) Unit
 
 /-- `undefined setIndexBuffer(GPUBuffer buffer, GPUIndexFormat indexFormat, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPURenderPassEncoder.setIndexBuffer (self : GPURenderPassEncoder) (buffer : GPUBuffer) (indexFormat : GPUIndexFormat) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setIndexBuffer" (Support.args #[toJS buffer, toJS indexFormat, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPURenderPassEncoder.setIndexBuffer (self : GPURenderPassEncoder) (buffer : GPUBuffer) (indexFormat : GPUIndexFormat) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setIndexBuffer" do
+  self.val.callMethod "setIndexBuffer" (Internal.args #[toJS buffer, toJS indexFormat, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `undefined setVertexBuffer(GPUIndex32 slot, GPUBuffer? buffer, optional GPUSize64 offset, optional GPUSize64 size)` -/
-def GPURenderPassEncoder.setVertexBuffer (self : GPURenderPassEncoder) (slot : Nat) (buffer : Option GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setVertexBuffer" (Support.args #[toJS slot, toJS buffer, Support.optional offset, Support.optional size]) Unit
+@[macro_inline] def GPURenderPassEncoder.setVertexBuffer (self : GPURenderPassEncoder) (slot : Nat) (buffer : Option GPUBuffer) (offset : Option Nat := none) (size : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setVertexBuffer" do
+  self.val.callMethod "setVertexBuffer" (Internal.args #[toJS slot, toJS buffer, Internal.optional offset, Internal.optional size]) Unit
 
 /-- `undefined draw(GPUSize32 vertexCount, optional GPUSize32 instanceCount, optional GPUSize32 firstVertex, optional GPUSize32 firstInstance)` -/
-def GPURenderPassEncoder.draw (self : GPURenderPassEncoder) (vertexCount : Nat) (instanceCount : Option Nat := none) (firstVertex : Option Nat := none) (firstInstance : Option Nat := none) : IO Unit :=
-  self.val.callMethod "draw" (Support.args #[toJS vertexCount, Support.optional instanceCount, Support.optional firstVertex, Support.optional firstInstance]) Unit
+@[macro_inline] def GPURenderPassEncoder.draw (self : GPURenderPassEncoder) (vertexCount : Nat) (instanceCount : Option Nat := none) (firstVertex : Option Nat := none) (firstInstance : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.draw" do
+  self.val.callMethod "draw" (Internal.args #[toJS vertexCount, Internal.optional instanceCount, Internal.optional firstVertex, Internal.optional firstInstance]) Unit
 
 /-- `undefined drawIndexed(GPUSize32 indexCount, optional GPUSize32 instanceCount, optional GPUSize32 firstIndex, optional GPUSignedOffset32 baseVertex, optional GPUSize32 firstInstance)` -/
-def GPURenderPassEncoder.drawIndexed (self : GPURenderPassEncoder) (indexCount : Nat) (instanceCount : Option Nat := none) (firstIndex : Option Nat := none) (baseVertex : Option Int := none) (firstInstance : Option Nat := none) : IO Unit :=
-  self.val.callMethod "drawIndexed" (Support.args #[toJS indexCount, Support.optional instanceCount, Support.optional firstIndex, Support.optional baseVertex, Support.optional firstInstance]) Unit
+@[macro_inline] def GPURenderPassEncoder.drawIndexed (self : GPURenderPassEncoder) (indexCount : Nat) (instanceCount : Option Nat := none) (firstIndex : Option Nat := none) (baseVertex : Option Int := none) (firstInstance : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.drawIndexed" do
+  self.val.callMethod "drawIndexed" (Internal.args #[toJS indexCount, Internal.optional instanceCount, Internal.optional firstIndex, Internal.optional baseVertex, Internal.optional firstInstance]) Unit
 
 /-- `undefined drawIndirect(GPUBuffer indirectBuffer, GPUSize64 indirectOffset)` -/
-def GPURenderPassEncoder.drawIndirect (self : GPURenderPassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit :=
-  self.val.callMethod "drawIndirect" (Support.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
+@[macro_inline] def GPURenderPassEncoder.drawIndirect (self : GPURenderPassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.drawIndirect" do
+  self.val.callMethod "drawIndirect" (Internal.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
 
 /-- `undefined drawIndexedIndirect(GPUBuffer indirectBuffer, GPUSize64 indirectOffset)` -/
-def GPURenderPassEncoder.drawIndexedIndirect (self : GPURenderPassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit :=
-  self.val.callMethod "drawIndexedIndirect" (Support.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
+@[macro_inline] def GPURenderPassEncoder.drawIndexedIndirect (self : GPURenderPassEncoder) (indirectBuffer : GPUBuffer) (indirectOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.drawIndexedIndirect" do
+  self.val.callMethod "drawIndexedIndirect" (Internal.args #[toJS indirectBuffer, toJS indirectOffset]) Unit
 
 /-- `v instanceof GPURenderPipeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPURenderPipeline`). -/
-def GPURenderPipeline.cast? (v : Value) : IO (Option GPURenderPipeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPURenderPipeline"] Value) v) then some { val := v } else none
+@[macro_inline] def GPURenderPipeline.cast? (v : Value) : IO (Option GPURenderPipeline) := Internal.api "Lasm.JS.Web.GPURenderPipeline.cast?" do
+  Internal.cast (Internal.getGlobal ["GPURenderPipeline"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPURenderPipeline.label (self : GPURenderPipeline) : IO String := self.val.get "label" String
+@[macro_inline] def GPURenderPipeline.label (self : GPURenderPipeline) : IO String := Internal.api "Lasm.JS.Web.GPURenderPipeline.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPURenderPipeline.setLabel (self : GPURenderPipeline) (value : String) : IO Unit :=
+@[macro_inline] def GPURenderPipeline.setLabel (self : GPURenderPipeline) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPipeline.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `GPUBindGroupLayout getBindGroupLayout(unsigned long index)` -/
-def GPURenderPipeline.getBindGroupLayout (self : GPURenderPipeline) (index : Nat) : IO GPUBindGroupLayout := do
-  let r ← self.val.callMethod "getBindGroupLayout" (Support.args #[toJS index]) Value
+@[macro_inline] def GPURenderPipeline.getBindGroupLayout (self : GPURenderPipeline) (index : Nat) : IO GPUBindGroupLayout := Internal.api "Lasm.JS.Web.GPURenderPipeline.getBindGroupLayout" do
+  let r ← self.val.callMethod "getBindGroupLayout" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `v instanceof GPUSampler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUSampler`). -/
-def GPUSampler.cast? (v : Value) : IO (Option GPUSampler) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUSampler"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUSampler.cast? (v : Value) : IO (Option GPUSampler) := Internal.api "Lasm.JS.Web.GPUSampler.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUSampler"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUSampler.label (self : GPUSampler) : IO String := self.val.get "label" String
+@[macro_inline] def GPUSampler.label (self : GPUSampler) : IO String := Internal.api "Lasm.JS.Web.GPUSampler.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUSampler.setLabel (self : GPUSampler) (value : String) : IO Unit :=
+@[macro_inline] def GPUSampler.setLabel (self : GPUSampler) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUSampler.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUShaderModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUShaderModule`). -/
-def GPUShaderModule.cast? (v : Value) : IO (Option GPUShaderModule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUShaderModule"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUShaderModule.cast? (v : Value) : IO (Option GPUShaderModule) := Internal.api "Lasm.JS.Web.GPUShaderModule.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUShaderModule"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUShaderModule.label (self : GPUShaderModule) : IO String := self.val.get "label" String
+@[macro_inline] def GPUShaderModule.label (self : GPUShaderModule) : IO String := Internal.api "Lasm.JS.Web.GPUShaderModule.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUShaderModule.setLabel (self : GPUShaderModule) (value : String) : IO Unit :=
+@[macro_inline] def GPUShaderModule.setLabel (self : GPUShaderModule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUShaderModule.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `Promise<GPUCompilationInfo> getCompilationInfo()` -/
-def GPUShaderModule.getCompilationInfo (self : GPUShaderModule) : Async GPUCompilationInfo := do
-  let r ← self.val.callMethodAwait "getCompilationInfo" (Support.args #[]) Value
+@[macro_inline] def GPUShaderModule.getCompilationInfo (self : GPUShaderModule) : Async GPUCompilationInfo := Internal.api "Lasm.JS.Web.GPUShaderModule.getCompilationInfo" do
+  let r ← self.val.callMethodAwait "getCompilationInfo" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof GPUSupportedFeatures`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUSupportedFeatures`). -/
-def GPUSupportedFeatures.cast? (v : Value) : IO (Option GPUSupportedFeatures) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUSupportedFeatures"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUSupportedFeatures.cast? (v : Value) : IO (Option GPUSupportedFeatures) := Internal.api "Lasm.JS.Web.GPUSupportedFeatures.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUSupportedFeatures"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof GPUSupportedLimits`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUSupportedLimits`). -/
-def GPUSupportedLimits.cast? (v : Value) : IO (Option GPUSupportedLimits) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUSupportedLimits"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUSupportedLimits.cast? (v : Value) : IO (Option GPUSupportedLimits) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUSupportedLimits"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long maxTextureDimension1D` -/
-def GPUSupportedLimits.maxTextureDimension1D (self : GPUSupportedLimits) : IO Nat := self.val.get "maxTextureDimension1D" Nat
+@[macro_inline] def GPUSupportedLimits.maxTextureDimension1D (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxTextureDimension1D" do
+  self.val.get "maxTextureDimension1D" Nat
 
 /-- `readonly attribute unsigned long maxTextureDimension2D` -/
-def GPUSupportedLimits.maxTextureDimension2D (self : GPUSupportedLimits) : IO Nat := self.val.get "maxTextureDimension2D" Nat
+@[macro_inline] def GPUSupportedLimits.maxTextureDimension2D (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxTextureDimension2D" do
+  self.val.get "maxTextureDimension2D" Nat
 
 /-- `readonly attribute unsigned long maxTextureDimension3D` -/
-def GPUSupportedLimits.maxTextureDimension3D (self : GPUSupportedLimits) : IO Nat := self.val.get "maxTextureDimension3D" Nat
+@[macro_inline] def GPUSupportedLimits.maxTextureDimension3D (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxTextureDimension3D" do
+  self.val.get "maxTextureDimension3D" Nat
 
 /-- `readonly attribute unsigned long maxTextureArrayLayers` -/
-def GPUSupportedLimits.maxTextureArrayLayers (self : GPUSupportedLimits) : IO Nat := self.val.get "maxTextureArrayLayers" Nat
+@[macro_inline] def GPUSupportedLimits.maxTextureArrayLayers (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxTextureArrayLayers" do
+  self.val.get "maxTextureArrayLayers" Nat
 
 /-- `readonly attribute unsigned long maxBindGroups` -/
-def GPUSupportedLimits.maxBindGroups (self : GPUSupportedLimits) : IO Nat := self.val.get "maxBindGroups" Nat
+@[macro_inline] def GPUSupportedLimits.maxBindGroups (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxBindGroups" do
+  self.val.get "maxBindGroups" Nat
 
 /-- `readonly attribute unsigned long maxBindGroupsPlusVertexBuffers` -/
-def GPUSupportedLimits.maxBindGroupsPlusVertexBuffers (self : GPUSupportedLimits) : IO Nat := self.val.get "maxBindGroupsPlusVertexBuffers" Nat
+@[macro_inline] def GPUSupportedLimits.maxBindGroupsPlusVertexBuffers (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxBindGroupsPlusVertexBuffers" do
+  self.val.get "maxBindGroupsPlusVertexBuffers" Nat
 
 /-- `readonly attribute unsigned long maxImmediateSize` -/
-def GPUSupportedLimits.maxImmediateSize (self : GPUSupportedLimits) : IO Nat := self.val.get "maxImmediateSize" Nat
+@[macro_inline] def GPUSupportedLimits.maxImmediateSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxImmediateSize" do
+  self.val.get "maxImmediateSize" Nat
 
 /-- `readonly attribute unsigned long maxBindingsPerBindGroup` -/
-def GPUSupportedLimits.maxBindingsPerBindGroup (self : GPUSupportedLimits) : IO Nat := self.val.get "maxBindingsPerBindGroup" Nat
+@[macro_inline] def GPUSupportedLimits.maxBindingsPerBindGroup (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxBindingsPerBindGroup" do
+  self.val.get "maxBindingsPerBindGroup" Nat
 
 /-- `readonly attribute unsigned long maxDynamicUniformBuffersPerPipelineLayout` -/
-def GPUSupportedLimits.maxDynamicUniformBuffersPerPipelineLayout (self : GPUSupportedLimits) : IO Nat := self.val.get "maxDynamicUniformBuffersPerPipelineLayout" Nat
+@[macro_inline] def GPUSupportedLimits.maxDynamicUniformBuffersPerPipelineLayout (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxDynamicUniformBuffersPerPipelineLayout" do
+  self.val.get "maxDynamicUniformBuffersPerPipelineLayout" Nat
 
 /-- `readonly attribute unsigned long maxDynamicStorageBuffersPerPipelineLayout` -/
-def GPUSupportedLimits.maxDynamicStorageBuffersPerPipelineLayout (self : GPUSupportedLimits) : IO Nat := self.val.get "maxDynamicStorageBuffersPerPipelineLayout" Nat
+@[macro_inline] def GPUSupportedLimits.maxDynamicStorageBuffersPerPipelineLayout (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxDynamicStorageBuffersPerPipelineLayout" do
+  self.val.get "maxDynamicStorageBuffersPerPipelineLayout" Nat
 
 /-- `readonly attribute unsigned long maxSampledTexturesPerShaderStage` -/
-def GPUSupportedLimits.maxSampledTexturesPerShaderStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxSampledTexturesPerShaderStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxSampledTexturesPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxSampledTexturesPerShaderStage" do
+  self.val.get "maxSampledTexturesPerShaderStage" Nat
 
 /-- `readonly attribute unsigned long maxSamplersPerShaderStage` -/
-def GPUSupportedLimits.maxSamplersPerShaderStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxSamplersPerShaderStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxSamplersPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxSamplersPerShaderStage" do
+  self.val.get "maxSamplersPerShaderStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageBuffersPerShaderStage` -/
-def GPUSupportedLimits.maxStorageBuffersPerShaderStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageBuffersPerShaderStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageBuffersPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersPerShaderStage" do
+  self.val.get "maxStorageBuffersPerShaderStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageBuffersInVertexStage` -/
-def GPUSupportedLimits.maxStorageBuffersInVertexStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageBuffersInVertexStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageBuffersInVertexStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInVertexStage" do
+  self.val.get "maxStorageBuffersInVertexStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageBuffersInFragmentStage` -/
-def GPUSupportedLimits.maxStorageBuffersInFragmentStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageBuffersInFragmentStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageBuffersInFragmentStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInFragmentStage" do
+  self.val.get "maxStorageBuffersInFragmentStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageTexturesPerShaderStage` -/
-def GPUSupportedLimits.maxStorageTexturesPerShaderStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageTexturesPerShaderStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageTexturesPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesPerShaderStage" do
+  self.val.get "maxStorageTexturesPerShaderStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageTexturesInVertexStage` -/
-def GPUSupportedLimits.maxStorageTexturesInVertexStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageTexturesInVertexStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageTexturesInVertexStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInVertexStage" do
+  self.val.get "maxStorageTexturesInVertexStage" Nat
 
 /-- `readonly attribute unsigned long maxStorageTexturesInFragmentStage` -/
-def GPUSupportedLimits.maxStorageTexturesInFragmentStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageTexturesInFragmentStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageTexturesInFragmentStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInFragmentStage" do
+  self.val.get "maxStorageTexturesInFragmentStage" Nat
 
 /-- `readonly attribute unsigned long maxUniformBuffersPerShaderStage` -/
-def GPUSupportedLimits.maxUniformBuffersPerShaderStage (self : GPUSupportedLimits) : IO Nat := self.val.get "maxUniformBuffersPerShaderStage" Nat
+@[macro_inline] def GPUSupportedLimits.maxUniformBuffersPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxUniformBuffersPerShaderStage" do
+  self.val.get "maxUniformBuffersPerShaderStage" Nat
 
 /-- `readonly attribute unsigned long long maxUniformBufferBindingSize` -/
-def GPUSupportedLimits.maxUniformBufferBindingSize (self : GPUSupportedLimits) : IO Nat := self.val.get "maxUniformBufferBindingSize" Nat
+@[macro_inline] def GPUSupportedLimits.maxUniformBufferBindingSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxUniformBufferBindingSize" do
+  self.val.get "maxUniformBufferBindingSize" Nat
 
 /-- `readonly attribute unsigned long long maxStorageBufferBindingSize` -/
-def GPUSupportedLimits.maxStorageBufferBindingSize (self : GPUSupportedLimits) : IO Nat := self.val.get "maxStorageBufferBindingSize" Nat
+@[macro_inline] def GPUSupportedLimits.maxStorageBufferBindingSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBufferBindingSize" do
+  self.val.get "maxStorageBufferBindingSize" Nat
 
 /-- `readonly attribute unsigned long minUniformBufferOffsetAlignment` -/
-def GPUSupportedLimits.minUniformBufferOffsetAlignment (self : GPUSupportedLimits) : IO Nat := self.val.get "minUniformBufferOffsetAlignment" Nat
+@[macro_inline] def GPUSupportedLimits.minUniformBufferOffsetAlignment (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.minUniformBufferOffsetAlignment" do
+  self.val.get "minUniformBufferOffsetAlignment" Nat
 
 /-- `readonly attribute unsigned long minStorageBufferOffsetAlignment` -/
-def GPUSupportedLimits.minStorageBufferOffsetAlignment (self : GPUSupportedLimits) : IO Nat := self.val.get "minStorageBufferOffsetAlignment" Nat
+@[macro_inline] def GPUSupportedLimits.minStorageBufferOffsetAlignment (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.minStorageBufferOffsetAlignment" do
+  self.val.get "minStorageBufferOffsetAlignment" Nat
 
 /-- `readonly attribute unsigned long maxVertexBuffers` -/
-def GPUSupportedLimits.maxVertexBuffers (self : GPUSupportedLimits) : IO Nat := self.val.get "maxVertexBuffers" Nat
+@[macro_inline] def GPUSupportedLimits.maxVertexBuffers (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxVertexBuffers" do
+  self.val.get "maxVertexBuffers" Nat
 
 /-- `readonly attribute unsigned long long maxBufferSize` -/
-def GPUSupportedLimits.maxBufferSize (self : GPUSupportedLimits) : IO Nat := self.val.get "maxBufferSize" Nat
+@[macro_inline] def GPUSupportedLimits.maxBufferSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxBufferSize" do
+  self.val.get "maxBufferSize" Nat
 
 /-- `readonly attribute unsigned long maxVertexAttributes` -/
-def GPUSupportedLimits.maxVertexAttributes (self : GPUSupportedLimits) : IO Nat := self.val.get "maxVertexAttributes" Nat
+@[macro_inline] def GPUSupportedLimits.maxVertexAttributes (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxVertexAttributes" do
+  self.val.get "maxVertexAttributes" Nat
 
 /-- `readonly attribute unsigned long maxVertexBufferArrayStride` -/
-def GPUSupportedLimits.maxVertexBufferArrayStride (self : GPUSupportedLimits) : IO Nat := self.val.get "maxVertexBufferArrayStride" Nat
+@[macro_inline] def GPUSupportedLimits.maxVertexBufferArrayStride (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxVertexBufferArrayStride" do
+  self.val.get "maxVertexBufferArrayStride" Nat
 
 /-- `readonly attribute unsigned long maxInterStageShaderVariables` -/
-def GPUSupportedLimits.maxInterStageShaderVariables (self : GPUSupportedLimits) : IO Nat := self.val.get "maxInterStageShaderVariables" Nat
+@[macro_inline] def GPUSupportedLimits.maxInterStageShaderVariables (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxInterStageShaderVariables" do
+  self.val.get "maxInterStageShaderVariables" Nat
 
 /-- `readonly attribute unsigned long maxColorAttachments` -/
-def GPUSupportedLimits.maxColorAttachments (self : GPUSupportedLimits) : IO Nat := self.val.get "maxColorAttachments" Nat
+@[macro_inline] def GPUSupportedLimits.maxColorAttachments (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxColorAttachments" do
+  self.val.get "maxColorAttachments" Nat
 
 /-- `readonly attribute unsigned long maxColorAttachmentBytesPerSample` -/
-def GPUSupportedLimits.maxColorAttachmentBytesPerSample (self : GPUSupportedLimits) : IO Nat := self.val.get "maxColorAttachmentBytesPerSample" Nat
+@[macro_inline] def GPUSupportedLimits.maxColorAttachmentBytesPerSample (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxColorAttachmentBytesPerSample" do
+  self.val.get "maxColorAttachmentBytesPerSample" Nat
 
 /-- `readonly attribute unsigned long maxComputeWorkgroupStorageSize` -/
-def GPUSupportedLimits.maxComputeWorkgroupStorageSize (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeWorkgroupStorageSize" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeWorkgroupStorageSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeWorkgroupStorageSize" do
+  self.val.get "maxComputeWorkgroupStorageSize" Nat
 
 /-- `readonly attribute unsigned long maxComputeInvocationsPerWorkgroup` -/
-def GPUSupportedLimits.maxComputeInvocationsPerWorkgroup (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeInvocationsPerWorkgroup" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeInvocationsPerWorkgroup (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeInvocationsPerWorkgroup" do
+  self.val.get "maxComputeInvocationsPerWorkgroup" Nat
 
 /-- `readonly attribute unsigned long maxComputeWorkgroupSizeX` -/
-def GPUSupportedLimits.maxComputeWorkgroupSizeX (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeWorkgroupSizeX" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeWorkgroupSizeX (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeWorkgroupSizeX" do
+  self.val.get "maxComputeWorkgroupSizeX" Nat
 
 /-- `readonly attribute unsigned long maxComputeWorkgroupSizeY` -/
-def GPUSupportedLimits.maxComputeWorkgroupSizeY (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeWorkgroupSizeY" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeWorkgroupSizeY (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeWorkgroupSizeY" do
+  self.val.get "maxComputeWorkgroupSizeY" Nat
 
 /-- `readonly attribute unsigned long maxComputeWorkgroupSizeZ` -/
-def GPUSupportedLimits.maxComputeWorkgroupSizeZ (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeWorkgroupSizeZ" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeWorkgroupSizeZ (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeWorkgroupSizeZ" do
+  self.val.get "maxComputeWorkgroupSizeZ" Nat
 
 /-- `readonly attribute unsigned long maxComputeWorkgroupsPerDimension` -/
-def GPUSupportedLimits.maxComputeWorkgroupsPerDimension (self : GPUSupportedLimits) : IO Nat := self.val.get "maxComputeWorkgroupsPerDimension" Nat
+@[macro_inline] def GPUSupportedLimits.maxComputeWorkgroupsPerDimension (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxComputeWorkgroupsPerDimension" do
+  self.val.get "maxComputeWorkgroupsPerDimension" Nat
 
 /-- `v instanceof GPUTexture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUTexture`). -/
-def GPUTexture.cast? (v : Value) : IO (Option GPUTexture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUTexture"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUTexture.cast? (v : Value) : IO (Option GPUTexture) := Internal.api "Lasm.JS.Web.GPUTexture.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUTexture"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUIntegerCoordinateOut width` -/
-def GPUTexture.width (self : GPUTexture) : IO Nat := self.val.get "width" Nat
+@[macro_inline] def GPUTexture.width (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.width" do
+  self.val.get "width" Nat
 
 /-- `readonly attribute GPUIntegerCoordinateOut height` -/
-def GPUTexture.height (self : GPUTexture) : IO Nat := self.val.get "height" Nat
+@[macro_inline] def GPUTexture.height (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.height" do
+  self.val.get "height" Nat
 
 /-- `readonly attribute GPUIntegerCoordinateOut depthOrArrayLayers` -/
-def GPUTexture.depthOrArrayLayers (self : GPUTexture) : IO Nat := self.val.get "depthOrArrayLayers" Nat
+@[macro_inline] def GPUTexture.depthOrArrayLayers (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.depthOrArrayLayers" do
+  self.val.get "depthOrArrayLayers" Nat
 
 /-- `readonly attribute GPUIntegerCoordinateOut mipLevelCount` -/
-def GPUTexture.mipLevelCount (self : GPUTexture) : IO Nat := self.val.get "mipLevelCount" Nat
+@[macro_inline] def GPUTexture.mipLevelCount (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.mipLevelCount" do
+  self.val.get "mipLevelCount" Nat
 
 /-- `readonly attribute GPUSize32Out sampleCount` -/
-def GPUTexture.sampleCount (self : GPUTexture) : IO Nat := self.val.get "sampleCount" Nat
+@[macro_inline] def GPUTexture.sampleCount (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.sampleCount" do
+  self.val.get "sampleCount" Nat
 
 /-- `readonly attribute GPUTextureDimension dimension` -/
-def GPUTexture.dimension (self : GPUTexture) : IO GPUTextureDimension := self.val.get "dimension" GPUTextureDimension
+@[macro_inline] def GPUTexture.dimension (self : GPUTexture) : IO GPUTextureDimension := Internal.api "Lasm.JS.Web.GPUTexture.dimension" do
+  self.val.get "dimension" GPUTextureDimension
 
 /-- `readonly attribute GPUTextureFormat format` -/
-def GPUTexture.format (self : GPUTexture) : IO GPUTextureFormat := self.val.get "format" GPUTextureFormat
+@[macro_inline] def GPUTexture.format (self : GPUTexture) : IO GPUTextureFormat := Internal.api "Lasm.JS.Web.GPUTexture.format" do
+  self.val.get "format" GPUTextureFormat
 
 /-- `readonly attribute GPUFlagsConstant usage` -/
-def GPUTexture.usage (self : GPUTexture) : IO Nat := self.val.get "usage" Nat
+@[macro_inline] def GPUTexture.usage (self : GPUTexture) : IO Nat := Internal.api "Lasm.JS.Web.GPUTexture.usage" do
+  self.val.get "usage" Nat
 
 /-- `readonly attribute (GPUTextureViewDimension or undefined) textureBindingViewDimension` -/
-def GPUTexture.textureBindingViewDimension (self : GPUTexture) : IO (Option GPUTextureViewDimension) := self.val.get "textureBindingViewDimension" (Option GPUTextureViewDimension)
+@[macro_inline] def GPUTexture.textureBindingViewDimension (self : GPUTexture) : IO (Option GPUTextureViewDimension) := Internal.api "Lasm.JS.Web.GPUTexture.textureBindingViewDimension" do
+  self.val.get "textureBindingViewDimension" (Option GPUTextureViewDimension)
 
 /-- `attribute USVString label` -/
-def GPUTexture.label (self : GPUTexture) : IO String := self.val.get "label" String
+@[macro_inline] def GPUTexture.label (self : GPUTexture) : IO String := Internal.api "Lasm.JS.Web.GPUTexture.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUTexture.setLabel (self : GPUTexture) (value : String) : IO Unit :=
+@[macro_inline] def GPUTexture.setLabel (self : GPUTexture) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUTexture.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `GPUTextureView createView(optional GPUTextureViewDescriptor descriptor)` -/
-def GPUTexture.createView (self : GPUTexture) (descriptor : Option GPUTextureViewDescriptor := none) : IO GPUTextureView := do
-  let r ← self.val.callMethod "createView" (Support.args #[Support.optional descriptor]) Value
+@[macro_inline] def GPUTexture.createView (self : GPUTexture) (descriptor : Option GPUTextureViewDescriptor := none) : IO GPUTextureView := Internal.api "Lasm.JS.Web.GPUTexture.createView" do
+  let r ← self.val.callMethod "createView" (Internal.args #[Internal.optional descriptor]) Value
   pure { val := r }
 
 /-- `undefined destroy()` -/
-def GPUTexture.destroy (self : GPUTexture) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def GPUTexture.destroy (self : GPUTexture) : IO Unit := Internal.api "Lasm.JS.Web.GPUTexture.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof GPUTextureView`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUTextureView`). -/
-def GPUTextureView.cast? (v : Value) : IO (Option GPUTextureView) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUTextureView"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUTextureView.cast? (v : Value) : IO (Option GPUTextureView) := Internal.api "Lasm.JS.Web.GPUTextureView.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUTextureView"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def GPUTextureView.label (self : GPUTextureView) : IO String := self.val.get "label" String
+@[macro_inline] def GPUTextureView.label (self : GPUTextureView) : IO String := Internal.api "Lasm.JS.Web.GPUTextureView.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def GPUTextureView.setLabel (self : GPUTextureView) (value : String) : IO Unit :=
+@[macro_inline] def GPUTextureView.setLabel (self : GPUTextureView) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.GPUTextureView.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof GPUUncapturedErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUUncapturedErrorEvent`). -/
-def GPUUncapturedErrorEvent.cast? (v : Value) : IO (Option GPUUncapturedErrorEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUUncapturedErrorEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUUncapturedErrorEvent.cast? (v : Value) : IO (Option GPUUncapturedErrorEvent) := Internal.api "Lasm.JS.Web.GPUUncapturedErrorEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUUncapturedErrorEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, GPUUncapturedErrorEventInit gpuUncapturedErrorEventInitDict)` -/
-def GPUUncapturedErrorEvent.new (type : String) (gpuUncapturedErrorEventInitDict : GPUUncapturedErrorEventInit) : IO GPUUncapturedErrorEvent :=
+@[macro_inline] def GPUUncapturedErrorEvent.new (type : String) (gpuUncapturedErrorEventInitDict : GPUUncapturedErrorEventInit) : IO GPUUncapturedErrorEvent := Internal.api "Lasm.JS.Web.GPUUncapturedErrorEvent.new" do
   Lasm.JS.Binding.invoke GPUUncapturedErrorEvent { name := "Lasm.JS.Web.GPUUncapturedErrorEvent.new", module := "globalThis", path := "GPUUncapturedErrorEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS gpuUncapturedErrorEventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS gpuUncapturedErrorEventInitDict]) (await := false)
 
 /-- `readonly attribute GPUError error` -/
-def GPUUncapturedErrorEvent.error (self : GPUUncapturedErrorEvent) : IO GPUError := do
+@[macro_inline] def GPUUncapturedErrorEvent.error (self : GPUUncapturedErrorEvent) : IO GPUError := Internal.api "Lasm.JS.Web.GPUUncapturedErrorEvent.error" do
   let r ← self.val.get "error" Value
   pure { val := r }
 
 /-- `v instanceof WGSLLanguageFeatures`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WGSLLanguageFeatures`). -/
-def WGSLLanguageFeatures.cast? (v : Value) : IO (Option WGSLLanguageFeatures) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WGSLLanguageFeatures"] Value) v) then some { val := v } else none
+@[macro_inline] def WGSLLanguageFeatures.cast? (v : Value) : IO (Option WGSLLanguageFeatures) := Internal.api "Lasm.JS.Web.WGSLLanguageFeatures.cast?" do
+  Internal.cast (Internal.getGlobal ["WGSLLanguageFeatures"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof GPUInternalError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUInternalError`). -/
-def GPUInternalError.cast? (v : Value) : IO (Option GPUInternalError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUInternalError"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUInternalError.cast? (v : Value) : IO (Option GPUInternalError) := Internal.api "Lasm.JS.Web.GPUInternalError.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUInternalError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString message)` -/
-def GPUInternalError.new (message : String) : IO GPUInternalError :=
+@[macro_inline] def GPUInternalError.new (message : String) : IO GPUInternalError := Internal.api "Lasm.JS.Web.GPUInternalError.new" do
   Lasm.JS.Binding.invoke GPUInternalError { name := "Lasm.JS.Web.GPUInternalError.new", module := "globalThis", path := "GPUInternalError", construct := true, arity := 1 }
-    (Support.args #[toJS message]) (await := false)
+    (Internal.args #[toJS message]) (await := false)
 
 /-- `v instanceof GPUOutOfMemoryError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUOutOfMemoryError`). -/
-def GPUOutOfMemoryError.cast? (v : Value) : IO (Option GPUOutOfMemoryError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUOutOfMemoryError"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUOutOfMemoryError.cast? (v : Value) : IO (Option GPUOutOfMemoryError) := Internal.api "Lasm.JS.Web.GPUOutOfMemoryError.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUOutOfMemoryError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString message)` -/
-def GPUOutOfMemoryError.new (message : String) : IO GPUOutOfMemoryError :=
+@[macro_inline] def GPUOutOfMemoryError.new (message : String) : IO GPUOutOfMemoryError := Internal.api "Lasm.JS.Web.GPUOutOfMemoryError.new" do
   Lasm.JS.Binding.invoke GPUOutOfMemoryError { name := "Lasm.JS.Web.GPUOutOfMemoryError.new", module := "globalThis", path := "GPUOutOfMemoryError", construct := true, arity := 1 }
-    (Support.args #[toJS message]) (await := false)
+    (Internal.args #[toJS message]) (await := false)
 
 /-- `v instanceof GPUValidationError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUValidationError`). -/
-def GPUValidationError.cast? (v : Value) : IO (Option GPUValidationError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GPUValidationError"] Value) v) then some { val := v } else none
+@[macro_inline] def GPUValidationError.cast? (v : Value) : IO (Option GPUValidationError) := Internal.api "Lasm.JS.Web.GPUValidationError.cast?" do
+  Internal.cast (Internal.getGlobal ["GPUValidationError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString message)` -/
-def GPUValidationError.new (message : String) : IO GPUValidationError :=
+@[macro_inline] def GPUValidationError.new (message : String) : IO GPUValidationError := Internal.api "Lasm.JS.Web.GPUValidationError.new" do
   Lasm.JS.Binding.invoke GPUValidationError { name := "Lasm.JS.Web.GPUValidationError.new", module := "globalThis", path := "GPUValidationError", construct := true, arity := 1 }
-    (Support.args #[toJS message]) (await := false)
+    (Internal.args #[toJS message]) (await := false)
 
 /-- `readonly attribute GPU gpu` -/
-def Navigator.gpu (self : Navigator) : IO GPU := do
+@[macro_inline] def Navigator.gpu (self : Navigator) : IO GPU := Internal.api "Lasm.JS.Web.Navigator.gpu" do
   let r ← self.val.get "gpu" Value
   pure { val := r }
 
 /-- `readonly attribute GPU gpu` -/
-def WorkerNavigator.gpu (self : WorkerNavigator) : IO GPU := do
+@[macro_inline] def WorkerNavigator.gpu (self : WorkerNavigator) : IO GPU := Internal.api "Lasm.JS.Web.WorkerNavigator.gpu" do
   let r ← self.val.get "gpu" Value
   pure { val := r }
 

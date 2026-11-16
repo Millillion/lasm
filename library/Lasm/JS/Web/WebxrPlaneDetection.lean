@@ -6,60 +6,52 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.WebxrPlaneDetection
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRPlaneOrientation` (WebXR Plane Detection Module (https://immersive-web.github.io/plane-detection/)): "horizontal", "vertical". -/
-inductive XRPlaneOrientation where
-  /-- "horizontal" -/
-  | horizontal
-  /-- "vertical" -/
-  | vertical
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRPlaneOrientation := ⟨fun
-  | .horizontal => .string "horizontal"
-  | .vertical => .string "vertical"⟩
-instance : FromJS XRPlaneOrientation where
-  fromJS
-    | .string "horizontal" => .ok .horizontal
-    | .string "vertical" => .ok .vertical
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRPlaneOrientation"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof XRPlane`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRPlane`). -/
-def XRPlane.cast? (v : Value) : IO (Option XRPlane) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRPlane"] Value) v) then some { val := v } else none
+@[macro_inline] def XRPlane.cast? (v : Value) : IO (Option XRPlane) := Internal.api "Lasm.JS.Web.XRPlane.cast?" do
+  Internal.cast (Internal.getGlobal ["XRPlane"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRSpace planeSpace` -/
-def XRPlane.planeSpace (self : XRPlane) : IO XRSpace := do
+@[macro_inline] def XRPlane.planeSpace (self : XRPlane) : IO XRSpace := Internal.api "Lasm.JS.Web.XRPlane.planeSpace" do
   let r ← self.val.get "planeSpace" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<DOMPointReadOnly> polygon` -/
-def XRPlane.polygon (self : XRPlane) : IO (Array DOMPointReadOnly) := self.val.get "polygon" (Array DOMPointReadOnly)
+@[macro_inline] def XRPlane.polygon (self : XRPlane) : IO (Array DOMPointReadOnly) := Internal.api "Lasm.JS.Web.XRPlane.polygon" do
+  self.val.get "polygon" (Array DOMPointReadOnly)
 
 /-- `readonly attribute XRPlaneOrientation? orientation` -/
-def XRPlane.orientation (self : XRPlane) : IO (Option XRPlaneOrientation) := self.val.get "orientation" (Option XRPlaneOrientation)
+@[macro_inline] def XRPlane.orientation (self : XRPlane) : IO (Option XRPlaneOrientation) := Internal.api "Lasm.JS.Web.XRPlane.orientation" do
+  self.val.get "orientation" (Option XRPlaneOrientation)
 
 /-- `readonly attribute DOMHighResTimeStamp lastChangedTime` -/
-def XRPlane.lastChangedTime (self : XRPlane) : IO Float := self.val.get "lastChangedTime" Float
+@[macro_inline] def XRPlane.lastChangedTime (self : XRPlane) : IO Float := Internal.api "Lasm.JS.Web.XRPlane.lastChangedTime" do
+  self.val.get "lastChangedTime" Float
 
 /-- `readonly attribute DOMString? semanticLabel` -/
-def XRPlane.semanticLabel (self : XRPlane) : IO (Option String) := self.val.get "semanticLabel" (Option String)
+@[macro_inline] def XRPlane.semanticLabel (self : XRPlane) : IO (Option String) := Internal.api "Lasm.JS.Web.XRPlane.semanticLabel" do
+  self.val.get "semanticLabel" (Option String)
 
 /-- `v instanceof XRPlaneSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRPlaneSet`). -/
-def XRPlaneSet.cast? (v : Value) : IO (Option XRPlaneSet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRPlaneSet"] Value) v) then some { val := v } else none
+@[macro_inline] def XRPlaneSet.cast? (v : Value) : IO (Option XRPlaneSet) := Internal.api "Lasm.JS.Web.XRPlaneSet.cast?" do
+  Internal.cast (Internal.getGlobal ["XRPlaneSet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRPlaneSet detectedPlanes` -/
-def XRFrame.detectedPlanes (self : XRFrame) : IO XRPlaneSet := do
+@[macro_inline] def XRFrame.detectedPlanes (self : XRFrame) : IO XRPlaneSet := Internal.api "Lasm.JS.Web.XRFrame.detectedPlanes" do
   let r ← self.val.get "detectedPlanes" Value
   pure { val := r }
 
 /-- `Promise<undefined> initiateRoomCapture()` -/
-def XRSession.initiateRoomCapture (self : XRSession) : Async Unit :=
-  self.val.callMethodAwait "initiateRoomCapture" (Support.args #[]) Unit
+@[macro_inline] def XRSession.initiateRoomCapture (self : XRSession) : Async Unit := Internal.api "Lasm.JS.Web.XRSession.initiateRoomCapture" do
+  self.val.callMethodAwait "initiateRoomCapture" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

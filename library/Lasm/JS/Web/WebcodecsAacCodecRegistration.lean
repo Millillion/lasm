@@ -6,32 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WebcodecsAacCodecRegistration
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AacBitstreamFormat` (AAC WebCodecs Registration (https://w3c.github.io/webcodecs/aac_codec_registration.html)): "aac", "adts". -/
-inductive AacBitstreamFormat where
-  /-- "aac" -/
-  | aac
-  /-- "adts" -/
-  | adts
-  deriving BEq, Repr, Inhabited
-instance : ToJS AacBitstreamFormat := ⟨fun
-  | .aac => .string "aac"
-  | .adts => .string "adts"⟩
-instance : FromJS AacBitstreamFormat where
-  fromJS
-    | .string "aac" => .ok .aac
-    | .string "adts" => .ok .adts
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AacBitstreamFormat"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AacEncoderConfig` (AAC WebCodecs Registration (https://w3c.github.io/webcodecs/aac_codec_registration.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AacEncoderConfig where
   /-- `AacBitstreamFormat format = "aac"` -/
   format : Option AacBitstreamFormat := none
-instance : ToJS AacEncoderConfig := ⟨fun d => Support.fields #[("format", Support.optional d.format)]⟩
+instance : ToJS AacEncoderConfig := ⟨fun d => Internal.fields #[("format", Internal.optional d.format)]⟩
 instance : FromJS AacEncoderConfig where
   fromJS d := do return {
     format := ← Lasm.JS.readField (Option AacBitstreamFormat) d "format" }

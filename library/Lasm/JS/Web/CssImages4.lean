@@ -9,8 +9,12 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute any elementSources` (CSS Images Module Level 4 (https://drafts.csswg.org/css-images-4/)) -/
-def CSS.elementSources : IO Data := Support.getGlobal ["CSS", "elementSources"] Data
+@[macro_inline] def CSS.elementSources : IO Data := Internal.api "Lasm.JS.Web.CSS.elementSources" do
+  Internal.getGlobal ["CSS", "elementSources"] Data
 
 end Lasm.JS.Web

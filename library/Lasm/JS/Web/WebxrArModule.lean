@@ -6,56 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.WebxrArModule
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XREnvironmentBlendMode` (WebXR Augmented Reality Module - Level 1 (https://immersive-web.github.io/webxr-ar-module/)): "opaque", "alpha-blend", "additive". -/
-inductive XREnvironmentBlendMode where
-  /-- "opaque" -/
-  | «opaque»
-  /-- "alpha-blend" -/
-  | alphaBlend
-  /-- "additive" -/
-  | additive
-  deriving BEq, Repr, Inhabited
-instance : ToJS XREnvironmentBlendMode := ⟨fun
-  | .«opaque» => .string "opaque"
-  | .alphaBlend => .string "alpha-blend"
-  | .additive => .string "additive"⟩
-instance : FromJS XREnvironmentBlendMode where
-  fromJS
-    | .string "opaque" => .ok .«opaque»
-    | .string "alpha-blend" => .ok .alphaBlend
-    | .string "additive" => .ok .additive
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XREnvironmentBlendMode"
-
-/-- `enum XRInteractionMode` (WebXR Augmented Reality Module - Level 1 (https://immersive-web.github.io/webxr-ar-module/)): "screen-space", "world-space". -/
-inductive XRInteractionMode where
-  /-- "screen-space" -/
-  | screenSpace
-  /-- "world-space" -/
-  | worldSpace
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRInteractionMode := ⟨fun
-  | .screenSpace => .string "screen-space"
-  | .worldSpace => .string "world-space"⟩
-instance : FromJS XRInteractionMode where
-  fromJS
-    | .string "screen-space" => .ok .screenSpace
-    | .string "world-space" => .ok .worldSpace
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRInteractionMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute XREnvironmentBlendMode environmentBlendMode` -/
-def XRSession.environmentBlendMode (self : XRSession) : IO XREnvironmentBlendMode := self.val.get "environmentBlendMode" XREnvironmentBlendMode
+@[macro_inline] def XRSession.environmentBlendMode (self : XRSession) : IO XREnvironmentBlendMode := Internal.api "Lasm.JS.Web.XRSession.environmentBlendMode" do
+  self.val.get "environmentBlendMode" XREnvironmentBlendMode
 
 /-- `readonly attribute XRInteractionMode interactionMode` -/
-def XRSession.interactionMode (self : XRSession) : IO XRInteractionMode := self.val.get "interactionMode" XRInteractionMode
+@[macro_inline] def XRSession.interactionMode (self : XRSession) : IO XRInteractionMode := Internal.api "Lasm.JS.Web.XRSession.interactionMode" do
+  self.val.get "interactionMode" XRInteractionMode
 
 /-- `readonly attribute boolean isFirstPersonObserver` -/
-def XRView.isFirstPersonObserver (self : XRView) : IO Bool := self.val.get "isFirstPersonObserver" Bool
+@[macro_inline] def XRView.isFirstPersonObserver (self : XRView) : IO Bool := Internal.api "Lasm.JS.Web.XRView.isFirstPersonObserver" do
+  self.val.get "isFirstPersonObserver" Bool
 
 end Lasm.JS.Web

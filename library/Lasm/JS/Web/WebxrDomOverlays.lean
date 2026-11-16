@@ -6,37 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.MathmlCore
+import Lasm.JS.Web.Types.WebxrDomOverlays
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRDOMOverlayType` (WebXR DOM Overlays Module (https://immersive-web.github.io/dom-overlays/)): "screen", "floating", "head-locked". -/
-inductive XRDOMOverlayType where
-  /-- "screen" -/
-  | screen
-  /-- "floating" -/
-  | floating
-  /-- "head-locked" -/
-  | headLocked
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRDOMOverlayType := ⟨fun
-  | .screen => .string "screen"
-  | .floating => .string "floating"
-  | .headLocked => .string "head-locked"⟩
-instance : FromJS XRDOMOverlayType where
-  fromJS
-    | .string "screen" => .ok .screen
-    | .string "floating" => .ok .floating
-    | .string "head-locked" => .ok .headLocked
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRDOMOverlayType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRDOMOverlayState` (WebXR DOM Overlays Module (https://immersive-web.github.io/dom-overlays/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRDOMOverlayState where
   /-- `XRDOMOverlayType type` -/
   type : Option XRDOMOverlayType := none
+instance : ToJS XRDOMOverlayState := ⟨fun d => Internal.fields #[("type", Internal.optional d.type)]⟩
 instance : FromJS XRDOMOverlayState where
   fromJS d := do return {
     type := ← Lasm.JS.readField (Option XRDOMOverlayType) d "type" }
@@ -46,40 +34,54 @@ instance : FromJS XRDOMOverlayState where
 structure XRDOMOverlayInit where
   /-- `required Element root` -/
   root : Element
-instance : ToJS XRDOMOverlayInit := ⟨fun d => Support.fields #[("root", toJS d.root)]⟩
+instance : ToJS XRDOMOverlayInit := ⟨fun d => Internal.fields #[("root", toJS d.root)]⟩
 
 /-- `attribute EventHandler onbeforexrselect` -/
-def Document.onbeforexrselect (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onbeforexrselect (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onbeforexrselect" do
+  self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforexrselect`: `attribute EventHandler onbeforexrselect` -/
-def Document.setOnbeforexrselect (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnbeforexrselect (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnbeforexrselect" do
   self.val.set "onbeforexrselect" (toJS value)
 
 /-- `attribute EventHandler onbeforexrselect` -/
-def HTMLElement.onbeforexrselect (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onbeforexrselect (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onbeforexrselect" do
+  self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforexrselect`: `attribute EventHandler onbeforexrselect` -/
-def HTMLElement.setOnbeforexrselect (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnbeforexrselect (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnbeforexrselect" do
   self.val.set "onbeforexrselect" (toJS value)
 
 /-- `attribute EventHandler onbeforexrselect` -/
-def MathMLElement.onbeforexrselect (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onbeforexrselect (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onbeforexrselect" do
+  self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforexrselect`: `attribute EventHandler onbeforexrselect` -/
-def MathMLElement.setOnbeforexrselect (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnbeforexrselect (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnbeforexrselect" do
   self.val.set "onbeforexrselect" (toJS value)
 
 /-- `attribute EventHandler onbeforexrselect` -/
-def SVGElement.onbeforexrselect (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onbeforexrselect (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onbeforexrselect" do
+  self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforexrselect`: `attribute EventHandler onbeforexrselect` -/
-def SVGElement.setOnbeforexrselect (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnbeforexrselect (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnbeforexrselect" do
+  self.val.set "onbeforexrselect" (toJS value)
+
+/-- `attribute EventHandler onbeforexrselect` -/
+@[macro_inline] def Window.onbeforexrselect (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onbeforexrselect" do
+  self.val.get "onbeforexrselect" (Option EventHandlerNonNull)
+
+/-- Sets `onbeforexrselect`: `attribute EventHandler onbeforexrselect` -/
+@[macro_inline] def Window.setOnbeforexrselect (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnbeforexrselect" do
   self.val.set "onbeforexrselect" (toJS value)
 
 /-- `readonly attribute XRDOMOverlayState? domOverlayState` -/
-def XRSession.domOverlayState (self : XRSession) : IO (Option XRDOMOverlayState) := self.val.get "domOverlayState" (Option XRDOMOverlayState)
+@[macro_inline] def XRSession.domOverlayState (self : XRSession) : IO (Option XRDOMOverlayState) := Internal.api "Lasm.JS.Web.XRSession.domOverlayState" do
+  self.val.get "domOverlayState" (Option XRDOMOverlayState)
 
 /-- `attribute EventHandler onbeforexrselect` (WebXR DOM Overlays Module (https://immersive-web.github.io/dom-overlays/)) -/
-def onbeforexrselect : IO (Option EventHandlerNonNull) := Support.getGlobal ["onbeforexrselect"] (Option EventHandlerNonNull)
+@[macro_inline] def onbeforexrselect : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforexrselect" do
+  Internal.getGlobal ["onbeforexrselect"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

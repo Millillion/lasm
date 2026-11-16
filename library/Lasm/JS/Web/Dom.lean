@@ -6,45 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.TrustedTypes
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ShadowRootMode` (DOM Standard (https://dom.spec.whatwg.org/)): "open", "closed". -/
-inductive ShadowRootMode where
-  /-- "open" -/
-  | «open»
-  /-- "closed" -/
-  | closed
-  deriving BEq, Repr, Inhabited
-instance : ToJS ShadowRootMode := ⟨fun
-  | .«open» => .string "open"
-  | .closed => .string "closed"⟩
-instance : FromJS ShadowRootMode where
-  fromJS
-    | .string "open" => .ok .«open»
-    | .string "closed" => .ok .closed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ShadowRootMode"
-
-/-- `enum SlotAssignmentMode` (DOM Standard (https://dom.spec.whatwg.org/)): "manual", "named". -/
-inductive SlotAssignmentMode where
-  /-- "manual" -/
-  | manual
-  /-- "named" -/
-  | named
-  deriving BEq, Repr, Inhabited
-instance : ToJS SlotAssignmentMode := ⟨fun
-  | .manual => .string "manual"
-  | .named => .string "named"⟩
-instance : FromJS SlotAssignmentMode where
-  fromJS
-    | .string "manual" => .ok .manual
-    | .string "named" => .ok .named
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SlotAssignmentMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary EventInit` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EventInit where
@@ -54,9 +25,9 @@ structure EventInit where
   cancelable : Option Bool := none
   /-- `boolean composed = false` -/
   composed : Option Bool := none
-instance : ToJS EventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed)]⟩
+instance : ToJS EventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed)]⟩
 
 /-- `callback interface EventListener { undefined handleEvent(Event event); }` (DOM Standard (https://dom.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure EventListener where
@@ -67,10 +38,10 @@ instance : ToJS EventListener := ⟨fun x => .ref x.val ""⟩
 instance : FromJS EventListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.EventListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def EventListener.ofFn (f : Event → Async Unit) : IO EventListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Event args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Event args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def EventListener.ofSyncFn (f : Event → IO Unit) : IO EventListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Event args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Event args 0)) }
 
 /-- `dictionary AddEventListenerOptions : EventListenerOptions` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AddEventListenerOptions where
@@ -82,10 +53,10 @@ structure AddEventListenerOptions where
   once : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS AddEventListenerOptions := ⟨fun d => Support.fields #[("capture", Support.optional d.capture),
-    ("passive", Support.optional d.passive),
-    ("once", Support.optional d.once),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS AddEventListenerOptions := ⟨fun d => Internal.fields #[("capture", Internal.optional d.capture),
+    ("passive", Internal.optional d.passive),
+    ("once", Internal.optional d.once),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(AddEventListenerOptions or boolean)`: one constructor per member type. -/
 inductive AddEventListenerOptionsOrBoolean where
@@ -103,7 +74,7 @@ instance : Coe Bool AddEventListenerOptionsOrBoolean := ⟨.boolean⟩
 structure EventListenerOptions where
   /-- `boolean capture = false` -/
   capture : Option Bool := none
-instance : ToJS EventListenerOptions := ⟨fun d => Support.fields #[("capture", Support.optional d.capture)]⟩
+instance : ToJS EventListenerOptions := ⟨fun d => Internal.fields #[("capture", Internal.optional d.capture)]⟩
 
 /-- `(EventListenerOptions or boolean)`: one constructor per member type. -/
 inductive EventListenerOptionsOrBoolean where
@@ -126,10 +97,10 @@ instance : ToJS MutationCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MutationCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.MutationCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MutationCallback.ofFn (f : (Array MutationRecord) → MutationObserver → Async Unit) : IO MutationCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array MutationRecord) args 0) (← Support.arg MutationObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Array MutationRecord) args 0) (← Internal.arg MutationObserver args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MutationCallback.ofSyncFn (f : (Array MutationRecord) → MutationObserver → IO Unit) : IO MutationCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array MutationRecord) args 0) (← Support.arg MutationObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Array MutationRecord) args 0) (← Internal.arg MutationObserver args 1)) }
 
 /-- `dictionary MutationObserverInit` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MutationObserverInit where
@@ -147,13 +118,13 @@ structure MutationObserverInit where
   characterDataOldValue : Option Bool := none
   /-- `sequence<DOMString> attributeFilter` -/
   attributeFilter : Option (Array String) := none
-instance : ToJS MutationObserverInit := ⟨fun d => Support.fields #[("childList", Support.optional d.childList),
-    ("attributes", Support.optional d.attributes),
-    ("characterData", Support.optional d.characterData),
-    ("subtree", Support.optional d.subtree),
-    ("attributeOldValue", Support.optional d.attributeOldValue),
-    ("characterDataOldValue", Support.optional d.characterDataOldValue),
-    ("attributeFilter", Support.optional d.attributeFilter)]⟩
+instance : ToJS MutationObserverInit := ⟨fun d => Internal.fields #[("childList", Internal.optional d.childList),
+    ("attributes", Internal.optional d.attributes),
+    ("characterData", Internal.optional d.characterData),
+    ("subtree", Internal.optional d.subtree),
+    ("attributeOldValue", Internal.optional d.attributeOldValue),
+    ("characterDataOldValue", Internal.optional d.characterDataOldValue),
+    ("attributeFilter", Internal.optional d.attributeFilter)]⟩
 
 /-- `callback interface NodeFilter { unsigned short acceptNode(Node node); }` (DOM Standard (https://dom.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure NodeFilter where
@@ -164,10 +135,10 @@ instance : ToJS NodeFilter := ⟨fun x => .ref x.val ""⟩
 instance : FromJS NodeFilter := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.NodeFilter", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def NodeFilter.ofFn (f : Node → Async Nat) : IO NodeFilter := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Node args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Node args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def NodeFilter.ofSyncFn (f : Node → IO Nat) : IO NodeFilter := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Node args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Node args 0)) }
 
 /-- `callback interface XPathNSResolver { DOMString? lookupNamespaceURI(DOMString? prefix); }` (DOM Standard (https://dom.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure XPathNSResolver where
@@ -178,10 +149,10 @@ instance : ToJS XPathNSResolver := ⟨fun x => .ref x.val ""⟩
 instance : FromJS XPathNSResolver := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.XPathNSResolver", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def XPathNSResolver.ofFn (f : (Option String) → Async (Option String)) : IO XPathNSResolver := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option String) args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option String) args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def XPathNSResolver.ofSyncFn (f : (Option String) → IO (Option String)) : IO XPathNSResolver := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option String) args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option String) args 0)) }
 
 /-- `dictionary CustomEventInit : EventInit` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CustomEventInit where
@@ -193,16 +164,16 @@ structure CustomEventInit where
   composed : Option Bool := none
   /-- `any detail = null` -/
   detail : Data := .undefined
-instance : ToJS CustomEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS CustomEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("detail", d.detail)]⟩
 
 /-- `dictionary GetRootNodeOptions` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GetRootNodeOptions where
   /-- `boolean composed = false` -/
   composed : Option Bool := none
-instance : ToJS GetRootNodeOptions := ⟨fun d => Support.fields #[("composed", Support.optional d.composed)]⟩
+instance : ToJS GetRootNodeOptions := ⟨fun d => Internal.fields #[("composed", Internal.optional d.composed)]⟩
 
 /-- `dictionary StaticRangeInit` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StaticRangeInit where
@@ -214,7 +185,7 @@ structure StaticRangeInit where
   endContainer : Node
   /-- `required unsigned long endOffset` -/
   endOffset : Nat
-instance : ToJS StaticRangeInit := ⟨fun d => Support.fields #[("startContainer", toJS d.startContainer),
+instance : ToJS StaticRangeInit := ⟨fun d => Internal.fields #[("startContainer", toJS d.startContainer),
     ("startOffset", toJS d.startOffset),
     ("endContainer", toJS d.endContainer),
     ("endOffset", toJS d.endOffset)]⟩
@@ -237,8 +208,8 @@ structure ElementCreationOptions where
   customElementRegistry : Option CustomElementRegistry := none
   /-- `DOMString is` -/
   is : Option String := none
-instance : ToJS ElementCreationOptions := ⟨fun d => Support.fields #[("customElementRegistry", Support.optional d.customElementRegistry),
-    ("is", Support.optional d.is)]⟩
+instance : ToJS ElementCreationOptions := ⟨fun d => Internal.fields #[("customElementRegistry", Internal.optional d.customElementRegistry),
+    ("is", Internal.optional d.is)]⟩
 
 /-- `(DOMString or ElementCreationOptions)`: one constructor per member type. -/
 inductive DOMStringOrElementCreationOptions where
@@ -258,8 +229,8 @@ structure ImportNodeOptions where
   customElementRegistry : Option CustomElementRegistry := none
   /-- `boolean selfOnly = false` -/
   selfOnly : Option Bool := none
-instance : ToJS ImportNodeOptions := ⟨fun d => Support.fields #[("customElementRegistry", Support.optional d.customElementRegistry),
-    ("selfOnly", Support.optional d.selfOnly)]⟩
+instance : ToJS ImportNodeOptions := ⟨fun d => Internal.fields #[("customElementRegistry", Internal.optional d.customElementRegistry),
+    ("selfOnly", Internal.optional d.selfOnly)]⟩
 
 /-- `(boolean or ImportNodeOptions)`: one constructor per member type. -/
 inductive BooleanOrImportNodeOptions where
@@ -307,134 +278,140 @@ structure ShadowRootInit where
   clonable : Option Bool := none
   /-- `CustomElementRegistry? customElementRegistry` -/
   customElementRegistry : Option CustomElementRegistry := none
-instance : ToJS ShadowRootInit := ⟨fun d => Support.fields #[("mode", toJS d.mode),
-    ("delegatesFocus", Support.optional d.delegatesFocus),
-    ("serializable", Support.optional d.serializable),
-    ("slotAssignment", Support.optional d.slotAssignment),
-    ("clonable", Support.optional d.clonable),
-    ("customElementRegistry", Support.optional d.customElementRegistry)]⟩
+instance : ToJS ShadowRootInit := ⟨fun d => Internal.fields #[("mode", toJS d.mode),
+    ("delegatesFocus", Internal.optional d.delegatesFocus),
+    ("serializable", Internal.optional d.serializable),
+    ("slotAssignment", Internal.optional d.slotAssignment),
+    ("clonable", Internal.optional d.clonable),
+    ("customElementRegistry", Internal.optional d.customElementRegistry)]⟩
 
 /-- `v instanceof AbortController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbortController`). -/
-def AbortController.cast? (v : Value) : IO (Option AbortController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortController"] Value) v) then some { val := v } else none
+@[macro_inline] def AbortController.cast? (v : Value) : IO (Option AbortController) := Internal.api "Lasm.JS.Web.AbortController.cast?" do
+  Internal.cast (Internal.getGlobal ["AbortController"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def AbortController.new : IO AbortController :=
+@[macro_inline] def AbortController.new : IO AbortController := Internal.api "Lasm.JS.Web.AbortController.new" do
   Lasm.JS.Binding.invoke AbortController { name := "Lasm.JS.Web.AbortController.new", module := "globalThis", path := "AbortController", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute AbortSignal signal` -/
-def AbortController.signal (self : AbortController) : IO AbortSignal := do
+@[macro_inline] def AbortController.signal (self : AbortController) : IO AbortSignal := Internal.api "Lasm.JS.Web.AbortController.signal" do
   let r ← self.val.get "signal" Value
   pure { val := r }
 
 /-- `undefined abort(optional any reason)` -/
-def AbortController.abort (self : AbortController) (reason : Data := .undefined) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[reason]) Unit
+@[macro_inline] def AbortController.abort (self : AbortController) (reason : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.AbortController.abort" do
+  self.val.callMethod "abort" (Internal.args #[reason]) Unit
 
 /-- `v instanceof AbstractRange`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbstractRange`). -/
-def AbstractRange.cast? (v : Value) : IO (Option AbstractRange) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbstractRange"] Value) v) then some { val := v } else none
+@[macro_inline] def AbstractRange.cast? (v : Value) : IO (Option AbstractRange) := Internal.api "Lasm.JS.Web.AbstractRange.cast?" do
+  Internal.cast (Internal.getGlobal ["AbstractRange"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node startContainer` -/
-def AbstractRange.startContainer (self : AbstractRange) : IO Node := do
+@[macro_inline] def AbstractRange.startContainer (self : AbstractRange) : IO Node := Internal.api "Lasm.JS.Web.AbstractRange.startContainer" do
   let r ← self.val.get "startContainer" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long startOffset` -/
-def AbstractRange.startOffset (self : AbstractRange) : IO Nat := self.val.get "startOffset" Nat
+@[macro_inline] def AbstractRange.startOffset (self : AbstractRange) : IO Nat := Internal.api "Lasm.JS.Web.AbstractRange.startOffset" do
+  self.val.get "startOffset" Nat
 
 /-- `readonly attribute Node endContainer` -/
-def AbstractRange.endContainer (self : AbstractRange) : IO Node := do
+@[macro_inline] def AbstractRange.endContainer (self : AbstractRange) : IO Node := Internal.api "Lasm.JS.Web.AbstractRange.endContainer" do
   let r ← self.val.get "endContainer" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long endOffset` -/
-def AbstractRange.endOffset (self : AbstractRange) : IO Nat := self.val.get "endOffset" Nat
+@[macro_inline] def AbstractRange.endOffset (self : AbstractRange) : IO Nat := Internal.api "Lasm.JS.Web.AbstractRange.endOffset" do
+  self.val.get "endOffset" Nat
 
 /-- `readonly attribute boolean collapsed` -/
-def AbstractRange.collapsed (self : AbstractRange) : IO Bool := self.val.get "collapsed" Bool
+@[macro_inline] def AbstractRange.collapsed (self : AbstractRange) : IO Bool := Internal.api "Lasm.JS.Web.AbstractRange.collapsed" do
+  self.val.get "collapsed" Bool
 
 /-- `v instanceof DOMImplementation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMImplementation`). -/
-def DOMImplementation.cast? (v : Value) : IO (Option DOMImplementation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMImplementation"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMImplementation.cast? (v : Value) : IO (Option DOMImplementation) := Internal.api "Lasm.JS.Web.DOMImplementation.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMImplementation"] Value) (fun x => { val := x }) v
 
 /-- `DocumentType createDocumentType(DOMString name, DOMString publicId, DOMString systemId)` -/
-def DOMImplementation.createDocumentType (self : DOMImplementation) (name : String) (publicId : String) (systemId : String) : IO DocumentType := do
-  let r ← self.val.callMethod "createDocumentType" (Support.args #[toJS name, toJS publicId, toJS systemId]) Value
+@[macro_inline] def DOMImplementation.createDocumentType (self : DOMImplementation) (name : String) (publicId : String) (systemId : String) : IO DocumentType := Internal.api "Lasm.JS.Web.DOMImplementation.createDocumentType" do
+  let r ← self.val.callMethod "createDocumentType" (Internal.args #[toJS name, toJS publicId, toJS systemId]) Value
   pure { val := r }
 
 /-- `XMLDocument createDocument(DOMString? namespace, DOMString qualifiedName, optional DocumentType? doctype)` -/
-def DOMImplementation.createDocument (self : DOMImplementation) («namespace» : Option String) (qualifiedName : String) (doctype : Option DocumentType := none) : IO XMLDocument := do
-  let r ← self.val.callMethod "createDocument" (Support.args #[toJS «namespace», toJS qualifiedName, Support.optional doctype]) Value
+@[macro_inline] def DOMImplementation.createDocument (self : DOMImplementation) («namespace» : Option String) (qualifiedName : String) (doctype : Option DocumentType := none) : IO XMLDocument := Internal.api "Lasm.JS.Web.DOMImplementation.createDocument" do
+  let r ← self.val.callMethod "createDocument" (Internal.args #[toJS «namespace», toJS qualifiedName, Internal.optional doctype]) Value
   pure { val := r }
 
 /-- `Document createHTMLDocument(optional DOMString title)` -/
-def DOMImplementation.createHTMLDocument (self : DOMImplementation) (title : Option String := none) : IO Document := do
-  let r ← self.val.callMethod "createHTMLDocument" (Support.args #[Support.optional title]) Value
+@[macro_inline] def DOMImplementation.createHTMLDocument (self : DOMImplementation) (title : Option String := none) : IO Document := Internal.api "Lasm.JS.Web.DOMImplementation.createHTMLDocument" do
+  let r ← self.val.callMethod "createHTMLDocument" (Internal.args #[Internal.optional title]) Value
   pure { val := r }
 
 /-- `boolean hasFeature()` -/
-def DOMImplementation.hasFeature (self : DOMImplementation) : IO Bool :=
-  self.val.callMethod "hasFeature" (Support.args #[]) Bool
+@[macro_inline] def DOMImplementation.hasFeature (self : DOMImplementation) : IO Bool := Internal.api "Lasm.JS.Web.DOMImplementation.hasFeature" do
+  self.val.callMethod "hasFeature" (Internal.args #[]) Bool
 
 /-- `v instanceof DOMTokenList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMTokenList`). -/
-def DOMTokenList.cast? (v : Value) : IO (Option DOMTokenList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMTokenList"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMTokenList.cast? (v : Value) : IO (Option DOMTokenList) := Internal.api "Lasm.JS.Web.DOMTokenList.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMTokenList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def DOMTokenList.length (self : DOMTokenList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def DOMTokenList.length (self : DOMTokenList) : IO Nat := Internal.api "Lasm.JS.Web.DOMTokenList.length" do
+  self.val.get "length" Nat
 
 /-- `stringifier attribute DOMString value` -/
-def DOMTokenList.value (self : DOMTokenList) : IO String := self.val.get "value" String
+@[macro_inline] def DOMTokenList.value (self : DOMTokenList) : IO String := Internal.api "Lasm.JS.Web.DOMTokenList.value" do
+  self.val.get "value" String
 
 /-- Sets `value`: `stringifier attribute DOMString value` -/
-def DOMTokenList.setValue (self : DOMTokenList) (value : String) : IO Unit :=
+@[macro_inline] def DOMTokenList.setValue (self : DOMTokenList) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.DOMTokenList.setValue" do
   self.val.set "value" (toJS value)
 
 /-- The stringifier (`value`). -/
-def DOMTokenList.toString (self : DOMTokenList) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def DOMTokenList.toString (self : DOMTokenList) : IO String := Internal.api "Lasm.JS.Web.DOMTokenList.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `getter DOMString? item(unsigned long index)` -/
-def DOMTokenList.item (self : DOMTokenList) (index : Nat) : IO (Option String) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option String)
+@[macro_inline] def DOMTokenList.item (self : DOMTokenList) (index : Nat) : IO (Option String) := Internal.api "Lasm.JS.Web.DOMTokenList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option String)
 
 /-- `boolean contains(DOMString token)` -/
-def DOMTokenList.contains (self : DOMTokenList) (token : String) : IO Bool :=
-  self.val.callMethod "contains" (Support.args #[toJS token]) Bool
+@[macro_inline] def DOMTokenList.contains (self : DOMTokenList) (token : String) : IO Bool := Internal.api "Lasm.JS.Web.DOMTokenList.contains" do
+  self.val.callMethod "contains" (Internal.args #[toJS token]) Bool
 
 /-- `undefined add(DOMString... tokens)` -/
-def DOMTokenList.add (self : DOMTokenList) (tokens : Array String := #[]) : IO Unit :=
-  self.val.callMethod "add" (Support.argsWith #[] (tokens.map toJS)) Unit
+@[macro_inline] def DOMTokenList.add (self : DOMTokenList) (tokens : Array String := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DOMTokenList.add" do
+  self.val.callMethod "add" (Internal.argsWith #[] (tokens.map toJS)) Unit
 
 /-- `undefined remove(DOMString... tokens)` -/
-def DOMTokenList.remove (self : DOMTokenList) (tokens : Array String := #[]) : IO Unit :=
-  self.val.callMethod "remove" (Support.argsWith #[] (tokens.map toJS)) Unit
+@[macro_inline] def DOMTokenList.remove (self : DOMTokenList) (tokens : Array String := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DOMTokenList.remove" do
+  self.val.callMethod "remove" (Internal.argsWith #[] (tokens.map toJS)) Unit
 
 /-- `boolean toggle(DOMString token, optional boolean force)` -/
-def DOMTokenList.toggle (self : DOMTokenList) (token : String) (force : Option Bool := none) : IO Bool :=
-  self.val.callMethod "toggle" (Support.args #[toJS token, Support.optional force]) Bool
+@[macro_inline] def DOMTokenList.toggle (self : DOMTokenList) (token : String) (force : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Web.DOMTokenList.toggle" do
+  self.val.callMethod "toggle" (Internal.args #[toJS token, Internal.optional force]) Bool
 
 /-- `boolean replace(DOMString token, DOMString newToken)` -/
-def DOMTokenList.replace (self : DOMTokenList) (token : String) (newToken : String) : IO Bool :=
-  self.val.callMethod "replace" (Support.args #[toJS token, toJS newToken]) Bool
+@[macro_inline] def DOMTokenList.replace (self : DOMTokenList) (token : String) (newToken : String) : IO Bool := Internal.api "Lasm.JS.Web.DOMTokenList.replace" do
+  self.val.callMethod "replace" (Internal.args #[toJS token, toJS newToken]) Bool
 
 /-- `boolean supports(DOMString token)` -/
-def DOMTokenList.supports (self : DOMTokenList) (token : String) : IO Bool :=
-  self.val.callMethod "supports" (Support.args #[toJS token]) Bool
+@[macro_inline] def DOMTokenList.supports (self : DOMTokenList) (token : String) : IO Bool := Internal.api "Lasm.JS.Web.DOMTokenList.supports" do
+  self.val.callMethod "supports" (Internal.args #[toJS token]) Bool
 
 /-- `iterable<DOMString>`: `values()`, collected into an array. -/
-def DOMTokenList.values (self : DOMTokenList) : IO (Array String) :=
-  Support.iterate self.val "values" (Array String)
+@[macro_inline] def DOMTokenList.values (self : DOMTokenList) : IO (Array String) := Internal.api "Lasm.JS.Web.DOMTokenList.values" do
+  Internal.iterate self.val "values" (Array String)
 
 /-- `v instanceof Event`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Event`). -/
-def Event.cast? (v : Value) : IO (Option Event) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Event"] Value) v) then some { val := v } else none
+@[macro_inline] def Event.cast? (v : Value) : IO (Option Event) := Internal.api "Lasm.JS.Web.Event.cast?" do
+  Internal.cast (Internal.getGlobal ["Event"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional EventInit eventInitDict)` -/
-def Event.new (type : String) (eventInitDict : Option EventInit := none) : IO Event :=
+@[macro_inline] def Event.new (type : String) (eventInitDict : Option EventInit := none) : IO Event := Internal.api "Lasm.JS.Web.Event.new" do
   Lasm.JS.Binding.invoke Event { name := "Lasm.JS.Web.Event.new", module := "globalThis", path := "Event", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `const unsigned short NONE = 0` -/
 def Event.NONE : Nat := 0
@@ -449,341 +426,368 @@ def Event.AT_TARGET : Nat := 2
 def Event.BUBBLING_PHASE : Nat := 3
 
 /-- `readonly attribute DOMString type` -/
-def Event.type (self : Event) : IO String := self.val.get "type" String
+@[macro_inline] def Event.type (self : Event) : IO String := Internal.api "Lasm.JS.Web.Event.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute EventTarget? target` -/
-def Event.target (self : Event) : IO (Option EventTarget) := self.val.get "target" (Option EventTarget)
+@[macro_inline] def Event.target (self : Event) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.Event.target" do
+  self.val.get "target" (Option EventTarget)
 
 /-- `readonly attribute EventTarget? srcElement` -/
-def Event.srcElement (self : Event) : IO (Option EventTarget) := self.val.get "srcElement" (Option EventTarget)
+@[macro_inline] def Event.srcElement (self : Event) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.Event.srcElement" do
+  self.val.get "srcElement" (Option EventTarget)
 
 /-- `readonly attribute EventTarget? currentTarget` -/
-def Event.currentTarget (self : Event) : IO (Option EventTarget) := self.val.get "currentTarget" (Option EventTarget)
+@[macro_inline] def Event.currentTarget (self : Event) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.Event.currentTarget" do
+  self.val.get "currentTarget" (Option EventTarget)
 
 /-- `readonly attribute unsigned short eventPhase` -/
-def Event.eventPhase (self : Event) : IO Nat := self.val.get "eventPhase" Nat
+@[macro_inline] def Event.eventPhase (self : Event) : IO Nat := Internal.api "Lasm.JS.Web.Event.eventPhase" do
+  self.val.get "eventPhase" Nat
 
 /-- `attribute boolean cancelBubble` -/
-def Event.cancelBubble (self : Event) : IO Bool := self.val.get "cancelBubble" Bool
+@[macro_inline] def Event.cancelBubble (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.cancelBubble" do
+  self.val.get "cancelBubble" Bool
 
 /-- Sets `cancelBubble`: `attribute boolean cancelBubble` -/
-def Event.setCancelBubble (self : Event) (value : Bool) : IO Unit :=
+@[macro_inline] def Event.setCancelBubble (self : Event) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.Event.setCancelBubble" do
   self.val.set "cancelBubble" (toJS value)
 
 /-- `readonly attribute boolean bubbles` -/
-def Event.bubbles (self : Event) : IO Bool := self.val.get "bubbles" Bool
+@[macro_inline] def Event.bubbles (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.bubbles" do
+  self.val.get "bubbles" Bool
 
 /-- `readonly attribute boolean cancelable` -/
-def Event.cancelable (self : Event) : IO Bool := self.val.get "cancelable" Bool
+@[macro_inline] def Event.cancelable (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.cancelable" do
+  self.val.get "cancelable" Bool
 
 /-- `attribute boolean returnValue` -/
-def Event.returnValue (self : Event) : IO Bool := self.val.get "returnValue" Bool
+@[macro_inline] def Event.returnValue (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.returnValue" do
+  self.val.get "returnValue" Bool
 
 /-- Sets `returnValue`: `attribute boolean returnValue` -/
-def Event.setReturnValue (self : Event) (value : Bool) : IO Unit :=
+@[macro_inline] def Event.setReturnValue (self : Event) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.Event.setReturnValue" do
   self.val.set "returnValue" (toJS value)
 
 /-- `readonly attribute boolean defaultPrevented` -/
-def Event.defaultPrevented (self : Event) : IO Bool := self.val.get "defaultPrevented" Bool
+@[macro_inline] def Event.defaultPrevented (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.defaultPrevented" do
+  self.val.get "defaultPrevented" Bool
 
 /-- `readonly attribute boolean composed` -/
-def Event.composed (self : Event) : IO Bool := self.val.get "composed" Bool
+@[macro_inline] def Event.composed (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.composed" do
+  self.val.get "composed" Bool
 
 /-- `readonly attribute boolean isTrusted` -/
-def Event.isTrusted (self : Event) : IO Bool := self.val.get "isTrusted" Bool
+@[macro_inline] def Event.isTrusted (self : Event) : IO Bool := Internal.api "Lasm.JS.Web.Event.isTrusted" do
+  self.val.get "isTrusted" Bool
 
 /-- `readonly attribute DOMHighResTimeStamp timeStamp` -/
-def Event.timeStamp (self : Event) : IO Float := self.val.get "timeStamp" Float
+@[macro_inline] def Event.timeStamp (self : Event) : IO Float := Internal.api "Lasm.JS.Web.Event.timeStamp" do
+  self.val.get "timeStamp" Float
 
 /-- `sequence<EventTarget> composedPath()` -/
-def Event.composedPath (self : Event) : IO (Array EventTarget) :=
-  self.val.callMethod "composedPath" (Support.args #[]) (Array EventTarget)
+@[macro_inline] def Event.composedPath (self : Event) : IO (Array EventTarget) := Internal.api "Lasm.JS.Web.Event.composedPath" do
+  self.val.callMethod "composedPath" (Internal.args #[]) (Array EventTarget)
 
 /-- `undefined stopPropagation()` -/
-def Event.stopPropagation (self : Event) : IO Unit :=
-  self.val.callMethod "stopPropagation" (Support.args #[]) Unit
+@[macro_inline] def Event.stopPropagation (self : Event) : IO Unit := Internal.api "Lasm.JS.Web.Event.stopPropagation" do
+  self.val.callMethod "stopPropagation" (Internal.args #[]) Unit
 
 /-- `undefined stopImmediatePropagation()` -/
-def Event.stopImmediatePropagation (self : Event) : IO Unit :=
-  self.val.callMethod "stopImmediatePropagation" (Support.args #[]) Unit
+@[macro_inline] def Event.stopImmediatePropagation (self : Event) : IO Unit := Internal.api "Lasm.JS.Web.Event.stopImmediatePropagation" do
+  self.val.callMethod "stopImmediatePropagation" (Internal.args #[]) Unit
 
 /-- `undefined preventDefault()` -/
-def Event.preventDefault (self : Event) : IO Unit :=
-  self.val.callMethod "preventDefault" (Support.args #[]) Unit
+@[macro_inline] def Event.preventDefault (self : Event) : IO Unit := Internal.api "Lasm.JS.Web.Event.preventDefault" do
+  self.val.callMethod "preventDefault" (Internal.args #[]) Unit
 
 /-- `undefined initEvent(DOMString type, optional boolean bubbles, optional boolean cancelable)` -/
-def Event.initEvent (self : Event) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) : IO Unit :=
-  self.val.callMethod "initEvent" (Support.args #[toJS type, Support.optional bubbles, Support.optional cancelable]) Unit
+@[macro_inline] def Event.initEvent (self : Event) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.Event.initEvent" do
+  self.val.callMethod "initEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable]) Unit
 
 /-- `v instanceof EventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventTarget`). -/
-def EventTarget.cast? (v : Value) : IO (Option EventTarget) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EventTarget"] Value) v) then some { val := v } else none
+@[macro_inline] def EventTarget.cast? (v : Value) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.EventTarget.cast?" do
+  Internal.cast (Internal.getGlobal ["EventTarget"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def EventTarget.new : IO EventTarget :=
+@[macro_inline] def EventTarget.new : IO EventTarget := Internal.api "Lasm.JS.Web.EventTarget.new" do
   Lasm.JS.Binding.invoke EventTarget { name := "Lasm.JS.Web.EventTarget.new", module := "globalThis", path := "EventTarget", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `undefined addEventListener(DOMString type, EventListener? callback, optional (AddEventListenerOptions or boolean) options)` -/
-def EventTarget.addEventListener (self : EventTarget) (type : String) (callback : Option EventListener) (options : Option AddEventListenerOptionsOrBoolean := none) : IO Unit :=
-  self.val.callMethod "addEventListener" (Support.args #[toJS type, toJS callback, Support.optional options]) Unit
+@[macro_inline] def EventTarget.addEventListener (self : EventTarget) (type : String) (callback : Option EventListener) (options : Option AddEventListenerOptionsOrBoolean := none) : IO Unit := Internal.api "Lasm.JS.Web.EventTarget.addEventListener" do
+  self.val.callMethod "addEventListener" (Internal.args #[toJS type, toJS callback, Internal.optional options]) Unit
 
 /-- `undefined removeEventListener(DOMString type, EventListener? callback, optional (EventListenerOptions or boolean) options)` -/
-def EventTarget.removeEventListener (self : EventTarget) (type : String) (callback : Option EventListener) (options : Option EventListenerOptionsOrBoolean := none) : IO Unit :=
-  self.val.callMethod "removeEventListener" (Support.args #[toJS type, toJS callback, Support.optional options]) Unit
+@[macro_inline] def EventTarget.removeEventListener (self : EventTarget) (type : String) (callback : Option EventListener) (options : Option EventListenerOptionsOrBoolean := none) : IO Unit := Internal.api "Lasm.JS.Web.EventTarget.removeEventListener" do
+  self.val.callMethod "removeEventListener" (Internal.args #[toJS type, toJS callback, Internal.optional options]) Unit
 
 /-- `boolean dispatchEvent(Event event)` -/
-def EventTarget.dispatchEvent (self : EventTarget) (event : Event) : IO Bool :=
-  self.val.callMethod "dispatchEvent" (Support.args #[toJS event]) Bool
+@[macro_inline] def EventTarget.dispatchEvent (self : EventTarget) (event : Event) : IO Bool := Internal.api "Lasm.JS.Web.EventTarget.dispatchEvent" do
+  self.val.callMethod "dispatchEvent" (Internal.args #[toJS event]) Bool
 
 /-- `v instanceof HTMLCollection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLCollection`). -/
-def HTMLCollection.cast? (v : Value) : IO (Option HTMLCollection) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLCollection"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLCollection.cast? (v : Value) : IO (Option HTMLCollection) := Internal.api "Lasm.JS.Web.HTMLCollection.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLCollection"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def HTMLCollection.length (self : HTMLCollection) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def HTMLCollection.length (self : HTMLCollection) : IO Nat := Internal.api "Lasm.JS.Web.HTMLCollection.length" do
+  self.val.get "length" Nat
 
 /-- `getter Element? item(unsigned long index)` -/
-def HTMLCollection.item (self : HTMLCollection) (index : Nat) : IO (Option Element) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option Element)
+@[macro_inline] def HTMLCollection.item (self : HTMLCollection) (index : Nat) : IO (Option Element) := Internal.api "Lasm.JS.Web.HTMLCollection.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option Element)
 
 /-- `getter Element? namedItem(DOMString name)` -/
-def HTMLCollection.namedItem (self : HTMLCollection) (name : String) : IO (Option Element) :=
-  self.val.callMethod "namedItem" (Support.args #[toJS name]) (Option Element)
+@[macro_inline] def HTMLCollection.namedItem (self : HTMLCollection) (name : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.HTMLCollection.namedItem" do
+  self.val.callMethod "namedItem" (Internal.args #[toJS name]) (Option Element)
 
 /-- `v instanceof MutationObserver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MutationObserver`). -/
-def MutationObserver.cast? (v : Value) : IO (Option MutationObserver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationObserver"] Value) v) then some { val := v } else none
+@[macro_inline] def MutationObserver.cast? (v : Value) : IO (Option MutationObserver) := Internal.api "Lasm.JS.Web.MutationObserver.cast?" do
+  Internal.cast (Internal.getGlobal ["MutationObserver"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MutationCallback callback)` -/
-def MutationObserver.new (callback : MutationCallback) : IO MutationObserver :=
+@[macro_inline] def MutationObserver.new (callback : MutationCallback) : IO MutationObserver := Internal.api "Lasm.JS.Web.MutationObserver.new" do
   Lasm.JS.Binding.invoke MutationObserver { name := "Lasm.JS.Web.MutationObserver.new", module := "globalThis", path := "MutationObserver", construct := true, arity := 1 }
-    (Support.args #[toJS callback]) (await := false)
+    (Internal.args #[toJS callback]) (await := false)
 
 /-- `undefined observe(Node target, optional MutationObserverInit options)` -/
-def MutationObserver.observe (self : MutationObserver) (target : Node) (options : Option MutationObserverInit := none) : IO Unit :=
-  self.val.callMethod "observe" (Support.args #[toJS target, Support.optional options]) Unit
+@[macro_inline] def MutationObserver.observe (self : MutationObserver) (target : Node) (options : Option MutationObserverInit := none) : IO Unit := Internal.api "Lasm.JS.Web.MutationObserver.observe" do
+  self.val.callMethod "observe" (Internal.args #[toJS target, Internal.optional options]) Unit
 
 /-- `undefined disconnect()` -/
-def MutationObserver.disconnect (self : MutationObserver) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def MutationObserver.disconnect (self : MutationObserver) : IO Unit := Internal.api "Lasm.JS.Web.MutationObserver.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `sequence<MutationRecord> takeRecords()` -/
-def MutationObserver.takeRecords (self : MutationObserver) : IO (Array MutationRecord) :=
-  self.val.callMethod "takeRecords" (Support.args #[]) (Array MutationRecord)
+@[macro_inline] def MutationObserver.takeRecords (self : MutationObserver) : IO (Array MutationRecord) := Internal.api "Lasm.JS.Web.MutationObserver.takeRecords" do
+  self.val.callMethod "takeRecords" (Internal.args #[]) (Array MutationRecord)
 
 /-- `v instanceof MutationRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MutationRecord`). -/
-def MutationRecord.cast? (v : Value) : IO (Option MutationRecord) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationRecord"] Value) v) then some { val := v } else none
+@[macro_inline] def MutationRecord.cast? (v : Value) : IO (Option MutationRecord) := Internal.api "Lasm.JS.Web.MutationRecord.cast?" do
+  Internal.cast (Internal.getGlobal ["MutationRecord"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString type` -/
-def MutationRecord.type (self : MutationRecord) : IO String := self.val.get "type" String
+@[macro_inline] def MutationRecord.type (self : MutationRecord) : IO String := Internal.api "Lasm.JS.Web.MutationRecord.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute Node target` -/
-def MutationRecord.target (self : MutationRecord) : IO Node := do
+@[macro_inline] def MutationRecord.target (self : MutationRecord) : IO Node := Internal.api "Lasm.JS.Web.MutationRecord.target" do
   let r ← self.val.get "target" Value
   pure { val := r }
 
 /-- `readonly attribute NodeList addedNodes` -/
-def MutationRecord.addedNodes (self : MutationRecord) : IO NodeList := do
+@[macro_inline] def MutationRecord.addedNodes (self : MutationRecord) : IO NodeList := Internal.api "Lasm.JS.Web.MutationRecord.addedNodes" do
   let r ← self.val.get "addedNodes" Value
   pure { val := r }
 
 /-- `readonly attribute NodeList removedNodes` -/
-def MutationRecord.removedNodes (self : MutationRecord) : IO NodeList := do
+@[macro_inline] def MutationRecord.removedNodes (self : MutationRecord) : IO NodeList := Internal.api "Lasm.JS.Web.MutationRecord.removedNodes" do
   let r ← self.val.get "removedNodes" Value
   pure { val := r }
 
 /-- `readonly attribute Node? previousSibling` -/
-def MutationRecord.previousSibling (self : MutationRecord) : IO (Option Node) := self.val.get "previousSibling" (Option Node)
+@[macro_inline] def MutationRecord.previousSibling (self : MutationRecord) : IO (Option Node) := Internal.api "Lasm.JS.Web.MutationRecord.previousSibling" do
+  self.val.get "previousSibling" (Option Node)
 
 /-- `readonly attribute Node? nextSibling` -/
-def MutationRecord.nextSibling (self : MutationRecord) : IO (Option Node) := self.val.get "nextSibling" (Option Node)
+@[macro_inline] def MutationRecord.nextSibling (self : MutationRecord) : IO (Option Node) := Internal.api "Lasm.JS.Web.MutationRecord.nextSibling" do
+  self.val.get "nextSibling" (Option Node)
 
 /-- `readonly attribute DOMString? attributeName` -/
-def MutationRecord.attributeName (self : MutationRecord) : IO (Option String) := self.val.get "attributeName" (Option String)
+@[macro_inline] def MutationRecord.attributeName (self : MutationRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.MutationRecord.attributeName" do
+  self.val.get "attributeName" (Option String)
 
 /-- `readonly attribute DOMString? attributeNamespace` -/
-def MutationRecord.attributeNamespace (self : MutationRecord) : IO (Option String) := self.val.get "attributeNamespace" (Option String)
+@[macro_inline] def MutationRecord.attributeNamespace (self : MutationRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.MutationRecord.attributeNamespace" do
+  self.val.get "attributeNamespace" (Option String)
 
 /-- `readonly attribute DOMString? oldValue` -/
-def MutationRecord.oldValue (self : MutationRecord) : IO (Option String) := self.val.get "oldValue" (Option String)
+@[macro_inline] def MutationRecord.oldValue (self : MutationRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.MutationRecord.oldValue" do
+  self.val.get "oldValue" (Option String)
 
 /-- `v instanceof NamedNodeMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NamedNodeMap`). -/
-def NamedNodeMap.cast? (v : Value) : IO (Option NamedNodeMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NamedNodeMap"] Value) v) then some { val := v } else none
+@[macro_inline] def NamedNodeMap.cast? (v : Value) : IO (Option NamedNodeMap) := Internal.api "Lasm.JS.Web.NamedNodeMap.cast?" do
+  Internal.cast (Internal.getGlobal ["NamedNodeMap"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def NamedNodeMap.length (self : NamedNodeMap) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def NamedNodeMap.length (self : NamedNodeMap) : IO Nat := Internal.api "Lasm.JS.Web.NamedNodeMap.length" do
+  self.val.get "length" Nat
 
 /-- `getter Attr? item(unsigned long index)` -/
-def NamedNodeMap.item (self : NamedNodeMap) (index : Nat) : IO (Option Attr) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option Attr)
+@[macro_inline] def NamedNodeMap.item (self : NamedNodeMap) (index : Nat) : IO (Option Attr) := Internal.api "Lasm.JS.Web.NamedNodeMap.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option Attr)
 
 /-- `getter Attr? getNamedItem(DOMString qualifiedName)` -/
-def NamedNodeMap.getNamedItem (self : NamedNodeMap) (qualifiedName : String) : IO (Option Attr) :=
-  self.val.callMethod "getNamedItem" (Support.args #[toJS qualifiedName]) (Option Attr)
+@[macro_inline] def NamedNodeMap.getNamedItem (self : NamedNodeMap) (qualifiedName : String) : IO (Option Attr) := Internal.api "Lasm.JS.Web.NamedNodeMap.getNamedItem" do
+  self.val.callMethod "getNamedItem" (Internal.args #[toJS qualifiedName]) (Option Attr)
 
 /-- `Attr? getNamedItemNS(DOMString? namespace, DOMString localName)` -/
-def NamedNodeMap.getNamedItemNS (self : NamedNodeMap) («namespace» : Option String) (localName : String) : IO (Option Attr) :=
-  self.val.callMethod "getNamedItemNS" (Support.args #[toJS «namespace», toJS localName]) (Option Attr)
+@[macro_inline] def NamedNodeMap.getNamedItemNS (self : NamedNodeMap) («namespace» : Option String) (localName : String) : IO (Option Attr) := Internal.api "Lasm.JS.Web.NamedNodeMap.getNamedItemNS" do
+  self.val.callMethod "getNamedItemNS" (Internal.args #[toJS «namespace», toJS localName]) (Option Attr)
 
 /-- `Attr? setNamedItem(Attr attr)` -/
-def NamedNodeMap.setNamedItem (self : NamedNodeMap) (attr : Attr) : IO (Option Attr) :=
-  self.val.callMethod "setNamedItem" (Support.args #[toJS attr]) (Option Attr)
+@[macro_inline] def NamedNodeMap.setNamedItem (self : NamedNodeMap) (attr : Attr) : IO (Option Attr) := Internal.api "Lasm.JS.Web.NamedNodeMap.setNamedItem" do
+  self.val.callMethod "setNamedItem" (Internal.args #[toJS attr]) (Option Attr)
 
 /-- `Attr? setNamedItemNS(Attr attr)` -/
-def NamedNodeMap.setNamedItemNS (self : NamedNodeMap) (attr : Attr) : IO (Option Attr) :=
-  self.val.callMethod "setNamedItemNS" (Support.args #[toJS attr]) (Option Attr)
+@[macro_inline] def NamedNodeMap.setNamedItemNS (self : NamedNodeMap) (attr : Attr) : IO (Option Attr) := Internal.api "Lasm.JS.Web.NamedNodeMap.setNamedItemNS" do
+  self.val.callMethod "setNamedItemNS" (Internal.args #[toJS attr]) (Option Attr)
 
 /-- `Attr removeNamedItem(DOMString qualifiedName)` -/
-def NamedNodeMap.removeNamedItem (self : NamedNodeMap) (qualifiedName : String) : IO Attr := do
-  let r ← self.val.callMethod "removeNamedItem" (Support.args #[toJS qualifiedName]) Value
+@[macro_inline] def NamedNodeMap.removeNamedItem (self : NamedNodeMap) (qualifiedName : String) : IO Attr := Internal.api "Lasm.JS.Web.NamedNodeMap.removeNamedItem" do
+  let r ← self.val.callMethod "removeNamedItem" (Internal.args #[toJS qualifiedName]) Value
   pure { val := r }
 
 /-- `Attr removeNamedItemNS(DOMString? namespace, DOMString localName)` -/
-def NamedNodeMap.removeNamedItemNS (self : NamedNodeMap) («namespace» : Option String) (localName : String) : IO Attr := do
-  let r ← self.val.callMethod "removeNamedItemNS" (Support.args #[toJS «namespace», toJS localName]) Value
+@[macro_inline] def NamedNodeMap.removeNamedItemNS (self : NamedNodeMap) («namespace» : Option String) (localName : String) : IO Attr := Internal.api "Lasm.JS.Web.NamedNodeMap.removeNamedItemNS" do
+  let r ← self.val.callMethod "removeNamedItemNS" (Internal.args #[toJS «namespace», toJS localName]) Value
   pure { val := r }
 
 /-- `v instanceof NodeIterator`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NodeIterator`). -/
-def NodeIterator.cast? (v : Value) : IO (Option NodeIterator) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NodeIterator"] Value) v) then some { val := v } else none
+@[macro_inline] def NodeIterator.cast? (v : Value) : IO (Option NodeIterator) := Internal.api "Lasm.JS.Web.NodeIterator.cast?" do
+  Internal.cast (Internal.getGlobal ["NodeIterator"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node root` -/
-def NodeIterator.root (self : NodeIterator) : IO Node := do
+@[macro_inline] def NodeIterator.root (self : NodeIterator) : IO Node := Internal.api "Lasm.JS.Web.NodeIterator.root" do
   let r ← self.val.get "root" Value
   pure { val := r }
 
 /-- `readonly attribute Node referenceNode` -/
-def NodeIterator.referenceNode (self : NodeIterator) : IO Node := do
+@[macro_inline] def NodeIterator.referenceNode (self : NodeIterator) : IO Node := Internal.api "Lasm.JS.Web.NodeIterator.referenceNode" do
   let r ← self.val.get "referenceNode" Value
   pure { val := r }
 
 /-- `readonly attribute boolean pointerBeforeReferenceNode` -/
-def NodeIterator.pointerBeforeReferenceNode (self : NodeIterator) : IO Bool := self.val.get "pointerBeforeReferenceNode" Bool
+@[macro_inline] def NodeIterator.pointerBeforeReferenceNode (self : NodeIterator) : IO Bool := Internal.api "Lasm.JS.Web.NodeIterator.pointerBeforeReferenceNode" do
+  self.val.get "pointerBeforeReferenceNode" Bool
 
 /-- `readonly attribute unsigned long whatToShow` -/
-def NodeIterator.whatToShow (self : NodeIterator) : IO Nat := self.val.get "whatToShow" Nat
+@[macro_inline] def NodeIterator.whatToShow (self : NodeIterator) : IO Nat := Internal.api "Lasm.JS.Web.NodeIterator.whatToShow" do
+  self.val.get "whatToShow" Nat
 
 /-- `readonly attribute NodeFilter? filter` -/
-def NodeIterator.filter (self : NodeIterator) : IO (Option NodeFilter) := self.val.get "filter" (Option NodeFilter)
+@[macro_inline] def NodeIterator.filter (self : NodeIterator) : IO (Option NodeFilter) := Internal.api "Lasm.JS.Web.NodeIterator.filter" do
+  self.val.get "filter" (Option NodeFilter)
 
 /-- `Node? nextNode()` -/
-def NodeIterator.nextNode (self : NodeIterator) : IO (Option Node) :=
-  self.val.callMethod "nextNode" (Support.args #[]) (Option Node)
+@[macro_inline] def NodeIterator.nextNode (self : NodeIterator) : IO (Option Node) := Internal.api "Lasm.JS.Web.NodeIterator.nextNode" do
+  self.val.callMethod "nextNode" (Internal.args #[]) (Option Node)
 
 /-- `Node? previousNode()` -/
-def NodeIterator.previousNode (self : NodeIterator) : IO (Option Node) :=
-  self.val.callMethod "previousNode" (Support.args #[]) (Option Node)
+@[macro_inline] def NodeIterator.previousNode (self : NodeIterator) : IO (Option Node) := Internal.api "Lasm.JS.Web.NodeIterator.previousNode" do
+  self.val.callMethod "previousNode" (Internal.args #[]) (Option Node)
 
 /-- `undefined detach()` -/
-def NodeIterator.detach (self : NodeIterator) : IO Unit :=
-  self.val.callMethod "detach" (Support.args #[]) Unit
+@[macro_inline] def NodeIterator.detach (self : NodeIterator) : IO Unit := Internal.api "Lasm.JS.Web.NodeIterator.detach" do
+  self.val.callMethod "detach" (Internal.args #[]) Unit
 
 /-- `v instanceof NodeList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NodeList`). -/
-def NodeList.cast? (v : Value) : IO (Option NodeList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NodeList"] Value) v) then some { val := v } else none
+@[macro_inline] def NodeList.cast? (v : Value) : IO (Option NodeList) := Internal.api "Lasm.JS.Web.NodeList.cast?" do
+  Internal.cast (Internal.getGlobal ["NodeList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def NodeList.length (self : NodeList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def NodeList.length (self : NodeList) : IO Nat := Internal.api "Lasm.JS.Web.NodeList.length" do
+  self.val.get "length" Nat
 
 /-- `getter Node? item(unsigned long index)` -/
-def NodeList.item (self : NodeList) (index : Nat) : IO (Option Node) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option Node)
+@[macro_inline] def NodeList.item (self : NodeList) (index : Nat) : IO (Option Node) := Internal.api "Lasm.JS.Web.NodeList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option Node)
 
 /-- `iterable<Node>`: `values()`, collected into an array. -/
-def NodeList.values (self : NodeList) : IO (Array Node) :=
-  Support.iterate self.val "values" (Array Node)
+@[macro_inline] def NodeList.values (self : NodeList) : IO (Array Node) := Internal.api "Lasm.JS.Web.NodeList.values" do
+  Internal.iterate self.val "values" (Array Node)
 
 /-- `v instanceof TreeWalker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TreeWalker`). -/
-def TreeWalker.cast? (v : Value) : IO (Option TreeWalker) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TreeWalker"] Value) v) then some { val := v } else none
+@[macro_inline] def TreeWalker.cast? (v : Value) : IO (Option TreeWalker) := Internal.api "Lasm.JS.Web.TreeWalker.cast?" do
+  Internal.cast (Internal.getGlobal ["TreeWalker"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node root` -/
-def TreeWalker.root (self : TreeWalker) : IO Node := do
+@[macro_inline] def TreeWalker.root (self : TreeWalker) : IO Node := Internal.api "Lasm.JS.Web.TreeWalker.root" do
   let r ← self.val.get "root" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long whatToShow` -/
-def TreeWalker.whatToShow (self : TreeWalker) : IO Nat := self.val.get "whatToShow" Nat
+@[macro_inline] def TreeWalker.whatToShow (self : TreeWalker) : IO Nat := Internal.api "Lasm.JS.Web.TreeWalker.whatToShow" do
+  self.val.get "whatToShow" Nat
 
 /-- `readonly attribute NodeFilter? filter` -/
-def TreeWalker.filter (self : TreeWalker) : IO (Option NodeFilter) := self.val.get "filter" (Option NodeFilter)
+@[macro_inline] def TreeWalker.filter (self : TreeWalker) : IO (Option NodeFilter) := Internal.api "Lasm.JS.Web.TreeWalker.filter" do
+  self.val.get "filter" (Option NodeFilter)
 
 /-- `attribute Node currentNode` -/
-def TreeWalker.currentNode (self : TreeWalker) : IO Node := do
+@[macro_inline] def TreeWalker.currentNode (self : TreeWalker) : IO Node := Internal.api "Lasm.JS.Web.TreeWalker.currentNode" do
   let r ← self.val.get "currentNode" Value
   pure { val := r }
 
 /-- Sets `currentNode`: `attribute Node currentNode` -/
-def TreeWalker.setCurrentNode (self : TreeWalker) (value : Node) : IO Unit :=
+@[macro_inline] def TreeWalker.setCurrentNode (self : TreeWalker) (value : Node) : IO Unit := Internal.api "Lasm.JS.Web.TreeWalker.setCurrentNode" do
   self.val.set "currentNode" (toJS value)
 
 /-- `Node? parentNode()` -/
-def TreeWalker.parentNode (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "parentNode" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.parentNode (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.parentNode" do
+  self.val.callMethod "parentNode" (Internal.args #[]) (Option Node)
 
 /-- `Node? firstChild()` -/
-def TreeWalker.firstChild (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "firstChild" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.firstChild (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.firstChild" do
+  self.val.callMethod "firstChild" (Internal.args #[]) (Option Node)
 
 /-- `Node? lastChild()` -/
-def TreeWalker.lastChild (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "lastChild" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.lastChild (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.lastChild" do
+  self.val.callMethod "lastChild" (Internal.args #[]) (Option Node)
 
 /-- `Node? previousSibling()` -/
-def TreeWalker.previousSibling (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "previousSibling" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.previousSibling (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.previousSibling" do
+  self.val.callMethod "previousSibling" (Internal.args #[]) (Option Node)
 
 /-- `Node? nextSibling()` -/
-def TreeWalker.nextSibling (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "nextSibling" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.nextSibling (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.nextSibling" do
+  self.val.callMethod "nextSibling" (Internal.args #[]) (Option Node)
 
 /-- `Node? previousNode()` -/
-def TreeWalker.previousNode (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "previousNode" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.previousNode (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.previousNode" do
+  self.val.callMethod "previousNode" (Internal.args #[]) (Option Node)
 
 /-- `Node? nextNode()` -/
-def TreeWalker.nextNode (self : TreeWalker) : IO (Option Node) :=
-  self.val.callMethod "nextNode" (Support.args #[]) (Option Node)
+@[macro_inline] def TreeWalker.nextNode (self : TreeWalker) : IO (Option Node) := Internal.api "Lasm.JS.Web.TreeWalker.nextNode" do
+  self.val.callMethod "nextNode" (Internal.args #[]) (Option Node)
 
 /-- `v instanceof XPathEvaluator`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XPathEvaluator`). -/
-def XPathEvaluator.cast? (v : Value) : IO (Option XPathEvaluator) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XPathEvaluator"] Value) v) then some { val := v } else none
+@[macro_inline] def XPathEvaluator.cast? (v : Value) : IO (Option XPathEvaluator) := Internal.api "Lasm.JS.Web.XPathEvaluator.cast?" do
+  Internal.cast (Internal.getGlobal ["XPathEvaluator"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def XPathEvaluator.new : IO XPathEvaluator :=
+@[macro_inline] def XPathEvaluator.new : IO XPathEvaluator := Internal.api "Lasm.JS.Web.XPathEvaluator.new" do
   Lasm.JS.Binding.invoke XPathEvaluator { name := "Lasm.JS.Web.XPathEvaluator.new", module := "globalThis", path := "XPathEvaluator", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `XPathExpression createExpression(DOMString expression, optional XPathNSResolver? resolver)` -/
-def XPathEvaluator.createExpression (self : XPathEvaluator) (expression : String) (resolver : Option XPathNSResolver := none) : IO XPathExpression := do
-  let r ← self.val.callMethod "createExpression" (Support.args #[toJS expression, Support.optional resolver]) Value
+@[macro_inline] def XPathEvaluator.createExpression (self : XPathEvaluator) (expression : String) (resolver : Option XPathNSResolver := none) : IO XPathExpression := Internal.api "Lasm.JS.Web.XPathEvaluator.createExpression" do
+  let r ← self.val.callMethod "createExpression" (Internal.args #[toJS expression, Internal.optional resolver]) Value
   pure { val := r }
 
 /-- `Node createNSResolver(Node nodeResolver)` -/
-def XPathEvaluator.createNSResolver (self : XPathEvaluator) (nodeResolver : Node) : IO Node := do
-  let r ← self.val.callMethod "createNSResolver" (Support.args #[toJS nodeResolver]) Value
+@[macro_inline] def XPathEvaluator.createNSResolver (self : XPathEvaluator) (nodeResolver : Node) : IO Node := Internal.api "Lasm.JS.Web.XPathEvaluator.createNSResolver" do
+  let r ← self.val.callMethod "createNSResolver" (Internal.args #[toJS nodeResolver]) Value
   pure { val := r }
 
 /-- `XPathResult evaluate(DOMString expression, Node contextNode, optional XPathNSResolver? resolver, optional unsigned short type, optional XPathResult? result)` -/
-def XPathEvaluator.evaluate (self : XPathEvaluator) (expression : String) (contextNode : Node) (resolver : Option XPathNSResolver := none) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := do
-  let r ← self.val.callMethod "evaluate" (Support.args #[toJS expression, toJS contextNode, Support.optional resolver, Support.optional type, Support.optional result]) Value
+@[macro_inline] def XPathEvaluator.evaluate (self : XPathEvaluator) (expression : String) (contextNode : Node) (resolver : Option XPathNSResolver := none) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := Internal.api "Lasm.JS.Web.XPathEvaluator.evaluate" do
+  let r ← self.val.callMethod "evaluate" (Internal.args #[toJS expression, toJS contextNode, Internal.optional resolver, Internal.optional type, Internal.optional result]) Value
   pure { val := r }
 
 /-- `v instanceof XPathExpression`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XPathExpression`). -/
-def XPathExpression.cast? (v : Value) : IO (Option XPathExpression) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XPathExpression"] Value) v) then some { val := v } else none
+@[macro_inline] def XPathExpression.cast? (v : Value) : IO (Option XPathExpression) := Internal.api "Lasm.JS.Web.XPathExpression.cast?" do
+  Internal.cast (Internal.getGlobal ["XPathExpression"] Value) (fun x => { val := x }) v
 
 /-- `XPathResult evaluate(Node contextNode, optional unsigned short type, optional XPathResult? result)` -/
-def XPathExpression.evaluate (self : XPathExpression) (contextNode : Node) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := do
-  let r ← self.val.callMethod "evaluate" (Support.args #[toJS contextNode, Support.optional type, Support.optional result]) Value
+@[macro_inline] def XPathExpression.evaluate (self : XPathExpression) (contextNode : Node) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := Internal.api "Lasm.JS.Web.XPathExpression.evaluate" do
+  let r ← self.val.callMethod "evaluate" (Internal.args #[toJS contextNode, Internal.optional type, Internal.optional result]) Value
   pure { val := r }
 
 /-- `v instanceof XPathResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XPathResult`). -/
-def XPathResult.cast? (v : Value) : IO (Option XPathResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XPathResult"] Value) v) then some { val := v } else none
+@[macro_inline] def XPathResult.cast? (v : Value) : IO (Option XPathResult) := Internal.api "Lasm.JS.Web.XPathResult.cast?" do
+  Internal.cast (Internal.getGlobal ["XPathResult"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short ANY_TYPE = 0` -/
 def XPathResult.ANY_TYPE : Nat := 0
@@ -816,135 +820,146 @@ def XPathResult.ANY_UNORDERED_NODE_TYPE : Nat := 8
 def XPathResult.FIRST_ORDERED_NODE_TYPE : Nat := 9
 
 /-- `readonly attribute unsigned short resultType` -/
-def XPathResult.resultType (self : XPathResult) : IO Nat := self.val.get "resultType" Nat
+@[macro_inline] def XPathResult.resultType (self : XPathResult) : IO Nat := Internal.api "Lasm.JS.Web.XPathResult.resultType" do
+  self.val.get "resultType" Nat
 
 /-- `readonly attribute unrestricted double numberValue` -/
-def XPathResult.numberValue (self : XPathResult) : IO Float := self.val.get "numberValue" Float
+@[macro_inline] def XPathResult.numberValue (self : XPathResult) : IO Float := Internal.api "Lasm.JS.Web.XPathResult.numberValue" do
+  self.val.get "numberValue" Float
 
 /-- `readonly attribute DOMString stringValue` -/
-def XPathResult.stringValue (self : XPathResult) : IO String := self.val.get "stringValue" String
+@[macro_inline] def XPathResult.stringValue (self : XPathResult) : IO String := Internal.api "Lasm.JS.Web.XPathResult.stringValue" do
+  self.val.get "stringValue" String
 
 /-- `readonly attribute boolean booleanValue` -/
-def XPathResult.booleanValue (self : XPathResult) : IO Bool := self.val.get "booleanValue" Bool
+@[macro_inline] def XPathResult.booleanValue (self : XPathResult) : IO Bool := Internal.api "Lasm.JS.Web.XPathResult.booleanValue" do
+  self.val.get "booleanValue" Bool
 
 /-- `readonly attribute Node? singleNodeValue` -/
-def XPathResult.singleNodeValue (self : XPathResult) : IO (Option Node) := self.val.get "singleNodeValue" (Option Node)
+@[macro_inline] def XPathResult.singleNodeValue (self : XPathResult) : IO (Option Node) := Internal.api "Lasm.JS.Web.XPathResult.singleNodeValue" do
+  self.val.get "singleNodeValue" (Option Node)
 
 /-- `readonly attribute boolean invalidIteratorState` -/
-def XPathResult.invalidIteratorState (self : XPathResult) : IO Bool := self.val.get "invalidIteratorState" Bool
+@[macro_inline] def XPathResult.invalidIteratorState (self : XPathResult) : IO Bool := Internal.api "Lasm.JS.Web.XPathResult.invalidIteratorState" do
+  self.val.get "invalidIteratorState" Bool
 
 /-- `readonly attribute unsigned long snapshotLength` -/
-def XPathResult.snapshotLength (self : XPathResult) : IO Nat := self.val.get "snapshotLength" Nat
+@[macro_inline] def XPathResult.snapshotLength (self : XPathResult) : IO Nat := Internal.api "Lasm.JS.Web.XPathResult.snapshotLength" do
+  self.val.get "snapshotLength" Nat
 
 /-- `Node? iterateNext()` -/
-def XPathResult.iterateNext (self : XPathResult) : IO (Option Node) :=
-  self.val.callMethod "iterateNext" (Support.args #[]) (Option Node)
+@[macro_inline] def XPathResult.iterateNext (self : XPathResult) : IO (Option Node) := Internal.api "Lasm.JS.Web.XPathResult.iterateNext" do
+  self.val.callMethod "iterateNext" (Internal.args #[]) (Option Node)
 
 /-- `Node? snapshotItem(unsigned long index)` -/
-def XPathResult.snapshotItem (self : XPathResult) (index : Nat) : IO (Option Node) :=
-  self.val.callMethod "snapshotItem" (Support.args #[toJS index]) (Option Node)
+@[macro_inline] def XPathResult.snapshotItem (self : XPathResult) (index : Nat) : IO (Option Node) := Internal.api "Lasm.JS.Web.XPathResult.snapshotItem" do
+  self.val.callMethod "snapshotItem" (Internal.args #[toJS index]) (Option Node)
 
 /-- `v instanceof XSLTProcessor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XSLTProcessor`). -/
-def XSLTProcessor.cast? (v : Value) : IO (Option XSLTProcessor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XSLTProcessor"] Value) v) then some { val := v } else none
+@[macro_inline] def XSLTProcessor.cast? (v : Value) : IO (Option XSLTProcessor) := Internal.api "Lasm.JS.Web.XSLTProcessor.cast?" do
+  Internal.cast (Internal.getGlobal ["XSLTProcessor"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def XSLTProcessor.new : IO XSLTProcessor :=
+@[macro_inline] def XSLTProcessor.new : IO XSLTProcessor := Internal.api "Lasm.JS.Web.XSLTProcessor.new" do
   Lasm.JS.Binding.invoke XSLTProcessor { name := "Lasm.JS.Web.XSLTProcessor.new", module := "globalThis", path := "XSLTProcessor", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `undefined importStylesheet(Node style)` -/
-def XSLTProcessor.importStylesheet (self : XSLTProcessor) (style : Node) : IO Unit :=
-  self.val.callMethod "importStylesheet" (Support.args #[toJS style]) Unit
+@[macro_inline] def XSLTProcessor.importStylesheet (self : XSLTProcessor) (style : Node) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.importStylesheet" do
+  self.val.callMethod "importStylesheet" (Internal.args #[toJS style]) Unit
 
 /-- `DocumentFragment transformToFragment(Node source, Document output)` -/
-def XSLTProcessor.transformToFragment (self : XSLTProcessor) (source : Node) (output : Document) : IO DocumentFragment := do
-  let r ← self.val.callMethod "transformToFragment" (Support.args #[toJS source, toJS output]) Value
+@[macro_inline] def XSLTProcessor.transformToFragment (self : XSLTProcessor) (source : Node) (output : Document) : IO DocumentFragment := Internal.api "Lasm.JS.Web.XSLTProcessor.transformToFragment" do
+  let r ← self.val.callMethod "transformToFragment" (Internal.args #[toJS source, toJS output]) Value
   pure { val := r }
 
 /-- `Document transformToDocument(Node source)` -/
-def XSLTProcessor.transformToDocument (self : XSLTProcessor) (source : Node) : IO Document := do
-  let r ← self.val.callMethod "transformToDocument" (Support.args #[toJS source]) Value
+@[macro_inline] def XSLTProcessor.transformToDocument (self : XSLTProcessor) (source : Node) : IO Document := Internal.api "Lasm.JS.Web.XSLTProcessor.transformToDocument" do
+  let r ← self.val.callMethod "transformToDocument" (Internal.args #[toJS source]) Value
   pure { val := r }
 
 /-- `undefined setParameter(DOMString namespaceURI, DOMString localName, any value)` -/
-def XSLTProcessor.setParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) (value : Data) : IO Unit :=
-  self.val.callMethod "setParameter" (Support.args #[toJS namespaceURI, toJS localName, toJS value]) Unit
+@[macro_inline] def XSLTProcessor.setParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.setParameter" do
+  self.val.callMethod "setParameter" (Internal.args #[toJS namespaceURI, toJS localName, toJS value]) Unit
 
 /-- `any getParameter(DOMString namespaceURI, DOMString localName)` -/
-def XSLTProcessor.getParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) : IO Data :=
-  self.val.callMethod "getParameter" (Support.args #[toJS namespaceURI, toJS localName]) Data
+@[macro_inline] def XSLTProcessor.getParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) : IO Data := Internal.api "Lasm.JS.Web.XSLTProcessor.getParameter" do
+  self.val.callMethod "getParameter" (Internal.args #[toJS namespaceURI, toJS localName]) Data
 
 /-- `undefined removeParameter(DOMString namespaceURI, DOMString localName)` -/
-def XSLTProcessor.removeParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) : IO Unit :=
-  self.val.callMethod "removeParameter" (Support.args #[toJS namespaceURI, toJS localName]) Unit
+@[macro_inline] def XSLTProcessor.removeParameter (self : XSLTProcessor) (namespaceURI : String) (localName : String) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.removeParameter" do
+  self.val.callMethod "removeParameter" (Internal.args #[toJS namespaceURI, toJS localName]) Unit
 
 /-- `undefined clearParameters()` -/
-def XSLTProcessor.clearParameters (self : XSLTProcessor) : IO Unit :=
-  self.val.callMethod "clearParameters" (Support.args #[]) Unit
+@[macro_inline] def XSLTProcessor.clearParameters (self : XSLTProcessor) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.clearParameters" do
+  self.val.callMethod "clearParameters" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def XSLTProcessor.reset (self : XSLTProcessor) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def XSLTProcessor.reset (self : XSLTProcessor) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `v instanceof AbortSignal`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbortSignal`). -/
-def AbortSignal.cast? (v : Value) : IO (Option AbortSignal) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortSignal"] Value) v) then some { val := v } else none
+@[macro_inline] def AbortSignal.cast? (v : Value) : IO (Option AbortSignal) := Internal.api "Lasm.JS.Web.AbortSignal.cast?" do
+  Internal.cast (Internal.getGlobal ["AbortSignal"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean aborted` -/
-def AbortSignal.aborted (self : AbortSignal) : IO Bool := self.val.get "aborted" Bool
+@[macro_inline] def AbortSignal.aborted (self : AbortSignal) : IO Bool := Internal.api "Lasm.JS.Web.AbortSignal.aborted" do
+  self.val.get "aborted" Bool
 
 /-- `readonly attribute any reason` -/
-def AbortSignal.reason (self : AbortSignal) : IO Data := self.val.get "reason" Data
+@[macro_inline] def AbortSignal.reason (self : AbortSignal) : IO Data := Internal.api "Lasm.JS.Web.AbortSignal.reason" do
+  self.val.get "reason" Data
 
 /-- `attribute EventHandler onabort` -/
-def AbortSignal.onabort (self : AbortSignal) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def AbortSignal.onabort (self : AbortSignal) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AbortSignal.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def AbortSignal.setOnabort (self : AbortSignal) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def AbortSignal.setOnabort (self : AbortSignal) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AbortSignal.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `static AbortSignal abort(optional any reason)` -/
-def AbortSignal.abort (reason : Data := .undefined) : IO AbortSignal := do
+@[macro_inline] def AbortSignal.abort (reason : Data := .undefined) : IO AbortSignal := Internal.api "Lasm.JS.Web.AbortSignal.abort" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.abort", module := "globalThis", path := "AbortSignal.abort", construct := false, arity := 1 }
-    (Support.args #[reason]) (await := false)
+    (Internal.args #[reason]) (await := false)
   pure { val := r }
 
 /-- `static AbortSignal timeout(unsigned long long milliseconds)` -/
-def AbortSignal.timeout (milliseconds : Nat) : IO AbortSignal := do
+@[macro_inline] def AbortSignal.timeout (milliseconds : Nat) : IO AbortSignal := Internal.api "Lasm.JS.Web.AbortSignal.timeout" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.timeout", module := "globalThis", path := "AbortSignal.timeout", construct := false, arity := 1 }
-    (Support.args #[toJS milliseconds]) (await := false)
+    (Internal.args #[toJS milliseconds]) (await := false)
   pure { val := r }
 
 /-- `static AbortSignal any(sequence<AbortSignal> signals)` -/
-def AbortSignal.any (signals : Array AbortSignal) : IO AbortSignal := do
+@[macro_inline] def AbortSignal.any (signals : Array AbortSignal) : IO AbortSignal := Internal.api "Lasm.JS.Web.AbortSignal.any" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.any", module := "globalThis", path := "AbortSignal.any", construct := false, arity := 1 }
-    (Support.args #[toJS signals]) (await := false)
+    (Internal.args #[toJS signals]) (await := false)
   pure { val := r }
 
 /-- `undefined throwIfAborted()` -/
-def AbortSignal.throwIfAborted (self : AbortSignal) : IO Unit :=
-  self.val.callMethod "throwIfAborted" (Support.args #[]) Unit
+@[macro_inline] def AbortSignal.throwIfAborted (self : AbortSignal) : IO Unit := Internal.api "Lasm.JS.Web.AbortSignal.throwIfAborted" do
+  self.val.callMethod "throwIfAborted" (Internal.args #[]) Unit
 
 /-- `v instanceof CustomEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CustomEvent`). -/
-def CustomEvent.cast? (v : Value) : IO (Option CustomEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CustomEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CustomEvent.cast? (v : Value) : IO (Option CustomEvent) := Internal.api "Lasm.JS.Web.CustomEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CustomEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CustomEventInit eventInitDict)` -/
-def CustomEvent.new (type : String) (eventInitDict : Option CustomEventInit := none) : IO CustomEvent :=
+@[macro_inline] def CustomEvent.new (type : String) (eventInitDict : Option CustomEventInit := none) : IO CustomEvent := Internal.api "Lasm.JS.Web.CustomEvent.new" do
   Lasm.JS.Binding.invoke CustomEvent { name := "Lasm.JS.Web.CustomEvent.new", module := "globalThis", path := "CustomEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute any detail` -/
-def CustomEvent.detail (self : CustomEvent) : IO Data := self.val.get "detail" Data
+@[macro_inline] def CustomEvent.detail (self : CustomEvent) : IO Data := Internal.api "Lasm.JS.Web.CustomEvent.detail" do
+  self.val.get "detail" Data
 
 /-- `undefined initCustomEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional any detail)` -/
-def CustomEvent.initCustomEvent (self : CustomEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (detail : Data := .undefined) : IO Unit :=
-  self.val.callMethod "initCustomEvent" (Support.args #[toJS type, Support.optional bubbles, Support.optional cancelable, detail]) Unit
+@[macro_inline] def CustomEvent.initCustomEvent (self : CustomEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (detail : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.CustomEvent.initCustomEvent" do
+  self.val.callMethod "initCustomEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, detail]) Unit
 
 /-- `v instanceof Node`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Node`). -/
-def Node.cast? (v : Value) : IO (Option Node) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Node"] Value) v) then some { val := v } else none
+@[macro_inline] def Node.cast? (v : Value) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.cast?" do
+  Internal.cast (Internal.getGlobal ["Node"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short ELEMENT_NODE = 1` -/
 def Node.ELEMENT_NODE : Nat := 1
@@ -1001,131 +1016,144 @@ def Node.DOCUMENT_POSITION_CONTAINED_BY : Nat := 0x10
 def Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : Nat := 0x20
 
 /-- `readonly attribute unsigned short nodeType` -/
-def Node.nodeType (self : Node) : IO Nat := self.val.get "nodeType" Nat
+@[macro_inline] def Node.nodeType (self : Node) : IO Nat := Internal.api "Lasm.JS.Web.Node.nodeType" do
+  self.val.get "nodeType" Nat
 
 /-- `readonly attribute DOMString nodeName` -/
-def Node.nodeName (self : Node) : IO String := self.val.get "nodeName" String
+@[macro_inline] def Node.nodeName (self : Node) : IO String := Internal.api "Lasm.JS.Web.Node.nodeName" do
+  self.val.get "nodeName" String
 
 /-- `readonly attribute USVString baseURI` -/
-def Node.baseURI (self : Node) : IO String := self.val.get "baseURI" String
+@[macro_inline] def Node.baseURI (self : Node) : IO String := Internal.api "Lasm.JS.Web.Node.baseURI" do
+  self.val.get "baseURI" String
 
 /-- `readonly attribute boolean isConnected` -/
-def Node.isConnected (self : Node) : IO Bool := self.val.get "isConnected" Bool
+@[macro_inline] def Node.isConnected (self : Node) : IO Bool := Internal.api "Lasm.JS.Web.Node.isConnected" do
+  self.val.get "isConnected" Bool
 
 /-- `readonly attribute Document? ownerDocument` -/
-def Node.ownerDocument (self : Node) : IO (Option Document) := self.val.get "ownerDocument" (Option Document)
+@[macro_inline] def Node.ownerDocument (self : Node) : IO (Option Document) := Internal.api "Lasm.JS.Web.Node.ownerDocument" do
+  self.val.get "ownerDocument" (Option Document)
 
 /-- `readonly attribute Node? parentNode` -/
-def Node.parentNode (self : Node) : IO (Option Node) := self.val.get "parentNode" (Option Node)
+@[macro_inline] def Node.parentNode (self : Node) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.parentNode" do
+  self.val.get "parentNode" (Option Node)
 
 /-- `readonly attribute Element? parentElement` -/
-def Node.parentElement (self : Node) : IO (Option Element) := self.val.get "parentElement" (Option Element)
+@[macro_inline] def Node.parentElement (self : Node) : IO (Option Element) := Internal.api "Lasm.JS.Web.Node.parentElement" do
+  self.val.get "parentElement" (Option Element)
 
 /-- `readonly attribute NodeList childNodes` -/
-def Node.childNodes (self : Node) : IO NodeList := do
+@[macro_inline] def Node.childNodes (self : Node) : IO NodeList := Internal.api "Lasm.JS.Web.Node.childNodes" do
   let r ← self.val.get "childNodes" Value
   pure { val := r }
 
 /-- `readonly attribute Node? firstChild` -/
-def Node.firstChild (self : Node) : IO (Option Node) := self.val.get "firstChild" (Option Node)
+@[macro_inline] def Node.firstChild (self : Node) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.firstChild" do
+  self.val.get "firstChild" (Option Node)
 
 /-- `readonly attribute Node? lastChild` -/
-def Node.lastChild (self : Node) : IO (Option Node) := self.val.get "lastChild" (Option Node)
+@[macro_inline] def Node.lastChild (self : Node) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.lastChild" do
+  self.val.get "lastChild" (Option Node)
 
 /-- `readonly attribute Node? previousSibling` -/
-def Node.previousSibling (self : Node) : IO (Option Node) := self.val.get "previousSibling" (Option Node)
+@[macro_inline] def Node.previousSibling (self : Node) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.previousSibling" do
+  self.val.get "previousSibling" (Option Node)
 
 /-- `readonly attribute Node? nextSibling` -/
-def Node.nextSibling (self : Node) : IO (Option Node) := self.val.get "nextSibling" (Option Node)
+@[macro_inline] def Node.nextSibling (self : Node) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.nextSibling" do
+  self.val.get "nextSibling" (Option Node)
 
 /-- `attribute DOMString? nodeValue` -/
-def Node.nodeValue (self : Node) : IO (Option String) := self.val.get "nodeValue" (Option String)
+@[macro_inline] def Node.nodeValue (self : Node) : IO (Option String) := Internal.api "Lasm.JS.Web.Node.nodeValue" do
+  self.val.get "nodeValue" (Option String)
 
 /-- Sets `nodeValue`: `attribute DOMString? nodeValue` -/
-def Node.setNodeValue (self : Node) (value : Option String) : IO Unit :=
+@[macro_inline] def Node.setNodeValue (self : Node) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Node.setNodeValue" do
   self.val.set "nodeValue" (toJS value)
 
 /-- `attribute DOMString? textContent` -/
-def Node.textContent (self : Node) : IO (Option String) := self.val.get "textContent" (Option String)
+@[macro_inline] def Node.textContent (self : Node) : IO (Option String) := Internal.api "Lasm.JS.Web.Node.textContent" do
+  self.val.get "textContent" (Option String)
 
 /-- Sets `textContent`: `attribute DOMString? textContent` -/
-def Node.setTextContent (self : Node) (value : Option String) : IO Unit :=
+@[macro_inline] def Node.setTextContent (self : Node) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Node.setTextContent" do
   self.val.set "textContent" (toJS value)
 
 /-- `Node getRootNode(optional GetRootNodeOptions options)` -/
-def Node.getRootNode (self : Node) (options : Option GetRootNodeOptions := none) : IO Node := do
-  let r ← self.val.callMethod "getRootNode" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Node.getRootNode (self : Node) (options : Option GetRootNodeOptions := none) : IO Node := Internal.api "Lasm.JS.Web.Node.getRootNode" do
+  let r ← self.val.callMethod "getRootNode" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `boolean hasChildNodes()` -/
-def Node.hasChildNodes (self : Node) : IO Bool :=
-  self.val.callMethod "hasChildNodes" (Support.args #[]) Bool
+@[macro_inline] def Node.hasChildNodes (self : Node) : IO Bool := Internal.api "Lasm.JS.Web.Node.hasChildNodes" do
+  self.val.callMethod "hasChildNodes" (Internal.args #[]) Bool
 
 /-- `undefined normalize()` -/
-def Node.normalize (self : Node) : IO Unit :=
-  self.val.callMethod "normalize" (Support.args #[]) Unit
+@[macro_inline] def Node.normalize (self : Node) : IO Unit := Internal.api "Lasm.JS.Web.Node.normalize" do
+  self.val.callMethod "normalize" (Internal.args #[]) Unit
 
 /-- `Node cloneNode(optional boolean subtree)` -/
-def Node.cloneNode (self : Node) (subtree : Option Bool := none) : IO Node := do
-  let r ← self.val.callMethod "cloneNode" (Support.args #[Support.optional subtree]) Value
+@[macro_inline] def Node.cloneNode (self : Node) (subtree : Option Bool := none) : IO Node := Internal.api "Lasm.JS.Web.Node.cloneNode" do
+  let r ← self.val.callMethod "cloneNode" (Internal.args #[Internal.optional subtree]) Value
   pure { val := r }
 
 /-- `boolean isEqualNode(Node? otherNode)` -/
-def Node.isEqualNode (self : Node) (otherNode : Option Node) : IO Bool :=
-  self.val.callMethod "isEqualNode" (Support.args #[toJS otherNode]) Bool
+@[macro_inline] def Node.isEqualNode (self : Node) (otherNode : Option Node) : IO Bool := Internal.api "Lasm.JS.Web.Node.isEqualNode" do
+  self.val.callMethod "isEqualNode" (Internal.args #[toJS otherNode]) Bool
 
 /-- `boolean isSameNode(Node? otherNode)` -/
-def Node.isSameNode (self : Node) (otherNode : Option Node) : IO Bool :=
-  self.val.callMethod "isSameNode" (Support.args #[toJS otherNode]) Bool
+@[macro_inline] def Node.isSameNode (self : Node) (otherNode : Option Node) : IO Bool := Internal.api "Lasm.JS.Web.Node.isSameNode" do
+  self.val.callMethod "isSameNode" (Internal.args #[toJS otherNode]) Bool
 
 /-- `unsigned short compareDocumentPosition(Node other)` -/
-def Node.compareDocumentPosition (self : Node) (other : Node) : IO Nat :=
-  self.val.callMethod "compareDocumentPosition" (Support.args #[toJS other]) Nat
+@[macro_inline] def Node.compareDocumentPosition (self : Node) (other : Node) : IO Nat := Internal.api "Lasm.JS.Web.Node.compareDocumentPosition" do
+  self.val.callMethod "compareDocumentPosition" (Internal.args #[toJS other]) Nat
 
 /-- `boolean contains(Node? other)` -/
-def Node.contains (self : Node) (other : Option Node) : IO Bool :=
-  self.val.callMethod "contains" (Support.args #[toJS other]) Bool
+@[macro_inline] def Node.contains (self : Node) (other : Option Node) : IO Bool := Internal.api "Lasm.JS.Web.Node.contains" do
+  self.val.callMethod "contains" (Internal.args #[toJS other]) Bool
 
 /-- `DOMString? lookupPrefix(DOMString? namespace)` -/
-def Node.lookupPrefix (self : Node) («namespace» : Option String) : IO (Option String) :=
-  self.val.callMethod "lookupPrefix" (Support.args #[toJS «namespace»]) (Option String)
+@[macro_inline] def Node.lookupPrefix (self : Node) («namespace» : Option String) : IO (Option String) := Internal.api "Lasm.JS.Web.Node.lookupPrefix" do
+  self.val.callMethod "lookupPrefix" (Internal.args #[toJS «namespace»]) (Option String)
 
 /-- `DOMString? lookupNamespaceURI(DOMString? prefix)` -/
-def Node.lookupNamespaceURI (self : Node) («prefix» : Option String) : IO (Option String) :=
-  self.val.callMethod "lookupNamespaceURI" (Support.args #[toJS «prefix»]) (Option String)
+@[macro_inline] def Node.lookupNamespaceURI (self : Node) («prefix» : Option String) : IO (Option String) := Internal.api "Lasm.JS.Web.Node.lookupNamespaceURI" do
+  self.val.callMethod "lookupNamespaceURI" (Internal.args #[toJS «prefix»]) (Option String)
 
 /-- `boolean isDefaultNamespace(DOMString? namespace)` -/
-def Node.isDefaultNamespace (self : Node) («namespace» : Option String) : IO Bool :=
-  self.val.callMethod "isDefaultNamespace" (Support.args #[toJS «namespace»]) Bool
+@[macro_inline] def Node.isDefaultNamespace (self : Node) («namespace» : Option String) : IO Bool := Internal.api "Lasm.JS.Web.Node.isDefaultNamespace" do
+  self.val.callMethod "isDefaultNamespace" (Internal.args #[toJS «namespace»]) Bool
 
 /-- `Node insertBefore(Node node, Node? child)` -/
-def Node.insertBefore (self : Node) (node : Node) (child : Option Node) : IO Node := do
-  let r ← self.val.callMethod "insertBefore" (Support.args #[toJS node, toJS child]) Value
+@[macro_inline] def Node.insertBefore (self : Node) (node : Node) (child : Option Node) : IO Node := Internal.api "Lasm.JS.Web.Node.insertBefore" do
+  let r ← self.val.callMethod "insertBefore" (Internal.args #[toJS node, toJS child]) Value
   pure { val := r }
 
 /-- `Node appendChild(Node node)` -/
-def Node.appendChild (self : Node) (node : Node) : IO Node := do
-  let r ← self.val.callMethod "appendChild" (Support.args #[toJS node]) Value
+@[macro_inline] def Node.appendChild (self : Node) (node : Node) : IO Node := Internal.api "Lasm.JS.Web.Node.appendChild" do
+  let r ← self.val.callMethod "appendChild" (Internal.args #[toJS node]) Value
   pure { val := r }
 
 /-- `Node replaceChild(Node node, Node child)` -/
-def Node.replaceChild (self : Node) (node : Node) (child : Node) : IO Node := do
-  let r ← self.val.callMethod "replaceChild" (Support.args #[toJS node, toJS child]) Value
+@[macro_inline] def Node.replaceChild (self : Node) (node : Node) (child : Node) : IO Node := Internal.api "Lasm.JS.Web.Node.replaceChild" do
+  let r ← self.val.callMethod "replaceChild" (Internal.args #[toJS node, toJS child]) Value
   pure { val := r }
 
 /-- `Node removeChild(Node child)` -/
-def Node.removeChild (self : Node) (child : Node) : IO Node := do
-  let r ← self.val.callMethod "removeChild" (Support.args #[toJS child]) Value
+@[macro_inline] def Node.removeChild (self : Node) (child : Node) : IO Node := Internal.api "Lasm.JS.Web.Node.removeChild" do
+  let r ← self.val.callMethod "removeChild" (Internal.args #[toJS child]) Value
   pure { val := r }
 
 /-- `v instanceof Range`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Range`). -/
-def Range.cast? (v : Value) : IO (Option Range) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Range"] Value) v) then some { val := v } else none
+@[macro_inline] def Range.cast? (v : Value) : IO (Option Range) := Internal.api "Lasm.JS.Web.Range.cast?" do
+  Internal.cast (Internal.getGlobal ["Range"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def Range.new : IO Range :=
+@[macro_inline] def Range.new : IO Range := Internal.api "Lasm.JS.Web.Range.new" do
   Lasm.JS.Binding.invoke Range { name := "Lasm.JS.Web.Range.new", module := "globalThis", path := "Range", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `const unsigned short START_TO_START = 0` -/
 def Range.START_TO_START : Nat := 0
@@ -1140,797 +1168,858 @@ def Range.END_TO_END : Nat := 2
 def Range.END_TO_START : Nat := 3
 
 /-- `readonly attribute Node commonAncestorContainer` -/
-def Range.commonAncestorContainer (self : Range) : IO Node := do
+@[macro_inline] def Range.commonAncestorContainer (self : Range) : IO Node := Internal.api "Lasm.JS.Web.Range.commonAncestorContainer" do
   let r ← self.val.get "commonAncestorContainer" Value
   pure { val := r }
 
 /-- The stringifier. -/
-def Range.toString (self : Range) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def Range.toString (self : Range) : IO String := Internal.api "Lasm.JS.Web.Range.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `undefined setStart(Node node, unsigned long offset)` -/
-def Range.setStart (self : Range) (node : Node) (offset : Nat) : IO Unit :=
-  self.val.callMethod "setStart" (Support.args #[toJS node, toJS offset]) Unit
+@[macro_inline] def Range.setStart (self : Range) (node : Node) (offset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Range.setStart" do
+  self.val.callMethod "setStart" (Internal.args #[toJS node, toJS offset]) Unit
 
 /-- `undefined setEnd(Node node, unsigned long offset)` -/
-def Range.setEnd (self : Range) (node : Node) (offset : Nat) : IO Unit :=
-  self.val.callMethod "setEnd" (Support.args #[toJS node, toJS offset]) Unit
+@[macro_inline] def Range.setEnd (self : Range) (node : Node) (offset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Range.setEnd" do
+  self.val.callMethod "setEnd" (Internal.args #[toJS node, toJS offset]) Unit
 
 /-- `undefined setStartBefore(Node node)` -/
-def Range.setStartBefore (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "setStartBefore" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.setStartBefore (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.setStartBefore" do
+  self.val.callMethod "setStartBefore" (Internal.args #[toJS node]) Unit
 
 /-- `undefined setStartAfter(Node node)` -/
-def Range.setStartAfter (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "setStartAfter" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.setStartAfter (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.setStartAfter" do
+  self.val.callMethod "setStartAfter" (Internal.args #[toJS node]) Unit
 
 /-- `undefined setEndBefore(Node node)` -/
-def Range.setEndBefore (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "setEndBefore" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.setEndBefore (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.setEndBefore" do
+  self.val.callMethod "setEndBefore" (Internal.args #[toJS node]) Unit
 
 /-- `undefined setEndAfter(Node node)` -/
-def Range.setEndAfter (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "setEndAfter" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.setEndAfter (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.setEndAfter" do
+  self.val.callMethod "setEndAfter" (Internal.args #[toJS node]) Unit
 
 /-- `undefined collapse(optional boolean toStart)` -/
-def Range.collapse (self : Range) (toStart : Option Bool := none) : IO Unit :=
-  self.val.callMethod "collapse" (Support.args #[Support.optional toStart]) Unit
+@[macro_inline] def Range.collapse (self : Range) (toStart : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.Range.collapse" do
+  self.val.callMethod "collapse" (Internal.args #[Internal.optional toStart]) Unit
 
 /-- `undefined selectNode(Node node)` -/
-def Range.selectNode (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "selectNode" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.selectNode (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.selectNode" do
+  self.val.callMethod "selectNode" (Internal.args #[toJS node]) Unit
 
 /-- `undefined selectNodeContents(Node node)` -/
-def Range.selectNodeContents (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "selectNodeContents" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.selectNodeContents (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.selectNodeContents" do
+  self.val.callMethod "selectNodeContents" (Internal.args #[toJS node]) Unit
 
 /-- `short compareBoundaryPoints(unsigned short how, Range sourceRange)` -/
-def Range.compareBoundaryPoints (self : Range) (how : Nat) (sourceRange : Range) : IO Int :=
-  self.val.callMethod "compareBoundaryPoints" (Support.args #[toJS how, toJS sourceRange]) Int
+@[macro_inline] def Range.compareBoundaryPoints (self : Range) (how : Nat) (sourceRange : Range) : IO Int := Internal.api "Lasm.JS.Web.Range.compareBoundaryPoints" do
+  self.val.callMethod "compareBoundaryPoints" (Internal.args #[toJS how, toJS sourceRange]) Int
 
 /-- `undefined deleteContents()` -/
-def Range.deleteContents (self : Range) : IO Unit :=
-  self.val.callMethod "deleteContents" (Support.args #[]) Unit
+@[macro_inline] def Range.deleteContents (self : Range) : IO Unit := Internal.api "Lasm.JS.Web.Range.deleteContents" do
+  self.val.callMethod "deleteContents" (Internal.args #[]) Unit
 
 /-- `DocumentFragment extractContents()` -/
-def Range.extractContents (self : Range) : IO DocumentFragment := do
-  let r ← self.val.callMethod "extractContents" (Support.args #[]) Value
+@[macro_inline] def Range.extractContents (self : Range) : IO DocumentFragment := Internal.api "Lasm.JS.Web.Range.extractContents" do
+  let r ← self.val.callMethod "extractContents" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DocumentFragment cloneContents()` -/
-def Range.cloneContents (self : Range) : IO DocumentFragment := do
-  let r ← self.val.callMethod "cloneContents" (Support.args #[]) Value
+@[macro_inline] def Range.cloneContents (self : Range) : IO DocumentFragment := Internal.api "Lasm.JS.Web.Range.cloneContents" do
+  let r ← self.val.callMethod "cloneContents" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined insertNode(Node node)` -/
-def Range.insertNode (self : Range) (node : Node) : IO Unit :=
-  self.val.callMethod "insertNode" (Support.args #[toJS node]) Unit
+@[macro_inline] def Range.insertNode (self : Range) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.insertNode" do
+  self.val.callMethod "insertNode" (Internal.args #[toJS node]) Unit
 
 /-- `undefined surroundContents(Node newParent)` -/
-def Range.surroundContents (self : Range) (newParent : Node) : IO Unit :=
-  self.val.callMethod "surroundContents" (Support.args #[toJS newParent]) Unit
+@[macro_inline] def Range.surroundContents (self : Range) (newParent : Node) : IO Unit := Internal.api "Lasm.JS.Web.Range.surroundContents" do
+  self.val.callMethod "surroundContents" (Internal.args #[toJS newParent]) Unit
 
 /-- `Range cloneRange()` -/
-def Range.cloneRange (self : Range) : IO Range := do
-  let r ← self.val.callMethod "cloneRange" (Support.args #[]) Value
+@[macro_inline] def Range.cloneRange (self : Range) : IO Range := Internal.api "Lasm.JS.Web.Range.cloneRange" do
+  let r ← self.val.callMethod "cloneRange" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined detach()` -/
-def Range.detach (self : Range) : IO Unit :=
-  self.val.callMethod "detach" (Support.args #[]) Unit
+@[macro_inline] def Range.detach (self : Range) : IO Unit := Internal.api "Lasm.JS.Web.Range.detach" do
+  self.val.callMethod "detach" (Internal.args #[]) Unit
 
 /-- `boolean isPointInRange(Node node, unsigned long offset)` -/
-def Range.isPointInRange (self : Range) (node : Node) (offset : Nat) : IO Bool :=
-  self.val.callMethod "isPointInRange" (Support.args #[toJS node, toJS offset]) Bool
+@[macro_inline] def Range.isPointInRange (self : Range) (node : Node) (offset : Nat) : IO Bool := Internal.api "Lasm.JS.Web.Range.isPointInRange" do
+  self.val.callMethod "isPointInRange" (Internal.args #[toJS node, toJS offset]) Bool
 
 /-- `short comparePoint(Node node, unsigned long offset)` -/
-def Range.comparePoint (self : Range) (node : Node) (offset : Nat) : IO Int :=
-  self.val.callMethod "comparePoint" (Support.args #[toJS node, toJS offset]) Int
+@[macro_inline] def Range.comparePoint (self : Range) (node : Node) (offset : Nat) : IO Int := Internal.api "Lasm.JS.Web.Range.comparePoint" do
+  self.val.callMethod "comparePoint" (Internal.args #[toJS node, toJS offset]) Int
 
 /-- `boolean intersectsNode(Node node)` -/
-def Range.intersectsNode (self : Range) (node : Node) : IO Bool :=
-  self.val.callMethod "intersectsNode" (Support.args #[toJS node]) Bool
+@[macro_inline] def Range.intersectsNode (self : Range) (node : Node) : IO Bool := Internal.api "Lasm.JS.Web.Range.intersectsNode" do
+  self.val.callMethod "intersectsNode" (Internal.args #[toJS node]) Bool
 
 /-- `v instanceof StaticRange`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StaticRange`). -/
-def StaticRange.cast? (v : Value) : IO (Option StaticRange) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StaticRange"] Value) v) then some { val := v } else none
+@[macro_inline] def StaticRange.cast? (v : Value) : IO (Option StaticRange) := Internal.api "Lasm.JS.Web.StaticRange.cast?" do
+  Internal.cast (Internal.getGlobal ["StaticRange"] Value) (fun x => { val := x }) v
 
 /-- `constructor(StaticRangeInit init)` -/
-def StaticRange.new (init : StaticRangeInit) : IO StaticRange :=
+@[macro_inline] def StaticRange.new (init : StaticRangeInit) : IO StaticRange := Internal.api "Lasm.JS.Web.StaticRange.new" do
   Lasm.JS.Binding.invoke StaticRange { name := "Lasm.JS.Web.StaticRange.new", module := "globalThis", path := "StaticRange", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `v instanceof Attr`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Attr`). -/
-def Attr.cast? (v : Value) : IO (Option Attr) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Attr"] Value) v) then some { val := v } else none
+@[macro_inline] def Attr.cast? (v : Value) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Attr.cast?" do
+  Internal.cast (Internal.getGlobal ["Attr"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString? namespaceURI` -/
-def Attr.namespaceURI (self : Attr) : IO (Option String) := self.val.get "namespaceURI" (Option String)
+@[macro_inline] def Attr.namespaceURI (self : Attr) : IO (Option String) := Internal.api "Lasm.JS.Web.Attr.namespaceURI" do
+  self.val.get "namespaceURI" (Option String)
 
 /-- `readonly attribute DOMString? prefix` -/
-def Attr.«prefix» (self : Attr) : IO (Option String) := self.val.get "prefix" (Option String)
+@[macro_inline] def Attr.«prefix» (self : Attr) : IO (Option String) := Internal.api "Lasm.JS.Web.Attr.prefix" do
+  self.val.get "prefix" (Option String)
 
 /-- `readonly attribute DOMString localName` -/
-def Attr.localName (self : Attr) : IO String := self.val.get "localName" String
+@[macro_inline] def Attr.localName (self : Attr) : IO String := Internal.api "Lasm.JS.Web.Attr.localName" do
+  self.val.get "localName" String
 
 /-- `readonly attribute DOMString name` -/
-def Attr.name (self : Attr) : IO String := self.val.get "name" String
+@[macro_inline] def Attr.name (self : Attr) : IO String := Internal.api "Lasm.JS.Web.Attr.name" do
+  self.val.get "name" String
 
 /-- `attribute DOMString value` -/
-def Attr.value (self : Attr) : IO String := self.val.get "value" String
+@[macro_inline] def Attr.value (self : Attr) : IO String := Internal.api "Lasm.JS.Web.Attr.value" do
+  self.val.get "value" String
 
 /-- Sets `value`: `attribute DOMString value` -/
-def Attr.setValue (self : Attr) (value : String) : IO Unit :=
+@[macro_inline] def Attr.setValue (self : Attr) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Attr.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `readonly attribute Element? ownerElement` -/
-def Attr.ownerElement (self : Attr) : IO (Option Element) := self.val.get "ownerElement" (Option Element)
+@[macro_inline] def Attr.ownerElement (self : Attr) : IO (Option Element) := Internal.api "Lasm.JS.Web.Attr.ownerElement" do
+  self.val.get "ownerElement" (Option Element)
 
 /-- `readonly attribute boolean specified` -/
-def Attr.specified (self : Attr) : IO Bool := self.val.get "specified" Bool
+@[macro_inline] def Attr.specified (self : Attr) : IO Bool := Internal.api "Lasm.JS.Web.Attr.specified" do
+  self.val.get "specified" Bool
 
 /-- `v instanceof CharacterData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CharacterData`). -/
-def CharacterData.cast? (v : Value) : IO (Option CharacterData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CharacterData"] Value) v) then some { val := v } else none
+@[macro_inline] def CharacterData.cast? (v : Value) : IO (Option CharacterData) := Internal.api "Lasm.JS.Web.CharacterData.cast?" do
+  Internal.cast (Internal.getGlobal ["CharacterData"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString data` -/
-def CharacterData.data (self : CharacterData) : IO String := self.val.get "data" String
+@[macro_inline] def CharacterData.data (self : CharacterData) : IO String := Internal.api "Lasm.JS.Web.CharacterData.data" do
+  self.val.get "data" String
 
 /-- Sets `data`: `attribute DOMString data` -/
-def CharacterData.setData (self : CharacterData) (value : String) : IO Unit :=
+@[macro_inline] def CharacterData.setData (self : CharacterData) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.setData" do
   self.val.set "data" (toJS value)
 
 /-- `readonly attribute unsigned long length` -/
-def CharacterData.length (self : CharacterData) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def CharacterData.length (self : CharacterData) : IO Nat := Internal.api "Lasm.JS.Web.CharacterData.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute Element? previousElementSibling` -/
-def CharacterData.previousElementSibling (self : CharacterData) : IO (Option Element) := self.val.get "previousElementSibling" (Option Element)
+@[macro_inline] def CharacterData.previousElementSibling (self : CharacterData) : IO (Option Element) := Internal.api "Lasm.JS.Web.CharacterData.previousElementSibling" do
+  self.val.get "previousElementSibling" (Option Element)
 
 /-- `readonly attribute Element? nextElementSibling` -/
-def CharacterData.nextElementSibling (self : CharacterData) : IO (Option Element) := self.val.get "nextElementSibling" (Option Element)
+@[macro_inline] def CharacterData.nextElementSibling (self : CharacterData) : IO (Option Element) := Internal.api "Lasm.JS.Web.CharacterData.nextElementSibling" do
+  self.val.get "nextElementSibling" (Option Element)
 
 /-- `DOMString substringData(unsigned long offset, unsigned long count)` -/
-def CharacterData.substringData (self : CharacterData) (offset : Nat) (count : Nat) : IO String :=
-  self.val.callMethod "substringData" (Support.args #[toJS offset, toJS count]) String
+@[macro_inline] def CharacterData.substringData (self : CharacterData) (offset : Nat) (count : Nat) : IO String := Internal.api "Lasm.JS.Web.CharacterData.substringData" do
+  self.val.callMethod "substringData" (Internal.args #[toJS offset, toJS count]) String
 
 /-- `undefined appendData(DOMString data)` -/
-def CharacterData.appendData (self : CharacterData) (data : String) : IO Unit :=
-  self.val.callMethod "appendData" (Support.args #[toJS data]) Unit
+@[macro_inline] def CharacterData.appendData (self : CharacterData) (data : String) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.appendData" do
+  self.val.callMethod "appendData" (Internal.args #[toJS data]) Unit
 
 /-- `undefined insertData(unsigned long offset, DOMString data)` -/
-def CharacterData.insertData (self : CharacterData) (offset : Nat) (data : String) : IO Unit :=
-  self.val.callMethod "insertData" (Support.args #[toJS offset, toJS data]) Unit
+@[macro_inline] def CharacterData.insertData (self : CharacterData) (offset : Nat) (data : String) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.insertData" do
+  self.val.callMethod "insertData" (Internal.args #[toJS offset, toJS data]) Unit
 
 /-- `undefined deleteData(unsigned long offset, unsigned long count)` -/
-def CharacterData.deleteData (self : CharacterData) (offset : Nat) (count : Nat) : IO Unit :=
-  self.val.callMethod "deleteData" (Support.args #[toJS offset, toJS count]) Unit
+@[macro_inline] def CharacterData.deleteData (self : CharacterData) (offset : Nat) (count : Nat) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.deleteData" do
+  self.val.callMethod "deleteData" (Internal.args #[toJS offset, toJS count]) Unit
 
 /-- `undefined replaceData(unsigned long offset, unsigned long count, DOMString data)` -/
-def CharacterData.replaceData (self : CharacterData) (offset : Nat) (count : Nat) (data : String) : IO Unit :=
-  self.val.callMethod "replaceData" (Support.args #[toJS offset, toJS count, toJS data]) Unit
+@[macro_inline] def CharacterData.replaceData (self : CharacterData) (offset : Nat) (count : Nat) (data : String) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.replaceData" do
+  self.val.callMethod "replaceData" (Internal.args #[toJS offset, toJS count, toJS data]) Unit
 
 /-- `undefined before((Node or DOMString)... nodes)` -/
-def CharacterData.before (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "before" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def CharacterData.before (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.before" do
+  self.val.callMethod "before" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined after((Node or DOMString)... nodes)` -/
-def CharacterData.after (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "after" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def CharacterData.after (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.after" do
+  self.val.callMethod "after" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceWith((Node or DOMString)... nodes)` -/
-def CharacterData.replaceWith (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceWith" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def CharacterData.replaceWith (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.replaceWith" do
+  self.val.callMethod "replaceWith" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined remove()` -/
-def CharacterData.remove (self : CharacterData) : IO Unit :=
-  self.val.callMethod "remove" (Support.args #[]) Unit
+@[macro_inline] def CharacterData.remove (self : CharacterData) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.remove" do
+  self.val.callMethod "remove" (Internal.args #[]) Unit
 
 /-- `v instanceof Document`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Document`). -/
-def Document.cast? (v : Value) : IO (Option Document) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Document"] Value) v) then some { val := v } else none
+@[macro_inline] def Document.cast? (v : Value) : IO (Option Document) := Internal.api "Lasm.JS.Web.Document.cast?" do
+  Internal.cast (Internal.getGlobal ["Document"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def Document.new : IO Document :=
+@[macro_inline] def Document.new : IO Document := Internal.api "Lasm.JS.Web.Document.new" do
   Lasm.JS.Binding.invoke Document { name := "Lasm.JS.Web.Document.new", module := "globalThis", path := "Document", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute DOMImplementation implementation` -/
-def Document.implementation (self : Document) : IO DOMImplementation := do
+@[macro_inline] def Document.implementation (self : Document) : IO DOMImplementation := Internal.api "Lasm.JS.Web.Document.implementation" do
   let r ← self.val.get "implementation" Value
   pure { val := r }
 
 /-- `readonly attribute USVString URL` -/
-def Document.URL (self : Document) : IO String := self.val.get "URL" String
+@[macro_inline] def Document.URL (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.URL" do
+  self.val.get "URL" String
 
 /-- `readonly attribute USVString documentURI` -/
-def Document.documentURI (self : Document) : IO String := self.val.get "documentURI" String
+@[macro_inline] def Document.documentURI (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.documentURI" do
+  self.val.get "documentURI" String
 
 /-- `readonly attribute DOMString compatMode` -/
-def Document.compatMode (self : Document) : IO String := self.val.get "compatMode" String
+@[macro_inline] def Document.compatMode (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.compatMode" do
+  self.val.get "compatMode" String
 
 /-- `readonly attribute DOMString characterSet` -/
-def Document.characterSet (self : Document) : IO String := self.val.get "characterSet" String
+@[macro_inline] def Document.characterSet (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.characterSet" do
+  self.val.get "characterSet" String
 
 /-- `readonly attribute DOMString charset` -/
-def Document.charset (self : Document) : IO String := self.val.get "charset" String
+@[macro_inline] def Document.charset (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.charset" do
+  self.val.get "charset" String
 
 /-- `readonly attribute DOMString inputEncoding` -/
-def Document.inputEncoding (self : Document) : IO String := self.val.get "inputEncoding" String
+@[macro_inline] def Document.inputEncoding (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.inputEncoding" do
+  self.val.get "inputEncoding" String
 
 /-- `readonly attribute DOMString contentType` -/
-def Document.contentType (self : Document) : IO String := self.val.get "contentType" String
+@[macro_inline] def Document.contentType (self : Document) : IO String := Internal.api "Lasm.JS.Web.Document.contentType" do
+  self.val.get "contentType" String
 
 /-- `readonly attribute DocumentType? doctype` -/
-def Document.doctype (self : Document) : IO (Option DocumentType) := self.val.get "doctype" (Option DocumentType)
+@[macro_inline] def Document.doctype (self : Document) : IO (Option DocumentType) := Internal.api "Lasm.JS.Web.Document.doctype" do
+  self.val.get "doctype" (Option DocumentType)
 
 /-- `readonly attribute Element? documentElement` -/
-def Document.documentElement (self : Document) : IO (Option Element) := self.val.get "documentElement" (Option Element)
+@[macro_inline] def Document.documentElement (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.documentElement" do
+  self.val.get "documentElement" (Option Element)
 
 /-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def Document.customElementRegistry (self : Document) : IO (Option CustomElementRegistry) := self.val.get "customElementRegistry" (Option CustomElementRegistry)
+@[macro_inline] def Document.customElementRegistry (self : Document) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.Document.customElementRegistry" do
+  self.val.get "customElementRegistry" (Option CustomElementRegistry)
 
 /-- `readonly attribute HTMLCollection children` -/
-def Document.children (self : Document) : IO HTMLCollection := do
+@[macro_inline] def Document.children (self : Document) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Document.children" do
   let r ← self.val.get "children" Value
   pure { val := r }
 
 /-- `readonly attribute Element? firstElementChild` -/
-def Document.firstElementChild (self : Document) : IO (Option Element) := self.val.get "firstElementChild" (Option Element)
+@[macro_inline] def Document.firstElementChild (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.firstElementChild" do
+  self.val.get "firstElementChild" (Option Element)
 
 /-- `readonly attribute Element? lastElementChild` -/
-def Document.lastElementChild (self : Document) : IO (Option Element) := self.val.get "lastElementChild" (Option Element)
+@[macro_inline] def Document.lastElementChild (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.lastElementChild" do
+  self.val.get "lastElementChild" (Option Element)
 
 /-- `readonly attribute unsigned long childElementCount` -/
-def Document.childElementCount (self : Document) : IO Nat := self.val.get "childElementCount" Nat
+@[macro_inline] def Document.childElementCount (self : Document) : IO Nat := Internal.api "Lasm.JS.Web.Document.childElementCount" do
+  self.val.get "childElementCount" Nat
 
 /-- `HTMLCollection getElementsByTagName(DOMString qualifiedName)` -/
-def Document.getElementsByTagName (self : Document) (qualifiedName : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByTagName" (Support.args #[toJS qualifiedName]) Value
+@[macro_inline] def Document.getElementsByTagName (self : Document) (qualifiedName : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Document.getElementsByTagName" do
+  let r ← self.val.callMethod "getElementsByTagName" (Internal.args #[toJS qualifiedName]) Value
   pure { val := r }
 
 /-- `HTMLCollection getElementsByTagNameNS(DOMString? namespace, DOMString localName)` -/
-def Document.getElementsByTagNameNS (self : Document) («namespace» : Option String) (localName : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByTagNameNS" (Support.args #[toJS «namespace», toJS localName]) Value
+@[macro_inline] def Document.getElementsByTagNameNS (self : Document) («namespace» : Option String) (localName : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Document.getElementsByTagNameNS" do
+  let r ← self.val.callMethod "getElementsByTagNameNS" (Internal.args #[toJS «namespace», toJS localName]) Value
   pure { val := r }
 
 /-- `HTMLCollection getElementsByClassName(DOMString classNames)` -/
-def Document.getElementsByClassName (self : Document) (classNames : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByClassName" (Support.args #[toJS classNames]) Value
+@[macro_inline] def Document.getElementsByClassName (self : Document) (classNames : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Document.getElementsByClassName" do
+  let r ← self.val.callMethod "getElementsByClassName" (Internal.args #[toJS classNames]) Value
   pure { val := r }
 
 /-- `Element createElement(DOMString localName, optional (DOMString or ElementCreationOptions) options)` -/
-def Document.createElement (self : Document) (localName : String) (options : Option DOMStringOrElementCreationOptions := none) : IO Element := do
-  let r ← self.val.callMethod "createElement" (Support.args #[toJS localName, Support.optional options]) Value
+@[macro_inline] def Document.createElement (self : Document) (localName : String) (options : Option DOMStringOrElementCreationOptions := none) : IO Element := Internal.api "Lasm.JS.Web.Document.createElement" do
+  let r ← self.val.callMethod "createElement" (Internal.args #[toJS localName, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Element createElementNS(DOMString? namespace, DOMString qualifiedName, optional (DOMString or ElementCreationOptions) options)` -/
-def Document.createElementNS (self : Document) («namespace» : Option String) (qualifiedName : String) (options : Option DOMStringOrElementCreationOptions := none) : IO Element := do
-  let r ← self.val.callMethod "createElementNS" (Support.args #[toJS «namespace», toJS qualifiedName, Support.optional options]) Value
+@[macro_inline] def Document.createElementNS (self : Document) («namespace» : Option String) (qualifiedName : String) (options : Option DOMStringOrElementCreationOptions := none) : IO Element := Internal.api "Lasm.JS.Web.Document.createElementNS" do
+  let r ← self.val.callMethod "createElementNS" (Internal.args #[toJS «namespace», toJS qualifiedName, Internal.optional options]) Value
   pure { val := r }
 
 /-- `DocumentFragment createDocumentFragment()` -/
-def Document.createDocumentFragment (self : Document) : IO DocumentFragment := do
-  let r ← self.val.callMethod "createDocumentFragment" (Support.args #[]) Value
+@[macro_inline] def Document.createDocumentFragment (self : Document) : IO DocumentFragment := Internal.api "Lasm.JS.Web.Document.createDocumentFragment" do
+  let r ← self.val.callMethod "createDocumentFragment" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Text createTextNode(DOMString data)` -/
-def Document.createTextNode (self : Document) (data : String) : IO Text := do
-  let r ← self.val.callMethod "createTextNode" (Support.args #[toJS data]) Value
+@[macro_inline] def Document.createTextNode (self : Document) (data : String) : IO Text := Internal.api "Lasm.JS.Web.Document.createTextNode" do
+  let r ← self.val.callMethod "createTextNode" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `CDATASection createCDATASection(DOMString data)` -/
-def Document.createCDATASection (self : Document) (data : String) : IO CDATASection := do
-  let r ← self.val.callMethod "createCDATASection" (Support.args #[toJS data]) Value
+@[macro_inline] def Document.createCDATASection (self : Document) (data : String) : IO CDATASection := Internal.api "Lasm.JS.Web.Document.createCDATASection" do
+  let r ← self.val.callMethod "createCDATASection" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `Comment createComment(DOMString data)` -/
-def Document.createComment (self : Document) (data : String) : IO Comment := do
-  let r ← self.val.callMethod "createComment" (Support.args #[toJS data]) Value
+@[macro_inline] def Document.createComment (self : Document) (data : String) : IO Comment := Internal.api "Lasm.JS.Web.Document.createComment" do
+  let r ← self.val.callMethod "createComment" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `ProcessingInstruction createProcessingInstruction(DOMString target, DOMString data)` -/
-def Document.createProcessingInstruction (self : Document) (target : String) (data : String) : IO ProcessingInstruction := do
-  let r ← self.val.callMethod "createProcessingInstruction" (Support.args #[toJS target, toJS data]) Value
+@[macro_inline] def Document.createProcessingInstruction (self : Document) (target : String) (data : String) : IO ProcessingInstruction := Internal.api "Lasm.JS.Web.Document.createProcessingInstruction" do
+  let r ← self.val.callMethod "createProcessingInstruction" (Internal.args #[toJS target, toJS data]) Value
   pure { val := r }
 
 /-- `Node importNode(Node node, optional (boolean or ImportNodeOptions) options)` -/
-def Document.importNode (self : Document) (node : Node) (options : Option BooleanOrImportNodeOptions := none) : IO Node := do
-  let r ← self.val.callMethod "importNode" (Support.args #[toJS node, Support.optional options]) Value
+@[macro_inline] def Document.importNode (self : Document) (node : Node) (options : Option BooleanOrImportNodeOptions := none) : IO Node := Internal.api "Lasm.JS.Web.Document.importNode" do
+  let r ← self.val.callMethod "importNode" (Internal.args #[toJS node, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Node adoptNode(Node node)` -/
-def Document.adoptNode (self : Document) (node : Node) : IO Node := do
-  let r ← self.val.callMethod "adoptNode" (Support.args #[toJS node]) Value
+@[macro_inline] def Document.adoptNode (self : Document) (node : Node) : IO Node := Internal.api "Lasm.JS.Web.Document.adoptNode" do
+  let r ← self.val.callMethod "adoptNode" (Internal.args #[toJS node]) Value
   pure { val := r }
 
 /-- `Attr createAttribute(DOMString localName)` -/
-def Document.createAttribute (self : Document) (localName : String) : IO Attr := do
-  let r ← self.val.callMethod "createAttribute" (Support.args #[toJS localName]) Value
+@[macro_inline] def Document.createAttribute (self : Document) (localName : String) : IO Attr := Internal.api "Lasm.JS.Web.Document.createAttribute" do
+  let r ← self.val.callMethod "createAttribute" (Internal.args #[toJS localName]) Value
   pure { val := r }
 
 /-- `Attr createAttributeNS(DOMString? namespace, DOMString qualifiedName)` -/
-def Document.createAttributeNS (self : Document) («namespace» : Option String) (qualifiedName : String) : IO Attr := do
-  let r ← self.val.callMethod "createAttributeNS" (Support.args #[toJS «namespace», toJS qualifiedName]) Value
+@[macro_inline] def Document.createAttributeNS (self : Document) («namespace» : Option String) (qualifiedName : String) : IO Attr := Internal.api "Lasm.JS.Web.Document.createAttributeNS" do
+  let r ← self.val.callMethod "createAttributeNS" (Internal.args #[toJS «namespace», toJS qualifiedName]) Value
   pure { val := r }
 
 /-- `Event createEvent(DOMString interface)` -/
-def Document.createEvent (self : Document) (interface : String) : IO Event := do
-  let r ← self.val.callMethod "createEvent" (Support.args #[toJS interface]) Value
+@[macro_inline] def Document.createEvent (self : Document) (interface : String) : IO Event := Internal.api "Lasm.JS.Web.Document.createEvent" do
+  let r ← self.val.callMethod "createEvent" (Internal.args #[toJS interface]) Value
   pure { val := r }
 
 /-- `Range createRange()` -/
-def Document.createRange (self : Document) : IO Range := do
-  let r ← self.val.callMethod "createRange" (Support.args #[]) Value
+@[macro_inline] def Document.createRange (self : Document) : IO Range := Internal.api "Lasm.JS.Web.Document.createRange" do
+  let r ← self.val.callMethod "createRange" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `NodeIterator createNodeIterator(Node root, optional unsigned long whatToShow, optional NodeFilter? filter)` -/
-def Document.createNodeIterator (self : Document) (root : Node) (whatToShow : Option Nat := none) (filter : Option NodeFilter := none) : IO NodeIterator := do
-  let r ← self.val.callMethod "createNodeIterator" (Support.args #[toJS root, Support.optional whatToShow, Support.optional filter]) Value
+@[macro_inline] def Document.createNodeIterator (self : Document) (root : Node) (whatToShow : Option Nat := none) (filter : Option NodeFilter := none) : IO NodeIterator := Internal.api "Lasm.JS.Web.Document.createNodeIterator" do
+  let r ← self.val.callMethod "createNodeIterator" (Internal.args #[toJS root, Internal.optional whatToShow, Internal.optional filter]) Value
   pure { val := r }
 
 /-- `TreeWalker createTreeWalker(Node root, optional unsigned long whatToShow, optional NodeFilter? filter)` -/
-def Document.createTreeWalker (self : Document) (root : Node) (whatToShow : Option Nat := none) (filter : Option NodeFilter := none) : IO TreeWalker := do
-  let r ← self.val.callMethod "createTreeWalker" (Support.args #[toJS root, Support.optional whatToShow, Support.optional filter]) Value
+@[macro_inline] def Document.createTreeWalker (self : Document) (root : Node) (whatToShow : Option Nat := none) (filter : Option NodeFilter := none) : IO TreeWalker := Internal.api "Lasm.JS.Web.Document.createTreeWalker" do
+  let r ← self.val.callMethod "createTreeWalker" (Internal.args #[toJS root, Internal.optional whatToShow, Internal.optional filter]) Value
   pure { val := r }
 
 /-- `Element? getElementById(DOMString elementId)` -/
-def Document.getElementById (self : Document) (elementId : String) : IO (Option Element) :=
-  self.val.callMethod "getElementById" (Support.args #[toJS elementId]) (Option Element)
+@[macro_inline] def Document.getElementById (self : Document) (elementId : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.getElementById" do
+  self.val.callMethod "getElementById" (Internal.args #[toJS elementId]) (Option Element)
 
 /-- `undefined prepend((Node or DOMString)... nodes)` -/
-def Document.prepend (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "prepend" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Document.prepend (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Document.prepend" do
+  self.val.callMethod "prepend" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined append((Node or DOMString)... nodes)` -/
-def Document.append (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "append" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Document.append (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Document.append" do
+  self.val.callMethod "append" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceChildren((Node or DOMString)... nodes)` -/
-def Document.replaceChildren (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Document.replaceChildren (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Document.replaceChildren" do
+  self.val.callMethod "replaceChildren" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined moveBefore(Node node, Node? child)` -/
-def Document.moveBefore (self : Document) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
+@[macro_inline] def Document.moveBefore (self : Document) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.Document.moveBefore" do
+  self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
 
 /-- `Element? querySelector(DOMString selectors)` -/
-def Document.querySelector (self : Document) (selectors : String) : IO (Option Element) :=
-  self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
+@[macro_inline] def Document.querySelector (self : Document) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.querySelector" do
+  self.val.callMethod "querySelector" (Internal.args #[toJS selectors]) (Option Element)
 
 /-- `NodeList querySelectorAll(DOMString selectors)` -/
-def Document.querySelectorAll (self : Document) (selectors : String) : IO NodeList := do
-  let r ← self.val.callMethod "querySelectorAll" (Support.args #[toJS selectors]) Value
+@[macro_inline] def Document.querySelectorAll (self : Document) (selectors : String) : IO NodeList := Internal.api "Lasm.JS.Web.Document.querySelectorAll" do
+  let r ← self.val.callMethod "querySelectorAll" (Internal.args #[toJS selectors]) Value
   pure { val := r }
 
 /-- `XPathExpression createExpression(DOMString expression, optional XPathNSResolver? resolver)` -/
-def Document.createExpression (self : Document) (expression : String) (resolver : Option XPathNSResolver := none) : IO XPathExpression := do
-  let r ← self.val.callMethod "createExpression" (Support.args #[toJS expression, Support.optional resolver]) Value
+@[macro_inline] def Document.createExpression (self : Document) (expression : String) (resolver : Option XPathNSResolver := none) : IO XPathExpression := Internal.api "Lasm.JS.Web.Document.createExpression" do
+  let r ← self.val.callMethod "createExpression" (Internal.args #[toJS expression, Internal.optional resolver]) Value
   pure { val := r }
 
 /-- `Node createNSResolver(Node nodeResolver)` -/
-def Document.createNSResolver (self : Document) (nodeResolver : Node) : IO Node := do
-  let r ← self.val.callMethod "createNSResolver" (Support.args #[toJS nodeResolver]) Value
+@[macro_inline] def Document.createNSResolver (self : Document) (nodeResolver : Node) : IO Node := Internal.api "Lasm.JS.Web.Document.createNSResolver" do
+  let r ← self.val.callMethod "createNSResolver" (Internal.args #[toJS nodeResolver]) Value
   pure { val := r }
 
 /-- `XPathResult evaluate(DOMString expression, Node contextNode, optional XPathNSResolver? resolver, optional unsigned short type, optional XPathResult? result)` -/
-def Document.evaluate (self : Document) (expression : String) (contextNode : Node) (resolver : Option XPathNSResolver := none) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := do
-  let r ← self.val.callMethod "evaluate" (Support.args #[toJS expression, toJS contextNode, Support.optional resolver, Support.optional type, Support.optional result]) Value
+@[macro_inline] def Document.evaluate (self : Document) (expression : String) (contextNode : Node) (resolver : Option XPathNSResolver := none) (type : Option Nat := none) (result : Option XPathResult := none) : IO XPathResult := Internal.api "Lasm.JS.Web.Document.evaluate" do
+  let r ← self.val.callMethod "evaluate" (Internal.args #[toJS expression, toJS contextNode, Internal.optional resolver, Internal.optional type, Internal.optional result]) Value
   pure { val := r }
 
 /-- `v instanceof DocumentFragment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentFragment`). -/
-def DocumentFragment.cast? (v : Value) : IO (Option DocumentFragment) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentFragment"] Value) v) then some { val := v } else none
+@[macro_inline] def DocumentFragment.cast? (v : Value) : IO (Option DocumentFragment) := Internal.api "Lasm.JS.Web.DocumentFragment.cast?" do
+  Internal.cast (Internal.getGlobal ["DocumentFragment"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def DocumentFragment.new : IO DocumentFragment :=
+@[macro_inline] def DocumentFragment.new : IO DocumentFragment := Internal.api "Lasm.JS.Web.DocumentFragment.new" do
   Lasm.JS.Binding.invoke DocumentFragment { name := "Lasm.JS.Web.DocumentFragment.new", module := "globalThis", path := "DocumentFragment", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute HTMLCollection children` -/
-def DocumentFragment.children (self : DocumentFragment) : IO HTMLCollection := do
+@[macro_inline] def DocumentFragment.children (self : DocumentFragment) : IO HTMLCollection := Internal.api "Lasm.JS.Web.DocumentFragment.children" do
   let r ← self.val.get "children" Value
   pure { val := r }
 
 /-- `readonly attribute Element? firstElementChild` -/
-def DocumentFragment.firstElementChild (self : DocumentFragment) : IO (Option Element) := self.val.get "firstElementChild" (Option Element)
+@[macro_inline] def DocumentFragment.firstElementChild (self : DocumentFragment) : IO (Option Element) := Internal.api "Lasm.JS.Web.DocumentFragment.firstElementChild" do
+  self.val.get "firstElementChild" (Option Element)
 
 /-- `readonly attribute Element? lastElementChild` -/
-def DocumentFragment.lastElementChild (self : DocumentFragment) : IO (Option Element) := self.val.get "lastElementChild" (Option Element)
+@[macro_inline] def DocumentFragment.lastElementChild (self : DocumentFragment) : IO (Option Element) := Internal.api "Lasm.JS.Web.DocumentFragment.lastElementChild" do
+  self.val.get "lastElementChild" (Option Element)
 
 /-- `readonly attribute unsigned long childElementCount` -/
-def DocumentFragment.childElementCount (self : DocumentFragment) : IO Nat := self.val.get "childElementCount" Nat
+@[macro_inline] def DocumentFragment.childElementCount (self : DocumentFragment) : IO Nat := Internal.api "Lasm.JS.Web.DocumentFragment.childElementCount" do
+  self.val.get "childElementCount" Nat
 
 /-- `Element? getElementById(DOMString elementId)` -/
-def DocumentFragment.getElementById (self : DocumentFragment) (elementId : String) : IO (Option Element) :=
-  self.val.callMethod "getElementById" (Support.args #[toJS elementId]) (Option Element)
+@[macro_inline] def DocumentFragment.getElementById (self : DocumentFragment) (elementId : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.DocumentFragment.getElementById" do
+  self.val.callMethod "getElementById" (Internal.args #[toJS elementId]) (Option Element)
 
 /-- `undefined prepend((Node or DOMString)... nodes)` -/
-def DocumentFragment.prepend (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "prepend" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentFragment.prepend (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentFragment.prepend" do
+  self.val.callMethod "prepend" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined append((Node or DOMString)... nodes)` -/
-def DocumentFragment.append (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "append" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentFragment.append (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentFragment.append" do
+  self.val.callMethod "append" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceChildren((Node or DOMString)... nodes)` -/
-def DocumentFragment.replaceChildren (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentFragment.replaceChildren (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentFragment.replaceChildren" do
+  self.val.callMethod "replaceChildren" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined moveBefore(Node node, Node? child)` -/
-def DocumentFragment.moveBefore (self : DocumentFragment) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
+@[macro_inline] def DocumentFragment.moveBefore (self : DocumentFragment) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.DocumentFragment.moveBefore" do
+  self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
 
 /-- `Element? querySelector(DOMString selectors)` -/
-def DocumentFragment.querySelector (self : DocumentFragment) (selectors : String) : IO (Option Element) :=
-  self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
+@[macro_inline] def DocumentFragment.querySelector (self : DocumentFragment) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.DocumentFragment.querySelector" do
+  self.val.callMethod "querySelector" (Internal.args #[toJS selectors]) (Option Element)
 
 /-- `NodeList querySelectorAll(DOMString selectors)` -/
-def DocumentFragment.querySelectorAll (self : DocumentFragment) (selectors : String) : IO NodeList := do
-  let r ← self.val.callMethod "querySelectorAll" (Support.args #[toJS selectors]) Value
+@[macro_inline] def DocumentFragment.querySelectorAll (self : DocumentFragment) (selectors : String) : IO NodeList := Internal.api "Lasm.JS.Web.DocumentFragment.querySelectorAll" do
+  let r ← self.val.callMethod "querySelectorAll" (Internal.args #[toJS selectors]) Value
   pure { val := r }
 
 /-- `v instanceof DocumentType`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentType`). -/
-def DocumentType.cast? (v : Value) : IO (Option DocumentType) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentType"] Value) v) then some { val := v } else none
+@[macro_inline] def DocumentType.cast? (v : Value) : IO (Option DocumentType) := Internal.api "Lasm.JS.Web.DocumentType.cast?" do
+  Internal.cast (Internal.getGlobal ["DocumentType"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def DocumentType.name (self : DocumentType) : IO String := self.val.get "name" String
+@[macro_inline] def DocumentType.name (self : DocumentType) : IO String := Internal.api "Lasm.JS.Web.DocumentType.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString publicId` -/
-def DocumentType.publicId (self : DocumentType) : IO String := self.val.get "publicId" String
+@[macro_inline] def DocumentType.publicId (self : DocumentType) : IO String := Internal.api "Lasm.JS.Web.DocumentType.publicId" do
+  self.val.get "publicId" String
 
 /-- `readonly attribute DOMString systemId` -/
-def DocumentType.systemId (self : DocumentType) : IO String := self.val.get "systemId" String
+@[macro_inline] def DocumentType.systemId (self : DocumentType) : IO String := Internal.api "Lasm.JS.Web.DocumentType.systemId" do
+  self.val.get "systemId" String
 
 /-- `undefined before((Node or DOMString)... nodes)` -/
-def DocumentType.before (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "before" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentType.before (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentType.before" do
+  self.val.callMethod "before" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined after((Node or DOMString)... nodes)` -/
-def DocumentType.after (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "after" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentType.after (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentType.after" do
+  self.val.callMethod "after" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceWith((Node or DOMString)... nodes)` -/
-def DocumentType.replaceWith (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceWith" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def DocumentType.replaceWith (self : DocumentType) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.DocumentType.replaceWith" do
+  self.val.callMethod "replaceWith" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined remove()` -/
-def DocumentType.remove (self : DocumentType) : IO Unit :=
-  self.val.callMethod "remove" (Support.args #[]) Unit
+@[macro_inline] def DocumentType.remove (self : DocumentType) : IO Unit := Internal.api "Lasm.JS.Web.DocumentType.remove" do
+  self.val.callMethod "remove" (Internal.args #[]) Unit
 
 /-- `v instanceof Element`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Element`). -/
-def Element.cast? (v : Value) : IO (Option Element) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Element"] Value) v) then some { val := v } else none
+@[macro_inline] def Element.cast? (v : Value) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.cast?" do
+  Internal.cast (Internal.getGlobal ["Element"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString? namespaceURI` -/
-def Element.namespaceURI (self : Element) : IO (Option String) := self.val.get "namespaceURI" (Option String)
+@[macro_inline] def Element.namespaceURI (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.namespaceURI" do
+  self.val.get "namespaceURI" (Option String)
 
 /-- `readonly attribute DOMString? prefix` -/
-def Element.«prefix» (self : Element) : IO (Option String) := self.val.get "prefix" (Option String)
+@[macro_inline] def Element.«prefix» (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.prefix" do
+  self.val.get "prefix" (Option String)
 
 /-- `readonly attribute DOMString localName` -/
-def Element.localName (self : Element) : IO String := self.val.get "localName" String
+@[macro_inline] def Element.localName (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.localName" do
+  self.val.get "localName" String
 
 /-- `readonly attribute DOMString tagName` -/
-def Element.tagName (self : Element) : IO String := self.val.get "tagName" String
+@[macro_inline] def Element.tagName (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.tagName" do
+  self.val.get "tagName" String
 
 /-- `attribute DOMString id` -/
-def Element.id (self : Element) : IO String := self.val.get "id" String
+@[macro_inline] def Element.id (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.id" do
+  self.val.get "id" String
 
 /-- Sets `id`: `attribute DOMString id` -/
-def Element.setId (self : Element) (value : String) : IO Unit :=
+@[macro_inline] def Element.setId (self : Element) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setId" do
   self.val.set "id" (toJS value)
 
 /-- `attribute DOMString className` -/
-def Element.className (self : Element) : IO String := self.val.get "className" String
+@[macro_inline] def Element.className (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.className" do
+  self.val.get "className" String
 
 /-- Sets `className`: `attribute DOMString className` -/
-def Element.setClassName (self : Element) (value : String) : IO Unit :=
+@[macro_inline] def Element.setClassName (self : Element) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setClassName" do
   self.val.set "className" (toJS value)
 
 /-- `readonly attribute DOMTokenList classList` -/
-def Element.classList (self : Element) : IO DOMTokenList := do
+@[macro_inline] def Element.classList (self : Element) : IO DOMTokenList := Internal.api "Lasm.JS.Web.Element.classList" do
   let r ← self.val.get "classList" Value
   pure { val := r }
 
 /-- `attribute DOMString slot` -/
-def Element.slot (self : Element) : IO String := self.val.get "slot" String
+@[macro_inline] def Element.slot (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.slot" do
+  self.val.get "slot" String
 
 /-- Sets `slot`: `attribute DOMString slot` -/
-def Element.setSlot (self : Element) (value : String) : IO Unit :=
+@[macro_inline] def Element.setSlot (self : Element) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setSlot" do
   self.val.set "slot" (toJS value)
 
 /-- `readonly attribute NamedNodeMap attributes` -/
-def Element.attributes (self : Element) : IO NamedNodeMap := do
+@[macro_inline] def Element.attributes (self : Element) : IO NamedNodeMap := Internal.api "Lasm.JS.Web.Element.attributes" do
   let r ← self.val.get "attributes" Value
   pure { val := r }
 
 /-- `readonly attribute ShadowRoot? shadowRoot` -/
-def Element.shadowRoot (self : Element) : IO (Option ShadowRoot) := self.val.get "shadowRoot" (Option ShadowRoot)
+@[macro_inline] def Element.shadowRoot (self : Element) : IO (Option ShadowRoot) := Internal.api "Lasm.JS.Web.Element.shadowRoot" do
+  self.val.get "shadowRoot" (Option ShadowRoot)
 
 /-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def Element.customElementRegistry (self : Element) : IO (Option CustomElementRegistry) := self.val.get "customElementRegistry" (Option CustomElementRegistry)
+@[macro_inline] def Element.customElementRegistry (self : Element) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.Element.customElementRegistry" do
+  self.val.get "customElementRegistry" (Option CustomElementRegistry)
 
 /-- `readonly attribute HTMLCollection children` -/
-def Element.children (self : Element) : IO HTMLCollection := do
+@[macro_inline] def Element.children (self : Element) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Element.children" do
   let r ← self.val.get "children" Value
   pure { val := r }
 
 /-- `readonly attribute Element? firstElementChild` -/
-def Element.firstElementChild (self : Element) : IO (Option Element) := self.val.get "firstElementChild" (Option Element)
+@[macro_inline] def Element.firstElementChild (self : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.firstElementChild" do
+  self.val.get "firstElementChild" (Option Element)
 
 /-- `readonly attribute Element? lastElementChild` -/
-def Element.lastElementChild (self : Element) : IO (Option Element) := self.val.get "lastElementChild" (Option Element)
+@[macro_inline] def Element.lastElementChild (self : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.lastElementChild" do
+  self.val.get "lastElementChild" (Option Element)
 
 /-- `readonly attribute unsigned long childElementCount` -/
-def Element.childElementCount (self : Element) : IO Nat := self.val.get "childElementCount" Nat
+@[macro_inline] def Element.childElementCount (self : Element) : IO Nat := Internal.api "Lasm.JS.Web.Element.childElementCount" do
+  self.val.get "childElementCount" Nat
 
 /-- `readonly attribute Element? previousElementSibling` -/
-def Element.previousElementSibling (self : Element) : IO (Option Element) := self.val.get "previousElementSibling" (Option Element)
+@[macro_inline] def Element.previousElementSibling (self : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.previousElementSibling" do
+  self.val.get "previousElementSibling" (Option Element)
 
 /-- `readonly attribute Element? nextElementSibling` -/
-def Element.nextElementSibling (self : Element) : IO (Option Element) := self.val.get "nextElementSibling" (Option Element)
+@[macro_inline] def Element.nextElementSibling (self : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.nextElementSibling" do
+  self.val.get "nextElementSibling" (Option Element)
 
 /-- `readonly attribute HTMLSlotElement? assignedSlot` -/
-def Element.assignedSlot (self : Element) : IO (Option HTMLSlotElement) := self.val.get "assignedSlot" (Option HTMLSlotElement)
+@[macro_inline] def Element.assignedSlot (self : Element) : IO (Option HTMLSlotElement) := Internal.api "Lasm.JS.Web.Element.assignedSlot" do
+  self.val.get "assignedSlot" (Option HTMLSlotElement)
 
 /-- `boolean hasAttributes()` -/
-def Element.hasAttributes (self : Element) : IO Bool :=
-  self.val.callMethod "hasAttributes" (Support.args #[]) Bool
+@[macro_inline] def Element.hasAttributes (self : Element) : IO Bool := Internal.api "Lasm.JS.Web.Element.hasAttributes" do
+  self.val.callMethod "hasAttributes" (Internal.args #[]) Bool
 
 /-- `sequence<DOMString> getAttributeNames()` -/
-def Element.getAttributeNames (self : Element) : IO (Array String) :=
-  self.val.callMethod "getAttributeNames" (Support.args #[]) (Array String)
+@[macro_inline] def Element.getAttributeNames (self : Element) : IO (Array String) := Internal.api "Lasm.JS.Web.Element.getAttributeNames" do
+  self.val.callMethod "getAttributeNames" (Internal.args #[]) (Array String)
 
 /-- `DOMString? getAttribute(DOMString qualifiedName)` -/
-def Element.getAttribute (self : Element) (qualifiedName : String) : IO (Option String) :=
-  self.val.callMethod "getAttribute" (Support.args #[toJS qualifiedName]) (Option String)
+@[macro_inline] def Element.getAttribute (self : Element) (qualifiedName : String) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.getAttribute" do
+  self.val.callMethod "getAttribute" (Internal.args #[toJS qualifiedName]) (Option String)
 
 /-- `DOMString? getAttributeNS(DOMString? namespace, DOMString localName)` -/
-def Element.getAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO (Option String) :=
-  self.val.callMethod "getAttributeNS" (Support.args #[toJS «namespace», toJS localName]) (Option String)
+@[macro_inline] def Element.getAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.getAttributeNS" do
+  self.val.callMethod "getAttributeNS" (Internal.args #[toJS «namespace», toJS localName]) (Option String)
 
 /-- `undefined setAttribute(DOMString qualifiedName, (TrustedType or DOMString) value)` -/
-def Element.setAttribute (self : Element) (qualifiedName : String) (value : TrustedHTMLOrTrustedScriptOrTrustedScriptURLOrDOMString) : IO Unit :=
-  self.val.callMethod "setAttribute" (Support.args #[toJS qualifiedName, toJS value]) Unit
+@[macro_inline] def Element.setAttribute (self : Element) (qualifiedName : String) (value : TrustedHTMLOrTrustedScriptOrTrustedScriptURLOrDOMString) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAttribute" do
+  self.val.callMethod "setAttribute" (Internal.args #[toJS qualifiedName, toJS value]) Unit
 
 /-- `undefined setAttributeNS(DOMString? namespace, DOMString qualifiedName, (TrustedType or DOMString) value)` -/
-def Element.setAttributeNS (self : Element) («namespace» : Option String) (qualifiedName : String) (value : TrustedHTMLOrTrustedScriptOrTrustedScriptURLOrDOMString) : IO Unit :=
-  self.val.callMethod "setAttributeNS" (Support.args #[toJS «namespace», toJS qualifiedName, toJS value]) Unit
+@[macro_inline] def Element.setAttributeNS (self : Element) («namespace» : Option String) (qualifiedName : String) (value : TrustedHTMLOrTrustedScriptOrTrustedScriptURLOrDOMString) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAttributeNS" do
+  self.val.callMethod "setAttributeNS" (Internal.args #[toJS «namespace», toJS qualifiedName, toJS value]) Unit
 
 /-- `undefined removeAttribute(DOMString qualifiedName)` -/
-def Element.removeAttribute (self : Element) (qualifiedName : String) : IO Unit :=
-  self.val.callMethod "removeAttribute" (Support.args #[toJS qualifiedName]) Unit
+@[macro_inline] def Element.removeAttribute (self : Element) (qualifiedName : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.removeAttribute" do
+  self.val.callMethod "removeAttribute" (Internal.args #[toJS qualifiedName]) Unit
 
 /-- `undefined removeAttributeNS(DOMString? namespace, DOMString localName)` -/
-def Element.removeAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO Unit :=
-  self.val.callMethod "removeAttributeNS" (Support.args #[toJS «namespace», toJS localName]) Unit
+@[macro_inline] def Element.removeAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.removeAttributeNS" do
+  self.val.callMethod "removeAttributeNS" (Internal.args #[toJS «namespace», toJS localName]) Unit
 
 /-- `boolean toggleAttribute(DOMString qualifiedName, optional boolean force)` -/
-def Element.toggleAttribute (self : Element) (qualifiedName : String) (force : Option Bool := none) : IO Bool :=
-  self.val.callMethod "toggleAttribute" (Support.args #[toJS qualifiedName, Support.optional force]) Bool
+@[macro_inline] def Element.toggleAttribute (self : Element) (qualifiedName : String) (force : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Web.Element.toggleAttribute" do
+  self.val.callMethod "toggleAttribute" (Internal.args #[toJS qualifiedName, Internal.optional force]) Bool
 
 /-- `boolean hasAttribute(DOMString qualifiedName)` -/
-def Element.hasAttribute (self : Element) (qualifiedName : String) : IO Bool :=
-  self.val.callMethod "hasAttribute" (Support.args #[toJS qualifiedName]) Bool
+@[macro_inline] def Element.hasAttribute (self : Element) (qualifiedName : String) : IO Bool := Internal.api "Lasm.JS.Web.Element.hasAttribute" do
+  self.val.callMethod "hasAttribute" (Internal.args #[toJS qualifiedName]) Bool
 
 /-- `boolean hasAttributeNS(DOMString? namespace, DOMString localName)` -/
-def Element.hasAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO Bool :=
-  self.val.callMethod "hasAttributeNS" (Support.args #[toJS «namespace», toJS localName]) Bool
+@[macro_inline] def Element.hasAttributeNS (self : Element) («namespace» : Option String) (localName : String) : IO Bool := Internal.api "Lasm.JS.Web.Element.hasAttributeNS" do
+  self.val.callMethod "hasAttributeNS" (Internal.args #[toJS «namespace», toJS localName]) Bool
 
 /-- `Attr? getAttributeNode(DOMString qualifiedName)` -/
-def Element.getAttributeNode (self : Element) (qualifiedName : String) : IO (Option Attr) :=
-  self.val.callMethod "getAttributeNode" (Support.args #[toJS qualifiedName]) (Option Attr)
+@[macro_inline] def Element.getAttributeNode (self : Element) (qualifiedName : String) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Element.getAttributeNode" do
+  self.val.callMethod "getAttributeNode" (Internal.args #[toJS qualifiedName]) (Option Attr)
 
 /-- `Attr? getAttributeNodeNS(DOMString? namespace, DOMString localName)` -/
-def Element.getAttributeNodeNS (self : Element) («namespace» : Option String) (localName : String) : IO (Option Attr) :=
-  self.val.callMethod "getAttributeNodeNS" (Support.args #[toJS «namespace», toJS localName]) (Option Attr)
+@[macro_inline] def Element.getAttributeNodeNS (self : Element) («namespace» : Option String) (localName : String) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Element.getAttributeNodeNS" do
+  self.val.callMethod "getAttributeNodeNS" (Internal.args #[toJS «namespace», toJS localName]) (Option Attr)
 
 /-- `Attr? setAttributeNode(Attr attr)` -/
-def Element.setAttributeNode (self : Element) (attr : Attr) : IO (Option Attr) :=
-  self.val.callMethod "setAttributeNode" (Support.args #[toJS attr]) (Option Attr)
+@[macro_inline] def Element.setAttributeNode (self : Element) (attr : Attr) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Element.setAttributeNode" do
+  self.val.callMethod "setAttributeNode" (Internal.args #[toJS attr]) (Option Attr)
 
 /-- `Attr? setAttributeNodeNS(Attr attr)` -/
-def Element.setAttributeNodeNS (self : Element) (attr : Attr) : IO (Option Attr) :=
-  self.val.callMethod "setAttributeNodeNS" (Support.args #[toJS attr]) (Option Attr)
+@[macro_inline] def Element.setAttributeNodeNS (self : Element) (attr : Attr) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Element.setAttributeNodeNS" do
+  self.val.callMethod "setAttributeNodeNS" (Internal.args #[toJS attr]) (Option Attr)
 
 /-- `Attr removeAttributeNode(Attr attr)` -/
-def Element.removeAttributeNode (self : Element) (attr : Attr) : IO Attr := do
-  let r ← self.val.callMethod "removeAttributeNode" (Support.args #[toJS attr]) Value
+@[macro_inline] def Element.removeAttributeNode (self : Element) (attr : Attr) : IO Attr := Internal.api "Lasm.JS.Web.Element.removeAttributeNode" do
+  let r ← self.val.callMethod "removeAttributeNode" (Internal.args #[toJS attr]) Value
   pure { val := r }
 
 /-- `ShadowRoot attachShadow(ShadowRootInit init)` -/
-def Element.attachShadow (self : Element) (init : ShadowRootInit) : IO ShadowRoot := do
-  let r ← self.val.callMethod "attachShadow" (Support.args #[toJS init]) Value
+@[macro_inline] def Element.attachShadow (self : Element) (init : ShadowRootInit) : IO ShadowRoot := Internal.api "Lasm.JS.Web.Element.attachShadow" do
+  let r ← self.val.callMethod "attachShadow" (Internal.args #[toJS init]) Value
   pure { val := r }
 
 /-- `Element? closest(DOMString selectors)` -/
-def Element.closest (self : Element) (selectors : String) : IO (Option Element) :=
-  self.val.callMethod "closest" (Support.args #[toJS selectors]) (Option Element)
+@[macro_inline] def Element.closest (self : Element) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.closest" do
+  self.val.callMethod "closest" (Internal.args #[toJS selectors]) (Option Element)
 
 /-- `boolean matches(DOMString selectors)` -/
-def Element.«matches» (self : Element) (selectors : String) : IO Bool :=
-  self.val.callMethod "matches" (Support.args #[toJS selectors]) Bool
+@[macro_inline] def Element.«matches» (self : Element) (selectors : String) : IO Bool := Internal.api "Lasm.JS.Web.Element.matches" do
+  self.val.callMethod "matches" (Internal.args #[toJS selectors]) Bool
 
 /-- `boolean webkitMatchesSelector(DOMString selectors)` -/
-def Element.webkitMatchesSelector (self : Element) (selectors : String) : IO Bool :=
-  self.val.callMethod "webkitMatchesSelector" (Support.args #[toJS selectors]) Bool
+@[macro_inline] def Element.webkitMatchesSelector (self : Element) (selectors : String) : IO Bool := Internal.api "Lasm.JS.Web.Element.webkitMatchesSelector" do
+  self.val.callMethod "webkitMatchesSelector" (Internal.args #[toJS selectors]) Bool
 
 /-- `HTMLCollection getElementsByTagName(DOMString qualifiedName)` -/
-def Element.getElementsByTagName (self : Element) (qualifiedName : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByTagName" (Support.args #[toJS qualifiedName]) Value
+@[macro_inline] def Element.getElementsByTagName (self : Element) (qualifiedName : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Element.getElementsByTagName" do
+  let r ← self.val.callMethod "getElementsByTagName" (Internal.args #[toJS qualifiedName]) Value
   pure { val := r }
 
 /-- `HTMLCollection getElementsByTagNameNS(DOMString? namespace, DOMString localName)` -/
-def Element.getElementsByTagNameNS (self : Element) («namespace» : Option String) (localName : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByTagNameNS" (Support.args #[toJS «namespace», toJS localName]) Value
+@[macro_inline] def Element.getElementsByTagNameNS (self : Element) («namespace» : Option String) (localName : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Element.getElementsByTagNameNS" do
+  let r ← self.val.callMethod "getElementsByTagNameNS" (Internal.args #[toJS «namespace», toJS localName]) Value
   pure { val := r }
 
 /-- `HTMLCollection getElementsByClassName(DOMString classNames)` -/
-def Element.getElementsByClassName (self : Element) (classNames : String) : IO HTMLCollection := do
-  let r ← self.val.callMethod "getElementsByClassName" (Support.args #[toJS classNames]) Value
+@[macro_inline] def Element.getElementsByClassName (self : Element) (classNames : String) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Element.getElementsByClassName" do
+  let r ← self.val.callMethod "getElementsByClassName" (Internal.args #[toJS classNames]) Value
   pure { val := r }
 
 /-- `Element? insertAdjacentElement(DOMString where, Element element)` -/
-def Element.insertAdjacentElement (self : Element) («where» : String) (element : Element) : IO (Option Element) :=
-  self.val.callMethod "insertAdjacentElement" (Support.args #[toJS «where», toJS element]) (Option Element)
+@[macro_inline] def Element.insertAdjacentElement (self : Element) («where» : String) (element : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.insertAdjacentElement" do
+  self.val.callMethod "insertAdjacentElement" (Internal.args #[toJS «where», toJS element]) (Option Element)
 
 /-- `undefined insertAdjacentText(DOMString where, DOMString data)` -/
-def Element.insertAdjacentText (self : Element) («where» : String) (data : String) : IO Unit :=
-  self.val.callMethod "insertAdjacentText" (Support.args #[toJS «where», toJS data]) Unit
+@[macro_inline] def Element.insertAdjacentText (self : Element) («where» : String) (data : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.insertAdjacentText" do
+  self.val.callMethod "insertAdjacentText" (Internal.args #[toJS «where», toJS data]) Unit
 
 /-- `undefined prepend((Node or DOMString)... nodes)` -/
-def Element.prepend (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "prepend" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.prepend (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.prepend" do
+  self.val.callMethod "prepend" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined append((Node or DOMString)... nodes)` -/
-def Element.append (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "append" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.append (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.append" do
+  self.val.callMethod "append" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceChildren((Node or DOMString)... nodes)` -/
-def Element.replaceChildren (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.replaceChildren (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.replaceChildren" do
+  self.val.callMethod "replaceChildren" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined moveBefore(Node node, Node? child)` -/
-def Element.moveBefore (self : Element) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
+@[macro_inline] def Element.moveBefore (self : Element) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.Element.moveBefore" do
+  self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
 
 /-- `Element? querySelector(DOMString selectors)` -/
-def Element.querySelector (self : Element) (selectors : String) : IO (Option Element) :=
-  self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
+@[macro_inline] def Element.querySelector (self : Element) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.querySelector" do
+  self.val.callMethod "querySelector" (Internal.args #[toJS selectors]) (Option Element)
 
 /-- `NodeList querySelectorAll(DOMString selectors)` -/
-def Element.querySelectorAll (self : Element) (selectors : String) : IO NodeList := do
-  let r ← self.val.callMethod "querySelectorAll" (Support.args #[toJS selectors]) Value
+@[macro_inline] def Element.querySelectorAll (self : Element) (selectors : String) : IO NodeList := Internal.api "Lasm.JS.Web.Element.querySelectorAll" do
+  let r ← self.val.callMethod "querySelectorAll" (Internal.args #[toJS selectors]) Value
   pure { val := r }
 
 /-- `undefined before((Node or DOMString)... nodes)` -/
-def Element.before (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "before" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.before (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.before" do
+  self.val.callMethod "before" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined after((Node or DOMString)... nodes)` -/
-def Element.after (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "after" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.after (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.after" do
+  self.val.callMethod "after" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined replaceWith((Node or DOMString)... nodes)` -/
-def Element.replaceWith (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "replaceWith" (Support.argsWith #[] (nodes.map toJS)) Unit
+@[macro_inline] def Element.replaceWith (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.Element.replaceWith" do
+  self.val.callMethod "replaceWith" (Internal.argsWith #[] (nodes.map toJS)) Unit
 
 /-- `undefined remove()` -/
-def Element.remove (self : Element) : IO Unit :=
-  self.val.callMethod "remove" (Support.args #[]) Unit
+@[macro_inline] def Element.remove (self : Element) : IO Unit := Internal.api "Lasm.JS.Web.Element.remove" do
+  self.val.callMethod "remove" (Internal.args #[]) Unit
 
 /-- `v instanceof Comment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Comment`). -/
-def Comment.cast? (v : Value) : IO (Option Comment) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Comment"] Value) v) then some { val := v } else none
+@[macro_inline] def Comment.cast? (v : Value) : IO (Option Comment) := Internal.api "Lasm.JS.Web.Comment.cast?" do
+  Internal.cast (Internal.getGlobal ["Comment"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString data)` -/
-def Comment.new (data : Option String := none) : IO Comment :=
+@[macro_inline] def Comment.new (data : Option String := none) : IO Comment := Internal.api "Lasm.JS.Web.Comment.new" do
   Lasm.JS.Binding.invoke Comment { name := "Lasm.JS.Web.Comment.new", module := "globalThis", path := "Comment", construct := true, arity := 1 }
-    (Support.args #[Support.optional data]) (await := false)
+    (Internal.args #[Internal.optional data]) (await := false)
 
 /-- `v instanceof ProcessingInstruction`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ProcessingInstruction`). -/
-def ProcessingInstruction.cast? (v : Value) : IO (Option ProcessingInstruction) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ProcessingInstruction"] Value) v) then some { val := v } else none
+@[macro_inline] def ProcessingInstruction.cast? (v : Value) : IO (Option ProcessingInstruction) := Internal.api "Lasm.JS.Web.ProcessingInstruction.cast?" do
+  Internal.cast (Internal.getGlobal ["ProcessingInstruction"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString target, optional DOMString data)` -/
-def ProcessingInstruction.new (target : String) (data : Option String := none) : IO ProcessingInstruction :=
+@[macro_inline] def ProcessingInstruction.new (target : String) (data : Option String := none) : IO ProcessingInstruction := Internal.api "Lasm.JS.Web.ProcessingInstruction.new" do
   Lasm.JS.Binding.invoke ProcessingInstruction { name := "Lasm.JS.Web.ProcessingInstruction.new", module := "globalThis", path := "ProcessingInstruction", construct := true, arity := 2 }
-    (Support.args #[toJS target, Support.optional data]) (await := false)
+    (Internal.args #[toJS target, Internal.optional data]) (await := false)
 
 /-- `readonly attribute DOMString target` -/
-def ProcessingInstruction.target (self : ProcessingInstruction) : IO String := self.val.get "target" String
+@[macro_inline] def ProcessingInstruction.target (self : ProcessingInstruction) : IO String := Internal.api "Lasm.JS.Web.ProcessingInstruction.target" do
+  self.val.get "target" String
 
 /-- `boolean hasAttributes()` -/
-def ProcessingInstruction.hasAttributes (self : ProcessingInstruction) : IO Bool :=
-  self.val.callMethod "hasAttributes" (Support.args #[]) Bool
+@[macro_inline] def ProcessingInstruction.hasAttributes (self : ProcessingInstruction) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttributes" do
+  self.val.callMethod "hasAttributes" (Internal.args #[]) Bool
 
 /-- `sequence<DOMString> getAttributeNames()` -/
-def ProcessingInstruction.getAttributeNames (self : ProcessingInstruction) : IO (Array String) :=
-  self.val.callMethod "getAttributeNames" (Support.args #[]) (Array String)
+@[macro_inline] def ProcessingInstruction.getAttributeNames (self : ProcessingInstruction) : IO (Array String) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttributeNames" do
+  self.val.callMethod "getAttributeNames" (Internal.args #[]) (Array String)
 
 /-- `DOMString? getAttribute(DOMString name)` -/
-def ProcessingInstruction.getAttribute (self : ProcessingInstruction) (name : String) : IO (Option String) :=
-  self.val.callMethod "getAttribute" (Support.args #[toJS name]) (Option String)
+@[macro_inline] def ProcessingInstruction.getAttribute (self : ProcessingInstruction) (name : String) : IO (Option String) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttribute" do
+  self.val.callMethod "getAttribute" (Internal.args #[toJS name]) (Option String)
 
 /-- `undefined setAttribute(DOMString name, DOMString value)` -/
-def ProcessingInstruction.setAttribute (self : ProcessingInstruction) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "setAttribute" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def ProcessingInstruction.setAttribute (self : ProcessingInstruction) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.ProcessingInstruction.setAttribute" do
+  self.val.callMethod "setAttribute" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined removeAttribute(DOMString name)` -/
-def ProcessingInstruction.removeAttribute (self : ProcessingInstruction) (name : String) : IO Unit :=
-  self.val.callMethod "removeAttribute" (Support.args #[toJS name]) Unit
+@[macro_inline] def ProcessingInstruction.removeAttribute (self : ProcessingInstruction) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.ProcessingInstruction.removeAttribute" do
+  self.val.callMethod "removeAttribute" (Internal.args #[toJS name]) Unit
 
 /-- `boolean toggleAttribute(DOMString name, optional boolean force)` -/
-def ProcessingInstruction.toggleAttribute (self : ProcessingInstruction) (name : String) (force : Option Bool := none) : IO Bool :=
-  self.val.callMethod "toggleAttribute" (Support.args #[toJS name, Support.optional force]) Bool
+@[macro_inline] def ProcessingInstruction.toggleAttribute (self : ProcessingInstruction) (name : String) (force : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.toggleAttribute" do
+  self.val.callMethod "toggleAttribute" (Internal.args #[toJS name, Internal.optional force]) Bool
 
 /-- `boolean hasAttribute(DOMString name)` -/
-def ProcessingInstruction.hasAttribute (self : ProcessingInstruction) (name : String) : IO Bool :=
-  self.val.callMethod "hasAttribute" (Support.args #[toJS name]) Bool
+@[macro_inline] def ProcessingInstruction.hasAttribute (self : ProcessingInstruction) (name : String) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttribute" do
+  self.val.callMethod "hasAttribute" (Internal.args #[toJS name]) Bool
 
 /-- `v instanceof ShadowRoot`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ShadowRoot`). -/
-def ShadowRoot.cast? (v : Value) : IO (Option ShadowRoot) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ShadowRoot"] Value) v) then some { val := v } else none
+@[macro_inline] def ShadowRoot.cast? (v : Value) : IO (Option ShadowRoot) := Internal.api "Lasm.JS.Web.ShadowRoot.cast?" do
+  Internal.cast (Internal.getGlobal ["ShadowRoot"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ShadowRootMode mode` -/
-def ShadowRoot.mode (self : ShadowRoot) : IO ShadowRootMode := self.val.get "mode" ShadowRootMode
+@[macro_inline] def ShadowRoot.mode (self : ShadowRoot) : IO ShadowRootMode := Internal.api "Lasm.JS.Web.ShadowRoot.mode" do
+  self.val.get "mode" ShadowRootMode
 
 /-- `readonly attribute boolean delegatesFocus` -/
-def ShadowRoot.delegatesFocus (self : ShadowRoot) : IO Bool := self.val.get "delegatesFocus" Bool
+@[macro_inline] def ShadowRoot.delegatesFocus (self : ShadowRoot) : IO Bool := Internal.api "Lasm.JS.Web.ShadowRoot.delegatesFocus" do
+  self.val.get "delegatesFocus" Bool
 
 /-- `readonly attribute boolean serializable` -/
-def ShadowRoot.serializable (self : ShadowRoot) : IO Bool := self.val.get "serializable" Bool
+@[macro_inline] def ShadowRoot.serializable (self : ShadowRoot) : IO Bool := Internal.api "Lasm.JS.Web.ShadowRoot.serializable" do
+  self.val.get "serializable" Bool
 
 /-- `readonly attribute SlotAssignmentMode slotAssignment` -/
-def ShadowRoot.slotAssignment (self : ShadowRoot) : IO SlotAssignmentMode := self.val.get "slotAssignment" SlotAssignmentMode
+@[macro_inline] def ShadowRoot.slotAssignment (self : ShadowRoot) : IO SlotAssignmentMode := Internal.api "Lasm.JS.Web.ShadowRoot.slotAssignment" do
+  self.val.get "slotAssignment" SlotAssignmentMode
 
 /-- `readonly attribute boolean clonable` -/
-def ShadowRoot.clonable (self : ShadowRoot) : IO Bool := self.val.get "clonable" Bool
+@[macro_inline] def ShadowRoot.clonable (self : ShadowRoot) : IO Bool := Internal.api "Lasm.JS.Web.ShadowRoot.clonable" do
+  self.val.get "clonable" Bool
 
 /-- `readonly attribute Element host` -/
-def ShadowRoot.host (self : ShadowRoot) : IO Element := do
+@[macro_inline] def ShadowRoot.host (self : ShadowRoot) : IO Element := Internal.api "Lasm.JS.Web.ShadowRoot.host" do
   let r ← self.val.get "host" Value
   pure { val := r }
 
 /-- `attribute EventHandler onslotchange` -/
-def ShadowRoot.onslotchange (self : ShadowRoot) : IO (Option EventHandlerNonNull) := self.val.get "onslotchange" (Option EventHandlerNonNull)
+@[macro_inline] def ShadowRoot.onslotchange (self : ShadowRoot) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ShadowRoot.onslotchange" do
+  self.val.get "onslotchange" (Option EventHandlerNonNull)
 
 /-- Sets `onslotchange`: `attribute EventHandler onslotchange` -/
-def ShadowRoot.setOnslotchange (self : ShadowRoot) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ShadowRoot.setOnslotchange (self : ShadowRoot) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.setOnslotchange" do
   self.val.set "onslotchange" (toJS value)
 
 /-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def ShadowRoot.customElementRegistry (self : ShadowRoot) : IO (Option CustomElementRegistry) := self.val.get "customElementRegistry" (Option CustomElementRegistry)
+@[macro_inline] def ShadowRoot.customElementRegistry (self : ShadowRoot) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.ShadowRoot.customElementRegistry" do
+  self.val.get "customElementRegistry" (Option CustomElementRegistry)
 
 /-- `v instanceof Text`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Text`). -/
-def Text.cast? (v : Value) : IO (Option Text) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Text"] Value) v) then some { val := v } else none
+@[macro_inline] def Text.cast? (v : Value) : IO (Option Text) := Internal.api "Lasm.JS.Web.Text.cast?" do
+  Internal.cast (Internal.getGlobal ["Text"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString data)` -/
-def Text.new (data : Option String := none) : IO Text :=
+@[macro_inline] def Text.new (data : Option String := none) : IO Text := Internal.api "Lasm.JS.Web.Text.new" do
   Lasm.JS.Binding.invoke Text { name := "Lasm.JS.Web.Text.new", module := "globalThis", path := "Text", construct := true, arity := 1 }
-    (Support.args #[Support.optional data]) (await := false)
+    (Internal.args #[Internal.optional data]) (await := false)
 
 /-- `readonly attribute DOMString wholeText` -/
-def Text.wholeText (self : Text) : IO String := self.val.get "wholeText" String
+@[macro_inline] def Text.wholeText (self : Text) : IO String := Internal.api "Lasm.JS.Web.Text.wholeText" do
+  self.val.get "wholeText" String
 
 /-- `readonly attribute HTMLSlotElement? assignedSlot` -/
-def Text.assignedSlot (self : Text) : IO (Option HTMLSlotElement) := self.val.get "assignedSlot" (Option HTMLSlotElement)
+@[macro_inline] def Text.assignedSlot (self : Text) : IO (Option HTMLSlotElement) := Internal.api "Lasm.JS.Web.Text.assignedSlot" do
+  self.val.get "assignedSlot" (Option HTMLSlotElement)
 
 /-- `Text splitText(unsigned long offset)` -/
-def Text.splitText (self : Text) (offset : Nat) : IO Text := do
-  let r ← self.val.callMethod "splitText" (Support.args #[toJS offset]) Value
+@[macro_inline] def Text.splitText (self : Text) (offset : Nat) : IO Text := Internal.api "Lasm.JS.Web.Text.splitText" do
+  let r ← self.val.callMethod "splitText" (Internal.args #[toJS offset]) Value
   pure { val := r }
 
 /-- `v instanceof XMLDocument`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XMLDocument`). -/
-def XMLDocument.cast? (v : Value) : IO (Option XMLDocument) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XMLDocument"] Value) v) then some { val := v } else none
+@[macro_inline] def XMLDocument.cast? (v : Value) : IO (Option XMLDocument) := Internal.api "Lasm.JS.Web.XMLDocument.cast?" do
+  Internal.cast (Internal.getGlobal ["XMLDocument"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof CDATASection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CDATASection`). -/
-def CDATASection.cast? (v : Value) : IO (Option CDATASection) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CDATASection"] Value) v) then some { val := v } else none
+@[macro_inline] def CDATASection.cast? (v : Value) : IO (Option CDATASection) := Internal.api "Lasm.JS.Web.CDATASection.cast?" do
+  Internal.cast (Internal.getGlobal ["CDATASection"] Value) (fun x => { val := x }) v
+
+/-- `readonly attribute (Event or undefined) event` -/
+@[macro_inline] def Window.event (self : Window) : IO (Option Event) := Internal.api "Lasm.JS.Web.Window.event" do
+  self.val.get "event" (Option Event)
 
 /-- `readonly attribute (Event or undefined) event` (DOM Standard (https://dom.spec.whatwg.org/)) -/
-def event : IO (Option Event) := Support.getGlobal ["event"] (Option Event)
+@[macro_inline] def event : IO (Option Event) := Internal.api "Lasm.JS.Web.event" do
+  Internal.getGlobal ["event"] (Option Event)
 
 end Lasm.JS.Web

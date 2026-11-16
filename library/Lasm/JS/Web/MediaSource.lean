@@ -6,66 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediaSource
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ReadyState` (Media Source Extensions™ (https://w3c.github.io/media-source/)): "closed", "open", "ended". -/
-inductive ReadyState where
-  /-- "closed" -/
-  | closed
-  /-- "open" -/
-  | «open»
-  /-- "ended" -/
-  | ended
-  deriving BEq, Repr, Inhabited
-instance : ToJS ReadyState := ⟨fun
-  | .closed => .string "closed"
-  | .«open» => .string "open"
-  | .ended => .string "ended"⟩
-instance : FromJS ReadyState where
-  fromJS
-    | .string "closed" => .ok .closed
-    | .string "open" => .ok .«open»
-    | .string "ended" => .ok .ended
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ReadyState"
-
-/-- `enum EndOfStreamError` (Media Source Extensions™ (https://w3c.github.io/media-source/)): "network", "decode". -/
-inductive EndOfStreamError where
-  /-- "network" -/
-  | network
-  /-- "decode" -/
-  | decode
-  deriving BEq, Repr, Inhabited
-instance : ToJS EndOfStreamError := ⟨fun
-  | .network => .string "network"
-  | .decode => .string "decode"⟩
-instance : FromJS EndOfStreamError where
-  fromJS
-    | .string "network" => .ok .network
-    | .string "decode" => .ok .decode
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.EndOfStreamError"
-
-/-- `enum AppendMode` (Media Source Extensions™ (https://w3c.github.io/media-source/)): "segments", "sequence". -/
-inductive AppendMode where
-  /-- "segments" -/
-  | segments
-  /-- "sequence" -/
-  | sequence
-  deriving BEq, Repr, Inhabited
-instance : ToJS AppendMode := ⟨fun
-  | .segments => .string "segments"
-  | .sequence => .string "sequence"⟩
-instance : FromJS AppendMode where
-  fromJS
-    | .string "segments" => .ok .segments
-    | .string "sequence" => .ok .sequence
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AppendMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BufferedChangeEventInit : EventInit` (Media Source Extensions™ (https://w3c.github.io/media-source/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BufferedChangeEventInit where
@@ -79,290 +29,316 @@ structure BufferedChangeEventInit where
   addedRanges : Option TimeRanges := none
   /-- `TimeRanges removedRanges` -/
   removedRanges : Option TimeRanges := none
-instance : ToJS BufferedChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("addedRanges", Support.optional d.addedRanges),
-    ("removedRanges", Support.optional d.removedRanges)]⟩
+instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("addedRanges", Internal.optional d.addedRanges),
+    ("removedRanges", Internal.optional d.removedRanges)]⟩
 
 /-- `v instanceof BufferedChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BufferedChangeEvent`). -/
-def BufferedChangeEvent.cast? (v : Value) : IO (Option BufferedChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BufferedChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BufferedChangeEvent.cast? (v : Value) : IO (Option BufferedChangeEvent) := Internal.api "Lasm.JS.Web.BufferedChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BufferedChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional BufferedChangeEventInit eventInitDict)` -/
-def BufferedChangeEvent.new (type : String) (eventInitDict : Option BufferedChangeEventInit := none) : IO BufferedChangeEvent :=
+@[macro_inline] def BufferedChangeEvent.new (type : String) (eventInitDict : Option BufferedChangeEventInit := none) : IO BufferedChangeEvent := Internal.api "Lasm.JS.Web.BufferedChangeEvent.new" do
   Lasm.JS.Binding.invoke BufferedChangeEvent { name := "Lasm.JS.Web.BufferedChangeEvent.new", module := "globalThis", path := "BufferedChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute TimeRanges addedRanges` -/
-def BufferedChangeEvent.addedRanges (self : BufferedChangeEvent) : IO TimeRanges := do
+@[macro_inline] def BufferedChangeEvent.addedRanges (self : BufferedChangeEvent) : IO TimeRanges := Internal.api "Lasm.JS.Web.BufferedChangeEvent.addedRanges" do
   let r ← self.val.get "addedRanges" Value
   pure { val := r }
 
 /-- `readonly attribute TimeRanges removedRanges` -/
-def BufferedChangeEvent.removedRanges (self : BufferedChangeEvent) : IO TimeRanges := do
+@[macro_inline] def BufferedChangeEvent.removedRanges (self : BufferedChangeEvent) : IO TimeRanges := Internal.api "Lasm.JS.Web.BufferedChangeEvent.removedRanges" do
   let r ← self.val.get "removedRanges" Value
   pure { val := r }
 
 /-- `v instanceof MediaSource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaSource`). -/
-def MediaSource.cast? (v : Value) : IO (Option MediaSource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaSource"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaSource.cast? (v : Value) : IO (Option MediaSource) := Internal.api "Lasm.JS.Web.MediaSource.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaSource"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def MediaSource.new : IO MediaSource :=
+@[macro_inline] def MediaSource.new : IO MediaSource := Internal.api "Lasm.JS.Web.MediaSource.new" do
   Lasm.JS.Binding.invoke MediaSource { name := "Lasm.JS.Web.MediaSource.new", module := "globalThis", path := "MediaSource", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute MediaSourceHandle handle` -/
-def MediaSource.handle (self : MediaSource) : IO MediaSourceHandle := do
+@[macro_inline] def MediaSource.handle (self : MediaSource) : IO MediaSourceHandle := Internal.api "Lasm.JS.Web.MediaSource.handle" do
   let r ← self.val.get "handle" Value
   pure { val := r }
 
 /-- `readonly attribute SourceBufferList sourceBuffers` -/
-def MediaSource.sourceBuffers (self : MediaSource) : IO SourceBufferList := do
+@[macro_inline] def MediaSource.sourceBuffers (self : MediaSource) : IO SourceBufferList := Internal.api "Lasm.JS.Web.MediaSource.sourceBuffers" do
   let r ← self.val.get "sourceBuffers" Value
   pure { val := r }
 
 /-- `readonly attribute SourceBufferList activeSourceBuffers` -/
-def MediaSource.activeSourceBuffers (self : MediaSource) : IO SourceBufferList := do
+@[macro_inline] def MediaSource.activeSourceBuffers (self : MediaSource) : IO SourceBufferList := Internal.api "Lasm.JS.Web.MediaSource.activeSourceBuffers" do
   let r ← self.val.get "activeSourceBuffers" Value
   pure { val := r }
 
 /-- `readonly attribute ReadyState readyState` -/
-def MediaSource.readyState (self : MediaSource) : IO ReadyState := self.val.get "readyState" ReadyState
+@[macro_inline] def MediaSource.readyState (self : MediaSource) : IO ReadyState := Internal.api "Lasm.JS.Web.MediaSource.readyState" do
+  self.val.get "readyState" ReadyState
 
 /-- `attribute unrestricted double duration` -/
-def MediaSource.duration (self : MediaSource) : IO Float := self.val.get "duration" Float
+@[macro_inline] def MediaSource.duration (self : MediaSource) : IO Float := Internal.api "Lasm.JS.Web.MediaSource.duration" do
+  self.val.get "duration" Float
 
 /-- Sets `duration`: `attribute unrestricted double duration` -/
-def MediaSource.setDuration (self : MediaSource) (value : Float) : IO Unit :=
+@[macro_inline] def MediaSource.setDuration (self : MediaSource) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.setDuration" do
   self.val.set "duration" (toJS value)
 
 /-- `attribute EventHandler onsourceopen` -/
-def MediaSource.onsourceopen (self : MediaSource) : IO (Option EventHandlerNonNull) := self.val.get "onsourceopen" (Option EventHandlerNonNull)
+@[macro_inline] def MediaSource.onsourceopen (self : MediaSource) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaSource.onsourceopen" do
+  self.val.get "onsourceopen" (Option EventHandlerNonNull)
 
 /-- Sets `onsourceopen`: `attribute EventHandler onsourceopen` -/
-def MediaSource.setOnsourceopen (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaSource.setOnsourceopen (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.setOnsourceopen" do
   self.val.set "onsourceopen" (toJS value)
 
 /-- `attribute EventHandler onsourceended` -/
-def MediaSource.onsourceended (self : MediaSource) : IO (Option EventHandlerNonNull) := self.val.get "onsourceended" (Option EventHandlerNonNull)
+@[macro_inline] def MediaSource.onsourceended (self : MediaSource) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaSource.onsourceended" do
+  self.val.get "onsourceended" (Option EventHandlerNonNull)
 
 /-- Sets `onsourceended`: `attribute EventHandler onsourceended` -/
-def MediaSource.setOnsourceended (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaSource.setOnsourceended (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.setOnsourceended" do
   self.val.set "onsourceended" (toJS value)
 
 /-- `attribute EventHandler onsourceclose` -/
-def MediaSource.onsourceclose (self : MediaSource) : IO (Option EventHandlerNonNull) := self.val.get "onsourceclose" (Option EventHandlerNonNull)
+@[macro_inline] def MediaSource.onsourceclose (self : MediaSource) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaSource.onsourceclose" do
+  self.val.get "onsourceclose" (Option EventHandlerNonNull)
 
 /-- Sets `onsourceclose`: `attribute EventHandler onsourceclose` -/
-def MediaSource.setOnsourceclose (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaSource.setOnsourceclose (self : MediaSource) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.setOnsourceclose" do
   self.val.set "onsourceclose" (toJS value)
 
 /-- `static readonly attribute boolean canConstructInDedicatedWorker` -/
-def MediaSource.canConstructInDedicatedWorker : IO Bool := Support.getGlobal ["MediaSource", "canConstructInDedicatedWorker"] Bool
+@[macro_inline] def MediaSource.canConstructInDedicatedWorker : IO Bool := Internal.api "Lasm.JS.Web.MediaSource.canConstructInDedicatedWorker" do
+  Internal.getGlobal ["MediaSource", "canConstructInDedicatedWorker"] Bool
 
 /-- `SourceBuffer addSourceBuffer(DOMString type)` -/
-def MediaSource.addSourceBuffer (self : MediaSource) (type : String) : IO SourceBuffer := do
-  let r ← self.val.callMethod "addSourceBuffer" (Support.args #[toJS type]) Value
+@[macro_inline] def MediaSource.addSourceBuffer (self : MediaSource) (type : String) : IO SourceBuffer := Internal.api "Lasm.JS.Web.MediaSource.addSourceBuffer" do
+  let r ← self.val.callMethod "addSourceBuffer" (Internal.args #[toJS type]) Value
   pure { val := r }
 
 /-- `undefined removeSourceBuffer(SourceBuffer sourceBuffer)` -/
-def MediaSource.removeSourceBuffer (self : MediaSource) (sourceBuffer : SourceBuffer) : IO Unit :=
-  self.val.callMethod "removeSourceBuffer" (Support.args #[toJS sourceBuffer]) Unit
+@[macro_inline] def MediaSource.removeSourceBuffer (self : MediaSource) (sourceBuffer : SourceBuffer) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.removeSourceBuffer" do
+  self.val.callMethod "removeSourceBuffer" (Internal.args #[toJS sourceBuffer]) Unit
 
 /-- `undefined endOfStream(optional EndOfStreamError error)` -/
-def MediaSource.endOfStream (self : MediaSource) (error : Option EndOfStreamError := none) : IO Unit :=
-  self.val.callMethod "endOfStream" (Support.args #[Support.optional error]) Unit
+@[macro_inline] def MediaSource.endOfStream (self : MediaSource) (error : Option EndOfStreamError := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.endOfStream" do
+  self.val.callMethod "endOfStream" (Internal.args #[Internal.optional error]) Unit
 
 /-- `undefined setLiveSeekableRange(double start, double end)` -/
-def MediaSource.setLiveSeekableRange (self : MediaSource) (start : Float) («end» : Float) : IO Unit :=
-  self.val.callMethod "setLiveSeekableRange" (Support.args #[toJS start, toJS «end»]) Unit
+@[macro_inline] def MediaSource.setLiveSeekableRange (self : MediaSource) (start : Float) («end» : Float) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.setLiveSeekableRange" do
+  self.val.callMethod "setLiveSeekableRange" (Internal.args #[toJS start, toJS «end»]) Unit
 
 /-- `undefined clearLiveSeekableRange()` -/
-def MediaSource.clearLiveSeekableRange (self : MediaSource) : IO Unit :=
-  self.val.callMethod "clearLiveSeekableRange" (Support.args #[]) Unit
+@[macro_inline] def MediaSource.clearLiveSeekableRange (self : MediaSource) : IO Unit := Internal.api "Lasm.JS.Web.MediaSource.clearLiveSeekableRange" do
+  self.val.callMethod "clearLiveSeekableRange" (Internal.args #[]) Unit
 
 /-- `static boolean isTypeSupported(DOMString type)` -/
-def MediaSource.isTypeSupported (type : String) : IO Bool :=
+@[macro_inline] def MediaSource.isTypeSupported (type : String) : IO Bool := Internal.api "Lasm.JS.Web.MediaSource.isTypeSupported" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaSource.isTypeSupported", module := "globalThis", path := "MediaSource.isTypeSupported", construct := false, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
 
 /-- `v instanceof MediaSourceHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaSourceHandle`). -/
-def MediaSourceHandle.cast? (v : Value) : IO (Option MediaSourceHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaSourceHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaSourceHandle.cast? (v : Value) : IO (Option MediaSourceHandle) := Internal.api "Lasm.JS.Web.MediaSourceHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaSourceHandle"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SourceBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceBuffer`). -/
-def SourceBuffer.cast? (v : Value) : IO (Option SourceBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SourceBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def SourceBuffer.cast? (v : Value) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.SourceBuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["SourceBuffer"] Value) (fun x => { val := x }) v
 
 /-- `attribute AppendMode mode` -/
-def SourceBuffer.mode (self : SourceBuffer) : IO AppendMode := self.val.get "mode" AppendMode
+@[macro_inline] def SourceBuffer.mode (self : SourceBuffer) : IO AppendMode := Internal.api "Lasm.JS.Web.SourceBuffer.mode" do
+  self.val.get "mode" AppendMode
 
 /-- Sets `mode`: `attribute AppendMode mode` -/
-def SourceBuffer.setMode (self : SourceBuffer) (value : AppendMode) : IO Unit :=
+@[macro_inline] def SourceBuffer.setMode (self : SourceBuffer) (value : AppendMode) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setMode" do
   self.val.set "mode" (toJS value)
 
 /-- `readonly attribute boolean updating` -/
-def SourceBuffer.updating (self : SourceBuffer) : IO Bool := self.val.get "updating" Bool
+@[macro_inline] def SourceBuffer.updating (self : SourceBuffer) : IO Bool := Internal.api "Lasm.JS.Web.SourceBuffer.updating" do
+  self.val.get "updating" Bool
 
 /-- `readonly attribute TimeRanges buffered` -/
-def SourceBuffer.buffered (self : SourceBuffer) : IO TimeRanges := do
+@[macro_inline] def SourceBuffer.buffered (self : SourceBuffer) : IO TimeRanges := Internal.api "Lasm.JS.Web.SourceBuffer.buffered" do
   let r ← self.val.get "buffered" Value
   pure { val := r }
 
 /-- `attribute double timestampOffset` -/
-def SourceBuffer.timestampOffset (self : SourceBuffer) : IO Float := self.val.get "timestampOffset" Float
+@[macro_inline] def SourceBuffer.timestampOffset (self : SourceBuffer) : IO Float := Internal.api "Lasm.JS.Web.SourceBuffer.timestampOffset" do
+  self.val.get "timestampOffset" Float
 
 /-- Sets `timestampOffset`: `attribute double timestampOffset` -/
-def SourceBuffer.setTimestampOffset (self : SourceBuffer) (value : Float) : IO Unit :=
+@[macro_inline] def SourceBuffer.setTimestampOffset (self : SourceBuffer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setTimestampOffset" do
   self.val.set "timestampOffset" (toJS value)
 
 /-- `readonly attribute AudioTrackList audioTracks` -/
-def SourceBuffer.audioTracks (self : SourceBuffer) : IO AudioTrackList := do
+@[macro_inline] def SourceBuffer.audioTracks (self : SourceBuffer) : IO AudioTrackList := Internal.api "Lasm.JS.Web.SourceBuffer.audioTracks" do
   let r ← self.val.get "audioTracks" Value
   pure { val := r }
 
 /-- `readonly attribute VideoTrackList videoTracks` -/
-def SourceBuffer.videoTracks (self : SourceBuffer) : IO VideoTrackList := do
+@[macro_inline] def SourceBuffer.videoTracks (self : SourceBuffer) : IO VideoTrackList := Internal.api "Lasm.JS.Web.SourceBuffer.videoTracks" do
   let r ← self.val.get "videoTracks" Value
   pure { val := r }
 
 /-- `readonly attribute TextTrackList textTracks` -/
-def SourceBuffer.textTracks (self : SourceBuffer) : IO TextTrackList := do
+@[macro_inline] def SourceBuffer.textTracks (self : SourceBuffer) : IO TextTrackList := Internal.api "Lasm.JS.Web.SourceBuffer.textTracks" do
   let r ← self.val.get "textTracks" Value
   pure { val := r }
 
 /-- `attribute double appendWindowStart` -/
-def SourceBuffer.appendWindowStart (self : SourceBuffer) : IO Float := self.val.get "appendWindowStart" Float
+@[macro_inline] def SourceBuffer.appendWindowStart (self : SourceBuffer) : IO Float := Internal.api "Lasm.JS.Web.SourceBuffer.appendWindowStart" do
+  self.val.get "appendWindowStart" Float
 
 /-- Sets `appendWindowStart`: `attribute double appendWindowStart` -/
-def SourceBuffer.setAppendWindowStart (self : SourceBuffer) (value : Float) : IO Unit :=
+@[macro_inline] def SourceBuffer.setAppendWindowStart (self : SourceBuffer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setAppendWindowStart" do
   self.val.set "appendWindowStart" (toJS value)
 
 /-- `attribute unrestricted double appendWindowEnd` -/
-def SourceBuffer.appendWindowEnd (self : SourceBuffer) : IO Float := self.val.get "appendWindowEnd" Float
+@[macro_inline] def SourceBuffer.appendWindowEnd (self : SourceBuffer) : IO Float := Internal.api "Lasm.JS.Web.SourceBuffer.appendWindowEnd" do
+  self.val.get "appendWindowEnd" Float
 
 /-- Sets `appendWindowEnd`: `attribute unrestricted double appendWindowEnd` -/
-def SourceBuffer.setAppendWindowEnd (self : SourceBuffer) (value : Float) : IO Unit :=
+@[macro_inline] def SourceBuffer.setAppendWindowEnd (self : SourceBuffer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setAppendWindowEnd" do
   self.val.set "appendWindowEnd" (toJS value)
 
 /-- `attribute EventHandler onupdatestart` -/
-def SourceBuffer.onupdatestart (self : SourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onupdatestart" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBuffer.onupdatestart (self : SourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBuffer.onupdatestart" do
+  self.val.get "onupdatestart" (Option EventHandlerNonNull)
 
 /-- Sets `onupdatestart`: `attribute EventHandler onupdatestart` -/
-def SourceBuffer.setOnupdatestart (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBuffer.setOnupdatestart (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setOnupdatestart" do
   self.val.set "onupdatestart" (toJS value)
 
 /-- `attribute EventHandler onupdate` -/
-def SourceBuffer.onupdate (self : SourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onupdate" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBuffer.onupdate (self : SourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBuffer.onupdate" do
+  self.val.get "onupdate" (Option EventHandlerNonNull)
 
 /-- Sets `onupdate`: `attribute EventHandler onupdate` -/
-def SourceBuffer.setOnupdate (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBuffer.setOnupdate (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setOnupdate" do
   self.val.set "onupdate" (toJS value)
 
 /-- `attribute EventHandler onupdateend` -/
-def SourceBuffer.onupdateend (self : SourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onupdateend" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBuffer.onupdateend (self : SourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBuffer.onupdateend" do
+  self.val.get "onupdateend" (Option EventHandlerNonNull)
 
 /-- Sets `onupdateend`: `attribute EventHandler onupdateend` -/
-def SourceBuffer.setOnupdateend (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBuffer.setOnupdateend (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setOnupdateend" do
   self.val.set "onupdateend" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def SourceBuffer.onerror (self : SourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBuffer.onerror (self : SourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBuffer.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def SourceBuffer.setOnerror (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBuffer.setOnerror (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onabort` -/
-def SourceBuffer.onabort (self : SourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBuffer.onabort (self : SourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBuffer.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def SourceBuffer.setOnabort (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBuffer.setOnabort (self : SourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `undefined appendBuffer(BufferSource data)` -/
-def SourceBuffer.appendBuffer (self : SourceBuffer) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "appendBuffer" (Support.args #[toJS data]) Unit
+@[macro_inline] def SourceBuffer.appendBuffer (self : SourceBuffer) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.appendBuffer" do
+  self.val.callMethod "appendBuffer" (Internal.args #[toJS data]) Unit
 
 /-- `undefined abort()` -/
-def SourceBuffer.abort (self : SourceBuffer) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[]) Unit
+@[macro_inline] def SourceBuffer.abort (self : SourceBuffer) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
 
 /-- `undefined changeType(DOMString type)` -/
-def SourceBuffer.changeType (self : SourceBuffer) (type : String) : IO Unit :=
-  self.val.callMethod "changeType" (Support.args #[toJS type]) Unit
+@[macro_inline] def SourceBuffer.changeType (self : SourceBuffer) (type : String) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.changeType" do
+  self.val.callMethod "changeType" (Internal.args #[toJS type]) Unit
 
 /-- `undefined remove(double start, unrestricted double end)` -/
-def SourceBuffer.remove (self : SourceBuffer) (start : Float) («end» : Float) : IO Unit :=
-  self.val.callMethod "remove" (Support.args #[toJS start, toJS «end»]) Unit
+@[macro_inline] def SourceBuffer.remove (self : SourceBuffer) (start : Float) («end» : Float) : IO Unit := Internal.api "Lasm.JS.Web.SourceBuffer.remove" do
+  self.val.callMethod "remove" (Internal.args #[toJS start, toJS «end»]) Unit
 
 /-- `v instanceof SourceBufferList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceBufferList`). -/
-def SourceBufferList.cast? (v : Value) : IO (Option SourceBufferList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SourceBufferList"] Value) v) then some { val := v } else none
+@[macro_inline] def SourceBufferList.cast? (v : Value) : IO (Option SourceBufferList) := Internal.api "Lasm.JS.Web.SourceBufferList.cast?" do
+  Internal.cast (Internal.getGlobal ["SourceBufferList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SourceBufferList.length (self : SourceBufferList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SourceBufferList.length (self : SourceBufferList) : IO Nat := Internal.api "Lasm.JS.Web.SourceBufferList.length" do
+  self.val.get "length" Nat
 
 /-- `attribute EventHandler onaddsourcebuffer` -/
-def SourceBufferList.onaddsourcebuffer (self : SourceBufferList) : IO (Option EventHandlerNonNull) := self.val.get "onaddsourcebuffer" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBufferList.onaddsourcebuffer (self : SourceBufferList) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBufferList.onaddsourcebuffer" do
+  self.val.get "onaddsourcebuffer" (Option EventHandlerNonNull)
 
 /-- Sets `onaddsourcebuffer`: `attribute EventHandler onaddsourcebuffer` -/
-def SourceBufferList.setOnaddsourcebuffer (self : SourceBufferList) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBufferList.setOnaddsourcebuffer (self : SourceBufferList) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBufferList.setOnaddsourcebuffer" do
   self.val.set "onaddsourcebuffer" (toJS value)
 
 /-- `attribute EventHandler onremovesourcebuffer` -/
-def SourceBufferList.onremovesourcebuffer (self : SourceBufferList) : IO (Option EventHandlerNonNull) := self.val.get "onremovesourcebuffer" (Option EventHandlerNonNull)
+@[macro_inline] def SourceBufferList.onremovesourcebuffer (self : SourceBufferList) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SourceBufferList.onremovesourcebuffer" do
+  self.val.get "onremovesourcebuffer" (Option EventHandlerNonNull)
 
 /-- Sets `onremovesourcebuffer`: `attribute EventHandler onremovesourcebuffer` -/
-def SourceBufferList.setOnremovesourcebuffer (self : SourceBufferList) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SourceBufferList.setOnremovesourcebuffer (self : SourceBufferList) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SourceBufferList.setOnremovesourcebuffer" do
   self.val.set "onremovesourcebuffer" (toJS value)
 
 /-- `v instanceof ManagedMediaSource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ManagedMediaSource`). -/
-def ManagedMediaSource.cast? (v : Value) : IO (Option ManagedMediaSource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ManagedMediaSource"] Value) v) then some { val := v } else none
+@[macro_inline] def ManagedMediaSource.cast? (v : Value) : IO (Option ManagedMediaSource) := Internal.api "Lasm.JS.Web.ManagedMediaSource.cast?" do
+  Internal.cast (Internal.getGlobal ["ManagedMediaSource"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def ManagedMediaSource.new : IO ManagedMediaSource :=
+@[macro_inline] def ManagedMediaSource.new : IO ManagedMediaSource := Internal.api "Lasm.JS.Web.ManagedMediaSource.new" do
   Lasm.JS.Binding.invoke ManagedMediaSource { name := "Lasm.JS.Web.ManagedMediaSource.new", module := "globalThis", path := "ManagedMediaSource", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute boolean streaming` -/
-def ManagedMediaSource.streaming (self : ManagedMediaSource) : IO Bool := self.val.get "streaming" Bool
+@[macro_inline] def ManagedMediaSource.streaming (self : ManagedMediaSource) : IO Bool := Internal.api "Lasm.JS.Web.ManagedMediaSource.streaming" do
+  self.val.get "streaming" Bool
 
 /-- `attribute EventHandler onstartstreaming` -/
-def ManagedMediaSource.onstartstreaming (self : ManagedMediaSource) : IO (Option EventHandlerNonNull) := self.val.get "onstartstreaming" (Option EventHandlerNonNull)
+@[macro_inline] def ManagedMediaSource.onstartstreaming (self : ManagedMediaSource) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ManagedMediaSource.onstartstreaming" do
+  self.val.get "onstartstreaming" (Option EventHandlerNonNull)
 
 /-- Sets `onstartstreaming`: `attribute EventHandler onstartstreaming` -/
-def ManagedMediaSource.setOnstartstreaming (self : ManagedMediaSource) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ManagedMediaSource.setOnstartstreaming (self : ManagedMediaSource) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ManagedMediaSource.setOnstartstreaming" do
   self.val.set "onstartstreaming" (toJS value)
 
 /-- `attribute EventHandler onendstreaming` -/
-def ManagedMediaSource.onendstreaming (self : ManagedMediaSource) : IO (Option EventHandlerNonNull) := self.val.get "onendstreaming" (Option EventHandlerNonNull)
+@[macro_inline] def ManagedMediaSource.onendstreaming (self : ManagedMediaSource) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ManagedMediaSource.onendstreaming" do
+  self.val.get "onendstreaming" (Option EventHandlerNonNull)
 
 /-- Sets `onendstreaming`: `attribute EventHandler onendstreaming` -/
-def ManagedMediaSource.setOnendstreaming (self : ManagedMediaSource) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ManagedMediaSource.setOnendstreaming (self : ManagedMediaSource) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ManagedMediaSource.setOnendstreaming" do
   self.val.set "onendstreaming" (toJS value)
 
 /-- `v instanceof ManagedSourceBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ManagedSourceBuffer`). -/
-def ManagedSourceBuffer.cast? (v : Value) : IO (Option ManagedSourceBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ManagedSourceBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def ManagedSourceBuffer.cast? (v : Value) : IO (Option ManagedSourceBuffer) := Internal.api "Lasm.JS.Web.ManagedSourceBuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["ManagedSourceBuffer"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onbufferedchange` -/
-def ManagedSourceBuffer.onbufferedchange (self : ManagedSourceBuffer) : IO (Option EventHandlerNonNull) := self.val.get "onbufferedchange" (Option EventHandlerNonNull)
+@[macro_inline] def ManagedSourceBuffer.onbufferedchange (self : ManagedSourceBuffer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ManagedSourceBuffer.onbufferedchange" do
+  self.val.get "onbufferedchange" (Option EventHandlerNonNull)
 
 /-- Sets `onbufferedchange`: `attribute EventHandler onbufferedchange` -/
-def ManagedSourceBuffer.setOnbufferedchange (self : ManagedSourceBuffer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ManagedSourceBuffer.setOnbufferedchange (self : ManagedSourceBuffer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ManagedSourceBuffer.setOnbufferedchange" do
   self.val.set "onbufferedchange" (toJS value)
 
 /-- `readonly attribute SourceBuffer? sourceBuffer` -/
-def AudioTrack.sourceBuffer (self : AudioTrack) : IO (Option SourceBuffer) := self.val.get "sourceBuffer" (Option SourceBuffer)
+@[macro_inline] def AudioTrack.sourceBuffer (self : AudioTrack) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.AudioTrack.sourceBuffer" do
+  self.val.get "sourceBuffer" (Option SourceBuffer)
 
 /-- `readonly attribute SourceBuffer? sourceBuffer` -/
-def TextTrack.sourceBuffer (self : TextTrack) : IO (Option SourceBuffer) := self.val.get "sourceBuffer" (Option SourceBuffer)
+@[macro_inline] def TextTrack.sourceBuffer (self : TextTrack) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.TextTrack.sourceBuffer" do
+  self.val.get "sourceBuffer" (Option SourceBuffer)
 
 /-- `readonly attribute SourceBuffer? sourceBuffer` -/
-def VideoTrack.sourceBuffer (self : VideoTrack) : IO (Option SourceBuffer) := self.val.get "sourceBuffer" (Option SourceBuffer)
+@[macro_inline] def VideoTrack.sourceBuffer (self : VideoTrack) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.VideoTrack.sourceBuffer" do
+  self.val.get "sourceBuffer" (Option SourceBuffer)
 
 end Lasm.JS.Web

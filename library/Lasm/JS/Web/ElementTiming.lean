@@ -6,59 +6,76 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.ElementTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceElementTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceElementTiming`). -/
-def PerformanceElementTiming.cast? (v : Value) : IO (Option PerformanceElementTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceElementTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceElementTiming.cast? (v : Value) : IO (Option PerformanceElementTiming) := Internal.api "Lasm.JS.Web.PerformanceElementTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceElementTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp renderTime` -/
-def PerformanceElementTiming.renderTime (self : PerformanceElementTiming) : IO Float := self.val.get "renderTime" Float
+@[macro_inline] def PerformanceElementTiming.renderTime (self : PerformanceElementTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceElementTiming.renderTime" do
+  self.val.get "renderTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp loadTime` -/
-def PerformanceElementTiming.loadTime (self : PerformanceElementTiming) : IO Float := self.val.get "loadTime" Float
+@[macro_inline] def PerformanceElementTiming.loadTime (self : PerformanceElementTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceElementTiming.loadTime" do
+  self.val.get "loadTime" Float
 
 /-- `readonly attribute DOMRectReadOnly intersectionRect` -/
-def PerformanceElementTiming.intersectionRect (self : PerformanceElementTiming) : IO DOMRectReadOnly := do
+@[macro_inline] def PerformanceElementTiming.intersectionRect (self : PerformanceElementTiming) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.PerformanceElementTiming.intersectionRect" do
   let r ← self.val.get "intersectionRect" Value
   pure { val := r }
 
 /-- `readonly attribute DOMString identifier` -/
-def PerformanceElementTiming.identifier (self : PerformanceElementTiming) : IO String := self.val.get "identifier" String
+@[macro_inline] def PerformanceElementTiming.identifier (self : PerformanceElementTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceElementTiming.identifier" do
+  self.val.get "identifier" String
 
 /-- `readonly attribute unsigned long naturalWidth` -/
-def PerformanceElementTiming.naturalWidth (self : PerformanceElementTiming) : IO Nat := self.val.get "naturalWidth" Nat
+@[macro_inline] def PerformanceElementTiming.naturalWidth (self : PerformanceElementTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceElementTiming.naturalWidth" do
+  self.val.get "naturalWidth" Nat
 
 /-- `readonly attribute unsigned long naturalHeight` -/
-def PerformanceElementTiming.naturalHeight (self : PerformanceElementTiming) : IO Nat := self.val.get "naturalHeight" Nat
+@[macro_inline] def PerformanceElementTiming.naturalHeight (self : PerformanceElementTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceElementTiming.naturalHeight" do
+  self.val.get "naturalHeight" Nat
 
 /-- `readonly attribute DOMString id` -/
-def PerformanceElementTiming.id (self : PerformanceElementTiming) : IO String := self.val.get "id" String
+@[macro_inline] def PerformanceElementTiming.id (self : PerformanceElementTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceElementTiming.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute Element? element` -/
-def PerformanceElementTiming.element (self : PerformanceElementTiming) : IO (Option Element) := self.val.get "element" (Option Element)
+@[macro_inline] def PerformanceElementTiming.element (self : PerformanceElementTiming) : IO (Option Element) := Internal.api "Lasm.JS.Web.PerformanceElementTiming.element" do
+  self.val.get "element" (Option Element)
 
 /-- `readonly attribute USVString url` -/
-def PerformanceElementTiming.url (self : PerformanceElementTiming) : IO String := self.val.get "url" String
+@[macro_inline] def PerformanceElementTiming.url (self : PerformanceElementTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceElementTiming.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def PerformanceElementTiming.paintTime (self : PerformanceElementTiming) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def PerformanceElementTiming.paintTime (self : PerformanceElementTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceElementTiming.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def PerformanceElementTiming.presentationTime (self : PerformanceElementTiming) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def PerformanceElementTiming.presentationTime (self : PerformanceElementTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceElementTiming.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def PerformanceElementTiming.toJSON (self : PerformanceElementTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceElementTiming.toJSON (self : PerformanceElementTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceElementTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `attribute DOMString elementTiming` -/
-def Element.elementTiming (self : Element) : IO String := self.val.get "elementTiming" String
+@[macro_inline] def Element.elementTiming (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.elementTiming" do
+  self.val.get "elementTiming" String
 
 /-- Sets `elementTiming`: `attribute DOMString elementTiming` -/
-def Element.setElementTiming (self : Element) (value : String) : IO Unit :=
+@[macro_inline] def Element.setElementTiming (self : Element) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setElementTiming" do
   self.val.set "elementTiming" (toJS value)
 
 end Lasm.JS.Web

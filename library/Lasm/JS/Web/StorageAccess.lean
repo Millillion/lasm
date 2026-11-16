@@ -6,17 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<boolean> hasStorageAccess()` -/
-def Document.hasStorageAccess (self : Document) : Async Bool :=
-  self.val.callMethodAwait "hasStorageAccess" (Support.args #[]) Bool
+@[macro_inline] def Document.hasStorageAccess (self : Document) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasStorageAccess" do
+  self.val.callMethodAwait "hasStorageAccess" (Internal.args #[]) Bool
 
 /-- `Promise<undefined> requestStorageAccess()` -/
-def Document.requestStorageAccess (self : Document) : Async Unit :=
-  self.val.callMethodAwait "requestStorageAccess" (Support.args #[]) Unit
+@[macro_inline] def Document.requestStorageAccess (self : Document) : Async Unit := Internal.api "Lasm.JS.Web.Document.requestStorageAccess" do
+  self.val.callMethodAwait "requestStorageAccess" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

@@ -6,29 +6,32 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ManagedConfiguration
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<DOMString> getAnnotatedAssetId()` -/
-def NavigatorManagedData.getAnnotatedAssetId (self : NavigatorManagedData) : Async String :=
-  self.val.callMethodAwait "getAnnotatedAssetId" (Support.args #[]) String
+@[macro_inline] def NavigatorManagedData.getAnnotatedAssetId (self : NavigatorManagedData) : Async String := Internal.api "Lasm.JS.Web.NavigatorManagedData.getAnnotatedAssetId" do
+  self.val.callMethodAwait "getAnnotatedAssetId" (Internal.args #[]) String
 
 /-- `Promise<DOMString> getAnnotatedLocation()` -/
-def NavigatorManagedData.getAnnotatedLocation (self : NavigatorManagedData) : Async String :=
-  self.val.callMethodAwait "getAnnotatedLocation" (Support.args #[]) String
+@[macro_inline] def NavigatorManagedData.getAnnotatedLocation (self : NavigatorManagedData) : Async String := Internal.api "Lasm.JS.Web.NavigatorManagedData.getAnnotatedLocation" do
+  self.val.callMethodAwait "getAnnotatedLocation" (Internal.args #[]) String
 
 /-- `Promise<DOMString> getDirectoryId()` -/
-def NavigatorManagedData.getDirectoryId (self : NavigatorManagedData) : Async String :=
-  self.val.callMethodAwait "getDirectoryId" (Support.args #[]) String
+@[macro_inline] def NavigatorManagedData.getDirectoryId (self : NavigatorManagedData) : Async String := Internal.api "Lasm.JS.Web.NavigatorManagedData.getDirectoryId" do
+  self.val.callMethodAwait "getDirectoryId" (Internal.args #[]) String
 
 /-- `Promise<DOMString> getHostname()` -/
-def NavigatorManagedData.getHostname (self : NavigatorManagedData) : Async String :=
-  self.val.callMethodAwait "getHostname" (Support.args #[]) String
+@[macro_inline] def NavigatorManagedData.getHostname (self : NavigatorManagedData) : Async String := Internal.api "Lasm.JS.Web.NavigatorManagedData.getHostname" do
+  self.val.callMethodAwait "getHostname" (Internal.args #[]) String
 
 /-- `Promise<DOMString> getSerialNumber()` -/
-def NavigatorManagedData.getSerialNumber (self : NavigatorManagedData) : Async String :=
-  self.val.callMethodAwait "getSerialNumber" (Support.args #[]) String
+@[macro_inline] def NavigatorManagedData.getSerialNumber (self : NavigatorManagedData) : Async String := Internal.api "Lasm.JS.Web.NavigatorManagedData.getSerialNumber" do
+  self.val.callMethodAwait "getSerialNumber" (Internal.args #[]) String
 
 end Lasm.JS.Web

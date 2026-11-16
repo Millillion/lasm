@@ -6,50 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.Serial
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Bluetooth
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ParityType` (WebSerial Standard (https://serial.spec.whatwg.org/)): "none", "even", "odd". -/
-inductive ParityType where
-  /-- "none" -/
-  | none
-  /-- "even" -/
-  | even
-  /-- "odd" -/
-  | odd
-  deriving BEq, Repr, Inhabited
-instance : ToJS ParityType := ⟨fun
-  | .none => .string "none"
-  | .even => .string "even"
-  | .odd => .string "odd"⟩
-instance : FromJS ParityType where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "even" => .ok .even
-    | .string "odd" => .ok .odd
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ParityType"
-
-/-- `enum FlowControlType` (WebSerial Standard (https://serial.spec.whatwg.org/)): "none", "hardware". -/
-inductive FlowControlType where
-  /-- "none" -/
-  | none
-  /-- "hardware" -/
-  | hardware
-  deriving BEq, Repr, Inhabited
-instance : ToJS FlowControlType := ⟨fun
-  | .none => .string "none"
-  | .hardware => .string "hardware"⟩
-instance : FromJS FlowControlType where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "hardware" => .ok .hardware
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FlowControlType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SerialPortFilter` (WebSerial Standard (https://serial.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SerialPortFilter where
@@ -59,9 +27,9 @@ structure SerialPortFilter where
   usbProductId : Option Nat := none
   /-- `BluetoothServiceUUID bluetoothServiceClassId` -/
   bluetoothServiceClassId : Option BluetoothServiceUUID := none
-instance : ToJS SerialPortFilter := ⟨fun d => Support.fields #[("usbVendorId", Support.optional d.usbVendorId),
-    ("usbProductId", Support.optional d.usbProductId),
-    ("bluetoothServiceClassId", Support.optional d.bluetoothServiceClassId)]⟩
+instance : ToJS SerialPortFilter := ⟨fun d => Internal.fields #[("usbVendorId", Internal.optional d.usbVendorId),
+    ("usbProductId", Internal.optional d.usbProductId),
+    ("bluetoothServiceClassId", Internal.optional d.bluetoothServiceClassId)]⟩
 
 /-- `dictionary SerialPortRequestOptions` (WebSerial Standard (https://serial.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SerialPortRequestOptions where
@@ -69,8 +37,8 @@ structure SerialPortRequestOptions where
   filters : Option (Array SerialPortFilter) := none
   /-- `sequence<BluetoothServiceUUID> allowedBluetoothServiceClassIds` -/
   allowedBluetoothServiceClassIds : Option (Array BluetoothServiceUUID) := none
-instance : ToJS SerialPortRequestOptions := ⟨fun d => Support.fields #[("filters", Support.optional d.filters),
-    ("allowedBluetoothServiceClassIds", Support.optional d.allowedBluetoothServiceClassIds)]⟩
+instance : ToJS SerialPortRequestOptions := ⟨fun d => Internal.fields #[("filters", Internal.optional d.filters),
+    ("allowedBluetoothServiceClassIds", Internal.optional d.allowedBluetoothServiceClassIds)]⟩
 
 /-- `dictionary SerialPortInfo` (WebSerial Standard (https://serial.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SerialPortInfo where
@@ -80,6 +48,9 @@ structure SerialPortInfo where
   usbProductId : Option Nat := none
   /-- `BluetoothServiceUUID bluetoothServiceClassId` -/
   bluetoothServiceClassId : Option BluetoothServiceUUID := none
+instance : ToJS SerialPortInfo := ⟨fun d => Internal.fields #[("usbVendorId", Internal.optional d.usbVendorId),
+    ("usbProductId", Internal.optional d.usbProductId),
+    ("bluetoothServiceClassId", Internal.optional d.bluetoothServiceClassId)]⟩
 instance : FromJS SerialPortInfo where
   fromJS d := do return {
     usbVendorId := ← Lasm.JS.readField (Option Nat) d "usbVendorId",
@@ -101,12 +72,12 @@ structure SerialOptions where
   bufferSize : Option Nat := none
   /-- `FlowControlType flowControl = "none"` -/
   flowControl : Option FlowControlType := none
-instance : ToJS SerialOptions := ⟨fun d => Support.fields #[("baudRate", toJS d.baudRate),
-    ("dataBits", Support.optional d.dataBits),
-    ("stopBits", Support.optional d.stopBits),
-    ("parity", Support.optional d.parity),
-    ("bufferSize", Support.optional d.bufferSize),
-    ("flowControl", Support.optional d.flowControl)]⟩
+instance : ToJS SerialOptions := ⟨fun d => Internal.fields #[("baudRate", toJS d.baudRate),
+    ("dataBits", Internal.optional d.dataBits),
+    ("stopBits", Internal.optional d.stopBits),
+    ("parity", Internal.optional d.parity),
+    ("bufferSize", Internal.optional d.bufferSize),
+    ("flowControl", Internal.optional d.flowControl)]⟩
 
 /-- `dictionary SerialOutputSignals` (WebSerial Standard (https://serial.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SerialOutputSignals where
@@ -116,9 +87,9 @@ structure SerialOutputSignals where
   requestToSend : Option Bool := none
   /-- `boolean break` -/
   «break» : Option Bool := none
-instance : ToJS SerialOutputSignals := ⟨fun d => Support.fields #[("dataTerminalReady", Support.optional d.dataTerminalReady),
-    ("requestToSend", Support.optional d.requestToSend),
-    ("break", Support.optional d.«break»)]⟩
+instance : ToJS SerialOutputSignals := ⟨fun d => Internal.fields #[("dataTerminalReady", Internal.optional d.dataTerminalReady),
+    ("requestToSend", Internal.optional d.requestToSend),
+    ("break", Internal.optional d.«break»)]⟩
 
 /-- `dictionary SerialInputSignals` (WebSerial Standard (https://serial.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SerialInputSignals where
@@ -130,6 +101,10 @@ structure SerialInputSignals where
   ringIndicator : Bool
   /-- `required boolean dataSetReady` -/
   dataSetReady : Bool
+instance : ToJS SerialInputSignals := ⟨fun d => Internal.fields #[("dataCarrierDetect", toJS d.dataCarrierDetect),
+    ("clearToSend", toJS d.clearToSend),
+    ("ringIndicator", toJS d.ringIndicator),
+    ("dataSetReady", toJS d.dataSetReady)]⟩
 instance : FromJS SerialInputSignals where
   fromJS d := do return {
     dataCarrierDetect := ← Lasm.JS.readField Bool d "dataCarrierDetect",
@@ -139,90 +114,97 @@ instance : FromJS SerialInputSignals where
   typeName := "Lasm.JS.Web.SerialInputSignals"
 
 /-- `v instanceof Serial`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Serial`). -/
-def Serial.cast? (v : Value) : IO (Option Serial) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Serial"] Value) v) then some { val := v } else none
+@[macro_inline] def Serial.cast? (v : Value) : IO (Option Serial) := Internal.api "Lasm.JS.Web.Serial.cast?" do
+  Internal.cast (Internal.getGlobal ["Serial"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onconnect` -/
-def Serial.onconnect (self : Serial) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def Serial.onconnect (self : Serial) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Serial.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def Serial.setOnconnect (self : Serial) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Serial.setOnconnect (self : Serial) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Serial.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler ondisconnect` -/
-def Serial.ondisconnect (self : Serial) : IO (Option EventHandlerNonNull) := self.val.get "ondisconnect" (Option EventHandlerNonNull)
+@[macro_inline] def Serial.ondisconnect (self : Serial) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Serial.ondisconnect" do
+  self.val.get "ondisconnect" (Option EventHandlerNonNull)
 
 /-- Sets `ondisconnect`: `attribute EventHandler ondisconnect` -/
-def Serial.setOndisconnect (self : Serial) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Serial.setOndisconnect (self : Serial) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Serial.setOndisconnect" do
   self.val.set "ondisconnect" (toJS value)
 
 /-- `Promise<sequence<SerialPort>> getPorts()` -/
-def Serial.getPorts (self : Serial) : Async (Array SerialPort) :=
-  self.val.callMethodAwait "getPorts" (Support.args #[]) (Array SerialPort)
+@[macro_inline] def Serial.getPorts (self : Serial) : Async (Array SerialPort) := Internal.api "Lasm.JS.Web.Serial.getPorts" do
+  self.val.callMethodAwait "getPorts" (Internal.args #[]) (Array SerialPort)
 
 /-- `Promise<SerialPort> requestPort(optional SerialPortRequestOptions options)` -/
-def Serial.requestPort (self : Serial) (options : Option SerialPortRequestOptions := none) : Async SerialPort := do
-  let r ← self.val.callMethodAwait "requestPort" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Serial.requestPort (self : Serial) (options : Option SerialPortRequestOptions := none) : Async SerialPort := Internal.api "Lasm.JS.Web.Serial.requestPort" do
+  let r ← self.val.callMethodAwait "requestPort" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof SerialPort`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SerialPort`). -/
-def SerialPort.cast? (v : Value) : IO (Option SerialPort) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SerialPort"] Value) v) then some { val := v } else none
+@[macro_inline] def SerialPort.cast? (v : Value) : IO (Option SerialPort) := Internal.api "Lasm.JS.Web.SerialPort.cast?" do
+  Internal.cast (Internal.getGlobal ["SerialPort"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onconnect` -/
-def SerialPort.onconnect (self : SerialPort) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def SerialPort.onconnect (self : SerialPort) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SerialPort.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def SerialPort.setOnconnect (self : SerialPort) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SerialPort.setOnconnect (self : SerialPort) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SerialPort.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler ondisconnect` -/
-def SerialPort.ondisconnect (self : SerialPort) : IO (Option EventHandlerNonNull) := self.val.get "ondisconnect" (Option EventHandlerNonNull)
+@[macro_inline] def SerialPort.ondisconnect (self : SerialPort) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SerialPort.ondisconnect" do
+  self.val.get "ondisconnect" (Option EventHandlerNonNull)
 
 /-- Sets `ondisconnect`: `attribute EventHandler ondisconnect` -/
-def SerialPort.setOndisconnect (self : SerialPort) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SerialPort.setOndisconnect (self : SerialPort) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SerialPort.setOndisconnect" do
   self.val.set "ondisconnect" (toJS value)
 
 /-- `readonly attribute boolean connected` -/
-def SerialPort.connected (self : SerialPort) : IO Bool := self.val.get "connected" Bool
+@[macro_inline] def SerialPort.connected (self : SerialPort) : IO Bool := Internal.api "Lasm.JS.Web.SerialPort.connected" do
+  self.val.get "connected" Bool
 
 /-- `readonly attribute ReadableStream? readable` -/
-def SerialPort.readable (self : SerialPort) : IO (Option ReadableStream) := self.val.get "readable" (Option ReadableStream)
+@[macro_inline] def SerialPort.readable (self : SerialPort) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.SerialPort.readable" do
+  self.val.get "readable" (Option ReadableStream)
 
 /-- `readonly attribute WritableStream? writable` -/
-def SerialPort.writable (self : SerialPort) : IO (Option WritableStream) := self.val.get "writable" (Option WritableStream)
+@[macro_inline] def SerialPort.writable (self : SerialPort) : IO (Option WritableStream) := Internal.api "Lasm.JS.Web.SerialPort.writable" do
+  self.val.get "writable" (Option WritableStream)
 
 /-- `SerialPortInfo getInfo()` -/
-def SerialPort.getInfo (self : SerialPort) : IO SerialPortInfo :=
-  self.val.callMethod "getInfo" (Support.args #[]) SerialPortInfo
+@[macro_inline] def SerialPort.getInfo (self : SerialPort) : IO SerialPortInfo := Internal.api "Lasm.JS.Web.SerialPort.getInfo" do
+  self.val.callMethod "getInfo" (Internal.args #[]) SerialPortInfo
 
 /-- `Promise<undefined> open(SerialOptions options)` -/
-def SerialPort.«open» (self : SerialPort) (options : SerialOptions) : Async Unit :=
-  self.val.callMethodAwait "open" (Support.args #[toJS options]) Unit
+@[macro_inline] def SerialPort.«open» (self : SerialPort) (options : SerialOptions) : Async Unit := Internal.api "Lasm.JS.Web.SerialPort.open" do
+  self.val.callMethodAwait "open" (Internal.args #[toJS options]) Unit
 
 /-- `Promise<undefined> setSignals(optional SerialOutputSignals signals)` -/
-def SerialPort.setSignals (self : SerialPort) (signals : Option SerialOutputSignals := none) : Async Unit :=
-  self.val.callMethodAwait "setSignals" (Support.args #[Support.optional signals]) Unit
+@[macro_inline] def SerialPort.setSignals (self : SerialPort) (signals : Option SerialOutputSignals := none) : Async Unit := Internal.api "Lasm.JS.Web.SerialPort.setSignals" do
+  self.val.callMethodAwait "setSignals" (Internal.args #[Internal.optional signals]) Unit
 
 /-- `Promise<SerialInputSignals> getSignals()` -/
-def SerialPort.getSignals (self : SerialPort) : Async SerialInputSignals :=
-  self.val.callMethodAwait "getSignals" (Support.args #[]) SerialInputSignals
+@[macro_inline] def SerialPort.getSignals (self : SerialPort) : Async SerialInputSignals := Internal.api "Lasm.JS.Web.SerialPort.getSignals" do
+  self.val.callMethodAwait "getSignals" (Internal.args #[]) SerialInputSignals
 
 /-- `Promise<undefined> close()` -/
-def SerialPort.close (self : SerialPort) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def SerialPort.close (self : SerialPort) : Async Unit := Internal.api "Lasm.JS.Web.SerialPort.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> forget()` -/
-def SerialPort.forget (self : SerialPort) : Async Unit :=
-  self.val.callMethodAwait "forget" (Support.args #[]) Unit
+@[macro_inline] def SerialPort.forget (self : SerialPort) : Async Unit := Internal.api "Lasm.JS.Web.SerialPort.forget" do
+  self.val.callMethodAwait "forget" (Internal.args #[]) Unit
 
 /-- `readonly attribute Serial serial` -/
-def Navigator.serial (self : Navigator) : IO Serial := do
+@[macro_inline] def Navigator.serial (self : Navigator) : IO Serial := Internal.api "Lasm.JS.Web.Navigator.serial" do
   let r ← self.val.get "serial" Value
   pure { val := r }
 
 /-- `readonly attribute Serial serial` -/
-def WorkerNavigator.serial (self : WorkerNavigator) : IO Serial := do
+@[macro_inline] def WorkerNavigator.serial (self : WorkerNavigator) : IO Serial := Internal.api "Lasm.JS.Web.WorkerNavigator.serial" do
   let r ← self.val.get "serial" Value
   pure { val := r }
 

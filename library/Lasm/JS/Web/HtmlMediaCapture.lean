@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute DOMString capture` -/
-def HTMLInputElement.capture (self : HTMLInputElement) : IO String := self.val.get "capture" String
+@[macro_inline] def HTMLInputElement.capture (self : HTMLInputElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInputElement.capture" do
+  self.val.get "capture" String
 
 /-- Sets `capture`: `attribute DOMString capture` -/
-def HTMLInputElement.setCapture (self : HTMLInputElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLInputElement.setCapture (self : HTMLInputElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInputElement.setCapture" do
   self.val.set "capture" (toJS value)
 
 end Lasm.JS.Web

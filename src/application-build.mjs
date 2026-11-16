@@ -64,7 +64,7 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports, webTarget } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -116,6 +116,13 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   let library;
   if (usesJs) {
     library = librarySources(lean, generated.sources);
+    // --target's web APIs (src/web-availability.mjs): the program's C and the library modules outside
+    // Lasm.JS.Web name the Lasm.JS.Web functions they call; the target must provide each.
+    if (webTarget !== undefined) {
+      const texts = [...generated.sources, ...library.sources.filter((_, i) => !library.inputs[i].module.startsWith('+Lasm.JS.Web'))]
+        .map(file => readFileSync(file, 'latin1'));
+      (await import('./web-availability.mjs')).assertWebAvailable(texts, webTarget);
+    }
     generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
   }
   // npm packages for Lasm.JS: package.json next to the lakefile (or the source).

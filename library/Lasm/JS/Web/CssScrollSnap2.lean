@@ -6,11 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.CssScrollSnap2
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SnapEventInit : EventInit` (CSS Scroll Snap Module Level 2 (https://drafts.csswg.org/css-scroll-snap-2/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SnapEventInit where
@@ -24,87 +31,115 @@ structure SnapEventInit where
   snapTargetBlock : Option Node := none
   /-- `Node? snapTargetInline` -/
   snapTargetInline : Option Node := none
-instance : ToJS SnapEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("snapTargetBlock", Support.optional d.snapTargetBlock),
-    ("snapTargetInline", Support.optional d.snapTargetInline)]⟩
+instance : ToJS SnapEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("snapTargetBlock", Internal.optional d.snapTargetBlock),
+    ("snapTargetInline", Internal.optional d.snapTargetInline)]⟩
 
 /-- `v instanceof SnapEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SnapEvent`). -/
-def SnapEvent.cast? (v : Value) : IO (Option SnapEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SnapEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SnapEvent.cast? (v : Value) : IO (Option SnapEvent) := Internal.api "Lasm.JS.Web.SnapEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SnapEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional SnapEventInit eventInitDict)` -/
-def SnapEvent.new (type : String) (eventInitDict : Option SnapEventInit := none) : IO SnapEvent :=
+@[macro_inline] def SnapEvent.new (type : String) (eventInitDict : Option SnapEventInit := none) : IO SnapEvent := Internal.api "Lasm.JS.Web.SnapEvent.new" do
   Lasm.JS.Binding.invoke SnapEvent { name := "Lasm.JS.Web.SnapEvent.new", module := "globalThis", path := "SnapEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute Node? snapTargetBlock` -/
-def SnapEvent.snapTargetBlock (self : SnapEvent) : IO (Option Node) := self.val.get "snapTargetBlock" (Option Node)
+@[macro_inline] def SnapEvent.snapTargetBlock (self : SnapEvent) : IO (Option Node) := Internal.api "Lasm.JS.Web.SnapEvent.snapTargetBlock" do
+  self.val.get "snapTargetBlock" (Option Node)
 
 /-- `readonly attribute Node? snapTargetInline` -/
-def SnapEvent.snapTargetInline (self : SnapEvent) : IO (Option Node) := self.val.get "snapTargetInline" (Option Node)
+@[macro_inline] def SnapEvent.snapTargetInline (self : SnapEvent) : IO (Option Node) := Internal.api "Lasm.JS.Web.SnapEvent.snapTargetInline" do
+  self.val.get "snapTargetInline" (Option Node)
 
 /-- `attribute EventHandler onsnapchanged` -/
-def Document.onsnapchanged (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanged" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onsnapchanged (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onsnapchanged" do
+  self.val.get "onsnapchanged" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanged`: `attribute EventHandler onsnapchanged` -/
-def Document.setOnsnapchanged (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnsnapchanged (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnsnapchanged" do
   self.val.set "onsnapchanged" (toJS value)
 
 /-- `attribute EventHandler onsnapchanging` -/
-def Document.onsnapchanging (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanging" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onsnapchanging (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onsnapchanging" do
+  self.val.get "onsnapchanging" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanging`: `attribute EventHandler onsnapchanging` -/
-def Document.setOnsnapchanging (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnsnapchanging (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnsnapchanging" do
   self.val.set "onsnapchanging" (toJS value)
 
 /-- `attribute EventHandler onsnapchanged` -/
-def HTMLElement.onsnapchanged (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanged" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onsnapchanged (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onsnapchanged" do
+  self.val.get "onsnapchanged" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanged`: `attribute EventHandler onsnapchanged` -/
-def HTMLElement.setOnsnapchanged (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnsnapchanged (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnsnapchanged" do
   self.val.set "onsnapchanged" (toJS value)
 
 /-- `attribute EventHandler onsnapchanging` -/
-def HTMLElement.onsnapchanging (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanging" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onsnapchanging (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onsnapchanging" do
+  self.val.get "onsnapchanging" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanging`: `attribute EventHandler onsnapchanging` -/
-def HTMLElement.setOnsnapchanging (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnsnapchanging (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnsnapchanging" do
   self.val.set "onsnapchanging" (toJS value)
 
 /-- `attribute EventHandler onsnapchanged` -/
-def MathMLElement.onsnapchanged (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanged" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onsnapchanged (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onsnapchanged" do
+  self.val.get "onsnapchanged" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanged`: `attribute EventHandler onsnapchanged` -/
-def MathMLElement.setOnsnapchanged (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnsnapchanged (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnsnapchanged" do
   self.val.set "onsnapchanged" (toJS value)
 
 /-- `attribute EventHandler onsnapchanging` -/
-def MathMLElement.onsnapchanging (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanging" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onsnapchanging (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onsnapchanging" do
+  self.val.get "onsnapchanging" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanging`: `attribute EventHandler onsnapchanging` -/
-def MathMLElement.setOnsnapchanging (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnsnapchanging (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnsnapchanging" do
   self.val.set "onsnapchanging" (toJS value)
 
 /-- `attribute EventHandler onsnapchanged` -/
-def SVGElement.onsnapchanged (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanged" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onsnapchanged (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onsnapchanged" do
+  self.val.get "onsnapchanged" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanged`: `attribute EventHandler onsnapchanged` -/
-def SVGElement.setOnsnapchanged (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnsnapchanged (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnsnapchanged" do
   self.val.set "onsnapchanged" (toJS value)
 
 /-- `attribute EventHandler onsnapchanging` -/
-def SVGElement.onsnapchanging (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onsnapchanging" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onsnapchanging (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onsnapchanging" do
+  self.val.get "onsnapchanging" (Option EventHandlerNonNull)
 
 /-- Sets `onsnapchanging`: `attribute EventHandler onsnapchanging` -/
-def SVGElement.setOnsnapchanging (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnsnapchanging (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnsnapchanging" do
+  self.val.set "onsnapchanging" (toJS value)
+
+/-- `attribute EventHandler onsnapchanged` -/
+@[macro_inline] def Window.onsnapchanged (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onsnapchanged" do
+  self.val.get "onsnapchanged" (Option EventHandlerNonNull)
+
+/-- Sets `onsnapchanged`: `attribute EventHandler onsnapchanged` -/
+@[macro_inline] def Window.setOnsnapchanged (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnsnapchanged" do
+  self.val.set "onsnapchanged" (toJS value)
+
+/-- `attribute EventHandler onsnapchanging` -/
+@[macro_inline] def Window.onsnapchanging (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onsnapchanging" do
+  self.val.get "onsnapchanging" (Option EventHandlerNonNull)
+
+/-- Sets `onsnapchanging`: `attribute EventHandler onsnapchanging` -/
+@[macro_inline] def Window.setOnsnapchanging (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnsnapchanging" do
   self.val.set "onsnapchanging" (toJS value)
 
 /-- `attribute EventHandler onsnapchanged` (CSS Scroll Snap Module Level 2 (https://drafts.csswg.org/css-scroll-snap-2/)) -/
-def onsnapchanged : IO (Option EventHandlerNonNull) := Support.getGlobal ["onsnapchanged"] (Option EventHandlerNonNull)
+@[macro_inline] def onsnapchanged : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsnapchanged" do
+  Internal.getGlobal ["onsnapchanged"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onsnapchanging` (CSS Scroll Snap Module Level 2 (https://drafts.csswg.org/css-scroll-snap-2/)) -/
-def onsnapchanging : IO (Option EventHandlerNonNull) := Support.getGlobal ["onsnapchanging"] (Option EventHandlerNonNull)
+@[macro_inline] def onsnapchanging : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsnapchanging" do
+  Internal.getGlobal ["onsnapchanging"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

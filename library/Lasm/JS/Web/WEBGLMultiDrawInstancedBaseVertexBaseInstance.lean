@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLMultiDrawInstancedBaseVertexBaseInstance
 import Lasm.JS.Web.WEBGLMultiDraw
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(Uint32Array or sequence<GLuint>)`: one constructor per member type. -/
 inductive Uint32ArrayOrSequenceOfGLuint where
@@ -24,11 +28,11 @@ instance : Coe ByteArray Uint32ArrayOrSequenceOfGLuint := ⟨.uint32Array⟩
 instance : Coe (Array Nat) Uint32ArrayOrSequenceOfGLuint := ⟨.sequence⟩
 
 /-- `undefined multiDrawArraysInstancedBaseInstanceWEBGL(GLenum mode, (Int32Array or sequence<GLint>) firstsList, unsigned long long firstsOffset, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, (Int32Array or sequence<GLsizei>) instanceCountsList, unsigned long long instanceCountsOffset, (Uint32Array or sequence<GLuint>) baseInstancesList, unsigned long long baseInstancesOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawArraysInstancedBaseInstanceWEBGL (self : WEBGL_multi_draw_instanced_base_vertex_base_instance) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (baseInstancesList : Uint32ArrayOrSequenceOfGLuint) (baseInstancesOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawArraysInstancedBaseInstanceWEBGL" (Support.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS baseInstancesList, toJS baseInstancesOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawArraysInstancedBaseInstanceWEBGL (self : WEBGL_multi_draw_instanced_base_vertex_base_instance) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (baseInstancesList : Uint32ArrayOrSequenceOfGLuint) (baseInstancesOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawArraysInstancedBaseInstanceWEBGL" do
+  self.val.callMethod "multiDrawArraysInstancedBaseInstanceWEBGL" (Internal.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS baseInstancesList, toJS baseInstancesOffset, toJS drawcount]) Unit
 
 /-- `undefined multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL(GLenum mode, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, GLenum type, (Int32Array or sequence<GLsizei>) offsetsList, unsigned long long offsetsOffset, (Int32Array or sequence<GLsizei>) instanceCountsList, unsigned long long instanceCountsOffset, (Int32Array or sequence<GLint>) baseVerticesList, unsigned long long baseVerticesOffset, (Uint32Array or sequence<GLuint>) baseInstancesList, unsigned long long baseInstancesOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL (self : WEBGL_multi_draw_instanced_base_vertex_base_instance) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (baseVerticesList : Int32ArrayOrSequenceOfGLint) (baseVerticesOffset : Nat) (baseInstancesList : Uint32ArrayOrSequenceOfGLuint) (baseInstancesOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL" (Support.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS baseVerticesList, toJS baseVerticesOffset, toJS baseInstancesList, toJS baseInstancesOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL (self : WEBGL_multi_draw_instanced_base_vertex_base_instance) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (baseVerticesList : Int32ArrayOrSequenceOfGLint) (baseVerticesOffset : Nat) (baseInstancesList : Uint32ArrayOrSequenceOfGLuint) (baseInstancesOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw_instanced_base_vertex_base_instance.multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL" do
+  self.val.callMethod "multiDrawElementsInstancedBaseVertexBaseInstanceWEBGL" (Internal.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS baseVerticesList, toJS baseVerticesOffset, toJS baseInstancesList, toJS baseInstancesOffset, toJS drawcount]) Unit
 
 end Lasm.JS.Web

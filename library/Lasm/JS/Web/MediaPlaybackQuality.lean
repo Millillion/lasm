@@ -6,30 +6,38 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediaPlaybackQuality
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof VideoPlaybackQuality`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoPlaybackQuality`). -/
-def VideoPlaybackQuality.cast? (v : Value) : IO (Option VideoPlaybackQuality) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VideoPlaybackQuality"] Value) v) then some { val := v } else none
+@[macro_inline] def VideoPlaybackQuality.cast? (v : Value) : IO (Option VideoPlaybackQuality) := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.cast?" do
+  Internal.cast (Internal.getGlobal ["VideoPlaybackQuality"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp creationTime` -/
-def VideoPlaybackQuality.creationTime (self : VideoPlaybackQuality) : IO Float := self.val.get "creationTime" Float
+@[macro_inline] def VideoPlaybackQuality.creationTime (self : VideoPlaybackQuality) : IO Float := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.creationTime" do
+  self.val.get "creationTime" Float
 
 /-- `readonly attribute unsigned long droppedVideoFrames` -/
-def VideoPlaybackQuality.droppedVideoFrames (self : VideoPlaybackQuality) : IO Nat := self.val.get "droppedVideoFrames" Nat
+@[macro_inline] def VideoPlaybackQuality.droppedVideoFrames (self : VideoPlaybackQuality) : IO Nat := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.droppedVideoFrames" do
+  self.val.get "droppedVideoFrames" Nat
 
 /-- `readonly attribute unsigned long totalVideoFrames` -/
-def VideoPlaybackQuality.totalVideoFrames (self : VideoPlaybackQuality) : IO Nat := self.val.get "totalVideoFrames" Nat
+@[macro_inline] def VideoPlaybackQuality.totalVideoFrames (self : VideoPlaybackQuality) : IO Nat := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.totalVideoFrames" do
+  self.val.get "totalVideoFrames" Nat
 
 /-- `readonly attribute unsigned long corruptedVideoFrames` -/
-def VideoPlaybackQuality.corruptedVideoFrames (self : VideoPlaybackQuality) : IO Nat := self.val.get "corruptedVideoFrames" Nat
+@[macro_inline] def VideoPlaybackQuality.corruptedVideoFrames (self : VideoPlaybackQuality) : IO Nat := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.corruptedVideoFrames" do
+  self.val.get "corruptedVideoFrames" Nat
 
 /-- `VideoPlaybackQuality getVideoPlaybackQuality()` -/
-def HTMLVideoElement.getVideoPlaybackQuality (self : HTMLVideoElement) : IO VideoPlaybackQuality := do
-  let r ← self.val.callMethod "getVideoPlaybackQuality" (Support.args #[]) Value
+@[macro_inline] def HTMLVideoElement.getVideoPlaybackQuality (self : HTMLVideoElement) : IO VideoPlaybackQuality := Internal.api "Lasm.JS.Web.HTMLVideoElement.getVideoPlaybackQuality" do
+  let r ← self.val.callMethod "getVideoPlaybackQuality" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

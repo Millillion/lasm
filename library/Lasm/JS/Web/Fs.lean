@@ -6,54 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.Fs
+import Lasm.JS.Web.Types.Storage
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FileSystemHandleKind` (File System Standard (https://fs.spec.whatwg.org/)): "file", "directory". -/
-inductive FileSystemHandleKind where
-  /-- "file" -/
-  | file
-  /-- "directory" -/
-  | directory
-  deriving BEq, Repr, Inhabited
-instance : ToJS FileSystemHandleKind := ⟨fun
-  | .file => .string "file"
-  | .directory => .string "directory"⟩
-instance : FromJS FileSystemHandleKind where
-  fromJS
-    | .string "file" => .ok .file
-    | .string "directory" => .ok .directory
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FileSystemHandleKind"
-
-/-- `enum WriteCommandType` (File System Standard (https://fs.spec.whatwg.org/)): "write", "seek", "truncate". -/
-inductive WriteCommandType where
-  /-- "write" -/
-  | write
-  /-- "seek" -/
-  | seek
-  /-- "truncate" -/
-  | truncate
-  deriving BEq, Repr, Inhabited
-instance : ToJS WriteCommandType := ⟨fun
-  | .write => .string "write"
-  | .seek => .string "seek"
-  | .truncate => .string "truncate"⟩
-instance : FromJS WriteCommandType where
-  fromJS
-    | .string "write" => .ok .write
-    | .string "seek" => .ok .seek
-    | .string "truncate" => .ok .truncate
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WriteCommandType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FileSystemReadWriteOptions` (File System Standard (https://fs.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemReadWriteOptions where
   /-- `unsigned long long at` -/
   «at» : Option Nat := none
-instance : ToJS FileSystemReadWriteOptions := ⟨fun d => Support.fields #[("at", Support.optional d.«at»)]⟩
+instance : ToJS FileSystemReadWriteOptions := ⟨fun d => Internal.fields #[("at", Internal.optional d.«at»)]⟩
 
 /-- `(BufferSource or Blob or USVString)`: one constructor per member type. -/
 inductive BufferSourceOrBlobOrUSVString where
@@ -81,10 +49,10 @@ structure WriteParams where
   position : Option Nat := none
   /-- `(BufferSource or Blob or USVString)? data` -/
   data : Option BufferSourceOrBlobOrUSVString := none
-instance : ToJS WriteParams := ⟨fun d => Support.fields #[("type", toJS d.type),
-    ("size", Support.optional d.size),
-    ("position", Support.optional d.position),
-    ("data", Support.optional d.data)]⟩
+instance : ToJS WriteParams := ⟨fun d => Internal.fields #[("type", toJS d.type),
+    ("size", Internal.optional d.size),
+    ("position", Internal.optional d.position),
+    ("data", Internal.optional d.data)]⟩
 
 /-- `typedef BufferSource or Blob or USVString or WriteParams FileSystemWriteChunkType`: one constructor per member type. -/
 inductive FileSystemWriteChunkType where
@@ -110,128 +78,130 @@ instance : Coe WriteParams FileSystemWriteChunkType := ⟨.writeParams⟩
 structure FileSystemGetFileOptions where
   /-- `boolean create = false` -/
   create : Option Bool := none
-instance : ToJS FileSystemGetFileOptions := ⟨fun d => Support.fields #[("create", Support.optional d.create)]⟩
+instance : ToJS FileSystemGetFileOptions := ⟨fun d => Internal.fields #[("create", Internal.optional d.create)]⟩
 
 /-- `dictionary FileSystemGetDirectoryOptions` (File System Standard (https://fs.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemGetDirectoryOptions where
   /-- `boolean create = false` -/
   create : Option Bool := none
-instance : ToJS FileSystemGetDirectoryOptions := ⟨fun d => Support.fields #[("create", Support.optional d.create)]⟩
+instance : ToJS FileSystemGetDirectoryOptions := ⟨fun d => Internal.fields #[("create", Internal.optional d.create)]⟩
 
 /-- `dictionary FileSystemRemoveOptions` (File System Standard (https://fs.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemRemoveOptions where
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance : ToJS FileSystemRemoveOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive)]⟩
+instance : ToJS FileSystemRemoveOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive)]⟩
 
 /-- `dictionary FileSystemCreateWritableOptions` (File System Standard (https://fs.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemCreateWritableOptions where
   /-- `boolean keepExistingData = false` -/
   keepExistingData : Option Bool := none
-instance : ToJS FileSystemCreateWritableOptions := ⟨fun d => Support.fields #[("keepExistingData", Support.optional d.keepExistingData)]⟩
+instance : ToJS FileSystemCreateWritableOptions := ⟨fun d => Internal.fields #[("keepExistingData", Internal.optional d.keepExistingData)]⟩
 
 /-- `v instanceof FileSystemHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemHandle`). -/
-def FileSystemHandle.cast? (v : Value) : IO (Option FileSystemHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemHandle.cast? (v : Value) : IO (Option FileSystemHandle) := Internal.api "Lasm.JS.Web.FileSystemHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemHandle"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FileSystemHandleKind kind` -/
-def FileSystemHandle.kind (self : FileSystemHandle) : IO FileSystemHandleKind := self.val.get "kind" FileSystemHandleKind
+@[macro_inline] def FileSystemHandle.kind (self : FileSystemHandle) : IO FileSystemHandleKind := Internal.api "Lasm.JS.Web.FileSystemHandle.kind" do
+  self.val.get "kind" FileSystemHandleKind
 
 /-- `readonly attribute USVString name` -/
-def FileSystemHandle.name (self : FileSystemHandle) : IO String := self.val.get "name" String
+@[macro_inline] def FileSystemHandle.name (self : FileSystemHandle) : IO String := Internal.api "Lasm.JS.Web.FileSystemHandle.name" do
+  self.val.get "name" String
 
 /-- `Promise<boolean> isSameEntry(FileSystemHandle other)` -/
-def FileSystemHandle.isSameEntry (self : FileSystemHandle) (other : FileSystemHandle) : Async Bool :=
-  self.val.callMethodAwait "isSameEntry" (Support.args #[toJS other]) Bool
+@[macro_inline] def FileSystemHandle.isSameEntry (self : FileSystemHandle) (other : FileSystemHandle) : Async Bool := Internal.api "Lasm.JS.Web.FileSystemHandle.isSameEntry" do
+  self.val.callMethodAwait "isSameEntry" (Internal.args #[toJS other]) Bool
 
 /-- `v instanceof FileSystemSyncAccessHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemSyncAccessHandle`). -/
-def FileSystemSyncAccessHandle.cast? (v : Value) : IO (Option FileSystemSyncAccessHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemSyncAccessHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemSyncAccessHandle.cast? (v : Value) : IO (Option FileSystemSyncAccessHandle) := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemSyncAccessHandle"] Value) (fun x => { val := x }) v
 
 /-- `unsigned long long read(AllowSharedBufferSource buffer, optional FileSystemReadWriteOptions options)` -/
-def FileSystemSyncAccessHandle.read (self : FileSystemSyncAccessHandle) (buffer : ByteArray) (options : Option FileSystemReadWriteOptions := none) : IO Nat :=
-  self.val.callMethod "read" (Support.args #[toJS buffer, Support.optional options]) Nat
+@[macro_inline] def FileSystemSyncAccessHandle.read (self : FileSystemSyncAccessHandle) (buffer : ByteArray) (options : Option FileSystemReadWriteOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.read" do
+  self.val.callMethod "read" (Internal.args #[toJS buffer, Internal.optional options]) Nat
 
 /-- `unsigned long long write(AllowSharedBufferSource buffer, optional FileSystemReadWriteOptions options)` -/
-def FileSystemSyncAccessHandle.write (self : FileSystemSyncAccessHandle) (buffer : ByteArray) (options : Option FileSystemReadWriteOptions := none) : IO Nat :=
-  self.val.callMethod "write" (Support.args #[toJS buffer, Support.optional options]) Nat
+@[macro_inline] def FileSystemSyncAccessHandle.write (self : FileSystemSyncAccessHandle) (buffer : ByteArray) (options : Option FileSystemReadWriteOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.write" do
+  self.val.callMethod "write" (Internal.args #[toJS buffer, Internal.optional options]) Nat
 
 /-- `undefined truncate(unsigned long long newSize)` -/
-def FileSystemSyncAccessHandle.truncate (self : FileSystemSyncAccessHandle) (newSize : Nat) : IO Unit :=
-  self.val.callMethod "truncate" (Support.args #[toJS newSize]) Unit
+@[macro_inline] def FileSystemSyncAccessHandle.truncate (self : FileSystemSyncAccessHandle) (newSize : Nat) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.truncate" do
+  self.val.callMethod "truncate" (Internal.args #[toJS newSize]) Unit
 
 /-- `unsigned long long getSize()` -/
-def FileSystemSyncAccessHandle.getSize (self : FileSystemSyncAccessHandle) : IO Nat :=
-  self.val.callMethod "getSize" (Support.args #[]) Nat
+@[macro_inline] def FileSystemSyncAccessHandle.getSize (self : FileSystemSyncAccessHandle) : IO Nat := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.getSize" do
+  self.val.callMethod "getSize" (Internal.args #[]) Nat
 
 /-- `undefined flush()` -/
-def FileSystemSyncAccessHandle.flush (self : FileSystemSyncAccessHandle) : IO Unit :=
-  self.val.callMethod "flush" (Support.args #[]) Unit
+@[macro_inline] def FileSystemSyncAccessHandle.flush (self : FileSystemSyncAccessHandle) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.flush" do
+  self.val.callMethod "flush" (Internal.args #[]) Unit
 
 /-- `undefined close()` -/
-def FileSystemSyncAccessHandle.close (self : FileSystemSyncAccessHandle) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def FileSystemSyncAccessHandle.close (self : FileSystemSyncAccessHandle) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemSyncAccessHandle.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `v instanceof FileSystemWritableFileStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemWritableFileStream`). -/
-def FileSystemWritableFileStream.cast? (v : Value) : IO (Option FileSystemWritableFileStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemWritableFileStream"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemWritableFileStream.cast? (v : Value) : IO (Option FileSystemWritableFileStream) := Internal.api "Lasm.JS.Web.FileSystemWritableFileStream.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemWritableFileStream"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> write(FileSystemWriteChunkType data)` -/
-def FileSystemWritableFileStream.write (self : FileSystemWritableFileStream) (data : FileSystemWriteChunkType) : Async Unit :=
-  self.val.callMethodAwait "write" (Support.args #[toJS data]) Unit
+@[macro_inline] def FileSystemWritableFileStream.write (self : FileSystemWritableFileStream) (data : FileSystemWriteChunkType) : Async Unit := Internal.api "Lasm.JS.Web.FileSystemWritableFileStream.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS data]) Unit
 
 /-- `Promise<undefined> seek(unsigned long long position)` -/
-def FileSystemWritableFileStream.seek (self : FileSystemWritableFileStream) (position : Nat) : Async Unit :=
-  self.val.callMethodAwait "seek" (Support.args #[toJS position]) Unit
+@[macro_inline] def FileSystemWritableFileStream.seek (self : FileSystemWritableFileStream) (position : Nat) : Async Unit := Internal.api "Lasm.JS.Web.FileSystemWritableFileStream.seek" do
+  self.val.callMethodAwait "seek" (Internal.args #[toJS position]) Unit
 
 /-- `Promise<undefined> truncate(unsigned long long size)` -/
-def FileSystemWritableFileStream.truncate (self : FileSystemWritableFileStream) (size : Nat) : Async Unit :=
-  self.val.callMethodAwait "truncate" (Support.args #[toJS size]) Unit
+@[macro_inline] def FileSystemWritableFileStream.truncate (self : FileSystemWritableFileStream) (size : Nat) : Async Unit := Internal.api "Lasm.JS.Web.FileSystemWritableFileStream.truncate" do
+  self.val.callMethodAwait "truncate" (Internal.args #[toJS size]) Unit
 
 /-- `v instanceof FileSystemDirectoryHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemDirectoryHandle`). -/
-def FileSystemDirectoryHandle.cast? (v : Value) : IO (Option FileSystemDirectoryHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemDirectoryHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemDirectoryHandle.cast? (v : Value) : IO (Option FileSystemDirectoryHandle) := Internal.api "Lasm.JS.Web.FileSystemDirectoryHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemDirectoryHandle"] Value) (fun x => { val := x }) v
 
 /-- `Promise<FileSystemFileHandle> getFileHandle(USVString name, optional FileSystemGetFileOptions options)` -/
-def FileSystemDirectoryHandle.getFileHandle (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemGetFileOptions := none) : Async FileSystemFileHandle := do
-  let r ← self.val.callMethodAwait "getFileHandle" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def FileSystemDirectoryHandle.getFileHandle (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemGetFileOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.FileSystemDirectoryHandle.getFileHandle" do
+  let r ← self.val.callMethodAwait "getFileHandle" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<FileSystemDirectoryHandle> getDirectoryHandle(USVString name, optional FileSystemGetDirectoryOptions options)` -/
-def FileSystemDirectoryHandle.getDirectoryHandle (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemGetDirectoryOptions := none) : Async FileSystemDirectoryHandle := do
-  let r ← self.val.callMethodAwait "getDirectoryHandle" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def FileSystemDirectoryHandle.getDirectoryHandle (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemGetDirectoryOptions := none) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.FileSystemDirectoryHandle.getDirectoryHandle" do
+  let r ← self.val.callMethodAwait "getDirectoryHandle" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<undefined> removeEntry(USVString name, optional FileSystemRemoveOptions options)` -/
-def FileSystemDirectoryHandle.removeEntry (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemRemoveOptions := none) : Async Unit :=
-  self.val.callMethodAwait "removeEntry" (Support.args #[toJS name, Support.optional options]) Unit
+@[macro_inline] def FileSystemDirectoryHandle.removeEntry (self : FileSystemDirectoryHandle) (name : String) (options : Option FileSystemRemoveOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.FileSystemDirectoryHandle.removeEntry" do
+  self.val.callMethodAwait "removeEntry" (Internal.args #[toJS name, Internal.optional options]) Unit
 
 /-- `Promise<sequence<USVString>?> resolve(FileSystemHandle possibleDescendant)` -/
-def FileSystemDirectoryHandle.resolve (self : FileSystemDirectoryHandle) (possibleDescendant : FileSystemHandle) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "resolve" (Support.args #[toJS possibleDescendant]) (Option (Array String))
+@[macro_inline] def FileSystemDirectoryHandle.resolve (self : FileSystemDirectoryHandle) (possibleDescendant : FileSystemHandle) : Async (Option (Array String)) := Internal.api "Lasm.JS.Web.FileSystemDirectoryHandle.resolve" do
+  self.val.callMethodAwait "resolve" (Internal.args #[toJS possibleDescendant]) (Option (Array String))
 
 /-- `v instanceof FileSystemFileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemFileHandle`). -/
-def FileSystemFileHandle.cast? (v : Value) : IO (Option FileSystemFileHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemFileHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemFileHandle.cast? (v : Value) : IO (Option FileSystemFileHandle) := Internal.api "Lasm.JS.Web.FileSystemFileHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemFileHandle"] Value) (fun x => { val := x }) v
 
 /-- `Promise<File> getFile()` -/
-def FileSystemFileHandle.getFile (self : FileSystemFileHandle) : Async File := do
-  let r ← self.val.callMethodAwait "getFile" (Support.args #[]) Value
+@[macro_inline] def FileSystemFileHandle.getFile (self : FileSystemFileHandle) : Async File := Internal.api "Lasm.JS.Web.FileSystemFileHandle.getFile" do
+  let r ← self.val.callMethodAwait "getFile" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<FileSystemWritableFileStream> createWritable(optional FileSystemCreateWritableOptions options)` -/
-def FileSystemFileHandle.createWritable (self : FileSystemFileHandle) (options : Option FileSystemCreateWritableOptions := none) : Async FileSystemWritableFileStream := do
-  let r ← self.val.callMethodAwait "createWritable" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileSystemFileHandle.createWritable (self : FileSystemFileHandle) (options : Option FileSystemCreateWritableOptions := none) : Async FileSystemWritableFileStream := Internal.api "Lasm.JS.Web.FileSystemFileHandle.createWritable" do
+  let r ← self.val.callMethodAwait "createWritable" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<FileSystemSyncAccessHandle> createSyncAccessHandle()` -/
-def FileSystemFileHandle.createSyncAccessHandle (self : FileSystemFileHandle) : Async FileSystemSyncAccessHandle := do
-  let r ← self.val.callMethodAwait "createSyncAccessHandle" (Support.args #[]) Value
+@[macro_inline] def FileSystemFileHandle.createSyncAccessHandle (self : FileSystemFileHandle) : Async FileSystemSyncAccessHandle := Internal.api "Lasm.JS.Web.FileSystemFileHandle.createSyncAccessHandle" do
+  let r ← self.val.callMethodAwait "createSyncAccessHandle" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<FileSystemDirectoryHandle> getDirectory()` -/
-def StorageManager.getDirectory (self : StorageManager) : Async FileSystemDirectoryHandle := do
-  let r ← self.val.callMethodAwait "getDirectory" (Support.args #[]) Value
+@[macro_inline] def StorageManager.getDirectory (self : StorageManager) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.StorageManager.getDirectory" do
+  let r ← self.val.callMethodAwait "getDirectory" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

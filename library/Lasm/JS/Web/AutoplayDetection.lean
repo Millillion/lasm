@@ -6,59 +6,26 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.AutoplayDetection
+import Lasm.JS.Web.Types.Webaudio
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AutoplayPolicyMediaType` (Autoplay Policy Detection (https://w3c.github.io/autoplay/)): "mediaelement", "audiocontext". -/
-inductive AutoplayPolicyMediaType where
-  /-- "mediaelement" -/
-  | mediaelement
-  /-- "audiocontext" -/
-  | audiocontext
-  deriving BEq, Repr, Inhabited
-instance : ToJS AutoplayPolicyMediaType := ⟨fun
-  | .mediaelement => .string "mediaelement"
-  | .audiocontext => .string "audiocontext"⟩
-instance : FromJS AutoplayPolicyMediaType where
-  fromJS
-    | .string "mediaelement" => .ok .mediaelement
-    | .string "audiocontext" => .ok .audiocontext
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AutoplayPolicyMediaType"
-
-/-- `enum AutoplayPolicy` (Autoplay Policy Detection (https://w3c.github.io/autoplay/)): "allowed", "allowed-muted", "disallowed". -/
-inductive AutoplayPolicy where
-  /-- "allowed" -/
-  | allowed
-  /-- "allowed-muted" -/
-  | allowedMuted
-  /-- "disallowed" -/
-  | disallowed
-  deriving BEq, Repr, Inhabited
-instance : ToJS AutoplayPolicy := ⟨fun
-  | .allowed => .string "allowed"
-  | .allowedMuted => .string "allowed-muted"
-  | .disallowed => .string "disallowed"⟩
-instance : FromJS AutoplayPolicy where
-  fromJS
-    | .string "allowed" => .ok .allowed
-    | .string "allowed-muted" => .ok .allowedMuted
-    | .string "disallowed" => .ok .disallowed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AutoplayPolicy"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `AutoplayPolicy getAutoplayPolicy(AutoplayPolicyMediaType type)` -/
-def Navigator.getAutoplayPolicy (self : Navigator) (type : AutoplayPolicyMediaType) : IO AutoplayPolicy :=
-  self.val.callMethod "getAutoplayPolicy" (Support.args #[toJS type]) AutoplayPolicy
+@[macro_inline] def Navigator.getAutoplayPolicy (self : Navigator) (type : AutoplayPolicyMediaType) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicy" do
+  self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS type]) AutoplayPolicy
 
 /-- `AutoplayPolicy getAutoplayPolicy(HTMLMediaElement element)` -/
-def Navigator.getAutoplayPolicyWithElement (self : Navigator) (element : HTMLMediaElement) : IO AutoplayPolicy :=
-  self.val.callMethod "getAutoplayPolicy" (Support.args #[toJS element]) AutoplayPolicy
+@[macro_inline] def Navigator.getAutoplayPolicyWithElement (self : Navigator) (element : HTMLMediaElement) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithElement" do
+  self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS element]) AutoplayPolicy
 
 /-- `AutoplayPolicy getAutoplayPolicy(AudioContext context)` -/
-def Navigator.getAutoplayPolicyWithContext (self : Navigator) (context : AudioContext) : IO AutoplayPolicy :=
-  self.val.callMethod "getAutoplayPolicy" (Support.args #[toJS context]) AutoplayPolicy
+@[macro_inline] def Navigator.getAutoplayPolicyWithContext (self : Navigator) (context : AudioContext) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithContext" do
+  self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS context]) AutoplayPolicy
 
 end Lasm.JS.Web

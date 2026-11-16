@@ -6,57 +6,64 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ModelElement
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof HTMLModelElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLModelElement`). -/
-def HTMLModelElement.cast? (v : Value) : IO (Option HTMLModelElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLModelElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLModelElement.cast? (v : Value) : IO (Option HTMLModelElement) := Internal.api "Lasm.JS.Web.HTMLModelElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLModelElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Promise<HTMLModelElement> ready` -/
-def HTMLModelElement.ready (self : HTMLModelElement) : Async HTMLModelElement := do
+@[macro_inline] def HTMLModelElement.ready (self : HTMLModelElement) : Async HTMLModelElement := Internal.api "Lasm.JS.Web.HTMLModelElement.ready" do
   let p ← self.val.get "ready" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `readonly attribute DOMPointReadOnly boundingBoxCenter` -/
-def HTMLModelElement.boundingBoxCenter (self : HTMLModelElement) : IO DOMPointReadOnly := do
+@[macro_inline] def HTMLModelElement.boundingBoxCenter (self : HTMLModelElement) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.HTMLModelElement.boundingBoxCenter" do
   let r ← self.val.get "boundingBoxCenter" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPointReadOnly boundingBoxExtents` -/
-def HTMLModelElement.boundingBoxExtents (self : HTMLModelElement) : IO DOMPointReadOnly := do
+@[macro_inline] def HTMLModelElement.boundingBoxExtents (self : HTMLModelElement) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.HTMLModelElement.boundingBoxExtents" do
   let r ← self.val.get "boundingBoxExtents" Value
   pure { val := r }
 
 /-- `attribute DOMMatrixReadOnly entityTransform` -/
-def HTMLModelElement.entityTransform (self : HTMLModelElement) : IO DOMMatrixReadOnly := do
+@[macro_inline] def HTMLModelElement.entityTransform (self : HTMLModelElement) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.HTMLModelElement.entityTransform" do
   let r ← self.val.get "entityTransform" Value
   pure { val := r }
 
 /-- Sets `entityTransform`: `attribute DOMMatrixReadOnly entityTransform` -/
-def HTMLModelElement.setEntityTransform (self : HTMLModelElement) (value : DOMMatrixReadOnly) : IO Unit :=
+@[macro_inline] def HTMLModelElement.setEntityTransform (self : HTMLModelElement) (value : DOMMatrixReadOnly) : IO Unit := Internal.api "Lasm.JS.Web.HTMLModelElement.setEntityTransform" do
   self.val.set "entityTransform" (toJS value)
 
 /-- `attribute USVString environmentMap` -/
-def HTMLModelElement.environmentMap (self : HTMLModelElement) : IO String := self.val.get "environmentMap" String
+@[macro_inline] def HTMLModelElement.environmentMap (self : HTMLModelElement) : IO String := Internal.api "Lasm.JS.Web.HTMLModelElement.environmentMap" do
+  self.val.get "environmentMap" String
 
 /-- Sets `environmentMap`: `attribute USVString environmentMap` -/
-def HTMLModelElement.setEnvironmentMap (self : HTMLModelElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLModelElement.setEnvironmentMap (self : HTMLModelElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLModelElement.setEnvironmentMap" do
   self.val.set "environmentMap" (toJS value)
 
 /-- `readonly attribute Promise<undefined> environmentMapReady` -/
-def HTMLModelElement.environmentMapReady (self : HTMLModelElement) : Async Unit := do
+@[macro_inline] def HTMLModelElement.environmentMapReady (self : HTMLModelElement) : Async Unit := Internal.api "Lasm.JS.Web.HTMLModelElement.environmentMapReady" do
   let p ← self.val.get "environmentMapReady" Value
   p.await Unit
 
 /-- `attribute DOMString stageMode` -/
-def HTMLModelElement.stageMode (self : HTMLModelElement) : IO String := self.val.get "stageMode" String
+@[macro_inline] def HTMLModelElement.stageMode (self : HTMLModelElement) : IO String := Internal.api "Lasm.JS.Web.HTMLModelElement.stageMode" do
+  self.val.get "stageMode" String
 
 /-- Sets `stageMode`: `attribute DOMString stageMode` -/
-def HTMLModelElement.setStageMode (self : HTMLModelElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLModelElement.setStageMode (self : HTMLModelElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLModelElement.setStageMode" do
   self.val.set "stageMode" (toJS value)
 
 end Lasm.JS.Web

@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.DocumentPictureInPicture
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary DocumentPictureInPictureOptions` (Document Picture-in-Picture Specification (https://wicg.github.io/document-picture-in-picture/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DocumentPictureInPictureOptions where
@@ -22,10 +27,10 @@ structure DocumentPictureInPictureOptions where
   disallowReturnToOpener : Option Bool := none
   /-- `boolean preferInitialWindowPlacement = false` -/
   preferInitialWindowPlacement : Option Bool := none
-instance : ToJS DocumentPictureInPictureOptions := ⟨fun d => Support.fields #[("width", Support.optional d.width),
-    ("height", Support.optional d.height),
-    ("disallowReturnToOpener", Support.optional d.disallowReturnToOpener),
-    ("preferInitialWindowPlacement", Support.optional d.preferInitialWindowPlacement)]⟩
+instance : ToJS DocumentPictureInPictureOptions := ⟨fun d => Internal.fields #[("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("disallowReturnToOpener", Internal.optional d.disallowReturnToOpener),
+    ("preferInitialWindowPlacement", Internal.optional d.preferInitialWindowPlacement)]⟩
 
 /-- `dictionary DocumentPictureInPictureEventInit : EventInit` (Document Picture-in-Picture Specification (https://wicg.github.io/document-picture-in-picture/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DocumentPictureInPictureEventInit where
@@ -37,49 +42,55 @@ structure DocumentPictureInPictureEventInit where
   composed : Option Bool := none
   /-- `required Window window` -/
   window : Window
-instance : ToJS DocumentPictureInPictureEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS DocumentPictureInPictureEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("window", toJS d.window)]⟩
 
 /-- `v instanceof DocumentPictureInPicture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentPictureInPicture`). -/
-def DocumentPictureInPicture.cast? (v : Value) : IO (Option DocumentPictureInPicture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentPictureInPicture"] Value) v) then some { val := v } else none
+@[macro_inline] def DocumentPictureInPicture.cast? (v : Value) : IO (Option DocumentPictureInPicture) := Internal.api "Lasm.JS.Web.DocumentPictureInPicture.cast?" do
+  Internal.cast (Internal.getGlobal ["DocumentPictureInPicture"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Window window` -/
-def DocumentPictureInPicture.window (self : DocumentPictureInPicture) : IO Window := do
+@[macro_inline] def DocumentPictureInPicture.window (self : DocumentPictureInPicture) : IO Window := Internal.api "Lasm.JS.Web.DocumentPictureInPicture.window" do
   let r ← self.val.get "window" Value
   pure { val := r }
 
 /-- `attribute EventHandler onenter` -/
-def DocumentPictureInPicture.onenter (self : DocumentPictureInPicture) : IO (Option EventHandlerNonNull) := self.val.get "onenter" (Option EventHandlerNonNull)
+@[macro_inline] def DocumentPictureInPicture.onenter (self : DocumentPictureInPicture) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.DocumentPictureInPicture.onenter" do
+  self.val.get "onenter" (Option EventHandlerNonNull)
 
 /-- Sets `onenter`: `attribute EventHandler onenter` -/
-def DocumentPictureInPicture.setOnenter (self : DocumentPictureInPicture) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def DocumentPictureInPicture.setOnenter (self : DocumentPictureInPicture) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.DocumentPictureInPicture.setOnenter" do
   self.val.set "onenter" (toJS value)
 
 /-- `Promise<Window> requestWindow(optional DocumentPictureInPictureOptions options)` -/
-def DocumentPictureInPicture.requestWindow (self : DocumentPictureInPicture) (options : Option DocumentPictureInPictureOptions := none) : Async Window := do
-  let r ← self.val.callMethodAwait "requestWindow" (Support.args #[Support.optional options]) Value
+@[macro_inline] def DocumentPictureInPicture.requestWindow (self : DocumentPictureInPicture) (options : Option DocumentPictureInPictureOptions := none) : Async Window := Internal.api "Lasm.JS.Web.DocumentPictureInPicture.requestWindow" do
+  let r ← self.val.callMethodAwait "requestWindow" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof DocumentPictureInPictureEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentPictureInPictureEvent`). -/
-def DocumentPictureInPictureEvent.cast? (v : Value) : IO (Option DocumentPictureInPictureEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentPictureInPictureEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def DocumentPictureInPictureEvent.cast? (v : Value) : IO (Option DocumentPictureInPictureEvent) := Internal.api "Lasm.JS.Web.DocumentPictureInPictureEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["DocumentPictureInPictureEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, DocumentPictureInPictureEventInit eventInitDict)` -/
-def DocumentPictureInPictureEvent.new (type : String) (eventInitDict : DocumentPictureInPictureEventInit) : IO DocumentPictureInPictureEvent :=
+@[macro_inline] def DocumentPictureInPictureEvent.new (type : String) (eventInitDict : DocumentPictureInPictureEventInit) : IO DocumentPictureInPictureEvent := Internal.api "Lasm.JS.Web.DocumentPictureInPictureEvent.new" do
   Lasm.JS.Binding.invoke DocumentPictureInPictureEvent { name := "Lasm.JS.Web.DocumentPictureInPictureEvent.new", module := "globalThis", path := "DocumentPictureInPictureEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute Window window` -/
-def DocumentPictureInPictureEvent.window (self : DocumentPictureInPictureEvent) : IO Window := do
+@[macro_inline] def DocumentPictureInPictureEvent.window (self : DocumentPictureInPictureEvent) : IO Window := Internal.api "Lasm.JS.Web.DocumentPictureInPictureEvent.window" do
   let r ← self.val.get "window" Value
   pure { val := r }
 
+/-- `readonly attribute DocumentPictureInPicture documentPictureInPicture` -/
+@[macro_inline] def Window.documentPictureInPicture (self : Window) : IO DocumentPictureInPicture := Internal.api "Lasm.JS.Web.Window.documentPictureInPicture" do
+  let r ← self.val.get "documentPictureInPicture" Value
+  pure { val := r }
+
 /-- `readonly attribute DocumentPictureInPicture documentPictureInPicture` (Document Picture-in-Picture Specification (https://wicg.github.io/document-picture-in-picture/)) -/
-def documentPictureInPicture : IO DocumentPictureInPicture := do
-  let r ← Support.getGlobal ["documentPictureInPicture"] Value
+@[macro_inline] def documentPictureInPicture : IO DocumentPictureInPicture := Internal.api "Lasm.JS.Web.documentPictureInPicture" do
+  let r ← Internal.getGlobal ["documentPictureInPicture"] Value
   pure { val := r }
 
 end Lasm.JS.Web

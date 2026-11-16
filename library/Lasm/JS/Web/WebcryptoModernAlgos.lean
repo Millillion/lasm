@@ -6,11 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webcrypto
+import Lasm.JS.Web.Types.WebcryptoModernAlgos
 import Lasm.JS.Web.Webcrypto
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary EncapsulatedKey` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EncapsulatedKey where
@@ -18,6 +22,8 @@ structure EncapsulatedKey where
   sharedKey : Option CryptoKey := none
   /-- `ArrayBuffer ciphertext` -/
   ciphertext : Option ByteArray := none
+instance : ToJS EncapsulatedKey := ⟨fun d => Internal.fields #[("sharedKey", Internal.optional d.sharedKey),
+    ("ciphertext", Internal.optional d.ciphertext)]⟩
 
 /-- `dictionary EncapsulatedBits` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EncapsulatedBits where
@@ -25,38 +31,169 @@ structure EncapsulatedBits where
   sharedKey : Option ByteArray := none
   /-- `ArrayBuffer ciphertext` -/
   ciphertext : Option ByteArray := none
+instance : ToJS EncapsulatedBits := ⟨fun d => Internal.fields #[("sharedKey", Internal.optional d.sharedKey),
+    ("ciphertext", Internal.optional d.ciphertext)]⟩
+
+/-- `dictionary ContextParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ContextParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `BufferSource context` -/
+  context : Option ByteArray := none
+instance : ToJS ContextParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("context", Internal.optional d.context)]⟩
+
+/-- `dictionary AeadParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AeadParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource iv` -/
+  iv : ByteArray
+  /-- `BufferSource additionalData` -/
+  additionalData : Option ByteArray := none
+  /-- `octet tagLength` -/
+  tagLength : Option Nat := none
+instance : ToJS AeadParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("iv", toJS d.iv),
+    ("additionalData", Internal.optional d.additionalData),
+    ("tagLength", Internal.optional d.tagLength)]⟩
+
+/-- `dictionary CShakeParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CShakeParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long outputLength` -/
+  outputLength : Nat
+  /-- `BufferSource functionName` -/
+  functionName : Option ByteArray := none
+  /-- `BufferSource customization` -/
+  customization : Option ByteArray := none
+instance : ToJS CShakeParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("outputLength", toJS d.outputLength),
+    ("functionName", Internal.optional d.functionName),
+    ("customization", Internal.optional d.customization)]⟩
+
+/-- `dictionary TurboShakeParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure TurboShakeParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long outputLength` -/
+  outputLength : Nat
+  /-- `octet domainSeparation` -/
+  domainSeparation : Option Nat := none
+instance : ToJS TurboShakeParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("outputLength", toJS d.outputLength),
+    ("domainSeparation", Internal.optional d.domainSeparation)]⟩
+
+/-- `dictionary KangarooTwelveParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KangarooTwelveParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long outputLength` -/
+  outputLength : Nat
+  /-- `BufferSource customization` -/
+  customization : Option ByteArray := none
+instance : ToJS KangarooTwelveParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("outputLength", toJS d.outputLength),
+    ("customization", Internal.optional d.customization)]⟩
+
+/-- `dictionary KmacKeyGenParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KmacKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `unsigned long length` -/
+  length : Option Nat := none
+instance : ToJS KmacKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", Internal.optional d.length)]⟩
+
+/-- `dictionary KmacImportParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KmacImportParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `unsigned long length` -/
+  length : Option Nat := none
+instance : ToJS KmacImportParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", Internal.optional d.length)]⟩
+
+/-- `dictionary KmacKeyAlgorithm : KeyAlgorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KmacKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long length` -/
+  length : Nat
+instance : ToJS KmacKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary KmacParams : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KmacParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long outputLength` -/
+  outputLength : Nat
+  /-- `BufferSource customization` -/
+  customization : Option ByteArray := none
+instance : ToJS KmacParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("outputLength", toJS d.outputLength),
+    ("customization", Internal.optional d.customization)]⟩
+
+/-- `dictionary Argon2Params : Algorithm` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Argon2Params where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource nonce` -/
+  nonce : ByteArray
+  /-- `required unsigned long parallelism` -/
+  parallelism : Nat
+  /-- `required unsigned long memory` -/
+  memory : Nat
+  /-- `required unsigned long passes` -/
+  passes : Nat
+  /-- `octet version` -/
+  version : Option Nat := none
+  /-- `BufferSource secretValue` -/
+  secretValue : Option ByteArray := none
+  /-- `BufferSource associatedData` -/
+  associatedData : Option ByteArray := none
+instance : ToJS Argon2Params := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("nonce", toJS d.nonce),
+    ("parallelism", toJS d.parallelism),
+    ("memory", toJS d.memory),
+    ("passes", toJS d.passes),
+    ("version", Internal.optional d.version),
+    ("secretValue", Internal.optional d.secretValue),
+    ("associatedData", Internal.optional d.associatedData)]⟩
 
 /-- `Promise<EncapsulatedKey> encapsulateKey(AlgorithmIdentifier encapsulationAlgorithm, CryptoKey encapsulationKey, AlgorithmIdentifier sharedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.encapsulateKey (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async Data :=
-  self.val.callMethodAwait "encapsulateKey" (Support.args #[toJS encapsulationAlgorithm, toJS encapsulationKey, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Data
+@[macro_inline] def SubtleCrypto.encapsulateKey (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async Data := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateKey" do
+  self.val.callMethodAwait "encapsulateKey" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Data
 
 /-- `Promise<EncapsulatedBits> encapsulateBits(AlgorithmIdentifier encapsulationAlgorithm, CryptoKey encapsulationKey)` -/
-def SubtleCrypto.encapsulateBits (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) : Async Data :=
-  self.val.callMethodAwait "encapsulateBits" (Support.args #[toJS encapsulationAlgorithm, toJS encapsulationKey]) Data
+@[macro_inline] def SubtleCrypto.encapsulateBits (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) : Async Data := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateBits" do
+  self.val.callMethodAwait "encapsulateBits" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey]) Data
 
 /-- `Promise<CryptoKey> decapsulateKey(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext, AlgorithmIdentifier sharedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.decapsulateKey (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
-  let r ← self.val.callMethodAwait "decapsulateKey" (Support.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
+@[macro_inline] def SubtleCrypto.decapsulateKey (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateKey" do
+  let r ← self.val.callMethodAwait "decapsulateKey" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `Promise<ArrayBuffer> decapsulateBits(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext)` -/
-def SubtleCrypto.decapsulateBits (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "decapsulateBits" (Support.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.decapsulateBits (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateBits" do
+  let r ← self.val.callMethodAwait "decapsulateBits" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<CryptoKey> getPublicKey(CryptoKey key, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.getPublicKey (self : SubtleCrypto) (key : CryptoKey) (keyUsages : Array KeyUsage) : Async CryptoKey := do
-  let r ← self.val.callMethodAwait "getPublicKey" (Support.args #[toJS key, toJS keyUsages]) Value
+@[macro_inline] def SubtleCrypto.getPublicKey (self : SubtleCrypto) (key : CryptoKey) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.getPublicKey" do
+  let r ← self.val.callMethodAwait "getPublicKey" (Internal.args #[toJS key, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, optional unsigned long? length)` -/
-def SubtleCrypto.supports (operation : String) (algorithm : AlgorithmIdentifier) (length : Option Nat := none) : IO Bool :=
+@[macro_inline] def SubtleCrypto.supports (operation : String) (algorithm : AlgorithmIdentifier) (length : Option Nat := none) : IO Bool := Internal.api "Lasm.JS.Web.SubtleCrypto.supports" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supports", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
-    (Support.args #[toJS operation, toJS algorithm, Support.optional length]) (await := false)
+    (Internal.args #[toJS operation, toJS algorithm, Internal.optional length]) (await := false)
 
 /-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, AlgorithmIdentifier additionalAlgorithm)` -/
-def SubtleCrypto.supportsWithAdditionalAlgorithm (operation : String) (algorithm : AlgorithmIdentifier) (additionalAlgorithm : AlgorithmIdentifier) : IO Bool :=
+@[macro_inline] def SubtleCrypto.supportsWithAdditionalAlgorithm (operation : String) (algorithm : AlgorithmIdentifier) (additionalAlgorithm : AlgorithmIdentifier) : IO Bool := Internal.api "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
-    (Support.args #[toJS operation, toJS algorithm, toJS additionalAlgorithm]) (await := false)
+    (Internal.args #[toJS operation, toJS algorithm, toJS additionalAlgorithm]) (await := false)
 
 end Lasm.JS.Web

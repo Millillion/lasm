@@ -6,23 +6,29 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.PaintTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformancePaintTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformancePaintTiming`). -/
-def PerformancePaintTiming.cast? (v : Value) : IO (Option PerformancePaintTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformancePaintTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformancePaintTiming.cast? (v : Value) : IO (Option PerformancePaintTiming) := Internal.api "Lasm.JS.Web.PerformancePaintTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformancePaintTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def PerformancePaintTiming.paintTime (self : PerformancePaintTiming) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def PerformancePaintTiming.paintTime (self : PerformancePaintTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformancePaintTiming.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def PerformancePaintTiming.presentationTime (self : PerformancePaintTiming) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def PerformancePaintTiming.presentationTime (self : PerformancePaintTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformancePaintTiming.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def PerformancePaintTiming.toJSON (self : PerformancePaintTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformancePaintTiming.toJSON (self : PerformancePaintTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformancePaintTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 end Lasm.JS.Web

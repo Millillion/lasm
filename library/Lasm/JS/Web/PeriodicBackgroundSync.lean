@@ -6,11 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.PeriodicBackgroundSync
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PeriodicSyncEventInit : ExtendableEventInit` (Web Periodic Background Synchronization (https://wicg.github.io/periodic-background-sync/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PeriodicSyncEventInit where
@@ -22,54 +26,56 @@ structure PeriodicSyncEventInit where
   composed : Option Bool := none
   /-- `required DOMString tag` -/
   tag : String
-instance : ToJS PeriodicSyncEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS PeriodicSyncEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("tag", toJS d.tag)]⟩
 
 /-- `dictionary BackgroundSyncOptions` (Web Periodic Background Synchronization (https://wicg.github.io/periodic-background-sync/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BackgroundSyncOptions where
   /-- `unsigned long long minInterval = 0` -/
   minInterval : Option Nat := none
-instance : ToJS BackgroundSyncOptions := ⟨fun d => Support.fields #[("minInterval", Support.optional d.minInterval)]⟩
+instance : ToJS BackgroundSyncOptions := ⟨fun d => Internal.fields #[("minInterval", Internal.optional d.minInterval)]⟩
 
 /-- `v instanceof PeriodicSyncEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PeriodicSyncEvent`). -/
-def PeriodicSyncEvent.cast? (v : Value) : IO (Option PeriodicSyncEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PeriodicSyncEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PeriodicSyncEvent.cast? (v : Value) : IO (Option PeriodicSyncEvent) := Internal.api "Lasm.JS.Web.PeriodicSyncEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PeriodicSyncEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, PeriodicSyncEventInit init)` -/
-def PeriodicSyncEvent.new (type : String) (init : PeriodicSyncEventInit) : IO PeriodicSyncEvent :=
+@[macro_inline] def PeriodicSyncEvent.new (type : String) (init : PeriodicSyncEventInit) : IO PeriodicSyncEvent := Internal.api "Lasm.JS.Web.PeriodicSyncEvent.new" do
   Lasm.JS.Binding.invoke PeriodicSyncEvent { name := "Lasm.JS.Web.PeriodicSyncEvent.new", module := "globalThis", path := "PeriodicSyncEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `readonly attribute DOMString tag` -/
-def PeriodicSyncEvent.tag (self : PeriodicSyncEvent) : IO String := self.val.get "tag" String
+@[macro_inline] def PeriodicSyncEvent.tag (self : PeriodicSyncEvent) : IO String := Internal.api "Lasm.JS.Web.PeriodicSyncEvent.tag" do
+  self.val.get "tag" String
 
 /-- `v instanceof PeriodicSyncManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PeriodicSyncManager`). -/
-def PeriodicSyncManager.cast? (v : Value) : IO (Option PeriodicSyncManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PeriodicSyncManager"] Value) v) then some { val := v } else none
+@[macro_inline] def PeriodicSyncManager.cast? (v : Value) : IO (Option PeriodicSyncManager) := Internal.api "Lasm.JS.Web.PeriodicSyncManager.cast?" do
+  Internal.cast (Internal.getGlobal ["PeriodicSyncManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> register(DOMString tag, optional BackgroundSyncOptions options)` -/
-def PeriodicSyncManager.register (self : PeriodicSyncManager) (tag : String) (options : Option BackgroundSyncOptions := none) : Async Unit :=
-  self.val.callMethodAwait "register" (Support.args #[toJS tag, Support.optional options]) Unit
+@[macro_inline] def PeriodicSyncManager.register (self : PeriodicSyncManager) (tag : String) (options : Option BackgroundSyncOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.PeriodicSyncManager.register" do
+  self.val.callMethodAwait "register" (Internal.args #[toJS tag, Internal.optional options]) Unit
 
 /-- `Promise<sequence<DOMString>> getTags()` -/
-def PeriodicSyncManager.getTags (self : PeriodicSyncManager) : Async (Array String) :=
-  self.val.callMethodAwait "getTags" (Support.args #[]) (Array String)
+@[macro_inline] def PeriodicSyncManager.getTags (self : PeriodicSyncManager) : Async (Array String) := Internal.api "Lasm.JS.Web.PeriodicSyncManager.getTags" do
+  self.val.callMethodAwait "getTags" (Internal.args #[]) (Array String)
 
 /-- `Promise<undefined> unregister(DOMString tag)` -/
-def PeriodicSyncManager.unregister (self : PeriodicSyncManager) (tag : String) : Async Unit :=
-  self.val.callMethodAwait "unregister" (Support.args #[toJS tag]) Unit
+@[macro_inline] def PeriodicSyncManager.unregister (self : PeriodicSyncManager) (tag : String) : Async Unit := Internal.api "Lasm.JS.Web.PeriodicSyncManager.unregister" do
+  self.val.callMethodAwait "unregister" (Internal.args #[toJS tag]) Unit
 
 /-- `attribute EventHandler onperiodicsync` -/
-def ServiceWorkerGlobalScope.onperiodicsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onperiodicsync" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onperiodicsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onperiodicsync" do
+  self.val.get "onperiodicsync" (Option EventHandlerNonNull)
 
 /-- Sets `onperiodicsync`: `attribute EventHandler onperiodicsync` -/
-def ServiceWorkerGlobalScope.setOnperiodicsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnperiodicsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnperiodicsync" do
   self.val.set "onperiodicsync" (toJS value)
 
 /-- `readonly attribute PeriodicSyncManager periodicSync` -/
-def ServiceWorkerRegistration.periodicSync (self : ServiceWorkerRegistration) : IO PeriodicSyncManager := do
+@[macro_inline] def ServiceWorkerRegistration.periodicSync (self : ServiceWorkerRegistration) : IO PeriodicSyncManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.periodicSync" do
   let r ← self.val.get "periodicSync" Value
   pure { val := r }
 

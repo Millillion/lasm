@@ -1,14 +1,16 @@
 /-
-Conformance checks for the rest of the browser platform (`Lasm.JS.Web.Platform`,
-docs/JS_BINDINGS.md "The rest of the browser platform"), part of the platform suite
+More conformance checks of Lasm.JS.Web in a browser (docs/JS_BINDINGS.md, "Lasm.JS.Web"), part of the platform suite
 (Main.lean), run on Chromium, Firefox and WebKit by scripts/browser/browser-ci.mjs and
 reported as `bindings.platform.<name>`. As in Bindings.lean, each check is a property
 over generated inputs against a Lean model of the spec's algorithm, stated in a comment.
 -/
-import Lasm.JS.Web.Browser
-import Lasm.JS.Web.Platform.Cssom
-import Lasm.JS.Web.Platform.Dom
-import Lasm.JS.Web.Platform.HtmlAndWebcodecs
+import Lasm.JS.Web.CssomView
+import Lasm.JS.Web.Geometry
+import Lasm.JS.Web.Uievents
+import Lasm.JS.Web.Cssom
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.WaiAria
 import Bindings
 open Lasm.JS Lasm.JS.Web
 
@@ -91,6 +93,13 @@ def run (record : Record) (root : Element) : IO Unit := do
       ok := ok && text == some (t.replace " " " ") && (← body2.textContent) == text
       last := markup
     return (ok, last)
+  -- ErrorEvent and PromiseRejectionEvent read back what they were made with (HTML; moved here from the
+  -- js-web fixture, since not every server target has them)
+  check record "platform.error-events" do
+    let ee ← ErrorEvent.new "error" (some { message := some "boom", lineno := some 3 })
+    let pr ← PromiseRejectionEvent.new "unhandledrejection" { promise := .ref (← Lasm.JS.global) "", reason := .string "r" }
+    let reason ← pr.reason
+    return ((← ee.message) == "boom" && (← ee.lineno) == 3 && (match reason with | .string "r" => true | _ => false), "ErrorEvent, PromiseRejectionEvent")
   -- Rule A12 on a platform interface: a parsed document is a Document, not a Range
   check record "platform.cast" do
     let doc ← (← DOMParser.new).parseFromString "<b>x</b>" .textHtml

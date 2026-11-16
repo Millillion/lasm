@@ -6,29 +6,33 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.OESVertexArrayObject
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum VERTEX_ARRAY_BINDING_OES = 0x85B5` -/
 def OES_vertex_array_object.VERTEX_ARRAY_BINDING_OES : Nat := 0x85B5
 
 /-- `WebGLVertexArrayObjectOES createVertexArrayOES()` -/
-def OES_vertex_array_object.createVertexArrayOES (self : OES_vertex_array_object) : IO WebGLVertexArrayObjectOES := do
-  let r ← self.val.callMethod "createVertexArrayOES" (Support.args #[]) Value
+@[macro_inline] def OES_vertex_array_object.createVertexArrayOES (self : OES_vertex_array_object) : IO WebGLVertexArrayObjectOES := Internal.api "Lasm.JS.Web.OES_vertex_array_object.createVertexArrayOES" do
+  let r ← self.val.callMethod "createVertexArrayOES" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined deleteVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject)` -/
-def OES_vertex_array_object.deleteVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Unit :=
-  self.val.callMethod "deleteVertexArrayOES" (Support.args #[toJS arrayObject]) Unit
+@[macro_inline] def OES_vertex_array_object.deleteVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Unit := Internal.api "Lasm.JS.Web.OES_vertex_array_object.deleteVertexArrayOES" do
+  self.val.callMethod "deleteVertexArrayOES" (Internal.args #[toJS arrayObject]) Unit
 
 /-- `GLboolean isVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject)` -/
-def OES_vertex_array_object.isVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Bool :=
-  self.val.callMethod "isVertexArrayOES" (Support.args #[toJS arrayObject]) Bool
+@[macro_inline] def OES_vertex_array_object.isVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Bool := Internal.api "Lasm.JS.Web.OES_vertex_array_object.isVertexArrayOES" do
+  self.val.callMethod "isVertexArrayOES" (Internal.args #[toJS arrayObject]) Bool
 
 /-- `undefined bindVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject)` -/
-def OES_vertex_array_object.bindVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Unit :=
-  self.val.callMethod "bindVertexArrayOES" (Support.args #[toJS arrayObject]) Unit
+@[macro_inline] def OES_vertex_array_object.bindVertexArrayOES (self : OES_vertex_array_object) (arrayObject : Option WebGLVertexArrayObjectOES) : IO Unit := Internal.api "Lasm.JS.Web.OES_vertex_array_object.bindVertexArrayOES" do
+  self.val.callMethod "bindVertexArrayOES" (Internal.args #[toJS arrayObject]) Unit
 
 end Lasm.JS.Web

@@ -6,48 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.HandwritingRecognition
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum HandwritingRecognitionType` (Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)): "text", "per-character". -/
-inductive HandwritingRecognitionType where
-  /-- "text" -/
-  | text
-  /-- "per-character" -/
-  | perCharacter
-  deriving BEq, Repr, Inhabited
-instance : ToJS HandwritingRecognitionType := ⟨fun
-  | .text => .string "text"
-  | .perCharacter => .string "per-character"⟩
-instance : FromJS HandwritingRecognitionType where
-  fromJS
-    | .string "text" => .ok .text
-    | .string "per-character" => .ok .perCharacter
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HandwritingRecognitionType"
-
-/-- `enum HandwritingInputType` (Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)): "mouse", "stylus", "touch". -/
-inductive HandwritingInputType where
-  /-- "mouse" -/
-  | mouse
-  /-- "stylus" -/
-  | stylus
-  /-- "touch" -/
-  | touch
-  deriving BEq, Repr, Inhabited
-instance : ToJS HandwritingInputType := ⟨fun
-  | .mouse => .string "mouse"
-  | .stylus => .string "stylus"
-  | .touch => .string "touch"⟩
-instance : FromJS HandwritingInputType where
-  fromJS
-    | .string "mouse" => .ok .mouse
-    | .string "stylus" => .ok .stylus
-    | .string "touch" => .ok .touch
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HandwritingInputType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HandwritingDrawingSegment` (Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HandwritingDrawingSegment where
@@ -57,6 +23,9 @@ structure HandwritingDrawingSegment where
   beginPointIndex : Nat
   /-- `required unsigned long endPointIndex` -/
   endPointIndex : Nat
+instance : ToJS HandwritingDrawingSegment := ⟨fun d => Internal.fields #[("strokeIndex", toJS d.strokeIndex),
+    ("beginPointIndex", toJS d.beginPointIndex),
+    ("endPointIndex", toJS d.endPointIndex)]⟩
 instance : FromJS HandwritingDrawingSegment where
   fromJS d := do return {
     strokeIndex := ← Lasm.JS.readField Nat d "strokeIndex",
@@ -74,6 +43,10 @@ structure HandwritingSegment where
   endIndex : Nat
   /-- `required sequence<HandwritingDrawingSegment> drawingSegments` -/
   drawingSegments : Array HandwritingDrawingSegment
+instance : ToJS HandwritingSegment := ⟨fun d => Internal.fields #[("grapheme", toJS d.grapheme),
+    ("beginIndex", toJS d.beginIndex),
+    ("endIndex", toJS d.endIndex),
+    ("drawingSegments", toJS d.drawingSegments)]⟩
 instance : FromJS HandwritingSegment where
   fromJS d := do return {
     grapheme := ← Lasm.JS.readField String d "grapheme",
@@ -88,6 +61,8 @@ structure HandwritingPrediction where
   text : String
   /-- `sequence<HandwritingSegment> segmentationResult` -/
   segmentationResult : Option (Array HandwritingSegment) := none
+instance : ToJS HandwritingPrediction := ⟨fun d => Internal.fields #[("text", toJS d.text),
+    ("segmentationResult", Internal.optional d.segmentationResult)]⟩
 instance : FromJS HandwritingPrediction where
   fromJS d := do return {
     text := ← Lasm.JS.readField String d "text",
@@ -104,10 +79,10 @@ structure HandwritingHints where
   textContext : Option String := none
   /-- `unsigned long alternatives = 3` -/
   alternatives : Option Nat := none
-instance : ToJS HandwritingHints := ⟨fun d => Support.fields #[("recognitionType", Support.optional d.recognitionType),
-    ("inputType", Support.optional d.inputType),
-    ("textContext", Support.optional d.textContext),
-    ("alternatives", Support.optional d.alternatives)]⟩
+instance : ToJS HandwritingHints := ⟨fun d => Internal.fields #[("recognitionType", Internal.optional d.recognitionType),
+    ("inputType", Internal.optional d.inputType),
+    ("textContext", Internal.optional d.textContext),
+    ("alternatives", Internal.optional d.alternatives)]⟩
 
 /-- `dictionary HandwritingPoint` (Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HandwritingPoint where
@@ -117,9 +92,9 @@ structure HandwritingPoint where
   y : Float
   /-- `DOMHighResTimeStamp t` -/
   t : Option Float := none
-instance : ToJS HandwritingPoint := ⟨fun d => Support.fields #[("x", toJS d.x),
+instance : ToJS HandwritingPoint := ⟨fun d => Internal.fields #[("x", toJS d.x),
     ("y", toJS d.y),
-    ("t", Support.optional d.t)]⟩
+    ("t", Internal.optional d.t)]⟩
 instance : FromJS HandwritingPoint where
   fromJS d := do return {
     x := ← Lasm.JS.readField Float d "x",
@@ -131,7 +106,7 @@ instance : FromJS HandwritingPoint where
 structure HandwritingModelConstraint where
   /-- `required sequence<DOMString> languages` -/
   languages : Array String
-instance : ToJS HandwritingModelConstraint := ⟨fun d => Support.fields #[("languages", toJS d.languages)]⟩
+instance : ToJS HandwritingModelConstraint := ⟨fun d => Internal.fields #[("languages", toJS d.languages)]⟩
 
 /-- `dictionary HandwritingHintsQueryResult` (Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HandwritingHintsQueryResult where
@@ -143,6 +118,10 @@ structure HandwritingHintsQueryResult where
   textContext : Option Bool := none
   /-- `boolean alternatives` -/
   alternatives : Option Bool := none
+instance : ToJS HandwritingHintsQueryResult := ⟨fun d => Internal.fields #[("recognitionType", Internal.optional d.recognitionType),
+    ("inputType", Internal.optional d.inputType),
+    ("textContext", Internal.optional d.textContext),
+    ("alternatives", Internal.optional d.alternatives)]⟩
 instance : FromJS HandwritingHintsQueryResult where
   fromJS d := do return {
     recognitionType := ← Lasm.JS.readField (Option (Array HandwritingRecognitionType)) d "recognitionType",
@@ -159,6 +138,9 @@ structure HandwritingRecognizerQueryResult where
   textSegmentation : Option Bool := none
   /-- `HandwritingHintsQueryResult hints` -/
   hints : Option HandwritingHintsQueryResult := none
+instance : ToJS HandwritingRecognizerQueryResult := ⟨fun d => Internal.fields #[("textAlternatives", Internal.optional d.textAlternatives),
+    ("textSegmentation", Internal.optional d.textSegmentation),
+    ("hints", Internal.optional d.hints)]⟩
 instance : FromJS HandwritingRecognizerQueryResult where
   fromJS d := do return {
     textAlternatives := ← Lasm.JS.readField (Option Bool) d "textAlternatives",
@@ -167,70 +149,70 @@ instance : FromJS HandwritingRecognizerQueryResult where
   typeName := "Lasm.JS.Web.HandwritingRecognizerQueryResult"
 
 /-- `v instanceof HandwritingDrawing`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HandwritingDrawing`). -/
-def HandwritingDrawing.cast? (v : Value) : IO (Option HandwritingDrawing) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HandwritingDrawing"] Value) v) then some { val := v } else none
+@[macro_inline] def HandwritingDrawing.cast? (v : Value) : IO (Option HandwritingDrawing) := Internal.api "Lasm.JS.Web.HandwritingDrawing.cast?" do
+  Internal.cast (Internal.getGlobal ["HandwritingDrawing"] Value) (fun x => { val := x }) v
 
 /-- `undefined addStroke(HandwritingStroke stroke)` -/
-def HandwritingDrawing.addStroke (self : HandwritingDrawing) (stroke : HandwritingStroke) : IO Unit :=
-  self.val.callMethod "addStroke" (Support.args #[toJS stroke]) Unit
+@[macro_inline] def HandwritingDrawing.addStroke (self : HandwritingDrawing) (stroke : HandwritingStroke) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingDrawing.addStroke" do
+  self.val.callMethod "addStroke" (Internal.args #[toJS stroke]) Unit
 
 /-- `undefined removeStroke(HandwritingStroke stroke)` -/
-def HandwritingDrawing.removeStroke (self : HandwritingDrawing) (stroke : HandwritingStroke) : IO Unit :=
-  self.val.callMethod "removeStroke" (Support.args #[toJS stroke]) Unit
+@[macro_inline] def HandwritingDrawing.removeStroke (self : HandwritingDrawing) (stroke : HandwritingStroke) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingDrawing.removeStroke" do
+  self.val.callMethod "removeStroke" (Internal.args #[toJS stroke]) Unit
 
 /-- `undefined clear()` -/
-def HandwritingDrawing.clear (self : HandwritingDrawing) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def HandwritingDrawing.clear (self : HandwritingDrawing) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingDrawing.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `sequence<HandwritingStroke> getStrokes()` -/
-def HandwritingDrawing.getStrokes (self : HandwritingDrawing) : IO (Array HandwritingStroke) :=
-  self.val.callMethod "getStrokes" (Support.args #[]) (Array HandwritingStroke)
+@[macro_inline] def HandwritingDrawing.getStrokes (self : HandwritingDrawing) : IO (Array HandwritingStroke) := Internal.api "Lasm.JS.Web.HandwritingDrawing.getStrokes" do
+  self.val.callMethod "getStrokes" (Internal.args #[]) (Array HandwritingStroke)
 
 /-- `Promise<sequence<HandwritingPrediction>> getPrediction()` -/
-def HandwritingDrawing.getPrediction (self : HandwritingDrawing) : Async (Array HandwritingPrediction) :=
-  self.val.callMethodAwait "getPrediction" (Support.args #[]) (Array HandwritingPrediction)
+@[macro_inline] def HandwritingDrawing.getPrediction (self : HandwritingDrawing) : Async (Array HandwritingPrediction) := Internal.api "Lasm.JS.Web.HandwritingDrawing.getPrediction" do
+  self.val.callMethodAwait "getPrediction" (Internal.args #[]) (Array HandwritingPrediction)
 
 /-- `v instanceof HandwritingRecognizer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HandwritingRecognizer`). -/
-def HandwritingRecognizer.cast? (v : Value) : IO (Option HandwritingRecognizer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HandwritingRecognizer"] Value) v) then some { val := v } else none
+@[macro_inline] def HandwritingRecognizer.cast? (v : Value) : IO (Option HandwritingRecognizer) := Internal.api "Lasm.JS.Web.HandwritingRecognizer.cast?" do
+  Internal.cast (Internal.getGlobal ["HandwritingRecognizer"] Value) (fun x => { val := x }) v
 
 /-- `HandwritingDrawing startDrawing(optional HandwritingHints hints)` -/
-def HandwritingRecognizer.startDrawing (self : HandwritingRecognizer) (hints : Option HandwritingHints := none) : IO HandwritingDrawing := do
-  let r ← self.val.callMethod "startDrawing" (Support.args #[Support.optional hints]) Value
+@[macro_inline] def HandwritingRecognizer.startDrawing (self : HandwritingRecognizer) (hints : Option HandwritingHints := none) : IO HandwritingDrawing := Internal.api "Lasm.JS.Web.HandwritingRecognizer.startDrawing" do
+  let r ← self.val.callMethod "startDrawing" (Internal.args #[Internal.optional hints]) Value
   pure { val := r }
 
 /-- `undefined finish()` -/
-def HandwritingRecognizer.finish (self : HandwritingRecognizer) : IO Unit :=
-  self.val.callMethod "finish" (Support.args #[]) Unit
+@[macro_inline] def HandwritingRecognizer.finish (self : HandwritingRecognizer) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingRecognizer.finish" do
+  self.val.callMethod "finish" (Internal.args #[]) Unit
 
 /-- `v instanceof HandwritingStroke`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HandwritingStroke`). -/
-def HandwritingStroke.cast? (v : Value) : IO (Option HandwritingStroke) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HandwritingStroke"] Value) v) then some { val := v } else none
+@[macro_inline] def HandwritingStroke.cast? (v : Value) : IO (Option HandwritingStroke) := Internal.api "Lasm.JS.Web.HandwritingStroke.cast?" do
+  Internal.cast (Internal.getGlobal ["HandwritingStroke"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def HandwritingStroke.new : IO HandwritingStroke :=
+@[macro_inline] def HandwritingStroke.new : IO HandwritingStroke := Internal.api "Lasm.JS.Web.HandwritingStroke.new" do
   Lasm.JS.Binding.invoke HandwritingStroke { name := "Lasm.JS.Web.HandwritingStroke.new", module := "globalThis", path := "HandwritingStroke", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `undefined addPoint(HandwritingPoint point)` -/
-def HandwritingStroke.addPoint (self : HandwritingStroke) (point : HandwritingPoint) : IO Unit :=
-  self.val.callMethod "addPoint" (Support.args #[toJS point]) Unit
+@[macro_inline] def HandwritingStroke.addPoint (self : HandwritingStroke) (point : HandwritingPoint) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingStroke.addPoint" do
+  self.val.callMethod "addPoint" (Internal.args #[toJS point]) Unit
 
 /-- `sequence<HandwritingPoint> getPoints()` -/
-def HandwritingStroke.getPoints (self : HandwritingStroke) : IO (Array HandwritingPoint) :=
-  self.val.callMethod "getPoints" (Support.args #[]) (Array HandwritingPoint)
+@[macro_inline] def HandwritingStroke.getPoints (self : HandwritingStroke) : IO (Array HandwritingPoint) := Internal.api "Lasm.JS.Web.HandwritingStroke.getPoints" do
+  self.val.callMethod "getPoints" (Internal.args #[]) (Array HandwritingPoint)
 
 /-- `undefined clear()` -/
-def HandwritingStroke.clear (self : HandwritingStroke) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def HandwritingStroke.clear (self : HandwritingStroke) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingStroke.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `Promise<HandwritingRecognizerQueryResult?> queryHandwritingRecognizer(HandwritingModelConstraint constraint)` -/
-def Navigator.queryHandwritingRecognizer (self : Navigator) (constraint : HandwritingModelConstraint) : Async (Option HandwritingRecognizerQueryResult) :=
-  self.val.callMethodAwait "queryHandwritingRecognizer" (Support.args #[toJS constraint]) (Option HandwritingRecognizerQueryResult)
+@[macro_inline] def Navigator.queryHandwritingRecognizer (self : Navigator) (constraint : HandwritingModelConstraint) : Async (Option HandwritingRecognizerQueryResult) := Internal.api "Lasm.JS.Web.Navigator.queryHandwritingRecognizer" do
+  self.val.callMethodAwait "queryHandwritingRecognizer" (Internal.args #[toJS constraint]) (Option HandwritingRecognizerQueryResult)
 
 /-- `Promise<HandwritingRecognizer> createHandwritingRecognizer(HandwritingModelConstraint constraint)` -/
-def Navigator.createHandwritingRecognizer (self : Navigator) (constraint : HandwritingModelConstraint) : Async HandwritingRecognizer := do
-  let r ← self.val.callMethodAwait "createHandwritingRecognizer" (Support.args #[toJS constraint]) Value
+@[macro_inline] def Navigator.createHandwritingRecognizer (self : Navigator) (constraint : HandwritingModelConstraint) : Async HandwritingRecognizer := Internal.api "Lasm.JS.Web.Navigator.createHandwritingRecognizer" do
+  let r ← self.val.callMethodAwait "createHandwritingRecognizer" (Internal.args #[toJS constraint]) Value
   pure { val := r }
 
 end Lasm.JS.Web

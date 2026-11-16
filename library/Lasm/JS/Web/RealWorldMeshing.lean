@@ -6,42 +6,48 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.RealWorldMeshing
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof XRMesh`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRMesh`). -/
-def XRMesh.cast? (v : Value) : IO (Option XRMesh) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRMesh"] Value) v) then some { val := v } else none
+@[macro_inline] def XRMesh.cast? (v : Value) : IO (Option XRMesh) := Internal.api "Lasm.JS.Web.XRMesh.cast?" do
+  Internal.cast (Internal.getGlobal ["XRMesh"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRSpace meshSpace` -/
-def XRMesh.meshSpace (self : XRMesh) : IO XRSpace := do
+@[macro_inline] def XRMesh.meshSpace (self : XRMesh) : IO XRSpace := Internal.api "Lasm.JS.Web.XRMesh.meshSpace" do
   let r ← self.val.get "meshSpace" Value
   pure { val := r }
 
 /-- `readonly attribute Float32Array vertices` -/
-def XRMesh.vertices (self : XRMesh) : IO ByteArray := do
+@[macro_inline] def XRMesh.vertices (self : XRMesh) : IO ByteArray := Internal.api "Lasm.JS.Web.XRMesh.vertices" do
   let r ← self.val.get "vertices" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute Uint32Array indices` -/
-def XRMesh.indices (self : XRMesh) : IO ByteArray := do
+@[macro_inline] def XRMesh.indices (self : XRMesh) : IO ByteArray := Internal.api "Lasm.JS.Web.XRMesh.indices" do
   let r ← self.val.get "indices" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute DOMHighResTimeStamp lastChangedTime` -/
-def XRMesh.lastChangedTime (self : XRMesh) : IO Float := self.val.get "lastChangedTime" Float
+@[macro_inline] def XRMesh.lastChangedTime (self : XRMesh) : IO Float := Internal.api "Lasm.JS.Web.XRMesh.lastChangedTime" do
+  self.val.get "lastChangedTime" Float
 
 /-- `readonly attribute DOMString? semanticLabel` -/
-def XRMesh.semanticLabel (self : XRMesh) : IO (Option String) := self.val.get "semanticLabel" (Option String)
+@[macro_inline] def XRMesh.semanticLabel (self : XRMesh) : IO (Option String) := Internal.api "Lasm.JS.Web.XRMesh.semanticLabel" do
+  self.val.get "semanticLabel" (Option String)
 
 /-- `v instanceof XRMeshSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRMeshSet`). -/
-def XRMeshSet.cast? (v : Value) : IO (Option XRMeshSet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRMeshSet"] Value) v) then some { val := v } else none
+@[macro_inline] def XRMeshSet.cast? (v : Value) : IO (Option XRMeshSet) := Internal.api "Lasm.JS.Web.XRMeshSet.cast?" do
+  Internal.cast (Internal.getGlobal ["XRMeshSet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRMeshSet detectedMeshes` -/
-def XRFrame.detectedMeshes (self : XRFrame) : IO XRMeshSet := do
+@[macro_inline] def XRFrame.detectedMeshes (self : XRFrame) : IO XRMeshSet := Internal.api "Lasm.JS.Web.XRFrame.detectedMeshes" do
   let r ← self.val.get "detectedMeshes" Value
   pure { val := r }
 

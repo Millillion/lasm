@@ -6,28 +6,34 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Datacue
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof DataCue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DataCue`). -/
-def DataCue.cast? (v : Value) : IO (Option DataCue) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DataCue"] Value) v) then some { val := v } else none
+@[macro_inline] def DataCue.cast? (v : Value) : IO (Option DataCue) := Internal.api "Lasm.JS.Web.DataCue.cast?" do
+  Internal.cast (Internal.getGlobal ["DataCue"] Value) (fun x => { val := x }) v
 
 /-- `constructor(double startTime, unrestricted double endTime, any value, optional DOMString type)` -/
-def DataCue.new (startTime : Float) (endTime : Float) (value : Data) (type : Option String := none) : IO DataCue :=
+@[macro_inline] def DataCue.new (startTime : Float) (endTime : Float) (value : Data) (type : Option String := none) : IO DataCue := Internal.api "Lasm.JS.Web.DataCue.new" do
   Lasm.JS.Binding.invoke DataCue { name := "Lasm.JS.Web.DataCue.new", module := "globalThis", path := "DataCue", construct := true, arity := 4 }
-    (Support.args #[toJS startTime, toJS endTime, toJS value, Support.optional type]) (await := false)
+    (Internal.args #[toJS startTime, toJS endTime, toJS value, Internal.optional type]) (await := false)
 
 /-- `attribute any value` -/
-def DataCue.value (self : DataCue) : IO Data := self.val.get "value" Data
+@[macro_inline] def DataCue.value (self : DataCue) : IO Data := Internal.api "Lasm.JS.Web.DataCue.value" do
+  self.val.get "value" Data
 
 /-- Sets `value`: `attribute any value` -/
-def DataCue.setValue (self : DataCue) (value : Data) : IO Unit :=
+@[macro_inline] def DataCue.setValue (self : DataCue) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.DataCue.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `readonly attribute DOMString type` -/
-def DataCue.type (self : DataCue) : IO String := self.val.get "type" String
+@[macro_inline] def DataCue.type (self : DataCue) : IO String := Internal.api "Lasm.JS.Web.DataCue.type" do
+  self.val.get "type" String
 
 end Lasm.JS.Web

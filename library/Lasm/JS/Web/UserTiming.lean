@@ -6,10 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.HrTime
+import Lasm.JS.Web.Types.UserTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PerformanceMarkOptions` (User Timing (https://w3c.github.io/user-timing/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PerformanceMarkOptions where
@@ -17,8 +22,8 @@ structure PerformanceMarkOptions where
   detail : Data := .undefined
   /-- `DOMHighResTimeStamp startTime` -/
   startTime : Option Float := none
-instance : ToJS PerformanceMarkOptions := ⟨fun d => Support.fields #[("detail", d.detail),
-    ("startTime", Support.optional d.startTime)]⟩
+instance : ToJS PerformanceMarkOptions := ⟨fun d => Internal.fields #[("detail", d.detail),
+    ("startTime", Internal.optional d.startTime)]⟩
 
 /-- `(DOMString or DOMHighResTimeStamp)`: one constructor per member type. -/
 inductive DOMStringOrDOMHighResTimeStamp where
@@ -42,10 +47,10 @@ structure PerformanceMeasureOptions where
   duration : Option Float := none
   /-- `(DOMString or DOMHighResTimeStamp) end` -/
   «end» : Option DOMStringOrDOMHighResTimeStamp := none
-instance : ToJS PerformanceMeasureOptions := ⟨fun d => Support.fields #[("detail", d.detail),
-    ("start", Support.optional d.start),
-    ("duration", Support.optional d.duration),
-    ("end", Support.optional d.«end»)]⟩
+instance : ToJS PerformanceMeasureOptions := ⟨fun d => Internal.fields #[("detail", d.detail),
+    ("start", Internal.optional d.start),
+    ("duration", Internal.optional d.duration),
+    ("end", Internal.optional d.«end»)]⟩
 
 /-- `(DOMString or PerformanceMeasureOptions)`: one constructor per member type. -/
 inductive DOMStringOrPerformanceMeasureOptions where
@@ -60,40 +65,42 @@ instance : Coe String DOMStringOrPerformanceMeasureOptions := ⟨.domString⟩
 instance : Coe PerformanceMeasureOptions DOMStringOrPerformanceMeasureOptions := ⟨.performanceMeasureOptions⟩
 
 /-- `v instanceof PerformanceMark`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceMark`). -/
-def PerformanceMark.cast? (v : Value) : IO (Option PerformanceMark) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceMark"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceMark.cast? (v : Value) : IO (Option PerformanceMark) := Internal.api "Lasm.JS.Web.PerformanceMark.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceMark"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString markName, optional PerformanceMarkOptions markOptions)` -/
-def PerformanceMark.new (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO PerformanceMark :=
+@[macro_inline] def PerformanceMark.new (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO PerformanceMark := Internal.api "Lasm.JS.Web.PerformanceMark.new" do
   Lasm.JS.Binding.invoke PerformanceMark { name := "Lasm.JS.Web.PerformanceMark.new", module := "globalThis", path := "PerformanceMark", construct := true, arity := 2 }
-    (Support.args #[toJS markName, Support.optional markOptions]) (await := false)
+    (Internal.args #[toJS markName, Internal.optional markOptions]) (await := false)
 
 /-- `readonly attribute any detail` -/
-def PerformanceMark.detail (self : PerformanceMark) : IO Data := self.val.get "detail" Data
+@[macro_inline] def PerformanceMark.detail (self : PerformanceMark) : IO Data := Internal.api "Lasm.JS.Web.PerformanceMark.detail" do
+  self.val.get "detail" Data
 
 /-- `v instanceof PerformanceMeasure`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceMeasure`). -/
-def PerformanceMeasure.cast? (v : Value) : IO (Option PerformanceMeasure) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceMeasure"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceMeasure.cast? (v : Value) : IO (Option PerformanceMeasure) := Internal.api "Lasm.JS.Web.PerformanceMeasure.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceMeasure"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any detail` -/
-def PerformanceMeasure.detail (self : PerformanceMeasure) : IO Data := self.val.get "detail" Data
+@[macro_inline] def PerformanceMeasure.detail (self : PerformanceMeasure) : IO Data := Internal.api "Lasm.JS.Web.PerformanceMeasure.detail" do
+  self.val.get "detail" Data
 
 /-- `PerformanceMark mark(DOMString markName, optional PerformanceMarkOptions markOptions)` -/
-def Performance.mark (self : Performance) (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO PerformanceMark := do
-  let r ← self.val.callMethod "mark" (Support.args #[toJS markName, Support.optional markOptions]) Value
+@[macro_inline] def Performance.mark (self : Performance) (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO PerformanceMark := Internal.api "Lasm.JS.Web.Performance.mark" do
+  let r ← self.val.callMethod "mark" (Internal.args #[toJS markName, Internal.optional markOptions]) Value
   pure { val := r }
 
 /-- `undefined clearMarks(optional DOMString markName)` -/
-def Performance.clearMarks (self : Performance) (markName : Option String := none) : IO Unit :=
-  self.val.callMethod "clearMarks" (Support.args #[Support.optional markName]) Unit
+@[macro_inline] def Performance.clearMarks (self : Performance) (markName : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearMarks" do
+  self.val.callMethod "clearMarks" (Internal.args #[Internal.optional markName]) Unit
 
 /-- `PerformanceMeasure measure(DOMString measureName, optional (DOMString or PerformanceMeasureOptions) startOrMeasureOptions, optional DOMString endMark)` -/
-def Performance.measure (self : Performance) (measureName : String) (startOrMeasureOptions : Option DOMStringOrPerformanceMeasureOptions := none) (endMark : Option String := none) : IO PerformanceMeasure := do
-  let r ← self.val.callMethod "measure" (Support.args #[toJS measureName, Support.optional startOrMeasureOptions, Support.optional endMark]) Value
+@[macro_inline] def Performance.measure (self : Performance) (measureName : String) (startOrMeasureOptions : Option DOMStringOrPerformanceMeasureOptions := none) (endMark : Option String := none) : IO PerformanceMeasure := Internal.api "Lasm.JS.Web.Performance.measure" do
+  let r ← self.val.callMethod "measure" (Internal.args #[toJS measureName, Internal.optional startOrMeasureOptions, Internal.optional endMark]) Value
   pure { val := r }
 
 /-- `undefined clearMeasures(optional DOMString measureName)` -/
-def Performance.clearMeasures (self : Performance) (measureName : Option String := none) : IO Unit :=
-  self.val.callMethod "clearMeasures" (Support.args #[Support.optional measureName]) Unit
+@[macro_inline] def Performance.clearMeasures (self : Performance) (measureName : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearMeasures" do
+  self.val.callMethod "clearMeasures" (Internal.args #[Internal.optional measureName]) Unit
 
 end Lasm.JS.Web

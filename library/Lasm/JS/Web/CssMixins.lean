@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssMixins
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FunctionParameter` (CSS Custom Functions and Mixins Module Level 1 (https://drafts.csswg.org/css-mixins-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FunctionParameter where
@@ -19,6 +23,9 @@ structure FunctionParameter where
   type : String
   /-- `CSSOMString defaultValue` -/
   defaultValue : Option String := none
+instance : ToJS FunctionParameter := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("type", toJS d.type),
+    ("defaultValue", Internal.optional d.defaultValue)]⟩
 instance : FromJS FunctionParameter where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -27,81 +34,88 @@ instance : FromJS FunctionParameter where
   typeName := "Lasm.JS.Web.FunctionParameter"
 
 /-- `v instanceof CSSApplyBlockRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSApplyBlockRule`). -/
-def CSSApplyBlockRule.cast? (v : Value) : IO (Option CSSApplyBlockRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSApplyBlockRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSApplyBlockRule.cast? (v : Value) : IO (Option CSSApplyBlockRule) := Internal.api "Lasm.JS.Web.CSSApplyBlockRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSApplyBlockRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSApplyBlockRule.name (self : CSSApplyBlockRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSApplyBlockRule.name (self : CSSApplyBlockRule) : IO String := Internal.api "Lasm.JS.Web.CSSApplyBlockRule.name" do
+  self.val.get "name" String
 
 /-- `sequence<CSSOMString> getArguments()` -/
-def CSSApplyBlockRule.getArguments (self : CSSApplyBlockRule) : IO (Array String) :=
-  self.val.callMethod "getArguments" (Support.args #[]) (Array String)
+@[macro_inline] def CSSApplyBlockRule.getArguments (self : CSSApplyBlockRule) : IO (Array String) := Internal.api "Lasm.JS.Web.CSSApplyBlockRule.getArguments" do
+  self.val.callMethod "getArguments" (Internal.args #[]) (Array String)
 
 /-- `v instanceof CSSApplyStatementRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSApplyStatementRule`). -/
-def CSSApplyStatementRule.cast? (v : Value) : IO (Option CSSApplyStatementRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSApplyStatementRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSApplyStatementRule.cast? (v : Value) : IO (Option CSSApplyStatementRule) := Internal.api "Lasm.JS.Web.CSSApplyStatementRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSApplyStatementRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSApplyStatementRule.name (self : CSSApplyStatementRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSApplyStatementRule.name (self : CSSApplyStatementRule) : IO String := Internal.api "Lasm.JS.Web.CSSApplyStatementRule.name" do
+  self.val.get "name" String
 
 /-- `sequence<CSSOMString> getArguments()` -/
-def CSSApplyStatementRule.getArguments (self : CSSApplyStatementRule) : IO (Array String) :=
-  self.val.callMethod "getArguments" (Support.args #[]) (Array String)
+@[macro_inline] def CSSApplyStatementRule.getArguments (self : CSSApplyStatementRule) : IO (Array String) := Internal.api "Lasm.JS.Web.CSSApplyStatementRule.getArguments" do
+  self.val.callMethod "getArguments" (Internal.args #[]) (Array String)
 
 /-- `v instanceof CSSContentsBlockRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSContentsBlockRule`). -/
-def CSSContentsBlockRule.cast? (v : Value) : IO (Option CSSContentsBlockRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSContentsBlockRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSContentsBlockRule.cast? (v : Value) : IO (Option CSSContentsBlockRule) := Internal.api "Lasm.JS.Web.CSSContentsBlockRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSContentsBlockRule"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof CSSContentsStatementRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSContentsStatementRule`). -/
-def CSSContentsStatementRule.cast? (v : Value) : IO (Option CSSContentsStatementRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSContentsStatementRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSContentsStatementRule.cast? (v : Value) : IO (Option CSSContentsStatementRule) := Internal.api "Lasm.JS.Web.CSSContentsStatementRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSContentsStatementRule"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof CSSFunctionDeclarations`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFunctionDeclarations`). -/
-def CSSFunctionDeclarations.cast? (v : Value) : IO (Option CSSFunctionDeclarations) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFunctionDeclarations"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFunctionDeclarations.cast? (v : Value) : IO (Option CSSFunctionDeclarations) := Internal.api "Lasm.JS.Web.CSSFunctionDeclarations.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFunctionDeclarations"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSFunctionDescriptors style` -/
-def CSSFunctionDeclarations.style (self : CSSFunctionDeclarations) : IO CSSFunctionDescriptors := do
+@[macro_inline] def CSSFunctionDeclarations.style (self : CSSFunctionDeclarations) : IO CSSFunctionDescriptors := Internal.api "Lasm.JS.Web.CSSFunctionDeclarations.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `v instanceof CSSFunctionDescriptors`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFunctionDescriptors`). -/
-def CSSFunctionDescriptors.cast? (v : Value) : IO (Option CSSFunctionDescriptors) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFunctionDescriptors"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFunctionDescriptors.cast? (v : Value) : IO (Option CSSFunctionDescriptors) := Internal.api "Lasm.JS.Web.CSSFunctionDescriptors.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFunctionDescriptors"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString result` -/
-def CSSFunctionDescriptors.result (self : CSSFunctionDescriptors) : IO String := self.val.get "result" String
+@[macro_inline] def CSSFunctionDescriptors.result (self : CSSFunctionDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSFunctionDescriptors.result" do
+  self.val.get "result" String
 
 /-- Sets `result`: `attribute CSSOMString result` -/
-def CSSFunctionDescriptors.setResult (self : CSSFunctionDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSFunctionDescriptors.setResult (self : CSSFunctionDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSFunctionDescriptors.setResult" do
   self.val.set "result" (toJS value)
 
 /-- `v instanceof CSSFunctionRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFunctionRule`). -/
-def CSSFunctionRule.cast? (v : Value) : IO (Option CSSFunctionRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFunctionRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFunctionRule.cast? (v : Value) : IO (Option CSSFunctionRule) := Internal.api "Lasm.JS.Web.CSSFunctionRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFunctionRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSFunctionRule.name (self : CSSFunctionRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSFunctionRule.name (self : CSSFunctionRule) : IO String := Internal.api "Lasm.JS.Web.CSSFunctionRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CSSOMString returnType` -/
-def CSSFunctionRule.returnType (self : CSSFunctionRule) : IO String := self.val.get "returnType" String
+@[macro_inline] def CSSFunctionRule.returnType (self : CSSFunctionRule) : IO String := Internal.api "Lasm.JS.Web.CSSFunctionRule.returnType" do
+  self.val.get "returnType" String
 
 /-- `sequence<FunctionParameter> getParameters()` -/
-def CSSFunctionRule.getParameters (self : CSSFunctionRule) : IO (Array FunctionParameter) :=
-  self.val.callMethod "getParameters" (Support.args #[]) (Array FunctionParameter)
+@[macro_inline] def CSSFunctionRule.getParameters (self : CSSFunctionRule) : IO (Array FunctionParameter) := Internal.api "Lasm.JS.Web.CSSFunctionRule.getParameters" do
+  self.val.callMethod "getParameters" (Internal.args #[]) (Array FunctionParameter)
 
 /-- `v instanceof CSSMixinRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSMixinRule`). -/
-def CSSMixinRule.cast? (v : Value) : IO (Option CSSMixinRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSMixinRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSMixinRule.cast? (v : Value) : IO (Option CSSMixinRule) := Internal.api "Lasm.JS.Web.CSSMixinRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSMixinRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSMixinRule.name (self : CSSMixinRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSMixinRule.name (self : CSSMixinRule) : IO String := Internal.api "Lasm.JS.Web.CSSMixinRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute boolean contents` -/
-def CSSMixinRule.contents (self : CSSMixinRule) : IO Bool := self.val.get "contents" Bool
+@[macro_inline] def CSSMixinRule.contents (self : CSSMixinRule) : IO Bool := Internal.api "Lasm.JS.Web.CSSMixinRule.contents" do
+  self.val.get "contents" Bool
 
 /-- `sequence<FunctionParameter> getParameters()` -/
-def CSSMixinRule.getParameters (self : CSSMixinRule) : IO (Array FunctionParameter) :=
-  self.val.callMethod "getParameters" (Support.args #[]) (Array FunctionParameter)
+@[macro_inline] def CSSMixinRule.getParameters (self : CSSMixinRule) : IO (Array FunctionParameter) := Internal.api "Lasm.JS.Web.CSSMixinRule.getParameters" do
+  self.val.callMethod "getParameters" (Internal.args #[]) (Array FunctionParameter)
 
 end Lasm.JS.Web

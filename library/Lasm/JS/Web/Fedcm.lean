@@ -6,52 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.CredentialManagement
+import Lasm.JS.Web.Types.Fedcm
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum IdentityCredentialRequestOptionsContext` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)): "signin", "signup", "use", "continue". -/
-inductive IdentityCredentialRequestOptionsContext where
-  /-- "signin" -/
-  | signin
-  /-- "signup" -/
-  | signup
-  /-- "use" -/
-  | use
-  /-- "continue" -/
-  | «continue»
-  deriving BEq, Repr, Inhabited
-instance : ToJS IdentityCredentialRequestOptionsContext := ⟨fun
-  | .signin => .string "signin"
-  | .signup => .string "signup"
-  | .use => .string "use"
-  | .«continue» => .string "continue"⟩
-instance : FromJS IdentityCredentialRequestOptionsContext where
-  fromJS
-    | .string "signin" => .ok .signin
-    | .string "signup" => .ok .signup
-    | .string "use" => .ok .use
-    | .string "continue" => .ok .«continue»
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IdentityCredentialRequestOptionsContext"
-
-/-- `enum IdentityCredentialRequestOptionsMode` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)): "active", "passive". -/
-inductive IdentityCredentialRequestOptionsMode where
-  /-- "active" -/
-  | active
-  /-- "passive" -/
-  | passive
-  deriving BEq, Repr, Inhabited
-instance : ToJS IdentityCredentialRequestOptionsMode := ⟨fun
-  | .active => .string "active"
-  | .passive => .string "passive"⟩
-instance : FromJS IdentityCredentialRequestOptionsMode where
-  fromJS
-    | .string "active" => .ok .active
-    | .string "passive" => .ok .passive
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IdentityCredentialRequestOptionsMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary IdentityCredentialDisconnectOptions : IdentityProviderConfig` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdentityCredentialDisconnectOptions where
@@ -61,7 +24,7 @@ structure IdentityCredentialDisconnectOptions where
   clientId : String
   /-- `required USVString accountHint` -/
   accountHint : String
-instance : ToJS IdentityCredentialDisconnectOptions := ⟨fun d => Support.fields #[("configURL", toJS d.configURL),
+instance : ToJS IdentityCredentialDisconnectOptions := ⟨fun d => Internal.fields #[("configURL", toJS d.configURL),
     ("clientId", toJS d.clientId),
     ("accountHint", toJS d.accountHint)]⟩
 
@@ -71,14 +34,14 @@ structure IdentityCredentialErrorInit where
   error : Option String := none
   /-- `USVString url` -/
   url : Option String := none
-instance : ToJS IdentityCredentialErrorInit := ⟨fun d => Support.fields #[("error", Support.optional d.error),
-    ("url", Support.optional d.url)]⟩
+instance : ToJS IdentityCredentialErrorInit := ⟨fun d => Internal.fields #[("error", Internal.optional d.error),
+    ("url", Internal.optional d.url)]⟩
 
 /-- `dictionary IdentityResolveOptions` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdentityResolveOptions where
   /-- `USVString accountId` -/
   accountId : Option String := none
-instance : ToJS IdentityResolveOptions := ⟨fun d => Support.fields #[("accountId", Support.optional d.accountId)]⟩
+instance : ToJS IdentityResolveOptions := ⟨fun d => Internal.fields #[("accountId", Internal.optional d.accountId)]⟩
 
 /-- `dictionary IdentityProviderConfig` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdentityProviderConfig where
@@ -86,7 +49,7 @@ structure IdentityProviderConfig where
   configURL : String
   /-- `required USVString clientId` -/
   clientId : String
-instance : ToJS IdentityProviderConfig := ⟨fun d => Support.fields #[("configURL", toJS d.configURL),
+instance : ToJS IdentityProviderConfig := ⟨fun d => Internal.fields #[("configURL", toJS d.configURL),
     ("clientId", toJS d.clientId)]⟩
 
 /-- `dictionary IdentityUserInfo` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -99,6 +62,10 @@ structure IdentityUserInfo where
   givenName : Option String := none
   /-- `USVString picture` -/
   picture : Option String := none
+instance : ToJS IdentityUserInfo := ⟨fun d => Internal.fields #[("email", Internal.optional d.email),
+    ("name", Internal.optional d.name),
+    ("givenName", Internal.optional d.givenName),
+    ("picture", Internal.optional d.picture)]⟩
 instance : FromJS IdentityUserInfo where
   fromJS d := do return {
     email := ← Lasm.JS.readField (Option String) d "email",
@@ -106,6 +73,12 @@ instance : FromJS IdentityUserInfo where
     givenName := ← Lasm.JS.readField (Option String) d "givenName",
     picture := ← Lasm.JS.readField (Option String) d "picture" }
   typeName := "Lasm.JS.Web.IdentityUserInfo"
+
+/-- `dictionary DisconnectedAccount` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DisconnectedAccount where
+  /-- `required USVString account_id` -/
+  account_id : String
+instance : ToJS DisconnectedAccount := ⟨fun d => Internal.fields #[("account_id", toJS d.account_id)]⟩
 
 /-- `dictionary IdentityProviderRequestOptions : IdentityProviderConfig` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdentityProviderRequestOptions where
@@ -121,11 +94,11 @@ structure IdentityProviderRequestOptions where
   fields : Option (Array String) := none
   /-- `any params` -/
   params : Data := .undefined
-instance : ToJS IdentityProviderRequestOptions := ⟨fun d => Support.fields #[("configURL", toJS d.configURL),
+instance : ToJS IdentityProviderRequestOptions := ⟨fun d => Internal.fields #[("configURL", toJS d.configURL),
     ("clientId", toJS d.clientId),
-    ("loginHint", Support.optional d.loginHint),
-    ("domainHint", Support.optional d.domainHint),
-    ("fields", Support.optional d.fields),
+    ("loginHint", Internal.optional d.loginHint),
+    ("domainHint", Internal.optional d.domainHint),
+    ("fields", Internal.optional d.fields),
     ("params", d.params)]⟩
 
 /-- `dictionary IdentityCredentialRequestOptions` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -136,60 +109,194 @@ structure IdentityCredentialRequestOptions where
   context : Option IdentityCredentialRequestOptionsContext := none
   /-- `IdentityCredentialRequestOptionsMode mode = "passive"` -/
   mode : Option IdentityCredentialRequestOptionsMode := none
-instance : ToJS IdentityCredentialRequestOptions := ⟨fun d => Support.fields #[("providers", toJS d.providers),
-    ("context", Support.optional d.context),
-    ("mode", Support.optional d.mode)]⟩
+instance : ToJS IdentityCredentialRequestOptions := ⟨fun d => Internal.fields #[("providers", toJS d.providers),
+    ("context", Internal.optional d.context),
+    ("mode", Internal.optional d.mode)]⟩
+
+/-- `dictionary IdentityProviderWellKnown` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderWellKnown where
+  /-- `sequence<USVString> provider_urls` -/
+  provider_urls : Option (Array String) := none
+  /-- `USVString accounts_endpoint` -/
+  accounts_endpoint : Option String := none
+  /-- `USVString login_url` -/
+  login_url : Option String := none
+instance : ToJS IdentityProviderWellKnown := ⟨fun d => Internal.fields #[("provider_urls", Internal.optional d.provider_urls),
+    ("accounts_endpoint", Internal.optional d.accounts_endpoint),
+    ("login_url", Internal.optional d.login_url)]⟩
+
+/-- `dictionary IdentityProviderIcon` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderIcon where
+  /-- `required USVString url` -/
+  url : String
+  /-- `unsigned long size` -/
+  size : Option Nat := none
+instance : ToJS IdentityProviderIcon := ⟨fun d => Internal.fields #[("url", toJS d.url),
+    ("size", Internal.optional d.size)]⟩
+
+/-- `dictionary IdentityProviderBranding` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderBranding where
+  /-- `USVString background_color` -/
+  background_color : Option String := none
+  /-- `USVString color` -/
+  color : Option String := none
+  /-- `sequence<IdentityProviderIcon> icons` -/
+  icons : Option (Array IdentityProviderIcon) := none
+  /-- `USVString name` -/
+  name : Option String := none
+instance : ToJS IdentityProviderBranding := ⟨fun d => Internal.fields #[("background_color", Internal.optional d.background_color),
+    ("color", Internal.optional d.color),
+    ("icons", Internal.optional d.icons),
+    ("name", Internal.optional d.name)]⟩
+
+/-- `dictionary IdentityProviderAPIConfig` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderAPIConfig where
+  /-- `required USVString accounts_endpoint` -/
+  accounts_endpoint : String
+  /-- `USVString client_metadata_endpoint` -/
+  client_metadata_endpoint : Option String := none
+  /-- `required USVString id_assertion_endpoint` -/
+  id_assertion_endpoint : String
+  /-- `required USVString login_url` -/
+  login_url : String
+  /-- `USVString disconnect_endpoint` -/
+  disconnect_endpoint : Option String := none
+  /-- `IdentityProviderBranding branding` -/
+  branding : Option IdentityProviderBranding := none
+  /-- `boolean supports_use_other_account = false` -/
+  supports_use_other_account : Option Bool := none
+  /-- `USVString account_label` -/
+  account_label : Option String := none
+instance : ToJS IdentityProviderAPIConfig := ⟨fun d => Internal.fields #[("accounts_endpoint", toJS d.accounts_endpoint),
+    ("client_metadata_endpoint", Internal.optional d.client_metadata_endpoint),
+    ("id_assertion_endpoint", toJS d.id_assertion_endpoint),
+    ("login_url", toJS d.login_url),
+    ("disconnect_endpoint", Internal.optional d.disconnect_endpoint),
+    ("branding", Internal.optional d.branding),
+    ("supports_use_other_account", Internal.optional d.supports_use_other_account),
+    ("account_label", Internal.optional d.account_label)]⟩
+
+/-- `dictionary IdentityProviderAccount` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderAccount where
+  /-- `required USVString id` -/
+  id : String
+  /-- `USVString name` -/
+  name : Option String := none
+  /-- `USVString email` -/
+  email : Option String := none
+  /-- `USVString tel` -/
+  tel : Option String := none
+  /-- `USVString username` -/
+  username : Option String := none
+  /-- `USVString given_name` -/
+  given_name : Option String := none
+  /-- `USVString picture` -/
+  picture : Option String := none
+  /-- `sequence<USVString> approved_clients` -/
+  approved_clients : Option (Array String) := none
+  /-- `sequence<DOMString> login_hints` -/
+  login_hints : Option (Array String) := none
+  /-- `sequence<DOMString> domain_hints` -/
+  domain_hints : Option (Array String) := none
+  /-- `sequence<DOMString> label_hints` -/
+  label_hints : Option (Array String) := none
+instance : ToJS IdentityProviderAccount := ⟨fun d => Internal.fields #[("id", toJS d.id),
+    ("name", Internal.optional d.name),
+    ("email", Internal.optional d.email),
+    ("tel", Internal.optional d.tel),
+    ("username", Internal.optional d.username),
+    ("given_name", Internal.optional d.given_name),
+    ("picture", Internal.optional d.picture),
+    ("approved_clients", Internal.optional d.approved_clients),
+    ("login_hints", Internal.optional d.login_hints),
+    ("domain_hints", Internal.optional d.domain_hints),
+    ("label_hints", Internal.optional d.label_hints)]⟩
+
+/-- `dictionary IdentityProviderAccountList` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderAccountList where
+  /-- `sequence<IdentityProviderAccount> accounts` -/
+  accounts : Option (Array IdentityProviderAccount) := none
+instance : ToJS IdentityProviderAccountList := ⟨fun d => Internal.fields #[("accounts", Internal.optional d.accounts)]⟩
+
+/-- `dictionary IdentityAssertionResponse` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityAssertionResponse where
+  /-- `any token` -/
+  token : Data := .undefined
+  /-- `USVString continue_on` -/
+  continue_on : Option String := none
+  /-- `IdentityCredentialErrorInit error` -/
+  error : Option IdentityCredentialErrorInit := none
+instance : ToJS IdentityAssertionResponse := ⟨fun d => Internal.fields #[("token", d.token),
+    ("continue_on", Internal.optional d.continue_on),
+    ("error", Internal.optional d.error)]⟩
+
+/-- `dictionary IdentityProviderClientMetadata` (Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IdentityProviderClientMetadata where
+  /-- `USVString privacy_policy_url` -/
+  privacy_policy_url : Option String := none
+  /-- `USVString terms_of_service_url` -/
+  terms_of_service_url : Option String := none
+  /-- `boolean client_is_third_party_to_top_frame_origin = false` -/
+  client_is_third_party_to_top_frame_origin : Option Bool := none
+instance : ToJS IdentityProviderClientMetadata := ⟨fun d => Internal.fields #[("privacy_policy_url", Internal.optional d.privacy_policy_url),
+    ("terms_of_service_url", Internal.optional d.terms_of_service_url),
+    ("client_is_third_party_to_top_frame_origin", Internal.optional d.client_is_third_party_to_top_frame_origin)]⟩
 
 /-- `v instanceof IdentityCredential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdentityCredential`). -/
-def IdentityCredential.cast? (v : Value) : IO (Option IdentityCredential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IdentityCredential"] Value) v) then some { val := v } else none
+@[macro_inline] def IdentityCredential.cast? (v : Value) : IO (Option IdentityCredential) := Internal.api "Lasm.JS.Web.IdentityCredential.cast?" do
+  Internal.cast (Internal.getGlobal ["IdentityCredential"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any token` -/
-def IdentityCredential.token (self : IdentityCredential) : IO Data := self.val.get "token" Data
+@[macro_inline] def IdentityCredential.token (self : IdentityCredential) : IO Data := Internal.api "Lasm.JS.Web.IdentityCredential.token" do
+  self.val.get "token" Data
 
 /-- `readonly attribute boolean isAutoSelected` -/
-def IdentityCredential.isAutoSelected (self : IdentityCredential) : IO Bool := self.val.get "isAutoSelected" Bool
+@[macro_inline] def IdentityCredential.isAutoSelected (self : IdentityCredential) : IO Bool := Internal.api "Lasm.JS.Web.IdentityCredential.isAutoSelected" do
+  self.val.get "isAutoSelected" Bool
 
 /-- `readonly attribute USVString configURL` -/
-def IdentityCredential.configURL (self : IdentityCredential) : IO String := self.val.get "configURL" String
+@[macro_inline] def IdentityCredential.configURL (self : IdentityCredential) : IO String := Internal.api "Lasm.JS.Web.IdentityCredential.configURL" do
+  self.val.get "configURL" String
 
 /-- `static Promise<undefined> disconnect(IdentityCredentialDisconnectOptions options)` -/
-def IdentityCredential.disconnect (options : IdentityCredentialDisconnectOptions) : Async Unit :=
+@[macro_inline] def IdentityCredential.disconnect (options : IdentityCredentialDisconnectOptions) : Async Unit := Internal.api "Lasm.JS.Web.IdentityCredential.disconnect" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityCredential.disconnect", module := "globalThis", path := "IdentityCredential.disconnect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `v instanceof IdentityCredentialError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdentityCredentialError`). -/
-def IdentityCredentialError.cast? (v : Value) : IO (Option IdentityCredentialError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IdentityCredentialError"] Value) v) then some { val := v } else none
+@[macro_inline] def IdentityCredentialError.cast? (v : Value) : IO (Option IdentityCredentialError) := Internal.api "Lasm.JS.Web.IdentityCredentialError.cast?" do
+  Internal.cast (Internal.getGlobal ["IdentityCredentialError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message, optional IdentityCredentialErrorInit options)` -/
-def IdentityCredentialError.new (message : Option String := none) (options : Option IdentityCredentialErrorInit := none) : IO IdentityCredentialError :=
+@[macro_inline] def IdentityCredentialError.new (message : Option String := none) (options : Option IdentityCredentialErrorInit := none) : IO IdentityCredentialError := Internal.api "Lasm.JS.Web.IdentityCredentialError.new" do
   Lasm.JS.Binding.invoke IdentityCredentialError { name := "Lasm.JS.Web.IdentityCredentialError.new", module := "globalThis", path := "IdentityCredentialError", construct := true, arity := 2 }
-    (Support.args #[Support.optional message, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
 
 /-- `readonly attribute DOMString error` -/
-def IdentityCredentialError.error (self : IdentityCredentialError) : IO String := self.val.get "error" String
+@[macro_inline] def IdentityCredentialError.error (self : IdentityCredentialError) : IO String := Internal.api "Lasm.JS.Web.IdentityCredentialError.error" do
+  self.val.get "error" String
 
 /-- `readonly attribute USVString url` -/
-def IdentityCredentialError.url (self : IdentityCredentialError) : IO String := self.val.get "url" String
+@[macro_inline] def IdentityCredentialError.url (self : IdentityCredentialError) : IO String := Internal.api "Lasm.JS.Web.IdentityCredentialError.url" do
+  self.val.get "url" String
 
 /-- `v instanceof IdentityProvider`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdentityProvider`). -/
-def IdentityProvider.cast? (v : Value) : IO (Option IdentityProvider) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IdentityProvider"] Value) v) then some { val := v } else none
+@[macro_inline] def IdentityProvider.cast? (v : Value) : IO (Option IdentityProvider) := Internal.api "Lasm.JS.Web.IdentityProvider.cast?" do
+  Internal.cast (Internal.getGlobal ["IdentityProvider"] Value) (fun x => { val := x }) v
 
 /-- `static undefined close()` -/
-def IdentityProvider.close : IO Unit :=
+@[macro_inline] def IdentityProvider.close : IO Unit := Internal.api "Lasm.JS.Web.IdentityProvider.close" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.IdentityProvider.close", module := "globalThis", path := "IdentityProvider.close", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static Promise<undefined> resolve(any token, optional IdentityResolveOptions options)` -/
-def IdentityProvider.resolve (token : Data) (options : Option IdentityResolveOptions := none) : Async Unit :=
+@[macro_inline] def IdentityProvider.resolve (token : Data) (options : Option IdentityResolveOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.IdentityProvider.resolve" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityProvider.resolve", module := "globalThis", path := "IdentityProvider.resolve", construct := false, arity := 2 }
-    (Support.args #[toJS token, Support.optional options])
+    (Internal.args #[toJS token, Internal.optional options])
 
 /-- `static Promise<sequence<IdentityUserInfo>> getUserInfo(IdentityProviderConfig config)` -/
-def IdentityProvider.getUserInfo (config : IdentityProviderConfig) : Async (Array IdentityUserInfo) :=
+@[macro_inline] def IdentityProvider.getUserInfo (config : IdentityProviderConfig) : Async (Array IdentityUserInfo) := Internal.api "Lasm.JS.Web.IdentityProvider.getUserInfo" do
   Lasm.JS.Binding.invokeAsync (Array IdentityUserInfo) { name := "Lasm.JS.Web.IdentityProvider.getUserInfo", module := "globalThis", path := "IdentityProvider.getUserInfo", construct := false, arity := 1 }
-    (Support.args #[toJS config])
+    (Internal.args #[toJS config])
 
 end Lasm.JS.Web

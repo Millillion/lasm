@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.Portals
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PortalActivateOptions : StructuredSerializeOptions` (Portals (https://wicg.github.io/portals/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PortalActivateOptions where
@@ -18,7 +24,7 @@ structure PortalActivateOptions where
   transfer : Option (Array Data) := none
   /-- `any data` -/
   data : Data := .undefined
-instance : ToJS PortalActivateOptions := ⟨fun d => Support.fields #[("transfer", Support.optional d.transfer),
+instance : ToJS PortalActivateOptions := ⟨fun d => Internal.fields #[("transfer", Internal.optional d.transfer),
     ("data", d.data)]⟩
 
 /-- `dictionary PortalActivateEventInit : EventInit` (Portals (https://wicg.github.io/portals/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -31,115 +37,139 @@ structure PortalActivateEventInit where
   composed : Option Bool := none
   /-- `any data = null` -/
   data : Data := .undefined
-instance : ToJS PortalActivateEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS PortalActivateEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("data", d.data)]⟩
 
 /-- `v instanceof HTMLPortalElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLPortalElement`). -/
-def HTMLPortalElement.cast? (v : Value) : IO (Option HTMLPortalElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLPortalElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLPortalElement.cast? (v : Value) : IO (Option HTMLPortalElement) := Internal.api "Lasm.JS.Web.HTMLPortalElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLPortalElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString src` -/
-def HTMLPortalElement.src (self : HTMLPortalElement) : IO String := self.val.get "src" String
+@[macro_inline] def HTMLPortalElement.src (self : HTMLPortalElement) : IO String := Internal.api "Lasm.JS.Web.HTMLPortalElement.src" do
+  self.val.get "src" String
 
 /-- Sets `src`: `attribute USVString src` -/
-def HTMLPortalElement.setSrc (self : HTMLPortalElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLPortalElement.setSrc (self : HTMLPortalElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.setSrc" do
   self.val.set "src" (toJS value)
 
 /-- `attribute DOMString referrerPolicy` -/
-def HTMLPortalElement.referrerPolicy (self : HTMLPortalElement) : IO String := self.val.get "referrerPolicy" String
+@[macro_inline] def HTMLPortalElement.referrerPolicy (self : HTMLPortalElement) : IO String := Internal.api "Lasm.JS.Web.HTMLPortalElement.referrerPolicy" do
+  self.val.get "referrerPolicy" String
 
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
-def HTMLPortalElement.setReferrerPolicy (self : HTMLPortalElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLPortalElement.setReferrerPolicy (self : HTMLPortalElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.setReferrerPolicy" do
   self.val.set "referrerPolicy" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def HTMLPortalElement.onmessage (self : HTMLPortalElement) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLPortalElement.onmessage (self : HTMLPortalElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLPortalElement.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def HTMLPortalElement.setOnmessage (self : HTMLPortalElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLPortalElement.setOnmessage (self : HTMLPortalElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute EventHandler onmessageerror` -/
-def HTMLPortalElement.onmessageerror (self : HTMLPortalElement) : IO (Option EventHandlerNonNull) := self.val.get "onmessageerror" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLPortalElement.onmessageerror (self : HTMLPortalElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLPortalElement.onmessageerror" do
+  self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
-def HTMLPortalElement.setOnmessageerror (self : HTMLPortalElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLPortalElement.setOnmessageerror (self : HTMLPortalElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
 
 /-- `Promise<undefined> activate(optional PortalActivateOptions options)` -/
-def HTMLPortalElement.activate (self : HTMLPortalElement) (options : Option PortalActivateOptions := none) : Async Unit :=
-  self.val.callMethodAwait "activate" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def HTMLPortalElement.activate (self : HTMLPortalElement) (options : Option PortalActivateOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.activate" do
+  self.val.callMethodAwait "activate" (Internal.args #[Internal.optional options]) Unit
 
 /-- `undefined postMessage(any message, optional StructuredSerializeOptions options)` -/
-def HTMLPortalElement.postMessage (self : HTMLPortalElement) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, Support.optional options]) Unit
+@[macro_inline] def HTMLPortalElement.postMessage (self : HTMLPortalElement) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.HTMLPortalElement.postMessage" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
 
 /-- `v instanceof PortalActivateEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PortalActivateEvent`). -/
-def PortalActivateEvent.cast? (v : Value) : IO (Option PortalActivateEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PortalActivateEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PortalActivateEvent.cast? (v : Value) : IO (Option PortalActivateEvent) := Internal.api "Lasm.JS.Web.PortalActivateEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PortalActivateEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional PortalActivateEventInit eventInitDict)` -/
-def PortalActivateEvent.new (type : String) (eventInitDict : Option PortalActivateEventInit := none) : IO PortalActivateEvent :=
+@[macro_inline] def PortalActivateEvent.new (type : String) (eventInitDict : Option PortalActivateEventInit := none) : IO PortalActivateEvent := Internal.api "Lasm.JS.Web.PortalActivateEvent.new" do
   Lasm.JS.Binding.invoke PortalActivateEvent { name := "Lasm.JS.Web.PortalActivateEvent.new", module := "globalThis", path := "PortalActivateEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute any data` -/
-def PortalActivateEvent.data (self : PortalActivateEvent) : IO Data := self.val.get "data" Data
+@[macro_inline] def PortalActivateEvent.data (self : PortalActivateEvent) : IO Data := Internal.api "Lasm.JS.Web.PortalActivateEvent.data" do
+  self.val.get "data" Data
 
 /-- `HTMLPortalElement adoptPredecessor()` -/
-def PortalActivateEvent.adoptPredecessor (self : PortalActivateEvent) : IO HTMLPortalElement := do
-  let r ← self.val.callMethod "adoptPredecessor" (Support.args #[]) Value
+@[macro_inline] def PortalActivateEvent.adoptPredecessor (self : PortalActivateEvent) : IO HTMLPortalElement := Internal.api "Lasm.JS.Web.PortalActivateEvent.adoptPredecessor" do
+  let r ← self.val.callMethod "adoptPredecessor" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof PortalHost`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PortalHost`). -/
-def PortalHost.cast? (v : Value) : IO (Option PortalHost) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PortalHost"] Value) v) then some { val := v } else none
+@[macro_inline] def PortalHost.cast? (v : Value) : IO (Option PortalHost) := Internal.api "Lasm.JS.Web.PortalHost.cast?" do
+  Internal.cast (Internal.getGlobal ["PortalHost"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onmessage` -/
-def PortalHost.onmessage (self : PortalHost) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def PortalHost.onmessage (self : PortalHost) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PortalHost.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def PortalHost.setOnmessage (self : PortalHost) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PortalHost.setOnmessage (self : PortalHost) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PortalHost.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute EventHandler onmessageerror` -/
-def PortalHost.onmessageerror (self : PortalHost) : IO (Option EventHandlerNonNull) := self.val.get "onmessageerror" (Option EventHandlerNonNull)
+@[macro_inline] def PortalHost.onmessageerror (self : PortalHost) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PortalHost.onmessageerror" do
+  self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
-def PortalHost.setOnmessageerror (self : PortalHost) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PortalHost.setOnmessageerror (self : PortalHost) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PortalHost.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
 
 /-- `undefined postMessage(any message, optional StructuredSerializeOptions options)` -/
-def PortalHost.postMessage (self : PortalHost) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, Support.optional options]) Unit
+@[macro_inline] def PortalHost.postMessage (self : PortalHost) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.PortalHost.postMessage" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
 
 /-- `attribute EventHandler onportalactivate` -/
-def HTMLBodyElement.onportalactivate (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := self.val.get "onportalactivate" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLBodyElement.onportalactivate (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLBodyElement.onportalactivate" do
+  self.val.get "onportalactivate" (Option EventHandlerNonNull)
 
 /-- Sets `onportalactivate`: `attribute EventHandler onportalactivate` -/
-def HTMLBodyElement.setOnportalactivate (self : HTMLBodyElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLBodyElement.setOnportalactivate (self : HTMLBodyElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLBodyElement.setOnportalactivate" do
   self.val.set "onportalactivate" (toJS value)
 
 /-- `attribute EventHandler onportalactivate` -/
-def HTMLFrameSetElement.onportalactivate (self : HTMLFrameSetElement) : IO (Option EventHandlerNonNull) := self.val.get "onportalactivate" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLFrameSetElement.onportalactivate (self : HTMLFrameSetElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLFrameSetElement.onportalactivate" do
+  self.val.get "onportalactivate" (Option EventHandlerNonNull)
 
 /-- Sets `onportalactivate`: `attribute EventHandler onportalactivate` -/
-def HTMLFrameSetElement.setOnportalactivate (self : HTMLFrameSetElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLFrameSetElement.setOnportalactivate (self : HTMLFrameSetElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLFrameSetElement.setOnportalactivate" do
   self.val.set "onportalactivate" (toJS value)
 
 /-- `attribute EventHandler onportalactivate` -/
-def SVGSVGElement.onportalactivate (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onportalactivate" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onportalactivate (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onportalactivate" do
+  self.val.get "onportalactivate" (Option EventHandlerNonNull)
 
 /-- Sets `onportalactivate`: `attribute EventHandler onportalactivate` -/
-def SVGSVGElement.setOnportalactivate (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnportalactivate (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnportalactivate" do
+  self.val.set "onportalactivate" (toJS value)
+
+/-- `readonly attribute PortalHost? portalHost` -/
+@[macro_inline] def Window.portalHost (self : Window) : IO (Option PortalHost) := Internal.api "Lasm.JS.Web.Window.portalHost" do
+  self.val.get "portalHost" (Option PortalHost)
+
+/-- `attribute EventHandler onportalactivate` -/
+@[macro_inline] def Window.onportalactivate (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onportalactivate" do
+  self.val.get "onportalactivate" (Option EventHandlerNonNull)
+
+/-- Sets `onportalactivate`: `attribute EventHandler onportalactivate` -/
+@[macro_inline] def Window.setOnportalactivate (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnportalactivate" do
   self.val.set "onportalactivate" (toJS value)
 
 /-- `readonly attribute PortalHost? portalHost` (Portals (https://wicg.github.io/portals/)) -/
-def portalHost : IO (Option PortalHost) := Support.getGlobal ["portalHost"] (Option PortalHost)
+@[macro_inline] def portalHost : IO (Option PortalHost) := Internal.api "Lasm.JS.Web.portalHost" do
+  Internal.getGlobal ["portalHost"] (Option PortalHost)
 
 /-- `attribute EventHandler onportalactivate` (Portals (https://wicg.github.io/portals/)) -/
-def onportalactivate : IO (Option EventHandlerNonNull) := Support.getGlobal ["onportalactivate"] (Option EventHandlerNonNull)
+@[macro_inline] def onportalactivate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onportalactivate" do
+  Internal.getGlobal ["onportalactivate"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

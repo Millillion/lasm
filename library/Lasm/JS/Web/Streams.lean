@@ -6,30 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
 import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ReadableStreamReaderMode` (Streams Standard (https://streams.spec.whatwg.org/)): "byob". -/
-inductive ReadableStreamReaderMode where
-  /-- "byob" -/
-  | byob
-  deriving BEq, Repr, Inhabited
-instance : ToJS ReadableStreamReaderMode := ⟨fun
-  | .byob => .string "byob"⟩
-instance : FromJS ReadableStreamReaderMode where
-  fromJS
-    | .string "byob" => .ok .byob
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ReadableStreamReaderMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary QueuingStrategyInit` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueuingStrategyInit where
   /-- `required unrestricted double highWaterMark` -/
   highWaterMark : Float
-instance : ToJS QueuingStrategyInit := ⟨fun d => Support.fields #[("highWaterMark", toJS d.highWaterMark)]⟩
+instance : ToJS QueuingStrategyInit := ⟨fun d => Internal.fields #[("highWaterMark", toJS d.highWaterMark)]⟩
 
 /-- `callback QueuingStrategySize = unrestricted double (any chunk)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure QueuingStrategySize where
@@ -40,10 +31,10 @@ instance : ToJS QueuingStrategySize := ⟨fun x => .ref x.val ""⟩
 instance : FromJS QueuingStrategySize := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.QueuingStrategySize", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def QueuingStrategySize.ofFn (f : Data → Async Float) : IO QueuingStrategySize := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def QueuingStrategySize.ofSyncFn (f : Data → IO Float) : IO QueuingStrategySize := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `dictionary QueuingStrategy` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueuingStrategy where
@@ -51,14 +42,14 @@ structure QueuingStrategy where
   highWaterMark : Option Float := none
   /-- `QueuingStrategySize size` -/
   size : Option QueuingStrategySize := none
-instance : ToJS QueuingStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
-    ("size", Support.optional d.size)]⟩
+instance : ToJS QueuingStrategy := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark),
+    ("size", Internal.optional d.size)]⟩
 
 /-- `dictionary ReadableStreamGetReaderOptions` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableStreamGetReaderOptions where
   /-- `ReadableStreamReaderMode mode` -/
   mode : Option ReadableStreamReaderMode := none
-instance : ToJS ReadableStreamGetReaderOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode)]⟩
+instance : ToJS ReadableStreamGetReaderOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode)]⟩
 
 /-- `dictionary ReadableWritablePair` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableWritablePair where
@@ -66,7 +57,7 @@ structure ReadableWritablePair where
   readable : ReadableStream
   /-- `required WritableStream writable` -/
   writable : WritableStream
-instance : ToJS ReadableWritablePair := ⟨fun d => Support.fields #[("readable", toJS d.readable),
+instance : ToJS ReadableWritablePair := ⟨fun d => Internal.fields #[("readable", toJS d.readable),
     ("writable", toJS d.writable)]⟩
 
 /-- `dictionary StreamPipeOptions` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -79,16 +70,16 @@ structure StreamPipeOptions where
   preventCancel : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS StreamPipeOptions := ⟨fun d => Support.fields #[("preventClose", Support.optional d.preventClose),
-    ("preventAbort", Support.optional d.preventAbort),
-    ("preventCancel", Support.optional d.preventCancel),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS StreamPipeOptions := ⟨fun d => Internal.fields #[("preventClose", Internal.optional d.preventClose),
+    ("preventAbort", Internal.optional d.preventAbort),
+    ("preventCancel", Internal.optional d.preventCancel),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary ReadableStreamBYOBReaderReadOptions` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableStreamBYOBReaderReadOptions where
   /-- `unsigned long long min = 1` -/
   min : Option Nat := none
-instance : ToJS ReadableStreamBYOBReaderReadOptions := ⟨fun d => Support.fields #[("min", Support.optional d.min)]⟩
+instance : ToJS ReadableStreamBYOBReaderReadOptions := ⟨fun d => Internal.fields #[("min", Internal.optional d.min)]⟩
 
 /-- `dictionary ReadableStreamReadResult` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableStreamReadResult where
@@ -96,301 +87,532 @@ structure ReadableStreamReadResult where
   value : Data := .undefined
   /-- `boolean done` -/
   done : Option Bool := none
+instance : ToJS ReadableStreamReadResult := ⟨fun d => Internal.fields #[("value", d.value),
+    ("done", Internal.optional d.done)]⟩
 instance : FromJS ReadableStreamReadResult where
   fromJS d := do return {
     value := ← Lasm.JS.readField Data d "value",
     done := ← Lasm.JS.readField (Option Bool) d "done" }
   typeName := "Lasm.JS.Web.ReadableStreamReadResult"
 
+/-- `dictionary ReadableStreamIteratorOptions` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ReadableStreamIteratorOptions where
+  /-- `boolean preventCancel = false` -/
+  preventCancel : Option Bool := none
+instance : ToJS ReadableStreamIteratorOptions := ⟨fun d => Internal.fields #[("preventCancel", Internal.optional d.preventCancel)]⟩
+
+/-- `callback UnderlyingSourceStartCallback = any (ReadableStreamController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSourceStartCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSourceStartCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSourceStartCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSourceStartCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSourceStartCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSourceStartCallback.ofFn (f : Value → Async Data) : IO UnderlyingSourceStartCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Value args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSourceStartCallback.ofSyncFn (f : Value → IO Data) : IO UnderlyingSourceStartCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Value args 0)) }
+
+/-- `callback UnderlyingSourcePullCallback = Promise<undefined> (ReadableStreamController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSourcePullCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSourcePullCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSourcePullCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSourcePullCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSourcePullCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSourcePullCallback.ofFn (f : Value → Async Unit) : IO UnderlyingSourcePullCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Value args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSourcePullCallback.ofSyncFn (f : Value → IO Unit) : IO UnderlyingSourcePullCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Value args 0)) }
+
+/-- `callback UnderlyingSourceCancelCallback = Promise<undefined> (optional any reason)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSourceCancelCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSourceCancelCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSourceCancelCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSourceCancelCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSourceCancelCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSourceCancelCallback.ofFn (f : Data → Async Unit) : IO UnderlyingSourceCancelCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSourceCancelCallback.ofSyncFn (f : Data → IO Unit) : IO UnderlyingSourceCancelCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+
+/-- `dictionary UnderlyingSource` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UnderlyingSource where
+  /-- `UnderlyingSourceStartCallback start` -/
+  start : Option UnderlyingSourceStartCallback := none
+  /-- `UnderlyingSourcePullCallback pull` -/
+  pull : Option UnderlyingSourcePullCallback := none
+  /-- `UnderlyingSourceCancelCallback cancel` -/
+  cancel : Option UnderlyingSourceCancelCallback := none
+  /-- `ReadableStreamType type` -/
+  type : Option ReadableStreamType := none
+  /-- `unsigned long long autoAllocateChunkSize` -/
+  autoAllocateChunkSize : Option Nat := none
+instance : ToJS UnderlyingSource := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("pull", Internal.optional d.pull),
+    ("cancel", Internal.optional d.cancel),
+    ("type", Internal.optional d.type),
+    ("autoAllocateChunkSize", Internal.optional d.autoAllocateChunkSize)]⟩
+
+/-- `callback UnderlyingSinkStartCallback = any (WritableStreamDefaultController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSinkStartCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSinkStartCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSinkStartCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSinkStartCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSinkStartCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSinkStartCallback.ofFn (f : WritableStreamDefaultController → Async Data) : IO UnderlyingSinkStartCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg WritableStreamDefaultController args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSinkStartCallback.ofSyncFn (f : WritableStreamDefaultController → IO Data) : IO UnderlyingSinkStartCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg WritableStreamDefaultController args 0)) }
+
+/-- `callback UnderlyingSinkWriteCallback = Promise<undefined> (any chunk, WritableStreamDefaultController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSinkWriteCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSinkWriteCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSinkWriteCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSinkWriteCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSinkWriteCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSinkWriteCallback.ofFn (f : Data → WritableStreamDefaultController → Async Unit) : IO UnderlyingSinkWriteCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg WritableStreamDefaultController args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSinkWriteCallback.ofSyncFn (f : Data → WritableStreamDefaultController → IO Unit) : IO UnderlyingSinkWriteCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg WritableStreamDefaultController args 1)) }
+
+/-- `callback UnderlyingSinkCloseCallback = Promise<undefined> ()` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSinkCloseCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSinkCloseCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSinkCloseCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSinkCloseCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSinkCloseCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSinkCloseCallback.ofFn (f : Async Unit) : IO UnderlyingSinkCloseCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSinkCloseCallback.ofSyncFn (f : IO Unit) : IO UnderlyingSinkCloseCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback UnderlyingSinkAbortCallback = Promise<undefined> (optional any reason)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UnderlyingSinkAbortCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty UnderlyingSinkAbortCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnderlyingSinkAbortCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnderlyingSinkAbortCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.UnderlyingSinkAbortCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def UnderlyingSinkAbortCallback.ofFn (f : Data → Async Unit) : IO UnderlyingSinkAbortCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def UnderlyingSinkAbortCallback.ofSyncFn (f : Data → IO Unit) : IO UnderlyingSinkAbortCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+
+/-- `dictionary UnderlyingSink` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UnderlyingSink where
+  /-- `UnderlyingSinkStartCallback start` -/
+  start : Option UnderlyingSinkStartCallback := none
+  /-- `UnderlyingSinkWriteCallback write` -/
+  write : Option UnderlyingSinkWriteCallback := none
+  /-- `UnderlyingSinkCloseCallback close` -/
+  close : Option UnderlyingSinkCloseCallback := none
+  /-- `UnderlyingSinkAbortCallback abort` -/
+  abort : Option UnderlyingSinkAbortCallback := none
+  /-- `any type` -/
+  type : Data := .undefined
+instance : ToJS UnderlyingSink := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("write", Internal.optional d.write),
+    ("close", Internal.optional d.close),
+    ("abort", Internal.optional d.abort),
+    ("type", d.type)]⟩
+
+/-- `callback TransformerStartCallback = any (TransformStreamDefaultController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure TransformerStartCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty TransformerStartCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS TransformerStartCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS TransformerStartCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.TransformerStartCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def TransformerStartCallback.ofFn (f : TransformStreamDefaultController → Async Data) : IO TransformerStartCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TransformStreamDefaultController args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def TransformerStartCallback.ofSyncFn (f : TransformStreamDefaultController → IO Data) : IO TransformerStartCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TransformStreamDefaultController args 0)) }
+
+/-- `callback TransformerTransformCallback = Promise<undefined> (any chunk, TransformStreamDefaultController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure TransformerTransformCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty TransformerTransformCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS TransformerTransformCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS TransformerTransformCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.TransformerTransformCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def TransformerTransformCallback.ofFn (f : Data → TransformStreamDefaultController → Async Unit) : IO TransformerTransformCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg TransformStreamDefaultController args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def TransformerTransformCallback.ofSyncFn (f : Data → TransformStreamDefaultController → IO Unit) : IO TransformerTransformCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg TransformStreamDefaultController args 1)) }
+
+/-- `callback TransformerFlushCallback = Promise<undefined> (TransformStreamDefaultController controller)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure TransformerFlushCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty TransformerFlushCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS TransformerFlushCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS TransformerFlushCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.TransformerFlushCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def TransformerFlushCallback.ofFn (f : TransformStreamDefaultController → Async Unit) : IO TransformerFlushCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TransformStreamDefaultController args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def TransformerFlushCallback.ofSyncFn (f : TransformStreamDefaultController → IO Unit) : IO TransformerFlushCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TransformStreamDefaultController args 0)) }
+
+/-- `callback TransformerCancelCallback = Promise<undefined> (any reason)` (Streams Standard (https://streams.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure TransformerCancelCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty TransformerCancelCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS TransformerCancelCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS TransformerCancelCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.TransformerCancelCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def TransformerCancelCallback.ofFn (f : Data → Async Unit) : IO TransformerCancelCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def TransformerCancelCallback.ofSyncFn (f : Data → IO Unit) : IO TransformerCancelCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
+
+/-- `dictionary Transformer` (Streams Standard (https://streams.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Transformer where
+  /-- `TransformerStartCallback start` -/
+  start : Option TransformerStartCallback := none
+  /-- `TransformerTransformCallback transform` -/
+  transform : Option TransformerTransformCallback := none
+  /-- `TransformerFlushCallback flush` -/
+  flush : Option TransformerFlushCallback := none
+  /-- `TransformerCancelCallback cancel` -/
+  cancel : Option TransformerCancelCallback := none
+  /-- `any readableType` -/
+  readableType : Data := .undefined
+  /-- `any writableType` -/
+  writableType : Data := .undefined
+instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("transform", Internal.optional d.transform),
+    ("flush", Internal.optional d.flush),
+    ("cancel", Internal.optional d.cancel),
+    ("readableType", d.readableType),
+    ("writableType", d.writableType)]⟩
+
 /-- `v instanceof ByteLengthQueuingStrategy`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ByteLengthQueuingStrategy`). -/
-def ByteLengthQueuingStrategy.cast? (v : Value) : IO (Option ByteLengthQueuingStrategy) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ByteLengthQueuingStrategy"] Value) v) then some { val := v } else none
+@[macro_inline] def ByteLengthQueuingStrategy.cast? (v : Value) : IO (Option ByteLengthQueuingStrategy) := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.cast?" do
+  Internal.cast (Internal.getGlobal ["ByteLengthQueuingStrategy"] Value) (fun x => { val := x }) v
 
 /-- `constructor(QueuingStrategyInit init)` -/
-def ByteLengthQueuingStrategy.new (init : QueuingStrategyInit) : IO ByteLengthQueuingStrategy :=
+@[macro_inline] def ByteLengthQueuingStrategy.new (init : QueuingStrategyInit) : IO ByteLengthQueuingStrategy := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.new" do
   Lasm.JS.Binding.invoke ByteLengthQueuingStrategy { name := "Lasm.JS.Web.ByteLengthQueuingStrategy.new", module := "globalThis", path := "ByteLengthQueuingStrategy", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute unrestricted double highWaterMark` -/
-def ByteLengthQueuingStrategy.highWaterMark (self : ByteLengthQueuingStrategy) : IO Float := self.val.get "highWaterMark" Float
+@[macro_inline] def ByteLengthQueuingStrategy.highWaterMark (self : ByteLengthQueuingStrategy) : IO Float := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.highWaterMark" do
+  self.val.get "highWaterMark" Float
 
 /-- `readonly attribute Function size` -/
-def ByteLengthQueuingStrategy.size (self : ByteLengthQueuingStrategy) : IO JSFunction := self.val.get "size" JSFunction
+@[macro_inline] def ByteLengthQueuingStrategy.size (self : ByteLengthQueuingStrategy) : IO JSFunction := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.size" do
+  self.val.get "size" JSFunction
 
 /-- `v instanceof CountQueuingStrategy`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CountQueuingStrategy`). -/
-def CountQueuingStrategy.cast? (v : Value) : IO (Option CountQueuingStrategy) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CountQueuingStrategy"] Value) v) then some { val := v } else none
+@[macro_inline] def CountQueuingStrategy.cast? (v : Value) : IO (Option CountQueuingStrategy) := Internal.api "Lasm.JS.Web.CountQueuingStrategy.cast?" do
+  Internal.cast (Internal.getGlobal ["CountQueuingStrategy"] Value) (fun x => { val := x }) v
 
 /-- `constructor(QueuingStrategyInit init)` -/
-def CountQueuingStrategy.new (init : QueuingStrategyInit) : IO CountQueuingStrategy :=
+@[macro_inline] def CountQueuingStrategy.new (init : QueuingStrategyInit) : IO CountQueuingStrategy := Internal.api "Lasm.JS.Web.CountQueuingStrategy.new" do
   Lasm.JS.Binding.invoke CountQueuingStrategy { name := "Lasm.JS.Web.CountQueuingStrategy.new", module := "globalThis", path := "CountQueuingStrategy", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute unrestricted double highWaterMark` -/
-def CountQueuingStrategy.highWaterMark (self : CountQueuingStrategy) : IO Float := self.val.get "highWaterMark" Float
+@[macro_inline] def CountQueuingStrategy.highWaterMark (self : CountQueuingStrategy) : IO Float := Internal.api "Lasm.JS.Web.CountQueuingStrategy.highWaterMark" do
+  self.val.get "highWaterMark" Float
 
 /-- `readonly attribute Function size` -/
-def CountQueuingStrategy.size (self : CountQueuingStrategy) : IO JSFunction := self.val.get "size" JSFunction
+@[macro_inline] def CountQueuingStrategy.size (self : CountQueuingStrategy) : IO JSFunction := Internal.api "Lasm.JS.Web.CountQueuingStrategy.size" do
+  self.val.get "size" JSFunction
 
 /-- `v instanceof ReadableByteStreamController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableByteStreamController`). -/
-def ReadableByteStreamController.cast? (v : Value) : IO (Option ReadableByteStreamController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableByteStreamController"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableByteStreamController.cast? (v : Value) : IO (Option ReadableByteStreamController) := Internal.api "Lasm.JS.Web.ReadableByteStreamController.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableByteStreamController"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ReadableStreamBYOBRequest? byobRequest` -/
-def ReadableByteStreamController.byobRequest (self : ReadableByteStreamController) : IO (Option ReadableStreamBYOBRequest) := self.val.get "byobRequest" (Option ReadableStreamBYOBRequest)
+@[macro_inline] def ReadableByteStreamController.byobRequest (self : ReadableByteStreamController) : IO (Option ReadableStreamBYOBRequest) := Internal.api "Lasm.JS.Web.ReadableByteStreamController.byobRequest" do
+  self.val.get "byobRequest" (Option ReadableStreamBYOBRequest)
 
 /-- `readonly attribute unrestricted double? desiredSize` -/
-def ReadableByteStreamController.desiredSize (self : ReadableByteStreamController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
+@[macro_inline] def ReadableByteStreamController.desiredSize (self : ReadableByteStreamController) : IO (Option Float) := Internal.api "Lasm.JS.Web.ReadableByteStreamController.desiredSize" do
+  self.val.get "desiredSize" (Option Float)
 
 /-- `undefined close()` -/
-def ReadableByteStreamController.close (self : ReadableByteStreamController) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def ReadableByteStreamController.close (self : ReadableByteStreamController) : IO Unit := Internal.api "Lasm.JS.Web.ReadableByteStreamController.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `undefined enqueue(ArrayBufferView chunk)` -/
-def ReadableByteStreamController.enqueue (self : ReadableByteStreamController) (chunk : ByteArray) : IO Unit :=
-  self.val.callMethod "enqueue" (Support.args #[toJS chunk]) Unit
+@[macro_inline] def ReadableByteStreamController.enqueue (self : ReadableByteStreamController) (chunk : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.ReadableByteStreamController.enqueue" do
+  self.val.callMethod "enqueue" (Internal.args #[toJS chunk]) Unit
 
 /-- `undefined error(optional any e)` -/
-def ReadableByteStreamController.error (self : ReadableByteStreamController) (e : Data := .undefined) : IO Unit :=
-  self.val.callMethod "error" (Support.args #[e]) Unit
+@[macro_inline] def ReadableByteStreamController.error (self : ReadableByteStreamController) (e : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.ReadableByteStreamController.error" do
+  self.val.callMethod "error" (Internal.args #[e]) Unit
 
 /-- `v instanceof ReadableStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStream`). -/
-def ReadableStream.cast? (v : Value) : IO (Option ReadableStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStream"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableStream.cast? (v : Value) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.ReadableStream.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional object underlyingSource, optional QueuingStrategy strategy)` -/
-def ReadableStream.new (underlyingSource : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO ReadableStream :=
+@[macro_inline] def ReadableStream.new (underlyingSource : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.ReadableStream.new" do
   Lasm.JS.Binding.invoke ReadableStream { name := "Lasm.JS.Web.ReadableStream.new", module := "globalThis", path := "ReadableStream", construct := true, arity := 2 }
-    (Support.args #[underlyingSource, Support.optional strategy]) (await := false)
+    (Internal.args #[underlyingSource, Internal.optional strategy]) (await := false)
 
 /-- `readonly attribute boolean locked` -/
-def ReadableStream.locked (self : ReadableStream) : IO Bool := self.val.get "locked" Bool
+@[macro_inline] def ReadableStream.locked (self : ReadableStream) : IO Bool := Internal.api "Lasm.JS.Web.ReadableStream.locked" do
+  self.val.get "locked" Bool
 
 /-- `static ReadableStream from(async_sequence<any> asyncIterable)` -/
-def ReadableStream.«from» (asyncIterable : Data) : IO ReadableStream := do
+@[macro_inline] def ReadableStream.«from» (asyncIterable : Data) : IO ReadableStream := Internal.api "Lasm.JS.Web.ReadableStream.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.ReadableStream.from", module := "globalThis", path := "ReadableStream.from", construct := false, arity := 1 }
-    (Support.args #[toJS asyncIterable]) (await := false)
+    (Internal.args #[toJS asyncIterable]) (await := false)
   pure { val := r }
 
 /-- `Promise<undefined> cancel(optional any reason)` -/
-def ReadableStream.cancel (self : ReadableStream) (reason : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "cancel" (Support.args #[reason]) Unit
+@[macro_inline] def ReadableStream.cancel (self : ReadableStream) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStream.cancel" do
+  self.val.callMethodAwait "cancel" (Internal.args #[reason]) Unit
 
 /-- `ReadableStreamReader getReader(optional ReadableStreamGetReaderOptions options)` -/
-def ReadableStream.getReader (self : ReadableStream) (options : Option ReadableStreamGetReaderOptions := none) : IO Value :=
-  self.val.callMethod "getReader" (Support.args #[Support.optional options]) Value
+@[macro_inline] def ReadableStream.getReader (self : ReadableStream) (options : Option ReadableStreamGetReaderOptions := none) : IO Value := Internal.api "Lasm.JS.Web.ReadableStream.getReader" do
+  self.val.callMethod "getReader" (Internal.args #[Internal.optional options]) Value
 
 /-- `ReadableStream pipeThrough(ReadableWritablePair transform, optional StreamPipeOptions options)` -/
-def ReadableStream.pipeThrough (self : ReadableStream) (transform : ReadableWritablePair) (options : Option StreamPipeOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "pipeThrough" (Support.args #[toJS transform, Support.optional options]) Value
+@[macro_inline] def ReadableStream.pipeThrough (self : ReadableStream) (transform : ReadableWritablePair) (options : Option StreamPipeOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.ReadableStream.pipeThrough" do
+  let r ← self.val.callMethod "pipeThrough" (Internal.args #[toJS transform, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<undefined> pipeTo(WritableStream destination, optional StreamPipeOptions options)` -/
-def ReadableStream.pipeTo (self : ReadableStream) (destination : WritableStream) (options : Option StreamPipeOptions := none) : Async Unit :=
-  self.val.callMethodAwait "pipeTo" (Support.args #[toJS destination, Support.optional options]) Unit
+@[macro_inline] def ReadableStream.pipeTo (self : ReadableStream) (destination : WritableStream) (options : Option StreamPipeOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStream.pipeTo" do
+  self.val.callMethodAwait "pipeTo" (Internal.args #[toJS destination, Internal.optional options]) Unit
 
 /-- `sequence<ReadableStream> tee()` -/
-def ReadableStream.tee (self : ReadableStream) : IO (Array ReadableStream) :=
-  self.val.callMethod "tee" (Support.args #[]) (Array ReadableStream)
+@[macro_inline] def ReadableStream.tee (self : ReadableStream) : IO (Array ReadableStream) := Internal.api "Lasm.JS.Web.ReadableStream.tee" do
+  self.val.callMethod "tee" (Internal.args #[]) (Array ReadableStream)
 
 /-- `v instanceof ReadableStreamBYOBReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamBYOBReader`). -/
-def ReadableStreamBYOBReader.cast? (v : Value) : IO (Option ReadableStreamBYOBReader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamBYOBReader"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableStreamBYOBReader.cast? (v : Value) : IO (Option ReadableStreamBYOBReader) := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableStreamBYOBReader"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ReadableStream stream)` -/
-def ReadableStreamBYOBReader.new (stream : ReadableStream) : IO ReadableStreamBYOBReader :=
+@[macro_inline] def ReadableStreamBYOBReader.new (stream : ReadableStream) : IO ReadableStreamBYOBReader := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.new" do
   Lasm.JS.Binding.invoke ReadableStreamBYOBReader { name := "Lasm.JS.Web.ReadableStreamBYOBReader.new", module := "globalThis", path := "ReadableStreamBYOBReader", construct := true, arity := 1 }
-    (Support.args #[toJS stream]) (await := false)
+    (Internal.args #[toJS stream]) (await := false)
 
 /-- `readonly attribute Promise<undefined> closed` -/
-def ReadableStreamBYOBReader.closed (self : ReadableStreamBYOBReader) : Async Unit := do
+@[macro_inline] def ReadableStreamBYOBReader.closed (self : ReadableStreamBYOBReader) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.closed" do
   let p ← self.val.get "closed" Value
   p.await Unit
 
 /-- `Promise<ReadableStreamReadResult> read(ArrayBufferView view, optional ReadableStreamBYOBReaderReadOptions options)` -/
-def ReadableStreamBYOBReader.read (self : ReadableStreamBYOBReader) (view : ByteArray) (options : Option ReadableStreamBYOBReaderReadOptions := none) : Async ReadableStreamReadResult :=
-  self.val.callMethodAwait "read" (Support.args #[toJS view, Support.optional options]) ReadableStreamReadResult
+@[macro_inline] def ReadableStreamBYOBReader.read (self : ReadableStreamBYOBReader) (view : ByteArray) (options : Option ReadableStreamBYOBReaderReadOptions := none) : Async ReadableStreamReadResult := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.read" do
+  self.val.callMethodAwait "read" (Internal.args #[toJS view, Internal.optional options]) ReadableStreamReadResult
 
 /-- `undefined releaseLock()` -/
-def ReadableStreamBYOBReader.releaseLock (self : ReadableStreamBYOBReader) : IO Unit :=
-  self.val.callMethod "releaseLock" (Support.args #[]) Unit
+@[macro_inline] def ReadableStreamBYOBReader.releaseLock (self : ReadableStreamBYOBReader) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.releaseLock" do
+  self.val.callMethod "releaseLock" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> cancel(optional any reason)` -/
-def ReadableStreamBYOBReader.cancel (self : ReadableStreamBYOBReader) (reason : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "cancel" (Support.args #[reason]) Unit
+@[macro_inline] def ReadableStreamBYOBReader.cancel (self : ReadableStreamBYOBReader) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.cancel" do
+  self.val.callMethodAwait "cancel" (Internal.args #[reason]) Unit
 
 /-- `v instanceof ReadableStreamBYOBRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamBYOBRequest`). -/
-def ReadableStreamBYOBRequest.cast? (v : Value) : IO (Option ReadableStreamBYOBRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamBYOBRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableStreamBYOBRequest.cast? (v : Value) : IO (Option ReadableStreamBYOBRequest) := Internal.api "Lasm.JS.Web.ReadableStreamBYOBRequest.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableStreamBYOBRequest"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Uint8Array? view` -/
-def ReadableStreamBYOBRequest.view (self : ReadableStreamBYOBRequest) : IO (Option ByteArray) := self.val.get "view" (Option ByteArray)
+@[macro_inline] def ReadableStreamBYOBRequest.view (self : ReadableStreamBYOBRequest) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.ReadableStreamBYOBRequest.view" do
+  self.val.get "view" (Option ByteArray)
 
 /-- `undefined respond(unsigned long long bytesWritten)` -/
-def ReadableStreamBYOBRequest.respond (self : ReadableStreamBYOBRequest) (bytesWritten : Nat) : IO Unit :=
-  self.val.callMethod "respond" (Support.args #[toJS bytesWritten]) Unit
+@[macro_inline] def ReadableStreamBYOBRequest.respond (self : ReadableStreamBYOBRequest) (bytesWritten : Nat) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBRequest.respond" do
+  self.val.callMethod "respond" (Internal.args #[toJS bytesWritten]) Unit
 
 /-- `undefined respondWithNewView(ArrayBufferView view)` -/
-def ReadableStreamBYOBRequest.respondWithNewView (self : ReadableStreamBYOBRequest) (view : ByteArray) : IO Unit :=
-  self.val.callMethod "respondWithNewView" (Support.args #[toJS view]) Unit
+@[macro_inline] def ReadableStreamBYOBRequest.respondWithNewView (self : ReadableStreamBYOBRequest) (view : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBRequest.respondWithNewView" do
+  self.val.callMethod "respondWithNewView" (Internal.args #[toJS view]) Unit
 
 /-- `v instanceof ReadableStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamDefaultController`). -/
-def ReadableStreamDefaultController.cast? (v : Value) : IO (Option ReadableStreamDefaultController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamDefaultController"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableStreamDefaultController.cast? (v : Value) : IO (Option ReadableStreamDefaultController) := Internal.api "Lasm.JS.Web.ReadableStreamDefaultController.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableStreamDefaultController"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unrestricted double? desiredSize` -/
-def ReadableStreamDefaultController.desiredSize (self : ReadableStreamDefaultController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
+@[macro_inline] def ReadableStreamDefaultController.desiredSize (self : ReadableStreamDefaultController) : IO (Option Float) := Internal.api "Lasm.JS.Web.ReadableStreamDefaultController.desiredSize" do
+  self.val.get "desiredSize" (Option Float)
 
 /-- `undefined close()` -/
-def ReadableStreamDefaultController.close (self : ReadableStreamDefaultController) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def ReadableStreamDefaultController.close (self : ReadableStreamDefaultController) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultController.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `undefined enqueue(optional any chunk)` -/
-def ReadableStreamDefaultController.enqueue (self : ReadableStreamDefaultController) (chunk : Data := .undefined) : IO Unit :=
-  self.val.callMethod "enqueue" (Support.args #[chunk]) Unit
+@[macro_inline] def ReadableStreamDefaultController.enqueue (self : ReadableStreamDefaultController) (chunk : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultController.enqueue" do
+  self.val.callMethod "enqueue" (Internal.args #[chunk]) Unit
 
 /-- `undefined error(optional any e)` -/
-def ReadableStreamDefaultController.error (self : ReadableStreamDefaultController) (e : Data := .undefined) : IO Unit :=
-  self.val.callMethod "error" (Support.args #[e]) Unit
+@[macro_inline] def ReadableStreamDefaultController.error (self : ReadableStreamDefaultController) (e : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultController.error" do
+  self.val.callMethod "error" (Internal.args #[e]) Unit
 
 /-- `v instanceof ReadableStreamDefaultReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamDefaultReader`). -/
-def ReadableStreamDefaultReader.cast? (v : Value) : IO (Option ReadableStreamDefaultReader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamDefaultReader"] Value) v) then some { val := v } else none
+@[macro_inline] def ReadableStreamDefaultReader.cast? (v : Value) : IO (Option ReadableStreamDefaultReader) := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.cast?" do
+  Internal.cast (Internal.getGlobal ["ReadableStreamDefaultReader"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ReadableStream stream)` -/
-def ReadableStreamDefaultReader.new (stream : ReadableStream) : IO ReadableStreamDefaultReader :=
+@[macro_inline] def ReadableStreamDefaultReader.new (stream : ReadableStream) : IO ReadableStreamDefaultReader := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.new" do
   Lasm.JS.Binding.invoke ReadableStreamDefaultReader { name := "Lasm.JS.Web.ReadableStreamDefaultReader.new", module := "globalThis", path := "ReadableStreamDefaultReader", construct := true, arity := 1 }
-    (Support.args #[toJS stream]) (await := false)
+    (Internal.args #[toJS stream]) (await := false)
 
 /-- `readonly attribute Promise<undefined> closed` -/
-def ReadableStreamDefaultReader.closed (self : ReadableStreamDefaultReader) : Async Unit := do
+@[macro_inline] def ReadableStreamDefaultReader.closed (self : ReadableStreamDefaultReader) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.closed" do
   let p ← self.val.get "closed" Value
   p.await Unit
 
 /-- `Promise<ReadableStreamReadResult> read()` -/
-def ReadableStreamDefaultReader.read (self : ReadableStreamDefaultReader) : Async ReadableStreamReadResult :=
-  self.val.callMethodAwait "read" (Support.args #[]) ReadableStreamReadResult
+@[macro_inline] def ReadableStreamDefaultReader.read (self : ReadableStreamDefaultReader) : Async ReadableStreamReadResult := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.read" do
+  self.val.callMethodAwait "read" (Internal.args #[]) ReadableStreamReadResult
 
 /-- `undefined releaseLock()` -/
-def ReadableStreamDefaultReader.releaseLock (self : ReadableStreamDefaultReader) : IO Unit :=
-  self.val.callMethod "releaseLock" (Support.args #[]) Unit
+@[macro_inline] def ReadableStreamDefaultReader.releaseLock (self : ReadableStreamDefaultReader) : IO Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.releaseLock" do
+  self.val.callMethod "releaseLock" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> cancel(optional any reason)` -/
-def ReadableStreamDefaultReader.cancel (self : ReadableStreamDefaultReader) (reason : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "cancel" (Support.args #[reason]) Unit
+@[macro_inline] def ReadableStreamDefaultReader.cancel (self : ReadableStreamDefaultReader) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.cancel" do
+  self.val.callMethodAwait "cancel" (Internal.args #[reason]) Unit
 
 /-- `v instanceof TransformStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TransformStream`). -/
-def TransformStream.cast? (v : Value) : IO (Option TransformStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TransformStream"] Value) v) then some { val := v } else none
+@[macro_inline] def TransformStream.cast? (v : Value) : IO (Option TransformStream) := Internal.api "Lasm.JS.Web.TransformStream.cast?" do
+  Internal.cast (Internal.getGlobal ["TransformStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional object transformer, optional QueuingStrategy writableStrategy, optional QueuingStrategy readableStrategy)` -/
-def TransformStream.new (transformer : Data := .undefined) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO TransformStream :=
+@[macro_inline] def TransformStream.new (transformer : Data := .undefined) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO TransformStream := Internal.api "Lasm.JS.Web.TransformStream.new" do
   Lasm.JS.Binding.invoke TransformStream { name := "Lasm.JS.Web.TransformStream.new", module := "globalThis", path := "TransformStream", construct := true, arity := 3 }
-    (Support.args #[transformer, Support.optional writableStrategy, Support.optional readableStrategy]) (await := false)
+    (Internal.args #[transformer, Internal.optional writableStrategy, Internal.optional readableStrategy]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def TransformStream.readable (self : TransformStream) : IO ReadableStream := do
+@[macro_inline] def TransformStream.readable (self : TransformStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.TransformStream.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TransformStream.writable (self : TransformStream) : IO WritableStream := do
+@[macro_inline] def TransformStream.writable (self : TransformStream) : IO WritableStream := Internal.api "Lasm.JS.Web.TransformStream.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `v instanceof TransformStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TransformStreamDefaultController`). -/
-def TransformStreamDefaultController.cast? (v : Value) : IO (Option TransformStreamDefaultController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TransformStreamDefaultController"] Value) v) then some { val := v } else none
+@[macro_inline] def TransformStreamDefaultController.cast? (v : Value) : IO (Option TransformStreamDefaultController) := Internal.api "Lasm.JS.Web.TransformStreamDefaultController.cast?" do
+  Internal.cast (Internal.getGlobal ["TransformStreamDefaultController"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unrestricted double? desiredSize` -/
-def TransformStreamDefaultController.desiredSize (self : TransformStreamDefaultController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
+@[macro_inline] def TransformStreamDefaultController.desiredSize (self : TransformStreamDefaultController) : IO (Option Float) := Internal.api "Lasm.JS.Web.TransformStreamDefaultController.desiredSize" do
+  self.val.get "desiredSize" (Option Float)
 
 /-- `undefined enqueue(optional any chunk)` -/
-def TransformStreamDefaultController.enqueue (self : TransformStreamDefaultController) (chunk : Data := .undefined) : IO Unit :=
-  self.val.callMethod "enqueue" (Support.args #[chunk]) Unit
+@[macro_inline] def TransformStreamDefaultController.enqueue (self : TransformStreamDefaultController) (chunk : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.TransformStreamDefaultController.enqueue" do
+  self.val.callMethod "enqueue" (Internal.args #[chunk]) Unit
 
 /-- `undefined error(optional any reason)` -/
-def TransformStreamDefaultController.error (self : TransformStreamDefaultController) (reason : Data := .undefined) : IO Unit :=
-  self.val.callMethod "error" (Support.args #[reason]) Unit
+@[macro_inline] def TransformStreamDefaultController.error (self : TransformStreamDefaultController) (reason : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.TransformStreamDefaultController.error" do
+  self.val.callMethod "error" (Internal.args #[reason]) Unit
 
 /-- `undefined terminate()` -/
-def TransformStreamDefaultController.terminate (self : TransformStreamDefaultController) : IO Unit :=
-  self.val.callMethod "terminate" (Support.args #[]) Unit
+@[macro_inline] def TransformStreamDefaultController.terminate (self : TransformStreamDefaultController) : IO Unit := Internal.api "Lasm.JS.Web.TransformStreamDefaultController.terminate" do
+  self.val.callMethod "terminate" (Internal.args #[]) Unit
 
 /-- `v instanceof WritableStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStream`). -/
-def WritableStream.cast? (v : Value) : IO (Option WritableStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStream"] Value) v) then some { val := v } else none
+@[macro_inline] def WritableStream.cast? (v : Value) : IO (Option WritableStream) := Internal.api "Lasm.JS.Web.WritableStream.cast?" do
+  Internal.cast (Internal.getGlobal ["WritableStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional object underlyingSink, optional QueuingStrategy strategy)` -/
-def WritableStream.new (underlyingSink : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO WritableStream :=
+@[macro_inline] def WritableStream.new (underlyingSink : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO WritableStream := Internal.api "Lasm.JS.Web.WritableStream.new" do
   Lasm.JS.Binding.invoke WritableStream { name := "Lasm.JS.Web.WritableStream.new", module := "globalThis", path := "WritableStream", construct := true, arity := 2 }
-    (Support.args #[underlyingSink, Support.optional strategy]) (await := false)
+    (Internal.args #[underlyingSink, Internal.optional strategy]) (await := false)
 
 /-- `readonly attribute boolean locked` -/
-def WritableStream.locked (self : WritableStream) : IO Bool := self.val.get "locked" Bool
+@[macro_inline] def WritableStream.locked (self : WritableStream) : IO Bool := Internal.api "Lasm.JS.Web.WritableStream.locked" do
+  self.val.get "locked" Bool
 
 /-- `Promise<undefined> abort(optional any reason)` -/
-def WritableStream.abort (self : WritableStream) (reason : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "abort" (Support.args #[reason]) Unit
+@[macro_inline] def WritableStream.abort (self : WritableStream) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.WritableStream.abort" do
+  self.val.callMethodAwait "abort" (Internal.args #[reason]) Unit
 
 /-- `Promise<undefined> close()` -/
-def WritableStream.close (self : WritableStream) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def WritableStream.close (self : WritableStream) : Async Unit := Internal.api "Lasm.JS.Web.WritableStream.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `WritableStreamDefaultWriter getWriter()` -/
-def WritableStream.getWriter (self : WritableStream) : IO WritableStreamDefaultWriter := do
-  let r ← self.val.callMethod "getWriter" (Support.args #[]) Value
+@[macro_inline] def WritableStream.getWriter (self : WritableStream) : IO WritableStreamDefaultWriter := Internal.api "Lasm.JS.Web.WritableStream.getWriter" do
+  let r ← self.val.callMethod "getWriter" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof WritableStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStreamDefaultController`). -/
-def WritableStreamDefaultController.cast? (v : Value) : IO (Option WritableStreamDefaultController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStreamDefaultController"] Value) v) then some { val := v } else none
+@[macro_inline] def WritableStreamDefaultController.cast? (v : Value) : IO (Option WritableStreamDefaultController) := Internal.api "Lasm.JS.Web.WritableStreamDefaultController.cast?" do
+  Internal.cast (Internal.getGlobal ["WritableStreamDefaultController"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute AbortSignal signal` -/
-def WritableStreamDefaultController.signal (self : WritableStreamDefaultController) : IO AbortSignal := do
+@[macro_inline] def WritableStreamDefaultController.signal (self : WritableStreamDefaultController) : IO AbortSignal := Internal.api "Lasm.JS.Web.WritableStreamDefaultController.signal" do
   let r ← self.val.get "signal" Value
   pure { val := r }
 
 /-- `undefined error(optional any e)` -/
-def WritableStreamDefaultController.error (self : WritableStreamDefaultController) (e : Data := .undefined) : IO Unit :=
-  self.val.callMethod "error" (Support.args #[e]) Unit
+@[macro_inline] def WritableStreamDefaultController.error (self : WritableStreamDefaultController) (e : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultController.error" do
+  self.val.callMethod "error" (Internal.args #[e]) Unit
 
 /-- `v instanceof WritableStreamDefaultWriter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStreamDefaultWriter`). -/
-def WritableStreamDefaultWriter.cast? (v : Value) : IO (Option WritableStreamDefaultWriter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStreamDefaultWriter"] Value) v) then some { val := v } else none
+@[macro_inline] def WritableStreamDefaultWriter.cast? (v : Value) : IO (Option WritableStreamDefaultWriter) := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.cast?" do
+  Internal.cast (Internal.getGlobal ["WritableStreamDefaultWriter"] Value) (fun x => { val := x }) v
 
 /-- `constructor(WritableStream stream)` -/
-def WritableStreamDefaultWriter.new (stream : WritableStream) : IO WritableStreamDefaultWriter :=
+@[macro_inline] def WritableStreamDefaultWriter.new (stream : WritableStream) : IO WritableStreamDefaultWriter := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.new" do
   Lasm.JS.Binding.invoke WritableStreamDefaultWriter { name := "Lasm.JS.Web.WritableStreamDefaultWriter.new", module := "globalThis", path := "WritableStreamDefaultWriter", construct := true, arity := 1 }
-    (Support.args #[toJS stream]) (await := false)
+    (Internal.args #[toJS stream]) (await := false)
 
 /-- `readonly attribute Promise<undefined> closed` -/
-def WritableStreamDefaultWriter.closed (self : WritableStreamDefaultWriter) : Async Unit := do
+@[macro_inline] def WritableStreamDefaultWriter.closed (self : WritableStreamDefaultWriter) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.closed" do
   let p ← self.val.get "closed" Value
   p.await Unit
 
 /-- `readonly attribute unrestricted double? desiredSize` -/
-def WritableStreamDefaultWriter.desiredSize (self : WritableStreamDefaultWriter) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
+@[macro_inline] def WritableStreamDefaultWriter.desiredSize (self : WritableStreamDefaultWriter) : IO (Option Float) := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.desiredSize" do
+  self.val.get "desiredSize" (Option Float)
 
 /-- `readonly attribute Promise<undefined> ready` -/
-def WritableStreamDefaultWriter.ready (self : WritableStreamDefaultWriter) : Async Unit := do
+@[macro_inline] def WritableStreamDefaultWriter.ready (self : WritableStreamDefaultWriter) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.ready" do
   let p ← self.val.get "ready" Value
   p.await Unit
 
 /-- `Promise<undefined> abort(optional any reason)` -/
-def WritableStreamDefaultWriter.abort (self : WritableStreamDefaultWriter) (reason : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "abort" (Support.args #[reason]) Unit
+@[macro_inline] def WritableStreamDefaultWriter.abort (self : WritableStreamDefaultWriter) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.abort" do
+  self.val.callMethodAwait "abort" (Internal.args #[reason]) Unit
 
 /-- `Promise<undefined> close()` -/
-def WritableStreamDefaultWriter.close (self : WritableStreamDefaultWriter) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def WritableStreamDefaultWriter.close (self : WritableStreamDefaultWriter) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `undefined releaseLock()` -/
-def WritableStreamDefaultWriter.releaseLock (self : WritableStreamDefaultWriter) : IO Unit :=
-  self.val.callMethod "releaseLock" (Support.args #[]) Unit
+@[macro_inline] def WritableStreamDefaultWriter.releaseLock (self : WritableStreamDefaultWriter) : IO Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.releaseLock" do
+  self.val.callMethod "releaseLock" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> write(optional any chunk)` -/
-def WritableStreamDefaultWriter.write (self : WritableStreamDefaultWriter) (chunk : Data := .undefined) : Async Unit :=
-  self.val.callMethodAwait "write" (Support.args #[chunk]) Unit
+@[macro_inline] def WritableStreamDefaultWriter.write (self : WritableStreamDefaultWriter) (chunk : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.write" do
+  self.val.callMethodAwait "write" (Internal.args #[chunk]) Unit
 
 end Lasm.JS.Web

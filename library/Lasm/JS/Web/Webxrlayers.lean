@@ -6,35 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.Webxrlayers
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.WebxrDepthSensing
 import Lasm.JS.Web.Webxr
-import Lasm.JS.Web.WebxrWebgpuBinding
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRLayerQuality` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)): "default", "text-optimized", "graphics-optimized". -/
-inductive XRLayerQuality where
-  /-- "default" -/
-  | default
-  /-- "text-optimized" -/
-  | textOptimized
-  /-- "graphics-optimized" -/
-  | graphicsOptimized
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRLayerQuality := ⟨fun
-  | .default => .string "default"
-  | .textOptimized => .string "text-optimized"
-  | .graphicsOptimized => .string "graphics-optimized"⟩
-instance : FromJS XRLayerQuality where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "text-optimized" => .ok .textOptimized
-    | .string "graphics-optimized" => .ok .graphicsOptimized
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRLayerQuality"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRLayerEventInit : EventInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRLayerEventInit where
@@ -46,9 +31,9 @@ structure XRLayerEventInit where
   composed : Option Bool := none
   /-- `required XRLayer layer` -/
   layer : XRLayer
-instance : ToJS XRLayerEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRLayerEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("layer", toJS d.layer)]⟩
 
 /-- `dictionary XRMediaQuadLayerInit : XRMediaLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -65,12 +50,12 @@ structure XRMediaQuadLayerInit where
   width : Option Float := none
   /-- `float? height` -/
   height : Option Float := none
-instance : ToJS XRMediaQuadLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("layout", Support.optional d.layout),
-    ("invertStereo", Support.optional d.invertStereo),
-    ("transform", Support.optional d.transform),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height)]⟩
+instance : ToJS XRMediaQuadLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("layout", Internal.optional d.layout),
+    ("invertStereo", Internal.optional d.invertStereo),
+    ("transform", Internal.optional d.transform),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height)]⟩
 
 /-- `dictionary XRMediaCylinderLayerInit : XRMediaLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRMediaCylinderLayerInit where
@@ -88,13 +73,13 @@ structure XRMediaCylinderLayerInit where
   centralAngle : Option Float := none
   /-- `float? aspectRatio` -/
   aspectRatio : Option Float := none
-instance : ToJS XRMediaCylinderLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("layout", Support.optional d.layout),
-    ("invertStereo", Support.optional d.invertStereo),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralAngle", Support.optional d.centralAngle),
-    ("aspectRatio", Support.optional d.aspectRatio)]⟩
+instance : ToJS XRMediaCylinderLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("layout", Internal.optional d.layout),
+    ("invertStereo", Internal.optional d.invertStereo),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralAngle", Internal.optional d.centralAngle),
+    ("aspectRatio", Internal.optional d.aspectRatio)]⟩
 
 /-- `dictionary XRMediaEquirectLayerInit : XRMediaLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRMediaEquirectLayerInit where
@@ -114,14 +99,14 @@ structure XRMediaEquirectLayerInit where
   upperVerticalAngle : Option Float := none
   /-- `float lowerVerticalAngle = -1.570795` -/
   lowerVerticalAngle : Option Float := none
-instance : ToJS XRMediaEquirectLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("layout", Support.optional d.layout),
-    ("invertStereo", Support.optional d.invertStereo),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralHorizontalAngle", Support.optional d.centralHorizontalAngle),
-    ("upperVerticalAngle", Support.optional d.upperVerticalAngle),
-    ("lowerVerticalAngle", Support.optional d.lowerVerticalAngle)]⟩
+instance : ToJS XRMediaEquirectLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("layout", Internal.optional d.layout),
+    ("invertStereo", Internal.optional d.invertStereo),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralHorizontalAngle", Internal.optional d.centralHorizontalAngle),
+    ("upperVerticalAngle", Internal.optional d.upperVerticalAngle),
+    ("lowerVerticalAngle", Internal.optional d.lowerVerticalAngle)]⟩
 
 /-- `dictionary XRProjectionLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRProjectionLayerInit where
@@ -135,11 +120,11 @@ structure XRProjectionLayerInit where
   scaleFactor : Option Float := none
   /-- `boolean clearOnAccess = true` -/
   clearOnAccess : Option Bool := none
-instance : ToJS XRProjectionLayerInit := ⟨fun d => Support.fields #[("textureType", Support.optional d.textureType),
-    ("colorFormat", Support.optional d.colorFormat),
-    ("depthFormat", Support.optional d.depthFormat),
-    ("scaleFactor", Support.optional d.scaleFactor),
-    ("clearOnAccess", Support.optional d.clearOnAccess)]⟩
+instance : ToJS XRProjectionLayerInit := ⟨fun d => Internal.fields #[("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("scaleFactor", Internal.optional d.scaleFactor),
+    ("clearOnAccess", Internal.optional d.clearOnAccess)]⟩
 
 /-- `dictionary XRQuadLayerInit : XRLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRQuadLayerInit where
@@ -169,19 +154,19 @@ structure XRQuadLayerInit where
   width : Option Float := none
   /-- `float height = 1.0` -/
   height : Option Float := none
-instance : ToJS XRQuadLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("textureType", Support.optional d.textureType),
-    ("colorFormat", Support.optional d.colorFormat),
-    ("depthFormat", Support.optional d.depthFormat),
-    ("mipLevels", Support.optional d.mipLevels),
+instance : ToJS XRQuadLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("clearOnAccess", Support.optional d.clearOnAccess),
-    ("transform", Support.optional d.transform),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("clearOnAccess", Internal.optional d.clearOnAccess),
+    ("transform", Internal.optional d.transform),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height)]⟩
 
 /-- `dictionary XRCylinderLayerInit : XRLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRCylinderLayerInit where
@@ -213,20 +198,20 @@ structure XRCylinderLayerInit where
   centralAngle : Option Float := none
   /-- `float aspectRatio = 2.0` -/
   aspectRatio : Option Float := none
-instance : ToJS XRCylinderLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("textureType", Support.optional d.textureType),
-    ("colorFormat", Support.optional d.colorFormat),
-    ("depthFormat", Support.optional d.depthFormat),
-    ("mipLevels", Support.optional d.mipLevels),
+instance : ToJS XRCylinderLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("clearOnAccess", Support.optional d.clearOnAccess),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralAngle", Support.optional d.centralAngle),
-    ("aspectRatio", Support.optional d.aspectRatio)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("clearOnAccess", Internal.optional d.clearOnAccess),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralAngle", Internal.optional d.centralAngle),
+    ("aspectRatio", Internal.optional d.aspectRatio)]⟩
 
 /-- `dictionary XREquirectLayerInit : XRLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XREquirectLayerInit where
@@ -260,21 +245,21 @@ structure XREquirectLayerInit where
   upperVerticalAngle : Option Float := none
   /-- `float lowerVerticalAngle = -1.570795` -/
   lowerVerticalAngle : Option Float := none
-instance : ToJS XREquirectLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("textureType", Support.optional d.textureType),
-    ("colorFormat", Support.optional d.colorFormat),
-    ("depthFormat", Support.optional d.depthFormat),
-    ("mipLevels", Support.optional d.mipLevels),
+instance : ToJS XREquirectLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("clearOnAccess", Support.optional d.clearOnAccess),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralHorizontalAngle", Support.optional d.centralHorizontalAngle),
-    ("upperVerticalAngle", Support.optional d.upperVerticalAngle),
-    ("lowerVerticalAngle", Support.optional d.lowerVerticalAngle)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("clearOnAccess", Internal.optional d.clearOnAccess),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralHorizontalAngle", Internal.optional d.centralHorizontalAngle),
+    ("upperVerticalAngle", Internal.optional d.upperVerticalAngle),
+    ("lowerVerticalAngle", Internal.optional d.lowerVerticalAngle)]⟩
 
 /-- `dictionary XRCubeLayerInit : XRLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRCubeLayerInit where
@@ -300,407 +285,489 @@ structure XRCubeLayerInit where
   clearOnAccess : Option Bool := none
   /-- `DOMPointReadOnly? orientation` -/
   orientation : Option DOMPointReadOnly := none
-instance : ToJS XRCubeLayerInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("textureType", Support.optional d.textureType),
-    ("colorFormat", Support.optional d.colorFormat),
-    ("depthFormat", Support.optional d.depthFormat),
-    ("mipLevels", Support.optional d.mipLevels),
+instance : ToJS XRCubeLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("clearOnAccess", Support.optional d.clearOnAccess),
-    ("orientation", Support.optional d.orientation)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("clearOnAccess", Internal.optional d.clearOnAccess),
+    ("orientation", Internal.optional d.orientation)]⟩
+
+/-- `dictionary XRLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure XRLayerInit where
+  /-- `required XRSpace space` -/
+  space : XRSpace
+  /-- `XRTextureType textureType = "texture"` -/
+  textureType : Option XRTextureType := none
+  /-- `GLenum colorFormat = 0x1908` -/
+  colorFormat : Option Nat := none
+  /-- `GLenum? depthFormat` -/
+  depthFormat : Option Nat := none
+  /-- `unsigned long mipLevels = 1` -/
+  mipLevels : Option Nat := none
+  /-- `required unsigned long viewPixelWidth` -/
+  viewPixelWidth : Nat
+  /-- `required unsigned long viewPixelHeight` -/
+  viewPixelHeight : Nat
+  /-- `XRLayerLayout layout = "mono"` -/
+  layout : Option XRLayerLayout := none
+  /-- `boolean isStatic = false` -/
+  isStatic : Option Bool := none
+  /-- `boolean clearOnAccess = true` -/
+  clearOnAccess : Option Bool := none
+instance : ToJS XRLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("textureType", Internal.optional d.textureType),
+    ("colorFormat", Internal.optional d.colorFormat),
+    ("depthFormat", Internal.optional d.depthFormat),
+    ("mipLevels", Internal.optional d.mipLevels),
+    ("viewPixelWidth", toJS d.viewPixelWidth),
+    ("viewPixelHeight", toJS d.viewPixelHeight),
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("clearOnAccess", Internal.optional d.clearOnAccess)]⟩
+
+/-- `dictionary XRMediaLayerInit` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure XRMediaLayerInit where
+  /-- `required XRSpace space` -/
+  space : XRSpace
+  /-- `XRLayerLayout layout = "mono"` -/
+  layout : Option XRLayerLayout := none
+  /-- `boolean invertStereo = false` -/
+  invertStereo : Option Bool := none
+instance : ToJS XRMediaLayerInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("layout", Internal.optional d.layout),
+    ("invertStereo", Internal.optional d.invertStereo)]⟩
 
 /-- `v instanceof XRCompositionLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRCompositionLayer`). -/
-def XRCompositionLayer.cast? (v : Value) : IO (Option XRCompositionLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRCompositionLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRCompositionLayer.cast? (v : Value) : IO (Option XRCompositionLayer) := Internal.api "Lasm.JS.Web.XRCompositionLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRCompositionLayer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRLayerLayout layout` -/
-def XRCompositionLayer.layout (self : XRCompositionLayer) : IO XRLayerLayout := self.val.get "layout" XRLayerLayout
+@[macro_inline] def XRCompositionLayer.layout (self : XRCompositionLayer) : IO XRLayerLayout := Internal.api "Lasm.JS.Web.XRCompositionLayer.layout" do
+  self.val.get "layout" XRLayerLayout
 
 /-- `attribute boolean blendTextureSourceAlpha` -/
-def XRCompositionLayer.blendTextureSourceAlpha (self : XRCompositionLayer) : IO Bool := self.val.get "blendTextureSourceAlpha" Bool
+@[macro_inline] def XRCompositionLayer.blendTextureSourceAlpha (self : XRCompositionLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRCompositionLayer.blendTextureSourceAlpha" do
+  self.val.get "blendTextureSourceAlpha" Bool
 
 /-- Sets `blendTextureSourceAlpha`: `attribute boolean blendTextureSourceAlpha` -/
-def XRCompositionLayer.setBlendTextureSourceAlpha (self : XRCompositionLayer) (value : Bool) : IO Unit :=
+@[macro_inline] def XRCompositionLayer.setBlendTextureSourceAlpha (self : XRCompositionLayer) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.XRCompositionLayer.setBlendTextureSourceAlpha" do
   self.val.set "blendTextureSourceAlpha" (toJS value)
 
 /-- `attribute boolean forceMonoPresentation` -/
-def XRCompositionLayer.forceMonoPresentation (self : XRCompositionLayer) : IO Bool := self.val.get "forceMonoPresentation" Bool
+@[macro_inline] def XRCompositionLayer.forceMonoPresentation (self : XRCompositionLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRCompositionLayer.forceMonoPresentation" do
+  self.val.get "forceMonoPresentation" Bool
 
 /-- Sets `forceMonoPresentation`: `attribute boolean forceMonoPresentation` -/
-def XRCompositionLayer.setForceMonoPresentation (self : XRCompositionLayer) (value : Bool) : IO Unit :=
+@[macro_inline] def XRCompositionLayer.setForceMonoPresentation (self : XRCompositionLayer) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.XRCompositionLayer.setForceMonoPresentation" do
   self.val.set "forceMonoPresentation" (toJS value)
 
 /-- `attribute float opacity` -/
-def XRCompositionLayer.opacity (self : XRCompositionLayer) : IO Float := self.val.get "opacity" Float
+@[macro_inline] def XRCompositionLayer.opacity (self : XRCompositionLayer) : IO Float := Internal.api "Lasm.JS.Web.XRCompositionLayer.opacity" do
+  self.val.get "opacity" Float
 
 /-- Sets `opacity`: `attribute float opacity` -/
-def XRCompositionLayer.setOpacity (self : XRCompositionLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRCompositionLayer.setOpacity (self : XRCompositionLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRCompositionLayer.setOpacity" do
   self.val.set "opacity" (toJS value)
 
 /-- `readonly attribute unsigned long mipLevels` -/
-def XRCompositionLayer.mipLevels (self : XRCompositionLayer) : IO Nat := self.val.get "mipLevels" Nat
+@[macro_inline] def XRCompositionLayer.mipLevels (self : XRCompositionLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRCompositionLayer.mipLevels" do
+  self.val.get "mipLevels" Nat
 
 /-- `attribute XRLayerQuality quality` -/
-def XRCompositionLayer.quality (self : XRCompositionLayer) : IO XRLayerQuality := self.val.get "quality" XRLayerQuality
+@[macro_inline] def XRCompositionLayer.quality (self : XRCompositionLayer) : IO XRLayerQuality := Internal.api "Lasm.JS.Web.XRCompositionLayer.quality" do
+  self.val.get "quality" XRLayerQuality
 
 /-- Sets `quality`: `attribute XRLayerQuality quality` -/
-def XRCompositionLayer.setQuality (self : XRCompositionLayer) (value : XRLayerQuality) : IO Unit :=
+@[macro_inline] def XRCompositionLayer.setQuality (self : XRCompositionLayer) (value : XRLayerQuality) : IO Unit := Internal.api "Lasm.JS.Web.XRCompositionLayer.setQuality" do
   self.val.set "quality" (toJS value)
 
 /-- `readonly attribute boolean needsRedraw` -/
-def XRCompositionLayer.needsRedraw (self : XRCompositionLayer) : IO Bool := self.val.get "needsRedraw" Bool
+@[macro_inline] def XRCompositionLayer.needsRedraw (self : XRCompositionLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRCompositionLayer.needsRedraw" do
+  self.val.get "needsRedraw" Bool
 
 /-- `undefined destroy()` -/
-def XRCompositionLayer.destroy (self : XRCompositionLayer) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def XRCompositionLayer.destroy (self : XRCompositionLayer) : IO Unit := Internal.api "Lasm.JS.Web.XRCompositionLayer.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof XRLayerEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRLayerEvent`). -/
-def XRLayerEvent.cast? (v : Value) : IO (Option XRLayerEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRLayerEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRLayerEvent.cast? (v : Value) : IO (Option XRLayerEvent) := Internal.api "Lasm.JS.Web.XRLayerEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRLayerEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRLayerEventInit eventInitDict)` -/
-def XRLayerEvent.new (type : String) (eventInitDict : XRLayerEventInit) : IO XRLayerEvent :=
+@[macro_inline] def XRLayerEvent.new (type : String) (eventInitDict : XRLayerEventInit) : IO XRLayerEvent := Internal.api "Lasm.JS.Web.XRLayerEvent.new" do
   Lasm.JS.Binding.invoke XRLayerEvent { name := "Lasm.JS.Web.XRLayerEvent.new", module := "globalThis", path := "XRLayerEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRLayer layer` -/
-def XRLayerEvent.layer (self : XRLayerEvent) : IO XRLayer := do
+@[macro_inline] def XRLayerEvent.layer (self : XRLayerEvent) : IO XRLayer := Internal.api "Lasm.JS.Web.XRLayerEvent.layer" do
   let r ← self.val.get "layer" Value
   pure { val := r }
 
 /-- `v instanceof XRMediaBinding`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRMediaBinding`). -/
-def XRMediaBinding.cast? (v : Value) : IO (Option XRMediaBinding) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRMediaBinding"] Value) v) then some { val := v } else none
+@[macro_inline] def XRMediaBinding.cast? (v : Value) : IO (Option XRMediaBinding) := Internal.api "Lasm.JS.Web.XRMediaBinding.cast?" do
+  Internal.cast (Internal.getGlobal ["XRMediaBinding"] Value) (fun x => { val := x }) v
 
 /-- `constructor(XRSession session)` -/
-def XRMediaBinding.new (session : XRSession) : IO XRMediaBinding :=
+@[macro_inline] def XRMediaBinding.new (session : XRSession) : IO XRMediaBinding := Internal.api "Lasm.JS.Web.XRMediaBinding.new" do
   Lasm.JS.Binding.invoke XRMediaBinding { name := "Lasm.JS.Web.XRMediaBinding.new", module := "globalThis", path := "XRMediaBinding", construct := true, arity := 1 }
-    (Support.args #[toJS session]) (await := false)
+    (Internal.args #[toJS session]) (await := false)
 
 /-- `XRQuadLayer createQuadLayer(HTMLVideoElement video, optional XRMediaQuadLayerInit init)` -/
-def XRMediaBinding.createQuadLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaQuadLayerInit := none) : IO XRQuadLayer := do
-  let r ← self.val.callMethod "createQuadLayer" (Support.args #[toJS video, Support.optional init]) Value
+@[macro_inline] def XRMediaBinding.createQuadLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaQuadLayerInit := none) : IO XRQuadLayer := Internal.api "Lasm.JS.Web.XRMediaBinding.createQuadLayer" do
+  let r ← self.val.callMethod "createQuadLayer" (Internal.args #[toJS video, Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRCylinderLayer createCylinderLayer(HTMLVideoElement video, optional XRMediaCylinderLayerInit init)` -/
-def XRMediaBinding.createCylinderLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaCylinderLayerInit := none) : IO XRCylinderLayer := do
-  let r ← self.val.callMethod "createCylinderLayer" (Support.args #[toJS video, Support.optional init]) Value
+@[macro_inline] def XRMediaBinding.createCylinderLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaCylinderLayerInit := none) : IO XRCylinderLayer := Internal.api "Lasm.JS.Web.XRMediaBinding.createCylinderLayer" do
+  let r ← self.val.callMethod "createCylinderLayer" (Internal.args #[toJS video, Internal.optional init]) Value
   pure { val := r }
 
 /-- `XREquirectLayer createEquirectLayer(HTMLVideoElement video, optional XRMediaEquirectLayerInit init)` -/
-def XRMediaBinding.createEquirectLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaEquirectLayerInit := none) : IO XREquirectLayer := do
-  let r ← self.val.callMethod "createEquirectLayer" (Support.args #[toJS video, Support.optional init]) Value
+@[macro_inline] def XRMediaBinding.createEquirectLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaEquirectLayerInit := none) : IO XREquirectLayer := Internal.api "Lasm.JS.Web.XRMediaBinding.createEquirectLayer" do
+  let r ← self.val.callMethod "createEquirectLayer" (Internal.args #[toJS video, Internal.optional init]) Value
   pure { val := r }
 
 /-- `v instanceof XRSubImage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRSubImage`). -/
-def XRSubImage.cast? (v : Value) : IO (Option XRSubImage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRSubImage"] Value) v) then some { val := v } else none
+@[macro_inline] def XRSubImage.cast? (v : Value) : IO (Option XRSubImage) := Internal.api "Lasm.JS.Web.XRSubImage.cast?" do
+  Internal.cast (Internal.getGlobal ["XRSubImage"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRViewport viewport` -/
-def XRSubImage.viewport (self : XRSubImage) : IO XRViewport := do
+@[macro_inline] def XRSubImage.viewport (self : XRSubImage) : IO XRViewport := Internal.api "Lasm.JS.Web.XRSubImage.viewport" do
   let r ← self.val.get "viewport" Value
   pure { val := r }
 
 /-- `v instanceof XRWebGLBinding`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRWebGLBinding`). -/
-def XRWebGLBinding.cast? (v : Value) : IO (Option XRWebGLBinding) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRWebGLBinding"] Value) v) then some { val := v } else none
+@[macro_inline] def XRWebGLBinding.cast? (v : Value) : IO (Option XRWebGLBinding) := Internal.api "Lasm.JS.Web.XRWebGLBinding.cast?" do
+  Internal.cast (Internal.getGlobal ["XRWebGLBinding"] Value) (fun x => { val := x }) v
 
 /-- `constructor(XRSession session, XRWebGLRenderingContext context)` -/
-def XRWebGLBinding.new (session : XRSession) (context : XRWebGLRenderingContext) : IO XRWebGLBinding :=
+@[macro_inline] def XRWebGLBinding.new (session : XRSession) (context : XRWebGLRenderingContext) : IO XRWebGLBinding := Internal.api "Lasm.JS.Web.XRWebGLBinding.new" do
   Lasm.JS.Binding.invoke XRWebGLBinding { name := "Lasm.JS.Web.XRWebGLBinding.new", module := "globalThis", path := "XRWebGLBinding", construct := true, arity := 2 }
-    (Support.args #[toJS session, toJS context]) (await := false)
+    (Internal.args #[toJS session, toJS context]) (await := false)
 
 /-- `readonly attribute double nativeProjectionScaleFactor` -/
-def XRWebGLBinding.nativeProjectionScaleFactor (self : XRWebGLBinding) : IO Float := self.val.get "nativeProjectionScaleFactor" Float
+@[macro_inline] def XRWebGLBinding.nativeProjectionScaleFactor (self : XRWebGLBinding) : IO Float := Internal.api "Lasm.JS.Web.XRWebGLBinding.nativeProjectionScaleFactor" do
+  self.val.get "nativeProjectionScaleFactor" Float
 
 /-- `readonly attribute boolean usesDepthValues` -/
-def XRWebGLBinding.usesDepthValues (self : XRWebGLBinding) : IO Bool := self.val.get "usesDepthValues" Bool
+@[macro_inline] def XRWebGLBinding.usesDepthValues (self : XRWebGLBinding) : IO Bool := Internal.api "Lasm.JS.Web.XRWebGLBinding.usesDepthValues" do
+  self.val.get "usesDepthValues" Bool
 
 /-- `XRProjectionLayer createProjectionLayer(optional XRProjectionLayerInit init)` -/
-def XRWebGLBinding.createProjectionLayer (self : XRWebGLBinding) (init : Option XRProjectionLayerInit := none) : IO XRProjectionLayer := do
-  let r ← self.val.callMethod "createProjectionLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRWebGLBinding.createProjectionLayer (self : XRWebGLBinding) (init : Option XRProjectionLayerInit := none) : IO XRProjectionLayer := Internal.api "Lasm.JS.Web.XRWebGLBinding.createProjectionLayer" do
+  let r ← self.val.callMethod "createProjectionLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRQuadLayer createQuadLayer(optional XRQuadLayerInit init)` -/
-def XRWebGLBinding.createQuadLayer (self : XRWebGLBinding) (init : Option XRQuadLayerInit := none) : IO XRQuadLayer := do
-  let r ← self.val.callMethod "createQuadLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRWebGLBinding.createQuadLayer (self : XRWebGLBinding) (init : Option XRQuadLayerInit := none) : IO XRQuadLayer := Internal.api "Lasm.JS.Web.XRWebGLBinding.createQuadLayer" do
+  let r ← self.val.callMethod "createQuadLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRCylinderLayer createCylinderLayer(optional XRCylinderLayerInit init)` -/
-def XRWebGLBinding.createCylinderLayer (self : XRWebGLBinding) (init : Option XRCylinderLayerInit := none) : IO XRCylinderLayer := do
-  let r ← self.val.callMethod "createCylinderLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRWebGLBinding.createCylinderLayer (self : XRWebGLBinding) (init : Option XRCylinderLayerInit := none) : IO XRCylinderLayer := Internal.api "Lasm.JS.Web.XRWebGLBinding.createCylinderLayer" do
+  let r ← self.val.callMethod "createCylinderLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XREquirectLayer createEquirectLayer(optional XREquirectLayerInit init)` -/
-def XRWebGLBinding.createEquirectLayer (self : XRWebGLBinding) (init : Option XREquirectLayerInit := none) : IO XREquirectLayer := do
-  let r ← self.val.callMethod "createEquirectLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRWebGLBinding.createEquirectLayer (self : XRWebGLBinding) (init : Option XREquirectLayerInit := none) : IO XREquirectLayer := Internal.api "Lasm.JS.Web.XRWebGLBinding.createEquirectLayer" do
+  let r ← self.val.callMethod "createEquirectLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRCubeLayer createCubeLayer(optional XRCubeLayerInit init)` -/
-def XRWebGLBinding.createCubeLayer (self : XRWebGLBinding) (init : Option XRCubeLayerInit := none) : IO XRCubeLayer := do
-  let r ← self.val.callMethod "createCubeLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRWebGLBinding.createCubeLayer (self : XRWebGLBinding) (init : Option XRCubeLayerInit := none) : IO XRCubeLayer := Internal.api "Lasm.JS.Web.XRWebGLBinding.createCubeLayer" do
+  let r ← self.val.callMethod "createCubeLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRWebGLSubImage getSubImage(XRCompositionLayer layer, XRFrame frame, optional XREye eye)` -/
-def XRWebGLBinding.getSubImage (self : XRWebGLBinding) (layer : XRCompositionLayer) (frame : XRFrame) (eye : Option XREye := none) : IO XRWebGLSubImage := do
-  let r ← self.val.callMethod "getSubImage" (Support.args #[toJS layer, toJS frame, Support.optional eye]) Value
+@[macro_inline] def XRWebGLBinding.getSubImage (self : XRWebGLBinding) (layer : XRCompositionLayer) (frame : XRFrame) (eye : Option XREye := none) : IO XRWebGLSubImage := Internal.api "Lasm.JS.Web.XRWebGLBinding.getSubImage" do
+  let r ← self.val.callMethod "getSubImage" (Internal.args #[toJS layer, toJS frame, Internal.optional eye]) Value
   pure { val := r }
 
 /-- `XRWebGLSubImage getViewSubImage(XRProjectionLayer layer, XRView view)` -/
-def XRWebGLBinding.getViewSubImage (self : XRWebGLBinding) (layer : XRProjectionLayer) (view : XRView) : IO XRWebGLSubImage := do
-  let r ← self.val.callMethod "getViewSubImage" (Support.args #[toJS layer, toJS view]) Value
+@[macro_inline] def XRWebGLBinding.getViewSubImage (self : XRWebGLBinding) (layer : XRProjectionLayer) (view : XRView) : IO XRWebGLSubImage := Internal.api "Lasm.JS.Web.XRWebGLBinding.getViewSubImage" do
+  let r ← self.val.callMethod "getViewSubImage" (Internal.args #[toJS layer, toJS view]) Value
   pure { val := r }
 
 /-- `undefined foveateBoundTexture(GLenum target, float fixed_foveation)` -/
-def XRWebGLBinding.foveateBoundTexture (self : XRWebGLBinding) (target : Nat) (fixed_foveation : Float) : IO Unit :=
-  self.val.callMethod "foveateBoundTexture" (Support.args #[toJS target, toJS fixed_foveation]) Unit
+@[macro_inline] def XRWebGLBinding.foveateBoundTexture (self : XRWebGLBinding) (target : Nat) (fixed_foveation : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRWebGLBinding.foveateBoundTexture" do
+  self.val.callMethod "foveateBoundTexture" (Internal.args #[toJS target, toJS fixed_foveation]) Unit
 
 /-- `v instanceof XRCubeLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRCubeLayer`). -/
-def XRCubeLayer.cast? (v : Value) : IO (Option XRCubeLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRCubeLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRCubeLayer.cast? (v : Value) : IO (Option XRCubeLayer) := Internal.api "Lasm.JS.Web.XRCubeLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRCubeLayer"] Value) (fun x => { val := x }) v
 
 /-- `attribute XRSpace space` -/
-def XRCubeLayer.space (self : XRCubeLayer) : IO XRSpace := do
+@[macro_inline] def XRCubeLayer.space (self : XRCubeLayer) : IO XRSpace := Internal.api "Lasm.JS.Web.XRCubeLayer.space" do
   let r ← self.val.get "space" Value
   pure { val := r }
 
 /-- Sets `space`: `attribute XRSpace space` -/
-def XRCubeLayer.setSpace (self : XRCubeLayer) (value : XRSpace) : IO Unit :=
+@[macro_inline] def XRCubeLayer.setSpace (self : XRCubeLayer) (value : XRSpace) : IO Unit := Internal.api "Lasm.JS.Web.XRCubeLayer.setSpace" do
   self.val.set "space" (toJS value)
 
 /-- `attribute DOMPointReadOnly orientation` -/
-def XRCubeLayer.orientation (self : XRCubeLayer) : IO DOMPointReadOnly := do
+@[macro_inline] def XRCubeLayer.orientation (self : XRCubeLayer) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRCubeLayer.orientation" do
   let r ← self.val.get "orientation" Value
   pure { val := r }
 
 /-- Sets `orientation`: `attribute DOMPointReadOnly orientation` -/
-def XRCubeLayer.setOrientation (self : XRCubeLayer) (value : DOMPointReadOnly) : IO Unit :=
+@[macro_inline] def XRCubeLayer.setOrientation (self : XRCubeLayer) (value : DOMPointReadOnly) : IO Unit := Internal.api "Lasm.JS.Web.XRCubeLayer.setOrientation" do
   self.val.set "orientation" (toJS value)
 
 /-- `attribute EventHandler onredraw` -/
-def XRCubeLayer.onredraw (self : XRCubeLayer) : IO (Option EventHandlerNonNull) := self.val.get "onredraw" (Option EventHandlerNonNull)
+@[macro_inline] def XRCubeLayer.onredraw (self : XRCubeLayer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRCubeLayer.onredraw" do
+  self.val.get "onredraw" (Option EventHandlerNonNull)
 
 /-- Sets `onredraw`: `attribute EventHandler onredraw` -/
-def XRCubeLayer.setOnredraw (self : XRCubeLayer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRCubeLayer.setOnredraw (self : XRCubeLayer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRCubeLayer.setOnredraw" do
   self.val.set "onredraw" (toJS value)
 
 /-- `v instanceof XRCylinderLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRCylinderLayer`). -/
-def XRCylinderLayer.cast? (v : Value) : IO (Option XRCylinderLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRCylinderLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRCylinderLayer.cast? (v : Value) : IO (Option XRCylinderLayer) := Internal.api "Lasm.JS.Web.XRCylinderLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRCylinderLayer"] Value) (fun x => { val := x }) v
 
 /-- `attribute XRSpace space` -/
-def XRCylinderLayer.space (self : XRCylinderLayer) : IO XRSpace := do
+@[macro_inline] def XRCylinderLayer.space (self : XRCylinderLayer) : IO XRSpace := Internal.api "Lasm.JS.Web.XRCylinderLayer.space" do
   let r ← self.val.get "space" Value
   pure { val := r }
 
 /-- Sets `space`: `attribute XRSpace space` -/
-def XRCylinderLayer.setSpace (self : XRCylinderLayer) (value : XRSpace) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setSpace (self : XRCylinderLayer) (value : XRSpace) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setSpace" do
   self.val.set "space" (toJS value)
 
 /-- `attribute XRRigidTransform transform` -/
-def XRCylinderLayer.transform (self : XRCylinderLayer) : IO XRRigidTransform := do
+@[macro_inline] def XRCylinderLayer.transform (self : XRCylinderLayer) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRCylinderLayer.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- Sets `transform`: `attribute XRRigidTransform transform` -/
-def XRCylinderLayer.setTransform (self : XRCylinderLayer) (value : XRRigidTransform) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setTransform (self : XRCylinderLayer) (value : XRRigidTransform) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setTransform" do
   self.val.set "transform" (toJS value)
 
 /-- `attribute float radius` -/
-def XRCylinderLayer.radius (self : XRCylinderLayer) : IO Float := self.val.get "radius" Float
+@[macro_inline] def XRCylinderLayer.radius (self : XRCylinderLayer) : IO Float := Internal.api "Lasm.JS.Web.XRCylinderLayer.radius" do
+  self.val.get "radius" Float
 
 /-- Sets `radius`: `attribute float radius` -/
-def XRCylinderLayer.setRadius (self : XRCylinderLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setRadius (self : XRCylinderLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setRadius" do
   self.val.set "radius" (toJS value)
 
 /-- `attribute float centralAngle` -/
-def XRCylinderLayer.centralAngle (self : XRCylinderLayer) : IO Float := self.val.get "centralAngle" Float
+@[macro_inline] def XRCylinderLayer.centralAngle (self : XRCylinderLayer) : IO Float := Internal.api "Lasm.JS.Web.XRCylinderLayer.centralAngle" do
+  self.val.get "centralAngle" Float
 
 /-- Sets `centralAngle`: `attribute float centralAngle` -/
-def XRCylinderLayer.setCentralAngle (self : XRCylinderLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setCentralAngle (self : XRCylinderLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setCentralAngle" do
   self.val.set "centralAngle" (toJS value)
 
 /-- `attribute float aspectRatio` -/
-def XRCylinderLayer.aspectRatio (self : XRCylinderLayer) : IO Float := self.val.get "aspectRatio" Float
+@[macro_inline] def XRCylinderLayer.aspectRatio (self : XRCylinderLayer) : IO Float := Internal.api "Lasm.JS.Web.XRCylinderLayer.aspectRatio" do
+  self.val.get "aspectRatio" Float
 
 /-- Sets `aspectRatio`: `attribute float aspectRatio` -/
-def XRCylinderLayer.setAspectRatio (self : XRCylinderLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setAspectRatio (self : XRCylinderLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setAspectRatio" do
   self.val.set "aspectRatio" (toJS value)
 
 /-- `attribute EventHandler onredraw` -/
-def XRCylinderLayer.onredraw (self : XRCylinderLayer) : IO (Option EventHandlerNonNull) := self.val.get "onredraw" (Option EventHandlerNonNull)
+@[macro_inline] def XRCylinderLayer.onredraw (self : XRCylinderLayer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRCylinderLayer.onredraw" do
+  self.val.get "onredraw" (Option EventHandlerNonNull)
 
 /-- Sets `onredraw`: `attribute EventHandler onredraw` -/
-def XRCylinderLayer.setOnredraw (self : XRCylinderLayer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRCylinderLayer.setOnredraw (self : XRCylinderLayer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRCylinderLayer.setOnredraw" do
   self.val.set "onredraw" (toJS value)
 
 /-- `v instanceof XREquirectLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XREquirectLayer`). -/
-def XREquirectLayer.cast? (v : Value) : IO (Option XREquirectLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XREquirectLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XREquirectLayer.cast? (v : Value) : IO (Option XREquirectLayer) := Internal.api "Lasm.JS.Web.XREquirectLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XREquirectLayer"] Value) (fun x => { val := x }) v
 
 /-- `attribute XRSpace space` -/
-def XREquirectLayer.space (self : XREquirectLayer) : IO XRSpace := do
+@[macro_inline] def XREquirectLayer.space (self : XREquirectLayer) : IO XRSpace := Internal.api "Lasm.JS.Web.XREquirectLayer.space" do
   let r ← self.val.get "space" Value
   pure { val := r }
 
 /-- Sets `space`: `attribute XRSpace space` -/
-def XREquirectLayer.setSpace (self : XREquirectLayer) (value : XRSpace) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setSpace (self : XREquirectLayer) (value : XRSpace) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setSpace" do
   self.val.set "space" (toJS value)
 
 /-- `attribute XRRigidTransform transform` -/
-def XREquirectLayer.transform (self : XREquirectLayer) : IO XRRigidTransform := do
+@[macro_inline] def XREquirectLayer.transform (self : XREquirectLayer) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XREquirectLayer.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- Sets `transform`: `attribute XRRigidTransform transform` -/
-def XREquirectLayer.setTransform (self : XREquirectLayer) (value : XRRigidTransform) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setTransform (self : XREquirectLayer) (value : XRRigidTransform) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setTransform" do
   self.val.set "transform" (toJS value)
 
 /-- `attribute float radius` -/
-def XREquirectLayer.radius (self : XREquirectLayer) : IO Float := self.val.get "radius" Float
+@[macro_inline] def XREquirectLayer.radius (self : XREquirectLayer) : IO Float := Internal.api "Lasm.JS.Web.XREquirectLayer.radius" do
+  self.val.get "radius" Float
 
 /-- Sets `radius`: `attribute float radius` -/
-def XREquirectLayer.setRadius (self : XREquirectLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setRadius (self : XREquirectLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setRadius" do
   self.val.set "radius" (toJS value)
 
 /-- `attribute float centralHorizontalAngle` -/
-def XREquirectLayer.centralHorizontalAngle (self : XREquirectLayer) : IO Float := self.val.get "centralHorizontalAngle" Float
+@[macro_inline] def XREquirectLayer.centralHorizontalAngle (self : XREquirectLayer) : IO Float := Internal.api "Lasm.JS.Web.XREquirectLayer.centralHorizontalAngle" do
+  self.val.get "centralHorizontalAngle" Float
 
 /-- Sets `centralHorizontalAngle`: `attribute float centralHorizontalAngle` -/
-def XREquirectLayer.setCentralHorizontalAngle (self : XREquirectLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setCentralHorizontalAngle (self : XREquirectLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setCentralHorizontalAngle" do
   self.val.set "centralHorizontalAngle" (toJS value)
 
 /-- `attribute float upperVerticalAngle` -/
-def XREquirectLayer.upperVerticalAngle (self : XREquirectLayer) : IO Float := self.val.get "upperVerticalAngle" Float
+@[macro_inline] def XREquirectLayer.upperVerticalAngle (self : XREquirectLayer) : IO Float := Internal.api "Lasm.JS.Web.XREquirectLayer.upperVerticalAngle" do
+  self.val.get "upperVerticalAngle" Float
 
 /-- Sets `upperVerticalAngle`: `attribute float upperVerticalAngle` -/
-def XREquirectLayer.setUpperVerticalAngle (self : XREquirectLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setUpperVerticalAngle (self : XREquirectLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setUpperVerticalAngle" do
   self.val.set "upperVerticalAngle" (toJS value)
 
 /-- `attribute float lowerVerticalAngle` -/
-def XREquirectLayer.lowerVerticalAngle (self : XREquirectLayer) : IO Float := self.val.get "lowerVerticalAngle" Float
+@[macro_inline] def XREquirectLayer.lowerVerticalAngle (self : XREquirectLayer) : IO Float := Internal.api "Lasm.JS.Web.XREquirectLayer.lowerVerticalAngle" do
+  self.val.get "lowerVerticalAngle" Float
 
 /-- Sets `lowerVerticalAngle`: `attribute float lowerVerticalAngle` -/
-def XREquirectLayer.setLowerVerticalAngle (self : XREquirectLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setLowerVerticalAngle (self : XREquirectLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setLowerVerticalAngle" do
   self.val.set "lowerVerticalAngle" (toJS value)
 
 /-- `attribute EventHandler onredraw` -/
-def XREquirectLayer.onredraw (self : XREquirectLayer) : IO (Option EventHandlerNonNull) := self.val.get "onredraw" (Option EventHandlerNonNull)
+@[macro_inline] def XREquirectLayer.onredraw (self : XREquirectLayer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XREquirectLayer.onredraw" do
+  self.val.get "onredraw" (Option EventHandlerNonNull)
 
 /-- Sets `onredraw`: `attribute EventHandler onredraw` -/
-def XREquirectLayer.setOnredraw (self : XREquirectLayer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XREquirectLayer.setOnredraw (self : XREquirectLayer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XREquirectLayer.setOnredraw" do
   self.val.set "onredraw" (toJS value)
 
 /-- `v instanceof XRProjectionLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRProjectionLayer`). -/
-def XRProjectionLayer.cast? (v : Value) : IO (Option XRProjectionLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRProjectionLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRProjectionLayer.cast? (v : Value) : IO (Option XRProjectionLayer) := Internal.api "Lasm.JS.Web.XRProjectionLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRProjectionLayer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long textureWidth` -/
-def XRProjectionLayer.textureWidth (self : XRProjectionLayer) : IO Nat := self.val.get "textureWidth" Nat
+@[macro_inline] def XRProjectionLayer.textureWidth (self : XRProjectionLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRProjectionLayer.textureWidth" do
+  self.val.get "textureWidth" Nat
 
 /-- `readonly attribute unsigned long textureHeight` -/
-def XRProjectionLayer.textureHeight (self : XRProjectionLayer) : IO Nat := self.val.get "textureHeight" Nat
+@[macro_inline] def XRProjectionLayer.textureHeight (self : XRProjectionLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRProjectionLayer.textureHeight" do
+  self.val.get "textureHeight" Nat
 
 /-- `readonly attribute unsigned long textureArrayLength` -/
-def XRProjectionLayer.textureArrayLength (self : XRProjectionLayer) : IO Nat := self.val.get "textureArrayLength" Nat
+@[macro_inline] def XRProjectionLayer.textureArrayLength (self : XRProjectionLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRProjectionLayer.textureArrayLength" do
+  self.val.get "textureArrayLength" Nat
 
 /-- `readonly attribute boolean ignoreDepthValues` -/
-def XRProjectionLayer.ignoreDepthValues (self : XRProjectionLayer) : IO Bool := self.val.get "ignoreDepthValues" Bool
+@[macro_inline] def XRProjectionLayer.ignoreDepthValues (self : XRProjectionLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRProjectionLayer.ignoreDepthValues" do
+  self.val.get "ignoreDepthValues" Bool
 
 /-- `attribute float? fixedFoveation` -/
-def XRProjectionLayer.fixedFoveation (self : XRProjectionLayer) : IO (Option Float) := self.val.get "fixedFoveation" (Option Float)
+@[macro_inline] def XRProjectionLayer.fixedFoveation (self : XRProjectionLayer) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRProjectionLayer.fixedFoveation" do
+  self.val.get "fixedFoveation" (Option Float)
 
 /-- Sets `fixedFoveation`: `attribute float? fixedFoveation` -/
-def XRProjectionLayer.setFixedFoveation (self : XRProjectionLayer) (value : Option Float) : IO Unit :=
+@[macro_inline] def XRProjectionLayer.setFixedFoveation (self : XRProjectionLayer) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.XRProjectionLayer.setFixedFoveation" do
   self.val.set "fixedFoveation" (toJS value)
 
 /-- `attribute XRRigidTransform? deltaPose` -/
-def XRProjectionLayer.deltaPose (self : XRProjectionLayer) : IO (Option XRRigidTransform) := self.val.get "deltaPose" (Option XRRigidTransform)
+@[macro_inline] def XRProjectionLayer.deltaPose (self : XRProjectionLayer) : IO (Option XRRigidTransform) := Internal.api "Lasm.JS.Web.XRProjectionLayer.deltaPose" do
+  self.val.get "deltaPose" (Option XRRigidTransform)
 
 /-- Sets `deltaPose`: `attribute XRRigidTransform? deltaPose` -/
-def XRProjectionLayer.setDeltaPose (self : XRProjectionLayer) (value : Option XRRigidTransform) : IO Unit :=
+@[macro_inline] def XRProjectionLayer.setDeltaPose (self : XRProjectionLayer) (value : Option XRRigidTransform) : IO Unit := Internal.api "Lasm.JS.Web.XRProjectionLayer.setDeltaPose" do
   self.val.set "deltaPose" (toJS value)
 
 /-- `v instanceof XRQuadLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRQuadLayer`). -/
-def XRQuadLayer.cast? (v : Value) : IO (Option XRQuadLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRQuadLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRQuadLayer.cast? (v : Value) : IO (Option XRQuadLayer) := Internal.api "Lasm.JS.Web.XRQuadLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRQuadLayer"] Value) (fun x => { val := x }) v
 
 /-- `attribute XRSpace space` -/
-def XRQuadLayer.space (self : XRQuadLayer) : IO XRSpace := do
+@[macro_inline] def XRQuadLayer.space (self : XRQuadLayer) : IO XRSpace := Internal.api "Lasm.JS.Web.XRQuadLayer.space" do
   let r ← self.val.get "space" Value
   pure { val := r }
 
 /-- Sets `space`: `attribute XRSpace space` -/
-def XRQuadLayer.setSpace (self : XRQuadLayer) (value : XRSpace) : IO Unit :=
+@[macro_inline] def XRQuadLayer.setSpace (self : XRQuadLayer) (value : XRSpace) : IO Unit := Internal.api "Lasm.JS.Web.XRQuadLayer.setSpace" do
   self.val.set "space" (toJS value)
 
 /-- `attribute XRRigidTransform transform` -/
-def XRQuadLayer.transform (self : XRQuadLayer) : IO XRRigidTransform := do
+@[macro_inline] def XRQuadLayer.transform (self : XRQuadLayer) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRQuadLayer.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- Sets `transform`: `attribute XRRigidTransform transform` -/
-def XRQuadLayer.setTransform (self : XRQuadLayer) (value : XRRigidTransform) : IO Unit :=
+@[macro_inline] def XRQuadLayer.setTransform (self : XRQuadLayer) (value : XRRigidTransform) : IO Unit := Internal.api "Lasm.JS.Web.XRQuadLayer.setTransform" do
   self.val.set "transform" (toJS value)
 
 /-- `attribute float width` -/
-def XRQuadLayer.width (self : XRQuadLayer) : IO Float := self.val.get "width" Float
+@[macro_inline] def XRQuadLayer.width (self : XRQuadLayer) : IO Float := Internal.api "Lasm.JS.Web.XRQuadLayer.width" do
+  self.val.get "width" Float
 
 /-- Sets `width`: `attribute float width` -/
-def XRQuadLayer.setWidth (self : XRQuadLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRQuadLayer.setWidth (self : XRQuadLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRQuadLayer.setWidth" do
   self.val.set "width" (toJS value)
 
 /-- `attribute float height` -/
-def XRQuadLayer.height (self : XRQuadLayer) : IO Float := self.val.get "height" Float
+@[macro_inline] def XRQuadLayer.height (self : XRQuadLayer) : IO Float := Internal.api "Lasm.JS.Web.XRQuadLayer.height" do
+  self.val.get "height" Float
 
 /-- Sets `height`: `attribute float height` -/
-def XRQuadLayer.setHeight (self : XRQuadLayer) (value : Float) : IO Unit :=
+@[macro_inline] def XRQuadLayer.setHeight (self : XRQuadLayer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.XRQuadLayer.setHeight" do
   self.val.set "height" (toJS value)
 
 /-- `attribute EventHandler onredraw` -/
-def XRQuadLayer.onredraw (self : XRQuadLayer) : IO (Option EventHandlerNonNull) := self.val.get "onredraw" (Option EventHandlerNonNull)
+@[macro_inline] def XRQuadLayer.onredraw (self : XRQuadLayer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRQuadLayer.onredraw" do
+  self.val.get "onredraw" (Option EventHandlerNonNull)
 
 /-- Sets `onredraw`: `attribute EventHandler onredraw` -/
-def XRQuadLayer.setOnredraw (self : XRQuadLayer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRQuadLayer.setOnredraw (self : XRQuadLayer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRQuadLayer.setOnredraw" do
   self.val.set "onredraw" (toJS value)
 
 /-- `v instanceof XRWebGLSubImage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRWebGLSubImage`). -/
-def XRWebGLSubImage.cast? (v : Value) : IO (Option XRWebGLSubImage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRWebGLSubImage"] Value) v) then some { val := v } else none
+@[macro_inline] def XRWebGLSubImage.cast? (v : Value) : IO (Option XRWebGLSubImage) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.cast?" do
+  Internal.cast (Internal.getGlobal ["XRWebGLSubImage"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute WebGLTexture colorTexture` -/
-def XRWebGLSubImage.colorTexture (self : XRWebGLSubImage) : IO WebGLTexture := do
+@[macro_inline] def XRWebGLSubImage.colorTexture (self : XRWebGLSubImage) : IO WebGLTexture := Internal.api "Lasm.JS.Web.XRWebGLSubImage.colorTexture" do
   let r ← self.val.get "colorTexture" Value
   pure { val := r }
 
 /-- `readonly attribute WebGLTexture? depthStencilTexture` -/
-def XRWebGLSubImage.depthStencilTexture (self : XRWebGLSubImage) : IO (Option WebGLTexture) := self.val.get "depthStencilTexture" (Option WebGLTexture)
+@[macro_inline] def XRWebGLSubImage.depthStencilTexture (self : XRWebGLSubImage) : IO (Option WebGLTexture) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.depthStencilTexture" do
+  self.val.get "depthStencilTexture" (Option WebGLTexture)
 
 /-- `readonly attribute WebGLTexture? motionVectorTexture` -/
-def XRWebGLSubImage.motionVectorTexture (self : XRWebGLSubImage) : IO (Option WebGLTexture) := self.val.get "motionVectorTexture" (Option WebGLTexture)
+@[macro_inline] def XRWebGLSubImage.motionVectorTexture (self : XRWebGLSubImage) : IO (Option WebGLTexture) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.motionVectorTexture" do
+  self.val.get "motionVectorTexture" (Option WebGLTexture)
 
 /-- `readonly attribute unsigned long? imageIndex` -/
-def XRWebGLSubImage.imageIndex (self : XRWebGLSubImage) : IO (Option Nat) := self.val.get "imageIndex" (Option Nat)
+@[macro_inline] def XRWebGLSubImage.imageIndex (self : XRWebGLSubImage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.imageIndex" do
+  self.val.get "imageIndex" (Option Nat)
 
 /-- `readonly attribute unsigned long colorTextureWidth` -/
-def XRWebGLSubImage.colorTextureWidth (self : XRWebGLSubImage) : IO Nat := self.val.get "colorTextureWidth" Nat
+@[macro_inline] def XRWebGLSubImage.colorTextureWidth (self : XRWebGLSubImage) : IO Nat := Internal.api "Lasm.JS.Web.XRWebGLSubImage.colorTextureWidth" do
+  self.val.get "colorTextureWidth" Nat
 
 /-- `readonly attribute unsigned long colorTextureHeight` -/
-def XRWebGLSubImage.colorTextureHeight (self : XRWebGLSubImage) : IO Nat := self.val.get "colorTextureHeight" Nat
+@[macro_inline] def XRWebGLSubImage.colorTextureHeight (self : XRWebGLSubImage) : IO Nat := Internal.api "Lasm.JS.Web.XRWebGLSubImage.colorTextureHeight" do
+  self.val.get "colorTextureHeight" Nat
 
 /-- `readonly attribute unsigned long? depthStencilTextureWidth` -/
-def XRWebGLSubImage.depthStencilTextureWidth (self : XRWebGLSubImage) : IO (Option Nat) := self.val.get "depthStencilTextureWidth" (Option Nat)
+@[macro_inline] def XRWebGLSubImage.depthStencilTextureWidth (self : XRWebGLSubImage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.depthStencilTextureWidth" do
+  self.val.get "depthStencilTextureWidth" (Option Nat)
 
 /-- `readonly attribute unsigned long? depthStencilTextureHeight` -/
-def XRWebGLSubImage.depthStencilTextureHeight (self : XRWebGLSubImage) : IO (Option Nat) := self.val.get "depthStencilTextureHeight" (Option Nat)
+@[macro_inline] def XRWebGLSubImage.depthStencilTextureHeight (self : XRWebGLSubImage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.XRWebGLSubImage.depthStencilTextureHeight" do
+  self.val.get "depthStencilTextureHeight" (Option Nat)
 
 /-- `readonly attribute FrozenArray<XRLayer> layers` -/
-def XRRenderState.layers (self : XRRenderState) : IO (Array XRLayer) := self.val.get "layers" (Array XRLayer)
+@[macro_inline] def XRRenderState.layers (self : XRRenderState) : IO (Array XRLayer) := Internal.api "Lasm.JS.Web.XRRenderState.layers" do
+  self.val.get "layers" (Array XRLayer)
 
 /-- `readonly attribute unsigned long maxRenderLayers` -/
-def XRSession.maxRenderLayers (self : XRSession) : IO Nat := self.val.get "maxRenderLayers" Nat
+@[macro_inline] def XRSession.maxRenderLayers (self : XRSession) : IO Nat := Internal.api "Lasm.JS.Web.XRSession.maxRenderLayers" do
+  self.val.get "maxRenderLayers" Nat
 
 end Lasm.JS.Web

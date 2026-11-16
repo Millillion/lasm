@@ -6,49 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediastreamRecording
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum BitrateMode` (MediaStream Recording (https://w3c.github.io/mediacapture-record/)): "constant", "variable". -/
-inductive BitrateMode where
-  /-- "constant" -/
-  | constant
-  /-- "variable" -/
-  | «variable»
-  deriving BEq, Repr, Inhabited
-instance : ToJS BitrateMode := ⟨fun
-  | .constant => .string "constant"
-  | .«variable» => .string "variable"⟩
-instance : FromJS BitrateMode where
-  fromJS
-    | .string "constant" => .ok .constant
-    | .string "variable" => .ok .«variable»
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BitrateMode"
-
-/-- `enum RecordingState` (MediaStream Recording (https://w3c.github.io/mediacapture-record/)): "inactive", "recording", "paused". -/
-inductive RecordingState where
-  /-- "inactive" -/
-  | inactive
-  /-- "recording" -/
-  | recording
-  /-- "paused" -/
-  | paused
-  deriving BEq, Repr, Inhabited
-instance : ToJS RecordingState := ⟨fun
-  | .inactive => .string "inactive"
-  | .recording => .string "recording"
-  | .paused => .string "paused"⟩
-instance : FromJS RecordingState where
-  fromJS
-    | .string "inactive" => .ok .inactive
-    | .string "recording" => .ok .recording
-    | .string "paused" => .ok .paused
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RecordingState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BlobEventInit : EventInit` (MediaStream Recording (https://w3c.github.io/mediacapture-record/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BlobEventInit where
@@ -62,11 +30,11 @@ structure BlobEventInit where
   data : Blob
   /-- `DOMHighResTimeStamp timecode` -/
   timecode : Option Float := none
-instance : ToJS BlobEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS BlobEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("data", toJS d.data),
-    ("timecode", Support.optional d.timecode)]⟩
+    ("timecode", Internal.optional d.timecode)]⟩
 
 /-- `dictionary MediaRecorderOptions` (MediaStream Recording (https://w3c.github.io/mediacapture-record/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaRecorderOptions where
@@ -84,125 +52,137 @@ structure MediaRecorderOptions where
   videoKeyFrameIntervalDuration : Option Float := none
   /-- `unsigned long videoKeyFrameIntervalCount` -/
   videoKeyFrameIntervalCount : Option Nat := none
-instance : ToJS MediaRecorderOptions := ⟨fun d => Support.fields #[("mimeType", Support.optional d.mimeType),
-    ("audioBitsPerSecond", Support.optional d.audioBitsPerSecond),
-    ("videoBitsPerSecond", Support.optional d.videoBitsPerSecond),
-    ("bitsPerSecond", Support.optional d.bitsPerSecond),
-    ("audioBitrateMode", Support.optional d.audioBitrateMode),
-    ("videoKeyFrameIntervalDuration", Support.optional d.videoKeyFrameIntervalDuration),
-    ("videoKeyFrameIntervalCount", Support.optional d.videoKeyFrameIntervalCount)]⟩
+instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType", Internal.optional d.mimeType),
+    ("audioBitsPerSecond", Internal.optional d.audioBitsPerSecond),
+    ("videoBitsPerSecond", Internal.optional d.videoBitsPerSecond),
+    ("bitsPerSecond", Internal.optional d.bitsPerSecond),
+    ("audioBitrateMode", Internal.optional d.audioBitrateMode),
+    ("videoKeyFrameIntervalDuration", Internal.optional d.videoKeyFrameIntervalDuration),
+    ("videoKeyFrameIntervalCount", Internal.optional d.videoKeyFrameIntervalCount)]⟩
 
 /-- `v instanceof BlobEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BlobEvent`). -/
-def BlobEvent.cast? (v : Value) : IO (Option BlobEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BlobEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BlobEvent.cast? (v : Value) : IO (Option BlobEvent) := Internal.api "Lasm.JS.Web.BlobEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BlobEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, BlobEventInit eventInitDict)` -/
-def BlobEvent.new (type : String) (eventInitDict : BlobEventInit) : IO BlobEvent :=
+@[macro_inline] def BlobEvent.new (type : String) (eventInitDict : BlobEventInit) : IO BlobEvent := Internal.api "Lasm.JS.Web.BlobEvent.new" do
   Lasm.JS.Binding.invoke BlobEvent { name := "Lasm.JS.Web.BlobEvent.new", module := "globalThis", path := "BlobEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute Blob data` -/
-def BlobEvent.data (self : BlobEvent) : IO Blob := do
+@[macro_inline] def BlobEvent.data (self : BlobEvent) : IO Blob := Internal.api "Lasm.JS.Web.BlobEvent.data" do
   let r ← self.val.get "data" Value
   pure { val := r }
 
 /-- `readonly attribute DOMHighResTimeStamp timecode` -/
-def BlobEvent.timecode (self : BlobEvent) : IO Float := self.val.get "timecode" Float
+@[macro_inline] def BlobEvent.timecode (self : BlobEvent) : IO Float := Internal.api "Lasm.JS.Web.BlobEvent.timecode" do
+  self.val.get "timecode" Float
 
 /-- `v instanceof MediaRecorder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaRecorder`). -/
-def MediaRecorder.cast? (v : Value) : IO (Option MediaRecorder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaRecorder"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaRecorder.cast? (v : Value) : IO (Option MediaRecorder) := Internal.api "Lasm.JS.Web.MediaRecorder.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaRecorder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MediaStream stream, optional MediaRecorderOptions options)` -/
-def MediaRecorder.new (stream : MediaStream) (options : Option MediaRecorderOptions := none) : IO MediaRecorder :=
+@[macro_inline] def MediaRecorder.new (stream : MediaStream) (options : Option MediaRecorderOptions := none) : IO MediaRecorder := Internal.api "Lasm.JS.Web.MediaRecorder.new" do
   Lasm.JS.Binding.invoke MediaRecorder { name := "Lasm.JS.Web.MediaRecorder.new", module := "globalThis", path := "MediaRecorder", construct := true, arity := 2 }
-    (Support.args #[toJS stream, Support.optional options]) (await := false)
+    (Internal.args #[toJS stream, Internal.optional options]) (await := false)
 
 /-- `readonly attribute MediaStream stream` -/
-def MediaRecorder.stream (self : MediaRecorder) : IO MediaStream := do
+@[macro_inline] def MediaRecorder.stream (self : MediaRecorder) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaRecorder.stream" do
   let r ← self.val.get "stream" Value
   pure { val := r }
 
 /-- `readonly attribute DOMString mimeType` -/
-def MediaRecorder.mimeType (self : MediaRecorder) : IO String := self.val.get "mimeType" String
+@[macro_inline] def MediaRecorder.mimeType (self : MediaRecorder) : IO String := Internal.api "Lasm.JS.Web.MediaRecorder.mimeType" do
+  self.val.get "mimeType" String
 
 /-- `readonly attribute RecordingState state` -/
-def MediaRecorder.state (self : MediaRecorder) : IO RecordingState := self.val.get "state" RecordingState
+@[macro_inline] def MediaRecorder.state (self : MediaRecorder) : IO RecordingState := Internal.api "Lasm.JS.Web.MediaRecorder.state" do
+  self.val.get "state" RecordingState
 
 /-- `attribute EventHandler onstart` -/
-def MediaRecorder.onstart (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "onstart" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.onstart (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.onstart" do
+  self.val.get "onstart" (Option EventHandlerNonNull)
 
 /-- Sets `onstart`: `attribute EventHandler onstart` -/
-def MediaRecorder.setOnstart (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOnstart (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOnstart" do
   self.val.set "onstart" (toJS value)
 
 /-- `attribute EventHandler onstop` -/
-def MediaRecorder.onstop (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "onstop" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.onstop (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.onstop" do
+  self.val.get "onstop" (Option EventHandlerNonNull)
 
 /-- Sets `onstop`: `attribute EventHandler onstop` -/
-def MediaRecorder.setOnstop (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOnstop (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOnstop" do
   self.val.set "onstop" (toJS value)
 
 /-- `attribute EventHandler ondataavailable` -/
-def MediaRecorder.ondataavailable (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "ondataavailable" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.ondataavailable (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.ondataavailable" do
+  self.val.get "ondataavailable" (Option EventHandlerNonNull)
 
 /-- Sets `ondataavailable`: `attribute EventHandler ondataavailable` -/
-def MediaRecorder.setOndataavailable (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOndataavailable (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOndataavailable" do
   self.val.set "ondataavailable" (toJS value)
 
 /-- `attribute EventHandler onpause` -/
-def MediaRecorder.onpause (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "onpause" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.onpause (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.onpause" do
+  self.val.get "onpause" (Option EventHandlerNonNull)
 
 /-- Sets `onpause`: `attribute EventHandler onpause` -/
-def MediaRecorder.setOnpause (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOnpause (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOnpause" do
   self.val.set "onpause" (toJS value)
 
 /-- `attribute EventHandler onresume` -/
-def MediaRecorder.onresume (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "onresume" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.onresume (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.onresume" do
+  self.val.get "onresume" (Option EventHandlerNonNull)
 
 /-- Sets `onresume`: `attribute EventHandler onresume` -/
-def MediaRecorder.setOnresume (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOnresume (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOnresume" do
   self.val.set "onresume" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def MediaRecorder.onerror (self : MediaRecorder) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def MediaRecorder.onerror (self : MediaRecorder) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaRecorder.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def MediaRecorder.setOnerror (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaRecorder.setOnerror (self : MediaRecorder) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `readonly attribute unsigned long videoBitsPerSecond` -/
-def MediaRecorder.videoBitsPerSecond (self : MediaRecorder) : IO Nat := self.val.get "videoBitsPerSecond" Nat
+@[macro_inline] def MediaRecorder.videoBitsPerSecond (self : MediaRecorder) : IO Nat := Internal.api "Lasm.JS.Web.MediaRecorder.videoBitsPerSecond" do
+  self.val.get "videoBitsPerSecond" Nat
 
 /-- `readonly attribute unsigned long audioBitsPerSecond` -/
-def MediaRecorder.audioBitsPerSecond (self : MediaRecorder) : IO Nat := self.val.get "audioBitsPerSecond" Nat
+@[macro_inline] def MediaRecorder.audioBitsPerSecond (self : MediaRecorder) : IO Nat := Internal.api "Lasm.JS.Web.MediaRecorder.audioBitsPerSecond" do
+  self.val.get "audioBitsPerSecond" Nat
 
 /-- `readonly attribute BitrateMode audioBitrateMode` -/
-def MediaRecorder.audioBitrateMode (self : MediaRecorder) : IO BitrateMode := self.val.get "audioBitrateMode" BitrateMode
+@[macro_inline] def MediaRecorder.audioBitrateMode (self : MediaRecorder) : IO BitrateMode := Internal.api "Lasm.JS.Web.MediaRecorder.audioBitrateMode" do
+  self.val.get "audioBitrateMode" BitrateMode
 
 /-- `undefined start(optional unsigned long timeslice)` -/
-def MediaRecorder.start (self : MediaRecorder) (timeslice : Option Nat := none) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[Support.optional timeslice]) Unit
+@[macro_inline] def MediaRecorder.start (self : MediaRecorder) (timeslice : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.start" do
+  self.val.callMethod "start" (Internal.args #[Internal.optional timeslice]) Unit
 
 /-- `undefined stop()` -/
-def MediaRecorder.stop (self : MediaRecorder) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def MediaRecorder.stop (self : MediaRecorder) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `undefined pause()` -/
-def MediaRecorder.pause (self : MediaRecorder) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def MediaRecorder.pause (self : MediaRecorder) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `undefined resume()` -/
-def MediaRecorder.resume (self : MediaRecorder) : IO Unit :=
-  self.val.callMethod "resume" (Support.args #[]) Unit
+@[macro_inline] def MediaRecorder.resume (self : MediaRecorder) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.resume" do
+  self.val.callMethod "resume" (Internal.args #[]) Unit
 
 /-- `undefined requestData()` -/
-def MediaRecorder.requestData (self : MediaRecorder) : IO Unit :=
-  self.val.callMethod "requestData" (Support.args #[]) Unit
+@[macro_inline] def MediaRecorder.requestData (self : MediaRecorder) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.requestData" do
+  self.val.callMethod "requestData" (Internal.args #[]) Unit
 
 /-- `static boolean isTypeSupported(DOMString type)` -/
-def MediaRecorder.isTypeSupported (type : String) : IO Bool :=
+@[macro_inline] def MediaRecorder.isTypeSupported (type : String) : IO Bool := Internal.api "Lasm.JS.Web.MediaRecorder.isTypeSupported" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaRecorder.isTypeSupported", module := "globalThis", path := "MediaRecorder.isTypeSupported", construct := false, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
 
 end Lasm.JS.Web

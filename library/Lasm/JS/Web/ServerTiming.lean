@@ -6,29 +6,37 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ResourceTiming
+import Lasm.JS.Web.Types.ServerTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceServerTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceServerTiming`). -/
-def PerformanceServerTiming.cast? (v : Value) : IO (Option PerformanceServerTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceServerTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceServerTiming.cast? (v : Value) : IO (Option PerformanceServerTiming) := Internal.api "Lasm.JS.Web.PerformanceServerTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceServerTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def PerformanceServerTiming.name (self : PerformanceServerTiming) : IO String := self.val.get "name" String
+@[macro_inline] def PerformanceServerTiming.name (self : PerformanceServerTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceServerTiming.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMHighResTimeStamp duration` -/
-def PerformanceServerTiming.duration (self : PerformanceServerTiming) : IO Float := self.val.get "duration" Float
+@[macro_inline] def PerformanceServerTiming.duration (self : PerformanceServerTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceServerTiming.duration" do
+  self.val.get "duration" Float
 
 /-- `readonly attribute DOMString description` -/
-def PerformanceServerTiming.description (self : PerformanceServerTiming) : IO String := self.val.get "description" String
+@[macro_inline] def PerformanceServerTiming.description (self : PerformanceServerTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceServerTiming.description" do
+  self.val.get "description" String
 
 /-- `object toJSON()` -/
-def PerformanceServerTiming.toJSON (self : PerformanceServerTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceServerTiming.toJSON (self : PerformanceServerTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceServerTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `readonly attribute FrozenArray<PerformanceServerTiming> serverTiming` -/
-def PerformanceResourceTiming.serverTiming (self : PerformanceResourceTiming) : IO (Array PerformanceServerTiming) := self.val.get "serverTiming" (Array PerformanceServerTiming)
+@[macro_inline] def PerformanceResourceTiming.serverTiming (self : PerformanceResourceTiming) : IO (Array PerformanceServerTiming) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.serverTiming" do
+  self.val.get "serverTiming" (Array PerformanceServerTiming)
 
 end Lasm.JS.Web

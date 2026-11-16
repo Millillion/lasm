@@ -6,19 +6,24 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.WritingAssistanceApis
+import Lasm.JS.Web.Types.TextDetectionApi
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.ImageCapture
-import Lasm.JS.Web.WritingAssistanceApis
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary TextDetectorOptions` (Accelerated Text Detection in Images (https://wicg.github.io/shape-detection-api/text.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextDetectorOptions where
   /-- `required sequence<DOMString> languages` -/
   languages : Array String
-instance : ToJS TextDetectorOptions := ⟨fun d => Support.fields #[("languages", toJS d.languages)]⟩
+instance : ToJS TextDetectorOptions := ⟨fun d => Internal.fields #[("languages", toJS d.languages)]⟩
 
 /-- `dictionary TextDetectorCreateOptions` (Accelerated Text Detection in Images (https://wicg.github.io/shape-detection-api/text.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextDetectorCreateOptions where
@@ -26,8 +31,8 @@ structure TextDetectorCreateOptions where
   signal : Option AbortSignal := none
   /-- `sequence<DOMString> languages` -/
   languages : Option (Array String) := none
-instance : ToJS TextDetectorCreateOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("languages", Support.optional d.languages)]⟩
+instance : ToJS TextDetectorCreateOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("languages", Internal.optional d.languages)]⟩
 
 /-- `dictionary DetectedText` (Accelerated Text Detection in Images (https://wicg.github.io/shape-detection-api/text.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DetectedText where
@@ -37,6 +42,9 @@ structure DetectedText where
   rawValue : String
   /-- `required sequence<Point2D> cornerPoints` -/
   cornerPoints : Array Point2D
+instance : ToJS DetectedText := ⟨fun d => Internal.fields #[("boundingBox", toJS d.boundingBox),
+    ("rawValue", toJS d.rawValue),
+    ("cornerPoints", toJS d.cornerPoints)]⟩
 instance : FromJS DetectedText where
   fromJS d := do return {
     boundingBox := ← Lasm.JS.readField DOMRectReadOnly d "boundingBox",
@@ -45,27 +53,27 @@ instance : FromJS DetectedText where
   typeName := "Lasm.JS.Web.DetectedText"
 
 /-- `v instanceof TextDetector`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextDetector`). -/
-def TextDetector.cast? (v : Value) : IO (Option TextDetector) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDetector"] Value) v) then some { val := v } else none
+@[macro_inline] def TextDetector.cast? (v : Value) : IO (Option TextDetector) := Internal.api "Lasm.JS.Web.TextDetector.cast?" do
+  Internal.cast (Internal.getGlobal ["TextDetector"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def TextDetector.new : IO TextDetector :=
+@[macro_inline] def TextDetector.new : IO TextDetector := Internal.api "Lasm.JS.Web.TextDetector.new" do
   Lasm.JS.Binding.invoke TextDetector { name := "Lasm.JS.Web.TextDetector.new", module := "globalThis", path := "TextDetector", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static Promise<Availability> availability(TextDetectorOptions options)` -/
-def TextDetector.availability (options : TextDetectorOptions) : Async Availability :=
+@[macro_inline] def TextDetector.availability (options : TextDetectorOptions) : Async Availability := Internal.api "Lasm.JS.Web.TextDetector.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.TextDetector.availability", module := "globalThis", path := "TextDetector.availability", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `static Promise<TextDetector> create(optional TextDetectorCreateOptions options)` -/
-def TextDetector.create (options : Option TextDetectorCreateOptions := none) : Async TextDetector := do
+@[macro_inline] def TextDetector.create (options : Option TextDetectorCreateOptions := none) : Async TextDetector := Internal.api "Lasm.JS.Web.TextDetector.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.TextDetector.create", module := "globalThis", path := "TextDetector.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `Promise<sequence<DetectedText>> detect(ImageBitmapSource image)` -/
-def TextDetector.detect (self : TextDetector) (image : ImageBitmapSource) : Async (Array DetectedText) :=
-  self.val.callMethodAwait "detect" (Support.args #[toJS image]) (Array DetectedText)
+@[macro_inline] def TextDetector.detect (self : TextDetector) (image : ImageBitmapSource) : Async (Array DetectedText) := Internal.api "Lasm.JS.Web.TextDetector.detect" do
+  self.val.callMethodAwait "detect" (Internal.args #[toJS image]) (Array DetectedText)
 
 end Lasm.JS.Web

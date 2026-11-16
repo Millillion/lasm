@@ -6,13 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute DOMTokenList part` -/
-def Element.part (self : Element) : IO DOMTokenList := do
+@[macro_inline] def Element.part (self : Element) : IO DOMTokenList := Internal.api "Lasm.JS.Web.Element.part" do
   let r ← self.val.get "part" Value
   pure { val := r }
 

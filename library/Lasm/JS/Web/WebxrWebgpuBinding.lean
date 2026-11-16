@@ -6,41 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Webgpu
+import Lasm.JS.Web.Types.Webxrlayers
+import Lasm.JS.Web.Types.WebxrWebgpuBinding
 import Lasm.JS.Web.Webgpu
-import Lasm.JS.Web.Webxr
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRLayerLayout` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)): "default", "mono", "stereo", "stereo-left-right", "stereo-top-bottom". -/
-inductive XRLayerLayout where
-  /-- "default" -/
-  | default
-  /-- "mono" -/
-  | mono
-  /-- "stereo" -/
-  | stereo
-  /-- "stereo-left-right" -/
-  | stereoLeftRight
-  /-- "stereo-top-bottom" -/
-  | stereoTopBottom
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRLayerLayout := ⟨fun
-  | .default => .string "default"
-  | .mono => .string "mono"
-  | .stereo => .string "stereo"
-  | .stereoLeftRight => .string "stereo-left-right"
-  | .stereoTopBottom => .string "stereo-top-bottom"⟩
-instance : FromJS XRLayerLayout where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "mono" => .ok .mono
-    | .string "stereo" => .ok .stereo
-    | .string "stereo-left-right" => .ok .stereoLeftRight
-    | .string "stereo-top-bottom" => .ok .stereoTopBottom
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRLayerLayout"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRGPUProjectionLayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRGPUProjectionLayerInit where
@@ -52,10 +29,10 @@ structure XRGPUProjectionLayerInit where
   textureUsage : Option Nat := none
   /-- `double scaleFactor = 1.0` -/
   scaleFactor : Option Float := none
-instance : ToJS XRGPUProjectionLayerInit := ⟨fun d => Support.fields #[("colorFormat", toJS d.colorFormat),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("textureUsage", Support.optional d.textureUsage),
-    ("scaleFactor", Support.optional d.scaleFactor)]⟩
+instance : ToJS XRGPUProjectionLayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
+    ("scaleFactor", Internal.optional d.scaleFactor)]⟩
 
 /-- `dictionary XRGPUQuadLayerInit : XRGPULayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRGPUQuadLayerInit where
@@ -83,18 +60,18 @@ structure XRGPUQuadLayerInit where
   width : Option Float := none
   /-- `float height = 1.0` -/
   height : Option Float := none
-instance : ToJS XRGPUQuadLayerInit := ⟨fun d => Support.fields #[("colorFormat", toJS d.colorFormat),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("textureUsage", Support.optional d.textureUsage),
+instance : ToJS XRGPUQuadLayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
     ("space", toJS d.space),
-    ("mipLevels", Support.optional d.mipLevels),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("transform", Support.optional d.transform),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("transform", Internal.optional d.transform),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height)]⟩
 
 /-- `dictionary XRGPUCylinderLayerInit : XRGPULayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRGPUCylinderLayerInit where
@@ -124,19 +101,19 @@ structure XRGPUCylinderLayerInit where
   centralAngle : Option Float := none
   /-- `float aspectRatio = 2.0` -/
   aspectRatio : Option Float := none
-instance : ToJS XRGPUCylinderLayerInit := ⟨fun d => Support.fields #[("colorFormat", toJS d.colorFormat),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("textureUsage", Support.optional d.textureUsage),
+instance : ToJS XRGPUCylinderLayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
     ("space", toJS d.space),
-    ("mipLevels", Support.optional d.mipLevels),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralAngle", Support.optional d.centralAngle),
-    ("aspectRatio", Support.optional d.aspectRatio)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralAngle", Internal.optional d.centralAngle),
+    ("aspectRatio", Internal.optional d.aspectRatio)]⟩
 
 /-- `dictionary XRGPUEquirectLayerInit : XRGPULayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRGPUEquirectLayerInit where
@@ -168,20 +145,20 @@ structure XRGPUEquirectLayerInit where
   upperVerticalAngle : Option Float := none
   /-- `float lowerVerticalAngle = -1.570795` -/
   lowerVerticalAngle : Option Float := none
-instance : ToJS XRGPUEquirectLayerInit := ⟨fun d => Support.fields #[("colorFormat", toJS d.colorFormat),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("textureUsage", Support.optional d.textureUsage),
+instance : ToJS XRGPUEquirectLayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
     ("space", toJS d.space),
-    ("mipLevels", Support.optional d.mipLevels),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("transform", Support.optional d.transform),
-    ("radius", Support.optional d.radius),
-    ("centralHorizontalAngle", Support.optional d.centralHorizontalAngle),
-    ("upperVerticalAngle", Support.optional d.upperVerticalAngle),
-    ("lowerVerticalAngle", Support.optional d.lowerVerticalAngle)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("transform", Internal.optional d.transform),
+    ("radius", Internal.optional d.radius),
+    ("centralHorizontalAngle", Internal.optional d.centralHorizontalAngle),
+    ("upperVerticalAngle", Internal.optional d.upperVerticalAngle),
+    ("lowerVerticalAngle", Internal.optional d.lowerVerticalAngle)]⟩
 
 /-- `dictionary XRGPUCubeLayerInit : XRGPULayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRGPUCubeLayerInit where
@@ -205,88 +182,122 @@ structure XRGPUCubeLayerInit where
   isStatic : Option Bool := none
   /-- `DOMPointReadOnly? orientation` -/
   orientation : Option DOMPointReadOnly := none
-instance : ToJS XRGPUCubeLayerInit := ⟨fun d => Support.fields #[("colorFormat", toJS d.colorFormat),
-    ("depthStencilFormat", Support.optional d.depthStencilFormat),
-    ("textureUsage", Support.optional d.textureUsage),
+instance : ToJS XRGPUCubeLayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
     ("space", toJS d.space),
-    ("mipLevels", Support.optional d.mipLevels),
+    ("mipLevels", Internal.optional d.mipLevels),
     ("viewPixelWidth", toJS d.viewPixelWidth),
     ("viewPixelHeight", toJS d.viewPixelHeight),
-    ("layout", Support.optional d.layout),
-    ("isStatic", Support.optional d.isStatic),
-    ("orientation", Support.optional d.orientation)]⟩
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic),
+    ("orientation", Internal.optional d.orientation)]⟩
+
+/-- `dictionary XRGPULayerInit` (WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure XRGPULayerInit where
+  /-- `required GPUTextureFormat colorFormat` -/
+  colorFormat : GPUTextureFormat
+  /-- `GPUTextureFormat? depthStencilFormat` -/
+  depthStencilFormat : Option GPUTextureFormat := none
+  /-- `GPUTextureUsageFlags textureUsage = 0x10` -/
+  textureUsage : Option Nat := none
+  /-- `required XRSpace space` -/
+  space : XRSpace
+  /-- `unsigned long mipLevels = 1` -/
+  mipLevels : Option Nat := none
+  /-- `required unsigned long viewPixelWidth` -/
+  viewPixelWidth : Nat
+  /-- `required unsigned long viewPixelHeight` -/
+  viewPixelHeight : Nat
+  /-- `XRLayerLayout layout = "mono"` -/
+  layout : Option XRLayerLayout := none
+  /-- `boolean isStatic = false` -/
+  isStatic : Option Bool := none
+instance : ToJS XRGPULayerInit := ⟨fun d => Internal.fields #[("colorFormat", toJS d.colorFormat),
+    ("depthStencilFormat", Internal.optional d.depthStencilFormat),
+    ("textureUsage", Internal.optional d.textureUsage),
+    ("space", toJS d.space),
+    ("mipLevels", Internal.optional d.mipLevels),
+    ("viewPixelWidth", toJS d.viewPixelWidth),
+    ("viewPixelHeight", toJS d.viewPixelHeight),
+    ("layout", Internal.optional d.layout),
+    ("isStatic", Internal.optional d.isStatic)]⟩
 
 /-- `v instanceof XRGPUBinding`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRGPUBinding`). -/
-def XRGPUBinding.cast? (v : Value) : IO (Option XRGPUBinding) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRGPUBinding"] Value) v) then some { val := v } else none
+@[macro_inline] def XRGPUBinding.cast? (v : Value) : IO (Option XRGPUBinding) := Internal.api "Lasm.JS.Web.XRGPUBinding.cast?" do
+  Internal.cast (Internal.getGlobal ["XRGPUBinding"] Value) (fun x => { val := x }) v
 
 /-- `constructor(XRSession session, GPUDevice device)` -/
-def XRGPUBinding.new (session : XRSession) (device : GPUDevice) : IO XRGPUBinding :=
+@[macro_inline] def XRGPUBinding.new (session : XRSession) (device : GPUDevice) : IO XRGPUBinding := Internal.api "Lasm.JS.Web.XRGPUBinding.new" do
   Lasm.JS.Binding.invoke XRGPUBinding { name := "Lasm.JS.Web.XRGPUBinding.new", module := "globalThis", path := "XRGPUBinding", construct := true, arity := 2 }
-    (Support.args #[toJS session, toJS device]) (await := false)
+    (Internal.args #[toJS session, toJS device]) (await := false)
 
 /-- `readonly attribute double nativeProjectionScaleFactor` -/
-def XRGPUBinding.nativeProjectionScaleFactor (self : XRGPUBinding) : IO Float := self.val.get "nativeProjectionScaleFactor" Float
+@[macro_inline] def XRGPUBinding.nativeProjectionScaleFactor (self : XRGPUBinding) : IO Float := Internal.api "Lasm.JS.Web.XRGPUBinding.nativeProjectionScaleFactor" do
+  self.val.get "nativeProjectionScaleFactor" Float
 
 /-- `readonly attribute boolean usesDepthValues` -/
-def XRGPUBinding.usesDepthValues (self : XRGPUBinding) : IO Bool := self.val.get "usesDepthValues" Bool
+@[macro_inline] def XRGPUBinding.usesDepthValues (self : XRGPUBinding) : IO Bool := Internal.api "Lasm.JS.Web.XRGPUBinding.usesDepthValues" do
+  self.val.get "usesDepthValues" Bool
 
 /-- `XRProjectionLayer createProjectionLayer(optional XRGPUProjectionLayerInit init)` -/
-def XRGPUBinding.createProjectionLayer (self : XRGPUBinding) (init : Option XRGPUProjectionLayerInit := none) : IO XRProjectionLayer := do
-  let r ← self.val.callMethod "createProjectionLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRGPUBinding.createProjectionLayer (self : XRGPUBinding) (init : Option XRGPUProjectionLayerInit := none) : IO XRProjectionLayer := Internal.api "Lasm.JS.Web.XRGPUBinding.createProjectionLayer" do
+  let r ← self.val.callMethod "createProjectionLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRQuadLayer createQuadLayer(optional XRGPUQuadLayerInit init)` -/
-def XRGPUBinding.createQuadLayer (self : XRGPUBinding) (init : Option XRGPUQuadLayerInit := none) : IO XRQuadLayer := do
-  let r ← self.val.callMethod "createQuadLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRGPUBinding.createQuadLayer (self : XRGPUBinding) (init : Option XRGPUQuadLayerInit := none) : IO XRQuadLayer := Internal.api "Lasm.JS.Web.XRGPUBinding.createQuadLayer" do
+  let r ← self.val.callMethod "createQuadLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRCylinderLayer createCylinderLayer(optional XRGPUCylinderLayerInit init)` -/
-def XRGPUBinding.createCylinderLayer (self : XRGPUBinding) (init : Option XRGPUCylinderLayerInit := none) : IO XRCylinderLayer := do
-  let r ← self.val.callMethod "createCylinderLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRGPUBinding.createCylinderLayer (self : XRGPUBinding) (init : Option XRGPUCylinderLayerInit := none) : IO XRCylinderLayer := Internal.api "Lasm.JS.Web.XRGPUBinding.createCylinderLayer" do
+  let r ← self.val.callMethod "createCylinderLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XREquirectLayer createEquirectLayer(optional XRGPUEquirectLayerInit init)` -/
-def XRGPUBinding.createEquirectLayer (self : XRGPUBinding) (init : Option XRGPUEquirectLayerInit := none) : IO XREquirectLayer := do
-  let r ← self.val.callMethod "createEquirectLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRGPUBinding.createEquirectLayer (self : XRGPUBinding) (init : Option XRGPUEquirectLayerInit := none) : IO XREquirectLayer := Internal.api "Lasm.JS.Web.XRGPUBinding.createEquirectLayer" do
+  let r ← self.val.callMethod "createEquirectLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRCubeLayer createCubeLayer(optional XRGPUCubeLayerInit init)` -/
-def XRGPUBinding.createCubeLayer (self : XRGPUBinding) (init : Option XRGPUCubeLayerInit := none) : IO XRCubeLayer := do
-  let r ← self.val.callMethod "createCubeLayer" (Support.args #[Support.optional init]) Value
+@[macro_inline] def XRGPUBinding.createCubeLayer (self : XRGPUBinding) (init : Option XRGPUCubeLayerInit := none) : IO XRCubeLayer := Internal.api "Lasm.JS.Web.XRGPUBinding.createCubeLayer" do
+  let r ← self.val.callMethod "createCubeLayer" (Internal.args #[Internal.optional init]) Value
   pure { val := r }
 
 /-- `XRGPUSubImage getSubImage(XRCompositionLayer layer, XRFrame frame, optional XREye eye)` -/
-def XRGPUBinding.getSubImage (self : XRGPUBinding) (layer : XRCompositionLayer) (frame : XRFrame) (eye : Option XREye := none) : IO XRGPUSubImage := do
-  let r ← self.val.callMethod "getSubImage" (Support.args #[toJS layer, toJS frame, Support.optional eye]) Value
+@[macro_inline] def XRGPUBinding.getSubImage (self : XRGPUBinding) (layer : XRCompositionLayer) (frame : XRFrame) (eye : Option XREye := none) : IO XRGPUSubImage := Internal.api "Lasm.JS.Web.XRGPUBinding.getSubImage" do
+  let r ← self.val.callMethod "getSubImage" (Internal.args #[toJS layer, toJS frame, Internal.optional eye]) Value
   pure { val := r }
 
 /-- `XRGPUSubImage getViewSubImage(XRProjectionLayer layer, XRView view)` -/
-def XRGPUBinding.getViewSubImage (self : XRGPUBinding) (layer : XRProjectionLayer) (view : XRView) : IO XRGPUSubImage := do
-  let r ← self.val.callMethod "getViewSubImage" (Support.args #[toJS layer, toJS view]) Value
+@[macro_inline] def XRGPUBinding.getViewSubImage (self : XRGPUBinding) (layer : XRProjectionLayer) (view : XRView) : IO XRGPUSubImage := Internal.api "Lasm.JS.Web.XRGPUBinding.getViewSubImage" do
+  let r ← self.val.callMethod "getViewSubImage" (Internal.args #[toJS layer, toJS view]) Value
   pure { val := r }
 
 /-- `GPUTextureFormat getPreferredColorFormat()` -/
-def XRGPUBinding.getPreferredColorFormat (self : XRGPUBinding) : IO GPUTextureFormat :=
-  self.val.callMethod "getPreferredColorFormat" (Support.args #[]) GPUTextureFormat
+@[macro_inline] def XRGPUBinding.getPreferredColorFormat (self : XRGPUBinding) : IO GPUTextureFormat := Internal.api "Lasm.JS.Web.XRGPUBinding.getPreferredColorFormat" do
+  self.val.callMethod "getPreferredColorFormat" (Internal.args #[]) GPUTextureFormat
 
 /-- `v instanceof XRGPUSubImage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRGPUSubImage`). -/
-def XRGPUSubImage.cast? (v : Value) : IO (Option XRGPUSubImage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRGPUSubImage"] Value) v) then some { val := v } else none
+@[macro_inline] def XRGPUSubImage.cast? (v : Value) : IO (Option XRGPUSubImage) := Internal.api "Lasm.JS.Web.XRGPUSubImage.cast?" do
+  Internal.cast (Internal.getGlobal ["XRGPUSubImage"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUTexture colorTexture` -/
-def XRGPUSubImage.colorTexture (self : XRGPUSubImage) : IO GPUTexture := do
+@[macro_inline] def XRGPUSubImage.colorTexture (self : XRGPUSubImage) : IO GPUTexture := Internal.api "Lasm.JS.Web.XRGPUSubImage.colorTexture" do
   let r ← self.val.get "colorTexture" Value
   pure { val := r }
 
 /-- `readonly attribute GPUTexture? depthStencilTexture` -/
-def XRGPUSubImage.depthStencilTexture (self : XRGPUSubImage) : IO (Option GPUTexture) := self.val.get "depthStencilTexture" (Option GPUTexture)
+@[macro_inline] def XRGPUSubImage.depthStencilTexture (self : XRGPUSubImage) : IO (Option GPUTexture) := Internal.api "Lasm.JS.Web.XRGPUSubImage.depthStencilTexture" do
+  self.val.get "depthStencilTexture" (Option GPUTexture)
 
 /-- `readonly attribute GPUTexture? motionVectorTexture` -/
-def XRGPUSubImage.motionVectorTexture (self : XRGPUSubImage) : IO (Option GPUTexture) := self.val.get "motionVectorTexture" (Option GPUTexture)
+@[macro_inline] def XRGPUSubImage.motionVectorTexture (self : XRGPUSubImage) : IO (Option GPUTexture) := Internal.api "Lasm.JS.Web.XRGPUSubImage.motionVectorTexture" do
+  self.val.get "motionVectorTexture" (Option GPUTexture)
 
 /-- `GPUTextureViewDescriptor getViewDescriptor()` -/
-def XRGPUSubImage.getViewDescriptor (self : XRGPUSubImage) : IO GPUTextureViewDescriptor :=
-  self.val.callMethod "getViewDescriptor" (Support.args #[]) GPUTextureViewDescriptor
+@[macro_inline] def XRGPUSubImage.getViewDescriptor (self : XRGPUSubImage) : IO GPUTextureViewDescriptor := Internal.api "Lasm.JS.Web.XRGPUSubImage.getViewDescriptor" do
+  self.val.callMethod "getViewDescriptor" (Internal.args #[]) GPUTextureViewDescriptor
 
 end Lasm.JS.Web

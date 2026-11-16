@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary RelatedApplication` (Get Installed Related Apps API (https://wicg.github.io/get-installed-related-apps/spec/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RelatedApplication where
@@ -21,6 +24,10 @@ structure RelatedApplication where
   id : Option String := none
   /-- `USVString version` -/
   version : Option String := none
+instance : ToJS RelatedApplication := ⟨fun d => Internal.fields #[("platform", toJS d.platform),
+    ("url", Internal.optional d.url),
+    ("id", Internal.optional d.id),
+    ("version", Internal.optional d.version)]⟩
 instance : FromJS RelatedApplication where
   fromJS d := do return {
     platform := ← Lasm.JS.readField String d "platform",
@@ -30,7 +37,7 @@ instance : FromJS RelatedApplication where
   typeName := "Lasm.JS.Web.RelatedApplication"
 
 /-- `Promise<sequence<RelatedApplication>> getInstalledRelatedApps()` -/
-def Navigator.getInstalledRelatedApps (self : Navigator) : Async (Array RelatedApplication) :=
-  self.val.callMethodAwait "getInstalledRelatedApps" (Support.args #[]) (Array RelatedApplication)
+@[macro_inline] def Navigator.getInstalledRelatedApps (self : Navigator) : Async (Array RelatedApplication) := Internal.api "Lasm.JS.Web.Navigator.getInstalledRelatedApps" do
+  self.val.callMethodAwait "getInstalledRelatedApps" (Internal.args #[]) (Array RelatedApplication)
 
 end Lasm.JS.Web

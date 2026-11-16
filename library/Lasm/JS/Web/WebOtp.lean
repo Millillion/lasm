@@ -6,35 +6,27 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.CredentialManagement
+import Lasm.JS.Web.Types.WebOtp
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum OTPCredentialTransportType` (WebOTP API (https://wicg.github.io/web-otp/)): "sms". -/
-inductive OTPCredentialTransportType where
-  /-- "sms" -/
-  | sms
-  deriving BEq, Repr, Inhabited
-instance : ToJS OTPCredentialTransportType := ⟨fun
-  | .sms => .string "sms"⟩
-instance : FromJS OTPCredentialTransportType where
-  fromJS
-    | .string "sms" => .ok .sms
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.OTPCredentialTransportType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary OTPCredentialRequestOptions` (WebOTP API (https://wicg.github.io/web-otp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure OTPCredentialRequestOptions where
   /-- `sequence<OTPCredentialTransportType> transport = []` -/
   transport : Option (Array OTPCredentialTransportType) := none
-instance : ToJS OTPCredentialRequestOptions := ⟨fun d => Support.fields #[("transport", Support.optional d.transport)]⟩
+instance : ToJS OTPCredentialRequestOptions := ⟨fun d => Internal.fields #[("transport", Internal.optional d.transport)]⟩
 
 /-- `v instanceof OTPCredential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OTPCredential`). -/
-def OTPCredential.cast? (v : Value) : IO (Option OTPCredential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["OTPCredential"] Value) v) then some { val := v } else none
+@[macro_inline] def OTPCredential.cast? (v : Value) : IO (Option OTPCredential) := Internal.api "Lasm.JS.Web.OTPCredential.cast?" do
+  Internal.cast (Internal.getGlobal ["OTPCredential"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString code` -/
-def OTPCredential.code (self : OTPCredential) : IO String := self.val.get "code" String
+@[macro_inline] def OTPCredential.code (self : OTPCredential) : IO String := Internal.api "Lasm.JS.Web.OTPCredential.code" do
+  self.val.get "code" String
 
 end Lasm.JS.Web

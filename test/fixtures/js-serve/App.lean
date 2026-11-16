@@ -14,7 +14,10 @@ binding in Main.lean and Serve.lean). Routes:
 - anything else: 404, `not found: <path>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.Webidl
 open Lasm.JS Lasm.JS.Web
 
 namespace App

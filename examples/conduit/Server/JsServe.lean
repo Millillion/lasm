@@ -14,7 +14,9 @@ Outbound requests (`fetch`, for PostgREST on Supabase) use Lasm.JS.Web's
 `fetch`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 import Lasm.JS.Deno
 import Lasm.JS.Bun
 import Server.Web

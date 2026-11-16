@@ -6,23 +6,31 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssTransitions
+import Lasm.JS.Web.Types.CssTransitions2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSStartingStyleRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStartingStyleRule`). -/
-def CSSStartingStyleRule.cast? (v : Value) : IO (Option CSSStartingStyleRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStartingStyleRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSStartingStyleRule.cast? (v : Value) : IO (Option CSSStartingStyleRule) := Internal.api "Lasm.JS.Web.CSSStartingStyleRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSStartingStyleRule"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof CSSTransition`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSTransition`). -/
-def CSSTransition.cast? (v : Value) : IO (Option CSSTransition) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSTransition"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSTransition.cast? (v : Value) : IO (Option CSSTransition) := Internal.api "Lasm.JS.Web.CSSTransition.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSTransition"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString transitionProperty` -/
-def CSSTransition.transitionProperty (self : CSSTransition) : IO String := self.val.get "transitionProperty" String
+@[macro_inline] def CSSTransition.transitionProperty (self : CSSTransition) : IO String := Internal.api "Lasm.JS.Web.CSSTransition.transitionProperty" do
+  self.val.get "transitionProperty" String
 
 /-- `readonly attribute CSSTransition? animation` -/
-def TransitionEvent.animation (self : TransitionEvent) : IO (Option CSSTransition) := self.val.get "animation" (Option CSSTransition)
+@[macro_inline] def TransitionEvent.animation (self : TransitionEvent) : IO (Option CSSTransition) := Internal.api "Lasm.JS.Web.TransitionEvent.animation" do
+  self.val.get "animation" (Option CSSTransition)
 
 end Lasm.JS.Web

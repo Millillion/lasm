@@ -6,59 +6,72 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.BatteryStatus
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof BatteryManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BatteryManager`). -/
-def BatteryManager.cast? (v : Value) : IO (Option BatteryManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BatteryManager"] Value) v) then some { val := v } else none
+@[macro_inline] def BatteryManager.cast? (v : Value) : IO (Option BatteryManager) := Internal.api "Lasm.JS.Web.BatteryManager.cast?" do
+  Internal.cast (Internal.getGlobal ["BatteryManager"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean charging` -/
-def BatteryManager.charging (self : BatteryManager) : IO Bool := self.val.get "charging" Bool
+@[macro_inline] def BatteryManager.charging (self : BatteryManager) : IO Bool := Internal.api "Lasm.JS.Web.BatteryManager.charging" do
+  self.val.get "charging" Bool
 
 /-- `readonly attribute unrestricted double chargingTime` -/
-def BatteryManager.chargingTime (self : BatteryManager) : IO Float := self.val.get "chargingTime" Float
+@[macro_inline] def BatteryManager.chargingTime (self : BatteryManager) : IO Float := Internal.api "Lasm.JS.Web.BatteryManager.chargingTime" do
+  self.val.get "chargingTime" Float
 
 /-- `readonly attribute unrestricted double dischargingTime` -/
-def BatteryManager.dischargingTime (self : BatteryManager) : IO Float := self.val.get "dischargingTime" Float
+@[macro_inline] def BatteryManager.dischargingTime (self : BatteryManager) : IO Float := Internal.api "Lasm.JS.Web.BatteryManager.dischargingTime" do
+  self.val.get "dischargingTime" Float
 
 /-- `readonly attribute double level` -/
-def BatteryManager.level (self : BatteryManager) : IO Float := self.val.get "level" Float
+@[macro_inline] def BatteryManager.level (self : BatteryManager) : IO Float := Internal.api "Lasm.JS.Web.BatteryManager.level" do
+  self.val.get "level" Float
 
 /-- `attribute EventHandler onchargingchange` -/
-def BatteryManager.onchargingchange (self : BatteryManager) : IO (Option EventHandlerNonNull) := self.val.get "onchargingchange" (Option EventHandlerNonNull)
+@[macro_inline] def BatteryManager.onchargingchange (self : BatteryManager) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BatteryManager.onchargingchange" do
+  self.val.get "onchargingchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchargingchange`: `attribute EventHandler onchargingchange` -/
-def BatteryManager.setOnchargingchange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BatteryManager.setOnchargingchange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BatteryManager.setOnchargingchange" do
   self.val.set "onchargingchange" (toJS value)
 
 /-- `attribute EventHandler onchargingtimechange` -/
-def BatteryManager.onchargingtimechange (self : BatteryManager) : IO (Option EventHandlerNonNull) := self.val.get "onchargingtimechange" (Option EventHandlerNonNull)
+@[macro_inline] def BatteryManager.onchargingtimechange (self : BatteryManager) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BatteryManager.onchargingtimechange" do
+  self.val.get "onchargingtimechange" (Option EventHandlerNonNull)
 
 /-- Sets `onchargingtimechange`: `attribute EventHandler onchargingtimechange` -/
-def BatteryManager.setOnchargingtimechange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BatteryManager.setOnchargingtimechange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BatteryManager.setOnchargingtimechange" do
   self.val.set "onchargingtimechange" (toJS value)
 
 /-- `attribute EventHandler ondischargingtimechange` -/
-def BatteryManager.ondischargingtimechange (self : BatteryManager) : IO (Option EventHandlerNonNull) := self.val.get "ondischargingtimechange" (Option EventHandlerNonNull)
+@[macro_inline] def BatteryManager.ondischargingtimechange (self : BatteryManager) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BatteryManager.ondischargingtimechange" do
+  self.val.get "ondischargingtimechange" (Option EventHandlerNonNull)
 
 /-- Sets `ondischargingtimechange`: `attribute EventHandler ondischargingtimechange` -/
-def BatteryManager.setOndischargingtimechange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BatteryManager.setOndischargingtimechange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BatteryManager.setOndischargingtimechange" do
   self.val.set "ondischargingtimechange" (toJS value)
 
 /-- `attribute EventHandler onlevelchange` -/
-def BatteryManager.onlevelchange (self : BatteryManager) : IO (Option EventHandlerNonNull) := self.val.get "onlevelchange" (Option EventHandlerNonNull)
+@[macro_inline] def BatteryManager.onlevelchange (self : BatteryManager) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BatteryManager.onlevelchange" do
+  self.val.get "onlevelchange" (Option EventHandlerNonNull)
 
 /-- Sets `onlevelchange`: `attribute EventHandler onlevelchange` -/
-def BatteryManager.setOnlevelchange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BatteryManager.setOnlevelchange (self : BatteryManager) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BatteryManager.setOnlevelchange" do
   self.val.set "onlevelchange" (toJS value)
 
 /-- `Promise<BatteryManager> getBattery()` -/
-def Navigator.getBattery (self : Navigator) : Async BatteryManager := do
-  let r ← self.val.callMethodAwait "getBattery" (Support.args #[]) Value
+@[macro_inline] def Navigator.getBattery (self : Navigator) : Async BatteryManager := Internal.api "Lasm.JS.Web.Navigator.getBattery" do
+  let r ← self.val.callMethodAwait "getBattery" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

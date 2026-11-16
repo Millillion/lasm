@@ -6,32 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.InstallElement
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum InstallResult` (Web Install (https://wicg.github.io/install-element/)): "success", "aborted", "invalid-data". -/
-inductive InstallResult where
-  /-- "success" -/
-  | success
-  /-- "aborted" -/
-  | aborted
-  /-- "invalid-data" -/
-  | invalidData
-  deriving BEq, Repr, Inhabited
-instance : ToJS InstallResult := ⟨fun
-  | .success => .string "success"
-  | .aborted => .string "aborted"
-  | .invalidData => .string "invalid-data"⟩
-instance : FromJS InstallResult where
-  fromJS
-    | .string "success" => .ok .success
-    | .string "aborted" => .ok .aborted
-    | .string "invalid-data" => .ok .invalidData
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.InstallResult"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary InstallResultEventInit : EventInit` (Web Install (https://wicg.github.io/install-element/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InstallResultEventInit where
@@ -43,13 +29,14 @@ structure InstallResultEventInit where
   composed : Option Bool := none
   /-- `InstallResult result = "aborted"` -/
   result : Option InstallResult := none
-instance : ToJS InstallResultEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("result", Support.optional d.result)]⟩
+instance : ToJS InstallResultEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("result", Internal.optional d.result)]⟩
 
 /-- `dictionary WebInstallResult` (Web Install (https://wicg.github.io/install-element/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebInstallResult where
+instance : ToJS WebInstallResult := ⟨fun _ => Internal.fields #[]⟩
 instance : FromJS WebInstallResult where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Web.WebInstallResult"
@@ -60,89 +47,108 @@ structure InstallParams where
   manifest : String
   /-- `USVString? manifestId` -/
   manifestId : Option String := none
-instance : ToJS InstallParams := ⟨fun d => Support.fields #[("manifest", toJS d.manifest),
-    ("manifestId", Support.optional d.manifestId)]⟩
+instance : ToJS InstallParams := ⟨fun d => Internal.fields #[("manifest", toJS d.manifest),
+    ("manifestId", Internal.optional d.manifestId)]⟩
 
 /-- `v instanceof HTMLInstallElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLInstallElement`). -/
-def HTMLInstallElement.cast? (v : Value) : IO (Option HTMLInstallElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLInstallElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLInstallElement.cast? (v : Value) : IO (Option HTMLInstallElement) := Internal.api "Lasm.JS.Web.HTMLInstallElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLInstallElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString manifest` -/
-def HTMLInstallElement.manifest (self : HTMLInstallElement) : IO String := self.val.get "manifest" String
+@[macro_inline] def HTMLInstallElement.manifest (self : HTMLInstallElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInstallElement.manifest" do
+  self.val.get "manifest" String
 
 /-- Sets `manifest`: `attribute USVString manifest` -/
-def HTMLInstallElement.setManifest (self : HTMLInstallElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLInstallElement.setManifest (self : HTMLInstallElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInstallElement.setManifest" do
   self.val.set "manifest" (toJS value)
 
 /-- `attribute USVString manifestId` -/
-def HTMLInstallElement.manifestId (self : HTMLInstallElement) : IO String := self.val.get "manifestId" String
+@[macro_inline] def HTMLInstallElement.manifestId (self : HTMLInstallElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInstallElement.manifestId" do
+  self.val.get "manifestId" String
 
 /-- Sets `manifestId`: `attribute USVString manifestId` -/
-def HTMLInstallElement.setManifestId (self : HTMLInstallElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLInstallElement.setManifestId (self : HTMLInstallElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInstallElement.setManifestId" do
   self.val.set "manifestId" (toJS value)
 
 /-- `readonly attribute boolean isValid` -/
-def HTMLInstallElement.isValid (self : HTMLInstallElement) : IO Bool := self.val.get "isValid" Bool
+@[macro_inline] def HTMLInstallElement.isValid (self : HTMLInstallElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLInstallElement.isValid" do
+  self.val.get "isValid" Bool
 
 /-- `readonly attribute DOMString invalidReason` -/
-def HTMLInstallElement.invalidReason (self : HTMLInstallElement) : IO String := self.val.get "invalidReason" String
+@[macro_inline] def HTMLInstallElement.invalidReason (self : HTMLInstallElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInstallElement.invalidReason" do
+  self.val.get "invalidReason" String
 
 /-- `attribute EventHandler onvalidationstatuschange` -/
-def HTMLInstallElement.onvalidationstatuschange (self : HTMLInstallElement) : IO (Option EventHandlerNonNull) := self.val.get "onvalidationstatuschange" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLInstallElement.onvalidationstatuschange (self : HTMLInstallElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLInstallElement.onvalidationstatuschange" do
+  self.val.get "onvalidationstatuschange" (Option EventHandlerNonNull)
 
 /-- Sets `onvalidationstatuschange`: `attribute EventHandler onvalidationstatuschange` -/
-def HTMLInstallElement.setOnvalidationstatuschange (self : HTMLInstallElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLInstallElement.setOnvalidationstatuschange (self : HTMLInstallElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInstallElement.setOnvalidationstatuschange" do
   self.val.set "onvalidationstatuschange" (toJS value)
 
 /-- `v instanceof InstallResultEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InstallResultEvent`). -/
-def InstallResultEvent.cast? (v : Value) : IO (Option InstallResultEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InstallResultEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def InstallResultEvent.cast? (v : Value) : IO (Option InstallResultEvent) := Internal.api "Lasm.JS.Web.InstallResultEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["InstallResultEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional InstallResultEventInit eventInitDict)` -/
-def InstallResultEvent.new (type : String) (eventInitDict : Option InstallResultEventInit := none) : IO InstallResultEvent :=
+@[macro_inline] def InstallResultEvent.new (type : String) (eventInitDict : Option InstallResultEventInit := none) : IO InstallResultEvent := Internal.api "Lasm.JS.Web.InstallResultEvent.new" do
   Lasm.JS.Binding.invoke InstallResultEvent { name := "Lasm.JS.Web.InstallResultEvent.new", module := "globalThis", path := "InstallResultEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute InstallResult result` -/
-def InstallResultEvent.result (self : InstallResultEvent) : IO InstallResult := self.val.get "result" InstallResult
+@[macro_inline] def InstallResultEvent.result (self : InstallResultEvent) : IO InstallResult := Internal.api "Lasm.JS.Web.InstallResultEvent.result" do
+  self.val.get "result" InstallResult
 
 /-- `attribute EventHandler oninstallresult` -/
-def Document.oninstallresult (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "oninstallresult" (Option EventHandlerNonNull)
+@[macro_inline] def Document.oninstallresult (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.oninstallresult" do
+  self.val.get "oninstallresult" (Option EventHandlerNonNull)
 
 /-- Sets `oninstallresult`: `attribute EventHandler oninstallresult` -/
-def Document.setOninstallresult (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOninstallresult (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOninstallresult" do
   self.val.set "oninstallresult" (toJS value)
 
 /-- `attribute EventHandler oninstallresult` -/
-def HTMLElement.oninstallresult (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oninstallresult" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.oninstallresult (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.oninstallresult" do
+  self.val.get "oninstallresult" (Option EventHandlerNonNull)
 
 /-- Sets `oninstallresult`: `attribute EventHandler oninstallresult` -/
-def HTMLElement.setOninstallresult (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOninstallresult (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOninstallresult" do
   self.val.set "oninstallresult" (toJS value)
 
 /-- `attribute EventHandler oninstallresult` -/
-def MathMLElement.oninstallresult (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oninstallresult" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oninstallresult (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oninstallresult" do
+  self.val.get "oninstallresult" (Option EventHandlerNonNull)
 
 /-- Sets `oninstallresult`: `attribute EventHandler oninstallresult` -/
-def MathMLElement.setOninstallresult (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOninstallresult (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOninstallresult" do
   self.val.set "oninstallresult" (toJS value)
 
 /-- `Promise<WebInstallResult> install()` -/
-def Navigator.install (self : Navigator) : Async WebInstallResult :=
-  self.val.callMethodAwait "install" (Support.args #[]) WebInstallResult
+@[macro_inline] def Navigator.install (self : Navigator) : Async WebInstallResult := Internal.api "Lasm.JS.Web.Navigator.install" do
+  self.val.callMethodAwait "install" (Internal.args #[]) WebInstallResult
 
 /-- `Promise<WebInstallResult> install(InstallParams options)` -/
-def Navigator.installWithOptions (self : Navigator) (options : InstallParams) : Async WebInstallResult :=
-  self.val.callMethodAwait "install" (Support.args #[toJS options]) WebInstallResult
+@[macro_inline] def Navigator.installWithOptions (self : Navigator) (options : InstallParams) : Async WebInstallResult := Internal.api "Lasm.JS.Web.Navigator.installWithOptions" do
+  self.val.callMethodAwait "install" (Internal.args #[toJS options]) WebInstallResult
 
 /-- `attribute EventHandler oninstallresult` -/
-def SVGElement.oninstallresult (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oninstallresult" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oninstallresult (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oninstallresult" do
+  self.val.get "oninstallresult" (Option EventHandlerNonNull)
 
 /-- Sets `oninstallresult`: `attribute EventHandler oninstallresult` -/
-def SVGElement.setOninstallresult (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOninstallresult (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOninstallresult" do
+  self.val.set "oninstallresult" (toJS value)
+
+/-- `attribute EventHandler oninstallresult` -/
+@[macro_inline] def Window.oninstallresult (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.oninstallresult" do
+  self.val.get "oninstallresult" (Option EventHandlerNonNull)
+
+/-- Sets `oninstallresult`: `attribute EventHandler oninstallresult` -/
+@[macro_inline] def Window.setOninstallresult (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOninstallresult" do
   self.val.set "oninstallresult" (toJS value)
 
 /-- `attribute EventHandler oninstallresult` (Web Install (https://wicg.github.io/install-element/)) -/
-def oninstallresult : IO (Option EventHandlerNonNull) := Support.getGlobal ["oninstallresult"] (Option EventHandlerNonNull)
+@[macro_inline] def oninstallresult : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oninstallresult" do
+  Internal.getGlobal ["oninstallresult"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

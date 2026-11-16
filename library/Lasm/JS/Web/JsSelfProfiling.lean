@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.JsSelfProfiling
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ProfilerInitOptions` (JS Self-Profiling API (https://wicg.github.io/js-self-profiling/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ProfilerInitOptions where
@@ -17,7 +21,7 @@ structure ProfilerInitOptions where
   sampleInterval : Float
   /-- `required unsigned long maxBufferSize` -/
   maxBufferSize : Nat
-instance : ToJS ProfilerInitOptions := ⟨fun d => Support.fields #[("sampleInterval", toJS d.sampleInterval),
+instance : ToJS ProfilerInitOptions := ⟨fun d => Internal.fields #[("sampleInterval", toJS d.sampleInterval),
     ("maxBufferSize", toJS d.maxBufferSize)]⟩
 
 /-- `dictionary ProfilerFrame` (JS Self-Profiling API (https://wicg.github.io/js-self-profiling/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -30,6 +34,10 @@ structure ProfilerFrame where
   line : Option Nat := none
   /-- `unsigned long long column` -/
   column : Option Nat := none
+instance : ToJS ProfilerFrame := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("resourceId", Internal.optional d.resourceId),
+    ("line", Internal.optional d.line),
+    ("column", Internal.optional d.column)]⟩
 instance : FromJS ProfilerFrame where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -44,6 +52,8 @@ structure ProfilerStack where
   parentId : Option Nat := none
   /-- `required unsigned long long frameId` -/
   frameId : Nat
+instance : ToJS ProfilerStack := ⟨fun d => Internal.fields #[("parentId", Internal.optional d.parentId),
+    ("frameId", toJS d.frameId)]⟩
 instance : FromJS ProfilerStack where
   fromJS d := do return {
     parentId := ← Lasm.JS.readField (Option Nat) d "parentId",
@@ -56,6 +66,8 @@ structure ProfilerSample where
   timestamp : Float
   /-- `unsigned long long stackId` -/
   stackId : Option Nat := none
+instance : ToJS ProfilerSample := ⟨fun d => Internal.fields #[("timestamp", toJS d.timestamp),
+    ("stackId", Internal.optional d.stackId)]⟩
 instance : FromJS ProfilerSample where
   fromJS d := do return {
     timestamp := ← Lasm.JS.readField Float d "timestamp",
@@ -72,6 +84,10 @@ structure ProfilerTrace where
   stacks : Array ProfilerStack
   /-- `required sequence<ProfilerSample> samples` -/
   samples : Array ProfilerSample
+instance : ToJS ProfilerTrace := ⟨fun d => Internal.fields #[("resources", toJS d.resources),
+    ("frames", toJS d.frames),
+    ("stacks", toJS d.stacks),
+    ("samples", toJS d.samples)]⟩
 instance : FromJS ProfilerTrace where
   fromJS d := do return {
     resources := ← Lasm.JS.readField (Array String) d "resources",
@@ -81,22 +97,24 @@ instance : FromJS ProfilerTrace where
   typeName := "Lasm.JS.Web.ProfilerTrace"
 
 /-- `v instanceof Profiler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Profiler`). -/
-def Profiler.cast? (v : Value) : IO (Option Profiler) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Profiler"] Value) v) then some { val := v } else none
+@[macro_inline] def Profiler.cast? (v : Value) : IO (Option Profiler) := Internal.api "Lasm.JS.Web.Profiler.cast?" do
+  Internal.cast (Internal.getGlobal ["Profiler"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ProfilerInitOptions options)` -/
-def Profiler.new (options : ProfilerInitOptions) : IO Profiler :=
+@[macro_inline] def Profiler.new (options : ProfilerInitOptions) : IO Profiler := Internal.api "Lasm.JS.Web.Profiler.new" do
   Lasm.JS.Binding.invoke Profiler { name := "Lasm.JS.Web.Profiler.new", module := "globalThis", path := "Profiler", construct := true, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `readonly attribute DOMHighResTimeStamp sampleInterval` -/
-def Profiler.sampleInterval (self : Profiler) : IO Float := self.val.get "sampleInterval" Float
+@[macro_inline] def Profiler.sampleInterval (self : Profiler) : IO Float := Internal.api "Lasm.JS.Web.Profiler.sampleInterval" do
+  self.val.get "sampleInterval" Float
 
 /-- `readonly attribute boolean stopped` -/
-def Profiler.stopped (self : Profiler) : IO Bool := self.val.get "stopped" Bool
+@[macro_inline] def Profiler.stopped (self : Profiler) : IO Bool := Internal.api "Lasm.JS.Web.Profiler.stopped" do
+  self.val.get "stopped" Bool
 
 /-- `Promise<ProfilerTrace> stop()` -/
-def Profiler.stop (self : Profiler) : Async ProfilerTrace :=
-  self.val.callMethodAwait "stop" (Support.args #[]) ProfilerTrace
+@[macro_inline] def Profiler.stop (self : Profiler) : Async ProfilerTrace := Internal.api "Lasm.JS.Web.Profiler.stop" do
+  self.val.callMethodAwait "stop" (Internal.args #[]) ProfilerTrace
 
 end Lasm.JS.Web

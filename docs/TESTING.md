@@ -452,7 +452,7 @@ five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
 loader, bundle and host (output streams, uncaught errors, panics), and engine
 behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
 with a real web host. *Cannot catch:* the exact non-zero exit status in a
-browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web.Browser`
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web`
 (browser.yml's suites cover those).
 
 ### Target equivalence
@@ -630,7 +630,7 @@ behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
 Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
 which run).
 
-**The browser tier** (`Lasm.JS.Web.Browser`, 2026-11-10).
+**The browser checks** (`Lasm.JS.Web`'s DOM, HTML, CSSOM and canvas modules; first written for the browser tier of 2026-11-10).
 [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
 runs inside the browser platform suite (`browser.yml`) on Chromium, Firefox and
 WebKit, each check reported as `bindings.<name>` and failing the engine's job.

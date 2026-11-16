@@ -6,23 +6,28 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.ElementCapture
+import Lasm.JS.Web.Types.MediacaptureRegion
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof RestrictionTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RestrictionTarget`). -/
-def RestrictionTarget.cast? (v : Value) : IO (Option RestrictionTarget) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RestrictionTarget"] Value) v) then some { val := v } else none
+@[macro_inline] def RestrictionTarget.cast? (v : Value) : IO (Option RestrictionTarget) := Internal.api "Lasm.JS.Web.RestrictionTarget.cast?" do
+  Internal.cast (Internal.getGlobal ["RestrictionTarget"] Value) (fun x => { val := x }) v
 
 /-- `static Promise<RestrictionTarget> fromElement(Element element)` -/
-def RestrictionTarget.fromElement (element : Element) : Async RestrictionTarget := do
+@[macro_inline] def RestrictionTarget.fromElement (element : Element) : Async RestrictionTarget := Internal.api "Lasm.JS.Web.RestrictionTarget.fromElement" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.RestrictionTarget.fromElement", module := "globalThis", path := "RestrictionTarget.fromElement", construct := false, arity := 1 }
-    (Support.args #[toJS element])
+    (Internal.args #[toJS element])
   pure { val := r }
 
 /-- `Promise<undefined> restrictTo(RestrictionTarget? RestrictionTarget)` -/
-def BrowserCaptureMediaStreamTrack.restrictTo (self : BrowserCaptureMediaStreamTrack) (RestrictionTarget : Option RestrictionTarget) : Async Unit :=
-  self.val.callMethodAwait "restrictTo" (Support.args #[toJS RestrictionTarget]) Unit
+@[macro_inline] def BrowserCaptureMediaStreamTrack.restrictTo (self : BrowserCaptureMediaStreamTrack) (RestrictionTarget : Option RestrictionTarget) : Async Unit := Internal.api "Lasm.JS.Web.BrowserCaptureMediaStreamTrack.restrictTo" do
+  self.val.callMethodAwait "restrictTo" (Internal.args #[toJS RestrictionTarget]) Unit
 
 end Lasm.JS.Web

@@ -6,26 +6,35 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.RawCameraAccess
+import Lasm.JS.Web.Types.Webxrlayers
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof XRCamera`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRCamera`). -/
-def XRCamera.cast? (v : Value) : IO (Option XRCamera) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRCamera"] Value) v) then some { val := v } else none
+@[macro_inline] def XRCamera.cast? (v : Value) : IO (Option XRCamera) := Internal.api "Lasm.JS.Web.XRCamera.cast?" do
+  Internal.cast (Internal.getGlobal ["XRCamera"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long width` -/
-def XRCamera.width (self : XRCamera) : IO Nat := self.val.get "width" Nat
+@[macro_inline] def XRCamera.width (self : XRCamera) : IO Nat := Internal.api "Lasm.JS.Web.XRCamera.width" do
+  self.val.get "width" Nat
 
 /-- `readonly attribute unsigned long height` -/
-def XRCamera.height (self : XRCamera) : IO Nat := self.val.get "height" Nat
+@[macro_inline] def XRCamera.height (self : XRCamera) : IO Nat := Internal.api "Lasm.JS.Web.XRCamera.height" do
+  self.val.get "height" Nat
 
 /-- `readonly attribute XRCamera? camera` -/
-def XRView.camera (self : XRView) : IO (Option XRCamera) := self.val.get "camera" (Option XRCamera)
+@[macro_inline] def XRView.camera (self : XRView) : IO (Option XRCamera) := Internal.api "Lasm.JS.Web.XRView.camera" do
+  self.val.get "camera" (Option XRCamera)
 
 /-- `WebGLTexture? getCameraImage(XRCamera camera)` -/
-def XRWebGLBinding.getCameraImage (self : XRWebGLBinding) (camera : XRCamera) : IO (Option WebGLTexture) :=
-  self.val.callMethod "getCameraImage" (Support.args #[toJS camera]) (Option WebGLTexture)
+@[macro_inline] def XRWebGLBinding.getCameraImage (self : XRWebGLBinding) (camera : XRCamera) : IO (Option WebGLTexture) := Internal.api "Lasm.JS.Web.XRWebGLBinding.getCameraImage" do
+  self.val.callMethod "getCameraImage" (Internal.args #[toJS camera]) (Option WebGLTexture)
 
 end Lasm.JS.Web

@@ -6,32 +6,37 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureFromelement
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CanvasCaptureMediaStreamTrack`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CanvasCaptureMediaStreamTrack`). -/
-def CanvasCaptureMediaStreamTrack.cast? (v : Value) : IO (Option CanvasCaptureMediaStreamTrack) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CanvasCaptureMediaStreamTrack"] Value) v) then some { val := v } else none
+@[macro_inline] def CanvasCaptureMediaStreamTrack.cast? (v : Value) : IO (Option CanvasCaptureMediaStreamTrack) := Internal.api "Lasm.JS.Web.CanvasCaptureMediaStreamTrack.cast?" do
+  Internal.cast (Internal.getGlobal ["CanvasCaptureMediaStreamTrack"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute HTMLCanvasElement canvas` -/
-def CanvasCaptureMediaStreamTrack.canvas (self : CanvasCaptureMediaStreamTrack) : IO HTMLCanvasElement := do
+@[macro_inline] def CanvasCaptureMediaStreamTrack.canvas (self : CanvasCaptureMediaStreamTrack) : IO HTMLCanvasElement := Internal.api "Lasm.JS.Web.CanvasCaptureMediaStreamTrack.canvas" do
   let r ← self.val.get "canvas" Value
   pure { val := r }
 
 /-- `undefined requestFrame()` -/
-def CanvasCaptureMediaStreamTrack.requestFrame (self : CanvasCaptureMediaStreamTrack) : IO Unit :=
-  self.val.callMethod "requestFrame" (Support.args #[]) Unit
+@[macro_inline] def CanvasCaptureMediaStreamTrack.requestFrame (self : CanvasCaptureMediaStreamTrack) : IO Unit := Internal.api "Lasm.JS.Web.CanvasCaptureMediaStreamTrack.requestFrame" do
+  self.val.callMethod "requestFrame" (Internal.args #[]) Unit
 
 /-- `MediaStream captureStream(optional double frameRequestRate)` -/
-def HTMLCanvasElement.captureStream (self : HTMLCanvasElement) (frameRequestRate : Option Float := none) : IO MediaStream := do
-  let r ← self.val.callMethod "captureStream" (Support.args #[Support.optional frameRequestRate]) Value
+@[macro_inline] def HTMLCanvasElement.captureStream (self : HTMLCanvasElement) (frameRequestRate : Option Float := none) : IO MediaStream := Internal.api "Lasm.JS.Web.HTMLCanvasElement.captureStream" do
+  let r ← self.val.callMethod "captureStream" (Internal.args #[Internal.optional frameRequestRate]) Value
   pure { val := r }
 
 /-- `MediaStream captureStream()` -/
-def HTMLMediaElement.captureStream (self : HTMLMediaElement) : IO MediaStream := do
-  let r ← self.val.callMethod "captureStream" (Support.args #[]) Value
+@[macro_inline] def HTMLMediaElement.captureStream (self : HTMLMediaElement) : IO MediaStream := Internal.api "Lasm.JS.Web.HTMLMediaElement.captureStream" do
+  let r ← self.val.callMethod "captureStream" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

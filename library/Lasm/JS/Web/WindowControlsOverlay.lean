@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.WindowControlsOverlay
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary WindowControlsOverlayGeometryChangeEventInit : EventInit` (Window Controls Overlay (https://wicg.github.io/window-controls-overlay/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WindowControlsOverlayGeometryChangeEventInit where
@@ -24,50 +30,53 @@ structure WindowControlsOverlayGeometryChangeEventInit where
   titlebarAreaRect : DOMRect
   /-- `boolean visible = false` -/
   visible : Option Bool := none
-instance : ToJS WindowControlsOverlayGeometryChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS WindowControlsOverlayGeometryChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("titlebarAreaRect", toJS d.titlebarAreaRect),
-    ("visible", Support.optional d.visible)]⟩
+    ("visible", Internal.optional d.visible)]⟩
 
 /-- `v instanceof WindowControlsOverlay`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WindowControlsOverlay`). -/
-def WindowControlsOverlay.cast? (v : Value) : IO (Option WindowControlsOverlay) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WindowControlsOverlay"] Value) v) then some { val := v } else none
+@[macro_inline] def WindowControlsOverlay.cast? (v : Value) : IO (Option WindowControlsOverlay) := Internal.api "Lasm.JS.Web.WindowControlsOverlay.cast?" do
+  Internal.cast (Internal.getGlobal ["WindowControlsOverlay"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean visible` -/
-def WindowControlsOverlay.visible (self : WindowControlsOverlay) : IO Bool := self.val.get "visible" Bool
+@[macro_inline] def WindowControlsOverlay.visible (self : WindowControlsOverlay) : IO Bool := Internal.api "Lasm.JS.Web.WindowControlsOverlay.visible" do
+  self.val.get "visible" Bool
 
 /-- `attribute EventHandler ongeometrychange` -/
-def WindowControlsOverlay.ongeometrychange (self : WindowControlsOverlay) : IO (Option EventHandlerNonNull) := self.val.get "ongeometrychange" (Option EventHandlerNonNull)
+@[macro_inline] def WindowControlsOverlay.ongeometrychange (self : WindowControlsOverlay) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WindowControlsOverlay.ongeometrychange" do
+  self.val.get "ongeometrychange" (Option EventHandlerNonNull)
 
 /-- Sets `ongeometrychange`: `attribute EventHandler ongeometrychange` -/
-def WindowControlsOverlay.setOngeometrychange (self : WindowControlsOverlay) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WindowControlsOverlay.setOngeometrychange (self : WindowControlsOverlay) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WindowControlsOverlay.setOngeometrychange" do
   self.val.set "ongeometrychange" (toJS value)
 
 /-- `DOMRect getTitlebarAreaRect()` -/
-def WindowControlsOverlay.getTitlebarAreaRect (self : WindowControlsOverlay) : IO DOMRect := do
-  let r ← self.val.callMethod "getTitlebarAreaRect" (Support.args #[]) Value
+@[macro_inline] def WindowControlsOverlay.getTitlebarAreaRect (self : WindowControlsOverlay) : IO DOMRect := Internal.api "Lasm.JS.Web.WindowControlsOverlay.getTitlebarAreaRect" do
+  let r ← self.val.callMethod "getTitlebarAreaRect" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof WindowControlsOverlayGeometryChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WindowControlsOverlayGeometryChangeEvent`). -/
-def WindowControlsOverlayGeometryChangeEvent.cast? (v : Value) : IO (Option WindowControlsOverlayGeometryChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WindowControlsOverlayGeometryChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def WindowControlsOverlayGeometryChangeEvent.cast? (v : Value) : IO (Option WindowControlsOverlayGeometryChangeEvent) := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["WindowControlsOverlayGeometryChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, WindowControlsOverlayGeometryChangeEventInit eventInitDict)` -/
-def WindowControlsOverlayGeometryChangeEvent.new (type : String) (eventInitDict : WindowControlsOverlayGeometryChangeEventInit) : IO WindowControlsOverlayGeometryChangeEvent :=
+@[macro_inline] def WindowControlsOverlayGeometryChangeEvent.new (type : String) (eventInitDict : WindowControlsOverlayGeometryChangeEventInit) : IO WindowControlsOverlayGeometryChangeEvent := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.new" do
   Lasm.JS.Binding.invoke WindowControlsOverlayGeometryChangeEvent { name := "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.new", module := "globalThis", path := "WindowControlsOverlayGeometryChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMRect titlebarAreaRect` -/
-def WindowControlsOverlayGeometryChangeEvent.titlebarAreaRect (self : WindowControlsOverlayGeometryChangeEvent) : IO DOMRect := do
+@[macro_inline] def WindowControlsOverlayGeometryChangeEvent.titlebarAreaRect (self : WindowControlsOverlayGeometryChangeEvent) : IO DOMRect := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.titlebarAreaRect" do
   let r ← self.val.get "titlebarAreaRect" Value
   pure { val := r }
 
 /-- `readonly attribute boolean visible` -/
-def WindowControlsOverlayGeometryChangeEvent.visible (self : WindowControlsOverlayGeometryChangeEvent) : IO Bool := self.val.get "visible" Bool
+@[macro_inline] def WindowControlsOverlayGeometryChangeEvent.visible (self : WindowControlsOverlayGeometryChangeEvent) : IO Bool := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.visible" do
+  self.val.get "visible" Bool
 
 /-- `readonly attribute WindowControlsOverlay windowControlsOverlay` -/
-def Navigator.windowControlsOverlay (self : Navigator) : IO WindowControlsOverlay := do
+@[macro_inline] def Navigator.windowControlsOverlay (self : Navigator) : IO WindowControlsOverlay := Internal.api "Lasm.JS.Web.Navigator.windowControlsOverlay" do
   let r ← self.val.get "windowControlsOverlay" Value
   pure { val := r }
 

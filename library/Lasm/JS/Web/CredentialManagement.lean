@@ -6,7 +6,9 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CredentialManagement
 import Lasm.JS.Web.DigitalCredentials
 import Lasm.JS.Web.Fedcm
 import Lasm.JS.Web.SecurePaymentConfirmationAndWebauthn
@@ -14,31 +16,9 @@ import Lasm.JS.Web.WebOtp
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CredentialMediationRequirement` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)): "silent", "optional", "conditional", "required". -/
-inductive CredentialMediationRequirement where
-  /-- "silent" -/
-  | silent
-  /-- "optional" -/
-  | optional
-  /-- "conditional" -/
-  | conditional
-  /-- "required" -/
-  | required
-  deriving BEq, Repr, Inhabited
-instance : ToJS CredentialMediationRequirement := ⟨fun
-  | .silent => .string "silent"
-  | .optional => .string "optional"
-  | .conditional => .string "conditional"
-  | .required => .string "required"⟩
-instance : FromJS CredentialMediationRequirement where
-  fromJS
-    | .string "silent" => .ok .silent
-    | .string "optional" => .ok .optional
-    | .string "conditional" => .ok .conditional
-    | .string "required" => .ok .required
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CredentialMediationRequirement"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FederatedCredentialRequestOptions` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FederatedCredentialRequestOptions where
@@ -46,8 +26,8 @@ structure FederatedCredentialRequestOptions where
   providers : Option (Array String) := none
   /-- `sequence<DOMString> protocols` -/
   protocols : Option (Array String) := none
-instance : ToJS FederatedCredentialRequestOptions := ⟨fun d => Support.fields #[("providers", Support.optional d.providers),
-    ("protocols", Support.optional d.protocols)]⟩
+instance : ToJS FederatedCredentialRequestOptions := ⟨fun d => Internal.fields #[("providers", Internal.optional d.providers),
+    ("protocols", Internal.optional d.protocols)]⟩
 
 /-- `dictionary CredentialRequestOptions` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CredentialRequestOptions where
@@ -69,15 +49,15 @@ structure CredentialRequestOptions where
   otp : Option OTPCredentialRequestOptions := none
   /-- `PublicKeyCredentialRequestOptions publicKey` -/
   publicKey : Option PublicKeyCredentialRequestOptions := none
-instance : ToJS CredentialRequestOptions := ⟨fun d => Support.fields #[("mediation", Support.optional d.mediation),
-    ("uiMode", Support.optional d.uiMode),
-    ("signal", Support.optional d.signal),
-    ("password", Support.optional d.password),
-    ("federated", Support.optional d.federated),
-    ("digital", Support.optional d.digital),
-    ("identity", Support.optional d.identity),
-    ("otp", Support.optional d.otp),
-    ("publicKey", Support.optional d.publicKey)]⟩
+instance : ToJS CredentialRequestOptions := ⟨fun d => Internal.fields #[("mediation", Internal.optional d.mediation),
+    ("uiMode", Internal.optional d.uiMode),
+    ("signal", Internal.optional d.signal),
+    ("password", Internal.optional d.password),
+    ("federated", Internal.optional d.federated),
+    ("digital", Internal.optional d.digital),
+    ("identity", Internal.optional d.identity),
+    ("otp", Internal.optional d.otp),
+    ("publicKey", Internal.optional d.publicKey)]⟩
 
 /-- `dictionary PasswordCredentialData : CredentialData` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PasswordCredentialData where
@@ -91,9 +71,9 @@ structure PasswordCredentialData where
   origin : String
   /-- `required USVString password` -/
   password : String
-instance : ToJS PasswordCredentialData := ⟨fun d => Support.fields #[("id", toJS d.id),
-    ("name", Support.optional d.name),
-    ("iconURL", Support.optional d.iconURL),
+instance : ToJS PasswordCredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id),
+    ("name", Internal.optional d.name),
+    ("iconURL", Internal.optional d.iconURL),
     ("origin", toJS d.origin),
     ("password", toJS d.password)]⟩
 
@@ -123,12 +103,12 @@ structure FederatedCredentialInit where
   provider : String
   /-- `DOMString protocol` -/
   protocol : Option String := none
-instance : ToJS FederatedCredentialInit := ⟨fun d => Support.fields #[("id", toJS d.id),
-    ("name", Support.optional d.name),
-    ("iconURL", Support.optional d.iconURL),
+instance : ToJS FederatedCredentialInit := ⟨fun d => Internal.fields #[("id", toJS d.id),
+    ("name", Internal.optional d.name),
+    ("iconURL", Internal.optional d.iconURL),
     ("origin", toJS d.origin),
     ("provider", toJS d.provider),
-    ("protocol", Support.optional d.protocol)]⟩
+    ("protocol", Internal.optional d.protocol)]⟩
 
 /-- `dictionary CredentialCreationOptions` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CredentialCreationOptions where
@@ -144,94 +124,109 @@ structure CredentialCreationOptions where
   digital : Option DigitalCredentialCreationOptions := none
   /-- `PublicKeyCredentialCreationOptions publicKey` -/
   publicKey : Option PublicKeyCredentialCreationOptions := none
-instance : ToJS CredentialCreationOptions := ⟨fun d => Support.fields #[("mediation", Support.optional d.mediation),
-    ("signal", Support.optional d.signal),
-    ("password", Support.optional d.password),
-    ("federated", Support.optional d.federated),
-    ("digital", Support.optional d.digital),
-    ("publicKey", Support.optional d.publicKey)]⟩
+instance : ToJS CredentialCreationOptions := ⟨fun d => Internal.fields #[("mediation", Internal.optional d.mediation),
+    ("signal", Internal.optional d.signal),
+    ("password", Internal.optional d.password),
+    ("federated", Internal.optional d.federated),
+    ("digital", Internal.optional d.digital),
+    ("publicKey", Internal.optional d.publicKey)]⟩
+
+/-- `dictionary CredentialData` (Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CredentialData where
+  /-- `required USVString id` -/
+  id : String
+instance : ToJS CredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id)]⟩
 
 /-- `v instanceof Credential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Credential`). -/
-def Credential.cast? (v : Value) : IO (Option Credential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Credential"] Value) v) then some { val := v } else none
+@[macro_inline] def Credential.cast? (v : Value) : IO (Option Credential) := Internal.api "Lasm.JS.Web.Credential.cast?" do
+  Internal.cast (Internal.getGlobal ["Credential"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString id` -/
-def Credential.id (self : Credential) : IO String := self.val.get "id" String
+@[macro_inline] def Credential.id (self : Credential) : IO String := Internal.api "Lasm.JS.Web.Credential.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute DOMString type` -/
-def Credential.type (self : Credential) : IO String := self.val.get "type" String
+@[macro_inline] def Credential.type (self : Credential) : IO String := Internal.api "Lasm.JS.Web.Credential.type" do
+  self.val.get "type" String
 
 /-- `static Promise<boolean> isConditionalMediationAvailable()` -/
-def Credential.isConditionalMediationAvailable : Async Bool :=
+@[macro_inline] def Credential.isConditionalMediationAvailable : Async Bool := Internal.api "Lasm.JS.Web.Credential.isConditionalMediationAvailable" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.Credential.isConditionalMediationAvailable", module := "globalThis", path := "Credential.isConditionalMediationAvailable", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `v instanceof CredentialsContainer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CredentialsContainer`). -/
-def CredentialsContainer.cast? (v : Value) : IO (Option CredentialsContainer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CredentialsContainer"] Value) v) then some { val := v } else none
+@[macro_inline] def CredentialsContainer.cast? (v : Value) : IO (Option CredentialsContainer) := Internal.api "Lasm.JS.Web.CredentialsContainer.cast?" do
+  Internal.cast (Internal.getGlobal ["CredentialsContainer"] Value) (fun x => { val := x }) v
 
 /-- `Promise<Credential?> get(optional CredentialRequestOptions options)` -/
-def CredentialsContainer.get (self : CredentialsContainer) (options : Option CredentialRequestOptions := none) : Async (Option Credential) :=
-  self.val.callMethodAwait "get" (Support.args #[Support.optional options]) (Option Credential)
+@[macro_inline] def CredentialsContainer.get (self : CredentialsContainer) (options : Option CredentialRequestOptions := none) : Async (Option Credential) := Internal.api "Lasm.JS.Web.CredentialsContainer.get" do
+  self.val.callMethodAwait "get" (Internal.args #[Internal.optional options]) (Option Credential)
 
 /-- `Promise<undefined> store(Credential credential)` -/
-def CredentialsContainer.store (self : CredentialsContainer) (credential : Credential) : Async Unit :=
-  self.val.callMethodAwait "store" (Support.args #[toJS credential]) Unit
+@[macro_inline] def CredentialsContainer.store (self : CredentialsContainer) (credential : Credential) : Async Unit := Internal.api "Lasm.JS.Web.CredentialsContainer.store" do
+  self.val.callMethodAwait "store" (Internal.args #[toJS credential]) Unit
 
 /-- `Promise<Credential?> create(optional CredentialCreationOptions options)` -/
-def CredentialsContainer.create (self : CredentialsContainer) (options : Option CredentialCreationOptions := none) : Async (Option Credential) :=
-  self.val.callMethodAwait "create" (Support.args #[Support.optional options]) (Option Credential)
+@[macro_inline] def CredentialsContainer.create (self : CredentialsContainer) (options : Option CredentialCreationOptions := none) : Async (Option Credential) := Internal.api "Lasm.JS.Web.CredentialsContainer.create" do
+  self.val.callMethodAwait "create" (Internal.args #[Internal.optional options]) (Option Credential)
 
 /-- `Promise<undefined> preventSilentAccess()` -/
-def CredentialsContainer.preventSilentAccess (self : CredentialsContainer) : Async Unit :=
-  self.val.callMethodAwait "preventSilentAccess" (Support.args #[]) Unit
+@[macro_inline] def CredentialsContainer.preventSilentAccess (self : CredentialsContainer) : Async Unit := Internal.api "Lasm.JS.Web.CredentialsContainer.preventSilentAccess" do
+  self.val.callMethodAwait "preventSilentAccess" (Internal.args #[]) Unit
 
 /-- `v instanceof FederatedCredential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FederatedCredential`). -/
-def FederatedCredential.cast? (v : Value) : IO (Option FederatedCredential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FederatedCredential"] Value) v) then some { val := v } else none
+@[macro_inline] def FederatedCredential.cast? (v : Value) : IO (Option FederatedCredential) := Internal.api "Lasm.JS.Web.FederatedCredential.cast?" do
+  Internal.cast (Internal.getGlobal ["FederatedCredential"] Value) (fun x => { val := x }) v
 
 /-- `constructor(FederatedCredentialInit data)` -/
-def FederatedCredential.new (data : FederatedCredentialInit) : IO FederatedCredential :=
+@[macro_inline] def FederatedCredential.new (data : FederatedCredentialInit) : IO FederatedCredential := Internal.api "Lasm.JS.Web.FederatedCredential.new" do
   Lasm.JS.Binding.invoke FederatedCredential { name := "Lasm.JS.Web.FederatedCredential.new", module := "globalThis", path := "FederatedCredential", construct := true, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
 
 /-- `readonly attribute USVString provider` -/
-def FederatedCredential.provider (self : FederatedCredential) : IO String := self.val.get "provider" String
+@[macro_inline] def FederatedCredential.provider (self : FederatedCredential) : IO String := Internal.api "Lasm.JS.Web.FederatedCredential.provider" do
+  self.val.get "provider" String
 
 /-- `readonly attribute DOMString? protocol` -/
-def FederatedCredential.protocol (self : FederatedCredential) : IO (Option String) := self.val.get "protocol" (Option String)
+@[macro_inline] def FederatedCredential.protocol (self : FederatedCredential) : IO (Option String) := Internal.api "Lasm.JS.Web.FederatedCredential.protocol" do
+  self.val.get "protocol" (Option String)
 
 /-- `readonly attribute USVString name` -/
-def FederatedCredential.name (self : FederatedCredential) : IO String := self.val.get "name" String
+@[macro_inline] def FederatedCredential.name (self : FederatedCredential) : IO String := Internal.api "Lasm.JS.Web.FederatedCredential.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute USVString iconURL` -/
-def FederatedCredential.iconURL (self : FederatedCredential) : IO String := self.val.get "iconURL" String
+@[macro_inline] def FederatedCredential.iconURL (self : FederatedCredential) : IO String := Internal.api "Lasm.JS.Web.FederatedCredential.iconURL" do
+  self.val.get "iconURL" String
 
 /-- `v instanceof PasswordCredential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PasswordCredential`). -/
-def PasswordCredential.cast? (v : Value) : IO (Option PasswordCredential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PasswordCredential"] Value) v) then some { val := v } else none
+@[macro_inline] def PasswordCredential.cast? (v : Value) : IO (Option PasswordCredential) := Internal.api "Lasm.JS.Web.PasswordCredential.cast?" do
+  Internal.cast (Internal.getGlobal ["PasswordCredential"] Value) (fun x => { val := x }) v
 
 /-- `constructor(HTMLFormElement form)` -/
-def PasswordCredential.new (form : HTMLFormElement) : IO PasswordCredential :=
+@[macro_inline] def PasswordCredential.new (form : HTMLFormElement) : IO PasswordCredential := Internal.api "Lasm.JS.Web.PasswordCredential.new" do
   Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.new", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
-    (Support.args #[toJS form]) (await := false)
+    (Internal.args #[toJS form]) (await := false)
 
 /-- `constructor(PasswordCredentialData data)` -/
-def PasswordCredential.newWithData (data : PasswordCredentialData) : IO PasswordCredential :=
+@[macro_inline] def PasswordCredential.newWithData (data : PasswordCredentialData) : IO PasswordCredential := Internal.api "Lasm.JS.Web.PasswordCredential.newWithData" do
   Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.newWithData", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
 
 /-- `readonly attribute USVString password` -/
-def PasswordCredential.password (self : PasswordCredential) : IO String := self.val.get "password" String
+@[macro_inline] def PasswordCredential.password (self : PasswordCredential) : IO String := Internal.api "Lasm.JS.Web.PasswordCredential.password" do
+  self.val.get "password" String
 
 /-- `readonly attribute USVString name` -/
-def PasswordCredential.name (self : PasswordCredential) : IO String := self.val.get "name" String
+@[macro_inline] def PasswordCredential.name (self : PasswordCredential) : IO String := Internal.api "Lasm.JS.Web.PasswordCredential.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute USVString iconURL` -/
-def PasswordCredential.iconURL (self : PasswordCredential) : IO String := self.val.get "iconURL" String
+@[macro_inline] def PasswordCredential.iconURL (self : PasswordCredential) : IO String := Internal.api "Lasm.JS.Web.PasswordCredential.iconURL" do
+  self.val.get "iconURL" String
 
 /-- `readonly attribute CredentialsContainer credentials` -/
-def Navigator.credentials (self : Navigator) : IO CredentialsContainer := do
+@[macro_inline] def Navigator.credentials (self : Navigator) : IO CredentialsContainer := Internal.api "Lasm.JS.Web.Navigator.credentials" do
   let r ← self.val.get "credentials" Value
   pure { val := r }
 

@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.Mediaqueries5
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef MediaList or boolean CustomMediaQuery`: one constructor per member type. -/
 inductive CustomMediaQuery where
@@ -26,74 +32,80 @@ instance : FromJS CustomMediaQuery where
   typeName := "Lasm.JS.Web.CustomMediaQuery"
 
 /-- `v instanceof CSSCustomMediaRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSCustomMediaRule`). -/
-def CSSCustomMediaRule.cast? (v : Value) : IO (Option CSSCustomMediaRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSCustomMediaRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSCustomMediaRule.cast? (v : Value) : IO (Option CSSCustomMediaRule) := Internal.api "Lasm.JS.Web.CSSCustomMediaRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSCustomMediaRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSCustomMediaRule.name (self : CSSCustomMediaRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSCustomMediaRule.name (self : CSSCustomMediaRule) : IO String := Internal.api "Lasm.JS.Web.CSSCustomMediaRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CustomMediaQuery query` -/
-def CSSCustomMediaRule.query (self : CSSCustomMediaRule) : IO CustomMediaQuery := self.val.get "query" CustomMediaQuery
+@[macro_inline] def CSSCustomMediaRule.query (self : CSSCustomMediaRule) : IO CustomMediaQuery := Internal.api "Lasm.JS.Web.CSSCustomMediaRule.query" do
+  self.val.get "query" CustomMediaQuery
 
 /-- `v instanceof PreferenceManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PreferenceManager`). -/
-def PreferenceManager.cast? (v : Value) : IO (Option PreferenceManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PreferenceManager"] Value) v) then some { val := v } else none
+@[macro_inline] def PreferenceManager.cast? (v : Value) : IO (Option PreferenceManager) := Internal.api "Lasm.JS.Web.PreferenceManager.cast?" do
+  Internal.cast (Internal.getGlobal ["PreferenceManager"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute PreferenceObject colorScheme` -/
-def PreferenceManager.colorScheme (self : PreferenceManager) : IO PreferenceObject := do
+@[macro_inline] def PreferenceManager.colorScheme (self : PreferenceManager) : IO PreferenceObject := Internal.api "Lasm.JS.Web.PreferenceManager.colorScheme" do
   let r ← self.val.get "colorScheme" Value
   pure { val := r }
 
 /-- `readonly attribute PreferenceObject contrast` -/
-def PreferenceManager.contrast (self : PreferenceManager) : IO PreferenceObject := do
+@[macro_inline] def PreferenceManager.contrast (self : PreferenceManager) : IO PreferenceObject := Internal.api "Lasm.JS.Web.PreferenceManager.contrast" do
   let r ← self.val.get "contrast" Value
   pure { val := r }
 
 /-- `readonly attribute PreferenceObject reducedMotion` -/
-def PreferenceManager.reducedMotion (self : PreferenceManager) : IO PreferenceObject := do
+@[macro_inline] def PreferenceManager.reducedMotion (self : PreferenceManager) : IO PreferenceObject := Internal.api "Lasm.JS.Web.PreferenceManager.reducedMotion" do
   let r ← self.val.get "reducedMotion" Value
   pure { val := r }
 
 /-- `readonly attribute PreferenceObject reducedTransparency` -/
-def PreferenceManager.reducedTransparency (self : PreferenceManager) : IO PreferenceObject := do
+@[macro_inline] def PreferenceManager.reducedTransparency (self : PreferenceManager) : IO PreferenceObject := Internal.api "Lasm.JS.Web.PreferenceManager.reducedTransparency" do
   let r ← self.val.get "reducedTransparency" Value
   pure { val := r }
 
 /-- `readonly attribute PreferenceObject reducedData` -/
-def PreferenceManager.reducedData (self : PreferenceManager) : IO PreferenceObject := do
+@[macro_inline] def PreferenceManager.reducedData (self : PreferenceManager) : IO PreferenceObject := Internal.api "Lasm.JS.Web.PreferenceManager.reducedData" do
   let r ← self.val.get "reducedData" Value
   pure { val := r }
 
 /-- `v instanceof PreferenceObject`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PreferenceObject`). -/
-def PreferenceObject.cast? (v : Value) : IO (Option PreferenceObject) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PreferenceObject"] Value) v) then some { val := v } else none
+@[macro_inline] def PreferenceObject.cast? (v : Value) : IO (Option PreferenceObject) := Internal.api "Lasm.JS.Web.PreferenceObject.cast?" do
+  Internal.cast (Internal.getGlobal ["PreferenceObject"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString? override` -/
-def PreferenceObject.override (self : PreferenceObject) : IO (Option String) := self.val.get "override" (Option String)
+@[macro_inline] def PreferenceObject.override (self : PreferenceObject) : IO (Option String) := Internal.api "Lasm.JS.Web.PreferenceObject.override" do
+  self.val.get "override" (Option String)
 
 /-- `readonly attribute DOMString value` -/
-def PreferenceObject.value (self : PreferenceObject) : IO String := self.val.get "value" String
+@[macro_inline] def PreferenceObject.value (self : PreferenceObject) : IO String := Internal.api "Lasm.JS.Web.PreferenceObject.value" do
+  self.val.get "value" String
 
 /-- `readonly attribute FrozenArray<DOMString> validValues` -/
-def PreferenceObject.validValues (self : PreferenceObject) : IO (Array String) := self.val.get "validValues" (Array String)
+@[macro_inline] def PreferenceObject.validValues (self : PreferenceObject) : IO (Array String) := Internal.api "Lasm.JS.Web.PreferenceObject.validValues" do
+  self.val.get "validValues" (Array String)
 
 /-- `attribute EventHandler onchange` -/
-def PreferenceObject.onchange (self : PreferenceObject) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def PreferenceObject.onchange (self : PreferenceObject) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PreferenceObject.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def PreferenceObject.setOnchange (self : PreferenceObject) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PreferenceObject.setOnchange (self : PreferenceObject) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PreferenceObject.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `undefined clearOverride()` -/
-def PreferenceObject.clearOverride (self : PreferenceObject) : IO Unit :=
-  self.val.callMethod "clearOverride" (Support.args #[]) Unit
+@[macro_inline] def PreferenceObject.clearOverride (self : PreferenceObject) : IO Unit := Internal.api "Lasm.JS.Web.PreferenceObject.clearOverride" do
+  self.val.callMethod "clearOverride" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> requestOverride(DOMString? value)` -/
-def PreferenceObject.requestOverride (self : PreferenceObject) (value : Option String) : Async Unit :=
-  self.val.callMethodAwait "requestOverride" (Support.args #[toJS value]) Unit
+@[macro_inline] def PreferenceObject.requestOverride (self : PreferenceObject) (value : Option String) : Async Unit := Internal.api "Lasm.JS.Web.PreferenceObject.requestOverride" do
+  self.val.callMethodAwait "requestOverride" (Internal.args #[toJS value]) Unit
 
 /-- `readonly attribute PreferenceManager preferences` -/
-def Navigator.preferences (self : Navigator) : IO PreferenceManager := do
+@[macro_inline] def Navigator.preferences (self : Navigator) : IO PreferenceManager := Internal.api "Lasm.JS.Web.Navigator.preferences" do
   let r ← self.val.get "preferences" Value
   pure { val := r }
 

@@ -6,57 +6,63 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Anchors
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.WebxrHitTest
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof XRAnchor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRAnchor`). -/
-def XRAnchor.cast? (v : Value) : IO (Option XRAnchor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRAnchor"] Value) v) then some { val := v } else none
+@[macro_inline] def XRAnchor.cast? (v : Value) : IO (Option XRAnchor) := Internal.api "Lasm.JS.Web.XRAnchor.cast?" do
+  Internal.cast (Internal.getGlobal ["XRAnchor"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRSpace anchorSpace` -/
-def XRAnchor.anchorSpace (self : XRAnchor) : IO XRSpace := do
+@[macro_inline] def XRAnchor.anchorSpace (self : XRAnchor) : IO XRSpace := Internal.api "Lasm.JS.Web.XRAnchor.anchorSpace" do
   let r ← self.val.get "anchorSpace" Value
   pure { val := r }
 
 /-- `Promise<DOMString> requestPersistentHandle()` -/
-def XRAnchor.requestPersistentHandle (self : XRAnchor) : Async String :=
-  self.val.callMethodAwait "requestPersistentHandle" (Support.args #[]) String
+@[macro_inline] def XRAnchor.requestPersistentHandle (self : XRAnchor) : Async String := Internal.api "Lasm.JS.Web.XRAnchor.requestPersistentHandle" do
+  self.val.callMethodAwait "requestPersistentHandle" (Internal.args #[]) String
 
 /-- `undefined delete()` -/
-def XRAnchor.delete (self : XRAnchor) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[]) Unit
+@[macro_inline] def XRAnchor.delete (self : XRAnchor) : IO Unit := Internal.api "Lasm.JS.Web.XRAnchor.delete" do
+  self.val.callMethod "delete" (Internal.args #[]) Unit
 
 /-- `v instanceof XRAnchorSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRAnchorSet`). -/
-def XRAnchorSet.cast? (v : Value) : IO (Option XRAnchorSet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRAnchorSet"] Value) v) then some { val := v } else none
+@[macro_inline] def XRAnchorSet.cast? (v : Value) : IO (Option XRAnchorSet) := Internal.api "Lasm.JS.Web.XRAnchorSet.cast?" do
+  Internal.cast (Internal.getGlobal ["XRAnchorSet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRAnchorSet trackedAnchors` -/
-def XRFrame.trackedAnchors (self : XRFrame) : IO XRAnchorSet := do
+@[macro_inline] def XRFrame.trackedAnchors (self : XRFrame) : IO XRAnchorSet := Internal.api "Lasm.JS.Web.XRFrame.trackedAnchors" do
   let r ← self.val.get "trackedAnchors" Value
   pure { val := r }
 
 /-- `Promise<XRAnchor> createAnchor(XRRigidTransform pose, XRSpace space)` -/
-def XRFrame.createAnchor (self : XRFrame) (pose : XRRigidTransform) (space : XRSpace) : Async XRAnchor := do
-  let r ← self.val.callMethodAwait "createAnchor" (Support.args #[toJS pose, toJS space]) Value
+@[macro_inline] def XRFrame.createAnchor (self : XRFrame) (pose : XRRigidTransform) (space : XRSpace) : Async XRAnchor := Internal.api "Lasm.JS.Web.XRFrame.createAnchor" do
+  let r ← self.val.callMethodAwait "createAnchor" (Internal.args #[toJS pose, toJS space]) Value
   pure { val := r }
 
 /-- `Promise<XRAnchor> createAnchor()` -/
-def XRHitTestResult.createAnchor (self : XRHitTestResult) : Async XRAnchor := do
-  let r ← self.val.callMethodAwait "createAnchor" (Support.args #[]) Value
+@[macro_inline] def XRHitTestResult.createAnchor (self : XRHitTestResult) : Async XRAnchor := Internal.api "Lasm.JS.Web.XRHitTestResult.createAnchor" do
+  let r ← self.val.callMethodAwait "createAnchor" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<DOMString> persistentAnchors` -/
-def XRSession.persistentAnchors (self : XRSession) : IO (Array String) := self.val.get "persistentAnchors" (Array String)
+@[macro_inline] def XRSession.persistentAnchors (self : XRSession) : IO (Array String) := Internal.api "Lasm.JS.Web.XRSession.persistentAnchors" do
+  self.val.get "persistentAnchors" (Array String)
 
 /-- `Promise<XRAnchor> restorePersistentAnchor(DOMString uuid)` -/
-def XRSession.restorePersistentAnchor (self : XRSession) (uuid : String) : Async XRAnchor := do
-  let r ← self.val.callMethodAwait "restorePersistentAnchor" (Support.args #[toJS uuid]) Value
+@[macro_inline] def XRSession.restorePersistentAnchor (self : XRSession) (uuid : String) : Async XRAnchor := Internal.api "Lasm.JS.Web.XRSession.restorePersistentAnchor" do
+  let r ← self.val.callMethodAwait "restorePersistentAnchor" (Internal.args #[toJS uuid]) Value
   pure { val := r }
 
 /-- `Promise<undefined> deletePersistentAnchor(DOMString uuid)` -/
-def XRSession.deletePersistentAnchor (self : XRSession) (uuid : String) : Async Unit :=
-  self.val.callMethodAwait "deletePersistentAnchor" (Support.args #[toJS uuid]) Unit
+@[macro_inline] def XRSession.deletePersistentAnchor (self : XRSession) (uuid : String) : Async Unit := Internal.api "Lasm.JS.Web.XRSession.deletePersistentAnchor" do
+  self.val.callMethodAwait "deletePersistentAnchor" (Internal.args #[toJS uuid]) Unit
 
 end Lasm.JS.Web

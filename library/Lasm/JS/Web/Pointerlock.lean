@@ -6,50 +6,60 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Pointerevents
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PointerLockOptions` (Pointer Lock 2.0 (https://w3c.github.io/pointerlock/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PointerLockOptions where
   /-- `boolean unadjustedMovement = false` -/
   unadjustedMovement : Option Bool := none
-instance : ToJS PointerLockOptions := ⟨fun d => Support.fields #[("unadjustedMovement", Support.optional d.unadjustedMovement)]⟩
+instance : ToJS PointerLockOptions := ⟨fun d => Internal.fields #[("unadjustedMovement", Internal.optional d.unadjustedMovement)]⟩
 
 /-- `attribute EventHandler onpointerlockchange` -/
-def Document.onpointerlockchange (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerlockchange" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerlockchange (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerlockchange" do
+  self.val.get "onpointerlockchange" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerlockchange`: `attribute EventHandler onpointerlockchange` -/
-def Document.setOnpointerlockchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerlockchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerlockchange" do
   self.val.set "onpointerlockchange" (toJS value)
 
 /-- `attribute EventHandler onpointerlockerror` -/
-def Document.onpointerlockerror (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerlockerror" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerlockerror (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerlockerror" do
+  self.val.get "onpointerlockerror" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerlockerror`: `attribute EventHandler onpointerlockerror` -/
-def Document.setOnpointerlockerror (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerlockerror (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerlockerror" do
   self.val.set "onpointerlockerror" (toJS value)
 
 /-- `readonly attribute Element? pointerLockElement` -/
-def Document.pointerLockElement (self : Document) : IO (Option Element) := self.val.get "pointerLockElement" (Option Element)
+@[macro_inline] def Document.pointerLockElement (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.pointerLockElement" do
+  self.val.get "pointerLockElement" (Option Element)
 
 /-- `undefined exitPointerLock()` -/
-def Document.exitPointerLock (self : Document) : IO Unit :=
-  self.val.callMethod "exitPointerLock" (Support.args #[]) Unit
+@[macro_inline] def Document.exitPointerLock (self : Document) : IO Unit := Internal.api "Lasm.JS.Web.Document.exitPointerLock" do
+  self.val.callMethod "exitPointerLock" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> requestPointerLock(optional PointerLockOptions options)` -/
-def Element.requestPointerLock (self : Element) (options : Option PointerLockOptions := none) : Async Unit :=
-  self.val.callMethodAwait "requestPointerLock" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def Element.requestPointerLock (self : Element) (options : Option PointerLockOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Element.requestPointerLock" do
+  self.val.callMethodAwait "requestPointerLock" (Internal.args #[Internal.optional options]) Unit
 
 /-- `readonly attribute double movementX` -/
-def MouseEvent.movementX (self : MouseEvent) : IO Float := self.val.get "movementX" Float
+@[macro_inline] def MouseEvent.movementX (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.movementX" do
+  self.val.get "movementX" Float
 
 /-- `readonly attribute double movementY` -/
-def MouseEvent.movementY (self : MouseEvent) : IO Float := self.val.get "movementY" Float
+@[macro_inline] def MouseEvent.movementY (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.movementY" do
+  self.val.get "movementY" Float
 
 /-- `readonly attribute Element? pointerLockElement` -/
-def ShadowRoot.pointerLockElement (self : ShadowRoot) : IO (Option Element) := self.val.get "pointerLockElement" (Option Element)
+@[macro_inline] def ShadowRoot.pointerLockElement (self : ShadowRoot) : IO (Option Element) := Internal.api "Lasm.JS.Web.ShadowRoot.pointerLockElement" do
+  self.val.get "pointerLockElement" (Option Element)
 
 end Lasm.JS.Web

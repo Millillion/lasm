@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssContain
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ContentVisibilityAutoStateChangeEventInit : EventInit` (CSS Containment Module Level 2 (https://drafts.csswg.org/css-contain-2/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContentVisibilityAutoStateChangeEventInit where
@@ -21,21 +25,22 @@ structure ContentVisibilityAutoStateChangeEventInit where
   composed : Option Bool := none
   /-- `boolean skipped = false` -/
   skipped : Option Bool := none
-instance : ToJS ContentVisibilityAutoStateChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("skipped", Support.optional d.skipped)]⟩
+instance : ToJS ContentVisibilityAutoStateChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("skipped", Internal.optional d.skipped)]⟩
 
 /-- `v instanceof ContentVisibilityAutoStateChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ContentVisibilityAutoStateChangeEvent`). -/
-def ContentVisibilityAutoStateChangeEvent.cast? (v : Value) : IO (Option ContentVisibilityAutoStateChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ContentVisibilityAutoStateChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ContentVisibilityAutoStateChangeEvent.cast? (v : Value) : IO (Option ContentVisibilityAutoStateChangeEvent) := Internal.api "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ContentVisibilityAutoStateChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ContentVisibilityAutoStateChangeEventInit eventInitDict)` -/
-def ContentVisibilityAutoStateChangeEvent.new (type : String) (eventInitDict : Option ContentVisibilityAutoStateChangeEventInit := none) : IO ContentVisibilityAutoStateChangeEvent :=
+@[macro_inline] def ContentVisibilityAutoStateChangeEvent.new (type : String) (eventInitDict : Option ContentVisibilityAutoStateChangeEventInit := none) : IO ContentVisibilityAutoStateChangeEvent := Internal.api "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.new" do
   Lasm.JS.Binding.invoke ContentVisibilityAutoStateChangeEvent { name := "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.new", module := "globalThis", path := "ContentVisibilityAutoStateChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute boolean skipped` -/
-def ContentVisibilityAutoStateChangeEvent.skipped (self : ContentVisibilityAutoStateChangeEvent) : IO Bool := self.val.get "skipped" Bool
+@[macro_inline] def ContentVisibilityAutoStateChangeEvent.skipped (self : ContentVisibilityAutoStateChangeEvent) : IO Bool := Internal.api "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.skipped" do
+  self.val.get "skipped" Bool
 
 end Lasm.JS.Web

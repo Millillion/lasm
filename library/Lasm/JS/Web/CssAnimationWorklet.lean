@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.CssAnimationWorklet
 import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback AnimatorInstanceConstructor = any (any options, optional any state)` (CSS Animation Worklet API (https://drafts.css-houdini.org/css-animationworklet-1/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure AnimatorInstanceConstructor where
@@ -21,10 +26,10 @@ instance : ToJS AnimatorInstanceConstructor := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AnimatorInstanceConstructor := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.AnimatorInstanceConstructor", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def AnimatorInstanceConstructor.ofFn (f : Data → Data → Async Data) : IO AnimatorInstanceConstructor := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def AnimatorInstanceConstructor.ofSyncFn (f : Data → Data → IO Data) : IO AnimatorInstanceConstructor := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1)) }
 
 /-- `(AnimationEffect or sequence<AnimationEffect>)`: one constructor per member type. -/
 inductive AnimationEffectOrSequenceOfAnimationEffect where
@@ -39,55 +44,57 @@ instance : Coe AnimationEffect AnimationEffectOrSequenceOfAnimationEffect := ⟨
 instance : Coe (Array AnimationEffect) AnimationEffectOrSequenceOfAnimationEffect := ⟨.sequence⟩
 
 /-- `v instanceof AnimationWorkletGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationWorkletGlobalScope`). -/
-def AnimationWorkletGlobalScope.cast? (v : Value) : IO (Option AnimationWorkletGlobalScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationWorkletGlobalScope"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationWorkletGlobalScope.cast? (v : Value) : IO (Option AnimationWorkletGlobalScope) := Internal.api "Lasm.JS.Web.AnimationWorkletGlobalScope.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationWorkletGlobalScope"] Value) (fun x => { val := x }) v
 
 /-- `undefined registerAnimator(DOMString name, AnimatorInstanceConstructor animatorCtor)` -/
-def AnimationWorkletGlobalScope.registerAnimator (self : AnimationWorkletGlobalScope) (name : String) (animatorCtor : AnimatorInstanceConstructor) : IO Unit :=
-  self.val.callMethod "registerAnimator" (Support.args #[toJS name, toJS animatorCtor]) Unit
+@[macro_inline] def AnimationWorkletGlobalScope.registerAnimator (self : AnimationWorkletGlobalScope) (name : String) (animatorCtor : AnimatorInstanceConstructor) : IO Unit := Internal.api "Lasm.JS.Web.AnimationWorkletGlobalScope.registerAnimator" do
+  self.val.callMethod "registerAnimator" (Internal.args #[toJS name, toJS animatorCtor]) Unit
 
 /-- `v instanceof WorkletAnimation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WorkletAnimation`). -/
-def WorkletAnimation.cast? (v : Value) : IO (Option WorkletAnimation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WorkletAnimation"] Value) v) then some { val := v } else none
+@[macro_inline] def WorkletAnimation.cast? (v : Value) : IO (Option WorkletAnimation) := Internal.api "Lasm.JS.Web.WorkletAnimation.cast?" do
+  Internal.cast (Internal.getGlobal ["WorkletAnimation"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString animatorName, optional (AnimationEffect or sequence<AnimationEffect>)? effects, optional AnimationTimeline? timeline, optional any options)` -/
-def WorkletAnimation.new (animatorName : String) (effects : Option AnimationEffectOrSequenceOfAnimationEffect := none) (timeline : Option AnimationTimeline := none) (options : Data := .undefined) : IO WorkletAnimation :=
+@[macro_inline] def WorkletAnimation.new (animatorName : String) (effects : Option AnimationEffectOrSequenceOfAnimationEffect := none) (timeline : Option AnimationTimeline := none) (options : Data := .undefined) : IO WorkletAnimation := Internal.api "Lasm.JS.Web.WorkletAnimation.new" do
   Lasm.JS.Binding.invoke WorkletAnimation { name := "Lasm.JS.Web.WorkletAnimation.new", module := "globalThis", path := "WorkletAnimation", construct := true, arity := 4 }
-    (Support.args #[toJS animatorName, Support.optional effects, Support.optional timeline, options]) (await := false)
+    (Internal.args #[toJS animatorName, Internal.optional effects, Internal.optional timeline, options]) (await := false)
 
 /-- `readonly attribute DOMString animatorName` -/
-def WorkletAnimation.animatorName (self : WorkletAnimation) : IO String := self.val.get "animatorName" String
+@[macro_inline] def WorkletAnimation.animatorName (self : WorkletAnimation) : IO String := Internal.api "Lasm.JS.Web.WorkletAnimation.animatorName" do
+  self.val.get "animatorName" String
 
 /-- `v instanceof WorkletAnimationEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WorkletAnimationEffect`). -/
-def WorkletAnimationEffect.cast? (v : Value) : IO (Option WorkletAnimationEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WorkletAnimationEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def WorkletAnimationEffect.cast? (v : Value) : IO (Option WorkletAnimationEffect) := Internal.api "Lasm.JS.Web.WorkletAnimationEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["WorkletAnimationEffect"] Value) (fun x => { val := x }) v
 
 /-- `attribute double? localTime` -/
-def WorkletAnimationEffect.localTime (self : WorkletAnimationEffect) : IO (Option Float) := self.val.get "localTime" (Option Float)
+@[macro_inline] def WorkletAnimationEffect.localTime (self : WorkletAnimationEffect) : IO (Option Float) := Internal.api "Lasm.JS.Web.WorkletAnimationEffect.localTime" do
+  self.val.get "localTime" (Option Float)
 
 /-- Sets `localTime`: `attribute double? localTime` -/
-def WorkletAnimationEffect.setLocalTime (self : WorkletAnimationEffect) (value : Option Float) : IO Unit :=
+@[macro_inline] def WorkletAnimationEffect.setLocalTime (self : WorkletAnimationEffect) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.WorkletAnimationEffect.setLocalTime" do
   self.val.set "localTime" (toJS value)
 
 /-- `EffectTiming getTiming()` -/
-def WorkletAnimationEffect.getTiming (self : WorkletAnimationEffect) : IO EffectTiming :=
-  self.val.callMethod "getTiming" (Support.args #[]) EffectTiming
+@[macro_inline] def WorkletAnimationEffect.getTiming (self : WorkletAnimationEffect) : IO EffectTiming := Internal.api "Lasm.JS.Web.WorkletAnimationEffect.getTiming" do
+  self.val.callMethod "getTiming" (Internal.args #[]) EffectTiming
 
 /-- `ComputedEffectTiming getComputedTiming()` -/
-def WorkletAnimationEffect.getComputedTiming (self : WorkletAnimationEffect) : IO ComputedEffectTiming :=
-  self.val.callMethod "getComputedTiming" (Support.args #[]) ComputedEffectTiming
+@[macro_inline] def WorkletAnimationEffect.getComputedTiming (self : WorkletAnimationEffect) : IO ComputedEffectTiming := Internal.api "Lasm.JS.Web.WorkletAnimationEffect.getComputedTiming" do
+  self.val.callMethod "getComputedTiming" (Internal.args #[]) ComputedEffectTiming
 
 /-- `v instanceof WorkletGroupEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WorkletGroupEffect`). -/
-def WorkletGroupEffect.cast? (v : Value) : IO (Option WorkletGroupEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WorkletGroupEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def WorkletGroupEffect.cast? (v : Value) : IO (Option WorkletGroupEffect) := Internal.api "Lasm.JS.Web.WorkletGroupEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["WorkletGroupEffect"] Value) (fun x => { val := x }) v
 
 /-- `sequence<WorkletAnimationEffect> getChildren()` -/
-def WorkletGroupEffect.getChildren (self : WorkletGroupEffect) : IO (Array WorkletAnimationEffect) :=
-  self.val.callMethod "getChildren" (Support.args #[]) (Array WorkletAnimationEffect)
+@[macro_inline] def WorkletGroupEffect.getChildren (self : WorkletGroupEffect) : IO (Array WorkletAnimationEffect) := Internal.api "Lasm.JS.Web.WorkletGroupEffect.getChildren" do
+  self.val.callMethod "getChildren" (Internal.args #[]) (Array WorkletAnimationEffect)
 
 /-- `readonly attribute Worklet animationWorklet` (CSS Animation Worklet API (https://drafts.css-houdini.org/css-animationworklet-1/)) -/
-def CSS.animationWorklet : IO Worklet := do
-  let r ← Support.getGlobal ["CSS", "animationWorklet"] Value
+@[macro_inline] def CSS.animationWorklet : IO Worklet := Internal.api "Lasm.JS.Web.CSS.animationWorklet" do
+  let r ← Internal.getGlobal ["CSS", "animationWorklet"] Value
   pure { val := r }
 
 end Lasm.JS.Web

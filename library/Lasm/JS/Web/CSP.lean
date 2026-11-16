@@ -6,27 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CSP
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum SecurityPolicyViolationEventDisposition` (Content Security Policy Level 3 (https://w3c.github.io/webappsec-csp/)): "enforce", "report". -/
-inductive SecurityPolicyViolationEventDisposition where
-  /-- "enforce" -/
-  | enforce
-  /-- "report" -/
-  | report
-  deriving BEq, Repr, Inhabited
-instance : ToJS SecurityPolicyViolationEventDisposition := ⟨fun
-  | .enforce => .string "enforce"
-  | .report => .string "report"⟩
-instance : FromJS SecurityPolicyViolationEventDisposition where
-  fromJS
-    | .string "enforce" => .ok .enforce
-    | .string "report" => .ok .report
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SecurityPolicyViolationEventDisposition"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SecurityPolicyViolationEventInit : EventInit` (Content Security Policy Level 3 (https://w3c.github.io/webappsec-csp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SecurityPolicyViolationEventInit where
@@ -60,65 +47,113 @@ structure SecurityPolicyViolationEventInit where
   lineNumber : Option Nat := none
   /-- `unsigned long columnNumber = 0` -/
   columnNumber : Option Nat := none
-instance : ToJS SecurityPolicyViolationEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("documentURI", Support.optional d.documentURI),
-    ("referrer", Support.optional d.referrer),
-    ("blockedURI", Support.optional d.blockedURI),
-    ("violatedDirective", Support.optional d.violatedDirective),
-    ("effectiveDirective", Support.optional d.effectiveDirective),
-    ("originalPolicy", Support.optional d.originalPolicy),
-    ("sourceFile", Support.optional d.sourceFile),
-    ("sample", Support.optional d.sample),
-    ("disposition", Support.optional d.disposition),
-    ("statusCode", Support.optional d.statusCode),
-    ("lineNumber", Support.optional d.lineNumber),
-    ("columnNumber", Support.optional d.columnNumber)]⟩
+instance : ToJS SecurityPolicyViolationEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("documentURI", Internal.optional d.documentURI),
+    ("referrer", Internal.optional d.referrer),
+    ("blockedURI", Internal.optional d.blockedURI),
+    ("violatedDirective", Internal.optional d.violatedDirective),
+    ("effectiveDirective", Internal.optional d.effectiveDirective),
+    ("originalPolicy", Internal.optional d.originalPolicy),
+    ("sourceFile", Internal.optional d.sourceFile),
+    ("sample", Internal.optional d.sample),
+    ("disposition", Internal.optional d.disposition),
+    ("statusCode", Internal.optional d.statusCode),
+    ("lineNumber", Internal.optional d.lineNumber),
+    ("columnNumber", Internal.optional d.columnNumber)]⟩
+
+/-- `dictionary CSPViolationReportBody : ReportBody` (Content Security Policy Level 3 (https://w3c.github.io/webappsec-csp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CSPViolationReportBody where
+  /-- `USVString documentURL` -/
+  documentURL : Option String := none
+  /-- `USVString? referrer` -/
+  referrer : Option String := none
+  /-- `USVString? blockedURL` -/
+  blockedURL : Option String := none
+  /-- `DOMString effectiveDirective` -/
+  effectiveDirective : Option String := none
+  /-- `DOMString originalPolicy` -/
+  originalPolicy : Option String := none
+  /-- `USVString? sourceFile` -/
+  sourceFile : Option String := none
+  /-- `DOMString? sample` -/
+  sample : Option String := none
+  /-- `SecurityPolicyViolationEventDisposition disposition` -/
+  disposition : Option SecurityPolicyViolationEventDisposition := none
+  /-- `unsigned short statusCode` -/
+  statusCode : Option Nat := none
+  /-- `unsigned long? lineNumber` -/
+  lineNumber : Option Nat := none
+  /-- `unsigned long? columnNumber` -/
+  columnNumber : Option Nat := none
+instance : ToJS CSPViolationReportBody := ⟨fun d => Internal.fields #[("documentURL", Internal.optional d.documentURL),
+    ("referrer", Internal.optional d.referrer),
+    ("blockedURL", Internal.optional d.blockedURL),
+    ("effectiveDirective", Internal.optional d.effectiveDirective),
+    ("originalPolicy", Internal.optional d.originalPolicy),
+    ("sourceFile", Internal.optional d.sourceFile),
+    ("sample", Internal.optional d.sample),
+    ("disposition", Internal.optional d.disposition),
+    ("statusCode", Internal.optional d.statusCode),
+    ("lineNumber", Internal.optional d.lineNumber),
+    ("columnNumber", Internal.optional d.columnNumber)]⟩
 
 /-- `v instanceof SecurityPolicyViolationEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SecurityPolicyViolationEvent`). -/
-def SecurityPolicyViolationEvent.cast? (v : Value) : IO (Option SecurityPolicyViolationEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SecurityPolicyViolationEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SecurityPolicyViolationEvent.cast? (v : Value) : IO (Option SecurityPolicyViolationEvent) := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SecurityPolicyViolationEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional SecurityPolicyViolationEventInit eventInitDict)` -/
-def SecurityPolicyViolationEvent.new (type : String) (eventInitDict : Option SecurityPolicyViolationEventInit := none) : IO SecurityPolicyViolationEvent :=
+@[macro_inline] def SecurityPolicyViolationEvent.new (type : String) (eventInitDict : Option SecurityPolicyViolationEventInit := none) : IO SecurityPolicyViolationEvent := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.new" do
   Lasm.JS.Binding.invoke SecurityPolicyViolationEvent { name := "Lasm.JS.Web.SecurityPolicyViolationEvent.new", module := "globalThis", path := "SecurityPolicyViolationEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute USVString documentURI` -/
-def SecurityPolicyViolationEvent.documentURI (self : SecurityPolicyViolationEvent) : IO String := self.val.get "documentURI" String
+@[macro_inline] def SecurityPolicyViolationEvent.documentURI (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.documentURI" do
+  self.val.get "documentURI" String
 
 /-- `readonly attribute USVString referrer` -/
-def SecurityPolicyViolationEvent.referrer (self : SecurityPolicyViolationEvent) : IO String := self.val.get "referrer" String
+@[macro_inline] def SecurityPolicyViolationEvent.referrer (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.referrer" do
+  self.val.get "referrer" String
 
 /-- `readonly attribute USVString blockedURI` -/
-def SecurityPolicyViolationEvent.blockedURI (self : SecurityPolicyViolationEvent) : IO String := self.val.get "blockedURI" String
+@[macro_inline] def SecurityPolicyViolationEvent.blockedURI (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.blockedURI" do
+  self.val.get "blockedURI" String
 
 /-- `readonly attribute DOMString effectiveDirective` -/
-def SecurityPolicyViolationEvent.effectiveDirective (self : SecurityPolicyViolationEvent) : IO String := self.val.get "effectiveDirective" String
+@[macro_inline] def SecurityPolicyViolationEvent.effectiveDirective (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.effectiveDirective" do
+  self.val.get "effectiveDirective" String
 
 /-- `readonly attribute DOMString violatedDirective` -/
-def SecurityPolicyViolationEvent.violatedDirective (self : SecurityPolicyViolationEvent) : IO String := self.val.get "violatedDirective" String
+@[macro_inline] def SecurityPolicyViolationEvent.violatedDirective (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.violatedDirective" do
+  self.val.get "violatedDirective" String
 
 /-- `readonly attribute DOMString originalPolicy` -/
-def SecurityPolicyViolationEvent.originalPolicy (self : SecurityPolicyViolationEvent) : IO String := self.val.get "originalPolicy" String
+@[macro_inline] def SecurityPolicyViolationEvent.originalPolicy (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.originalPolicy" do
+  self.val.get "originalPolicy" String
 
 /-- `readonly attribute USVString sourceFile` -/
-def SecurityPolicyViolationEvent.sourceFile (self : SecurityPolicyViolationEvent) : IO String := self.val.get "sourceFile" String
+@[macro_inline] def SecurityPolicyViolationEvent.sourceFile (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.sourceFile" do
+  self.val.get "sourceFile" String
 
 /-- `readonly attribute DOMString sample` -/
-def SecurityPolicyViolationEvent.sample (self : SecurityPolicyViolationEvent) : IO String := self.val.get "sample" String
+@[macro_inline] def SecurityPolicyViolationEvent.sample (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.sample" do
+  self.val.get "sample" String
 
 /-- `readonly attribute SecurityPolicyViolationEventDisposition disposition` -/
-def SecurityPolicyViolationEvent.disposition (self : SecurityPolicyViolationEvent) : IO SecurityPolicyViolationEventDisposition := self.val.get "disposition" SecurityPolicyViolationEventDisposition
+@[macro_inline] def SecurityPolicyViolationEvent.disposition (self : SecurityPolicyViolationEvent) : IO SecurityPolicyViolationEventDisposition := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.disposition" do
+  self.val.get "disposition" SecurityPolicyViolationEventDisposition
 
 /-- `readonly attribute unsigned short statusCode` -/
-def SecurityPolicyViolationEvent.statusCode (self : SecurityPolicyViolationEvent) : IO Nat := self.val.get "statusCode" Nat
+@[macro_inline] def SecurityPolicyViolationEvent.statusCode (self : SecurityPolicyViolationEvent) : IO Nat := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.statusCode" do
+  self.val.get "statusCode" Nat
 
 /-- `readonly attribute unsigned long lineNumber` -/
-def SecurityPolicyViolationEvent.lineNumber (self : SecurityPolicyViolationEvent) : IO Nat := self.val.get "lineNumber" Nat
+@[macro_inline] def SecurityPolicyViolationEvent.lineNumber (self : SecurityPolicyViolationEvent) : IO Nat := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.lineNumber" do
+  self.val.get "lineNumber" Nat
 
 /-- `readonly attribute unsigned long columnNumber` -/
-def SecurityPolicyViolationEvent.columnNumber (self : SecurityPolicyViolationEvent) : IO Nat := self.val.get "columnNumber" Nat
+@[macro_inline] def SecurityPolicyViolationEvent.columnNumber (self : SecurityPolicyViolationEvent) : IO Nat := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.columnNumber" do
+  self.val.get "columnNumber" Nat
 
 end Lasm.JS.Web

@@ -6,71 +6,50 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Compression
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CompressionFormat` (Compression Standard (https://compression.spec.whatwg.org/)): "brotli", "deflate", "deflate-raw", "gzip". -/
-inductive CompressionFormat where
-  /-- "brotli" -/
-  | brotli
-  /-- "deflate" -/
-  | deflate
-  /-- "deflate-raw" -/
-  | deflateRaw
-  /-- "gzip" -/
-  | gzip
-  deriving BEq, Repr, Inhabited
-instance : ToJS CompressionFormat := ⟨fun
-  | .brotli => .string "brotli"
-  | .deflate => .string "deflate"
-  | .deflateRaw => .string "deflate-raw"
-  | .gzip => .string "gzip"⟩
-instance : FromJS CompressionFormat where
-  fromJS
-    | .string "brotli" => .ok .brotli
-    | .string "deflate" => .ok .deflate
-    | .string "deflate-raw" => .ok .deflateRaw
-    | .string "gzip" => .ok .gzip
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CompressionFormat"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CompressionStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CompressionStream`). -/
-def CompressionStream.cast? (v : Value) : IO (Option CompressionStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompressionStream"] Value) v) then some { val := v } else none
+@[macro_inline] def CompressionStream.cast? (v : Value) : IO (Option CompressionStream) := Internal.api "Lasm.JS.Web.CompressionStream.cast?" do
+  Internal.cast (Internal.getGlobal ["CompressionStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CompressionFormat format)` -/
-def CompressionStream.new (format : CompressionFormat) : IO CompressionStream :=
+@[macro_inline] def CompressionStream.new (format : CompressionFormat) : IO CompressionStream := Internal.api "Lasm.JS.Web.CompressionStream.new" do
   Lasm.JS.Binding.invoke CompressionStream { name := "Lasm.JS.Web.CompressionStream.new", module := "globalThis", path := "CompressionStream", construct := true, arity := 1 }
-    (Support.args #[toJS format]) (await := false)
+    (Internal.args #[toJS format]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def CompressionStream.readable (self : CompressionStream) : IO ReadableStream := do
+@[macro_inline] def CompressionStream.readable (self : CompressionStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.CompressionStream.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def CompressionStream.writable (self : CompressionStream) : IO WritableStream := do
+@[macro_inline] def CompressionStream.writable (self : CompressionStream) : IO WritableStream := Internal.api "Lasm.JS.Web.CompressionStream.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `v instanceof DecompressionStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DecompressionStream`). -/
-def DecompressionStream.cast? (v : Value) : IO (Option DecompressionStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DecompressionStream"] Value) v) then some { val := v } else none
+@[macro_inline] def DecompressionStream.cast? (v : Value) : IO (Option DecompressionStream) := Internal.api "Lasm.JS.Web.DecompressionStream.cast?" do
+  Internal.cast (Internal.getGlobal ["DecompressionStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CompressionFormat format)` -/
-def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStream :=
+@[macro_inline] def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStream := Internal.api "Lasm.JS.Web.DecompressionStream.new" do
   Lasm.JS.Binding.invoke DecompressionStream { name := "Lasm.JS.Web.DecompressionStream.new", module := "globalThis", path := "DecompressionStream", construct := true, arity := 1 }
-    (Support.args #[toJS format]) (await := false)
+    (Internal.args #[toJS format]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def DecompressionStream.readable (self : DecompressionStream) : IO ReadableStream := do
+@[macro_inline] def DecompressionStream.readable (self : DecompressionStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.DecompressionStream.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def DecompressionStream.writable (self : DecompressionStream) : IO WritableStream := do
+@[macro_inline] def DecompressionStream.writable (self : DecompressionStream) : IO WritableStream := Internal.api "Lasm.JS.Web.DecompressionStream.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 

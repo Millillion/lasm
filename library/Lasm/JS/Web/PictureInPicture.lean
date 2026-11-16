@@ -6,11 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.PictureInPicture
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PictureInPictureEventInit : EventInit` (Picture-in-Picture (https://w3c.github.io/picture-in-picture/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PictureInPictureEventInit where
@@ -22,79 +27,88 @@ structure PictureInPictureEventInit where
   composed : Option Bool := none
   /-- `required PictureInPictureWindow pictureInPictureWindow` -/
   pictureInPictureWindow : PictureInPictureWindow
-instance : ToJS PictureInPictureEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS PictureInPictureEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("pictureInPictureWindow", toJS d.pictureInPictureWindow)]⟩
 
 /-- `v instanceof PictureInPictureEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PictureInPictureEvent`). -/
-def PictureInPictureEvent.cast? (v : Value) : IO (Option PictureInPictureEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PictureInPictureEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PictureInPictureEvent.cast? (v : Value) : IO (Option PictureInPictureEvent) := Internal.api "Lasm.JS.Web.PictureInPictureEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PictureInPictureEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, PictureInPictureEventInit eventInitDict)` -/
-def PictureInPictureEvent.new (type : String) (eventInitDict : PictureInPictureEventInit) : IO PictureInPictureEvent :=
+@[macro_inline] def PictureInPictureEvent.new (type : String) (eventInitDict : PictureInPictureEventInit) : IO PictureInPictureEvent := Internal.api "Lasm.JS.Web.PictureInPictureEvent.new" do
   Lasm.JS.Binding.invoke PictureInPictureEvent { name := "Lasm.JS.Web.PictureInPictureEvent.new", module := "globalThis", path := "PictureInPictureEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute PictureInPictureWindow pictureInPictureWindow` -/
-def PictureInPictureEvent.pictureInPictureWindow (self : PictureInPictureEvent) : IO PictureInPictureWindow := do
+@[macro_inline] def PictureInPictureEvent.pictureInPictureWindow (self : PictureInPictureEvent) : IO PictureInPictureWindow := Internal.api "Lasm.JS.Web.PictureInPictureEvent.pictureInPictureWindow" do
   let r ← self.val.get "pictureInPictureWindow" Value
   pure { val := r }
 
 /-- `v instanceof PictureInPictureWindow`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PictureInPictureWindow`). -/
-def PictureInPictureWindow.cast? (v : Value) : IO (Option PictureInPictureWindow) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PictureInPictureWindow"] Value) v) then some { val := v } else none
+@[macro_inline] def PictureInPictureWindow.cast? (v : Value) : IO (Option PictureInPictureWindow) := Internal.api "Lasm.JS.Web.PictureInPictureWindow.cast?" do
+  Internal.cast (Internal.getGlobal ["PictureInPictureWindow"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute long width` -/
-def PictureInPictureWindow.width (self : PictureInPictureWindow) : IO Int := self.val.get "width" Int
+@[macro_inline] def PictureInPictureWindow.width (self : PictureInPictureWindow) : IO Int := Internal.api "Lasm.JS.Web.PictureInPictureWindow.width" do
+  self.val.get "width" Int
 
 /-- `readonly attribute long height` -/
-def PictureInPictureWindow.height (self : PictureInPictureWindow) : IO Int := self.val.get "height" Int
+@[macro_inline] def PictureInPictureWindow.height (self : PictureInPictureWindow) : IO Int := Internal.api "Lasm.JS.Web.PictureInPictureWindow.height" do
+  self.val.get "height" Int
 
 /-- `attribute EventHandler onresize` -/
-def PictureInPictureWindow.onresize (self : PictureInPictureWindow) : IO (Option EventHandlerNonNull) := self.val.get "onresize" (Option EventHandlerNonNull)
+@[macro_inline] def PictureInPictureWindow.onresize (self : PictureInPictureWindow) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PictureInPictureWindow.onresize" do
+  self.val.get "onresize" (Option EventHandlerNonNull)
 
 /-- Sets `onresize`: `attribute EventHandler onresize` -/
-def PictureInPictureWindow.setOnresize (self : PictureInPictureWindow) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PictureInPictureWindow.setOnresize (self : PictureInPictureWindow) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PictureInPictureWindow.setOnresize" do
   self.val.set "onresize" (toJS value)
 
 /-- `readonly attribute boolean pictureInPictureEnabled` -/
-def Document.pictureInPictureEnabled (self : Document) : IO Bool := self.val.get "pictureInPictureEnabled" Bool
+@[macro_inline] def Document.pictureInPictureEnabled (self : Document) : IO Bool := Internal.api "Lasm.JS.Web.Document.pictureInPictureEnabled" do
+  self.val.get "pictureInPictureEnabled" Bool
 
 /-- `readonly attribute Element? pictureInPictureElement` -/
-def Document.pictureInPictureElement (self : Document) : IO (Option Element) := self.val.get "pictureInPictureElement" (Option Element)
+@[macro_inline] def Document.pictureInPictureElement (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.pictureInPictureElement" do
+  self.val.get "pictureInPictureElement" (Option Element)
 
 /-- `Promise<undefined> exitPictureInPicture()` -/
-def Document.exitPictureInPicture (self : Document) : Async Unit :=
-  self.val.callMethodAwait "exitPictureInPicture" (Support.args #[]) Unit
+@[macro_inline] def Document.exitPictureInPicture (self : Document) : Async Unit := Internal.api "Lasm.JS.Web.Document.exitPictureInPicture" do
+  self.val.callMethodAwait "exitPictureInPicture" (Internal.args #[]) Unit
 
 /-- `attribute EventHandler onenterpictureinpicture` -/
-def HTMLVideoElement.onenterpictureinpicture (self : HTMLVideoElement) : IO (Option EventHandlerNonNull) := self.val.get "onenterpictureinpicture" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLVideoElement.onenterpictureinpicture (self : HTMLVideoElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLVideoElement.onenterpictureinpicture" do
+  self.val.get "onenterpictureinpicture" (Option EventHandlerNonNull)
 
 /-- Sets `onenterpictureinpicture`: `attribute EventHandler onenterpictureinpicture` -/
-def HTMLVideoElement.setOnenterpictureinpicture (self : HTMLVideoElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLVideoElement.setOnenterpictureinpicture (self : HTMLVideoElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLVideoElement.setOnenterpictureinpicture" do
   self.val.set "onenterpictureinpicture" (toJS value)
 
 /-- `attribute EventHandler onleavepictureinpicture` -/
-def HTMLVideoElement.onleavepictureinpicture (self : HTMLVideoElement) : IO (Option EventHandlerNonNull) := self.val.get "onleavepictureinpicture" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLVideoElement.onleavepictureinpicture (self : HTMLVideoElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLVideoElement.onleavepictureinpicture" do
+  self.val.get "onleavepictureinpicture" (Option EventHandlerNonNull)
 
 /-- Sets `onleavepictureinpicture`: `attribute EventHandler onleavepictureinpicture` -/
-def HTMLVideoElement.setOnleavepictureinpicture (self : HTMLVideoElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLVideoElement.setOnleavepictureinpicture (self : HTMLVideoElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLVideoElement.setOnleavepictureinpicture" do
   self.val.set "onleavepictureinpicture" (toJS value)
 
 /-- `attribute boolean disablePictureInPicture` -/
-def HTMLVideoElement.disablePictureInPicture (self : HTMLVideoElement) : IO Bool := self.val.get "disablePictureInPicture" Bool
+@[macro_inline] def HTMLVideoElement.disablePictureInPicture (self : HTMLVideoElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLVideoElement.disablePictureInPicture" do
+  self.val.get "disablePictureInPicture" Bool
 
 /-- Sets `disablePictureInPicture`: `attribute boolean disablePictureInPicture` -/
-def HTMLVideoElement.setDisablePictureInPicture (self : HTMLVideoElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLVideoElement.setDisablePictureInPicture (self : HTMLVideoElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLVideoElement.setDisablePictureInPicture" do
   self.val.set "disablePictureInPicture" (toJS value)
 
 /-- `Promise<PictureInPictureWindow> requestPictureInPicture()` -/
-def HTMLVideoElement.requestPictureInPicture (self : HTMLVideoElement) : Async PictureInPictureWindow := do
-  let r ← self.val.callMethodAwait "requestPictureInPicture" (Support.args #[]) Value
+@[macro_inline] def HTMLVideoElement.requestPictureInPicture (self : HTMLVideoElement) : Async PictureInPictureWindow := Internal.api "Lasm.JS.Web.HTMLVideoElement.requestPictureInPicture" do
+  let r ← self.val.callMethodAwait "requestPictureInPicture" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readonly attribute Element? pictureInPictureElement` -/
-def ShadowRoot.pictureInPictureElement (self : ShadowRoot) : IO (Option Element) := self.val.get "pictureInPictureElement" (Option Element)
+@[macro_inline] def ShadowRoot.pictureInPictureElement (self : ShadowRoot) : IO (Option Element) := Internal.api "Lasm.JS.Web.ShadowRoot.pictureInPictureElement" do
+  self.val.get "pictureInPictureElement" (Option Element)
 
 end Lasm.JS.Web

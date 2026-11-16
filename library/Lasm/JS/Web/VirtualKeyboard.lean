@@ -6,52 +6,61 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.VirtualKeyboard
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof VirtualKeyboard`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VirtualKeyboard`). -/
-def VirtualKeyboard.cast? (v : Value) : IO (Option VirtualKeyboard) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VirtualKeyboard"] Value) v) then some { val := v } else none
+@[macro_inline] def VirtualKeyboard.cast? (v : Value) : IO (Option VirtualKeyboard) := Internal.api "Lasm.JS.Web.VirtualKeyboard.cast?" do
+  Internal.cast (Internal.getGlobal ["VirtualKeyboard"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMRect boundingRect` -/
-def VirtualKeyboard.boundingRect (self : VirtualKeyboard) : IO DOMRect := do
+@[macro_inline] def VirtualKeyboard.boundingRect (self : VirtualKeyboard) : IO DOMRect := Internal.api "Lasm.JS.Web.VirtualKeyboard.boundingRect" do
   let r ← self.val.get "boundingRect" Value
   pure { val := r }
 
 /-- `attribute boolean overlaysContent` -/
-def VirtualKeyboard.overlaysContent (self : VirtualKeyboard) : IO Bool := self.val.get "overlaysContent" Bool
+@[macro_inline] def VirtualKeyboard.overlaysContent (self : VirtualKeyboard) : IO Bool := Internal.api "Lasm.JS.Web.VirtualKeyboard.overlaysContent" do
+  self.val.get "overlaysContent" Bool
 
 /-- Sets `overlaysContent`: `attribute boolean overlaysContent` -/
-def VirtualKeyboard.setOverlaysContent (self : VirtualKeyboard) (value : Bool) : IO Unit :=
+@[macro_inline] def VirtualKeyboard.setOverlaysContent (self : VirtualKeyboard) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.VirtualKeyboard.setOverlaysContent" do
   self.val.set "overlaysContent" (toJS value)
 
 /-- `attribute EventHandler ongeometrychange` -/
-def VirtualKeyboard.ongeometrychange (self : VirtualKeyboard) : IO (Option EventHandlerNonNull) := self.val.get "ongeometrychange" (Option EventHandlerNonNull)
+@[macro_inline] def VirtualKeyboard.ongeometrychange (self : VirtualKeyboard) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VirtualKeyboard.ongeometrychange" do
+  self.val.get "ongeometrychange" (Option EventHandlerNonNull)
 
 /-- Sets `ongeometrychange`: `attribute EventHandler ongeometrychange` -/
-def VirtualKeyboard.setOngeometrychange (self : VirtualKeyboard) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VirtualKeyboard.setOngeometrychange (self : VirtualKeyboard) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VirtualKeyboard.setOngeometrychange" do
   self.val.set "ongeometrychange" (toJS value)
 
 /-- `undefined show()` -/
-def VirtualKeyboard.«show» (self : VirtualKeyboard) : IO Unit :=
-  self.val.callMethod "show" (Support.args #[]) Unit
+@[macro_inline] def VirtualKeyboard.«show» (self : VirtualKeyboard) : IO Unit := Internal.api "Lasm.JS.Web.VirtualKeyboard.show" do
+  self.val.callMethod "show" (Internal.args #[]) Unit
 
 /-- `undefined hide()` -/
-def VirtualKeyboard.hide (self : VirtualKeyboard) : IO Unit :=
-  self.val.callMethod "hide" (Support.args #[]) Unit
+@[macro_inline] def VirtualKeyboard.hide (self : VirtualKeyboard) : IO Unit := Internal.api "Lasm.JS.Web.VirtualKeyboard.hide" do
+  self.val.callMethod "hide" (Internal.args #[]) Unit
 
 /-- `attribute DOMString virtualKeyboardPolicy` -/
-def HTMLElement.virtualKeyboardPolicy (self : HTMLElement) : IO String := self.val.get "virtualKeyboardPolicy" String
+@[macro_inline] def HTMLElement.virtualKeyboardPolicy (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.virtualKeyboardPolicy" do
+  self.val.get "virtualKeyboardPolicy" String
 
 /-- Sets `virtualKeyboardPolicy`: `attribute DOMString virtualKeyboardPolicy` -/
-def HTMLElement.setVirtualKeyboardPolicy (self : HTMLElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLElement.setVirtualKeyboardPolicy (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setVirtualKeyboardPolicy" do
   self.val.set "virtualKeyboardPolicy" (toJS value)
 
 /-- `readonly attribute VirtualKeyboard virtualKeyboard` -/
-def Navigator.virtualKeyboard (self : Navigator) : IO VirtualKeyboard := do
+@[macro_inline] def Navigator.virtualKeyboard (self : Navigator) : IO VirtualKeyboard := Internal.api "Lasm.JS.Web.Navigator.virtualKeyboard" do
   let r ← self.val.get "virtualKeyboard" Value
   pure { val := r }
 

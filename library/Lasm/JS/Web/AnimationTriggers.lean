@@ -6,36 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.AnimationTriggers
 import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AnimationTriggerBehavior` (Animation Triggers (https://drafts.csswg.org/animation-triggers-1/)): "once", "repeat", "alternate", "state". -/
-inductive AnimationTriggerBehavior where
-  /-- "once" -/
-  | once
-  /-- "repeat" -/
-  | «repeat»
-  /-- "alternate" -/
-  | alternate
-  /-- "state" -/
-  | state
-  deriving BEq, Repr, Inhabited
-instance : ToJS AnimationTriggerBehavior := ⟨fun
-  | .once => .string "once"
-  | .«repeat» => .string "repeat"
-  | .alternate => .string "alternate"
-  | .state => .string "state"⟩
-instance : FromJS AnimationTriggerBehavior where
-  fromJS
-    | .string "once" => .ok .once
-    | .string "repeat" => .ok .«repeat»
-    | .string "alternate" => .ok .alternate
-    | .string "state" => .ok .state
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AnimationTriggerBehavior"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AnimationTriggerOptions` (Animation Triggers (https://drafts.csswg.org/animation-triggers-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AnimationTriggerOptions where
@@ -51,64 +30,69 @@ structure AnimationTriggerOptions where
   activeRangeStart : Option TimelineRangeOffsetOrCSSNumericValueOrCSSKeywordValueOrDOMString := none
   /-- `(TimelineRangeOffset or CSSNumericValue or CSSKeywordValue or DOMString) activeRangeEnd = "auto"` -/
   activeRangeEnd : Option TimelineRangeOffsetOrCSSNumericValueOrCSSKeywordValueOrDOMString := none
-instance : ToJS AnimationTriggerOptions := ⟨fun d => Support.fields #[("timeline", Support.optional d.timeline),
-    ("behavior", Support.optional d.behavior),
-    ("activationRangeStart", Support.optional d.activationRangeStart),
-    ("activationRangeEnd", Support.optional d.activationRangeEnd),
-    ("activeRangeStart", Support.optional d.activeRangeStart),
-    ("activeRangeEnd", Support.optional d.activeRangeEnd)]⟩
+instance : ToJS AnimationTriggerOptions := ⟨fun d => Internal.fields #[("timeline", Internal.optional d.timeline),
+    ("behavior", Internal.optional d.behavior),
+    ("activationRangeStart", Internal.optional d.activationRangeStart),
+    ("activationRangeEnd", Internal.optional d.activationRangeEnd),
+    ("activeRangeStart", Internal.optional d.activeRangeStart),
+    ("activeRangeEnd", Internal.optional d.activeRangeEnd)]⟩
 
 /-- `v instanceof AnimationTrigger`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationTrigger`). -/
-def AnimationTrigger.cast? (v : Value) : IO (Option AnimationTrigger) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationTrigger"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationTrigger.cast? (v : Value) : IO (Option AnimationTrigger) := Internal.api "Lasm.JS.Web.AnimationTrigger.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationTrigger"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional AnimationTriggerOptions options)` -/
-def AnimationTrigger.new (options : Option AnimationTriggerOptions := none) : IO AnimationTrigger :=
+@[macro_inline] def AnimationTrigger.new (options : Option AnimationTriggerOptions := none) : IO AnimationTrigger := Internal.api "Lasm.JS.Web.AnimationTrigger.new" do
   Lasm.JS.Binding.invoke AnimationTrigger { name := "Lasm.JS.Web.AnimationTrigger.new", module := "globalThis", path := "AnimationTrigger", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `attribute AnimationTimeline timeline` -/
-def AnimationTrigger.timeline (self : AnimationTrigger) : IO AnimationTimeline := do
+@[macro_inline] def AnimationTrigger.timeline (self : AnimationTrigger) : IO AnimationTimeline := Internal.api "Lasm.JS.Web.AnimationTrigger.timeline" do
   let r ← self.val.get "timeline" Value
   pure { val := r }
 
 /-- Sets `timeline`: `attribute AnimationTimeline timeline` -/
-def AnimationTrigger.setTimeline (self : AnimationTrigger) (value : AnimationTimeline) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setTimeline (self : AnimationTrigger) (value : AnimationTimeline) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setTimeline" do
   self.val.set "timeline" (toJS value)
 
 /-- `attribute AnimationTriggerBehavior behavior` -/
-def AnimationTrigger.behavior (self : AnimationTrigger) : IO AnimationTriggerBehavior := self.val.get "behavior" AnimationTriggerBehavior
+@[macro_inline] def AnimationTrigger.behavior (self : AnimationTrigger) : IO AnimationTriggerBehavior := Internal.api "Lasm.JS.Web.AnimationTrigger.behavior" do
+  self.val.get "behavior" AnimationTriggerBehavior
 
 /-- Sets `behavior`: `attribute AnimationTriggerBehavior behavior` -/
-def AnimationTrigger.setBehavior (self : AnimationTrigger) (value : AnimationTriggerBehavior) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setBehavior (self : AnimationTrigger) (value : AnimationTriggerBehavior) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setBehavior" do
   self.val.set "behavior" (toJS value)
 
 /-- `attribute any activationRangeStart` -/
-def AnimationTrigger.activationRangeStart (self : AnimationTrigger) : IO Data := self.val.get "activationRangeStart" Data
+@[macro_inline] def AnimationTrigger.activationRangeStart (self : AnimationTrigger) : IO Data := Internal.api "Lasm.JS.Web.AnimationTrigger.activationRangeStart" do
+  self.val.get "activationRangeStart" Data
 
 /-- Sets `activationRangeStart`: `attribute any activationRangeStart` -/
-def AnimationTrigger.setActivationRangeStart (self : AnimationTrigger) (value : Data) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setActivationRangeStart (self : AnimationTrigger) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setActivationRangeStart" do
   self.val.set "activationRangeStart" (toJS value)
 
 /-- `attribute any activationRangeEnd` -/
-def AnimationTrigger.activationRangeEnd (self : AnimationTrigger) : IO Data := self.val.get "activationRangeEnd" Data
+@[macro_inline] def AnimationTrigger.activationRangeEnd (self : AnimationTrigger) : IO Data := Internal.api "Lasm.JS.Web.AnimationTrigger.activationRangeEnd" do
+  self.val.get "activationRangeEnd" Data
 
 /-- Sets `activationRangeEnd`: `attribute any activationRangeEnd` -/
-def AnimationTrigger.setActivationRangeEnd (self : AnimationTrigger) (value : Data) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setActivationRangeEnd (self : AnimationTrigger) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setActivationRangeEnd" do
   self.val.set "activationRangeEnd" (toJS value)
 
 /-- `attribute any activeRangeStart` -/
-def AnimationTrigger.activeRangeStart (self : AnimationTrigger) : IO Data := self.val.get "activeRangeStart" Data
+@[macro_inline] def AnimationTrigger.activeRangeStart (self : AnimationTrigger) : IO Data := Internal.api "Lasm.JS.Web.AnimationTrigger.activeRangeStart" do
+  self.val.get "activeRangeStart" Data
 
 /-- Sets `activeRangeStart`: `attribute any activeRangeStart` -/
-def AnimationTrigger.setActiveRangeStart (self : AnimationTrigger) (value : Data) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setActiveRangeStart (self : AnimationTrigger) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setActiveRangeStart" do
   self.val.set "activeRangeStart" (toJS value)
 
 /-- `attribute any activeRangeEnd` -/
-def AnimationTrigger.activeRangeEnd (self : AnimationTrigger) : IO Data := self.val.get "activeRangeEnd" Data
+@[macro_inline] def AnimationTrigger.activeRangeEnd (self : AnimationTrigger) : IO Data := Internal.api "Lasm.JS.Web.AnimationTrigger.activeRangeEnd" do
+  self.val.get "activeRangeEnd" Data
 
 /-- Sets `activeRangeEnd`: `attribute any activeRangeEnd` -/
-def AnimationTrigger.setActiveRangeEnd (self : AnimationTrigger) (value : Data) : IO Unit :=
+@[macro_inline] def AnimationTrigger.setActiveRangeEnd (self : AnimationTrigger) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.AnimationTrigger.setActiveRangeEnd" do
   self.val.set "activeRangeEnd" (toJS value)
 
 end Lasm.JS.Web

@@ -9,13 +9,9 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `dictionary HMACGetSecretOutput` (Client to Authenticator Protocol (CTAP) (https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure HMACGetSecretOutput where
-  /-- `required ArrayBuffer output1` -/
-  output1 : ByteArray
-  /-- `ArrayBuffer output2` -/
-  output2 : Option ByteArray := none
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HMACGetSecretInput` (Client to Authenticator Protocol (CTAP) (https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HMACGetSecretInput where
@@ -23,7 +19,16 @@ structure HMACGetSecretInput where
   salt1 : ByteArray
   /-- `ArrayBuffer salt2` -/
   salt2 : Option ByteArray := none
-instance : ToJS HMACGetSecretInput := ⟨fun d => Support.fields #[("salt1", toJS d.salt1),
-    ("salt2", Support.optional d.salt2)]⟩
+instance : ToJS HMACGetSecretInput := ⟨fun d => Internal.fields #[("salt1", toJS d.salt1),
+    ("salt2", Internal.optional d.salt2)]⟩
+
+/-- `dictionary HMACGetSecretOutput` (Client to Authenticator Protocol (CTAP) (https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure HMACGetSecretOutput where
+  /-- `required ArrayBuffer output1` -/
+  output1 : ByteArray
+  /-- `ArrayBuffer output2` -/
+  output2 : Option ByteArray := none
+instance : ToJS HMACGetSecretOutput := ⟨fun d => Internal.fields #[("output1", toJS d.output1),
+    ("output2", Internal.optional d.output2)]⟩
 
 end Lasm.JS.Web

@@ -6,32 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SchedulingApis
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum TaskPriority` (Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)): "user-blocking", "user-visible", "background". -/
-inductive TaskPriority where
-  /-- "user-blocking" -/
-  | userBlocking
-  /-- "user-visible" -/
-  | userVisible
-  /-- "background" -/
-  | background
-  deriving BEq, Repr, Inhabited
-instance : ToJS TaskPriority := ⟨fun
-  | .userBlocking => .string "user-blocking"
-  | .userVisible => .string "user-visible"
-  | .background => .string "background"⟩
-instance : FromJS TaskPriority where
-  fromJS
-    | .string "user-blocking" => .ok .userBlocking
-    | .string "user-visible" => .ok .userVisible
-    | .string "background" => .ok .background
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.TaskPriority"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback SchedulerPostTaskCallback = any ()` (Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SchedulerPostTaskCallback where
@@ -55,15 +39,15 @@ structure SchedulerPostTaskOptions where
   priority : Option TaskPriority := none
   /-- `unsigned long long delay = 0` -/
   delay : Option Nat := none
-instance : ToJS SchedulerPostTaskOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("priority", Support.optional d.priority),
-    ("delay", Support.optional d.delay)]⟩
+instance : ToJS SchedulerPostTaskOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("priority", Internal.optional d.priority),
+    ("delay", Internal.optional d.delay)]⟩
 
 /-- `dictionary TaskControllerInit` (Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TaskControllerInit where
   /-- `TaskPriority priority = "user-visible"` -/
   priority : Option TaskPriority := none
-instance : ToJS TaskControllerInit := ⟨fun d => Support.fields #[("priority", Support.optional d.priority)]⟩
+instance : ToJS TaskControllerInit := ⟨fun d => Internal.fields #[("priority", Internal.optional d.priority)]⟩
 
 /-- `dictionary TaskPriorityChangeEventInit : EventInit` (Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TaskPriorityChangeEventInit where
@@ -75,9 +59,9 @@ structure TaskPriorityChangeEventInit where
   composed : Option Bool := none
   /-- `required TaskPriority previousPriority` -/
   previousPriority : TaskPriority
-instance : ToJS TaskPriorityChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS TaskPriorityChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("previousPriority", toJS d.previousPriority)]⟩
 
 /-- `(TaskPriority or TaskSignal)`: one constructor per member type. -/
@@ -96,73 +80,81 @@ instance : Coe TaskSignal TaskPriorityOrTaskSignal := ⟨.taskSignal⟩
 structure TaskSignalAnyInit where
   /-- `(TaskPriority or TaskSignal) priority = "user-visible"` -/
   priority : Option TaskPriorityOrTaskSignal := none
-instance : ToJS TaskSignalAnyInit := ⟨fun d => Support.fields #[("priority", Support.optional d.priority)]⟩
+instance : ToJS TaskSignalAnyInit := ⟨fun d => Internal.fields #[("priority", Internal.optional d.priority)]⟩
 
 /-- `v instanceof Scheduler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Scheduler`). -/
-def Scheduler.cast? (v : Value) : IO (Option Scheduler) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Scheduler"] Value) v) then some { val := v } else none
+@[macro_inline] def Scheduler.cast? (v : Value) : IO (Option Scheduler) := Internal.api "Lasm.JS.Web.Scheduler.cast?" do
+  Internal.cast (Internal.getGlobal ["Scheduler"] Value) (fun x => { val := x }) v
 
 /-- `Promise<any> postTask(SchedulerPostTaskCallback callback, optional SchedulerPostTaskOptions options)` -/
-def Scheduler.postTask (self : Scheduler) (callback : SchedulerPostTaskCallback) (options : Option SchedulerPostTaskOptions := none) : Async Data :=
-  self.val.callMethodAwait "postTask" (Support.args #[toJS callback, Support.optional options]) Data
+@[macro_inline] def Scheduler.postTask (self : Scheduler) (callback : SchedulerPostTaskCallback) (options : Option SchedulerPostTaskOptions := none) : Async Data := Internal.api "Lasm.JS.Web.Scheduler.postTask" do
+  self.val.callMethodAwait "postTask" (Internal.args #[toJS callback, Internal.optional options]) Data
 
 /-- `Promise<undefined> yield()` -/
-def Scheduler.yield (self : Scheduler) : Async Unit :=
-  self.val.callMethodAwait "yield" (Support.args #[]) Unit
+@[macro_inline] def Scheduler.yield (self : Scheduler) : Async Unit := Internal.api "Lasm.JS.Web.Scheduler.yield" do
+  self.val.callMethodAwait "yield" (Internal.args #[]) Unit
 
 /-- `v instanceof TaskController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TaskController`). -/
-def TaskController.cast? (v : Value) : IO (Option TaskController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TaskController"] Value) v) then some { val := v } else none
+@[macro_inline] def TaskController.cast? (v : Value) : IO (Option TaskController) := Internal.api "Lasm.JS.Web.TaskController.cast?" do
+  Internal.cast (Internal.getGlobal ["TaskController"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional TaskControllerInit init)` -/
-def TaskController.new (init : Option TaskControllerInit := none) : IO TaskController :=
+@[macro_inline] def TaskController.new (init : Option TaskControllerInit := none) : IO TaskController := Internal.api "Lasm.JS.Web.TaskController.new" do
   Lasm.JS.Binding.invoke TaskController { name := "Lasm.JS.Web.TaskController.new", module := "globalThis", path := "TaskController", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `undefined setPriority(TaskPriority priority)` -/
-def TaskController.setPriority (self : TaskController) (priority : TaskPriority) : IO Unit :=
-  self.val.callMethod "setPriority" (Support.args #[toJS priority]) Unit
+@[macro_inline] def TaskController.setPriority (self : TaskController) (priority : TaskPriority) : IO Unit := Internal.api "Lasm.JS.Web.TaskController.setPriority" do
+  self.val.callMethod "setPriority" (Internal.args #[toJS priority]) Unit
 
 /-- `v instanceof TaskPriorityChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TaskPriorityChangeEvent`). -/
-def TaskPriorityChangeEvent.cast? (v : Value) : IO (Option TaskPriorityChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TaskPriorityChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TaskPriorityChangeEvent.cast? (v : Value) : IO (Option TaskPriorityChangeEvent) := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TaskPriorityChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, TaskPriorityChangeEventInit priorityChangeEventInitDict)` -/
-def TaskPriorityChangeEvent.new (type : String) (priorityChangeEventInitDict : TaskPriorityChangeEventInit) : IO TaskPriorityChangeEvent :=
+@[macro_inline] def TaskPriorityChangeEvent.new (type : String) (priorityChangeEventInitDict : TaskPriorityChangeEventInit) : IO TaskPriorityChangeEvent := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.new" do
   Lasm.JS.Binding.invoke TaskPriorityChangeEvent { name := "Lasm.JS.Web.TaskPriorityChangeEvent.new", module := "globalThis", path := "TaskPriorityChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS priorityChangeEventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS priorityChangeEventInitDict]) (await := false)
 
 /-- `readonly attribute TaskPriority previousPriority` -/
-def TaskPriorityChangeEvent.previousPriority (self : TaskPriorityChangeEvent) : IO TaskPriority := self.val.get "previousPriority" TaskPriority
+@[macro_inline] def TaskPriorityChangeEvent.previousPriority (self : TaskPriorityChangeEvent) : IO TaskPriority := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.previousPriority" do
+  self.val.get "previousPriority" TaskPriority
 
 /-- `v instanceof TaskSignal`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TaskSignal`). -/
-def TaskSignal.cast? (v : Value) : IO (Option TaskSignal) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TaskSignal"] Value) v) then some { val := v } else none
+@[macro_inline] def TaskSignal.cast? (v : Value) : IO (Option TaskSignal) := Internal.api "Lasm.JS.Web.TaskSignal.cast?" do
+  Internal.cast (Internal.getGlobal ["TaskSignal"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute TaskPriority priority` -/
-def TaskSignal.priority (self : TaskSignal) : IO TaskPriority := self.val.get "priority" TaskPriority
+@[macro_inline] def TaskSignal.priority (self : TaskSignal) : IO TaskPriority := Internal.api "Lasm.JS.Web.TaskSignal.priority" do
+  self.val.get "priority" TaskPriority
 
 /-- `attribute EventHandler onprioritychange` -/
-def TaskSignal.onprioritychange (self : TaskSignal) : IO (Option EventHandlerNonNull) := self.val.get "onprioritychange" (Option EventHandlerNonNull)
+@[macro_inline] def TaskSignal.onprioritychange (self : TaskSignal) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.TaskSignal.onprioritychange" do
+  self.val.get "onprioritychange" (Option EventHandlerNonNull)
 
 /-- Sets `onprioritychange`: `attribute EventHandler onprioritychange` -/
-def TaskSignal.setOnprioritychange (self : TaskSignal) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def TaskSignal.setOnprioritychange (self : TaskSignal) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.TaskSignal.setOnprioritychange" do
   self.val.set "onprioritychange" (toJS value)
 
 /-- `static TaskSignal any(sequence<AbortSignal> signals, optional TaskSignalAnyInit init)` -/
-def TaskSignal.any (signals : Array AbortSignal) (init : Option TaskSignalAnyInit := none) : IO TaskSignal := do
+@[macro_inline] def TaskSignal.any (signals : Array AbortSignal) (init : Option TaskSignalAnyInit := none) : IO TaskSignal := Internal.api "Lasm.JS.Web.TaskSignal.any" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.TaskSignal.any", module := "globalThis", path := "TaskSignal.any", construct := false, arity := 2 }
-    (Support.args #[toJS signals, Support.optional init]) (await := false)
+    (Internal.args #[toJS signals, Internal.optional init]) (await := false)
   pure { val := r }
 
 /-- `readonly attribute Scheduler scheduler` -/
-def WorkerGlobalScope.scheduler (self : WorkerGlobalScope) : IO Scheduler := do
+@[macro_inline] def Window.scheduler (self : Window) : IO Scheduler := Internal.api "Lasm.JS.Web.Window.scheduler" do
+  let r ← self.val.get "scheduler" Value
+  pure { val := r }
+
+/-- `readonly attribute Scheduler scheduler` -/
+@[macro_inline] def WorkerGlobalScope.scheduler (self : WorkerGlobalScope) : IO Scheduler := Internal.api "Lasm.JS.Web.WorkerGlobalScope.scheduler" do
   let r ← self.val.get "scheduler" Value
   pure { val := r }
 
 /-- `readonly attribute Scheduler scheduler` (Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)) -/
-def scheduler : IO Scheduler := do
-  let r ← Support.getGlobal ["scheduler"] Value
+@[macro_inline] def scheduler : IO Scheduler := Internal.api "Lasm.JS.Web.scheduler" do
+  let r ← Internal.getGlobal ["scheduler"] Value
   pure { val := r }
 
 end Lasm.JS.Web

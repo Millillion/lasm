@@ -6,44 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Types.Xhr
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XMLHttpRequestResponseType` (XMLHttpRequest Standard (https://xhr.spec.whatwg.org/)): "", "arraybuffer", "blob", "document", "json", "text". -/
-inductive XMLHttpRequestResponseType where
-  /-- "" -/
-  | empty
-  /-- "arraybuffer" -/
-  | arraybuffer
-  /-- "blob" -/
-  | blob
-  /-- "document" -/
-  | document
-  /-- "json" -/
-  | json
-  /-- "text" -/
-  | text
-  deriving BEq, Repr, Inhabited
-instance : ToJS XMLHttpRequestResponseType := ⟨fun
-  | .empty => .string ""
-  | .arraybuffer => .string "arraybuffer"
-  | .blob => .string "blob"
-  | .document => .string "document"
-  | .json => .string "json"
-  | .text => .string "text"⟩
-instance : FromJS XMLHttpRequestResponseType where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "arraybuffer" => .ok .arraybuffer
-    | .string "blob" => .ok .blob
-    | .string "document" => .ok .document
-    | .string "json" => .ok .json
-    | .string "text" => .ok .text
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XMLHttpRequestResponseType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef File or USVString FormDataEntryValue`: one constructor per member type. -/
 inductive FormDataEntryValue where
@@ -72,12 +46,12 @@ structure ProgressEventInit where
   loaded : Option Float := none
   /-- `double total = 0` -/
   total : Option Float := none
-instance : ToJS ProgressEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("lengthComputable", Support.optional d.lengthComputable),
-    ("loaded", Support.optional d.loaded),
-    ("total", Support.optional d.total)]⟩
+instance : ToJS ProgressEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("lengthComputable", Internal.optional d.lengthComputable),
+    ("loaded", Internal.optional d.loaded),
+    ("total", Internal.optional d.total)]⟩
 
 /-- `(Document or Blob or BufferSource or FormData or URLSearchParams or USVString)`: one constructor per member type. -/
 inductive DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrUSVString where
@@ -108,137 +82,147 @@ instance : Coe URLSearchParams DocumentOrBlobOrBufferSourceOrFormDataOrURLSearch
 instance : Coe String DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrUSVString := ⟨.usvString⟩
 
 /-- `v instanceof FormData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FormData`). -/
-def FormData.cast? (v : Value) : IO (Option FormData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FormData"] Value) v) then some { val := v } else none
+@[macro_inline] def FormData.cast? (v : Value) : IO (Option FormData) := Internal.api "Lasm.JS.Web.FormData.cast?" do
+  Internal.cast (Internal.getGlobal ["FormData"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional HTMLFormElement form, optional HTMLElement? submitter)` -/
-def FormData.new (form : Option HTMLFormElement := none) (submitter : Option HTMLElement := none) : IO FormData :=
+@[macro_inline] def FormData.new (form : Option HTMLFormElement := none) (submitter : Option HTMLElement := none) : IO FormData := Internal.api "Lasm.JS.Web.FormData.new" do
   Lasm.JS.Binding.invoke FormData { name := "Lasm.JS.Web.FormData.new", module := "globalThis", path := "FormData", construct := true, arity := 2 }
-    (Support.args #[Support.optional form, Support.optional submitter]) (await := false)
+    (Internal.args #[Internal.optional form, Internal.optional submitter]) (await := false)
 
 /-- `undefined append(USVString name, USVString value)` -/
-def FormData.append (self : FormData) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "append" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def FormData.append (self : FormData) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FormData.append" do
+  self.val.callMethod "append" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined append(USVString name, Blob blobValue, optional USVString filename)` -/
-def FormData.appendBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
-  self.val.callMethod "append" (Support.args #[toJS name, toJS blobValue, Support.optional filename]) Unit
+@[macro_inline] def FormData.appendBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.FormData.appendBlob" do
+  self.val.callMethod "append" (Internal.args #[toJS name, toJS blobValue, Internal.optional filename]) Unit
 
 /-- `undefined delete(USVString name)` -/
-def FormData.delete (self : FormData) (name : String) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS name]) Unit
+@[macro_inline] def FormData.delete (self : FormData) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.FormData.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS name]) Unit
 
 /-- `FormDataEntryValue? get(USVString name)` -/
-def FormData.get (self : FormData) (name : String) : IO (Option FormDataEntryValue) :=
-  self.val.callMethod "get" (Support.args #[toJS name]) (Option FormDataEntryValue)
+@[macro_inline] def FormData.get (self : FormData) (name : String) : IO (Option FormDataEntryValue) := Internal.api "Lasm.JS.Web.FormData.get" do
+  self.val.callMethod "get" (Internal.args #[toJS name]) (Option FormDataEntryValue)
 
 /-- `sequence<FormDataEntryValue> getAll(USVString name)` -/
-def FormData.getAll (self : FormData) (name : String) : IO (Array FormDataEntryValue) :=
-  self.val.callMethod "getAll" (Support.args #[toJS name]) (Array FormDataEntryValue)
+@[macro_inline] def FormData.getAll (self : FormData) (name : String) : IO (Array FormDataEntryValue) := Internal.api "Lasm.JS.Web.FormData.getAll" do
+  self.val.callMethod "getAll" (Internal.args #[toJS name]) (Array FormDataEntryValue)
 
 /-- `boolean has(USVString name)` -/
-def FormData.has (self : FormData) (name : String) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+@[macro_inline] def FormData.has (self : FormData) (name : String) : IO Bool := Internal.api "Lasm.JS.Web.FormData.has" do
+  self.val.callMethod "has" (Internal.args #[toJS name]) Bool
 
 /-- `undefined set(USVString name, USVString value)` -/
-def FormData.set (self : FormData) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def FormData.set (self : FormData) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FormData.set" do
+  self.val.callMethod "set" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined set(USVString name, Blob blobValue, optional USVString filename)` -/
-def FormData.setBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS name, toJS blobValue, Support.optional filename]) Unit
+@[macro_inline] def FormData.setBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.FormData.setBlob" do
+  self.val.callMethod "set" (Internal.args #[toJS name, toJS blobValue, Internal.optional filename]) Unit
 
 /-- `iterable<USVString, FormDataEntryValue>`: `entries()`, collected into an array. -/
-def FormData.entries (self : FormData) : IO (Array (String × FormDataEntryValue)) :=
-  Support.iterate self.val "entries" (Array (String × FormDataEntryValue))
+@[macro_inline] def FormData.entries (self : FormData) : IO (Array (String × FormDataEntryValue)) := Internal.api "Lasm.JS.Web.FormData.entries" do
+  Internal.iterate self.val "entries" (Array (String × FormDataEntryValue))
 
 /-- `iterable<USVString, FormDataEntryValue>`: `keys()`, collected into an array. -/
-def FormData.keys (self : FormData) : IO (Array String) :=
-  Support.iterate self.val "keys" (Array String)
+@[macro_inline] def FormData.keys (self : FormData) : IO (Array String) := Internal.api "Lasm.JS.Web.FormData.keys" do
+  Internal.iterate self.val "keys" (Array String)
 
 /-- `iterable<USVString, FormDataEntryValue>`: `values()`, collected into an array. -/
-def FormData.values (self : FormData) : IO (Array FormDataEntryValue) :=
-  Support.iterate self.val "values" (Array FormDataEntryValue)
+@[macro_inline] def FormData.values (self : FormData) : IO (Array FormDataEntryValue) := Internal.api "Lasm.JS.Web.FormData.values" do
+  Internal.iterate self.val "values" (Array FormDataEntryValue)
 
 /-- `v instanceof ProgressEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ProgressEvent`). -/
-def ProgressEvent.cast? (v : Value) : IO (Option ProgressEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ProgressEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ProgressEvent.cast? (v : Value) : IO (Option ProgressEvent) := Internal.api "Lasm.JS.Web.ProgressEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ProgressEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ProgressEventInit eventInitDict)` -/
-def ProgressEvent.new (type : String) (eventInitDict : Option ProgressEventInit := none) : IO ProgressEvent :=
+@[macro_inline] def ProgressEvent.new (type : String) (eventInitDict : Option ProgressEventInit := none) : IO ProgressEvent := Internal.api "Lasm.JS.Web.ProgressEvent.new" do
   Lasm.JS.Binding.invoke ProgressEvent { name := "Lasm.JS.Web.ProgressEvent.new", module := "globalThis", path := "ProgressEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute boolean lengthComputable` -/
-def ProgressEvent.lengthComputable (self : ProgressEvent) : IO Bool := self.val.get "lengthComputable" Bool
+@[macro_inline] def ProgressEvent.lengthComputable (self : ProgressEvent) : IO Bool := Internal.api "Lasm.JS.Web.ProgressEvent.lengthComputable" do
+  self.val.get "lengthComputable" Bool
 
 /-- `readonly attribute double loaded` -/
-def ProgressEvent.loaded (self : ProgressEvent) : IO Float := self.val.get "loaded" Float
+@[macro_inline] def ProgressEvent.loaded (self : ProgressEvent) : IO Float := Internal.api "Lasm.JS.Web.ProgressEvent.loaded" do
+  self.val.get "loaded" Float
 
 /-- `readonly attribute double total` -/
-def ProgressEvent.total (self : ProgressEvent) : IO Float := self.val.get "total" Float
+@[macro_inline] def ProgressEvent.total (self : ProgressEvent) : IO Float := Internal.api "Lasm.JS.Web.ProgressEvent.total" do
+  self.val.get "total" Float
 
 /-- `v instanceof XMLHttpRequestEventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XMLHttpRequestEventTarget`). -/
-def XMLHttpRequestEventTarget.cast? (v : Value) : IO (Option XMLHttpRequestEventTarget) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XMLHttpRequestEventTarget"] Value) v) then some { val := v } else none
+@[macro_inline] def XMLHttpRequestEventTarget.cast? (v : Value) : IO (Option XMLHttpRequestEventTarget) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.cast?" do
+  Internal.cast (Internal.getGlobal ["XMLHttpRequestEventTarget"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onloadstart` -/
-def XMLHttpRequestEventTarget.onloadstart (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onloadstart" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onloadstart (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onloadstart" do
+  self.val.get "onloadstart" (Option EventHandlerNonNull)
 
 /-- Sets `onloadstart`: `attribute EventHandler onloadstart` -/
-def XMLHttpRequestEventTarget.setOnloadstart (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnloadstart (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnloadstart" do
   self.val.set "onloadstart" (toJS value)
 
 /-- `attribute EventHandler onprogress` -/
-def XMLHttpRequestEventTarget.onprogress (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onprogress" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onprogress (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onprogress" do
+  self.val.get "onprogress" (Option EventHandlerNonNull)
 
 /-- Sets `onprogress`: `attribute EventHandler onprogress` -/
-def XMLHttpRequestEventTarget.setOnprogress (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnprogress (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnprogress" do
   self.val.set "onprogress" (toJS value)
 
 /-- `attribute EventHandler onabort` -/
-def XMLHttpRequestEventTarget.onabort (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onabort (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def XMLHttpRequestEventTarget.setOnabort (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnabort (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def XMLHttpRequestEventTarget.onerror (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onerror (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def XMLHttpRequestEventTarget.setOnerror (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnerror (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onload` -/
-def XMLHttpRequestEventTarget.onload (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onload" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onload (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onload" do
+  self.val.get "onload" (Option EventHandlerNonNull)
 
 /-- Sets `onload`: `attribute EventHandler onload` -/
-def XMLHttpRequestEventTarget.setOnload (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnload (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnload" do
   self.val.set "onload" (toJS value)
 
 /-- `attribute EventHandler ontimeout` -/
-def XMLHttpRequestEventTarget.ontimeout (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "ontimeout" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.ontimeout (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.ontimeout" do
+  self.val.get "ontimeout" (Option EventHandlerNonNull)
 
 /-- Sets `ontimeout`: `attribute EventHandler ontimeout` -/
-def XMLHttpRequestEventTarget.setOntimeout (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOntimeout (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOntimeout" do
   self.val.set "ontimeout" (toJS value)
 
 /-- `attribute EventHandler onloadend` -/
-def XMLHttpRequestEventTarget.onloadend (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := self.val.get "onloadend" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequestEventTarget.onloadend (self : XMLHttpRequestEventTarget) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.onloadend" do
+  self.val.get "onloadend" (Option EventHandlerNonNull)
 
 /-- Sets `onloadend`: `attribute EventHandler onloadend` -/
-def XMLHttpRequestEventTarget.setOnloadend (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequestEventTarget.setOnloadend (self : XMLHttpRequestEventTarget) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequestEventTarget.setOnloadend" do
   self.val.set "onloadend" (toJS value)
 
 /-- `v instanceof XMLHttpRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XMLHttpRequest`). -/
-def XMLHttpRequest.cast? (v : Value) : IO (Option XMLHttpRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XMLHttpRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def XMLHttpRequest.cast? (v : Value) : IO (Option XMLHttpRequest) := Internal.api "Lasm.JS.Web.XMLHttpRequest.cast?" do
+  Internal.cast (Internal.getGlobal ["XMLHttpRequest"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def XMLHttpRequest.new : IO XMLHttpRequest :=
+@[macro_inline] def XMLHttpRequest.new : IO XMLHttpRequest := Internal.api "Lasm.JS.Web.XMLHttpRequest.new" do
   Lasm.JS.Binding.invoke XMLHttpRequest { name := "Lasm.JS.Web.XMLHttpRequest.new", module := "globalThis", path := "XMLHttpRequest", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `const unsigned short UNSENT = 0` -/
 def XMLHttpRequest.UNSENT : Nat := 0
@@ -256,93 +240,104 @@ def XMLHttpRequest.LOADING : Nat := 3
 def XMLHttpRequest.DONE : Nat := 4
 
 /-- `attribute EventHandler onreadystatechange` -/
-def XMLHttpRequest.onreadystatechange (self : XMLHttpRequest) : IO (Option EventHandlerNonNull) := self.val.get "onreadystatechange" (Option EventHandlerNonNull)
+@[macro_inline] def XMLHttpRequest.onreadystatechange (self : XMLHttpRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XMLHttpRequest.onreadystatechange" do
+  self.val.get "onreadystatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onreadystatechange`: `attribute EventHandler onreadystatechange` -/
-def XMLHttpRequest.setOnreadystatechange (self : XMLHttpRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XMLHttpRequest.setOnreadystatechange (self : XMLHttpRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setOnreadystatechange" do
   self.val.set "onreadystatechange" (toJS value)
 
 /-- `readonly attribute unsigned short readyState` -/
-def XMLHttpRequest.readyState (self : XMLHttpRequest) : IO Nat := self.val.get "readyState" Nat
+@[macro_inline] def XMLHttpRequest.readyState (self : XMLHttpRequest) : IO Nat := Internal.api "Lasm.JS.Web.XMLHttpRequest.readyState" do
+  self.val.get "readyState" Nat
 
 /-- `attribute unsigned long timeout` -/
-def XMLHttpRequest.timeout (self : XMLHttpRequest) : IO Nat := self.val.get "timeout" Nat
+@[macro_inline] def XMLHttpRequest.timeout (self : XMLHttpRequest) : IO Nat := Internal.api "Lasm.JS.Web.XMLHttpRequest.timeout" do
+  self.val.get "timeout" Nat
 
 /-- Sets `timeout`: `attribute unsigned long timeout` -/
-def XMLHttpRequest.setTimeout (self : XMLHttpRequest) (value : Nat) : IO Unit :=
+@[macro_inline] def XMLHttpRequest.setTimeout (self : XMLHttpRequest) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setTimeout" do
   self.val.set "timeout" (toJS value)
 
 /-- `attribute boolean withCredentials` -/
-def XMLHttpRequest.withCredentials (self : XMLHttpRequest) : IO Bool := self.val.get "withCredentials" Bool
+@[macro_inline] def XMLHttpRequest.withCredentials (self : XMLHttpRequest) : IO Bool := Internal.api "Lasm.JS.Web.XMLHttpRequest.withCredentials" do
+  self.val.get "withCredentials" Bool
 
 /-- Sets `withCredentials`: `attribute boolean withCredentials` -/
-def XMLHttpRequest.setWithCredentials (self : XMLHttpRequest) (value : Bool) : IO Unit :=
+@[macro_inline] def XMLHttpRequest.setWithCredentials (self : XMLHttpRequest) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setWithCredentials" do
   self.val.set "withCredentials" (toJS value)
 
 /-- `readonly attribute XMLHttpRequestUpload upload` -/
-def XMLHttpRequest.upload (self : XMLHttpRequest) : IO XMLHttpRequestUpload := do
+@[macro_inline] def XMLHttpRequest.upload (self : XMLHttpRequest) : IO XMLHttpRequestUpload := Internal.api "Lasm.JS.Web.XMLHttpRequest.upload" do
   let r ← self.val.get "upload" Value
   pure { val := r }
 
 /-- `readonly attribute USVString responseURL` -/
-def XMLHttpRequest.responseURL (self : XMLHttpRequest) : IO String := self.val.get "responseURL" String
+@[macro_inline] def XMLHttpRequest.responseURL (self : XMLHttpRequest) : IO String := Internal.api "Lasm.JS.Web.XMLHttpRequest.responseURL" do
+  self.val.get "responseURL" String
 
 /-- `readonly attribute unsigned short status` -/
-def XMLHttpRequest.status (self : XMLHttpRequest) : IO Nat := self.val.get "status" Nat
+@[macro_inline] def XMLHttpRequest.status (self : XMLHttpRequest) : IO Nat := Internal.api "Lasm.JS.Web.XMLHttpRequest.status" do
+  self.val.get "status" Nat
 
 /-- `readonly attribute ByteString statusText` -/
-def XMLHttpRequest.statusText (self : XMLHttpRequest) : IO String := self.val.get "statusText" String
+@[macro_inline] def XMLHttpRequest.statusText (self : XMLHttpRequest) : IO String := Internal.api "Lasm.JS.Web.XMLHttpRequest.statusText" do
+  self.val.get "statusText" String
 
 /-- `attribute XMLHttpRequestResponseType responseType` -/
-def XMLHttpRequest.responseType (self : XMLHttpRequest) : IO XMLHttpRequestResponseType := self.val.get "responseType" XMLHttpRequestResponseType
+@[macro_inline] def XMLHttpRequest.responseType (self : XMLHttpRequest) : IO XMLHttpRequestResponseType := Internal.api "Lasm.JS.Web.XMLHttpRequest.responseType" do
+  self.val.get "responseType" XMLHttpRequestResponseType
 
 /-- Sets `responseType`: `attribute XMLHttpRequestResponseType responseType` -/
-def XMLHttpRequest.setResponseType (self : XMLHttpRequest) (value : XMLHttpRequestResponseType) : IO Unit :=
+@[macro_inline] def XMLHttpRequest.setResponseType (self : XMLHttpRequest) (value : XMLHttpRequestResponseType) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setResponseType" do
   self.val.set "responseType" (toJS value)
 
 /-- `readonly attribute any response` -/
-def XMLHttpRequest.response (self : XMLHttpRequest) : IO Data := self.val.get "response" Data
+@[macro_inline] def XMLHttpRequest.response (self : XMLHttpRequest) : IO Data := Internal.api "Lasm.JS.Web.XMLHttpRequest.response" do
+  self.val.get "response" Data
 
 /-- `readonly attribute USVString responseText` -/
-def XMLHttpRequest.responseText (self : XMLHttpRequest) : IO String := self.val.get "responseText" String
+@[macro_inline] def XMLHttpRequest.responseText (self : XMLHttpRequest) : IO String := Internal.api "Lasm.JS.Web.XMLHttpRequest.responseText" do
+  self.val.get "responseText" String
 
 /-- `readonly attribute Document? responseXML` -/
-def XMLHttpRequest.responseXML (self : XMLHttpRequest) : IO (Option Document) := self.val.get "responseXML" (Option Document)
+@[macro_inline] def XMLHttpRequest.responseXML (self : XMLHttpRequest) : IO (Option Document) := Internal.api "Lasm.JS.Web.XMLHttpRequest.responseXML" do
+  self.val.get "responseXML" (Option Document)
 
 /-- `undefined open(ByteString method, USVString url)` -/
-def XMLHttpRequest.«open» (self : XMLHttpRequest) (method : String) (url : String) : IO Unit :=
-  self.val.callMethod "open" (Support.args #[toJS method, toJS url]) Unit
+@[macro_inline] def XMLHttpRequest.«open» (self : XMLHttpRequest) (method : String) (url : String) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.open" do
+  self.val.callMethod "open" (Internal.args #[toJS method, toJS url]) Unit
 
 /-- `undefined open(ByteString method, USVString url, boolean async, optional USVString? username, optional USVString? password)` -/
-def XMLHttpRequest.openWithAsync (self : XMLHttpRequest) (method : String) (url : String) (async : Bool) (username : Option String := none) (password : Option String := none) : IO Unit :=
-  self.val.callMethod "open" (Support.args #[toJS method, toJS url, toJS async, Support.optional username, Support.optional password]) Unit
+@[macro_inline] def XMLHttpRequest.openWithAsync (self : XMLHttpRequest) (method : String) (url : String) (async : Bool) (username : Option String := none) (password : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.openWithAsync" do
+  self.val.callMethod "open" (Internal.args #[toJS method, toJS url, toJS async, Internal.optional username, Internal.optional password]) Unit
 
 /-- `undefined setRequestHeader(ByteString name, ByteString value)` -/
-def XMLHttpRequest.setRequestHeader (self : XMLHttpRequest) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "setRequestHeader" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def XMLHttpRequest.setRequestHeader (self : XMLHttpRequest) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setRequestHeader" do
+  self.val.callMethod "setRequestHeader" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined send(optional (Document or XMLHttpRequestBodyInit)? body)` -/
-def XMLHttpRequest.send (self : XMLHttpRequest) (body : Option DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrUSVString := none) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[Support.optional body]) Unit
+@[macro_inline] def XMLHttpRequest.send (self : XMLHttpRequest) (body : Option DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrUSVString := none) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.send" do
+  self.val.callMethod "send" (Internal.args #[Internal.optional body]) Unit
 
 /-- `undefined abort()` -/
-def XMLHttpRequest.abort (self : XMLHttpRequest) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[]) Unit
+@[macro_inline] def XMLHttpRequest.abort (self : XMLHttpRequest) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
 
 /-- `ByteString? getResponseHeader(ByteString name)` -/
-def XMLHttpRequest.getResponseHeader (self : XMLHttpRequest) (name : String) : IO (Option String) :=
-  self.val.callMethod "getResponseHeader" (Support.args #[toJS name]) (Option String)
+@[macro_inline] def XMLHttpRequest.getResponseHeader (self : XMLHttpRequest) (name : String) : IO (Option String) := Internal.api "Lasm.JS.Web.XMLHttpRequest.getResponseHeader" do
+  self.val.callMethod "getResponseHeader" (Internal.args #[toJS name]) (Option String)
 
 /-- `ByteString getAllResponseHeaders()` -/
-def XMLHttpRequest.getAllResponseHeaders (self : XMLHttpRequest) : IO String :=
-  self.val.callMethod "getAllResponseHeaders" (Support.args #[]) String
+@[macro_inline] def XMLHttpRequest.getAllResponseHeaders (self : XMLHttpRequest) : IO String := Internal.api "Lasm.JS.Web.XMLHttpRequest.getAllResponseHeaders" do
+  self.val.callMethod "getAllResponseHeaders" (Internal.args #[]) String
 
 /-- `undefined overrideMimeType(DOMString mime)` -/
-def XMLHttpRequest.overrideMimeType (self : XMLHttpRequest) (mime : String) : IO Unit :=
-  self.val.callMethod "overrideMimeType" (Support.args #[toJS mime]) Unit
+@[macro_inline] def XMLHttpRequest.overrideMimeType (self : XMLHttpRequest) (mime : String) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.overrideMimeType" do
+  self.val.callMethod "overrideMimeType" (Internal.args #[toJS mime]) Unit
 
 /-- `v instanceof XMLHttpRequestUpload`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XMLHttpRequestUpload`). -/
-def XMLHttpRequestUpload.cast? (v : Value) : IO (Option XMLHttpRequestUpload) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XMLHttpRequestUpload"] Value) v) then some { val := v } else none
+@[macro_inline] def XMLHttpRequestUpload.cast? (v : Value) : IO (Option XMLHttpRequestUpload) := Internal.api "Lasm.JS.Web.XMLHttpRequestUpload.cast?" do
+  Internal.cast (Internal.getGlobal ["XMLHttpRequestUpload"] Value) (fun x => { val := x }) v
 
 end Lasm.JS.Web

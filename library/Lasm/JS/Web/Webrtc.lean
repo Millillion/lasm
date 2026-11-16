@@ -6,586 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MstContentHint
+import Lasm.JS.Web.Types.Webrtc
+import Lasm.JS.Web.Types.WebrtcPriority
+import Lasm.JS.Web.Types.WebrtcStats
+import Lasm.JS.Web.Types.Websockets
 import Lasm.JS.Web.Webidl
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.FileSystemAccess
-import Lasm.JS.Web.PresentationApi
 import Lasm.JS.Web.Webcrypto
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum RTCDataChannelState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "connecting", "open", "closing", "closed". -/
-inductive RTCDataChannelState where
-  /-- "connecting" -/
-  | connecting
-  /-- "open" -/
-  | «open»
-  /-- "closing" -/
-  | closing
-  /-- "closed" -/
-  | closed
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCDataChannelState := ⟨fun
-  | .connecting => .string "connecting"
-  | .«open» => .string "open"
-  | .closing => .string "closing"
-  | .closed => .string "closed"⟩
-instance : FromJS RTCDataChannelState where
-  fromJS
-    | .string "connecting" => .ok .connecting
-    | .string "open" => .ok .«open»
-    | .string "closing" => .ok .closing
-    | .string "closed" => .ok .closed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCDataChannelState"
-
-/-- `enum RTCDtlsTransportState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "new", "connecting", "connected", "closed", "failed". -/
-inductive RTCDtlsTransportState where
-  /-- "new" -/
-  | new
-  /-- "connecting" -/
-  | connecting
-  /-- "connected" -/
-  | connected
-  /-- "closed" -/
-  | closed
-  /-- "failed" -/
-  | failed
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCDtlsTransportState := ⟨fun
-  | .new => .string "new"
-  | .connecting => .string "connecting"
-  | .connected => .string "connected"
-  | .closed => .string "closed"
-  | .failed => .string "failed"⟩
-instance : FromJS RTCDtlsTransportState where
-  fromJS
-    | .string "new" => .ok .new
-    | .string "connecting" => .ok .connecting
-    | .string "connected" => .ok .connected
-    | .string "closed" => .ok .closed
-    | .string "failed" => .ok .failed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCDtlsTransportState"
-
-/-- `enum RTCErrorDetailType` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "data-channel-failure", "dtls-failure", "fingerprint-failure", "sctp-failure", "sdp-syntax-error", "hardware-encoder-not-available", "hardware-encoder-error". -/
-inductive RTCErrorDetailType where
-  /-- "data-channel-failure" -/
-  | dataChannelFailure
-  /-- "dtls-failure" -/
-  | dtlsFailure
-  /-- "fingerprint-failure" -/
-  | fingerprintFailure
-  /-- "sctp-failure" -/
-  | sctpFailure
-  /-- "sdp-syntax-error" -/
-  | sdpSyntaxError
-  /-- "hardware-encoder-not-available" -/
-  | hardwareEncoderNotAvailable
-  /-- "hardware-encoder-error" -/
-  | hardwareEncoderError
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCErrorDetailType := ⟨fun
-  | .dataChannelFailure => .string "data-channel-failure"
-  | .dtlsFailure => .string "dtls-failure"
-  | .fingerprintFailure => .string "fingerprint-failure"
-  | .sctpFailure => .string "sctp-failure"
-  | .sdpSyntaxError => .string "sdp-syntax-error"
-  | .hardwareEncoderNotAvailable => .string "hardware-encoder-not-available"
-  | .hardwareEncoderError => .string "hardware-encoder-error"⟩
-instance : FromJS RTCErrorDetailType where
-  fromJS
-    | .string "data-channel-failure" => .ok .dataChannelFailure
-    | .string "dtls-failure" => .ok .dtlsFailure
-    | .string "fingerprint-failure" => .ok .fingerprintFailure
-    | .string "sctp-failure" => .ok .sctpFailure
-    | .string "sdp-syntax-error" => .ok .sdpSyntaxError
-    | .string "hardware-encoder-not-available" => .ok .hardwareEncoderNotAvailable
-    | .string "hardware-encoder-error" => .ok .hardwareEncoderError
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCErrorDetailType"
-
-/-- `enum RTCIceServerTransportProtocol` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "udp", "tcp", "tls". -/
-inductive RTCIceServerTransportProtocol where
-  /-- "udp" -/
-  | udp
-  /-- "tcp" -/
-  | tcp
-  /-- "tls" -/
-  | tls
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceServerTransportProtocol := ⟨fun
-  | .udp => .string "udp"
-  | .tcp => .string "tcp"
-  | .tls => .string "tls"⟩
-instance : FromJS RTCIceServerTransportProtocol where
-  fromJS
-    | .string "udp" => .ok .udp
-    | .string "tcp" => .ok .tcp
-    | .string "tls" => .ok .tls
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceServerTransportProtocol"
-
-/-- `enum RTCIceComponent` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "rtp", "rtcp". -/
-inductive RTCIceComponent where
-  /-- "rtp" -/
-  | rtp
-  /-- "rtcp" -/
-  | rtcp
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceComponent := ⟨fun
-  | .rtp => .string "rtp"
-  | .rtcp => .string "rtcp"⟩
-instance : FromJS RTCIceComponent where
-  fromJS
-    | .string "rtp" => .ok .rtp
-    | .string "rtcp" => .ok .rtcp
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceComponent"
-
-/-- `enum RTCIceProtocol` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "udp", "tcp". -/
-inductive RTCIceProtocol where
-  /-- "udp" -/
-  | udp
-  /-- "tcp" -/
-  | tcp
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceProtocol := ⟨fun
-  | .udp => .string "udp"
-  | .tcp => .string "tcp"⟩
-instance : FromJS RTCIceProtocol where
-  fromJS
-    | .string "udp" => .ok .udp
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceProtocol"
-
-/-- `enum RTCIceCandidateType` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "host", "srflx", "prflx", "relay". -/
-inductive RTCIceCandidateType where
-  /-- "host" -/
-  | host
-  /-- "srflx" -/
-  | srflx
-  /-- "prflx" -/
-  | prflx
-  /-- "relay" -/
-  | relay
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceCandidateType := ⟨fun
-  | .host => .string "host"
-  | .srflx => .string "srflx"
-  | .prflx => .string "prflx"
-  | .relay => .string "relay"⟩
-instance : FromJS RTCIceCandidateType where
-  fromJS
-    | .string "host" => .ok .host
-    | .string "srflx" => .ok .srflx
-    | .string "prflx" => .ok .prflx
-    | .string "relay" => .ok .relay
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceCandidateType"
-
-/-- `enum RTCIceTcpCandidateType` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "active", "passive", "so". -/
-inductive RTCIceTcpCandidateType where
-  /-- "active" -/
-  | active
-  /-- "passive" -/
-  | passive
-  /-- "so" -/
-  | so
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceTcpCandidateType := ⟨fun
-  | .active => .string "active"
-  | .passive => .string "passive"
-  | .so => .string "so"⟩
-instance : FromJS RTCIceTcpCandidateType where
-  fromJS
-    | .string "active" => .ok .active
-    | .string "passive" => .ok .passive
-    | .string "so" => .ok .so
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceTcpCandidateType"
-
-/-- `enum RTCIceRole` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "unknown", "controlling", "controlled". -/
-inductive RTCIceRole where
-  /-- "unknown" -/
-  | unknown
-  /-- "controlling" -/
-  | controlling
-  /-- "controlled" -/
-  | controlled
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceRole := ⟨fun
-  | .unknown => .string "unknown"
-  | .controlling => .string "controlling"
-  | .controlled => .string "controlled"⟩
-instance : FromJS RTCIceRole where
-  fromJS
-    | .string "unknown" => .ok .unknown
-    | .string "controlling" => .ok .controlling
-    | .string "controlled" => .ok .controlled
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceRole"
-
-/-- `enum RTCIceTransportState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "closed", "failed", "disconnected", "new", "checking", "completed", "connected". -/
-inductive RTCIceTransportState where
-  /-- "closed" -/
-  | closed
-  /-- "failed" -/
-  | failed
-  /-- "disconnected" -/
-  | disconnected
-  /-- "new" -/
-  | new
-  /-- "checking" -/
-  | checking
-  /-- "completed" -/
-  | completed
-  /-- "connected" -/
-  | connected
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceTransportState := ⟨fun
-  | .closed => .string "closed"
-  | .failed => .string "failed"
-  | .disconnected => .string "disconnected"
-  | .new => .string "new"
-  | .checking => .string "checking"
-  | .completed => .string "completed"
-  | .connected => .string "connected"⟩
-instance : FromJS RTCIceTransportState where
-  fromJS
-    | .string "closed" => .ok .closed
-    | .string "failed" => .ok .failed
-    | .string "disconnected" => .ok .disconnected
-    | .string "new" => .ok .new
-    | .string "checking" => .ok .checking
-    | .string "completed" => .ok .completed
-    | .string "connected" => .ok .connected
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceTransportState"
-
-/-- `enum RTCIceGathererState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "new", "gathering", "complete". -/
-inductive RTCIceGathererState where
-  /-- "new" -/
-  | new
-  /-- "gathering" -/
-  | gathering
-  /-- "complete" -/
-  | complete
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceGathererState := ⟨fun
-  | .new => .string "new"
-  | .gathering => .string "gathering"
-  | .complete => .string "complete"⟩
-instance : FromJS RTCIceGathererState where
-  fromJS
-    | .string "new" => .ok .new
-    | .string "gathering" => .ok .gathering
-    | .string "complete" => .ok .complete
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceGathererState"
-
-/-- `enum RTCIceTransportPolicy` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "relay", "all". -/
-inductive RTCIceTransportPolicy where
-  /-- "relay" -/
-  | relay
-  /-- "all" -/
-  | all
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceTransportPolicy := ⟨fun
-  | .relay => .string "relay"
-  | .all => .string "all"⟩
-instance : FromJS RTCIceTransportPolicy where
-  fromJS
-    | .string "relay" => .ok .relay
-    | .string "all" => .ok .all
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceTransportPolicy"
-
-/-- `enum RTCBundlePolicy` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "balanced", "max-compat", "max-bundle". -/
-inductive RTCBundlePolicy where
-  /-- "balanced" -/
-  | balanced
-  /-- "max-compat" -/
-  | maxCompat
-  /-- "max-bundle" -/
-  | maxBundle
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCBundlePolicy := ⟨fun
-  | .balanced => .string "balanced"
-  | .maxCompat => .string "max-compat"
-  | .maxBundle => .string "max-bundle"⟩
-instance : FromJS RTCBundlePolicy where
-  fromJS
-    | .string "balanced" => .ok .balanced
-    | .string "max-compat" => .ok .maxCompat
-    | .string "max-bundle" => .ok .maxBundle
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCBundlePolicy"
-
-/-- `enum RTCRtcpMuxPolicy` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "require". -/
-inductive RTCRtcpMuxPolicy where
-  /-- "require" -/
-  | require
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCRtcpMuxPolicy := ⟨fun
-  | .require => .string "require"⟩
-instance : FromJS RTCRtcpMuxPolicy where
-  fromJS
-    | .string "require" => .ok .require
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCRtcpMuxPolicy"
-
-/-- `enum RTCSdpType` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "offer", "pranswer", "answer", "rollback". -/
-inductive RTCSdpType where
-  /-- "offer" -/
-  | offer
-  /-- "pranswer" -/
-  | pranswer
-  /-- "answer" -/
-  | answer
-  /-- "rollback" -/
-  | rollback
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCSdpType := ⟨fun
-  | .offer => .string "offer"
-  | .pranswer => .string "pranswer"
-  | .answer => .string "answer"
-  | .rollback => .string "rollback"⟩
-instance : FromJS RTCSdpType where
-  fromJS
-    | .string "offer" => .ok .offer
-    | .string "pranswer" => .ok .pranswer
-    | .string "answer" => .ok .answer
-    | .string "rollback" => .ok .rollback
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCSdpType"
-
-/-- `enum RTCSignalingState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "stable", "have-local-offer", "have-remote-offer", "have-local-pranswer", "have-remote-pranswer", "closed". -/
-inductive RTCSignalingState where
-  /-- "stable" -/
-  | stable
-  /-- "have-local-offer" -/
-  | haveLocalOffer
-  /-- "have-remote-offer" -/
-  | haveRemoteOffer
-  /-- "have-local-pranswer" -/
-  | haveLocalPranswer
-  /-- "have-remote-pranswer" -/
-  | haveRemotePranswer
-  /-- "closed" -/
-  | closed
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCSignalingState := ⟨fun
-  | .stable => .string "stable"
-  | .haveLocalOffer => .string "have-local-offer"
-  | .haveRemoteOffer => .string "have-remote-offer"
-  | .haveLocalPranswer => .string "have-local-pranswer"
-  | .haveRemotePranswer => .string "have-remote-pranswer"
-  | .closed => .string "closed"⟩
-instance : FromJS RTCSignalingState where
-  fromJS
-    | .string "stable" => .ok .stable
-    | .string "have-local-offer" => .ok .haveLocalOffer
-    | .string "have-remote-offer" => .ok .haveRemoteOffer
-    | .string "have-local-pranswer" => .ok .haveLocalPranswer
-    | .string "have-remote-pranswer" => .ok .haveRemotePranswer
-    | .string "closed" => .ok .closed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCSignalingState"
-
-/-- `enum RTCIceGatheringState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "new", "gathering", "complete". -/
-inductive RTCIceGatheringState where
-  /-- "new" -/
-  | new
-  /-- "gathering" -/
-  | gathering
-  /-- "complete" -/
-  | complete
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceGatheringState := ⟨fun
-  | .new => .string "new"
-  | .gathering => .string "gathering"
-  | .complete => .string "complete"⟩
-instance : FromJS RTCIceGatheringState where
-  fromJS
-    | .string "new" => .ok .new
-    | .string "gathering" => .ok .gathering
-    | .string "complete" => .ok .complete
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceGatheringState"
-
-/-- `enum RTCIceConnectionState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "closed", "failed", "disconnected", "new", "checking", "completed", "connected". -/
-inductive RTCIceConnectionState where
-  /-- "closed" -/
-  | closed
-  /-- "failed" -/
-  | failed
-  /-- "disconnected" -/
-  | disconnected
-  /-- "new" -/
-  | new
-  /-- "checking" -/
-  | checking
-  /-- "completed" -/
-  | completed
-  /-- "connected" -/
-  | connected
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCIceConnectionState := ⟨fun
-  | .closed => .string "closed"
-  | .failed => .string "failed"
-  | .disconnected => .string "disconnected"
-  | .new => .string "new"
-  | .checking => .string "checking"
-  | .completed => .string "completed"
-  | .connected => .string "connected"⟩
-instance : FromJS RTCIceConnectionState where
-  fromJS
-    | .string "closed" => .ok .closed
-    | .string "failed" => .ok .failed
-    | .string "disconnected" => .ok .disconnected
-    | .string "new" => .ok .new
-    | .string "checking" => .ok .checking
-    | .string "completed" => .ok .completed
-    | .string "connected" => .ok .connected
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCIceConnectionState"
-
-/-- `enum RTCPeerConnectionState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "closed", "failed", "disconnected", "new", "connecting", "connected". -/
-inductive RTCPeerConnectionState where
-  /-- "closed" -/
-  | closed
-  /-- "failed" -/
-  | failed
-  /-- "disconnected" -/
-  | disconnected
-  /-- "new" -/
-  | new
-  /-- "connecting" -/
-  | connecting
-  /-- "connected" -/
-  | connected
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCPeerConnectionState := ⟨fun
-  | .closed => .string "closed"
-  | .failed => .string "failed"
-  | .disconnected => .string "disconnected"
-  | .new => .string "new"
-  | .connecting => .string "connecting"
-  | .connected => .string "connected"⟩
-instance : FromJS RTCPeerConnectionState where
-  fromJS
-    | .string "closed" => .ok .closed
-    | .string "failed" => .ok .failed
-    | .string "disconnected" => .ok .disconnected
-    | .string "new" => .ok .new
-    | .string "connecting" => .ok .connecting
-    | .string "connected" => .ok .connected
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCPeerConnectionState"
-
-/-- `enum RTCRtpTransceiverDirection` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "sendrecv", "sendonly", "recvonly", "inactive", "stopped". -/
-inductive RTCRtpTransceiverDirection where
-  /-- "sendrecv" -/
-  | sendrecv
-  /-- "sendonly" -/
-  | sendonly
-  /-- "recvonly" -/
-  | recvonly
-  /-- "inactive" -/
-  | inactive
-  /-- "stopped" -/
-  | stopped
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCRtpTransceiverDirection := ⟨fun
-  | .sendrecv => .string "sendrecv"
-  | .sendonly => .string "sendonly"
-  | .recvonly => .string "recvonly"
-  | .inactive => .string "inactive"
-  | .stopped => .string "stopped"⟩
-instance : FromJS RTCRtpTransceiverDirection where
-  fromJS
-    | .string "sendrecv" => .ok .sendrecv
-    | .string "sendonly" => .ok .sendonly
-    | .string "recvonly" => .ok .recvonly
-    | .string "inactive" => .ok .inactive
-    | .string "stopped" => .ok .stopped
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCRtpTransceiverDirection"
-
-/-- `enum RTCPriorityType` (WebRTC Priority Control API (https://w3c.github.io/webrtc-priority/)): "very-low", "low", "medium", "high". -/
-inductive RTCPriorityType where
-  /-- "very-low" -/
-  | veryLow
-  /-- "low" -/
-  | low
-  /-- "medium" -/
-  | medium
-  /-- "high" -/
-  | high
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCPriorityType := ⟨fun
-  | .veryLow => .string "very-low"
-  | .low => .string "low"
-  | .medium => .string "medium"
-  | .high => .string "high"⟩
-instance : FromJS RTCPriorityType where
-  fromJS
-    | .string "very-low" => .ok .veryLow
-    | .string "low" => .ok .low
-    | .string "medium" => .ok .medium
-    | .string "high" => .ok .high
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCPriorityType"
-
-/-- `enum RTCDegradationPreference` (MediaStreamTrack Content Hints (https://w3c.github.io/mst-content-hint/)): "maintain-framerate", "maintain-resolution", "balanced", "maintain-framerate-and-resolution". -/
-inductive RTCDegradationPreference where
-  /-- "maintain-framerate" -/
-  | maintainFramerate
-  /-- "maintain-resolution" -/
-  | maintainResolution
-  /-- "balanced" -/
-  | balanced
-  /-- "maintain-framerate-and-resolution" -/
-  | maintainFramerateAndResolution
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCDegradationPreference := ⟨fun
-  | .maintainFramerate => .string "maintain-framerate"
-  | .maintainResolution => .string "maintain-resolution"
-  | .balanced => .string "balanced"
-  | .maintainFramerateAndResolution => .string "maintain-framerate-and-resolution"⟩
-instance : FromJS RTCDegradationPreference where
-  fromJS
-    | .string "maintain-framerate" => .ok .maintainFramerate
-    | .string "maintain-resolution" => .ok .maintainResolution
-    | .string "balanced" => .ok .balanced
-    | .string "maintain-framerate-and-resolution" => .ok .maintainFramerateAndResolution
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCDegradationPreference"
-
-/-- `enum RTCSctpTransportState` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): "connecting", "connected", "closed". -/
-inductive RTCSctpTransportState where
-  /-- "connecting" -/
-  | connecting
-  /-- "connected" -/
-  | connected
-  /-- "closed" -/
-  | closed
-  deriving BEq, Repr, Inhabited
-instance : ToJS RTCSctpTransportState := ⟨fun
-  | .connecting => .string "connecting"
-  | .connected => .string "connected"
-  | .closed => .string "closed"⟩
-instance : FromJS RTCSctpTransportState where
-  fromJS
-    | .string "connecting" => .ok .connecting
-    | .string "connected" => .ok .connected
-    | .string "closed" => .ok .closed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RTCSctpTransportState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary RTCDtlsFingerprint` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCDtlsFingerprint where
@@ -593,6 +32,8 @@ structure RTCDtlsFingerprint where
   algorithm : Option String := none
   /-- `DOMString value` -/
   value : Option String := none
+instance : ToJS RTCDtlsFingerprint := ⟨fun d => Internal.fields #[("algorithm", Internal.optional d.algorithm),
+    ("value", Internal.optional d.value)]⟩
 instance : FromJS RTCDtlsFingerprint where
   fromJS d := do return {
     algorithm := ← Lasm.JS.readField (Option String) d "algorithm",
@@ -609,10 +50,10 @@ structure RTCDTMFToneChangeEventInit where
   composed : Option Bool := none
   /-- `DOMString tone = ""` -/
   tone : Option String := none
-instance : ToJS RTCDTMFToneChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("tone", Support.optional d.tone)]⟩
+instance : ToJS RTCDTMFToneChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("tone", Internal.optional d.tone)]⟩
 
 /-- `dictionary RTCDataChannelEventInit : EventInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCDataChannelEventInit where
@@ -624,9 +65,9 @@ structure RTCDataChannelEventInit where
   composed : Option Bool := none
   /-- `required RTCDataChannel channel` -/
   channel : RTCDataChannel
-instance : ToJS RTCDataChannelEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS RTCDataChannelEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("channel", toJS d.channel)]⟩
 
 /-- `dictionary RTCErrorInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -643,12 +84,12 @@ structure RTCErrorInit where
   sentAlert : Option Nat := none
   /-- `long httpRequestStatusCode` -/
   httpRequestStatusCode : Option Int := none
-instance : ToJS RTCErrorInit := ⟨fun d => Support.fields #[("errorDetail", toJS d.errorDetail),
-    ("sdpLineNumber", Support.optional d.sdpLineNumber),
-    ("sctpCauseCode", Support.optional d.sctpCauseCode),
-    ("receivedAlert", Support.optional d.receivedAlert),
-    ("sentAlert", Support.optional d.sentAlert),
-    ("httpRequestStatusCode", Support.optional d.httpRequestStatusCode)]⟩
+instance : ToJS RTCErrorInit := ⟨fun d => Internal.fields #[("errorDetail", toJS d.errorDetail),
+    ("sdpLineNumber", Internal.optional d.sdpLineNumber),
+    ("sctpCauseCode", Internal.optional d.sctpCauseCode),
+    ("receivedAlert", Internal.optional d.receivedAlert),
+    ("sentAlert", Internal.optional d.sentAlert),
+    ("httpRequestStatusCode", Internal.optional d.httpRequestStatusCode)]⟩
 
 /-- `dictionary RTCErrorEventInit : EventInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCErrorEventInit where
@@ -660,9 +101,9 @@ structure RTCErrorEventInit where
   composed : Option Bool := none
   /-- `required RTCError error` -/
   error : RTCError
-instance : ToJS RTCErrorEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS RTCErrorEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("error", toJS d.error)]⟩
 
 /-- `dictionary RTCLocalIceCandidateInit : RTCIceCandidateInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -679,12 +120,12 @@ structure RTCLocalIceCandidateInit where
   relayProtocol : Option RTCIceServerTransportProtocol := none
   /-- `USVString? url = null` -/
   url : Option String := none
-instance : ToJS RTCLocalIceCandidateInit := ⟨fun d => Support.fields #[("candidate", Support.optional d.candidate),
-    ("sdpMid", Support.optional d.sdpMid),
-    ("sdpMLineIndex", Support.optional d.sdpMLineIndex),
-    ("usernameFragment", Support.optional d.usernameFragment),
-    ("relayProtocol", Support.optional d.relayProtocol),
-    ("url", Support.optional d.url)]⟩
+instance : ToJS RTCLocalIceCandidateInit := ⟨fun d => Internal.fields #[("candidate", Internal.optional d.candidate),
+    ("sdpMid", Internal.optional d.sdpMid),
+    ("sdpMLineIndex", Internal.optional d.sdpMLineIndex),
+    ("usernameFragment", Internal.optional d.usernameFragment),
+    ("relayProtocol", Internal.optional d.relayProtocol),
+    ("url", Internal.optional d.url)]⟩
 
 /-- `dictionary RTCIceCandidateInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIceCandidateInit where
@@ -696,10 +137,10 @@ structure RTCIceCandidateInit where
   sdpMLineIndex : Option Nat := none
   /-- `DOMString? usernameFragment = null` -/
   usernameFragment : Option String := none
-instance : ToJS RTCIceCandidateInit := ⟨fun d => Support.fields #[("candidate", Support.optional d.candidate),
-    ("sdpMid", Support.optional d.sdpMid),
-    ("sdpMLineIndex", Support.optional d.sdpMLineIndex),
-    ("usernameFragment", Support.optional d.usernameFragment)]⟩
+instance : ToJS RTCIceCandidateInit := ⟨fun d => Internal.fields #[("candidate", Internal.optional d.candidate),
+    ("sdpMid", Internal.optional d.sdpMid),
+    ("sdpMLineIndex", Internal.optional d.sdpMLineIndex),
+    ("usernameFragment", Internal.optional d.usernameFragment)]⟩
 instance : FromJS RTCIceCandidateInit where
   fromJS d := do return {
     candidate := ← Lasm.JS.readField (Option String) d "candidate",
@@ -716,9 +157,9 @@ structure RTCIceParameters where
   password : Option String := none
   /-- `boolean iceLite` -/
   iceLite : Option Bool := none
-instance : ToJS RTCIceParameters := ⟨fun d => Support.fields #[("usernameFragment", Support.optional d.usernameFragment),
-    ("password", Support.optional d.password),
-    ("iceLite", Support.optional d.iceLite)]⟩
+instance : ToJS RTCIceParameters := ⟨fun d => Internal.fields #[("usernameFragment", Internal.optional d.usernameFragment),
+    ("password", Internal.optional d.password),
+    ("iceLite", Internal.optional d.iceLite)]⟩
 instance : FromJS RTCIceParameters where
   fromJS d := do return {
     usernameFragment := ← Lasm.JS.readField (Option String) d "usernameFragment",
@@ -734,9 +175,9 @@ structure RTCIceServer where
   username : Option String := none
   /-- `DOMString credential` -/
   credential : Option String := none
-instance : ToJS RTCIceServer := ⟨fun d => Support.fields #[("urls", toJS d.urls),
-    ("username", Support.optional d.username),
-    ("credential", Support.optional d.credential)]⟩
+instance : ToJS RTCIceServer := ⟨fun d => Internal.fields #[("urls", toJS d.urls),
+    ("username", Internal.optional d.username),
+    ("credential", Internal.optional d.credential)]⟩
 instance : FromJS RTCIceServer where
   fromJS d := do return {
     urls := ← Lasm.JS.readField USVStringOrSequenceOfUSVString d "urls",
@@ -760,13 +201,13 @@ structure RTCConfiguration where
   iceCandidatePoolSize : Option Nat := none
   /-- `DOMString peerIdentity` -/
   peerIdentity : Option String := none
-instance : ToJS RTCConfiguration := ⟨fun d => Support.fields #[("iceServers", Support.optional d.iceServers),
-    ("iceTransportPolicy", Support.optional d.iceTransportPolicy),
-    ("bundlePolicy", Support.optional d.bundlePolicy),
-    ("rtcpMuxPolicy", Support.optional d.rtcpMuxPolicy),
-    ("certificates", Support.optional d.certificates),
-    ("iceCandidatePoolSize", Support.optional d.iceCandidatePoolSize),
-    ("peerIdentity", Support.optional d.peerIdentity)]⟩
+instance : ToJS RTCConfiguration := ⟨fun d => Internal.fields #[("iceServers", Internal.optional d.iceServers),
+    ("iceTransportPolicy", Internal.optional d.iceTransportPolicy),
+    ("bundlePolicy", Internal.optional d.bundlePolicy),
+    ("rtcpMuxPolicy", Internal.optional d.rtcpMuxPolicy),
+    ("certificates", Internal.optional d.certificates),
+    ("iceCandidatePoolSize", Internal.optional d.iceCandidatePoolSize),
+    ("peerIdentity", Internal.optional d.peerIdentity)]⟩
 instance : FromJS RTCConfiguration where
   fromJS d := do return {
     iceServers := ← Lasm.JS.readField (Option (Array RTCIceServer)) d "iceServers",
@@ -786,9 +227,9 @@ structure RTCOfferOptions where
   offerToReceiveAudio : Option Bool := none
   /-- `boolean offerToReceiveVideo` -/
   offerToReceiveVideo : Option Bool := none
-instance : ToJS RTCOfferOptions := ⟨fun d => Support.fields #[("iceRestart", Support.optional d.iceRestart),
-    ("offerToReceiveAudio", Support.optional d.offerToReceiveAudio),
-    ("offerToReceiveVideo", Support.optional d.offerToReceiveVideo)]⟩
+instance : ToJS RTCOfferOptions := ⟨fun d => Internal.fields #[("iceRestart", Internal.optional d.iceRestart),
+    ("offerToReceiveAudio", Internal.optional d.offerToReceiveAudio),
+    ("offerToReceiveVideo", Internal.optional d.offerToReceiveVideo)]⟩
 
 /-- `dictionary RTCSessionDescriptionInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCSessionDescriptionInit where
@@ -796,8 +237,8 @@ structure RTCSessionDescriptionInit where
   type : RTCSdpType
   /-- `DOMString sdp = ""` -/
   sdp : Option String := none
-instance : ToJS RTCSessionDescriptionInit := ⟨fun d => Support.fields #[("type", toJS d.type),
-    ("sdp", Support.optional d.sdp)]⟩
+instance : ToJS RTCSessionDescriptionInit := ⟨fun d => Internal.fields #[("type", toJS d.type),
+    ("sdp", Internal.optional d.sdp)]⟩
 instance : FromJS RTCSessionDescriptionInit where
   fromJS d := do return {
     type := ← Lasm.JS.readField RTCSdpType d "type",
@@ -806,7 +247,7 @@ instance : FromJS RTCSessionDescriptionInit where
 
 /-- `dictionary RTCAnswerOptions : RTCOfferAnswerOptions` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCAnswerOptions where
-instance : ToJS RTCAnswerOptions := ⟨fun _ => Support.fields #[]⟩
+instance : ToJS RTCAnswerOptions := ⟨fun _ => Internal.fields #[]⟩
 
 /-- `dictionary RTCLocalSessionDescriptionInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCLocalSessionDescriptionInit where
@@ -814,8 +255,8 @@ structure RTCLocalSessionDescriptionInit where
   type : Option RTCSdpType := none
   /-- `DOMString sdp = ""` -/
   sdp : Option String := none
-instance : ToJS RTCLocalSessionDescriptionInit := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("sdp", Support.optional d.sdp)]⟩
+instance : ToJS RTCLocalSessionDescriptionInit := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("sdp", Internal.optional d.sdp)]⟩
 
 /-- `callback RTCSessionDescriptionCallback = undefined (RTCSessionDescriptionInit description)` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure RTCSessionDescriptionCallback where
@@ -826,10 +267,10 @@ instance : ToJS RTCSessionDescriptionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RTCSessionDescriptionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.RTCSessionDescriptionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def RTCSessionDescriptionCallback.ofFn (f : RTCSessionDescriptionInit → Async Unit) : IO RTCSessionDescriptionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg RTCSessionDescriptionInit args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg RTCSessionDescriptionInit args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def RTCSessionDescriptionCallback.ofSyncFn (f : RTCSessionDescriptionInit → IO Unit) : IO RTCSessionDescriptionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg RTCSessionDescriptionInit args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg RTCSessionDescriptionInit args 0)) }
 
 /-- `callback RTCPeerConnectionErrorCallback = undefined (DOMException error)` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure RTCPeerConnectionErrorCallback where
@@ -840,10 +281,10 @@ instance : ToJS RTCPeerConnectionErrorCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RTCPeerConnectionErrorCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.RTCPeerConnectionErrorCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def RTCPeerConnectionErrorCallback.ofFn (f : DOMException → Async Unit) : IO RTCPeerConnectionErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def RTCPeerConnectionErrorCallback.ofSyncFn (f : DOMException → IO Unit) : IO RTCPeerConnectionErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 
 /-- `(MediaStreamTrack or DOMString)`: one constructor per member type. -/
 inductive MediaStreamTrackOrDOMString where
@@ -867,10 +308,10 @@ structure RTCRtpCodec where
   channels : Option Nat := none
   /-- `DOMString sdpFmtpLine` -/
   sdpFmtpLine : Option String := none
-instance : ToJS RTCRtpCodec := ⟨fun d => Support.fields #[("mimeType", toJS d.mimeType),
+instance : ToJS RTCRtpCodec := ⟨fun d => Internal.fields #[("mimeType", toJS d.mimeType),
     ("clockRate", toJS d.clockRate),
-    ("channels", Support.optional d.channels),
-    ("sdpFmtpLine", Support.optional d.sdpFmtpLine)]⟩
+    ("channels", Internal.optional d.channels),
+    ("sdpFmtpLine", Internal.optional d.sdpFmtpLine)]⟩
 instance : FromJS RTCRtpCodec where
   fromJS d := do return {
     mimeType := ← Lasm.JS.readField String d "mimeType",
@@ -899,15 +340,15 @@ structure RTCRtpEncodingParameters where
   networkPriority : Option RTCPriorityType := none
   /-- `DOMString scalabilityMode` -/
   scalabilityMode : Option String := none
-instance : ToJS RTCRtpEncodingParameters := ⟨fun d => Support.fields #[("rid", Support.optional d.rid),
-    ("active", Support.optional d.active),
-    ("codec", Support.optional d.codec),
-    ("maxBitrate", Support.optional d.maxBitrate),
-    ("maxFramerate", Support.optional d.maxFramerate),
-    ("scaleResolutionDownBy", Support.optional d.scaleResolutionDownBy),
-    ("priority", Support.optional d.priority),
-    ("networkPriority", Support.optional d.networkPriority),
-    ("scalabilityMode", Support.optional d.scalabilityMode)]⟩
+instance : ToJS RTCRtpEncodingParameters := ⟨fun d => Internal.fields #[("rid", Internal.optional d.rid),
+    ("active", Internal.optional d.active),
+    ("codec", Internal.optional d.codec),
+    ("maxBitrate", Internal.optional d.maxBitrate),
+    ("maxFramerate", Internal.optional d.maxFramerate),
+    ("scaleResolutionDownBy", Internal.optional d.scaleResolutionDownBy),
+    ("priority", Internal.optional d.priority),
+    ("networkPriority", Internal.optional d.networkPriority),
+    ("scalabilityMode", Internal.optional d.scalabilityMode)]⟩
 instance : FromJS RTCRtpEncodingParameters where
   fromJS d := do return {
     rid := ← Lasm.JS.readField (Option String) d "rid",
@@ -929,9 +370,9 @@ structure RTCRtpTransceiverInit where
   streams : Option (Array MediaStream) := none
   /-- `sequence<RTCRtpEncodingParameters> sendEncodings = []` -/
   sendEncodings : Option (Array RTCRtpEncodingParameters) := none
-instance : ToJS RTCRtpTransceiverInit := ⟨fun d => Support.fields #[("direction", Support.optional d.direction),
-    ("streams", Support.optional d.streams),
-    ("sendEncodings", Support.optional d.sendEncodings)]⟩
+instance : ToJS RTCRtpTransceiverInit := ⟨fun d => Internal.fields #[("direction", Internal.optional d.direction),
+    ("streams", Internal.optional d.streams),
+    ("sendEncodings", Internal.optional d.sendEncodings)]⟩
 
 /-- `dictionary RTCDataChannelInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCDataChannelInit where
@@ -949,13 +390,13 @@ structure RTCDataChannelInit where
   id : Option Nat := none
   /-- `RTCPriorityType priority = "low"` -/
   priority : Option RTCPriorityType := none
-instance : ToJS RTCDataChannelInit := ⟨fun d => Support.fields #[("ordered", Support.optional d.ordered),
-    ("maxPacketLifeTime", Support.optional d.maxPacketLifeTime),
-    ("maxRetransmits", Support.optional d.maxRetransmits),
-    ("protocol", Support.optional d.protocol),
-    ("negotiated", Support.optional d.negotiated),
-    ("id", Support.optional d.id),
-    ("priority", Support.optional d.priority)]⟩
+instance : ToJS RTCDataChannelInit := ⟨fun d => Internal.fields #[("ordered", Internal.optional d.ordered),
+    ("maxPacketLifeTime", Internal.optional d.maxPacketLifeTime),
+    ("maxRetransmits", Internal.optional d.maxRetransmits),
+    ("protocol", Internal.optional d.protocol),
+    ("negotiated", Internal.optional d.negotiated),
+    ("id", Internal.optional d.id),
+    ("priority", Internal.optional d.priority)]⟩
 
 /-- `dictionary RTCPeerConnectionIceErrorEventInit : EventInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCPeerConnectionIceErrorEventInit where
@@ -975,14 +416,14 @@ structure RTCPeerConnectionIceErrorEventInit where
   errorCode : Nat
   /-- `USVString errorText` -/
   errorText : Option String := none
-instance : ToJS RTCPeerConnectionIceErrorEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("address", Support.optional d.address),
-    ("port", Support.optional d.port),
-    ("url", Support.optional d.url),
+instance : ToJS RTCPeerConnectionIceErrorEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("address", Internal.optional d.address),
+    ("port", Internal.optional d.port),
+    ("url", Internal.optional d.url),
     ("errorCode", toJS d.errorCode),
-    ("errorText", Support.optional d.errorText)]⟩
+    ("errorText", Internal.optional d.errorText)]⟩
 
 /-- `dictionary RTCPeerConnectionIceEventInit : EventInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCPeerConnectionIceEventInit where
@@ -996,16 +437,17 @@ structure RTCPeerConnectionIceEventInit where
   candidate : Option RTCIceCandidate := none
   /-- `USVString? url` -/
   url : Option String := none
-instance : ToJS RTCPeerConnectionIceEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("candidate", Support.optional d.candidate),
-    ("url", Support.optional d.url)]⟩
+instance : ToJS RTCPeerConnectionIceEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("candidate", Internal.optional d.candidate),
+    ("url", Internal.optional d.url)]⟩
 
 /-- `dictionary RTCRtpHeaderExtensionCapability` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCRtpHeaderExtensionCapability where
   /-- `required DOMString uri` -/
   uri : String
+instance : ToJS RTCRtpHeaderExtensionCapability := ⟨fun d => Internal.fields #[("uri", toJS d.uri)]⟩
 instance : FromJS RTCRtpHeaderExtensionCapability where
   fromJS d := do return {
     uri := ← Lasm.JS.readField String d "uri" }
@@ -1017,6 +459,8 @@ structure RTCRtpCapabilities where
   codecs : Array RTCRtpCodec
   /-- `required sequence<RTCRtpHeaderExtensionCapability> headerExtensions` -/
   headerExtensions : Array RTCRtpHeaderExtensionCapability
+instance : ToJS RTCRtpCapabilities := ⟨fun d => Internal.fields #[("codecs", toJS d.codecs),
+    ("headerExtensions", toJS d.headerExtensions)]⟩
 instance : FromJS RTCRtpCapabilities where
   fromJS d := do return {
     codecs := ← Lasm.JS.readField (Array RTCRtpCodec) d "codecs",
@@ -1031,9 +475,9 @@ structure RTCRtpHeaderExtensionParameters where
   id : Nat
   /-- `boolean encrypted = false` -/
   encrypted : Option Bool := none
-instance : ToJS RTCRtpHeaderExtensionParameters := ⟨fun d => Support.fields #[("uri", toJS d.uri),
+instance : ToJS RTCRtpHeaderExtensionParameters := ⟨fun d => Internal.fields #[("uri", toJS d.uri),
     ("id", toJS d.id),
-    ("encrypted", Support.optional d.encrypted)]⟩
+    ("encrypted", Internal.optional d.encrypted)]⟩
 instance : FromJS RTCRtpHeaderExtensionParameters where
   fromJS d := do return {
     uri := ← Lasm.JS.readField String d "uri",
@@ -1047,8 +491,8 @@ structure RTCRtcpParameters where
   cname : Option String := none
   /-- `boolean reducedSize` -/
   reducedSize : Option Bool := none
-instance : ToJS RTCRtcpParameters := ⟨fun d => Support.fields #[("cname", Support.optional d.cname),
-    ("reducedSize", Support.optional d.reducedSize)]⟩
+instance : ToJS RTCRtcpParameters := ⟨fun d => Internal.fields #[("cname", Internal.optional d.cname),
+    ("reducedSize", Internal.optional d.reducedSize)]⟩
 instance : FromJS RTCRtcpParameters where
   fromJS d := do return {
     cname := ← Lasm.JS.readField (Option String) d "cname",
@@ -1067,10 +511,10 @@ structure RTCRtpCodecParameters where
   sdpFmtpLine : Option String := none
   /-- `required octet payloadType` -/
   payloadType : Nat
-instance : ToJS RTCRtpCodecParameters := ⟨fun d => Support.fields #[("mimeType", toJS d.mimeType),
+instance : ToJS RTCRtpCodecParameters := ⟨fun d => Internal.fields #[("mimeType", toJS d.mimeType),
     ("clockRate", toJS d.clockRate),
-    ("channels", Support.optional d.channels),
-    ("sdpFmtpLine", Support.optional d.sdpFmtpLine),
+    ("channels", Internal.optional d.channels),
+    ("sdpFmtpLine", Internal.optional d.sdpFmtpLine),
     ("payloadType", toJS d.payloadType)]⟩
 instance : FromJS RTCRtpCodecParameters where
   fromJS d := do return {
@@ -1089,6 +533,9 @@ structure RTCRtpReceiveParameters where
   rtcp : RTCRtcpParameters
   /-- `required sequence<RTCRtpCodecParameters> codecs` -/
   codecs : Array RTCRtpCodecParameters
+instance : ToJS RTCRtpReceiveParameters := ⟨fun d => Internal.fields #[("headerExtensions", toJS d.headerExtensions),
+    ("rtcp", toJS d.rtcp),
+    ("codecs", toJS d.codecs)]⟩
 instance : FromJS RTCRtpReceiveParameters where
   fromJS d := do return {
     headerExtensions := ← Lasm.JS.readField (Array RTCRtpHeaderExtensionParameters) d "headerExtensions",
@@ -1106,6 +553,10 @@ structure RTCRtpContributingSource where
   audioLevel : Option Float := none
   /-- `required unsigned long rtpTimestamp` -/
   rtpTimestamp : Nat
+instance : ToJS RTCRtpContributingSource := ⟨fun d => Internal.fields #[("timestamp", toJS d.timestamp),
+    ("source", toJS d.source),
+    ("audioLevel", Internal.optional d.audioLevel),
+    ("rtpTimestamp", toJS d.rtpTimestamp)]⟩
 instance : FromJS RTCRtpContributingSource where
   fromJS d := do return {
     timestamp := ← Lasm.JS.readField Float d "timestamp",
@@ -1124,6 +575,10 @@ structure RTCRtpSynchronizationSource where
   audioLevel : Option Float := none
   /-- `required unsigned long rtpTimestamp` -/
   rtpTimestamp : Nat
+instance : ToJS RTCRtpSynchronizationSource := ⟨fun d => Internal.fields #[("timestamp", toJS d.timestamp),
+    ("source", toJS d.source),
+    ("audioLevel", Internal.optional d.audioLevel),
+    ("rtpTimestamp", toJS d.rtpTimestamp)]⟩
 instance : FromJS RTCRtpSynchronizationSource where
   fromJS d := do return {
     timestamp := ← Lasm.JS.readField Float d "timestamp",
@@ -1146,10 +601,10 @@ structure RTCRtpSendParameters where
   transactionId : String
   /-- `required sequence<RTCRtpEncodingParameters> encodings` -/
   encodings : Array RTCRtpEncodingParameters
-instance : ToJS RTCRtpSendParameters := ⟨fun d => Support.fields #[("headerExtensions", toJS d.headerExtensions),
+instance : ToJS RTCRtpSendParameters := ⟨fun d => Internal.fields #[("headerExtensions", toJS d.headerExtensions),
     ("rtcp", toJS d.rtcp),
     ("codecs", toJS d.codecs),
-    ("degradationPreference", Support.optional d.degradationPreference),
+    ("degradationPreference", Internal.optional d.degradationPreference),
     ("transactionId", toJS d.transactionId),
     ("encodings", toJS d.encodings)]⟩
 instance : FromJS RTCRtpSendParameters where
@@ -1164,7 +619,7 @@ instance : FromJS RTCRtpSendParameters where
 
 /-- `dictionary RTCSetParameterOptions` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCSetParameterOptions where
-instance : ToJS RTCSetParameterOptions := ⟨fun _ => Support.fields #[]⟩
+instance : ToJS RTCSetParameterOptions := ⟨fun _ => Internal.fields #[]⟩
 
 /-- `dictionary RTCTrackEventInit : EventInit` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCTrackEventInit where
@@ -1182,812 +637,948 @@ structure RTCTrackEventInit where
   streams : Option (Array MediaStream) := none
   /-- `required RTCRtpTransceiver transceiver` -/
   transceiver : RTCRtpTransceiver
-instance : ToJS RTCTrackEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS RTCTrackEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("receiver", toJS d.receiver),
     ("track", toJS d.track),
-    ("streams", Support.optional d.streams),
+    ("streams", Internal.optional d.streams),
     ("transceiver", toJS d.transceiver)]⟩
 
+/-- `dictionary RTCOfferAnswerOptions` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RTCOfferAnswerOptions where
+instance : ToJS RTCOfferAnswerOptions := ⟨fun _ => Internal.fields #[]⟩
+
+/-- `dictionary RTCCertificateExpiration` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RTCCertificateExpiration where
+  /-- `unsigned long long expires` -/
+  expires : Option Nat := none
+instance : ToJS RTCCertificateExpiration := ⟨fun d => Internal.fields #[("expires", Internal.optional d.expires)]⟩
+
+/-- `dictionary RTCRtpParameters` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RTCRtpParameters where
+  /-- `required sequence<RTCRtpHeaderExtensionParameters> headerExtensions` -/
+  headerExtensions : Array RTCRtpHeaderExtensionParameters
+  /-- `required RTCRtcpParameters rtcp` -/
+  rtcp : RTCRtcpParameters
+  /-- `required sequence<RTCRtpCodecParameters> codecs` -/
+  codecs : Array RTCRtpCodecParameters
+instance : ToJS RTCRtpParameters := ⟨fun d => Internal.fields #[("headerExtensions", toJS d.headerExtensions),
+    ("rtcp", toJS d.rtcp),
+    ("codecs", toJS d.codecs)]⟩
+
+/-- `dictionary RTCRtpCodingParameters` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RTCRtpCodingParameters where
+  /-- `DOMString rid` -/
+  rid : Option String := none
+instance : ToJS RTCRtpCodingParameters := ⟨fun d => Internal.fields #[("rid", Internal.optional d.rid)]⟩
+
+/-- `dictionary RTCStats` (WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RTCStats where
+  /-- `required DOMHighResTimeStamp timestamp` -/
+  timestamp : Float
+  /-- `required RTCStatsType type` -/
+  type : RTCStatsType
+  /-- `required DOMString id` -/
+  id : String
+instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.timestamp),
+    ("type", toJS d.type),
+    ("id", toJS d.id)]⟩
+
 /-- `v instanceof RTCCertificate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCCertificate`). -/
-def RTCCertificate.cast? (v : Value) : IO (Option RTCCertificate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCCertificate"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCCertificate.cast? (v : Value) : IO (Option RTCCertificate) := Internal.api "Lasm.JS.Web.RTCCertificate.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCCertificate"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute EpochTimeStamp expires` -/
-def RTCCertificate.expires (self : RTCCertificate) : IO Nat := self.val.get "expires" Nat
+@[macro_inline] def RTCCertificate.expires (self : RTCCertificate) : IO Nat := Internal.api "Lasm.JS.Web.RTCCertificate.expires" do
+  self.val.get "expires" Nat
 
 /-- `sequence<RTCDtlsFingerprint> getFingerprints()` -/
-def RTCCertificate.getFingerprints (self : RTCCertificate) : IO (Array RTCDtlsFingerprint) :=
-  self.val.callMethod "getFingerprints" (Support.args #[]) (Array RTCDtlsFingerprint)
+@[macro_inline] def RTCCertificate.getFingerprints (self : RTCCertificate) : IO (Array RTCDtlsFingerprint) := Internal.api "Lasm.JS.Web.RTCCertificate.getFingerprints" do
+  self.val.callMethod "getFingerprints" (Internal.args #[]) (Array RTCDtlsFingerprint)
 
 /-- `v instanceof RTCDTMFSender`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCDTMFSender`). -/
-def RTCDTMFSender.cast? (v : Value) : IO (Option RTCDTMFSender) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCDTMFSender"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCDTMFSender.cast? (v : Value) : IO (Option RTCDTMFSender) := Internal.api "Lasm.JS.Web.RTCDTMFSender.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCDTMFSender"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler ontonechange` -/
-def RTCDTMFSender.ontonechange (self : RTCDTMFSender) : IO (Option EventHandlerNonNull) := self.val.get "ontonechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDTMFSender.ontonechange (self : RTCDTMFSender) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDTMFSender.ontonechange" do
+  self.val.get "ontonechange" (Option EventHandlerNonNull)
 
 /-- Sets `ontonechange`: `attribute EventHandler ontonechange` -/
-def RTCDTMFSender.setOntonechange (self : RTCDTMFSender) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDTMFSender.setOntonechange (self : RTCDTMFSender) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDTMFSender.setOntonechange" do
   self.val.set "ontonechange" (toJS value)
 
 /-- `readonly attribute boolean canInsertDTMF` -/
-def RTCDTMFSender.canInsertDTMF (self : RTCDTMFSender) : IO Bool := self.val.get "canInsertDTMF" Bool
+@[macro_inline] def RTCDTMFSender.canInsertDTMF (self : RTCDTMFSender) : IO Bool := Internal.api "Lasm.JS.Web.RTCDTMFSender.canInsertDTMF" do
+  self.val.get "canInsertDTMF" Bool
 
 /-- `readonly attribute DOMString toneBuffer` -/
-def RTCDTMFSender.toneBuffer (self : RTCDTMFSender) : IO String := self.val.get "toneBuffer" String
+@[macro_inline] def RTCDTMFSender.toneBuffer (self : RTCDTMFSender) : IO String := Internal.api "Lasm.JS.Web.RTCDTMFSender.toneBuffer" do
+  self.val.get "toneBuffer" String
 
 /-- `undefined insertDTMF(DOMString tones, optional unsigned long duration, optional unsigned long interToneGap)` -/
-def RTCDTMFSender.insertDTMF (self : RTCDTMFSender) (tones : String) (duration : Option Nat := none) (interToneGap : Option Nat := none) : IO Unit :=
-  self.val.callMethod "insertDTMF" (Support.args #[toJS tones, Support.optional duration, Support.optional interToneGap]) Unit
+@[macro_inline] def RTCDTMFSender.insertDTMF (self : RTCDTMFSender) (tones : String) (duration : Option Nat := none) (interToneGap : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCDTMFSender.insertDTMF" do
+  self.val.callMethod "insertDTMF" (Internal.args #[toJS tones, Internal.optional duration, Internal.optional interToneGap]) Unit
 
 /-- `v instanceof RTCDTMFToneChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCDTMFToneChangeEvent`). -/
-def RTCDTMFToneChangeEvent.cast? (v : Value) : IO (Option RTCDTMFToneChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCDTMFToneChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCDTMFToneChangeEvent.cast? (v : Value) : IO (Option RTCDTMFToneChangeEvent) := Internal.api "Lasm.JS.Web.RTCDTMFToneChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCDTMFToneChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional RTCDTMFToneChangeEventInit eventInitDict)` -/
-def RTCDTMFToneChangeEvent.new (type : String) (eventInitDict : Option RTCDTMFToneChangeEventInit := none) : IO RTCDTMFToneChangeEvent :=
+@[macro_inline] def RTCDTMFToneChangeEvent.new (type : String) (eventInitDict : Option RTCDTMFToneChangeEventInit := none) : IO RTCDTMFToneChangeEvent := Internal.api "Lasm.JS.Web.RTCDTMFToneChangeEvent.new" do
   Lasm.JS.Binding.invoke RTCDTMFToneChangeEvent { name := "Lasm.JS.Web.RTCDTMFToneChangeEvent.new", module := "globalThis", path := "RTCDTMFToneChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString tone` -/
-def RTCDTMFToneChangeEvent.tone (self : RTCDTMFToneChangeEvent) : IO String := self.val.get "tone" String
+@[macro_inline] def RTCDTMFToneChangeEvent.tone (self : RTCDTMFToneChangeEvent) : IO String := Internal.api "Lasm.JS.Web.RTCDTMFToneChangeEvent.tone" do
+  self.val.get "tone" String
 
 /-- `v instanceof RTCDataChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCDataChannel`). -/
-def RTCDataChannel.cast? (v : Value) : IO (Option RTCDataChannel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCDataChannel"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCDataChannel.cast? (v : Value) : IO (Option RTCDataChannel) := Internal.api "Lasm.JS.Web.RTCDataChannel.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCDataChannel"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString label` -/
-def RTCDataChannel.label (self : RTCDataChannel) : IO String := self.val.get "label" String
+@[macro_inline] def RTCDataChannel.label (self : RTCDataChannel) : IO String := Internal.api "Lasm.JS.Web.RTCDataChannel.label" do
+  self.val.get "label" String
 
 /-- `readonly attribute boolean ordered` -/
-def RTCDataChannel.ordered (self : RTCDataChannel) : IO Bool := self.val.get "ordered" Bool
+@[macro_inline] def RTCDataChannel.ordered (self : RTCDataChannel) : IO Bool := Internal.api "Lasm.JS.Web.RTCDataChannel.ordered" do
+  self.val.get "ordered" Bool
 
 /-- `readonly attribute unsigned short? maxPacketLifeTime` -/
-def RTCDataChannel.maxPacketLifeTime (self : RTCDataChannel) : IO (Option Nat) := self.val.get "maxPacketLifeTime" (Option Nat)
+@[macro_inline] def RTCDataChannel.maxPacketLifeTime (self : RTCDataChannel) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCDataChannel.maxPacketLifeTime" do
+  self.val.get "maxPacketLifeTime" (Option Nat)
 
 /-- `readonly attribute unsigned short? maxRetransmits` -/
-def RTCDataChannel.maxRetransmits (self : RTCDataChannel) : IO (Option Nat) := self.val.get "maxRetransmits" (Option Nat)
+@[macro_inline] def RTCDataChannel.maxRetransmits (self : RTCDataChannel) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCDataChannel.maxRetransmits" do
+  self.val.get "maxRetransmits" (Option Nat)
 
 /-- `readonly attribute USVString protocol` -/
-def RTCDataChannel.protocol (self : RTCDataChannel) : IO String := self.val.get "protocol" String
+@[macro_inline] def RTCDataChannel.protocol (self : RTCDataChannel) : IO String := Internal.api "Lasm.JS.Web.RTCDataChannel.protocol" do
+  self.val.get "protocol" String
 
 /-- `readonly attribute boolean negotiated` -/
-def RTCDataChannel.negotiated (self : RTCDataChannel) : IO Bool := self.val.get "negotiated" Bool
+@[macro_inline] def RTCDataChannel.negotiated (self : RTCDataChannel) : IO Bool := Internal.api "Lasm.JS.Web.RTCDataChannel.negotiated" do
+  self.val.get "negotiated" Bool
 
 /-- `readonly attribute unsigned short? id` -/
-def RTCDataChannel.id (self : RTCDataChannel) : IO (Option Nat) := self.val.get "id" (Option Nat)
+@[macro_inline] def RTCDataChannel.id (self : RTCDataChannel) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCDataChannel.id" do
+  self.val.get "id" (Option Nat)
 
 /-- `readonly attribute RTCDataChannelState readyState` -/
-def RTCDataChannel.readyState (self : RTCDataChannel) : IO RTCDataChannelState := self.val.get "readyState" RTCDataChannelState
+@[macro_inline] def RTCDataChannel.readyState (self : RTCDataChannel) : IO RTCDataChannelState := Internal.api "Lasm.JS.Web.RTCDataChannel.readyState" do
+  self.val.get "readyState" RTCDataChannelState
 
 /-- `readonly attribute unsigned long bufferedAmount` -/
-def RTCDataChannel.bufferedAmount (self : RTCDataChannel) : IO Nat := self.val.get "bufferedAmount" Nat
+@[macro_inline] def RTCDataChannel.bufferedAmount (self : RTCDataChannel) : IO Nat := Internal.api "Lasm.JS.Web.RTCDataChannel.bufferedAmount" do
+  self.val.get "bufferedAmount" Nat
 
 /-- `attribute unsigned long bufferedAmountLowThreshold` -/
-def RTCDataChannel.bufferedAmountLowThreshold (self : RTCDataChannel) : IO Nat := self.val.get "bufferedAmountLowThreshold" Nat
+@[macro_inline] def RTCDataChannel.bufferedAmountLowThreshold (self : RTCDataChannel) : IO Nat := Internal.api "Lasm.JS.Web.RTCDataChannel.bufferedAmountLowThreshold" do
+  self.val.get "bufferedAmountLowThreshold" Nat
 
 /-- Sets `bufferedAmountLowThreshold`: `attribute unsigned long bufferedAmountLowThreshold` -/
-def RTCDataChannel.setBufferedAmountLowThreshold (self : RTCDataChannel) (value : Nat) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setBufferedAmountLowThreshold (self : RTCDataChannel) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setBufferedAmountLowThreshold" do
   self.val.set "bufferedAmountLowThreshold" (toJS value)
 
 /-- `attribute EventHandler onopen` -/
-def RTCDataChannel.onopen (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onopen" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onopen (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onopen" do
+  self.val.get "onopen" (Option EventHandlerNonNull)
 
 /-- Sets `onopen`: `attribute EventHandler onopen` -/
-def RTCDataChannel.setOnopen (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnopen (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnopen" do
   self.val.set "onopen" (toJS value)
 
 /-- `attribute EventHandler onbufferedamountlow` -/
-def RTCDataChannel.onbufferedamountlow (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onbufferedamountlow" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onbufferedamountlow (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onbufferedamountlow" do
+  self.val.get "onbufferedamountlow" (Option EventHandlerNonNull)
 
 /-- Sets `onbufferedamountlow`: `attribute EventHandler onbufferedamountlow` -/
-def RTCDataChannel.setOnbufferedamountlow (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnbufferedamountlow (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnbufferedamountlow" do
   self.val.set "onbufferedamountlow" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def RTCDataChannel.onerror (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onerror (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def RTCDataChannel.setOnerror (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnerror (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onclosing` -/
-def RTCDataChannel.onclosing (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onclosing" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onclosing (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onclosing" do
+  self.val.get "onclosing" (Option EventHandlerNonNull)
 
 /-- Sets `onclosing`: `attribute EventHandler onclosing` -/
-def RTCDataChannel.setOnclosing (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnclosing (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnclosing" do
   self.val.set "onclosing" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def RTCDataChannel.onclose (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onclose (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def RTCDataChannel.setOnclose (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnclose (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def RTCDataChannel.onmessage (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDataChannel.onmessage (self : RTCDataChannel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDataChannel.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def RTCDataChannel.setOnmessage (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setOnmessage (self : RTCDataChannel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute BinaryType binaryType` -/
-def RTCDataChannel.binaryType (self : RTCDataChannel) : IO BinaryType := self.val.get "binaryType" BinaryType
+@[macro_inline] def RTCDataChannel.binaryType (self : RTCDataChannel) : IO BinaryType := Internal.api "Lasm.JS.Web.RTCDataChannel.binaryType" do
+  self.val.get "binaryType" BinaryType
 
 /-- Sets `binaryType`: `attribute BinaryType binaryType` -/
-def RTCDataChannel.setBinaryType (self : RTCDataChannel) (value : BinaryType) : IO Unit :=
+@[macro_inline] def RTCDataChannel.setBinaryType (self : RTCDataChannel) (value : BinaryType) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.setBinaryType" do
   self.val.set "binaryType" (toJS value)
 
 /-- `undefined close()` -/
-def RTCDataChannel.close (self : RTCDataChannel) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def RTCDataChannel.close (self : RTCDataChannel) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `undefined send(USVString data)` -/
-def RTCDataChannel.send (self : RTCDataChannel) (data : String) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def RTCDataChannel.send (self : RTCDataChannel) (data : String) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.send" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `undefined send(Blob data)` -/
-def RTCDataChannel.sendWithBlob (self : RTCDataChannel) (data : Blob) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def RTCDataChannel.sendWithBlob (self : RTCDataChannel) (data : Blob) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.sendWithBlob" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBuffer data)` -/
-def RTCDataChannel.sendWithArrayBuffer (self : RTCDataChannel) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def RTCDataChannel.sendWithArrayBuffer (self : RTCDataChannel) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.sendWithArrayBuffer" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBufferView data)` -/
-def RTCDataChannel.sendWithArrayBufferView (self : RTCDataChannel) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def RTCDataChannel.sendWithArrayBufferView (self : RTCDataChannel) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.RTCDataChannel.sendWithArrayBufferView" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `v instanceof RTCDataChannelEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCDataChannelEvent`). -/
-def RTCDataChannelEvent.cast? (v : Value) : IO (Option RTCDataChannelEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCDataChannelEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCDataChannelEvent.cast? (v : Value) : IO (Option RTCDataChannelEvent) := Internal.api "Lasm.JS.Web.RTCDataChannelEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCDataChannelEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, RTCDataChannelEventInit eventInitDict)` -/
-def RTCDataChannelEvent.new (type : String) (eventInitDict : RTCDataChannelEventInit) : IO RTCDataChannelEvent :=
+@[macro_inline] def RTCDataChannelEvent.new (type : String) (eventInitDict : RTCDataChannelEventInit) : IO RTCDataChannelEvent := Internal.api "Lasm.JS.Web.RTCDataChannelEvent.new" do
   Lasm.JS.Binding.invoke RTCDataChannelEvent { name := "Lasm.JS.Web.RTCDataChannelEvent.new", module := "globalThis", path := "RTCDataChannelEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute RTCDataChannel channel` -/
-def RTCDataChannelEvent.channel (self : RTCDataChannelEvent) : IO RTCDataChannel := do
+@[macro_inline] def RTCDataChannelEvent.channel (self : RTCDataChannelEvent) : IO RTCDataChannel := Internal.api "Lasm.JS.Web.RTCDataChannelEvent.channel" do
   let r ← self.val.get "channel" Value
   pure { val := r }
 
 /-- `v instanceof RTCDtlsTransport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCDtlsTransport`). -/
-def RTCDtlsTransport.cast? (v : Value) : IO (Option RTCDtlsTransport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCDtlsTransport"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCDtlsTransport.cast? (v : Value) : IO (Option RTCDtlsTransport) := Internal.api "Lasm.JS.Web.RTCDtlsTransport.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCDtlsTransport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RTCIceTransport iceTransport` -/
-def RTCDtlsTransport.iceTransport (self : RTCDtlsTransport) : IO RTCIceTransport := do
+@[macro_inline] def RTCDtlsTransport.iceTransport (self : RTCDtlsTransport) : IO RTCIceTransport := Internal.api "Lasm.JS.Web.RTCDtlsTransport.iceTransport" do
   let r ← self.val.get "iceTransport" Value
   pure { val := r }
 
 /-- `readonly attribute RTCDtlsTransportState state` -/
-def RTCDtlsTransport.state (self : RTCDtlsTransport) : IO RTCDtlsTransportState := self.val.get "state" RTCDtlsTransportState
+@[macro_inline] def RTCDtlsTransport.state (self : RTCDtlsTransport) : IO RTCDtlsTransportState := Internal.api "Lasm.JS.Web.RTCDtlsTransport.state" do
+  self.val.get "state" RTCDtlsTransportState
 
 /-- `attribute EventHandler onstatechange` -/
-def RTCDtlsTransport.onstatechange (self : RTCDtlsTransport) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDtlsTransport.onstatechange (self : RTCDtlsTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDtlsTransport.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def RTCDtlsTransport.setOnstatechange (self : RTCDtlsTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDtlsTransport.setOnstatechange (self : RTCDtlsTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDtlsTransport.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def RTCDtlsTransport.onerror (self : RTCDtlsTransport) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def RTCDtlsTransport.onerror (self : RTCDtlsTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCDtlsTransport.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def RTCDtlsTransport.setOnerror (self : RTCDtlsTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCDtlsTransport.setOnerror (self : RTCDtlsTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCDtlsTransport.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `sequence<ArrayBuffer> getRemoteCertificates()` -/
-def RTCDtlsTransport.getRemoteCertificates (self : RTCDtlsTransport) : IO (Array ByteArray) := do
-  let r ← self.val.callMethod "getRemoteCertificates" (Support.args #[]) (Array Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+@[macro_inline] def RTCDtlsTransport.getRemoteCertificates (self : RTCDtlsTransport) : IO (Array ByteArray) := Internal.api "Lasm.JS.Web.RTCDtlsTransport.getRemoteCertificates" do
+  let r ← self.val.callMethod "getRemoteCertificates" (Internal.args #[]) (Array Value)
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `v instanceof RTCError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCError`). -/
-def RTCError.cast? (v : Value) : IO (Option RTCError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCError"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCError.cast? (v : Value) : IO (Option RTCError) := Internal.api "Lasm.JS.Web.RTCError.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(RTCErrorInit init, optional DOMString message)` -/
-def RTCError.new (init : RTCErrorInit) (message : Option String := none) : IO RTCError :=
+@[macro_inline] def RTCError.new (init : RTCErrorInit) (message : Option String := none) : IO RTCError := Internal.api "Lasm.JS.Web.RTCError.new" do
   Lasm.JS.Binding.invoke RTCError { name := "Lasm.JS.Web.RTCError.new", module := "globalThis", path := "RTCError", construct := true, arity := 2 }
-    (Support.args #[toJS init, Support.optional message]) (await := false)
+    (Internal.args #[toJS init, Internal.optional message]) (await := false)
 
 /-- `readonly attribute RTCErrorDetailType errorDetail` -/
-def RTCError.errorDetail (self : RTCError) : IO RTCErrorDetailType := self.val.get "errorDetail" RTCErrorDetailType
+@[macro_inline] def RTCError.errorDetail (self : RTCError) : IO RTCErrorDetailType := Internal.api "Lasm.JS.Web.RTCError.errorDetail" do
+  self.val.get "errorDetail" RTCErrorDetailType
 
 /-- `readonly attribute long? sdpLineNumber` -/
-def RTCError.sdpLineNumber (self : RTCError) : IO (Option Int) := self.val.get "sdpLineNumber" (Option Int)
+@[macro_inline] def RTCError.sdpLineNumber (self : RTCError) : IO (Option Int) := Internal.api "Lasm.JS.Web.RTCError.sdpLineNumber" do
+  self.val.get "sdpLineNumber" (Option Int)
 
 /-- `readonly attribute long? sctpCauseCode` -/
-def RTCError.sctpCauseCode (self : RTCError) : IO (Option Int) := self.val.get "sctpCauseCode" (Option Int)
+@[macro_inline] def RTCError.sctpCauseCode (self : RTCError) : IO (Option Int) := Internal.api "Lasm.JS.Web.RTCError.sctpCauseCode" do
+  self.val.get "sctpCauseCode" (Option Int)
 
 /-- `readonly attribute unsigned long? receivedAlert` -/
-def RTCError.receivedAlert (self : RTCError) : IO (Option Nat) := self.val.get "receivedAlert" (Option Nat)
+@[macro_inline] def RTCError.receivedAlert (self : RTCError) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCError.receivedAlert" do
+  self.val.get "receivedAlert" (Option Nat)
 
 /-- `readonly attribute unsigned long? sentAlert` -/
-def RTCError.sentAlert (self : RTCError) : IO (Option Nat) := self.val.get "sentAlert" (Option Nat)
+@[macro_inline] def RTCError.sentAlert (self : RTCError) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCError.sentAlert" do
+  self.val.get "sentAlert" (Option Nat)
 
 /-- `v instanceof RTCErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCErrorEvent`). -/
-def RTCErrorEvent.cast? (v : Value) : IO (Option RTCErrorEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCErrorEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCErrorEvent.cast? (v : Value) : IO (Option RTCErrorEvent) := Internal.api "Lasm.JS.Web.RTCErrorEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCErrorEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, RTCErrorEventInit eventInitDict)` -/
-def RTCErrorEvent.new (type : String) (eventInitDict : RTCErrorEventInit) : IO RTCErrorEvent :=
+@[macro_inline] def RTCErrorEvent.new (type : String) (eventInitDict : RTCErrorEventInit) : IO RTCErrorEvent := Internal.api "Lasm.JS.Web.RTCErrorEvent.new" do
   Lasm.JS.Binding.invoke RTCErrorEvent { name := "Lasm.JS.Web.RTCErrorEvent.new", module := "globalThis", path := "RTCErrorEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute RTCError error` -/
-def RTCErrorEvent.error (self : RTCErrorEvent) : IO RTCError := do
+@[macro_inline] def RTCErrorEvent.error (self : RTCErrorEvent) : IO RTCError := Internal.api "Lasm.JS.Web.RTCErrorEvent.error" do
   let r ← self.val.get "error" Value
   pure { val := r }
 
 /-- `v instanceof RTCIceCandidate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIceCandidate`). -/
-def RTCIceCandidate.cast? (v : Value) : IO (Option RTCIceCandidate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIceCandidate"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIceCandidate.cast? (v : Value) : IO (Option RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceCandidate.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIceCandidate"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional RTCLocalIceCandidateInit candidateInitDict)` -/
-def RTCIceCandidate.new (candidateInitDict : Option RTCLocalIceCandidateInit := none) : IO RTCIceCandidate :=
+@[macro_inline] def RTCIceCandidate.new (candidateInitDict : Option RTCLocalIceCandidateInit := none) : IO RTCIceCandidate := Internal.api "Lasm.JS.Web.RTCIceCandidate.new" do
   Lasm.JS.Binding.invoke RTCIceCandidate { name := "Lasm.JS.Web.RTCIceCandidate.new", module := "globalThis", path := "RTCIceCandidate", construct := true, arity := 1 }
-    (Support.args #[Support.optional candidateInitDict]) (await := false)
+    (Internal.args #[Internal.optional candidateInitDict]) (await := false)
 
 /-- `readonly attribute DOMString candidate` -/
-def RTCIceCandidate.candidate (self : RTCIceCandidate) : IO String := self.val.get "candidate" String
+@[macro_inline] def RTCIceCandidate.candidate (self : RTCIceCandidate) : IO String := Internal.api "Lasm.JS.Web.RTCIceCandidate.candidate" do
+  self.val.get "candidate" String
 
 /-- `readonly attribute DOMString? sdpMid` -/
-def RTCIceCandidate.sdpMid (self : RTCIceCandidate) : IO (Option String) := self.val.get "sdpMid" (Option String)
+@[macro_inline] def RTCIceCandidate.sdpMid (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.sdpMid" do
+  self.val.get "sdpMid" (Option String)
 
 /-- `readonly attribute unsigned short? sdpMLineIndex` -/
-def RTCIceCandidate.sdpMLineIndex (self : RTCIceCandidate) : IO (Option Nat) := self.val.get "sdpMLineIndex" (Option Nat)
+@[macro_inline] def RTCIceCandidate.sdpMLineIndex (self : RTCIceCandidate) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCIceCandidate.sdpMLineIndex" do
+  self.val.get "sdpMLineIndex" (Option Nat)
 
 /-- `readonly attribute DOMString? foundation` -/
-def RTCIceCandidate.foundation (self : RTCIceCandidate) : IO (Option String) := self.val.get "foundation" (Option String)
+@[macro_inline] def RTCIceCandidate.foundation (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.foundation" do
+  self.val.get "foundation" (Option String)
 
 /-- `readonly attribute RTCIceComponent? component` -/
-def RTCIceCandidate.component (self : RTCIceCandidate) : IO (Option RTCIceComponent) := self.val.get "component" (Option RTCIceComponent)
+@[macro_inline] def RTCIceCandidate.component (self : RTCIceCandidate) : IO (Option RTCIceComponent) := Internal.api "Lasm.JS.Web.RTCIceCandidate.component" do
+  self.val.get "component" (Option RTCIceComponent)
 
 /-- `readonly attribute unsigned long? priority` -/
-def RTCIceCandidate.priority (self : RTCIceCandidate) : IO (Option Nat) := self.val.get "priority" (Option Nat)
+@[macro_inline] def RTCIceCandidate.priority (self : RTCIceCandidate) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCIceCandidate.priority" do
+  self.val.get "priority" (Option Nat)
 
 /-- `readonly attribute DOMString? address` -/
-def RTCIceCandidate.address (self : RTCIceCandidate) : IO (Option String) := self.val.get "address" (Option String)
+@[macro_inline] def RTCIceCandidate.address (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.address" do
+  self.val.get "address" (Option String)
 
 /-- `readonly attribute RTCIceProtocol? protocol` -/
-def RTCIceCandidate.protocol (self : RTCIceCandidate) : IO (Option RTCIceProtocol) := self.val.get "protocol" (Option RTCIceProtocol)
+@[macro_inline] def RTCIceCandidate.protocol (self : RTCIceCandidate) : IO (Option RTCIceProtocol) := Internal.api "Lasm.JS.Web.RTCIceCandidate.protocol" do
+  self.val.get "protocol" (Option RTCIceProtocol)
 
 /-- `readonly attribute unsigned short? port` -/
-def RTCIceCandidate.port (self : RTCIceCandidate) : IO (Option Nat) := self.val.get "port" (Option Nat)
+@[macro_inline] def RTCIceCandidate.port (self : RTCIceCandidate) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCIceCandidate.port" do
+  self.val.get "port" (Option Nat)
 
 /-- `readonly attribute RTCIceCandidateType? type` -/
-def RTCIceCandidate.type (self : RTCIceCandidate) : IO (Option RTCIceCandidateType) := self.val.get "type" (Option RTCIceCandidateType)
+@[macro_inline] def RTCIceCandidate.type (self : RTCIceCandidate) : IO (Option RTCIceCandidateType) := Internal.api "Lasm.JS.Web.RTCIceCandidate.type" do
+  self.val.get "type" (Option RTCIceCandidateType)
 
 /-- `readonly attribute RTCIceTcpCandidateType? tcpType` -/
-def RTCIceCandidate.tcpType (self : RTCIceCandidate) : IO (Option RTCIceTcpCandidateType) := self.val.get "tcpType" (Option RTCIceTcpCandidateType)
+@[macro_inline] def RTCIceCandidate.tcpType (self : RTCIceCandidate) : IO (Option RTCIceTcpCandidateType) := Internal.api "Lasm.JS.Web.RTCIceCandidate.tcpType" do
+  self.val.get "tcpType" (Option RTCIceTcpCandidateType)
 
 /-- `readonly attribute DOMString? relatedAddress` -/
-def RTCIceCandidate.relatedAddress (self : RTCIceCandidate) : IO (Option String) := self.val.get "relatedAddress" (Option String)
+@[macro_inline] def RTCIceCandidate.relatedAddress (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.relatedAddress" do
+  self.val.get "relatedAddress" (Option String)
 
 /-- `readonly attribute unsigned short? relatedPort` -/
-def RTCIceCandidate.relatedPort (self : RTCIceCandidate) : IO (Option Nat) := self.val.get "relatedPort" (Option Nat)
+@[macro_inline] def RTCIceCandidate.relatedPort (self : RTCIceCandidate) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCIceCandidate.relatedPort" do
+  self.val.get "relatedPort" (Option Nat)
 
 /-- `readonly attribute DOMString? usernameFragment` -/
-def RTCIceCandidate.usernameFragment (self : RTCIceCandidate) : IO (Option String) := self.val.get "usernameFragment" (Option String)
+@[macro_inline] def RTCIceCandidate.usernameFragment (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.usernameFragment" do
+  self.val.get "usernameFragment" (Option String)
 
 /-- `readonly attribute RTCIceServerTransportProtocol? relayProtocol` -/
-def RTCIceCandidate.relayProtocol (self : RTCIceCandidate) : IO (Option RTCIceServerTransportProtocol) := self.val.get "relayProtocol" (Option RTCIceServerTransportProtocol)
+@[macro_inline] def RTCIceCandidate.relayProtocol (self : RTCIceCandidate) : IO (Option RTCIceServerTransportProtocol) := Internal.api "Lasm.JS.Web.RTCIceCandidate.relayProtocol" do
+  self.val.get "relayProtocol" (Option RTCIceServerTransportProtocol)
 
 /-- `readonly attribute USVString? url` -/
-def RTCIceCandidate.url (self : RTCIceCandidate) : IO (Option String) := self.val.get "url" (Option String)
+@[macro_inline] def RTCIceCandidate.url (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.url" do
+  self.val.get "url" (Option String)
 
 /-- `RTCIceCandidateInit toJSON()` -/
-def RTCIceCandidate.toJSON (self : RTCIceCandidate) : IO RTCIceCandidateInit :=
-  self.val.callMethod "toJSON" (Support.args #[]) RTCIceCandidateInit
+@[macro_inline] def RTCIceCandidate.toJSON (self : RTCIceCandidate) : IO RTCIceCandidateInit := Internal.api "Lasm.JS.Web.RTCIceCandidate.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) RTCIceCandidateInit
 
 /-- `v instanceof RTCIceCandidatePair`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIceCandidatePair`). -/
-def RTCIceCandidatePair.cast? (v : Value) : IO (Option RTCIceCandidatePair) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIceCandidatePair"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIceCandidatePair.cast? (v : Value) : IO (Option RTCIceCandidatePair) := Internal.api "Lasm.JS.Web.RTCIceCandidatePair.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIceCandidatePair"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RTCIceCandidate local` -/
-def RTCIceCandidatePair.«local» (self : RTCIceCandidatePair) : IO RTCIceCandidate := do
+@[macro_inline] def RTCIceCandidatePair.«local» (self : RTCIceCandidatePair) : IO RTCIceCandidate := Internal.api "Lasm.JS.Web.RTCIceCandidatePair.local" do
   let r ← self.val.get "local" Value
   pure { val := r }
 
 /-- `readonly attribute RTCIceCandidate remote` -/
-def RTCIceCandidatePair.remote (self : RTCIceCandidatePair) : IO RTCIceCandidate := do
+@[macro_inline] def RTCIceCandidatePair.remote (self : RTCIceCandidatePair) : IO RTCIceCandidate := Internal.api "Lasm.JS.Web.RTCIceCandidatePair.remote" do
   let r ← self.val.get "remote" Value
   pure { val := r }
 
 /-- `v instanceof RTCIceTransport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIceTransport`). -/
-def RTCIceTransport.cast? (v : Value) : IO (Option RTCIceTransport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIceTransport"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIceTransport.cast? (v : Value) : IO (Option RTCIceTransport) := Internal.api "Lasm.JS.Web.RTCIceTransport.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIceTransport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RTCIceRole role` -/
-def RTCIceTransport.role (self : RTCIceTransport) : IO RTCIceRole := self.val.get "role" RTCIceRole
+@[macro_inline] def RTCIceTransport.role (self : RTCIceTransport) : IO RTCIceRole := Internal.api "Lasm.JS.Web.RTCIceTransport.role" do
+  self.val.get "role" RTCIceRole
 
 /-- `readonly attribute RTCIceComponent component` -/
-def RTCIceTransport.component (self : RTCIceTransport) : IO RTCIceComponent := self.val.get "component" RTCIceComponent
+@[macro_inline] def RTCIceTransport.component (self : RTCIceTransport) : IO RTCIceComponent := Internal.api "Lasm.JS.Web.RTCIceTransport.component" do
+  self.val.get "component" RTCIceComponent
 
 /-- `readonly attribute RTCIceTransportState state` -/
-def RTCIceTransport.state (self : RTCIceTransport) : IO RTCIceTransportState := self.val.get "state" RTCIceTransportState
+@[macro_inline] def RTCIceTransport.state (self : RTCIceTransport) : IO RTCIceTransportState := Internal.api "Lasm.JS.Web.RTCIceTransport.state" do
+  self.val.get "state" RTCIceTransportState
 
 /-- `readonly attribute RTCIceGathererState gatheringState` -/
-def RTCIceTransport.gatheringState (self : RTCIceTransport) : IO RTCIceGathererState := self.val.get "gatheringState" RTCIceGathererState
+@[macro_inline] def RTCIceTransport.gatheringState (self : RTCIceTransport) : IO RTCIceGathererState := Internal.api "Lasm.JS.Web.RTCIceTransport.gatheringState" do
+  self.val.get "gatheringState" RTCIceGathererState
 
 /-- `attribute EventHandler onstatechange` -/
-def RTCIceTransport.onstatechange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCIceTransport.onstatechange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def RTCIceTransport.setOnstatechange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCIceTransport.setOnstatechange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `attribute EventHandler ongatheringstatechange` -/
-def RTCIceTransport.ongatheringstatechange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := self.val.get "ongatheringstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCIceTransport.ongatheringstatechange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.ongatheringstatechange" do
+  self.val.get "ongatheringstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `ongatheringstatechange`: `attribute EventHandler ongatheringstatechange` -/
-def RTCIceTransport.setOngatheringstatechange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCIceTransport.setOngatheringstatechange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.setOngatheringstatechange" do
   self.val.set "ongatheringstatechange" (toJS value)
 
 /-- `attribute EventHandler onselectedcandidatepairchange` -/
-def RTCIceTransport.onselectedcandidatepairchange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := self.val.get "onselectedcandidatepairchange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCIceTransport.onselectedcandidatepairchange (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.onselectedcandidatepairchange" do
+  self.val.get "onselectedcandidatepairchange" (Option EventHandlerNonNull)
 
 /-- Sets `onselectedcandidatepairchange`: `attribute EventHandler onselectedcandidatepairchange` -/
-def RTCIceTransport.setOnselectedcandidatepairchange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCIceTransport.setOnselectedcandidatepairchange (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.setOnselectedcandidatepairchange" do
   self.val.set "onselectedcandidatepairchange" (toJS value)
 
 /-- `sequence<RTCIceCandidate> getLocalCandidates()` -/
-def RTCIceTransport.getLocalCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) :=
-  self.val.callMethod "getLocalCandidates" (Support.args #[]) (Array RTCIceCandidate)
+@[macro_inline] def RTCIceTransport.getLocalCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalCandidates" do
+  self.val.callMethod "getLocalCandidates" (Internal.args #[]) (Array RTCIceCandidate)
 
 /-- `sequence<RTCIceCandidate> getRemoteCandidates()` -/
-def RTCIceTransport.getRemoteCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) :=
-  self.val.callMethod "getRemoteCandidates" (Support.args #[]) (Array RTCIceCandidate)
+@[macro_inline] def RTCIceTransport.getRemoteCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteCandidates" do
+  self.val.callMethod "getRemoteCandidates" (Internal.args #[]) (Array RTCIceCandidate)
 
 /-- `RTCIceCandidatePair? getSelectedCandidatePair()` -/
-def RTCIceTransport.getSelectedCandidatePair (self : RTCIceTransport) : IO (Option RTCIceCandidatePair) :=
-  self.val.callMethod "getSelectedCandidatePair" (Support.args #[]) (Option RTCIceCandidatePair)
+@[macro_inline] def RTCIceTransport.getSelectedCandidatePair (self : RTCIceTransport) : IO (Option RTCIceCandidatePair) := Internal.api "Lasm.JS.Web.RTCIceTransport.getSelectedCandidatePair" do
+  self.val.callMethod "getSelectedCandidatePair" (Internal.args #[]) (Option RTCIceCandidatePair)
 
 /-- `RTCIceParameters? getLocalParameters()` -/
-def RTCIceTransport.getLocalParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) :=
-  self.val.callMethod "getLocalParameters" (Support.args #[]) (Option RTCIceParameters)
+@[macro_inline] def RTCIceTransport.getLocalParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalParameters" do
+  self.val.callMethod "getLocalParameters" (Internal.args #[]) (Option RTCIceParameters)
 
 /-- `RTCIceParameters? getRemoteParameters()` -/
-def RTCIceTransport.getRemoteParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) :=
-  self.val.callMethod "getRemoteParameters" (Support.args #[]) (Option RTCIceParameters)
+@[macro_inline] def RTCIceTransport.getRemoteParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteParameters" do
+  self.val.callMethod "getRemoteParameters" (Internal.args #[]) (Option RTCIceParameters)
 
 /-- `v instanceof RTCPeerConnection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCPeerConnection`). -/
-def RTCPeerConnection.cast? (v : Value) : IO (Option RTCPeerConnection) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCPeerConnection"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCPeerConnection.cast? (v : Value) : IO (Option RTCPeerConnection) := Internal.api "Lasm.JS.Web.RTCPeerConnection.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCPeerConnection"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional RTCConfiguration configuration)` -/
-def RTCPeerConnection.new (configuration : Option RTCConfiguration := none) : IO RTCPeerConnection :=
+@[macro_inline] def RTCPeerConnection.new (configuration : Option RTCConfiguration := none) : IO RTCPeerConnection := Internal.api "Lasm.JS.Web.RTCPeerConnection.new" do
   Lasm.JS.Binding.invoke RTCPeerConnection { name := "Lasm.JS.Web.RTCPeerConnection.new", module := "globalThis", path := "RTCPeerConnection", construct := true, arity := 1 }
-    (Support.args #[Support.optional configuration]) (await := false)
+    (Internal.args #[Internal.optional configuration]) (await := false)
 
 /-- `readonly attribute RTCSessionDescription? localDescription` -/
-def RTCPeerConnection.localDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "localDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.localDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.localDescription" do
+  self.val.get "localDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSessionDescription? currentLocalDescription` -/
-def RTCPeerConnection.currentLocalDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "currentLocalDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.currentLocalDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.currentLocalDescription" do
+  self.val.get "currentLocalDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSessionDescription? pendingLocalDescription` -/
-def RTCPeerConnection.pendingLocalDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "pendingLocalDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.pendingLocalDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.pendingLocalDescription" do
+  self.val.get "pendingLocalDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSessionDescription? remoteDescription` -/
-def RTCPeerConnection.remoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "remoteDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.remoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.remoteDescription" do
+  self.val.get "remoteDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSessionDescription? currentRemoteDescription` -/
-def RTCPeerConnection.currentRemoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "currentRemoteDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.currentRemoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.currentRemoteDescription" do
+  self.val.get "currentRemoteDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSessionDescription? pendingRemoteDescription` -/
-def RTCPeerConnection.pendingRemoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := self.val.get "pendingRemoteDescription" (Option RTCSessionDescription)
+@[macro_inline] def RTCPeerConnection.pendingRemoteDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.pendingRemoteDescription" do
+  self.val.get "pendingRemoteDescription" (Option RTCSessionDescription)
 
 /-- `readonly attribute RTCSignalingState signalingState` -/
-def RTCPeerConnection.signalingState (self : RTCPeerConnection) : IO RTCSignalingState := self.val.get "signalingState" RTCSignalingState
+@[macro_inline] def RTCPeerConnection.signalingState (self : RTCPeerConnection) : IO RTCSignalingState := Internal.api "Lasm.JS.Web.RTCPeerConnection.signalingState" do
+  self.val.get "signalingState" RTCSignalingState
 
 /-- `readonly attribute RTCIceGatheringState iceGatheringState` -/
-def RTCPeerConnection.iceGatheringState (self : RTCPeerConnection) : IO RTCIceGatheringState := self.val.get "iceGatheringState" RTCIceGatheringState
+@[macro_inline] def RTCPeerConnection.iceGatheringState (self : RTCPeerConnection) : IO RTCIceGatheringState := Internal.api "Lasm.JS.Web.RTCPeerConnection.iceGatheringState" do
+  self.val.get "iceGatheringState" RTCIceGatheringState
 
 /-- `readonly attribute RTCIceConnectionState iceConnectionState` -/
-def RTCPeerConnection.iceConnectionState (self : RTCPeerConnection) : IO RTCIceConnectionState := self.val.get "iceConnectionState" RTCIceConnectionState
+@[macro_inline] def RTCPeerConnection.iceConnectionState (self : RTCPeerConnection) : IO RTCIceConnectionState := Internal.api "Lasm.JS.Web.RTCPeerConnection.iceConnectionState" do
+  self.val.get "iceConnectionState" RTCIceConnectionState
 
 /-- `readonly attribute RTCPeerConnectionState connectionState` -/
-def RTCPeerConnection.connectionState (self : RTCPeerConnection) : IO RTCPeerConnectionState := self.val.get "connectionState" RTCPeerConnectionState
+@[macro_inline] def RTCPeerConnection.connectionState (self : RTCPeerConnection) : IO RTCPeerConnectionState := Internal.api "Lasm.JS.Web.RTCPeerConnection.connectionState" do
+  self.val.get "connectionState" RTCPeerConnectionState
 
 /-- `readonly attribute boolean? canTrickleIceCandidates` -/
-def RTCPeerConnection.canTrickleIceCandidates (self : RTCPeerConnection) : IO (Option Bool) := self.val.get "canTrickleIceCandidates" (Option Bool)
+@[macro_inline] def RTCPeerConnection.canTrickleIceCandidates (self : RTCPeerConnection) : IO (Option Bool) := Internal.api "Lasm.JS.Web.RTCPeerConnection.canTrickleIceCandidates" do
+  self.val.get "canTrickleIceCandidates" (Option Bool)
 
 /-- `attribute EventHandler onnegotiationneeded` -/
-def RTCPeerConnection.onnegotiationneeded (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onnegotiationneeded" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onnegotiationneeded (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onnegotiationneeded" do
+  self.val.get "onnegotiationneeded" (Option EventHandlerNonNull)
 
 /-- Sets `onnegotiationneeded`: `attribute EventHandler onnegotiationneeded` -/
-def RTCPeerConnection.setOnnegotiationneeded (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnnegotiationneeded (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnnegotiationneeded" do
   self.val.set "onnegotiationneeded" (toJS value)
 
 /-- `attribute EventHandler onicecandidate` -/
-def RTCPeerConnection.onicecandidate (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onicecandidate" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onicecandidate (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onicecandidate" do
+  self.val.get "onicecandidate" (Option EventHandlerNonNull)
 
 /-- Sets `onicecandidate`: `attribute EventHandler onicecandidate` -/
-def RTCPeerConnection.setOnicecandidate (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnicecandidate (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnicecandidate" do
   self.val.set "onicecandidate" (toJS value)
 
 /-- `attribute EventHandler onicecandidateerror` -/
-def RTCPeerConnection.onicecandidateerror (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onicecandidateerror" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onicecandidateerror (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onicecandidateerror" do
+  self.val.get "onicecandidateerror" (Option EventHandlerNonNull)
 
 /-- Sets `onicecandidateerror`: `attribute EventHandler onicecandidateerror` -/
-def RTCPeerConnection.setOnicecandidateerror (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnicecandidateerror (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnicecandidateerror" do
   self.val.set "onicecandidateerror" (toJS value)
 
 /-- `attribute EventHandler onsignalingstatechange` -/
-def RTCPeerConnection.onsignalingstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onsignalingstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onsignalingstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onsignalingstatechange" do
+  self.val.get "onsignalingstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onsignalingstatechange`: `attribute EventHandler onsignalingstatechange` -/
-def RTCPeerConnection.setOnsignalingstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnsignalingstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnsignalingstatechange" do
   self.val.set "onsignalingstatechange" (toJS value)
 
 /-- `attribute EventHandler oniceconnectionstatechange` -/
-def RTCPeerConnection.oniceconnectionstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "oniceconnectionstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.oniceconnectionstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.oniceconnectionstatechange" do
+  self.val.get "oniceconnectionstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `oniceconnectionstatechange`: `attribute EventHandler oniceconnectionstatechange` -/
-def RTCPeerConnection.setOniceconnectionstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOniceconnectionstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOniceconnectionstatechange" do
   self.val.set "oniceconnectionstatechange" (toJS value)
 
 /-- `attribute EventHandler onicegatheringstatechange` -/
-def RTCPeerConnection.onicegatheringstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onicegatheringstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onicegatheringstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onicegatheringstatechange" do
+  self.val.get "onicegatheringstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onicegatheringstatechange`: `attribute EventHandler onicegatheringstatechange` -/
-def RTCPeerConnection.setOnicegatheringstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnicegatheringstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnicegatheringstatechange" do
   self.val.set "onicegatheringstatechange" (toJS value)
 
 /-- `attribute EventHandler onconnectionstatechange` -/
-def RTCPeerConnection.onconnectionstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "onconnectionstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.onconnectionstatechange (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.onconnectionstatechange" do
+  self.val.get "onconnectionstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onconnectionstatechange`: `attribute EventHandler onconnectionstatechange` -/
-def RTCPeerConnection.setOnconnectionstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOnconnectionstatechange (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOnconnectionstatechange" do
   self.val.set "onconnectionstatechange" (toJS value)
 
 /-- `attribute EventHandler ontrack` -/
-def RTCPeerConnection.ontrack (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "ontrack" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.ontrack (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.ontrack" do
+  self.val.get "ontrack" (Option EventHandlerNonNull)
 
 /-- Sets `ontrack`: `attribute EventHandler ontrack` -/
-def RTCPeerConnection.setOntrack (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOntrack (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOntrack" do
   self.val.set "ontrack" (toJS value)
 
 /-- `readonly attribute RTCSctpTransport? sctp` -/
-def RTCPeerConnection.sctp (self : RTCPeerConnection) : IO (Option RTCSctpTransport) := self.val.get "sctp" (Option RTCSctpTransport)
+@[macro_inline] def RTCPeerConnection.sctp (self : RTCPeerConnection) : IO (Option RTCSctpTransport) := Internal.api "Lasm.JS.Web.RTCPeerConnection.sctp" do
+  self.val.get "sctp" (Option RTCSctpTransport)
 
 /-- `attribute EventHandler ondatachannel` -/
-def RTCPeerConnection.ondatachannel (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := self.val.get "ondatachannel" (Option EventHandlerNonNull)
+@[macro_inline] def RTCPeerConnection.ondatachannel (self : RTCPeerConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCPeerConnection.ondatachannel" do
+  self.val.get "ondatachannel" (Option EventHandlerNonNull)
 
 /-- Sets `ondatachannel`: `attribute EventHandler ondatachannel` -/
-def RTCPeerConnection.setOndatachannel (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCPeerConnection.setOndatachannel (self : RTCPeerConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setOndatachannel" do
   self.val.set "ondatachannel" (toJS value)
 
 /-- `Promise<RTCSessionDescriptionInit> createOffer(optional RTCOfferOptions options)` -/
-def RTCPeerConnection.createOffer (self : RTCPeerConnection) (options : Option RTCOfferOptions := none) : Async RTCSessionDescriptionInit :=
-  self.val.callMethodAwait "createOffer" (Support.args #[Support.optional options]) RTCSessionDescriptionInit
+@[macro_inline] def RTCPeerConnection.createOffer (self : RTCPeerConnection) (options : Option RTCOfferOptions := none) : Async RTCSessionDescriptionInit := Internal.api "Lasm.JS.Web.RTCPeerConnection.createOffer" do
+  self.val.callMethodAwait "createOffer" (Internal.args #[Internal.optional options]) RTCSessionDescriptionInit
 
 /-- `Promise<undefined> createOffer(RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback, optional RTCOfferOptions options)` -/
-def RTCPeerConnection.createOfferWithSuccessCallback (self : RTCPeerConnection) (successCallback : RTCSessionDescriptionCallback) (failureCallback : RTCPeerConnectionErrorCallback) (options : Option RTCOfferOptions := none) : Async Unit :=
-  self.val.callMethodAwait "createOffer" (Support.args #[toJS successCallback, toJS failureCallback, Support.optional options]) Unit
+@[macro_inline] def RTCPeerConnection.createOfferWithSuccessCallback (self : RTCPeerConnection) (successCallback : RTCSessionDescriptionCallback) (failureCallback : RTCPeerConnectionErrorCallback) (options : Option RTCOfferOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.createOfferWithSuccessCallback" do
+  self.val.callMethodAwait "createOffer" (Internal.args #[toJS successCallback, toJS failureCallback, Internal.optional options]) Unit
 
 /-- `Promise<RTCSessionDescriptionInit> createAnswer(optional RTCAnswerOptions options)` -/
-def RTCPeerConnection.createAnswer (self : RTCPeerConnection) (options : Option RTCAnswerOptions := none) : Async RTCSessionDescriptionInit :=
-  self.val.callMethodAwait "createAnswer" (Support.args #[Support.optional options]) RTCSessionDescriptionInit
+@[macro_inline] def RTCPeerConnection.createAnswer (self : RTCPeerConnection) (options : Option RTCAnswerOptions := none) : Async RTCSessionDescriptionInit := Internal.api "Lasm.JS.Web.RTCPeerConnection.createAnswer" do
+  self.val.callMethodAwait "createAnswer" (Internal.args #[Internal.optional options]) RTCSessionDescriptionInit
 
 /-- `Promise<undefined> createAnswer(RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback)` -/
-def RTCPeerConnection.createAnswerWithSuccessCallback (self : RTCPeerConnection) (successCallback : RTCSessionDescriptionCallback) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit :=
-  self.val.callMethodAwait "createAnswer" (Support.args #[toJS successCallback, toJS failureCallback]) Unit
+@[macro_inline] def RTCPeerConnection.createAnswerWithSuccessCallback (self : RTCPeerConnection) (successCallback : RTCSessionDescriptionCallback) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.createAnswerWithSuccessCallback" do
+  self.val.callMethodAwait "createAnswer" (Internal.args #[toJS successCallback, toJS failureCallback]) Unit
 
 /-- `Promise<undefined> setLocalDescription(optional RTCLocalSessionDescriptionInit description)` -/
-def RTCPeerConnection.setLocalDescription (self : RTCPeerConnection) (description : Option RTCLocalSessionDescriptionInit := none) : Async Unit :=
-  self.val.callMethodAwait "setLocalDescription" (Support.args #[Support.optional description]) Unit
+@[macro_inline] def RTCPeerConnection.setLocalDescription (self : RTCPeerConnection) (description : Option RTCLocalSessionDescriptionInit := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setLocalDescription" do
+  self.val.callMethodAwait "setLocalDescription" (Internal.args #[Internal.optional description]) Unit
 
 /-- `Promise<undefined> setLocalDescription(RTCLocalSessionDescriptionInit description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback)` -/
-def RTCPeerConnection.setLocalDescriptionWithSuccessCallback (self : RTCPeerConnection) (description : RTCLocalSessionDescriptionInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit :=
-  self.val.callMethodAwait "setLocalDescription" (Support.args #[toJS description, toJS successCallback, toJS failureCallback]) Unit
+@[macro_inline] def RTCPeerConnection.setLocalDescriptionWithSuccessCallback (self : RTCPeerConnection) (description : RTCLocalSessionDescriptionInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setLocalDescriptionWithSuccessCallback" do
+  self.val.callMethodAwait "setLocalDescription" (Internal.args #[toJS description, toJS successCallback, toJS failureCallback]) Unit
 
 /-- `Promise<undefined> setRemoteDescription(RTCSessionDescriptionInit description)` -/
-def RTCPeerConnection.setRemoteDescription (self : RTCPeerConnection) (description : RTCSessionDescriptionInit) : Async Unit :=
-  self.val.callMethodAwait "setRemoteDescription" (Support.args #[toJS description]) Unit
+@[macro_inline] def RTCPeerConnection.setRemoteDescription (self : RTCPeerConnection) (description : RTCSessionDescriptionInit) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setRemoteDescription" do
+  self.val.callMethodAwait "setRemoteDescription" (Internal.args #[toJS description]) Unit
 
 /-- `Promise<undefined> setRemoteDescription(RTCSessionDescriptionInit description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback)` -/
-def RTCPeerConnection.setRemoteDescriptionWithSuccessCallback (self : RTCPeerConnection) (description : RTCSessionDescriptionInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit :=
-  self.val.callMethodAwait "setRemoteDescription" (Support.args #[toJS description, toJS successCallback, toJS failureCallback]) Unit
+@[macro_inline] def RTCPeerConnection.setRemoteDescriptionWithSuccessCallback (self : RTCPeerConnection) (description : RTCSessionDescriptionInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setRemoteDescriptionWithSuccessCallback" do
+  self.val.callMethodAwait "setRemoteDescription" (Internal.args #[toJS description, toJS successCallback, toJS failureCallback]) Unit
 
 /-- `Promise<undefined> addIceCandidate(optional RTCIceCandidateInit candidate)` -/
-def RTCPeerConnection.addIceCandidate (self : RTCPeerConnection) (candidate : Option RTCIceCandidateInit := none) : Async Unit :=
-  self.val.callMethodAwait "addIceCandidate" (Support.args #[Support.optional candidate]) Unit
+@[macro_inline] def RTCPeerConnection.addIceCandidate (self : RTCPeerConnection) (candidate : Option RTCIceCandidateInit := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.addIceCandidate" do
+  self.val.callMethodAwait "addIceCandidate" (Internal.args #[Internal.optional candidate]) Unit
 
 /-- `Promise<undefined> addIceCandidate(RTCIceCandidateInit candidate, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback)` -/
-def RTCPeerConnection.addIceCandidateWithSuccessCallback (self : RTCPeerConnection) (candidate : RTCIceCandidateInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit :=
-  self.val.callMethodAwait "addIceCandidate" (Support.args #[toJS candidate, toJS successCallback, toJS failureCallback]) Unit
+@[macro_inline] def RTCPeerConnection.addIceCandidateWithSuccessCallback (self : RTCPeerConnection) (candidate : RTCIceCandidateInit) (successCallback : VoidFunction) (failureCallback : RTCPeerConnectionErrorCallback) : Async Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.addIceCandidateWithSuccessCallback" do
+  self.val.callMethodAwait "addIceCandidate" (Internal.args #[toJS candidate, toJS successCallback, toJS failureCallback]) Unit
 
 /-- `undefined restartIce()` -/
-def RTCPeerConnection.restartIce (self : RTCPeerConnection) : IO Unit :=
-  self.val.callMethod "restartIce" (Support.args #[]) Unit
+@[macro_inline] def RTCPeerConnection.restartIce (self : RTCPeerConnection) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.restartIce" do
+  self.val.callMethod "restartIce" (Internal.args #[]) Unit
 
 /-- `RTCConfiguration getConfiguration()` -/
-def RTCPeerConnection.getConfiguration (self : RTCPeerConnection) : IO RTCConfiguration :=
-  self.val.callMethod "getConfiguration" (Support.args #[]) RTCConfiguration
+@[macro_inline] def RTCPeerConnection.getConfiguration (self : RTCPeerConnection) : IO RTCConfiguration := Internal.api "Lasm.JS.Web.RTCPeerConnection.getConfiguration" do
+  self.val.callMethod "getConfiguration" (Internal.args #[]) RTCConfiguration
 
 /-- `undefined setConfiguration(optional RTCConfiguration configuration)` -/
-def RTCPeerConnection.setConfiguration (self : RTCPeerConnection) (configuration : Option RTCConfiguration := none) : IO Unit :=
-  self.val.callMethod "setConfiguration" (Support.args #[Support.optional configuration]) Unit
+@[macro_inline] def RTCPeerConnection.setConfiguration (self : RTCPeerConnection) (configuration : Option RTCConfiguration := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setConfiguration" do
+  self.val.callMethod "setConfiguration" (Internal.args #[Internal.optional configuration]) Unit
 
 /-- `undefined close()` -/
-def RTCPeerConnection.close (self : RTCPeerConnection) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def RTCPeerConnection.close (self : RTCPeerConnection) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `static Promise<RTCCertificate> generateCertificate(AlgorithmIdentifier keygenAlgorithm)` -/
-def RTCPeerConnection.generateCertificate (keygenAlgorithm : AlgorithmIdentifier) : Async RTCCertificate := do
+@[macro_inline] def RTCPeerConnection.generateCertificate (keygenAlgorithm : AlgorithmIdentifier) : Async RTCCertificate := Internal.api "Lasm.JS.Web.RTCPeerConnection.generateCertificate" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.RTCPeerConnection.generateCertificate", module := "globalThis", path := "RTCPeerConnection.generateCertificate", construct := false, arity := 1 }
-    (Support.args #[toJS keygenAlgorithm])
+    (Internal.args #[toJS keygenAlgorithm])
   pure { val := r }
 
 /-- `sequence<RTCRtpSender> getSenders()` -/
-def RTCPeerConnection.getSenders (self : RTCPeerConnection) : IO (Array RTCRtpSender) :=
-  self.val.callMethod "getSenders" (Support.args #[]) (Array RTCRtpSender)
+@[macro_inline] def RTCPeerConnection.getSenders (self : RTCPeerConnection) : IO (Array RTCRtpSender) := Internal.api "Lasm.JS.Web.RTCPeerConnection.getSenders" do
+  self.val.callMethod "getSenders" (Internal.args #[]) (Array RTCRtpSender)
 
 /-- `sequence<RTCRtpReceiver> getReceivers()` -/
-def RTCPeerConnection.getReceivers (self : RTCPeerConnection) : IO (Array RTCRtpReceiver) :=
-  self.val.callMethod "getReceivers" (Support.args #[]) (Array RTCRtpReceiver)
+@[macro_inline] def RTCPeerConnection.getReceivers (self : RTCPeerConnection) : IO (Array RTCRtpReceiver) := Internal.api "Lasm.JS.Web.RTCPeerConnection.getReceivers" do
+  self.val.callMethod "getReceivers" (Internal.args #[]) (Array RTCRtpReceiver)
 
 /-- `sequence<RTCRtpTransceiver> getTransceivers()` -/
-def RTCPeerConnection.getTransceivers (self : RTCPeerConnection) : IO (Array RTCRtpTransceiver) :=
-  self.val.callMethod "getTransceivers" (Support.args #[]) (Array RTCRtpTransceiver)
+@[macro_inline] def RTCPeerConnection.getTransceivers (self : RTCPeerConnection) : IO (Array RTCRtpTransceiver) := Internal.api "Lasm.JS.Web.RTCPeerConnection.getTransceivers" do
+  self.val.callMethod "getTransceivers" (Internal.args #[]) (Array RTCRtpTransceiver)
 
 /-- `RTCRtpSender addTrack(MediaStreamTrack track, MediaStream... streams)` -/
-def RTCPeerConnection.addTrack (self : RTCPeerConnection) (track : MediaStreamTrack) (streams : Array MediaStream := #[]) : IO RTCRtpSender := do
-  let r ← self.val.callMethod "addTrack" (Support.argsWith #[toJS track] (streams.map toJS)) Value
+@[macro_inline] def RTCPeerConnection.addTrack (self : RTCPeerConnection) (track : MediaStreamTrack) (streams : Array MediaStream := #[]) : IO RTCRtpSender := Internal.api "Lasm.JS.Web.RTCPeerConnection.addTrack" do
+  let r ← self.val.callMethod "addTrack" (Internal.argsWith #[toJS track] (streams.map toJS)) Value
   pure { val := r }
 
 /-- `undefined removeTrack(RTCRtpSender sender)` -/
-def RTCPeerConnection.removeTrack (self : RTCPeerConnection) (sender : RTCRtpSender) : IO Unit :=
-  self.val.callMethod "removeTrack" (Support.args #[toJS sender]) Unit
+@[macro_inline] def RTCPeerConnection.removeTrack (self : RTCPeerConnection) (sender : RTCRtpSender) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.removeTrack" do
+  self.val.callMethod "removeTrack" (Internal.args #[toJS sender]) Unit
 
 /-- `RTCRtpTransceiver addTransceiver((MediaStreamTrack or DOMString) trackOrKind, optional RTCRtpTransceiverInit init)` -/
-def RTCPeerConnection.addTransceiver (self : RTCPeerConnection) (trackOrKind : MediaStreamTrackOrDOMString) (init : Option RTCRtpTransceiverInit := none) : IO RTCRtpTransceiver := do
-  let r ← self.val.callMethod "addTransceiver" (Support.args #[toJS trackOrKind, Support.optional init]) Value
+@[macro_inline] def RTCPeerConnection.addTransceiver (self : RTCPeerConnection) (trackOrKind : MediaStreamTrackOrDOMString) (init : Option RTCRtpTransceiverInit := none) : IO RTCRtpTransceiver := Internal.api "Lasm.JS.Web.RTCPeerConnection.addTransceiver" do
+  let r ← self.val.callMethod "addTransceiver" (Internal.args #[toJS trackOrKind, Internal.optional init]) Value
   pure { val := r }
 
 /-- `RTCDataChannel createDataChannel(USVString label, optional RTCDataChannelInit dataChannelDict)` -/
-def RTCPeerConnection.createDataChannel (self : RTCPeerConnection) (label : String) (dataChannelDict : Option RTCDataChannelInit := none) : IO RTCDataChannel := do
-  let r ← self.val.callMethod "createDataChannel" (Support.args #[toJS label, Support.optional dataChannelDict]) Value
+@[macro_inline] def RTCPeerConnection.createDataChannel (self : RTCPeerConnection) (label : String) (dataChannelDict : Option RTCDataChannelInit := none) : IO RTCDataChannel := Internal.api "Lasm.JS.Web.RTCPeerConnection.createDataChannel" do
+  let r ← self.val.callMethod "createDataChannel" (Internal.args #[toJS label, Internal.optional dataChannelDict]) Value
   pure { val := r }
 
 /-- `Promise<RTCStatsReport> getStats(optional MediaStreamTrack? selector)` -/
-def RTCPeerConnection.getStats (self : RTCPeerConnection) (selector : Option MediaStreamTrack := none) : Async RTCStatsReport := do
-  let r ← self.val.callMethodAwait "getStats" (Support.args #[Support.optional selector]) Value
+@[macro_inline] def RTCPeerConnection.getStats (self : RTCPeerConnection) (selector : Option MediaStreamTrack := none) : Async RTCStatsReport := Internal.api "Lasm.JS.Web.RTCPeerConnection.getStats" do
+  let r ← self.val.callMethodAwait "getStats" (Internal.args #[Internal.optional selector]) Value
   pure { val := r }
 
 /-- `v instanceof RTCPeerConnectionIceErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCPeerConnectionIceErrorEvent`). -/
-def RTCPeerConnectionIceErrorEvent.cast? (v : Value) : IO (Option RTCPeerConnectionIceErrorEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCPeerConnectionIceErrorEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.cast? (v : Value) : IO (Option RTCPeerConnectionIceErrorEvent) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCPeerConnectionIceErrorEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, RTCPeerConnectionIceErrorEventInit eventInitDict)` -/
-def RTCPeerConnectionIceErrorEvent.new (type : String) (eventInitDict : RTCPeerConnectionIceErrorEventInit) : IO RTCPeerConnectionIceErrorEvent :=
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.new (type : String) (eventInitDict : RTCPeerConnectionIceErrorEventInit) : IO RTCPeerConnectionIceErrorEvent := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.new" do
   Lasm.JS.Binding.invoke RTCPeerConnectionIceErrorEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.new", module := "globalThis", path := "RTCPeerConnectionIceErrorEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString? address` -/
-def RTCPeerConnectionIceErrorEvent.address (self : RTCPeerConnectionIceErrorEvent) : IO (Option String) := self.val.get "address" (Option String)
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.address (self : RTCPeerConnectionIceErrorEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.address" do
+  self.val.get "address" (Option String)
 
 /-- `readonly attribute unsigned short? port` -/
-def RTCPeerConnectionIceErrorEvent.port (self : RTCPeerConnectionIceErrorEvent) : IO (Option Nat) := self.val.get "port" (Option Nat)
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.port (self : RTCPeerConnectionIceErrorEvent) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.port" do
+  self.val.get "port" (Option Nat)
 
 /-- `readonly attribute USVString url` -/
-def RTCPeerConnectionIceErrorEvent.url (self : RTCPeerConnectionIceErrorEvent) : IO String := self.val.get "url" String
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.url (self : RTCPeerConnectionIceErrorEvent) : IO String := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute unsigned short errorCode` -/
-def RTCPeerConnectionIceErrorEvent.errorCode (self : RTCPeerConnectionIceErrorEvent) : IO Nat := self.val.get "errorCode" Nat
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.errorCode (self : RTCPeerConnectionIceErrorEvent) : IO Nat := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.errorCode" do
+  self.val.get "errorCode" Nat
 
 /-- `readonly attribute USVString errorText` -/
-def RTCPeerConnectionIceErrorEvent.errorText (self : RTCPeerConnectionIceErrorEvent) : IO String := self.val.get "errorText" String
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.errorText (self : RTCPeerConnectionIceErrorEvent) : IO String := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.errorText" do
+  self.val.get "errorText" String
 
 /-- `v instanceof RTCPeerConnectionIceEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCPeerConnectionIceEvent`). -/
-def RTCPeerConnectionIceEvent.cast? (v : Value) : IO (Option RTCPeerConnectionIceEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCPeerConnectionIceEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCPeerConnectionIceEvent.cast? (v : Value) : IO (Option RTCPeerConnectionIceEvent) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCPeerConnectionIceEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional RTCPeerConnectionIceEventInit eventInitDict)` -/
-def RTCPeerConnectionIceEvent.new (type : String) (eventInitDict : Option RTCPeerConnectionIceEventInit := none) : IO RTCPeerConnectionIceEvent :=
+@[macro_inline] def RTCPeerConnectionIceEvent.new (type : String) (eventInitDict : Option RTCPeerConnectionIceEventInit := none) : IO RTCPeerConnectionIceEvent := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.new" do
   Lasm.JS.Binding.invoke RTCPeerConnectionIceEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceEvent.new", module := "globalThis", path := "RTCPeerConnectionIceEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute RTCIceCandidate? candidate` -/
-def RTCPeerConnectionIceEvent.candidate (self : RTCPeerConnectionIceEvent) : IO (Option RTCIceCandidate) := self.val.get "candidate" (Option RTCIceCandidate)
+@[macro_inline] def RTCPeerConnectionIceEvent.candidate (self : RTCPeerConnectionIceEvent) : IO (Option RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.candidate" do
+  self.val.get "candidate" (Option RTCIceCandidate)
 
 /-- `readonly attribute USVString? url` -/
-def RTCPeerConnectionIceEvent.url (self : RTCPeerConnectionIceEvent) : IO (Option String) := self.val.get "url" (Option String)
+@[macro_inline] def RTCPeerConnectionIceEvent.url (self : RTCPeerConnectionIceEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.url" do
+  self.val.get "url" (Option String)
 
 /-- `v instanceof RTCRtpReceiver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCRtpReceiver`). -/
-def RTCRtpReceiver.cast? (v : Value) : IO (Option RTCRtpReceiver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCRtpReceiver"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCRtpReceiver.cast? (v : Value) : IO (Option RTCRtpReceiver) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCRtpReceiver"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaStreamTrack track` -/
-def RTCRtpReceiver.track (self : RTCRtpReceiver) : IO MediaStreamTrack := do
+@[macro_inline] def RTCRtpReceiver.track (self : RTCRtpReceiver) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.RTCRtpReceiver.track" do
   let r ← self.val.get "track" Value
   pure { val := r }
 
 /-- `readonly attribute RTCDtlsTransport? transport` -/
-def RTCRtpReceiver.transport (self : RTCRtpReceiver) : IO (Option RTCDtlsTransport) := self.val.get "transport" (Option RTCDtlsTransport)
+@[macro_inline] def RTCRtpReceiver.transport (self : RTCRtpReceiver) : IO (Option RTCDtlsTransport) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.transport" do
+  self.val.get "transport" (Option RTCDtlsTransport)
 
 /-- `attribute DOMHighResTimeStamp? jitterBufferTarget` -/
-def RTCRtpReceiver.jitterBufferTarget (self : RTCRtpReceiver) : IO (Option Float) := self.val.get "jitterBufferTarget" (Option Float)
+@[macro_inline] def RTCRtpReceiver.jitterBufferTarget (self : RTCRtpReceiver) : IO (Option Float) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.jitterBufferTarget" do
+  self.val.get "jitterBufferTarget" (Option Float)
 
 /-- Sets `jitterBufferTarget`: `attribute DOMHighResTimeStamp? jitterBufferTarget` -/
-def RTCRtpReceiver.setJitterBufferTarget (self : RTCRtpReceiver) (value : Option Float) : IO Unit :=
+@[macro_inline] def RTCRtpReceiver.setJitterBufferTarget (self : RTCRtpReceiver) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpReceiver.setJitterBufferTarget" do
   self.val.set "jitterBufferTarget" (toJS value)
 
 /-- `static RTCRtpCapabilities? getCapabilities(DOMString kind)` -/
-def RTCRtpReceiver.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) :=
+@[macro_inline] def RTCRtpReceiver.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getCapabilities" do
   Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpReceiver.getCapabilities", module := "globalThis", path := "RTCRtpReceiver.getCapabilities", construct := false, arity := 1 }
-    (Support.args #[toJS kind]) (await := false)
+    (Internal.args #[toJS kind]) (await := false)
 
 /-- `RTCRtpReceiveParameters getParameters()` -/
-def RTCRtpReceiver.getParameters (self : RTCRtpReceiver) : IO RTCRtpReceiveParameters :=
-  self.val.callMethod "getParameters" (Support.args #[]) RTCRtpReceiveParameters
+@[macro_inline] def RTCRtpReceiver.getParameters (self : RTCRtpReceiver) : IO RTCRtpReceiveParameters := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getParameters" do
+  self.val.callMethod "getParameters" (Internal.args #[]) RTCRtpReceiveParameters
 
 /-- `sequence<RTCRtpContributingSource> getContributingSources()` -/
-def RTCRtpReceiver.getContributingSources (self : RTCRtpReceiver) : IO (Array RTCRtpContributingSource) :=
-  self.val.callMethod "getContributingSources" (Support.args #[]) (Array RTCRtpContributingSource)
+@[macro_inline] def RTCRtpReceiver.getContributingSources (self : RTCRtpReceiver) : IO (Array RTCRtpContributingSource) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getContributingSources" do
+  self.val.callMethod "getContributingSources" (Internal.args #[]) (Array RTCRtpContributingSource)
 
 /-- `sequence<RTCRtpSynchronizationSource> getSynchronizationSources()` -/
-def RTCRtpReceiver.getSynchronizationSources (self : RTCRtpReceiver) : IO (Array RTCRtpSynchronizationSource) :=
-  self.val.callMethod "getSynchronizationSources" (Support.args #[]) (Array RTCRtpSynchronizationSource)
+@[macro_inline] def RTCRtpReceiver.getSynchronizationSources (self : RTCRtpReceiver) : IO (Array RTCRtpSynchronizationSource) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getSynchronizationSources" do
+  self.val.callMethod "getSynchronizationSources" (Internal.args #[]) (Array RTCRtpSynchronizationSource)
 
 /-- `Promise<RTCStatsReport> getStats()` -/
-def RTCRtpReceiver.getStats (self : RTCRtpReceiver) : Async RTCStatsReport := do
-  let r ← self.val.callMethodAwait "getStats" (Support.args #[]) Value
+@[macro_inline] def RTCRtpReceiver.getStats (self : RTCRtpReceiver) : Async RTCStatsReport := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getStats" do
+  let r ← self.val.callMethodAwait "getStats" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof RTCRtpSender`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCRtpSender`). -/
-def RTCRtpSender.cast? (v : Value) : IO (Option RTCRtpSender) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCRtpSender"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCRtpSender.cast? (v : Value) : IO (Option RTCRtpSender) := Internal.api "Lasm.JS.Web.RTCRtpSender.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCRtpSender"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaStreamTrack? track` -/
-def RTCRtpSender.track (self : RTCRtpSender) : IO (Option MediaStreamTrack) := self.val.get "track" (Option MediaStreamTrack)
+@[macro_inline] def RTCRtpSender.track (self : RTCRtpSender) : IO (Option MediaStreamTrack) := Internal.api "Lasm.JS.Web.RTCRtpSender.track" do
+  self.val.get "track" (Option MediaStreamTrack)
 
 /-- `readonly attribute RTCDtlsTransport? transport` -/
-def RTCRtpSender.transport (self : RTCRtpSender) : IO (Option RTCDtlsTransport) := self.val.get "transport" (Option RTCDtlsTransport)
+@[macro_inline] def RTCRtpSender.transport (self : RTCRtpSender) : IO (Option RTCDtlsTransport) := Internal.api "Lasm.JS.Web.RTCRtpSender.transport" do
+  self.val.get "transport" (Option RTCDtlsTransport)
 
 /-- `readonly attribute RTCDTMFSender? dtmf` -/
-def RTCRtpSender.dtmf (self : RTCRtpSender) : IO (Option RTCDTMFSender) := self.val.get "dtmf" (Option RTCDTMFSender)
+@[macro_inline] def RTCRtpSender.dtmf (self : RTCRtpSender) : IO (Option RTCDTMFSender) := Internal.api "Lasm.JS.Web.RTCRtpSender.dtmf" do
+  self.val.get "dtmf" (Option RTCDTMFSender)
 
 /-- `static RTCRtpCapabilities? getCapabilities(DOMString kind)` -/
-def RTCRtpSender.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) :=
+@[macro_inline] def RTCRtpSender.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) := Internal.api "Lasm.JS.Web.RTCRtpSender.getCapabilities" do
   Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpSender.getCapabilities", module := "globalThis", path := "RTCRtpSender.getCapabilities", construct := false, arity := 1 }
-    (Support.args #[toJS kind]) (await := false)
+    (Internal.args #[toJS kind]) (await := false)
 
 /-- `Promise<undefined> setParameters(RTCRtpSendParameters parameters, optional RTCSetParameterOptions setParameterOptions)` -/
-def RTCRtpSender.setParameters (self : RTCRtpSender) (parameters : RTCRtpSendParameters) (setParameterOptions : Option RTCSetParameterOptions := none) : Async Unit :=
-  self.val.callMethodAwait "setParameters" (Support.args #[toJS parameters, Support.optional setParameterOptions]) Unit
+@[macro_inline] def RTCRtpSender.setParameters (self : RTCRtpSender) (parameters : RTCRtpSendParameters) (setParameterOptions : Option RTCSetParameterOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpSender.setParameters" do
+  self.val.callMethodAwait "setParameters" (Internal.args #[toJS parameters, Internal.optional setParameterOptions]) Unit
 
 /-- `RTCRtpSendParameters getParameters()` -/
-def RTCRtpSender.getParameters (self : RTCRtpSender) : IO RTCRtpSendParameters :=
-  self.val.callMethod "getParameters" (Support.args #[]) RTCRtpSendParameters
+@[macro_inline] def RTCRtpSender.getParameters (self : RTCRtpSender) : IO RTCRtpSendParameters := Internal.api "Lasm.JS.Web.RTCRtpSender.getParameters" do
+  self.val.callMethod "getParameters" (Internal.args #[]) RTCRtpSendParameters
 
 /-- `Promise<undefined> replaceTrack(MediaStreamTrack? withTrack)` -/
-def RTCRtpSender.replaceTrack (self : RTCRtpSender) (withTrack : Option MediaStreamTrack) : Async Unit :=
-  self.val.callMethodAwait "replaceTrack" (Support.args #[toJS withTrack]) Unit
+@[macro_inline] def RTCRtpSender.replaceTrack (self : RTCRtpSender) (withTrack : Option MediaStreamTrack) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpSender.replaceTrack" do
+  self.val.callMethodAwait "replaceTrack" (Internal.args #[toJS withTrack]) Unit
 
 /-- `undefined setStreams(MediaStream... streams)` -/
-def RTCRtpSender.setStreams (self : RTCRtpSender) (streams : Array MediaStream := #[]) : IO Unit :=
-  self.val.callMethod "setStreams" (Support.argsWith #[] (streams.map toJS)) Unit
+@[macro_inline] def RTCRtpSender.setStreams (self : RTCRtpSender) (streams : Array MediaStream := #[]) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpSender.setStreams" do
+  self.val.callMethod "setStreams" (Internal.argsWith #[] (streams.map toJS)) Unit
 
 /-- `Promise<RTCStatsReport> getStats()` -/
-def RTCRtpSender.getStats (self : RTCRtpSender) : Async RTCStatsReport := do
-  let r ← self.val.callMethodAwait "getStats" (Support.args #[]) Value
+@[macro_inline] def RTCRtpSender.getStats (self : RTCRtpSender) : Async RTCStatsReport := Internal.api "Lasm.JS.Web.RTCRtpSender.getStats" do
+  let r ← self.val.callMethodAwait "getStats" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof RTCRtpTransceiver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCRtpTransceiver`). -/
-def RTCRtpTransceiver.cast? (v : Value) : IO (Option RTCRtpTransceiver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCRtpTransceiver"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCRtpTransceiver.cast? (v : Value) : IO (Option RTCRtpTransceiver) := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCRtpTransceiver"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString? mid` -/
-def RTCRtpTransceiver.mid (self : RTCRtpTransceiver) : IO (Option String) := self.val.get "mid" (Option String)
+@[macro_inline] def RTCRtpTransceiver.mid (self : RTCRtpTransceiver) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.mid" do
+  self.val.get "mid" (Option String)
 
 /-- `readonly attribute RTCRtpSender sender` -/
-def RTCRtpTransceiver.sender (self : RTCRtpTransceiver) : IO RTCRtpSender := do
+@[macro_inline] def RTCRtpTransceiver.sender (self : RTCRtpTransceiver) : IO RTCRtpSender := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.sender" do
   let r ← self.val.get "sender" Value
   pure { val := r }
 
 /-- `readonly attribute RTCRtpReceiver receiver` -/
-def RTCRtpTransceiver.receiver (self : RTCRtpTransceiver) : IO RTCRtpReceiver := do
+@[macro_inline] def RTCRtpTransceiver.receiver (self : RTCRtpTransceiver) : IO RTCRtpReceiver := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.receiver" do
   let r ← self.val.get "receiver" Value
   pure { val := r }
 
 /-- `attribute RTCRtpTransceiverDirection direction` -/
-def RTCRtpTransceiver.direction (self : RTCRtpTransceiver) : IO RTCRtpTransceiverDirection := self.val.get "direction" RTCRtpTransceiverDirection
+@[macro_inline] def RTCRtpTransceiver.direction (self : RTCRtpTransceiver) : IO RTCRtpTransceiverDirection := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.direction" do
+  self.val.get "direction" RTCRtpTransceiverDirection
 
 /-- Sets `direction`: `attribute RTCRtpTransceiverDirection direction` -/
-def RTCRtpTransceiver.setDirection (self : RTCRtpTransceiver) (value : RTCRtpTransceiverDirection) : IO Unit :=
+@[macro_inline] def RTCRtpTransceiver.setDirection (self : RTCRtpTransceiver) (value : RTCRtpTransceiverDirection) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.setDirection" do
   self.val.set "direction" (toJS value)
 
 /-- `readonly attribute RTCRtpTransceiverDirection? currentDirection` -/
-def RTCRtpTransceiver.currentDirection (self : RTCRtpTransceiver) : IO (Option RTCRtpTransceiverDirection) := self.val.get "currentDirection" (Option RTCRtpTransceiverDirection)
+@[macro_inline] def RTCRtpTransceiver.currentDirection (self : RTCRtpTransceiver) : IO (Option RTCRtpTransceiverDirection) := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.currentDirection" do
+  self.val.get "currentDirection" (Option RTCRtpTransceiverDirection)
 
 /-- `undefined stop()` -/
-def RTCRtpTransceiver.stop (self : RTCRtpTransceiver) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def RTCRtpTransceiver.stop (self : RTCRtpTransceiver) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `undefined setCodecPreferences(sequence<RTCRtpCodec> codecs)` -/
-def RTCRtpTransceiver.setCodecPreferences (self : RTCRtpTransceiver) (codecs : Array RTCRtpCodec) : IO Unit :=
-  self.val.callMethod "setCodecPreferences" (Support.args #[toJS codecs]) Unit
+@[macro_inline] def RTCRtpTransceiver.setCodecPreferences (self : RTCRtpTransceiver) (codecs : Array RTCRtpCodec) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpTransceiver.setCodecPreferences" do
+  self.val.callMethod "setCodecPreferences" (Internal.args #[toJS codecs]) Unit
 
 /-- `v instanceof RTCSctpTransport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCSctpTransport`). -/
-def RTCSctpTransport.cast? (v : Value) : IO (Option RTCSctpTransport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCSctpTransport"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCSctpTransport.cast? (v : Value) : IO (Option RTCSctpTransport) := Internal.api "Lasm.JS.Web.RTCSctpTransport.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCSctpTransport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RTCDtlsTransport transport` -/
-def RTCSctpTransport.transport (self : RTCSctpTransport) : IO RTCDtlsTransport := do
+@[macro_inline] def RTCSctpTransport.transport (self : RTCSctpTransport) : IO RTCDtlsTransport := Internal.api "Lasm.JS.Web.RTCSctpTransport.transport" do
   let r ← self.val.get "transport" Value
   pure { val := r }
 
 /-- `readonly attribute RTCSctpTransportState state` -/
-def RTCSctpTransport.state (self : RTCSctpTransport) : IO RTCSctpTransportState := self.val.get "state" RTCSctpTransportState
+@[macro_inline] def RTCSctpTransport.state (self : RTCSctpTransport) : IO RTCSctpTransportState := Internal.api "Lasm.JS.Web.RTCSctpTransport.state" do
+  self.val.get "state" RTCSctpTransportState
 
 /-- `readonly attribute unrestricted double? maxMessageSize` -/
-def RTCSctpTransport.maxMessageSize (self : RTCSctpTransport) : IO (Option Float) := self.val.get "maxMessageSize" (Option Float)
+@[macro_inline] def RTCSctpTransport.maxMessageSize (self : RTCSctpTransport) : IO (Option Float) := Internal.api "Lasm.JS.Web.RTCSctpTransport.maxMessageSize" do
+  self.val.get "maxMessageSize" (Option Float)
 
 /-- `readonly attribute unsigned short? maxChannels` -/
-def RTCSctpTransport.maxChannels (self : RTCSctpTransport) : IO (Option Nat) := self.val.get "maxChannels" (Option Nat)
+@[macro_inline] def RTCSctpTransport.maxChannels (self : RTCSctpTransport) : IO (Option Nat) := Internal.api "Lasm.JS.Web.RTCSctpTransport.maxChannels" do
+  self.val.get "maxChannels" (Option Nat)
 
 /-- `attribute EventHandler onstatechange` -/
-def RTCSctpTransport.onstatechange (self : RTCSctpTransport) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def RTCSctpTransport.onstatechange (self : RTCSctpTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCSctpTransport.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def RTCSctpTransport.setOnstatechange (self : RTCSctpTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCSctpTransport.setOnstatechange (self : RTCSctpTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCSctpTransport.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `v instanceof RTCSessionDescription`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCSessionDescription`). -/
-def RTCSessionDescription.cast? (v : Value) : IO (Option RTCSessionDescription) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCSessionDescription"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCSessionDescription.cast? (v : Value) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCSessionDescription.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCSessionDescription"] Value) (fun x => { val := x }) v
 
 /-- `constructor(RTCSessionDescriptionInit descriptionInitDict)` -/
-def RTCSessionDescription.new (descriptionInitDict : RTCSessionDescriptionInit) : IO RTCSessionDescription :=
+@[macro_inline] def RTCSessionDescription.new (descriptionInitDict : RTCSessionDescriptionInit) : IO RTCSessionDescription := Internal.api "Lasm.JS.Web.RTCSessionDescription.new" do
   Lasm.JS.Binding.invoke RTCSessionDescription { name := "Lasm.JS.Web.RTCSessionDescription.new", module := "globalThis", path := "RTCSessionDescription", construct := true, arity := 1 }
-    (Support.args #[toJS descriptionInitDict]) (await := false)
+    (Internal.args #[toJS descriptionInitDict]) (await := false)
 
 /-- `readonly attribute RTCSdpType type` -/
-def RTCSessionDescription.type (self : RTCSessionDescription) : IO RTCSdpType := self.val.get "type" RTCSdpType
+@[macro_inline] def RTCSessionDescription.type (self : RTCSessionDescription) : IO RTCSdpType := Internal.api "Lasm.JS.Web.RTCSessionDescription.type" do
+  self.val.get "type" RTCSdpType
 
 /-- `readonly attribute DOMString sdp` -/
-def RTCSessionDescription.sdp (self : RTCSessionDescription) : IO String := self.val.get "sdp" String
+@[macro_inline] def RTCSessionDescription.sdp (self : RTCSessionDescription) : IO String := Internal.api "Lasm.JS.Web.RTCSessionDescription.sdp" do
+  self.val.get "sdp" String
 
 /-- `RTCSessionDescriptionInit toJSON()` -/
-def RTCSessionDescription.toJSON (self : RTCSessionDescription) : IO RTCSessionDescriptionInit :=
-  self.val.callMethod "toJSON" (Support.args #[]) RTCSessionDescriptionInit
+@[macro_inline] def RTCSessionDescription.toJSON (self : RTCSessionDescription) : IO RTCSessionDescriptionInit := Internal.api "Lasm.JS.Web.RTCSessionDescription.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) RTCSessionDescriptionInit
 
 /-- `v instanceof RTCStatsReport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCStatsReport`). -/
-def RTCStatsReport.cast? (v : Value) : IO (Option RTCStatsReport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCStatsReport"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCStatsReport.cast? (v : Value) : IO (Option RTCStatsReport) := Internal.api "Lasm.JS.Web.RTCStatsReport.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCStatsReport"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof RTCTrackEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCTrackEvent`). -/
-def RTCTrackEvent.cast? (v : Value) : IO (Option RTCTrackEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCTrackEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCTrackEvent.cast? (v : Value) : IO (Option RTCTrackEvent) := Internal.api "Lasm.JS.Web.RTCTrackEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCTrackEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, RTCTrackEventInit eventInitDict)` -/
-def RTCTrackEvent.new (type : String) (eventInitDict : RTCTrackEventInit) : IO RTCTrackEvent :=
+@[macro_inline] def RTCTrackEvent.new (type : String) (eventInitDict : RTCTrackEventInit) : IO RTCTrackEvent := Internal.api "Lasm.JS.Web.RTCTrackEvent.new" do
   Lasm.JS.Binding.invoke RTCTrackEvent { name := "Lasm.JS.Web.RTCTrackEvent.new", module := "globalThis", path := "RTCTrackEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute RTCRtpReceiver receiver` -/
-def RTCTrackEvent.receiver (self : RTCTrackEvent) : IO RTCRtpReceiver := do
+@[macro_inline] def RTCTrackEvent.receiver (self : RTCTrackEvent) : IO RTCRtpReceiver := Internal.api "Lasm.JS.Web.RTCTrackEvent.receiver" do
   let r ← self.val.get "receiver" Value
   pure { val := r }
 
 /-- `readonly attribute MediaStreamTrack track` -/
-def RTCTrackEvent.track (self : RTCTrackEvent) : IO MediaStreamTrack := do
+@[macro_inline] def RTCTrackEvent.track (self : RTCTrackEvent) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.RTCTrackEvent.track" do
   let r ← self.val.get "track" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<MediaStream> streams` -/
-def RTCTrackEvent.streams (self : RTCTrackEvent) : IO (Array MediaStream) := self.val.get "streams" (Array MediaStream)
+@[macro_inline] def RTCTrackEvent.streams (self : RTCTrackEvent) : IO (Array MediaStream) := Internal.api "Lasm.JS.Web.RTCTrackEvent.streams" do
+  self.val.get "streams" (Array MediaStream)
 
 /-- `readonly attribute RTCRtpTransceiver transceiver` -/
-def RTCTrackEvent.transceiver (self : RTCTrackEvent) : IO RTCRtpTransceiver := do
+@[macro_inline] def RTCTrackEvent.transceiver (self : RTCTrackEvent) : IO RTCRtpTransceiver := Internal.api "Lasm.JS.Web.RTCTrackEvent.transceiver" do
   let r ← self.val.get "transceiver" Value
   pure { val := r }
 

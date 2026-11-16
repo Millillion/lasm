@@ -6,36 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.WritingAssistanceApis
+import Lasm.JS.Web.Types.ProofreaderApi
 import Lasm.JS.Web.WritingAssistanceApis
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CorrectionType` (Proofreader API (https://webmachinelearning.github.io/proofreader-api/)): "spelling", "punctuation", "capitalization", "grammar". -/
-inductive CorrectionType where
-  /-- "spelling" -/
-  | spelling
-  /-- "punctuation" -/
-  | punctuation
-  /-- "capitalization" -/
-  | capitalization
-  /-- "grammar" -/
-  | grammar
-  deriving BEq, Repr, Inhabited
-instance : ToJS CorrectionType := ⟨fun
-  | .spelling => .string "spelling"
-  | .punctuation => .string "punctuation"
-  | .capitalization => .string "capitalization"
-  | .grammar => .string "grammar"⟩
-instance : FromJS CorrectionType where
-  fromJS
-    | .string "spelling" => .ok .spelling
-    | .string "punctuation" => .ok .punctuation
-    | .string "capitalization" => .ok .capitalization
-    | .string "grammar" => .ok .grammar
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CorrectionType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ProofreaderCreateOptions : ProofreaderCreateCoreOptions` (Proofreader API (https://webmachinelearning.github.io/proofreader-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ProofreaderCreateOptions where
@@ -51,12 +31,12 @@ structure ProofreaderCreateOptions where
   signal : Option AbortSignal := none
   /-- `CreateMonitorCallback monitor` -/
   monitor : Option CreateMonitorCallback := none
-instance : ToJS ProofreaderCreateOptions := ⟨fun d => Support.fields #[("includeCorrectionTypes", Support.optional d.includeCorrectionTypes),
-    ("includeCorrectionExplanations", Support.optional d.includeCorrectionExplanations),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("correctionExplanationLanguage", Support.optional d.correctionExplanationLanguage),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor)]⟩
+instance : ToJS ProofreaderCreateOptions := ⟨fun d => Internal.fields #[("includeCorrectionTypes", Internal.optional d.includeCorrectionTypes),
+    ("includeCorrectionExplanations", Internal.optional d.includeCorrectionExplanations),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("correctionExplanationLanguage", Internal.optional d.correctionExplanationLanguage),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor)]⟩
 
 /-- `dictionary ProofreaderCreateCoreOptions` (Proofreader API (https://webmachinelearning.github.io/proofreader-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ProofreaderCreateCoreOptions where
@@ -68,16 +48,16 @@ structure ProofreaderCreateCoreOptions where
   expectedInputLanguages : Option (Array String) := none
   /-- `DOMString correctionExplanationLanguage` -/
   correctionExplanationLanguage : Option String := none
-instance : ToJS ProofreaderCreateCoreOptions := ⟨fun d => Support.fields #[("includeCorrectionTypes", Support.optional d.includeCorrectionTypes),
-    ("includeCorrectionExplanations", Support.optional d.includeCorrectionExplanations),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("correctionExplanationLanguage", Support.optional d.correctionExplanationLanguage)]⟩
+instance : ToJS ProofreaderCreateCoreOptions := ⟨fun d => Internal.fields #[("includeCorrectionTypes", Internal.optional d.includeCorrectionTypes),
+    ("includeCorrectionExplanations", Internal.optional d.includeCorrectionExplanations),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("correctionExplanationLanguage", Internal.optional d.correctionExplanationLanguage)]⟩
 
 /-- `dictionary ProofreaderProofreadOptions` (Proofreader API (https://webmachinelearning.github.io/proofreader-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ProofreaderProofreadOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ProofreaderProofreadOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS ProofreaderProofreadOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary ProofreadCorrection` (Proofreader API (https://webmachinelearning.github.io/proofreader-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ProofreadCorrection where
@@ -91,6 +71,11 @@ structure ProofreadCorrection where
   types : Option (Array CorrectionType) := none
   /-- `DOMString explanation` -/
   explanation : Option String := none
+instance : ToJS ProofreadCorrection := ⟨fun d => Internal.fields #[("startIndex", Internal.optional d.startIndex),
+    ("endIndex", Internal.optional d.endIndex),
+    ("correction", Internal.optional d.correction),
+    ("types", Internal.optional d.types),
+    ("explanation", Internal.optional d.explanation)]⟩
 instance : FromJS ProofreadCorrection where
   fromJS d := do return {
     startIndex := ← Lasm.JS.readField (Option Nat) d "startIndex",
@@ -106,6 +91,8 @@ structure ProofreadResult where
   correctedInput : Option String := none
   /-- `sequence<ProofreadCorrection> corrections` -/
   corrections : Option (Array ProofreadCorrection) := none
+instance : ToJS ProofreadResult := ⟨fun d => Internal.fields #[("correctedInput", Internal.optional d.correctedInput),
+    ("corrections", Internal.optional d.corrections)]⟩
 instance : FromJS ProofreadResult where
   fromJS d := do return {
     correctedInput := ← Lasm.JS.readField (Option String) d "correctedInput",
@@ -113,34 +100,38 @@ instance : FromJS ProofreadResult where
   typeName := "Lasm.JS.Web.ProofreadResult"
 
 /-- `v instanceof Proofreader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Proofreader`). -/
-def Proofreader.cast? (v : Value) : IO (Option Proofreader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Proofreader"] Value) v) then some { val := v } else none
+@[macro_inline] def Proofreader.cast? (v : Value) : IO (Option Proofreader) := Internal.api "Lasm.JS.Web.Proofreader.cast?" do
+  Internal.cast (Internal.getGlobal ["Proofreader"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean includeCorrectionTypes` -/
-def Proofreader.includeCorrectionTypes (self : Proofreader) : IO Bool := self.val.get "includeCorrectionTypes" Bool
+@[macro_inline] def Proofreader.includeCorrectionTypes (self : Proofreader) : IO Bool := Internal.api "Lasm.JS.Web.Proofreader.includeCorrectionTypes" do
+  self.val.get "includeCorrectionTypes" Bool
 
 /-- `readonly attribute boolean includeCorrectionExplanations` -/
-def Proofreader.includeCorrectionExplanations (self : Proofreader) : IO Bool := self.val.get "includeCorrectionExplanations" Bool
+@[macro_inline] def Proofreader.includeCorrectionExplanations (self : Proofreader) : IO Bool := Internal.api "Lasm.JS.Web.Proofreader.includeCorrectionExplanations" do
+  self.val.get "includeCorrectionExplanations" Bool
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedInputLanguages` -/
-def Proofreader.expectedInputLanguages (self : Proofreader) : IO (Option (Array String)) := self.val.get "expectedInputLanguages" (Option (Array String))
+@[macro_inline] def Proofreader.expectedInputLanguages (self : Proofreader) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Proofreader.expectedInputLanguages" do
+  self.val.get "expectedInputLanguages" (Option (Array String))
 
 /-- `readonly attribute DOMString? correctionExplanationLanguage` -/
-def Proofreader.correctionExplanationLanguage (self : Proofreader) : IO (Option String) := self.val.get "correctionExplanationLanguage" (Option String)
+@[macro_inline] def Proofreader.correctionExplanationLanguage (self : Proofreader) : IO (Option String) := Internal.api "Lasm.JS.Web.Proofreader.correctionExplanationLanguage" do
+  self.val.get "correctionExplanationLanguage" (Option String)
 
 /-- `static Promise<Proofreader> create(optional ProofreaderCreateOptions options)` -/
-def Proofreader.create (options : Option ProofreaderCreateOptions := none) : Async Proofreader := do
+@[macro_inline] def Proofreader.create (options : Option ProofreaderCreateOptions := none) : Async Proofreader := Internal.api "Lasm.JS.Web.Proofreader.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Proofreader.create", module := "globalThis", path := "Proofreader.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional ProofreaderCreateCoreOptions options)` -/
-def Proofreader.availability (options : Option ProofreaderCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def Proofreader.availability (options : Option ProofreaderCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Proofreader.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Proofreader.availability", module := "globalThis", path := "Proofreader.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<ProofreadResult> proofread(DOMString input, optional ProofreaderProofreadOptions options)` -/
-def Proofreader.proofread (self : Proofreader) (input : String) (options : Option ProofreaderProofreadOptions := none) : Async ProofreadResult :=
-  self.val.callMethodAwait "proofread" (Support.args #[toJS input, Support.optional options]) ProofreadResult
+@[macro_inline] def Proofreader.proofread (self : Proofreader) (input : String) (options : Option ProofreaderProofreadOptions := none) : Async ProofreadResult := Internal.api "Lasm.JS.Web.Proofreader.proofread" do
+  self.val.callMethodAwait "proofread" (Internal.args #[toJS input, Internal.optional options]) ProofreadResult
 
 end Lasm.JS.Web

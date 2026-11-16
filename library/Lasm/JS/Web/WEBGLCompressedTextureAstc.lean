@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLCompressedTextureAstc
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum COMPRESSED_RGBA_ASTC_4x4_KHR = 0x93B0` -/
 def WEBGL_compressed_texture_astc.COMPRESSED_RGBA_ASTC_4x4_KHR : Nat := 0x93B0
@@ -95,7 +99,7 @@ def WEBGL_compressed_texture_astc.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR : Nat :
 def WEBGL_compressed_texture_astc.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR : Nat := 0x93DD
 
 /-- `sequence<DOMString> getSupportedProfiles()` -/
-def WEBGL_compressed_texture_astc.getSupportedProfiles (self : WEBGL_compressed_texture_astc) : IO (Array String) :=
-  self.val.callMethod "getSupportedProfiles" (Support.args #[]) (Array String)
+@[macro_inline] def WEBGL_compressed_texture_astc.getSupportedProfiles (self : WEBGL_compressed_texture_astc) : IO (Array String) := Internal.api "Lasm.JS.Web.WEBGL_compressed_texture_astc.getSupportedProfiles" do
+  self.val.callMethod "getSupportedProfiles" (Internal.args #[]) (Array String)
 
 end Lasm.JS.Web

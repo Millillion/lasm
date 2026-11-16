@@ -9,5 +9,26 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary ScriptingPolicyReportBody : ReportBody` (Scripting Policy (https://wicg.github.io/csp-next/scripting-policy.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ScriptingPolicyReportBody where
+  /-- `DOMString violationType` -/
+  violationType : Option String := none
+  /-- `USVString? violationURL` -/
+  violationURL : Option String := none
+  /-- `USVString? violationSample` -/
+  violationSample : Option String := none
+  /-- `unsigned long lineno` -/
+  lineno : Option Nat := none
+  /-- `unsigned long colno` -/
+  colno : Option Nat := none
+instance : ToJS ScriptingPolicyReportBody := ⟨fun d => Internal.fields #[("violationType", Internal.optional d.violationType),
+    ("violationURL", Internal.optional d.violationURL),
+    ("violationSample", Internal.optional d.violationSample),
+    ("lineno", Internal.optional d.lineno),
+    ("colno", Internal.optional d.colno)]⟩
 
 end Lasm.JS.Web

@@ -6,10 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.EntriesApi
+import Lasm.JS.Web.Types.FileAPI
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback FileSystemEntriesCallback = undefined (sequence<FileSystemEntry> entries)` (File and Directory Entries API (https://wicg.github.io/entries-api/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure FileSystemEntriesCallback where
@@ -20,10 +26,10 @@ instance : ToJS FileSystemEntriesCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS FileSystemEntriesCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.FileSystemEntriesCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def FileSystemEntriesCallback.ofFn (f : (Array FileSystemEntry) → Async Unit) : IO FileSystemEntriesCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array FileSystemEntry) args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Array FileSystemEntry) args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def FileSystemEntriesCallback.ofSyncFn (f : (Array FileSystemEntry) → IO Unit) : IO FileSystemEntriesCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array FileSystemEntry) args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Array FileSystemEntry) args 0)) }
 
 /-- `callback ErrorCallback = undefined (DOMException err)` (File and Directory Entries API (https://wicg.github.io/entries-api/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ErrorCallback where
@@ -34,10 +40,10 @@ instance : ToJS ErrorCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ErrorCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ErrorCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ErrorCallback.ofFn (f : DOMException → Async Unit) : IO ErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ErrorCallback.ofSyncFn (f : DOMException → IO Unit) : IO ErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMException args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMException args 0)) }
 
 /-- `callback FileSystemEntryCallback = undefined (FileSystemEntry entry)` (File and Directory Entries API (https://wicg.github.io/entries-api/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure FileSystemEntryCallback where
@@ -48,10 +54,10 @@ instance : ToJS FileSystemEntryCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS FileSystemEntryCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.FileSystemEntryCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def FileSystemEntryCallback.ofFn (f : FileSystemEntry → Async Unit) : IO FileSystemEntryCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg FileSystemEntry args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg FileSystemEntry args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def FileSystemEntryCallback.ofSyncFn (f : FileSystemEntry → IO Unit) : IO FileSystemEntryCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg FileSystemEntry args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg FileSystemEntry args 0)) }
 
 /-- `dictionary FileSystemFlags` (File and Directory Entries API (https://wicg.github.io/entries-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemFlags where
@@ -59,8 +65,8 @@ structure FileSystemFlags where
   create : Option Bool := none
   /-- `boolean exclusive = false` -/
   exclusive : Option Bool := none
-instance : ToJS FileSystemFlags := ⟨fun d => Support.fields #[("create", Support.optional d.create),
-    ("exclusive", Support.optional d.exclusive)]⟩
+instance : ToJS FileSystemFlags := ⟨fun d => Internal.fields #[("create", Internal.optional d.create),
+    ("exclusive", Internal.optional d.exclusive)]⟩
 
 /-- `callback FileCallback = undefined (File file)` (File and Directory Entries API (https://wicg.github.io/entries-api/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure FileCallback where
@@ -71,96 +77,104 @@ instance : ToJS FileCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS FileCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.FileCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def FileCallback.ofFn (f : File → Async Unit) : IO FileCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg File args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg File args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def FileCallback.ofSyncFn (f : File → IO Unit) : IO FileCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg File args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg File args 0)) }
 
 /-- `v instanceof FileSystem`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystem`). -/
-def FileSystem.cast? (v : Value) : IO (Option FileSystem) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystem"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystem.cast? (v : Value) : IO (Option FileSystem) := Internal.api "Lasm.JS.Web.FileSystem.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystem"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString name` -/
-def FileSystem.name (self : FileSystem) : IO String := self.val.get "name" String
+@[macro_inline] def FileSystem.name (self : FileSystem) : IO String := Internal.api "Lasm.JS.Web.FileSystem.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute FileSystemDirectoryEntry root` -/
-def FileSystem.root (self : FileSystem) : IO FileSystemDirectoryEntry := do
+@[macro_inline] def FileSystem.root (self : FileSystem) : IO FileSystemDirectoryEntry := Internal.api "Lasm.JS.Web.FileSystem.root" do
   let r ← self.val.get "root" Value
   pure { val := r }
 
 /-- `v instanceof FileSystemDirectoryReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemDirectoryReader`). -/
-def FileSystemDirectoryReader.cast? (v : Value) : IO (Option FileSystemDirectoryReader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemDirectoryReader"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemDirectoryReader.cast? (v : Value) : IO (Option FileSystemDirectoryReader) := Internal.api "Lasm.JS.Web.FileSystemDirectoryReader.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemDirectoryReader"] Value) (fun x => { val := x }) v
 
 /-- `undefined readEntries(FileSystemEntriesCallback successCallback, optional ErrorCallback errorCallback)` -/
-def FileSystemDirectoryReader.readEntries (self : FileSystemDirectoryReader) (successCallback : FileSystemEntriesCallback) (errorCallback : Option ErrorCallback := none) : IO Unit :=
-  self.val.callMethod "readEntries" (Support.args #[toJS successCallback, Support.optional errorCallback]) Unit
+@[macro_inline] def FileSystemDirectoryReader.readEntries (self : FileSystemDirectoryReader) (successCallback : FileSystemEntriesCallback) (errorCallback : Option ErrorCallback := none) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemDirectoryReader.readEntries" do
+  self.val.callMethod "readEntries" (Internal.args #[toJS successCallback, Internal.optional errorCallback]) Unit
 
 /-- `v instanceof FileSystemEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemEntry`). -/
-def FileSystemEntry.cast? (v : Value) : IO (Option FileSystemEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemEntry.cast? (v : Value) : IO (Option FileSystemEntry) := Internal.api "Lasm.JS.Web.FileSystemEntry.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemEntry"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean isFile` -/
-def FileSystemEntry.isFile (self : FileSystemEntry) : IO Bool := self.val.get "isFile" Bool
+@[macro_inline] def FileSystemEntry.isFile (self : FileSystemEntry) : IO Bool := Internal.api "Lasm.JS.Web.FileSystemEntry.isFile" do
+  self.val.get "isFile" Bool
 
 /-- `readonly attribute boolean isDirectory` -/
-def FileSystemEntry.isDirectory (self : FileSystemEntry) : IO Bool := self.val.get "isDirectory" Bool
+@[macro_inline] def FileSystemEntry.isDirectory (self : FileSystemEntry) : IO Bool := Internal.api "Lasm.JS.Web.FileSystemEntry.isDirectory" do
+  self.val.get "isDirectory" Bool
 
 /-- `readonly attribute USVString name` -/
-def FileSystemEntry.name (self : FileSystemEntry) : IO String := self.val.get "name" String
+@[macro_inline] def FileSystemEntry.name (self : FileSystemEntry) : IO String := Internal.api "Lasm.JS.Web.FileSystemEntry.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute USVString fullPath` -/
-def FileSystemEntry.fullPath (self : FileSystemEntry) : IO String := self.val.get "fullPath" String
+@[macro_inline] def FileSystemEntry.fullPath (self : FileSystemEntry) : IO String := Internal.api "Lasm.JS.Web.FileSystemEntry.fullPath" do
+  self.val.get "fullPath" String
 
 /-- `readonly attribute FileSystem filesystem` -/
-def FileSystemEntry.filesystem (self : FileSystemEntry) : IO FileSystem := do
+@[macro_inline] def FileSystemEntry.filesystem (self : FileSystemEntry) : IO FileSystem := Internal.api "Lasm.JS.Web.FileSystemEntry.filesystem" do
   let r ← self.val.get "filesystem" Value
   pure { val := r }
 
 /-- `undefined getParent(optional FileSystemEntryCallback successCallback, optional ErrorCallback errorCallback)` -/
-def FileSystemEntry.getParent (self : FileSystemEntry) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit :=
-  self.val.callMethod "getParent" (Support.args #[Support.optional successCallback, Support.optional errorCallback]) Unit
+@[macro_inline] def FileSystemEntry.getParent (self : FileSystemEntry) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemEntry.getParent" do
+  self.val.callMethod "getParent" (Internal.args #[Internal.optional successCallback, Internal.optional errorCallback]) Unit
 
 /-- `v instanceof FileSystemDirectoryEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemDirectoryEntry`). -/
-def FileSystemDirectoryEntry.cast? (v : Value) : IO (Option FileSystemDirectoryEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemDirectoryEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemDirectoryEntry.cast? (v : Value) : IO (Option FileSystemDirectoryEntry) := Internal.api "Lasm.JS.Web.FileSystemDirectoryEntry.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemDirectoryEntry"] Value) (fun x => { val := x }) v
 
 /-- `FileSystemDirectoryReader createReader()` -/
-def FileSystemDirectoryEntry.createReader (self : FileSystemDirectoryEntry) : IO FileSystemDirectoryReader := do
-  let r ← self.val.callMethod "createReader" (Support.args #[]) Value
+@[macro_inline] def FileSystemDirectoryEntry.createReader (self : FileSystemDirectoryEntry) : IO FileSystemDirectoryReader := Internal.api "Lasm.JS.Web.FileSystemDirectoryEntry.createReader" do
+  let r ← self.val.callMethod "createReader" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined getFile(optional USVString? path, optional FileSystemFlags options, optional FileSystemEntryCallback successCallback, optional ErrorCallback errorCallback)` -/
-def FileSystemDirectoryEntry.getFile (self : FileSystemDirectoryEntry) (path : Option String := none) (options : Option FileSystemFlags := none) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit :=
-  self.val.callMethod "getFile" (Support.args #[Support.optional path, Support.optional options, Support.optional successCallback, Support.optional errorCallback]) Unit
+@[macro_inline] def FileSystemDirectoryEntry.getFile (self : FileSystemDirectoryEntry) (path : Option String := none) (options : Option FileSystemFlags := none) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemDirectoryEntry.getFile" do
+  self.val.callMethod "getFile" (Internal.args #[Internal.optional path, Internal.optional options, Internal.optional successCallback, Internal.optional errorCallback]) Unit
 
 /-- `undefined getDirectory(optional USVString? path, optional FileSystemFlags options, optional FileSystemEntryCallback successCallback, optional ErrorCallback errorCallback)` -/
-def FileSystemDirectoryEntry.getDirectory (self : FileSystemDirectoryEntry) (path : Option String := none) (options : Option FileSystemFlags := none) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit :=
-  self.val.callMethod "getDirectory" (Support.args #[Support.optional path, Support.optional options, Support.optional successCallback, Support.optional errorCallback]) Unit
+@[macro_inline] def FileSystemDirectoryEntry.getDirectory (self : FileSystemDirectoryEntry) (path : Option String := none) (options : Option FileSystemFlags := none) (successCallback : Option FileSystemEntryCallback := none) (errorCallback : Option ErrorCallback := none) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemDirectoryEntry.getDirectory" do
+  self.val.callMethod "getDirectory" (Internal.args #[Internal.optional path, Internal.optional options, Internal.optional successCallback, Internal.optional errorCallback]) Unit
 
 /-- `v instanceof FileSystemFileEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileSystemFileEntry`). -/
-def FileSystemFileEntry.cast? (v : Value) : IO (Option FileSystemFileEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileSystemFileEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def FileSystemFileEntry.cast? (v : Value) : IO (Option FileSystemFileEntry) := Internal.api "Lasm.JS.Web.FileSystemFileEntry.cast?" do
+  Internal.cast (Internal.getGlobal ["FileSystemFileEntry"] Value) (fun x => { val := x }) v
 
 /-- `undefined file(FileCallback successCallback, optional ErrorCallback errorCallback)` -/
-def FileSystemFileEntry.file (self : FileSystemFileEntry) (successCallback : FileCallback) (errorCallback : Option ErrorCallback := none) : IO Unit :=
-  self.val.callMethod "file" (Support.args #[toJS successCallback, Support.optional errorCallback]) Unit
+@[macro_inline] def FileSystemFileEntry.file (self : FileSystemFileEntry) (successCallback : FileCallback) (errorCallback : Option ErrorCallback := none) : IO Unit := Internal.api "Lasm.JS.Web.FileSystemFileEntry.file" do
+  self.val.callMethod "file" (Internal.args #[toJS successCallback, Internal.optional errorCallback]) Unit
 
 /-- `FileSystemEntry? webkitGetAsEntry()` -/
-def DataTransferItem.webkitGetAsEntry (self : DataTransferItem) : IO (Option FileSystemEntry) :=
-  self.val.callMethod "webkitGetAsEntry" (Support.args #[]) (Option FileSystemEntry)
+@[macro_inline] def DataTransferItem.webkitGetAsEntry (self : DataTransferItem) : IO (Option FileSystemEntry) := Internal.api "Lasm.JS.Web.DataTransferItem.webkitGetAsEntry" do
+  self.val.callMethod "webkitGetAsEntry" (Internal.args #[]) (Option FileSystemEntry)
 
 /-- `readonly attribute USVString webkitRelativePath` -/
-def File.webkitRelativePath (self : File) : IO String := self.val.get "webkitRelativePath" String
+@[macro_inline] def File.webkitRelativePath (self : File) : IO String := Internal.api "Lasm.JS.Web.File.webkitRelativePath" do
+  self.val.get "webkitRelativePath" String
 
 /-- `attribute boolean webkitdirectory` -/
-def HTMLInputElement.webkitdirectory (self : HTMLInputElement) : IO Bool := self.val.get "webkitdirectory" Bool
+@[macro_inline] def HTMLInputElement.webkitdirectory (self : HTMLInputElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLInputElement.webkitdirectory" do
+  self.val.get "webkitdirectory" Bool
 
 /-- Sets `webkitdirectory`: `attribute boolean webkitdirectory` -/
-def HTMLInputElement.setWebkitdirectory (self : HTMLInputElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLInputElement.setWebkitdirectory (self : HTMLInputElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInputElement.setWebkitdirectory" do
   self.val.set "webkitdirectory" (toJS value)
 
 /-- `readonly attribute FrozenArray<FileSystemEntry> webkitEntries` -/
-def HTMLInputElement.webkitEntries (self : HTMLInputElement) : IO (Array FileSystemEntry) := self.val.get "webkitEntries" (Array FileSystemEntry)
+@[macro_inline] def HTMLInputElement.webkitEntries (self : HTMLInputElement) : IO (Array FileSystemEntry) := Internal.api "Lasm.JS.Web.HTMLInputElement.webkitEntries" do
+  self.val.get "webkitEntries" (Array FileSystemEntry)
 
 end Lasm.JS.Web

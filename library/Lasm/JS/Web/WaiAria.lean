@@ -6,404 +6,443 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.WaiAria
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AriaNotifyPriority` (Accessible Rich Internet Applications (WAI-ARIA) 1.3 (https://w3c.github.io/aria/)): "normal", "high". -/
-inductive AriaNotifyPriority where
-  /-- "normal" -/
-  | normal
-  /-- "high" -/
-  | high
-  deriving BEq, Repr, Inhabited
-instance : ToJS AriaNotifyPriority := ⟨fun
-  | .normal => .string "normal"
-  | .high => .string "high"⟩
-instance : FromJS AriaNotifyPriority where
-  fromJS
-    | .string "normal" => .ok .normal
-    | .string "high" => .ok .high
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AriaNotifyPriority"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AriaNotificationOptions` (Accessible Rich Internet Applications (WAI-ARIA) 1.3 (https://w3c.github.io/aria/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AriaNotificationOptions where
   /-- `AriaNotifyPriority priority = "normal"` -/
   priority : Option AriaNotifyPriority := none
-instance : ToJS AriaNotificationOptions := ⟨fun d => Support.fields #[("priority", Support.optional d.priority)]⟩
+instance : ToJS AriaNotificationOptions := ⟨fun d => Internal.fields #[("priority", Internal.optional d.priority)]⟩
 
 /-- `undefined ariaNotify(DOMString announcement, optional AriaNotificationOptions options)` -/
-def Document.ariaNotify (self : Document) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit :=
-  self.val.callMethod "ariaNotify" (Support.args #[toJS announcement, Support.optional options]) Unit
+@[macro_inline] def Document.ariaNotify (self : Document) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Document.ariaNotify" do
+  self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
 
 /-- `attribute DOMString? role` -/
-def Element.role (self : Element) : IO (Option String) := self.val.get "role" (Option String)
+@[macro_inline] def Element.role (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.role" do
+  self.val.get "role" (Option String)
 
 /-- Sets `role`: `attribute DOMString? role` -/
-def Element.setRole (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setRole (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setRole" do
   self.val.set "role" (toJS value)
 
 /-- `attribute Element? ariaActiveDescendantElement` -/
-def Element.ariaActiveDescendantElement (self : Element) : IO (Option Element) := self.val.get "ariaActiveDescendantElement" (Option Element)
+@[macro_inline] def Element.ariaActiveDescendantElement (self : Element) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.ariaActiveDescendantElement" do
+  self.val.get "ariaActiveDescendantElement" (Option Element)
 
 /-- Sets `ariaActiveDescendantElement`: `attribute Element? ariaActiveDescendantElement` -/
-def Element.setAriaActiveDescendantElement (self : Element) (value : Option Element) : IO Unit :=
+@[macro_inline] def Element.setAriaActiveDescendantElement (self : Element) (value : Option Element) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaActiveDescendantElement" do
   self.val.set "ariaActiveDescendantElement" (toJS value)
 
 /-- `attribute DOMString? ariaAtomic` -/
-def Element.ariaAtomic (self : Element) : IO (Option String) := self.val.get "ariaAtomic" (Option String)
+@[macro_inline] def Element.ariaAtomic (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaAtomic" do
+  self.val.get "ariaAtomic" (Option String)
 
 /-- Sets `ariaAtomic`: `attribute DOMString? ariaAtomic` -/
-def Element.setAriaAtomic (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaAtomic (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaAtomic" do
   self.val.set "ariaAtomic" (toJS value)
 
 /-- `attribute DOMString? ariaAutoComplete` -/
-def Element.ariaAutoComplete (self : Element) : IO (Option String) := self.val.get "ariaAutoComplete" (Option String)
+@[macro_inline] def Element.ariaAutoComplete (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaAutoComplete" do
+  self.val.get "ariaAutoComplete" (Option String)
 
 /-- Sets `ariaAutoComplete`: `attribute DOMString? ariaAutoComplete` -/
-def Element.setAriaAutoComplete (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaAutoComplete (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaAutoComplete" do
   self.val.set "ariaAutoComplete" (toJS value)
 
 /-- `attribute DOMString? ariaBrailleLabel` -/
-def Element.ariaBrailleLabel (self : Element) : IO (Option String) := self.val.get "ariaBrailleLabel" (Option String)
+@[macro_inline] def Element.ariaBrailleLabel (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaBrailleLabel" do
+  self.val.get "ariaBrailleLabel" (Option String)
 
 /-- Sets `ariaBrailleLabel`: `attribute DOMString? ariaBrailleLabel` -/
-def Element.setAriaBrailleLabel (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaBrailleLabel (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaBrailleLabel" do
   self.val.set "ariaBrailleLabel" (toJS value)
 
 /-- `attribute DOMString? ariaBrailleRoleDescription` -/
-def Element.ariaBrailleRoleDescription (self : Element) : IO (Option String) := self.val.get "ariaBrailleRoleDescription" (Option String)
+@[macro_inline] def Element.ariaBrailleRoleDescription (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaBrailleRoleDescription" do
+  self.val.get "ariaBrailleRoleDescription" (Option String)
 
 /-- Sets `ariaBrailleRoleDescription`: `attribute DOMString? ariaBrailleRoleDescription` -/
-def Element.setAriaBrailleRoleDescription (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaBrailleRoleDescription (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaBrailleRoleDescription" do
   self.val.set "ariaBrailleRoleDescription" (toJS value)
 
 /-- `attribute DOMString? ariaBusy` -/
-def Element.ariaBusy (self : Element) : IO (Option String) := self.val.get "ariaBusy" (Option String)
+@[macro_inline] def Element.ariaBusy (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaBusy" do
+  self.val.get "ariaBusy" (Option String)
 
 /-- Sets `ariaBusy`: `attribute DOMString? ariaBusy` -/
-def Element.setAriaBusy (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaBusy (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaBusy" do
   self.val.set "ariaBusy" (toJS value)
 
 /-- `attribute DOMString? ariaChecked` -/
-def Element.ariaChecked (self : Element) : IO (Option String) := self.val.get "ariaChecked" (Option String)
+@[macro_inline] def Element.ariaChecked (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaChecked" do
+  self.val.get "ariaChecked" (Option String)
 
 /-- Sets `ariaChecked`: `attribute DOMString? ariaChecked` -/
-def Element.setAriaChecked (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaChecked (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaChecked" do
   self.val.set "ariaChecked" (toJS value)
 
 /-- `attribute DOMString? ariaColCount` -/
-def Element.ariaColCount (self : Element) : IO (Option String) := self.val.get "ariaColCount" (Option String)
+@[macro_inline] def Element.ariaColCount (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaColCount" do
+  self.val.get "ariaColCount" (Option String)
 
 /-- Sets `ariaColCount`: `attribute DOMString? ariaColCount` -/
-def Element.setAriaColCount (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaColCount (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaColCount" do
   self.val.set "ariaColCount" (toJS value)
 
 /-- `attribute DOMString? ariaColIndex` -/
-def Element.ariaColIndex (self : Element) : IO (Option String) := self.val.get "ariaColIndex" (Option String)
+@[macro_inline] def Element.ariaColIndex (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaColIndex" do
+  self.val.get "ariaColIndex" (Option String)
 
 /-- Sets `ariaColIndex`: `attribute DOMString? ariaColIndex` -/
-def Element.setAriaColIndex (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaColIndex (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaColIndex" do
   self.val.set "ariaColIndex" (toJS value)
 
 /-- `attribute DOMString? ariaColIndexText` -/
-def Element.ariaColIndexText (self : Element) : IO (Option String) := self.val.get "ariaColIndexText" (Option String)
+@[macro_inline] def Element.ariaColIndexText (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaColIndexText" do
+  self.val.get "ariaColIndexText" (Option String)
 
 /-- Sets `ariaColIndexText`: `attribute DOMString? ariaColIndexText` -/
-def Element.setAriaColIndexText (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaColIndexText (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaColIndexText" do
   self.val.set "ariaColIndexText" (toJS value)
 
 /-- `attribute DOMString? ariaColSpan` -/
-def Element.ariaColSpan (self : Element) : IO (Option String) := self.val.get "ariaColSpan" (Option String)
+@[macro_inline] def Element.ariaColSpan (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaColSpan" do
+  self.val.get "ariaColSpan" (Option String)
 
 /-- Sets `ariaColSpan`: `attribute DOMString? ariaColSpan` -/
-def Element.setAriaColSpan (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaColSpan (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaColSpan" do
   self.val.set "ariaColSpan" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaControlsElements` -/
-def Element.ariaControlsElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaControlsElements" (Option (Array Element))
+@[macro_inline] def Element.ariaControlsElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaControlsElements" do
+  self.val.get "ariaControlsElements" (Option (Array Element))
 
 /-- Sets `ariaControlsElements`: `attribute FrozenArray<Element>? ariaControlsElements` -/
-def Element.setAriaControlsElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaControlsElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaControlsElements" do
   self.val.set "ariaControlsElements" (toJS value)
 
 /-- `attribute DOMString? ariaCurrent` -/
-def Element.ariaCurrent (self : Element) : IO (Option String) := self.val.get "ariaCurrent" (Option String)
+@[macro_inline] def Element.ariaCurrent (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaCurrent" do
+  self.val.get "ariaCurrent" (Option String)
 
 /-- Sets `ariaCurrent`: `attribute DOMString? ariaCurrent` -/
-def Element.setAriaCurrent (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaCurrent (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaCurrent" do
   self.val.set "ariaCurrent" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaDescribedByElements` -/
-def Element.ariaDescribedByElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaDescribedByElements" (Option (Array Element))
+@[macro_inline] def Element.ariaDescribedByElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaDescribedByElements" do
+  self.val.get "ariaDescribedByElements" (Option (Array Element))
 
 /-- Sets `ariaDescribedByElements`: `attribute FrozenArray<Element>? ariaDescribedByElements` -/
-def Element.setAriaDescribedByElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaDescribedByElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaDescribedByElements" do
   self.val.set "ariaDescribedByElements" (toJS value)
 
 /-- `attribute DOMString? ariaDescription` -/
-def Element.ariaDescription (self : Element) : IO (Option String) := self.val.get "ariaDescription" (Option String)
+@[macro_inline] def Element.ariaDescription (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaDescription" do
+  self.val.get "ariaDescription" (Option String)
 
 /-- Sets `ariaDescription`: `attribute DOMString? ariaDescription` -/
-def Element.setAriaDescription (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaDescription (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaDescription" do
   self.val.set "ariaDescription" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaDetailsElements` -/
-def Element.ariaDetailsElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaDetailsElements" (Option (Array Element))
+@[macro_inline] def Element.ariaDetailsElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaDetailsElements" do
+  self.val.get "ariaDetailsElements" (Option (Array Element))
 
 /-- Sets `ariaDetailsElements`: `attribute FrozenArray<Element>? ariaDetailsElements` -/
-def Element.setAriaDetailsElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaDetailsElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaDetailsElements" do
   self.val.set "ariaDetailsElements" (toJS value)
 
 /-- `attribute DOMString? ariaDisabled` -/
-def Element.ariaDisabled (self : Element) : IO (Option String) := self.val.get "ariaDisabled" (Option String)
+@[macro_inline] def Element.ariaDisabled (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaDisabled" do
+  self.val.get "ariaDisabled" (Option String)
 
 /-- Sets `ariaDisabled`: `attribute DOMString? ariaDisabled` -/
-def Element.setAriaDisabled (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaDisabled (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaDisabled" do
   self.val.set "ariaDisabled" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaErrorMessageElements` -/
-def Element.ariaErrorMessageElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaErrorMessageElements" (Option (Array Element))
+@[macro_inline] def Element.ariaErrorMessageElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaErrorMessageElements" do
+  self.val.get "ariaErrorMessageElements" (Option (Array Element))
 
 /-- Sets `ariaErrorMessageElements`: `attribute FrozenArray<Element>? ariaErrorMessageElements` -/
-def Element.setAriaErrorMessageElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaErrorMessageElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaErrorMessageElements" do
   self.val.set "ariaErrorMessageElements" (toJS value)
 
 /-- `attribute DOMString? ariaExpanded` -/
-def Element.ariaExpanded (self : Element) : IO (Option String) := self.val.get "ariaExpanded" (Option String)
+@[macro_inline] def Element.ariaExpanded (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaExpanded" do
+  self.val.get "ariaExpanded" (Option String)
 
 /-- Sets `ariaExpanded`: `attribute DOMString? ariaExpanded` -/
-def Element.setAriaExpanded (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaExpanded (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaExpanded" do
   self.val.set "ariaExpanded" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaFlowToElements` -/
-def Element.ariaFlowToElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaFlowToElements" (Option (Array Element))
+@[macro_inline] def Element.ariaFlowToElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaFlowToElements" do
+  self.val.get "ariaFlowToElements" (Option (Array Element))
 
 /-- Sets `ariaFlowToElements`: `attribute FrozenArray<Element>? ariaFlowToElements` -/
-def Element.setAriaFlowToElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaFlowToElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaFlowToElements" do
   self.val.set "ariaFlowToElements" (toJS value)
 
 /-- `attribute DOMString? ariaHasPopup` -/
-def Element.ariaHasPopup (self : Element) : IO (Option String) := self.val.get "ariaHasPopup" (Option String)
+@[macro_inline] def Element.ariaHasPopup (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaHasPopup" do
+  self.val.get "ariaHasPopup" (Option String)
 
 /-- Sets `ariaHasPopup`: `attribute DOMString? ariaHasPopup` -/
-def Element.setAriaHasPopup (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaHasPopup (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaHasPopup" do
   self.val.set "ariaHasPopup" (toJS value)
 
 /-- `attribute DOMString? ariaHidden` -/
-def Element.ariaHidden (self : Element) : IO (Option String) := self.val.get "ariaHidden" (Option String)
+@[macro_inline] def Element.ariaHidden (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaHidden" do
+  self.val.get "ariaHidden" (Option String)
 
 /-- Sets `ariaHidden`: `attribute DOMString? ariaHidden` -/
-def Element.setAriaHidden (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaHidden (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaHidden" do
   self.val.set "ariaHidden" (toJS value)
 
 /-- `attribute DOMString? ariaInvalid` -/
-def Element.ariaInvalid (self : Element) : IO (Option String) := self.val.get "ariaInvalid" (Option String)
+@[macro_inline] def Element.ariaInvalid (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaInvalid" do
+  self.val.get "ariaInvalid" (Option String)
 
 /-- Sets `ariaInvalid`: `attribute DOMString? ariaInvalid` -/
-def Element.setAriaInvalid (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaInvalid (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaInvalid" do
   self.val.set "ariaInvalid" (toJS value)
 
 /-- `attribute DOMString? ariaKeyShortcuts` -/
-def Element.ariaKeyShortcuts (self : Element) : IO (Option String) := self.val.get "ariaKeyShortcuts" (Option String)
+@[macro_inline] def Element.ariaKeyShortcuts (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaKeyShortcuts" do
+  self.val.get "ariaKeyShortcuts" (Option String)
 
 /-- Sets `ariaKeyShortcuts`: `attribute DOMString? ariaKeyShortcuts` -/
-def Element.setAriaKeyShortcuts (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaKeyShortcuts (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaKeyShortcuts" do
   self.val.set "ariaKeyShortcuts" (toJS value)
 
 /-- `attribute DOMString? ariaLabel` -/
-def Element.ariaLabel (self : Element) : IO (Option String) := self.val.get "ariaLabel" (Option String)
+@[macro_inline] def Element.ariaLabel (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaLabel" do
+  self.val.get "ariaLabel" (Option String)
 
 /-- Sets `ariaLabel`: `attribute DOMString? ariaLabel` -/
-def Element.setAriaLabel (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaLabel (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaLabel" do
   self.val.set "ariaLabel" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaLabelledByElements` -/
-def Element.ariaLabelledByElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaLabelledByElements" (Option (Array Element))
+@[macro_inline] def Element.ariaLabelledByElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaLabelledByElements" do
+  self.val.get "ariaLabelledByElements" (Option (Array Element))
 
 /-- Sets `ariaLabelledByElements`: `attribute FrozenArray<Element>? ariaLabelledByElements` -/
-def Element.setAriaLabelledByElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaLabelledByElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaLabelledByElements" do
   self.val.set "ariaLabelledByElements" (toJS value)
 
 /-- `attribute DOMString? ariaLevel` -/
-def Element.ariaLevel (self : Element) : IO (Option String) := self.val.get "ariaLevel" (Option String)
+@[macro_inline] def Element.ariaLevel (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaLevel" do
+  self.val.get "ariaLevel" (Option String)
 
 /-- Sets `ariaLevel`: `attribute DOMString? ariaLevel` -/
-def Element.setAriaLevel (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaLevel (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaLevel" do
   self.val.set "ariaLevel" (toJS value)
 
 /-- `attribute DOMString? ariaLive` -/
-def Element.ariaLive (self : Element) : IO (Option String) := self.val.get "ariaLive" (Option String)
+@[macro_inline] def Element.ariaLive (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaLive" do
+  self.val.get "ariaLive" (Option String)
 
 /-- Sets `ariaLive`: `attribute DOMString? ariaLive` -/
-def Element.setAriaLive (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaLive (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaLive" do
   self.val.set "ariaLive" (toJS value)
 
 /-- `attribute DOMString? ariaModal` -/
-def Element.ariaModal (self : Element) : IO (Option String) := self.val.get "ariaModal" (Option String)
+@[macro_inline] def Element.ariaModal (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaModal" do
+  self.val.get "ariaModal" (Option String)
 
 /-- Sets `ariaModal`: `attribute DOMString? ariaModal` -/
-def Element.setAriaModal (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaModal (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaModal" do
   self.val.set "ariaModal" (toJS value)
 
 /-- `attribute DOMString? ariaMultiLine` -/
-def Element.ariaMultiLine (self : Element) : IO (Option String) := self.val.get "ariaMultiLine" (Option String)
+@[macro_inline] def Element.ariaMultiLine (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaMultiLine" do
+  self.val.get "ariaMultiLine" (Option String)
 
 /-- Sets `ariaMultiLine`: `attribute DOMString? ariaMultiLine` -/
-def Element.setAriaMultiLine (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaMultiLine (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaMultiLine" do
   self.val.set "ariaMultiLine" (toJS value)
 
 /-- `attribute DOMString? ariaMultiSelectable` -/
-def Element.ariaMultiSelectable (self : Element) : IO (Option String) := self.val.get "ariaMultiSelectable" (Option String)
+@[macro_inline] def Element.ariaMultiSelectable (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaMultiSelectable" do
+  self.val.get "ariaMultiSelectable" (Option String)
 
 /-- Sets `ariaMultiSelectable`: `attribute DOMString? ariaMultiSelectable` -/
-def Element.setAriaMultiSelectable (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaMultiSelectable (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaMultiSelectable" do
   self.val.set "ariaMultiSelectable" (toJS value)
 
 /-- `attribute DOMString? ariaOrientation` -/
-def Element.ariaOrientation (self : Element) : IO (Option String) := self.val.get "ariaOrientation" (Option String)
+@[macro_inline] def Element.ariaOrientation (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaOrientation" do
+  self.val.get "ariaOrientation" (Option String)
 
 /-- Sets `ariaOrientation`: `attribute DOMString? ariaOrientation` -/
-def Element.setAriaOrientation (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaOrientation (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaOrientation" do
   self.val.set "ariaOrientation" (toJS value)
 
 /-- `attribute FrozenArray<Element>? ariaOwnsElements` -/
-def Element.ariaOwnsElements (self : Element) : IO (Option (Array Element)) := self.val.get "ariaOwnsElements" (Option (Array Element))
+@[macro_inline] def Element.ariaOwnsElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaOwnsElements" do
+  self.val.get "ariaOwnsElements" (Option (Array Element))
 
 /-- Sets `ariaOwnsElements`: `attribute FrozenArray<Element>? ariaOwnsElements` -/
-def Element.setAriaOwnsElements (self : Element) (value : Option (Array Element)) : IO Unit :=
+@[macro_inline] def Element.setAriaOwnsElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaOwnsElements" do
   self.val.set "ariaOwnsElements" (toJS value)
 
 /-- `attribute DOMString? ariaPlaceholder` -/
-def Element.ariaPlaceholder (self : Element) : IO (Option String) := self.val.get "ariaPlaceholder" (Option String)
+@[macro_inline] def Element.ariaPlaceholder (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaPlaceholder" do
+  self.val.get "ariaPlaceholder" (Option String)
 
 /-- Sets `ariaPlaceholder`: `attribute DOMString? ariaPlaceholder` -/
-def Element.setAriaPlaceholder (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaPlaceholder (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaPlaceholder" do
   self.val.set "ariaPlaceholder" (toJS value)
 
 /-- `attribute DOMString? ariaPosInSet` -/
-def Element.ariaPosInSet (self : Element) : IO (Option String) := self.val.get "ariaPosInSet" (Option String)
+@[macro_inline] def Element.ariaPosInSet (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaPosInSet" do
+  self.val.get "ariaPosInSet" (Option String)
 
 /-- Sets `ariaPosInSet`: `attribute DOMString? ariaPosInSet` -/
-def Element.setAriaPosInSet (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaPosInSet (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaPosInSet" do
   self.val.set "ariaPosInSet" (toJS value)
 
 /-- `attribute DOMString? ariaPressed` -/
-def Element.ariaPressed (self : Element) : IO (Option String) := self.val.get "ariaPressed" (Option String)
+@[macro_inline] def Element.ariaPressed (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaPressed" do
+  self.val.get "ariaPressed" (Option String)
 
 /-- Sets `ariaPressed`: `attribute DOMString? ariaPressed` -/
-def Element.setAriaPressed (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaPressed (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaPressed" do
   self.val.set "ariaPressed" (toJS value)
 
 /-- `attribute DOMString? ariaReadOnly` -/
-def Element.ariaReadOnly (self : Element) : IO (Option String) := self.val.get "ariaReadOnly" (Option String)
+@[macro_inline] def Element.ariaReadOnly (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaReadOnly" do
+  self.val.get "ariaReadOnly" (Option String)
 
 /-- Sets `ariaReadOnly`: `attribute DOMString? ariaReadOnly` -/
-def Element.setAriaReadOnly (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaReadOnly (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaReadOnly" do
   self.val.set "ariaReadOnly" (toJS value)
 
 /-- `attribute DOMString? ariaRelevant` -/
-def Element.ariaRelevant (self : Element) : IO (Option String) := self.val.get "ariaRelevant" (Option String)
+@[macro_inline] def Element.ariaRelevant (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRelevant" do
+  self.val.get "ariaRelevant" (Option String)
 
 /-- Sets `ariaRelevant`: `attribute DOMString? ariaRelevant` -/
-def Element.setAriaRelevant (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRelevant (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRelevant" do
   self.val.set "ariaRelevant" (toJS value)
 
 /-- `attribute DOMString? ariaRequired` -/
-def Element.ariaRequired (self : Element) : IO (Option String) := self.val.get "ariaRequired" (Option String)
+@[macro_inline] def Element.ariaRequired (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRequired" do
+  self.val.get "ariaRequired" (Option String)
 
 /-- Sets `ariaRequired`: `attribute DOMString? ariaRequired` -/
-def Element.setAriaRequired (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRequired (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRequired" do
   self.val.set "ariaRequired" (toJS value)
 
 /-- `attribute DOMString? ariaRoleDescription` -/
-def Element.ariaRoleDescription (self : Element) : IO (Option String) := self.val.get "ariaRoleDescription" (Option String)
+@[macro_inline] def Element.ariaRoleDescription (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRoleDescription" do
+  self.val.get "ariaRoleDescription" (Option String)
 
 /-- Sets `ariaRoleDescription`: `attribute DOMString? ariaRoleDescription` -/
-def Element.setAriaRoleDescription (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRoleDescription (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRoleDescription" do
   self.val.set "ariaRoleDescription" (toJS value)
 
 /-- `attribute DOMString? ariaRowCount` -/
-def Element.ariaRowCount (self : Element) : IO (Option String) := self.val.get "ariaRowCount" (Option String)
+@[macro_inline] def Element.ariaRowCount (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRowCount" do
+  self.val.get "ariaRowCount" (Option String)
 
 /-- Sets `ariaRowCount`: `attribute DOMString? ariaRowCount` -/
-def Element.setAriaRowCount (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRowCount (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRowCount" do
   self.val.set "ariaRowCount" (toJS value)
 
 /-- `attribute DOMString? ariaRowIndex` -/
-def Element.ariaRowIndex (self : Element) : IO (Option String) := self.val.get "ariaRowIndex" (Option String)
+@[macro_inline] def Element.ariaRowIndex (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRowIndex" do
+  self.val.get "ariaRowIndex" (Option String)
 
 /-- Sets `ariaRowIndex`: `attribute DOMString? ariaRowIndex` -/
-def Element.setAriaRowIndex (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRowIndex (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRowIndex" do
   self.val.set "ariaRowIndex" (toJS value)
 
 /-- `attribute DOMString? ariaRowIndexText` -/
-def Element.ariaRowIndexText (self : Element) : IO (Option String) := self.val.get "ariaRowIndexText" (Option String)
+@[macro_inline] def Element.ariaRowIndexText (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRowIndexText" do
+  self.val.get "ariaRowIndexText" (Option String)
 
 /-- Sets `ariaRowIndexText`: `attribute DOMString? ariaRowIndexText` -/
-def Element.setAriaRowIndexText (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRowIndexText (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRowIndexText" do
   self.val.set "ariaRowIndexText" (toJS value)
 
 /-- `attribute DOMString? ariaRowSpan` -/
-def Element.ariaRowSpan (self : Element) : IO (Option String) := self.val.get "ariaRowSpan" (Option String)
+@[macro_inline] def Element.ariaRowSpan (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaRowSpan" do
+  self.val.get "ariaRowSpan" (Option String)
 
 /-- Sets `ariaRowSpan`: `attribute DOMString? ariaRowSpan` -/
-def Element.setAriaRowSpan (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaRowSpan (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaRowSpan" do
   self.val.set "ariaRowSpan" (toJS value)
 
 /-- `attribute DOMString? ariaSelected` -/
-def Element.ariaSelected (self : Element) : IO (Option String) := self.val.get "ariaSelected" (Option String)
+@[macro_inline] def Element.ariaSelected (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaSelected" do
+  self.val.get "ariaSelected" (Option String)
 
 /-- Sets `ariaSelected`: `attribute DOMString? ariaSelected` -/
-def Element.setAriaSelected (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaSelected (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaSelected" do
   self.val.set "ariaSelected" (toJS value)
 
 /-- `attribute DOMString? ariaSetSize` -/
-def Element.ariaSetSize (self : Element) : IO (Option String) := self.val.get "ariaSetSize" (Option String)
+@[macro_inline] def Element.ariaSetSize (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaSetSize" do
+  self.val.get "ariaSetSize" (Option String)
 
 /-- Sets `ariaSetSize`: `attribute DOMString? ariaSetSize` -/
-def Element.setAriaSetSize (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaSetSize (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaSetSize" do
   self.val.set "ariaSetSize" (toJS value)
 
 /-- `attribute DOMString? ariaSort` -/
-def Element.ariaSort (self : Element) : IO (Option String) := self.val.get "ariaSort" (Option String)
+@[macro_inline] def Element.ariaSort (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaSort" do
+  self.val.get "ariaSort" (Option String)
 
 /-- Sets `ariaSort`: `attribute DOMString? ariaSort` -/
-def Element.setAriaSort (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaSort (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaSort" do
   self.val.set "ariaSort" (toJS value)
 
 /-- `attribute DOMString? ariaValueMax` -/
-def Element.ariaValueMax (self : Element) : IO (Option String) := self.val.get "ariaValueMax" (Option String)
+@[macro_inline] def Element.ariaValueMax (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaValueMax" do
+  self.val.get "ariaValueMax" (Option String)
 
 /-- Sets `ariaValueMax`: `attribute DOMString? ariaValueMax` -/
-def Element.setAriaValueMax (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaValueMax (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaValueMax" do
   self.val.set "ariaValueMax" (toJS value)
 
 /-- `attribute DOMString? ariaValueMin` -/
-def Element.ariaValueMin (self : Element) : IO (Option String) := self.val.get "ariaValueMin" (Option String)
+@[macro_inline] def Element.ariaValueMin (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaValueMin" do
+  self.val.get "ariaValueMin" (Option String)
 
 /-- Sets `ariaValueMin`: `attribute DOMString? ariaValueMin` -/
-def Element.setAriaValueMin (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaValueMin (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaValueMin" do
   self.val.set "ariaValueMin" (toJS value)
 
 /-- `attribute DOMString? ariaValueNow` -/
-def Element.ariaValueNow (self : Element) : IO (Option String) := self.val.get "ariaValueNow" (Option String)
+@[macro_inline] def Element.ariaValueNow (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaValueNow" do
+  self.val.get "ariaValueNow" (Option String)
 
 /-- Sets `ariaValueNow`: `attribute DOMString? ariaValueNow` -/
-def Element.setAriaValueNow (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaValueNow (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaValueNow" do
   self.val.set "ariaValueNow" (toJS value)
 
 /-- `attribute DOMString? ariaValueText` -/
-def Element.ariaValueText (self : Element) : IO (Option String) := self.val.get "ariaValueText" (Option String)
+@[macro_inline] def Element.ariaValueText (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.ariaValueText" do
+  self.val.get "ariaValueText" (Option String)
 
 /-- Sets `ariaValueText`: `attribute DOMString? ariaValueText` -/
-def Element.setAriaValueText (self : Element) (value : Option String) : IO Unit :=
+@[macro_inline] def Element.setAriaValueText (self : Element) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaValueText" do
   self.val.set "ariaValueText" (toJS value)
 
 /-- `undefined ariaNotify(DOMString announcement, optional AriaNotificationOptions options)` -/
-def Element.ariaNotify (self : Element) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit :=
-  self.val.callMethod "ariaNotify" (Support.args #[toJS announcement, Support.optional options]) Unit
+@[macro_inline] def Element.ariaNotify (self : Element) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.ariaNotify" do
+  self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
 
 end Lasm.JS.Web

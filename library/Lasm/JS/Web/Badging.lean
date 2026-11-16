@@ -6,25 +6,28 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<undefined> setAppBadge(optional unsigned long long contents)` -/
-def Navigator.setAppBadge (self : Navigator) (contents : Option Nat := none) : Async Unit :=
-  self.val.callMethodAwait "setAppBadge" (Support.args #[Support.optional contents]) Unit
+@[macro_inline] def Navigator.setAppBadge (self : Navigator) (contents : Option Nat := none) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.setAppBadge" do
+  self.val.callMethodAwait "setAppBadge" (Internal.args #[Internal.optional contents]) Unit
 
 /-- `Promise<undefined> clearAppBadge()` -/
-def Navigator.clearAppBadge (self : Navigator) : Async Unit :=
-  self.val.callMethodAwait "clearAppBadge" (Support.args #[]) Unit
+@[macro_inline] def Navigator.clearAppBadge (self : Navigator) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.clearAppBadge" do
+  self.val.callMethodAwait "clearAppBadge" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> setAppBadge(optional unsigned long long contents)` -/
-def WorkerNavigator.setAppBadge (self : WorkerNavigator) (contents : Option Nat := none) : Async Unit :=
-  self.val.callMethodAwait "setAppBadge" (Support.args #[Support.optional contents]) Unit
+@[macro_inline] def WorkerNavigator.setAppBadge (self : WorkerNavigator) (contents : Option Nat := none) : Async Unit := Internal.api "Lasm.JS.Web.WorkerNavigator.setAppBadge" do
+  self.val.callMethodAwait "setAppBadge" (Internal.args #[Internal.optional contents]) Unit
 
 /-- `Promise<undefined> clearAppBadge()` -/
-def WorkerNavigator.clearAppBadge (self : WorkerNavigator) : Async Unit :=
-  self.val.callMethodAwait "clearAppBadge" (Support.args #[]) Unit
+@[macro_inline] def WorkerNavigator.clearAppBadge (self : WorkerNavigator) : Async Unit := Internal.api "Lasm.JS.Web.WorkerNavigator.clearAppBadge" do
+  self.val.callMethodAwait "clearAppBadge" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

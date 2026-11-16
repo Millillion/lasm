@@ -6,14 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.FilterEffects
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof SVGComponentTransferFunctionElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGComponentTransferFunctionElement`). -/
-def SVGComponentTransferFunctionElement.cast? (v : Value) : IO (Option SVGComponentTransferFunctionElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGComponentTransferFunctionElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGComponentTransferFunctionElement.cast? (v : Value) : IO (Option SVGComponentTransferFunctionElement) := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGComponentTransferFunctionElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN = 0` -/
 def SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN : Nat := 0
@@ -34,43 +38,43 @@ def SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_LINEAR : Na
 def SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_GAMMA : Nat := 5
 
 /-- `readonly attribute SVGAnimatedEnumeration type` -/
-def SVGComponentTransferFunctionElement.type (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGComponentTransferFunctionElement.type (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.type" do
   let r ← self.val.get "type" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumberList tableValues` -/
-def SVGComponentTransferFunctionElement.tableValues (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumberList := do
+@[macro_inline] def SVGComponentTransferFunctionElement.tableValues (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumberList := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.tableValues" do
   let r ← self.val.get "tableValues" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber slope` -/
-def SVGComponentTransferFunctionElement.slope (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGComponentTransferFunctionElement.slope (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.slope" do
   let r ← self.val.get "slope" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber intercept` -/
-def SVGComponentTransferFunctionElement.intercept (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGComponentTransferFunctionElement.intercept (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.intercept" do
   let r ← self.val.get "intercept" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber amplitude` -/
-def SVGComponentTransferFunctionElement.amplitude (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGComponentTransferFunctionElement.amplitude (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.amplitude" do
   let r ← self.val.get "amplitude" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber exponent` -/
-def SVGComponentTransferFunctionElement.exponent (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGComponentTransferFunctionElement.exponent (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.exponent" do
   let r ← self.val.get "exponent" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber offset` -/
-def SVGComponentTransferFunctionElement.offset (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGComponentTransferFunctionElement.offset (self : SVGComponentTransferFunctionElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGComponentTransferFunctionElement.offset" do
   let r ← self.val.get "offset" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEBlendElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEBlendElement`). -/
-def SVGFEBlendElement.cast? (v : Value) : IO (Option SVGFEBlendElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEBlendElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEBlendElement.cast? (v : Value) : IO (Option SVGFEBlendElement) := Internal.api "Lasm.JS.Web.SVGFEBlendElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEBlendElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_FEBLEND_MODE_UNKNOWN = 0` -/
 def SVGFEBlendElement.SVG_FEBLEND_MODE_UNKNOWN : Nat := 0
@@ -124,48 +128,48 @@ def SVGFEBlendElement.SVG_FEBLEND_MODE_COLOR : Nat := 15
 def SVGFEBlendElement.SVG_FEBLEND_MODE_LUMINOSITY : Nat := 16
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEBlendElement.in1 (self : SVGFEBlendElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEBlendElement.in1 (self : SVGFEBlendElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEBlendElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString in2` -/
-def SVGFEBlendElement.in2 (self : SVGFEBlendElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEBlendElement.in2 (self : SVGFEBlendElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEBlendElement.in2" do
   let r ← self.val.get "in2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration mode` -/
-def SVGFEBlendElement.mode (self : SVGFEBlendElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEBlendElement.mode (self : SVGFEBlendElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEBlendElement.mode" do
   let r ← self.val.get "mode" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEBlendElement.x (self : SVGFEBlendElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEBlendElement.x (self : SVGFEBlendElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEBlendElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEBlendElement.y (self : SVGFEBlendElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEBlendElement.y (self : SVGFEBlendElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEBlendElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEBlendElement.width (self : SVGFEBlendElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEBlendElement.width (self : SVGFEBlendElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEBlendElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEBlendElement.height (self : SVGFEBlendElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEBlendElement.height (self : SVGFEBlendElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEBlendElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEBlendElement.result (self : SVGFEBlendElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEBlendElement.result (self : SVGFEBlendElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEBlendElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEColorMatrixElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEColorMatrixElement`). -/
-def SVGFEColorMatrixElement.cast? (v : Value) : IO (Option SVGFEColorMatrixElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEColorMatrixElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEColorMatrixElement.cast? (v : Value) : IO (Option SVGFEColorMatrixElement) := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEColorMatrixElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_FECOLORMATRIX_TYPE_UNKNOWN = 0` -/
 def SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_UNKNOWN : Nat := 0
@@ -183,82 +187,82 @@ def SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_HUEROTATE : Nat := 3
 def SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA : Nat := 4
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEColorMatrixElement.in1 (self : SVGFEColorMatrixElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEColorMatrixElement.in1 (self : SVGFEColorMatrixElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration type` -/
-def SVGFEColorMatrixElement.type (self : SVGFEColorMatrixElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEColorMatrixElement.type (self : SVGFEColorMatrixElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.type" do
   let r ← self.val.get "type" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumberList values` -/
-def SVGFEColorMatrixElement.values (self : SVGFEColorMatrixElement) : IO SVGAnimatedNumberList := do
+@[macro_inline] def SVGFEColorMatrixElement.values (self : SVGFEColorMatrixElement) : IO SVGAnimatedNumberList := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.values" do
   let r ← self.val.get "values" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEColorMatrixElement.x (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEColorMatrixElement.x (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEColorMatrixElement.y (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEColorMatrixElement.y (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEColorMatrixElement.width (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEColorMatrixElement.width (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEColorMatrixElement.height (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEColorMatrixElement.height (self : SVGFEColorMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEColorMatrixElement.result (self : SVGFEColorMatrixElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEColorMatrixElement.result (self : SVGFEColorMatrixElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEColorMatrixElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEComponentTransferElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEComponentTransferElement`). -/
-def SVGFEComponentTransferElement.cast? (v : Value) : IO (Option SVGFEComponentTransferElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEComponentTransferElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEComponentTransferElement.cast? (v : Value) : IO (Option SVGFEComponentTransferElement) := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEComponentTransferElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEComponentTransferElement.in1 (self : SVGFEComponentTransferElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEComponentTransferElement.in1 (self : SVGFEComponentTransferElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEComponentTransferElement.x (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEComponentTransferElement.x (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEComponentTransferElement.y (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEComponentTransferElement.y (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEComponentTransferElement.width (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEComponentTransferElement.width (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEComponentTransferElement.height (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEComponentTransferElement.height (self : SVGFEComponentTransferElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEComponentTransferElement.result (self : SVGFEComponentTransferElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEComponentTransferElement.result (self : SVGFEComponentTransferElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEComponentTransferElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFECompositeElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFECompositeElement`). -/
-def SVGFECompositeElement.cast? (v : Value) : IO (Option SVGFECompositeElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFECompositeElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFECompositeElement.cast? (v : Value) : IO (Option SVGFECompositeElement) := Internal.api "Lasm.JS.Web.SVGFECompositeElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFECompositeElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_FECOMPOSITE_OPERATOR_UNKNOWN = 0` -/
 def SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_UNKNOWN : Nat := 0
@@ -282,68 +286,68 @@ def SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_XOR : Nat := 5
 def SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_ARITHMETIC : Nat := 6
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFECompositeElement.in1 (self : SVGFECompositeElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFECompositeElement.in1 (self : SVGFECompositeElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFECompositeElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString in2` -/
-def SVGFECompositeElement.in2 (self : SVGFECompositeElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFECompositeElement.in2 (self : SVGFECompositeElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFECompositeElement.in2" do
   let r ← self.val.get "in2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration operator` -/
-def SVGFECompositeElement.operator (self : SVGFECompositeElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFECompositeElement.operator (self : SVGFECompositeElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFECompositeElement.operator" do
   let r ← self.val.get "operator" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber k1` -/
-def SVGFECompositeElement.k1 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFECompositeElement.k1 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFECompositeElement.k1" do
   let r ← self.val.get "k1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber k2` -/
-def SVGFECompositeElement.k2 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFECompositeElement.k2 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFECompositeElement.k2" do
   let r ← self.val.get "k2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber k3` -/
-def SVGFECompositeElement.k3 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFECompositeElement.k3 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFECompositeElement.k3" do
   let r ← self.val.get "k3" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber k4` -/
-def SVGFECompositeElement.k4 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFECompositeElement.k4 (self : SVGFECompositeElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFECompositeElement.k4" do
   let r ← self.val.get "k4" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFECompositeElement.x (self : SVGFECompositeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFECompositeElement.x (self : SVGFECompositeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFECompositeElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFECompositeElement.y (self : SVGFECompositeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFECompositeElement.y (self : SVGFECompositeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFECompositeElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFECompositeElement.width (self : SVGFECompositeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFECompositeElement.width (self : SVGFECompositeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFECompositeElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFECompositeElement.height (self : SVGFECompositeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFECompositeElement.height (self : SVGFECompositeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFECompositeElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFECompositeElement.result (self : SVGFECompositeElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFECompositeElement.result (self : SVGFECompositeElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFECompositeElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEConvolveMatrixElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEConvolveMatrixElement`). -/
-def SVGFEConvolveMatrixElement.cast? (v : Value) : IO (Option SVGFEConvolveMatrixElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEConvolveMatrixElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEConvolveMatrixElement.cast? (v : Value) : IO (Option SVGFEConvolveMatrixElement) := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEConvolveMatrixElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_EDGEMODE_UNKNOWN = 0` -/
 def SVGFEConvolveMatrixElement.SVG_EDGEMODE_UNKNOWN : Nat := 0
@@ -358,147 +362,147 @@ def SVGFEConvolveMatrixElement.SVG_EDGEMODE_WRAP : Nat := 2
 def SVGFEConvolveMatrixElement.SVG_EDGEMODE_NONE : Nat := 3
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEConvolveMatrixElement.in1 (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEConvolveMatrixElement.in1 (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedInteger orderX` -/
-def SVGFEConvolveMatrixElement.orderX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := do
+@[macro_inline] def SVGFEConvolveMatrixElement.orderX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.orderX" do
   let r ← self.val.get "orderX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedInteger orderY` -/
-def SVGFEConvolveMatrixElement.orderY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := do
+@[macro_inline] def SVGFEConvolveMatrixElement.orderY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.orderY" do
   let r ← self.val.get "orderY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumberList kernelMatrix` -/
-def SVGFEConvolveMatrixElement.kernelMatrix (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumberList := do
+@[macro_inline] def SVGFEConvolveMatrixElement.kernelMatrix (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumberList := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.kernelMatrix" do
   let r ← self.val.get "kernelMatrix" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber divisor` -/
-def SVGFEConvolveMatrixElement.divisor (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEConvolveMatrixElement.divisor (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.divisor" do
   let r ← self.val.get "divisor" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber bias` -/
-def SVGFEConvolveMatrixElement.bias (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEConvolveMatrixElement.bias (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.bias" do
   let r ← self.val.get "bias" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedInteger targetX` -/
-def SVGFEConvolveMatrixElement.targetX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := do
+@[macro_inline] def SVGFEConvolveMatrixElement.targetX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.targetX" do
   let r ← self.val.get "targetX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedInteger targetY` -/
-def SVGFEConvolveMatrixElement.targetY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := do
+@[macro_inline] def SVGFEConvolveMatrixElement.targetY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedInteger := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.targetY" do
   let r ← self.val.get "targetY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration edgeMode` -/
-def SVGFEConvolveMatrixElement.edgeMode (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEConvolveMatrixElement.edgeMode (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.edgeMode" do
   let r ← self.val.get "edgeMode" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthX` -/
-def SVGFEConvolveMatrixElement.kernelUnitLengthX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEConvolveMatrixElement.kernelUnitLengthX (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.kernelUnitLengthX" do
   let r ← self.val.get "kernelUnitLengthX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthY` -/
-def SVGFEConvolveMatrixElement.kernelUnitLengthY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEConvolveMatrixElement.kernelUnitLengthY (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.kernelUnitLengthY" do
   let r ← self.val.get "kernelUnitLengthY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedBoolean preserveAlpha` -/
-def SVGFEConvolveMatrixElement.preserveAlpha (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedBoolean := do
+@[macro_inline] def SVGFEConvolveMatrixElement.preserveAlpha (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedBoolean := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.preserveAlpha" do
   let r ← self.val.get "preserveAlpha" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEConvolveMatrixElement.x (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEConvolveMatrixElement.x (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEConvolveMatrixElement.y (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEConvolveMatrixElement.y (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEConvolveMatrixElement.width (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEConvolveMatrixElement.width (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEConvolveMatrixElement.height (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEConvolveMatrixElement.height (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEConvolveMatrixElement.result (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEConvolveMatrixElement.result (self : SVGFEConvolveMatrixElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEConvolveMatrixElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEDiffuseLightingElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEDiffuseLightingElement`). -/
-def SVGFEDiffuseLightingElement.cast? (v : Value) : IO (Option SVGFEDiffuseLightingElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEDiffuseLightingElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEDiffuseLightingElement.cast? (v : Value) : IO (Option SVGFEDiffuseLightingElement) := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEDiffuseLightingElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEDiffuseLightingElement.in1 (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDiffuseLightingElement.in1 (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber surfaceScale` -/
-def SVGFEDiffuseLightingElement.surfaceScale (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDiffuseLightingElement.surfaceScale (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.surfaceScale" do
   let r ← self.val.get "surfaceScale" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber diffuseConstant` -/
-def SVGFEDiffuseLightingElement.diffuseConstant (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDiffuseLightingElement.diffuseConstant (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.diffuseConstant" do
   let r ← self.val.get "diffuseConstant" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthX` -/
-def SVGFEDiffuseLightingElement.kernelUnitLengthX (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDiffuseLightingElement.kernelUnitLengthX (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.kernelUnitLengthX" do
   let r ← self.val.get "kernelUnitLengthX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthY` -/
-def SVGFEDiffuseLightingElement.kernelUnitLengthY (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDiffuseLightingElement.kernelUnitLengthY (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.kernelUnitLengthY" do
   let r ← self.val.get "kernelUnitLengthY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEDiffuseLightingElement.x (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDiffuseLightingElement.x (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEDiffuseLightingElement.y (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDiffuseLightingElement.y (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEDiffuseLightingElement.width (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDiffuseLightingElement.width (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEDiffuseLightingElement.height (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDiffuseLightingElement.height (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEDiffuseLightingElement.result (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDiffuseLightingElement.result (self : SVGFEDiffuseLightingElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDiffuseLightingElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEDisplacementMapElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEDisplacementMapElement`). -/
-def SVGFEDisplacementMapElement.cast? (v : Value) : IO (Option SVGFEDisplacementMapElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEDisplacementMapElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEDisplacementMapElement.cast? (v : Value) : IO (Option SVGFEDisplacementMapElement) := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEDisplacementMapElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_CHANNEL_UNKNOWN = 0` -/
 def SVGFEDisplacementMapElement.SVG_CHANNEL_UNKNOWN : Nat := 0
@@ -516,159 +520,159 @@ def SVGFEDisplacementMapElement.SVG_CHANNEL_B : Nat := 3
 def SVGFEDisplacementMapElement.SVG_CHANNEL_A : Nat := 4
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEDisplacementMapElement.in1 (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDisplacementMapElement.in1 (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString in2` -/
-def SVGFEDisplacementMapElement.in2 (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDisplacementMapElement.in2 (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.in2" do
   let r ← self.val.get "in2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber scale` -/
-def SVGFEDisplacementMapElement.scale (self : SVGFEDisplacementMapElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDisplacementMapElement.scale (self : SVGFEDisplacementMapElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.scale" do
   let r ← self.val.get "scale" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration xChannelSelector` -/
-def SVGFEDisplacementMapElement.xChannelSelector (self : SVGFEDisplacementMapElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEDisplacementMapElement.xChannelSelector (self : SVGFEDisplacementMapElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.xChannelSelector" do
   let r ← self.val.get "xChannelSelector" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration yChannelSelector` -/
-def SVGFEDisplacementMapElement.yChannelSelector (self : SVGFEDisplacementMapElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEDisplacementMapElement.yChannelSelector (self : SVGFEDisplacementMapElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.yChannelSelector" do
   let r ← self.val.get "yChannelSelector" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEDisplacementMapElement.x (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDisplacementMapElement.x (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEDisplacementMapElement.y (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDisplacementMapElement.y (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEDisplacementMapElement.width (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDisplacementMapElement.width (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEDisplacementMapElement.height (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDisplacementMapElement.height (self : SVGFEDisplacementMapElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEDisplacementMapElement.result (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDisplacementMapElement.result (self : SVGFEDisplacementMapElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDisplacementMapElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEDistantLightElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEDistantLightElement`). -/
-def SVGFEDistantLightElement.cast? (v : Value) : IO (Option SVGFEDistantLightElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEDistantLightElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEDistantLightElement.cast? (v : Value) : IO (Option SVGFEDistantLightElement) := Internal.api "Lasm.JS.Web.SVGFEDistantLightElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEDistantLightElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber azimuth` -/
-def SVGFEDistantLightElement.azimuth (self : SVGFEDistantLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDistantLightElement.azimuth (self : SVGFEDistantLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDistantLightElement.azimuth" do
   let r ← self.val.get "azimuth" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber elevation` -/
-def SVGFEDistantLightElement.elevation (self : SVGFEDistantLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDistantLightElement.elevation (self : SVGFEDistantLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDistantLightElement.elevation" do
   let r ← self.val.get "elevation" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEDropShadowElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEDropShadowElement`). -/
-def SVGFEDropShadowElement.cast? (v : Value) : IO (Option SVGFEDropShadowElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEDropShadowElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEDropShadowElement.cast? (v : Value) : IO (Option SVGFEDropShadowElement) := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEDropShadowElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEDropShadowElement.in1 (self : SVGFEDropShadowElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDropShadowElement.in1 (self : SVGFEDropShadowElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber dx` -/
-def SVGFEDropShadowElement.dx (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDropShadowElement.dx (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.dx" do
   let r ← self.val.get "dx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber dy` -/
-def SVGFEDropShadowElement.dy (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDropShadowElement.dy (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.dy" do
   let r ← self.val.get "dy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber stdDeviationX` -/
-def SVGFEDropShadowElement.stdDeviationX (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDropShadowElement.stdDeviationX (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.stdDeviationX" do
   let r ← self.val.get "stdDeviationX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber stdDeviationY` -/
-def SVGFEDropShadowElement.stdDeviationY (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEDropShadowElement.stdDeviationY (self : SVGFEDropShadowElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.stdDeviationY" do
   let r ← self.val.get "stdDeviationY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEDropShadowElement.x (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDropShadowElement.x (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEDropShadowElement.y (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDropShadowElement.y (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEDropShadowElement.width (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDropShadowElement.width (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEDropShadowElement.height (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEDropShadowElement.height (self : SVGFEDropShadowElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEDropShadowElement.result (self : SVGFEDropShadowElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEDropShadowElement.result (self : SVGFEDropShadowElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `undefined setStdDeviation(float stdDeviationX, float stdDeviationY)` -/
-def SVGFEDropShadowElement.setStdDeviation (self : SVGFEDropShadowElement) (stdDeviationX : Float) (stdDeviationY : Float) : IO Unit :=
-  self.val.callMethod "setStdDeviation" (Support.args #[toJS stdDeviationX, toJS stdDeviationY]) Unit
+@[macro_inline] def SVGFEDropShadowElement.setStdDeviation (self : SVGFEDropShadowElement) (stdDeviationX : Float) (stdDeviationY : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGFEDropShadowElement.setStdDeviation" do
+  self.val.callMethod "setStdDeviation" (Internal.args #[toJS stdDeviationX, toJS stdDeviationY]) Unit
 
 /-- `v instanceof SVGFEFloodElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEFloodElement`). -/
-def SVGFEFloodElement.cast? (v : Value) : IO (Option SVGFEFloodElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEFloodElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEFloodElement.cast? (v : Value) : IO (Option SVGFEFloodElement) := Internal.api "Lasm.JS.Web.SVGFEFloodElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEFloodElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEFloodElement.x (self : SVGFEFloodElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEFloodElement.x (self : SVGFEFloodElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEFloodElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEFloodElement.y (self : SVGFEFloodElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEFloodElement.y (self : SVGFEFloodElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEFloodElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEFloodElement.width (self : SVGFEFloodElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEFloodElement.width (self : SVGFEFloodElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEFloodElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEFloodElement.height (self : SVGFEFloodElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEFloodElement.height (self : SVGFEFloodElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEFloodElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEFloodElement.result (self : SVGFEFloodElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEFloodElement.result (self : SVGFEFloodElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEFloodElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEGaussianBlurElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEGaussianBlurElement`). -/
-def SVGFEGaussianBlurElement.cast? (v : Value) : IO (Option SVGFEGaussianBlurElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEGaussianBlurElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEGaussianBlurElement.cast? (v : Value) : IO (Option SVGFEGaussianBlurElement) := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEGaussianBlurElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_EDGEMODE_UNKNOWN = 0` -/
 def SVGFEGaussianBlurElement.SVG_EDGEMODE_UNKNOWN : Nat := 0
@@ -683,139 +687,139 @@ def SVGFEGaussianBlurElement.SVG_EDGEMODE_WRAP : Nat := 2
 def SVGFEGaussianBlurElement.SVG_EDGEMODE_NONE : Nat := 3
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEGaussianBlurElement.in1 (self : SVGFEGaussianBlurElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEGaussianBlurElement.in1 (self : SVGFEGaussianBlurElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber stdDeviationX` -/
-def SVGFEGaussianBlurElement.stdDeviationX (self : SVGFEGaussianBlurElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEGaussianBlurElement.stdDeviationX (self : SVGFEGaussianBlurElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.stdDeviationX" do
   let r ← self.val.get "stdDeviationX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber stdDeviationY` -/
-def SVGFEGaussianBlurElement.stdDeviationY (self : SVGFEGaussianBlurElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEGaussianBlurElement.stdDeviationY (self : SVGFEGaussianBlurElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.stdDeviationY" do
   let r ← self.val.get "stdDeviationY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration edgeMode` -/
-def SVGFEGaussianBlurElement.edgeMode (self : SVGFEGaussianBlurElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEGaussianBlurElement.edgeMode (self : SVGFEGaussianBlurElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.edgeMode" do
   let r ← self.val.get "edgeMode" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEGaussianBlurElement.x (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEGaussianBlurElement.x (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEGaussianBlurElement.y (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEGaussianBlurElement.y (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEGaussianBlurElement.width (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEGaussianBlurElement.width (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEGaussianBlurElement.height (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEGaussianBlurElement.height (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEGaussianBlurElement.result (self : SVGFEGaussianBlurElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEGaussianBlurElement.result (self : SVGFEGaussianBlurElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `undefined setStdDeviation(float stdDeviationX, float stdDeviationY)` -/
-def SVGFEGaussianBlurElement.setStdDeviation (self : SVGFEGaussianBlurElement) (stdDeviationX : Float) (stdDeviationY : Float) : IO Unit :=
-  self.val.callMethod "setStdDeviation" (Support.args #[toJS stdDeviationX, toJS stdDeviationY]) Unit
+@[macro_inline] def SVGFEGaussianBlurElement.setStdDeviation (self : SVGFEGaussianBlurElement) (stdDeviationX : Float) (stdDeviationY : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.setStdDeviation" do
+  self.val.callMethod "setStdDeviation" (Internal.args #[toJS stdDeviationX, toJS stdDeviationY]) Unit
 
 /-- `v instanceof SVGFEImageElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEImageElement`). -/
-def SVGFEImageElement.cast? (v : Value) : IO (Option SVGFEImageElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEImageElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEImageElement.cast? (v : Value) : IO (Option SVGFEImageElement) := Internal.api "Lasm.JS.Web.SVGFEImageElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEImageElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGFEImageElement.preserveAspectRatio (self : SVGFEImageElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGFEImageElement.preserveAspectRatio (self : SVGFEImageElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGFEImageElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString crossOrigin` -/
-def SVGFEImageElement.crossOrigin (self : SVGFEImageElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEImageElement.crossOrigin (self : SVGFEImageElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEImageElement.crossOrigin" do
   let r ← self.val.get "crossOrigin" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEImageElement.x (self : SVGFEImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEImageElement.x (self : SVGFEImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEImageElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEImageElement.y (self : SVGFEImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEImageElement.y (self : SVGFEImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEImageElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEImageElement.width (self : SVGFEImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEImageElement.width (self : SVGFEImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEImageElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEImageElement.height (self : SVGFEImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEImageElement.height (self : SVGFEImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEImageElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEImageElement.result (self : SVGFEImageElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEImageElement.result (self : SVGFEImageElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEImageElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGFEImageElement.href (self : SVGFEImageElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEImageElement.href (self : SVGFEImageElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEImageElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEMergeElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEMergeElement`). -/
-def SVGFEMergeElement.cast? (v : Value) : IO (Option SVGFEMergeElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEMergeElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEMergeElement.cast? (v : Value) : IO (Option SVGFEMergeElement) := Internal.api "Lasm.JS.Web.SVGFEMergeElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEMergeElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEMergeElement.x (self : SVGFEMergeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMergeElement.x (self : SVGFEMergeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMergeElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEMergeElement.y (self : SVGFEMergeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMergeElement.y (self : SVGFEMergeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMergeElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEMergeElement.width (self : SVGFEMergeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMergeElement.width (self : SVGFEMergeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMergeElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEMergeElement.height (self : SVGFEMergeElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMergeElement.height (self : SVGFEMergeElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMergeElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEMergeElement.result (self : SVGFEMergeElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEMergeElement.result (self : SVGFEMergeElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEMergeElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEMergeNodeElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEMergeNodeElement`). -/
-def SVGFEMergeNodeElement.cast? (v : Value) : IO (Option SVGFEMergeNodeElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEMergeNodeElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEMergeNodeElement.cast? (v : Value) : IO (Option SVGFEMergeNodeElement) := Internal.api "Lasm.JS.Web.SVGFEMergeNodeElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEMergeNodeElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEMergeNodeElement.in1 (self : SVGFEMergeNodeElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEMergeNodeElement.in1 (self : SVGFEMergeNodeElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEMergeNodeElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEMorphologyElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEMorphologyElement`). -/
-def SVGFEMorphologyElement.cast? (v : Value) : IO (Option SVGFEMorphologyElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEMorphologyElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEMorphologyElement.cast? (v : Value) : IO (Option SVGFEMorphologyElement) := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEMorphologyElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_MORPHOLOGY_OPERATOR_UNKNOWN = 0` -/
 def SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_UNKNOWN : Nat := 0
@@ -827,253 +831,253 @@ def SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_ERODE : Nat := 1
 def SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_DILATE : Nat := 2
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEMorphologyElement.in1 (self : SVGFEMorphologyElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEMorphologyElement.in1 (self : SVGFEMorphologyElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration operator` -/
-def SVGFEMorphologyElement.operator (self : SVGFEMorphologyElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFEMorphologyElement.operator (self : SVGFEMorphologyElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.operator" do
   let r ← self.val.get "operator" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber radiusX` -/
-def SVGFEMorphologyElement.radiusX (self : SVGFEMorphologyElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEMorphologyElement.radiusX (self : SVGFEMorphologyElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.radiusX" do
   let r ← self.val.get "radiusX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber radiusY` -/
-def SVGFEMorphologyElement.radiusY (self : SVGFEMorphologyElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEMorphologyElement.radiusY (self : SVGFEMorphologyElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.radiusY" do
   let r ← self.val.get "radiusY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEMorphologyElement.x (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMorphologyElement.x (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEMorphologyElement.y (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMorphologyElement.y (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEMorphologyElement.width (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMorphologyElement.width (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEMorphologyElement.height (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEMorphologyElement.height (self : SVGFEMorphologyElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEMorphologyElement.result (self : SVGFEMorphologyElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEMorphologyElement.result (self : SVGFEMorphologyElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEMorphologyElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEOffsetElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEOffsetElement`). -/
-def SVGFEOffsetElement.cast? (v : Value) : IO (Option SVGFEOffsetElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEOffsetElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEOffsetElement.cast? (v : Value) : IO (Option SVGFEOffsetElement) := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEOffsetElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFEOffsetElement.in1 (self : SVGFEOffsetElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEOffsetElement.in1 (self : SVGFEOffsetElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber dx` -/
-def SVGFEOffsetElement.dx (self : SVGFEOffsetElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEOffsetElement.dx (self : SVGFEOffsetElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.dx" do
   let r ← self.val.get "dx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber dy` -/
-def SVGFEOffsetElement.dy (self : SVGFEOffsetElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEOffsetElement.dy (self : SVGFEOffsetElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.dy" do
   let r ← self.val.get "dy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFEOffsetElement.x (self : SVGFEOffsetElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEOffsetElement.x (self : SVGFEOffsetElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFEOffsetElement.y (self : SVGFEOffsetElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEOffsetElement.y (self : SVGFEOffsetElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFEOffsetElement.width (self : SVGFEOffsetElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEOffsetElement.width (self : SVGFEOffsetElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFEOffsetElement.height (self : SVGFEOffsetElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFEOffsetElement.height (self : SVGFEOffsetElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFEOffsetElement.result (self : SVGFEOffsetElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFEOffsetElement.result (self : SVGFEOffsetElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEOffsetElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEPointLightElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEPointLightElement`). -/
-def SVGFEPointLightElement.cast? (v : Value) : IO (Option SVGFEPointLightElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEPointLightElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEPointLightElement.cast? (v : Value) : IO (Option SVGFEPointLightElement) := Internal.api "Lasm.JS.Web.SVGFEPointLightElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEPointLightElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber x` -/
-def SVGFEPointLightElement.x (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEPointLightElement.x (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEPointLightElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber y` -/
-def SVGFEPointLightElement.y (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEPointLightElement.y (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEPointLightElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber z` -/
-def SVGFEPointLightElement.z (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFEPointLightElement.z (self : SVGFEPointLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFEPointLightElement.z" do
   let r ← self.val.get "z" Value
   pure { val := r }
 
 /-- `v instanceof SVGFESpecularLightingElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFESpecularLightingElement`). -/
-def SVGFESpecularLightingElement.cast? (v : Value) : IO (Option SVGFESpecularLightingElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFESpecularLightingElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFESpecularLightingElement.cast? (v : Value) : IO (Option SVGFESpecularLightingElement) := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFESpecularLightingElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFESpecularLightingElement.in1 (self : SVGFESpecularLightingElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFESpecularLightingElement.in1 (self : SVGFESpecularLightingElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber surfaceScale` -/
-def SVGFESpecularLightingElement.surfaceScale (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpecularLightingElement.surfaceScale (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.surfaceScale" do
   let r ← self.val.get "surfaceScale" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber specularConstant` -/
-def SVGFESpecularLightingElement.specularConstant (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpecularLightingElement.specularConstant (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.specularConstant" do
   let r ← self.val.get "specularConstant" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber specularExponent` -/
-def SVGFESpecularLightingElement.specularExponent (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpecularLightingElement.specularExponent (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.specularExponent" do
   let r ← self.val.get "specularExponent" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthX` -/
-def SVGFESpecularLightingElement.kernelUnitLengthX (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpecularLightingElement.kernelUnitLengthX (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.kernelUnitLengthX" do
   let r ← self.val.get "kernelUnitLengthX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber kernelUnitLengthY` -/
-def SVGFESpecularLightingElement.kernelUnitLengthY (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpecularLightingElement.kernelUnitLengthY (self : SVGFESpecularLightingElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.kernelUnitLengthY" do
   let r ← self.val.get "kernelUnitLengthY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFESpecularLightingElement.x (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFESpecularLightingElement.x (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFESpecularLightingElement.y (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFESpecularLightingElement.y (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFESpecularLightingElement.width (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFESpecularLightingElement.width (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFESpecularLightingElement.height (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFESpecularLightingElement.height (self : SVGFESpecularLightingElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFESpecularLightingElement.result (self : SVGFESpecularLightingElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFESpecularLightingElement.result (self : SVGFESpecularLightingElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFESpecularLightingElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFESpotLightElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFESpotLightElement`). -/
-def SVGFESpotLightElement.cast? (v : Value) : IO (Option SVGFESpotLightElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFESpotLightElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFESpotLightElement.cast? (v : Value) : IO (Option SVGFESpotLightElement) := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFESpotLightElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber x` -/
-def SVGFESpotLightElement.x (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.x (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber y` -/
-def SVGFESpotLightElement.y (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.y (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber z` -/
-def SVGFESpotLightElement.z (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.z (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.z" do
   let r ← self.val.get "z" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber pointsAtX` -/
-def SVGFESpotLightElement.pointsAtX (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.pointsAtX (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.pointsAtX" do
   let r ← self.val.get "pointsAtX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber pointsAtY` -/
-def SVGFESpotLightElement.pointsAtY (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.pointsAtY (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.pointsAtY" do
   let r ← self.val.get "pointsAtY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber pointsAtZ` -/
-def SVGFESpotLightElement.pointsAtZ (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.pointsAtZ (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.pointsAtZ" do
   let r ← self.val.get "pointsAtZ" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber specularExponent` -/
-def SVGFESpotLightElement.specularExponent (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.specularExponent (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.specularExponent" do
   let r ← self.val.get "specularExponent" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber limitingConeAngle` -/
-def SVGFESpotLightElement.limitingConeAngle (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFESpotLightElement.limitingConeAngle (self : SVGFESpotLightElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFESpotLightElement.limitingConeAngle" do
   let r ← self.val.get "limitingConeAngle" Value
   pure { val := r }
 
 /-- `v instanceof SVGFETileElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFETileElement`). -/
-def SVGFETileElement.cast? (v : Value) : IO (Option SVGFETileElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFETileElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFETileElement.cast? (v : Value) : IO (Option SVGFETileElement) := Internal.api "Lasm.JS.Web.SVGFETileElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFETileElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString in1` -/
-def SVGFETileElement.in1 (self : SVGFETileElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFETileElement.in1 (self : SVGFETileElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFETileElement.in1" do
   let r ← self.val.get "in1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFETileElement.x (self : SVGFETileElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETileElement.x (self : SVGFETileElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETileElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFETileElement.y (self : SVGFETileElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETileElement.y (self : SVGFETileElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETileElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFETileElement.width (self : SVGFETileElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETileElement.width (self : SVGFETileElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETileElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFETileElement.height (self : SVGFETileElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETileElement.height (self : SVGFETileElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETileElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFETileElement.result (self : SVGFETileElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFETileElement.result (self : SVGFETileElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFETileElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFETurbulenceElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFETurbulenceElement`). -/
-def SVGFETurbulenceElement.cast? (v : Value) : IO (Option SVGFETurbulenceElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFETurbulenceElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFETurbulenceElement.cast? (v : Value) : IO (Option SVGFETurbulenceElement) := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFETurbulenceElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_TURBULENCE_TYPE_UNKNOWN = 0` -/
 def SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_UNKNOWN : Nat := 0
@@ -1094,108 +1098,108 @@ def SVGFETurbulenceElement.SVG_STITCHTYPE_STITCH : Nat := 1
 def SVGFETurbulenceElement.SVG_STITCHTYPE_NOSTITCH : Nat := 2
 
 /-- `readonly attribute SVGAnimatedNumber baseFrequencyX` -/
-def SVGFETurbulenceElement.baseFrequencyX (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFETurbulenceElement.baseFrequencyX (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.baseFrequencyX" do
   let r ← self.val.get "baseFrequencyX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber baseFrequencyY` -/
-def SVGFETurbulenceElement.baseFrequencyY (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFETurbulenceElement.baseFrequencyY (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.baseFrequencyY" do
   let r ← self.val.get "baseFrequencyY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedInteger numOctaves` -/
-def SVGFETurbulenceElement.numOctaves (self : SVGFETurbulenceElement) : IO SVGAnimatedInteger := do
+@[macro_inline] def SVGFETurbulenceElement.numOctaves (self : SVGFETurbulenceElement) : IO SVGAnimatedInteger := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.numOctaves" do
   let r ← self.val.get "numOctaves" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumber seed` -/
-def SVGFETurbulenceElement.seed (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGFETurbulenceElement.seed (self : SVGFETurbulenceElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.seed" do
   let r ← self.val.get "seed" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration stitchTiles` -/
-def SVGFETurbulenceElement.stitchTiles (self : SVGFETurbulenceElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFETurbulenceElement.stitchTiles (self : SVGFETurbulenceElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.stitchTiles" do
   let r ← self.val.get "stitchTiles" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration type` -/
-def SVGFETurbulenceElement.type (self : SVGFETurbulenceElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFETurbulenceElement.type (self : SVGFETurbulenceElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.type" do
   let r ← self.val.get "type" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFETurbulenceElement.x (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETurbulenceElement.x (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFETurbulenceElement.y (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETurbulenceElement.y (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFETurbulenceElement.width (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETurbulenceElement.width (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFETurbulenceElement.height (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFETurbulenceElement.height (self : SVGFETurbulenceElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString result` -/
-def SVGFETurbulenceElement.result (self : SVGFETurbulenceElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGFETurbulenceElement.result (self : SVGFETurbulenceElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFETurbulenceElement.result" do
   let r ← self.val.get "result" Value
   pure { val := r }
 
 /-- `v instanceof SVGFilterElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFilterElement`). -/
-def SVGFilterElement.cast? (v : Value) : IO (Option SVGFilterElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFilterElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFilterElement.cast? (v : Value) : IO (Option SVGFilterElement) := Internal.api "Lasm.JS.Web.SVGFilterElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFilterElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedEnumeration filterUnits` -/
-def SVGFilterElement.filterUnits (self : SVGFilterElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFilterElement.filterUnits (self : SVGFilterElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFilterElement.filterUnits" do
   let r ← self.val.get "filterUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration primitiveUnits` -/
-def SVGFilterElement.primitiveUnits (self : SVGFilterElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGFilterElement.primitiveUnits (self : SVGFilterElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGFilterElement.primitiveUnits" do
   let r ← self.val.get "primitiveUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGFilterElement.x (self : SVGFilterElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFilterElement.x (self : SVGFilterElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFilterElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGFilterElement.y (self : SVGFilterElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFilterElement.y (self : SVGFilterElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFilterElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGFilterElement.width (self : SVGFilterElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFilterElement.width (self : SVGFilterElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFilterElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGFilterElement.height (self : SVGFilterElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGFilterElement.height (self : SVGFilterElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFilterElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `v instanceof SVGFEFuncAElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEFuncAElement`). -/
-def SVGFEFuncAElement.cast? (v : Value) : IO (Option SVGFEFuncAElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEFuncAElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEFuncAElement.cast? (v : Value) : IO (Option SVGFEFuncAElement) := Internal.api "Lasm.JS.Web.SVGFEFuncAElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEFuncAElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGFEFuncBElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEFuncBElement`). -/
-def SVGFEFuncBElement.cast? (v : Value) : IO (Option SVGFEFuncBElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEFuncBElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEFuncBElement.cast? (v : Value) : IO (Option SVGFEFuncBElement) := Internal.api "Lasm.JS.Web.SVGFEFuncBElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEFuncBElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGFEFuncGElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEFuncGElement`). -/
-def SVGFEFuncGElement.cast? (v : Value) : IO (Option SVGFEFuncGElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEFuncGElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEFuncGElement.cast? (v : Value) : IO (Option SVGFEFuncGElement) := Internal.api "Lasm.JS.Web.SVGFEFuncGElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEFuncGElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGFEFuncRElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGFEFuncRElement`). -/
-def SVGFEFuncRElement.cast? (v : Value) : IO (Option SVGFEFuncRElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGFEFuncRElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGFEFuncRElement.cast? (v : Value) : IO (Option SVGFEFuncRElement) := Internal.api "Lasm.JS.Web.SVGFEFuncRElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGFEFuncRElement"] Value) (fun x => { val := x }) v
 
 end Lasm.JS.Web

@@ -6,15 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.MediacaptureStreams
 import Lasm.JS.Web.ScreenCapture
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<MediaStream> getViewportMedia(optional DisplayMediaStreamOptions options)` -/
-def MediaDevices.getViewportMedia (self : MediaDevices) (options : Option DisplayMediaStreamOptions := none) : Async MediaStream := do
-  let r ← self.val.callMethodAwait "getViewportMedia" (Support.args #[Support.optional options]) Value
+@[macro_inline] def MediaDevices.getViewportMedia (self : MediaDevices) (options : Option DisplayMediaStreamOptions := none) : Async MediaStream := Internal.api "Lasm.JS.Web.MediaDevices.getViewportMedia" do
+  let r ← self.val.callMethodAwait "getViewportMedia" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

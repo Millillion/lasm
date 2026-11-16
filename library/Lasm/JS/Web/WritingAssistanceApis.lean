@@ -6,242 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.WritingAssistanceApis
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum RewriterTone` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "as-is", "more-formal", "more-casual". -/
-inductive RewriterTone where
-  /-- "as-is" -/
-  | asIs
-  /-- "more-formal" -/
-  | moreFormal
-  /-- "more-casual" -/
-  | moreCasual
-  deriving BEq, Repr, Inhabited
-instance : ToJS RewriterTone := ⟨fun
-  | .asIs => .string "as-is"
-  | .moreFormal => .string "more-formal"
-  | .moreCasual => .string "more-casual"⟩
-instance : FromJS RewriterTone where
-  fromJS
-    | .string "as-is" => .ok .asIs
-    | .string "more-formal" => .ok .moreFormal
-    | .string "more-casual" => .ok .moreCasual
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RewriterTone"
-
-/-- `enum RewriterFormat` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "as-is", "plain-text", "markdown". -/
-inductive RewriterFormat where
-  /-- "as-is" -/
-  | asIs
-  /-- "plain-text" -/
-  | plainText
-  /-- "markdown" -/
-  | markdown
-  deriving BEq, Repr, Inhabited
-instance : ToJS RewriterFormat := ⟨fun
-  | .asIs => .string "as-is"
-  | .plainText => .string "plain-text"
-  | .markdown => .string "markdown"⟩
-instance : FromJS RewriterFormat where
-  fromJS
-    | .string "as-is" => .ok .asIs
-    | .string "plain-text" => .ok .plainText
-    | .string "markdown" => .ok .markdown
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RewriterFormat"
-
-/-- `enum RewriterLength` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "as-is", "shorter", "longer". -/
-inductive RewriterLength where
-  /-- "as-is" -/
-  | asIs
-  /-- "shorter" -/
-  | shorter
-  /-- "longer" -/
-  | longer
-  deriving BEq, Repr, Inhabited
-instance : ToJS RewriterLength := ⟨fun
-  | .asIs => .string "as-is"
-  | .shorter => .string "shorter"
-  | .longer => .string "longer"⟩
-instance : FromJS RewriterLength where
-  fromJS
-    | .string "as-is" => .ok .asIs
-    | .string "shorter" => .ok .shorter
-    | .string "longer" => .ok .longer
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RewriterLength"
-
-/-- `enum Availability` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "unavailable", "downloadable", "downloading", "available". -/
-inductive Availability where
-  /-- "unavailable" -/
-  | unavailable
-  /-- "downloadable" -/
-  | downloadable
-  /-- "downloading" -/
-  | downloading
-  /-- "available" -/
-  | available
-  deriving BEq, Repr, Inhabited
-instance : ToJS Availability := ⟨fun
-  | .unavailable => .string "unavailable"
-  | .downloadable => .string "downloadable"
-  | .downloading => .string "downloading"
-  | .available => .string "available"⟩
-instance : FromJS Availability where
-  fromJS
-    | .string "unavailable" => .ok .unavailable
-    | .string "downloadable" => .ok .downloadable
-    | .string "downloading" => .ok .downloading
-    | .string "available" => .ok .available
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.Availability"
-
-/-- `enum SummarizerType` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "tldr", "teaser", "key-points", "headline". -/
-inductive SummarizerType where
-  /-- "tldr" -/
-  | tldr
-  /-- "teaser" -/
-  | teaser
-  /-- "key-points" -/
-  | keyPoints
-  /-- "headline" -/
-  | headline
-  deriving BEq, Repr, Inhabited
-instance : ToJS SummarizerType := ⟨fun
-  | .tldr => .string "tldr"
-  | .teaser => .string "teaser"
-  | .keyPoints => .string "key-points"
-  | .headline => .string "headline"⟩
-instance : FromJS SummarizerType where
-  fromJS
-    | .string "tldr" => .ok .tldr
-    | .string "teaser" => .ok .teaser
-    | .string "key-points" => .ok .keyPoints
-    | .string "headline" => .ok .headline
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SummarizerType"
-
-/-- `enum SummarizerFormat` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "plain-text", "markdown". -/
-inductive SummarizerFormat where
-  /-- "plain-text" -/
-  | plainText
-  /-- "markdown" -/
-  | markdown
-  deriving BEq, Repr, Inhabited
-instance : ToJS SummarizerFormat := ⟨fun
-  | .plainText => .string "plain-text"
-  | .markdown => .string "markdown"⟩
-instance : FromJS SummarizerFormat where
-  fromJS
-    | .string "plain-text" => .ok .plainText
-    | .string "markdown" => .ok .markdown
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SummarizerFormat"
-
-/-- `enum SummarizerLength` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "short", "medium", "long". -/
-inductive SummarizerLength where
-  /-- "short" -/
-  | short
-  /-- "medium" -/
-  | medium
-  /-- "long" -/
-  | long
-  deriving BEq, Repr, Inhabited
-instance : ToJS SummarizerLength := ⟨fun
-  | .short => .string "short"
-  | .medium => .string "medium"
-  | .long => .string "long"⟩
-instance : FromJS SummarizerLength where
-  fromJS
-    | .string "short" => .ok .short
-    | .string "medium" => .ok .medium
-    | .string "long" => .ok .long
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SummarizerLength"
-
-/-- `enum PerformancePreference` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "auto", "speed", "capability". -/
-inductive PerformancePreference where
-  /-- "auto" -/
-  | auto
-  /-- "speed" -/
-  | speed
-  /-- "capability" -/
-  | capability
-  deriving BEq, Repr, Inhabited
-instance : ToJS PerformancePreference := ⟨fun
-  | .auto => .string "auto"
-  | .speed => .string "speed"
-  | .capability => .string "capability"⟩
-instance : FromJS PerformancePreference where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "speed" => .ok .speed
-    | .string "capability" => .ok .capability
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PerformancePreference"
-
-/-- `enum WriterTone` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "formal", "neutral", "casual". -/
-inductive WriterTone where
-  /-- "formal" -/
-  | formal
-  /-- "neutral" -/
-  | neutral
-  /-- "casual" -/
-  | casual
-  deriving BEq, Repr, Inhabited
-instance : ToJS WriterTone := ⟨fun
-  | .formal => .string "formal"
-  | .neutral => .string "neutral"
-  | .casual => .string "casual"⟩
-instance : FromJS WriterTone where
-  fromJS
-    | .string "formal" => .ok .formal
-    | .string "neutral" => .ok .neutral
-    | .string "casual" => .ok .casual
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WriterTone"
-
-/-- `enum WriterFormat` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "plain-text", "markdown". -/
-inductive WriterFormat where
-  /-- "plain-text" -/
-  | plainText
-  /-- "markdown" -/
-  | markdown
-  deriving BEq, Repr, Inhabited
-instance : ToJS WriterFormat := ⟨fun
-  | .plainText => .string "plain-text"
-  | .markdown => .string "markdown"⟩
-instance : FromJS WriterFormat where
-  fromJS
-    | .string "plain-text" => .ok .plainText
-    | .string "markdown" => .ok .markdown
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WriterFormat"
-
-/-- `enum WriterLength` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): "short", "medium", "long". -/
-inductive WriterLength where
-  /-- "short" -/
-  | short
-  /-- "medium" -/
-  | medium
-  /-- "long" -/
-  | long
-  deriving BEq, Repr, Inhabited
-instance : ToJS WriterLength := ⟨fun
-  | .short => .string "short"
-  | .medium => .string "medium"
-  | .long => .string "long"⟩
-instance : FromJS WriterLength where
-  fromJS
-    | .string "short" => .ok .short
-    | .string "medium" => .ok .medium
-    | .string "long" => .ok .long
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WriterLength"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback CreateMonitorCallback = undefined (CreateMonitor monitor)` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure CreateMonitorCallback where
@@ -252,10 +26,10 @@ instance : ToJS CreateMonitorCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CreateMonitorCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.CreateMonitorCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def CreateMonitorCallback.ofFn (f : CreateMonitor → Async Unit) : IO CreateMonitorCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg CreateMonitor args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg CreateMonitor args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def CreateMonitorCallback.ofSyncFn (f : CreateMonitor → IO Unit) : IO CreateMonitorCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg CreateMonitor args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg CreateMonitor args 0)) }
 
 /-- `dictionary RewriterCreateOptions : RewriterCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RewriterCreateOptions where
@@ -277,15 +51,15 @@ structure RewriterCreateOptions where
   monitor : Option CreateMonitorCallback := none
   /-- `DOMString sharedContext` -/
   sharedContext : Option String := none
-instance : ToJS RewriterCreateOptions := ⟨fun d => Support.fields #[("tone", Support.optional d.tone),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor),
-    ("sharedContext", Support.optional d.sharedContext)]⟩
+instance : ToJS RewriterCreateOptions := ⟨fun d => Internal.fields #[("tone", Internal.optional d.tone),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor),
+    ("sharedContext", Internal.optional d.sharedContext)]⟩
 
 /-- `dictionary RewriterCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RewriterCreateCoreOptions where
@@ -301,12 +75,12 @@ structure RewriterCreateCoreOptions where
   expectedContextLanguages : Option (Array String) := none
   /-- `DOMString outputLanguage` -/
   outputLanguage : Option String := none
-instance : ToJS RewriterCreateCoreOptions := ⟨fun d => Support.fields #[("tone", Support.optional d.tone),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage)]⟩
+instance : ToJS RewriterCreateCoreOptions := ⟨fun d => Internal.fields #[("tone", Internal.optional d.tone),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage)]⟩
 
 /-- `dictionary RewriterRewriteOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RewriterRewriteOptions where
@@ -314,8 +88,8 @@ structure RewriterRewriteOptions where
   context : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS RewriterRewriteOptions := ⟨fun d => Support.fields #[("context", Support.optional d.context),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS RewriterRewriteOptions := ⟨fun d => Internal.fields #[("context", Internal.optional d.context),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary SummarizerCreateOptions : SummarizerCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SummarizerCreateOptions where
@@ -339,16 +113,16 @@ structure SummarizerCreateOptions where
   monitor : Option CreateMonitorCallback := none
   /-- `DOMString sharedContext` -/
   sharedContext : Option String := none
-instance : ToJS SummarizerCreateOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("preference", Support.optional d.preference),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor),
-    ("sharedContext", Support.optional d.sharedContext)]⟩
+instance : ToJS SummarizerCreateOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("preference", Internal.optional d.preference),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor),
+    ("sharedContext", Internal.optional d.sharedContext)]⟩
 
 /-- `dictionary SummarizerCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SummarizerCreateCoreOptions where
@@ -366,13 +140,13 @@ structure SummarizerCreateCoreOptions where
   expectedContextLanguages : Option (Array String) := none
   /-- `DOMString outputLanguage` -/
   outputLanguage : Option String := none
-instance : ToJS SummarizerCreateCoreOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("preference", Support.optional d.preference),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage)]⟩
+instance : ToJS SummarizerCreateCoreOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("preference", Internal.optional d.preference),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage)]⟩
 
 /-- `dictionary SummarizerSummarizeOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SummarizerSummarizeOptions where
@@ -380,8 +154,8 @@ structure SummarizerSummarizeOptions where
   signal : Option AbortSignal := none
   /-- `DOMString context` -/
   context : Option String := none
-instance : ToJS SummarizerSummarizeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("context", Support.optional d.context)]⟩
+instance : ToJS SummarizerSummarizeOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("context", Internal.optional d.context)]⟩
 
 /-- `dictionary WriterCreateOptions : WriterCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WriterCreateOptions where
@@ -403,15 +177,15 @@ structure WriterCreateOptions where
   monitor : Option CreateMonitorCallback := none
   /-- `DOMString sharedContext` -/
   sharedContext : Option String := none
-instance : ToJS WriterCreateOptions := ⟨fun d => Support.fields #[("tone", Support.optional d.tone),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor),
-    ("sharedContext", Support.optional d.sharedContext)]⟩
+instance : ToJS WriterCreateOptions := ⟨fun d => Internal.fields #[("tone", Internal.optional d.tone),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor),
+    ("sharedContext", Internal.optional d.sharedContext)]⟩
 
 /-- `dictionary WriterCreateCoreOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WriterCreateCoreOptions where
@@ -427,12 +201,12 @@ structure WriterCreateCoreOptions where
   expectedContextLanguages : Option (Array String) := none
   /-- `DOMString outputLanguage` -/
   outputLanguage : Option String := none
-instance : ToJS WriterCreateCoreOptions := ⟨fun d => Support.fields #[("tone", Support.optional d.tone),
-    ("format", Support.optional d.format),
-    ("length", Support.optional d.length),
-    ("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("expectedContextLanguages", Support.optional d.expectedContextLanguages),
-    ("outputLanguage", Support.optional d.outputLanguage)]⟩
+instance : ToJS WriterCreateCoreOptions := ⟨fun d => Internal.fields #[("tone", Internal.optional d.tone),
+    ("format", Internal.optional d.format),
+    ("length", Internal.optional d.length),
+    ("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("expectedContextLanguages", Internal.optional d.expectedContextLanguages),
+    ("outputLanguage", Internal.optional d.outputLanguage)]⟩
 
 /-- `dictionary WriterWriteOptions` (Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WriterWriteOptions where
@@ -440,189 +214,215 @@ structure WriterWriteOptions where
   context : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS WriterWriteOptions := ⟨fun d => Support.fields #[("context", Support.optional d.context),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS WriterWriteOptions := ⟨fun d => Internal.fields #[("context", Internal.optional d.context),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof CreateMonitor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CreateMonitor`). -/
-def CreateMonitor.cast? (v : Value) : IO (Option CreateMonitor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CreateMonitor"] Value) v) then some { val := v } else none
+@[macro_inline] def CreateMonitor.cast? (v : Value) : IO (Option CreateMonitor) := Internal.api "Lasm.JS.Web.CreateMonitor.cast?" do
+  Internal.cast (Internal.getGlobal ["CreateMonitor"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler ondownloadprogress` -/
-def CreateMonitor.ondownloadprogress (self : CreateMonitor) : IO (Option EventHandlerNonNull) := self.val.get "ondownloadprogress" (Option EventHandlerNonNull)
+@[macro_inline] def CreateMonitor.ondownloadprogress (self : CreateMonitor) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.CreateMonitor.ondownloadprogress" do
+  self.val.get "ondownloadprogress" (Option EventHandlerNonNull)
 
 /-- Sets `ondownloadprogress`: `attribute EventHandler ondownloadprogress` -/
-def CreateMonitor.setOndownloadprogress (self : CreateMonitor) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def CreateMonitor.setOndownloadprogress (self : CreateMonitor) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.CreateMonitor.setOndownloadprogress" do
   self.val.set "ondownloadprogress" (toJS value)
 
 /-- `v instanceof Rewriter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Rewriter`). -/
-def Rewriter.cast? (v : Value) : IO (Option Rewriter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Rewriter"] Value) v) then some { val := v } else none
+@[macro_inline] def Rewriter.cast? (v : Value) : IO (Option Rewriter) := Internal.api "Lasm.JS.Web.Rewriter.cast?" do
+  Internal.cast (Internal.getGlobal ["Rewriter"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString sharedContext` -/
-def Rewriter.sharedContext (self : Rewriter) : IO String := self.val.get "sharedContext" String
+@[macro_inline] def Rewriter.sharedContext (self : Rewriter) : IO String := Internal.api "Lasm.JS.Web.Rewriter.sharedContext" do
+  self.val.get "sharedContext" String
 
 /-- `readonly attribute RewriterTone tone` -/
-def Rewriter.tone (self : Rewriter) : IO RewriterTone := self.val.get "tone" RewriterTone
+@[macro_inline] def Rewriter.tone (self : Rewriter) : IO RewriterTone := Internal.api "Lasm.JS.Web.Rewriter.tone" do
+  self.val.get "tone" RewriterTone
 
 /-- `readonly attribute RewriterFormat format` -/
-def Rewriter.format (self : Rewriter) : IO RewriterFormat := self.val.get "format" RewriterFormat
+@[macro_inline] def Rewriter.format (self : Rewriter) : IO RewriterFormat := Internal.api "Lasm.JS.Web.Rewriter.format" do
+  self.val.get "format" RewriterFormat
 
 /-- `readonly attribute RewriterLength length` -/
-def Rewriter.length (self : Rewriter) : IO RewriterLength := self.val.get "length" RewriterLength
+@[macro_inline] def Rewriter.length (self : Rewriter) : IO RewriterLength := Internal.api "Lasm.JS.Web.Rewriter.length" do
+  self.val.get "length" RewriterLength
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedInputLanguages` -/
-def Rewriter.expectedInputLanguages (self : Rewriter) : IO (Option (Array String)) := self.val.get "expectedInputLanguages" (Option (Array String))
+@[macro_inline] def Rewriter.expectedInputLanguages (self : Rewriter) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Rewriter.expectedInputLanguages" do
+  self.val.get "expectedInputLanguages" (Option (Array String))
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedContextLanguages` -/
-def Rewriter.expectedContextLanguages (self : Rewriter) : IO (Option (Array String)) := self.val.get "expectedContextLanguages" (Option (Array String))
+@[macro_inline] def Rewriter.expectedContextLanguages (self : Rewriter) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Rewriter.expectedContextLanguages" do
+  self.val.get "expectedContextLanguages" (Option (Array String))
 
 /-- `readonly attribute DOMString? outputLanguage` -/
-def Rewriter.outputLanguage (self : Rewriter) : IO (Option String) := self.val.get "outputLanguage" (Option String)
+@[macro_inline] def Rewriter.outputLanguage (self : Rewriter) : IO (Option String) := Internal.api "Lasm.JS.Web.Rewriter.outputLanguage" do
+  self.val.get "outputLanguage" (Option String)
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def Rewriter.inputQuota (self : Rewriter) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def Rewriter.inputQuota (self : Rewriter) : IO Float := Internal.api "Lasm.JS.Web.Rewriter.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `static Promise<Rewriter> create(optional RewriterCreateOptions options)` -/
-def Rewriter.create (options : Option RewriterCreateOptions := none) : Async Rewriter := do
+@[macro_inline] def Rewriter.create (options : Option RewriterCreateOptions := none) : Async Rewriter := Internal.api "Lasm.JS.Web.Rewriter.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Rewriter.create", module := "globalThis", path := "Rewriter.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional RewriterCreateCoreOptions options)` -/
-def Rewriter.availability (options : Option RewriterCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def Rewriter.availability (options : Option RewriterCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Rewriter.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Rewriter.availability", module := "globalThis", path := "Rewriter.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<DOMString> rewrite(DOMString input, optional RewriterRewriteOptions options)` -/
-def Rewriter.rewrite (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : Async String :=
-  self.val.callMethodAwait "rewrite" (Support.args #[toJS input, Support.optional options]) String
+@[macro_inline] def Rewriter.rewrite (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : Async String := Internal.api "Lasm.JS.Web.Rewriter.rewrite" do
+  self.val.callMethodAwait "rewrite" (Internal.args #[toJS input, Internal.optional options]) String
 
 /-- `ReadableStream rewriteStreaming(DOMString input, optional RewriterRewriteOptions options)` -/
-def Rewriter.rewriteStreaming (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "rewriteStreaming" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def Rewriter.rewriteStreaming (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.Rewriter.rewriteStreaming" do
+  let r ← self.val.callMethod "rewriteStreaming" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<double> measureInputUsage(DOMString input, optional RewriterRewriteOptions options)` -/
-def Rewriter.measureInputUsage (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def Rewriter.measureInputUsage (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : Async Float := Internal.api "Lasm.JS.Web.Rewriter.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `undefined destroy()` -/
-def Rewriter.destroy (self : Rewriter) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def Rewriter.destroy (self : Rewriter) : IO Unit := Internal.api "Lasm.JS.Web.Rewriter.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof Summarizer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Summarizer`). -/
-def Summarizer.cast? (v : Value) : IO (Option Summarizer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Summarizer"] Value) v) then some { val := v } else none
+@[macro_inline] def Summarizer.cast? (v : Value) : IO (Option Summarizer) := Internal.api "Lasm.JS.Web.Summarizer.cast?" do
+  Internal.cast (Internal.getGlobal ["Summarizer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString sharedContext` -/
-def Summarizer.sharedContext (self : Summarizer) : IO String := self.val.get "sharedContext" String
+@[macro_inline] def Summarizer.sharedContext (self : Summarizer) : IO String := Internal.api "Lasm.JS.Web.Summarizer.sharedContext" do
+  self.val.get "sharedContext" String
 
 /-- `readonly attribute SummarizerType type` -/
-def Summarizer.type (self : Summarizer) : IO SummarizerType := self.val.get "type" SummarizerType
+@[macro_inline] def Summarizer.type (self : Summarizer) : IO SummarizerType := Internal.api "Lasm.JS.Web.Summarizer.type" do
+  self.val.get "type" SummarizerType
 
 /-- `readonly attribute SummarizerFormat format` -/
-def Summarizer.format (self : Summarizer) : IO SummarizerFormat := self.val.get "format" SummarizerFormat
+@[macro_inline] def Summarizer.format (self : Summarizer) : IO SummarizerFormat := Internal.api "Lasm.JS.Web.Summarizer.format" do
+  self.val.get "format" SummarizerFormat
 
 /-- `readonly attribute SummarizerLength length` -/
-def Summarizer.length (self : Summarizer) : IO SummarizerLength := self.val.get "length" SummarizerLength
+@[macro_inline] def Summarizer.length (self : Summarizer) : IO SummarizerLength := Internal.api "Lasm.JS.Web.Summarizer.length" do
+  self.val.get "length" SummarizerLength
 
 /-- `readonly attribute PerformancePreference preference` -/
-def Summarizer.preference (self : Summarizer) : IO PerformancePreference := self.val.get "preference" PerformancePreference
+@[macro_inline] def Summarizer.preference (self : Summarizer) : IO PerformancePreference := Internal.api "Lasm.JS.Web.Summarizer.preference" do
+  self.val.get "preference" PerformancePreference
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedInputLanguages` -/
-def Summarizer.expectedInputLanguages (self : Summarizer) : IO (Option (Array String)) := self.val.get "expectedInputLanguages" (Option (Array String))
+@[macro_inline] def Summarizer.expectedInputLanguages (self : Summarizer) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Summarizer.expectedInputLanguages" do
+  self.val.get "expectedInputLanguages" (Option (Array String))
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedContextLanguages` -/
-def Summarizer.expectedContextLanguages (self : Summarizer) : IO (Option (Array String)) := self.val.get "expectedContextLanguages" (Option (Array String))
+@[macro_inline] def Summarizer.expectedContextLanguages (self : Summarizer) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Summarizer.expectedContextLanguages" do
+  self.val.get "expectedContextLanguages" (Option (Array String))
 
 /-- `readonly attribute DOMString? outputLanguage` -/
-def Summarizer.outputLanguage (self : Summarizer) : IO (Option String) := self.val.get "outputLanguage" (Option String)
+@[macro_inline] def Summarizer.outputLanguage (self : Summarizer) : IO (Option String) := Internal.api "Lasm.JS.Web.Summarizer.outputLanguage" do
+  self.val.get "outputLanguage" (Option String)
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def Summarizer.inputQuota (self : Summarizer) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def Summarizer.inputQuota (self : Summarizer) : IO Float := Internal.api "Lasm.JS.Web.Summarizer.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `static Promise<Summarizer> create(optional SummarizerCreateOptions options)` -/
-def Summarizer.create (options : Option SummarizerCreateOptions := none) : Async Summarizer := do
+@[macro_inline] def Summarizer.create (options : Option SummarizerCreateOptions := none) : Async Summarizer := Internal.api "Lasm.JS.Web.Summarizer.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Summarizer.create", module := "globalThis", path := "Summarizer.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional SummarizerCreateCoreOptions options)` -/
-def Summarizer.availability (options : Option SummarizerCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def Summarizer.availability (options : Option SummarizerCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Summarizer.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Summarizer.availability", module := "globalThis", path := "Summarizer.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<DOMString> summarize(DOMString input, optional SummarizerSummarizeOptions options)` -/
-def Summarizer.summarize (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : Async String :=
-  self.val.callMethodAwait "summarize" (Support.args #[toJS input, Support.optional options]) String
+@[macro_inline] def Summarizer.summarize (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : Async String := Internal.api "Lasm.JS.Web.Summarizer.summarize" do
+  self.val.callMethodAwait "summarize" (Internal.args #[toJS input, Internal.optional options]) String
 
 /-- `ReadableStream summarizeStreaming(DOMString input, optional SummarizerSummarizeOptions options)` -/
-def Summarizer.summarizeStreaming (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "summarizeStreaming" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def Summarizer.summarizeStreaming (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.Summarizer.summarizeStreaming" do
+  let r ← self.val.callMethod "summarizeStreaming" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<double> measureInputUsage(DOMString input, optional SummarizerSummarizeOptions options)` -/
-def Summarizer.measureInputUsage (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def Summarizer.measureInputUsage (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : Async Float := Internal.api "Lasm.JS.Web.Summarizer.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `undefined destroy()` -/
-def Summarizer.destroy (self : Summarizer) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def Summarizer.destroy (self : Summarizer) : IO Unit := Internal.api "Lasm.JS.Web.Summarizer.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof Writer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writer`). -/
-def Writer.cast? (v : Value) : IO (Option Writer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Writer"] Value) v) then some { val := v } else none
+@[macro_inline] def Writer.cast? (v : Value) : IO (Option Writer) := Internal.api "Lasm.JS.Web.Writer.cast?" do
+  Internal.cast (Internal.getGlobal ["Writer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString sharedContext` -/
-def Writer.sharedContext (self : Writer) : IO String := self.val.get "sharedContext" String
+@[macro_inline] def Writer.sharedContext (self : Writer) : IO String := Internal.api "Lasm.JS.Web.Writer.sharedContext" do
+  self.val.get "sharedContext" String
 
 /-- `readonly attribute WriterTone tone` -/
-def Writer.tone (self : Writer) : IO WriterTone := self.val.get "tone" WriterTone
+@[macro_inline] def Writer.tone (self : Writer) : IO WriterTone := Internal.api "Lasm.JS.Web.Writer.tone" do
+  self.val.get "tone" WriterTone
 
 /-- `readonly attribute WriterFormat format` -/
-def Writer.format (self : Writer) : IO WriterFormat := self.val.get "format" WriterFormat
+@[macro_inline] def Writer.format (self : Writer) : IO WriterFormat := Internal.api "Lasm.JS.Web.Writer.format" do
+  self.val.get "format" WriterFormat
 
 /-- `readonly attribute WriterLength length` -/
-def Writer.length (self : Writer) : IO WriterLength := self.val.get "length" WriterLength
+@[macro_inline] def Writer.length (self : Writer) : IO WriterLength := Internal.api "Lasm.JS.Web.Writer.length" do
+  self.val.get "length" WriterLength
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedInputLanguages` -/
-def Writer.expectedInputLanguages (self : Writer) : IO (Option (Array String)) := self.val.get "expectedInputLanguages" (Option (Array String))
+@[macro_inline] def Writer.expectedInputLanguages (self : Writer) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Writer.expectedInputLanguages" do
+  self.val.get "expectedInputLanguages" (Option (Array String))
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedContextLanguages` -/
-def Writer.expectedContextLanguages (self : Writer) : IO (Option (Array String)) := self.val.get "expectedContextLanguages" (Option (Array String))
+@[macro_inline] def Writer.expectedContextLanguages (self : Writer) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Writer.expectedContextLanguages" do
+  self.val.get "expectedContextLanguages" (Option (Array String))
 
 /-- `readonly attribute DOMString? outputLanguage` -/
-def Writer.outputLanguage (self : Writer) : IO (Option String) := self.val.get "outputLanguage" (Option String)
+@[macro_inline] def Writer.outputLanguage (self : Writer) : IO (Option String) := Internal.api "Lasm.JS.Web.Writer.outputLanguage" do
+  self.val.get "outputLanguage" (Option String)
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def Writer.inputQuota (self : Writer) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def Writer.inputQuota (self : Writer) : IO Float := Internal.api "Lasm.JS.Web.Writer.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `static Promise<Writer> create(optional WriterCreateOptions options)` -/
-def Writer.create (options : Option WriterCreateOptions := none) : Async Writer := do
+@[macro_inline] def Writer.create (options : Option WriterCreateOptions := none) : Async Writer := Internal.api "Lasm.JS.Web.Writer.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Writer.create", module := "globalThis", path := "Writer.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional WriterCreateCoreOptions options)` -/
-def Writer.availability (options : Option WriterCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def Writer.availability (options : Option WriterCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Writer.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Writer.availability", module := "globalThis", path := "Writer.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<DOMString> write(DOMString input, optional WriterWriteOptions options)` -/
-def Writer.write (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : Async String :=
-  self.val.callMethodAwait "write" (Support.args #[toJS input, Support.optional options]) String
+@[macro_inline] def Writer.write (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : Async String := Internal.api "Lasm.JS.Web.Writer.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS input, Internal.optional options]) String
 
 /-- `ReadableStream writeStreaming(DOMString input, optional WriterWriteOptions options)` -/
-def Writer.writeStreaming (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "writeStreaming" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def Writer.writeStreaming (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.Writer.writeStreaming" do
+  let r ← self.val.callMethod "writeStreaming" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<double> measureInputUsage(DOMString input, optional WriterWriteOptions options)` -/
-def Writer.measureInputUsage (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def Writer.measureInputUsage (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : Async Float := Internal.api "Lasm.JS.Web.Writer.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `undefined destroy()` -/
-def Writer.destroy (self : Writer) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def Writer.destroy (self : Writer) : IO Unit := Internal.api "Lasm.JS.Web.Writer.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

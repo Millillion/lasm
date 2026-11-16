@@ -6,36 +6,40 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.OESDrawBuffersIndexed
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `undefined enableiOES(GLenum target, GLuint index)` -/
-def OES_draw_buffers_indexed.enableiOES (self : OES_draw_buffers_indexed) (target : Nat) (index : Nat) : IO Unit :=
-  self.val.callMethod "enableiOES" (Support.args #[toJS target, toJS index]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.enableiOES (self : OES_draw_buffers_indexed) (target : Nat) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.enableiOES" do
+  self.val.callMethod "enableiOES" (Internal.args #[toJS target, toJS index]) Unit
 
 /-- `undefined disableiOES(GLenum target, GLuint index)` -/
-def OES_draw_buffers_indexed.disableiOES (self : OES_draw_buffers_indexed) (target : Nat) (index : Nat) : IO Unit :=
-  self.val.callMethod "disableiOES" (Support.args #[toJS target, toJS index]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.disableiOES (self : OES_draw_buffers_indexed) (target : Nat) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.disableiOES" do
+  self.val.callMethod "disableiOES" (Internal.args #[toJS target, toJS index]) Unit
 
 /-- `undefined blendEquationiOES(GLuint buf, GLenum mode)` -/
-def OES_draw_buffers_indexed.blendEquationiOES (self : OES_draw_buffers_indexed) (buf : Nat) (mode : Nat) : IO Unit :=
-  self.val.callMethod "blendEquationiOES" (Support.args #[toJS buf, toJS mode]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.blendEquationiOES (self : OES_draw_buffers_indexed) (buf : Nat) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.blendEquationiOES" do
+  self.val.callMethod "blendEquationiOES" (Internal.args #[toJS buf, toJS mode]) Unit
 
 /-- `undefined blendEquationSeparateiOES(GLuint buf, GLenum modeRGB, GLenum modeAlpha)` -/
-def OES_draw_buffers_indexed.blendEquationSeparateiOES (self : OES_draw_buffers_indexed) (buf : Nat) (modeRGB : Nat) (modeAlpha : Nat) : IO Unit :=
-  self.val.callMethod "blendEquationSeparateiOES" (Support.args #[toJS buf, toJS modeRGB, toJS modeAlpha]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.blendEquationSeparateiOES (self : OES_draw_buffers_indexed) (buf : Nat) (modeRGB : Nat) (modeAlpha : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.blendEquationSeparateiOES" do
+  self.val.callMethod "blendEquationSeparateiOES" (Internal.args #[toJS buf, toJS modeRGB, toJS modeAlpha]) Unit
 
 /-- `undefined blendFunciOES(GLuint buf, GLenum src, GLenum dst)` -/
-def OES_draw_buffers_indexed.blendFunciOES (self : OES_draw_buffers_indexed) (buf : Nat) (src : Nat) (dst : Nat) : IO Unit :=
-  self.val.callMethod "blendFunciOES" (Support.args #[toJS buf, toJS src, toJS dst]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.blendFunciOES (self : OES_draw_buffers_indexed) (buf : Nat) (src : Nat) (dst : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.blendFunciOES" do
+  self.val.callMethod "blendFunciOES" (Internal.args #[toJS buf, toJS src, toJS dst]) Unit
 
 /-- `undefined blendFuncSeparateiOES(GLuint buf, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)` -/
-def OES_draw_buffers_indexed.blendFuncSeparateiOES (self : OES_draw_buffers_indexed) (buf : Nat) (srcRGB : Nat) (dstRGB : Nat) (srcAlpha : Nat) (dstAlpha : Nat) : IO Unit :=
-  self.val.callMethod "blendFuncSeparateiOES" (Support.args #[toJS buf, toJS srcRGB, toJS dstRGB, toJS srcAlpha, toJS dstAlpha]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.blendFuncSeparateiOES (self : OES_draw_buffers_indexed) (buf : Nat) (srcRGB : Nat) (dstRGB : Nat) (srcAlpha : Nat) (dstAlpha : Nat) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.blendFuncSeparateiOES" do
+  self.val.callMethod "blendFuncSeparateiOES" (Internal.args #[toJS buf, toJS srcRGB, toJS dstRGB, toJS srcAlpha, toJS dstAlpha]) Unit
 
 /-- `undefined colorMaskiOES(GLuint buf, GLboolean r, GLboolean g, GLboolean b, GLboolean a)` -/
-def OES_draw_buffers_indexed.colorMaskiOES (self : OES_draw_buffers_indexed) (buf : Nat) (r : Bool) (g : Bool) (b : Bool) (a : Bool) : IO Unit :=
-  self.val.callMethod "colorMaskiOES" (Support.args #[toJS buf, toJS r, toJS g, toJS b, toJS a]) Unit
+@[macro_inline] def OES_draw_buffers_indexed.colorMaskiOES (self : OES_draw_buffers_indexed) (buf : Nat) (r : Bool) (g : Bool) (b : Bool) (a : Bool) : IO Unit := Internal.api "Lasm.JS.Web.OES_draw_buffers_indexed.colorMaskiOES" do
+  self.val.callMethod "colorMaskiOES" (Internal.args #[toJS buf, toJS r, toJS g, toJS b, toJS a]) Unit
 
 end Lasm.JS.Web

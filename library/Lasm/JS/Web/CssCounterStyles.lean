@@ -6,90 +6,105 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssCounterStyles
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSCounterStyleRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSCounterStyleRule`). -/
-def CSSCounterStyleRule.cast? (v : Value) : IO (Option CSSCounterStyleRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSCounterStyleRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSCounterStyleRule.cast? (v : Value) : IO (Option CSSCounterStyleRule) := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSCounterStyleRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString name` -/
-def CSSCounterStyleRule.name (self : CSSCounterStyleRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSCounterStyleRule.name (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.name" do
+  self.val.get "name" String
 
 /-- Sets `name`: `attribute CSSOMString name` -/
-def CSSCounterStyleRule.setName (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setName (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setName" do
   self.val.set "name" (toJS value)
 
 /-- `attribute CSSOMString system` -/
-def CSSCounterStyleRule.system (self : CSSCounterStyleRule) : IO String := self.val.get "system" String
+@[macro_inline] def CSSCounterStyleRule.system (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.system" do
+  self.val.get "system" String
 
 /-- Sets `system`: `attribute CSSOMString system` -/
-def CSSCounterStyleRule.setSystem (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setSystem (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setSystem" do
   self.val.set "system" (toJS value)
 
 /-- `attribute CSSOMString symbols` -/
-def CSSCounterStyleRule.symbols (self : CSSCounterStyleRule) : IO String := self.val.get "symbols" String
+@[macro_inline] def CSSCounterStyleRule.symbols (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.symbols" do
+  self.val.get "symbols" String
 
 /-- Sets `symbols`: `attribute CSSOMString symbols` -/
-def CSSCounterStyleRule.setSymbols (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setSymbols (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setSymbols" do
   self.val.set "symbols" (toJS value)
 
 /-- `attribute CSSOMString additiveSymbols` -/
-def CSSCounterStyleRule.additiveSymbols (self : CSSCounterStyleRule) : IO String := self.val.get "additiveSymbols" String
+@[macro_inline] def CSSCounterStyleRule.additiveSymbols (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.additiveSymbols" do
+  self.val.get "additiveSymbols" String
 
 /-- Sets `additiveSymbols`: `attribute CSSOMString additiveSymbols` -/
-def CSSCounterStyleRule.setAdditiveSymbols (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setAdditiveSymbols (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setAdditiveSymbols" do
   self.val.set "additiveSymbols" (toJS value)
 
 /-- `attribute CSSOMString negative` -/
-def CSSCounterStyleRule.negative (self : CSSCounterStyleRule) : IO String := self.val.get "negative" String
+@[macro_inline] def CSSCounterStyleRule.negative (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.negative" do
+  self.val.get "negative" String
 
 /-- Sets `negative`: `attribute CSSOMString negative` -/
-def CSSCounterStyleRule.setNegative (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setNegative (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setNegative" do
   self.val.set "negative" (toJS value)
 
 /-- `attribute CSSOMString prefix` -/
-def CSSCounterStyleRule.«prefix» (self : CSSCounterStyleRule) : IO String := self.val.get "prefix" String
+@[macro_inline] def CSSCounterStyleRule.«prefix» (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.prefix" do
+  self.val.get "prefix" String
 
 /-- Sets `prefix`: `attribute CSSOMString prefix` -/
-def CSSCounterStyleRule.setPrefix (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setPrefix (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setPrefix" do
   self.val.set "prefix" (toJS value)
 
 /-- `attribute CSSOMString suffix` -/
-def CSSCounterStyleRule.suffix (self : CSSCounterStyleRule) : IO String := self.val.get "suffix" String
+@[macro_inline] def CSSCounterStyleRule.suffix (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.suffix" do
+  self.val.get "suffix" String
 
 /-- Sets `suffix`: `attribute CSSOMString suffix` -/
-def CSSCounterStyleRule.setSuffix (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setSuffix (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setSuffix" do
   self.val.set "suffix" (toJS value)
 
 /-- `attribute CSSOMString range` -/
-def CSSCounterStyleRule.range (self : CSSCounterStyleRule) : IO String := self.val.get "range" String
+@[macro_inline] def CSSCounterStyleRule.range (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.range" do
+  self.val.get "range" String
 
 /-- Sets `range`: `attribute CSSOMString range` -/
-def CSSCounterStyleRule.setRange (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setRange (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setRange" do
   self.val.set "range" (toJS value)
 
 /-- `attribute CSSOMString pad` -/
-def CSSCounterStyleRule.pad (self : CSSCounterStyleRule) : IO String := self.val.get "pad" String
+@[macro_inline] def CSSCounterStyleRule.pad (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.pad" do
+  self.val.get "pad" String
 
 /-- Sets `pad`: `attribute CSSOMString pad` -/
-def CSSCounterStyleRule.setPad (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setPad (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setPad" do
   self.val.set "pad" (toJS value)
 
 /-- `attribute CSSOMString speakAs` -/
-def CSSCounterStyleRule.speakAs (self : CSSCounterStyleRule) : IO String := self.val.get "speakAs" String
+@[macro_inline] def CSSCounterStyleRule.speakAs (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.speakAs" do
+  self.val.get "speakAs" String
 
 /-- Sets `speakAs`: `attribute CSSOMString speakAs` -/
-def CSSCounterStyleRule.setSpeakAs (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setSpeakAs (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setSpeakAs" do
   self.val.set "speakAs" (toJS value)
 
 /-- `attribute CSSOMString fallback` -/
-def CSSCounterStyleRule.fallback (self : CSSCounterStyleRule) : IO String := self.val.get "fallback" String
+@[macro_inline] def CSSCounterStyleRule.fallback (self : CSSCounterStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.fallback" do
+  self.val.get "fallback" String
 
 /-- Sets `fallback`: `attribute CSSOMString fallback` -/
-def CSSCounterStyleRule.setFallback (self : CSSCounterStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSCounterStyleRule.setFallback (self : CSSCounterStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSCounterStyleRule.setFallback" do
   self.val.set "fallback" (toJS value)
 
 /-- `const unsigned short COUNTER_STYLE_RULE = 11` -/

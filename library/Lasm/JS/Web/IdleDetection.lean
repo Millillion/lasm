@@ -6,46 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.IdleDetection
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.FileSystemAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum UserIdleState` (Idle Detection API (https://wicg.github.io/idle-detection/)): "active", "idle". -/
-inductive UserIdleState where
-  /-- "active" -/
-  | active
-  /-- "idle" -/
-  | idle
-  deriving BEq, Repr, Inhabited
-instance : ToJS UserIdleState := ⟨fun
-  | .active => .string "active"
-  | .idle => .string "idle"⟩
-instance : FromJS UserIdleState where
-  fromJS
-    | .string "active" => .ok .active
-    | .string "idle" => .ok .idle
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.UserIdleState"
-
-/-- `enum ScreenIdleState` (Idle Detection API (https://wicg.github.io/idle-detection/)): "locked", "unlocked". -/
-inductive ScreenIdleState where
-  /-- "locked" -/
-  | locked
-  /-- "unlocked" -/
-  | unlocked
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScreenIdleState := ⟨fun
-  | .locked => .string "locked"
-  | .unlocked => .string "unlocked"⟩
-instance : FromJS ScreenIdleState where
-  fromJS
-    | .string "locked" => .ok .locked
-    | .string "unlocked" => .ok .unlocked
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScreenIdleState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary IdleOptions` (Idle Detection API (https://wicg.github.io/idle-detection/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdleOptions where
@@ -53,38 +23,41 @@ structure IdleOptions where
   threshold : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS IdleOptions := ⟨fun d => Support.fields #[("threshold", Support.optional d.threshold),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS IdleOptions := ⟨fun d => Internal.fields #[("threshold", Internal.optional d.threshold),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof IdleDetector`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdleDetector`). -/
-def IdleDetector.cast? (v : Value) : IO (Option IdleDetector) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IdleDetector"] Value) v) then some { val := v } else none
+@[macro_inline] def IdleDetector.cast? (v : Value) : IO (Option IdleDetector) := Internal.api "Lasm.JS.Web.IdleDetector.cast?" do
+  Internal.cast (Internal.getGlobal ["IdleDetector"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def IdleDetector.new : IO IdleDetector :=
+@[macro_inline] def IdleDetector.new : IO IdleDetector := Internal.api "Lasm.JS.Web.IdleDetector.new" do
   Lasm.JS.Binding.invoke IdleDetector { name := "Lasm.JS.Web.IdleDetector.new", module := "globalThis", path := "IdleDetector", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute UserIdleState? userState` -/
-def IdleDetector.userState (self : IdleDetector) : IO (Option UserIdleState) := self.val.get "userState" (Option UserIdleState)
+@[macro_inline] def IdleDetector.userState (self : IdleDetector) : IO (Option UserIdleState) := Internal.api "Lasm.JS.Web.IdleDetector.userState" do
+  self.val.get "userState" (Option UserIdleState)
 
 /-- `readonly attribute ScreenIdleState? screenState` -/
-def IdleDetector.screenState (self : IdleDetector) : IO (Option ScreenIdleState) := self.val.get "screenState" (Option ScreenIdleState)
+@[macro_inline] def IdleDetector.screenState (self : IdleDetector) : IO (Option ScreenIdleState) := Internal.api "Lasm.JS.Web.IdleDetector.screenState" do
+  self.val.get "screenState" (Option ScreenIdleState)
 
 /-- `attribute EventHandler onchange` -/
-def IdleDetector.onchange (self : IdleDetector) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def IdleDetector.onchange (self : IdleDetector) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IdleDetector.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def IdleDetector.setOnchange (self : IdleDetector) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IdleDetector.setOnchange (self : IdleDetector) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IdleDetector.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `static Promise<PermissionState> requestPermission()` -/
-def IdleDetector.requestPermission : Async PermissionState :=
+@[macro_inline] def IdleDetector.requestPermission : Async PermissionState := Internal.api "Lasm.JS.Web.IdleDetector.requestPermission" do
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.IdleDetector.requestPermission", module := "globalThis", path := "IdleDetector.requestPermission", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<undefined> start(optional IdleOptions options)` -/
-def IdleDetector.start (self : IdleDetector) (options : Option IdleOptions := none) : Async Unit :=
-  self.val.callMethodAwait "start" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def IdleDetector.start (self : IdleDetector) (options : Option IdleOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.IdleDetector.start" do
+  self.val.callMethodAwait "start" (Internal.args #[Internal.optional options]) Unit
 
 end Lasm.JS.Web

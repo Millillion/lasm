@@ -6,87 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.FileSystemAccess
+import Lasm.JS.Web.Types.Fs
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FileSystemPermissionMode` (File System Access (https://wicg.github.io/file-system-access/)): "read", "readwrite". -/
-inductive FileSystemPermissionMode where
-  /-- "read" -/
-  | read
-  /-- "readwrite" -/
-  | readwrite
-  deriving BEq, Repr, Inhabited
-instance : ToJS FileSystemPermissionMode := ⟨fun
-  | .read => .string "read"
-  | .readwrite => .string "readwrite"⟩
-instance : FromJS FileSystemPermissionMode where
-  fromJS
-    | .string "read" => .ok .read
-    | .string "readwrite" => .ok .readwrite
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FileSystemPermissionMode"
-
-/-- `enum PermissionState` (Permissions (https://w3c.github.io/permissions/)): "granted", "denied", "prompt". -/
-inductive PermissionState where
-  /-- "granted" -/
-  | granted
-  /-- "denied" -/
-  | denied
-  /-- "prompt" -/
-  | prompt
-  deriving BEq, Repr, Inhabited
-instance : ToJS PermissionState := ⟨fun
-  | .granted => .string "granted"
-  | .denied => .string "denied"
-  | .prompt => .string "prompt"⟩
-instance : FromJS PermissionState where
-  fromJS
-    | .string "granted" => .ok .granted
-    | .string "denied" => .ok .denied
-    | .string "prompt" => .ok .prompt
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PermissionState"
-
-/-- `enum WellKnownDirectory` (File System Access (https://wicg.github.io/file-system-access/)): "desktop", "documents", "downloads", "music", "pictures", "videos". -/
-inductive WellKnownDirectory where
-  /-- "desktop" -/
-  | desktop
-  /-- "documents" -/
-  | documents
-  /-- "downloads" -/
-  | downloads
-  /-- "music" -/
-  | music
-  /-- "pictures" -/
-  | pictures
-  /-- "videos" -/
-  | videos
-  deriving BEq, Repr, Inhabited
-instance : ToJS WellKnownDirectory := ⟨fun
-  | .desktop => .string "desktop"
-  | .documents => .string "documents"
-  | .downloads => .string "downloads"
-  | .music => .string "music"
-  | .pictures => .string "pictures"
-  | .videos => .string "videos"⟩
-instance : FromJS WellKnownDirectory where
-  fromJS
-    | .string "desktop" => .ok .desktop
-    | .string "documents" => .ok .documents
-    | .string "downloads" => .ok .downloads
-    | .string "music" => .ok .music
-    | .string "pictures" => .ok .pictures
-    | .string "videos" => .ok .videos
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WellKnownDirectory"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FileSystemHandlePermissionDescriptor` (File System Access (https://wicg.github.io/file-system-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSystemHandlePermissionDescriptor where
   /-- `FileSystemPermissionMode mode = "read"` -/
   mode : Option FileSystemPermissionMode := none
-instance : ToJS FileSystemHandlePermissionDescriptor := ⟨fun d => Support.fields #[("mode", Support.optional d.mode)]⟩
+instance : ToJS FileSystemHandlePermissionDescriptor := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode)]⟩
 
 /-- `(USVString or sequence<USVString>)`: one constructor per member type. -/
 inductive USVStringOrSequenceOfUSVString where
@@ -112,8 +47,8 @@ structure FilePickerAcceptType where
   description : Option String := none
   /-- `record<USVString, (USVString or sequence<USVString>)> accept` -/
   accept : Option (Record USVStringOrSequenceOfUSVString) := none
-instance : ToJS FilePickerAcceptType := ⟨fun d => Support.fields #[("description", Support.optional d.description),
-    ("accept", Support.optional d.accept)]⟩
+instance : ToJS FilePickerAcceptType := ⟨fun d => Internal.fields #[("description", Internal.optional d.description),
+    ("accept", Internal.optional d.accept)]⟩
 
 /-- `typedef WellKnownDirectory or FileSystemHandle StartInDirectory`: one constructor per member type. -/
 inductive StartInDirectory where
@@ -139,11 +74,11 @@ structure OpenFilePickerOptions where
   startIn : Option StartInDirectory := none
   /-- `boolean multiple = false` -/
   multiple : Option Bool := none
-instance : ToJS OpenFilePickerOptions := ⟨fun d => Support.fields #[("types", Support.optional d.types),
-    ("excludeAcceptAllOption", Support.optional d.excludeAcceptAllOption),
-    ("id", Support.optional d.id),
-    ("startIn", Support.optional d.startIn),
-    ("multiple", Support.optional d.multiple)]⟩
+instance : ToJS OpenFilePickerOptions := ⟨fun d => Internal.fields #[("types", Internal.optional d.types),
+    ("excludeAcceptAllOption", Internal.optional d.excludeAcceptAllOption),
+    ("id", Internal.optional d.id),
+    ("startIn", Internal.optional d.startIn),
+    ("multiple", Internal.optional d.multiple)]⟩
 
 /-- `dictionary SaveFilePickerOptions : FilePickerOptions` (File System Access (https://wicg.github.io/file-system-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SaveFilePickerOptions where
@@ -157,11 +92,11 @@ structure SaveFilePickerOptions where
   startIn : Option StartInDirectory := none
   /-- `USVString? suggestedName` -/
   suggestedName : Option String := none
-instance : ToJS SaveFilePickerOptions := ⟨fun d => Support.fields #[("types", Support.optional d.types),
-    ("excludeAcceptAllOption", Support.optional d.excludeAcceptAllOption),
-    ("id", Support.optional d.id),
-    ("startIn", Support.optional d.startIn),
-    ("suggestedName", Support.optional d.suggestedName)]⟩
+instance : ToJS SaveFilePickerOptions := ⟨fun d => Internal.fields #[("types", Internal.optional d.types),
+    ("excludeAcceptAllOption", Internal.optional d.excludeAcceptAllOption),
+    ("id", Internal.optional d.id),
+    ("startIn", Internal.optional d.startIn),
+    ("suggestedName", Internal.optional d.suggestedName)]⟩
 
 /-- `dictionary DirectoryPickerOptions` (File System Access (https://wicg.github.io/file-system-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DirectoryPickerOptions where
@@ -171,37 +106,78 @@ structure DirectoryPickerOptions where
   startIn : Option StartInDirectory := none
   /-- `FileSystemPermissionMode mode = "read"` -/
   mode : Option FileSystemPermissionMode := none
-instance : ToJS DirectoryPickerOptions := ⟨fun d => Support.fields #[("id", Support.optional d.id),
-    ("startIn", Support.optional d.startIn),
-    ("mode", Support.optional d.mode)]⟩
+instance : ToJS DirectoryPickerOptions := ⟨fun d => Internal.fields #[("id", Internal.optional d.id),
+    ("startIn", Internal.optional d.startIn),
+    ("mode", Internal.optional d.mode)]⟩
+
+/-- `dictionary FileSystemPermissionDescriptor : PermissionDescriptor` (File System Access (https://wicg.github.io/file-system-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure FileSystemPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required FileSystemHandle handle` -/
+  handle : FileSystemHandle
+  /-- `FileSystemPermissionMode mode = "read"` -/
+  mode : Option FileSystemPermissionMode := none
+instance : ToJS FileSystemPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("handle", toJS d.handle),
+    ("mode", Internal.optional d.mode)]⟩
+
+/-- `dictionary FilePickerOptions` (File System Access (https://wicg.github.io/file-system-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure FilePickerOptions where
+  /-- `sequence<FilePickerAcceptType> types` -/
+  types : Option (Array FilePickerAcceptType) := none
+  /-- `boolean excludeAcceptAllOption = false` -/
+  excludeAcceptAllOption : Option Bool := none
+  /-- `DOMString id` -/
+  id : Option String := none
+  /-- `StartInDirectory startIn` -/
+  startIn : Option StartInDirectory := none
+instance : ToJS FilePickerOptions := ⟨fun d => Internal.fields #[("types", Internal.optional d.types),
+    ("excludeAcceptAllOption", Internal.optional d.excludeAcceptAllOption),
+    ("id", Internal.optional d.id),
+    ("startIn", Internal.optional d.startIn)]⟩
 
 /-- `Promise<FileSystemHandle?> getAsFileSystemHandle()` -/
-def DataTransferItem.getAsFileSystemHandle (self : DataTransferItem) : Async (Option FileSystemHandle) :=
-  self.val.callMethodAwait "getAsFileSystemHandle" (Support.args #[]) (Option FileSystemHandle)
+@[macro_inline] def DataTransferItem.getAsFileSystemHandle (self : DataTransferItem) : Async (Option FileSystemHandle) := Internal.api "Lasm.JS.Web.DataTransferItem.getAsFileSystemHandle" do
+  self.val.callMethodAwait "getAsFileSystemHandle" (Internal.args #[]) (Option FileSystemHandle)
 
 /-- `Promise<PermissionState> queryPermission(optional FileSystemHandlePermissionDescriptor descriptor)` -/
-def FileSystemHandle.queryPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState :=
-  self.val.callMethodAwait "queryPermission" (Support.args #[Support.optional descriptor]) PermissionState
+@[macro_inline] def FileSystemHandle.queryPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState := Internal.api "Lasm.JS.Web.FileSystemHandle.queryPermission" do
+  self.val.callMethodAwait "queryPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
 
 /-- `Promise<PermissionState> requestPermission(optional FileSystemHandlePermissionDescriptor descriptor)` -/
-def FileSystemHandle.requestPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState :=
-  self.val.callMethodAwait "requestPermission" (Support.args #[Support.optional descriptor]) PermissionState
+@[macro_inline] def FileSystemHandle.requestPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState := Internal.api "Lasm.JS.Web.FileSystemHandle.requestPermission" do
+  self.val.callMethodAwait "requestPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
+
+/-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` -/
+@[macro_inline] def Window.showOpenFilePicker (self : Window) (options : Option OpenFilePickerOptions := none) : Async (Array FileSystemFileHandle) := Internal.api "Lasm.JS.Web.Window.showOpenFilePicker" do
+  self.val.callMethodAwait "showOpenFilePicker" (Internal.args #[Internal.optional options]) (Array FileSystemFileHandle)
+
+/-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` -/
+@[macro_inline] def Window.showSaveFilePicker (self : Window) (options : Option SaveFilePickerOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.Window.showSaveFilePicker" do
+  let r ← self.val.callMethodAwait "showSaveFilePicker" (Internal.args #[Internal.optional options]) Value
+  pure { val := r }
+
+/-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` -/
+@[macro_inline] def Window.showDirectoryPicker (self : Window) (options : Option DirectoryPickerOptions := none) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.Window.showDirectoryPicker" do
+  let r ← self.val.callMethodAwait "showDirectoryPicker" (Internal.args #[Internal.optional options]) Value
+  pure { val := r }
 
 /-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
-def showOpenFilePicker (options : Option OpenFilePickerOptions := none) : Async (Array FileSystemFileHandle) :=
+@[macro_inline] def showOpenFilePicker (options : Option OpenFilePickerOptions := none) : Async (Array FileSystemFileHandle) := Internal.api "Lasm.JS.Web.showOpenFilePicker" do
   Lasm.JS.Binding.invokeAsync (Array FileSystemFileHandle) { name := "Lasm.JS.Web.showOpenFilePicker", module := "globalThis", path := "showOpenFilePicker", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
-def showSaveFilePicker (options : Option SaveFilePickerOptions := none) : Async FileSystemFileHandle := do
+@[macro_inline] def showSaveFilePicker (options : Option SaveFilePickerOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.showSaveFilePicker" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.showSaveFilePicker", module := "globalThis", path := "showSaveFilePicker", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
-def showDirectoryPicker (options : Option DirectoryPickerOptions := none) : Async FileSystemDirectoryHandle := do
+@[macro_inline] def showDirectoryPicker (options : Option DirectoryPickerOptions := none) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.showDirectoryPicker" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.showDirectoryPicker", module := "globalThis", path := "showDirectoryPicker", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 end Lasm.JS.Web

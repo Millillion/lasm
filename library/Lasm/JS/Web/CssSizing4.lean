@@ -6,13 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `undefined requestResize()` -/
+@[macro_inline] def Window.requestResize (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.requestResize" do
+  self.val.callMethod "requestResize" (Internal.args #[]) Unit
 
 /-- `undefined requestResize()` (CSS Box Sizing Module Level 4 (https://drafts.csswg.org/css-sizing-4/)) -/
-def requestResize : IO Unit :=
+@[macro_inline] def requestResize : IO Unit := Internal.api "Lasm.JS.Web.requestResize" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.requestResize", module := "globalThis", path := "requestResize", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Web

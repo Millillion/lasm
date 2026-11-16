@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssPropertiesValuesApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PropertyDefinition` (CSS Properties and Values API Level 1 (https://drafts.css-houdini.org/css-properties-values-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PropertyDefinition where
@@ -21,30 +25,34 @@ structure PropertyDefinition where
   inherits : Option Bool := none
   /-- `DOMString initialValue` -/
   initialValue : Option String := none
-instance : ToJS PropertyDefinition := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("syntax", Support.optional d.«syntax»),
-    ("inherits", Support.optional d.inherits),
-    ("initialValue", Support.optional d.initialValue)]⟩
+instance : ToJS PropertyDefinition := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("syntax", Internal.optional d.«syntax»),
+    ("inherits", Internal.optional d.inherits),
+    ("initialValue", Internal.optional d.initialValue)]⟩
 
 /-- `v instanceof CSSPropertyRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPropertyRule`). -/
-def CSSPropertyRule.cast? (v : Value) : IO (Option CSSPropertyRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSPropertyRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSPropertyRule.cast? (v : Value) : IO (Option CSSPropertyRule) := Internal.api "Lasm.JS.Web.CSSPropertyRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSPropertyRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSPropertyRule.name (self : CSSPropertyRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSPropertyRule.name (self : CSSPropertyRule) : IO String := Internal.api "Lasm.JS.Web.CSSPropertyRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CSSOMString syntax` -/
-def CSSPropertyRule.«syntax» (self : CSSPropertyRule) : IO String := self.val.get "syntax" String
+@[macro_inline] def CSSPropertyRule.«syntax» (self : CSSPropertyRule) : IO String := Internal.api "Lasm.JS.Web.CSSPropertyRule.syntax" do
+  self.val.get "syntax" String
 
 /-- `readonly attribute boolean inherits` -/
-def CSSPropertyRule.inherits (self : CSSPropertyRule) : IO Bool := self.val.get "inherits" Bool
+@[macro_inline] def CSSPropertyRule.inherits (self : CSSPropertyRule) : IO Bool := Internal.api "Lasm.JS.Web.CSSPropertyRule.inherits" do
+  self.val.get "inherits" Bool
 
 /-- `readonly attribute CSSOMString? initialValue` -/
-def CSSPropertyRule.initialValue (self : CSSPropertyRule) : IO (Option String) := self.val.get "initialValue" (Option String)
+@[macro_inline] def CSSPropertyRule.initialValue (self : CSSPropertyRule) : IO (Option String) := Internal.api "Lasm.JS.Web.CSSPropertyRule.initialValue" do
+  self.val.get "initialValue" (Option String)
 
 /-- `undefined registerProperty(PropertyDefinition definition)` (CSS Properties and Values API Level 1 (https://drafts.css-houdini.org/css-properties-values-api-1/)) -/
-def CSS.registerProperty (definition : PropertyDefinition) : IO Unit :=
+@[macro_inline] def CSS.registerProperty (definition : PropertyDefinition) : IO Unit := Internal.api "Lasm.JS.Web.CSS.registerProperty" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.CSS.registerProperty", module := "globalThis", path := "CSS.registerProperty", construct := false, arity := 1 }
-    (Support.args #[toJS definition]) (await := false)
+    (Internal.args #[toJS definition]) (await := false)
 
 end Lasm.JS.Web

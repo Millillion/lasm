@@ -6,50 +6,58 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssRegions
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof NamedFlow`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NamedFlow`). -/
-def NamedFlow.cast? (v : Value) : IO (Option NamedFlow) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NamedFlow"] Value) v) then some { val := v } else none
+@[macro_inline] def NamedFlow.cast? (v : Value) : IO (Option NamedFlow) := Internal.api "Lasm.JS.Web.NamedFlow.cast?" do
+  Internal.cast (Internal.getGlobal ["NamedFlow"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def NamedFlow.name (self : NamedFlow) : IO String := self.val.get "name" String
+@[macro_inline] def NamedFlow.name (self : NamedFlow) : IO String := Internal.api "Lasm.JS.Web.NamedFlow.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute boolean overset` -/
-def NamedFlow.overset (self : NamedFlow) : IO Bool := self.val.get "overset" Bool
+@[macro_inline] def NamedFlow.overset (self : NamedFlow) : IO Bool := Internal.api "Lasm.JS.Web.NamedFlow.overset" do
+  self.val.get "overset" Bool
 
 /-- `readonly attribute short firstEmptyRegionIndex` -/
-def NamedFlow.firstEmptyRegionIndex (self : NamedFlow) : IO Int := self.val.get "firstEmptyRegionIndex" Int
+@[macro_inline] def NamedFlow.firstEmptyRegionIndex (self : NamedFlow) : IO Int := Internal.api "Lasm.JS.Web.NamedFlow.firstEmptyRegionIndex" do
+  self.val.get "firstEmptyRegionIndex" Int
 
 /-- `sequence<Element> getRegions()` -/
-def NamedFlow.getRegions (self : NamedFlow) : IO (Array Element) :=
-  self.val.callMethod "getRegions" (Support.args #[]) (Array Element)
+@[macro_inline] def NamedFlow.getRegions (self : NamedFlow) : IO (Array Element) := Internal.api "Lasm.JS.Web.NamedFlow.getRegions" do
+  self.val.callMethod "getRegions" (Internal.args #[]) (Array Element)
 
 /-- `sequence<Node> getContent()` -/
-def NamedFlow.getContent (self : NamedFlow) : IO (Array Node) :=
-  self.val.callMethod "getContent" (Support.args #[]) (Array Node)
+@[macro_inline] def NamedFlow.getContent (self : NamedFlow) : IO (Array Node) := Internal.api "Lasm.JS.Web.NamedFlow.getContent" do
+  self.val.callMethod "getContent" (Internal.args #[]) (Array Node)
 
 /-- `sequence<Element> getRegionsByContent(Node node)` -/
-def NamedFlow.getRegionsByContent (self : NamedFlow) (node : Node) : IO (Array Element) :=
-  self.val.callMethod "getRegionsByContent" (Support.args #[toJS node]) (Array Element)
+@[macro_inline] def NamedFlow.getRegionsByContent (self : NamedFlow) (node : Node) : IO (Array Element) := Internal.api "Lasm.JS.Web.NamedFlow.getRegionsByContent" do
+  self.val.callMethod "getRegionsByContent" (Internal.args #[toJS node]) (Array Element)
 
 /-- `v instanceof NamedFlowMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NamedFlowMap`). -/
-def NamedFlowMap.cast? (v : Value) : IO (Option NamedFlowMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NamedFlowMap"] Value) v) then some { val := v } else none
+@[macro_inline] def NamedFlowMap.cast? (v : Value) : IO (Option NamedFlowMap) := Internal.api "Lasm.JS.Web.NamedFlowMap.cast?" do
+  Internal.cast (Internal.getGlobal ["NamedFlowMap"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute NamedFlowMap namedFlows` -/
-def Document.namedFlows (self : Document) : IO NamedFlowMap := do
+@[macro_inline] def Document.namedFlows (self : Document) : IO NamedFlowMap := Internal.api "Lasm.JS.Web.Document.namedFlows" do
   let r ← self.val.get "namedFlows" Value
   pure { val := r }
 
 /-- `readonly attribute CSSOMString regionOverset` -/
-def Element.regionOverset (self : Element) : IO String := self.val.get "regionOverset" String
+@[macro_inline] def Element.regionOverset (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.regionOverset" do
+  self.val.get "regionOverset" String
 
 /-- `sequence<Range>? getRegionFlowRanges()` -/
-def Element.getRegionFlowRanges (self : Element) : IO (Option (Array Range)) :=
-  self.val.callMethod "getRegionFlowRanges" (Support.args #[]) (Option (Array Range))
+@[macro_inline] def Element.getRegionFlowRanges (self : Element) : IO (Option (Array Range)) := Internal.api "Lasm.JS.Web.Element.getRegionFlowRanges" do
+  self.val.callMethod "getRegionFlowRanges" (Internal.args #[]) (Option (Array Range))
 
 end Lasm.JS.Web

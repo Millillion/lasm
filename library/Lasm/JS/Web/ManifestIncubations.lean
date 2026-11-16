@@ -6,56 +6,63 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ManifestIncubations
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Dom
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AppBannerPromptOutcome` (Manifest Incubations (https://wicg.github.io/manifest-incubations/)): "accepted", "dismissed". -/
-inductive AppBannerPromptOutcome where
-  /-- "accepted" -/
-  | accepted
-  /-- "dismissed" -/
-  | dismissed
-  deriving BEq, Repr, Inhabited
-instance : ToJS AppBannerPromptOutcome := ⟨fun
-  | .accepted => .string "accepted"
-  | .dismissed => .string "dismissed"⟩
-instance : FromJS AppBannerPromptOutcome where
-  fromJS
-    | .string "accepted" => .ok .accepted
-    | .string "dismissed" => .ok .dismissed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AppBannerPromptOutcome"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PromptResponseObject` (Manifest Incubations (https://wicg.github.io/manifest-incubations/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PromptResponseObject where
   /-- `AppBannerPromptOutcome userChoice` -/
   userChoice : Option AppBannerPromptOutcome := none
+instance : ToJS PromptResponseObject := ⟨fun d => Internal.fields #[("userChoice", Internal.optional d.userChoice)]⟩
 instance : FromJS PromptResponseObject where
   fromJS d := do return {
     userChoice := ← Lasm.JS.readField (Option AppBannerPromptOutcome) d "userChoice" }
   typeName := "Lasm.JS.Web.PromptResponseObject"
 
 /-- `v instanceof BeforeInstallPromptEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BeforeInstallPromptEvent`). -/
-def BeforeInstallPromptEvent.cast? (v : Value) : IO (Option BeforeInstallPromptEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BeforeInstallPromptEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BeforeInstallPromptEvent.cast? (v : Value) : IO (Option BeforeInstallPromptEvent) := Internal.api "Lasm.JS.Web.BeforeInstallPromptEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BeforeInstallPromptEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional EventInit eventInitDict)` -/
-def BeforeInstallPromptEvent.new (type : String) (eventInitDict : Option EventInit := none) : IO BeforeInstallPromptEvent :=
+@[macro_inline] def BeforeInstallPromptEvent.new (type : String) (eventInitDict : Option EventInit := none) : IO BeforeInstallPromptEvent := Internal.api "Lasm.JS.Web.BeforeInstallPromptEvent.new" do
   Lasm.JS.Binding.invoke BeforeInstallPromptEvent { name := "Lasm.JS.Web.BeforeInstallPromptEvent.new", module := "globalThis", path := "BeforeInstallPromptEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `Promise<PromptResponseObject> prompt()` -/
-def BeforeInstallPromptEvent.prompt (self : BeforeInstallPromptEvent) : Async PromptResponseObject :=
-  self.val.callMethodAwait "prompt" (Support.args #[]) PromptResponseObject
+@[macro_inline] def BeforeInstallPromptEvent.prompt (self : BeforeInstallPromptEvent) : Async PromptResponseObject := Internal.api "Lasm.JS.Web.BeforeInstallPromptEvent.prompt" do
+  self.val.callMethodAwait "prompt" (Internal.args #[]) PromptResponseObject
+
+/-- `attribute EventHandler onappinstalled` -/
+@[macro_inline] def Window.onappinstalled (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onappinstalled" do
+  self.val.get "onappinstalled" (Option EventHandlerNonNull)
+
+/-- Sets `onappinstalled`: `attribute EventHandler onappinstalled` -/
+@[macro_inline] def Window.setOnappinstalled (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnappinstalled" do
+  self.val.set "onappinstalled" (toJS value)
+
+/-- `attribute EventHandler onbeforeinstallprompt` -/
+@[macro_inline] def Window.onbeforeinstallprompt (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onbeforeinstallprompt" do
+  self.val.get "onbeforeinstallprompt" (Option EventHandlerNonNull)
+
+/-- Sets `onbeforeinstallprompt`: `attribute EventHandler onbeforeinstallprompt` -/
+@[macro_inline] def Window.setOnbeforeinstallprompt (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnbeforeinstallprompt" do
+  self.val.set "onbeforeinstallprompt" (toJS value)
 
 /-- `attribute EventHandler onappinstalled` (Manifest Incubations (https://wicg.github.io/manifest-incubations/)) -/
-def onappinstalled : IO (Option EventHandlerNonNull) := Support.getGlobal ["onappinstalled"] (Option EventHandlerNonNull)
+@[macro_inline] def onappinstalled : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onappinstalled" do
+  Internal.getGlobal ["onappinstalled"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onbeforeinstallprompt` (Manifest Incubations (https://wicg.github.io/manifest-incubations/)) -/
-def onbeforeinstallprompt : IO (Option EventHandlerNonNull) := Support.getGlobal ["onbeforeinstallprompt"] (Option EventHandlerNonNull)
+@[macro_inline] def onbeforeinstallprompt : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforeinstallprompt" do
+  Internal.getGlobal ["onbeforeinstallprompt"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

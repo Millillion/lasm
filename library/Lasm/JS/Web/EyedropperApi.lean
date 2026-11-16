@@ -6,37 +6,42 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.EyedropperApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ColorSelectionOptions` (EyeDropper API (https://wicg.github.io/eyedropper-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ColorSelectionOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ColorSelectionOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS ColorSelectionOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary ColorSelectionResult` (EyeDropper API (https://wicg.github.io/eyedropper-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ColorSelectionResult where
   /-- `DOMString sRGBHex` -/
   sRGBHex : Option String := none
+instance : ToJS ColorSelectionResult := ⟨fun d => Internal.fields #[("sRGBHex", Internal.optional d.sRGBHex)]⟩
 instance : FromJS ColorSelectionResult where
   fromJS d := do return {
     sRGBHex := ← Lasm.JS.readField (Option String) d "sRGBHex" }
   typeName := "Lasm.JS.Web.ColorSelectionResult"
 
 /-- `v instanceof EyeDropper`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EyeDropper`). -/
-def EyeDropper.cast? (v : Value) : IO (Option EyeDropper) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EyeDropper"] Value) v) then some { val := v } else none
+@[macro_inline] def EyeDropper.cast? (v : Value) : IO (Option EyeDropper) := Internal.api "Lasm.JS.Web.EyeDropper.cast?" do
+  Internal.cast (Internal.getGlobal ["EyeDropper"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def EyeDropper.new : IO EyeDropper :=
+@[macro_inline] def EyeDropper.new : IO EyeDropper := Internal.api "Lasm.JS.Web.EyeDropper.new" do
   Lasm.JS.Binding.invoke EyeDropper { name := "Lasm.JS.Web.EyeDropper.new", module := "globalThis", path := "EyeDropper", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Promise<ColorSelectionResult> open(optional ColorSelectionOptions options)` -/
-def EyeDropper.«open» (self : EyeDropper) (options : Option ColorSelectionOptions := none) : Async ColorSelectionResult :=
-  self.val.callMethodAwait "open" (Support.args #[Support.optional options]) ColorSelectionResult
+@[macro_inline] def EyeDropper.«open» (self : EyeDropper) (options : Option ColorSelectionOptions := none) : Async ColorSelectionResult := Internal.api "Lasm.JS.Web.EyeDropper.open" do
+  self.val.callMethodAwait "open" (Internal.args #[Internal.optional options]) ColorSelectionResult
 
 end Lasm.JS.Web

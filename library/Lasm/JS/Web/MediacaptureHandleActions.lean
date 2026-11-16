@@ -6,36 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureHandleActions
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CaptureAction` (The Capture-Handle Actions Mechanism (https://w3c.github.io/mediacapture-handle/actions/)): "next", "previous", "first", "last". -/
-inductive CaptureAction where
-  /-- "next" -/
-  | next
-  /-- "previous" -/
-  | previous
-  /-- "first" -/
-  | first
-  /-- "last" -/
-  | last
-  deriving BEq, Repr, Inhabited
-instance : ToJS CaptureAction := ⟨fun
-  | .next => .string "next"
-  | .previous => .string "previous"
-  | .first => .string "first"
-  | .last => .string "last"⟩
-instance : FromJS CaptureAction where
-  fromJS
-    | .string "next" => .ok .next
-    | .string "previous" => .ok .previous
-    | .string "first" => .ok .first
-    | .string "last" => .ok .last
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CaptureAction"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CaptureActionEventInit : EventInit` (The Capture-Handle Actions Mechanism (https://w3c.github.io/mediacapture-handle/actions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaptureActionEventInit where
@@ -47,40 +27,42 @@ structure CaptureActionEventInit where
   composed : Option Bool := none
   /-- `DOMString action` -/
   action : Option String := none
-instance : ToJS CaptureActionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("action", Support.optional d.action)]⟩
+instance : ToJS CaptureActionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("action", Internal.optional d.action)]⟩
 
 /-- `v instanceof CaptureActionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CaptureActionEvent`). -/
-def CaptureActionEvent.cast? (v : Value) : IO (Option CaptureActionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CaptureActionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CaptureActionEvent.cast? (v : Value) : IO (Option CaptureActionEvent) := Internal.api "Lasm.JS.Web.CaptureActionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CaptureActionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional CaptureActionEventInit init)` -/
-def CaptureActionEvent.new (init : Option CaptureActionEventInit := none) : IO CaptureActionEvent :=
+@[macro_inline] def CaptureActionEvent.new (init : Option CaptureActionEventInit := none) : IO CaptureActionEvent := Internal.api "Lasm.JS.Web.CaptureActionEvent.new" do
   Lasm.JS.Binding.invoke CaptureActionEvent { name := "Lasm.JS.Web.CaptureActionEvent.new", module := "globalThis", path := "CaptureActionEvent", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute CaptureAction action` -/
-def CaptureActionEvent.action (self : CaptureActionEvent) : IO CaptureAction := self.val.get "action" CaptureAction
+@[macro_inline] def CaptureActionEvent.action (self : CaptureActionEvent) : IO CaptureAction := Internal.api "Lasm.JS.Web.CaptureActionEvent.action" do
+  self.val.get "action" CaptureAction
 
 /-- `attribute EventHandler oncaptureaction` -/
-def MediaDevices.oncaptureaction (self : MediaDevices) : IO (Option EventHandlerNonNull) := self.val.get "oncaptureaction" (Option EventHandlerNonNull)
+@[macro_inline] def MediaDevices.oncaptureaction (self : MediaDevices) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaDevices.oncaptureaction" do
+  self.val.get "oncaptureaction" (Option EventHandlerNonNull)
 
 /-- Sets `oncaptureaction`: `attribute EventHandler oncaptureaction` -/
-def MediaDevices.setOncaptureaction (self : MediaDevices) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaDevices.setOncaptureaction (self : MediaDevices) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaDevices.setOncaptureaction" do
   self.val.set "oncaptureaction" (toJS value)
 
 /-- `undefined setSupportedCaptureActions(sequence<DOMString> actions)` -/
-def MediaDevices.setSupportedCaptureActions (self : MediaDevices) (actions : Array String) : IO Unit :=
-  self.val.callMethod "setSupportedCaptureActions" (Support.args #[toJS actions]) Unit
+@[macro_inline] def MediaDevices.setSupportedCaptureActions (self : MediaDevices) (actions : Array String) : IO Unit := Internal.api "Lasm.JS.Web.MediaDevices.setSupportedCaptureActions" do
+  self.val.callMethod "setSupportedCaptureActions" (Internal.args #[toJS actions]) Unit
 
 /-- `sequence<DOMString> getSupportedCaptureActions()` -/
-def MediaStreamTrack.getSupportedCaptureActions (self : MediaStreamTrack) : IO (Array String) :=
-  self.val.callMethod "getSupportedCaptureActions" (Support.args #[]) (Array String)
+@[macro_inline] def MediaStreamTrack.getSupportedCaptureActions (self : MediaStreamTrack) : IO (Array String) := Internal.api "Lasm.JS.Web.MediaStreamTrack.getSupportedCaptureActions" do
+  self.val.callMethod "getSupportedCaptureActions" (Internal.args #[]) (Array String)
 
 /-- `Promise<undefined> sendCaptureAction(CaptureAction action)` -/
-def MediaStreamTrack.sendCaptureAction (self : MediaStreamTrack) (action : CaptureAction) : Async Unit :=
-  self.val.callMethodAwait "sendCaptureAction" (Support.args #[toJS action]) Unit
+@[macro_inline] def MediaStreamTrack.sendCaptureAction (self : MediaStreamTrack) (action : CaptureAction) : Async Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.sendCaptureAction" do
+  self.val.callMethodAwait "sendCaptureAction" (Internal.args #[toJS action]) Unit
 
 end Lasm.JS.Web

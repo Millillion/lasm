@@ -6,25 +6,30 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.KeyboardLock
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof Keyboard`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Keyboard`). -/
-def Keyboard.cast? (v : Value) : IO (Option Keyboard) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Keyboard"] Value) v) then some { val := v } else none
+@[macro_inline] def Keyboard.cast? (v : Value) : IO (Option Keyboard) := Internal.api "Lasm.JS.Web.Keyboard.cast?" do
+  Internal.cast (Internal.getGlobal ["Keyboard"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> lock(optional sequence<DOMString> keyCodes)` -/
-def Keyboard.lock (self : Keyboard) (keyCodes : Option (Array String) := none) : Async Unit :=
-  self.val.callMethodAwait "lock" (Support.args #[Support.optional keyCodes]) Unit
+@[macro_inline] def Keyboard.lock (self : Keyboard) (keyCodes : Option (Array String) := none) : Async Unit := Internal.api "Lasm.JS.Web.Keyboard.lock" do
+  self.val.callMethodAwait "lock" (Internal.args #[Internal.optional keyCodes]) Unit
 
 /-- `undefined unlock()` -/
-def Keyboard.unlock (self : Keyboard) : IO Unit :=
-  self.val.callMethod "unlock" (Support.args #[]) Unit
+@[macro_inline] def Keyboard.unlock (self : Keyboard) : IO Unit := Internal.api "Lasm.JS.Web.Keyboard.unlock" do
+  self.val.callMethod "unlock" (Internal.args #[]) Unit
 
 /-- `readonly attribute Keyboard keyboard` -/
-def Navigator.keyboard (self : Navigator) : IO Keyboard := do
+@[macro_inline] def Navigator.keyboard (self : Navigator) : IO Keyboard := Internal.api "Lasm.JS.Web.Navigator.keyboard" do
   let r ← self.val.get "keyboard" Value
   pure { val := r }
 

@@ -9,5 +9,26 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary InterventionReportBody : ReportBody` (Intervention Reporting (https://wicg.github.io/intervention-reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure InterventionReportBody where
+  /-- `DOMString id` -/
+  id : Option String := none
+  /-- `DOMString message` -/
+  message : Option String := none
+  /-- `DOMString? sourceFile` -/
+  sourceFile : Option String := none
+  /-- `unsigned long? lineNumber` -/
+  lineNumber : Option Nat := none
+  /-- `unsigned long? columnNumber` -/
+  columnNumber : Option Nat := none
+instance : ToJS InterventionReportBody := ⟨fun d => Internal.fields #[("id", Internal.optional d.id),
+    ("message", Internal.optional d.message),
+    ("sourceFile", Internal.optional d.sourceFile),
+    ("lineNumber", Internal.optional d.lineNumber),
+    ("columnNumber", Internal.optional d.columnNumber)]⟩
 
 end Lasm.JS.Web

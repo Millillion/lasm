@@ -6,52 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.HrTime
+import Lasm.JS.Web.Types.ResourceTiming
+import Lasm.JS.Web.Types.NavigationTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum NavigationTimingType` (Navigation Timing Level 2 (https://w3c.github.io/navigation-timing/)): "navigate", "reload", "back_forward". -/
-inductive NavigationTimingType where
-  /-- "navigate" -/
-  | navigate
-  /-- "reload" -/
-  | reload
-  /-- "back_forward" -/
-  | backForward
-  deriving BEq, Repr, Inhabited
-instance : ToJS NavigationTimingType := ⟨fun
-  | .navigate => .string "navigate"
-  | .reload => .string "reload"
-  | .backForward => .string "back_forward"⟩
-instance : FromJS NavigationTimingType where
-  fromJS
-    | .string "navigate" => .ok .navigate
-    | .string "reload" => .ok .reload
-    | .string "back_forward" => .ok .backForward
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.NavigationTimingType"
-
-/-- `enum PerformanceTimingConfidenceValue` (Navigation Timing Level 2 (https://w3c.github.io/navigation-timing/)): "high", "low". -/
-inductive PerformanceTimingConfidenceValue where
-  /-- "high" -/
-  | high
-  /-- "low" -/
-  | low
-  deriving BEq, Repr, Inhabited
-instance : ToJS PerformanceTimingConfidenceValue := ⟨fun
-  | .high => .string "high"
-  | .low => .string "low"⟩
-instance : FromJS PerformanceTimingConfidenceValue where
-  fromJS
-    | .string "high" => .ok .high
-    | .string "low" => .ok .low
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PerformanceTimingConfidenceValue"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceNavigation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNavigation`). -/
-def PerformanceNavigation.cast? (v : Value) : IO (Option PerformanceNavigation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceNavigation"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceNavigation.cast? (v : Value) : IO (Option PerformanceNavigation) := Internal.api "Lasm.JS.Web.PerformanceNavigation.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceNavigation"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short TYPE_NAVIGATE = 0` -/
 def PerformanceNavigation.TYPE_NAVIGATE : Nat := 0
@@ -66,156 +34,193 @@ def PerformanceNavigation.TYPE_BACK_FORWARD : Nat := 2
 def PerformanceNavigation.TYPE_RESERVED : Nat := 255
 
 /-- `readonly attribute unsigned short type` -/
-def PerformanceNavigation.type (self : PerformanceNavigation) : IO Nat := self.val.get "type" Nat
+@[macro_inline] def PerformanceNavigation.type (self : PerformanceNavigation) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceNavigation.type" do
+  self.val.get "type" Nat
 
 /-- `readonly attribute unsigned short redirectCount` -/
-def PerformanceNavigation.redirectCount (self : PerformanceNavigation) : IO Nat := self.val.get "redirectCount" Nat
+@[macro_inline] def PerformanceNavigation.redirectCount (self : PerformanceNavigation) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceNavigation.redirectCount" do
+  self.val.get "redirectCount" Nat
 
 /-- `object toJSON()` -/
-def PerformanceNavigation.toJSON (self : PerformanceNavigation) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceNavigation.toJSON (self : PerformanceNavigation) : IO Data := Internal.api "Lasm.JS.Web.PerformanceNavigation.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceNavigationTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNavigationTiming`). -/
-def PerformanceNavigationTiming.cast? (v : Value) : IO (Option PerformanceNavigationTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceNavigationTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceNavigationTiming.cast? (v : Value) : IO (Option PerformanceNavigationTiming) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceNavigationTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp unloadEventStart` -/
-def PerformanceNavigationTiming.unloadEventStart (self : PerformanceNavigationTiming) : IO Float := self.val.get "unloadEventStart" Float
+@[macro_inline] def PerformanceNavigationTiming.unloadEventStart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.unloadEventStart" do
+  self.val.get "unloadEventStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp unloadEventEnd` -/
-def PerformanceNavigationTiming.unloadEventEnd (self : PerformanceNavigationTiming) : IO Float := self.val.get "unloadEventEnd" Float
+@[macro_inline] def PerformanceNavigationTiming.unloadEventEnd (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.unloadEventEnd" do
+  self.val.get "unloadEventEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domInteractive` -/
-def PerformanceNavigationTiming.domInteractive (self : PerformanceNavigationTiming) : IO Float := self.val.get "domInteractive" Float
+@[macro_inline] def PerformanceNavigationTiming.domInteractive (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.domInteractive" do
+  self.val.get "domInteractive" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domContentLoadedEventStart` -/
-def PerformanceNavigationTiming.domContentLoadedEventStart (self : PerformanceNavigationTiming) : IO Float := self.val.get "domContentLoadedEventStart" Float
+@[macro_inline] def PerformanceNavigationTiming.domContentLoadedEventStart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.domContentLoadedEventStart" do
+  self.val.get "domContentLoadedEventStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domContentLoadedEventEnd` -/
-def PerformanceNavigationTiming.domContentLoadedEventEnd (self : PerformanceNavigationTiming) : IO Float := self.val.get "domContentLoadedEventEnd" Float
+@[macro_inline] def PerformanceNavigationTiming.domContentLoadedEventEnd (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.domContentLoadedEventEnd" do
+  self.val.get "domContentLoadedEventEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domComplete` -/
-def PerformanceNavigationTiming.domComplete (self : PerformanceNavigationTiming) : IO Float := self.val.get "domComplete" Float
+@[macro_inline] def PerformanceNavigationTiming.domComplete (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.domComplete" do
+  self.val.get "domComplete" Float
 
 /-- `readonly attribute DOMHighResTimeStamp loadEventStart` -/
-def PerformanceNavigationTiming.loadEventStart (self : PerformanceNavigationTiming) : IO Float := self.val.get "loadEventStart" Float
+@[macro_inline] def PerformanceNavigationTiming.loadEventStart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.loadEventStart" do
+  self.val.get "loadEventStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp loadEventEnd` -/
-def PerformanceNavigationTiming.loadEventEnd (self : PerformanceNavigationTiming) : IO Float := self.val.get "loadEventEnd" Float
+@[macro_inline] def PerformanceNavigationTiming.loadEventEnd (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.loadEventEnd" do
+  self.val.get "loadEventEnd" Float
 
 /-- `readonly attribute NavigationTimingType type` -/
-def PerformanceNavigationTiming.type (self : PerformanceNavigationTiming) : IO NavigationTimingType := self.val.get "type" NavigationTimingType
+@[macro_inline] def PerformanceNavigationTiming.type (self : PerformanceNavigationTiming) : IO NavigationTimingType := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.type" do
+  self.val.get "type" NavigationTimingType
 
 /-- `readonly attribute unsigned short redirectCount` -/
-def PerformanceNavigationTiming.redirectCount (self : PerformanceNavigationTiming) : IO Nat := self.val.get "redirectCount" Nat
+@[macro_inline] def PerformanceNavigationTiming.redirectCount (self : PerformanceNavigationTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.redirectCount" do
+  self.val.get "redirectCount" Nat
 
 /-- `readonly attribute DOMHighResTimeStamp criticalCHRestart` -/
-def PerformanceNavigationTiming.criticalCHRestart (self : PerformanceNavigationTiming) : IO Float := self.val.get "criticalCHRestart" Float
+@[macro_inline] def PerformanceNavigationTiming.criticalCHRestart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.criticalCHRestart" do
+  self.val.get "criticalCHRestart" Float
 
 /-- `readonly attribute NotRestoredReasons? notRestoredReasons` -/
-def PerformanceNavigationTiming.notRestoredReasons (self : PerformanceNavigationTiming) : IO (Option NotRestoredReasons) := self.val.get "notRestoredReasons" (Option NotRestoredReasons)
+@[macro_inline] def PerformanceNavigationTiming.notRestoredReasons (self : PerformanceNavigationTiming) : IO (Option NotRestoredReasons) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.notRestoredReasons" do
+  self.val.get "notRestoredReasons" (Option NotRestoredReasons)
 
 /-- `readonly attribute PerformanceTimingConfidence confidence` -/
-def PerformanceNavigationTiming.confidence (self : PerformanceNavigationTiming) : IO PerformanceTimingConfidence := do
+@[macro_inline] def PerformanceNavigationTiming.confidence (self : PerformanceNavigationTiming) : IO PerformanceTimingConfidence := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.confidence" do
   let r ← self.val.get "confidence" Value
   pure { val := r }
 
 /-- `object toJSON()` -/
-def PerformanceNavigationTiming.toJSON (self : PerformanceNavigationTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceNavigationTiming.toJSON (self : PerformanceNavigationTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceTiming`). -/
-def PerformanceTiming.cast? (v : Value) : IO (Option PerformanceTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceTiming.cast? (v : Value) : IO (Option PerformanceTiming) := Internal.api "Lasm.JS.Web.PerformanceTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long long navigationStart` -/
-def PerformanceTiming.navigationStart (self : PerformanceTiming) : IO Nat := self.val.get "navigationStart" Nat
+@[macro_inline] def PerformanceTiming.navigationStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.navigationStart" do
+  self.val.get "navigationStart" Nat
 
 /-- `readonly attribute unsigned long long unloadEventStart` -/
-def PerformanceTiming.unloadEventStart (self : PerformanceTiming) : IO Nat := self.val.get "unloadEventStart" Nat
+@[macro_inline] def PerformanceTiming.unloadEventStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.unloadEventStart" do
+  self.val.get "unloadEventStart" Nat
 
 /-- `readonly attribute unsigned long long unloadEventEnd` -/
-def PerformanceTiming.unloadEventEnd (self : PerformanceTiming) : IO Nat := self.val.get "unloadEventEnd" Nat
+@[macro_inline] def PerformanceTiming.unloadEventEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.unloadEventEnd" do
+  self.val.get "unloadEventEnd" Nat
 
 /-- `readonly attribute unsigned long long redirectStart` -/
-def PerformanceTiming.redirectStart (self : PerformanceTiming) : IO Nat := self.val.get "redirectStart" Nat
+@[macro_inline] def PerformanceTiming.redirectStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.redirectStart" do
+  self.val.get "redirectStart" Nat
 
 /-- `readonly attribute unsigned long long redirectEnd` -/
-def PerformanceTiming.redirectEnd (self : PerformanceTiming) : IO Nat := self.val.get "redirectEnd" Nat
+@[macro_inline] def PerformanceTiming.redirectEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.redirectEnd" do
+  self.val.get "redirectEnd" Nat
 
 /-- `readonly attribute unsigned long long fetchStart` -/
-def PerformanceTiming.fetchStart (self : PerformanceTiming) : IO Nat := self.val.get "fetchStart" Nat
+@[macro_inline] def PerformanceTiming.fetchStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.fetchStart" do
+  self.val.get "fetchStart" Nat
 
 /-- `readonly attribute unsigned long long domainLookupStart` -/
-def PerformanceTiming.domainLookupStart (self : PerformanceTiming) : IO Nat := self.val.get "domainLookupStart" Nat
+@[macro_inline] def PerformanceTiming.domainLookupStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domainLookupStart" do
+  self.val.get "domainLookupStart" Nat
 
 /-- `readonly attribute unsigned long long domainLookupEnd` -/
-def PerformanceTiming.domainLookupEnd (self : PerformanceTiming) : IO Nat := self.val.get "domainLookupEnd" Nat
+@[macro_inline] def PerformanceTiming.domainLookupEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domainLookupEnd" do
+  self.val.get "domainLookupEnd" Nat
 
 /-- `readonly attribute unsigned long long connectStart` -/
-def PerformanceTiming.connectStart (self : PerformanceTiming) : IO Nat := self.val.get "connectStart" Nat
+@[macro_inline] def PerformanceTiming.connectStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.connectStart" do
+  self.val.get "connectStart" Nat
 
 /-- `readonly attribute unsigned long long connectEnd` -/
-def PerformanceTiming.connectEnd (self : PerformanceTiming) : IO Nat := self.val.get "connectEnd" Nat
+@[macro_inline] def PerformanceTiming.connectEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.connectEnd" do
+  self.val.get "connectEnd" Nat
 
 /-- `readonly attribute unsigned long long secureConnectionStart` -/
-def PerformanceTiming.secureConnectionStart (self : PerformanceTiming) : IO Nat := self.val.get "secureConnectionStart" Nat
+@[macro_inline] def PerformanceTiming.secureConnectionStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.secureConnectionStart" do
+  self.val.get "secureConnectionStart" Nat
 
 /-- `readonly attribute unsigned long long requestStart` -/
-def PerformanceTiming.requestStart (self : PerformanceTiming) : IO Nat := self.val.get "requestStart" Nat
+@[macro_inline] def PerformanceTiming.requestStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.requestStart" do
+  self.val.get "requestStart" Nat
 
 /-- `readonly attribute unsigned long long responseStart` -/
-def PerformanceTiming.responseStart (self : PerformanceTiming) : IO Nat := self.val.get "responseStart" Nat
+@[macro_inline] def PerformanceTiming.responseStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.responseStart" do
+  self.val.get "responseStart" Nat
 
 /-- `readonly attribute unsigned long long responseEnd` -/
-def PerformanceTiming.responseEnd (self : PerformanceTiming) : IO Nat := self.val.get "responseEnd" Nat
+@[macro_inline] def PerformanceTiming.responseEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.responseEnd" do
+  self.val.get "responseEnd" Nat
 
 /-- `readonly attribute unsigned long long domLoading` -/
-def PerformanceTiming.domLoading (self : PerformanceTiming) : IO Nat := self.val.get "domLoading" Nat
+@[macro_inline] def PerformanceTiming.domLoading (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domLoading" do
+  self.val.get "domLoading" Nat
 
 /-- `readonly attribute unsigned long long domInteractive` -/
-def PerformanceTiming.domInteractive (self : PerformanceTiming) : IO Nat := self.val.get "domInteractive" Nat
+@[macro_inline] def PerformanceTiming.domInteractive (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domInteractive" do
+  self.val.get "domInteractive" Nat
 
 /-- `readonly attribute unsigned long long domContentLoadedEventStart` -/
-def PerformanceTiming.domContentLoadedEventStart (self : PerformanceTiming) : IO Nat := self.val.get "domContentLoadedEventStart" Nat
+@[macro_inline] def PerformanceTiming.domContentLoadedEventStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domContentLoadedEventStart" do
+  self.val.get "domContentLoadedEventStart" Nat
 
 /-- `readonly attribute unsigned long long domContentLoadedEventEnd` -/
-def PerformanceTiming.domContentLoadedEventEnd (self : PerformanceTiming) : IO Nat := self.val.get "domContentLoadedEventEnd" Nat
+@[macro_inline] def PerformanceTiming.domContentLoadedEventEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domContentLoadedEventEnd" do
+  self.val.get "domContentLoadedEventEnd" Nat
 
 /-- `readonly attribute unsigned long long domComplete` -/
-def PerformanceTiming.domComplete (self : PerformanceTiming) : IO Nat := self.val.get "domComplete" Nat
+@[macro_inline] def PerformanceTiming.domComplete (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.domComplete" do
+  self.val.get "domComplete" Nat
 
 /-- `readonly attribute unsigned long long loadEventStart` -/
-def PerformanceTiming.loadEventStart (self : PerformanceTiming) : IO Nat := self.val.get "loadEventStart" Nat
+@[macro_inline] def PerformanceTiming.loadEventStart (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.loadEventStart" do
+  self.val.get "loadEventStart" Nat
 
 /-- `readonly attribute unsigned long long loadEventEnd` -/
-def PerformanceTiming.loadEventEnd (self : PerformanceTiming) : IO Nat := self.val.get "loadEventEnd" Nat
+@[macro_inline] def PerformanceTiming.loadEventEnd (self : PerformanceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceTiming.loadEventEnd" do
+  self.val.get "loadEventEnd" Nat
 
 /-- `object toJSON()` -/
-def PerformanceTiming.toJSON (self : PerformanceTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceTiming.toJSON (self : PerformanceTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceTimingConfidence`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceTimingConfidence`). -/
-def PerformanceTimingConfidence.cast? (v : Value) : IO (Option PerformanceTimingConfidence) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceTimingConfidence"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceTimingConfidence.cast? (v : Value) : IO (Option PerformanceTimingConfidence) := Internal.api "Lasm.JS.Web.PerformanceTimingConfidence.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceTimingConfidence"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double randomizedTriggerRate` -/
-def PerformanceTimingConfidence.randomizedTriggerRate (self : PerformanceTimingConfidence) : IO Float := self.val.get "randomizedTriggerRate" Float
+@[macro_inline] def PerformanceTimingConfidence.randomizedTriggerRate (self : PerformanceTimingConfidence) : IO Float := Internal.api "Lasm.JS.Web.PerformanceTimingConfidence.randomizedTriggerRate" do
+  self.val.get "randomizedTriggerRate" Float
 
 /-- `readonly attribute PerformanceTimingConfidenceValue value` -/
-def PerformanceTimingConfidence.value (self : PerformanceTimingConfidence) : IO PerformanceTimingConfidenceValue := self.val.get "value" PerformanceTimingConfidenceValue
+@[macro_inline] def PerformanceTimingConfidence.value (self : PerformanceTimingConfidence) : IO PerformanceTimingConfidenceValue := Internal.api "Lasm.JS.Web.PerformanceTimingConfidence.value" do
+  self.val.get "value" PerformanceTimingConfidenceValue
 
 /-- `object toJSON()` -/
-def PerformanceTimingConfidence.toJSON (self : PerformanceTimingConfidence) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceTimingConfidence.toJSON (self : PerformanceTimingConfidence) : IO Data := Internal.api "Lasm.JS.Web.PerformanceTimingConfidence.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `readonly attribute PerformanceTiming timing` -/
-def Performance.timing (self : Performance) : IO PerformanceTiming := do
+@[macro_inline] def Performance.timing (self : Performance) : IO PerformanceTiming := Internal.api "Lasm.JS.Web.Performance.timing" do
   let r ← self.val.get "timing" Value
   pure { val := r }
 
 /-- `readonly attribute PerformanceNavigation navigation` -/
-def Performance.navigation (self : Performance) : IO PerformanceNavigation := do
+@[macro_inline] def Performance.navigation (self : Performance) : IO PerformanceNavigation := Internal.api "Lasm.JS.Web.Performance.navigation" do
   let r ← self.val.get "navigation" Value
   pure { val := r }
 

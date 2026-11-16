@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLPolygonMode
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum POLYGON_MODE_WEBGL = 0x0B40` -/
 def WEBGL_polygon_mode.POLYGON_MODE_WEBGL : Nat := 0x0B40
@@ -23,7 +27,7 @@ def WEBGL_polygon_mode.LINE_WEBGL : Nat := 0x1B01
 def WEBGL_polygon_mode.FILL_WEBGL : Nat := 0x1B02
 
 /-- `undefined polygonModeWEBGL(GLenum face, GLenum mode)` -/
-def WEBGL_polygon_mode.polygonModeWEBGL (self : WEBGL_polygon_mode) (face : Nat) (mode : Nat) : IO Unit :=
-  self.val.callMethod "polygonModeWEBGL" (Support.args #[toJS face, toJS mode]) Unit
+@[macro_inline] def WEBGL_polygon_mode.polygonModeWEBGL (self : WEBGL_polygon_mode) (face : Nat) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_polygon_mode.polygonModeWEBGL" do
+  self.val.callMethod "polygonModeWEBGL" (Internal.args #[toJS face, toJS mode]) Unit
 
 end Lasm.JS.Web

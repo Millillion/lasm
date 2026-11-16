@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.OVRMultiview2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum FRAMEBUFFER_ATTACHMENT_TEXTURE_NUM_VIEWS_OVR = 0x9630` -/
 def OVR_multiview2.FRAMEBUFFER_ATTACHMENT_TEXTURE_NUM_VIEWS_OVR : Nat := 0x9630
@@ -24,7 +28,7 @@ def OVR_multiview2.MAX_VIEWS_OVR : Nat := 0x9631
 def OVR_multiview2.FRAMEBUFFER_INCOMPLETE_VIEW_TARGETS_OVR : Nat := 0x9633
 
 /-- `undefined framebufferTextureMultiviewOVR(GLenum target, GLenum attachment, WebGLTexture? texture, GLint level, GLint baseViewIndex, GLsizei numViews)` -/
-def OVR_multiview2.framebufferTextureMultiviewOVR (self : OVR_multiview2) (target : Nat) (attachment : Nat) (texture : Option WebGLTexture) (level : Int) (baseViewIndex : Int) (numViews : Int) : IO Unit :=
-  self.val.callMethod "framebufferTextureMultiviewOVR" (Support.args #[toJS target, toJS attachment, toJS texture, toJS level, toJS baseViewIndex, toJS numViews]) Unit
+@[macro_inline] def OVR_multiview2.framebufferTextureMultiviewOVR (self : OVR_multiview2) (target : Nat) (attachment : Nat) (texture : Option WebGLTexture) (level : Int) (baseViewIndex : Int) (numViews : Int) : IO Unit := Internal.api "Lasm.JS.Web.OVR_multiview2.framebufferTextureMultiviewOVR" do
+  self.val.callMethod "framebufferTextureMultiviewOVR" (Internal.args #[toJS target, toJS attachment, toJS texture, toJS level, toJS baseViewIndex, toJS numViews]) Unit
 
 end Lasm.JS.Web

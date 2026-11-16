@@ -6,678 +6,776 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof MathMLElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MathMLElement`). -/
-def MathMLElement.cast? (v : Value) : IO (Option MathMLElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MathMLElement"] Value) v) then some { val := v } else none
+@[macro_inline] def MathMLElement.cast? (v : Value) : IO (Option MathMLElement) := Internal.api "Lasm.JS.Web.MathMLElement.cast?" do
+  Internal.cast (Internal.getGlobal ["MathMLElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onabort` -/
-def MathMLElement.onabort (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onabort (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def MathMLElement.setOnabort (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnabort (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler onauxclick` -/
-def MathMLElement.onauxclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onauxclick" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onauxclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onauxclick" do
+  self.val.get "onauxclick" (Option EventHandlerNonNull)
 
 /-- Sets `onauxclick`: `attribute EventHandler onauxclick` -/
-def MathMLElement.setOnauxclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnauxclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnauxclick" do
   self.val.set "onauxclick" (toJS value)
 
 /-- `attribute EventHandler onbeforeinput` -/
-def MathMLElement.onbeforeinput (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforeinput" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onbeforeinput (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onbeforeinput" do
+  self.val.get "onbeforeinput" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforeinput`: `attribute EventHandler onbeforeinput` -/
-def MathMLElement.setOnbeforeinput (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnbeforeinput (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnbeforeinput" do
   self.val.set "onbeforeinput" (toJS value)
 
 /-- `attribute EventHandler onbeforematch` -/
-def MathMLElement.onbeforematch (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforematch" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onbeforematch (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onbeforematch" do
+  self.val.get "onbeforematch" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforematch`: `attribute EventHandler onbeforematch` -/
-def MathMLElement.setOnbeforematch (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnbeforematch (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnbeforematch" do
   self.val.set "onbeforematch" (toJS value)
 
 /-- `attribute EventHandler onbeforetoggle` -/
-def MathMLElement.onbeforetoggle (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforetoggle" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onbeforetoggle (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onbeforetoggle" do
+  self.val.get "onbeforetoggle" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforetoggle`: `attribute EventHandler onbeforetoggle` -/
-def MathMLElement.setOnbeforetoggle (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnbeforetoggle (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnbeforetoggle" do
   self.val.set "onbeforetoggle" (toJS value)
 
 /-- `attribute EventHandler onblur` -/
-def MathMLElement.onblur (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onblur" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onblur (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onblur" do
+  self.val.get "onblur" (Option EventHandlerNonNull)
 
 /-- Sets `onblur`: `attribute EventHandler onblur` -/
-def MathMLElement.setOnblur (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnblur (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnblur" do
   self.val.set "onblur" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def MathMLElement.oncancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def MathMLElement.setOncancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `attribute EventHandler oncanplay` -/
-def MathMLElement.oncanplay (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncanplay" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncanplay (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncanplay" do
+  self.val.get "oncanplay" (Option EventHandlerNonNull)
 
 /-- Sets `oncanplay`: `attribute EventHandler oncanplay` -/
-def MathMLElement.setOncanplay (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncanplay (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncanplay" do
   self.val.set "oncanplay" (toJS value)
 
 /-- `attribute EventHandler oncanplaythrough` -/
-def MathMLElement.oncanplaythrough (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncanplaythrough" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncanplaythrough (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncanplaythrough" do
+  self.val.get "oncanplaythrough" (Option EventHandlerNonNull)
 
 /-- Sets `oncanplaythrough`: `attribute EventHandler oncanplaythrough` -/
-def MathMLElement.setOncanplaythrough (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncanplaythrough (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncanplaythrough" do
   self.val.set "oncanplaythrough" (toJS value)
 
 /-- `attribute EventHandler onchange` -/
-def MathMLElement.onchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def MathMLElement.setOnchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `attribute EventHandler onclick` -/
-def MathMLElement.onclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onclick" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onclick" do
+  self.val.get "onclick" (Option EventHandlerNonNull)
 
 /-- Sets `onclick`: `attribute EventHandler onclick` -/
-def MathMLElement.setOnclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnclick" do
   self.val.set "onclick" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def MathMLElement.onclose (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onclose (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def MathMLElement.setOnclose (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnclose (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `attribute EventHandler oncommand` -/
-def MathMLElement.oncommand (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncommand" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncommand (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncommand" do
+  self.val.get "oncommand" (Option EventHandlerNonNull)
 
 /-- Sets `oncommand`: `attribute EventHandler oncommand` -/
-def MathMLElement.setOncommand (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncommand (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncommand" do
   self.val.set "oncommand" (toJS value)
 
 /-- `attribute EventHandler oncontextlost` -/
-def MathMLElement.oncontextlost (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextlost" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncontextlost (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncontextlost" do
+  self.val.get "oncontextlost" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextlost`: `attribute EventHandler oncontextlost` -/
-def MathMLElement.setOncontextlost (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncontextlost (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncontextlost" do
   self.val.set "oncontextlost" (toJS value)
 
 /-- `attribute EventHandler oncontextmenu` -/
-def MathMLElement.oncontextmenu (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextmenu" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncontextmenu (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncontextmenu" do
+  self.val.get "oncontextmenu" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextmenu`: `attribute EventHandler oncontextmenu` -/
-def MathMLElement.setOncontextmenu (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncontextmenu (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncontextmenu" do
   self.val.set "oncontextmenu" (toJS value)
 
 /-- `attribute EventHandler oncontextrestored` -/
-def MathMLElement.oncontextrestored (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextrestored" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncontextrestored (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncontextrestored" do
+  self.val.get "oncontextrestored" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextrestored`: `attribute EventHandler oncontextrestored` -/
-def MathMLElement.setOncontextrestored (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncontextrestored (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncontextrestored" do
   self.val.set "oncontextrestored" (toJS value)
 
 /-- `attribute EventHandler oncopy` -/
-def MathMLElement.oncopy (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncopy" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncopy (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncopy" do
+  self.val.get "oncopy" (Option EventHandlerNonNull)
 
 /-- Sets `oncopy`: `attribute EventHandler oncopy` -/
-def MathMLElement.setOncopy (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncopy (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncopy" do
   self.val.set "oncopy" (toJS value)
 
 /-- `attribute EventHandler oncuechange` -/
-def MathMLElement.oncuechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncuechange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncuechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncuechange" do
+  self.val.get "oncuechange" (Option EventHandlerNonNull)
 
 /-- Sets `oncuechange`: `attribute EventHandler oncuechange` -/
-def MathMLElement.setOncuechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncuechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncuechange" do
   self.val.set "oncuechange" (toJS value)
 
 /-- `attribute EventHandler oncut` -/
-def MathMLElement.oncut (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oncut" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oncut (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oncut" do
+  self.val.get "oncut" (Option EventHandlerNonNull)
 
 /-- Sets `oncut`: `attribute EventHandler oncut` -/
-def MathMLElement.setOncut (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOncut (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOncut" do
   self.val.set "oncut" (toJS value)
 
 /-- `attribute EventHandler ondblclick` -/
-def MathMLElement.ondblclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondblclick" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondblclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondblclick" do
+  self.val.get "ondblclick" (Option EventHandlerNonNull)
 
 /-- Sets `ondblclick`: `attribute EventHandler ondblclick` -/
-def MathMLElement.setOndblclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndblclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndblclick" do
   self.val.set "ondblclick" (toJS value)
 
 /-- `attribute EventHandler ondrag` -/
-def MathMLElement.ondrag (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondrag" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondrag (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondrag" do
+  self.val.get "ondrag" (Option EventHandlerNonNull)
 
 /-- Sets `ondrag`: `attribute EventHandler ondrag` -/
-def MathMLElement.setOndrag (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndrag (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndrag" do
   self.val.set "ondrag" (toJS value)
 
 /-- `attribute EventHandler ondragend` -/
-def MathMLElement.ondragend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondragend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondragend" do
+  self.val.get "ondragend" (Option EventHandlerNonNull)
 
 /-- Sets `ondragend`: `attribute EventHandler ondragend` -/
-def MathMLElement.setOndragend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndragend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndragend" do
   self.val.set "ondragend" (toJS value)
 
 /-- `attribute EventHandler ondragenter` -/
-def MathMLElement.ondragenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragenter" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondragenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondragenter" do
+  self.val.get "ondragenter" (Option EventHandlerNonNull)
 
 /-- Sets `ondragenter`: `attribute EventHandler ondragenter` -/
-def MathMLElement.setOndragenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndragenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndragenter" do
   self.val.set "ondragenter" (toJS value)
 
 /-- `attribute EventHandler ondragleave` -/
-def MathMLElement.ondragleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragleave" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondragleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondragleave" do
+  self.val.get "ondragleave" (Option EventHandlerNonNull)
 
 /-- Sets `ondragleave`: `attribute EventHandler ondragleave` -/
-def MathMLElement.setOndragleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndragleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndragleave" do
   self.val.set "ondragleave" (toJS value)
 
 /-- `attribute EventHandler ondragover` -/
-def MathMLElement.ondragover (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragover" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondragover (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondragover" do
+  self.val.get "ondragover" (Option EventHandlerNonNull)
 
 /-- Sets `ondragover`: `attribute EventHandler ondragover` -/
-def MathMLElement.setOndragover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndragover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndragover" do
   self.val.set "ondragover" (toJS value)
 
 /-- `attribute EventHandler ondragstart` -/
-def MathMLElement.ondragstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondragstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondragstart" do
+  self.val.get "ondragstart" (Option EventHandlerNonNull)
 
 /-- Sets `ondragstart`: `attribute EventHandler ondragstart` -/
-def MathMLElement.setOndragstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndragstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndragstart" do
   self.val.set "ondragstart" (toJS value)
 
 /-- `attribute EventHandler ondrop` -/
-def MathMLElement.ondrop (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondrop" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondrop (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondrop" do
+  self.val.get "ondrop" (Option EventHandlerNonNull)
 
 /-- Sets `ondrop`: `attribute EventHandler ondrop` -/
-def MathMLElement.setOndrop (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndrop (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndrop" do
   self.val.set "ondrop" (toJS value)
 
 /-- `attribute EventHandler ondurationchange` -/
-def MathMLElement.ondurationchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ondurationchange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ondurationchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ondurationchange" do
+  self.val.get "ondurationchange" (Option EventHandlerNonNull)
 
 /-- Sets `ondurationchange`: `attribute EventHandler ondurationchange` -/
-def MathMLElement.setOndurationchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOndurationchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOndurationchange" do
   self.val.set "ondurationchange" (toJS value)
 
 /-- `attribute EventHandler onemptied` -/
-def MathMLElement.onemptied (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onemptied" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onemptied (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onemptied" do
+  self.val.get "onemptied" (Option EventHandlerNonNull)
 
 /-- Sets `onemptied`: `attribute EventHandler onemptied` -/
-def MathMLElement.setOnemptied (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnemptied (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnemptied" do
   self.val.set "onemptied" (toJS value)
 
 /-- `attribute EventHandler onended` -/
-def MathMLElement.onended (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onended" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onended (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onended" do
+  self.val.get "onended" (Option EventHandlerNonNull)
 
 /-- Sets `onended`: `attribute EventHandler onended` -/
-def MathMLElement.setOnended (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnended (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnended" do
   self.val.set "onended" (toJS value)
 
 /-- `attribute OnErrorEventHandler onerror` -/
-def MathMLElement.onerror (self : MathMLElement) : IO (Option OnErrorEventHandlerNonNull) := self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
+@[macro_inline] def MathMLElement.onerror (self : MathMLElement) : IO (Option OnErrorEventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onerror" do
+  self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute OnErrorEventHandler onerror` -/
-def MathMLElement.setOnerror (self : MathMLElement) (value : Option OnErrorEventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnerror (self : MathMLElement) (value : Option OnErrorEventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onfocus` -/
-def MathMLElement.onfocus (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onfocus" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onfocus (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onfocus" do
+  self.val.get "onfocus" (Option EventHandlerNonNull)
 
 /-- Sets `onfocus`: `attribute EventHandler onfocus` -/
-def MathMLElement.setOnfocus (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnfocus (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnfocus" do
   self.val.set "onfocus" (toJS value)
 
 /-- `attribute EventHandler onformdata` -/
-def MathMLElement.onformdata (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onformdata" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onformdata (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onformdata" do
+  self.val.get "onformdata" (Option EventHandlerNonNull)
 
 /-- Sets `onformdata`: `attribute EventHandler onformdata` -/
-def MathMLElement.setOnformdata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnformdata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnformdata" do
   self.val.set "onformdata" (toJS value)
 
 /-- `attribute EventHandler oninput` -/
-def MathMLElement.oninput (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oninput" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oninput (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oninput" do
+  self.val.get "oninput" (Option EventHandlerNonNull)
 
 /-- Sets `oninput`: `attribute EventHandler oninput` -/
-def MathMLElement.setOninput (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOninput (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOninput" do
   self.val.set "oninput" (toJS value)
 
 /-- `attribute EventHandler oninvalid` -/
-def MathMLElement.oninvalid (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "oninvalid" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.oninvalid (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.oninvalid" do
+  self.val.get "oninvalid" (Option EventHandlerNonNull)
 
 /-- Sets `oninvalid`: `attribute EventHandler oninvalid` -/
-def MathMLElement.setOninvalid (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOninvalid (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOninvalid" do
   self.val.set "oninvalid" (toJS value)
 
 /-- `attribute EventHandler onkeydown` -/
-def MathMLElement.onkeydown (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeydown" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onkeydown (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onkeydown" do
+  self.val.get "onkeydown" (Option EventHandlerNonNull)
 
 /-- Sets `onkeydown`: `attribute EventHandler onkeydown` -/
-def MathMLElement.setOnkeydown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnkeydown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnkeydown" do
   self.val.set "onkeydown" (toJS value)
 
 /-- `attribute EventHandler onkeypress` -/
-def MathMLElement.onkeypress (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeypress" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onkeypress (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onkeypress" do
+  self.val.get "onkeypress" (Option EventHandlerNonNull)
 
 /-- Sets `onkeypress`: `attribute EventHandler onkeypress` -/
-def MathMLElement.setOnkeypress (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnkeypress (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnkeypress" do
   self.val.set "onkeypress" (toJS value)
 
 /-- `attribute EventHandler onkeyup` -/
-def MathMLElement.onkeyup (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeyup" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onkeyup (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onkeyup" do
+  self.val.get "onkeyup" (Option EventHandlerNonNull)
 
 /-- Sets `onkeyup`: `attribute EventHandler onkeyup` -/
-def MathMLElement.setOnkeyup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnkeyup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnkeyup" do
   self.val.set "onkeyup" (toJS value)
 
 /-- `attribute EventHandler onload` -/
-def MathMLElement.onload (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onload" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onload (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onload" do
+  self.val.get "onload" (Option EventHandlerNonNull)
 
 /-- Sets `onload`: `attribute EventHandler onload` -/
-def MathMLElement.setOnload (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnload (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnload" do
   self.val.set "onload" (toJS value)
 
 /-- `attribute EventHandler onloadeddata` -/
-def MathMLElement.onloadeddata (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadeddata" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onloadeddata (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onloadeddata" do
+  self.val.get "onloadeddata" (Option EventHandlerNonNull)
 
 /-- Sets `onloadeddata`: `attribute EventHandler onloadeddata` -/
-def MathMLElement.setOnloadeddata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnloadeddata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnloadeddata" do
   self.val.set "onloadeddata" (toJS value)
 
 /-- `attribute EventHandler onloadedmetadata` -/
-def MathMLElement.onloadedmetadata (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadedmetadata" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onloadedmetadata (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onloadedmetadata" do
+  self.val.get "onloadedmetadata" (Option EventHandlerNonNull)
 
 /-- Sets `onloadedmetadata`: `attribute EventHandler onloadedmetadata` -/
-def MathMLElement.setOnloadedmetadata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnloadedmetadata (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnloadedmetadata" do
   self.val.set "onloadedmetadata" (toJS value)
 
 /-- `attribute EventHandler onloadstart` -/
-def MathMLElement.onloadstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onloadstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onloadstart" do
+  self.val.get "onloadstart" (Option EventHandlerNonNull)
 
 /-- Sets `onloadstart`: `attribute EventHandler onloadstart` -/
-def MathMLElement.setOnloadstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnloadstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnloadstart" do
   self.val.set "onloadstart" (toJS value)
 
 /-- `attribute EventHandler onmousedown` -/
-def MathMLElement.onmousedown (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmousedown" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmousedown (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmousedown" do
+  self.val.get "onmousedown" (Option EventHandlerNonNull)
 
 /-- Sets `onmousedown`: `attribute EventHandler onmousedown` -/
-def MathMLElement.setOnmousedown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmousedown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmousedown" do
   self.val.set "onmousedown" (toJS value)
 
 /-- `attribute EventHandler onmouseenter` -/
-def MathMLElement.onmouseenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseenter" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmouseenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmouseenter" do
+  self.val.get "onmouseenter" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseenter`: `attribute EventHandler onmouseenter` -/
-def MathMLElement.setOnmouseenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmouseenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmouseenter" do
   self.val.set "onmouseenter" (toJS value)
 
 /-- `attribute EventHandler onmouseleave` -/
-def MathMLElement.onmouseleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseleave" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmouseleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmouseleave" do
+  self.val.get "onmouseleave" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseleave`: `attribute EventHandler onmouseleave` -/
-def MathMLElement.setOnmouseleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmouseleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmouseleave" do
   self.val.set "onmouseleave" (toJS value)
 
 /-- `attribute EventHandler onmousemove` -/
-def MathMLElement.onmousemove (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmousemove" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmousemove (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmousemove" do
+  self.val.get "onmousemove" (Option EventHandlerNonNull)
 
 /-- Sets `onmousemove`: `attribute EventHandler onmousemove` -/
-def MathMLElement.setOnmousemove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmousemove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmousemove" do
   self.val.set "onmousemove" (toJS value)
 
 /-- `attribute EventHandler onmouseout` -/
-def MathMLElement.onmouseout (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseout" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmouseout (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmouseout" do
+  self.val.get "onmouseout" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseout`: `attribute EventHandler onmouseout` -/
-def MathMLElement.setOnmouseout (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmouseout (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmouseout" do
   self.val.set "onmouseout" (toJS value)
 
 /-- `attribute EventHandler onmouseover` -/
-def MathMLElement.onmouseover (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseover" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmouseover (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmouseover" do
+  self.val.get "onmouseover" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseover`: `attribute EventHandler onmouseover` -/
-def MathMLElement.setOnmouseover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmouseover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmouseover" do
   self.val.set "onmouseover" (toJS value)
 
 /-- `attribute EventHandler onmouseup` -/
-def MathMLElement.onmouseup (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseup" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onmouseup (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onmouseup" do
+  self.val.get "onmouseup" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseup`: `attribute EventHandler onmouseup` -/
-def MathMLElement.setOnmouseup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnmouseup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnmouseup" do
   self.val.set "onmouseup" (toJS value)
 
 /-- `attribute EventHandler onpaste` -/
-def MathMLElement.onpaste (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpaste" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpaste (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpaste" do
+  self.val.get "onpaste" (Option EventHandlerNonNull)
 
 /-- Sets `onpaste`: `attribute EventHandler onpaste` -/
-def MathMLElement.setOnpaste (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpaste (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpaste" do
   self.val.set "onpaste" (toJS value)
 
 /-- `attribute EventHandler onpause` -/
-def MathMLElement.onpause (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpause" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpause (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpause" do
+  self.val.get "onpause" (Option EventHandlerNonNull)
 
 /-- Sets `onpause`: `attribute EventHandler onpause` -/
-def MathMLElement.setOnpause (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpause (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpause" do
   self.val.set "onpause" (toJS value)
 
 /-- `attribute EventHandler onplay` -/
-def MathMLElement.onplay (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onplay" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onplay (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onplay" do
+  self.val.get "onplay" (Option EventHandlerNonNull)
 
 /-- Sets `onplay`: `attribute EventHandler onplay` -/
-def MathMLElement.setOnplay (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnplay (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnplay" do
   self.val.set "onplay" (toJS value)
 
 /-- `attribute EventHandler onplaying` -/
-def MathMLElement.onplaying (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onplaying" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onplaying (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onplaying" do
+  self.val.get "onplaying" (Option EventHandlerNonNull)
 
 /-- Sets `onplaying`: `attribute EventHandler onplaying` -/
-def MathMLElement.setOnplaying (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnplaying (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnplaying" do
   self.val.set "onplaying" (toJS value)
 
 /-- `attribute EventHandler onprogress` -/
-def MathMLElement.onprogress (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onprogress" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onprogress (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onprogress" do
+  self.val.get "onprogress" (Option EventHandlerNonNull)
 
 /-- Sets `onprogress`: `attribute EventHandler onprogress` -/
-def MathMLElement.setOnprogress (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnprogress (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnprogress" do
   self.val.set "onprogress" (toJS value)
 
 /-- `attribute EventHandler onratechange` -/
-def MathMLElement.onratechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onratechange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onratechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onratechange" do
+  self.val.get "onratechange" (Option EventHandlerNonNull)
 
 /-- Sets `onratechange`: `attribute EventHandler onratechange` -/
-def MathMLElement.setOnratechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnratechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnratechange" do
   self.val.set "onratechange" (toJS value)
 
 /-- `attribute EventHandler onreset` -/
-def MathMLElement.onreset (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onreset" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onreset (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onreset" do
+  self.val.get "onreset" (Option EventHandlerNonNull)
 
 /-- Sets `onreset`: `attribute EventHandler onreset` -/
-def MathMLElement.setOnreset (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnreset (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnreset" do
   self.val.set "onreset" (toJS value)
 
 /-- `attribute EventHandler onresize` -/
-def MathMLElement.onresize (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onresize" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onresize (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onresize" do
+  self.val.get "onresize" (Option EventHandlerNonNull)
 
 /-- Sets `onresize`: `attribute EventHandler onresize` -/
-def MathMLElement.setOnresize (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnresize (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnresize" do
   self.val.set "onresize" (toJS value)
 
 /-- `attribute EventHandler onscroll` -/
-def MathMLElement.onscroll (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onscroll" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onscroll (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onscroll" do
+  self.val.get "onscroll" (Option EventHandlerNonNull)
 
 /-- Sets `onscroll`: `attribute EventHandler onscroll` -/
-def MathMLElement.setOnscroll (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnscroll (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnscroll" do
   self.val.set "onscroll" (toJS value)
 
 /-- `attribute EventHandler onscrollend` -/
-def MathMLElement.onscrollend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onscrollend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onscrollend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onscrollend" do
+  self.val.get "onscrollend" (Option EventHandlerNonNull)
 
 /-- Sets `onscrollend`: `attribute EventHandler onscrollend` -/
-def MathMLElement.setOnscrollend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnscrollend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnscrollend" do
   self.val.set "onscrollend" (toJS value)
 
 /-- `attribute EventHandler onsecuritypolicyviolation` -/
-def MathMLElement.onsecuritypolicyviolation (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsecuritypolicyviolation" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onsecuritypolicyviolation (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onsecuritypolicyviolation" do
+  self.val.get "onsecuritypolicyviolation" (Option EventHandlerNonNull)
 
 /-- Sets `onsecuritypolicyviolation`: `attribute EventHandler onsecuritypolicyviolation` -/
-def MathMLElement.setOnsecuritypolicyviolation (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnsecuritypolicyviolation (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnsecuritypolicyviolation" do
   self.val.set "onsecuritypolicyviolation" (toJS value)
 
 /-- `attribute EventHandler onseeked` -/
-def MathMLElement.onseeked (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onseeked" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onseeked (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onseeked" do
+  self.val.get "onseeked" (Option EventHandlerNonNull)
 
 /-- Sets `onseeked`: `attribute EventHandler onseeked` -/
-def MathMLElement.setOnseeked (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnseeked (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnseeked" do
   self.val.set "onseeked" (toJS value)
 
 /-- `attribute EventHandler onseeking` -/
-def MathMLElement.onseeking (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onseeking" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onseeking (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onseeking" do
+  self.val.get "onseeking" (Option EventHandlerNonNull)
 
 /-- Sets `onseeking`: `attribute EventHandler onseeking` -/
-def MathMLElement.setOnseeking (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnseeking (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnseeking" do
   self.val.set "onseeking" (toJS value)
 
 /-- `attribute EventHandler onselect` -/
-def MathMLElement.onselect (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onselect" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onselect (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onselect" do
+  self.val.get "onselect" (Option EventHandlerNonNull)
 
 /-- Sets `onselect`: `attribute EventHandler onselect` -/
-def MathMLElement.setOnselect (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnselect (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnselect" do
   self.val.set "onselect" (toJS value)
 
 /-- `attribute EventHandler onslotchange` -/
-def MathMLElement.onslotchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onslotchange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onslotchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onslotchange" do
+  self.val.get "onslotchange" (Option EventHandlerNonNull)
 
 /-- Sets `onslotchange`: `attribute EventHandler onslotchange` -/
-def MathMLElement.setOnslotchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnslotchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnslotchange" do
   self.val.set "onslotchange" (toJS value)
 
 /-- `attribute EventHandler onstalled` -/
-def MathMLElement.onstalled (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onstalled" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onstalled (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onstalled" do
+  self.val.get "onstalled" (Option EventHandlerNonNull)
 
 /-- Sets `onstalled`: `attribute EventHandler onstalled` -/
-def MathMLElement.setOnstalled (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnstalled (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnstalled" do
   self.val.set "onstalled" (toJS value)
 
 /-- `attribute EventHandler onsubmit` -/
-def MathMLElement.onsubmit (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsubmit" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onsubmit (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onsubmit" do
+  self.val.get "onsubmit" (Option EventHandlerNonNull)
 
 /-- Sets `onsubmit`: `attribute EventHandler onsubmit` -/
-def MathMLElement.setOnsubmit (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnsubmit (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnsubmit" do
   self.val.set "onsubmit" (toJS value)
 
 /-- `attribute EventHandler onsuspend` -/
-def MathMLElement.onsuspend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onsuspend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onsuspend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onsuspend" do
+  self.val.get "onsuspend" (Option EventHandlerNonNull)
 
 /-- Sets `onsuspend`: `attribute EventHandler onsuspend` -/
-def MathMLElement.setOnsuspend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnsuspend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnsuspend" do
   self.val.set "onsuspend" (toJS value)
 
 /-- `attribute EventHandler ontimeupdate` -/
-def MathMLElement.ontimeupdate (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontimeupdate" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontimeupdate (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontimeupdate" do
+  self.val.get "ontimeupdate" (Option EventHandlerNonNull)
 
 /-- Sets `ontimeupdate`: `attribute EventHandler ontimeupdate` -/
-def MathMLElement.setOntimeupdate (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntimeupdate (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntimeupdate" do
   self.val.set "ontimeupdate" (toJS value)
 
 /-- `attribute EventHandler ontoggle` -/
-def MathMLElement.ontoggle (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontoggle" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontoggle (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontoggle" do
+  self.val.get "ontoggle" (Option EventHandlerNonNull)
 
 /-- Sets `ontoggle`: `attribute EventHandler ontoggle` -/
-def MathMLElement.setOntoggle (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntoggle (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntoggle" do
   self.val.set "ontoggle" (toJS value)
 
 /-- `attribute EventHandler onvolumechange` -/
-def MathMLElement.onvolumechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onvolumechange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onvolumechange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onvolumechange" do
+  self.val.get "onvolumechange" (Option EventHandlerNonNull)
 
 /-- Sets `onvolumechange`: `attribute EventHandler onvolumechange` -/
-def MathMLElement.setOnvolumechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnvolumechange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnvolumechange" do
   self.val.set "onvolumechange" (toJS value)
 
 /-- `attribute EventHandler onwaiting` -/
-def MathMLElement.onwaiting (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwaiting" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwaiting (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwaiting" do
+  self.val.get "onwaiting" (Option EventHandlerNonNull)
 
 /-- Sets `onwaiting`: `attribute EventHandler onwaiting` -/
-def MathMLElement.setOnwaiting (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwaiting (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwaiting" do
   self.val.set "onwaiting" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationend` -/
-def MathMLElement.onwebkitanimationend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwebkitanimationend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwebkitanimationend" do
+  self.val.get "onwebkitanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationend`: `attribute EventHandler onwebkitanimationend` -/
-def MathMLElement.setOnwebkitanimationend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwebkitanimationend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwebkitanimationend" do
   self.val.set "onwebkitanimationend" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationiteration` -/
-def MathMLElement.onwebkitanimationiteration (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwebkitanimationiteration (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwebkitanimationiteration" do
+  self.val.get "onwebkitanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationiteration`: `attribute EventHandler onwebkitanimationiteration` -/
-def MathMLElement.setOnwebkitanimationiteration (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwebkitanimationiteration (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwebkitanimationiteration" do
   self.val.set "onwebkitanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationstart` -/
-def MathMLElement.onwebkitanimationstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwebkitanimationstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwebkitanimationstart" do
+  self.val.get "onwebkitanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationstart`: `attribute EventHandler onwebkitanimationstart` -/
-def MathMLElement.setOnwebkitanimationstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwebkitanimationstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwebkitanimationstart" do
   self.val.set "onwebkitanimationstart" (toJS value)
 
 /-- `attribute EventHandler onwebkittransitionend` -/
-def MathMLElement.onwebkittransitionend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkittransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwebkittransitionend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwebkittransitionend" do
+  self.val.get "onwebkittransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkittransitionend`: `attribute EventHandler onwebkittransitionend` -/
-def MathMLElement.setOnwebkittransitionend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwebkittransitionend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwebkittransitionend" do
   self.val.set "onwebkittransitionend" (toJS value)
 
 /-- `attribute EventHandler onwheel` -/
-def MathMLElement.onwheel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onwheel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onwheel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onwheel" do
+  self.val.get "onwheel" (Option EventHandlerNonNull)
 
 /-- Sets `onwheel`: `attribute EventHandler onwheel` -/
-def MathMLElement.setOnwheel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnwheel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnwheel" do
   self.val.set "onwheel" (toJS value)
 
 /-- `readonly attribute DOMStringMap dataset` -/
-def MathMLElement.dataset (self : MathMLElement) : IO DOMStringMap := do
+@[macro_inline] def MathMLElement.dataset (self : MathMLElement) : IO DOMStringMap := Internal.api "Lasm.JS.Web.MathMLElement.dataset" do
   let r ← self.val.get "dataset" Value
   pure { val := r }
 
 /-- `attribute DOMString nonce` -/
-def MathMLElement.nonce (self : MathMLElement) : IO String := self.val.get "nonce" String
+@[macro_inline] def MathMLElement.nonce (self : MathMLElement) : IO String := Internal.api "Lasm.JS.Web.MathMLElement.nonce" do
+  self.val.get "nonce" String
 
 /-- Sets `nonce`: `attribute DOMString nonce` -/
-def MathMLElement.setNonce (self : MathMLElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLElement.setNonce (self : MathMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setNonce" do
   self.val.set "nonce" (toJS value)
 
 /-- `attribute boolean autofocus` -/
-def MathMLElement.autofocus (self : MathMLElement) : IO Bool := self.val.get "autofocus" Bool
+@[macro_inline] def MathMLElement.autofocus (self : MathMLElement) : IO Bool := Internal.api "Lasm.JS.Web.MathMLElement.autofocus" do
+  self.val.get "autofocus" Bool
 
 /-- Sets `autofocus`: `attribute boolean autofocus` -/
-def MathMLElement.setAutofocus (self : MathMLElement) (value : Bool) : IO Unit :=
+@[macro_inline] def MathMLElement.setAutofocus (self : MathMLElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setAutofocus" do
   self.val.set "autofocus" (toJS value)
 
 /-- `attribute long tabIndex` -/
-def MathMLElement.tabIndex (self : MathMLElement) : IO Int := self.val.get "tabIndex" Int
+@[macro_inline] def MathMLElement.tabIndex (self : MathMLElement) : IO Int := Internal.api "Lasm.JS.Web.MathMLElement.tabIndex" do
+  self.val.get "tabIndex" Int
 
 /-- Sets `tabIndex`: `attribute long tabIndex` -/
-def MathMLElement.setTabIndex (self : MathMLElement) (value : Int) : IO Unit :=
+@[macro_inline] def MathMLElement.setTabIndex (self : MathMLElement) (value : Int) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setTabIndex" do
   self.val.set "tabIndex" (toJS value)
 
 /-- `undefined focus(optional FocusOptions options)` -/
-def MathMLElement.focus (self : MathMLElement) (options : Option FocusOptions := none) : IO Unit :=
-  self.val.callMethod "focus" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def MathMLElement.focus (self : MathMLElement) (options : Option FocusOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.focus" do
+  self.val.callMethod "focus" (Internal.args #[Internal.optional options]) Unit
 
 /-- `undefined blur()` -/
-def MathMLElement.blur (self : MathMLElement) : IO Unit :=
-  self.val.callMethod "blur" (Support.args #[]) Unit
+@[macro_inline] def MathMLElement.blur (self : MathMLElement) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.blur" do
+  self.val.callMethod "blur" (Internal.args #[]) Unit
 
 /-- `v instanceof MathMLAnchorElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MathMLAnchorElement`). -/
-def MathMLAnchorElement.cast? (v : Value) : IO (Option MathMLAnchorElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MathMLAnchorElement"] Value) v) then some { val := v } else none
+@[macro_inline] def MathMLAnchorElement.cast? (v : Value) : IO (Option MathMLAnchorElement) := Internal.api "Lasm.JS.Web.MathMLAnchorElement.cast?" do
+  Internal.cast (Internal.getGlobal ["MathMLAnchorElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString href` -/
-def MathMLAnchorElement.href (self : MathMLAnchorElement) : IO String := self.val.get "href" String
+@[macro_inline] def MathMLAnchorElement.href (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.href" do
+  self.val.get "href" String
 
 /-- Sets `href`: `attribute USVString href` -/
-def MathMLAnchorElement.setHref (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setHref (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setHref" do
   self.val.set "href" (toJS value)
 
 /-- `attribute DOMString target` -/
-def MathMLAnchorElement.target (self : MathMLAnchorElement) : IO String := self.val.get "target" String
+@[macro_inline] def MathMLAnchorElement.target (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.target" do
+  self.val.get "target" String
 
 /-- Sets `target`: `attribute DOMString target` -/
-def MathMLAnchorElement.setTarget (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setTarget (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setTarget" do
   self.val.set "target" (toJS value)
 
 /-- `readonly attribute USVString origin` -/
-def MathMLAnchorElement.origin (self : MathMLAnchorElement) : IO String := self.val.get "origin" String
+@[macro_inline] def MathMLAnchorElement.origin (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.origin" do
+  self.val.get "origin" String
 
 /-- `attribute USVString protocol` -/
-def MathMLAnchorElement.protocol (self : MathMLAnchorElement) : IO String := self.val.get "protocol" String
+@[macro_inline] def MathMLAnchorElement.protocol (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.protocol" do
+  self.val.get "protocol" String
 
 /-- Sets `protocol`: `attribute USVString protocol` -/
-def MathMLAnchorElement.setProtocol (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setProtocol (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setProtocol" do
   self.val.set "protocol" (toJS value)
 
 /-- `attribute USVString username` -/
-def MathMLAnchorElement.username (self : MathMLAnchorElement) : IO String := self.val.get "username" String
+@[macro_inline] def MathMLAnchorElement.username (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.username" do
+  self.val.get "username" String
 
 /-- Sets `username`: `attribute USVString username` -/
-def MathMLAnchorElement.setUsername (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setUsername (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setUsername" do
   self.val.set "username" (toJS value)
 
 /-- `attribute USVString password` -/
-def MathMLAnchorElement.password (self : MathMLAnchorElement) : IO String := self.val.get "password" String
+@[macro_inline] def MathMLAnchorElement.password (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.password" do
+  self.val.get "password" String
 
 /-- Sets `password`: `attribute USVString password` -/
-def MathMLAnchorElement.setPassword (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setPassword (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setPassword" do
   self.val.set "password" (toJS value)
 
 /-- `attribute USVString host` -/
-def MathMLAnchorElement.host (self : MathMLAnchorElement) : IO String := self.val.get "host" String
+@[macro_inline] def MathMLAnchorElement.host (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.host" do
+  self.val.get "host" String
 
 /-- Sets `host`: `attribute USVString host` -/
-def MathMLAnchorElement.setHost (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setHost (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setHost" do
   self.val.set "host" (toJS value)
 
 /-- `attribute USVString hostname` -/
-def MathMLAnchorElement.hostname (self : MathMLAnchorElement) : IO String := self.val.get "hostname" String
+@[macro_inline] def MathMLAnchorElement.hostname (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.hostname" do
+  self.val.get "hostname" String
 
 /-- Sets `hostname`: `attribute USVString hostname` -/
-def MathMLAnchorElement.setHostname (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setHostname (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setHostname" do
   self.val.set "hostname" (toJS value)
 
 /-- `attribute USVString port` -/
-def MathMLAnchorElement.port (self : MathMLAnchorElement) : IO String := self.val.get "port" String
+@[macro_inline] def MathMLAnchorElement.port (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.port" do
+  self.val.get "port" String
 
 /-- Sets `port`: `attribute USVString port` -/
-def MathMLAnchorElement.setPort (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setPort (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setPort" do
   self.val.set "port" (toJS value)
 
 /-- `attribute USVString pathname` -/
-def MathMLAnchorElement.pathname (self : MathMLAnchorElement) : IO String := self.val.get "pathname" String
+@[macro_inline] def MathMLAnchorElement.pathname (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.pathname" do
+  self.val.get "pathname" String
 
 /-- Sets `pathname`: `attribute USVString pathname` -/
-def MathMLAnchorElement.setPathname (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setPathname (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setPathname" do
   self.val.set "pathname" (toJS value)
 
 /-- `attribute USVString search` -/
-def MathMLAnchorElement.search (self : MathMLAnchorElement) : IO String := self.val.get "search" String
+@[macro_inline] def MathMLAnchorElement.search (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.search" do
+  self.val.get "search" String
 
 /-- Sets `search`: `attribute USVString search` -/
-def MathMLAnchorElement.setSearch (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setSearch (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setSearch" do
   self.val.set "search" (toJS value)
 
 /-- `attribute USVString hash` -/
-def MathMLAnchorElement.hash (self : MathMLAnchorElement) : IO String := self.val.get "hash" String
+@[macro_inline] def MathMLAnchorElement.hash (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.hash" do
+  self.val.get "hash" String
 
 /-- Sets `hash`: `attribute USVString hash` -/
-def MathMLAnchorElement.setHash (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setHash (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setHash" do
   self.val.set "hash" (toJS value)
 
 /-- `attribute DOMString hreflang` -/
-def MathMLAnchorElement.hreflang (self : MathMLAnchorElement) : IO String := self.val.get "hreflang" String
+@[macro_inline] def MathMLAnchorElement.hreflang (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.hreflang" do
+  self.val.get "hreflang" String
 
 /-- Sets `hreflang`: `attribute DOMString hreflang` -/
-def MathMLAnchorElement.setHreflang (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setHreflang (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setHreflang" do
   self.val.set "hreflang" (toJS value)
 
 /-- `attribute DOMString type` -/
-def MathMLAnchorElement.type (self : MathMLAnchorElement) : IO String := self.val.get "type" String
+@[macro_inline] def MathMLAnchorElement.type (self : MathMLAnchorElement) : IO String := Internal.api "Lasm.JS.Web.MathMLAnchorElement.type" do
+  self.val.get "type" String
 
 /-- Sets `type`: `attribute DOMString type` -/
-def MathMLAnchorElement.setType (self : MathMLAnchorElement) (value : String) : IO Unit :=
+@[macro_inline] def MathMLAnchorElement.setType (self : MathMLAnchorElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MathMLAnchorElement.setType" do
   self.val.set "type" (toJS value)
 
 end Lasm.JS.Web

@@ -6,19 +6,28 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute boolean credentialless` -/
-def HTMLIFrameElement.credentialless (self : HTMLIFrameElement) : IO Bool := self.val.get "credentialless" Bool
+@[macro_inline] def HTMLIFrameElement.credentialless (self : HTMLIFrameElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLIFrameElement.credentialless" do
+  self.val.get "credentialless" Bool
 
 /-- Sets `credentialless`: `attribute boolean credentialless` -/
-def HTMLIFrameElement.setCredentialless (self : HTMLIFrameElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLIFrameElement.setCredentialless (self : HTMLIFrameElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setCredentialless" do
   self.val.set "credentialless" (toJS value)
 
+/-- `readonly attribute boolean credentialless` -/
+@[macro_inline] def Window.credentialless (self : Window) : IO Bool := Internal.api "Lasm.JS.Web.Window.credentialless" do
+  self.val.get "credentialless" Bool
+
 /-- `readonly attribute boolean credentialless` (Iframe credentialless (https://wicg.github.io/anonymous-iframe/)) -/
-def credentialless : IO Bool := Support.getGlobal ["credentialless"] Bool
+@[macro_inline] def credentialless : IO Bool := Internal.api "Lasm.JS.Web.credentialless" do
+  Internal.getGlobal ["credentialless"] Bool
 
 end Lasm.JS.Web

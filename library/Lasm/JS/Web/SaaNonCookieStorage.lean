@@ -6,72 +6,123 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.Fs
+import Lasm.JS.Web.Types.IndexedDB
+import Lasm.JS.Web.Types.SaaNonCookieStorage
+import Lasm.JS.Web.Types.WebLocks
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.FileAPI
 import Lasm.JS.Web.Storage
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary StorageAccessTypes` (Extending Storage Access API (SAA) to non-cookie storage (https://privacycg.github.io/saa-non-cookie-storage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure StorageAccessTypes where
+  /-- `boolean all = false` -/
+  all : Option Bool := none
+  /-- `boolean cookies = false` -/
+  cookies : Option Bool := none
+  /-- `boolean sessionStorage = false` -/
+  sessionStorage : Option Bool := none
+  /-- `boolean localStorage = false` -/
+  localStorage : Option Bool := none
+  /-- `boolean indexedDB = false` -/
+  indexedDB : Option Bool := none
+  /-- `boolean locks = false` -/
+  locks : Option Bool := none
+  /-- `boolean caches = false` -/
+  caches : Option Bool := none
+  /-- `boolean getDirectory = false` -/
+  getDirectory : Option Bool := none
+  /-- `boolean estimate = false` -/
+  estimate : Option Bool := none
+  /-- `boolean createObjectURL = false` -/
+  createObjectURL : Option Bool := none
+  /-- `boolean revokeObjectURL = false` -/
+  revokeObjectURL : Option Bool := none
+  /-- `boolean BroadcastChannel = false` -/
+  BroadcastChannel : Option Bool := none
+  /-- `boolean SharedWorker = false` -/
+  SharedWorker : Option Bool := none
+instance : ToJS StorageAccessTypes := ⟨fun d => Internal.fields #[("all", Internal.optional d.all),
+    ("cookies", Internal.optional d.cookies),
+    ("sessionStorage", Internal.optional d.sessionStorage),
+    ("localStorage", Internal.optional d.localStorage),
+    ("indexedDB", Internal.optional d.indexedDB),
+    ("locks", Internal.optional d.locks),
+    ("caches", Internal.optional d.caches),
+    ("getDirectory", Internal.optional d.getDirectory),
+    ("estimate", Internal.optional d.estimate),
+    ("createObjectURL", Internal.optional d.createObjectURL),
+    ("revokeObjectURL", Internal.optional d.revokeObjectURL),
+    ("BroadcastChannel", Internal.optional d.BroadcastChannel),
+    ("SharedWorker", Internal.optional d.SharedWorker)]⟩
 
 /-- `v instanceof StorageAccessHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StorageAccessHandle`). -/
-def StorageAccessHandle.cast? (v : Value) : IO (Option StorageAccessHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageAccessHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def StorageAccessHandle.cast? (v : Value) : IO (Option StorageAccessHandle) := Internal.api "Lasm.JS.Web.StorageAccessHandle.cast?" do
+  Internal.cast (Internal.getGlobal ["StorageAccessHandle"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Storage sessionStorage` -/
-def StorageAccessHandle.sessionStorage (self : StorageAccessHandle) : IO Storage := do
+@[macro_inline] def StorageAccessHandle.sessionStorage (self : StorageAccessHandle) : IO Storage := Internal.api "Lasm.JS.Web.StorageAccessHandle.sessionStorage" do
   let r ← self.val.get "sessionStorage" Value
   pure { val := r }
 
 /-- `readonly attribute Storage localStorage` -/
-def StorageAccessHandle.localStorage (self : StorageAccessHandle) : IO Storage := do
+@[macro_inline] def StorageAccessHandle.localStorage (self : StorageAccessHandle) : IO Storage := Internal.api "Lasm.JS.Web.StorageAccessHandle.localStorage" do
   let r ← self.val.get "localStorage" Value
   pure { val := r }
 
 /-- `readonly attribute IDBFactory indexedDB` -/
-def StorageAccessHandle.indexedDB (self : StorageAccessHandle) : IO IDBFactory := do
+@[macro_inline] def StorageAccessHandle.indexedDB (self : StorageAccessHandle) : IO IDBFactory := Internal.api "Lasm.JS.Web.StorageAccessHandle.indexedDB" do
   let r ← self.val.get "indexedDB" Value
   pure { val := r }
 
 /-- `readonly attribute LockManager locks` -/
-def StorageAccessHandle.locks (self : StorageAccessHandle) : IO LockManager := do
+@[macro_inline] def StorageAccessHandle.locks (self : StorageAccessHandle) : IO LockManager := Internal.api "Lasm.JS.Web.StorageAccessHandle.locks" do
   let r ← self.val.get "locks" Value
   pure { val := r }
 
 /-- `readonly attribute CacheStorage caches` -/
-def StorageAccessHandle.caches (self : StorageAccessHandle) : IO CacheStorage := do
+@[macro_inline] def StorageAccessHandle.caches (self : StorageAccessHandle) : IO CacheStorage := Internal.api "Lasm.JS.Web.StorageAccessHandle.caches" do
   let r ← self.val.get "caches" Value
   pure { val := r }
 
 /-- `Promise<FileSystemDirectoryHandle> getDirectory()` -/
-def StorageAccessHandle.getDirectory (self : StorageAccessHandle) : Async FileSystemDirectoryHandle := do
-  let r ← self.val.callMethodAwait "getDirectory" (Support.args #[]) Value
+@[macro_inline] def StorageAccessHandle.getDirectory (self : StorageAccessHandle) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.StorageAccessHandle.getDirectory" do
+  let r ← self.val.callMethodAwait "getDirectory" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<StorageEstimate> estimate()` -/
-def StorageAccessHandle.estimate (self : StorageAccessHandle) : Async StorageEstimate :=
-  self.val.callMethodAwait "estimate" (Support.args #[]) StorageEstimate
+@[macro_inline] def StorageAccessHandle.estimate (self : StorageAccessHandle) : Async StorageEstimate := Internal.api "Lasm.JS.Web.StorageAccessHandle.estimate" do
+  self.val.callMethodAwait "estimate" (Internal.args #[]) StorageEstimate
 
 /-- `DOMString createObjectURL((Blob or MediaSource) obj)` -/
-def StorageAccessHandle.createObjectURL (self : StorageAccessHandle) (obj : BlobOrMediaSource) : IO String :=
-  self.val.callMethod "createObjectURL" (Support.args #[toJS obj]) String
+@[macro_inline] def StorageAccessHandle.createObjectURL (self : StorageAccessHandle) (obj : BlobOrMediaSource) : IO String := Internal.api "Lasm.JS.Web.StorageAccessHandle.createObjectURL" do
+  self.val.callMethod "createObjectURL" (Internal.args #[toJS obj]) String
 
 /-- `undefined revokeObjectURL(DOMString url)` -/
-def StorageAccessHandle.revokeObjectURL (self : StorageAccessHandle) (url : String) : IO Unit :=
-  self.val.callMethod "revokeObjectURL" (Support.args #[toJS url]) Unit
+@[macro_inline] def StorageAccessHandle.revokeObjectURL (self : StorageAccessHandle) (url : String) : IO Unit := Internal.api "Lasm.JS.Web.StorageAccessHandle.revokeObjectURL" do
+  self.val.callMethod "revokeObjectURL" (Internal.args #[toJS url]) Unit
 
 /-- `BroadcastChannel BroadcastChannel(DOMString name)` -/
-def StorageAccessHandle.BroadcastChannel (self : StorageAccessHandle) (name : String) : IO BroadcastChannel := do
-  let r ← self.val.callMethod "BroadcastChannel" (Support.args #[toJS name]) Value
+@[macro_inline] def StorageAccessHandle.BroadcastChannel (self : StorageAccessHandle) (name : String) : IO BroadcastChannel := Internal.api "Lasm.JS.Web.StorageAccessHandle.BroadcastChannel" do
+  let r ← self.val.callMethod "BroadcastChannel" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `SharedWorker SharedWorker(USVString scriptURL, optional (DOMString or SharedWorkerOptions) options)` -/
-def StorageAccessHandle.SharedWorker (self : StorageAccessHandle) (scriptURL : String) (options : Option DOMStringOrSharedWorkerOptions := none) : IO SharedWorker := do
-  let r ← self.val.callMethod "SharedWorker" (Support.args #[toJS scriptURL, Support.optional options]) Value
+@[macro_inline] def StorageAccessHandle.SharedWorker (self : StorageAccessHandle) (scriptURL : String) (options : Option DOMStringOrSharedWorkerOptions := none) : IO SharedWorker := Internal.api "Lasm.JS.Web.StorageAccessHandle.SharedWorker" do
+  let r ← self.val.callMethod "SharedWorker" (Internal.args #[toJS scriptURL, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<boolean> hasUnpartitionedCookieAccess()` -/
-def Document.hasUnpartitionedCookieAccess (self : Document) : Async Bool :=
-  self.val.callMethodAwait "hasUnpartitionedCookieAccess" (Support.args #[]) Bool
+@[macro_inline] def Document.hasUnpartitionedCookieAccess (self : Document) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasUnpartitionedCookieAccess" do
+  self.val.callMethodAwait "hasUnpartitionedCookieAccess" (Internal.args #[]) Bool
 
 end Lasm.JS.Web

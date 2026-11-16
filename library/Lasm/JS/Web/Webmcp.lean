@@ -6,16 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webmcp
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ToolExecuteCallbackOptions` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ToolExecuteCallbackOptions where
   /-- `required AbortSignal signal` -/
   signal : AbortSignal
+instance : ToJS ToolExecuteCallbackOptions := ⟨fun d => Internal.fields #[("signal", toJS d.signal)]⟩
 instance : FromJS ToolExecuteCallbackOptions where
   fromJS d := do return {
     signal := ← Lasm.JS.readField AbortSignal d "signal" }
@@ -30,10 +36,10 @@ instance : ToJS ToolExecuteCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ToolExecuteCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ToolExecuteCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ToolExecuteCallback.ofFn (f : Data → ToolExecuteCallbackOptions → Async Data) : IO ToolExecuteCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ToolExecuteCallbackOptions args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ToolExecuteCallbackOptions args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ToolExecuteCallback.ofSyncFn (f : Data → ToolExecuteCallbackOptions → IO Data) : IO ToolExecuteCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ToolExecuteCallbackOptions args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ToolExecuteCallbackOptions args 1)) }
 
 /-- `dictionary ToolAnnotations` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ToolAnnotations where
@@ -45,10 +51,10 @@ structure ToolAnnotations where
   consequentialHint : Option Bool := none
   /-- `boolean debugging = false` -/
   debugging : Option Bool := none
-instance : ToJS ToolAnnotations := ⟨fun d => Support.fields #[("readOnlyHint", Support.optional d.readOnlyHint),
-    ("untrustedContentHint", Support.optional d.untrustedContentHint),
-    ("consequentialHint", Support.optional d.consequentialHint),
-    ("debugging", Support.optional d.debugging)]⟩
+instance : ToJS ToolAnnotations := ⟨fun d => Internal.fields #[("readOnlyHint", Internal.optional d.readOnlyHint),
+    ("untrustedContentHint", Internal.optional d.untrustedContentHint),
+    ("consequentialHint", Internal.optional d.consequentialHint),
+    ("debugging", Internal.optional d.debugging)]⟩
 instance : FromJS ToolAnnotations where
   fromJS d := do return {
     readOnlyHint := ← Lasm.JS.readField (Option Bool) d "readOnlyHint",
@@ -71,12 +77,12 @@ structure ModelContextTool where
   execute : ToolExecuteCallback
   /-- `ToolAnnotations annotations` -/
   annotations : Option ToolAnnotations := none
-instance : ToJS ModelContextTool := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("title", Support.optional d.title),
+instance : ToJS ModelContextTool := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("title", Internal.optional d.title),
     ("description", toJS d.description),
     ("inputSchema", d.inputSchema),
     ("execute", toJS d.execute),
-    ("annotations", Support.optional d.annotations)]⟩
+    ("annotations", Internal.optional d.annotations)]⟩
 
 /-- `dictionary ModelContextRegisterToolOptions` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ModelContextRegisterToolOptions where
@@ -84,14 +90,14 @@ structure ModelContextRegisterToolOptions where
   exposedTo : Option (Array String) := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ModelContextRegisterToolOptions := ⟨fun d => Support.fields #[("exposedTo", Support.optional d.exposedTo),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS ModelContextRegisterToolOptions := ⟨fun d => Internal.fields #[("exposedTo", Internal.optional d.exposedTo),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary ModelContextGetToolOptions` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ModelContextGetToolOptions where
   /-- `sequence<USVString> fromOrigins` -/
   fromOrigins : Option (Array String) := none
-instance : ToJS ModelContextGetToolOptions := ⟨fun d => Support.fields #[("fromOrigins", Support.optional d.fromOrigins)]⟩
+instance : ToJS ModelContextGetToolOptions := ⟨fun d => Internal.fields #[("fromOrigins", Internal.optional d.fromOrigins)]⟩
 
 /-- `dictionary RegisteredTool` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RegisteredTool where
@@ -109,13 +115,13 @@ structure RegisteredTool where
   origin : String
   /-- `ToolAnnotations annotations` -/
   annotations : Option ToolAnnotations := none
-instance : ToJS RegisteredTool := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("title", Support.optional d.title),
+instance : ToJS RegisteredTool := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("title", Internal.optional d.title),
     ("description", toJS d.description),
     ("inputSchema", d.inputSchema),
     ("window", toJS d.window),
     ("origin", toJS d.origin),
-    ("annotations", Support.optional d.annotations)]⟩
+    ("annotations", Internal.optional d.annotations)]⟩
 instance : FromJS RegisteredTool where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -131,7 +137,7 @@ instance : FromJS RegisteredTool where
 structure ModelContextExecuteToolOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ModelContextExecuteToolOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS ModelContextExecuteToolOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary ToolActivatedEventInit : EventInit` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ToolActivatedEventInit where
@@ -143,10 +149,10 @@ structure ToolActivatedEventInit where
   composed : Option Bool := none
   /-- `DOMString toolName = ""` -/
   toolName : Option String := none
-instance : ToJS ToolActivatedEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("toolName", Support.optional d.toolName)]⟩
+instance : ToJS ToolActivatedEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("toolName", Internal.optional d.toolName)]⟩
 
 /-- `dictionary ToolCancelEventInit : EventInit` (WebMCP (https://webmachinelearning.github.io/webmcp/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ToolCancelEventInit where
@@ -158,74 +164,79 @@ structure ToolCancelEventInit where
   composed : Option Bool := none
   /-- `DOMString toolName = ""` -/
   toolName : Option String := none
-instance : ToJS ToolCancelEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("toolName", Support.optional d.toolName)]⟩
+instance : ToJS ToolCancelEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("toolName", Internal.optional d.toolName)]⟩
 
 /-- `v instanceof ModelContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ModelContext`). -/
-def ModelContext.cast? (v : Value) : IO (Option ModelContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ModelContext"] Value) v) then some { val := v } else none
+@[macro_inline] def ModelContext.cast? (v : Value) : IO (Option ModelContext) := Internal.api "Lasm.JS.Web.ModelContext.cast?" do
+  Internal.cast (Internal.getGlobal ["ModelContext"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler ontoolchange` -/
-def ModelContext.ontoolchange (self : ModelContext) : IO (Option EventHandlerNonNull) := self.val.get "ontoolchange" (Option EventHandlerNonNull)
+@[macro_inline] def ModelContext.ontoolchange (self : ModelContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ModelContext.ontoolchange" do
+  self.val.get "ontoolchange" (Option EventHandlerNonNull)
 
 /-- Sets `ontoolchange`: `attribute EventHandler ontoolchange` -/
-def ModelContext.setOntoolchange (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ModelContext.setOntoolchange (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ModelContext.setOntoolchange" do
   self.val.set "ontoolchange" (toJS value)
 
 /-- `attribute EventHandler ontoolactivated` -/
-def ModelContext.ontoolactivated (self : ModelContext) : IO (Option EventHandlerNonNull) := self.val.get "ontoolactivated" (Option EventHandlerNonNull)
+@[macro_inline] def ModelContext.ontoolactivated (self : ModelContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ModelContext.ontoolactivated" do
+  self.val.get "ontoolactivated" (Option EventHandlerNonNull)
 
 /-- Sets `ontoolactivated`: `attribute EventHandler ontoolactivated` -/
-def ModelContext.setOntoolactivated (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ModelContext.setOntoolactivated (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ModelContext.setOntoolactivated" do
   self.val.set "ontoolactivated" (toJS value)
 
 /-- `attribute EventHandler ontoolcancel` -/
-def ModelContext.ontoolcancel (self : ModelContext) : IO (Option EventHandlerNonNull) := self.val.get "ontoolcancel" (Option EventHandlerNonNull)
+@[macro_inline] def ModelContext.ontoolcancel (self : ModelContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ModelContext.ontoolcancel" do
+  self.val.get "ontoolcancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontoolcancel`: `attribute EventHandler ontoolcancel` -/
-def ModelContext.setOntoolcancel (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ModelContext.setOntoolcancel (self : ModelContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ModelContext.setOntoolcancel" do
   self.val.set "ontoolcancel" (toJS value)
 
 /-- `Promise<undefined> registerTool(ModelContextTool tool, optional ModelContextRegisterToolOptions options)` -/
-def ModelContext.registerTool (self : ModelContext) (tool : ModelContextTool) (options : Option ModelContextRegisterToolOptions := none) : Async Unit :=
-  self.val.callMethodAwait "registerTool" (Support.args #[toJS tool, Support.optional options]) Unit
+@[macro_inline] def ModelContext.registerTool (self : ModelContext) (tool : ModelContextTool) (options : Option ModelContextRegisterToolOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.ModelContext.registerTool" do
+  self.val.callMethodAwait "registerTool" (Internal.args #[toJS tool, Internal.optional options]) Unit
 
 /-- `Promise<sequence<RegisteredTool>> getTools(optional ModelContextGetToolOptions options)` -/
-def ModelContext.getTools (self : ModelContext) (options : Option ModelContextGetToolOptions := none) : Async (Array RegisteredTool) :=
-  self.val.callMethodAwait "getTools" (Support.args #[Support.optional options]) (Array RegisteredTool)
+@[macro_inline] def ModelContext.getTools (self : ModelContext) (options : Option ModelContextGetToolOptions := none) : Async (Array RegisteredTool) := Internal.api "Lasm.JS.Web.ModelContext.getTools" do
+  self.val.callMethodAwait "getTools" (Internal.args #[Internal.optional options]) (Array RegisteredTool)
 
 /-- `Promise<DOMString> executeTool(RegisteredTool tool, optional object inputObject, optional ModelContextExecuteToolOptions options)` -/
-def ModelContext.executeTool (self : ModelContext) (tool : RegisteredTool) (inputObject : Data := .undefined) (options : Option ModelContextExecuteToolOptions := none) : Async String :=
-  self.val.callMethodAwait "executeTool" (Support.args #[toJS tool, inputObject, Support.optional options]) String
+@[macro_inline] def ModelContext.executeTool (self : ModelContext) (tool : RegisteredTool) (inputObject : Data := .undefined) (options : Option ModelContextExecuteToolOptions := none) : Async String := Internal.api "Lasm.JS.Web.ModelContext.executeTool" do
+  self.val.callMethodAwait "executeTool" (Internal.args #[toJS tool, inputObject, Internal.optional options]) String
 
 /-- `v instanceof ToolActivatedEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ToolActivatedEvent`). -/
-def ToolActivatedEvent.cast? (v : Value) : IO (Option ToolActivatedEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ToolActivatedEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ToolActivatedEvent.cast? (v : Value) : IO (Option ToolActivatedEvent) := Internal.api "Lasm.JS.Web.ToolActivatedEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ToolActivatedEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ToolActivatedEventInit eventInitDict)` -/
-def ToolActivatedEvent.new (type : String) (eventInitDict : Option ToolActivatedEventInit := none) : IO ToolActivatedEvent :=
+@[macro_inline] def ToolActivatedEvent.new (type : String) (eventInitDict : Option ToolActivatedEventInit := none) : IO ToolActivatedEvent := Internal.api "Lasm.JS.Web.ToolActivatedEvent.new" do
   Lasm.JS.Binding.invoke ToolActivatedEvent { name := "Lasm.JS.Web.ToolActivatedEvent.new", module := "globalThis", path := "ToolActivatedEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString toolName` -/
-def ToolActivatedEvent.toolName (self : ToolActivatedEvent) : IO String := self.val.get "toolName" String
+@[macro_inline] def ToolActivatedEvent.toolName (self : ToolActivatedEvent) : IO String := Internal.api "Lasm.JS.Web.ToolActivatedEvent.toolName" do
+  self.val.get "toolName" String
 
 /-- `v instanceof ToolCancelEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ToolCancelEvent`). -/
-def ToolCancelEvent.cast? (v : Value) : IO (Option ToolCancelEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ToolCancelEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ToolCancelEvent.cast? (v : Value) : IO (Option ToolCancelEvent) := Internal.api "Lasm.JS.Web.ToolCancelEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ToolCancelEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ToolCancelEventInit eventInitDict)` -/
-def ToolCancelEvent.new (type : String) (eventInitDict : Option ToolCancelEventInit := none) : IO ToolCancelEvent :=
+@[macro_inline] def ToolCancelEvent.new (type : String) (eventInitDict : Option ToolCancelEventInit := none) : IO ToolCancelEvent := Internal.api "Lasm.JS.Web.ToolCancelEvent.new" do
   Lasm.JS.Binding.invoke ToolCancelEvent { name := "Lasm.JS.Web.ToolCancelEvent.new", module := "globalThis", path := "ToolCancelEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString toolName` -/
-def ToolCancelEvent.toolName (self : ToolCancelEvent) : IO String := self.val.get "toolName" String
+@[macro_inline] def ToolCancelEvent.toolName (self : ToolCancelEvent) : IO String := Internal.api "Lasm.JS.Web.ToolCancelEvent.toolName" do
+  self.val.get "toolName" String
 
 /-- `readonly attribute ModelContext modelContext` -/
-def Document.modelContext (self : Document) : IO ModelContext := do
+@[macro_inline] def Document.modelContext (self : Document) : IO ModelContext := Internal.api "Lasm.JS.Web.Document.modelContext" do
   let r ← self.val.get "modelContext" Value
   pure { val := r }
 

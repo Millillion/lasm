@@ -6,45 +6,56 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.LayoutInstability
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof LayoutShift`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutShift`). -/
-def LayoutShift.cast? (v : Value) : IO (Option LayoutShift) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutShift"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutShift.cast? (v : Value) : IO (Option LayoutShift) := Internal.api "Lasm.JS.Web.LayoutShift.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutShift"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double value` -/
-def LayoutShift.value (self : LayoutShift) : IO Float := self.val.get "value" Float
+@[macro_inline] def LayoutShift.value (self : LayoutShift) : IO Float := Internal.api "Lasm.JS.Web.LayoutShift.value" do
+  self.val.get "value" Float
 
 /-- `readonly attribute boolean hadRecentInput` -/
-def LayoutShift.hadRecentInput (self : LayoutShift) : IO Bool := self.val.get "hadRecentInput" Bool
+@[macro_inline] def LayoutShift.hadRecentInput (self : LayoutShift) : IO Bool := Internal.api "Lasm.JS.Web.LayoutShift.hadRecentInput" do
+  self.val.get "hadRecentInput" Bool
 
 /-- `readonly attribute DOMHighResTimeStamp lastInputTime` -/
-def LayoutShift.lastInputTime (self : LayoutShift) : IO Float := self.val.get "lastInputTime" Float
+@[macro_inline] def LayoutShift.lastInputTime (self : LayoutShift) : IO Float := Internal.api "Lasm.JS.Web.LayoutShift.lastInputTime" do
+  self.val.get "lastInputTime" Float
 
 /-- `readonly attribute FrozenArray<LayoutShiftAttribution> sources` -/
-def LayoutShift.sources (self : LayoutShift) : IO (Array LayoutShiftAttribution) := self.val.get "sources" (Array LayoutShiftAttribution)
+@[macro_inline] def LayoutShift.sources (self : LayoutShift) : IO (Array LayoutShiftAttribution) := Internal.api "Lasm.JS.Web.LayoutShift.sources" do
+  self.val.get "sources" (Array LayoutShiftAttribution)
 
 /-- `object toJSON()` -/
-def LayoutShift.toJSON (self : LayoutShift) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def LayoutShift.toJSON (self : LayoutShift) : IO Data := Internal.api "Lasm.JS.Web.LayoutShift.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof LayoutShiftAttribution`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutShiftAttribution`). -/
-def LayoutShiftAttribution.cast? (v : Value) : IO (Option LayoutShiftAttribution) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutShiftAttribution"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutShiftAttribution.cast? (v : Value) : IO (Option LayoutShiftAttribution) := Internal.api "Lasm.JS.Web.LayoutShiftAttribution.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutShiftAttribution"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node? node` -/
-def LayoutShiftAttribution.node (self : LayoutShiftAttribution) : IO (Option Node) := self.val.get "node" (Option Node)
+@[macro_inline] def LayoutShiftAttribution.node (self : LayoutShiftAttribution) : IO (Option Node) := Internal.api "Lasm.JS.Web.LayoutShiftAttribution.node" do
+  self.val.get "node" (Option Node)
 
 /-- `readonly attribute DOMRectReadOnly previousRect` -/
-def LayoutShiftAttribution.previousRect (self : LayoutShiftAttribution) : IO DOMRectReadOnly := do
+@[macro_inline] def LayoutShiftAttribution.previousRect (self : LayoutShiftAttribution) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.LayoutShiftAttribution.previousRect" do
   let r ← self.val.get "previousRect" Value
   pure { val := r }
 
 /-- `readonly attribute DOMRectReadOnly currentRect` -/
-def LayoutShiftAttribution.currentRect (self : LayoutShiftAttribution) : IO DOMRectReadOnly := do
+@[macro_inline] def LayoutShiftAttribution.currentRect (self : LayoutShiftAttribution) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.LayoutShiftAttribution.currentRect" do
   let r ← self.val.get "currentRect" Value
   pure { val := r }
 

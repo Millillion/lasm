@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLStencilTexturing
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum DEPTH_STENCIL_TEXTURE_MODE_WEBGL = 0x90EA` -/
 def WEBGL_stencil_texturing.DEPTH_STENCIL_TEXTURE_MODE_WEBGL : Nat := 0x90EA

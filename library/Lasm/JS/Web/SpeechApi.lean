@@ -6,155 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.SpeechApi
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum SpeechRecognitionQuality` (Web Speech API (https://webaudio.github.io/web-speech-api/)): "command", "dictation", "conversation". -/
-inductive SpeechRecognitionQuality where
-  /-- "command" -/
-  | command
-  /-- "dictation" -/
-  | dictation
-  /-- "conversation" -/
-  | conversation
-  deriving BEq, Repr, Inhabited
-instance : ToJS SpeechRecognitionQuality := ⟨fun
-  | .command => .string "command"
-  | .dictation => .string "dictation"
-  | .conversation => .string "conversation"⟩
-instance : FromJS SpeechRecognitionQuality where
-  fromJS
-    | .string "command" => .ok .command
-    | .string "dictation" => .ok .dictation
-    | .string "conversation" => .ok .conversation
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SpeechRecognitionQuality"
-
-/-- `enum SpeechRecognitionAvailabilityStatus` (Web Speech API (https://webaudio.github.io/web-speech-api/)): "unavailable", "downloadable", "downloading", "available". -/
-inductive SpeechRecognitionAvailabilityStatus where
-  /-- "unavailable" -/
-  | unavailable
-  /-- "downloadable" -/
-  | downloadable
-  /-- "downloading" -/
-  | downloading
-  /-- "available" -/
-  | available
-  deriving BEq, Repr, Inhabited
-instance : ToJS SpeechRecognitionAvailabilityStatus := ⟨fun
-  | .unavailable => .string "unavailable"
-  | .downloadable => .string "downloadable"
-  | .downloading => .string "downloading"
-  | .available => .string "available"⟩
-instance : FromJS SpeechRecognitionAvailabilityStatus where
-  fromJS
-    | .string "unavailable" => .ok .unavailable
-    | .string "downloadable" => .ok .downloadable
-    | .string "downloading" => .ok .downloading
-    | .string "available" => .ok .available
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SpeechRecognitionAvailabilityStatus"
-
-/-- `enum SpeechRecognitionErrorCode` (Web Speech API (https://webaudio.github.io/web-speech-api/)): "no-speech", "aborted", "audio-capture", "network", "not-allowed", "service-not-allowed", "language-not-supported", "phrases-not-supported". -/
-inductive SpeechRecognitionErrorCode where
-  /-- "no-speech" -/
-  | noSpeech
-  /-- "aborted" -/
-  | aborted
-  /-- "audio-capture" -/
-  | audioCapture
-  /-- "network" -/
-  | network
-  /-- "not-allowed" -/
-  | notAllowed
-  /-- "service-not-allowed" -/
-  | serviceNotAllowed
-  /-- "language-not-supported" -/
-  | languageNotSupported
-  /-- "phrases-not-supported" -/
-  | phrasesNotSupported
-  deriving BEq, Repr, Inhabited
-instance : ToJS SpeechRecognitionErrorCode := ⟨fun
-  | .noSpeech => .string "no-speech"
-  | .aborted => .string "aborted"
-  | .audioCapture => .string "audio-capture"
-  | .network => .string "network"
-  | .notAllowed => .string "not-allowed"
-  | .serviceNotAllowed => .string "service-not-allowed"
-  | .languageNotSupported => .string "language-not-supported"
-  | .phrasesNotSupported => .string "phrases-not-supported"⟩
-instance : FromJS SpeechRecognitionErrorCode where
-  fromJS
-    | .string "no-speech" => .ok .noSpeech
-    | .string "aborted" => .ok .aborted
-    | .string "audio-capture" => .ok .audioCapture
-    | .string "network" => .ok .network
-    | .string "not-allowed" => .ok .notAllowed
-    | .string "service-not-allowed" => .ok .serviceNotAllowed
-    | .string "language-not-supported" => .ok .languageNotSupported
-    | .string "phrases-not-supported" => .ok .phrasesNotSupported
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SpeechRecognitionErrorCode"
-
-/-- `enum SpeechSynthesisErrorCode` (Web Speech API (https://webaudio.github.io/web-speech-api/)): "canceled", "interrupted", "audio-busy", "audio-hardware", "network", "synthesis-unavailable", "synthesis-failed", "language-unavailable", "voice-unavailable", "text-too-long", "invalid-argument", "not-allowed". -/
-inductive SpeechSynthesisErrorCode where
-  /-- "canceled" -/
-  | canceled
-  /-- "interrupted" -/
-  | interrupted
-  /-- "audio-busy" -/
-  | audioBusy
-  /-- "audio-hardware" -/
-  | audioHardware
-  /-- "network" -/
-  | network
-  /-- "synthesis-unavailable" -/
-  | synthesisUnavailable
-  /-- "synthesis-failed" -/
-  | synthesisFailed
-  /-- "language-unavailable" -/
-  | languageUnavailable
-  /-- "voice-unavailable" -/
-  | voiceUnavailable
-  /-- "text-too-long" -/
-  | textTooLong
-  /-- "invalid-argument" -/
-  | invalidArgument
-  /-- "not-allowed" -/
-  | notAllowed
-  deriving BEq, Repr, Inhabited
-instance : ToJS SpeechSynthesisErrorCode := ⟨fun
-  | .canceled => .string "canceled"
-  | .interrupted => .string "interrupted"
-  | .audioBusy => .string "audio-busy"
-  | .audioHardware => .string "audio-hardware"
-  | .network => .string "network"
-  | .synthesisUnavailable => .string "synthesis-unavailable"
-  | .synthesisFailed => .string "synthesis-failed"
-  | .languageUnavailable => .string "language-unavailable"
-  | .voiceUnavailable => .string "voice-unavailable"
-  | .textTooLong => .string "text-too-long"
-  | .invalidArgument => .string "invalid-argument"
-  | .notAllowed => .string "not-allowed"⟩
-instance : FromJS SpeechSynthesisErrorCode where
-  fromJS
-    | .string "canceled" => .ok .canceled
-    | .string "interrupted" => .ok .interrupted
-    | .string "audio-busy" => .ok .audioBusy
-    | .string "audio-hardware" => .ok .audioHardware
-    | .string "network" => .ok .network
-    | .string "synthesis-unavailable" => .ok .synthesisUnavailable
-    | .string "synthesis-failed" => .ok .synthesisFailed
-    | .string "language-unavailable" => .ok .languageUnavailable
-    | .string "voice-unavailable" => .ok .voiceUnavailable
-    | .string "text-too-long" => .ok .textTooLong
-    | .string "invalid-argument" => .ok .invalidArgument
-    | .string "not-allowed" => .ok .notAllowed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SpeechSynthesisErrorCode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SpeechRecognitionOptions` (Web Speech API (https://webaudio.github.io/web-speech-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpeechRecognitionOptions where
@@ -164,9 +26,9 @@ structure SpeechRecognitionOptions where
   processLocally : Option Bool := none
   /-- `SpeechRecognitionQuality quality = "command"` -/
   quality : Option SpeechRecognitionQuality := none
-instance : ToJS SpeechRecognitionOptions := ⟨fun d => Support.fields #[("langs", toJS d.langs),
-    ("processLocally", Support.optional d.processLocally),
-    ("quality", Support.optional d.quality)]⟩
+instance : ToJS SpeechRecognitionOptions := ⟨fun d => Internal.fields #[("langs", toJS d.langs),
+    ("processLocally", Internal.optional d.processLocally),
+    ("quality", Internal.optional d.quality)]⟩
 
 /-- `dictionary SpeechRecognitionErrorEventInit : EventInit` (Web Speech API (https://webaudio.github.io/web-speech-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpeechRecognitionErrorEventInit where
@@ -180,11 +42,11 @@ structure SpeechRecognitionErrorEventInit where
   error : SpeechRecognitionErrorCode
   /-- `DOMString message = ""` -/
   message : Option String := none
-instance : ToJS SpeechRecognitionErrorEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS SpeechRecognitionErrorEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("error", toJS d.error),
-    ("message", Support.optional d.message)]⟩
+    ("message", Internal.optional d.message)]⟩
 
 /-- `dictionary SpeechRecognitionEventInit : EventInit` (Web Speech API (https://webaudio.github.io/web-speech-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpeechRecognitionEventInit where
@@ -198,10 +60,10 @@ structure SpeechRecognitionEventInit where
   resultIndex : Option Nat := none
   /-- `required SpeechRecognitionResultList results` -/
   results : SpeechRecognitionResultList
-instance : ToJS SpeechRecognitionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("resultIndex", Support.optional d.resultIndex),
+instance : ToJS SpeechRecognitionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("resultIndex", Internal.optional d.resultIndex),
     ("results", toJS d.results)]⟩
 
 /-- `dictionary SpeechSynthesisEventInit : EventInit` (Web Speech API (https://webaudio.github.io/web-speech-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -222,14 +84,14 @@ structure SpeechSynthesisEventInit where
   elapsedTime : Option Float := none
   /-- `DOMString name = ""` -/
   name : Option String := none
-instance : ToJS SpeechSynthesisEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS SpeechSynthesisEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("utterance", toJS d.utterance),
-    ("charIndex", Support.optional d.charIndex),
-    ("charLength", Support.optional d.charLength),
-    ("elapsedTime", Support.optional d.elapsedTime),
-    ("name", Support.optional d.name)]⟩
+    ("charIndex", Internal.optional d.charIndex),
+    ("charLength", Internal.optional d.charLength),
+    ("elapsedTime", Internal.optional d.elapsedTime),
+    ("name", Internal.optional d.name)]⟩
 
 /-- `dictionary SpeechSynthesisErrorEventInit : SpeechSynthesisEventInit` (Web Speech API (https://webaudio.github.io/web-speech-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpeechSynthesisErrorEventInit where
@@ -251,516 +113,581 @@ structure SpeechSynthesisErrorEventInit where
   name : Option String := none
   /-- `required SpeechSynthesisErrorCode error` -/
   error : SpeechSynthesisErrorCode
-instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("utterance", toJS d.utterance),
-    ("charIndex", Support.optional d.charIndex),
-    ("charLength", Support.optional d.charLength),
-    ("elapsedTime", Support.optional d.elapsedTime),
-    ("name", Support.optional d.name),
+    ("charIndex", Internal.optional d.charIndex),
+    ("charLength", Internal.optional d.charLength),
+    ("elapsedTime", Internal.optional d.elapsedTime),
+    ("name", Internal.optional d.name),
     ("error", toJS d.error)]⟩
 
 /-- `v instanceof SpeechGrammar`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechGrammar`). -/
-def SpeechGrammar.cast? (v : Value) : IO (Option SpeechGrammar) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechGrammar"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechGrammar.cast? (v : Value) : IO (Option SpeechGrammar) := Internal.api "Lasm.JS.Web.SpeechGrammar.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechGrammar"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString src` -/
-def SpeechGrammar.src (self : SpeechGrammar) : IO String := self.val.get "src" String
+@[macro_inline] def SpeechGrammar.src (self : SpeechGrammar) : IO String := Internal.api "Lasm.JS.Web.SpeechGrammar.src" do
+  self.val.get "src" String
 
 /-- Sets `src`: `attribute DOMString src` -/
-def SpeechGrammar.setSrc (self : SpeechGrammar) (value : String) : IO Unit :=
+@[macro_inline] def SpeechGrammar.setSrc (self : SpeechGrammar) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SpeechGrammar.setSrc" do
   self.val.set "src" (toJS value)
 
 /-- `attribute float weight` -/
-def SpeechGrammar.weight (self : SpeechGrammar) : IO Float := self.val.get "weight" Float
+@[macro_inline] def SpeechGrammar.weight (self : SpeechGrammar) : IO Float := Internal.api "Lasm.JS.Web.SpeechGrammar.weight" do
+  self.val.get "weight" Float
 
 /-- Sets `weight`: `attribute float weight` -/
-def SpeechGrammar.setWeight (self : SpeechGrammar) (value : Float) : IO Unit :=
+@[macro_inline] def SpeechGrammar.setWeight (self : SpeechGrammar) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SpeechGrammar.setWeight" do
   self.val.set "weight" (toJS value)
 
 /-- `v instanceof SpeechGrammarList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechGrammarList`). -/
-def SpeechGrammarList.cast? (v : Value) : IO (Option SpeechGrammarList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechGrammarList"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechGrammarList.cast? (v : Value) : IO (Option SpeechGrammarList) := Internal.api "Lasm.JS.Web.SpeechGrammarList.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechGrammarList"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def SpeechGrammarList.new : IO SpeechGrammarList :=
+@[macro_inline] def SpeechGrammarList.new : IO SpeechGrammarList := Internal.api "Lasm.JS.Web.SpeechGrammarList.new" do
   Lasm.JS.Binding.invoke SpeechGrammarList { name := "Lasm.JS.Web.SpeechGrammarList.new", module := "globalThis", path := "SpeechGrammarList", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute unsigned long length` -/
-def SpeechGrammarList.length (self : SpeechGrammarList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SpeechGrammarList.length (self : SpeechGrammarList) : IO Nat := Internal.api "Lasm.JS.Web.SpeechGrammarList.length" do
+  self.val.get "length" Nat
 
 /-- `getter SpeechGrammar? item(unsigned long index)` -/
-def SpeechGrammarList.item (self : SpeechGrammarList) (index : Nat) : IO (Option SpeechGrammar) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option SpeechGrammar)
+@[macro_inline] def SpeechGrammarList.item (self : SpeechGrammarList) (index : Nat) : IO (Option SpeechGrammar) := Internal.api "Lasm.JS.Web.SpeechGrammarList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option SpeechGrammar)
 
 /-- `undefined addFromUri(DOMString src, optional float weight)` -/
-def SpeechGrammarList.addFromUri (self : SpeechGrammarList) (src : String) (weight : Option Float := none) : IO Unit :=
-  self.val.callMethod "addFromUri" (Support.args #[toJS src, Support.optional weight]) Unit
+@[macro_inline] def SpeechGrammarList.addFromUri (self : SpeechGrammarList) (src : String) (weight : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Web.SpeechGrammarList.addFromUri" do
+  self.val.callMethod "addFromUri" (Internal.args #[toJS src, Internal.optional weight]) Unit
 
 /-- `undefined addFromString(DOMString string, optional float weight)` -/
-def SpeechGrammarList.addFromString (self : SpeechGrammarList) (string : String) (weight : Option Float := none) : IO Unit :=
-  self.val.callMethod "addFromString" (Support.args #[toJS string, Support.optional weight]) Unit
+@[macro_inline] def SpeechGrammarList.addFromString (self : SpeechGrammarList) (string : String) (weight : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Web.SpeechGrammarList.addFromString" do
+  self.val.callMethod "addFromString" (Internal.args #[toJS string, Internal.optional weight]) Unit
 
 /-- `v instanceof SpeechRecognition`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognition`). -/
-def SpeechRecognition.cast? (v : Value) : IO (Option SpeechRecognition) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognition"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognition.cast? (v : Value) : IO (Option SpeechRecognition) := Internal.api "Lasm.JS.Web.SpeechRecognition.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognition"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def SpeechRecognition.new : IO SpeechRecognition :=
+@[macro_inline] def SpeechRecognition.new : IO SpeechRecognition := Internal.api "Lasm.JS.Web.SpeechRecognition.new" do
   Lasm.JS.Binding.invoke SpeechRecognition { name := "Lasm.JS.Web.SpeechRecognition.new", module := "globalThis", path := "SpeechRecognition", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `attribute SpeechGrammarList grammars` -/
-def SpeechRecognition.grammars (self : SpeechRecognition) : IO SpeechGrammarList := do
+@[macro_inline] def SpeechRecognition.grammars (self : SpeechRecognition) : IO SpeechGrammarList := Internal.api "Lasm.JS.Web.SpeechRecognition.grammars" do
   let r ← self.val.get "grammars" Value
   pure { val := r }
 
 /-- Sets `grammars`: `attribute SpeechGrammarList grammars` -/
-def SpeechRecognition.setGrammars (self : SpeechRecognition) (value : SpeechGrammarList) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setGrammars (self : SpeechRecognition) (value : SpeechGrammarList) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setGrammars" do
   self.val.set "grammars" (toJS value)
 
 /-- `attribute DOMString lang` -/
-def SpeechRecognition.lang (self : SpeechRecognition) : IO String := self.val.get "lang" String
+@[macro_inline] def SpeechRecognition.lang (self : SpeechRecognition) : IO String := Internal.api "Lasm.JS.Web.SpeechRecognition.lang" do
+  self.val.get "lang" String
 
 /-- Sets `lang`: `attribute DOMString lang` -/
-def SpeechRecognition.setLang (self : SpeechRecognition) (value : String) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setLang (self : SpeechRecognition) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setLang" do
   self.val.set "lang" (toJS value)
 
 /-- `attribute boolean continuous` -/
-def SpeechRecognition.continuous (self : SpeechRecognition) : IO Bool := self.val.get "continuous" Bool
+@[macro_inline] def SpeechRecognition.continuous (self : SpeechRecognition) : IO Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.continuous" do
+  self.val.get "continuous" Bool
 
 /-- Sets `continuous`: `attribute boolean continuous` -/
-def SpeechRecognition.setContinuous (self : SpeechRecognition) (value : Bool) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setContinuous (self : SpeechRecognition) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setContinuous" do
   self.val.set "continuous" (toJS value)
 
 /-- `attribute boolean interimResults` -/
-def SpeechRecognition.interimResults (self : SpeechRecognition) : IO Bool := self.val.get "interimResults" Bool
+@[macro_inline] def SpeechRecognition.interimResults (self : SpeechRecognition) : IO Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.interimResults" do
+  self.val.get "interimResults" Bool
 
 /-- Sets `interimResults`: `attribute boolean interimResults` -/
-def SpeechRecognition.setInterimResults (self : SpeechRecognition) (value : Bool) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setInterimResults (self : SpeechRecognition) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setInterimResults" do
   self.val.set "interimResults" (toJS value)
 
 /-- `attribute boolean unspokenPunctuation` -/
-def SpeechRecognition.unspokenPunctuation (self : SpeechRecognition) : IO Bool := self.val.get "unspokenPunctuation" Bool
+@[macro_inline] def SpeechRecognition.unspokenPunctuation (self : SpeechRecognition) : IO Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.unspokenPunctuation" do
+  self.val.get "unspokenPunctuation" Bool
 
 /-- Sets `unspokenPunctuation`: `attribute boolean unspokenPunctuation` -/
-def SpeechRecognition.setUnspokenPunctuation (self : SpeechRecognition) (value : Bool) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setUnspokenPunctuation (self : SpeechRecognition) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setUnspokenPunctuation" do
   self.val.set "unspokenPunctuation" (toJS value)
 
 /-- `attribute unsigned long maxAlternatives` -/
-def SpeechRecognition.maxAlternatives (self : SpeechRecognition) : IO Nat := self.val.get "maxAlternatives" Nat
+@[macro_inline] def SpeechRecognition.maxAlternatives (self : SpeechRecognition) : IO Nat := Internal.api "Lasm.JS.Web.SpeechRecognition.maxAlternatives" do
+  self.val.get "maxAlternatives" Nat
 
 /-- Sets `maxAlternatives`: `attribute unsigned long maxAlternatives` -/
-def SpeechRecognition.setMaxAlternatives (self : SpeechRecognition) (value : Nat) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setMaxAlternatives (self : SpeechRecognition) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setMaxAlternatives" do
   self.val.set "maxAlternatives" (toJS value)
 
 /-- `attribute boolean processLocally` -/
-def SpeechRecognition.processLocally (self : SpeechRecognition) : IO Bool := self.val.get "processLocally" Bool
+@[macro_inline] def SpeechRecognition.processLocally (self : SpeechRecognition) : IO Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.processLocally" do
+  self.val.get "processLocally" Bool
 
 /-- Sets `processLocally`: `attribute boolean processLocally` -/
-def SpeechRecognition.setProcessLocally (self : SpeechRecognition) (value : Bool) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setProcessLocally (self : SpeechRecognition) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setProcessLocally" do
   self.val.set "processLocally" (toJS value)
 
 /-- `attribute ObservableArray<SpeechRecognitionPhrase> phrases` -/
-def SpeechRecognition.phrases (self : SpeechRecognition) : IO (Array SpeechRecognitionPhrase) := self.val.get "phrases" (Array SpeechRecognitionPhrase)
+@[macro_inline] def SpeechRecognition.phrases (self : SpeechRecognition) : IO (Array SpeechRecognitionPhrase) := Internal.api "Lasm.JS.Web.SpeechRecognition.phrases" do
+  self.val.get "phrases" (Array SpeechRecognitionPhrase)
 
 /-- Sets `phrases`: `attribute ObservableArray<SpeechRecognitionPhrase> phrases` -/
-def SpeechRecognition.setPhrases (self : SpeechRecognition) (value : Array SpeechRecognitionPhrase) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setPhrases (self : SpeechRecognition) (value : Array SpeechRecognitionPhrase) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setPhrases" do
   self.val.set "phrases" (toJS value)
 
 /-- `attribute EventHandler onaudiostart` -/
-def SpeechRecognition.onaudiostart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onaudiostart" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onaudiostart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onaudiostart" do
+  self.val.get "onaudiostart" (Option EventHandlerNonNull)
 
 /-- Sets `onaudiostart`: `attribute EventHandler onaudiostart` -/
-def SpeechRecognition.setOnaudiostart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnaudiostart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnaudiostart" do
   self.val.set "onaudiostart" (toJS value)
 
 /-- `attribute EventHandler onsoundstart` -/
-def SpeechRecognition.onsoundstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onsoundstart" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onsoundstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onsoundstart" do
+  self.val.get "onsoundstart" (Option EventHandlerNonNull)
 
 /-- Sets `onsoundstart`: `attribute EventHandler onsoundstart` -/
-def SpeechRecognition.setOnsoundstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnsoundstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnsoundstart" do
   self.val.set "onsoundstart" (toJS value)
 
 /-- `attribute EventHandler onspeechstart` -/
-def SpeechRecognition.onspeechstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onspeechstart" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onspeechstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onspeechstart" do
+  self.val.get "onspeechstart" (Option EventHandlerNonNull)
 
 /-- Sets `onspeechstart`: `attribute EventHandler onspeechstart` -/
-def SpeechRecognition.setOnspeechstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnspeechstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnspeechstart" do
   self.val.set "onspeechstart" (toJS value)
 
 /-- `attribute EventHandler onspeechend` -/
-def SpeechRecognition.onspeechend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onspeechend" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onspeechend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onspeechend" do
+  self.val.get "onspeechend" (Option EventHandlerNonNull)
 
 /-- Sets `onspeechend`: `attribute EventHandler onspeechend` -/
-def SpeechRecognition.setOnspeechend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnspeechend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnspeechend" do
   self.val.set "onspeechend" (toJS value)
 
 /-- `attribute EventHandler onsoundend` -/
-def SpeechRecognition.onsoundend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onsoundend" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onsoundend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onsoundend" do
+  self.val.get "onsoundend" (Option EventHandlerNonNull)
 
 /-- Sets `onsoundend`: `attribute EventHandler onsoundend` -/
-def SpeechRecognition.setOnsoundend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnsoundend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnsoundend" do
   self.val.set "onsoundend" (toJS value)
 
 /-- `attribute EventHandler onaudioend` -/
-def SpeechRecognition.onaudioend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onaudioend" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onaudioend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onaudioend" do
+  self.val.get "onaudioend" (Option EventHandlerNonNull)
 
 /-- Sets `onaudioend`: `attribute EventHandler onaudioend` -/
-def SpeechRecognition.setOnaudioend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnaudioend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnaudioend" do
   self.val.set "onaudioend" (toJS value)
 
 /-- `attribute EventHandler onresult` -/
-def SpeechRecognition.onresult (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onresult" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onresult (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onresult" do
+  self.val.get "onresult" (Option EventHandlerNonNull)
 
 /-- Sets `onresult`: `attribute EventHandler onresult` -/
-def SpeechRecognition.setOnresult (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnresult (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnresult" do
   self.val.set "onresult" (toJS value)
 
 /-- `attribute EventHandler onnomatch` -/
-def SpeechRecognition.onnomatch (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onnomatch" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onnomatch (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onnomatch" do
+  self.val.get "onnomatch" (Option EventHandlerNonNull)
 
 /-- Sets `onnomatch`: `attribute EventHandler onnomatch` -/
-def SpeechRecognition.setOnnomatch (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnnomatch (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnnomatch" do
   self.val.set "onnomatch" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def SpeechRecognition.onerror (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onerror (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def SpeechRecognition.setOnerror (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnerror (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onstart` -/
-def SpeechRecognition.onstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onstart" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onstart (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onstart" do
+  self.val.get "onstart" (Option EventHandlerNonNull)
 
 /-- Sets `onstart`: `attribute EventHandler onstart` -/
-def SpeechRecognition.setOnstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnstart (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnstart" do
   self.val.set "onstart" (toJS value)
 
 /-- `attribute EventHandler onend` -/
-def SpeechRecognition.onend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := self.val.get "onend" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechRecognition.onend (self : SpeechRecognition) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechRecognition.onend" do
+  self.val.get "onend" (Option EventHandlerNonNull)
 
 /-- Sets `onend`: `attribute EventHandler onend` -/
-def SpeechRecognition.setOnend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechRecognition.setOnend (self : SpeechRecognition) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.setOnend" do
   self.val.set "onend" (toJS value)
 
 /-- `undefined start()` -/
-def SpeechRecognition.start (self : SpeechRecognition) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[]) Unit
+@[macro_inline] def SpeechRecognition.start (self : SpeechRecognition) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.start" do
+  self.val.callMethod "start" (Internal.args #[]) Unit
 
 /-- `undefined start(MediaStreamTrack audioTrack)` -/
-def SpeechRecognition.startWithAudioTrack (self : SpeechRecognition) (audioTrack : MediaStreamTrack) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[toJS audioTrack]) Unit
+@[macro_inline] def SpeechRecognition.startWithAudioTrack (self : SpeechRecognition) (audioTrack : MediaStreamTrack) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.startWithAudioTrack" do
+  self.val.callMethod "start" (Internal.args #[toJS audioTrack]) Unit
 
 /-- `undefined stop()` -/
-def SpeechRecognition.stop (self : SpeechRecognition) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def SpeechRecognition.stop (self : SpeechRecognition) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `undefined abort()` -/
-def SpeechRecognition.abort (self : SpeechRecognition) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[]) Unit
+@[macro_inline] def SpeechRecognition.abort (self : SpeechRecognition) : IO Unit := Internal.api "Lasm.JS.Web.SpeechRecognition.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
 
 /-- `static Promise<SpeechRecognitionAvailabilityStatus> available(SpeechRecognitionOptions options)` -/
-def SpeechRecognition.available (options : SpeechRecognitionOptions) : Async SpeechRecognitionAvailabilityStatus :=
+@[macro_inline] def SpeechRecognition.available (options : SpeechRecognitionOptions) : Async SpeechRecognitionAvailabilityStatus := Internal.api "Lasm.JS.Web.SpeechRecognition.available" do
   Lasm.JS.Binding.invokeAsync SpeechRecognitionAvailabilityStatus { name := "Lasm.JS.Web.SpeechRecognition.available", module := "globalThis", path := "SpeechRecognition.available", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `static Promise<boolean> install(SpeechRecognitionOptions options)` -/
-def SpeechRecognition.install (options : SpeechRecognitionOptions) : Async Bool :=
+@[macro_inline] def SpeechRecognition.install (options : SpeechRecognitionOptions) : Async Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.install" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.SpeechRecognition.install", module := "globalThis", path := "SpeechRecognition.install", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `v instanceof SpeechRecognitionAlternative`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionAlternative`). -/
-def SpeechRecognitionAlternative.cast? (v : Value) : IO (Option SpeechRecognitionAlternative) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionAlternative"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionAlternative.cast? (v : Value) : IO (Option SpeechRecognitionAlternative) := Internal.api "Lasm.JS.Web.SpeechRecognitionAlternative.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionAlternative"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString transcript` -/
-def SpeechRecognitionAlternative.transcript (self : SpeechRecognitionAlternative) : IO String := self.val.get "transcript" String
+@[macro_inline] def SpeechRecognitionAlternative.transcript (self : SpeechRecognitionAlternative) : IO String := Internal.api "Lasm.JS.Web.SpeechRecognitionAlternative.transcript" do
+  self.val.get "transcript" String
 
 /-- `readonly attribute float confidence` -/
-def SpeechRecognitionAlternative.confidence (self : SpeechRecognitionAlternative) : IO Float := self.val.get "confidence" Float
+@[macro_inline] def SpeechRecognitionAlternative.confidence (self : SpeechRecognitionAlternative) : IO Float := Internal.api "Lasm.JS.Web.SpeechRecognitionAlternative.confidence" do
+  self.val.get "confidence" Float
 
 /-- `v instanceof SpeechRecognitionErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionErrorEvent`). -/
-def SpeechRecognitionErrorEvent.cast? (v : Value) : IO (Option SpeechRecognitionErrorEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionErrorEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionErrorEvent.cast? (v : Value) : IO (Option SpeechRecognitionErrorEvent) := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionErrorEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, SpeechRecognitionErrorEventInit eventInitDict)` -/
-def SpeechRecognitionErrorEvent.new (type : String) (eventInitDict : SpeechRecognitionErrorEventInit) : IO SpeechRecognitionErrorEvent :=
+@[macro_inline] def SpeechRecognitionErrorEvent.new (type : String) (eventInitDict : SpeechRecognitionErrorEventInit) : IO SpeechRecognitionErrorEvent := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.new" do
   Lasm.JS.Binding.invoke SpeechRecognitionErrorEvent { name := "Lasm.JS.Web.SpeechRecognitionErrorEvent.new", module := "globalThis", path := "SpeechRecognitionErrorEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute SpeechRecognitionErrorCode error` -/
-def SpeechRecognitionErrorEvent.error (self : SpeechRecognitionErrorEvent) : IO SpeechRecognitionErrorCode := self.val.get "error" SpeechRecognitionErrorCode
+@[macro_inline] def SpeechRecognitionErrorEvent.error (self : SpeechRecognitionErrorEvent) : IO SpeechRecognitionErrorCode := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.error" do
+  self.val.get "error" SpeechRecognitionErrorCode
 
 /-- `readonly attribute DOMString message` -/
-def SpeechRecognitionErrorEvent.message (self : SpeechRecognitionErrorEvent) : IO String := self.val.get "message" String
+@[macro_inline] def SpeechRecognitionErrorEvent.message (self : SpeechRecognitionErrorEvent) : IO String := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.message" do
+  self.val.get "message" String
 
 /-- `v instanceof SpeechRecognitionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionEvent`). -/
-def SpeechRecognitionEvent.cast? (v : Value) : IO (Option SpeechRecognitionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionEvent.cast? (v : Value) : IO (Option SpeechRecognitionEvent) := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, SpeechRecognitionEventInit eventInitDict)` -/
-def SpeechRecognitionEvent.new (type : String) (eventInitDict : SpeechRecognitionEventInit) : IO SpeechRecognitionEvent :=
+@[macro_inline] def SpeechRecognitionEvent.new (type : String) (eventInitDict : SpeechRecognitionEventInit) : IO SpeechRecognitionEvent := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.new" do
   Lasm.JS.Binding.invoke SpeechRecognitionEvent { name := "Lasm.JS.Web.SpeechRecognitionEvent.new", module := "globalThis", path := "SpeechRecognitionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute unsigned long resultIndex` -/
-def SpeechRecognitionEvent.resultIndex (self : SpeechRecognitionEvent) : IO Nat := self.val.get "resultIndex" Nat
+@[macro_inline] def SpeechRecognitionEvent.resultIndex (self : SpeechRecognitionEvent) : IO Nat := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.resultIndex" do
+  self.val.get "resultIndex" Nat
 
 /-- `readonly attribute SpeechRecognitionResultList results` -/
-def SpeechRecognitionEvent.results (self : SpeechRecognitionEvent) : IO SpeechRecognitionResultList := do
+@[macro_inline] def SpeechRecognitionEvent.results (self : SpeechRecognitionEvent) : IO SpeechRecognitionResultList := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.results" do
   let r ← self.val.get "results" Value
   pure { val := r }
 
 /-- `v instanceof SpeechRecognitionPhrase`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionPhrase`). -/
-def SpeechRecognitionPhrase.cast? (v : Value) : IO (Option SpeechRecognitionPhrase) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionPhrase"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionPhrase.cast? (v : Value) : IO (Option SpeechRecognitionPhrase) := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionPhrase"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString phrase, optional float boost)` -/
-def SpeechRecognitionPhrase.new (phrase : String) (boost : Option Float := none) : IO SpeechRecognitionPhrase :=
+@[macro_inline] def SpeechRecognitionPhrase.new (phrase : String) (boost : Option Float := none) : IO SpeechRecognitionPhrase := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.new" do
   Lasm.JS.Binding.invoke SpeechRecognitionPhrase { name := "Lasm.JS.Web.SpeechRecognitionPhrase.new", module := "globalThis", path := "SpeechRecognitionPhrase", construct := true, arity := 2 }
-    (Support.args #[toJS phrase, Support.optional boost]) (await := false)
+    (Internal.args #[toJS phrase, Internal.optional boost]) (await := false)
 
 /-- `readonly attribute DOMString phrase` -/
-def SpeechRecognitionPhrase.phrase (self : SpeechRecognitionPhrase) : IO String := self.val.get "phrase" String
+@[macro_inline] def SpeechRecognitionPhrase.phrase (self : SpeechRecognitionPhrase) : IO String := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.phrase" do
+  self.val.get "phrase" String
 
 /-- `readonly attribute float boost` -/
-def SpeechRecognitionPhrase.boost (self : SpeechRecognitionPhrase) : IO Float := self.val.get "boost" Float
+@[macro_inline] def SpeechRecognitionPhrase.boost (self : SpeechRecognitionPhrase) : IO Float := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.boost" do
+  self.val.get "boost" Float
 
 /-- `v instanceof SpeechRecognitionResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionResult`). -/
-def SpeechRecognitionResult.cast? (v : Value) : IO (Option SpeechRecognitionResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionResult"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionResult.cast? (v : Value) : IO (Option SpeechRecognitionResult) := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionResult"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SpeechRecognitionResult.length (self : SpeechRecognitionResult) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SpeechRecognitionResult.length (self : SpeechRecognitionResult) : IO Nat := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute boolean isFinal` -/
-def SpeechRecognitionResult.isFinal (self : SpeechRecognitionResult) : IO Bool := self.val.get "isFinal" Bool
+@[macro_inline] def SpeechRecognitionResult.isFinal (self : SpeechRecognitionResult) : IO Bool := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.isFinal" do
+  self.val.get "isFinal" Bool
 
 /-- `readonly attribute double speechStartTime` -/
-def SpeechRecognitionResult.speechStartTime (self : SpeechRecognitionResult) : IO Float := self.val.get "speechStartTime" Float
+@[macro_inline] def SpeechRecognitionResult.speechStartTime (self : SpeechRecognitionResult) : IO Float := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.speechStartTime" do
+  self.val.get "speechStartTime" Float
 
 /-- `readonly attribute double speechEndTime` -/
-def SpeechRecognitionResult.speechEndTime (self : SpeechRecognitionResult) : IO Float := self.val.get "speechEndTime" Float
+@[macro_inline] def SpeechRecognitionResult.speechEndTime (self : SpeechRecognitionResult) : IO Float := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.speechEndTime" do
+  self.val.get "speechEndTime" Float
 
 /-- `getter SpeechRecognitionAlternative? item(unsigned long index)` -/
-def SpeechRecognitionResult.item (self : SpeechRecognitionResult) (index : Nat) : IO (Option SpeechRecognitionAlternative) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option SpeechRecognitionAlternative)
+@[macro_inline] def SpeechRecognitionResult.item (self : SpeechRecognitionResult) (index : Nat) : IO (Option SpeechRecognitionAlternative) := Internal.api "Lasm.JS.Web.SpeechRecognitionResult.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option SpeechRecognitionAlternative)
 
 /-- `v instanceof SpeechRecognitionResultList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionResultList`). -/
-def SpeechRecognitionResultList.cast? (v : Value) : IO (Option SpeechRecognitionResultList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechRecognitionResultList"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechRecognitionResultList.cast? (v : Value) : IO (Option SpeechRecognitionResultList) := Internal.api "Lasm.JS.Web.SpeechRecognitionResultList.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechRecognitionResultList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SpeechRecognitionResultList.length (self : SpeechRecognitionResultList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SpeechRecognitionResultList.length (self : SpeechRecognitionResultList) : IO Nat := Internal.api "Lasm.JS.Web.SpeechRecognitionResultList.length" do
+  self.val.get "length" Nat
 
 /-- `getter SpeechRecognitionResult? item(unsigned long index)` -/
-def SpeechRecognitionResultList.item (self : SpeechRecognitionResultList) (index : Nat) : IO (Option SpeechRecognitionResult) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option SpeechRecognitionResult)
+@[macro_inline] def SpeechRecognitionResultList.item (self : SpeechRecognitionResultList) (index : Nat) : IO (Option SpeechRecognitionResult) := Internal.api "Lasm.JS.Web.SpeechRecognitionResultList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option SpeechRecognitionResult)
 
 /-- `v instanceof SpeechSynthesis`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechSynthesis`). -/
-def SpeechSynthesis.cast? (v : Value) : IO (Option SpeechSynthesis) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechSynthesis"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechSynthesis.cast? (v : Value) : IO (Option SpeechSynthesis) := Internal.api "Lasm.JS.Web.SpeechSynthesis.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechSynthesis"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean pending` -/
-def SpeechSynthesis.pending (self : SpeechSynthesis) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def SpeechSynthesis.pending (self : SpeechSynthesis) : IO Bool := Internal.api "Lasm.JS.Web.SpeechSynthesis.pending" do
+  self.val.get "pending" Bool
 
 /-- `readonly attribute boolean speaking` -/
-def SpeechSynthesis.speaking (self : SpeechSynthesis) : IO Bool := self.val.get "speaking" Bool
+@[macro_inline] def SpeechSynthesis.speaking (self : SpeechSynthesis) : IO Bool := Internal.api "Lasm.JS.Web.SpeechSynthesis.speaking" do
+  self.val.get "speaking" Bool
 
 /-- `readonly attribute boolean paused` -/
-def SpeechSynthesis.paused (self : SpeechSynthesis) : IO Bool := self.val.get "paused" Bool
+@[macro_inline] def SpeechSynthesis.paused (self : SpeechSynthesis) : IO Bool := Internal.api "Lasm.JS.Web.SpeechSynthesis.paused" do
+  self.val.get "paused" Bool
 
 /-- `attribute EventHandler onvoiceschanged` -/
-def SpeechSynthesis.onvoiceschanged (self : SpeechSynthesis) : IO (Option EventHandlerNonNull) := self.val.get "onvoiceschanged" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesis.onvoiceschanged (self : SpeechSynthesis) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesis.onvoiceschanged" do
+  self.val.get "onvoiceschanged" (Option EventHandlerNonNull)
 
 /-- Sets `onvoiceschanged`: `attribute EventHandler onvoiceschanged` -/
-def SpeechSynthesis.setOnvoiceschanged (self : SpeechSynthesis) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesis.setOnvoiceschanged (self : SpeechSynthesis) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesis.setOnvoiceschanged" do
   self.val.set "onvoiceschanged" (toJS value)
 
 /-- `undefined speak(SpeechSynthesisUtterance utterance)` -/
-def SpeechSynthesis.speak (self : SpeechSynthesis) (utterance : SpeechSynthesisUtterance) : IO Unit :=
-  self.val.callMethod "speak" (Support.args #[toJS utterance]) Unit
+@[macro_inline] def SpeechSynthesis.speak (self : SpeechSynthesis) (utterance : SpeechSynthesisUtterance) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesis.speak" do
+  self.val.callMethod "speak" (Internal.args #[toJS utterance]) Unit
 
 /-- `undefined cancel()` -/
-def SpeechSynthesis.cancel (self : SpeechSynthesis) : IO Unit :=
-  self.val.callMethod "cancel" (Support.args #[]) Unit
+@[macro_inline] def SpeechSynthesis.cancel (self : SpeechSynthesis) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesis.cancel" do
+  self.val.callMethod "cancel" (Internal.args #[]) Unit
 
 /-- `undefined pause()` -/
-def SpeechSynthesis.pause (self : SpeechSynthesis) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def SpeechSynthesis.pause (self : SpeechSynthesis) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesis.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `undefined resume()` -/
-def SpeechSynthesis.resume (self : SpeechSynthesis) : IO Unit :=
-  self.val.callMethod "resume" (Support.args #[]) Unit
+@[macro_inline] def SpeechSynthesis.resume (self : SpeechSynthesis) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesis.resume" do
+  self.val.callMethod "resume" (Internal.args #[]) Unit
 
 /-- `sequence<SpeechSynthesisVoice> getVoices()` -/
-def SpeechSynthesis.getVoices (self : SpeechSynthesis) : IO (Array SpeechSynthesisVoice) :=
-  self.val.callMethod "getVoices" (Support.args #[]) (Array SpeechSynthesisVoice)
+@[macro_inline] def SpeechSynthesis.getVoices (self : SpeechSynthesis) : IO (Array SpeechSynthesisVoice) := Internal.api "Lasm.JS.Web.SpeechSynthesis.getVoices" do
+  self.val.callMethod "getVoices" (Internal.args #[]) (Array SpeechSynthesisVoice)
 
 /-- `v instanceof SpeechSynthesisEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechSynthesisEvent`). -/
-def SpeechSynthesisEvent.cast? (v : Value) : IO (Option SpeechSynthesisEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechSynthesisEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechSynthesisEvent.cast? (v : Value) : IO (Option SpeechSynthesisEvent) := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechSynthesisEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, SpeechSynthesisEventInit eventInitDict)` -/
-def SpeechSynthesisEvent.new (type : String) (eventInitDict : SpeechSynthesisEventInit) : IO SpeechSynthesisEvent :=
+@[macro_inline] def SpeechSynthesisEvent.new (type : String) (eventInitDict : SpeechSynthesisEventInit) : IO SpeechSynthesisEvent := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.new" do
   Lasm.JS.Binding.invoke SpeechSynthesisEvent { name := "Lasm.JS.Web.SpeechSynthesisEvent.new", module := "globalThis", path := "SpeechSynthesisEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute SpeechSynthesisUtterance utterance` -/
-def SpeechSynthesisEvent.utterance (self : SpeechSynthesisEvent) : IO SpeechSynthesisUtterance := do
+@[macro_inline] def SpeechSynthesisEvent.utterance (self : SpeechSynthesisEvent) : IO SpeechSynthesisUtterance := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.utterance" do
   let r ← self.val.get "utterance" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long charIndex` -/
-def SpeechSynthesisEvent.charIndex (self : SpeechSynthesisEvent) : IO Nat := self.val.get "charIndex" Nat
+@[macro_inline] def SpeechSynthesisEvent.charIndex (self : SpeechSynthesisEvent) : IO Nat := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.charIndex" do
+  self.val.get "charIndex" Nat
 
 /-- `readonly attribute unsigned long charLength` -/
-def SpeechSynthesisEvent.charLength (self : SpeechSynthesisEvent) : IO Nat := self.val.get "charLength" Nat
+@[macro_inline] def SpeechSynthesisEvent.charLength (self : SpeechSynthesisEvent) : IO Nat := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.charLength" do
+  self.val.get "charLength" Nat
 
 /-- `readonly attribute float elapsedTime` -/
-def SpeechSynthesisEvent.elapsedTime (self : SpeechSynthesisEvent) : IO Float := self.val.get "elapsedTime" Float
+@[macro_inline] def SpeechSynthesisEvent.elapsedTime (self : SpeechSynthesisEvent) : IO Float := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.elapsedTime" do
+  self.val.get "elapsedTime" Float
 
 /-- `readonly attribute DOMString name` -/
-def SpeechSynthesisEvent.name (self : SpeechSynthesisEvent) : IO String := self.val.get "name" String
+@[macro_inline] def SpeechSynthesisEvent.name (self : SpeechSynthesisEvent) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.name" do
+  self.val.get "name" String
 
 /-- `v instanceof SpeechSynthesisUtterance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechSynthesisUtterance`). -/
-def SpeechSynthesisUtterance.cast? (v : Value) : IO (Option SpeechSynthesisUtterance) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechSynthesisUtterance"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechSynthesisUtterance.cast? (v : Value) : IO (Option SpeechSynthesisUtterance) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechSynthesisUtterance"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString text)` -/
-def SpeechSynthesisUtterance.new (text : Option String := none) : IO SpeechSynthesisUtterance :=
+@[macro_inline] def SpeechSynthesisUtterance.new (text : Option String := none) : IO SpeechSynthesisUtterance := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.new" do
   Lasm.JS.Binding.invoke SpeechSynthesisUtterance { name := "Lasm.JS.Web.SpeechSynthesisUtterance.new", module := "globalThis", path := "SpeechSynthesisUtterance", construct := true, arity := 1 }
-    (Support.args #[Support.optional text]) (await := false)
+    (Internal.args #[Internal.optional text]) (await := false)
 
 /-- `attribute DOMString text` -/
-def SpeechSynthesisUtterance.text (self : SpeechSynthesisUtterance) : IO String := self.val.get "text" String
+@[macro_inline] def SpeechSynthesisUtterance.text (self : SpeechSynthesisUtterance) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.text" do
+  self.val.get "text" String
 
 /-- Sets `text`: `attribute DOMString text` -/
-def SpeechSynthesisUtterance.setText (self : SpeechSynthesisUtterance) (value : String) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setText (self : SpeechSynthesisUtterance) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setText" do
   self.val.set "text" (toJS value)
 
 /-- `attribute DOMString lang` -/
-def SpeechSynthesisUtterance.lang (self : SpeechSynthesisUtterance) : IO String := self.val.get "lang" String
+@[macro_inline] def SpeechSynthesisUtterance.lang (self : SpeechSynthesisUtterance) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.lang" do
+  self.val.get "lang" String
 
 /-- Sets `lang`: `attribute DOMString lang` -/
-def SpeechSynthesisUtterance.setLang (self : SpeechSynthesisUtterance) (value : String) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setLang (self : SpeechSynthesisUtterance) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setLang" do
   self.val.set "lang" (toJS value)
 
 /-- `attribute SpeechSynthesisVoice? voice` -/
-def SpeechSynthesisUtterance.voice (self : SpeechSynthesisUtterance) : IO (Option SpeechSynthesisVoice) := self.val.get "voice" (Option SpeechSynthesisVoice)
+@[macro_inline] def SpeechSynthesisUtterance.voice (self : SpeechSynthesisUtterance) : IO (Option SpeechSynthesisVoice) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.voice" do
+  self.val.get "voice" (Option SpeechSynthesisVoice)
 
 /-- Sets `voice`: `attribute SpeechSynthesisVoice? voice` -/
-def SpeechSynthesisUtterance.setVoice (self : SpeechSynthesisUtterance) (value : Option SpeechSynthesisVoice) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setVoice (self : SpeechSynthesisUtterance) (value : Option SpeechSynthesisVoice) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setVoice" do
   self.val.set "voice" (toJS value)
 
 /-- `attribute float volume` -/
-def SpeechSynthesisUtterance.volume (self : SpeechSynthesisUtterance) : IO Float := self.val.get "volume" Float
+@[macro_inline] def SpeechSynthesisUtterance.volume (self : SpeechSynthesisUtterance) : IO Float := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.volume" do
+  self.val.get "volume" Float
 
 /-- Sets `volume`: `attribute float volume` -/
-def SpeechSynthesisUtterance.setVolume (self : SpeechSynthesisUtterance) (value : Float) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setVolume (self : SpeechSynthesisUtterance) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setVolume" do
   self.val.set "volume" (toJS value)
 
 /-- `attribute float rate` -/
-def SpeechSynthesisUtterance.rate (self : SpeechSynthesisUtterance) : IO Float := self.val.get "rate" Float
+@[macro_inline] def SpeechSynthesisUtterance.rate (self : SpeechSynthesisUtterance) : IO Float := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.rate" do
+  self.val.get "rate" Float
 
 /-- Sets `rate`: `attribute float rate` -/
-def SpeechSynthesisUtterance.setRate (self : SpeechSynthesisUtterance) (value : Float) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setRate (self : SpeechSynthesisUtterance) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setRate" do
   self.val.set "rate" (toJS value)
 
 /-- `attribute float pitch` -/
-def SpeechSynthesisUtterance.pitch (self : SpeechSynthesisUtterance) : IO Float := self.val.get "pitch" Float
+@[macro_inline] def SpeechSynthesisUtterance.pitch (self : SpeechSynthesisUtterance) : IO Float := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.pitch" do
+  self.val.get "pitch" Float
 
 /-- Sets `pitch`: `attribute float pitch` -/
-def SpeechSynthesisUtterance.setPitch (self : SpeechSynthesisUtterance) (value : Float) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setPitch (self : SpeechSynthesisUtterance) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setPitch" do
   self.val.set "pitch" (toJS value)
 
 /-- `attribute EventHandler onstart` -/
-def SpeechSynthesisUtterance.onstart (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onstart" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onstart (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onstart" do
+  self.val.get "onstart" (Option EventHandlerNonNull)
 
 /-- Sets `onstart`: `attribute EventHandler onstart` -/
-def SpeechSynthesisUtterance.setOnstart (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnstart (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnstart" do
   self.val.set "onstart" (toJS value)
 
 /-- `attribute EventHandler onend` -/
-def SpeechSynthesisUtterance.onend (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onend" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onend (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onend" do
+  self.val.get "onend" (Option EventHandlerNonNull)
 
 /-- Sets `onend`: `attribute EventHandler onend` -/
-def SpeechSynthesisUtterance.setOnend (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnend (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnend" do
   self.val.set "onend" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def SpeechSynthesisUtterance.onerror (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onerror (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def SpeechSynthesisUtterance.setOnerror (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnerror (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onpause` -/
-def SpeechSynthesisUtterance.onpause (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onpause" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onpause (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onpause" do
+  self.val.get "onpause" (Option EventHandlerNonNull)
 
 /-- Sets `onpause`: `attribute EventHandler onpause` -/
-def SpeechSynthesisUtterance.setOnpause (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnpause (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnpause" do
   self.val.set "onpause" (toJS value)
 
 /-- `attribute EventHandler onresume` -/
-def SpeechSynthesisUtterance.onresume (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onresume" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onresume (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onresume" do
+  self.val.get "onresume" (Option EventHandlerNonNull)
 
 /-- Sets `onresume`: `attribute EventHandler onresume` -/
-def SpeechSynthesisUtterance.setOnresume (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnresume (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnresume" do
   self.val.set "onresume" (toJS value)
 
 /-- `attribute EventHandler onmark` -/
-def SpeechSynthesisUtterance.onmark (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onmark" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onmark (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onmark" do
+  self.val.get "onmark" (Option EventHandlerNonNull)
 
 /-- Sets `onmark`: `attribute EventHandler onmark` -/
-def SpeechSynthesisUtterance.setOnmark (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnmark (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnmark" do
   self.val.set "onmark" (toJS value)
 
 /-- `attribute EventHandler onboundary` -/
-def SpeechSynthesisUtterance.onboundary (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := self.val.get "onboundary" (Option EventHandlerNonNull)
+@[macro_inline] def SpeechSynthesisUtterance.onboundary (self : SpeechSynthesisUtterance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.onboundary" do
+  self.val.get "onboundary" (Option EventHandlerNonNull)
 
 /-- Sets `onboundary`: `attribute EventHandler onboundary` -/
-def SpeechSynthesisUtterance.setOnboundary (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SpeechSynthesisUtterance.setOnboundary (self : SpeechSynthesisUtterance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.setOnboundary" do
   self.val.set "onboundary" (toJS value)
 
 /-- `v instanceof SpeechSynthesisVoice`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechSynthesisVoice`). -/
-def SpeechSynthesisVoice.cast? (v : Value) : IO (Option SpeechSynthesisVoice) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechSynthesisVoice"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechSynthesisVoice.cast? (v : Value) : IO (Option SpeechSynthesisVoice) := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechSynthesisVoice"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString voiceURI` -/
-def SpeechSynthesisVoice.voiceURI (self : SpeechSynthesisVoice) : IO String := self.val.get "voiceURI" String
+@[macro_inline] def SpeechSynthesisVoice.voiceURI (self : SpeechSynthesisVoice) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.voiceURI" do
+  self.val.get "voiceURI" String
 
 /-- `readonly attribute DOMString name` -/
-def SpeechSynthesisVoice.name (self : SpeechSynthesisVoice) : IO String := self.val.get "name" String
+@[macro_inline] def SpeechSynthesisVoice.name (self : SpeechSynthesisVoice) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString lang` -/
-def SpeechSynthesisVoice.lang (self : SpeechSynthesisVoice) : IO String := self.val.get "lang" String
+@[macro_inline] def SpeechSynthesisVoice.lang (self : SpeechSynthesisVoice) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.lang" do
+  self.val.get "lang" String
 
 /-- `readonly attribute boolean localService` -/
-def SpeechSynthesisVoice.localService (self : SpeechSynthesisVoice) : IO Bool := self.val.get "localService" Bool
+@[macro_inline] def SpeechSynthesisVoice.localService (self : SpeechSynthesisVoice) : IO Bool := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.localService" do
+  self.val.get "localService" Bool
 
 /-- `readonly attribute boolean default` -/
-def SpeechSynthesisVoice.default (self : SpeechSynthesisVoice) : IO Bool := self.val.get "default" Bool
+@[macro_inline] def SpeechSynthesisVoice.default (self : SpeechSynthesisVoice) : IO Bool := Internal.api "Lasm.JS.Web.SpeechSynthesisVoice.default" do
+  self.val.get "default" Bool
 
 /-- `v instanceof SpeechSynthesisErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechSynthesisErrorEvent`). -/
-def SpeechSynthesisErrorEvent.cast? (v : Value) : IO (Option SpeechSynthesisErrorEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SpeechSynthesisErrorEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SpeechSynthesisErrorEvent.cast? (v : Value) : IO (Option SpeechSynthesisErrorEvent) := Internal.api "Lasm.JS.Web.SpeechSynthesisErrorEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SpeechSynthesisErrorEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, SpeechSynthesisErrorEventInit eventInitDict)` -/
-def SpeechSynthesisErrorEvent.new (type : String) (eventInitDict : SpeechSynthesisErrorEventInit) : IO SpeechSynthesisErrorEvent :=
+@[macro_inline] def SpeechSynthesisErrorEvent.new (type : String) (eventInitDict : SpeechSynthesisErrorEventInit) : IO SpeechSynthesisErrorEvent := Internal.api "Lasm.JS.Web.SpeechSynthesisErrorEvent.new" do
   Lasm.JS.Binding.invoke SpeechSynthesisErrorEvent { name := "Lasm.JS.Web.SpeechSynthesisErrorEvent.new", module := "globalThis", path := "SpeechSynthesisErrorEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute SpeechSynthesisErrorCode error` -/
-def SpeechSynthesisErrorEvent.error (self : SpeechSynthesisErrorEvent) : IO SpeechSynthesisErrorCode := self.val.get "error" SpeechSynthesisErrorCode
+@[macro_inline] def SpeechSynthesisErrorEvent.error (self : SpeechSynthesisErrorEvent) : IO SpeechSynthesisErrorCode := Internal.api "Lasm.JS.Web.SpeechSynthesisErrorEvent.error" do
+  self.val.get "error" SpeechSynthesisErrorCode
+
+/-- `readonly attribute SpeechSynthesis speechSynthesis` -/
+@[macro_inline] def Window.speechSynthesis (self : Window) : IO SpeechSynthesis := Internal.api "Lasm.JS.Web.Window.speechSynthesis" do
+  let r ← self.val.get "speechSynthesis" Value
+  pure { val := r }
 
 /-- `readonly attribute SpeechSynthesis speechSynthesis` (Web Speech API (https://webaudio.github.io/web-speech-api/)) -/
-def speechSynthesis : IO SpeechSynthesis := do
-  let r ← Support.getGlobal ["speechSynthesis"] Value
+@[macro_inline] def speechSynthesis : IO SpeechSynthesis := Internal.api "Lasm.JS.Web.speechSynthesis" do
+  let r ← Internal.getGlobal ["speechSynthesis"] Value
   pure { val := r }
 
 end Lasm.JS.Web

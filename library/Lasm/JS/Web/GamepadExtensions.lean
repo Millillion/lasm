@@ -6,83 +6,71 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Gamepad
+import Lasm.JS.Web.Types.GamepadExtensions
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum GamepadHand` (Gamepad Extensions (https://w3c.github.io/gamepad/extensions.html)): "", "left", "right". -/
-inductive GamepadHand where
-  /-- "" -/
-  | empty
-  /-- "left" -/
-  | left
-  /-- "right" -/
-  | right
-  deriving BEq, Repr, Inhabited
-instance : ToJS GamepadHand := ⟨fun
-  | .empty => .string ""
-  | .left => .string "left"
-  | .right => .string "right"⟩
-instance : FromJS GamepadHand where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "left" => .ok .left
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GamepadHand"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof GamepadPose`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GamepadPose`). -/
-def GamepadPose.cast? (v : Value) : IO (Option GamepadPose) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GamepadPose"] Value) v) then some { val := v } else none
+@[macro_inline] def GamepadPose.cast? (v : Value) : IO (Option GamepadPose) := Internal.api "Lasm.JS.Web.GamepadPose.cast?" do
+  Internal.cast (Internal.getGlobal ["GamepadPose"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean hasOrientation` -/
-def GamepadPose.hasOrientation (self : GamepadPose) : IO Bool := self.val.get "hasOrientation" Bool
+@[macro_inline] def GamepadPose.hasOrientation (self : GamepadPose) : IO Bool := Internal.api "Lasm.JS.Web.GamepadPose.hasOrientation" do
+  self.val.get "hasOrientation" Bool
 
 /-- `readonly attribute boolean hasPosition` -/
-def GamepadPose.hasPosition (self : GamepadPose) : IO Bool := self.val.get "hasPosition" Bool
+@[macro_inline] def GamepadPose.hasPosition (self : GamepadPose) : IO Bool := Internal.api "Lasm.JS.Web.GamepadPose.hasPosition" do
+  self.val.get "hasPosition" Bool
 
 /-- `readonly attribute Float32Array? position` -/
-def GamepadPose.position (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.position (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.position" do
   let r ← self.val.get "position" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute Float32Array? linearVelocity` -/
-def GamepadPose.linearVelocity (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.linearVelocity (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.linearVelocity" do
   let r ← self.val.get "linearVelocity" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute Float32Array? linearAcceleration` -/
-def GamepadPose.linearAcceleration (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.linearAcceleration (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.linearAcceleration" do
   let r ← self.val.get "linearAcceleration" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute Float32Array? orientation` -/
-def GamepadPose.orientation (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.orientation (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.orientation" do
   let r ← self.val.get "orientation" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute Float32Array? angularVelocity` -/
-def GamepadPose.angularVelocity (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.angularVelocity (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.angularVelocity" do
   let r ← self.val.get "angularVelocity" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute Float32Array? angularAcceleration` -/
-def GamepadPose.angularAcceleration (self : GamepadPose) : IO (Option ByteArray) := do
+@[macro_inline] def GamepadPose.angularAcceleration (self : GamepadPose) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.GamepadPose.angularAcceleration" do
   let r ← self.val.get "angularAcceleration" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute GamepadHand hand` -/
-def Gamepad.hand (self : Gamepad) : IO GamepadHand := self.val.get "hand" GamepadHand
+@[macro_inline] def Gamepad.hand (self : Gamepad) : IO GamepadHand := Internal.api "Lasm.JS.Web.Gamepad.hand" do
+  self.val.get "hand" GamepadHand
 
 /-- `readonly attribute FrozenArray<GamepadHapticActuator> hapticActuators` -/
-def Gamepad.hapticActuators (self : Gamepad) : IO (Array GamepadHapticActuator) := self.val.get "hapticActuators" (Array GamepadHapticActuator)
+@[macro_inline] def Gamepad.hapticActuators (self : Gamepad) : IO (Array GamepadHapticActuator) := Internal.api "Lasm.JS.Web.Gamepad.hapticActuators" do
+  self.val.get "hapticActuators" (Array GamepadHapticActuator)
 
 /-- `readonly attribute GamepadPose? pose` -/
-def Gamepad.pose (self : Gamepad) : IO (Option GamepadPose) := self.val.get "pose" (Option GamepadPose)
+@[macro_inline] def Gamepad.pose (self : Gamepad) : IO (Option GamepadPose) := Internal.api "Lasm.JS.Web.Gamepad.pose" do
+  self.val.get "pose" (Option GamepadPose)
 
 /-- `Promise<boolean> pulse(double value, double duration)` -/
-def GamepadHapticActuator.pulse (self : GamepadHapticActuator) (value : Float) (duration : Float) : Async Bool :=
-  self.val.callMethodAwait "pulse" (Support.args #[toJS value, toJS duration]) Bool
+@[macro_inline] def GamepadHapticActuator.pulse (self : GamepadHapticActuator) (value : Float) (duration : Float) : Async Bool := Internal.api "Lasm.JS.Web.GamepadHapticActuator.pulse" do
+  self.val.callMethodAwait "pulse" (Internal.args #[toJS value, toJS duration]) Bool
 
 end Lasm.JS.Web

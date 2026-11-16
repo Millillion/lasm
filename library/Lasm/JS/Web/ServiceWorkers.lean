@@ -6,159 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.ServiceWorkers
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Urlpattern
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FrameType` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "auxiliary", "top-level", "nested", "none". -/
-inductive FrameType where
-  /-- "auxiliary" -/
-  | auxiliary
-  /-- "top-level" -/
-  | topLevel
-  /-- "nested" -/
-  | nested
-  /-- "none" -/
-  | none
-  deriving BEq, Repr, Inhabited
-instance : ToJS FrameType := ⟨fun
-  | .auxiliary => .string "auxiliary"
-  | .topLevel => .string "top-level"
-  | .nested => .string "nested"
-  | .none => .string "none"⟩
-instance : FromJS FrameType where
-  fromJS
-    | .string "auxiliary" => .ok .auxiliary
-    | .string "top-level" => .ok .topLevel
-    | .string "nested" => .ok .nested
-    | .string "none" => .ok .none
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FrameType"
-
-/-- `enum ClientType` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "window", "worker", "sharedworker", "all". -/
-inductive ClientType where
-  /-- "window" -/
-  | window
-  /-- "worker" -/
-  | worker
-  /-- "sharedworker" -/
-  | sharedworker
-  /-- "all" -/
-  | all
-  deriving BEq, Repr, Inhabited
-instance : ToJS ClientType := ⟨fun
-  | .window => .string "window"
-  | .worker => .string "worker"
-  | .sharedworker => .string "sharedworker"
-  | .all => .string "all"⟩
-instance : FromJS ClientType where
-  fromJS
-    | .string "window" => .ok .window
-    | .string "worker" => .ok .worker
-    | .string "sharedworker" => .ok .sharedworker
-    | .string "all" => .ok .all
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ClientType"
-
-/-- `enum ServiceWorkerState` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "parsed", "installing", "installed", "activating", "activated", "redundant". -/
-inductive ServiceWorkerState where
-  /-- "parsed" -/
-  | parsed
-  /-- "installing" -/
-  | installing
-  /-- "installed" -/
-  | installed
-  /-- "activating" -/
-  | activating
-  /-- "activated" -/
-  | activated
-  /-- "redundant" -/
-  | redundant
-  deriving BEq, Repr, Inhabited
-instance : ToJS ServiceWorkerState := ⟨fun
-  | .parsed => .string "parsed"
-  | .installing => .string "installing"
-  | .installed => .string "installed"
-  | .activating => .string "activating"
-  | .activated => .string "activated"
-  | .redundant => .string "redundant"⟩
-instance : FromJS ServiceWorkerState where
-  fromJS
-    | .string "parsed" => .ok .parsed
-    | .string "installing" => .ok .installing
-    | .string "installed" => .ok .installed
-    | .string "activating" => .ok .activating
-    | .string "activated" => .ok .activated
-    | .string "redundant" => .ok .redundant
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ServiceWorkerState"
-
-/-- `enum ServiceWorkerUpdateViaCache` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "imports", "all", "none". -/
-inductive ServiceWorkerUpdateViaCache where
-  /-- "imports" -/
-  | imports
-  /-- "all" -/
-  | all
-  /-- "none" -/
-  | none
-  deriving BEq, Repr, Inhabited
-instance : ToJS ServiceWorkerUpdateViaCache := ⟨fun
-  | .imports => .string "imports"
-  | .all => .string "all"
-  | .none => .string "none"⟩
-instance : FromJS ServiceWorkerUpdateViaCache where
-  fromJS
-    | .string "imports" => .ok .imports
-    | .string "all" => .ok .all
-    | .string "none" => .ok .none
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ServiceWorkerUpdateViaCache"
-
-/-- `enum RunningStatus` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "running", "not-running". -/
-inductive RunningStatus where
-  /-- "running" -/
-  | running
-  /-- "not-running" -/
-  | notRunning
-  deriving BEq, Repr, Inhabited
-instance : ToJS RunningStatus := ⟨fun
-  | .running => .string "running"
-  | .notRunning => .string "not-running"⟩
-instance : FromJS RunningStatus where
-  fromJS
-    | .string "running" => .ok .running
-    | .string "not-running" => .ok .notRunning
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RunningStatus"
-
-/-- `enum RouterSourceEnum` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)): "cache", "fetch-event", "network", "race-network-and-fetch-handler". -/
-inductive RouterSourceEnum where
-  /-- "cache" -/
-  | cache
-  /-- "fetch-event" -/
-  | fetchEvent
-  /-- "network" -/
-  | network
-  /-- "race-network-and-fetch-handler" -/
-  | raceNetworkAndFetchHandler
-  deriving BEq, Repr, Inhabited
-instance : ToJS RouterSourceEnum := ⟨fun
-  | .cache => .string "cache"
-  | .fetchEvent => .string "fetch-event"
-  | .network => .string "network"
-  | .raceNetworkAndFetchHandler => .string "race-network-and-fetch-handler"⟩
-instance : FromJS RouterSourceEnum where
-  fromJS
-    | .string "cache" => .ok .cache
-    | .string "fetch-event" => .ok .fetchEvent
-    | .string "network" => .ok .network
-    | .string "race-network-and-fetch-handler" => .ok .raceNetworkAndFetchHandler
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RouterSourceEnum"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CacheQueryOptions` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CacheQueryOptions where
@@ -168,9 +28,9 @@ structure CacheQueryOptions where
   ignoreMethod : Option Bool := none
   /-- `boolean ignoreVary = false` -/
   ignoreVary : Option Bool := none
-instance : ToJS CacheQueryOptions := ⟨fun d => Support.fields #[("ignoreSearch", Support.optional d.ignoreSearch),
-    ("ignoreMethod", Support.optional d.ignoreMethod),
-    ("ignoreVary", Support.optional d.ignoreVary)]⟩
+instance : ToJS CacheQueryOptions := ⟨fun d => Internal.fields #[("ignoreSearch", Internal.optional d.ignoreSearch),
+    ("ignoreMethod", Internal.optional d.ignoreMethod),
+    ("ignoreVary", Internal.optional d.ignoreVary)]⟩
 
 /-- `dictionary MultiCacheQueryOptions : CacheQueryOptions` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MultiCacheQueryOptions where
@@ -182,10 +42,10 @@ structure MultiCacheQueryOptions where
   ignoreVary : Option Bool := none
   /-- `DOMString cacheName` -/
   cacheName : Option String := none
-instance : ToJS MultiCacheQueryOptions := ⟨fun d => Support.fields #[("ignoreSearch", Support.optional d.ignoreSearch),
-    ("ignoreMethod", Support.optional d.ignoreMethod),
-    ("ignoreVary", Support.optional d.ignoreVary),
-    ("cacheName", Support.optional d.cacheName)]⟩
+instance : ToJS MultiCacheQueryOptions := ⟨fun d => Internal.fields #[("ignoreSearch", Internal.optional d.ignoreSearch),
+    ("ignoreMethod", Internal.optional d.ignoreMethod),
+    ("ignoreVary", Internal.optional d.ignoreVary),
+    ("cacheName", Internal.optional d.cacheName)]⟩
 
 /-- `dictionary ClientQueryOptions` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ClientQueryOptions where
@@ -193,8 +53,8 @@ structure ClientQueryOptions where
   includeUncontrolled : Option Bool := none
   /-- `ClientType type = "window"` -/
   type : Option ClientType := none
-instance : ToJS ClientQueryOptions := ⟨fun d => Support.fields #[("includeUncontrolled", Support.optional d.includeUncontrolled),
-    ("type", Support.optional d.type)]⟩
+instance : ToJS ClientQueryOptions := ⟨fun d => Internal.fields #[("includeUncontrolled", Internal.optional d.includeUncontrolled),
+    ("type", Internal.optional d.type)]⟩
 
 /-- `dictionary ExtendableEventInit : EventInit` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ExtendableEventInit where
@@ -204,9 +64,9 @@ structure ExtendableEventInit where
   cancelable : Option Bool := none
   /-- `boolean composed = false` -/
   composed : Option Bool := none
-instance : ToJS ExtendableEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed)]⟩
+instance : ToJS ExtendableEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed)]⟩
 
 /-- `dictionary NavigationPreloadState` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NavigationPreloadState where
@@ -214,6 +74,8 @@ structure NavigationPreloadState where
   enabled : Option Bool := none
   /-- `ByteString headerValue` -/
   headerValue : Option String := none
+instance : ToJS NavigationPreloadState := ⟨fun d => Internal.fields #[("enabled", Internal.optional d.enabled),
+    ("headerValue", Internal.optional d.headerValue)]⟩
 instance : FromJS NavigationPreloadState where
   fromJS d := do return {
     enabled := ← Lasm.JS.readField (Option Bool) d "enabled",
@@ -228,9 +90,9 @@ structure RegistrationOptions where
   type : Option WorkerType := none
   /-- `ServiceWorkerUpdateViaCache updateViaCache = "imports"` -/
   updateViaCache : Option ServiceWorkerUpdateViaCache := none
-instance : ToJS RegistrationOptions := ⟨fun d => Support.fields #[("scope", Support.optional d.scope),
-    ("type", Support.optional d.type),
-    ("updateViaCache", Support.optional d.updateViaCache)]⟩
+instance : ToJS RegistrationOptions := ⟨fun d => Internal.fields #[("scope", Internal.optional d.scope),
+    ("type", Internal.optional d.type),
+    ("updateViaCache", Internal.optional d.updateViaCache)]⟩
 
 /-- `(Client or ServiceWorker or MessagePort)`: one constructor per member type. -/
 inductive ClientOrServiceWorkerOrMessagePort where
@@ -266,14 +128,14 @@ structure ExtendableMessageEventInit where
   source : Option ClientOrServiceWorkerOrMessagePort := none
   /-- `sequence<MessagePort> ports = []` -/
   ports : Option (Array MessagePort) := none
-instance : ToJS ExtendableMessageEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS ExtendableMessageEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("data", d.data),
-    ("origin", Support.optional d.origin),
-    ("lastEventId", Support.optional d.lastEventId),
-    ("source", Support.optional d.source),
-    ("ports", Support.optional d.ports)]⟩
+    ("origin", Internal.optional d.origin),
+    ("lastEventId", Internal.optional d.lastEventId),
+    ("source", Internal.optional d.source),
+    ("ports", Internal.optional d.ports)]⟩
 
 /-- `dictionary FetchEventInit : ExtendableEventInit` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FetchEventInit where
@@ -295,15 +157,15 @@ structure FetchEventInit where
   replacesClientId : Option String := none
   /-- `Promise<undefined> handled` -/
   handled : Option Value := none
-instance : ToJS FetchEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS FetchEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("request", toJS d.request),
-    ("preloadResponse", Support.optional d.preloadResponse),
-    ("clientId", Support.optional d.clientId),
-    ("resultingClientId", Support.optional d.resultingClientId),
-    ("replacesClientId", Support.optional d.replacesClientId),
-    ("handled", Support.optional d.handled)]⟩
+    ("preloadResponse", Internal.optional d.preloadResponse),
+    ("clientId", Internal.optional d.clientId),
+    ("resultingClientId", Internal.optional d.resultingClientId),
+    ("replacesClientId", Internal.optional d.replacesClientId),
+    ("handled", Internal.optional d.handled)]⟩
 
 /-- `dictionary RouterCondition` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RouterCondition where
@@ -321,19 +183,19 @@ structure RouterCondition where
   or : Option (Array Data) := none
   /-- `RouterCondition /* recursive: any */ not` -/
   not : Data := .undefined
-instance : ToJS RouterCondition := ⟨fun d => Support.fields #[("urlPattern", Support.optional d.urlPattern),
-    ("requestMethod", Support.optional d.requestMethod),
-    ("requestMode", Support.optional d.requestMode),
-    ("requestDestination", Support.optional d.requestDestination),
-    ("runningStatus", Support.optional d.runningStatus),
-    ("or", Support.optional d.or),
+instance : ToJS RouterCondition := ⟨fun d => Internal.fields #[("urlPattern", Internal.optional d.urlPattern),
+    ("requestMethod", Internal.optional d.requestMethod),
+    ("requestMode", Internal.optional d.requestMode),
+    ("requestDestination", Internal.optional d.requestDestination),
+    ("runningStatus", Internal.optional d.runningStatus),
+    ("or", Internal.optional d.or),
     ("not", d.not)]⟩
 
 /-- `dictionary RouterSourceDict` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RouterSourceDict where
   /-- `DOMString cacheName` -/
   cacheName : Option String := none
-instance : ToJS RouterSourceDict := ⟨fun d => Support.fields #[("cacheName", Support.optional d.cacheName)]⟩
+instance : ToJS RouterSourceDict := ⟨fun d => Internal.fields #[("cacheName", Internal.optional d.cacheName)]⟩
 
 /-- `typedef RouterSourceDict or RouterSourceEnum RouterSource`: one constructor per member type. -/
 inductive RouterSource where
@@ -353,7 +215,7 @@ structure RouterRule where
   condition : RouterCondition
   /-- `required RouterSource source` -/
   source : RouterSource
-instance : ToJS RouterRule := ⟨fun d => Support.fields #[("condition", toJS d.condition),
+instance : ToJS RouterRule := ⟨fun d => Internal.fields #[("condition", toJS d.condition),
     ("source", toJS d.source)]⟩
 
 /-- `(RouterRule or sequence<RouterRule>)`: one constructor per member type. -/
@@ -369,436 +231,474 @@ instance : Coe RouterRule RouterRuleOrSequenceOfRouterRule := ⟨.routerRule⟩
 instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequence⟩
 
 /-- `v instanceof Cache`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Cache`). -/
-def Cache.cast? (v : Value) : IO (Option Cache) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Cache"] Value) v) then some { val := v } else none
+@[macro_inline] def Cache.cast? (v : Value) : IO (Option Cache) := Internal.api "Lasm.JS.Web.Cache.cast?" do
+  Internal.cast (Internal.getGlobal ["Cache"] Value) (fun x => { val := x }) v
 
 /-- `Promise<(Response or undefined)> match(RequestInfo request, optional CacheQueryOptions options)` -/
-def Cache.«match» (self : Cache) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async (Option Response) :=
-  self.val.callMethodAwait "match" (Support.args #[toJS request, Support.optional options]) (Option Response)
+@[macro_inline] def Cache.«match» (self : Cache) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async (Option Response) := Internal.api "Lasm.JS.Web.Cache.match" do
+  self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) (Option Response)
 
 /-- `Promise<FrozenArray<Response>> matchAll(optional RequestInfo request, optional CacheQueryOptions options)` -/
-def Cache.matchAll (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Response) :=
-  self.val.callMethodAwait "matchAll" (Support.args #[Support.optional request, Support.optional options]) (Array Response)
+@[macro_inline] def Cache.matchAll (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Response) := Internal.api "Lasm.JS.Web.Cache.matchAll" do
+  self.val.callMethodAwait "matchAll" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Response)
 
 /-- `Promise<undefined> add(RequestInfo request)` -/
-def Cache.add (self : Cache) (request : RequestInfo) : Async Unit :=
-  self.val.callMethodAwait "add" (Support.args #[toJS request]) Unit
+@[macro_inline] def Cache.add (self : Cache) (request : RequestInfo) : Async Unit := Internal.api "Lasm.JS.Web.Cache.add" do
+  self.val.callMethodAwait "add" (Internal.args #[toJS request]) Unit
 
 /-- `Promise<undefined> addAll(sequence<RequestInfo> requests)` -/
-def Cache.addAll (self : Cache) (requests : Array RequestInfo) : Async Unit :=
-  self.val.callMethodAwait "addAll" (Support.args #[toJS requests]) Unit
+@[macro_inline] def Cache.addAll (self : Cache) (requests : Array RequestInfo) : Async Unit := Internal.api "Lasm.JS.Web.Cache.addAll" do
+  self.val.callMethodAwait "addAll" (Internal.args #[toJS requests]) Unit
 
 /-- `Promise<undefined> put(RequestInfo request, Response response)` -/
-def Cache.put (self : Cache) (request : RequestInfo) (response : Response) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS request, toJS response]) Unit
+@[macro_inline] def Cache.put (self : Cache) (request : RequestInfo) (response : Response) : Async Unit := Internal.api "Lasm.JS.Web.Cache.put" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS request, toJS response]) Unit
 
 /-- `Promise<boolean> delete(RequestInfo request, optional CacheQueryOptions options)` -/
-def Cache.delete (self : Cache) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS request, Support.optional options]) Bool
+@[macro_inline] def Cache.delete (self : Cache) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async Bool := Internal.api "Lasm.JS.Web.Cache.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS request, Internal.optional options]) Bool
 
 /-- `Promise<FrozenArray<Request>> keys(optional RequestInfo request, optional CacheQueryOptions options)` -/
-def Cache.keys (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Request) :=
-  self.val.callMethodAwait "keys" (Support.args #[Support.optional request, Support.optional options]) (Array Request)
+@[macro_inline] def Cache.keys (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Request) := Internal.api "Lasm.JS.Web.Cache.keys" do
+  self.val.callMethodAwait "keys" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Request)
 
 /-- `v instanceof CacheStorage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CacheStorage`). -/
-def CacheStorage.cast? (v : Value) : IO (Option CacheStorage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CacheStorage"] Value) v) then some { val := v } else none
+@[macro_inline] def CacheStorage.cast? (v : Value) : IO (Option CacheStorage) := Internal.api "Lasm.JS.Web.CacheStorage.cast?" do
+  Internal.cast (Internal.getGlobal ["CacheStorage"] Value) (fun x => { val := x }) v
 
 /-- `Promise<(Response or undefined)> match(RequestInfo request, optional MultiCacheQueryOptions options)` -/
-def CacheStorage.«match» (self : CacheStorage) (request : RequestInfo) (options : Option MultiCacheQueryOptions := none) : Async (Option Response) :=
-  self.val.callMethodAwait "match" (Support.args #[toJS request, Support.optional options]) (Option Response)
+@[macro_inline] def CacheStorage.«match» (self : CacheStorage) (request : RequestInfo) (options : Option MultiCacheQueryOptions := none) : Async (Option Response) := Internal.api "Lasm.JS.Web.CacheStorage.match" do
+  self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) (Option Response)
 
 /-- `Promise<boolean> has(DOMString cacheName)` -/
-def CacheStorage.has (self : CacheStorage) (cacheName : String) : Async Bool :=
-  self.val.callMethodAwait "has" (Support.args #[toJS cacheName]) Bool
+@[macro_inline] def CacheStorage.has (self : CacheStorage) (cacheName : String) : Async Bool := Internal.api "Lasm.JS.Web.CacheStorage.has" do
+  self.val.callMethodAwait "has" (Internal.args #[toJS cacheName]) Bool
 
 /-- `Promise<Cache> open(DOMString cacheName)` -/
-def CacheStorage.«open» (self : CacheStorage) (cacheName : String) : Async Cache := do
-  let r ← self.val.callMethodAwait "open" (Support.args #[toJS cacheName]) Value
+@[macro_inline] def CacheStorage.«open» (self : CacheStorage) (cacheName : String) : Async Cache := Internal.api "Lasm.JS.Web.CacheStorage.open" do
+  let r ← self.val.callMethodAwait "open" (Internal.args #[toJS cacheName]) Value
   pure { val := r }
 
 /-- `Promise<boolean> delete(DOMString cacheName)` -/
-def CacheStorage.delete (self : CacheStorage) (cacheName : String) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS cacheName]) Bool
+@[macro_inline] def CacheStorage.delete (self : CacheStorage) (cacheName : String) : Async Bool := Internal.api "Lasm.JS.Web.CacheStorage.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS cacheName]) Bool
 
 /-- `Promise<sequence<DOMString>> keys()` -/
-def CacheStorage.keys (self : CacheStorage) : Async (Array String) :=
-  self.val.callMethodAwait "keys" (Support.args #[]) (Array String)
+@[macro_inline] def CacheStorage.keys (self : CacheStorage) : Async (Array String) := Internal.api "Lasm.JS.Web.CacheStorage.keys" do
+  self.val.callMethodAwait "keys" (Internal.args #[]) (Array String)
 
 /-- `v instanceof Client`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Client`). -/
-def Client.cast? (v : Value) : IO (Option Client) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Client"] Value) v) then some { val := v } else none
+@[macro_inline] def Client.cast? (v : Value) : IO (Option Client) := Internal.api "Lasm.JS.Web.Client.cast?" do
+  Internal.cast (Internal.getGlobal ["Client"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString url` -/
-def Client.url (self : Client) : IO String := self.val.get "url" String
+@[macro_inline] def Client.url (self : Client) : IO String := Internal.api "Lasm.JS.Web.Client.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute FrameType frameType` -/
-def Client.frameType (self : Client) : IO FrameType := self.val.get "frameType" FrameType
+@[macro_inline] def Client.frameType (self : Client) : IO FrameType := Internal.api "Lasm.JS.Web.Client.frameType" do
+  self.val.get "frameType" FrameType
 
 /-- `readonly attribute DOMString id` -/
-def Client.id (self : Client) : IO String := self.val.get "id" String
+@[macro_inline] def Client.id (self : Client) : IO String := Internal.api "Lasm.JS.Web.Client.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute ClientType type` -/
-def Client.type (self : Client) : IO ClientType := self.val.get "type" ClientType
+@[macro_inline] def Client.type (self : Client) : IO ClientType := Internal.api "Lasm.JS.Web.Client.type" do
+  self.val.get "type" ClientType
 
 /-- `undefined postMessage(any message, sequence<object> transfer)` -/
-def Client.postMessage (self : Client) (message : Data) (transfer : Array Data) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, toJS transfer]) Unit
+@[macro_inline] def Client.postMessage (self : Client) (message : Data) (transfer : Array Data) : IO Unit := Internal.api "Lasm.JS.Web.Client.postMessage" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, toJS transfer]) Unit
 
 /-- `undefined postMessage(any message, optional StructuredSerializeOptions options)` -/
-def Client.postMessageWithOptions (self : Client) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, Support.optional options]) Unit
+@[macro_inline] def Client.postMessageWithOptions (self : Client) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Client.postMessageWithOptions" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
 
 /-- `v instanceof Clients`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Clients`). -/
-def Clients.cast? (v : Value) : IO (Option Clients) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Clients"] Value) v) then some { val := v } else none
+@[macro_inline] def Clients.cast? (v : Value) : IO (Option Clients) := Internal.api "Lasm.JS.Web.Clients.cast?" do
+  Internal.cast (Internal.getGlobal ["Clients"] Value) (fun x => { val := x }) v
 
 /-- `Promise<(Client or undefined)> get(DOMString id)` -/
-def Clients.get (self : Clients) (id : String) : Async (Option Client) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS id]) (Option Client)
+@[macro_inline] def Clients.get (self : Clients) (id : String) : Async (Option Client) := Internal.api "Lasm.JS.Web.Clients.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS id]) (Option Client)
 
 /-- `Promise<FrozenArray<Client>> matchAll(optional ClientQueryOptions options)` -/
-def Clients.matchAll (self : Clients) (options : Option ClientQueryOptions := none) : Async (Array Client) :=
-  self.val.callMethodAwait "matchAll" (Support.args #[Support.optional options]) (Array Client)
+@[macro_inline] def Clients.matchAll (self : Clients) (options : Option ClientQueryOptions := none) : Async (Array Client) := Internal.api "Lasm.JS.Web.Clients.matchAll" do
+  self.val.callMethodAwait "matchAll" (Internal.args #[Internal.optional options]) (Array Client)
 
 /-- `Promise<WindowClient?> openWindow(USVString url)` -/
-def Clients.openWindow (self : Clients) (url : String) : Async (Option WindowClient) :=
-  self.val.callMethodAwait "openWindow" (Support.args #[toJS url]) (Option WindowClient)
+@[macro_inline] def Clients.openWindow (self : Clients) (url : String) : Async (Option WindowClient) := Internal.api "Lasm.JS.Web.Clients.openWindow" do
+  self.val.callMethodAwait "openWindow" (Internal.args #[toJS url]) (Option WindowClient)
 
 /-- `Promise<undefined> claim()` -/
-def Clients.claim (self : Clients) : Async Unit :=
-  self.val.callMethodAwait "claim" (Support.args #[]) Unit
+@[macro_inline] def Clients.claim (self : Clients) : Async Unit := Internal.api "Lasm.JS.Web.Clients.claim" do
+  self.val.callMethodAwait "claim" (Internal.args #[]) Unit
 
 /-- `v instanceof ExtendableEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ExtendableEvent`). -/
-def ExtendableEvent.cast? (v : Value) : IO (Option ExtendableEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ExtendableEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ExtendableEvent.cast? (v : Value) : IO (Option ExtendableEvent) := Internal.api "Lasm.JS.Web.ExtendableEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ExtendableEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ExtendableEventInit eventInitDict)` -/
-def ExtendableEvent.new (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO ExtendableEvent :=
+@[macro_inline] def ExtendableEvent.new (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO ExtendableEvent := Internal.api "Lasm.JS.Web.ExtendableEvent.new" do
   Lasm.JS.Binding.invoke ExtendableEvent { name := "Lasm.JS.Web.ExtendableEvent.new", module := "globalThis", path := "ExtendableEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `undefined waitUntil(Promise<any> f)` -/
-def ExtendableEvent.waitUntil (self : ExtendableEvent) (f : Value) : IO Unit :=
-  self.val.callMethod "waitUntil" (Support.args #[toJS f]) Unit
+@[macro_inline] def ExtendableEvent.waitUntil (self : ExtendableEvent) (f : Value) : IO Unit := Internal.api "Lasm.JS.Web.ExtendableEvent.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS f]) Unit
 
 /-- `v instanceof NavigationPreloadManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NavigationPreloadManager`). -/
-def NavigationPreloadManager.cast? (v : Value) : IO (Option NavigationPreloadManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NavigationPreloadManager"] Value) v) then some { val := v } else none
+@[macro_inline] def NavigationPreloadManager.cast? (v : Value) : IO (Option NavigationPreloadManager) := Internal.api "Lasm.JS.Web.NavigationPreloadManager.cast?" do
+  Internal.cast (Internal.getGlobal ["NavigationPreloadManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> enable()` -/
-def NavigationPreloadManager.enable (self : NavigationPreloadManager) : Async Unit :=
-  self.val.callMethodAwait "enable" (Support.args #[]) Unit
+@[macro_inline] def NavigationPreloadManager.enable (self : NavigationPreloadManager) : Async Unit := Internal.api "Lasm.JS.Web.NavigationPreloadManager.enable" do
+  self.val.callMethodAwait "enable" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> disable()` -/
-def NavigationPreloadManager.disable (self : NavigationPreloadManager) : Async Unit :=
-  self.val.callMethodAwait "disable" (Support.args #[]) Unit
+@[macro_inline] def NavigationPreloadManager.disable (self : NavigationPreloadManager) : Async Unit := Internal.api "Lasm.JS.Web.NavigationPreloadManager.disable" do
+  self.val.callMethodAwait "disable" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> setHeaderValue(ByteString value)` -/
-def NavigationPreloadManager.setHeaderValue (self : NavigationPreloadManager) (value : String) : Async Unit :=
-  self.val.callMethodAwait "setHeaderValue" (Support.args #[toJS value]) Unit
+@[macro_inline] def NavigationPreloadManager.setHeaderValue (self : NavigationPreloadManager) (value : String) : Async Unit := Internal.api "Lasm.JS.Web.NavigationPreloadManager.setHeaderValue" do
+  self.val.callMethodAwait "setHeaderValue" (Internal.args #[toJS value]) Unit
 
 /-- `Promise<NavigationPreloadState> getState()` -/
-def NavigationPreloadManager.getState (self : NavigationPreloadManager) : Async NavigationPreloadState :=
-  self.val.callMethodAwait "getState" (Support.args #[]) NavigationPreloadState
+@[macro_inline] def NavigationPreloadManager.getState (self : NavigationPreloadManager) : Async NavigationPreloadState := Internal.api "Lasm.JS.Web.NavigationPreloadManager.getState" do
+  self.val.callMethodAwait "getState" (Internal.args #[]) NavigationPreloadState
 
 /-- `v instanceof ServiceWorker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServiceWorker`). -/
-def ServiceWorker.cast? (v : Value) : IO (Option ServiceWorker) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ServiceWorker"] Value) v) then some { val := v } else none
+@[macro_inline] def ServiceWorker.cast? (v : Value) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorker.cast?" do
+  Internal.cast (Internal.getGlobal ["ServiceWorker"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString scriptURL` -/
-def ServiceWorker.scriptURL (self : ServiceWorker) : IO String := self.val.get "scriptURL" String
+@[macro_inline] def ServiceWorker.scriptURL (self : ServiceWorker) : IO String := Internal.api "Lasm.JS.Web.ServiceWorker.scriptURL" do
+  self.val.get "scriptURL" String
 
 /-- `readonly attribute ServiceWorkerState state` -/
-def ServiceWorker.state (self : ServiceWorker) : IO ServiceWorkerState := self.val.get "state" ServiceWorkerState
+@[macro_inline] def ServiceWorker.state (self : ServiceWorker) : IO ServiceWorkerState := Internal.api "Lasm.JS.Web.ServiceWorker.state" do
+  self.val.get "state" ServiceWorkerState
 
 /-- `attribute EventHandler onstatechange` -/
-def ServiceWorker.onstatechange (self : ServiceWorker) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorker.onstatechange (self : ServiceWorker) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorker.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def ServiceWorker.setOnstatechange (self : ServiceWorker) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorker.setOnstatechange (self : ServiceWorker) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorker.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def ServiceWorker.onerror (self : ServiceWorker) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorker.onerror (self : ServiceWorker) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorker.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def ServiceWorker.setOnerror (self : ServiceWorker) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorker.setOnerror (self : ServiceWorker) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorker.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `undefined postMessage(any message, sequence<object> transfer)` -/
-def ServiceWorker.postMessage (self : ServiceWorker) (message : Data) (transfer : Array Data) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, toJS transfer]) Unit
+@[macro_inline] def ServiceWorker.postMessage (self : ServiceWorker) (message : Data) (transfer : Array Data) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorker.postMessage" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, toJS transfer]) Unit
 
 /-- `undefined postMessage(any message, optional StructuredSerializeOptions options)` -/
-def ServiceWorker.postMessageWithOptions (self : ServiceWorker) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit :=
-  self.val.callMethod "postMessage" (Support.args #[toJS message, Support.optional options]) Unit
+@[macro_inline] def ServiceWorker.postMessageWithOptions (self : ServiceWorker) (message : Data) (options : Option StructuredSerializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorker.postMessageWithOptions" do
+  self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
 
 /-- `v instanceof ServiceWorkerContainer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServiceWorkerContainer`). -/
-def ServiceWorkerContainer.cast? (v : Value) : IO (Option ServiceWorkerContainer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ServiceWorkerContainer"] Value) v) then some { val := v } else none
+@[macro_inline] def ServiceWorkerContainer.cast? (v : Value) : IO (Option ServiceWorkerContainer) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.cast?" do
+  Internal.cast (Internal.getGlobal ["ServiceWorkerContainer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ServiceWorker? controller` -/
-def ServiceWorkerContainer.controller (self : ServiceWorkerContainer) : IO (Option ServiceWorker) := self.val.get "controller" (Option ServiceWorker)
+@[macro_inline] def ServiceWorkerContainer.controller (self : ServiceWorkerContainer) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.controller" do
+  self.val.get "controller" (Option ServiceWorker)
 
 /-- `readonly attribute Promise<ServiceWorkerRegistration> ready` -/
-def ServiceWorkerContainer.ready (self : ServiceWorkerContainer) : Async ServiceWorkerRegistration := do
+@[macro_inline] def ServiceWorkerContainer.ready (self : ServiceWorkerContainer) : Async ServiceWorkerRegistration := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.ready" do
   let p ← self.val.get "ready" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `attribute EventHandler oncontrollerchange` -/
-def ServiceWorkerContainer.oncontrollerchange (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := self.val.get "oncontrollerchange" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerContainer.oncontrollerchange (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.oncontrollerchange" do
+  self.val.get "oncontrollerchange" (Option EventHandlerNonNull)
 
 /-- Sets `oncontrollerchange`: `attribute EventHandler oncontrollerchange` -/
-def ServiceWorkerContainer.setOncontrollerchange (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerContainer.setOncontrollerchange (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.setOncontrollerchange" do
   self.val.set "oncontrollerchange" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def ServiceWorkerContainer.onmessage (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerContainer.onmessage (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def ServiceWorkerContainer.setOnmessage (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerContainer.setOnmessage (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute EventHandler onmessageerror` -/
-def ServiceWorkerContainer.onmessageerror (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := self.val.get "onmessageerror" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerContainer.onmessageerror (self : ServiceWorkerContainer) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.onmessageerror" do
+  self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
-def ServiceWorkerContainer.setOnmessageerror (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerContainer.setOnmessageerror (self : ServiceWorkerContainer) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
 
 /-- `Promise<ServiceWorkerRegistration> register((TrustedScriptURL or USVString) scriptURL, optional RegistrationOptions options)` -/
-def ServiceWorkerContainer.register (self : ServiceWorkerContainer) (scriptURL : TrustedScriptURLOrUSVString) (options : Option RegistrationOptions := none) : Async ServiceWorkerRegistration := do
-  let r ← self.val.callMethodAwait "register" (Support.args #[toJS scriptURL, Support.optional options]) Value
+@[macro_inline] def ServiceWorkerContainer.register (self : ServiceWorkerContainer) (scriptURL : TrustedScriptURLOrUSVString) (options : Option RegistrationOptions := none) : Async ServiceWorkerRegistration := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.register" do
+  let r ← self.val.callMethodAwait "register" (Internal.args #[toJS scriptURL, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<(ServiceWorkerRegistration or undefined)> getRegistration(optional USVString clientURL)` -/
-def ServiceWorkerContainer.getRegistration (self : ServiceWorkerContainer) (clientURL : Option String := none) : Async (Option ServiceWorkerRegistration) :=
-  self.val.callMethodAwait "getRegistration" (Support.args #[Support.optional clientURL]) (Option ServiceWorkerRegistration)
+@[macro_inline] def ServiceWorkerContainer.getRegistration (self : ServiceWorkerContainer) (clientURL : Option String := none) : Async (Option ServiceWorkerRegistration) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.getRegistration" do
+  self.val.callMethodAwait "getRegistration" (Internal.args #[Internal.optional clientURL]) (Option ServiceWorkerRegistration)
 
 /-- `Promise<FrozenArray<ServiceWorkerRegistration>> getRegistrations()` -/
-def ServiceWorkerContainer.getRegistrations (self : ServiceWorkerContainer) : Async (Array ServiceWorkerRegistration) :=
-  self.val.callMethodAwait "getRegistrations" (Support.args #[]) (Array ServiceWorkerRegistration)
+@[macro_inline] def ServiceWorkerContainer.getRegistrations (self : ServiceWorkerContainer) : Async (Array ServiceWorkerRegistration) := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.getRegistrations" do
+  self.val.callMethodAwait "getRegistrations" (Internal.args #[]) (Array ServiceWorkerRegistration)
 
 /-- `undefined startMessages()` -/
-def ServiceWorkerContainer.startMessages (self : ServiceWorkerContainer) : IO Unit :=
-  self.val.callMethod "startMessages" (Support.args #[]) Unit
+@[macro_inline] def ServiceWorkerContainer.startMessages (self : ServiceWorkerContainer) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerContainer.startMessages" do
+  self.val.callMethod "startMessages" (Internal.args #[]) Unit
 
 /-- `v instanceof ServiceWorkerGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServiceWorkerGlobalScope`). -/
-def ServiceWorkerGlobalScope.cast? (v : Value) : IO (Option ServiceWorkerGlobalScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ServiceWorkerGlobalScope"] Value) v) then some { val := v } else none
+@[macro_inline] def ServiceWorkerGlobalScope.cast? (v : Value) : IO (Option ServiceWorkerGlobalScope) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.cast?" do
+  Internal.cast (Internal.getGlobal ["ServiceWorkerGlobalScope"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Clients clients` -/
-def ServiceWorkerGlobalScope.clients (self : ServiceWorkerGlobalScope) : IO Clients := do
+@[macro_inline] def ServiceWorkerGlobalScope.clients (self : ServiceWorkerGlobalScope) : IO Clients := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.clients" do
   let r ← self.val.get "clients" Value
   pure { val := r }
 
 /-- `readonly attribute ServiceWorkerRegistration registration` -/
-def ServiceWorkerGlobalScope.registration (self : ServiceWorkerGlobalScope) : IO ServiceWorkerRegistration := do
+@[macro_inline] def ServiceWorkerGlobalScope.registration (self : ServiceWorkerGlobalScope) : IO ServiceWorkerRegistration := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.registration" do
   let r ← self.val.get "registration" Value
   pure { val := r }
 
 /-- `readonly attribute ServiceWorker serviceWorker` -/
-def ServiceWorkerGlobalScope.serviceWorker (self : ServiceWorkerGlobalScope) : IO ServiceWorker := do
+@[macro_inline] def ServiceWorkerGlobalScope.serviceWorker (self : ServiceWorkerGlobalScope) : IO ServiceWorker := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.serviceWorker" do
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
 
 /-- `attribute EventHandler oninstall` -/
-def ServiceWorkerGlobalScope.oninstall (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "oninstall" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.oninstall (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oninstall" do
+  self.val.get "oninstall" (Option EventHandlerNonNull)
 
 /-- Sets `oninstall`: `attribute EventHandler oninstall` -/
-def ServiceWorkerGlobalScope.setOninstall (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOninstall (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOninstall" do
   self.val.set "oninstall" (toJS value)
 
 /-- `attribute EventHandler onactivate` -/
-def ServiceWorkerGlobalScope.onactivate (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onactivate" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onactivate (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onactivate" do
+  self.val.get "onactivate" (Option EventHandlerNonNull)
 
 /-- Sets `onactivate`: `attribute EventHandler onactivate` -/
-def ServiceWorkerGlobalScope.setOnactivate (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnactivate (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnactivate" do
   self.val.set "onactivate" (toJS value)
 
 /-- `attribute EventHandler onfetch` -/
-def ServiceWorkerGlobalScope.onfetch (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onfetch" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onfetch (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onfetch" do
+  self.val.get "onfetch" (Option EventHandlerNonNull)
 
 /-- Sets `onfetch`: `attribute EventHandler onfetch` -/
-def ServiceWorkerGlobalScope.setOnfetch (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnfetch (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnfetch" do
   self.val.set "onfetch" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def ServiceWorkerGlobalScope.onmessage (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onmessage (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def ServiceWorkerGlobalScope.setOnmessage (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnmessage (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute EventHandler onmessageerror` -/
-def ServiceWorkerGlobalScope.onmessageerror (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onmessageerror" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onmessageerror (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onmessageerror" do
+  self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
-def ServiceWorkerGlobalScope.setOnmessageerror (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnmessageerror (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
 
 /-- `Promise<undefined> skipWaiting()` -/
-def ServiceWorkerGlobalScope.skipWaiting (self : ServiceWorkerGlobalScope) : Async Unit :=
-  self.val.callMethodAwait "skipWaiting" (Support.args #[]) Unit
+@[macro_inline] def ServiceWorkerGlobalScope.skipWaiting (self : ServiceWorkerGlobalScope) : Async Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.skipWaiting" do
+  self.val.callMethodAwait "skipWaiting" (Internal.args #[]) Unit
 
 /-- `v instanceof ServiceWorkerRegistration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServiceWorkerRegistration`). -/
-def ServiceWorkerRegistration.cast? (v : Value) : IO (Option ServiceWorkerRegistration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ServiceWorkerRegistration"] Value) v) then some { val := v } else none
+@[macro_inline] def ServiceWorkerRegistration.cast? (v : Value) : IO (Option ServiceWorkerRegistration) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.cast?" do
+  Internal.cast (Internal.getGlobal ["ServiceWorkerRegistration"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ServiceWorker? installing` -/
-def ServiceWorkerRegistration.installing (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := self.val.get "installing" (Option ServiceWorker)
+@[macro_inline] def ServiceWorkerRegistration.installing (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.installing" do
+  self.val.get "installing" (Option ServiceWorker)
 
 /-- `readonly attribute ServiceWorker? waiting` -/
-def ServiceWorkerRegistration.waiting (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := self.val.get "waiting" (Option ServiceWorker)
+@[macro_inline] def ServiceWorkerRegistration.waiting (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.waiting" do
+  self.val.get "waiting" (Option ServiceWorker)
 
 /-- `readonly attribute ServiceWorker? active` -/
-def ServiceWorkerRegistration.active (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := self.val.get "active" (Option ServiceWorker)
+@[macro_inline] def ServiceWorkerRegistration.active (self : ServiceWorkerRegistration) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.active" do
+  self.val.get "active" (Option ServiceWorker)
 
 /-- `readonly attribute NavigationPreloadManager navigationPreload` -/
-def ServiceWorkerRegistration.navigationPreload (self : ServiceWorkerRegistration) : IO NavigationPreloadManager := do
+@[macro_inline] def ServiceWorkerRegistration.navigationPreload (self : ServiceWorkerRegistration) : IO NavigationPreloadManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.navigationPreload" do
   let r ← self.val.get "navigationPreload" Value
   pure { val := r }
 
 /-- `readonly attribute USVString scope` -/
-def ServiceWorkerRegistration.scope (self : ServiceWorkerRegistration) : IO String := self.val.get "scope" String
+@[macro_inline] def ServiceWorkerRegistration.scope (self : ServiceWorkerRegistration) : IO String := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.scope" do
+  self.val.get "scope" String
 
 /-- `readonly attribute ServiceWorkerUpdateViaCache updateViaCache` -/
-def ServiceWorkerRegistration.updateViaCache (self : ServiceWorkerRegistration) : IO ServiceWorkerUpdateViaCache := self.val.get "updateViaCache" ServiceWorkerUpdateViaCache
+@[macro_inline] def ServiceWorkerRegistration.updateViaCache (self : ServiceWorkerRegistration) : IO ServiceWorkerUpdateViaCache := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.updateViaCache" do
+  self.val.get "updateViaCache" ServiceWorkerUpdateViaCache
 
 /-- `attribute EventHandler onupdatefound` -/
-def ServiceWorkerRegistration.onupdatefound (self : ServiceWorkerRegistration) : IO (Option EventHandlerNonNull) := self.val.get "onupdatefound" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerRegistration.onupdatefound (self : ServiceWorkerRegistration) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.onupdatefound" do
+  self.val.get "onupdatefound" (Option EventHandlerNonNull)
 
 /-- Sets `onupdatefound`: `attribute EventHandler onupdatefound` -/
-def ServiceWorkerRegistration.setOnupdatefound (self : ServiceWorkerRegistration) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerRegistration.setOnupdatefound (self : ServiceWorkerRegistration) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.setOnupdatefound" do
   self.val.set "onupdatefound" (toJS value)
 
 /-- `Promise<ServiceWorkerRegistration> update()` -/
-def ServiceWorkerRegistration.update (self : ServiceWorkerRegistration) : Async ServiceWorkerRegistration := do
-  let r ← self.val.callMethodAwait "update" (Support.args #[]) Value
+@[macro_inline] def ServiceWorkerRegistration.update (self : ServiceWorkerRegistration) : Async ServiceWorkerRegistration := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.update" do
+  let r ← self.val.callMethodAwait "update" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<boolean> unregister()` -/
-def ServiceWorkerRegistration.unregister (self : ServiceWorkerRegistration) : Async Bool :=
-  self.val.callMethodAwait "unregister" (Support.args #[]) Bool
+@[macro_inline] def ServiceWorkerRegistration.unregister (self : ServiceWorkerRegistration) : Async Bool := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.unregister" do
+  self.val.callMethodAwait "unregister" (Internal.args #[]) Bool
 
 /-- `v instanceof ExtendableMessageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ExtendableMessageEvent`). -/
-def ExtendableMessageEvent.cast? (v : Value) : IO (Option ExtendableMessageEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ExtendableMessageEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ExtendableMessageEvent.cast? (v : Value) : IO (Option ExtendableMessageEvent) := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ExtendableMessageEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ExtendableMessageEventInit eventInitDict)` -/
-def ExtendableMessageEvent.new (type : String) (eventInitDict : Option ExtendableMessageEventInit := none) : IO ExtendableMessageEvent :=
+@[macro_inline] def ExtendableMessageEvent.new (type : String) (eventInitDict : Option ExtendableMessageEventInit := none) : IO ExtendableMessageEvent := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.new" do
   Lasm.JS.Binding.invoke ExtendableMessageEvent { name := "Lasm.JS.Web.ExtendableMessageEvent.new", module := "globalThis", path := "ExtendableMessageEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute any data` -/
-def ExtendableMessageEvent.data (self : ExtendableMessageEvent) : IO Data := self.val.get "data" Data
+@[macro_inline] def ExtendableMessageEvent.data (self : ExtendableMessageEvent) : IO Data := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.data" do
+  self.val.get "data" Data
 
 /-- `readonly attribute USVString origin` -/
-def ExtendableMessageEvent.origin (self : ExtendableMessageEvent) : IO String := self.val.get "origin" String
+@[macro_inline] def ExtendableMessageEvent.origin (self : ExtendableMessageEvent) : IO String := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.origin" do
+  self.val.get "origin" String
 
 /-- `readonly attribute DOMString lastEventId` -/
-def ExtendableMessageEvent.lastEventId (self : ExtendableMessageEvent) : IO String := self.val.get "lastEventId" String
+@[macro_inline] def ExtendableMessageEvent.lastEventId (self : ExtendableMessageEvent) : IO String := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.lastEventId" do
+  self.val.get "lastEventId" String
 
 /-- `readonly attribute (Client or ServiceWorker or MessagePort)? source` -/
-def ExtendableMessageEvent.source (self : ExtendableMessageEvent) : IO (Option Value) := do
+@[macro_inline] def ExtendableMessageEvent.source (self : ExtendableMessageEvent) : IO (Option Value) := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.source" do
   let r ← self.val.get "source" Data
-  Support.optionalValue r
+  Internal.optionalValue r
 
 /-- `readonly attribute FrozenArray<MessagePort> ports` -/
-def ExtendableMessageEvent.ports (self : ExtendableMessageEvent) : IO (Array MessagePort) := self.val.get "ports" (Array MessagePort)
+@[macro_inline] def ExtendableMessageEvent.ports (self : ExtendableMessageEvent) : IO (Array MessagePort) := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.ports" do
+  self.val.get "ports" (Array MessagePort)
 
 /-- `v instanceof FetchEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FetchEvent`). -/
-def FetchEvent.cast? (v : Value) : IO (Option FetchEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FetchEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def FetchEvent.cast? (v : Value) : IO (Option FetchEvent) := Internal.api "Lasm.JS.Web.FetchEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["FetchEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, FetchEventInit eventInitDict)` -/
-def FetchEvent.new (type : String) (eventInitDict : FetchEventInit) : IO FetchEvent :=
+@[macro_inline] def FetchEvent.new (type : String) (eventInitDict : FetchEventInit) : IO FetchEvent := Internal.api "Lasm.JS.Web.FetchEvent.new" do
   Lasm.JS.Binding.invoke FetchEvent { name := "Lasm.JS.Web.FetchEvent.new", module := "globalThis", path := "FetchEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute Request request` -/
-def FetchEvent.request (self : FetchEvent) : IO Request := do
+@[macro_inline] def FetchEvent.request (self : FetchEvent) : IO Request := Internal.api "Lasm.JS.Web.FetchEvent.request" do
   let r ← self.val.get "request" Value
   pure { val := r }
 
 /-- `readonly attribute Promise<any> preloadResponse` -/
-def FetchEvent.preloadResponse (self : FetchEvent) : Async Data := do
+@[macro_inline] def FetchEvent.preloadResponse (self : FetchEvent) : Async Data := Internal.api "Lasm.JS.Web.FetchEvent.preloadResponse" do
   let p ← self.val.get "preloadResponse" Value
   p.await Data
 
 /-- `readonly attribute DOMString clientId` -/
-def FetchEvent.clientId (self : FetchEvent) : IO String := self.val.get "clientId" String
+@[macro_inline] def FetchEvent.clientId (self : FetchEvent) : IO String := Internal.api "Lasm.JS.Web.FetchEvent.clientId" do
+  self.val.get "clientId" String
 
 /-- `readonly attribute DOMString resultingClientId` -/
-def FetchEvent.resultingClientId (self : FetchEvent) : IO String := self.val.get "resultingClientId" String
+@[macro_inline] def FetchEvent.resultingClientId (self : FetchEvent) : IO String := Internal.api "Lasm.JS.Web.FetchEvent.resultingClientId" do
+  self.val.get "resultingClientId" String
 
 /-- `readonly attribute DOMString replacesClientId` -/
-def FetchEvent.replacesClientId (self : FetchEvent) : IO String := self.val.get "replacesClientId" String
+@[macro_inline] def FetchEvent.replacesClientId (self : FetchEvent) : IO String := Internal.api "Lasm.JS.Web.FetchEvent.replacesClientId" do
+  self.val.get "replacesClientId" String
 
 /-- `readonly attribute Promise<undefined> handled` -/
-def FetchEvent.handled (self : FetchEvent) : Async Unit := do
+@[macro_inline] def FetchEvent.handled (self : FetchEvent) : Async Unit := Internal.api "Lasm.JS.Web.FetchEvent.handled" do
   let p ← self.val.get "handled" Value
   p.await Unit
 
 /-- `undefined respondWith(Promise<Response> r)` -/
-def FetchEvent.respondWith (self : FetchEvent) (r : Value) : IO Unit :=
-  self.val.callMethod "respondWith" (Support.args #[toJS r]) Unit
+@[macro_inline] def FetchEvent.respondWith (self : FetchEvent) (r : Value) : IO Unit := Internal.api "Lasm.JS.Web.FetchEvent.respondWith" do
+  self.val.callMethod "respondWith" (Internal.args #[toJS r]) Unit
 
 /-- `v instanceof InstallEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InstallEvent`). -/
-def InstallEvent.cast? (v : Value) : IO (Option InstallEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InstallEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def InstallEvent.cast? (v : Value) : IO (Option InstallEvent) := Internal.api "Lasm.JS.Web.InstallEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["InstallEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ExtendableEventInit eventInitDict)` -/
-def InstallEvent.new (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO InstallEvent :=
+@[macro_inline] def InstallEvent.new (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO InstallEvent := Internal.api "Lasm.JS.Web.InstallEvent.new" do
   Lasm.JS.Binding.invoke InstallEvent { name := "Lasm.JS.Web.InstallEvent.new", module := "globalThis", path := "InstallEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `Promise<undefined> addRoutes((RouterRule or sequence<RouterRule>) rules)` -/
-def InstallEvent.addRoutes (self : InstallEvent) (rules : RouterRuleOrSequenceOfRouterRule) : Async Unit :=
-  self.val.callMethodAwait "addRoutes" (Support.args #[toJS rules]) Unit
+@[macro_inline] def InstallEvent.addRoutes (self : InstallEvent) (rules : RouterRuleOrSequenceOfRouterRule) : Async Unit := Internal.api "Lasm.JS.Web.InstallEvent.addRoutes" do
+  self.val.callMethodAwait "addRoutes" (Internal.args #[toJS rules]) Unit
 
 /-- `v instanceof WindowClient`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WindowClient`). -/
-def WindowClient.cast? (v : Value) : IO (Option WindowClient) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WindowClient"] Value) v) then some { val := v } else none
+@[macro_inline] def WindowClient.cast? (v : Value) : IO (Option WindowClient) := Internal.api "Lasm.JS.Web.WindowClient.cast?" do
+  Internal.cast (Internal.getGlobal ["WindowClient"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DocumentVisibilityState visibilityState` -/
-def WindowClient.visibilityState (self : WindowClient) : IO DocumentVisibilityState := self.val.get "visibilityState" DocumentVisibilityState
+@[macro_inline] def WindowClient.visibilityState (self : WindowClient) : IO DocumentVisibilityState := Internal.api "Lasm.JS.Web.WindowClient.visibilityState" do
+  self.val.get "visibilityState" DocumentVisibilityState
 
 /-- `readonly attribute boolean focused` -/
-def WindowClient.focused (self : WindowClient) : IO Bool := self.val.get "focused" Bool
+@[macro_inline] def WindowClient.focused (self : WindowClient) : IO Bool := Internal.api "Lasm.JS.Web.WindowClient.focused" do
+  self.val.get "focused" Bool
 
 /-- `readonly attribute FrozenArray<USVString> ancestorOrigins` -/
-def WindowClient.ancestorOrigins (self : WindowClient) : IO (Array String) := self.val.get "ancestorOrigins" (Array String)
+@[macro_inline] def WindowClient.ancestorOrigins (self : WindowClient) : IO (Array String) := Internal.api "Lasm.JS.Web.WindowClient.ancestorOrigins" do
+  self.val.get "ancestorOrigins" (Array String)
 
 /-- `Promise<WindowClient> focus()` -/
-def WindowClient.focus (self : WindowClient) : Async WindowClient := do
-  let r ← self.val.callMethodAwait "focus" (Support.args #[]) Value
+@[macro_inline] def WindowClient.focus (self : WindowClient) : Async WindowClient := Internal.api "Lasm.JS.Web.WindowClient.focus" do
+  let r ← self.val.callMethodAwait "focus" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<WindowClient?> navigate(USVString url)` -/
-def WindowClient.navigate (self : WindowClient) (url : String) : Async (Option WindowClient) :=
-  self.val.callMethodAwait "navigate" (Support.args #[toJS url]) (Option WindowClient)
+@[macro_inline] def WindowClient.navigate (self : WindowClient) (url : String) : Async (Option WindowClient) := Internal.api "Lasm.JS.Web.WindowClient.navigate" do
+  self.val.callMethodAwait "navigate" (Internal.args #[toJS url]) (Option WindowClient)
 
 /-- `readonly attribute ServiceWorkerContainer serviceWorker` -/
-def Navigator.serviceWorker (self : Navigator) : IO ServiceWorkerContainer := do
+@[macro_inline] def Navigator.serviceWorker (self : Navigator) : IO ServiceWorkerContainer := Internal.api "Lasm.JS.Web.Navigator.serviceWorker" do
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
 
 /-- `readonly attribute CacheStorage caches` -/
-def WorkerGlobalScope.caches (self : WorkerGlobalScope) : IO CacheStorage := do
+@[macro_inline] def Window.caches (self : Window) : IO CacheStorage := Internal.api "Lasm.JS.Web.Window.caches" do
+  let r ← self.val.get "caches" Value
+  pure { val := r }
+
+/-- `readonly attribute CacheStorage caches` -/
+@[macro_inline] def WorkerGlobalScope.caches (self : WorkerGlobalScope) : IO CacheStorage := Internal.api "Lasm.JS.Web.WorkerGlobalScope.caches" do
   let r ← self.val.get "caches" Value
   pure { val := r }
 
 /-- `readonly attribute ServiceWorkerContainer serviceWorker` -/
-def WorkerNavigator.serviceWorker (self : WorkerNavigator) : IO ServiceWorkerContainer := do
+@[macro_inline] def WorkerNavigator.serviceWorker (self : WorkerNavigator) : IO ServiceWorkerContainer := Internal.api "Lasm.JS.Web.WorkerNavigator.serviceWorker" do
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
 
 /-- `readonly attribute CacheStorage caches` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)) -/
-def caches : IO CacheStorage := do
-  let r ← Support.getGlobal ["caches"] Value
+@[macro_inline] def caches : IO CacheStorage := Internal.api "Lasm.JS.Web.caches" do
+  let r ← Internal.getGlobal ["caches"] Value
   pure { val := r }
 
 end Lasm.JS.Web

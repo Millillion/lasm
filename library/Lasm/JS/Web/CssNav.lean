@@ -6,52 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssNav
+import Lasm.JS.Web.Types.InputDeviceCapabilities
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum SpatialNavigationDirection` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)): "up", "down", "left", "right". -/
-inductive SpatialNavigationDirection where
-  /-- "up" -/
-  | up
-  /-- "down" -/
-  | down
-  /-- "left" -/
-  | left
-  /-- "right" -/
-  | right
-  deriving BEq, Repr, Inhabited
-instance : ToJS SpatialNavigationDirection := ⟨fun
-  | .up => .string "up"
-  | .down => .string "down"
-  | .left => .string "left"
-  | .right => .string "right"⟩
-instance : FromJS SpatialNavigationDirection where
-  fromJS
-    | .string "up" => .ok .up
-    | .string "down" => .ok .down
-    | .string "left" => .ok .left
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SpatialNavigationDirection"
-
-/-- `enum FocusableAreaSearchMode` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)): "visible", "all". -/
-inductive FocusableAreaSearchMode where
-  /-- "visible" -/
-  | visible
-  /-- "all" -/
-  | all
-  deriving BEq, Repr, Inhabited
-instance : ToJS FocusableAreaSearchMode := ⟨fun
-  | .visible => .string "visible"
-  | .all => .string "all"⟩
-instance : FromJS FocusableAreaSearchMode where
-  fromJS
-    | .string "visible" => .ok .visible
-    | .string "all" => .ok .all
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FocusableAreaSearchMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary NavigationEventInit : UIEventInit` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NavigationEventInit where
@@ -73,21 +38,21 @@ structure NavigationEventInit where
   dir : Option SpatialNavigationDirection := none
   /-- `EventTarget? relatedTarget = null` -/
   relatedTarget : Option EventTarget := none
-instance : ToJS NavigationEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("dir", Support.optional d.dir),
-    ("relatedTarget", Support.optional d.relatedTarget)]⟩
+instance : ToJS NavigationEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("dir", Internal.optional d.dir),
+    ("relatedTarget", Internal.optional d.relatedTarget)]⟩
 
 /-- `dictionary FocusableAreasOption` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FocusableAreasOption where
   /-- `FocusableAreaSearchMode mode` -/
   mode : Option FocusableAreaSearchMode := none
-instance : ToJS FocusableAreasOption := ⟨fun d => Support.fields #[("mode", Support.optional d.mode)]⟩
+instance : ToJS FocusableAreasOption := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode)]⟩
 
 /-- `dictionary SpatialNavigationSearchOptions` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpatialNavigationSearchOptions where
@@ -95,40 +60,46 @@ structure SpatialNavigationSearchOptions where
   candidates : Option (Array Node) := none
   /-- `Node? container` -/
   container : Option Node := none
-instance : ToJS SpatialNavigationSearchOptions := ⟨fun d => Support.fields #[("candidates", Support.optional d.candidates),
-    ("container", Support.optional d.container)]⟩
+instance : ToJS SpatialNavigationSearchOptions := ⟨fun d => Internal.fields #[("candidates", Internal.optional d.candidates),
+    ("container", Internal.optional d.container)]⟩
 
 /-- `v instanceof NavigationEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NavigationEvent`). -/
-def NavigationEvent.cast? (v : Value) : IO (Option NavigationEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NavigationEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def NavigationEvent.cast? (v : Value) : IO (Option NavigationEvent) := Internal.api "Lasm.JS.Web.NavigationEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["NavigationEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional NavigationEventInit eventInitDict)` -/
-def NavigationEvent.new (type : String) (eventInitDict : Option NavigationEventInit := none) : IO NavigationEvent :=
+@[macro_inline] def NavigationEvent.new (type : String) (eventInitDict : Option NavigationEventInit := none) : IO NavigationEvent := Internal.api "Lasm.JS.Web.NavigationEvent.new" do
   Lasm.JS.Binding.invoke NavigationEvent { name := "Lasm.JS.Web.NavigationEvent.new", module := "globalThis", path := "NavigationEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute SpatialNavigationDirection dir` -/
-def NavigationEvent.dir (self : NavigationEvent) : IO SpatialNavigationDirection := self.val.get "dir" SpatialNavigationDirection
+@[macro_inline] def NavigationEvent.dir (self : NavigationEvent) : IO SpatialNavigationDirection := Internal.api "Lasm.JS.Web.NavigationEvent.dir" do
+  self.val.get "dir" SpatialNavigationDirection
 
 /-- `readonly attribute EventTarget? relatedTarget` -/
-def NavigationEvent.relatedTarget (self : NavigationEvent) : IO (Option EventTarget) := self.val.get "relatedTarget" (Option EventTarget)
+@[macro_inline] def NavigationEvent.relatedTarget (self : NavigationEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.NavigationEvent.relatedTarget" do
+  self.val.get "relatedTarget" (Option EventTarget)
 
 /-- `Node getSpatialNavigationContainer()` -/
-def Element.getSpatialNavigationContainer (self : Element) : IO Node := do
-  let r ← self.val.callMethod "getSpatialNavigationContainer" (Support.args #[]) Value
+@[macro_inline] def Element.getSpatialNavigationContainer (self : Element) : IO Node := Internal.api "Lasm.JS.Web.Element.getSpatialNavigationContainer" do
+  let r ← self.val.callMethod "getSpatialNavigationContainer" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `sequence<Node> focusableAreas(optional FocusableAreasOption option)` -/
-def Element.focusableAreas (self : Element) (option : Option FocusableAreasOption := none) : IO (Array Node) :=
-  self.val.callMethod "focusableAreas" (Support.args #[Support.optional option]) (Array Node)
+@[macro_inline] def Element.focusableAreas (self : Element) (option : Option FocusableAreasOption := none) : IO (Array Node) := Internal.api "Lasm.JS.Web.Element.focusableAreas" do
+  self.val.callMethod "focusableAreas" (Internal.args #[Internal.optional option]) (Array Node)
 
 /-- `Node? spatialNavigationSearch(SpatialNavigationDirection dir, optional SpatialNavigationSearchOptions options)` -/
-def Element.spatialNavigationSearch (self : Element) (dir : SpatialNavigationDirection) (options : Option SpatialNavigationSearchOptions := none) : IO (Option Node) :=
-  self.val.callMethod "spatialNavigationSearch" (Support.args #[toJS dir, Support.optional options]) (Option Node)
+@[macro_inline] def Element.spatialNavigationSearch (self : Element) (dir : SpatialNavigationDirection) (options : Option SpatialNavigationSearchOptions := none) : IO (Option Node) := Internal.api "Lasm.JS.Web.Element.spatialNavigationSearch" do
+  self.val.callMethod "spatialNavigationSearch" (Internal.args #[toJS dir, Internal.optional options]) (Option Node)
+
+/-- `undefined navigate(SpatialNavigationDirection dir)` -/
+@[macro_inline] def Window.navigate (self : Window) (dir : SpatialNavigationDirection) : IO Unit := Internal.api "Lasm.JS.Web.Window.navigate" do
+  self.val.callMethod "navigate" (Internal.args #[toJS dir]) Unit
 
 /-- `undefined navigate(SpatialNavigationDirection dir)` (CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)) -/
-def navigate (dir : SpatialNavigationDirection) : IO Unit :=
+@[macro_inline] def navigate (dir : SpatialNavigationDirection) : IO Unit := Internal.api "Lasm.JS.Web.navigate" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.navigate", module := "globalThis", path := "navigate", construct := false, arity := 1 }
-    (Support.args #[toJS dir]) (await := false)
+    (Internal.args #[toJS dir]) (await := false)
 
 end Lasm.JS.Web

@@ -6,275 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webgpu
+import Lasm.JS.Web.Types.Webnn
 import Lasm.JS.Web.CssFonts
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MLPowerPreference` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "default", "high-performance", "low-power". -/
-inductive MLPowerPreference where
-  /-- "default" -/
-  | default
-  /-- "high-performance" -/
-  | highPerformance
-  /-- "low-power" -/
-  | lowPower
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLPowerPreference := ⟨fun
-  | .default => .string "default"
-  | .highPerformance => .string "high-performance"
-  | .lowPower => .string "low-power"⟩
-instance : FromJS MLPowerPreference where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "high-performance" => .ok .highPerformance
-    | .string "low-power" => .ok .lowPower
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLPowerPreference"
-
-/-- `enum MLOperandDataType` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "float32", "float16", "int32", "uint32", "int64", "uint64", "int8", "uint8", "bfloat16", "float8e4m3". -/
-inductive MLOperandDataType where
-  /-- "float32" -/
-  | float32
-  /-- "float16" -/
-  | float16
-  /-- "int32" -/
-  | int32
-  /-- "uint32" -/
-  | uint32
-  /-- "int64" -/
-  | int64
-  /-- "uint64" -/
-  | uint64
-  /-- "int8" -/
-  | int8
-  /-- "uint8" -/
-  | uint8
-  /-- "bfloat16" -/
-  | bfloat16
-  /-- "float8e4m3" -/
-  | float8e4m3
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLOperandDataType := ⟨fun
-  | .float32 => .string "float32"
-  | .float16 => .string "float16"
-  | .int32 => .string "int32"
-  | .uint32 => .string "uint32"
-  | .int64 => .string "int64"
-  | .uint64 => .string "uint64"
-  | .int8 => .string "int8"
-  | .uint8 => .string "uint8"
-  | .bfloat16 => .string "bfloat16"
-  | .float8e4m3 => .string "float8e4m3"⟩
-instance : FromJS MLOperandDataType where
-  fromJS
-    | .string "float32" => .ok .float32
-    | .string "float16" => .ok .float16
-    | .string "int32" => .ok .int32
-    | .string "uint32" => .ok .uint32
-    | .string "int64" => .ok .int64
-    | .string "uint64" => .ok .uint64
-    | .string "int8" => .ok .int8
-    | .string "uint8" => .ok .uint8
-    | .string "bfloat16" => .ok .bfloat16
-    | .string "float8e4m3" => .ok .float8e4m3
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLOperandDataType"
-
-/-- `enum MLInputOperandLayout` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "nchw", "nhwc". -/
-inductive MLInputOperandLayout where
-  /-- "nchw" -/
-  | nchw
-  /-- "nhwc" -/
-  | nhwc
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLInputOperandLayout := ⟨fun
-  | .nchw => .string "nchw"
-  | .nhwc => .string "nhwc"⟩
-instance : FromJS MLInputOperandLayout where
-  fromJS
-    | .string "nchw" => .ok .nchw
-    | .string "nhwc" => .ok .nhwc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLInputOperandLayout"
-
-/-- `enum MLConv2dFilterOperandLayout` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "oihw", "hwio", "ohwi", "ihwo". -/
-inductive MLConv2dFilterOperandLayout where
-  /-- "oihw" -/
-  | oihw
-  /-- "hwio" -/
-  | hwio
-  /-- "ohwi" -/
-  | ohwi
-  /-- "ihwo" -/
-  | ihwo
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLConv2dFilterOperandLayout := ⟨fun
-  | .oihw => .string "oihw"
-  | .hwio => .string "hwio"
-  | .ohwi => .string "ohwi"
-  | .ihwo => .string "ihwo"⟩
-instance : FromJS MLConv2dFilterOperandLayout where
-  fromJS
-    | .string "oihw" => .ok .oihw
-    | .string "hwio" => .ok .hwio
-    | .string "ohwi" => .ok .ohwi
-    | .string "ihwo" => .ok .ihwo
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLConv2dFilterOperandLayout"
-
-/-- `enum MLConvTranspose2dFilterOperandLayout` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "iohw", "hwoi", "ohwi". -/
-inductive MLConvTranspose2dFilterOperandLayout where
-  /-- "iohw" -/
-  | iohw
-  /-- "hwoi" -/
-  | hwoi
-  /-- "ohwi" -/
-  | ohwi
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLConvTranspose2dFilterOperandLayout := ⟨fun
-  | .iohw => .string "iohw"
-  | .hwoi => .string "hwoi"
-  | .ohwi => .string "ohwi"⟩
-instance : FromJS MLConvTranspose2dFilterOperandLayout where
-  fromJS
-    | .string "iohw" => .ok .iohw
-    | .string "hwoi" => .ok .hwoi
-    | .string "ohwi" => .ok .ohwi
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLConvTranspose2dFilterOperandLayout"
-
-/-- `enum MLRecurrentNetworkDirection` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "forward", "backward", "both". -/
-inductive MLRecurrentNetworkDirection where
-  /-- "forward" -/
-  | forward
-  /-- "backward" -/
-  | backward
-  /-- "both" -/
-  | both
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLRecurrentNetworkDirection := ⟨fun
-  | .forward => .string "forward"
-  | .backward => .string "backward"
-  | .both => .string "both"⟩
-instance : FromJS MLRecurrentNetworkDirection where
-  fromJS
-    | .string "forward" => .ok .forward
-    | .string "backward" => .ok .backward
-    | .string "both" => .ok .both
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLRecurrentNetworkDirection"
-
-/-- `enum MLGruWeightLayout` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "zrn", "rzn". -/
-inductive MLGruWeightLayout where
-  /-- "zrn" -/
-  | zrn
-  /-- "rzn" -/
-  | rzn
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLGruWeightLayout := ⟨fun
-  | .zrn => .string "zrn"
-  | .rzn => .string "rzn"⟩
-instance : FromJS MLGruWeightLayout where
-  fromJS
-    | .string "zrn" => .ok .zrn
-    | .string "rzn" => .ok .rzn
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLGruWeightLayout"
-
-/-- `enum MLRecurrentNetworkActivation` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "relu", "sigmoid", "tanh". -/
-inductive MLRecurrentNetworkActivation where
-  /-- "relu" -/
-  | relu
-  /-- "sigmoid" -/
-  | sigmoid
-  /-- "tanh" -/
-  | tanh
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLRecurrentNetworkActivation := ⟨fun
-  | .relu => .string "relu"
-  | .sigmoid => .string "sigmoid"
-  | .tanh => .string "tanh"⟩
-instance : FromJS MLRecurrentNetworkActivation where
-  fromJS
-    | .string "relu" => .ok .relu
-    | .string "sigmoid" => .ok .sigmoid
-    | .string "tanh" => .ok .tanh
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLRecurrentNetworkActivation"
-
-/-- `enum MLLstmWeightLayout` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "iofg", "ifgo". -/
-inductive MLLstmWeightLayout where
-  /-- "iofg" -/
-  | iofg
-  /-- "ifgo" -/
-  | ifgo
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLLstmWeightLayout := ⟨fun
-  | .iofg => .string "iofg"
-  | .ifgo => .string "ifgo"⟩
-instance : FromJS MLLstmWeightLayout where
-  fromJS
-    | .string "iofg" => .ok .iofg
-    | .string "ifgo" => .ok .ifgo
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLLstmWeightLayout"
-
-/-- `enum MLPaddingMode` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "constant", "edge", "reflection". -/
-inductive MLPaddingMode where
-  /-- "constant" -/
-  | constant
-  /-- "edge" -/
-  | edge
-  /-- "reflection" -/
-  | reflection
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLPaddingMode := ⟨fun
-  | .constant => .string "constant"
-  | .edge => .string "edge"
-  | .reflection => .string "reflection"⟩
-instance : FromJS MLPaddingMode where
-  fromJS
-    | .string "constant" => .ok .constant
-    | .string "edge" => .ok .edge
-    | .string "reflection" => .ok .reflection
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLPaddingMode"
-
-/-- `enum MLRoundingType` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "floor", "ceil". -/
-inductive MLRoundingType where
-  /-- "floor" -/
-  | floor
-  /-- "ceil" -/
-  | ceil
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLRoundingType := ⟨fun
-  | .floor => .string "floor"
-  | .ceil => .string "ceil"⟩
-instance : FromJS MLRoundingType where
-  fromJS
-    | .string "floor" => .ok .floor
-    | .string "ceil" => .ok .ceil
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLRoundingType"
-
-/-- `enum MLInterpolationMode` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)): "nearest-neighbor", "linear". -/
-inductive MLInterpolationMode where
-  /-- "nearest-neighbor" -/
-  | nearestNeighbor
-  /-- "linear" -/
-  | linear
-  deriving BEq, Repr, Inhabited
-instance : ToJS MLInterpolationMode := ⟨fun
-  | .nearestNeighbor => .string "nearest-neighbor"
-  | .linear => .string "linear"⟩
-instance : FromJS MLInterpolationMode where
-  fromJS
-    | .string "nearest-neighbor" => .ok .nearestNeighbor
-    | .string "linear" => .ok .linear
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MLInterpolationMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MLContextOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLContextOptions where
@@ -282,8 +23,8 @@ structure MLContextOptions where
   powerPreference : Option MLPowerPreference := none
   /-- `boolean accelerated = true` -/
   accelerated : Option Bool := none
-instance : ToJS MLContextOptions := ⟨fun d => Support.fields #[("powerPreference", Support.optional d.powerPreference),
-    ("accelerated", Support.optional d.accelerated)]⟩
+instance : ToJS MLContextOptions := ⟨fun d => Internal.fields #[("powerPreference", Internal.optional d.powerPreference),
+    ("accelerated", Internal.optional d.accelerated)]⟩
 
 /-- `dictionary MLTensorDescriptor : MLOperandDescriptor` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLTensorDescriptor where
@@ -295,10 +36,10 @@ structure MLTensorDescriptor where
   readable : Option Bool := none
   /-- `boolean writable = false` -/
   writable : Option Bool := none
-instance : ToJS MLTensorDescriptor := ⟨fun d => Support.fields #[("dataType", toJS d.dataType),
+instance : ToJS MLTensorDescriptor := ⟨fun d => Internal.fields #[("dataType", toJS d.dataType),
     ("shape", toJS d.shape),
-    ("readable", Support.optional d.readable),
-    ("writable", Support.optional d.writable)]⟩
+    ("readable", Internal.optional d.readable),
+    ("writable", Internal.optional d.writable)]⟩
 
 /-- `dictionary MLOperandDescriptor` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLOperandDescriptor where
@@ -306,7 +47,7 @@ structure MLOperandDescriptor where
   dataType : MLOperandDataType
   /-- `required sequence<unsigned long> shape` -/
   shape : Array Nat
-instance : ToJS MLOperandDescriptor := ⟨fun d => Support.fields #[("dataType", toJS d.dataType),
+instance : ToJS MLOperandDescriptor := ⟨fun d => Internal.fields #[("dataType", toJS d.dataType),
     ("shape", toJS d.shape)]⟩
 
 /-- `dictionary MLRankRange` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -315,6 +56,8 @@ structure MLRankRange where
   min : Option Nat := none
   /-- `unsigned long max` -/
   max : Option Nat := none
+instance : ToJS MLRankRange := ⟨fun d => Internal.fields #[("min", Internal.optional d.min),
+    ("max", Internal.optional d.max)]⟩
 instance : FromJS MLRankRange where
   fromJS d := do return {
     min := ← Lasm.JS.readField (Option Nat) d "min",
@@ -327,6 +70,8 @@ structure MLTensorLimits where
   dataTypes : Option (Array MLOperandDataType) := none
   /-- `MLRankRange rankRange` -/
   rankRange : Option MLRankRange := none
+instance : ToJS MLTensorLimits := ⟨fun d => Internal.fields #[("dataTypes", Internal.optional d.dataTypes),
+    ("rankRange", Internal.optional d.rankRange)]⟩
 instance : FromJS MLTensorLimits where
   fromJS d := do return {
     dataTypes := ← Lasm.JS.readField (Option (Array MLOperandDataType)) d "dataTypes",
@@ -339,6 +84,8 @@ structure MLSingleInputSupportLimits where
   input : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLSingleInputSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLSingleInputSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -359,6 +106,12 @@ structure MLBatchNormalizationSupportLimits where
   bias : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLBatchNormalizationSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("mean", Internal.optional d.mean),
+    ("variance", Internal.optional d.variance),
+    ("scale", Internal.optional d.scale),
+    ("bias", Internal.optional d.bias),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLBatchNormalizationSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -375,6 +128,8 @@ structure MLConcatSupportLimits where
   inputs : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLConcatSupportLimits := ⟨fun d => Internal.fields #[("inputs", Internal.optional d.inputs),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLConcatSupportLimits where
   fromJS d := do return {
     inputs := ← Lasm.JS.readField (Option MLTensorLimits) d "inputs",
@@ -391,6 +146,10 @@ structure MLConv2dSupportLimits where
   bias : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLConv2dSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("filter", Internal.optional d.filter),
+    ("bias", Internal.optional d.bias),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLConv2dSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -407,6 +166,9 @@ structure MLBinarySupportLimits where
   b : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLBinarySupportLimits := ⟨fun d => Internal.fields #[("a", Internal.optional d.a),
+    ("b", Internal.optional d.b),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLBinarySupportLimits where
   fromJS d := do return {
     a := ← Lasm.JS.readField (Option MLTensorLimits) d "a",
@@ -420,6 +182,8 @@ structure MLLogicalNotSupportLimits where
   a : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLLogicalNotSupportLimits := ⟨fun d => Internal.fields #[("a", Internal.optional d.a),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLLogicalNotSupportLimits where
   fromJS d := do return {
     a := ← Lasm.JS.readField (Option MLTensorLimits) d "a",
@@ -436,6 +200,10 @@ structure MLQuantizeDequantizeLinearSupportLimits where
   zeroPoint : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLQuantizeDequantizeLinearSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("scale", Internal.optional d.scale),
+    ("zeroPoint", Internal.optional d.zeroPoint),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLQuantizeDequantizeLinearSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -452,6 +220,9 @@ structure MLGatherSupportLimits where
   indices : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLGatherSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("indices", Internal.optional d.indices),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLGatherSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -469,6 +240,10 @@ structure MLGemmSupportLimits where
   c : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLGemmSupportLimits := ⟨fun d => Internal.fields #[("a", Internal.optional d.a),
+    ("b", Internal.optional d.b),
+    ("c", Internal.optional d.c),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLGemmSupportLimits where
   fromJS d := do return {
     a := ← Lasm.JS.readField (Option MLTensorLimits) d "a",
@@ -495,6 +270,14 @@ structure MLGruSupportLimits where
   output0 : Option MLTensorLimits := none
   /-- `MLTensorLimits output1` -/
   output1 : Option MLTensorLimits := none
+instance : ToJS MLGruSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("weight", Internal.optional d.weight),
+    ("recurrentWeight", Internal.optional d.recurrentWeight),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("initialHiddenState", Internal.optional d.initialHiddenState),
+    ("output0", Internal.optional d.output0),
+    ("output1", Internal.optional d.output1)]⟩
 instance : FromJS MLGruSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -523,6 +306,13 @@ structure MLGruCellSupportLimits where
   recurrentBias : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLGruCellSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("weight", Internal.optional d.weight),
+    ("recurrentWeight", Internal.optional d.recurrentWeight),
+    ("hiddenState", Internal.optional d.hiddenState),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLGruCellSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -544,6 +334,10 @@ structure MLNormalizationSupportLimits where
   bias : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLNormalizationSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("scale", Internal.optional d.scale),
+    ("bias", Internal.optional d.bias),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLNormalizationSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -576,6 +370,17 @@ structure MLLstmSupportLimits where
   output1 : Option MLTensorLimits := none
   /-- `MLTensorLimits output2` -/
   output2 : Option MLTensorLimits := none
+instance : ToJS MLLstmSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("weight", Internal.optional d.weight),
+    ("recurrentWeight", Internal.optional d.recurrentWeight),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("peepholeWeight", Internal.optional d.peepholeWeight),
+    ("initialHiddenState", Internal.optional d.initialHiddenState),
+    ("initialCellState", Internal.optional d.initialCellState),
+    ("output0", Internal.optional d.output0),
+    ("output1", Internal.optional d.output1),
+    ("output2", Internal.optional d.output2)]⟩
 instance : FromJS MLLstmSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -613,6 +418,16 @@ structure MLLstmCellSupportLimits where
   output0 : Option MLTensorLimits := none
   /-- `MLTensorLimits output1` -/
   output1 : Option MLTensorLimits := none
+instance : ToJS MLLstmCellSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("weight", Internal.optional d.weight),
+    ("recurrentWeight", Internal.optional d.recurrentWeight),
+    ("hiddenState", Internal.optional d.hiddenState),
+    ("cellState", Internal.optional d.cellState),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("peepholeWeight", Internal.optional d.peepholeWeight),
+    ("output0", Internal.optional d.output0),
+    ("output1", Internal.optional d.output1)]⟩
 instance : FromJS MLLstmCellSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -635,6 +450,9 @@ structure MLPreluSupportLimits where
   slope : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLPreluSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("slope", Internal.optional d.slope),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLPreluSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -652,6 +470,10 @@ structure MLScatterSupportLimits where
   updates : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLScatterSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("indices", Internal.optional d.indices),
+    ("updates", Internal.optional d.updates),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLScatterSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -666,6 +488,8 @@ structure MLSplitSupportLimits where
   input : Option MLTensorLimits := none
   /-- `MLTensorLimits outputs` -/
   outputs : Option MLTensorLimits := none
+instance : ToJS MLSplitSupportLimits := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("outputs", Internal.optional d.outputs)]⟩
 instance : FromJS MLSplitSupportLimits where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option MLTensorLimits) d "input",
@@ -682,6 +506,10 @@ structure MLWhereSupportLimits where
   falseValue : Option MLTensorLimits := none
   /-- `MLTensorLimits output` -/
   output : Option MLTensorLimits := none
+instance : ToJS MLWhereSupportLimits := ⟨fun d => Internal.fields #[("condition", Internal.optional d.condition),
+    ("trueValue", Internal.optional d.trueValue),
+    ("falseValue", Internal.optional d.falseValue),
+    ("output", Internal.optional d.output)]⟩
 instance : FromJS MLWhereSupportLimits where
   fromJS d := do return {
     condition := ← Lasm.JS.readField (Option MLTensorLimits) d "condition",
@@ -892,6 +720,106 @@ structure MLOpSupportLimits where
   triangular : Option MLSingleInputSupportLimits := none
   /-- `MLWhereSupportLimits where` -/
   «where» : Option MLWhereSupportLimits := none
+instance : ToJS MLOpSupportLimits := ⟨fun d => Internal.fields #[("preferredInputLayout", Internal.optional d.preferredInputLayout),
+    ("maxTensorByteLength", Internal.optional d.maxTensorByteLength),
+    ("input", Internal.optional d.input),
+    ("constant", Internal.optional d.constant),
+    ("output", Internal.optional d.output),
+    ("argMin", Internal.optional d.argMin),
+    ("argMax", Internal.optional d.argMax),
+    ("batchNormalization", Internal.optional d.batchNormalization),
+    ("cast", Internal.optional d.cast),
+    ("clamp", Internal.optional d.clamp),
+    ("concat", Internal.optional d.concat),
+    ("conv2d", Internal.optional d.conv2d),
+    ("convTranspose2d", Internal.optional d.convTranspose2d),
+    ("cumulativeSum", Internal.optional d.cumulativeSum),
+    ("add", Internal.optional d.add),
+    ("sub", Internal.optional d.sub),
+    ("mul", Internal.optional d.mul),
+    ("div", Internal.optional d.div),
+    ("max", Internal.optional d.max),
+    ("min", Internal.optional d.min),
+    ("pow", Internal.optional d.pow),
+    ("equal", Internal.optional d.equal),
+    ("notEqual", Internal.optional d.notEqual),
+    ("greater", Internal.optional d.greater),
+    ("greaterOrEqual", Internal.optional d.greaterOrEqual),
+    ("lesser", Internal.optional d.lesser),
+    ("lesserOrEqual", Internal.optional d.lesserOrEqual),
+    ("logicalNot", Internal.optional d.logicalNot),
+    ("logicalAnd", Internal.optional d.logicalAnd),
+    ("logicalOr", Internal.optional d.logicalOr),
+    ("logicalXor", Internal.optional d.logicalXor),
+    ("isNaN", Internal.optional d.isNaN),
+    ("isInfinite", Internal.optional d.isInfinite),
+    ("abs", Internal.optional d.abs),
+    ("ceil", Internal.optional d.ceil),
+    ("cos", Internal.optional d.cos),
+    ("erf", Internal.optional d.erf),
+    ("exp", Internal.optional d.exp),
+    ("floor", Internal.optional d.floor),
+    ("identity", Internal.optional d.identity),
+    ("log", Internal.optional d.log),
+    ("neg", Internal.optional d.neg),
+    ("reciprocal", Internal.optional d.reciprocal),
+    ("roundEven", Internal.optional d.roundEven),
+    ("sin", Internal.optional d.sin),
+    ("sign", Internal.optional d.sign),
+    ("sqrt", Internal.optional d.sqrt),
+    ("tan", Internal.optional d.tan),
+    ("dequantizeLinear", Internal.optional d.dequantizeLinear),
+    ("quantizeLinear", Internal.optional d.quantizeLinear),
+    ("elu", Internal.optional d.elu),
+    ("expand", Internal.optional d.expand),
+    ("gather", Internal.optional d.gather),
+    ("gatherElements", Internal.optional d.gatherElements),
+    ("gatherND", Internal.optional d.gatherND),
+    ("gelu", Internal.optional d.gelu),
+    ("gemm", Internal.optional d.gemm),
+    ("gru", Internal.optional d.gru),
+    ("gruCell", Internal.optional d.gruCell),
+    ("hardSigmoid", Internal.optional d.hardSigmoid),
+    ("hardSwish", Internal.optional d.hardSwish),
+    ("instanceNormalization", Internal.optional d.instanceNormalization),
+    ("layerNormalization", Internal.optional d.layerNormalization),
+    ("leakyRelu", Internal.optional d.leakyRelu),
+    ("linear", Internal.optional d.linear),
+    ("lstm", Internal.optional d.lstm),
+    ("lstmCell", Internal.optional d.lstmCell),
+    ("matmul", Internal.optional d.matmul),
+    ("pad", Internal.optional d.pad),
+    ("averagePool2d", Internal.optional d.averagePool2d),
+    ("l2Pool2d", Internal.optional d.l2Pool2d),
+    ("maxPool2d", Internal.optional d.maxPool2d),
+    ("prelu", Internal.optional d.prelu),
+    ("reduceL1", Internal.optional d.reduceL1),
+    ("reduceL2", Internal.optional d.reduceL2),
+    ("reduceLogSum", Internal.optional d.reduceLogSum),
+    ("reduceLogSumExp", Internal.optional d.reduceLogSumExp),
+    ("reduceMax", Internal.optional d.reduceMax),
+    ("reduceMean", Internal.optional d.reduceMean),
+    ("reduceMin", Internal.optional d.reduceMin),
+    ("reduceProduct", Internal.optional d.reduceProduct),
+    ("reduceSum", Internal.optional d.reduceSum),
+    ("reduceSumSquare", Internal.optional d.reduceSumSquare),
+    ("relu", Internal.optional d.relu),
+    ("resample2d", Internal.optional d.resample2d),
+    ("reshape", Internal.optional d.reshape),
+    ("reverse", Internal.optional d.reverse),
+    ("scatterElements", Internal.optional d.scatterElements),
+    ("scatterND", Internal.optional d.scatterND),
+    ("sigmoid", Internal.optional d.sigmoid),
+    ("slice", Internal.optional d.slice),
+    ("softmax", Internal.optional d.softmax),
+    ("softplus", Internal.optional d.softplus),
+    ("softsign", Internal.optional d.softsign),
+    ("split", Internal.optional d.split),
+    ("tanh", Internal.optional d.tanh),
+    ("tile", Internal.optional d.tile),
+    ("transpose", Internal.optional d.transpose),
+    ("triangular", Internal.optional d.triangular),
+    ("where", Internal.optional d.«where»)]⟩
 instance : FromJS MLOpSupportLimits where
   fromJS d := do return {
     preferredInputLayout := ← Lasm.JS.readField (Option MLInputOperandLayout) d "preferredInputLayout",
@@ -1000,6 +928,7 @@ instance : FromJS MLOpSupportLimits where
 structure MLContextLostInfo where
   /-- `DOMString message` -/
   message : Option String := none
+instance : ToJS MLContextLostInfo := ⟨fun d => Internal.fields #[("message", Internal.optional d.message)]⟩
 instance : FromJS MLContextLostInfo where
   fromJS d := do return {
     message := ← Lasm.JS.readField (Option String) d "message" }
@@ -1025,9 +954,9 @@ structure MLArgMinMaxOptions where
   keepDimensions : Option Bool := none
   /-- `MLOperandDataType outputDataType = "int32"` -/
   outputDataType : Option MLOperandDataType := none
-instance : ToJS MLArgMinMaxOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("keepDimensions", Support.optional d.keepDimensions),
-    ("outputDataType", Support.optional d.outputDataType)]⟩
+instance : ToJS MLArgMinMaxOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("keepDimensions", Internal.optional d.keepDimensions),
+    ("outputDataType", Internal.optional d.outputDataType)]⟩
 
 /-- `dictionary MLBatchNormalizationOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLBatchNormalizationOptions where
@@ -1041,17 +970,17 @@ structure MLBatchNormalizationOptions where
   axis : Option Nat := none
   /-- `double epsilon = 1e-5` -/
   epsilon : Option Float := none
-instance : ToJS MLBatchNormalizationOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("scale", Support.optional d.scale),
-    ("bias", Support.optional d.bias),
-    ("axis", Support.optional d.axis),
-    ("epsilon", Support.optional d.epsilon)]⟩
+instance : ToJS MLBatchNormalizationOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("scale", Internal.optional d.scale),
+    ("bias", Internal.optional d.bias),
+    ("axis", Internal.optional d.axis),
+    ("epsilon", Internal.optional d.epsilon)]⟩
 
 /-- `dictionary MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLOperatorOptions where
   /-- `USVString label = ""` -/
   label : Option String := none
-instance : ToJS MLOperatorOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label)]⟩
+instance : ToJS MLOperatorOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label)]⟩
 
 /-- `dictionary MLClampOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLClampOptions where
@@ -1061,9 +990,9 @@ structure MLClampOptions where
   minValue : Option MLNumber := none
   /-- `MLNumber maxValue` -/
   maxValue : Option MLNumber := none
-instance : ToJS MLClampOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("minValue", Support.optional d.minValue),
-    ("maxValue", Support.optional d.maxValue)]⟩
+instance : ToJS MLClampOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("minValue", Internal.optional d.minValue),
+    ("maxValue", Internal.optional d.maxValue)]⟩
 
 /-- `dictionary MLConv2dOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLConv2dOptions where
@@ -1083,14 +1012,14 @@ structure MLConv2dOptions where
   filterLayout : Option MLConv2dFilterOperandLayout := none
   /-- `MLOperand bias` -/
   bias : Option MLOperand := none
-instance : ToJS MLConv2dOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("padding", Support.optional d.padding),
-    ("strides", Support.optional d.strides),
-    ("dilations", Support.optional d.dilations),
-    ("groups", Support.optional d.groups),
-    ("inputLayout", Support.optional d.inputLayout),
-    ("filterLayout", Support.optional d.filterLayout),
-    ("bias", Support.optional d.bias)]⟩
+instance : ToJS MLConv2dOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("padding", Internal.optional d.padding),
+    ("strides", Internal.optional d.strides),
+    ("dilations", Internal.optional d.dilations),
+    ("groups", Internal.optional d.groups),
+    ("inputLayout", Internal.optional d.inputLayout),
+    ("filterLayout", Internal.optional d.filterLayout),
+    ("bias", Internal.optional d.bias)]⟩
 
 /-- `dictionary MLConvTranspose2dOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLConvTranspose2dOptions where
@@ -1114,16 +1043,16 @@ structure MLConvTranspose2dOptions where
   filterLayout : Option MLConvTranspose2dFilterOperandLayout := none
   /-- `MLOperand bias` -/
   bias : Option MLOperand := none
-instance : ToJS MLConvTranspose2dOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("padding", Support.optional d.padding),
-    ("strides", Support.optional d.strides),
-    ("dilations", Support.optional d.dilations),
-    ("outputPadding", Support.optional d.outputPadding),
-    ("outputSizes", Support.optional d.outputSizes),
-    ("groups", Support.optional d.groups),
-    ("inputLayout", Support.optional d.inputLayout),
-    ("filterLayout", Support.optional d.filterLayout),
-    ("bias", Support.optional d.bias)]⟩
+instance : ToJS MLConvTranspose2dOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("padding", Internal.optional d.padding),
+    ("strides", Internal.optional d.strides),
+    ("dilations", Internal.optional d.dilations),
+    ("outputPadding", Internal.optional d.outputPadding),
+    ("outputSizes", Internal.optional d.outputSizes),
+    ("groups", Internal.optional d.groups),
+    ("inputLayout", Internal.optional d.inputLayout),
+    ("filterLayout", Internal.optional d.filterLayout),
+    ("bias", Internal.optional d.bias)]⟩
 
 /-- `dictionary MLCumulativeSumOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLCumulativeSumOptions where
@@ -1133,9 +1062,9 @@ structure MLCumulativeSumOptions where
   exclusive : Option Bool := none
   /-- `boolean reversed = false` -/
   reversed : Option Bool := none
-instance : ToJS MLCumulativeSumOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("exclusive", Support.optional d.exclusive),
-    ("reversed", Support.optional d.reversed)]⟩
+instance : ToJS MLCumulativeSumOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("exclusive", Internal.optional d.exclusive),
+    ("reversed", Internal.optional d.reversed)]⟩
 
 /-- `dictionary MLEluOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLEluOptions where
@@ -1143,8 +1072,8 @@ structure MLEluOptions where
   label : Option String := none
   /-- `double alpha = 1` -/
   alpha : Option Float := none
-instance : ToJS MLEluOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("alpha", Support.optional d.alpha)]⟩
+instance : ToJS MLEluOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("alpha", Internal.optional d.alpha)]⟩
 
 /-- `dictionary MLGatherOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLGatherOptions where
@@ -1152,8 +1081,8 @@ structure MLGatherOptions where
   label : Option String := none
   /-- `unsigned long axis = 0` -/
   axis : Option Nat := none
-instance : ToJS MLGatherOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("axis", Support.optional d.axis)]⟩
+instance : ToJS MLGatherOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("axis", Internal.optional d.axis)]⟩
 
 /-- `dictionary MLGemmOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLGemmOptions where
@@ -1169,12 +1098,12 @@ structure MLGemmOptions where
   aTranspose : Option Bool := none
   /-- `boolean bTranspose = false` -/
   bTranspose : Option Bool := none
-instance : ToJS MLGemmOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("c", Support.optional d.c),
-    ("alpha", Support.optional d.alpha),
-    ("beta", Support.optional d.beta),
-    ("aTranspose", Support.optional d.aTranspose),
-    ("bTranspose", Support.optional d.bTranspose)]⟩
+instance : ToJS MLGemmOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("c", Internal.optional d.c),
+    ("alpha", Internal.optional d.alpha),
+    ("beta", Internal.optional d.beta),
+    ("aTranspose", Internal.optional d.aTranspose),
+    ("bTranspose", Internal.optional d.bTranspose)]⟩
 
 /-- `dictionary MLGruOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLGruOptions where
@@ -1196,15 +1125,15 @@ structure MLGruOptions where
   layout : Option MLGruWeightLayout := none
   /-- `sequence<MLRecurrentNetworkActivation> activations` -/
   activations : Option (Array MLRecurrentNetworkActivation) := none
-instance : ToJS MLGruOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("bias", Support.optional d.bias),
-    ("recurrentBias", Support.optional d.recurrentBias),
-    ("initialHiddenState", Support.optional d.initialHiddenState),
-    ("resetAfter", Support.optional d.resetAfter),
-    ("returnSequence", Support.optional d.returnSequence),
-    ("direction", Support.optional d.direction),
-    ("layout", Support.optional d.layout),
-    ("activations", Support.optional d.activations)]⟩
+instance : ToJS MLGruOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("initialHiddenState", Internal.optional d.initialHiddenState),
+    ("resetAfter", Internal.optional d.resetAfter),
+    ("returnSequence", Internal.optional d.returnSequence),
+    ("direction", Internal.optional d.direction),
+    ("layout", Internal.optional d.layout),
+    ("activations", Internal.optional d.activations)]⟩
 
 /-- `dictionary MLGruCellOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLGruCellOptions where
@@ -1220,12 +1149,12 @@ structure MLGruCellOptions where
   layout : Option MLGruWeightLayout := none
   /-- `sequence<MLRecurrentNetworkActivation> activations` -/
   activations : Option (Array MLRecurrentNetworkActivation) := none
-instance : ToJS MLGruCellOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("bias", Support.optional d.bias),
-    ("recurrentBias", Support.optional d.recurrentBias),
-    ("resetAfter", Support.optional d.resetAfter),
-    ("layout", Support.optional d.layout),
-    ("activations", Support.optional d.activations)]⟩
+instance : ToJS MLGruCellOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("resetAfter", Internal.optional d.resetAfter),
+    ("layout", Internal.optional d.layout),
+    ("activations", Internal.optional d.activations)]⟩
 
 /-- `dictionary MLHardSigmoidOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLHardSigmoidOptions where
@@ -1235,9 +1164,9 @@ structure MLHardSigmoidOptions where
   alpha : Option Float := none
   /-- `double beta = 0.5` -/
   beta : Option Float := none
-instance : ToJS MLHardSigmoidOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("alpha", Support.optional d.alpha),
-    ("beta", Support.optional d.beta)]⟩
+instance : ToJS MLHardSigmoidOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("alpha", Internal.optional d.alpha),
+    ("beta", Internal.optional d.beta)]⟩
 
 /-- `dictionary MLInstanceNormalizationOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLInstanceNormalizationOptions where
@@ -1251,11 +1180,11 @@ structure MLInstanceNormalizationOptions where
   epsilon : Option Float := none
   /-- `MLInputOperandLayout layout = "nchw"` -/
   layout : Option MLInputOperandLayout := none
-instance : ToJS MLInstanceNormalizationOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("scale", Support.optional d.scale),
-    ("bias", Support.optional d.bias),
-    ("epsilon", Support.optional d.epsilon),
-    ("layout", Support.optional d.layout)]⟩
+instance : ToJS MLInstanceNormalizationOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("scale", Internal.optional d.scale),
+    ("bias", Internal.optional d.bias),
+    ("epsilon", Internal.optional d.epsilon),
+    ("layout", Internal.optional d.layout)]⟩
 
 /-- `dictionary MLLayerNormalizationOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLLayerNormalizationOptions where
@@ -1269,11 +1198,11 @@ structure MLLayerNormalizationOptions where
   axes : Option (Array Nat) := none
   /-- `double epsilon = 1e-5` -/
   epsilon : Option Float := none
-instance : ToJS MLLayerNormalizationOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("scale", Support.optional d.scale),
-    ("bias", Support.optional d.bias),
-    ("axes", Support.optional d.axes),
-    ("epsilon", Support.optional d.epsilon)]⟩
+instance : ToJS MLLayerNormalizationOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("scale", Internal.optional d.scale),
+    ("bias", Internal.optional d.bias),
+    ("axes", Internal.optional d.axes),
+    ("epsilon", Internal.optional d.epsilon)]⟩
 
 /-- `dictionary MLLeakyReluOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLLeakyReluOptions where
@@ -1281,8 +1210,8 @@ structure MLLeakyReluOptions where
   label : Option String := none
   /-- `double alpha = 0.01` -/
   alpha : Option Float := none
-instance : ToJS MLLeakyReluOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("alpha", Support.optional d.alpha)]⟩
+instance : ToJS MLLeakyReluOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("alpha", Internal.optional d.alpha)]⟩
 
 /-- `dictionary MLLinearOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLLinearOptions where
@@ -1292,9 +1221,9 @@ structure MLLinearOptions where
   alpha : Option Float := none
   /-- `double beta = 0` -/
   beta : Option Float := none
-instance : ToJS MLLinearOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("alpha", Support.optional d.alpha),
-    ("beta", Support.optional d.beta)]⟩
+instance : ToJS MLLinearOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("alpha", Internal.optional d.alpha),
+    ("beta", Internal.optional d.beta)]⟩
 
 /-- `dictionary MLLstmOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLLstmOptions where
@@ -1318,16 +1247,16 @@ structure MLLstmOptions where
   layout : Option MLLstmWeightLayout := none
   /-- `sequence<MLRecurrentNetworkActivation> activations` -/
   activations : Option (Array MLRecurrentNetworkActivation) := none
-instance : ToJS MLLstmOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("bias", Support.optional d.bias),
-    ("recurrentBias", Support.optional d.recurrentBias),
-    ("peepholeWeight", Support.optional d.peepholeWeight),
-    ("initialHiddenState", Support.optional d.initialHiddenState),
-    ("initialCellState", Support.optional d.initialCellState),
-    ("returnSequence", Support.optional d.returnSequence),
-    ("direction", Support.optional d.direction),
-    ("layout", Support.optional d.layout),
-    ("activations", Support.optional d.activations)]⟩
+instance : ToJS MLLstmOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("peepholeWeight", Internal.optional d.peepholeWeight),
+    ("initialHiddenState", Internal.optional d.initialHiddenState),
+    ("initialCellState", Internal.optional d.initialCellState),
+    ("returnSequence", Internal.optional d.returnSequence),
+    ("direction", Internal.optional d.direction),
+    ("layout", Internal.optional d.layout),
+    ("activations", Internal.optional d.activations)]⟩
 
 /-- `dictionary MLLstmCellOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLLstmCellOptions where
@@ -1343,12 +1272,12 @@ structure MLLstmCellOptions where
   layout : Option MLLstmWeightLayout := none
   /-- `sequence<MLRecurrentNetworkActivation> activations` -/
   activations : Option (Array MLRecurrentNetworkActivation) := none
-instance : ToJS MLLstmCellOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("bias", Support.optional d.bias),
-    ("recurrentBias", Support.optional d.recurrentBias),
-    ("peepholeWeight", Support.optional d.peepholeWeight),
-    ("layout", Support.optional d.layout),
-    ("activations", Support.optional d.activations)]⟩
+instance : ToJS MLLstmCellOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("bias", Internal.optional d.bias),
+    ("recurrentBias", Internal.optional d.recurrentBias),
+    ("peepholeWeight", Internal.optional d.peepholeWeight),
+    ("layout", Internal.optional d.layout),
+    ("activations", Internal.optional d.activations)]⟩
 
 /-- `dictionary MLPadOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLPadOptions where
@@ -1358,9 +1287,9 @@ structure MLPadOptions where
   mode : Option MLPaddingMode := none
   /-- `MLNumber value = 0` -/
   value : Option MLNumber := none
-instance : ToJS MLPadOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("mode", Support.optional d.mode),
-    ("value", Support.optional d.value)]⟩
+instance : ToJS MLPadOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("mode", Internal.optional d.mode),
+    ("value", Internal.optional d.value)]⟩
 
 /-- `dictionary MLPool2dOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLPool2dOptions where
@@ -1380,14 +1309,14 @@ structure MLPool2dOptions where
   outputShapeRounding : Option MLRoundingType := none
   /-- `sequence<unsigned long> outputSizes` -/
   outputSizes : Option (Array Nat) := none
-instance : ToJS MLPool2dOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("windowDimensions", Support.optional d.windowDimensions),
-    ("padding", Support.optional d.padding),
-    ("strides", Support.optional d.strides),
-    ("dilations", Support.optional d.dilations),
-    ("layout", Support.optional d.layout),
-    ("outputShapeRounding", Support.optional d.outputShapeRounding),
-    ("outputSizes", Support.optional d.outputSizes)]⟩
+instance : ToJS MLPool2dOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("windowDimensions", Internal.optional d.windowDimensions),
+    ("padding", Internal.optional d.padding),
+    ("strides", Internal.optional d.strides),
+    ("dilations", Internal.optional d.dilations),
+    ("layout", Internal.optional d.layout),
+    ("outputShapeRounding", Internal.optional d.outputShapeRounding),
+    ("outputSizes", Internal.optional d.outputSizes)]⟩
 
 /-- `dictionary MLReduceOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLReduceOptions where
@@ -1397,9 +1326,9 @@ structure MLReduceOptions where
   axes : Option (Array Nat) := none
   /-- `boolean keepDimensions = false` -/
   keepDimensions : Option Bool := none
-instance : ToJS MLReduceOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("axes", Support.optional d.axes),
-    ("keepDimensions", Support.optional d.keepDimensions)]⟩
+instance : ToJS MLReduceOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("axes", Internal.optional d.axes),
+    ("keepDimensions", Internal.optional d.keepDimensions)]⟩
 
 /-- `dictionary MLResample2dOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLResample2dOptions where
@@ -1413,11 +1342,11 @@ structure MLResample2dOptions where
   sizes : Option (Array Nat) := none
   /-- `sequence<unsigned long> axes` -/
   axes : Option (Array Nat) := none
-instance : ToJS MLResample2dOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("mode", Support.optional d.mode),
-    ("scales", Support.optional d.scales),
-    ("sizes", Support.optional d.sizes),
-    ("axes", Support.optional d.axes)]⟩
+instance : ToJS MLResample2dOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("mode", Internal.optional d.mode),
+    ("scales", Internal.optional d.scales),
+    ("sizes", Internal.optional d.sizes),
+    ("axes", Internal.optional d.axes)]⟩
 
 /-- `dictionary MLReverseOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLReverseOptions where
@@ -1425,8 +1354,8 @@ structure MLReverseOptions where
   label : Option String := none
   /-- `sequence<unsigned long> axes` -/
   axes : Option (Array Nat) := none
-instance : ToJS MLReverseOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("axes", Support.optional d.axes)]⟩
+instance : ToJS MLReverseOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("axes", Internal.optional d.axes)]⟩
 
 /-- `dictionary MLScatterOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLScatterOptions where
@@ -1434,8 +1363,8 @@ structure MLScatterOptions where
   label : Option String := none
   /-- `unsigned long axis = 0` -/
   axis : Option Nat := none
-instance : ToJS MLScatterOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("axis", Support.optional d.axis)]⟩
+instance : ToJS MLScatterOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("axis", Internal.optional d.axis)]⟩
 
 /-- `dictionary MLSliceOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLSliceOptions where
@@ -1443,8 +1372,8 @@ structure MLSliceOptions where
   label : Option String := none
   /-- `sequence<unsigned long> strides` -/
   strides : Option (Array Nat) := none
-instance : ToJS MLSliceOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("strides", Support.optional d.strides)]⟩
+instance : ToJS MLSliceOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("strides", Internal.optional d.strides)]⟩
 
 /-- `dictionary MLSplitOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLSplitOptions where
@@ -1452,8 +1381,8 @@ structure MLSplitOptions where
   label : Option String := none
   /-- `unsigned long axis = 0` -/
   axis : Option Nat := none
-instance : ToJS MLSplitOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("axis", Support.optional d.axis)]⟩
+instance : ToJS MLSplitOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("axis", Internal.optional d.axis)]⟩
 
 /-- `dictionary MLTransposeOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLTransposeOptions where
@@ -1461,8 +1390,8 @@ structure MLTransposeOptions where
   label : Option String := none
   /-- `sequence<unsigned long> permutation` -/
   permutation : Option (Array Nat) := none
-instance : ToJS MLTransposeOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("permutation", Support.optional d.permutation)]⟩
+instance : ToJS MLTransposeOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("permutation", Internal.optional d.permutation)]⟩
 
 /-- `dictionary MLTriangularOptions : MLOperatorOptions` (Web Neural Network API (https://webmachinelearning.github.io/webnn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MLTriangularOptions where
@@ -1472,634 +1401,642 @@ structure MLTriangularOptions where
   upper : Option Bool := none
   /-- `long diagonal = 0` -/
   diagonal : Option Int := none
-instance : ToJS MLTriangularOptions := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("upper", Support.optional d.upper),
-    ("diagonal", Support.optional d.diagonal)]⟩
+instance : ToJS MLTriangularOptions := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("upper", Internal.optional d.upper),
+    ("diagonal", Internal.optional d.diagonal)]⟩
 
 /-- `v instanceof ML`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ML`). -/
-def ML.cast? (v : Value) : IO (Option ML) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ML"] Value) v) then some { val := v } else none
+@[macro_inline] def ML.cast? (v : Value) : IO (Option ML) := Internal.api "Lasm.JS.Web.ML.cast?" do
+  Internal.cast (Internal.getGlobal ["ML"] Value) (fun x => { val := x }) v
 
 /-- `Promise<MLContext> createContext(optional MLContextOptions options)` -/
-def ML.createContext (self : ML) (options : Option MLContextOptions := none) : Async MLContext := do
-  let r ← self.val.callMethodAwait "createContext" (Support.args #[Support.optional options]) Value
+@[macro_inline] def ML.createContext (self : ML) (options : Option MLContextOptions := none) : Async MLContext := Internal.api "Lasm.JS.Web.ML.createContext" do
+  let r ← self.val.callMethodAwait "createContext" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<MLContext> createContext(GPUDevice gpuDevice)` -/
-def ML.createContextWithGpuDevice (self : ML) (gpuDevice : GPUDevice) : Async MLContext := do
-  let r ← self.val.callMethodAwait "createContext" (Support.args #[toJS gpuDevice]) Value
+@[macro_inline] def ML.createContextWithGpuDevice (self : ML) (gpuDevice : GPUDevice) : Async MLContext := Internal.api "Lasm.JS.Web.ML.createContextWithGpuDevice" do
+  let r ← self.val.callMethodAwait "createContext" (Internal.args #[toJS gpuDevice]) Value
   pure { val := r }
 
 /-- `v instanceof MLContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MLContext`). -/
-def MLContext.cast? (v : Value) : IO (Option MLContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MLContext"] Value) v) then some { val := v } else none
+@[macro_inline] def MLContext.cast? (v : Value) : IO (Option MLContext) := Internal.api "Lasm.JS.Web.MLContext.cast?" do
+  Internal.cast (Internal.getGlobal ["MLContext"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean accelerated` -/
-def MLContext.accelerated (self : MLContext) : IO Bool := self.val.get "accelerated" Bool
+@[macro_inline] def MLContext.accelerated (self : MLContext) : IO Bool := Internal.api "Lasm.JS.Web.MLContext.accelerated" do
+  self.val.get "accelerated" Bool
 
 /-- `readonly attribute Promise<MLContextLostInfo> lost` -/
-def MLContext.lost (self : MLContext) : Async MLContextLostInfo := do
+@[macro_inline] def MLContext.lost (self : MLContext) : Async MLContextLostInfo := Internal.api "Lasm.JS.Web.MLContext.lost" do
   let p ← self.val.get "lost" Value
   p.await MLContextLostInfo
 
 /-- `undefined dispatch(MLGraph graph, MLNamedTensors inputs, MLNamedTensors outputs)` -/
-def MLContext.dispatch (self : MLContext) (graph : MLGraph) (inputs : Record MLTensor) (outputs : Record MLTensor) : IO Unit :=
-  self.val.callMethod "dispatch" (Support.args #[toJS graph, toJS inputs, toJS outputs]) Unit
+@[macro_inline] def MLContext.dispatch (self : MLContext) (graph : MLGraph) (inputs : Record MLTensor) (outputs : Record MLTensor) : IO Unit := Internal.api "Lasm.JS.Web.MLContext.dispatch" do
+  self.val.callMethod "dispatch" (Internal.args #[toJS graph, toJS inputs, toJS outputs]) Unit
 
 /-- `Promise<MLTensor> createTensor(MLTensorDescriptor descriptor)` -/
-def MLContext.createTensor (self : MLContext) (descriptor : MLTensorDescriptor) : Async MLTensor := do
-  let r ← self.val.callMethodAwait "createTensor" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def MLContext.createTensor (self : MLContext) (descriptor : MLTensorDescriptor) : Async MLTensor := Internal.api "Lasm.JS.Web.MLContext.createTensor" do
+  let r ← self.val.callMethodAwait "createTensor" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `Promise<MLTensor> createExportableTensor(MLTensorDescriptor descriptor, GPUDevice gpuDevice)` -/
-def MLContext.createExportableTensor (self : MLContext) (descriptor : MLTensorDescriptor) (gpuDevice : GPUDevice) : Async MLTensor := do
-  let r ← self.val.callMethodAwait "createExportableTensor" (Support.args #[toJS descriptor, toJS gpuDevice]) Value
+@[macro_inline] def MLContext.createExportableTensor (self : MLContext) (descriptor : MLTensorDescriptor) (gpuDevice : GPUDevice) : Async MLTensor := Internal.api "Lasm.JS.Web.MLContext.createExportableTensor" do
+  let r ← self.val.callMethodAwait "createExportableTensor" (Internal.args #[toJS descriptor, toJS gpuDevice]) Value
   pure { val := r }
 
 /-- `Promise<MLTensor> createConstantTensor(MLOperandDescriptor descriptor, AllowSharedBufferSource inputData)` -/
-def MLContext.createConstantTensor (self : MLContext) (descriptor : MLOperandDescriptor) (inputData : ByteArray) : Async MLTensor := do
-  let r ← self.val.callMethodAwait "createConstantTensor" (Support.args #[toJS descriptor, toJS inputData]) Value
+@[macro_inline] def MLContext.createConstantTensor (self : MLContext) (descriptor : MLOperandDescriptor) (inputData : ByteArray) : Async MLTensor := Internal.api "Lasm.JS.Web.MLContext.createConstantTensor" do
+  let r ← self.val.callMethodAwait "createConstantTensor" (Internal.args #[toJS descriptor, toJS inputData]) Value
   pure { val := r }
 
 /-- `Promise<ArrayBuffer> readTensor(MLTensor tensor)` -/
-def MLContext.readTensor (self : MLContext) (tensor : MLTensor) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "readTensor" (Support.args #[toJS tensor]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def MLContext.readTensor (self : MLContext) (tensor : MLTensor) : Async ByteArray := Internal.api "Lasm.JS.Web.MLContext.readTensor" do
+  let r ← self.val.callMethodAwait "readTensor" (Internal.args #[toJS tensor]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<undefined> readTensor(MLTensor tensor, AllowSharedBufferSource outputData)` -/
-def MLContext.readTensorWithOutputData (self : MLContext) (tensor : MLTensor) (outputData : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "readTensor" (Support.args #[toJS tensor, toJS outputData]) Unit
+@[macro_inline] def MLContext.readTensorWithOutputData (self : MLContext) (tensor : MLTensor) (outputData : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.MLContext.readTensorWithOutputData" do
+  self.val.callMethodAwait "readTensor" (Internal.args #[toJS tensor, toJS outputData]) Unit
 
 /-- `undefined writeTensor(MLTensor tensor, AllowSharedBufferSource inputData)` -/
-def MLContext.writeTensor (self : MLContext) (tensor : MLTensor) (inputData : ByteArray) : IO Unit :=
-  self.val.callMethod "writeTensor" (Support.args #[toJS tensor, toJS inputData]) Unit
+@[macro_inline] def MLContext.writeTensor (self : MLContext) (tensor : MLTensor) (inputData : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.MLContext.writeTensor" do
+  self.val.callMethod "writeTensor" (Internal.args #[toJS tensor, toJS inputData]) Unit
 
 /-- `GPUBuffer exportToGPU(MLTensor tensor)` -/
-def MLContext.exportToGPU (self : MLContext) (tensor : MLTensor) : IO GPUBuffer := do
-  let r ← self.val.callMethod "exportToGPU" (Support.args #[toJS tensor]) Value
+@[macro_inline] def MLContext.exportToGPU (self : MLContext) (tensor : MLTensor) : IO GPUBuffer := Internal.api "Lasm.JS.Web.MLContext.exportToGPU" do
+  let r ← self.val.callMethod "exportToGPU" (Internal.args #[toJS tensor]) Value
   pure { val := r }
 
 /-- `MLOpSupportLimits opSupportLimits()` -/
-def MLContext.opSupportLimits (self : MLContext) : IO MLOpSupportLimits :=
-  self.val.callMethod "opSupportLimits" (Support.args #[]) MLOpSupportLimits
+@[macro_inline] def MLContext.opSupportLimits (self : MLContext) : IO MLOpSupportLimits := Internal.api "Lasm.JS.Web.MLContext.opSupportLimits" do
+  self.val.callMethod "opSupportLimits" (Internal.args #[]) MLOpSupportLimits
 
 /-- `undefined destroy()` -/
-def MLContext.destroy (self : MLContext) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def MLContext.destroy (self : MLContext) : IO Unit := Internal.api "Lasm.JS.Web.MLContext.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof MLGraph`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MLGraph`). -/
-def MLGraph.cast? (v : Value) : IO (Option MLGraph) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MLGraph"] Value) v) then some { val := v } else none
+@[macro_inline] def MLGraph.cast? (v : Value) : IO (Option MLGraph) := Internal.api "Lasm.JS.Web.MLGraph.cast?" do
+  Internal.cast (Internal.getGlobal ["MLGraph"] Value) (fun x => { val := x }) v
 
 /-- `undefined destroy()` -/
-def MLGraph.destroy (self : MLGraph) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def MLGraph.destroy (self : MLGraph) : IO Unit := Internal.api "Lasm.JS.Web.MLGraph.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof MLGraphBuilder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MLGraphBuilder`). -/
-def MLGraphBuilder.cast? (v : Value) : IO (Option MLGraphBuilder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MLGraphBuilder"] Value) v) then some { val := v } else none
+@[macro_inline] def MLGraphBuilder.cast? (v : Value) : IO (Option MLGraphBuilder) := Internal.api "Lasm.JS.Web.MLGraphBuilder.cast?" do
+  Internal.cast (Internal.getGlobal ["MLGraphBuilder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MLContext context)` -/
-def MLGraphBuilder.new (context : MLContext) : IO MLGraphBuilder :=
+@[macro_inline] def MLGraphBuilder.new (context : MLContext) : IO MLGraphBuilder := Internal.api "Lasm.JS.Web.MLGraphBuilder.new" do
   Lasm.JS.Binding.invoke MLGraphBuilder { name := "Lasm.JS.Web.MLGraphBuilder.new", module := "globalThis", path := "MLGraphBuilder", construct := true, arity := 1 }
-    (Support.args #[toJS context]) (await := false)
+    (Internal.args #[toJS context]) (await := false)
 
 /-- `MLOperand input(USVString name, MLOperandDescriptor descriptor)` -/
-def MLGraphBuilder.input (self : MLGraphBuilder) (name : String) (descriptor : MLOperandDescriptor) : IO MLOperand := do
-  let r ← self.val.callMethod "input" (Support.args #[toJS name, toJS descriptor]) Value
+@[macro_inline] def MLGraphBuilder.input (self : MLGraphBuilder) (name : String) (descriptor : MLOperandDescriptor) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.input" do
+  let r ← self.val.callMethod "input" (Internal.args #[toJS name, toJS descriptor]) Value
   pure { val := r }
 
 /-- `MLOperand constant(MLOperandDescriptor descriptor, AllowSharedBufferSource buffer)` -/
-def MLGraphBuilder.constant (self : MLGraphBuilder) (descriptor : MLOperandDescriptor) (buffer : ByteArray) : IO MLOperand := do
-  let r ← self.val.callMethod "constant" (Support.args #[toJS descriptor, toJS buffer]) Value
+@[macro_inline] def MLGraphBuilder.constant (self : MLGraphBuilder) (descriptor : MLOperandDescriptor) (buffer : ByteArray) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.constant" do
+  let r ← self.val.callMethod "constant" (Internal.args #[toJS descriptor, toJS buffer]) Value
   pure { val := r }
 
 /-- `MLOperand constant(MLOperandDataType dataType, MLNumber value)` -/
-def MLGraphBuilder.constantWithDataType (self : MLGraphBuilder) (dataType : MLOperandDataType) (value : MLNumber) : IO MLOperand := do
-  let r ← self.val.callMethod "constant" (Support.args #[toJS dataType, toJS value]) Value
+@[macro_inline] def MLGraphBuilder.constantWithDataType (self : MLGraphBuilder) (dataType : MLOperandDataType) (value : MLNumber) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.constantWithDataType" do
+  let r ← self.val.callMethod "constant" (Internal.args #[toJS dataType, toJS value]) Value
   pure { val := r }
 
 /-- `MLOperand constant(MLTensor tensor)` -/
-def MLGraphBuilder.constantWithTensor (self : MLGraphBuilder) (tensor : MLTensor) : IO MLOperand := do
-  let r ← self.val.callMethod "constant" (Support.args #[toJS tensor]) Value
+@[macro_inline] def MLGraphBuilder.constantWithTensor (self : MLGraphBuilder) (tensor : MLTensor) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.constantWithTensor" do
+  let r ← self.val.callMethod "constant" (Internal.args #[toJS tensor]) Value
   pure { val := r }
 
 /-- `Promise<MLGraph> build(MLNamedOperands outputs)` -/
-def MLGraphBuilder.build (self : MLGraphBuilder) (outputs : Record MLOperand) : Async MLGraph := do
-  let r ← self.val.callMethodAwait "build" (Support.args #[toJS outputs]) Value
+@[macro_inline] def MLGraphBuilder.build (self : MLGraphBuilder) (outputs : Record MLOperand) : Async MLGraph := Internal.api "Lasm.JS.Web.MLGraphBuilder.build" do
+  let r ← self.val.callMethodAwait "build" (Internal.args #[toJS outputs]) Value
   pure { val := r }
 
 /-- `MLOperand argMin(MLOperand input, unsigned long axis, optional MLArgMinMaxOptions options)` -/
-def MLGraphBuilder.argMin (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLArgMinMaxOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "argMin" (Support.args #[toJS input, toJS axis, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.argMin (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLArgMinMaxOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.argMin" do
+  let r ← self.val.callMethod "argMin" (Internal.args #[toJS input, toJS axis, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand argMax(MLOperand input, unsigned long axis, optional MLArgMinMaxOptions options)` -/
-def MLGraphBuilder.argMax (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLArgMinMaxOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "argMax" (Support.args #[toJS input, toJS axis, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.argMax (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLArgMinMaxOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.argMax" do
+  let r ← self.val.callMethod "argMax" (Internal.args #[toJS input, toJS axis, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand batchNormalization(MLOperand input, MLOperand mean, MLOperand variance, optional MLBatchNormalizationOptions options)` -/
-def MLGraphBuilder.batchNormalization (self : MLGraphBuilder) (input : MLOperand) (mean : MLOperand) (variance : MLOperand) (options : Option MLBatchNormalizationOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "batchNormalization" (Support.args #[toJS input, toJS mean, toJS variance, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.batchNormalization (self : MLGraphBuilder) (input : MLOperand) (mean : MLOperand) (variance : MLOperand) (options : Option MLBatchNormalizationOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.batchNormalization" do
+  let r ← self.val.callMethod "batchNormalization" (Internal.args #[toJS input, toJS mean, toJS variance, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand cast(MLOperand input, MLOperandDataType dataType, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.cast (self : MLGraphBuilder) (input : MLOperand) (dataType : MLOperandDataType) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "cast" (Support.args #[toJS input, toJS dataType, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.cast (self : MLGraphBuilder) (input : MLOperand) (dataType : MLOperandDataType) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.cast" do
+  let r ← self.val.callMethod "cast" (Internal.args #[toJS input, toJS dataType, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand clamp(MLOperand input, optional MLClampOptions options)` -/
-def MLGraphBuilder.clamp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLClampOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "clamp" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.clamp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLClampOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.clamp" do
+  let r ← self.val.callMethod "clamp" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand concat(sequence<MLOperand> inputs, unsigned long axis, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.concat (self : MLGraphBuilder) (inputs : Array MLOperand) (axis : Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "concat" (Support.args #[toJS inputs, toJS axis, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.concat (self : MLGraphBuilder) (inputs : Array MLOperand) (axis : Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.concat" do
+  let r ← self.val.callMethod "concat" (Internal.args #[toJS inputs, toJS axis, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand conv2d(MLOperand input, MLOperand filter, optional MLConv2dOptions options)` -/
-def MLGraphBuilder.conv2d (self : MLGraphBuilder) (input : MLOperand) (filter : MLOperand) (options : Option MLConv2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "conv2d" (Support.args #[toJS input, toJS filter, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.conv2d (self : MLGraphBuilder) (input : MLOperand) (filter : MLOperand) (options : Option MLConv2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.conv2d" do
+  let r ← self.val.callMethod "conv2d" (Internal.args #[toJS input, toJS filter, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand convTranspose2d(MLOperand input, MLOperand filter, optional MLConvTranspose2dOptions options)` -/
-def MLGraphBuilder.convTranspose2d (self : MLGraphBuilder) (input : MLOperand) (filter : MLOperand) (options : Option MLConvTranspose2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "convTranspose2d" (Support.args #[toJS input, toJS filter, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.convTranspose2d (self : MLGraphBuilder) (input : MLOperand) (filter : MLOperand) (options : Option MLConvTranspose2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.convTranspose2d" do
+  let r ← self.val.callMethod "convTranspose2d" (Internal.args #[toJS input, toJS filter, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand cumulativeSum(MLOperand input, unsigned long axis, optional MLCumulativeSumOptions options)` -/
-def MLGraphBuilder.cumulativeSum (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLCumulativeSumOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "cumulativeSum" (Support.args #[toJS input, toJS axis, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.cumulativeSum (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLCumulativeSumOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.cumulativeSum" do
+  let r ← self.val.callMethod "cumulativeSum" (Internal.args #[toJS input, toJS axis, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand add(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.add (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "add" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.add (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.add" do
+  let r ← self.val.callMethod "add" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand sub(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.sub (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "sub" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.sub (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.sub" do
+  let r ← self.val.callMethod "sub" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand mul(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.mul (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "mul" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.mul (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.mul" do
+  let r ← self.val.callMethod "mul" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand div(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.div (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "div" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.div (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.div" do
+  let r ← self.val.callMethod "div" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand max(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.max (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "max" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.max (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.max" do
+  let r ← self.val.callMethod "max" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand min(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.min (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "min" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.min (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.min" do
+  let r ← self.val.callMethod "min" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand pow(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.pow (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "pow" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.pow (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.pow" do
+  let r ← self.val.callMethod "pow" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand equal(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.equal (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "equal" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.equal (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.equal" do
+  let r ← self.val.callMethod "equal" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand notEqual(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.notEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "notEqual" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.notEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.notEqual" do
+  let r ← self.val.callMethod "notEqual" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand greater(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.greater (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "greater" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.greater (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.greater" do
+  let r ← self.val.callMethod "greater" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand greaterOrEqual(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.greaterOrEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "greaterOrEqual" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.greaterOrEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.greaterOrEqual" do
+  let r ← self.val.callMethod "greaterOrEqual" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand lesser(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.lesser (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "lesser" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.lesser (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.lesser" do
+  let r ← self.val.callMethod "lesser" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand lesserOrEqual(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.lesserOrEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "lesserOrEqual" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.lesserOrEqual (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.lesserOrEqual" do
+  let r ← self.val.callMethod "lesserOrEqual" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand logicalNot(MLOperand a, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.logicalNot (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "logicalNot" (Support.args #[toJS a, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.logicalNot (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.logicalNot" do
+  let r ← self.val.callMethod "logicalNot" (Internal.args #[toJS a, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand logicalAnd(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.logicalAnd (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "logicalAnd" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.logicalAnd (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.logicalAnd" do
+  let r ← self.val.callMethod "logicalAnd" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand logicalOr(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.logicalOr (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "logicalOr" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.logicalOr (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.logicalOr" do
+  let r ← self.val.callMethod "logicalOr" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand logicalXor(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.logicalXor (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "logicalXor" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.logicalXor (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.logicalXor" do
+  let r ← self.val.callMethod "logicalXor" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand isNaN(MLOperand a, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.isNaN (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "isNaN" (Support.args #[toJS a, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.isNaN (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.isNaN" do
+  let r ← self.val.callMethod "isNaN" (Internal.args #[toJS a, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand isInfinite(MLOperand a, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.isInfinite (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "isInfinite" (Support.args #[toJS a, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.isInfinite (self : MLGraphBuilder) (a : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.isInfinite" do
+  let r ← self.val.callMethod "isInfinite" (Internal.args #[toJS a, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand abs(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.abs (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "abs" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.abs (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.abs" do
+  let r ← self.val.callMethod "abs" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand ceil(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.ceil (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "ceil" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.ceil (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.ceil" do
+  let r ← self.val.callMethod "ceil" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand cos(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.cos (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "cos" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.cos (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.cos" do
+  let r ← self.val.callMethod "cos" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand erf(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.erf (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "erf" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.erf (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.erf" do
+  let r ← self.val.callMethod "erf" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand exp(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.exp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "exp" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.exp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.exp" do
+  let r ← self.val.callMethod "exp" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand floor(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.floor (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "floor" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.floor (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.floor" do
+  let r ← self.val.callMethod "floor" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand identity(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.identity (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "identity" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.identity (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.identity" do
+  let r ← self.val.callMethod "identity" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand log(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.log (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "log" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.log (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.log" do
+  let r ← self.val.callMethod "log" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand neg(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.neg (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "neg" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.neg (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.neg" do
+  let r ← self.val.callMethod "neg" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reciprocal(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.reciprocal (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reciprocal" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reciprocal (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reciprocal" do
+  let r ← self.val.callMethod "reciprocal" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand roundEven(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.roundEven (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "roundEven" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.roundEven (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.roundEven" do
+  let r ← self.val.callMethod "roundEven" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand sin(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.sin (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "sin" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.sin (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.sin" do
+  let r ← self.val.callMethod "sin" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand sign(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.sign (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "sign" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.sign (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.sign" do
+  let r ← self.val.callMethod "sign" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand sqrt(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.sqrt (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "sqrt" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.sqrt (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.sqrt" do
+  let r ← self.val.callMethod "sqrt" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand tan(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.tan (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "tan" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.tan (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.tan" do
+  let r ← self.val.callMethod "tan" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand dequantizeLinear(MLOperand input, MLOperand scale, MLOperand zeroPoint, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.dequantizeLinear (self : MLGraphBuilder) (input : MLOperand) (scale : MLOperand) (zeroPoint : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "dequantizeLinear" (Support.args #[toJS input, toJS scale, toJS zeroPoint, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.dequantizeLinear (self : MLGraphBuilder) (input : MLOperand) (scale : MLOperand) (zeroPoint : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.dequantizeLinear" do
+  let r ← self.val.callMethod "dequantizeLinear" (Internal.args #[toJS input, toJS scale, toJS zeroPoint, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand quantizeLinear(MLOperand input, MLOperand scale, MLOperand zeroPoint, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.quantizeLinear (self : MLGraphBuilder) (input : MLOperand) (scale : MLOperand) (zeroPoint : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "quantizeLinear" (Support.args #[toJS input, toJS scale, toJS zeroPoint, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.quantizeLinear (self : MLGraphBuilder) (input : MLOperand) (scale : MLOperand) (zeroPoint : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.quantizeLinear" do
+  let r ← self.val.callMethod "quantizeLinear" (Internal.args #[toJS input, toJS scale, toJS zeroPoint, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand elu(MLOperand input, optional MLEluOptions options)` -/
-def MLGraphBuilder.elu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLEluOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "elu" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.elu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLEluOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.elu" do
+  let r ← self.val.callMethod "elu" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand expand(MLOperand input, sequence<unsigned long> newShape, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.expand (self : MLGraphBuilder) (input : MLOperand) (newShape : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "expand" (Support.args #[toJS input, toJS newShape, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.expand (self : MLGraphBuilder) (input : MLOperand) (newShape : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.expand" do
+  let r ← self.val.callMethod "expand" (Internal.args #[toJS input, toJS newShape, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand gather(MLOperand input, MLOperand indices, optional MLGatherOptions options)` -/
-def MLGraphBuilder.gather (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLGatherOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gather" (Support.args #[toJS input, toJS indices, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gather (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLGatherOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gather" do
+  let r ← self.val.callMethod "gather" (Internal.args #[toJS input, toJS indices, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand gatherElements(MLOperand input, MLOperand indices, optional MLGatherOptions options)` -/
-def MLGraphBuilder.gatherElements (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLGatherOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gatherElements" (Support.args #[toJS input, toJS indices, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gatherElements (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLGatherOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gatherElements" do
+  let r ← self.val.callMethod "gatherElements" (Internal.args #[toJS input, toJS indices, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand gatherND(MLOperand input, MLOperand indices, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.gatherND (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gatherND" (Support.args #[toJS input, toJS indices, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gatherND (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gatherND" do
+  let r ← self.val.callMethod "gatherND" (Internal.args #[toJS input, toJS indices, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand gelu(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.gelu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gelu" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gelu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gelu" do
+  let r ← self.val.callMethod "gelu" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand gemm(MLOperand a, MLOperand b, optional MLGemmOptions options)` -/
-def MLGraphBuilder.gemm (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLGemmOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gemm" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gemm (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLGemmOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gemm" do
+  let r ← self.val.callMethod "gemm" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `sequence<MLOperand> gru(MLOperand input, MLOperand weight, MLOperand recurrentWeight, unsigned long steps, unsigned long hiddenSize, optional MLGruOptions options)` -/
-def MLGraphBuilder.gru (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (steps : Nat) (hiddenSize : Nat) (options : Option MLGruOptions := none) : IO (Array MLOperand) :=
-  self.val.callMethod "gru" (Support.args #[toJS input, toJS weight, toJS recurrentWeight, toJS steps, toJS hiddenSize, Support.optional options]) (Array MLOperand)
+@[macro_inline] def MLGraphBuilder.gru (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (steps : Nat) (hiddenSize : Nat) (options : Option MLGruOptions := none) : IO (Array MLOperand) := Internal.api "Lasm.JS.Web.MLGraphBuilder.gru" do
+  self.val.callMethod "gru" (Internal.args #[toJS input, toJS weight, toJS recurrentWeight, toJS steps, toJS hiddenSize, Internal.optional options]) (Array MLOperand)
 
 /-- `MLOperand gruCell(MLOperand input, MLOperand weight, MLOperand recurrentWeight, MLOperand hiddenState, unsigned long hiddenSize, optional MLGruCellOptions options)` -/
-def MLGraphBuilder.gruCell (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (hiddenState : MLOperand) (hiddenSize : Nat) (options : Option MLGruCellOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "gruCell" (Support.args #[toJS input, toJS weight, toJS recurrentWeight, toJS hiddenState, toJS hiddenSize, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.gruCell (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (hiddenState : MLOperand) (hiddenSize : Nat) (options : Option MLGruCellOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.gruCell" do
+  let r ← self.val.callMethod "gruCell" (Internal.args #[toJS input, toJS weight, toJS recurrentWeight, toJS hiddenState, toJS hiddenSize, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand hardSigmoid(MLOperand input, optional MLHardSigmoidOptions options)` -/
-def MLGraphBuilder.hardSigmoid (self : MLGraphBuilder) (input : MLOperand) (options : Option MLHardSigmoidOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "hardSigmoid" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.hardSigmoid (self : MLGraphBuilder) (input : MLOperand) (options : Option MLHardSigmoidOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.hardSigmoid" do
+  let r ← self.val.callMethod "hardSigmoid" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand hardSwish(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.hardSwish (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "hardSwish" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.hardSwish (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.hardSwish" do
+  let r ← self.val.callMethod "hardSwish" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand instanceNormalization(MLOperand input, optional MLInstanceNormalizationOptions options)` -/
-def MLGraphBuilder.instanceNormalization (self : MLGraphBuilder) (input : MLOperand) (options : Option MLInstanceNormalizationOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "instanceNormalization" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.instanceNormalization (self : MLGraphBuilder) (input : MLOperand) (options : Option MLInstanceNormalizationOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.instanceNormalization" do
+  let r ← self.val.callMethod "instanceNormalization" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand layerNormalization(MLOperand input, optional MLLayerNormalizationOptions options)` -/
-def MLGraphBuilder.layerNormalization (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLayerNormalizationOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "layerNormalization" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.layerNormalization (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLayerNormalizationOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.layerNormalization" do
+  let r ← self.val.callMethod "layerNormalization" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand leakyRelu(MLOperand input, optional MLLeakyReluOptions options)` -/
-def MLGraphBuilder.leakyRelu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLeakyReluOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "leakyRelu" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.leakyRelu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLeakyReluOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.leakyRelu" do
+  let r ← self.val.callMethod "leakyRelu" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand linear(MLOperand input, optional MLLinearOptions options)` -/
-def MLGraphBuilder.linear (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLinearOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "linear" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.linear (self : MLGraphBuilder) (input : MLOperand) (options : Option MLLinearOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.linear" do
+  let r ← self.val.callMethod "linear" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `sequence<MLOperand> lstm(MLOperand input, MLOperand weight, MLOperand recurrentWeight, unsigned long steps, unsigned long hiddenSize, optional MLLstmOptions options)` -/
-def MLGraphBuilder.lstm (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (steps : Nat) (hiddenSize : Nat) (options : Option MLLstmOptions := none) : IO (Array MLOperand) :=
-  self.val.callMethod "lstm" (Support.args #[toJS input, toJS weight, toJS recurrentWeight, toJS steps, toJS hiddenSize, Support.optional options]) (Array MLOperand)
+@[macro_inline] def MLGraphBuilder.lstm (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (steps : Nat) (hiddenSize : Nat) (options : Option MLLstmOptions := none) : IO (Array MLOperand) := Internal.api "Lasm.JS.Web.MLGraphBuilder.lstm" do
+  self.val.callMethod "lstm" (Internal.args #[toJS input, toJS weight, toJS recurrentWeight, toJS steps, toJS hiddenSize, Internal.optional options]) (Array MLOperand)
 
 /-- `sequence<MLOperand> lstmCell(MLOperand input, MLOperand weight, MLOperand recurrentWeight, MLOperand hiddenState, MLOperand cellState, unsigned long hiddenSize, optional MLLstmCellOptions options)` -/
-def MLGraphBuilder.lstmCell (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (hiddenState : MLOperand) (cellState : MLOperand) (hiddenSize : Nat) (options : Option MLLstmCellOptions := none) : IO (Array MLOperand) :=
-  self.val.callMethod "lstmCell" (Support.args #[toJS input, toJS weight, toJS recurrentWeight, toJS hiddenState, toJS cellState, toJS hiddenSize, Support.optional options]) (Array MLOperand)
+@[macro_inline] def MLGraphBuilder.lstmCell (self : MLGraphBuilder) (input : MLOperand) (weight : MLOperand) (recurrentWeight : MLOperand) (hiddenState : MLOperand) (cellState : MLOperand) (hiddenSize : Nat) (options : Option MLLstmCellOptions := none) : IO (Array MLOperand) := Internal.api "Lasm.JS.Web.MLGraphBuilder.lstmCell" do
+  self.val.callMethod "lstmCell" (Internal.args #[toJS input, toJS weight, toJS recurrentWeight, toJS hiddenState, toJS cellState, toJS hiddenSize, Internal.optional options]) (Array MLOperand)
 
 /-- `MLOperand matmul(MLOperand a, MLOperand b, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.matmul (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "matmul" (Support.args #[toJS a, toJS b, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.matmul (self : MLGraphBuilder) (a : MLOperand) (b : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.matmul" do
+  let r ← self.val.callMethod "matmul" (Internal.args #[toJS a, toJS b, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand pad(MLOperand input, sequence<unsigned long> beginningPadding, sequence<unsigned long> endingPadding, optional MLPadOptions options)` -/
-def MLGraphBuilder.pad (self : MLGraphBuilder) (input : MLOperand) (beginningPadding : Array Nat) (endingPadding : Array Nat) (options : Option MLPadOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "pad" (Support.args #[toJS input, toJS beginningPadding, toJS endingPadding, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.pad (self : MLGraphBuilder) (input : MLOperand) (beginningPadding : Array Nat) (endingPadding : Array Nat) (options : Option MLPadOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.pad" do
+  let r ← self.val.callMethod "pad" (Internal.args #[toJS input, toJS beginningPadding, toJS endingPadding, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand averagePool2d(MLOperand input, optional MLPool2dOptions options)` -/
-def MLGraphBuilder.averagePool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "averagePool2d" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.averagePool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.averagePool2d" do
+  let r ← self.val.callMethod "averagePool2d" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand l2Pool2d(MLOperand input, optional MLPool2dOptions options)` -/
-def MLGraphBuilder.l2Pool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "l2Pool2d" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.l2Pool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.l2Pool2d" do
+  let r ← self.val.callMethod "l2Pool2d" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand maxPool2d(MLOperand input, optional MLPool2dOptions options)` -/
-def MLGraphBuilder.maxPool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "maxPool2d" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.maxPool2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLPool2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.maxPool2d" do
+  let r ← self.val.callMethod "maxPool2d" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand prelu(MLOperand input, MLOperand slope, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.prelu (self : MLGraphBuilder) (input : MLOperand) (slope : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "prelu" (Support.args #[toJS input, toJS slope, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.prelu (self : MLGraphBuilder) (input : MLOperand) (slope : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.prelu" do
+  let r ← self.val.callMethod "prelu" (Internal.args #[toJS input, toJS slope, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceL1(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceL1 (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceL1" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceL1 (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceL1" do
+  let r ← self.val.callMethod "reduceL1" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceL2(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceL2 (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceL2" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceL2 (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceL2" do
+  let r ← self.val.callMethod "reduceL2" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceLogSum(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceLogSum (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceLogSum" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceLogSum (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceLogSum" do
+  let r ← self.val.callMethod "reduceLogSum" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceLogSumExp(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceLogSumExp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceLogSumExp" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceLogSumExp (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceLogSumExp" do
+  let r ← self.val.callMethod "reduceLogSumExp" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceMax(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceMax (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceMax" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceMax (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceMax" do
+  let r ← self.val.callMethod "reduceMax" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceMean(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceMean (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceMean" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceMean (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceMean" do
+  let r ← self.val.callMethod "reduceMean" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceMin(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceMin (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceMin" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceMin (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceMin" do
+  let r ← self.val.callMethod "reduceMin" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceProduct(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceProduct (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceProduct" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceProduct (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceProduct" do
+  let r ← self.val.callMethod "reduceProduct" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceSum(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceSum (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceSum" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceSum (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceSum" do
+  let r ← self.val.callMethod "reduceSum" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reduceSumSquare(MLOperand input, optional MLReduceOptions options)` -/
-def MLGraphBuilder.reduceSumSquare (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reduceSumSquare" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reduceSumSquare (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReduceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reduceSumSquare" do
+  let r ← self.val.callMethod "reduceSumSquare" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand relu(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.relu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "relu" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.relu (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.relu" do
+  let r ← self.val.callMethod "relu" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand resample2d(MLOperand input, optional MLResample2dOptions options)` -/
-def MLGraphBuilder.resample2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLResample2dOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "resample2d" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.resample2d (self : MLGraphBuilder) (input : MLOperand) (options : Option MLResample2dOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.resample2d" do
+  let r ← self.val.callMethod "resample2d" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reshape(MLOperand input, sequence<unsigned long> newShape, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.reshape (self : MLGraphBuilder) (input : MLOperand) (newShape : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reshape" (Support.args #[toJS input, toJS newShape, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reshape (self : MLGraphBuilder) (input : MLOperand) (newShape : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reshape" do
+  let r ← self.val.callMethod "reshape" (Internal.args #[toJS input, toJS newShape, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand reverse(MLOperand input, optional MLReverseOptions options)` -/
-def MLGraphBuilder.reverse (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReverseOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "reverse" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.reverse (self : MLGraphBuilder) (input : MLOperand) (options : Option MLReverseOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.reverse" do
+  let r ← self.val.callMethod "reverse" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand scatterElements(MLOperand input, MLOperand indices, MLOperand updates, optional MLScatterOptions options)` -/
-def MLGraphBuilder.scatterElements (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (updates : MLOperand) (options : Option MLScatterOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "scatterElements" (Support.args #[toJS input, toJS indices, toJS updates, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.scatterElements (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (updates : MLOperand) (options : Option MLScatterOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.scatterElements" do
+  let r ← self.val.callMethod "scatterElements" (Internal.args #[toJS input, toJS indices, toJS updates, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand scatterND(MLOperand input, MLOperand indices, MLOperand updates, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.scatterND (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (updates : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "scatterND" (Support.args #[toJS input, toJS indices, toJS updates, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.scatterND (self : MLGraphBuilder) (input : MLOperand) (indices : MLOperand) (updates : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.scatterND" do
+  let r ← self.val.callMethod "scatterND" (Internal.args #[toJS input, toJS indices, toJS updates, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand sigmoid(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.sigmoid (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "sigmoid" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.sigmoid (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.sigmoid" do
+  let r ← self.val.callMethod "sigmoid" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand slice(MLOperand input, sequence<unsigned long> starts, sequence<unsigned long> sizes, optional MLSliceOptions options)` -/
-def MLGraphBuilder.slice (self : MLGraphBuilder) (input : MLOperand) (starts : Array Nat) (sizes : Array Nat) (options : Option MLSliceOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "slice" (Support.args #[toJS input, toJS starts, toJS sizes, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.slice (self : MLGraphBuilder) (input : MLOperand) (starts : Array Nat) (sizes : Array Nat) (options : Option MLSliceOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.slice" do
+  let r ← self.val.callMethod "slice" (Internal.args #[toJS input, toJS starts, toJS sizes, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand softmax(MLOperand input, unsigned long axis, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.softmax (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "softmax" (Support.args #[toJS input, toJS axis, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.softmax (self : MLGraphBuilder) (input : MLOperand) (axis : Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.softmax" do
+  let r ← self.val.callMethod "softmax" (Internal.args #[toJS input, toJS axis, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand softplus(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.softplus (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "softplus" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.softplus (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.softplus" do
+  let r ← self.val.callMethod "softplus" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand softsign(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.softsign (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "softsign" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.softsign (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.softsign" do
+  let r ← self.val.callMethod "softsign" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `sequence<MLOperand> split(MLOperand input, (unsigned long or sequence<unsigned long>) splits, optional MLSplitOptions options)` -/
-def MLGraphBuilder.split (self : MLGraphBuilder) (input : MLOperand) (splits : UnsignedLongOrSequenceOfUnsignedLong) (options : Option MLSplitOptions := none) : IO (Array MLOperand) :=
-  self.val.callMethod "split" (Support.args #[toJS input, toJS splits, Support.optional options]) (Array MLOperand)
+@[macro_inline] def MLGraphBuilder.split (self : MLGraphBuilder) (input : MLOperand) (splits : UnsignedLongOrSequenceOfUnsignedLong) (options : Option MLSplitOptions := none) : IO (Array MLOperand) := Internal.api "Lasm.JS.Web.MLGraphBuilder.split" do
+  self.val.callMethod "split" (Internal.args #[toJS input, toJS splits, Internal.optional options]) (Array MLOperand)
 
 /-- `MLOperand tanh(MLOperand input, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.tanh (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "tanh" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.tanh (self : MLGraphBuilder) (input : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.tanh" do
+  let r ← self.val.callMethod "tanh" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand tile(MLOperand input, sequence<unsigned long> repetitions, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.tile (self : MLGraphBuilder) (input : MLOperand) (repetitions : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "tile" (Support.args #[toJS input, toJS repetitions, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.tile (self : MLGraphBuilder) (input : MLOperand) (repetitions : Array Nat) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.tile" do
+  let r ← self.val.callMethod "tile" (Internal.args #[toJS input, toJS repetitions, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand transpose(MLOperand input, optional MLTransposeOptions options)` -/
-def MLGraphBuilder.transpose (self : MLGraphBuilder) (input : MLOperand) (options : Option MLTransposeOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "transpose" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.transpose (self : MLGraphBuilder) (input : MLOperand) (options : Option MLTransposeOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.transpose" do
+  let r ← self.val.callMethod "transpose" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand triangular(MLOperand input, optional MLTriangularOptions options)` -/
-def MLGraphBuilder.triangular (self : MLGraphBuilder) (input : MLOperand) (options : Option MLTriangularOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "triangular" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.triangular (self : MLGraphBuilder) (input : MLOperand) (options : Option MLTriangularOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.triangular" do
+  let r ← self.val.callMethod "triangular" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `MLOperand where(MLOperand condition, MLOperand trueValue, MLOperand falseValue, optional MLOperatorOptions options)` -/
-def MLGraphBuilder.«where» (self : MLGraphBuilder) (condition : MLOperand) (trueValue : MLOperand) (falseValue : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := do
-  let r ← self.val.callMethod "where" (Support.args #[toJS condition, toJS trueValue, toJS falseValue, Support.optional options]) Value
+@[macro_inline] def MLGraphBuilder.«where» (self : MLGraphBuilder) (condition : MLOperand) (trueValue : MLOperand) (falseValue : MLOperand) (options : Option MLOperatorOptions := none) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.where" do
+  let r ← self.val.callMethod "where" (Internal.args #[toJS condition, toJS trueValue, toJS falseValue, Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof MLOperand`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MLOperand`). -/
-def MLOperand.cast? (v : Value) : IO (Option MLOperand) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MLOperand"] Value) v) then some { val := v } else none
+@[macro_inline] def MLOperand.cast? (v : Value) : IO (Option MLOperand) := Internal.api "Lasm.JS.Web.MLOperand.cast?" do
+  Internal.cast (Internal.getGlobal ["MLOperand"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MLOperandDataType dataType` -/
-def MLOperand.dataType (self : MLOperand) : IO MLOperandDataType := self.val.get "dataType" MLOperandDataType
+@[macro_inline] def MLOperand.dataType (self : MLOperand) : IO MLOperandDataType := Internal.api "Lasm.JS.Web.MLOperand.dataType" do
+  self.val.get "dataType" MLOperandDataType
 
 /-- `readonly attribute FrozenArray<unsigned long> shape` -/
-def MLOperand.shape (self : MLOperand) : IO (Array Nat) := self.val.get "shape" (Array Nat)
+@[macro_inline] def MLOperand.shape (self : MLOperand) : IO (Array Nat) := Internal.api "Lasm.JS.Web.MLOperand.shape" do
+  self.val.get "shape" (Array Nat)
 
 /-- `v instanceof MLTensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MLTensor`). -/
-def MLTensor.cast? (v : Value) : IO (Option MLTensor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MLTensor"] Value) v) then some { val := v } else none
+@[macro_inline] def MLTensor.cast? (v : Value) : IO (Option MLTensor) := Internal.api "Lasm.JS.Web.MLTensor.cast?" do
+  Internal.cast (Internal.getGlobal ["MLTensor"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MLOperandDataType dataType` -/
-def MLTensor.dataType (self : MLTensor) : IO MLOperandDataType := self.val.get "dataType" MLOperandDataType
+@[macro_inline] def MLTensor.dataType (self : MLTensor) : IO MLOperandDataType := Internal.api "Lasm.JS.Web.MLTensor.dataType" do
+  self.val.get "dataType" MLOperandDataType
 
 /-- `readonly attribute FrozenArray<unsigned long> shape` -/
-def MLTensor.shape (self : MLTensor) : IO (Array Nat) := self.val.get "shape" (Array Nat)
+@[macro_inline] def MLTensor.shape (self : MLTensor) : IO (Array Nat) := Internal.api "Lasm.JS.Web.MLTensor.shape" do
+  self.val.get "shape" (Array Nat)
 
 /-- `readonly attribute boolean readable` -/
-def MLTensor.readable (self : MLTensor) : IO Bool := self.val.get "readable" Bool
+@[macro_inline] def MLTensor.readable (self : MLTensor) : IO Bool := Internal.api "Lasm.JS.Web.MLTensor.readable" do
+  self.val.get "readable" Bool
 
 /-- `readonly attribute boolean writable` -/
-def MLTensor.writable (self : MLTensor) : IO Bool := self.val.get "writable" Bool
+@[macro_inline] def MLTensor.writable (self : MLTensor) : IO Bool := Internal.api "Lasm.JS.Web.MLTensor.writable" do
+  self.val.get "writable" Bool
 
 /-- `readonly attribute boolean constant` -/
-def MLTensor.constant (self : MLTensor) : IO Bool := self.val.get "constant" Bool
+@[macro_inline] def MLTensor.constant (self : MLTensor) : IO Bool := Internal.api "Lasm.JS.Web.MLTensor.constant" do
+  self.val.get "constant" Bool
 
 /-- `undefined destroy()` -/
-def MLTensor.destroy (self : MLTensor) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def MLTensor.destroy (self : MLTensor) : IO Unit := Internal.api "Lasm.JS.Web.MLTensor.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `readonly attribute ML ml` -/
-def Navigator.ml (self : Navigator) : IO ML := do
+@[macro_inline] def Navigator.ml (self : Navigator) : IO ML := Internal.api "Lasm.JS.Web.Navigator.ml" do
   let r ← self.val.get "ml" Value
   pure { val := r }
 
 /-- `readonly attribute ML ml` -/
-def WorkerNavigator.ml (self : WorkerNavigator) : IO ML := do
+@[macro_inline] def WorkerNavigator.ml (self : WorkerNavigator) : IO ML := Internal.api "Lasm.JS.Web.WorkerNavigator.ml" do
   let r ← self.val.get "ml" Value
   pure { val := r }
 

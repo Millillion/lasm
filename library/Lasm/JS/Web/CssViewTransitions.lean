@@ -6,10 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssViewTransitions
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback ViewTransitionUpdateCallback = Promise<any> ()` (CSS View Transitions Module Level 2 (https://drafts.csswg.org/css-view-transitions-2/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ViewTransitionUpdateCallback where
@@ -31,8 +36,8 @@ structure StartViewTransitionOptions where
   update : Option ViewTransitionUpdateCallback := none
   /-- `sequence<DOMString>? types = null` -/
   types : Option (Array String) := none
-instance : ToJS StartViewTransitionOptions := ⟨fun d => Support.fields #[("update", Support.optional d.update),
-    ("types", Support.optional d.types)]⟩
+instance : ToJS StartViewTransitionOptions := ⟨fun d => Internal.fields #[("update", Internal.optional d.update),
+    ("types", Internal.optional d.types)]⟩
 
 /-- `(ViewTransitionUpdateCallback or StartViewTransitionOptions)`: one constructor per member type. -/
 inductive ViewTransitionUpdateCallbackOrStartViewTransitionOptions where
@@ -47,70 +52,74 @@ instance : Coe ViewTransitionUpdateCallback ViewTransitionUpdateCallbackOrStartV
 instance : Coe StartViewTransitionOptions ViewTransitionUpdateCallbackOrStartViewTransitionOptions := ⟨.startViewTransitionOptions⟩
 
 /-- `v instanceof CSSViewTransitionRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSViewTransitionRule`). -/
-def CSSViewTransitionRule.cast? (v : Value) : IO (Option CSSViewTransitionRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSViewTransitionRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSViewTransitionRule.cast? (v : Value) : IO (Option CSSViewTransitionRule) := Internal.api "Lasm.JS.Web.CSSViewTransitionRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSViewTransitionRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString navigation` -/
-def CSSViewTransitionRule.navigation (self : CSSViewTransitionRule) : IO String := self.val.get "navigation" String
+@[macro_inline] def CSSViewTransitionRule.navigation (self : CSSViewTransitionRule) : IO String := Internal.api "Lasm.JS.Web.CSSViewTransitionRule.navigation" do
+  self.val.get "navigation" String
 
 /-- `readonly attribute FrozenArray<CSSOMString> types` -/
-def CSSViewTransitionRule.types (self : CSSViewTransitionRule) : IO (Array String) := self.val.get "types" (Array String)
+@[macro_inline] def CSSViewTransitionRule.types (self : CSSViewTransitionRule) : IO (Array String) := Internal.api "Lasm.JS.Web.CSSViewTransitionRule.types" do
+  self.val.get "types" (Array String)
 
 /-- `v instanceof ViewTransition`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ViewTransition`). -/
-def ViewTransition.cast? (v : Value) : IO (Option ViewTransition) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ViewTransition"] Value) v) then some { val := v } else none
+@[macro_inline] def ViewTransition.cast? (v : Value) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.ViewTransition.cast?" do
+  Internal.cast (Internal.getGlobal ["ViewTransition"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Promise<undefined> updateCallbackDone` -/
-def ViewTransition.updateCallbackDone (self : ViewTransition) : Async Unit := do
+@[macro_inline] def ViewTransition.updateCallbackDone (self : ViewTransition) : Async Unit := Internal.api "Lasm.JS.Web.ViewTransition.updateCallbackDone" do
   let p ← self.val.get "updateCallbackDone" Value
   p.await Unit
 
 /-- `readonly attribute Promise<undefined> ready` -/
-def ViewTransition.ready (self : ViewTransition) : Async Unit := do
+@[macro_inline] def ViewTransition.ready (self : ViewTransition) : Async Unit := Internal.api "Lasm.JS.Web.ViewTransition.ready" do
   let p ← self.val.get "ready" Value
   p.await Unit
 
 /-- `readonly attribute Promise<undefined> finished` -/
-def ViewTransition.finished (self : ViewTransition) : Async Unit := do
+@[macro_inline] def ViewTransition.finished (self : ViewTransition) : Async Unit := Internal.api "Lasm.JS.Web.ViewTransition.finished" do
   let p ← self.val.get "finished" Value
   p.await Unit
 
 /-- `readonly attribute ViewTransitionTypeSet types` -/
-def ViewTransition.types (self : ViewTransition) : IO ViewTransitionTypeSet := do
+@[macro_inline] def ViewTransition.types (self : ViewTransition) : IO ViewTransitionTypeSet := Internal.api "Lasm.JS.Web.ViewTransition.types" do
   let r ← self.val.get "types" Value
   pure { val := r }
 
 /-- `readonly attribute Element transitionRoot` -/
-def ViewTransition.transitionRoot (self : ViewTransition) : IO Element := do
+@[macro_inline] def ViewTransition.transitionRoot (self : ViewTransition) : IO Element := Internal.api "Lasm.JS.Web.ViewTransition.transitionRoot" do
   let r ← self.val.get "transitionRoot" Value
   pure { val := r }
 
 /-- `undefined skipTransition()` -/
-def ViewTransition.skipTransition (self : ViewTransition) : IO Unit :=
-  self.val.callMethod "skipTransition" (Support.args #[]) Unit
+@[macro_inline] def ViewTransition.skipTransition (self : ViewTransition) : IO Unit := Internal.api "Lasm.JS.Web.ViewTransition.skipTransition" do
+  self.val.callMethod "skipTransition" (Internal.args #[]) Unit
 
 /-- `undefined waitUntil(Promise<any> promise)` -/
-def ViewTransition.waitUntil (self : ViewTransition) (promise : Value) : IO Unit :=
-  self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
+@[macro_inline] def ViewTransition.waitUntil (self : ViewTransition) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Web.ViewTransition.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
 
 /-- `v instanceof ViewTransitionTypeSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ViewTransitionTypeSet`). -/
-def ViewTransitionTypeSet.cast? (v : Value) : IO (Option ViewTransitionTypeSet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ViewTransitionTypeSet"] Value) v) then some { val := v } else none
+@[macro_inline] def ViewTransitionTypeSet.cast? (v : Value) : IO (Option ViewTransitionTypeSet) := Internal.api "Lasm.JS.Web.ViewTransitionTypeSet.cast?" do
+  Internal.cast (Internal.getGlobal ["ViewTransitionTypeSet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ViewTransition? activeViewTransition` -/
-def Document.activeViewTransition (self : Document) : IO (Option ViewTransition) := self.val.get "activeViewTransition" (Option ViewTransition)
+@[macro_inline] def Document.activeViewTransition (self : Document) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.Document.activeViewTransition" do
+  self.val.get "activeViewTransition" (Option ViewTransition)
 
 /-- `ViewTransition startViewTransition(optional (ViewTransitionUpdateCallback or StartViewTransitionOptions) callbackOptions)` -/
-def Document.startViewTransition (self : Document) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO ViewTransition := do
-  let r ← self.val.callMethod "startViewTransition" (Support.args #[Support.optional callbackOptions]) Value
+@[macro_inline] def Document.startViewTransition (self : Document) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO ViewTransition := Internal.api "Lasm.JS.Web.Document.startViewTransition" do
+  let r ← self.val.callMethod "startViewTransition" (Internal.args #[Internal.optional callbackOptions]) Value
   pure { val := r }
 
 /-- `readonly attribute ViewTransition? activeViewTransition` -/
-def Element.activeViewTransition (self : Element) : IO (Option ViewTransition) := self.val.get "activeViewTransition" (Option ViewTransition)
+@[macro_inline] def Element.activeViewTransition (self : Element) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.Element.activeViewTransition" do
+  self.val.get "activeViewTransition" (Option ViewTransition)
 
 /-- `ViewTransition startViewTransition(optional (ViewTransitionUpdateCallback or StartViewTransitionOptions) callbackOptions)` -/
-def Element.startViewTransition (self : Element) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO ViewTransition := do
-  let r ← self.val.callMethod "startViewTransition" (Support.args #[Support.optional callbackOptions]) Value
+@[macro_inline] def Element.startViewTransition (self : Element) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO ViewTransition := Internal.api "Lasm.JS.Web.Element.startViewTransition" do
+  let r ← self.val.callMethod "startViewTransition" (Internal.args #[Internal.optional callbackOptions]) Value
   pure { val := r }
 
 end Lasm.JS.Web

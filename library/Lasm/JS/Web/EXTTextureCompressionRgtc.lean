@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.EXTTextureCompressionRgtc
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum COMPRESSED_RED_RGTC1_EXT = 0x8DBB` -/
 def EXT_texture_compression_rgtc.COMPRESSED_RED_RGTC1_EXT : Nat := 0x8DBB

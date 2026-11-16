@@ -6,124 +6,23 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.WritingAssistanceApis
+import Lasm.JS.Web.Types.PromptApi
+import Lasm.JS.Web.Types.Webaudio
+import Lasm.JS.Web.Types.Webcodecs
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.WritingAssistanceApis
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum LanguageModelSamplingMode` (Prompt API (https://webmachinelearning.github.io/prompt-api/)): "most-predictable", "predictable", "slightly-predictable", "balanced", "slightly-creative", "creative", "most-creative". -/
-inductive LanguageModelSamplingMode where
-  /-- "most-predictable" -/
-  | mostPredictable
-  /-- "predictable" -/
-  | predictable
-  /-- "slightly-predictable" -/
-  | slightlyPredictable
-  /-- "balanced" -/
-  | balanced
-  /-- "slightly-creative" -/
-  | slightlyCreative
-  /-- "creative" -/
-  | creative
-  /-- "most-creative" -/
-  | mostCreative
-  deriving BEq, Repr, Inhabited
-instance : ToJS LanguageModelSamplingMode := ⟨fun
-  | .mostPredictable => .string "most-predictable"
-  | .predictable => .string "predictable"
-  | .slightlyPredictable => .string "slightly-predictable"
-  | .balanced => .string "balanced"
-  | .slightlyCreative => .string "slightly-creative"
-  | .creative => .string "creative"
-  | .mostCreative => .string "most-creative"⟩
-instance : FromJS LanguageModelSamplingMode where
-  fromJS
-    | .string "most-predictable" => .ok .mostPredictable
-    | .string "predictable" => .ok .predictable
-    | .string "slightly-predictable" => .ok .slightlyPredictable
-    | .string "balanced" => .ok .balanced
-    | .string "slightly-creative" => .ok .slightlyCreative
-    | .string "creative" => .ok .creative
-    | .string "most-creative" => .ok .mostCreative
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LanguageModelSamplingMode"
-
-/-- `enum LanguageModelMessageType` (Prompt API (https://webmachinelearning.github.io/prompt-api/)): "text", "image", "audio", "tool-call", "tool-response". -/
-inductive LanguageModelMessageType where
-  /-- "text" -/
-  | text
-  /-- "image" -/
-  | image
-  /-- "audio" -/
-  | audio
-  /-- "tool-call" -/
-  | toolCall
-  /-- "tool-response" -/
-  | toolResponse
-  deriving BEq, Repr, Inhabited
-instance : ToJS LanguageModelMessageType := ⟨fun
-  | .text => .string "text"
-  | .image => .string "image"
-  | .audio => .string "audio"
-  | .toolCall => .string "tool-call"
-  | .toolResponse => .string "tool-response"⟩
-instance : FromJS LanguageModelMessageType where
-  fromJS
-    | .string "text" => .ok .text
-    | .string "image" => .ok .image
-    | .string "audio" => .ok .audio
-    | .string "tool-call" => .ok .toolCall
-    | .string "tool-response" => .ok .toolResponse
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LanguageModelMessageType"
-
-/-- `enum LanguageModelMessageRole` (Prompt API (https://webmachinelearning.github.io/prompt-api/)): "system", "user", "assistant". -/
-inductive LanguageModelMessageRole where
-  /-- "system" -/
-  | system
-  /-- "user" -/
-  | user
-  /-- "assistant" -/
-  | assistant
-  deriving BEq, Repr, Inhabited
-instance : ToJS LanguageModelMessageRole := ⟨fun
-  | .system => .string "system"
-  | .user => .string "user"
-  | .assistant => .string "assistant"⟩
-instance : FromJS LanguageModelMessageRole where
-  fromJS
-    | .string "system" => .ok .system
-    | .string "user" => .ok .user
-    | .string "assistant" => .ok .assistant
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LanguageModelMessageRole"
-
-/-- `enum LanguageModelToolResultType` (Prompt API (https://webmachinelearning.github.io/prompt-api/)): "text", "image", "audio", "object". -/
-inductive LanguageModelToolResultType where
-  /-- "text" -/
-  | text
-  /-- "image" -/
-  | image
-  /-- "audio" -/
-  | audio
-  /-- "object" -/
-  | object
-  deriving BEq, Repr, Inhabited
-instance : ToJS LanguageModelToolResultType := ⟨fun
-  | .text => .string "text"
-  | .image => .string "image"
-  | .audio => .string "audio"
-  | .object => .string "object"⟩
-instance : FromJS LanguageModelToolResultType where
-  fromJS
-    | .string "text" => .ok .text
-    | .string "image" => .ok .image
-    | .string "audio" => .ok .audio
-    | .string "object" => .ok .object
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LanguageModelToolResultType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary LanguageModelExpected` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelExpected where
@@ -131,8 +30,8 @@ structure LanguageModelExpected where
   type : LanguageModelMessageType
   /-- `sequence<DOMString> languages` -/
   languages : Option (Array String) := none
-instance : ToJS LanguageModelExpected := ⟨fun d => Support.fields #[("type", toJS d.type),
-    ("languages", Support.optional d.languages)]⟩
+instance : ToJS LanguageModelExpected := ⟨fun d => Internal.fields #[("type", toJS d.type),
+    ("languages", Internal.optional d.languages)]⟩
 
 /-- `dictionary LanguageModelToolDeclaration` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelToolDeclaration where
@@ -142,7 +41,7 @@ structure LanguageModelToolDeclaration where
   description : String
   /-- `required object inputSchema` -/
   inputSchema : Data
-instance : ToJS LanguageModelToolDeclaration := ⟨fun d => Support.fields #[("name", toJS d.name),
+instance : ToJS LanguageModelToolDeclaration := ⟨fun d => Internal.fields #[("name", toJS d.name),
     ("description", toJS d.description),
     ("inputSchema", toJS d.inputSchema)]⟩
 
@@ -216,13 +115,8 @@ structure LanguageModelMessageContent where
   type : LanguageModelMessageType
   /-- `required LanguageModelMessageValue value` -/
   value : LanguageModelMessageValue
-instance : ToJS LanguageModelMessageContent := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS LanguageModelMessageContent := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("value", toJS d.value)]⟩
-instance : FromJS LanguageModelMessageContent where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField LanguageModelMessageType d "type",
-    value := ← Lasm.JS.readField Data d "value" }
-  typeName := "Lasm.JS.Web.LanguageModelMessageContent"
 
 /-- `(DOMString or sequence<LanguageModelMessageContent>)`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfLanguageModelMessageContent where
@@ -244,9 +138,9 @@ structure LanguageModelMessage where
   content : DOMStringOrSequenceOfLanguageModelMessageContent
   /-- `boolean prefix = false` -/
   «prefix» : Option Bool := none
-instance : ToJS LanguageModelMessage := ⟨fun d => Support.fields #[("role", toJS d.role),
+instance : ToJS LanguageModelMessage := ⟨fun d => Internal.fields #[("role", toJS d.role),
     ("content", toJS d.content),
-    ("prefix", Support.optional d.«prefix»)]⟩
+    ("prefix", Internal.optional d.«prefix»)]⟩
 
 /-- `dictionary LanguageModelCreateOptions : LanguageModelCreateCoreOptions` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelCreateOptions where
@@ -268,15 +162,15 @@ structure LanguageModelCreateOptions where
   monitor : Option CreateMonitorCallback := none
   /-- `sequence<LanguageModelMessage> initialPrompts = []` -/
   initialPrompts : Option (Array LanguageModelMessage) := none
-instance : ToJS LanguageModelCreateOptions := ⟨fun d => Support.fields #[("topK", Support.optional d.topK),
-    ("temperature", Support.optional d.temperature),
-    ("samplingMode", Support.optional d.samplingMode),
-    ("expectedInputs", Support.optional d.expectedInputs),
-    ("expectedOutputs", Support.optional d.expectedOutputs),
-    ("tools", Support.optional d.tools),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor),
-    ("initialPrompts", Support.optional d.initialPrompts)]⟩
+instance : ToJS LanguageModelCreateOptions := ⟨fun d => Internal.fields #[("topK", Internal.optional d.topK),
+    ("temperature", Internal.optional d.temperature),
+    ("samplingMode", Internal.optional d.samplingMode),
+    ("expectedInputs", Internal.optional d.expectedInputs),
+    ("expectedOutputs", Internal.optional d.expectedOutputs),
+    ("tools", Internal.optional d.tools),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor),
+    ("initialPrompts", Internal.optional d.initialPrompts)]⟩
 
 /-- `dictionary LanguageModelCreateCoreOptions` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelCreateCoreOptions where
@@ -292,12 +186,12 @@ structure LanguageModelCreateCoreOptions where
   expectedOutputs : Option (Array LanguageModelExpected) := none
   /-- `sequence<LanguageModelToolDeclaration> tools = []` -/
   tools : Option (Array LanguageModelToolDeclaration) := none
-instance : ToJS LanguageModelCreateCoreOptions := ⟨fun d => Support.fields #[("topK", Support.optional d.topK),
-    ("temperature", Support.optional d.temperature),
-    ("samplingMode", Support.optional d.samplingMode),
-    ("expectedInputs", Support.optional d.expectedInputs),
-    ("expectedOutputs", Support.optional d.expectedOutputs),
-    ("tools", Support.optional d.tools)]⟩
+instance : ToJS LanguageModelCreateCoreOptions := ⟨fun d => Internal.fields #[("topK", Internal.optional d.topK),
+    ("temperature", Internal.optional d.temperature),
+    ("samplingMode", Internal.optional d.samplingMode),
+    ("expectedInputs", Internal.optional d.expectedInputs),
+    ("expectedOutputs", Internal.optional d.expectedOutputs),
+    ("tools", Internal.optional d.tools)]⟩
 
 /-- `typedef sequence<LanguageModelMessage> or DOMString LanguageModelPrompt`: one constructor per member type. -/
 inductive LanguageModelPrompt where
@@ -319,34 +213,21 @@ structure LanguageModelPromptOptions where
   omitResponseConstraintInput : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS LanguageModelPromptOptions := ⟨fun d => Support.fields #[("responseConstraint", d.responseConstraint),
-    ("omitResponseConstraintInput", Support.optional d.omitResponseConstraintInput),
-    ("signal", Support.optional d.signal)]⟩
-
-/-- `typedef DOMString or sequence<LanguageModelMessageContent> LanguageModelPromptResult`: one constructor per member type. -/
-inductive LanguageModelPromptResult where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `sequence<LanguageModelMessageContent>` -/
-  | sequence (value : Array LanguageModelMessageContent)
-instance : FromJS LanguageModelPromptResult where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array LanguageModelMessageContent)).map .sequence
-    | _ => .error ""
-  typeName := "Lasm.JS.Web.LanguageModelPromptResult"
+instance : ToJS LanguageModelPromptOptions := ⟨fun d => Internal.fields #[("responseConstraint", d.responseConstraint),
+    ("omitResponseConstraintInput", Internal.optional d.omitResponseConstraintInput),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary LanguageModelAppendOptions` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelAppendOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS LanguageModelAppendOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS LanguageModelAppendOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary LanguageModelCloneOptions` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelCloneOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS LanguageModelCloneOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS LanguageModelCloneOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary LanguageModelToolCallInit` (Prompt API (https://webmachinelearning.github.io/prompt-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageModelToolCallInit where
@@ -356,7 +237,7 @@ structure LanguageModelToolCallInit where
   name : String
   /-- `object arguments` -/
   arguments : Data := .undefined
-instance : ToJS LanguageModelToolCallInit := ⟨fun d => Support.fields #[("callId", toJS d.callId),
+instance : ToJS LanguageModelToolCallInit := ⟨fun d => Internal.fields #[("callId", toJS d.callId),
     ("name", toJS d.name),
     ("arguments", d.arguments)]⟩
 
@@ -368,7 +249,7 @@ structure LanguageModelToolErrorInit where
   name : String
   /-- `required DOMString errorMessage` -/
   errorMessage : String
-instance : ToJS LanguageModelToolErrorInit := ⟨fun d => Support.fields #[("callId", toJS d.callId),
+instance : ToJS LanguageModelToolErrorInit := ⟨fun d => Internal.fields #[("callId", toJS d.callId),
     ("name", toJS d.name),
     ("errorMessage", toJS d.errorMessage)]⟩
 
@@ -378,7 +259,7 @@ structure LanguageModelToolResultContent where
   type : LanguageModelToolResultType
   /-- `required any value` -/
   value : Data
-instance : ToJS LanguageModelToolResultContent := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS LanguageModelToolResultContent := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("value", toJS d.value)]⟩
 instance : FromJS LanguageModelToolResultContent where
   fromJS d := do return {
@@ -394,163 +275,185 @@ structure LanguageModelToolSuccessInit where
   name : String
   /-- `required sequence<LanguageModelToolResultContent> result` -/
   result : Array LanguageModelToolResultContent
-instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Support.fields #[("callId", toJS d.callId),
+instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Internal.fields #[("callId", toJS d.callId),
     ("name", toJS d.name),
     ("result", toJS d.result)]⟩
 
 /-- `v instanceof LanguageModel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageModel`). -/
-def LanguageModel.cast? (v : Value) : IO (Option LanguageModel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageModel"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageModel.cast? (v : Value) : IO (Option LanguageModel) := Internal.api "Lasm.JS.Web.LanguageModel.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageModel"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double contextUsage` -/
-def LanguageModel.contextUsage (self : LanguageModel) : IO Float := self.val.get "contextUsage" Float
+@[macro_inline] def LanguageModel.contextUsage (self : LanguageModel) : IO Float := Internal.api "Lasm.JS.Web.LanguageModel.contextUsage" do
+  self.val.get "contextUsage" Float
 
 /-- `readonly attribute unrestricted double contextWindow` -/
-def LanguageModel.contextWindow (self : LanguageModel) : IO Float := self.val.get "contextWindow" Float
+@[macro_inline] def LanguageModel.contextWindow (self : LanguageModel) : IO Float := Internal.api "Lasm.JS.Web.LanguageModel.contextWindow" do
+  self.val.get "contextWindow" Float
 
 /-- `attribute EventHandler oncontextoverflow` -/
-def LanguageModel.oncontextoverflow (self : LanguageModel) : IO (Option EventHandlerNonNull) := self.val.get "oncontextoverflow" (Option EventHandlerNonNull)
+@[macro_inline] def LanguageModel.oncontextoverflow (self : LanguageModel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.LanguageModel.oncontextoverflow" do
+  self.val.get "oncontextoverflow" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextoverflow`: `attribute EventHandler oncontextoverflow` -/
-def LanguageModel.setOncontextoverflow (self : LanguageModel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def LanguageModel.setOncontextoverflow (self : LanguageModel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.LanguageModel.setOncontextoverflow" do
   self.val.set "oncontextoverflow" (toJS value)
 
 /-- `readonly attribute double inputUsage` -/
-def LanguageModel.inputUsage (self : LanguageModel) : IO Float := self.val.get "inputUsage" Float
+@[macro_inline] def LanguageModel.inputUsage (self : LanguageModel) : IO Float := Internal.api "Lasm.JS.Web.LanguageModel.inputUsage" do
+  self.val.get "inputUsage" Float
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def LanguageModel.inputQuota (self : LanguageModel) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def LanguageModel.inputQuota (self : LanguageModel) : IO Float := Internal.api "Lasm.JS.Web.LanguageModel.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `attribute EventHandler onquotaoverflow` -/
-def LanguageModel.onquotaoverflow (self : LanguageModel) : IO (Option EventHandlerNonNull) := self.val.get "onquotaoverflow" (Option EventHandlerNonNull)
+@[macro_inline] def LanguageModel.onquotaoverflow (self : LanguageModel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.LanguageModel.onquotaoverflow" do
+  self.val.get "onquotaoverflow" (Option EventHandlerNonNull)
 
 /-- Sets `onquotaoverflow`: `attribute EventHandler onquotaoverflow` -/
-def LanguageModel.setOnquotaoverflow (self : LanguageModel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def LanguageModel.setOnquotaoverflow (self : LanguageModel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.LanguageModel.setOnquotaoverflow" do
   self.val.set "onquotaoverflow" (toJS value)
 
 /-- `readonly attribute unsigned long topK` -/
-def LanguageModel.topK (self : LanguageModel) : IO Nat := self.val.get "topK" Nat
+@[macro_inline] def LanguageModel.topK (self : LanguageModel) : IO Nat := Internal.api "Lasm.JS.Web.LanguageModel.topK" do
+  self.val.get "topK" Nat
 
 /-- `readonly attribute float temperature` -/
-def LanguageModel.temperature (self : LanguageModel) : IO Float := self.val.get "temperature" Float
+@[macro_inline] def LanguageModel.temperature (self : LanguageModel) : IO Float := Internal.api "Lasm.JS.Web.LanguageModel.temperature" do
+  self.val.get "temperature" Float
 
 /-- `readonly attribute LanguageModelSamplingMode? samplingMode` -/
-def LanguageModel.samplingMode (self : LanguageModel) : IO (Option LanguageModelSamplingMode) := self.val.get "samplingMode" (Option LanguageModelSamplingMode)
+@[macro_inline] def LanguageModel.samplingMode (self : LanguageModel) : IO (Option LanguageModelSamplingMode) := Internal.api "Lasm.JS.Web.LanguageModel.samplingMode" do
+  self.val.get "samplingMode" (Option LanguageModelSamplingMode)
 
 /-- `static Promise<LanguageModel> create(optional LanguageModelCreateOptions options)` -/
-def LanguageModel.create (options : Option LanguageModelCreateOptions := none) : Async LanguageModel := do
+@[macro_inline] def LanguageModel.create (options : Option LanguageModelCreateOptions := none) : Async LanguageModel := Internal.api "Lasm.JS.Web.LanguageModel.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.LanguageModel.create", module := "globalThis", path := "LanguageModel.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional LanguageModelCreateCoreOptions options)` -/
-def LanguageModel.availability (options : Option LanguageModelCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def LanguageModel.availability (options : Option LanguageModelCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.LanguageModel.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageModel.availability", module := "globalThis", path := "LanguageModel.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `static Promise<LanguageModelParams?> params()` -/
-def LanguageModel.params : Async (Option LanguageModelParams) :=
+@[macro_inline] def LanguageModel.params : Async (Option LanguageModelParams) := Internal.api "Lasm.JS.Web.LanguageModel.params" do
   Lasm.JS.Binding.invokeAsync (Option LanguageModelParams) { name := "Lasm.JS.Web.LanguageModel.params", module := "globalThis", path := "LanguageModel.params", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<LanguageModelPromptResult> prompt(LanguageModelPrompt input, optional LanguageModelPromptOptions options)` -/
-def LanguageModel.prompt (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async LanguageModelPromptResult :=
-  self.val.callMethodAwait "prompt" (Support.args #[toJS input, Support.optional options]) LanguageModelPromptResult
+@[macro_inline] def LanguageModel.prompt (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Data := Internal.api "Lasm.JS.Web.LanguageModel.prompt" do
+  self.val.callMethodAwait "prompt" (Internal.args #[toJS input, Internal.optional options]) Data
 
 /-- `ReadableStream promptStreaming(LanguageModelPrompt input, optional LanguageModelPromptOptions options)` -/
-def LanguageModel.promptStreaming (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "promptStreaming" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def LanguageModel.promptStreaming (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.LanguageModel.promptStreaming" do
+  let r ← self.val.callMethod "promptStreaming" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<undefined> append(LanguageModelPrompt input, optional LanguageModelAppendOptions options)` -/
-def LanguageModel.append (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelAppendOptions := none) : Async Unit :=
-  self.val.callMethodAwait "append" (Support.args #[toJS input, Support.optional options]) Unit
+@[macro_inline] def LanguageModel.append (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelAppendOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.LanguageModel.append" do
+  self.val.callMethodAwait "append" (Internal.args #[toJS input, Internal.optional options]) Unit
 
 /-- `Promise<double> measureContextUsage(LanguageModelPrompt input, optional LanguageModelPromptOptions options)` -/
-def LanguageModel.measureContextUsage (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureContextUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def LanguageModel.measureContextUsage (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Float := Internal.api "Lasm.JS.Web.LanguageModel.measureContextUsage" do
+  self.val.callMethodAwait "measureContextUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `Promise<double> measureInputUsage(LanguageModelPrompt input, optional LanguageModelPromptOptions options)` -/
-def LanguageModel.measureInputUsage (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def LanguageModel.measureInputUsage (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Float := Internal.api "Lasm.JS.Web.LanguageModel.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `Promise<LanguageModel> clone(optional LanguageModelCloneOptions options)` -/
-def LanguageModel.clone (self : LanguageModel) (options : Option LanguageModelCloneOptions := none) : Async LanguageModel := do
-  let r ← self.val.callMethodAwait "clone" (Support.args #[Support.optional options]) Value
+@[macro_inline] def LanguageModel.clone (self : LanguageModel) (options : Option LanguageModelCloneOptions := none) : Async LanguageModel := Internal.api "Lasm.JS.Web.LanguageModel.clone" do
+  let r ← self.val.callMethodAwait "clone" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `undefined destroy()` -/
-def LanguageModel.destroy (self : LanguageModel) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def LanguageModel.destroy (self : LanguageModel) : IO Unit := Internal.api "Lasm.JS.Web.LanguageModel.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof LanguageModelParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageModelParams`). -/
-def LanguageModelParams.cast? (v : Value) : IO (Option LanguageModelParams) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageModelParams"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageModelParams.cast? (v : Value) : IO (Option LanguageModelParams) := Internal.api "Lasm.JS.Web.LanguageModelParams.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageModelParams"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long defaultTopK` -/
-def LanguageModelParams.defaultTopK (self : LanguageModelParams) : IO Nat := self.val.get "defaultTopK" Nat
+@[macro_inline] def LanguageModelParams.defaultTopK (self : LanguageModelParams) : IO Nat := Internal.api "Lasm.JS.Web.LanguageModelParams.defaultTopK" do
+  self.val.get "defaultTopK" Nat
 
 /-- `readonly attribute unsigned long maxTopK` -/
-def LanguageModelParams.maxTopK (self : LanguageModelParams) : IO Nat := self.val.get "maxTopK" Nat
+@[macro_inline] def LanguageModelParams.maxTopK (self : LanguageModelParams) : IO Nat := Internal.api "Lasm.JS.Web.LanguageModelParams.maxTopK" do
+  self.val.get "maxTopK" Nat
 
 /-- `readonly attribute float defaultTemperature` -/
-def LanguageModelParams.defaultTemperature (self : LanguageModelParams) : IO Float := self.val.get "defaultTemperature" Float
+@[macro_inline] def LanguageModelParams.defaultTemperature (self : LanguageModelParams) : IO Float := Internal.api "Lasm.JS.Web.LanguageModelParams.defaultTemperature" do
+  self.val.get "defaultTemperature" Float
 
 /-- `readonly attribute float maxTemperature` -/
-def LanguageModelParams.maxTemperature (self : LanguageModelParams) : IO Float := self.val.get "maxTemperature" Float
+@[macro_inline] def LanguageModelParams.maxTemperature (self : LanguageModelParams) : IO Float := Internal.api "Lasm.JS.Web.LanguageModelParams.maxTemperature" do
+  self.val.get "maxTemperature" Float
 
 /-- `v instanceof LanguageModelToolCall`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageModelToolCall`). -/
-def LanguageModelToolCall.cast? (v : Value) : IO (Option LanguageModelToolCall) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageModelToolCall"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageModelToolCall.cast? (v : Value) : IO (Option LanguageModelToolCall) := Internal.api "Lasm.JS.Web.LanguageModelToolCall.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageModelToolCall"] Value) (fun x => { val := x }) v
 
 /-- `constructor(LanguageModelToolCallInit init)` -/
-def LanguageModelToolCall.new (init : LanguageModelToolCallInit) : IO LanguageModelToolCall :=
+@[macro_inline] def LanguageModelToolCall.new (init : LanguageModelToolCallInit) : IO LanguageModelToolCall := Internal.api "Lasm.JS.Web.LanguageModelToolCall.new" do
   Lasm.JS.Binding.invoke LanguageModelToolCall { name := "Lasm.JS.Web.LanguageModelToolCall.new", module := "globalThis", path := "LanguageModelToolCall", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute DOMString callId` -/
-def LanguageModelToolCall.callId (self : LanguageModelToolCall) : IO String := self.val.get "callId" String
+@[macro_inline] def LanguageModelToolCall.callId (self : LanguageModelToolCall) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolCall.callId" do
+  self.val.get "callId" String
 
 /-- `readonly attribute DOMString name` -/
-def LanguageModelToolCall.name (self : LanguageModelToolCall) : IO String := self.val.get "name" String
+@[macro_inline] def LanguageModelToolCall.name (self : LanguageModelToolCall) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolCall.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute object? arguments` -/
-def LanguageModelToolCall.arguments (self : LanguageModelToolCall) : IO (Option Data) := self.val.get "arguments" (Option Data)
+@[macro_inline] def LanguageModelToolCall.arguments (self : LanguageModelToolCall) : IO (Option Data) := Internal.api "Lasm.JS.Web.LanguageModelToolCall.arguments" do
+  self.val.get "arguments" (Option Data)
 
 /-- `v instanceof LanguageModelToolError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageModelToolError`). -/
-def LanguageModelToolError.cast? (v : Value) : IO (Option LanguageModelToolError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageModelToolError"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageModelToolError.cast? (v : Value) : IO (Option LanguageModelToolError) := Internal.api "Lasm.JS.Web.LanguageModelToolError.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageModelToolError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(LanguageModelToolErrorInit init)` -/
-def LanguageModelToolError.new (init : LanguageModelToolErrorInit) : IO LanguageModelToolError :=
+@[macro_inline] def LanguageModelToolError.new (init : LanguageModelToolErrorInit) : IO LanguageModelToolError := Internal.api "Lasm.JS.Web.LanguageModelToolError.new" do
   Lasm.JS.Binding.invoke LanguageModelToolError { name := "Lasm.JS.Web.LanguageModelToolError.new", module := "globalThis", path := "LanguageModelToolError", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute DOMString callId` -/
-def LanguageModelToolError.callId (self : LanguageModelToolError) : IO String := self.val.get "callId" String
+@[macro_inline] def LanguageModelToolError.callId (self : LanguageModelToolError) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolError.callId" do
+  self.val.get "callId" String
 
 /-- `readonly attribute DOMString name` -/
-def LanguageModelToolError.name (self : LanguageModelToolError) : IO String := self.val.get "name" String
+@[macro_inline] def LanguageModelToolError.name (self : LanguageModelToolError) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolError.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString errorMessage` -/
-def LanguageModelToolError.errorMessage (self : LanguageModelToolError) : IO String := self.val.get "errorMessage" String
+@[macro_inline] def LanguageModelToolError.errorMessage (self : LanguageModelToolError) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolError.errorMessage" do
+  self.val.get "errorMessage" String
 
 /-- `v instanceof LanguageModelToolSuccess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageModelToolSuccess`). -/
-def LanguageModelToolSuccess.cast? (v : Value) : IO (Option LanguageModelToolSuccess) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageModelToolSuccess"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageModelToolSuccess.cast? (v : Value) : IO (Option LanguageModelToolSuccess) := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageModelToolSuccess"] Value) (fun x => { val := x }) v
 
 /-- `constructor(LanguageModelToolSuccessInit init)` -/
-def LanguageModelToolSuccess.new (init : LanguageModelToolSuccessInit) : IO LanguageModelToolSuccess :=
+@[macro_inline] def LanguageModelToolSuccess.new (init : LanguageModelToolSuccessInit) : IO LanguageModelToolSuccess := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.new" do
   Lasm.JS.Binding.invoke LanguageModelToolSuccess { name := "Lasm.JS.Web.LanguageModelToolSuccess.new", module := "globalThis", path := "LanguageModelToolSuccess", construct := true, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `readonly attribute DOMString callId` -/
-def LanguageModelToolSuccess.callId (self : LanguageModelToolSuccess) : IO String := self.val.get "callId" String
+@[macro_inline] def LanguageModelToolSuccess.callId (self : LanguageModelToolSuccess) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.callId" do
+  self.val.get "callId" String
 
 /-- `readonly attribute DOMString name` -/
-def LanguageModelToolSuccess.name (self : LanguageModelToolSuccess) : IO String := self.val.get "name" String
+@[macro_inline] def LanguageModelToolSuccess.name (self : LanguageModelToolSuccess) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute FrozenArray<LanguageModelToolResultContent> result` -/
-def LanguageModelToolSuccess.result (self : LanguageModelToolSuccess) : IO (Array LanguageModelToolResultContent) := self.val.get "result" (Array LanguageModelToolResultContent)
+@[macro_inline] def LanguageModelToolSuccess.result (self : LanguageModelToolSuccess) : IO (Array LanguageModelToolResultContent) := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.result" do
+  self.val.get "result" (Array LanguageModelToolResultContent)
 
 end Lasm.JS.Web

@@ -6,89 +6,43 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.AudioSession
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AudioSessionType` (Audio Session (https://w3c.github.io/audio-session/)): "auto", "playback", "transient", "transient-solo", "ambient", "play-and-record". -/
-inductive AudioSessionType where
-  /-- "auto" -/
-  | auto
-  /-- "playback" -/
-  | playback
-  /-- "transient" -/
-  | transient
-  /-- "transient-solo" -/
-  | transientSolo
-  /-- "ambient" -/
-  | ambient
-  /-- "play-and-record" -/
-  | playAndRecord
-  deriving BEq, Repr, Inhabited
-instance : ToJS AudioSessionType := ⟨fun
-  | .auto => .string "auto"
-  | .playback => .string "playback"
-  | .transient => .string "transient"
-  | .transientSolo => .string "transient-solo"
-  | .ambient => .string "ambient"
-  | .playAndRecord => .string "play-and-record"⟩
-instance : FromJS AudioSessionType where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "playback" => .ok .playback
-    | .string "transient" => .ok .transient
-    | .string "transient-solo" => .ok .transientSolo
-    | .string "ambient" => .ok .ambient
-    | .string "play-and-record" => .ok .playAndRecord
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AudioSessionType"
-
-/-- `enum AudioSessionState` (Audio Session (https://w3c.github.io/audio-session/)): "inactive", "active", "interrupted". -/
-inductive AudioSessionState where
-  /-- "inactive" -/
-  | inactive
-  /-- "active" -/
-  | active
-  /-- "interrupted" -/
-  | interrupted
-  deriving BEq, Repr, Inhabited
-instance : ToJS AudioSessionState := ⟨fun
-  | .inactive => .string "inactive"
-  | .active => .string "active"
-  | .interrupted => .string "interrupted"⟩
-instance : FromJS AudioSessionState where
-  fromJS
-    | .string "inactive" => .ok .inactive
-    | .string "active" => .ok .active
-    | .string "interrupted" => .ok .interrupted
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AudioSessionState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof AudioSession`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioSession`). -/
-def AudioSession.cast? (v : Value) : IO (Option AudioSession) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AudioSession"] Value) v) then some { val := v } else none
+@[macro_inline] def AudioSession.cast? (v : Value) : IO (Option AudioSession) := Internal.api "Lasm.JS.Web.AudioSession.cast?" do
+  Internal.cast (Internal.getGlobal ["AudioSession"] Value) (fun x => { val := x }) v
 
 /-- `attribute AudioSessionType type` -/
-def AudioSession.type (self : AudioSession) : IO AudioSessionType := self.val.get "type" AudioSessionType
+@[macro_inline] def AudioSession.type (self : AudioSession) : IO AudioSessionType := Internal.api "Lasm.JS.Web.AudioSession.type" do
+  self.val.get "type" AudioSessionType
 
 /-- Sets `type`: `attribute AudioSessionType type` -/
-def AudioSession.setType (self : AudioSession) (value : AudioSessionType) : IO Unit :=
+@[macro_inline] def AudioSession.setType (self : AudioSession) (value : AudioSessionType) : IO Unit := Internal.api "Lasm.JS.Web.AudioSession.setType" do
   self.val.set "type" (toJS value)
 
 /-- `readonly attribute AudioSessionState state` -/
-def AudioSession.state (self : AudioSession) : IO AudioSessionState := self.val.get "state" AudioSessionState
+@[macro_inline] def AudioSession.state (self : AudioSession) : IO AudioSessionState := Internal.api "Lasm.JS.Web.AudioSession.state" do
+  self.val.get "state" AudioSessionState
 
 /-- `attribute EventHandler onstatechange` -/
-def AudioSession.onstatechange (self : AudioSession) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def AudioSession.onstatechange (self : AudioSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AudioSession.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def AudioSession.setOnstatechange (self : AudioSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def AudioSession.setOnstatechange (self : AudioSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AudioSession.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `readonly attribute AudioSession audioSession` -/
-def Navigator.audioSession (self : Navigator) : IO AudioSession := do
+@[macro_inline] def Navigator.audioSession (self : Navigator) : IO AudioSession := Internal.api "Lasm.JS.Web.Navigator.audioSession" do
   let r ← self.val.get "audioSession" Value
   pure { val := r }
 

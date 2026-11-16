@@ -6,11 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssAnimations
+import Lasm.JS.Web.Types.CssAnimations2
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AnimationEventInit : EventInit` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AnimationEventInit where
@@ -28,78 +37,84 @@ structure AnimationEventInit where
   pseudoElement : Option String := none
   /-- `CSSAnimation? animation = null` -/
   animation : Option CSSAnimation := none
-instance : ToJS AnimationEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("animationName", Support.optional d.animationName),
-    ("elapsedTime", Support.optional d.elapsedTime),
-    ("pseudoElement", Support.optional d.pseudoElement),
-    ("animation", Support.optional d.animation)]⟩
+instance : ToJS AnimationEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("animationName", Internal.optional d.animationName),
+    ("elapsedTime", Internal.optional d.elapsedTime),
+    ("pseudoElement", Internal.optional d.pseudoElement),
+    ("animation", Internal.optional d.animation)]⟩
 
 /-- `v instanceof AnimationEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationEvent`). -/
-def AnimationEvent.cast? (v : Value) : IO (Option AnimationEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationEvent.cast? (v : Value) : IO (Option AnimationEvent) := Internal.api "Lasm.JS.Web.AnimationEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CSSOMString type, optional AnimationEventInit animationEventInitDict)` -/
-def AnimationEvent.new (type : String) (animationEventInitDict : Option AnimationEventInit := none) : IO AnimationEvent :=
+@[macro_inline] def AnimationEvent.new (type : String) (animationEventInitDict : Option AnimationEventInit := none) : IO AnimationEvent := Internal.api "Lasm.JS.Web.AnimationEvent.new" do
   Lasm.JS.Binding.invoke AnimationEvent { name := "Lasm.JS.Web.AnimationEvent.new", module := "globalThis", path := "AnimationEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional animationEventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional animationEventInitDict]) (await := false)
 
 /-- `readonly attribute CSSOMString animationName` -/
-def AnimationEvent.animationName (self : AnimationEvent) : IO String := self.val.get "animationName" String
+@[macro_inline] def AnimationEvent.animationName (self : AnimationEvent) : IO String := Internal.api "Lasm.JS.Web.AnimationEvent.animationName" do
+  self.val.get "animationName" String
 
 /-- `readonly attribute double elapsedTime` -/
-def AnimationEvent.elapsedTime (self : AnimationEvent) : IO Float := self.val.get "elapsedTime" Float
+@[macro_inline] def AnimationEvent.elapsedTime (self : AnimationEvent) : IO Float := Internal.api "Lasm.JS.Web.AnimationEvent.elapsedTime" do
+  self.val.get "elapsedTime" Float
 
 /-- `readonly attribute CSSOMString pseudoElement` -/
-def AnimationEvent.pseudoElement (self : AnimationEvent) : IO String := self.val.get "pseudoElement" String
+@[macro_inline] def AnimationEvent.pseudoElement (self : AnimationEvent) : IO String := Internal.api "Lasm.JS.Web.AnimationEvent.pseudoElement" do
+  self.val.get "pseudoElement" String
 
 /-- `v instanceof CSSKeyframeRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSKeyframeRule`). -/
-def CSSKeyframeRule.cast? (v : Value) : IO (Option CSSKeyframeRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSKeyframeRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSKeyframeRule.cast? (v : Value) : IO (Option CSSKeyframeRule) := Internal.api "Lasm.JS.Web.CSSKeyframeRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSKeyframeRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString keyText` -/
-def CSSKeyframeRule.keyText (self : CSSKeyframeRule) : IO String := self.val.get "keyText" String
+@[macro_inline] def CSSKeyframeRule.keyText (self : CSSKeyframeRule) : IO String := Internal.api "Lasm.JS.Web.CSSKeyframeRule.keyText" do
+  self.val.get "keyText" String
 
 /-- Sets `keyText`: `attribute CSSOMString keyText` -/
-def CSSKeyframeRule.setKeyText (self : CSSKeyframeRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSKeyframeRule.setKeyText (self : CSSKeyframeRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSKeyframeRule.setKeyText" do
   self.val.set "keyText" (toJS value)
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def CSSKeyframeRule.style (self : CSSKeyframeRule) : IO CSSStyleProperties := do
+@[macro_inline] def CSSKeyframeRule.style (self : CSSKeyframeRule) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.CSSKeyframeRule.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `v instanceof CSSKeyframesRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSKeyframesRule`). -/
-def CSSKeyframesRule.cast? (v : Value) : IO (Option CSSKeyframesRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSKeyframesRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSKeyframesRule.cast? (v : Value) : IO (Option CSSKeyframesRule) := Internal.api "Lasm.JS.Web.CSSKeyframesRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSKeyframesRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString name` -/
-def CSSKeyframesRule.name (self : CSSKeyframesRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSKeyframesRule.name (self : CSSKeyframesRule) : IO String := Internal.api "Lasm.JS.Web.CSSKeyframesRule.name" do
+  self.val.get "name" String
 
 /-- Sets `name`: `attribute CSSOMString name` -/
-def CSSKeyframesRule.setName (self : CSSKeyframesRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSKeyframesRule.setName (self : CSSKeyframesRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSKeyframesRule.setName" do
   self.val.set "name" (toJS value)
 
 /-- `readonly attribute CSSRuleList cssRules` -/
-def CSSKeyframesRule.cssRules (self : CSSKeyframesRule) : IO CSSRuleList := do
+@[macro_inline] def CSSKeyframesRule.cssRules (self : CSSKeyframesRule) : IO CSSRuleList := Internal.api "Lasm.JS.Web.CSSKeyframesRule.cssRules" do
   let r ← self.val.get "cssRules" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long length` -/
-def CSSKeyframesRule.length (self : CSSKeyframesRule) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def CSSKeyframesRule.length (self : CSSKeyframesRule) : IO Nat := Internal.api "Lasm.JS.Web.CSSKeyframesRule.length" do
+  self.val.get "length" Nat
 
 /-- `undefined appendRule(CSSOMString rule)` -/
-def CSSKeyframesRule.appendRule (self : CSSKeyframesRule) (rule : String) : IO Unit :=
-  self.val.callMethod "appendRule" (Support.args #[toJS rule]) Unit
+@[macro_inline] def CSSKeyframesRule.appendRule (self : CSSKeyframesRule) (rule : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSKeyframesRule.appendRule" do
+  self.val.callMethod "appendRule" (Internal.args #[toJS rule]) Unit
 
 /-- `undefined deleteRule(CSSOMString select)` -/
-def CSSKeyframesRule.deleteRule (self : CSSKeyframesRule) (select : String) : IO Unit :=
-  self.val.callMethod "deleteRule" (Support.args #[toJS select]) Unit
+@[macro_inline] def CSSKeyframesRule.deleteRule (self : CSSKeyframesRule) (select : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSKeyframesRule.deleteRule" do
+  self.val.callMethod "deleteRule" (Internal.args #[toJS select]) Unit
 
 /-- `CSSKeyframeRule? findRule(CSSOMString select)` -/
-def CSSKeyframesRule.findRule (self : CSSKeyframesRule) (select : String) : IO (Option CSSKeyframeRule) :=
-  self.val.callMethod "findRule" (Support.args #[toJS select]) (Option CSSKeyframeRule)
+@[macro_inline] def CSSKeyframesRule.findRule (self : CSSKeyframesRule) (select : String) : IO (Option CSSKeyframeRule) := Internal.api "Lasm.JS.Web.CSSKeyframesRule.findRule" do
+  self.val.callMethod "findRule" (Internal.args #[toJS select]) (Option CSSKeyframeRule)
 
 /-- `const unsigned short KEYFRAMES_RULE = 7` -/
 def CSSRule.KEYFRAMES_RULE : Nat := 7
@@ -108,127 +123,179 @@ def CSSRule.KEYFRAMES_RULE : Nat := 7
 def CSSRule.KEYFRAME_RULE : Nat := 8
 
 /-- `attribute EventHandler onanimationstart` -/
-def Document.onanimationstart (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onanimationstart (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onanimationstart" do
+  self.val.get "onanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationstart`: `attribute EventHandler onanimationstart` -/
-def Document.setOnanimationstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnanimationstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnanimationstart" do
   self.val.set "onanimationstart" (toJS value)
 
 /-- `attribute EventHandler onanimationiteration` -/
-def Document.onanimationiteration (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onanimationiteration (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onanimationiteration" do
+  self.val.get "onanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationiteration`: `attribute EventHandler onanimationiteration` -/
-def Document.setOnanimationiteration (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnanimationiteration (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnanimationiteration" do
   self.val.set "onanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onanimationend` -/
-def Document.onanimationend (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onanimationend (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onanimationend" do
+  self.val.get "onanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationend`: `attribute EventHandler onanimationend` -/
-def Document.setOnanimationend (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnanimationend (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnanimationend" do
   self.val.set "onanimationend" (toJS value)
 
 /-- `attribute EventHandler onanimationcancel` -/
-def Document.onanimationcancel (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onanimationcancel" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onanimationcancel (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onanimationcancel" do
+  self.val.get "onanimationcancel" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationcancel`: `attribute EventHandler onanimationcancel` -/
-def Document.setOnanimationcancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnanimationcancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnanimationcancel" do
   self.val.set "onanimationcancel" (toJS value)
 
 /-- `attribute EventHandler onanimationstart` -/
-def HTMLElement.onanimationstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onanimationstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onanimationstart" do
+  self.val.get "onanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationstart`: `attribute EventHandler onanimationstart` -/
-def HTMLElement.setOnanimationstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnanimationstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnanimationstart" do
   self.val.set "onanimationstart" (toJS value)
 
 /-- `attribute EventHandler onanimationiteration` -/
-def HTMLElement.onanimationiteration (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onanimationiteration (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onanimationiteration" do
+  self.val.get "onanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationiteration`: `attribute EventHandler onanimationiteration` -/
-def HTMLElement.setOnanimationiteration (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnanimationiteration (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnanimationiteration" do
   self.val.set "onanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onanimationend` -/
-def HTMLElement.onanimationend (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onanimationend (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onanimationend" do
+  self.val.get "onanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationend`: `attribute EventHandler onanimationend` -/
-def HTMLElement.setOnanimationend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnanimationend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnanimationend" do
   self.val.set "onanimationend" (toJS value)
 
 /-- `attribute EventHandler onanimationcancel` -/
-def HTMLElement.onanimationcancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationcancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onanimationcancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onanimationcancel" do
+  self.val.get "onanimationcancel" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationcancel`: `attribute EventHandler onanimationcancel` -/
-def HTMLElement.setOnanimationcancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnanimationcancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnanimationcancel" do
   self.val.set "onanimationcancel" (toJS value)
 
 /-- `attribute EventHandler onanimationstart` -/
-def MathMLElement.onanimationstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onanimationstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onanimationstart" do
+  self.val.get "onanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationstart`: `attribute EventHandler onanimationstart` -/
-def MathMLElement.setOnanimationstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnanimationstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnanimationstart" do
   self.val.set "onanimationstart" (toJS value)
 
 /-- `attribute EventHandler onanimationiteration` -/
-def MathMLElement.onanimationiteration (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onanimationiteration (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onanimationiteration" do
+  self.val.get "onanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationiteration`: `attribute EventHandler onanimationiteration` -/
-def MathMLElement.setOnanimationiteration (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnanimationiteration (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnanimationiteration" do
   self.val.set "onanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onanimationend` -/
-def MathMLElement.onanimationend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onanimationend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onanimationend" do
+  self.val.get "onanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationend`: `attribute EventHandler onanimationend` -/
-def MathMLElement.setOnanimationend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnanimationend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnanimationend" do
   self.val.set "onanimationend" (toJS value)
 
 /-- `attribute EventHandler onanimationcancel` -/
-def MathMLElement.onanimationcancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationcancel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onanimationcancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onanimationcancel" do
+  self.val.get "onanimationcancel" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationcancel`: `attribute EventHandler onanimationcancel` -/
-def MathMLElement.setOnanimationcancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnanimationcancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnanimationcancel" do
   self.val.set "onanimationcancel" (toJS value)
 
 /-- `attribute EventHandler onanimationstart` -/
-def SVGElement.onanimationstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onanimationstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onanimationstart" do
+  self.val.get "onanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationstart`: `attribute EventHandler onanimationstart` -/
-def SVGElement.setOnanimationstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnanimationstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnanimationstart" do
   self.val.set "onanimationstart" (toJS value)
 
 /-- `attribute EventHandler onanimationiteration` -/
-def SVGElement.onanimationiteration (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onanimationiteration (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onanimationiteration" do
+  self.val.get "onanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationiteration`: `attribute EventHandler onanimationiteration` -/
-def SVGElement.setOnanimationiteration (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnanimationiteration (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnanimationiteration" do
   self.val.set "onanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onanimationend` -/
-def SVGElement.onanimationend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onanimationend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onanimationend" do
+  self.val.get "onanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationend`: `attribute EventHandler onanimationend` -/
-def SVGElement.setOnanimationend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnanimationend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnanimationend" do
   self.val.set "onanimationend" (toJS value)
 
 /-- `attribute EventHandler onanimationcancel` -/
-def SVGElement.onanimationcancel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onanimationcancel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onanimationcancel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onanimationcancel" do
+  self.val.get "onanimationcancel" (Option EventHandlerNonNull)
 
 /-- Sets `onanimationcancel`: `attribute EventHandler onanimationcancel` -/
-def SVGElement.setOnanimationcancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnanimationcancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnanimationcancel" do
+  self.val.set "onanimationcancel" (toJS value)
+
+/-- `attribute EventHandler onanimationstart` -/
+@[macro_inline] def Window.onanimationstart (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onanimationstart" do
+  self.val.get "onanimationstart" (Option EventHandlerNonNull)
+
+/-- Sets `onanimationstart`: `attribute EventHandler onanimationstart` -/
+@[macro_inline] def Window.setOnanimationstart (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnanimationstart" do
+  self.val.set "onanimationstart" (toJS value)
+
+/-- `attribute EventHandler onanimationiteration` -/
+@[macro_inline] def Window.onanimationiteration (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onanimationiteration" do
+  self.val.get "onanimationiteration" (Option EventHandlerNonNull)
+
+/-- Sets `onanimationiteration`: `attribute EventHandler onanimationiteration` -/
+@[macro_inline] def Window.setOnanimationiteration (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnanimationiteration" do
+  self.val.set "onanimationiteration" (toJS value)
+
+/-- `attribute EventHandler onanimationend` -/
+@[macro_inline] def Window.onanimationend (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onanimationend" do
+  self.val.get "onanimationend" (Option EventHandlerNonNull)
+
+/-- Sets `onanimationend`: `attribute EventHandler onanimationend` -/
+@[macro_inline] def Window.setOnanimationend (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnanimationend" do
+  self.val.set "onanimationend" (toJS value)
+
+/-- `attribute EventHandler onanimationcancel` -/
+@[macro_inline] def Window.onanimationcancel (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onanimationcancel" do
+  self.val.get "onanimationcancel" (Option EventHandlerNonNull)
+
+/-- Sets `onanimationcancel`: `attribute EventHandler onanimationcancel` -/
+@[macro_inline] def Window.setOnanimationcancel (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnanimationcancel" do
   self.val.set "onanimationcancel" (toJS value)
 
 /-- `attribute EventHandler onanimationstart` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
-def onanimationstart : IO (Option EventHandlerNonNull) := Support.getGlobal ["onanimationstart"] (Option EventHandlerNonNull)
+@[macro_inline] def onanimationstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationstart" do
+  Internal.getGlobal ["onanimationstart"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onanimationiteration` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
-def onanimationiteration : IO (Option EventHandlerNonNull) := Support.getGlobal ["onanimationiteration"] (Option EventHandlerNonNull)
+@[macro_inline] def onanimationiteration : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationiteration" do
+  Internal.getGlobal ["onanimationiteration"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onanimationend` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
-def onanimationend : IO (Option EventHandlerNonNull) := Support.getGlobal ["onanimationend"] (Option EventHandlerNonNull)
+@[macro_inline] def onanimationend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationend" do
+  Internal.getGlobal ["onanimationend"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onanimationcancel` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
-def onanimationcancel : IO (Option EventHandlerNonNull) := Support.getGlobal ["onanimationcancel"] (Option EventHandlerNonNull)
+@[macro_inline] def onanimationcancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationcancel" do
+  Internal.getGlobal ["onanimationcancel"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

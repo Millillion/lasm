@@ -6,10 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CrossOriginStorage
+import Lasm.JS.Web.Types.Fs
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CrossOriginStorageGetFileHandleHash` (Cross-Origin Storage (https://wicg.github.io/cross-origin-storage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CrossOriginStorageGetFileHandleHash where
@@ -17,26 +23,8 @@ structure CrossOriginStorageGetFileHandleHash where
   value : String
   /-- `required DOMString algorithm` -/
   algorithm : String
-instance : ToJS CrossOriginStorageGetFileHandleHash := ⟨fun d => Support.fields #[("value", toJS d.value),
+instance : ToJS CrossOriginStorageGetFileHandleHash := ⟨fun d => Internal.fields #[("value", toJS d.value),
     ("algorithm", toJS d.algorithm)]⟩
-
-/-- `(DOMString or sequence<DOMString>)`: one constructor per member type. -/
-inductive DOMStringOrSequenceOfDOMString where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `sequence<DOMString>` -/
-  | sequence (value : Array String)
-instance : ToJS DOMStringOrSequenceOfDOMString := ⟨fun
-  | .domString v => toJS v
-  | .sequence v => toJS v⟩
-instance : Coe String DOMStringOrSequenceOfDOMString := ⟨.domString⟩
-instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
-instance : FromJS DOMStringOrSequenceOfDOMString where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array String)).map .sequence
-    | _ => .error ""
-  typeName := "Lasm.JS.Web.DOMStringOrSequenceOfDOMString"
 
 /-- `dictionary CrossOriginStorageGetFileHandleOptions` (Cross-Origin Storage (https://wicg.github.io/cross-origin-storage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CrossOriginStorageGetFileHandleOptions where
@@ -44,25 +32,25 @@ structure CrossOriginStorageGetFileHandleOptions where
   create : Option Bool := none
   /-- `(DOMString or sequence<DOMString>) origins` -/
   origins : Option DOMStringOrSequenceOfDOMString := none
-instance : ToJS CrossOriginStorageGetFileHandleOptions := ⟨fun d => Support.fields #[("create", Support.optional d.create),
-    ("origins", Support.optional d.origins)]⟩
+instance : ToJS CrossOriginStorageGetFileHandleOptions := ⟨fun d => Internal.fields #[("create", Internal.optional d.create),
+    ("origins", Internal.optional d.origins)]⟩
 
 /-- `v instanceof CrossOriginStorageManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CrossOriginStorageManager`). -/
-def CrossOriginStorageManager.cast? (v : Value) : IO (Option CrossOriginStorageManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CrossOriginStorageManager"] Value) v) then some { val := v } else none
+@[macro_inline] def CrossOriginStorageManager.cast? (v : Value) : IO (Option CrossOriginStorageManager) := Internal.api "Lasm.JS.Web.CrossOriginStorageManager.cast?" do
+  Internal.cast (Internal.getGlobal ["CrossOriginStorageManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<FileSystemFileHandle> getFileHandle(CrossOriginStorageGetFileHandleHash hash, optional CrossOriginStorageGetFileHandleOptions options)` -/
-def CrossOriginStorageManager.getFileHandle (self : CrossOriginStorageManager) (hash : CrossOriginStorageGetFileHandleHash) (options : Option CrossOriginStorageGetFileHandleOptions := none) : Async FileSystemFileHandle := do
-  let r ← self.val.callMethodAwait "getFileHandle" (Support.args #[toJS hash, Support.optional options]) Value
+@[macro_inline] def CrossOriginStorageManager.getFileHandle (self : CrossOriginStorageManager) (hash : CrossOriginStorageGetFileHandleHash) (options : Option CrossOriginStorageGetFileHandleOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.CrossOriginStorageManager.getFileHandle" do
+  let r ← self.val.callMethodAwait "getFileHandle" (Internal.args #[toJS hash, Internal.optional options]) Value
   pure { val := r }
 
 /-- `readonly attribute CrossOriginStorageManager crossOriginStorage` -/
-def Navigator.crossOriginStorage (self : Navigator) : IO CrossOriginStorageManager := do
+@[macro_inline] def Navigator.crossOriginStorage (self : Navigator) : IO CrossOriginStorageManager := Internal.api "Lasm.JS.Web.Navigator.crossOriginStorage" do
   let r ← self.val.get "crossOriginStorage" Value
   pure { val := r }
 
 /-- `readonly attribute CrossOriginStorageManager crossOriginStorage` -/
-def WorkerNavigator.crossOriginStorage (self : WorkerNavigator) : IO CrossOriginStorageManager := do
+@[macro_inline] def WorkerNavigator.crossOriginStorage (self : WorkerNavigator) : IO CrossOriginStorageManager := Internal.api "Lasm.JS.Web.WorkerNavigator.crossOriginStorage" do
   let r ← self.val.get "crossOriginStorage" Value
   pure { val := r }
 

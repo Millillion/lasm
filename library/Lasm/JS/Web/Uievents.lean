@@ -6,10 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.InputDeviceCapabilities
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary UIEventInit : EventInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UIEventInit where
@@ -27,13 +33,13 @@ structure UIEventInit where
   detail : Option Int := none
   /-- `unsigned long which = 0` -/
   which : Option Nat := none
-instance : ToJS UIEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which)]⟩
+instance : ToJS UIEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which)]⟩
 
 /-- `dictionary CompositionEventInit : UIEventInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CompositionEventInit where
@@ -53,14 +59,14 @@ structure CompositionEventInit where
   which : Option Nat := none
   /-- `DOMString data = ""` -/
   data : Option String := none
-instance : ToJS CompositionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("data", Support.optional d.data)]⟩
+instance : ToJS CompositionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("data", Internal.optional d.data)]⟩
 
 /-- `dictionary FocusEventInit : UIEventInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FocusEventInit where
@@ -80,14 +86,14 @@ structure FocusEventInit where
   which : Option Nat := none
   /-- `EventTarget? relatedTarget = null` -/
   relatedTarget : Option EventTarget := none
-instance : ToJS FocusEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("relatedTarget", Support.optional d.relatedTarget)]⟩
+instance : ToJS FocusEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("relatedTarget", Internal.optional d.relatedTarget)]⟩
 
 /-- `dictionary InputEventInit : UIEventInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InputEventInit where
@@ -115,18 +121,18 @@ structure InputEventInit where
   isComposing : Option Bool := none
   /-- `DOMString inputType = ""` -/
   inputType : Option String := none
-instance : ToJS InputEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("dataTransfer", Support.optional d.dataTransfer),
-    ("targetRanges", Support.optional d.targetRanges),
-    ("data", Support.optional d.data),
-    ("isComposing", Support.optional d.isComposing),
-    ("inputType", Support.optional d.inputType)]⟩
+instance : ToJS InputEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("dataTransfer", Internal.optional d.dataTransfer),
+    ("targetRanges", Internal.optional d.targetRanges),
+    ("data", Internal.optional d.data),
+    ("isComposing", Internal.optional d.isComposing),
+    ("inputType", Internal.optional d.inputType)]⟩
 
 /-- `dictionary KeyboardEventInit : EventModifierInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KeyboardEventInit where
@@ -186,111 +192,185 @@ structure KeyboardEventInit where
   charCode : Option Nat := none
   /-- `unsigned long keyCode = 0` -/
   keyCode : Option Nat := none
-instance : ToJS KeyboardEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("ctrlKey", Support.optional d.ctrlKey),
-    ("shiftKey", Support.optional d.shiftKey),
-    ("altKey", Support.optional d.altKey),
-    ("metaKey", Support.optional d.metaKey),
-    ("modifierAltGraph", Support.optional d.modifierAltGraph),
-    ("modifierCapsLock", Support.optional d.modifierCapsLock),
-    ("modifierFn", Support.optional d.modifierFn),
-    ("modifierFnLock", Support.optional d.modifierFnLock),
-    ("modifierHyper", Support.optional d.modifierHyper),
-    ("modifierNumLock", Support.optional d.modifierNumLock),
-    ("modifierScrollLock", Support.optional d.modifierScrollLock),
-    ("modifierSuper", Support.optional d.modifierSuper),
-    ("modifierSymbol", Support.optional d.modifierSymbol),
-    ("modifierSymbolLock", Support.optional d.modifierSymbolLock),
-    ("key", Support.optional d.key),
-    ("code", Support.optional d.code),
-    ("location", Support.optional d.location),
-    ("repeat", Support.optional d.«repeat»),
-    ("isComposing", Support.optional d.isComposing),
-    ("charCode", Support.optional d.charCode),
-    ("keyCode", Support.optional d.keyCode)]⟩
+instance : ToJS KeyboardEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock),
+    ("key", Internal.optional d.key),
+    ("code", Internal.optional d.code),
+    ("location", Internal.optional d.location),
+    ("repeat", Internal.optional d.«repeat»),
+    ("isComposing", Internal.optional d.isComposing),
+    ("charCode", Internal.optional d.charCode),
+    ("keyCode", Internal.optional d.keyCode)]⟩
+
+/-- `dictionary EventModifierInit : UIEventInit` (UI Events (https://w3c.github.io/uievents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EventModifierInit where
+  /-- `boolean bubbles = false` -/
+  bubbles : Option Bool := none
+  /-- `boolean cancelable = false` -/
+  cancelable : Option Bool := none
+  /-- `boolean composed = false` -/
+  composed : Option Bool := none
+  /-- `InputDeviceCapabilities? sourceCapabilities = null` -/
+  sourceCapabilities : Option InputDeviceCapabilities := none
+  /-- `Window? view = null` -/
+  view : Option Window := none
+  /-- `long detail = 0` -/
+  detail : Option Int := none
+  /-- `unsigned long which = 0` -/
+  which : Option Nat := none
+  /-- `boolean ctrlKey = false` -/
+  ctrlKey : Option Bool := none
+  /-- `boolean shiftKey = false` -/
+  shiftKey : Option Bool := none
+  /-- `boolean altKey = false` -/
+  altKey : Option Bool := none
+  /-- `boolean metaKey = false` -/
+  metaKey : Option Bool := none
+  /-- `boolean modifierAltGraph = false` -/
+  modifierAltGraph : Option Bool := none
+  /-- `boolean modifierCapsLock = false` -/
+  modifierCapsLock : Option Bool := none
+  /-- `boolean modifierFn = false` -/
+  modifierFn : Option Bool := none
+  /-- `boolean modifierFnLock = false` -/
+  modifierFnLock : Option Bool := none
+  /-- `boolean modifierHyper = false` -/
+  modifierHyper : Option Bool := none
+  /-- `boolean modifierNumLock = false` -/
+  modifierNumLock : Option Bool := none
+  /-- `boolean modifierScrollLock = false` -/
+  modifierScrollLock : Option Bool := none
+  /-- `boolean modifierSuper = false` -/
+  modifierSuper : Option Bool := none
+  /-- `boolean modifierSymbol = false` -/
+  modifierSymbol : Option Bool := none
+  /-- `boolean modifierSymbolLock = false` -/
+  modifierSymbolLock : Option Bool := none
+instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock)]⟩
 
 /-- `v instanceof UIEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `UIEvent`). -/
-def UIEvent.cast? (v : Value) : IO (Option UIEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["UIEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def UIEvent.cast? (v : Value) : IO (Option UIEvent) := Internal.api "Lasm.JS.Web.UIEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["UIEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional UIEventInit eventInitDict)` -/
-def UIEvent.new (type : String) (eventInitDict : Option UIEventInit := none) : IO UIEvent :=
+@[macro_inline] def UIEvent.new (type : String) (eventInitDict : Option UIEventInit := none) : IO UIEvent := Internal.api "Lasm.JS.Web.UIEvent.new" do
   Lasm.JS.Binding.invoke UIEvent { name := "Lasm.JS.Web.UIEvent.new", module := "globalThis", path := "UIEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute Window? view` -/
-def UIEvent.view (self : UIEvent) : IO (Option Window) := self.val.get "view" (Option Window)
+@[macro_inline] def UIEvent.view (self : UIEvent) : IO (Option Window) := Internal.api "Lasm.JS.Web.UIEvent.view" do
+  self.val.get "view" (Option Window)
 
 /-- `readonly attribute long detail` -/
-def UIEvent.detail (self : UIEvent) : IO Int := self.val.get "detail" Int
+@[macro_inline] def UIEvent.detail (self : UIEvent) : IO Int := Internal.api "Lasm.JS.Web.UIEvent.detail" do
+  self.val.get "detail" Int
 
 /-- `readonly attribute unsigned long which` -/
-def UIEvent.which (self : UIEvent) : IO Nat := self.val.get "which" Nat
+@[macro_inline] def UIEvent.which (self : UIEvent) : IO Nat := Internal.api "Lasm.JS.Web.UIEvent.which" do
+  self.val.get "which" Nat
 
 /-- `undefined initUIEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional long detailArg)` -/
-def UIEvent.initUIEvent (self : UIEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) : IO Unit :=
-  self.val.callMethod "initUIEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional detailArg]) Unit
+@[macro_inline] def UIEvent.initUIEvent (self : UIEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Web.UIEvent.initUIEvent" do
+  self.val.callMethod "initUIEvent" (Internal.args #[toJS typeArg, Internal.optional bubblesArg, Internal.optional cancelableArg, Internal.optional viewArg, Internal.optional detailArg]) Unit
 
 /-- `v instanceof CompositionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CompositionEvent`). -/
-def CompositionEvent.cast? (v : Value) : IO (Option CompositionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompositionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CompositionEvent.cast? (v : Value) : IO (Option CompositionEvent) := Internal.api "Lasm.JS.Web.CompositionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CompositionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CompositionEventInit eventInitDict)` -/
-def CompositionEvent.new (type : String) (eventInitDict : Option CompositionEventInit := none) : IO CompositionEvent :=
+@[macro_inline] def CompositionEvent.new (type : String) (eventInitDict : Option CompositionEventInit := none) : IO CompositionEvent := Internal.api "Lasm.JS.Web.CompositionEvent.new" do
   Lasm.JS.Binding.invoke CompositionEvent { name := "Lasm.JS.Web.CompositionEvent.new", module := "globalThis", path := "CompositionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute USVString data` -/
-def CompositionEvent.data (self : CompositionEvent) : IO String := self.val.get "data" String
+@[macro_inline] def CompositionEvent.data (self : CompositionEvent) : IO String := Internal.api "Lasm.JS.Web.CompositionEvent.data" do
+  self.val.get "data" String
 
 /-- `undefined initCompositionEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional WindowProxy? viewArg, optional DOMString dataArg)` -/
-def CompositionEvent.initCompositionEvent (self : CompositionEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (dataArg : Option String := none) : IO Unit :=
-  self.val.callMethod "initCompositionEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional dataArg]) Unit
+@[macro_inline] def CompositionEvent.initCompositionEvent (self : CompositionEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (dataArg : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.CompositionEvent.initCompositionEvent" do
+  self.val.callMethod "initCompositionEvent" (Internal.args #[toJS typeArg, Internal.optional bubblesArg, Internal.optional cancelableArg, Internal.optional viewArg, Internal.optional dataArg]) Unit
 
 /-- `v instanceof FocusEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FocusEvent`). -/
-def FocusEvent.cast? (v : Value) : IO (Option FocusEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FocusEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def FocusEvent.cast? (v : Value) : IO (Option FocusEvent) := Internal.api "Lasm.JS.Web.FocusEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["FocusEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional FocusEventInit eventInitDict)` -/
-def FocusEvent.new (type : String) (eventInitDict : Option FocusEventInit := none) : IO FocusEvent :=
+@[macro_inline] def FocusEvent.new (type : String) (eventInitDict : Option FocusEventInit := none) : IO FocusEvent := Internal.api "Lasm.JS.Web.FocusEvent.new" do
   Lasm.JS.Binding.invoke FocusEvent { name := "Lasm.JS.Web.FocusEvent.new", module := "globalThis", path := "FocusEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute EventTarget? relatedTarget` -/
-def FocusEvent.relatedTarget (self : FocusEvent) : IO (Option EventTarget) := self.val.get "relatedTarget" (Option EventTarget)
+@[macro_inline] def FocusEvent.relatedTarget (self : FocusEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.FocusEvent.relatedTarget" do
+  self.val.get "relatedTarget" (Option EventTarget)
 
 /-- `v instanceof InputEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InputEvent`). -/
-def InputEvent.cast? (v : Value) : IO (Option InputEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InputEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def InputEvent.cast? (v : Value) : IO (Option InputEvent) := Internal.api "Lasm.JS.Web.InputEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["InputEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional InputEventInit eventInitDict)` -/
-def InputEvent.new (type : String) (eventInitDict : Option InputEventInit := none) : IO InputEvent :=
+@[macro_inline] def InputEvent.new (type : String) (eventInitDict : Option InputEventInit := none) : IO InputEvent := Internal.api "Lasm.JS.Web.InputEvent.new" do
   Lasm.JS.Binding.invoke InputEvent { name := "Lasm.JS.Web.InputEvent.new", module := "globalThis", path := "InputEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute USVString? data` -/
-def InputEvent.data (self : InputEvent) : IO (Option String) := self.val.get "data" (Option String)
+@[macro_inline] def InputEvent.data (self : InputEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.InputEvent.data" do
+  self.val.get "data" (Option String)
 
 /-- `readonly attribute boolean isComposing` -/
-def InputEvent.isComposing (self : InputEvent) : IO Bool := self.val.get "isComposing" Bool
+@[macro_inline] def InputEvent.isComposing (self : InputEvent) : IO Bool := Internal.api "Lasm.JS.Web.InputEvent.isComposing" do
+  self.val.get "isComposing" Bool
 
 /-- `readonly attribute DOMString inputType` -/
-def InputEvent.inputType (self : InputEvent) : IO String := self.val.get "inputType" String
+@[macro_inline] def InputEvent.inputType (self : InputEvent) : IO String := Internal.api "Lasm.JS.Web.InputEvent.inputType" do
+  self.val.get "inputType" String
 
 /-- `v instanceof KeyboardEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyboardEvent`). -/
-def KeyboardEvent.cast? (v : Value) : IO (Option KeyboardEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["KeyboardEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def KeyboardEvent.cast? (v : Value) : IO (Option KeyboardEvent) := Internal.api "Lasm.JS.Web.KeyboardEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["KeyboardEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional KeyboardEventInit eventInitDict)` -/
-def KeyboardEvent.new (type : String) (eventInitDict : Option KeyboardEventInit := none) : IO KeyboardEvent :=
+@[macro_inline] def KeyboardEvent.new (type : String) (eventInitDict : Option KeyboardEventInit := none) : IO KeyboardEvent := Internal.api "Lasm.JS.Web.KeyboardEvent.new" do
   Lasm.JS.Binding.invoke KeyboardEvent { name := "Lasm.JS.Web.KeyboardEvent.new", module := "globalThis", path := "KeyboardEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `const unsigned long DOM_KEY_LOCATION_STANDARD = 0x00` -/
 def KeyboardEvent.DOM_KEY_LOCATION_STANDARD : Nat := 0x00
@@ -305,55 +385,67 @@ def KeyboardEvent.DOM_KEY_LOCATION_RIGHT : Nat := 0x02
 def KeyboardEvent.DOM_KEY_LOCATION_NUMPAD : Nat := 0x03
 
 /-- `readonly attribute DOMString key` -/
-def KeyboardEvent.key (self : KeyboardEvent) : IO String := self.val.get "key" String
+@[macro_inline] def KeyboardEvent.key (self : KeyboardEvent) : IO String := Internal.api "Lasm.JS.Web.KeyboardEvent.key" do
+  self.val.get "key" String
 
 /-- `readonly attribute DOMString code` -/
-def KeyboardEvent.code (self : KeyboardEvent) : IO String := self.val.get "code" String
+@[macro_inline] def KeyboardEvent.code (self : KeyboardEvent) : IO String := Internal.api "Lasm.JS.Web.KeyboardEvent.code" do
+  self.val.get "code" String
 
 /-- `readonly attribute unsigned long location` -/
-def KeyboardEvent.location (self : KeyboardEvent) : IO Nat := self.val.get "location" Nat
+@[macro_inline] def KeyboardEvent.location (self : KeyboardEvent) : IO Nat := Internal.api "Lasm.JS.Web.KeyboardEvent.location" do
+  self.val.get "location" Nat
 
 /-- `readonly attribute boolean ctrlKey` -/
-def KeyboardEvent.ctrlKey (self : KeyboardEvent) : IO Bool := self.val.get "ctrlKey" Bool
+@[macro_inline] def KeyboardEvent.ctrlKey (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.ctrlKey" do
+  self.val.get "ctrlKey" Bool
 
 /-- `readonly attribute boolean shiftKey` -/
-def KeyboardEvent.shiftKey (self : KeyboardEvent) : IO Bool := self.val.get "shiftKey" Bool
+@[macro_inline] def KeyboardEvent.shiftKey (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.shiftKey" do
+  self.val.get "shiftKey" Bool
 
 /-- `readonly attribute boolean altKey` -/
-def KeyboardEvent.altKey (self : KeyboardEvent) : IO Bool := self.val.get "altKey" Bool
+@[macro_inline] def KeyboardEvent.altKey (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.altKey" do
+  self.val.get "altKey" Bool
 
 /-- `readonly attribute boolean metaKey` -/
-def KeyboardEvent.metaKey (self : KeyboardEvent) : IO Bool := self.val.get "metaKey" Bool
+@[macro_inline] def KeyboardEvent.metaKey (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.metaKey" do
+  self.val.get "metaKey" Bool
 
 /-- `readonly attribute boolean repeat` -/
-def KeyboardEvent.«repeat» (self : KeyboardEvent) : IO Bool := self.val.get "repeat" Bool
+@[macro_inline] def KeyboardEvent.«repeat» (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.repeat" do
+  self.val.get "repeat" Bool
 
 /-- `readonly attribute boolean isComposing` -/
-def KeyboardEvent.isComposing (self : KeyboardEvent) : IO Bool := self.val.get "isComposing" Bool
+@[macro_inline] def KeyboardEvent.isComposing (self : KeyboardEvent) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.isComposing" do
+  self.val.get "isComposing" Bool
 
 /-- `readonly attribute unsigned long charCode` -/
-def KeyboardEvent.charCode (self : KeyboardEvent) : IO Nat := self.val.get "charCode" Nat
+@[macro_inline] def KeyboardEvent.charCode (self : KeyboardEvent) : IO Nat := Internal.api "Lasm.JS.Web.KeyboardEvent.charCode" do
+  self.val.get "charCode" Nat
 
 /-- `readonly attribute unsigned long keyCode` -/
-def KeyboardEvent.keyCode (self : KeyboardEvent) : IO Nat := self.val.get "keyCode" Nat
+@[macro_inline] def KeyboardEvent.keyCode (self : KeyboardEvent) : IO Nat := Internal.api "Lasm.JS.Web.KeyboardEvent.keyCode" do
+  self.val.get "keyCode" Nat
 
 /-- `boolean getModifierState(DOMString keyArg)` -/
-def KeyboardEvent.getModifierState (self : KeyboardEvent) (keyArg : String) : IO Bool :=
-  self.val.callMethod "getModifierState" (Support.args #[toJS keyArg]) Bool
+@[macro_inline] def KeyboardEvent.getModifierState (self : KeyboardEvent) (keyArg : String) : IO Bool := Internal.api "Lasm.JS.Web.KeyboardEvent.getModifierState" do
+  self.val.callMethod "getModifierState" (Internal.args #[toJS keyArg]) Bool
 
 /-- `undefined initKeyboardEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional DOMString keyArg, optional unsigned long locationArg, optional boolean ctrlKey, optional boolean altKey, optional boolean shiftKey, optional boolean metaKey)` -/
-def KeyboardEvent.initKeyboardEvent (self : KeyboardEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (keyArg : Option String := none) (locationArg : Option Nat := none) (ctrlKey : Option Bool := none) (altKey : Option Bool := none) (shiftKey : Option Bool := none) (metaKey : Option Bool := none) : IO Unit :=
-  self.val.callMethod "initKeyboardEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional keyArg, Support.optional locationArg, Support.optional ctrlKey, Support.optional altKey, Support.optional shiftKey, Support.optional metaKey]) Unit
+@[macro_inline] def KeyboardEvent.initKeyboardEvent (self : KeyboardEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (keyArg : Option String := none) (locationArg : Option Nat := none) (ctrlKey : Option Bool := none) (altKey : Option Bool := none) (shiftKey : Option Bool := none) (metaKey : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.KeyboardEvent.initKeyboardEvent" do
+  self.val.callMethod "initKeyboardEvent" (Internal.args #[toJS typeArg, Internal.optional bubblesArg, Internal.optional cancelableArg, Internal.optional viewArg, Internal.optional keyArg, Internal.optional locationArg, Internal.optional ctrlKey, Internal.optional altKey, Internal.optional shiftKey, Internal.optional metaKey]) Unit
 
 /-- `v instanceof TextEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextEvent`). -/
-def TextEvent.cast? (v : Value) : IO (Option TextEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TextEvent.cast? (v : Value) : IO (Option TextEvent) := Internal.api "Lasm.JS.Web.TextEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TextEvent"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString data` -/
-def TextEvent.data (self : TextEvent) : IO String := self.val.get "data" String
+@[macro_inline] def TextEvent.data (self : TextEvent) : IO String := Internal.api "Lasm.JS.Web.TextEvent.data" do
+  self.val.get "data" String
 
 /-- `undefined initTextEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional Window? view, optional DOMString data)` -/
-def TextEvent.initTextEvent (self : TextEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (view : Option Window := none) (data : Option String := none) : IO Unit :=
-  self.val.callMethod "initTextEvent" (Support.args #[toJS type, Support.optional bubbles, Support.optional cancelable, Support.optional view, Support.optional data]) Unit
+@[macro_inline] def TextEvent.initTextEvent (self : TextEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (view : Option Window := none) (data : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.TextEvent.initTextEvent" do
+  self.val.callMethod "initTextEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, Internal.optional view, Internal.optional data]) Unit
 
 end Lasm.JS.Web

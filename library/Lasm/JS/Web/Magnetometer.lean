@@ -6,27 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.GenericSensor
+import Lasm.JS.Web.Types.Magnetometer
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MagnetometerLocalCoordinateSystem` (Magnetometer (https://w3c.github.io/magnetometer/)): "device", "screen". -/
-inductive MagnetometerLocalCoordinateSystem where
-  /-- "device" -/
-  | device
-  /-- "screen" -/
-  | screen
-  deriving BEq, Repr, Inhabited
-instance : ToJS MagnetometerLocalCoordinateSystem := ⟨fun
-  | .device => .string "device"
-  | .screen => .string "screen"⟩
-instance : FromJS MagnetometerLocalCoordinateSystem where
-  fromJS
-    | .string "device" => .ok .device
-    | .string "screen" => .ok .screen
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MagnetometerLocalCoordinateSystem"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MagnetometerSensorOptions : SensorOptions` (Magnetometer (https://w3c.github.io/magnetometer/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MagnetometerSensorOptions where
@@ -34,52 +21,61 @@ structure MagnetometerSensorOptions where
   frequency : Option Float := none
   /-- `MagnetometerLocalCoordinateSystem referenceFrame = "device"` -/
   referenceFrame : Option MagnetometerLocalCoordinateSystem := none
-instance : ToJS MagnetometerSensorOptions := ⟨fun d => Support.fields #[("frequency", Support.optional d.frequency),
-    ("referenceFrame", Support.optional d.referenceFrame)]⟩
+instance : ToJS MagnetometerSensorOptions := ⟨fun d => Internal.fields #[("frequency", Internal.optional d.frequency),
+    ("referenceFrame", Internal.optional d.referenceFrame)]⟩
 
 /-- `v instanceof Magnetometer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Magnetometer`). -/
-def Magnetometer.cast? (v : Value) : IO (Option Magnetometer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Magnetometer"] Value) v) then some { val := v } else none
+@[macro_inline] def Magnetometer.cast? (v : Value) : IO (Option Magnetometer) := Internal.api "Lasm.JS.Web.Magnetometer.cast?" do
+  Internal.cast (Internal.getGlobal ["Magnetometer"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional MagnetometerSensorOptions sensorOptions)` -/
-def Magnetometer.new (sensorOptions : Option MagnetometerSensorOptions := none) : IO Magnetometer :=
+@[macro_inline] def Magnetometer.new (sensorOptions : Option MagnetometerSensorOptions := none) : IO Magnetometer := Internal.api "Lasm.JS.Web.Magnetometer.new" do
   Lasm.JS.Binding.invoke Magnetometer { name := "Lasm.JS.Web.Magnetometer.new", module := "globalThis", path := "Magnetometer", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 /-- `readonly attribute double? x` -/
-def Magnetometer.x (self : Magnetometer) : IO (Option Float) := self.val.get "x" (Option Float)
+@[macro_inline] def Magnetometer.x (self : Magnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.Magnetometer.x" do
+  self.val.get "x" (Option Float)
 
 /-- `readonly attribute double? y` -/
-def Magnetometer.y (self : Magnetometer) : IO (Option Float) := self.val.get "y" (Option Float)
+@[macro_inline] def Magnetometer.y (self : Magnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.Magnetometer.y" do
+  self.val.get "y" (Option Float)
 
 /-- `readonly attribute double? z` -/
-def Magnetometer.z (self : Magnetometer) : IO (Option Float) := self.val.get "z" (Option Float)
+@[macro_inline] def Magnetometer.z (self : Magnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.Magnetometer.z" do
+  self.val.get "z" (Option Float)
 
 /-- `v instanceof UncalibratedMagnetometer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `UncalibratedMagnetometer`). -/
-def UncalibratedMagnetometer.cast? (v : Value) : IO (Option UncalibratedMagnetometer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["UncalibratedMagnetometer"] Value) v) then some { val := v } else none
+@[macro_inline] def UncalibratedMagnetometer.cast? (v : Value) : IO (Option UncalibratedMagnetometer) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.cast?" do
+  Internal.cast (Internal.getGlobal ["UncalibratedMagnetometer"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional MagnetometerSensorOptions sensorOptions)` -/
-def UncalibratedMagnetometer.new (sensorOptions : Option MagnetometerSensorOptions := none) : IO UncalibratedMagnetometer :=
+@[macro_inline] def UncalibratedMagnetometer.new (sensorOptions : Option MagnetometerSensorOptions := none) : IO UncalibratedMagnetometer := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.new" do
   Lasm.JS.Binding.invoke UncalibratedMagnetometer { name := "Lasm.JS.Web.UncalibratedMagnetometer.new", module := "globalThis", path := "UncalibratedMagnetometer", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 /-- `readonly attribute double? x` -/
-def UncalibratedMagnetometer.x (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "x" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.x (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.x" do
+  self.val.get "x" (Option Float)
 
 /-- `readonly attribute double? y` -/
-def UncalibratedMagnetometer.y (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "y" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.y (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.y" do
+  self.val.get "y" (Option Float)
 
 /-- `readonly attribute double? z` -/
-def UncalibratedMagnetometer.z (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "z" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.z (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.z" do
+  self.val.get "z" (Option Float)
 
 /-- `readonly attribute double? xBias` -/
-def UncalibratedMagnetometer.xBias (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "xBias" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.xBias (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.xBias" do
+  self.val.get "xBias" (Option Float)
 
 /-- `readonly attribute double? yBias` -/
-def UncalibratedMagnetometer.yBias (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "yBias" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.yBias (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.yBias" do
+  self.val.get "yBias" (Option Float)
 
 /-- `readonly attribute double? zBias` -/
-def UncalibratedMagnetometer.zBias (self : UncalibratedMagnetometer) : IO (Option Float) := self.val.get "zBias" (Option Float)
+@[macro_inline] def UncalibratedMagnetometer.zBias (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.zBias" do
+  self.val.get "zBias" (Option Float)
 
 end Lasm.JS.Web

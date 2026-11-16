@@ -6,47 +6,43 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssPseudo
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `(Element or CSSPseudoElement)`: one constructor per member type. -/
-inductive ElementOrCSSPseudoElement where
-  /-- `Element` -/
-  | element (value : Element)
-  /-- `CSSPseudoElement` -/
-  | cssPseudoElement (value : CSSPseudoElement)
-instance : ToJS ElementOrCSSPseudoElement := ⟨fun
-  | .element v => toJS v
-  | .cssPseudoElement v => toJS v⟩
-instance : Coe Element ElementOrCSSPseudoElement := ⟨.element⟩
-instance : Coe CSSPseudoElement ElementOrCSSPseudoElement := ⟨.cssPseudoElement⟩
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSPseudoElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPseudoElement`). -/
-def CSSPseudoElement.cast? (v : Value) : IO (Option CSSPseudoElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSPseudoElement"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSPseudoElement.cast? (v : Value) : IO (Option CSSPseudoElement) := Internal.api "Lasm.JS.Web.CSSPseudoElement.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSPseudoElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString type` -/
-def CSSPseudoElement.type (self : CSSPseudoElement) : IO String := self.val.get "type" String
+@[macro_inline] def CSSPseudoElement.type (self : CSSPseudoElement) : IO String := Internal.api "Lasm.JS.Web.CSSPseudoElement.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute Element element` -/
-def CSSPseudoElement.element (self : CSSPseudoElement) : IO Element := do
+@[macro_inline] def CSSPseudoElement.element (self : CSSPseudoElement) : IO Element := Internal.api "Lasm.JS.Web.CSSPseudoElement.element" do
   let r ← self.val.get "element" Value
   pure { val := r }
 
 /-- `readonly attribute (Element or CSSPseudoElement) parent` -/
-def CSSPseudoElement.parent (self : CSSPseudoElement) : IO Value := self.val.get "parent" Value
+@[macro_inline] def CSSPseudoElement.parent (self : CSSPseudoElement) : IO Value := Internal.api "Lasm.JS.Web.CSSPseudoElement.parent" do
+  self.val.get "parent" Value
 
 /-- `readonly attribute CSSOMString selectorText` -/
-def CSSPseudoElement.selectorText (self : CSSPseudoElement) : IO String := self.val.get "selectorText" String
+@[macro_inline] def CSSPseudoElement.selectorText (self : CSSPseudoElement) : IO String := Internal.api "Lasm.JS.Web.CSSPseudoElement.selectorText" do
+  self.val.get "selectorText" String
 
 /-- `CSSPseudoElement? pseudo(CSSOMString type)` -/
-def CSSPseudoElement.pseudo (self : CSSPseudoElement) (type : String) : IO (Option CSSPseudoElement) :=
-  self.val.callMethod "pseudo" (Support.args #[toJS type]) (Option CSSPseudoElement)
+@[macro_inline] def CSSPseudoElement.pseudo (self : CSSPseudoElement) (type : String) : IO (Option CSSPseudoElement) := Internal.api "Lasm.JS.Web.CSSPseudoElement.pseudo" do
+  self.val.callMethod "pseudo" (Internal.args #[toJS type]) (Option CSSPseudoElement)
 
 /-- `CSSPseudoElement? pseudo(CSSOMString type)` -/
-def Element.pseudo (self : Element) (type : String) : IO (Option CSSPseudoElement) :=
-  self.val.callMethod "pseudo" (Support.args #[toJS type]) (Option CSSPseudoElement)
+@[macro_inline] def Element.pseudo (self : Element) (type : String) : IO (Option CSSPseudoElement) := Internal.api "Lasm.JS.Web.Element.pseudo" do
+  self.val.callMethod "pseudo" (Internal.args #[toJS type]) (Option CSSPseudoElement)
 
 end Lasm.JS.Web

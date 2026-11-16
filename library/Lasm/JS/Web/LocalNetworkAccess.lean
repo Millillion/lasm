@@ -6,13 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.LocalNetworkAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute IPAddressSpace targetAddressSpace` -/
-def Request.targetAddressSpace (self : Request) : IO IPAddressSpace := self.val.get "targetAddressSpace" IPAddressSpace
+@[macro_inline] def Request.targetAddressSpace (self : Request) : IO IPAddressSpace := Internal.api "Lasm.JS.Web.Request.targetAddressSpace" do
+  self.val.get "targetAddressSpace" IPAddressSpace
 
 end Lasm.JS.Web

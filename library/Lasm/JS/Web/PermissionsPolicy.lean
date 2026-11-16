@@ -6,38 +6,67 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.PermissionsPolicy
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary PermissionsPolicyViolationReportBody : ReportBody` (Permissions Policy (https://w3c.github.io/webappsec-permissions-policy/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PermissionsPolicyViolationReportBody where
+  /-- `DOMString featureId` -/
+  featureId : Option String := none
+  /-- `DOMString? sourceFile` -/
+  sourceFile : Option String := none
+  /-- `long? lineNumber` -/
+  lineNumber : Option Int := none
+  /-- `long? columnNumber` -/
+  columnNumber : Option Int := none
+  /-- `DOMString disposition` -/
+  disposition : Option String := none
+  /-- `DOMString? allowAttribute` -/
+  allowAttribute : Option String := none
+  /-- `DOMString? srcAttribute` -/
+  srcAttribute : Option String := none
+instance : ToJS PermissionsPolicyViolationReportBody := ⟨fun d => Internal.fields #[("featureId", Internal.optional d.featureId),
+    ("sourceFile", Internal.optional d.sourceFile),
+    ("lineNumber", Internal.optional d.lineNumber),
+    ("columnNumber", Internal.optional d.columnNumber),
+    ("disposition", Internal.optional d.disposition),
+    ("allowAttribute", Internal.optional d.allowAttribute),
+    ("srcAttribute", Internal.optional d.srcAttribute)]⟩
 
 /-- `v instanceof PermissionsPolicy`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PermissionsPolicy`). -/
-def PermissionsPolicy.cast? (v : Value) : IO (Option PermissionsPolicy) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PermissionsPolicy"] Value) v) then some { val := v } else none
+@[macro_inline] def PermissionsPolicy.cast? (v : Value) : IO (Option PermissionsPolicy) := Internal.api "Lasm.JS.Web.PermissionsPolicy.cast?" do
+  Internal.cast (Internal.getGlobal ["PermissionsPolicy"] Value) (fun x => { val := x }) v
 
 /-- `boolean allowsFeature(DOMString feature, optional DOMString origin)` -/
-def PermissionsPolicy.allowsFeature (self : PermissionsPolicy) (feature : String) (origin : Option String := none) : IO Bool :=
-  self.val.callMethod "allowsFeature" (Support.args #[toJS feature, Support.optional origin]) Bool
+@[macro_inline] def PermissionsPolicy.allowsFeature (self : PermissionsPolicy) (feature : String) (origin : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.PermissionsPolicy.allowsFeature" do
+  self.val.callMethod "allowsFeature" (Internal.args #[toJS feature, Internal.optional origin]) Bool
 
 /-- `sequence<DOMString> features()` -/
-def PermissionsPolicy.features (self : PermissionsPolicy) : IO (Array String) :=
-  self.val.callMethod "features" (Support.args #[]) (Array String)
+@[macro_inline] def PermissionsPolicy.features (self : PermissionsPolicy) : IO (Array String) := Internal.api "Lasm.JS.Web.PermissionsPolicy.features" do
+  self.val.callMethod "features" (Internal.args #[]) (Array String)
 
 /-- `sequence<DOMString> allowedFeatures()` -/
-def PermissionsPolicy.allowedFeatures (self : PermissionsPolicy) : IO (Array String) :=
-  self.val.callMethod "allowedFeatures" (Support.args #[]) (Array String)
+@[macro_inline] def PermissionsPolicy.allowedFeatures (self : PermissionsPolicy) : IO (Array String) := Internal.api "Lasm.JS.Web.PermissionsPolicy.allowedFeatures" do
+  self.val.callMethod "allowedFeatures" (Internal.args #[]) (Array String)
 
 /-- `sequence<DOMString> getAllowlistForFeature(DOMString feature)` -/
-def PermissionsPolicy.getAllowlistForFeature (self : PermissionsPolicy) (feature : String) : IO (Array String) :=
-  self.val.callMethod "getAllowlistForFeature" (Support.args #[toJS feature]) (Array String)
+@[macro_inline] def PermissionsPolicy.getAllowlistForFeature (self : PermissionsPolicy) (feature : String) : IO (Array String) := Internal.api "Lasm.JS.Web.PermissionsPolicy.getAllowlistForFeature" do
+  self.val.callMethod "getAllowlistForFeature" (Internal.args #[toJS feature]) (Array String)
 
 /-- `readonly attribute PermissionsPolicy permissionsPolicy` -/
-def Document.permissionsPolicy (self : Document) : IO PermissionsPolicy := do
+@[macro_inline] def Document.permissionsPolicy (self : Document) : IO PermissionsPolicy := Internal.api "Lasm.JS.Web.Document.permissionsPolicy" do
   let r ← self.val.get "permissionsPolicy" Value
   pure { val := r }
 
 /-- `readonly attribute PermissionsPolicy permissionsPolicy` -/
-def HTMLIFrameElement.permissionsPolicy (self : HTMLIFrameElement) : IO PermissionsPolicy := do
+@[macro_inline] def HTMLIFrameElement.permissionsPolicy (self : HTMLIFrameElement) : IO PermissionsPolicy := Internal.api "Lasm.JS.Web.HTMLIFrameElement.permissionsPolicy" do
   let r ← self.val.get "permissionsPolicy" Value
   pure { val := r }
 

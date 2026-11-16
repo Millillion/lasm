@@ -6,45 +6,35 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.DevicePosture
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum DevicePostureType` (Device Posture API (https://w3c.github.io/device-posture/)): "continuous", "folded". -/
-inductive DevicePostureType where
-  /-- "continuous" -/
-  | continuous
-  /-- "folded" -/
-  | folded
-  deriving BEq, Repr, Inhabited
-instance : ToJS DevicePostureType := ⟨fun
-  | .continuous => .string "continuous"
-  | .folded => .string "folded"⟩
-instance : FromJS DevicePostureType where
-  fromJS
-    | .string "continuous" => .ok .continuous
-    | .string "folded" => .ok .folded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.DevicePostureType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof DevicePosture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DevicePosture`). -/
-def DevicePosture.cast? (v : Value) : IO (Option DevicePosture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DevicePosture"] Value) v) then some { val := v } else none
+@[macro_inline] def DevicePosture.cast? (v : Value) : IO (Option DevicePosture) := Internal.api "Lasm.JS.Web.DevicePosture.cast?" do
+  Internal.cast (Internal.getGlobal ["DevicePosture"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DevicePostureType type` -/
-def DevicePosture.type (self : DevicePosture) : IO DevicePostureType := self.val.get "type" DevicePostureType
+@[macro_inline] def DevicePosture.type (self : DevicePosture) : IO DevicePostureType := Internal.api "Lasm.JS.Web.DevicePosture.type" do
+  self.val.get "type" DevicePostureType
 
 /-- `attribute EventHandler onchange` -/
-def DevicePosture.onchange (self : DevicePosture) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def DevicePosture.onchange (self : DevicePosture) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.DevicePosture.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def DevicePosture.setOnchange (self : DevicePosture) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def DevicePosture.setOnchange (self : DevicePosture) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.DevicePosture.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `readonly attribute DevicePosture devicePosture` -/
-def Navigator.devicePosture (self : Navigator) : IO DevicePosture := do
+@[macro_inline] def Navigator.devicePosture (self : Navigator) : IO DevicePosture := Internal.api "Lasm.JS.Web.Navigator.devicePosture" do
   let r ← self.val.get "devicePosture" Value
   pure { val := r }
 

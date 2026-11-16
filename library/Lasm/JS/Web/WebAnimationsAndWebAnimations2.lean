@@ -6,150 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssTypedOm
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.AnimationTriggers
+import Lasm.JS.Web.Types.CssPseudo
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.CssTypedOm
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum AnimationPlayState` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)): "idle", "running", "paused", "finished". -/
-inductive AnimationPlayState where
-  /-- "idle" -/
-  | idle
-  /-- "running" -/
-  | running
-  /-- "paused" -/
-  | paused
-  /-- "finished" -/
-  | finished
-  deriving BEq, Repr, Inhabited
-instance : ToJS AnimationPlayState := ⟨fun
-  | .idle => .string "idle"
-  | .running => .string "running"
-  | .paused => .string "paused"
-  | .finished => .string "finished"⟩
-instance : FromJS AnimationPlayState where
-  fromJS
-    | .string "idle" => .ok .idle
-    | .string "running" => .ok .running
-    | .string "paused" => .ok .paused
-    | .string "finished" => .ok .finished
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AnimationPlayState"
-
-/-- `enum AnimationReplaceState` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)): "active", "removed", "persisted". -/
-inductive AnimationReplaceState where
-  /-- "active" -/
-  | active
-  /-- "removed" -/
-  | removed
-  /-- "persisted" -/
-  | persisted
-  deriving BEq, Repr, Inhabited
-instance : ToJS AnimationReplaceState := ⟨fun
-  | .active => .string "active"
-  | .removed => .string "removed"
-  | .persisted => .string "persisted"⟩
-instance : FromJS AnimationReplaceState where
-  fromJS
-    | .string "active" => .ok .active
-    | .string "removed" => .ok .removed
-    | .string "persisted" => .ok .persisted
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AnimationReplaceState"
-
-/-- `enum FillMode` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)): "none", "forwards", "backwards", "both", "auto". -/
-inductive FillMode where
-  /-- "none" -/
-  | none
-  /-- "forwards" -/
-  | forwards
-  /-- "backwards" -/
-  | backwards
-  /-- "both" -/
-  | both
-  /-- "auto" -/
-  | auto
-  deriving BEq, Repr, Inhabited
-instance : ToJS FillMode := ⟨fun
-  | .none => .string "none"
-  | .forwards => .string "forwards"
-  | .backwards => .string "backwards"
-  | .both => .string "both"
-  | .auto => .string "auto"⟩
-instance : FromJS FillMode where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "forwards" => .ok .forwards
-    | .string "backwards" => .ok .backwards
-    | .string "both" => .ok .both
-    | .string "auto" => .ok .auto
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FillMode"
-
-/-- `enum PlaybackDirection` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)): "normal", "reverse", "alternate", "alternate-reverse". -/
-inductive PlaybackDirection where
-  /-- "normal" -/
-  | normal
-  /-- "reverse" -/
-  | reverse
-  /-- "alternate" -/
-  | alternate
-  /-- "alternate-reverse" -/
-  | alternateReverse
-  deriving BEq, Repr, Inhabited
-instance : ToJS PlaybackDirection := ⟨fun
-  | .normal => .string "normal"
-  | .reverse => .string "reverse"
-  | .alternate => .string "alternate"
-  | .alternateReverse => .string "alternate-reverse"⟩
-instance : FromJS PlaybackDirection where
-  fromJS
-    | .string "normal" => .ok .normal
-    | .string "reverse" => .ok .reverse
-    | .string "alternate" => .ok .alternate
-    | .string "alternate-reverse" => .ok .alternateReverse
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PlaybackDirection"
-
-/-- `enum CompositeOperation` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)): "replace", "add", "accumulate". -/
-inductive CompositeOperation where
-  /-- "replace" -/
-  | replace
-  /-- "add" -/
-  | add
-  /-- "accumulate" -/
-  | accumulate
-  deriving BEq, Repr, Inhabited
-instance : ToJS CompositeOperation := ⟨fun
-  | .replace => .string "replace"
-  | .add => .string "add"
-  | .accumulate => .string "accumulate"⟩
-instance : FromJS CompositeOperation where
-  fromJS
-    | .string "replace" => .ok .replace
-    | .string "add" => .ok .add
-    | .string "accumulate" => .ok .accumulate
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CompositeOperation"
-
-/-- `enum IterationCompositeOperation` (Web Animations Module Level 2 (https://drafts.csswg.org/web-animations-2/)): "replace", "accumulate". -/
-inductive IterationCompositeOperation where
-  /-- "replace" -/
-  | replace
-  /-- "accumulate" -/
-  | accumulate
-  deriving BEq, Repr, Inhabited
-instance : ToJS IterationCompositeOperation := ⟨fun
-  | .replace => .string "replace"
-  | .accumulate => .string "accumulate"⟩
-instance : FromJS IterationCompositeOperation where
-  fromJS
-    | .string "replace" => .ok .replace
-    | .string "accumulate" => .ok .accumulate
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IterationCompositeOperation"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(unrestricted double or CSSNumericValue or DOMString)`: one constructor per member type. -/
 inductive UnrestrictedDoubleOrCSSNumericValueOrDOMString where
@@ -194,15 +63,15 @@ structure EffectTiming where
   playbackRate : Option Float := none
   /-- `(unrestricted double or CSSNumericValue or DOMString) duration = "auto"` -/
   duration : Option UnrestrictedDoubleOrCSSNumericValueOrDOMString := none
-instance : ToJS EffectTiming := ⟨fun d => Support.fields #[("fill", Support.optional d.fill),
-    ("iterationStart", Support.optional d.iterationStart),
-    ("iterations", Support.optional d.iterations),
-    ("direction", Support.optional d.direction),
-    ("easing", Support.optional d.easing),
-    ("delay", Support.optional d.delay),
-    ("endDelay", Support.optional d.endDelay),
-    ("playbackRate", Support.optional d.playbackRate),
-    ("duration", Support.optional d.duration)]⟩
+instance : ToJS EffectTiming := ⟨fun d => Internal.fields #[("fill", Internal.optional d.fill),
+    ("iterationStart", Internal.optional d.iterationStart),
+    ("iterations", Internal.optional d.iterations),
+    ("direction", Internal.optional d.direction),
+    ("easing", Internal.optional d.easing),
+    ("delay", Internal.optional d.delay),
+    ("endDelay", Internal.optional d.endDelay),
+    ("playbackRate", Internal.optional d.playbackRate),
+    ("duration", Internal.optional d.duration)]⟩
 instance : FromJS EffectTiming where
   fromJS d := do return {
     fill := ← Lasm.JS.readField (Option FillMode) d "fill",
@@ -248,6 +117,21 @@ structure ComputedEffectTiming where
   activeDuration : Option CSSNumberish := none
   /-- `CSSNumberish? localTime` -/
   localTime : Option CSSNumberish := none
+instance : ToJS ComputedEffectTiming := ⟨fun d => Internal.fields #[("fill", Internal.optional d.fill),
+    ("iterationStart", Internal.optional d.iterationStart),
+    ("iterations", Internal.optional d.iterations),
+    ("direction", Internal.optional d.direction),
+    ("easing", Internal.optional d.easing),
+    ("delay", Internal.optional d.delay),
+    ("endDelay", Internal.optional d.endDelay),
+    ("playbackRate", Internal.optional d.playbackRate),
+    ("duration", Internal.optional d.duration),
+    ("progress", Internal.optional d.progress),
+    ("currentIteration", Internal.optional d.currentIteration),
+    ("startTime", Internal.optional d.startTime),
+    ("endTime", Internal.optional d.endTime),
+    ("activeDuration", Internal.optional d.activeDuration),
+    ("localTime", Internal.optional d.localTime)]⟩
 instance : FromJS ComputedEffectTiming where
   fromJS d := do return {
     fill := ← Lasm.JS.readField (Option FillMode) d "fill",
@@ -299,15 +183,15 @@ structure OptionalEffectTiming where
   easing : Option String := none
   /-- `double playbackRate` -/
   playbackRate : Option Float := none
-instance : ToJS OptionalEffectTiming := ⟨fun d => Support.fields #[("delay", Support.optional d.delay),
-    ("endDelay", Support.optional d.endDelay),
-    ("fill", Support.optional d.fill),
-    ("iterationStart", Support.optional d.iterationStart),
-    ("iterations", Support.optional d.iterations),
-    ("duration", Support.optional d.duration),
-    ("direction", Support.optional d.direction),
-    ("easing", Support.optional d.easing),
-    ("playbackRate", Support.optional d.playbackRate)]⟩
+instance : ToJS OptionalEffectTiming := ⟨fun d => Internal.fields #[("delay", Internal.optional d.delay),
+    ("endDelay", Internal.optional d.endDelay),
+    ("fill", Internal.optional d.fill),
+    ("iterationStart", Internal.optional d.iterationStart),
+    ("iterations", Internal.optional d.iterations),
+    ("duration", Internal.optional d.duration),
+    ("direction", Internal.optional d.direction),
+    ("easing", Internal.optional d.easing),
+    ("playbackRate", Internal.optional d.playbackRate)]⟩
 
 /-- `dictionary AnimationPlaybackEventInit : EventInit` (Web Animations Module Level 2 (https://drafts.csswg.org/web-animations-2/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AnimationPlaybackEventInit where
@@ -321,11 +205,11 @@ structure AnimationPlaybackEventInit where
   currentTime : Option CSSNumberish := none
   /-- `CSSNumberish? timelineTime = null` -/
   timelineTime : Option CSSNumberish := none
-instance : ToJS AnimationPlaybackEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("currentTime", Support.optional d.currentTime),
-    ("timelineTime", Support.optional d.timelineTime)]⟩
+instance : ToJS AnimationPlaybackEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("currentTime", Internal.optional d.currentTime),
+    ("timelineTime", Internal.optional d.timelineTime)]⟩
 
 /-- `(unrestricted double or EffectTiming)`: one constructor per member type. -/
 inductive UnrestrictedDoubleOrEffectTiming where
@@ -343,7 +227,7 @@ instance : Coe EffectTiming UnrestrictedDoubleOrEffectTiming := ⟨.effectTiming
 structure DocumentTimelineOptions where
   /-- `DOMHighResTimeStamp originTime = 0` -/
   originTime : Option Float := none
-instance : ToJS DocumentTimelineOptions := ⟨fun d => Support.fields #[("originTime", Support.optional d.originTime)]⟩
+instance : ToJS DocumentTimelineOptions := ⟨fun d => Internal.fields #[("originTime", Internal.optional d.originTime)]⟩
 
 /-- `dictionary KeyframeEffectOptions : EffectTiming` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KeyframeEffectOptions where
@@ -371,18 +255,18 @@ structure KeyframeEffectOptions where
   pseudoElement : Option String := none
   /-- `IterationCompositeOperation iterationComposite = "replace"` -/
   iterationComposite : Option IterationCompositeOperation := none
-instance : ToJS KeyframeEffectOptions := ⟨fun d => Support.fields #[("fill", Support.optional d.fill),
-    ("iterationStart", Support.optional d.iterationStart),
-    ("iterations", Support.optional d.iterations),
-    ("direction", Support.optional d.direction),
-    ("easing", Support.optional d.easing),
-    ("delay", Support.optional d.delay),
-    ("endDelay", Support.optional d.endDelay),
-    ("playbackRate", Support.optional d.playbackRate),
-    ("duration", Support.optional d.duration),
-    ("composite", Support.optional d.composite),
-    ("pseudoElement", Support.optional d.pseudoElement),
-    ("iterationComposite", Support.optional d.iterationComposite)]⟩
+instance : ToJS KeyframeEffectOptions := ⟨fun d => Internal.fields #[("fill", Internal.optional d.fill),
+    ("iterationStart", Internal.optional d.iterationStart),
+    ("iterations", Internal.optional d.iterations),
+    ("direction", Internal.optional d.direction),
+    ("easing", Internal.optional d.easing),
+    ("delay", Internal.optional d.delay),
+    ("endDelay", Internal.optional d.endDelay),
+    ("playbackRate", Internal.optional d.playbackRate),
+    ("duration", Internal.optional d.duration),
+    ("composite", Internal.optional d.composite),
+    ("pseudoElement", Internal.optional d.pseudoElement),
+    ("iterationComposite", Internal.optional d.iterationComposite)]⟩
 
 /-- `(unrestricted double or KeyframeEffectOptions)`: one constructor per member type. -/
 inductive UnrestrictedDoubleOrKeyframeEffectOptions where
@@ -402,8 +286,8 @@ structure TimelineRangeOffset where
   rangeName : Option String := none
   /-- `CSSNumericValue offset` -/
   offset : Option CSSNumericValue := none
-instance : ToJS TimelineRangeOffset := ⟨fun d => Support.fields #[("rangeName", Support.optional d.rangeName),
-    ("offset", Support.optional d.offset)]⟩
+instance : ToJS TimelineRangeOffset := ⟨fun d => Internal.fields #[("rangeName", Internal.optional d.rangeName),
+    ("offset", Internal.optional d.offset)]⟩
 
 /-- `(TimelineRangeOffset or CSSNumericValue or CSSKeywordValue or DOMString)`: one constructor per member type. -/
 inductive TimelineRangeOffsetOrCSSNumericValueOrCSSKeywordValueOrDOMString where
@@ -461,23 +345,23 @@ structure KeyframeAnimationOptions where
   rangeEnd : Option TimelineRangeOffsetOrCSSNumericValueOrCSSKeywordValueOrDOMString := none
   /-- `AnimationTrigger? trigger` -/
   trigger : Option AnimationTrigger := none
-instance : ToJS KeyframeAnimationOptions := ⟨fun d => Support.fields #[("fill", Support.optional d.fill),
-    ("iterationStart", Support.optional d.iterationStart),
-    ("iterations", Support.optional d.iterations),
-    ("direction", Support.optional d.direction),
-    ("easing", Support.optional d.easing),
-    ("delay", Support.optional d.delay),
-    ("endDelay", Support.optional d.endDelay),
-    ("playbackRate", Support.optional d.playbackRate),
-    ("duration", Support.optional d.duration),
-    ("composite", Support.optional d.composite),
-    ("pseudoElement", Support.optional d.pseudoElement),
-    ("iterationComposite", Support.optional d.iterationComposite),
-    ("id", Support.optional d.id),
-    ("timeline", Support.optional d.timeline),
-    ("rangeStart", Support.optional d.rangeStart),
-    ("rangeEnd", Support.optional d.rangeEnd),
-    ("trigger", Support.optional d.trigger)]⟩
+instance : ToJS KeyframeAnimationOptions := ⟨fun d => Internal.fields #[("fill", Internal.optional d.fill),
+    ("iterationStart", Internal.optional d.iterationStart),
+    ("iterations", Internal.optional d.iterations),
+    ("direction", Internal.optional d.direction),
+    ("easing", Internal.optional d.easing),
+    ("delay", Internal.optional d.delay),
+    ("endDelay", Internal.optional d.endDelay),
+    ("playbackRate", Internal.optional d.playbackRate),
+    ("duration", Internal.optional d.duration),
+    ("composite", Internal.optional d.composite),
+    ("pseudoElement", Internal.optional d.pseudoElement),
+    ("iterationComposite", Internal.optional d.iterationComposite),
+    ("id", Internal.optional d.id),
+    ("timeline", Internal.optional d.timeline),
+    ("rangeStart", Internal.optional d.rangeStart),
+    ("rangeEnd", Internal.optional d.rangeEnd),
+    ("trigger", Internal.optional d.trigger)]⟩
 
 /-- `(unrestricted double or KeyframeAnimationOptions)`: one constructor per member type. -/
 inductive UnrestrictedDoubleOrKeyframeAnimationOptions where
@@ -497,352 +381,487 @@ structure GetAnimationsOptions where
   subtree : Option Bool := none
   /-- `CSSOMString? pseudoElement = null` -/
   pseudoElement : Option String := none
-instance : ToJS GetAnimationsOptions := ⟨fun d => Support.fields #[("subtree", Support.optional d.subtree),
-    ("pseudoElement", Support.optional d.pseudoElement)]⟩
+instance : ToJS GetAnimationsOptions := ⟨fun d => Internal.fields #[("subtree", Internal.optional d.subtree),
+    ("pseudoElement", Internal.optional d.pseudoElement)]⟩
+
+/-- `dictionary BaseComputedKeyframe` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BaseComputedKeyframe where
+  /-- `double? offset = null` -/
+  offset : Option Float := none
+  /-- `double computedOffset` -/
+  computedOffset : Option Float := none
+  /-- `DOMString easing = "linear"` -/
+  easing : Option String := none
+  /-- `CompositeOperationOrAuto composite = "auto"` -/
+  composite : Option CompositeOperationOrAuto := none
+instance : ToJS BaseComputedKeyframe := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("computedOffset", Internal.optional d.computedOffset),
+    ("easing", Internal.optional d.easing),
+    ("composite", Internal.optional d.composite)]⟩
+
+/-- `(double? or sequence<double?>)`: one constructor per member type. -/
+inductive NullableDoubleOrSequenceOfNullableDouble where
+  /-- `double?` -/
+  | double (value : Option Float)
+  /-- `sequence<double?>` -/
+  | sequence (value : Array (Option Float))
+instance : ToJS NullableDoubleOrSequenceOfNullableDouble := ⟨fun
+  | .double v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe (Option Float) NullableDoubleOrSequenceOfNullableDouble := ⟨.double⟩
+instance : Coe (Array (Option Float)) NullableDoubleOrSequenceOfNullableDouble := ⟨.sequence⟩
+
+/-- `(DOMString or sequence<DOMString>)`: one constructor per member type. -/
+inductive DOMStringOrSequenceOfDOMString where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `sequence<DOMString>` -/
+  | sequence (value : Array String)
+instance : ToJS DOMStringOrSequenceOfDOMString := ⟨fun
+  | .domString v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe String DOMStringOrSequenceOfDOMString := ⟨.domString⟩
+instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
+instance : FromJS DOMStringOrSequenceOfDOMString where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array String)).map .sequence
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.DOMStringOrSequenceOfDOMString"
+
+/-- `(CompositeOperationOrAuto or sequence<CompositeOperationOrAuto>)`: one constructor per member type. -/
+inductive CompositeOperationOrAutoOrSequenceOfCompositeOperationOrAuto where
+  /-- `CompositeOperationOrAuto` -/
+  | compositeOperationOrAuto (value : CompositeOperationOrAuto)
+  /-- `sequence<CompositeOperationOrAuto>` -/
+  | sequence (value : Array CompositeOperationOrAuto)
+instance : ToJS CompositeOperationOrAutoOrSequenceOfCompositeOperationOrAuto := ⟨fun
+  | .compositeOperationOrAuto v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe CompositeOperationOrAuto CompositeOperationOrAutoOrSequenceOfCompositeOperationOrAuto := ⟨.compositeOperationOrAuto⟩
+instance : Coe (Array CompositeOperationOrAuto) CompositeOperationOrAutoOrSequenceOfCompositeOperationOrAuto := ⟨.sequence⟩
+
+/-- `dictionary BasePropertyIndexedKeyframe` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BasePropertyIndexedKeyframe where
+  /-- `(double? or sequence<double?>) offset = []` -/
+  offset : Option NullableDoubleOrSequenceOfNullableDouble := none
+  /-- `(DOMString or sequence<DOMString>) easing = []` -/
+  easing : Option DOMStringOrSequenceOfDOMString := none
+  /-- `(CompositeOperationOrAuto or sequence<CompositeOperationOrAuto>) composite = []` -/
+  composite : Option CompositeOperationOrAutoOrSequenceOfCompositeOperationOrAuto := none
+instance : ToJS BasePropertyIndexedKeyframe := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("easing", Internal.optional d.easing),
+    ("composite", Internal.optional d.composite)]⟩
+
+/-- `dictionary BaseKeyframe` (Web Animations Module Level 1 (https://drafts.csswg.org/web-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BaseKeyframe where
+  /-- `double? offset = null` -/
+  offset : Option Float := none
+  /-- `DOMString easing = "linear"` -/
+  easing : Option String := none
+  /-- `CompositeOperationOrAuto composite = "auto"` -/
+  composite : Option CompositeOperationOrAuto := none
+instance : ToJS BaseKeyframe := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("easing", Internal.optional d.easing),
+    ("composite", Internal.optional d.composite)]⟩
+
+/-- `(Element or CSSPseudoElement)`: one constructor per member type. -/
+inductive ElementOrCSSPseudoElement where
+  /-- `Element` -/
+  | element (value : Element)
+  /-- `CSSPseudoElement` -/
+  | cssPseudoElement (value : CSSPseudoElement)
+instance : ToJS ElementOrCSSPseudoElement := ⟨fun
+  | .element v => toJS v
+  | .cssPseudoElement v => toJS v⟩
+instance : Coe Element ElementOrCSSPseudoElement := ⟨.element⟩
+instance : Coe CSSPseudoElement ElementOrCSSPseudoElement := ⟨.cssPseudoElement⟩
+
+/-- `callback EffectCallback = undefined (double? progress, (Element or CSSPseudoElement) currentTarget, Animation animation)` (Web Animations Module Level 2 (https://drafts.csswg.org/web-animations-2/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure EffectCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty EffectCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS EffectCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS EffectCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.EffectCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def EffectCallback.ofFn (f : (Option Float) → Value → Animation → Async Unit) : IO EffectCallback := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option Float) args 0) (← Internal.arg Value args 1) (← Internal.arg Animation args 2)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO Unit) : IO EffectCallback := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option Float) args 0) (← Internal.arg Value args 1) (← Internal.arg Animation args 2)) }
 
 /-- `v instanceof Animation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Animation`). -/
-def Animation.cast? (v : Value) : IO (Option Animation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Animation"] Value) v) then some { val := v } else none
+@[macro_inline] def Animation.cast? (v : Value) : IO (Option Animation) := Internal.api "Lasm.JS.Web.Animation.cast?" do
+  Internal.cast (Internal.getGlobal ["Animation"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional AnimationEffect? effect, optional AnimationTimeline? timeline)` -/
-def Animation.new (effect : Option AnimationEffect := none) (timeline : Option AnimationTimeline := none) : IO Animation :=
+@[macro_inline] def Animation.new (effect : Option AnimationEffect := none) (timeline : Option AnimationTimeline := none) : IO Animation := Internal.api "Lasm.JS.Web.Animation.new" do
   Lasm.JS.Binding.invoke Animation { name := "Lasm.JS.Web.Animation.new", module := "globalThis", path := "Animation", construct := true, arity := 2 }
-    (Support.args #[Support.optional effect, Support.optional timeline]) (await := false)
+    (Internal.args #[Internal.optional effect, Internal.optional timeline]) (await := false)
 
 /-- `attribute DOMString id` -/
-def Animation.id (self : Animation) : IO String := self.val.get "id" String
+@[macro_inline] def Animation.id (self : Animation) : IO String := Internal.api "Lasm.JS.Web.Animation.id" do
+  self.val.get "id" String
 
 /-- Sets `id`: `attribute DOMString id` -/
-def Animation.setId (self : Animation) (value : String) : IO Unit :=
+@[macro_inline] def Animation.setId (self : Animation) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setId" do
   self.val.set "id" (toJS value)
 
 /-- `attribute AnimationEffect? effect` -/
-def Animation.effect (self : Animation) : IO (Option AnimationEffect) := self.val.get "effect" (Option AnimationEffect)
+@[macro_inline] def Animation.effect (self : Animation) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.Animation.effect" do
+  self.val.get "effect" (Option AnimationEffect)
 
 /-- Sets `effect`: `attribute AnimationEffect? effect` -/
-def Animation.setEffect (self : Animation) (value : Option AnimationEffect) : IO Unit :=
+@[macro_inline] def Animation.setEffect (self : Animation) (value : Option AnimationEffect) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setEffect" do
   self.val.set "effect" (toJS value)
 
 /-- `attribute AnimationTimeline? timeline` -/
-def Animation.timeline (self : Animation) : IO (Option AnimationTimeline) := self.val.get "timeline" (Option AnimationTimeline)
+@[macro_inline] def Animation.timeline (self : Animation) : IO (Option AnimationTimeline) := Internal.api "Lasm.JS.Web.Animation.timeline" do
+  self.val.get "timeline" (Option AnimationTimeline)
 
 /-- Sets `timeline`: `attribute AnimationTimeline? timeline` -/
-def Animation.setTimeline (self : Animation) (value : Option AnimationTimeline) : IO Unit :=
+@[macro_inline] def Animation.setTimeline (self : Animation) (value : Option AnimationTimeline) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setTimeline" do
   self.val.set "timeline" (toJS value)
 
 /-- `attribute double playbackRate` -/
-def Animation.playbackRate (self : Animation) : IO Float := self.val.get "playbackRate" Float
+@[macro_inline] def Animation.playbackRate (self : Animation) : IO Float := Internal.api "Lasm.JS.Web.Animation.playbackRate" do
+  self.val.get "playbackRate" Float
 
 /-- Sets `playbackRate`: `attribute double playbackRate` -/
-def Animation.setPlaybackRate (self : Animation) (value : Float) : IO Unit :=
+@[macro_inline] def Animation.setPlaybackRate (self : Animation) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setPlaybackRate" do
   self.val.set "playbackRate" (toJS value)
 
 /-- `readonly attribute AnimationPlayState playState` -/
-def Animation.playState (self : Animation) : IO AnimationPlayState := self.val.get "playState" AnimationPlayState
+@[macro_inline] def Animation.playState (self : Animation) : IO AnimationPlayState := Internal.api "Lasm.JS.Web.Animation.playState" do
+  self.val.get "playState" AnimationPlayState
 
 /-- `readonly attribute AnimationReplaceState replaceState` -/
-def Animation.replaceState (self : Animation) : IO AnimationReplaceState := self.val.get "replaceState" AnimationReplaceState
+@[macro_inline] def Animation.replaceState (self : Animation) : IO AnimationReplaceState := Internal.api "Lasm.JS.Web.Animation.replaceState" do
+  self.val.get "replaceState" AnimationReplaceState
 
 /-- `readonly attribute boolean pending` -/
-def Animation.pending (self : Animation) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def Animation.pending (self : Animation) : IO Bool := Internal.api "Lasm.JS.Web.Animation.pending" do
+  self.val.get "pending" Bool
 
 /-- `readonly attribute Promise<Animation> ready` -/
-def Animation.ready (self : Animation) : Async Animation := do
+@[macro_inline] def Animation.ready (self : Animation) : Async Animation := Internal.api "Lasm.JS.Web.Animation.ready" do
   let p ← self.val.get "ready" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `readonly attribute Promise<Animation> finished` -/
-def Animation.finished (self : Animation) : Async Animation := do
+@[macro_inline] def Animation.finished (self : Animation) : Async Animation := Internal.api "Lasm.JS.Web.Animation.finished" do
   let p ← self.val.get "finished" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `attribute EventHandler onfinish` -/
-def Animation.onfinish (self : Animation) : IO (Option EventHandlerNonNull) := self.val.get "onfinish" (Option EventHandlerNonNull)
+@[macro_inline] def Animation.onfinish (self : Animation) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Animation.onfinish" do
+  self.val.get "onfinish" (Option EventHandlerNonNull)
 
 /-- Sets `onfinish`: `attribute EventHandler onfinish` -/
-def Animation.setOnfinish (self : Animation) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Animation.setOnfinish (self : Animation) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setOnfinish" do
   self.val.set "onfinish" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def Animation.oncancel (self : Animation) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def Animation.oncancel (self : Animation) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Animation.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def Animation.setOncancel (self : Animation) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Animation.setOncancel (self : Animation) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `attribute EventHandler onremove` -/
-def Animation.onremove (self : Animation) : IO (Option EventHandlerNonNull) := self.val.get "onremove" (Option EventHandlerNonNull)
+@[macro_inline] def Animation.onremove (self : Animation) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Animation.onremove" do
+  self.val.get "onremove" (Option EventHandlerNonNull)
 
 /-- Sets `onremove`: `attribute EventHandler onremove` -/
-def Animation.setOnremove (self : Animation) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Animation.setOnremove (self : Animation) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setOnremove" do
   self.val.set "onremove" (toJS value)
 
 /-- `attribute CSSNumberish? startTime` -/
-def Animation.startTime (self : Animation) : IO (Option CSSNumberish) := self.val.get "startTime" (Option CSSNumberish)
+@[macro_inline] def Animation.startTime (self : Animation) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.Animation.startTime" do
+  self.val.get "startTime" (Option CSSNumberish)
 
 /-- Sets `startTime`: `attribute CSSNumberish? startTime` -/
-def Animation.setStartTime (self : Animation) (value : Option CSSNumberish) : IO Unit :=
+@[macro_inline] def Animation.setStartTime (self : Animation) (value : Option CSSNumberish) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setStartTime" do
   self.val.set "startTime" (toJS value)
 
 /-- `attribute CSSNumberish? currentTime` -/
-def Animation.currentTime (self : Animation) : IO (Option CSSNumberish) := self.val.get "currentTime" (Option CSSNumberish)
+@[macro_inline] def Animation.currentTime (self : Animation) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.Animation.currentTime" do
+  self.val.get "currentTime" (Option CSSNumberish)
 
 /-- Sets `currentTime`: `attribute CSSNumberish? currentTime` -/
-def Animation.setCurrentTime (self : Animation) (value : Option CSSNumberish) : IO Unit :=
+@[macro_inline] def Animation.setCurrentTime (self : Animation) (value : Option CSSNumberish) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setCurrentTime" do
   self.val.set "currentTime" (toJS value)
 
 /-- `attribute AnimationTrigger? trigger` -/
-def Animation.trigger (self : Animation) : IO (Option AnimationTrigger) := self.val.get "trigger" (Option AnimationTrigger)
+@[macro_inline] def Animation.trigger (self : Animation) : IO (Option AnimationTrigger) := Internal.api "Lasm.JS.Web.Animation.trigger" do
+  self.val.get "trigger" (Option AnimationTrigger)
 
 /-- Sets `trigger`: `attribute AnimationTrigger? trigger` -/
-def Animation.setTrigger (self : Animation) (value : Option AnimationTrigger) : IO Unit :=
+@[macro_inline] def Animation.setTrigger (self : Animation) (value : Option AnimationTrigger) : IO Unit := Internal.api "Lasm.JS.Web.Animation.setTrigger" do
   self.val.set "trigger" (toJS value)
 
 /-- `readonly attribute double? overallProgress` -/
-def Animation.overallProgress (self : Animation) : IO (Option Float) := self.val.get "overallProgress" (Option Float)
+@[macro_inline] def Animation.overallProgress (self : Animation) : IO (Option Float) := Internal.api "Lasm.JS.Web.Animation.overallProgress" do
+  self.val.get "overallProgress" (Option Float)
 
 /-- `undefined cancel()` -/
-def Animation.cancel (self : Animation) : IO Unit :=
-  self.val.callMethod "cancel" (Support.args #[]) Unit
+@[macro_inline] def Animation.cancel (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.cancel" do
+  self.val.callMethod "cancel" (Internal.args #[]) Unit
 
 /-- `undefined finish()` -/
-def Animation.finish (self : Animation) : IO Unit :=
-  self.val.callMethod "finish" (Support.args #[]) Unit
+@[macro_inline] def Animation.finish (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.finish" do
+  self.val.callMethod "finish" (Internal.args #[]) Unit
 
 /-- `undefined play()` -/
-def Animation.play (self : Animation) : IO Unit :=
-  self.val.callMethod "play" (Support.args #[]) Unit
+@[macro_inline] def Animation.play (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.play" do
+  self.val.callMethod "play" (Internal.args #[]) Unit
 
 /-- `undefined pause()` -/
-def Animation.pause (self : Animation) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def Animation.pause (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `undefined updatePlaybackRate(double playbackRate)` -/
-def Animation.updatePlaybackRate (self : Animation) (playbackRate : Float) : IO Unit :=
-  self.val.callMethod "updatePlaybackRate" (Support.args #[toJS playbackRate]) Unit
+@[macro_inline] def Animation.updatePlaybackRate (self : Animation) (playbackRate : Float) : IO Unit := Internal.api "Lasm.JS.Web.Animation.updatePlaybackRate" do
+  self.val.callMethod "updatePlaybackRate" (Internal.args #[toJS playbackRate]) Unit
 
 /-- `undefined reverse()` -/
-def Animation.reverse (self : Animation) : IO Unit :=
-  self.val.callMethod "reverse" (Support.args #[]) Unit
+@[macro_inline] def Animation.reverse (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.reverse" do
+  self.val.callMethod "reverse" (Internal.args #[]) Unit
 
 /-- `undefined persist()` -/
-def Animation.persist (self : Animation) : IO Unit :=
-  self.val.callMethod "persist" (Support.args #[]) Unit
+@[macro_inline] def Animation.persist (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.persist" do
+  self.val.callMethod "persist" (Internal.args #[]) Unit
 
 /-- `undefined commitStyles()` -/
-def Animation.commitStyles (self : Animation) : IO Unit :=
-  self.val.callMethod "commitStyles" (Support.args #[]) Unit
+@[macro_inline] def Animation.commitStyles (self : Animation) : IO Unit := Internal.api "Lasm.JS.Web.Animation.commitStyles" do
+  self.val.callMethod "commitStyles" (Internal.args #[]) Unit
 
 /-- `v instanceof AnimationEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationEffect`). -/
-def AnimationEffect.cast? (v : Value) : IO (Option AnimationEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationEffect.cast? (v : Value) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.AnimationEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationEffect"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GroupEffect? parent` -/
-def AnimationEffect.parent (self : AnimationEffect) : IO (Option GroupEffect) := self.val.get "parent" (Option GroupEffect)
+@[macro_inline] def AnimationEffect.parent (self : AnimationEffect) : IO (Option GroupEffect) := Internal.api "Lasm.JS.Web.AnimationEffect.parent" do
+  self.val.get "parent" (Option GroupEffect)
 
 /-- `readonly attribute AnimationEffect? previousSibling` -/
-def AnimationEffect.previousSibling (self : AnimationEffect) : IO (Option AnimationEffect) := self.val.get "previousSibling" (Option AnimationEffect)
+@[macro_inline] def AnimationEffect.previousSibling (self : AnimationEffect) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.AnimationEffect.previousSibling" do
+  self.val.get "previousSibling" (Option AnimationEffect)
 
 /-- `readonly attribute AnimationEffect? nextSibling` -/
-def AnimationEffect.nextSibling (self : AnimationEffect) : IO (Option AnimationEffect) := self.val.get "nextSibling" (Option AnimationEffect)
+@[macro_inline] def AnimationEffect.nextSibling (self : AnimationEffect) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.AnimationEffect.nextSibling" do
+  self.val.get "nextSibling" (Option AnimationEffect)
 
 /-- `EffectTiming getTiming()` -/
-def AnimationEffect.getTiming (self : AnimationEffect) : IO EffectTiming :=
-  self.val.callMethod "getTiming" (Support.args #[]) EffectTiming
+@[macro_inline] def AnimationEffect.getTiming (self : AnimationEffect) : IO EffectTiming := Internal.api "Lasm.JS.Web.AnimationEffect.getTiming" do
+  self.val.callMethod "getTiming" (Internal.args #[]) EffectTiming
 
 /-- `ComputedEffectTiming getComputedTiming()` -/
-def AnimationEffect.getComputedTiming (self : AnimationEffect) : IO ComputedEffectTiming :=
-  self.val.callMethod "getComputedTiming" (Support.args #[]) ComputedEffectTiming
+@[macro_inline] def AnimationEffect.getComputedTiming (self : AnimationEffect) : IO ComputedEffectTiming := Internal.api "Lasm.JS.Web.AnimationEffect.getComputedTiming" do
+  self.val.callMethod "getComputedTiming" (Internal.args #[]) ComputedEffectTiming
 
 /-- `undefined updateTiming(optional OptionalEffectTiming timing)` -/
-def AnimationEffect.updateTiming (self : AnimationEffect) (timing : Option OptionalEffectTiming := none) : IO Unit :=
-  self.val.callMethod "updateTiming" (Support.args #[Support.optional timing]) Unit
+@[macro_inline] def AnimationEffect.updateTiming (self : AnimationEffect) (timing : Option OptionalEffectTiming := none) : IO Unit := Internal.api "Lasm.JS.Web.AnimationEffect.updateTiming" do
+  self.val.callMethod "updateTiming" (Internal.args #[Internal.optional timing]) Unit
 
 /-- `undefined before(AnimationEffect... effects)` -/
-def AnimationEffect.before (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit :=
-  self.val.callMethod "before" (Support.argsWith #[] (effects.map toJS)) Unit
+@[macro_inline] def AnimationEffect.before (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit := Internal.api "Lasm.JS.Web.AnimationEffect.before" do
+  self.val.callMethod "before" (Internal.argsWith #[] (effects.map toJS)) Unit
 
 /-- `undefined after(AnimationEffect... effects)` -/
-def AnimationEffect.after (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit :=
-  self.val.callMethod "after" (Support.argsWith #[] (effects.map toJS)) Unit
+@[macro_inline] def AnimationEffect.after (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit := Internal.api "Lasm.JS.Web.AnimationEffect.after" do
+  self.val.callMethod "after" (Internal.argsWith #[] (effects.map toJS)) Unit
 
 /-- `undefined replace(AnimationEffect... effects)` -/
-def AnimationEffect.replace (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit :=
-  self.val.callMethod "replace" (Support.argsWith #[] (effects.map toJS)) Unit
+@[macro_inline] def AnimationEffect.replace (self : AnimationEffect) (effects : Array AnimationEffect := #[]) : IO Unit := Internal.api "Lasm.JS.Web.AnimationEffect.replace" do
+  self.val.callMethod "replace" (Internal.argsWith #[] (effects.map toJS)) Unit
 
 /-- `undefined remove()` -/
-def AnimationEffect.remove (self : AnimationEffect) : IO Unit :=
-  self.val.callMethod "remove" (Support.args #[]) Unit
+@[macro_inline] def AnimationEffect.remove (self : AnimationEffect) : IO Unit := Internal.api "Lasm.JS.Web.AnimationEffect.remove" do
+  self.val.callMethod "remove" (Internal.args #[]) Unit
 
 /-- `v instanceof AnimationNodeList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationNodeList`). -/
-def AnimationNodeList.cast? (v : Value) : IO (Option AnimationNodeList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationNodeList"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationNodeList.cast? (v : Value) : IO (Option AnimationNodeList) := Internal.api "Lasm.JS.Web.AnimationNodeList.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationNodeList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def AnimationNodeList.length (self : AnimationNodeList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def AnimationNodeList.length (self : AnimationNodeList) : IO Nat := Internal.api "Lasm.JS.Web.AnimationNodeList.length" do
+  self.val.get "length" Nat
 
 /-- `getter AnimationEffect? item(unsigned long index)` -/
-def AnimationNodeList.item (self : AnimationNodeList) (index : Nat) : IO (Option AnimationEffect) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option AnimationEffect)
+@[macro_inline] def AnimationNodeList.item (self : AnimationNodeList) (index : Nat) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.AnimationNodeList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option AnimationEffect)
 
 /-- `v instanceof AnimationPlaybackEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationPlaybackEvent`). -/
-def AnimationPlaybackEvent.cast? (v : Value) : IO (Option AnimationPlaybackEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationPlaybackEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationPlaybackEvent.cast? (v : Value) : IO (Option AnimationPlaybackEvent) := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationPlaybackEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional AnimationPlaybackEventInit eventInitDict)` -/
-def AnimationPlaybackEvent.new (type : String) (eventInitDict : Option AnimationPlaybackEventInit := none) : IO AnimationPlaybackEvent :=
+@[macro_inline] def AnimationPlaybackEvent.new (type : String) (eventInitDict : Option AnimationPlaybackEventInit := none) : IO AnimationPlaybackEvent := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.new" do
   Lasm.JS.Binding.invoke AnimationPlaybackEvent { name := "Lasm.JS.Web.AnimationPlaybackEvent.new", module := "globalThis", path := "AnimationPlaybackEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute CSSNumberish? currentTime` -/
-def AnimationPlaybackEvent.currentTime (self : AnimationPlaybackEvent) : IO (Option CSSNumberish) := self.val.get "currentTime" (Option CSSNumberish)
+@[macro_inline] def AnimationPlaybackEvent.currentTime (self : AnimationPlaybackEvent) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.currentTime" do
+  self.val.get "currentTime" (Option CSSNumberish)
 
 /-- `readonly attribute CSSNumberish? timelineTime` -/
-def AnimationPlaybackEvent.timelineTime (self : AnimationPlaybackEvent) : IO (Option CSSNumberish) := self.val.get "timelineTime" (Option CSSNumberish)
+@[macro_inline] def AnimationPlaybackEvent.timelineTime (self : AnimationPlaybackEvent) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.timelineTime" do
+  self.val.get "timelineTime" (Option CSSNumberish)
 
 /-- `v instanceof AnimationTimeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnimationTimeline`). -/
-def AnimationTimeline.cast? (v : Value) : IO (Option AnimationTimeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AnimationTimeline"] Value) v) then some { val := v } else none
+@[macro_inline] def AnimationTimeline.cast? (v : Value) : IO (Option AnimationTimeline) := Internal.api "Lasm.JS.Web.AnimationTimeline.cast?" do
+  Internal.cast (Internal.getGlobal ["AnimationTimeline"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSNumberish? currentTime` -/
-def AnimationTimeline.currentTime (self : AnimationTimeline) : IO (Option CSSNumberish) := self.val.get "currentTime" (Option CSSNumberish)
+@[macro_inline] def AnimationTimeline.currentTime (self : AnimationTimeline) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationTimeline.currentTime" do
+  self.val.get "currentTime" (Option CSSNumberish)
 
 /-- `readonly attribute CSSNumberish? duration` -/
-def AnimationTimeline.duration (self : AnimationTimeline) : IO (Option CSSNumberish) := self.val.get "duration" (Option CSSNumberish)
+@[macro_inline] def AnimationTimeline.duration (self : AnimationTimeline) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationTimeline.duration" do
+  self.val.get "duration" (Option CSSNumberish)
 
 /-- `Animation play(optional AnimationEffect? effect)` -/
-def AnimationTimeline.play (self : AnimationTimeline) (effect : Option AnimationEffect := none) : IO Animation := do
-  let r ← self.val.callMethod "play" (Support.args #[Support.optional effect]) Value
+@[macro_inline] def AnimationTimeline.play (self : AnimationTimeline) (effect : Option AnimationEffect := none) : IO Animation := Internal.api "Lasm.JS.Web.AnimationTimeline.play" do
+  let r ← self.val.callMethod "play" (Internal.args #[Internal.optional effect]) Value
   pure { val := r }
 
 /-- `v instanceof GroupEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GroupEffect`). -/
-def GroupEffect.cast? (v : Value) : IO (Option GroupEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GroupEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def GroupEffect.cast? (v : Value) : IO (Option GroupEffect) := Internal.api "Lasm.JS.Web.GroupEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["GroupEffect"] Value) (fun x => { val := x }) v
 
 /-- `constructor(sequence<AnimationEffect>? children, optional (unrestricted double or EffectTiming) timing)` -/
-def GroupEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO GroupEffect :=
+@[macro_inline] def GroupEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO GroupEffect := Internal.api "Lasm.JS.Web.GroupEffect.new" do
   Lasm.JS.Binding.invoke GroupEffect { name := "Lasm.JS.Web.GroupEffect.new", module := "globalThis", path := "GroupEffect", construct := true, arity := 2 }
-    (Support.args #[toJS children, Support.optional timing]) (await := false)
+    (Internal.args #[toJS children, Internal.optional timing]) (await := false)
 
 /-- `readonly attribute AnimationNodeList children` -/
-def GroupEffect.children (self : GroupEffect) : IO AnimationNodeList := do
+@[macro_inline] def GroupEffect.children (self : GroupEffect) : IO AnimationNodeList := Internal.api "Lasm.JS.Web.GroupEffect.children" do
   let r ← self.val.get "children" Value
   pure { val := r }
 
 /-- `readonly attribute AnimationEffect? firstChild` -/
-def GroupEffect.firstChild (self : GroupEffect) : IO (Option AnimationEffect) := self.val.get "firstChild" (Option AnimationEffect)
+@[macro_inline] def GroupEffect.firstChild (self : GroupEffect) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.GroupEffect.firstChild" do
+  self.val.get "firstChild" (Option AnimationEffect)
 
 /-- `readonly attribute AnimationEffect? lastChild` -/
-def GroupEffect.lastChild (self : GroupEffect) : IO (Option AnimationEffect) := self.val.get "lastChild" (Option AnimationEffect)
+@[macro_inline] def GroupEffect.lastChild (self : GroupEffect) : IO (Option AnimationEffect) := Internal.api "Lasm.JS.Web.GroupEffect.lastChild" do
+  self.val.get "lastChild" (Option AnimationEffect)
 
 /-- `GroupEffect clone()` -/
-def GroupEffect.clone (self : GroupEffect) : IO GroupEffect := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def GroupEffect.clone (self : GroupEffect) : IO GroupEffect := Internal.api "Lasm.JS.Web.GroupEffect.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined prepend(AnimationEffect... effects)` -/
-def GroupEffect.prepend (self : GroupEffect) (effects : Array AnimationEffect := #[]) : IO Unit :=
-  self.val.callMethod "prepend" (Support.argsWith #[] (effects.map toJS)) Unit
+@[macro_inline] def GroupEffect.prepend (self : GroupEffect) (effects : Array AnimationEffect := #[]) : IO Unit := Internal.api "Lasm.JS.Web.GroupEffect.prepend" do
+  self.val.callMethod "prepend" (Internal.argsWith #[] (effects.map toJS)) Unit
 
 /-- `undefined append(AnimationEffect... effects)` -/
-def GroupEffect.append (self : GroupEffect) (effects : Array AnimationEffect := #[]) : IO Unit :=
-  self.val.callMethod "append" (Support.argsWith #[] (effects.map toJS)) Unit
+@[macro_inline] def GroupEffect.append (self : GroupEffect) (effects : Array AnimationEffect := #[]) : IO Unit := Internal.api "Lasm.JS.Web.GroupEffect.append" do
+  self.val.callMethod "append" (Internal.argsWith #[] (effects.map toJS)) Unit
 
 /-- `v instanceof DocumentTimeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentTimeline`). -/
-def DocumentTimeline.cast? (v : Value) : IO (Option DocumentTimeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentTimeline"] Value) v) then some { val := v } else none
+@[macro_inline] def DocumentTimeline.cast? (v : Value) : IO (Option DocumentTimeline) := Internal.api "Lasm.JS.Web.DocumentTimeline.cast?" do
+  Internal.cast (Internal.getGlobal ["DocumentTimeline"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DocumentTimelineOptions options)` -/
-def DocumentTimeline.new (options : Option DocumentTimelineOptions := none) : IO DocumentTimeline :=
+@[macro_inline] def DocumentTimeline.new (options : Option DocumentTimelineOptions := none) : IO DocumentTimeline := Internal.api "Lasm.JS.Web.DocumentTimeline.new" do
   Lasm.JS.Binding.invoke DocumentTimeline { name := "Lasm.JS.Web.DocumentTimeline.new", module := "globalThis", path := "DocumentTimeline", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `v instanceof KeyframeEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyframeEffect`). -/
-def KeyframeEffect.cast? (v : Value) : IO (Option KeyframeEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["KeyframeEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def KeyframeEffect.cast? (v : Value) : IO (Option KeyframeEffect) := Internal.api "Lasm.JS.Web.KeyframeEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["KeyframeEffect"] Value) (fun x => { val := x }) v
 
 /-- `constructor(Element? target, object? keyframes, optional (unrestricted double or KeyframeEffectOptions) options)` -/
-def KeyframeEffect.new (target : Option Element) (keyframes : Option Data) (options : Option UnrestrictedDoubleOrKeyframeEffectOptions := none) : IO KeyframeEffect :=
+@[macro_inline] def KeyframeEffect.new (target : Option Element) (keyframes : Option Data) (options : Option UnrestrictedDoubleOrKeyframeEffectOptions := none) : IO KeyframeEffect := Internal.api "Lasm.JS.Web.KeyframeEffect.new" do
   Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.new", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 3 }
-    (Support.args #[toJS target, toJS keyframes, Support.optional options]) (await := false)
+    (Internal.args #[toJS target, toJS keyframes, Internal.optional options]) (await := false)
 
 /-- `constructor(KeyframeEffect source)` -/
-def KeyframeEffect.newWithSource (source : KeyframeEffect) : IO KeyframeEffect :=
+@[macro_inline] def KeyframeEffect.newWithSource (source : KeyframeEffect) : IO KeyframeEffect := Internal.api "Lasm.JS.Web.KeyframeEffect.newWithSource" do
   Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.newWithSource", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 1 }
-    (Support.args #[toJS source]) (await := false)
+    (Internal.args #[toJS source]) (await := false)
 
 /-- `attribute Element? target` -/
-def KeyframeEffect.target (self : KeyframeEffect) : IO (Option Element) := self.val.get "target" (Option Element)
+@[macro_inline] def KeyframeEffect.target (self : KeyframeEffect) : IO (Option Element) := Internal.api "Lasm.JS.Web.KeyframeEffect.target" do
+  self.val.get "target" (Option Element)
 
 /-- Sets `target`: `attribute Element? target` -/
-def KeyframeEffect.setTarget (self : KeyframeEffect) (value : Option Element) : IO Unit :=
+@[macro_inline] def KeyframeEffect.setTarget (self : KeyframeEffect) (value : Option Element) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setTarget" do
   self.val.set "target" (toJS value)
 
 /-- `attribute CSSOMString? pseudoElement` -/
-def KeyframeEffect.pseudoElement (self : KeyframeEffect) : IO (Option String) := self.val.get "pseudoElement" (Option String)
+@[macro_inline] def KeyframeEffect.pseudoElement (self : KeyframeEffect) : IO (Option String) := Internal.api "Lasm.JS.Web.KeyframeEffect.pseudoElement" do
+  self.val.get "pseudoElement" (Option String)
 
 /-- Sets `pseudoElement`: `attribute CSSOMString? pseudoElement` -/
-def KeyframeEffect.setPseudoElement (self : KeyframeEffect) (value : Option String) : IO Unit :=
+@[macro_inline] def KeyframeEffect.setPseudoElement (self : KeyframeEffect) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setPseudoElement" do
   self.val.set "pseudoElement" (toJS value)
 
 /-- `attribute CompositeOperation composite` -/
-def KeyframeEffect.composite (self : KeyframeEffect) : IO CompositeOperation := self.val.get "composite" CompositeOperation
+@[macro_inline] def KeyframeEffect.composite (self : KeyframeEffect) : IO CompositeOperation := Internal.api "Lasm.JS.Web.KeyframeEffect.composite" do
+  self.val.get "composite" CompositeOperation
 
 /-- Sets `composite`: `attribute CompositeOperation composite` -/
-def KeyframeEffect.setComposite (self : KeyframeEffect) (value : CompositeOperation) : IO Unit :=
+@[macro_inline] def KeyframeEffect.setComposite (self : KeyframeEffect) (value : CompositeOperation) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setComposite" do
   self.val.set "composite" (toJS value)
 
 /-- `attribute IterationCompositeOperation iterationComposite` -/
-def KeyframeEffect.iterationComposite (self : KeyframeEffect) : IO IterationCompositeOperation := self.val.get "iterationComposite" IterationCompositeOperation
+@[macro_inline] def KeyframeEffect.iterationComposite (self : KeyframeEffect) : IO IterationCompositeOperation := Internal.api "Lasm.JS.Web.KeyframeEffect.iterationComposite" do
+  self.val.get "iterationComposite" IterationCompositeOperation
 
 /-- Sets `iterationComposite`: `attribute IterationCompositeOperation iterationComposite` -/
-def KeyframeEffect.setIterationComposite (self : KeyframeEffect) (value : IterationCompositeOperation) : IO Unit :=
+@[macro_inline] def KeyframeEffect.setIterationComposite (self : KeyframeEffect) (value : IterationCompositeOperation) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setIterationComposite" do
   self.val.set "iterationComposite" (toJS value)
 
 /-- `sequence<object> getKeyframes()` -/
-def KeyframeEffect.getKeyframes (self : KeyframeEffect) : IO (Array Data) :=
-  self.val.callMethod "getKeyframes" (Support.args #[]) (Array Data)
+@[macro_inline] def KeyframeEffect.getKeyframes (self : KeyframeEffect) : IO (Array Data) := Internal.api "Lasm.JS.Web.KeyframeEffect.getKeyframes" do
+  self.val.callMethod "getKeyframes" (Internal.args #[]) (Array Data)
 
 /-- `undefined setKeyframes(object? keyframes)` -/
-def KeyframeEffect.setKeyframes (self : KeyframeEffect) (keyframes : Option Data) : IO Unit :=
-  self.val.callMethod "setKeyframes" (Support.args #[toJS keyframes]) Unit
+@[macro_inline] def KeyframeEffect.setKeyframes (self : KeyframeEffect) (keyframes : Option Data) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setKeyframes" do
+  self.val.callMethod "setKeyframes" (Internal.args #[toJS keyframes]) Unit
 
 /-- `v instanceof SequenceEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SequenceEffect`). -/
-def SequenceEffect.cast? (v : Value) : IO (Option SequenceEffect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SequenceEffect"] Value) v) then some { val := v } else none
+@[macro_inline] def SequenceEffect.cast? (v : Value) : IO (Option SequenceEffect) := Internal.api "Lasm.JS.Web.SequenceEffect.cast?" do
+  Internal.cast (Internal.getGlobal ["SequenceEffect"] Value) (fun x => { val := x }) v
 
 /-- `constructor(sequence<AnimationEffect>? children, optional (unrestricted double or EffectTiming) timing)` -/
-def SequenceEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO SequenceEffect :=
+@[macro_inline] def SequenceEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO SequenceEffect := Internal.api "Lasm.JS.Web.SequenceEffect.new" do
   Lasm.JS.Binding.invoke SequenceEffect { name := "Lasm.JS.Web.SequenceEffect.new", module := "globalThis", path := "SequenceEffect", construct := true, arity := 2 }
-    (Support.args #[toJS children, Support.optional timing]) (await := false)
+    (Internal.args #[toJS children, Internal.optional timing]) (await := false)
 
 /-- `SequenceEffect clone()` -/
-def SequenceEffect.clone (self : SequenceEffect) : IO SequenceEffect := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def SequenceEffect.clone (self : SequenceEffect) : IO SequenceEffect := Internal.api "Lasm.JS.Web.SequenceEffect.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readonly attribute DocumentTimeline timeline` -/
-def Document.timeline (self : Document) : IO DocumentTimeline := do
+@[macro_inline] def Document.timeline (self : Document) : IO DocumentTimeline := Internal.api "Lasm.JS.Web.Document.timeline" do
   let r ← self.val.get "timeline" Value
   pure { val := r }
 
 /-- `sequence<Animation> getAnimations()` -/
-def Document.getAnimations (self : Document) : IO (Array Animation) :=
-  self.val.callMethod "getAnimations" (Support.args #[]) (Array Animation)
+@[macro_inline] def Document.getAnimations (self : Document) : IO (Array Animation) := Internal.api "Lasm.JS.Web.Document.getAnimations" do
+  self.val.callMethod "getAnimations" (Internal.args #[]) (Array Animation)
 
 /-- `Animation animate(object? keyframes, optional (unrestricted double or KeyframeAnimationOptions) options)` -/
-def Element.animate (self : Element) (keyframes : Option Data) (options : Option UnrestrictedDoubleOrKeyframeAnimationOptions := none) : IO Animation := do
-  let r ← self.val.callMethod "animate" (Support.args #[toJS keyframes, Support.optional options]) Value
+@[macro_inline] def Element.animate (self : Element) (keyframes : Option Data) (options : Option UnrestrictedDoubleOrKeyframeAnimationOptions := none) : IO Animation := Internal.api "Lasm.JS.Web.Element.animate" do
+  let r ← self.val.callMethod "animate" (Internal.args #[toJS keyframes, Internal.optional options]) Value
   pure { val := r }
 
 /-- `sequence<Animation> getAnimations(optional GetAnimationsOptions options)` -/
-def Element.getAnimations (self : Element) (options : Option GetAnimationsOptions := none) : IO (Array Animation) :=
-  self.val.callMethod "getAnimations" (Support.args #[Support.optional options]) (Array Animation)
+@[macro_inline] def Element.getAnimations (self : Element) (options : Option GetAnimationsOptions := none) : IO (Array Animation) := Internal.api "Lasm.JS.Web.Element.getAnimations" do
+  self.val.callMethod "getAnimations" (Internal.args #[Internal.optional options]) (Array Animation)
 
 /-- `sequence<Animation> getAnimations()` -/
-def ShadowRoot.getAnimations (self : ShadowRoot) : IO (Array Animation) :=
-  self.val.callMethod "getAnimations" (Support.args #[]) (Array Animation)
+@[macro_inline] def ShadowRoot.getAnimations (self : ShadowRoot) : IO (Array Animation) := Internal.api "Lasm.JS.Web.ShadowRoot.getAnimations" do
+  self.val.callMethod "getAnimations" (Internal.args #[]) (Array Animation)
 
 end Lasm.JS.Web

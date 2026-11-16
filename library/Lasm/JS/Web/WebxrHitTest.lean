@@ -6,32 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.WebxrHitTest
 import Lasm.JS.Web.Geometry
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRHitTestTrackableType` (WebXR Hit Test Module (https://immersive-web.github.io/hit-test/)): "point", "plane", "mesh". -/
-inductive XRHitTestTrackableType where
-  /-- "point" -/
-  | point
-  /-- "plane" -/
-  | plane
-  /-- "mesh" -/
-  | mesh
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRHitTestTrackableType := ⟨fun
-  | .point => .string "point"
-  | .plane => .string "plane"
-  | .mesh => .string "mesh"⟩
-instance : FromJS XRHitTestTrackableType where
-  fromJS
-    | .string "point" => .ok .point
-    | .string "plane" => .ok .plane
-    | .string "mesh" => .ok .mesh
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRHitTestTrackableType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRRayDirectionInit` (WebXR Hit Test Module (https://immersive-web.github.io/hit-test/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRRayDirectionInit where
@@ -43,10 +27,10 @@ structure XRRayDirectionInit where
   z : Option Float := none
   /-- `double w = 0` -/
   w : Option Float := none
-instance : ToJS XRRayDirectionInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("z", Support.optional d.z),
-    ("w", Support.optional d.w)]⟩
+instance : ToJS XRRayDirectionInit := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("z", Internal.optional d.z),
+    ("w", Internal.optional d.w)]⟩
 
 /-- `dictionary XRHitTestOptionsInit` (WebXR Hit Test Module (https://immersive-web.github.io/hit-test/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRHitTestOptionsInit where
@@ -56,9 +40,9 @@ structure XRHitTestOptionsInit where
   entityTypes : Option (Array XRHitTestTrackableType) := none
   /-- `XRRay offsetRay` -/
   offsetRay : Option XRRay := none
-instance : ToJS XRHitTestOptionsInit := ⟨fun d => Support.fields #[("space", toJS d.space),
-    ("entityTypes", Support.optional d.entityTypes),
-    ("offsetRay", Support.optional d.offsetRay)]⟩
+instance : ToJS XRHitTestOptionsInit := ⟨fun d => Internal.fields #[("space", toJS d.space),
+    ("entityTypes", Internal.optional d.entityTypes),
+    ("offsetRay", Internal.optional d.offsetRay)]⟩
 
 /-- `dictionary XRTransientInputHitTestOptionsInit` (WebXR Hit Test Module (https://immersive-web.github.io/hit-test/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRTransientInputHitTestOptionsInit where
@@ -68,91 +52,92 @@ structure XRTransientInputHitTestOptionsInit where
   entityTypes : Option (Array XRHitTestTrackableType) := none
   /-- `XRRay offsetRay` -/
   offsetRay : Option XRRay := none
-instance : ToJS XRTransientInputHitTestOptionsInit := ⟨fun d => Support.fields #[("profile", toJS d.profile),
-    ("entityTypes", Support.optional d.entityTypes),
-    ("offsetRay", Support.optional d.offsetRay)]⟩
+instance : ToJS XRTransientInputHitTestOptionsInit := ⟨fun d => Internal.fields #[("profile", toJS d.profile),
+    ("entityTypes", Internal.optional d.entityTypes),
+    ("offsetRay", Internal.optional d.offsetRay)]⟩
 
 /-- `v instanceof XRHitTestResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRHitTestResult`). -/
-def XRHitTestResult.cast? (v : Value) : IO (Option XRHitTestResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRHitTestResult"] Value) v) then some { val := v } else none
+@[macro_inline] def XRHitTestResult.cast? (v : Value) : IO (Option XRHitTestResult) := Internal.api "Lasm.JS.Web.XRHitTestResult.cast?" do
+  Internal.cast (Internal.getGlobal ["XRHitTestResult"] Value) (fun x => { val := x }) v
 
 /-- `XRPose? getPose(XRSpace baseSpace)` -/
-def XRHitTestResult.getPose (self : XRHitTestResult) (baseSpace : XRSpace) : IO (Option XRPose) :=
-  self.val.callMethod "getPose" (Support.args #[toJS baseSpace]) (Option XRPose)
+@[macro_inline] def XRHitTestResult.getPose (self : XRHitTestResult) (baseSpace : XRSpace) : IO (Option XRPose) := Internal.api "Lasm.JS.Web.XRHitTestResult.getPose" do
+  self.val.callMethod "getPose" (Internal.args #[toJS baseSpace]) (Option XRPose)
 
 /-- `v instanceof XRHitTestSource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRHitTestSource`). -/
-def XRHitTestSource.cast? (v : Value) : IO (Option XRHitTestSource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRHitTestSource"] Value) v) then some { val := v } else none
+@[macro_inline] def XRHitTestSource.cast? (v : Value) : IO (Option XRHitTestSource) := Internal.api "Lasm.JS.Web.XRHitTestSource.cast?" do
+  Internal.cast (Internal.getGlobal ["XRHitTestSource"] Value) (fun x => { val := x }) v
 
 /-- `undefined cancel()` -/
-def XRHitTestSource.cancel (self : XRHitTestSource) : IO Unit :=
-  self.val.callMethod "cancel" (Support.args #[]) Unit
+@[macro_inline] def XRHitTestSource.cancel (self : XRHitTestSource) : IO Unit := Internal.api "Lasm.JS.Web.XRHitTestSource.cancel" do
+  self.val.callMethod "cancel" (Internal.args #[]) Unit
 
 /-- `v instanceof XRRay`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRRay`). -/
-def XRRay.cast? (v : Value) : IO (Option XRRay) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRRay"] Value) v) then some { val := v } else none
+@[macro_inline] def XRRay.cast? (v : Value) : IO (Option XRRay) := Internal.api "Lasm.JS.Web.XRRay.cast?" do
+  Internal.cast (Internal.getGlobal ["XRRay"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMPointInit origin, optional XRRayDirectionInit direction)` -/
-def XRRay.new (origin : Option DOMPointInit := none) (direction : Option XRRayDirectionInit := none) : IO XRRay :=
+@[macro_inline] def XRRay.new (origin : Option DOMPointInit := none) (direction : Option XRRayDirectionInit := none) : IO XRRay := Internal.api "Lasm.JS.Web.XRRay.new" do
   Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.new", module := "globalThis", path := "XRRay", construct := true, arity := 2 }
-    (Support.args #[Support.optional origin, Support.optional direction]) (await := false)
+    (Internal.args #[Internal.optional origin, Internal.optional direction]) (await := false)
 
 /-- `constructor(XRRigidTransform transform)` -/
-def XRRay.newWithTransform (transform : XRRigidTransform) : IO XRRay :=
+@[macro_inline] def XRRay.newWithTransform (transform : XRRigidTransform) : IO XRRay := Internal.api "Lasm.JS.Web.XRRay.newWithTransform" do
   Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.newWithTransform", module := "globalThis", path := "XRRay", construct := true, arity := 1 }
-    (Support.args #[toJS transform]) (await := false)
+    (Internal.args #[toJS transform]) (await := false)
 
 /-- `readonly attribute DOMPointReadOnly origin` -/
-def XRRay.origin (self : XRRay) : IO DOMPointReadOnly := do
+@[macro_inline] def XRRay.origin (self : XRRay) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRay.origin" do
   let r ← self.val.get "origin" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPointReadOnly direction` -/
-def XRRay.direction (self : XRRay) : IO DOMPointReadOnly := do
+@[macro_inline] def XRRay.direction (self : XRRay) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRay.direction" do
   let r ← self.val.get "direction" Value
   pure { val := r }
 
 /-- `readonly attribute Float32Array matrix` -/
-def XRRay.matrix (self : XRRay) : IO ByteArray := do
+@[macro_inline] def XRRay.matrix (self : XRRay) : IO ByteArray := Internal.api "Lasm.JS.Web.XRRay.matrix" do
   let r ← self.val.get "matrix" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `v instanceof XRTransientInputHitTestResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRTransientInputHitTestResult`). -/
-def XRTransientInputHitTestResult.cast? (v : Value) : IO (Option XRTransientInputHitTestResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRTransientInputHitTestResult"] Value) v) then some { val := v } else none
+@[macro_inline] def XRTransientInputHitTestResult.cast? (v : Value) : IO (Option XRTransientInputHitTestResult) := Internal.api "Lasm.JS.Web.XRTransientInputHitTestResult.cast?" do
+  Internal.cast (Internal.getGlobal ["XRTransientInputHitTestResult"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRInputSource inputSource` -/
-def XRTransientInputHitTestResult.inputSource (self : XRTransientInputHitTestResult) : IO XRInputSource := do
+@[macro_inline] def XRTransientInputHitTestResult.inputSource (self : XRTransientInputHitTestResult) : IO XRInputSource := Internal.api "Lasm.JS.Web.XRTransientInputHitTestResult.inputSource" do
   let r ← self.val.get "inputSource" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<XRHitTestResult> results` -/
-def XRTransientInputHitTestResult.results (self : XRTransientInputHitTestResult) : IO (Array XRHitTestResult) := self.val.get "results" (Array XRHitTestResult)
+@[macro_inline] def XRTransientInputHitTestResult.results (self : XRTransientInputHitTestResult) : IO (Array XRHitTestResult) := Internal.api "Lasm.JS.Web.XRTransientInputHitTestResult.results" do
+  self.val.get "results" (Array XRHitTestResult)
 
 /-- `v instanceof XRTransientInputHitTestSource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRTransientInputHitTestSource`). -/
-def XRTransientInputHitTestSource.cast? (v : Value) : IO (Option XRTransientInputHitTestSource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRTransientInputHitTestSource"] Value) v) then some { val := v } else none
+@[macro_inline] def XRTransientInputHitTestSource.cast? (v : Value) : IO (Option XRTransientInputHitTestSource) := Internal.api "Lasm.JS.Web.XRTransientInputHitTestSource.cast?" do
+  Internal.cast (Internal.getGlobal ["XRTransientInputHitTestSource"] Value) (fun x => { val := x }) v
 
 /-- `undefined cancel()` -/
-def XRTransientInputHitTestSource.cancel (self : XRTransientInputHitTestSource) : IO Unit :=
-  self.val.callMethod "cancel" (Support.args #[]) Unit
+@[macro_inline] def XRTransientInputHitTestSource.cancel (self : XRTransientInputHitTestSource) : IO Unit := Internal.api "Lasm.JS.Web.XRTransientInputHitTestSource.cancel" do
+  self.val.callMethod "cancel" (Internal.args #[]) Unit
 
 /-- `sequence<XRHitTestResult> getHitTestResults(XRHitTestSource hitTestSource)` -/
-def XRFrame.getHitTestResults (self : XRFrame) (hitTestSource : XRHitTestSource) : IO (Array XRHitTestResult) :=
-  self.val.callMethod "getHitTestResults" (Support.args #[toJS hitTestSource]) (Array XRHitTestResult)
+@[macro_inline] def XRFrame.getHitTestResults (self : XRFrame) (hitTestSource : XRHitTestSource) : IO (Array XRHitTestResult) := Internal.api "Lasm.JS.Web.XRFrame.getHitTestResults" do
+  self.val.callMethod "getHitTestResults" (Internal.args #[toJS hitTestSource]) (Array XRHitTestResult)
 
 /-- `sequence<XRTransientInputHitTestResult> getHitTestResultsForTransientInput(XRTransientInputHitTestSource hitTestSource)` -/
-def XRFrame.getHitTestResultsForTransientInput (self : XRFrame) (hitTestSource : XRTransientInputHitTestSource) : IO (Array XRTransientInputHitTestResult) :=
-  self.val.callMethod "getHitTestResultsForTransientInput" (Support.args #[toJS hitTestSource]) (Array XRTransientInputHitTestResult)
+@[macro_inline] def XRFrame.getHitTestResultsForTransientInput (self : XRFrame) (hitTestSource : XRTransientInputHitTestSource) : IO (Array XRTransientInputHitTestResult) := Internal.api "Lasm.JS.Web.XRFrame.getHitTestResultsForTransientInput" do
+  self.val.callMethod "getHitTestResultsForTransientInput" (Internal.args #[toJS hitTestSource]) (Array XRTransientInputHitTestResult)
 
 /-- `Promise<XRHitTestSource> requestHitTestSource(XRHitTestOptionsInit options)` -/
-def XRSession.requestHitTestSource (self : XRSession) (options : XRHitTestOptionsInit) : Async XRHitTestSource := do
-  let r ← self.val.callMethodAwait "requestHitTestSource" (Support.args #[toJS options]) Value
+@[macro_inline] def XRSession.requestHitTestSource (self : XRSession) (options : XRHitTestOptionsInit) : Async XRHitTestSource := Internal.api "Lasm.JS.Web.XRSession.requestHitTestSource" do
+  let r ← self.val.callMethodAwait "requestHitTestSource" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `Promise<XRTransientInputHitTestSource> requestHitTestSourceForTransientInput(XRTransientInputHitTestOptionsInit options)` -/
-def XRSession.requestHitTestSourceForTransientInput (self : XRSession) (options : XRTransientInputHitTestOptionsInit) : Async XRTransientInputHitTestSource := do
-  let r ← self.val.callMethodAwait "requestHitTestSourceForTransientInput" (Support.args #[toJS options]) Value
+@[macro_inline] def XRSession.requestHitTestSourceForTransientInput (self : XRSession) (options : XRTransientInputHitTestOptionsInit) : Async XRTransientInputHitTestSource := Internal.api "Lasm.JS.Web.XRSession.requestHitTestSourceForTransientInput" do
+  let r ← self.val.callMethodAwait "requestHitTestSourceForTransientInput" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

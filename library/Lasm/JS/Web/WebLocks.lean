@@ -6,27 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.WebLocks
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum LockMode` (Web Locks API (https://w3c.github.io/web-locks/)): "shared", "exclusive". -/
-inductive LockMode where
-  /-- "shared" -/
-  | shared
-  /-- "exclusive" -/
-  | exclusive
-  deriving BEq, Repr, Inhabited
-instance : ToJS LockMode := ⟨fun
-  | .shared => .string "shared"
-  | .exclusive => .string "exclusive"⟩
-instance : FromJS LockMode where
-  fromJS
-    | .string "shared" => .ok .shared
-    | .string "exclusive" => .ok .exclusive
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LockMode"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback LockGrantedCallback = Promise<any> (Lock? lock)` (Web Locks API (https://w3c.github.io/web-locks/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure LockGrantedCallback where
@@ -37,10 +25,10 @@ instance : ToJS LockGrantedCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS LockGrantedCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.LockGrantedCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def LockGrantedCallback.ofFn (f : (Option Lock) → Async Data) : IO LockGrantedCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option Lock) args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option Lock) args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def LockGrantedCallback.ofSyncFn (f : (Option Lock) → IO Data) : IO LockGrantedCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option Lock) args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option Lock) args 0)) }
 
 /-- `dictionary LockOptions` (Web Locks API (https://w3c.github.io/web-locks/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LockOptions where
@@ -52,10 +40,10 @@ structure LockOptions where
   steal : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS LockOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
-    ("ifAvailable", Support.optional d.ifAvailable),
-    ("steal", Support.optional d.steal),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS LockOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode),
+    ("ifAvailable", Internal.optional d.ifAvailable),
+    ("steal", Internal.optional d.steal),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary LockInfo` (Web Locks API (https://w3c.github.io/web-locks/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LockInfo where
@@ -65,6 +53,9 @@ structure LockInfo where
   mode : Option LockMode := none
   /-- `DOMString clientId` -/
   clientId : Option String := none
+instance : ToJS LockInfo := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("mode", Internal.optional d.mode),
+    ("clientId", Internal.optional d.clientId)]⟩
 instance : FromJS LockInfo where
   fromJS d := do return {
     name := ← Lasm.JS.readField (Option String) d "name",
@@ -78,6 +69,8 @@ structure LockManagerSnapshot where
   held : Option (Array LockInfo) := none
   /-- `sequence<LockInfo> pending` -/
   pending : Option (Array LockInfo) := none
+instance : ToJS LockManagerSnapshot := ⟨fun d => Internal.fields #[("held", Internal.optional d.held),
+    ("pending", Internal.optional d.pending)]⟩
 instance : FromJS LockManagerSnapshot where
   fromJS d := do return {
     held := ← Lasm.JS.readField (Option (Array LockInfo)) d "held",
@@ -85,38 +78,40 @@ instance : FromJS LockManagerSnapshot where
   typeName := "Lasm.JS.Web.LockManagerSnapshot"
 
 /-- `v instanceof Lock`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Lock`). -/
-def Lock.cast? (v : Value) : IO (Option Lock) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Lock"] Value) v) then some { val := v } else none
+@[macro_inline] def Lock.cast? (v : Value) : IO (Option Lock) := Internal.api "Lasm.JS.Web.Lock.cast?" do
+  Internal.cast (Internal.getGlobal ["Lock"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def Lock.name (self : Lock) : IO String := self.val.get "name" String
+@[macro_inline] def Lock.name (self : Lock) : IO String := Internal.api "Lasm.JS.Web.Lock.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute LockMode mode` -/
-def Lock.mode (self : Lock) : IO LockMode := self.val.get "mode" LockMode
+@[macro_inline] def Lock.mode (self : Lock) : IO LockMode := Internal.api "Lasm.JS.Web.Lock.mode" do
+  self.val.get "mode" LockMode
 
 /-- `v instanceof LockManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LockManager`). -/
-def LockManager.cast? (v : Value) : IO (Option LockManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LockManager"] Value) v) then some { val := v } else none
+@[macro_inline] def LockManager.cast? (v : Value) : IO (Option LockManager) := Internal.api "Lasm.JS.Web.LockManager.cast?" do
+  Internal.cast (Internal.getGlobal ["LockManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<any> request(DOMString name, LockGrantedCallback callback)` -/
-def LockManager.request (self : LockManager) (name : String) (callback : LockGrantedCallback) : Async Data :=
-  self.val.callMethodAwait "request" (Support.args #[toJS name, toJS callback]) Data
+@[macro_inline] def LockManager.request (self : LockManager) (name : String) (callback : LockGrantedCallback) : Async Data := Internal.api "Lasm.JS.Web.LockManager.request" do
+  self.val.callMethodAwait "request" (Internal.args #[toJS name, toJS callback]) Data
 
 /-- `Promise<any> request(DOMString name, LockOptions options, LockGrantedCallback callback)` -/
-def LockManager.requestWithOptions (self : LockManager) (name : String) (options : LockOptions) (callback : LockGrantedCallback) : Async Data :=
-  self.val.callMethodAwait "request" (Support.args #[toJS name, toJS options, toJS callback]) Data
+@[macro_inline] def LockManager.requestWithOptions (self : LockManager) (name : String) (options : LockOptions) (callback : LockGrantedCallback) : Async Data := Internal.api "Lasm.JS.Web.LockManager.requestWithOptions" do
+  self.val.callMethodAwait "request" (Internal.args #[toJS name, toJS options, toJS callback]) Data
 
 /-- `Promise<LockManagerSnapshot> query()` -/
-def LockManager.query (self : LockManager) : Async LockManagerSnapshot :=
-  self.val.callMethodAwait "query" (Support.args #[]) LockManagerSnapshot
+@[macro_inline] def LockManager.query (self : LockManager) : Async LockManagerSnapshot := Internal.api "Lasm.JS.Web.LockManager.query" do
+  self.val.callMethodAwait "query" (Internal.args #[]) LockManagerSnapshot
 
 /-- `readonly attribute LockManager locks` -/
-def Navigator.locks (self : Navigator) : IO LockManager := do
+@[macro_inline] def Navigator.locks (self : Navigator) : IO LockManager := Internal.api "Lasm.JS.Web.Navigator.locks" do
   let r ← self.val.get "locks" Value
   pure { val := r }
 
 /-- `readonly attribute LockManager locks` -/
-def WorkerNavigator.locks (self : WorkerNavigator) : IO LockManager := do
+@[macro_inline] def WorkerNavigator.locks (self : WorkerNavigator) : IO LockManager := Internal.api "Lasm.JS.Web.WorkerNavigator.locks" do
   let r ← self.val.get "locks" Value
   pure { val := r }
 

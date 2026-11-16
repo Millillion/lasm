@@ -6,23 +6,27 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.ANGLEInstancedArrays
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE = 0x88FE` -/
 def ANGLE_instanced_arrays.VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE : Nat := 0x88FE
 
 /-- `undefined drawArraysInstancedANGLE(GLenum mode, GLint first, GLsizei count, GLsizei primcount)` -/
-def ANGLE_instanced_arrays.drawArraysInstancedANGLE (self : ANGLE_instanced_arrays) (mode : Nat) (first : Int) (count : Int) (primcount : Int) : IO Unit :=
-  self.val.callMethod "drawArraysInstancedANGLE" (Support.args #[toJS mode, toJS first, toJS count, toJS primcount]) Unit
+@[macro_inline] def ANGLE_instanced_arrays.drawArraysInstancedANGLE (self : ANGLE_instanced_arrays) (mode : Nat) (first : Int) (count : Int) (primcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.ANGLE_instanced_arrays.drawArraysInstancedANGLE" do
+  self.val.callMethod "drawArraysInstancedANGLE" (Internal.args #[toJS mode, toJS first, toJS count, toJS primcount]) Unit
 
 /-- `undefined drawElementsInstancedANGLE(GLenum mode, GLsizei count, GLenum type, GLintptr offset, GLsizei primcount)` -/
-def ANGLE_instanced_arrays.drawElementsInstancedANGLE (self : ANGLE_instanced_arrays) (mode : Nat) (count : Int) (type : Nat) (offset : Int) (primcount : Int) : IO Unit :=
-  self.val.callMethod "drawElementsInstancedANGLE" (Support.args #[toJS mode, toJS count, toJS type, toJS offset, toJS primcount]) Unit
+@[macro_inline] def ANGLE_instanced_arrays.drawElementsInstancedANGLE (self : ANGLE_instanced_arrays) (mode : Nat) (count : Int) (type : Nat) (offset : Int) (primcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.ANGLE_instanced_arrays.drawElementsInstancedANGLE" do
+  self.val.callMethod "drawElementsInstancedANGLE" (Internal.args #[toJS mode, toJS count, toJS type, toJS offset, toJS primcount]) Unit
 
 /-- `undefined vertexAttribDivisorANGLE(GLuint index, GLuint divisor)` -/
-def ANGLE_instanced_arrays.vertexAttribDivisorANGLE (self : ANGLE_instanced_arrays) (index : Nat) (divisor : Nat) : IO Unit :=
-  self.val.callMethod "vertexAttribDivisorANGLE" (Support.args #[toJS index, toJS divisor]) Unit
+@[macro_inline] def ANGLE_instanced_arrays.vertexAttribDivisorANGLE (self : ANGLE_instanced_arrays) (index : Nat) (divisor : Nat) : IO Unit := Internal.api "Lasm.JS.Web.ANGLE_instanced_arrays.vertexAttribDivisorANGLE" do
+  self.val.callMethod "vertexAttribDivisorANGLE" (Internal.args #[toJS index, toJS divisor]) Unit
 
 end Lasm.JS.Web

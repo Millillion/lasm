@@ -6,116 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.Usb
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum USBRequestType` (WebUSB API (https://usb.spec.whatwg.org/)): "standard", "class", "vendor". -/
-inductive USBRequestType where
-  /-- "standard" -/
-  | standard
-  /-- "class" -/
-  | «class»
-  /-- "vendor" -/
-  | vendor
-  deriving BEq, Repr, Inhabited
-instance : ToJS USBRequestType := ⟨fun
-  | .standard => .string "standard"
-  | .«class» => .string "class"
-  | .vendor => .string "vendor"⟩
-instance : FromJS USBRequestType where
-  fromJS
-    | .string "standard" => .ok .standard
-    | .string "class" => .ok .«class»
-    | .string "vendor" => .ok .vendor
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.USBRequestType"
-
-/-- `enum USBRecipient` (WebUSB API (https://usb.spec.whatwg.org/)): "device", "interface", "endpoint", "other". -/
-inductive USBRecipient where
-  /-- "device" -/
-  | device
-  /-- "interface" -/
-  | interface
-  /-- "endpoint" -/
-  | endpoint
-  /-- "other" -/
-  | other
-  deriving BEq, Repr, Inhabited
-instance : ToJS USBRecipient := ⟨fun
-  | .device => .string "device"
-  | .interface => .string "interface"
-  | .endpoint => .string "endpoint"
-  | .other => .string "other"⟩
-instance : FromJS USBRecipient where
-  fromJS
-    | .string "device" => .ok .device
-    | .string "interface" => .ok .interface
-    | .string "endpoint" => .ok .endpoint
-    | .string "other" => .ok .other
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.USBRecipient"
-
-/-- `enum USBDirection` (WebUSB API (https://usb.spec.whatwg.org/)): "in", "out". -/
-inductive USBDirection where
-  /-- "in" -/
-  | «in»
-  /-- "out" -/
-  | out
-  deriving BEq, Repr, Inhabited
-instance : ToJS USBDirection := ⟨fun
-  | .«in» => .string "in"
-  | .out => .string "out"⟩
-instance : FromJS USBDirection where
-  fromJS
-    | .string "in" => .ok .«in»
-    | .string "out" => .ok .out
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.USBDirection"
-
-/-- `enum USBEndpointType` (WebUSB API (https://usb.spec.whatwg.org/)): "bulk", "interrupt", "isochronous". -/
-inductive USBEndpointType where
-  /-- "bulk" -/
-  | bulk
-  /-- "interrupt" -/
-  | interrupt
-  /-- "isochronous" -/
-  | isochronous
-  deriving BEq, Repr, Inhabited
-instance : ToJS USBEndpointType := ⟨fun
-  | .bulk => .string "bulk"
-  | .interrupt => .string "interrupt"
-  | .isochronous => .string "isochronous"⟩
-instance : FromJS USBEndpointType where
-  fromJS
-    | .string "bulk" => .ok .bulk
-    | .string "interrupt" => .ok .interrupt
-    | .string "isochronous" => .ok .isochronous
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.USBEndpointType"
-
-/-- `enum USBTransferStatus` (WebUSB API (https://usb.spec.whatwg.org/)): "ok", "stall", "babble". -/
-inductive USBTransferStatus where
-  /-- "ok" -/
-  | ok
-  /-- "stall" -/
-  | stall
-  /-- "babble" -/
-  | babble
-  deriving BEq, Repr, Inhabited
-instance : ToJS USBTransferStatus := ⟨fun
-  | .ok => .string "ok"
-  | .stall => .string "stall"
-  | .babble => .string "babble"⟩
-instance : FromJS USBTransferStatus where
-  fromJS
-    | .string "ok" => .ok .ok
-    | .string "stall" => .ok .stall
-    | .string "babble" => .ok .babble
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.USBTransferStatus"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary USBDeviceFilter` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure USBDeviceFilter where
@@ -131,12 +32,12 @@ structure USBDeviceFilter where
   protocolCode : Option Nat := none
   /-- `DOMString serialNumber` -/
   serialNumber : Option String := none
-instance : ToJS USBDeviceFilter := ⟨fun d => Support.fields #[("vendorId", Support.optional d.vendorId),
-    ("productId", Support.optional d.productId),
-    ("classCode", Support.optional d.classCode),
-    ("subclassCode", Support.optional d.subclassCode),
-    ("protocolCode", Support.optional d.protocolCode),
-    ("serialNumber", Support.optional d.serialNumber)]⟩
+instance : ToJS USBDeviceFilter := ⟨fun d => Internal.fields #[("vendorId", Internal.optional d.vendorId),
+    ("productId", Internal.optional d.productId),
+    ("classCode", Internal.optional d.classCode),
+    ("subclassCode", Internal.optional d.subclassCode),
+    ("protocolCode", Internal.optional d.protocolCode),
+    ("serialNumber", Internal.optional d.serialNumber)]⟩
 
 /-- `dictionary USBDeviceRequestOptions` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure USBDeviceRequestOptions where
@@ -144,8 +45,8 @@ structure USBDeviceRequestOptions where
   filters : Array USBDeviceFilter
   /-- `sequence<USBDeviceFilter> exclusionFilters = []` -/
   exclusionFilters : Option (Array USBDeviceFilter) := none
-instance : ToJS USBDeviceRequestOptions := ⟨fun d => Support.fields #[("filters", toJS d.filters),
-    ("exclusionFilters", Support.optional d.exclusionFilters)]⟩
+instance : ToJS USBDeviceRequestOptions := ⟨fun d => Internal.fields #[("filters", toJS d.filters),
+    ("exclusionFilters", Internal.optional d.exclusionFilters)]⟩
 
 /-- `dictionary USBConnectionEventInit : EventInit` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure USBConnectionEventInit where
@@ -157,9 +58,9 @@ structure USBConnectionEventInit where
   composed : Option Bool := none
   /-- `required USBDevice device` -/
   device : USBDevice
-instance : ToJS USBConnectionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS USBConnectionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("device", toJS d.device)]⟩
 
 /-- `dictionary USBControlTransferParameters` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -174,374 +75,460 @@ structure USBControlTransferParameters where
   value : Nat
   /-- `required unsigned short index` -/
   index : Nat
-instance : ToJS USBControlTransferParameters := ⟨fun d => Support.fields #[("requestType", toJS d.requestType),
+instance : ToJS USBControlTransferParameters := ⟨fun d => Internal.fields #[("requestType", toJS d.requestType),
     ("recipient", toJS d.recipient),
     ("request", toJS d.request),
     ("value", toJS d.value),
     ("index", toJS d.index)]⟩
 
+/-- `dictionary USBBlocklistEntry` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure USBBlocklistEntry where
+  /-- `required unsigned short idVendor` -/
+  idVendor : Nat
+  /-- `required unsigned short idProduct` -/
+  idProduct : Nat
+  /-- `required unsigned short bcdDevice` -/
+  bcdDevice : Nat
+instance : ToJS USBBlocklistEntry := ⟨fun d => Internal.fields #[("idVendor", toJS d.idVendor),
+    ("idProduct", toJS d.idProduct),
+    ("bcdDevice", toJS d.bcdDevice)]⟩
+
+/-- `dictionary USBPermissionDescriptor : PermissionDescriptor` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure USBPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `sequence<USBDeviceFilter> filters` -/
+  filters : Option (Array USBDeviceFilter) := none
+  /-- `sequence<USBDeviceFilter> exclusionFilters` -/
+  exclusionFilters : Option (Array USBDeviceFilter) := none
+instance : ToJS USBPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("filters", Internal.optional d.filters),
+    ("exclusionFilters", Internal.optional d.exclusionFilters)]⟩
+
+/-- `dictionary AllowedUSBDevice` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AllowedUSBDevice where
+  /-- `required octet vendorId` -/
+  vendorId : Nat
+  /-- `required octet productId` -/
+  productId : Nat
+  /-- `DOMString serialNumber` -/
+  serialNumber : Option String := none
+instance : ToJS AllowedUSBDevice := ⟨fun d => Internal.fields #[("vendorId", toJS d.vendorId),
+    ("productId", toJS d.productId),
+    ("serialNumber", Internal.optional d.serialNumber)]⟩
+
+/-- `dictionary USBPermissionStorage` (WebUSB API (https://usb.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure USBPermissionStorage where
+  /-- `sequence<AllowedUSBDevice> allowedDevices = []` -/
+  allowedDevices : Option (Array AllowedUSBDevice) := none
+instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedDevices", Internal.optional d.allowedDevices)]⟩
+
 /-- `v instanceof USB`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USB`). -/
-def USB.cast? (v : Value) : IO (Option USB) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USB"] Value) v) then some { val := v } else none
+@[macro_inline] def USB.cast? (v : Value) : IO (Option USB) := Internal.api "Lasm.JS.Web.USB.cast?" do
+  Internal.cast (Internal.getGlobal ["USB"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onconnect` -/
-def USB.onconnect (self : USB) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def USB.onconnect (self : USB) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.USB.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def USB.setOnconnect (self : USB) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def USB.setOnconnect (self : USB) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.USB.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler ondisconnect` -/
-def USB.ondisconnect (self : USB) : IO (Option EventHandlerNonNull) := self.val.get "ondisconnect" (Option EventHandlerNonNull)
+@[macro_inline] def USB.ondisconnect (self : USB) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.USB.ondisconnect" do
+  self.val.get "ondisconnect" (Option EventHandlerNonNull)
 
 /-- Sets `ondisconnect`: `attribute EventHandler ondisconnect` -/
-def USB.setOndisconnect (self : USB) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def USB.setOndisconnect (self : USB) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.USB.setOndisconnect" do
   self.val.set "ondisconnect" (toJS value)
 
 /-- `Promise<sequence<USBDevice>> getDevices()` -/
-def USB.getDevices (self : USB) : Async (Array USBDevice) :=
-  self.val.callMethodAwait "getDevices" (Support.args #[]) (Array USBDevice)
+@[macro_inline] def USB.getDevices (self : USB) : Async (Array USBDevice) := Internal.api "Lasm.JS.Web.USB.getDevices" do
+  self.val.callMethodAwait "getDevices" (Internal.args #[]) (Array USBDevice)
 
 /-- `Promise<USBDevice> requestDevice(USBDeviceRequestOptions options)` -/
-def USB.requestDevice (self : USB) (options : USBDeviceRequestOptions) : Async USBDevice := do
-  let r ← self.val.callMethodAwait "requestDevice" (Support.args #[toJS options]) Value
+@[macro_inline] def USB.requestDevice (self : USB) (options : USBDeviceRequestOptions) : Async USBDevice := Internal.api "Lasm.JS.Web.USB.requestDevice" do
+  let r ← self.val.callMethodAwait "requestDevice" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `v instanceof USBAlternateInterface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBAlternateInterface`). -/
-def USBAlternateInterface.cast? (v : Value) : IO (Option USBAlternateInterface) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBAlternateInterface"] Value) v) then some { val := v } else none
+@[macro_inline] def USBAlternateInterface.cast? (v : Value) : IO (Option USBAlternateInterface) := Internal.api "Lasm.JS.Web.USBAlternateInterface.cast?" do
+  Internal.cast (Internal.getGlobal ["USBAlternateInterface"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBInterface deviceInterface, octet alternateSetting)` -/
-def USBAlternateInterface.new (deviceInterface : USBInterface) (alternateSetting : Nat) : IO USBAlternateInterface :=
+@[macro_inline] def USBAlternateInterface.new (deviceInterface : USBInterface) (alternateSetting : Nat) : IO USBAlternateInterface := Internal.api "Lasm.JS.Web.USBAlternateInterface.new" do
   Lasm.JS.Binding.invoke USBAlternateInterface { name := "Lasm.JS.Web.USBAlternateInterface.new", module := "globalThis", path := "USBAlternateInterface", construct := true, arity := 2 }
-    (Support.args #[toJS deviceInterface, toJS alternateSetting]) (await := false)
+    (Internal.args #[toJS deviceInterface, toJS alternateSetting]) (await := false)
 
 /-- `readonly attribute octet alternateSetting` -/
-def USBAlternateInterface.alternateSetting (self : USBAlternateInterface) : IO Nat := self.val.get "alternateSetting" Nat
+@[macro_inline] def USBAlternateInterface.alternateSetting (self : USBAlternateInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBAlternateInterface.alternateSetting" do
+  self.val.get "alternateSetting" Nat
 
 /-- `readonly attribute octet interfaceClass` -/
-def USBAlternateInterface.interfaceClass (self : USBAlternateInterface) : IO Nat := self.val.get "interfaceClass" Nat
+@[macro_inline] def USBAlternateInterface.interfaceClass (self : USBAlternateInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBAlternateInterface.interfaceClass" do
+  self.val.get "interfaceClass" Nat
 
 /-- `readonly attribute octet interfaceSubclass` -/
-def USBAlternateInterface.interfaceSubclass (self : USBAlternateInterface) : IO Nat := self.val.get "interfaceSubclass" Nat
+@[macro_inline] def USBAlternateInterface.interfaceSubclass (self : USBAlternateInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBAlternateInterface.interfaceSubclass" do
+  self.val.get "interfaceSubclass" Nat
 
 /-- `readonly attribute octet interfaceProtocol` -/
-def USBAlternateInterface.interfaceProtocol (self : USBAlternateInterface) : IO Nat := self.val.get "interfaceProtocol" Nat
+@[macro_inline] def USBAlternateInterface.interfaceProtocol (self : USBAlternateInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBAlternateInterface.interfaceProtocol" do
+  self.val.get "interfaceProtocol" Nat
 
 /-- `readonly attribute DOMString? interfaceName` -/
-def USBAlternateInterface.interfaceName (self : USBAlternateInterface) : IO (Option String) := self.val.get "interfaceName" (Option String)
+@[macro_inline] def USBAlternateInterface.interfaceName (self : USBAlternateInterface) : IO (Option String) := Internal.api "Lasm.JS.Web.USBAlternateInterface.interfaceName" do
+  self.val.get "interfaceName" (Option String)
 
 /-- `readonly attribute FrozenArray<USBEndpoint> endpoints` -/
-def USBAlternateInterface.endpoints (self : USBAlternateInterface) : IO (Array USBEndpoint) := self.val.get "endpoints" (Array USBEndpoint)
+@[macro_inline] def USBAlternateInterface.endpoints (self : USBAlternateInterface) : IO (Array USBEndpoint) := Internal.api "Lasm.JS.Web.USBAlternateInterface.endpoints" do
+  self.val.get "endpoints" (Array USBEndpoint)
 
 /-- `v instanceof USBConfiguration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBConfiguration`). -/
-def USBConfiguration.cast? (v : Value) : IO (Option USBConfiguration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBConfiguration"] Value) v) then some { val := v } else none
+@[macro_inline] def USBConfiguration.cast? (v : Value) : IO (Option USBConfiguration) := Internal.api "Lasm.JS.Web.USBConfiguration.cast?" do
+  Internal.cast (Internal.getGlobal ["USBConfiguration"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBDevice device, octet configurationValue)` -/
-def USBConfiguration.new (device : USBDevice) (configurationValue : Nat) : IO USBConfiguration :=
+@[macro_inline] def USBConfiguration.new (device : USBDevice) (configurationValue : Nat) : IO USBConfiguration := Internal.api "Lasm.JS.Web.USBConfiguration.new" do
   Lasm.JS.Binding.invoke USBConfiguration { name := "Lasm.JS.Web.USBConfiguration.new", module := "globalThis", path := "USBConfiguration", construct := true, arity := 2 }
-    (Support.args #[toJS device, toJS configurationValue]) (await := false)
+    (Internal.args #[toJS device, toJS configurationValue]) (await := false)
 
 /-- `readonly attribute octet configurationValue` -/
-def USBConfiguration.configurationValue (self : USBConfiguration) : IO Nat := self.val.get "configurationValue" Nat
+@[macro_inline] def USBConfiguration.configurationValue (self : USBConfiguration) : IO Nat := Internal.api "Lasm.JS.Web.USBConfiguration.configurationValue" do
+  self.val.get "configurationValue" Nat
 
 /-- `readonly attribute DOMString? configurationName` -/
-def USBConfiguration.configurationName (self : USBConfiguration) : IO (Option String) := self.val.get "configurationName" (Option String)
+@[macro_inline] def USBConfiguration.configurationName (self : USBConfiguration) : IO (Option String) := Internal.api "Lasm.JS.Web.USBConfiguration.configurationName" do
+  self.val.get "configurationName" (Option String)
 
 /-- `readonly attribute FrozenArray<USBInterface> interfaces` -/
-def USBConfiguration.interfaces (self : USBConfiguration) : IO (Array USBInterface) := self.val.get "interfaces" (Array USBInterface)
+@[macro_inline] def USBConfiguration.interfaces (self : USBConfiguration) : IO (Array USBInterface) := Internal.api "Lasm.JS.Web.USBConfiguration.interfaces" do
+  self.val.get "interfaces" (Array USBInterface)
 
 /-- `v instanceof USBConnectionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBConnectionEvent`). -/
-def USBConnectionEvent.cast? (v : Value) : IO (Option USBConnectionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBConnectionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def USBConnectionEvent.cast? (v : Value) : IO (Option USBConnectionEvent) := Internal.api "Lasm.JS.Web.USBConnectionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["USBConnectionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, USBConnectionEventInit eventInitDict)` -/
-def USBConnectionEvent.new (type : String) (eventInitDict : USBConnectionEventInit) : IO USBConnectionEvent :=
+@[macro_inline] def USBConnectionEvent.new (type : String) (eventInitDict : USBConnectionEventInit) : IO USBConnectionEvent := Internal.api "Lasm.JS.Web.USBConnectionEvent.new" do
   Lasm.JS.Binding.invoke USBConnectionEvent { name := "Lasm.JS.Web.USBConnectionEvent.new", module := "globalThis", path := "USBConnectionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute USBDevice device` -/
-def USBConnectionEvent.device (self : USBConnectionEvent) : IO USBDevice := do
+@[macro_inline] def USBConnectionEvent.device (self : USBConnectionEvent) : IO USBDevice := Internal.api "Lasm.JS.Web.USBConnectionEvent.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `v instanceof USBDevice`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBDevice`). -/
-def USBDevice.cast? (v : Value) : IO (Option USBDevice) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBDevice"] Value) v) then some { val := v } else none
+@[macro_inline] def USBDevice.cast? (v : Value) : IO (Option USBDevice) := Internal.api "Lasm.JS.Web.USBDevice.cast?" do
+  Internal.cast (Internal.getGlobal ["USBDevice"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute octet usbVersionMajor` -/
-def USBDevice.usbVersionMajor (self : USBDevice) : IO Nat := self.val.get "usbVersionMajor" Nat
+@[macro_inline] def USBDevice.usbVersionMajor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.usbVersionMajor" do
+  self.val.get "usbVersionMajor" Nat
 
 /-- `readonly attribute octet usbVersionMinor` -/
-def USBDevice.usbVersionMinor (self : USBDevice) : IO Nat := self.val.get "usbVersionMinor" Nat
+@[macro_inline] def USBDevice.usbVersionMinor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.usbVersionMinor" do
+  self.val.get "usbVersionMinor" Nat
 
 /-- `readonly attribute octet usbVersionSubminor` -/
-def USBDevice.usbVersionSubminor (self : USBDevice) : IO Nat := self.val.get "usbVersionSubminor" Nat
+@[macro_inline] def USBDevice.usbVersionSubminor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.usbVersionSubminor" do
+  self.val.get "usbVersionSubminor" Nat
 
 /-- `readonly attribute octet deviceClass` -/
-def USBDevice.deviceClass (self : USBDevice) : IO Nat := self.val.get "deviceClass" Nat
+@[macro_inline] def USBDevice.deviceClass (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceClass" do
+  self.val.get "deviceClass" Nat
 
 /-- `readonly attribute octet deviceSubclass` -/
-def USBDevice.deviceSubclass (self : USBDevice) : IO Nat := self.val.get "deviceSubclass" Nat
+@[macro_inline] def USBDevice.deviceSubclass (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceSubclass" do
+  self.val.get "deviceSubclass" Nat
 
 /-- `readonly attribute octet deviceProtocol` -/
-def USBDevice.deviceProtocol (self : USBDevice) : IO Nat := self.val.get "deviceProtocol" Nat
+@[macro_inline] def USBDevice.deviceProtocol (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceProtocol" do
+  self.val.get "deviceProtocol" Nat
 
 /-- `readonly attribute unsigned short vendorId` -/
-def USBDevice.vendorId (self : USBDevice) : IO Nat := self.val.get "vendorId" Nat
+@[macro_inline] def USBDevice.vendorId (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.vendorId" do
+  self.val.get "vendorId" Nat
 
 /-- `readonly attribute unsigned short productId` -/
-def USBDevice.productId (self : USBDevice) : IO Nat := self.val.get "productId" Nat
+@[macro_inline] def USBDevice.productId (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.productId" do
+  self.val.get "productId" Nat
 
 /-- `readonly attribute octet deviceVersionMajor` -/
-def USBDevice.deviceVersionMajor (self : USBDevice) : IO Nat := self.val.get "deviceVersionMajor" Nat
+@[macro_inline] def USBDevice.deviceVersionMajor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceVersionMajor" do
+  self.val.get "deviceVersionMajor" Nat
 
 /-- `readonly attribute octet deviceVersionMinor` -/
-def USBDevice.deviceVersionMinor (self : USBDevice) : IO Nat := self.val.get "deviceVersionMinor" Nat
+@[macro_inline] def USBDevice.deviceVersionMinor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceVersionMinor" do
+  self.val.get "deviceVersionMinor" Nat
 
 /-- `readonly attribute octet deviceVersionSubminor` -/
-def USBDevice.deviceVersionSubminor (self : USBDevice) : IO Nat := self.val.get "deviceVersionSubminor" Nat
+@[macro_inline] def USBDevice.deviceVersionSubminor (self : USBDevice) : IO Nat := Internal.api "Lasm.JS.Web.USBDevice.deviceVersionSubminor" do
+  self.val.get "deviceVersionSubminor" Nat
 
 /-- `readonly attribute DOMString? manufacturerName` -/
-def USBDevice.manufacturerName (self : USBDevice) : IO (Option String) := self.val.get "manufacturerName" (Option String)
+@[macro_inline] def USBDevice.manufacturerName (self : USBDevice) : IO (Option String) := Internal.api "Lasm.JS.Web.USBDevice.manufacturerName" do
+  self.val.get "manufacturerName" (Option String)
 
 /-- `readonly attribute DOMString? productName` -/
-def USBDevice.productName (self : USBDevice) : IO (Option String) := self.val.get "productName" (Option String)
+@[macro_inline] def USBDevice.productName (self : USBDevice) : IO (Option String) := Internal.api "Lasm.JS.Web.USBDevice.productName" do
+  self.val.get "productName" (Option String)
 
 /-- `readonly attribute DOMString? serialNumber` -/
-def USBDevice.serialNumber (self : USBDevice) : IO (Option String) := self.val.get "serialNumber" (Option String)
+@[macro_inline] def USBDevice.serialNumber (self : USBDevice) : IO (Option String) := Internal.api "Lasm.JS.Web.USBDevice.serialNumber" do
+  self.val.get "serialNumber" (Option String)
 
 /-- `readonly attribute USBConfiguration? configuration` -/
-def USBDevice.configuration (self : USBDevice) : IO (Option USBConfiguration) := self.val.get "configuration" (Option USBConfiguration)
+@[macro_inline] def USBDevice.configuration (self : USBDevice) : IO (Option USBConfiguration) := Internal.api "Lasm.JS.Web.USBDevice.configuration" do
+  self.val.get "configuration" (Option USBConfiguration)
 
 /-- `readonly attribute FrozenArray<USBConfiguration> configurations` -/
-def USBDevice.configurations (self : USBDevice) : IO (Array USBConfiguration) := self.val.get "configurations" (Array USBConfiguration)
+@[macro_inline] def USBDevice.configurations (self : USBDevice) : IO (Array USBConfiguration) := Internal.api "Lasm.JS.Web.USBDevice.configurations" do
+  self.val.get "configurations" (Array USBConfiguration)
 
 /-- `readonly attribute boolean opened` -/
-def USBDevice.opened (self : USBDevice) : IO Bool := self.val.get "opened" Bool
+@[macro_inline] def USBDevice.opened (self : USBDevice) : IO Bool := Internal.api "Lasm.JS.Web.USBDevice.opened" do
+  self.val.get "opened" Bool
 
 /-- `Promise<undefined> open()` -/
-def USBDevice.«open» (self : USBDevice) : Async Unit :=
-  self.val.callMethodAwait "open" (Support.args #[]) Unit
+@[macro_inline] def USBDevice.«open» (self : USBDevice) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.open" do
+  self.val.callMethodAwait "open" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> close()` -/
-def USBDevice.close (self : USBDevice) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def USBDevice.close (self : USBDevice) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> forget()` -/
-def USBDevice.forget (self : USBDevice) : Async Unit :=
-  self.val.callMethodAwait "forget" (Support.args #[]) Unit
+@[macro_inline] def USBDevice.forget (self : USBDevice) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.forget" do
+  self.val.callMethodAwait "forget" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> selectConfiguration(octet configurationValue)` -/
-def USBDevice.selectConfiguration (self : USBDevice) (configurationValue : Nat) : Async Unit :=
-  self.val.callMethodAwait "selectConfiguration" (Support.args #[toJS configurationValue]) Unit
+@[macro_inline] def USBDevice.selectConfiguration (self : USBDevice) (configurationValue : Nat) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.selectConfiguration" do
+  self.val.callMethodAwait "selectConfiguration" (Internal.args #[toJS configurationValue]) Unit
 
 /-- `Promise<undefined> claimInterface(octet interfaceNumber)` -/
-def USBDevice.claimInterface (self : USBDevice) (interfaceNumber : Nat) : Async Unit :=
-  self.val.callMethodAwait "claimInterface" (Support.args #[toJS interfaceNumber]) Unit
+@[macro_inline] def USBDevice.claimInterface (self : USBDevice) (interfaceNumber : Nat) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.claimInterface" do
+  self.val.callMethodAwait "claimInterface" (Internal.args #[toJS interfaceNumber]) Unit
 
 /-- `Promise<undefined> releaseInterface(octet interfaceNumber)` -/
-def USBDevice.releaseInterface (self : USBDevice) (interfaceNumber : Nat) : Async Unit :=
-  self.val.callMethodAwait "releaseInterface" (Support.args #[toJS interfaceNumber]) Unit
+@[macro_inline] def USBDevice.releaseInterface (self : USBDevice) (interfaceNumber : Nat) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.releaseInterface" do
+  self.val.callMethodAwait "releaseInterface" (Internal.args #[toJS interfaceNumber]) Unit
 
 /-- `Promise<undefined> selectAlternateInterface(octet interfaceNumber, octet alternateSetting)` -/
-def USBDevice.selectAlternateInterface (self : USBDevice) (interfaceNumber : Nat) (alternateSetting : Nat) : Async Unit :=
-  self.val.callMethodAwait "selectAlternateInterface" (Support.args #[toJS interfaceNumber, toJS alternateSetting]) Unit
+@[macro_inline] def USBDevice.selectAlternateInterface (self : USBDevice) (interfaceNumber : Nat) (alternateSetting : Nat) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.selectAlternateInterface" do
+  self.val.callMethodAwait "selectAlternateInterface" (Internal.args #[toJS interfaceNumber, toJS alternateSetting]) Unit
 
 /-- `Promise<USBInTransferResult> controlTransferIn(USBControlTransferParameters setup, unsigned short length)` -/
-def USBDevice.controlTransferIn (self : USBDevice) (setup : USBControlTransferParameters) (length : Nat) : Async USBInTransferResult := do
-  let r ← self.val.callMethodAwait "controlTransferIn" (Support.args #[toJS setup, toJS length]) Value
+@[macro_inline] def USBDevice.controlTransferIn (self : USBDevice) (setup : USBControlTransferParameters) (length : Nat) : Async USBInTransferResult := Internal.api "Lasm.JS.Web.USBDevice.controlTransferIn" do
+  let r ← self.val.callMethodAwait "controlTransferIn" (Internal.args #[toJS setup, toJS length]) Value
   pure { val := r }
 
 /-- `Promise<USBOutTransferResult> controlTransferOut(USBControlTransferParameters setup, optional BufferSource data)` -/
-def USBDevice.controlTransferOut (self : USBDevice) (setup : USBControlTransferParameters) (data : Option ByteArray := none) : Async USBOutTransferResult := do
-  let r ← self.val.callMethodAwait "controlTransferOut" (Support.args #[toJS setup, Support.optional data]) Value
+@[macro_inline] def USBDevice.controlTransferOut (self : USBDevice) (setup : USBControlTransferParameters) (data : Option ByteArray := none) : Async USBOutTransferResult := Internal.api "Lasm.JS.Web.USBDevice.controlTransferOut" do
+  let r ← self.val.callMethodAwait "controlTransferOut" (Internal.args #[toJS setup, Internal.optional data]) Value
   pure { val := r }
 
 /-- `Promise<undefined> clearHalt(USBDirection direction, octet endpointNumber)` -/
-def USBDevice.clearHalt (self : USBDevice) (direction : USBDirection) (endpointNumber : Nat) : Async Unit :=
-  self.val.callMethodAwait "clearHalt" (Support.args #[toJS direction, toJS endpointNumber]) Unit
+@[macro_inline] def USBDevice.clearHalt (self : USBDevice) (direction : USBDirection) (endpointNumber : Nat) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.clearHalt" do
+  self.val.callMethodAwait "clearHalt" (Internal.args #[toJS direction, toJS endpointNumber]) Unit
 
 /-- `Promise<USBInTransferResult> transferIn(octet endpointNumber, unsigned long length)` -/
-def USBDevice.transferIn (self : USBDevice) (endpointNumber : Nat) (length : Nat) : Async USBInTransferResult := do
-  let r ← self.val.callMethodAwait "transferIn" (Support.args #[toJS endpointNumber, toJS length]) Value
+@[macro_inline] def USBDevice.transferIn (self : USBDevice) (endpointNumber : Nat) (length : Nat) : Async USBInTransferResult := Internal.api "Lasm.JS.Web.USBDevice.transferIn" do
+  let r ← self.val.callMethodAwait "transferIn" (Internal.args #[toJS endpointNumber, toJS length]) Value
   pure { val := r }
 
 /-- `Promise<USBOutTransferResult> transferOut(octet endpointNumber, BufferSource data)` -/
-def USBDevice.transferOut (self : USBDevice) (endpointNumber : Nat) (data : ByteArray) : Async USBOutTransferResult := do
-  let r ← self.val.callMethodAwait "transferOut" (Support.args #[toJS endpointNumber, toJS data]) Value
+@[macro_inline] def USBDevice.transferOut (self : USBDevice) (endpointNumber : Nat) (data : ByteArray) : Async USBOutTransferResult := Internal.api "Lasm.JS.Web.USBDevice.transferOut" do
+  let r ← self.val.callMethodAwait "transferOut" (Internal.args #[toJS endpointNumber, toJS data]) Value
   pure { val := r }
 
 /-- `Promise<USBIsochronousInTransferResult> isochronousTransferIn(octet endpointNumber, sequence<unsigned long> packetLengths)` -/
-def USBDevice.isochronousTransferIn (self : USBDevice) (endpointNumber : Nat) (packetLengths : Array Nat) : Async USBIsochronousInTransferResult := do
-  let r ← self.val.callMethodAwait "isochronousTransferIn" (Support.args #[toJS endpointNumber, toJS packetLengths]) Value
+@[macro_inline] def USBDevice.isochronousTransferIn (self : USBDevice) (endpointNumber : Nat) (packetLengths : Array Nat) : Async USBIsochronousInTransferResult := Internal.api "Lasm.JS.Web.USBDevice.isochronousTransferIn" do
+  let r ← self.val.callMethodAwait "isochronousTransferIn" (Internal.args #[toJS endpointNumber, toJS packetLengths]) Value
   pure { val := r }
 
 /-- `Promise<USBIsochronousOutTransferResult> isochronousTransferOut(octet endpointNumber, BufferSource data, sequence<unsigned long> packetLengths)` -/
-def USBDevice.isochronousTransferOut (self : USBDevice) (endpointNumber : Nat) (data : ByteArray) (packetLengths : Array Nat) : Async USBIsochronousOutTransferResult := do
-  let r ← self.val.callMethodAwait "isochronousTransferOut" (Support.args #[toJS endpointNumber, toJS data, toJS packetLengths]) Value
+@[macro_inline] def USBDevice.isochronousTransferOut (self : USBDevice) (endpointNumber : Nat) (data : ByteArray) (packetLengths : Array Nat) : Async USBIsochronousOutTransferResult := Internal.api "Lasm.JS.Web.USBDevice.isochronousTransferOut" do
+  let r ← self.val.callMethodAwait "isochronousTransferOut" (Internal.args #[toJS endpointNumber, toJS data, toJS packetLengths]) Value
   pure { val := r }
 
 /-- `Promise<undefined> reset()` -/
-def USBDevice.reset (self : USBDevice) : Async Unit :=
-  self.val.callMethodAwait "reset" (Support.args #[]) Unit
+@[macro_inline] def USBDevice.reset (self : USBDevice) : Async Unit := Internal.api "Lasm.JS.Web.USBDevice.reset" do
+  self.val.callMethodAwait "reset" (Internal.args #[]) Unit
 
 /-- `v instanceof USBEndpoint`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBEndpoint`). -/
-def USBEndpoint.cast? (v : Value) : IO (Option USBEndpoint) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBEndpoint"] Value) v) then some { val := v } else none
+@[macro_inline] def USBEndpoint.cast? (v : Value) : IO (Option USBEndpoint) := Internal.api "Lasm.JS.Web.USBEndpoint.cast?" do
+  Internal.cast (Internal.getGlobal ["USBEndpoint"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBAlternateInterface alternate, octet endpointNumber, USBDirection direction)` -/
-def USBEndpoint.new (alternate : USBAlternateInterface) (endpointNumber : Nat) (direction : USBDirection) : IO USBEndpoint :=
+@[macro_inline] def USBEndpoint.new (alternate : USBAlternateInterface) (endpointNumber : Nat) (direction : USBDirection) : IO USBEndpoint := Internal.api "Lasm.JS.Web.USBEndpoint.new" do
   Lasm.JS.Binding.invoke USBEndpoint { name := "Lasm.JS.Web.USBEndpoint.new", module := "globalThis", path := "USBEndpoint", construct := true, arity := 3 }
-    (Support.args #[toJS alternate, toJS endpointNumber, toJS direction]) (await := false)
+    (Internal.args #[toJS alternate, toJS endpointNumber, toJS direction]) (await := false)
 
 /-- `readonly attribute octet endpointNumber` -/
-def USBEndpoint.endpointNumber (self : USBEndpoint) : IO Nat := self.val.get "endpointNumber" Nat
+@[macro_inline] def USBEndpoint.endpointNumber (self : USBEndpoint) : IO Nat := Internal.api "Lasm.JS.Web.USBEndpoint.endpointNumber" do
+  self.val.get "endpointNumber" Nat
 
 /-- `readonly attribute USBDirection direction` -/
-def USBEndpoint.direction (self : USBEndpoint) : IO USBDirection := self.val.get "direction" USBDirection
+@[macro_inline] def USBEndpoint.direction (self : USBEndpoint) : IO USBDirection := Internal.api "Lasm.JS.Web.USBEndpoint.direction" do
+  self.val.get "direction" USBDirection
 
 /-- `readonly attribute USBEndpointType type` -/
-def USBEndpoint.type (self : USBEndpoint) : IO USBEndpointType := self.val.get "type" USBEndpointType
+@[macro_inline] def USBEndpoint.type (self : USBEndpoint) : IO USBEndpointType := Internal.api "Lasm.JS.Web.USBEndpoint.type" do
+  self.val.get "type" USBEndpointType
 
 /-- `readonly attribute unsigned long packetSize` -/
-def USBEndpoint.packetSize (self : USBEndpoint) : IO Nat := self.val.get "packetSize" Nat
+@[macro_inline] def USBEndpoint.packetSize (self : USBEndpoint) : IO Nat := Internal.api "Lasm.JS.Web.USBEndpoint.packetSize" do
+  self.val.get "packetSize" Nat
 
 /-- `v instanceof USBInTransferResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBInTransferResult`). -/
-def USBInTransferResult.cast? (v : Value) : IO (Option USBInTransferResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBInTransferResult"] Value) v) then some { val := v } else none
+@[macro_inline] def USBInTransferResult.cast? (v : Value) : IO (Option USBInTransferResult) := Internal.api "Lasm.JS.Web.USBInTransferResult.cast?" do
+  Internal.cast (Internal.getGlobal ["USBInTransferResult"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBTransferStatus status, optional DataView? data)` -/
-def USBInTransferResult.new (status : USBTransferStatus) (data : Option ByteArray := none) : IO USBInTransferResult :=
+@[macro_inline] def USBInTransferResult.new (status : USBTransferStatus) (data : Option ByteArray := none) : IO USBInTransferResult := Internal.api "Lasm.JS.Web.USBInTransferResult.new" do
   Lasm.JS.Binding.invoke USBInTransferResult { name := "Lasm.JS.Web.USBInTransferResult.new", module := "globalThis", path := "USBInTransferResult", construct := true, arity := 2 }
-    (Support.args #[toJS status, Support.optional data]) (await := false)
+    (Internal.args #[toJS status, Internal.optional data]) (await := false)
 
 /-- `readonly attribute DataView? data` -/
-def USBInTransferResult.data (self : USBInTransferResult) : IO (Option ByteArray) := do
+@[macro_inline] def USBInTransferResult.data (self : USBInTransferResult) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBInTransferResult.data" do
   let r ← self.val.get "data" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute USBTransferStatus status` -/
-def USBInTransferResult.status (self : USBInTransferResult) : IO USBTransferStatus := self.val.get "status" USBTransferStatus
+@[macro_inline] def USBInTransferResult.status (self : USBInTransferResult) : IO USBTransferStatus := Internal.api "Lasm.JS.Web.USBInTransferResult.status" do
+  self.val.get "status" USBTransferStatus
 
 /-- `v instanceof USBInterface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBInterface`). -/
-def USBInterface.cast? (v : Value) : IO (Option USBInterface) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBInterface"] Value) v) then some { val := v } else none
+@[macro_inline] def USBInterface.cast? (v : Value) : IO (Option USBInterface) := Internal.api "Lasm.JS.Web.USBInterface.cast?" do
+  Internal.cast (Internal.getGlobal ["USBInterface"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBConfiguration configuration, octet interfaceNumber)` -/
-def USBInterface.new (configuration : USBConfiguration) (interfaceNumber : Nat) : IO USBInterface :=
+@[macro_inline] def USBInterface.new (configuration : USBConfiguration) (interfaceNumber : Nat) : IO USBInterface := Internal.api "Lasm.JS.Web.USBInterface.new" do
   Lasm.JS.Binding.invoke USBInterface { name := "Lasm.JS.Web.USBInterface.new", module := "globalThis", path := "USBInterface", construct := true, arity := 2 }
-    (Support.args #[toJS configuration, toJS interfaceNumber]) (await := false)
+    (Internal.args #[toJS configuration, toJS interfaceNumber]) (await := false)
 
 /-- `readonly attribute octet interfaceNumber` -/
-def USBInterface.interfaceNumber (self : USBInterface) : IO Nat := self.val.get "interfaceNumber" Nat
+@[macro_inline] def USBInterface.interfaceNumber (self : USBInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBInterface.interfaceNumber" do
+  self.val.get "interfaceNumber" Nat
 
 /-- `readonly attribute USBAlternateInterface alternate` -/
-def USBInterface.alternate (self : USBInterface) : IO USBAlternateInterface := do
+@[macro_inline] def USBInterface.alternate (self : USBInterface) : IO USBAlternateInterface := Internal.api "Lasm.JS.Web.USBInterface.alternate" do
   let r ← self.val.get "alternate" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<USBAlternateInterface> alternates` -/
-def USBInterface.alternates (self : USBInterface) : IO (Array USBAlternateInterface) := self.val.get "alternates" (Array USBAlternateInterface)
+@[macro_inline] def USBInterface.alternates (self : USBInterface) : IO (Array USBAlternateInterface) := Internal.api "Lasm.JS.Web.USBInterface.alternates" do
+  self.val.get "alternates" (Array USBAlternateInterface)
 
 /-- `readonly attribute boolean claimed` -/
-def USBInterface.claimed (self : USBInterface) : IO Bool := self.val.get "claimed" Bool
+@[macro_inline] def USBInterface.claimed (self : USBInterface) : IO Bool := Internal.api "Lasm.JS.Web.USBInterface.claimed" do
+  self.val.get "claimed" Bool
 
 /-- `v instanceof USBIsochronousInTransferPacket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBIsochronousInTransferPacket`). -/
-def USBIsochronousInTransferPacket.cast? (v : Value) : IO (Option USBIsochronousInTransferPacket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBIsochronousInTransferPacket"] Value) v) then some { val := v } else none
+@[macro_inline] def USBIsochronousInTransferPacket.cast? (v : Value) : IO (Option USBIsochronousInTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.cast?" do
+  Internal.cast (Internal.getGlobal ["USBIsochronousInTransferPacket"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBTransferStatus status, optional DataView? data)` -/
-def USBIsochronousInTransferPacket.new (status : USBTransferStatus) (data : Option ByteArray := none) : IO USBIsochronousInTransferPacket :=
+@[macro_inline] def USBIsochronousInTransferPacket.new (status : USBTransferStatus) (data : Option ByteArray := none) : IO USBIsochronousInTransferPacket := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.new" do
   Lasm.JS.Binding.invoke USBIsochronousInTransferPacket { name := "Lasm.JS.Web.USBIsochronousInTransferPacket.new", module := "globalThis", path := "USBIsochronousInTransferPacket", construct := true, arity := 2 }
-    (Support.args #[toJS status, Support.optional data]) (await := false)
+    (Internal.args #[toJS status, Internal.optional data]) (await := false)
 
 /-- `readonly attribute DataView? data` -/
-def USBIsochronousInTransferPacket.data (self : USBIsochronousInTransferPacket) : IO (Option ByteArray) := do
+@[macro_inline] def USBIsochronousInTransferPacket.data (self : USBIsochronousInTransferPacket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.data" do
   let r ← self.val.get "data" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute USBTransferStatus status` -/
-def USBIsochronousInTransferPacket.status (self : USBIsochronousInTransferPacket) : IO USBTransferStatus := self.val.get "status" USBTransferStatus
+@[macro_inline] def USBIsochronousInTransferPacket.status (self : USBIsochronousInTransferPacket) : IO USBTransferStatus := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.status" do
+  self.val.get "status" USBTransferStatus
 
 /-- `v instanceof USBIsochronousInTransferResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBIsochronousInTransferResult`). -/
-def USBIsochronousInTransferResult.cast? (v : Value) : IO (Option USBIsochronousInTransferResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBIsochronousInTransferResult"] Value) v) then some { val := v } else none
+@[macro_inline] def USBIsochronousInTransferResult.cast? (v : Value) : IO (Option USBIsochronousInTransferResult) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.cast?" do
+  Internal.cast (Internal.getGlobal ["USBIsochronousInTransferResult"] Value) (fun x => { val := x }) v
 
 /-- `constructor(sequence<USBIsochronousInTransferPacket> packets, optional DataView? data)` -/
-def USBIsochronousInTransferResult.new (packets : Array USBIsochronousInTransferPacket) (data : Option ByteArray := none) : IO USBIsochronousInTransferResult :=
+@[macro_inline] def USBIsochronousInTransferResult.new (packets : Array USBIsochronousInTransferPacket) (data : Option ByteArray := none) : IO USBIsochronousInTransferResult := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.new" do
   Lasm.JS.Binding.invoke USBIsochronousInTransferResult { name := "Lasm.JS.Web.USBIsochronousInTransferResult.new", module := "globalThis", path := "USBIsochronousInTransferResult", construct := true, arity := 2 }
-    (Support.args #[toJS packets, Support.optional data]) (await := false)
+    (Internal.args #[toJS packets, Internal.optional data]) (await := false)
 
 /-- `readonly attribute DataView? data` -/
-def USBIsochronousInTransferResult.data (self : USBIsochronousInTransferResult) : IO (Option ByteArray) := do
+@[macro_inline] def USBIsochronousInTransferResult.data (self : USBIsochronousInTransferResult) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.data" do
   let r ← self.val.get "data" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute FrozenArray<USBIsochronousInTransferPacket> packets` -/
-def USBIsochronousInTransferResult.packets (self : USBIsochronousInTransferResult) : IO (Array USBIsochronousInTransferPacket) := self.val.get "packets" (Array USBIsochronousInTransferPacket)
+@[macro_inline] def USBIsochronousInTransferResult.packets (self : USBIsochronousInTransferResult) : IO (Array USBIsochronousInTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.packets" do
+  self.val.get "packets" (Array USBIsochronousInTransferPacket)
 
 /-- `v instanceof USBIsochronousOutTransferPacket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBIsochronousOutTransferPacket`). -/
-def USBIsochronousOutTransferPacket.cast? (v : Value) : IO (Option USBIsochronousOutTransferPacket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBIsochronousOutTransferPacket"] Value) v) then some { val := v } else none
+@[macro_inline] def USBIsochronousOutTransferPacket.cast? (v : Value) : IO (Option USBIsochronousOutTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.cast?" do
+  Internal.cast (Internal.getGlobal ["USBIsochronousOutTransferPacket"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBTransferStatus status, optional unsigned long bytesWritten)` -/
-def USBIsochronousOutTransferPacket.new (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO USBIsochronousOutTransferPacket :=
+@[macro_inline] def USBIsochronousOutTransferPacket.new (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO USBIsochronousOutTransferPacket := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.new" do
   Lasm.JS.Binding.invoke USBIsochronousOutTransferPacket { name := "Lasm.JS.Web.USBIsochronousOutTransferPacket.new", module := "globalThis", path := "USBIsochronousOutTransferPacket", construct := true, arity := 2 }
-    (Support.args #[toJS status, Support.optional bytesWritten]) (await := false)
+    (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
 
 /-- `readonly attribute unsigned long bytesWritten` -/
-def USBIsochronousOutTransferPacket.bytesWritten (self : USBIsochronousOutTransferPacket) : IO Nat := self.val.get "bytesWritten" Nat
+@[macro_inline] def USBIsochronousOutTransferPacket.bytesWritten (self : USBIsochronousOutTransferPacket) : IO Nat := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.bytesWritten" do
+  self.val.get "bytesWritten" Nat
 
 /-- `readonly attribute USBTransferStatus status` -/
-def USBIsochronousOutTransferPacket.status (self : USBIsochronousOutTransferPacket) : IO USBTransferStatus := self.val.get "status" USBTransferStatus
+@[macro_inline] def USBIsochronousOutTransferPacket.status (self : USBIsochronousOutTransferPacket) : IO USBTransferStatus := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.status" do
+  self.val.get "status" USBTransferStatus
 
 /-- `v instanceof USBIsochronousOutTransferResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBIsochronousOutTransferResult`). -/
-def USBIsochronousOutTransferResult.cast? (v : Value) : IO (Option USBIsochronousOutTransferResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBIsochronousOutTransferResult"] Value) v) then some { val := v } else none
+@[macro_inline] def USBIsochronousOutTransferResult.cast? (v : Value) : IO (Option USBIsochronousOutTransferResult) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferResult.cast?" do
+  Internal.cast (Internal.getGlobal ["USBIsochronousOutTransferResult"] Value) (fun x => { val := x }) v
 
 /-- `constructor(sequence<USBIsochronousOutTransferPacket> packets)` -/
-def USBIsochronousOutTransferResult.new (packets : Array USBIsochronousOutTransferPacket) : IO USBIsochronousOutTransferResult :=
+@[macro_inline] def USBIsochronousOutTransferResult.new (packets : Array USBIsochronousOutTransferPacket) : IO USBIsochronousOutTransferResult := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferResult.new" do
   Lasm.JS.Binding.invoke USBIsochronousOutTransferResult { name := "Lasm.JS.Web.USBIsochronousOutTransferResult.new", module := "globalThis", path := "USBIsochronousOutTransferResult", construct := true, arity := 1 }
-    (Support.args #[toJS packets]) (await := false)
+    (Internal.args #[toJS packets]) (await := false)
 
 /-- `readonly attribute FrozenArray<USBIsochronousOutTransferPacket> packets` -/
-def USBIsochronousOutTransferResult.packets (self : USBIsochronousOutTransferResult) : IO (Array USBIsochronousOutTransferPacket) := self.val.get "packets" (Array USBIsochronousOutTransferPacket)
+@[macro_inline] def USBIsochronousOutTransferResult.packets (self : USBIsochronousOutTransferResult) : IO (Array USBIsochronousOutTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferResult.packets" do
+  self.val.get "packets" (Array USBIsochronousOutTransferPacket)
 
 /-- `v instanceof USBOutTransferResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBOutTransferResult`). -/
-def USBOutTransferResult.cast? (v : Value) : IO (Option USBOutTransferResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBOutTransferResult"] Value) v) then some { val := v } else none
+@[macro_inline] def USBOutTransferResult.cast? (v : Value) : IO (Option USBOutTransferResult) := Internal.api "Lasm.JS.Web.USBOutTransferResult.cast?" do
+  Internal.cast (Internal.getGlobal ["USBOutTransferResult"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USBTransferStatus status, optional unsigned long bytesWritten)` -/
-def USBOutTransferResult.new (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO USBOutTransferResult :=
+@[macro_inline] def USBOutTransferResult.new (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO USBOutTransferResult := Internal.api "Lasm.JS.Web.USBOutTransferResult.new" do
   Lasm.JS.Binding.invoke USBOutTransferResult { name := "Lasm.JS.Web.USBOutTransferResult.new", module := "globalThis", path := "USBOutTransferResult", construct := true, arity := 2 }
-    (Support.args #[toJS status, Support.optional bytesWritten]) (await := false)
+    (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
 
 /-- `readonly attribute unsigned long bytesWritten` -/
-def USBOutTransferResult.bytesWritten (self : USBOutTransferResult) : IO Nat := self.val.get "bytesWritten" Nat
+@[macro_inline] def USBOutTransferResult.bytesWritten (self : USBOutTransferResult) : IO Nat := Internal.api "Lasm.JS.Web.USBOutTransferResult.bytesWritten" do
+  self.val.get "bytesWritten" Nat
 
 /-- `readonly attribute USBTransferStatus status` -/
-def USBOutTransferResult.status (self : USBOutTransferResult) : IO USBTransferStatus := self.val.get "status" USBTransferStatus
+@[macro_inline] def USBOutTransferResult.status (self : USBOutTransferResult) : IO USBTransferStatus := Internal.api "Lasm.JS.Web.USBOutTransferResult.status" do
+  self.val.get "status" USBTransferStatus
 
 /-- `v instanceof USBPermissionResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `USBPermissionResult`). -/
-def USBPermissionResult.cast? (v : Value) : IO (Option USBPermissionResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["USBPermissionResult"] Value) v) then some { val := v } else none
+@[macro_inline] def USBPermissionResult.cast? (v : Value) : IO (Option USBPermissionResult) := Internal.api "Lasm.JS.Web.USBPermissionResult.cast?" do
+  Internal.cast (Internal.getGlobal ["USBPermissionResult"] Value) (fun x => { val := x }) v
 
 /-- `attribute FrozenArray<USBDevice> devices` -/
-def USBPermissionResult.devices (self : USBPermissionResult) : IO (Array USBDevice) := self.val.get "devices" (Array USBDevice)
+@[macro_inline] def USBPermissionResult.devices (self : USBPermissionResult) : IO (Array USBDevice) := Internal.api "Lasm.JS.Web.USBPermissionResult.devices" do
+  self.val.get "devices" (Array USBDevice)
 
 /-- Sets `devices`: `attribute FrozenArray<USBDevice> devices` -/
-def USBPermissionResult.setDevices (self : USBPermissionResult) (value : Array USBDevice) : IO Unit :=
+@[macro_inline] def USBPermissionResult.setDevices (self : USBPermissionResult) (value : Array USBDevice) : IO Unit := Internal.api "Lasm.JS.Web.USBPermissionResult.setDevices" do
   self.val.set "devices" (toJS value)
 
 /-- `readonly attribute USB usb` -/
-def Navigator.usb (self : Navigator) : IO USB := do
+@[macro_inline] def Navigator.usb (self : Navigator) : IO USB := Internal.api "Lasm.JS.Web.Navigator.usb" do
   let r ← self.val.get "usb" Value
   pure { val := r }
 
 /-- `readonly attribute USB usb` -/
-def WorkerNavigator.usb (self : WorkerNavigator) : IO USB := do
+@[macro_inline] def WorkerNavigator.usb (self : WorkerNavigator) : IO USB := Internal.api "Lasm.JS.Web.WorkerNavigator.usb" do
   let r ← self.val.get "usb" Value
   pure { val := r }
 

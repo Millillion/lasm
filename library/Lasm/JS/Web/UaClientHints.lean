@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.UaClientHints
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary NavigatorUABrandVersion` (User-Agent Client Hints (https://wicg.github.io/ua-client-hints/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NavigatorUABrandVersion where
@@ -17,6 +21,8 @@ structure NavigatorUABrandVersion where
   brand : Option String := none
   /-- `DOMString version` -/
   version : Option String := none
+instance : ToJS NavigatorUABrandVersion := ⟨fun d => Internal.fields #[("brand", Internal.optional d.brand),
+    ("version", Internal.optional d.version)]⟩
 instance : FromJS NavigatorUABrandVersion where
   fromJS d := do return {
     brand := ← Lasm.JS.readField (Option String) d "brand",
@@ -47,6 +53,17 @@ structure UADataValues where
   uaFullVersion : Option String := none
   /-- `boolean wow64` -/
   wow64 : Option Bool := none
+instance : ToJS UADataValues := ⟨fun d => Internal.fields #[("architecture", Internal.optional d.architecture),
+    ("bitness", Internal.optional d.bitness),
+    ("brands", Internal.optional d.brands),
+    ("formFactors", Internal.optional d.formFactors),
+    ("fullVersionList", Internal.optional d.fullVersionList),
+    ("model", Internal.optional d.model),
+    ("mobile", Internal.optional d.mobile),
+    ("platform", Internal.optional d.platform),
+    ("platformVersion", Internal.optional d.platformVersion),
+    ("uaFullVersion", Internal.optional d.uaFullVersion),
+    ("wow64", Internal.optional d.wow64)]⟩
 instance : FromJS UADataValues where
   fromJS d := do return {
     architecture := ← Lasm.JS.readField (Option String) d "architecture",
@@ -70,6 +87,9 @@ structure UALowEntropyJSON where
   mobile : Option Bool := none
   /-- `DOMString platform` -/
   platform : Option String := none
+instance : ToJS UALowEntropyJSON := ⟨fun d => Internal.fields #[("brands", Internal.optional d.brands),
+    ("mobile", Internal.optional d.mobile),
+    ("platform", Internal.optional d.platform)]⟩
 instance : FromJS UALowEntropyJSON where
   fromJS d := do return {
     brands := ← Lasm.JS.readField (Option (Array NavigatorUABrandVersion)) d "brands",
@@ -78,33 +98,36 @@ instance : FromJS UALowEntropyJSON where
   typeName := "Lasm.JS.Web.UALowEntropyJSON"
 
 /-- `v instanceof NavigatorUAData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NavigatorUAData`). -/
-def NavigatorUAData.cast? (v : Value) : IO (Option NavigatorUAData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NavigatorUAData"] Value) v) then some { val := v } else none
+@[macro_inline] def NavigatorUAData.cast? (v : Value) : IO (Option NavigatorUAData) := Internal.api "Lasm.JS.Web.NavigatorUAData.cast?" do
+  Internal.cast (Internal.getGlobal ["NavigatorUAData"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<NavigatorUABrandVersion> brands` -/
-def NavigatorUAData.brands (self : NavigatorUAData) : IO (Array NavigatorUABrandVersion) := self.val.get "brands" (Array NavigatorUABrandVersion)
+@[macro_inline] def NavigatorUAData.brands (self : NavigatorUAData) : IO (Array NavigatorUABrandVersion) := Internal.api "Lasm.JS.Web.NavigatorUAData.brands" do
+  self.val.get "brands" (Array NavigatorUABrandVersion)
 
 /-- `readonly attribute boolean mobile` -/
-def NavigatorUAData.mobile (self : NavigatorUAData) : IO Bool := self.val.get "mobile" Bool
+@[macro_inline] def NavigatorUAData.mobile (self : NavigatorUAData) : IO Bool := Internal.api "Lasm.JS.Web.NavigatorUAData.mobile" do
+  self.val.get "mobile" Bool
 
 /-- `readonly attribute DOMString platform` -/
-def NavigatorUAData.platform (self : NavigatorUAData) : IO String := self.val.get "platform" String
+@[macro_inline] def NavigatorUAData.platform (self : NavigatorUAData) : IO String := Internal.api "Lasm.JS.Web.NavigatorUAData.platform" do
+  self.val.get "platform" String
 
 /-- `Promise<UADataValues> getHighEntropyValues(sequence<DOMString> hints)` -/
-def NavigatorUAData.getHighEntropyValues (self : NavigatorUAData) (hints : Array String) : Async UADataValues :=
-  self.val.callMethodAwait "getHighEntropyValues" (Support.args #[toJS hints]) UADataValues
+@[macro_inline] def NavigatorUAData.getHighEntropyValues (self : NavigatorUAData) (hints : Array String) : Async UADataValues := Internal.api "Lasm.JS.Web.NavigatorUAData.getHighEntropyValues" do
+  self.val.callMethodAwait "getHighEntropyValues" (Internal.args #[toJS hints]) UADataValues
 
 /-- `UALowEntropyJSON toJSON()` -/
-def NavigatorUAData.toJSON (self : NavigatorUAData) : IO UALowEntropyJSON :=
-  self.val.callMethod "toJSON" (Support.args #[]) UALowEntropyJSON
+@[macro_inline] def NavigatorUAData.toJSON (self : NavigatorUAData) : IO UALowEntropyJSON := Internal.api "Lasm.JS.Web.NavigatorUAData.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) UALowEntropyJSON
 
 /-- `readonly attribute NavigatorUAData userAgentData` -/
-def Navigator.userAgentData (self : Navigator) : IO NavigatorUAData := do
+@[macro_inline] def Navigator.userAgentData (self : Navigator) : IO NavigatorUAData := Internal.api "Lasm.JS.Web.Navigator.userAgentData" do
   let r ← self.val.get "userAgentData" Value
   pure { val := r }
 
 /-- `readonly attribute NavigatorUAData userAgentData` -/
-def WorkerNavigator.userAgentData (self : WorkerNavigator) : IO NavigatorUAData := do
+@[macro_inline] def WorkerNavigator.userAgentData (self : WorkerNavigator) : IO NavigatorUAData := Internal.api "Lasm.JS.Web.WorkerNavigator.userAgentData" do
   let r ← self.val.get "userAgentData" Value
   pure { val := r }
 

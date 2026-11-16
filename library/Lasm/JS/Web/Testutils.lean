@@ -9,10 +9,13 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<undefined> gc()` (Test Utils Standard (https://testutils.spec.whatwg.org/)) -/
-def TestUtils.gc : Async Unit :=
+@[macro_inline] def TestUtils.gc : Async Unit := Internal.api "Lasm.JS.Web.TestUtils.gc" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.TestUtils.gc", module := "globalThis", path := "TestUtils.gc", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 end Lasm.JS.Web

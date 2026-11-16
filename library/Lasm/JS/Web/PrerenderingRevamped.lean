@@ -6,23 +6,30 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.NavigationTiming
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute boolean prerendering` -/
-def Document.prerendering (self : Document) : IO Bool := self.val.get "prerendering" Bool
+@[macro_inline] def Document.prerendering (self : Document) : IO Bool := Internal.api "Lasm.JS.Web.Document.prerendering" do
+  self.val.get "prerendering" Bool
 
 /-- `attribute EventHandler onprerenderingchange` -/
-def Document.onprerenderingchange (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onprerenderingchange" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onprerenderingchange (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onprerenderingchange" do
+  self.val.get "onprerenderingchange" (Option EventHandlerNonNull)
 
 /-- Sets `onprerenderingchange`: `attribute EventHandler onprerenderingchange` -/
-def Document.setOnprerenderingchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnprerenderingchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnprerenderingchange" do
   self.val.set "onprerenderingchange" (toJS value)
 
 /-- `readonly attribute DOMHighResTimeStamp activationStart` -/
-def PerformanceNavigationTiming.activationStart (self : PerformanceNavigationTiming) : IO Float := self.val.get "activationStart" Float
+@[macro_inline] def PerformanceNavigationTiming.activationStart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.activationStart" do
+  self.val.get "activationStart" Float
 
 end Lasm.JS.Web

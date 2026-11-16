@@ -6,104 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.ShapeDetectionApi
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.ImageCapture
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum BarcodeFormat` (Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)): "aztec", "code_128", "code_39", "code_93", "codabar", "data_matrix", "ean_13", "ean_8", "itf", "pdf417", "qr_code", "unknown", "upc_a", "upc_e". -/
-inductive BarcodeFormat where
-  /-- "aztec" -/
-  | aztec
-  /-- "code_128" -/
-  | code128
-  /-- "code_39" -/
-  | code39
-  /-- "code_93" -/
-  | code93
-  /-- "codabar" -/
-  | codabar
-  /-- "data_matrix" -/
-  | dataMatrix
-  /-- "ean_13" -/
-  | ean13
-  /-- "ean_8" -/
-  | ean8
-  /-- "itf" -/
-  | itf
-  /-- "pdf417" -/
-  | pdf417
-  /-- "qr_code" -/
-  | qrCode
-  /-- "unknown" -/
-  | unknown
-  /-- "upc_a" -/
-  | upcA
-  /-- "upc_e" -/
-  | upcE
-  deriving BEq, Repr, Inhabited
-instance : ToJS BarcodeFormat := ⟨fun
-  | .aztec => .string "aztec"
-  | .code128 => .string "code_128"
-  | .code39 => .string "code_39"
-  | .code93 => .string "code_93"
-  | .codabar => .string "codabar"
-  | .dataMatrix => .string "data_matrix"
-  | .ean13 => .string "ean_13"
-  | .ean8 => .string "ean_8"
-  | .itf => .string "itf"
-  | .pdf417 => .string "pdf417"
-  | .qrCode => .string "qr_code"
-  | .unknown => .string "unknown"
-  | .upcA => .string "upc_a"
-  | .upcE => .string "upc_e"⟩
-instance : FromJS BarcodeFormat where
-  fromJS
-    | .string "aztec" => .ok .aztec
-    | .string "code_128" => .ok .code128
-    | .string "code_39" => .ok .code39
-    | .string "code_93" => .ok .code93
-    | .string "codabar" => .ok .codabar
-    | .string "data_matrix" => .ok .dataMatrix
-    | .string "ean_13" => .ok .ean13
-    | .string "ean_8" => .ok .ean8
-    | .string "itf" => .ok .itf
-    | .string "pdf417" => .ok .pdf417
-    | .string "qr_code" => .ok .qrCode
-    | .string "unknown" => .ok .unknown
-    | .string "upc_a" => .ok .upcA
-    | .string "upc_e" => .ok .upcE
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BarcodeFormat"
-
-/-- `enum LandmarkType` (Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)): "mouth", "eye", "nose". -/
-inductive LandmarkType where
-  /-- "mouth" -/
-  | mouth
-  /-- "eye" -/
-  | eye
-  /-- "nose" -/
-  | nose
-  deriving BEq, Repr, Inhabited
-instance : ToJS LandmarkType := ⟨fun
-  | .mouth => .string "mouth"
-  | .eye => .string "eye"
-  | .nose => .string "nose"⟩
-instance : FromJS LandmarkType where
-  fromJS
-    | .string "mouth" => .ok .mouth
-    | .string "eye" => .ok .eye
-    | .string "nose" => .ok .nose
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LandmarkType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BarcodeDetectorOptions` (Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BarcodeDetectorOptions where
   /-- `sequence<BarcodeFormat> formats` -/
   formats : Option (Array BarcodeFormat) := none
-instance : ToJS BarcodeDetectorOptions := ⟨fun d => Support.fields #[("formats", Support.optional d.formats)]⟩
+instance : ToJS BarcodeDetectorOptions := ⟨fun d => Internal.fields #[("formats", Internal.optional d.formats)]⟩
 
 /-- `dictionary DetectedBarcode` (Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DetectedBarcode where
@@ -115,6 +33,10 @@ structure DetectedBarcode where
   format : BarcodeFormat
   /-- `required sequence<Point2D> cornerPoints` -/
   cornerPoints : Array Point2D
+instance : ToJS DetectedBarcode := ⟨fun d => Internal.fields #[("boundingBox", toJS d.boundingBox),
+    ("rawValue", toJS d.rawValue),
+    ("format", toJS d.format),
+    ("cornerPoints", toJS d.cornerPoints)]⟩
 instance : FromJS DetectedBarcode where
   fromJS d := do return {
     boundingBox := ← Lasm.JS.readField DOMRectReadOnly d "boundingBox",
@@ -129,8 +51,8 @@ structure FaceDetectorOptions where
   maxDetectedFaces : Option Nat := none
   /-- `boolean fastMode` -/
   fastMode : Option Bool := none
-instance : ToJS FaceDetectorOptions := ⟨fun d => Support.fields #[("maxDetectedFaces", Support.optional d.maxDetectedFaces),
-    ("fastMode", Support.optional d.fastMode)]⟩
+instance : ToJS FaceDetectorOptions := ⟨fun d => Internal.fields #[("maxDetectedFaces", Internal.optional d.maxDetectedFaces),
+    ("fastMode", Internal.optional d.fastMode)]⟩
 
 /-- `dictionary Landmark` (Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Landmark where
@@ -138,6 +60,8 @@ structure Landmark where
   locations : Array Point2D
   /-- `LandmarkType type` -/
   type : Option LandmarkType := none
+instance : ToJS Landmark := ⟨fun d => Internal.fields #[("locations", toJS d.locations),
+    ("type", Internal.optional d.type)]⟩
 instance : FromJS Landmark where
   fromJS d := do return {
     locations := ← Lasm.JS.readField (Array Point2D) d "locations",
@@ -150,6 +74,8 @@ structure DetectedFace where
   boundingBox : DOMRectReadOnly
   /-- `required sequence<Landmark>? landmarks` -/
   landmarks : Option (Array Landmark)
+instance : ToJS DetectedFace := ⟨fun d => Internal.fields #[("boundingBox", toJS d.boundingBox),
+    ("landmarks", toJS d.landmarks)]⟩
 instance : FromJS DetectedFace where
   fromJS d := do return {
     boundingBox := ← Lasm.JS.readField DOMRectReadOnly d "boundingBox",
@@ -157,34 +83,34 @@ instance : FromJS DetectedFace where
   typeName := "Lasm.JS.Web.DetectedFace"
 
 /-- `v instanceof BarcodeDetector`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BarcodeDetector`). -/
-def BarcodeDetector.cast? (v : Value) : IO (Option BarcodeDetector) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BarcodeDetector"] Value) v) then some { val := v } else none
+@[macro_inline] def BarcodeDetector.cast? (v : Value) : IO (Option BarcodeDetector) := Internal.api "Lasm.JS.Web.BarcodeDetector.cast?" do
+  Internal.cast (Internal.getGlobal ["BarcodeDetector"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional BarcodeDetectorOptions barcodeDetectorOptions)` -/
-def BarcodeDetector.new (barcodeDetectorOptions : Option BarcodeDetectorOptions := none) : IO BarcodeDetector :=
+@[macro_inline] def BarcodeDetector.new (barcodeDetectorOptions : Option BarcodeDetectorOptions := none) : IO BarcodeDetector := Internal.api "Lasm.JS.Web.BarcodeDetector.new" do
   Lasm.JS.Binding.invoke BarcodeDetector { name := "Lasm.JS.Web.BarcodeDetector.new", module := "globalThis", path := "BarcodeDetector", construct := true, arity := 1 }
-    (Support.args #[Support.optional barcodeDetectorOptions]) (await := false)
+    (Internal.args #[Internal.optional barcodeDetectorOptions]) (await := false)
 
 /-- `static Promise<sequence<BarcodeFormat>> getSupportedFormats()` -/
-def BarcodeDetector.getSupportedFormats : Async (Array BarcodeFormat) :=
+@[macro_inline] def BarcodeDetector.getSupportedFormats : Async (Array BarcodeFormat) := Internal.api "Lasm.JS.Web.BarcodeDetector.getSupportedFormats" do
   Lasm.JS.Binding.invokeAsync (Array BarcodeFormat) { name := "Lasm.JS.Web.BarcodeDetector.getSupportedFormats", module := "globalThis", path := "BarcodeDetector.getSupportedFormats", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<sequence<DetectedBarcode>> detect(ImageBitmapSource image)` -/
-def BarcodeDetector.detect (self : BarcodeDetector) (image : ImageBitmapSource) : Async (Array DetectedBarcode) :=
-  self.val.callMethodAwait "detect" (Support.args #[toJS image]) (Array DetectedBarcode)
+@[macro_inline] def BarcodeDetector.detect (self : BarcodeDetector) (image : ImageBitmapSource) : Async (Array DetectedBarcode) := Internal.api "Lasm.JS.Web.BarcodeDetector.detect" do
+  self.val.callMethodAwait "detect" (Internal.args #[toJS image]) (Array DetectedBarcode)
 
 /-- `v instanceof FaceDetector`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FaceDetector`). -/
-def FaceDetector.cast? (v : Value) : IO (Option FaceDetector) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FaceDetector"] Value) v) then some { val := v } else none
+@[macro_inline] def FaceDetector.cast? (v : Value) : IO (Option FaceDetector) := Internal.api "Lasm.JS.Web.FaceDetector.cast?" do
+  Internal.cast (Internal.getGlobal ["FaceDetector"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional FaceDetectorOptions faceDetectorOptions)` -/
-def FaceDetector.new (faceDetectorOptions : Option FaceDetectorOptions := none) : IO FaceDetector :=
+@[macro_inline] def FaceDetector.new (faceDetectorOptions : Option FaceDetectorOptions := none) : IO FaceDetector := Internal.api "Lasm.JS.Web.FaceDetector.new" do
   Lasm.JS.Binding.invoke FaceDetector { name := "Lasm.JS.Web.FaceDetector.new", module := "globalThis", path := "FaceDetector", construct := true, arity := 1 }
-    (Support.args #[Support.optional faceDetectorOptions]) (await := false)
+    (Internal.args #[Internal.optional faceDetectorOptions]) (await := false)
 
 /-- `Promise<sequence<DetectedFace>> detect(ImageBitmapSource image)` -/
-def FaceDetector.detect (self : FaceDetector) (image : ImageBitmapSource) : Async (Array DetectedFace) :=
-  self.val.callMethodAwait "detect" (Support.args #[toJS image]) (Array DetectedFace)
+@[macro_inline] def FaceDetector.detect (self : FaceDetector) (image : ImageBitmapSource) : Async (Array DetectedFace) := Internal.api "Lasm.JS.Web.FaceDetector.detect" do
+  self.val.callMethodAwait "detect" (Internal.args #[toJS image]) (Array DetectedFace)
 
 end Lasm.JS.Web

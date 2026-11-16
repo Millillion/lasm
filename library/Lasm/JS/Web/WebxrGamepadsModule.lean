@@ -6,12 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Gamepad
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute Gamepad? gamepad` -/
-def XRInputSource.gamepad (self : XRInputSource) : IO (Option Gamepad) := self.val.get "gamepad" (Option Gamepad)
+@[macro_inline] def XRInputSource.gamepad (self : XRInputSource) : IO (Option Gamepad) := Internal.api "Lasm.JS.Web.XRInputSource.gamepad" do
+  self.val.get "gamepad" (Option Gamepad)
 
 end Lasm.JS.Web

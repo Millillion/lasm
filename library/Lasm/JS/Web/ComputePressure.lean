@@ -6,48 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ComputePressure
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PressureSource` (Compute Pressure Level 1 (https://w3c.github.io/compute-pressure/)): "cpu". -/
-inductive PressureSource where
-  /-- "cpu" -/
-  | cpu
-  deriving BEq, Repr, Inhabited
-instance : ToJS PressureSource := ⟨fun
-  | .cpu => .string "cpu"⟩
-instance : FromJS PressureSource where
-  fromJS
-    | .string "cpu" => .ok .cpu
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PressureSource"
-
-/-- `enum PressureState` (Compute Pressure Level 1 (https://w3c.github.io/compute-pressure/)): "nominal", "fair", "serious", "critical". -/
-inductive PressureState where
-  /-- "nominal" -/
-  | nominal
-  /-- "fair" -/
-  | fair
-  /-- "serious" -/
-  | serious
-  /-- "critical" -/
-  | critical
-  deriving BEq, Repr, Inhabited
-instance : ToJS PressureState := ⟨fun
-  | .nominal => .string "nominal"
-  | .fair => .string "fair"
-  | .serious => .string "serious"
-  | .critical => .string "critical"⟩
-instance : FromJS PressureState where
-  fromJS
-    | .string "nominal" => .ok .nominal
-    | .string "fair" => .ok .fair
-    | .string "serious" => .ok .serious
-    | .string "critical" => .ok .critical
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PressureState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback PressureUpdateCallback = undefined (sequence<PressureRecord> changes, PressureObserver observer)` (Compute Pressure Level 1 (https://w3c.github.io/compute-pressure/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PressureUpdateCallback where
@@ -58,60 +23,64 @@ instance : ToJS PressureUpdateCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PressureUpdateCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.PressureUpdateCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PressureUpdateCallback.ofFn (f : (Array PressureRecord) → PressureObserver → Async Unit) : IO PressureUpdateCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array PressureRecord) args 0) (← Support.arg PressureObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Array PressureRecord) args 0) (← Internal.arg PressureObserver args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PressureUpdateCallback.ofSyncFn (f : (Array PressureRecord) → PressureObserver → IO Unit) : IO PressureUpdateCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array PressureRecord) args 0) (← Support.arg PressureObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Array PressureRecord) args 0) (← Internal.arg PressureObserver args 1)) }
 
 /-- `dictionary PressureObserverOptions` (Compute Pressure Level 1 (https://w3c.github.io/compute-pressure/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PressureObserverOptions where
   /-- `unsigned long sampleInterval = 0` -/
   sampleInterval : Option Nat := none
-instance : ToJS PressureObserverOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval)]⟩
+instance : ToJS PressureObserverOptions := ⟨fun d => Internal.fields #[("sampleInterval", Internal.optional d.sampleInterval)]⟩
 
 /-- `v instanceof PressureObserver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PressureObserver`). -/
-def PressureObserver.cast? (v : Value) : IO (Option PressureObserver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PressureObserver"] Value) v) then some { val := v } else none
+@[macro_inline] def PressureObserver.cast? (v : Value) : IO (Option PressureObserver) := Internal.api "Lasm.JS.Web.PressureObserver.cast?" do
+  Internal.cast (Internal.getGlobal ["PressureObserver"] Value) (fun x => { val := x }) v
 
 /-- `constructor(PressureUpdateCallback callback)` -/
-def PressureObserver.new (callback : PressureUpdateCallback) : IO PressureObserver :=
+@[macro_inline] def PressureObserver.new (callback : PressureUpdateCallback) : IO PressureObserver := Internal.api "Lasm.JS.Web.PressureObserver.new" do
   Lasm.JS.Binding.invoke PressureObserver { name := "Lasm.JS.Web.PressureObserver.new", module := "globalThis", path := "PressureObserver", construct := true, arity := 1 }
-    (Support.args #[toJS callback]) (await := false)
+    (Internal.args #[toJS callback]) (await := false)
 
 /-- `static readonly attribute FrozenArray<PressureSource> knownSources` -/
-def PressureObserver.knownSources : IO (Array PressureSource) := Support.getGlobal ["PressureObserver", "knownSources"] (Array PressureSource)
+@[macro_inline] def PressureObserver.knownSources : IO (Array PressureSource) := Internal.api "Lasm.JS.Web.PressureObserver.knownSources" do
+  Internal.getGlobal ["PressureObserver", "knownSources"] (Array PressureSource)
 
 /-- `Promise<undefined> observe(PressureSource source, optional PressureObserverOptions options)` -/
-def PressureObserver.observe (self : PressureObserver) (source : PressureSource) (options : Option PressureObserverOptions := none) : Async Unit :=
-  self.val.callMethodAwait "observe" (Support.args #[toJS source, Support.optional options]) Unit
+@[macro_inline] def PressureObserver.observe (self : PressureObserver) (source : PressureSource) (options : Option PressureObserverOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.PressureObserver.observe" do
+  self.val.callMethodAwait "observe" (Internal.args #[toJS source, Internal.optional options]) Unit
 
 /-- `undefined unobserve(PressureSource source)` -/
-def PressureObserver.unobserve (self : PressureObserver) (source : PressureSource) : IO Unit :=
-  self.val.callMethod "unobserve" (Support.args #[toJS source]) Unit
+@[macro_inline] def PressureObserver.unobserve (self : PressureObserver) (source : PressureSource) : IO Unit := Internal.api "Lasm.JS.Web.PressureObserver.unobserve" do
+  self.val.callMethod "unobserve" (Internal.args #[toJS source]) Unit
 
 /-- `undefined disconnect()` -/
-def PressureObserver.disconnect (self : PressureObserver) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def PressureObserver.disconnect (self : PressureObserver) : IO Unit := Internal.api "Lasm.JS.Web.PressureObserver.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `sequence<PressureRecord> takeRecords()` -/
-def PressureObserver.takeRecords (self : PressureObserver) : IO (Array PressureRecord) :=
-  self.val.callMethod "takeRecords" (Support.args #[]) (Array PressureRecord)
+@[macro_inline] def PressureObserver.takeRecords (self : PressureObserver) : IO (Array PressureRecord) := Internal.api "Lasm.JS.Web.PressureObserver.takeRecords" do
+  self.val.callMethod "takeRecords" (Internal.args #[]) (Array PressureRecord)
 
 /-- `v instanceof PressureRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PressureRecord`). -/
-def PressureRecord.cast? (v : Value) : IO (Option PressureRecord) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PressureRecord"] Value) v) then some { val := v } else none
+@[macro_inline] def PressureRecord.cast? (v : Value) : IO (Option PressureRecord) := Internal.api "Lasm.JS.Web.PressureRecord.cast?" do
+  Internal.cast (Internal.getGlobal ["PressureRecord"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute PressureSource source` -/
-def PressureRecord.source (self : PressureRecord) : IO PressureSource := self.val.get "source" PressureSource
+@[macro_inline] def PressureRecord.source (self : PressureRecord) : IO PressureSource := Internal.api "Lasm.JS.Web.PressureRecord.source" do
+  self.val.get "source" PressureSource
 
 /-- `readonly attribute PressureState state` -/
-def PressureRecord.state (self : PressureRecord) : IO PressureState := self.val.get "state" PressureState
+@[macro_inline] def PressureRecord.state (self : PressureRecord) : IO PressureState := Internal.api "Lasm.JS.Web.PressureRecord.state" do
+  self.val.get "state" PressureState
 
 /-- `readonly attribute DOMHighResTimeStamp time` -/
-def PressureRecord.time (self : PressureRecord) : IO Float := self.val.get "time" Float
+@[macro_inline] def PressureRecord.time (self : PressureRecord) : IO Float := Internal.api "Lasm.JS.Web.PressureRecord.time" do
+  self.val.get "time" Float
 
 /-- `object toJSON()` -/
-def PressureRecord.toJSON (self : PressureRecord) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PressureRecord.toJSON (self : PressureRecord) : IO Data := Internal.api "Lasm.JS.Web.PressureRecord.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 end Lasm.JS.Web

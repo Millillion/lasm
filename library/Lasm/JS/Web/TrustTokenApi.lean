@@ -6,61 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.TrustTokenApi
+import Lasm.JS.Web.Types.Xhr
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum TokenVersion` (Private State Token API (https://wicg.github.io/trust-token-api/)): "1". -/
-inductive TokenVersion where
-  /-- "1" -/
-  | v1
-  deriving BEq, Repr, Inhabited
-instance : ToJS TokenVersion := ⟨fun
-  | .v1 => .string "1"⟩
-instance : FromJS TokenVersion where
-  fromJS
-    | .string "1" => .ok .v1
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.TokenVersion"
-
-/-- `enum OperationType` (Private State Token API (https://wicg.github.io/trust-token-api/)): "token-request", "send-redemption-record", "token-redemption". -/
-inductive OperationType where
-  /-- "token-request" -/
-  | tokenRequest
-  /-- "send-redemption-record" -/
-  | sendRedemptionRecord
-  /-- "token-redemption" -/
-  | tokenRedemption
-  deriving BEq, Repr, Inhabited
-instance : ToJS OperationType := ⟨fun
-  | .tokenRequest => .string "token-request"
-  | .sendRedemptionRecord => .string "send-redemption-record"
-  | .tokenRedemption => .string "token-redemption"⟩
-instance : FromJS OperationType where
-  fromJS
-    | .string "token-request" => .ok .tokenRequest
-    | .string "send-redemption-record" => .ok .sendRedemptionRecord
-    | .string "token-redemption" => .ok .tokenRedemption
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.OperationType"
-
-/-- `enum RefreshPolicy` (Private State Token API (https://wicg.github.io/trust-token-api/)): "none", "refresh". -/
-inductive RefreshPolicy where
-  /-- "none" -/
-  | none
-  /-- "refresh" -/
-  | refresh
-  deriving BEq, Repr, Inhabited
-instance : ToJS RefreshPolicy := ⟨fun
-  | .none => .string "none"
-  | .refresh => .string "refresh"⟩
-instance : FromJS RefreshPolicy where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "refresh" => .ok .refresh
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RefreshPolicy"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PrivateToken` (Private State Token API (https://wicg.github.io/trust-token-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PrivateToken where
@@ -72,28 +27,29 @@ structure PrivateToken where
   refreshPolicy : Option RefreshPolicy := none
   /-- `sequence<USVString> issuers` -/
   issuers : Option (Array String) := none
-instance : ToJS PrivateToken := ⟨fun d => Support.fields #[("version", toJS d.version),
+instance : ToJS PrivateToken := ⟨fun d => Internal.fields #[("version", toJS d.version),
     ("operation", toJS d.operation),
-    ("refreshPolicy", Support.optional d.refreshPolicy),
-    ("issuers", Support.optional d.issuers)]⟩
+    ("refreshPolicy", Internal.optional d.refreshPolicy),
+    ("issuers", Internal.optional d.issuers)]⟩
 
 /-- `Promise<boolean> hasPrivateToken(USVString issuer)` -/
-def Document.hasPrivateToken (self : Document) (issuer : String) : Async Bool :=
-  self.val.callMethodAwait "hasPrivateToken" (Support.args #[toJS issuer]) Bool
+@[macro_inline] def Document.hasPrivateToken (self : Document) (issuer : String) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasPrivateToken" do
+  self.val.callMethodAwait "hasPrivateToken" (Internal.args #[toJS issuer]) Bool
 
 /-- `Promise<boolean> hasRedemptionRecord(USVString issuer)` -/
-def Document.hasRedemptionRecord (self : Document) (issuer : String) : Async Bool :=
-  self.val.callMethodAwait "hasRedemptionRecord" (Support.args #[toJS issuer]) Bool
+@[macro_inline] def Document.hasRedemptionRecord (self : Document) (issuer : String) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasRedemptionRecord" do
+  self.val.callMethodAwait "hasRedemptionRecord" (Internal.args #[toJS issuer]) Bool
 
 /-- `attribute DOMString privateToken` -/
-def HTMLIFrameElement.privateToken (self : HTMLIFrameElement) : IO String := self.val.get "privateToken" String
+@[macro_inline] def HTMLIFrameElement.privateToken (self : HTMLIFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLIFrameElement.privateToken" do
+  self.val.get "privateToken" String
 
 /-- Sets `privateToken`: `attribute DOMString privateToken` -/
-def HTMLIFrameElement.setPrivateToken (self : HTMLIFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLIFrameElement.setPrivateToken (self : HTMLIFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setPrivateToken" do
   self.val.set "privateToken" (toJS value)
 
 /-- `undefined setPrivateToken(PrivateToken privateToken)` -/
-def XMLHttpRequest.setPrivateToken (self : XMLHttpRequest) (privateToken : PrivateToken) : IO Unit :=
-  self.val.callMethod "setPrivateToken" (Support.args #[toJS privateToken]) Unit
+@[macro_inline] def XMLHttpRequest.setPrivateToken (self : XMLHttpRequest) (privateToken : PrivateToken) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setPrivateToken" do
+  self.val.callMethod "setPrivateToken" (Internal.args #[toJS privateToken]) Unit
 
 end Lasm.JS.Web

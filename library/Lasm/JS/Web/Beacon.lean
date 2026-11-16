@@ -6,14 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 import Lasm.JS.Web.Fetch
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `boolean sendBeacon(USVString url, optional BodyInit? data)` -/
-def Navigator.sendBeacon (self : Navigator) (url : String) (data : Option BodyInit := none) : IO Bool :=
-  self.val.callMethod "sendBeacon" (Support.args #[toJS url, Support.optional data]) Bool
+@[macro_inline] def Navigator.sendBeacon (self : Navigator) (url : String) (data : Option BodyInit := none) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.sendBeacon" do
+  self.val.callMethod "sendBeacon" (Internal.args #[toJS url, Internal.optional data]) Bool
 
 end Lasm.JS.Web

@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Requestidlecallback
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback IdleRequestCallback = undefined (IdleDeadline deadline)` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure IdleRequestCallback where
@@ -20,36 +24,45 @@ instance : ToJS IdleRequestCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS IdleRequestCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.IdleRequestCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def IdleRequestCallback.ofFn (f : IdleDeadline → Async Unit) : IO IdleRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg IdleDeadline args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg IdleDeadline args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def IdleRequestCallback.ofSyncFn (f : IdleDeadline → IO Unit) : IO IdleRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg IdleDeadline args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg IdleDeadline args 0)) }
 
 /-- `dictionary IdleRequestOptions` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IdleRequestOptions where
   /-- `unsigned long timeout` -/
   timeout : Option Nat := none
-instance : ToJS IdleRequestOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout)]⟩
+instance : ToJS IdleRequestOptions := ⟨fun d => Internal.fields #[("timeout", Internal.optional d.timeout)]⟩
 
 /-- `v instanceof IdleDeadline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdleDeadline`). -/
-def IdleDeadline.cast? (v : Value) : IO (Option IdleDeadline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IdleDeadline"] Value) v) then some { val := v } else none
+@[macro_inline] def IdleDeadline.cast? (v : Value) : IO (Option IdleDeadline) := Internal.api "Lasm.JS.Web.IdleDeadline.cast?" do
+  Internal.cast (Internal.getGlobal ["IdleDeadline"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean didTimeout` -/
-def IdleDeadline.didTimeout (self : IdleDeadline) : IO Bool := self.val.get "didTimeout" Bool
+@[macro_inline] def IdleDeadline.didTimeout (self : IdleDeadline) : IO Bool := Internal.api "Lasm.JS.Web.IdleDeadline.didTimeout" do
+  self.val.get "didTimeout" Bool
 
 /-- `DOMHighResTimeStamp timeRemaining()` -/
-def IdleDeadline.timeRemaining (self : IdleDeadline) : IO Float :=
-  self.val.callMethod "timeRemaining" (Support.args #[]) Float
+@[macro_inline] def IdleDeadline.timeRemaining (self : IdleDeadline) : IO Float := Internal.api "Lasm.JS.Web.IdleDeadline.timeRemaining" do
+  self.val.callMethod "timeRemaining" (Internal.args #[]) Float
+
+/-- `unsigned long requestIdleCallback(IdleRequestCallback callback, optional IdleRequestOptions options)` -/
+@[macro_inline] def Window.requestIdleCallback (self : Window) (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.Window.requestIdleCallback" do
+  self.val.callMethod "requestIdleCallback" (Internal.args #[toJS callback, Internal.optional options]) Nat
+
+/-- `undefined cancelIdleCallback(unsigned long handle)` -/
+@[macro_inline] def Window.cancelIdleCallback (self : Window) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Window.cancelIdleCallback" do
+  self.val.callMethod "cancelIdleCallback" (Internal.args #[toJS handle]) Unit
 
 /-- `unsigned long requestIdleCallback(IdleRequestCallback callback, optional IdleRequestOptions options)` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)) -/
-def requestIdleCallback (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO Nat :=
+@[macro_inline] def requestIdleCallback (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.requestIdleCallback" do
   Lasm.JS.Binding.invoke Nat { name := "Lasm.JS.Web.requestIdleCallback", module := "globalThis", path := "requestIdleCallback", construct := false, arity := 2 }
-    (Support.args #[toJS callback, Support.optional options]) (await := false)
+    (Internal.args #[toJS callback, Internal.optional options]) (await := false)
 
 /-- `undefined cancelIdleCallback(unsigned long handle)` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)) -/
-def cancelIdleCallback (handle : Nat) : IO Unit :=
+@[macro_inline] def cancelIdleCallback (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.cancelIdleCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.cancelIdleCallback", module := "globalThis", path := "cancelIdleCallback", construct := false, arity := 1 }
-    (Support.args #[toJS handle]) (await := false)
+    (Internal.args #[toJS handle]) (await := false)
 
 end Lasm.JS.Web

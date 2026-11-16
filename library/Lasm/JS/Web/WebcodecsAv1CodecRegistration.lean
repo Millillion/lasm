@@ -9,11 +9,14 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary VideoEncoderEncodeOptionsForAv1` (AV1 WebCodecs Registration (https://w3c.github.io/webcodecs/av1_codec_registration.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoEncoderEncodeOptionsForAv1 where
   /-- `unsigned short? quantizer` -/
   quantizer : Option Nat := none
-instance : ToJS VideoEncoderEncodeOptionsForAv1 := ⟨fun d => Support.fields #[("quantizer", Support.optional d.quantizer)]⟩
+instance : ToJS VideoEncoderEncodeOptionsForAv1 := ⟨fun d => Internal.fields #[("quantizer", Internal.optional d.quantizer)]⟩
 
 end Lasm.JS.Web

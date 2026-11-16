@@ -9,5 +9,23 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary IntegrityViolationReportBody : ReportBody` (Subresource Integrity (https://w3c.github.io/webappsec-subresource-integrity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IntegrityViolationReportBody where
+  /-- `USVString documentURL` -/
+  documentURL : Option String := none
+  /-- `USVString blockedURL` -/
+  blockedURL : Option String := none
+  /-- `USVString destination` -/
+  destination : Option String := none
+  /-- `boolean reportOnly` -/
+  reportOnly : Option Bool := none
+instance : ToJS IntegrityViolationReportBody := ⟨fun d => Internal.fields #[("documentURL", Internal.optional d.documentURL),
+    ("blockedURL", Internal.optional d.blockedURL),
+    ("destination", Internal.optional d.destination),
+    ("reportOnly", Internal.optional d.reportOnly)]⟩
 
 end Lasm.JS.Web

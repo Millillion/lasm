@@ -6,66 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webmidi
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MIDIPortType` (Web MIDI API (https://webaudio.github.io/web-midi-api/)): "input", "output". -/
-inductive MIDIPortType where
-  /-- "input" -/
-  | input
-  /-- "output" -/
-  | output
-  deriving BEq, Repr, Inhabited
-instance : ToJS MIDIPortType := ⟨fun
-  | .input => .string "input"
-  | .output => .string "output"⟩
-instance : FromJS MIDIPortType where
-  fromJS
-    | .string "input" => .ok .input
-    | .string "output" => .ok .output
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MIDIPortType"
-
-/-- `enum MIDIPortDeviceState` (Web MIDI API (https://webaudio.github.io/web-midi-api/)): "disconnected", "connected". -/
-inductive MIDIPortDeviceState where
-  /-- "disconnected" -/
-  | disconnected
-  /-- "connected" -/
-  | connected
-  deriving BEq, Repr, Inhabited
-instance : ToJS MIDIPortDeviceState := ⟨fun
-  | .disconnected => .string "disconnected"
-  | .connected => .string "connected"⟩
-instance : FromJS MIDIPortDeviceState where
-  fromJS
-    | .string "disconnected" => .ok .disconnected
-    | .string "connected" => .ok .connected
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MIDIPortDeviceState"
-
-/-- `enum MIDIPortConnectionState` (Web MIDI API (https://webaudio.github.io/web-midi-api/)): "open", "closed", "pending". -/
-inductive MIDIPortConnectionState where
-  /-- "open" -/
-  | «open»
-  /-- "closed" -/
-  | closed
-  /-- "pending" -/
-  | pending
-  deriving BEq, Repr, Inhabited
-instance : ToJS MIDIPortConnectionState := ⟨fun
-  | .«open» => .string "open"
-  | .closed => .string "closed"
-  | .pending => .string "pending"⟩
-instance : FromJS MIDIPortConnectionState where
-  fromJS
-    | .string "open" => .ok .«open»
-    | .string "closed" => .ok .closed
-    | .string "pending" => .ok .pending
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MIDIPortConnectionState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MIDIConnectionEventInit : EventInit` (Web MIDI API (https://webaudio.github.io/web-midi-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MIDIConnectionEventInit where
@@ -77,10 +27,10 @@ structure MIDIConnectionEventInit where
   composed : Option Bool := none
   /-- `MIDIPort port` -/
   port : Option MIDIPort := none
-instance : ToJS MIDIConnectionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("port", Support.optional d.port)]⟩
+instance : ToJS MIDIConnectionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("port", Internal.optional d.port)]⟩
 
 /-- `dictionary MIDIMessageEventInit : EventInit` (Web MIDI API (https://webaudio.github.io/web-midi-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MIDIMessageEventInit where
@@ -92,10 +42,10 @@ structure MIDIMessageEventInit where
   composed : Option Bool := none
   /-- `Uint8Array data` -/
   data : Option ByteArray := none
-instance : ToJS MIDIMessageEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("data", Support.optional d.data)]⟩
+instance : ToJS MIDIMessageEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("data", Internal.optional d.data)]⟩
 
 /-- `dictionary MIDIOptions` (Web MIDI API (https://webaudio.github.io/web-midi-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MIDIOptions where
@@ -103,133 +53,155 @@ structure MIDIOptions where
   sysex : Option Bool := none
   /-- `boolean software` -/
   software : Option Bool := none
-instance : ToJS MIDIOptions := ⟨fun d => Support.fields #[("sysex", Support.optional d.sysex),
-    ("software", Support.optional d.software)]⟩
+instance : ToJS MIDIOptions := ⟨fun d => Internal.fields #[("sysex", Internal.optional d.sysex),
+    ("software", Internal.optional d.software)]⟩
+
+/-- `dictionary MidiPermissionDescriptor : PermissionDescriptor` (Web MIDI API (https://webaudio.github.io/web-midi-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MidiPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `boolean sysex = false` -/
+  sysex : Option Bool := none
+instance : ToJS MidiPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("sysex", Internal.optional d.sysex)]⟩
 
 /-- `v instanceof MIDIAccess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIAccess`). -/
-def MIDIAccess.cast? (v : Value) : IO (Option MIDIAccess) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIAccess"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIAccess.cast? (v : Value) : IO (Option MIDIAccess) := Internal.api "Lasm.JS.Web.MIDIAccess.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIAccess"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MIDIInputMap inputs` -/
-def MIDIAccess.inputs (self : MIDIAccess) : IO MIDIInputMap := do
+@[macro_inline] def MIDIAccess.inputs (self : MIDIAccess) : IO MIDIInputMap := Internal.api "Lasm.JS.Web.MIDIAccess.inputs" do
   let r ← self.val.get "inputs" Value
   pure { val := r }
 
 /-- `readonly attribute MIDIOutputMap outputs` -/
-def MIDIAccess.outputs (self : MIDIAccess) : IO MIDIOutputMap := do
+@[macro_inline] def MIDIAccess.outputs (self : MIDIAccess) : IO MIDIOutputMap := Internal.api "Lasm.JS.Web.MIDIAccess.outputs" do
   let r ← self.val.get "outputs" Value
   pure { val := r }
 
 /-- `attribute EventHandler onstatechange` -/
-def MIDIAccess.onstatechange (self : MIDIAccess) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def MIDIAccess.onstatechange (self : MIDIAccess) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MIDIAccess.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def MIDIAccess.setOnstatechange (self : MIDIAccess) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MIDIAccess.setOnstatechange (self : MIDIAccess) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MIDIAccess.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `readonly attribute boolean sysexEnabled` -/
-def MIDIAccess.sysexEnabled (self : MIDIAccess) : IO Bool := self.val.get "sysexEnabled" Bool
+@[macro_inline] def MIDIAccess.sysexEnabled (self : MIDIAccess) : IO Bool := Internal.api "Lasm.JS.Web.MIDIAccess.sysexEnabled" do
+  self.val.get "sysexEnabled" Bool
 
 /-- `v instanceof MIDIConnectionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIConnectionEvent`). -/
-def MIDIConnectionEvent.cast? (v : Value) : IO (Option MIDIConnectionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIConnectionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIConnectionEvent.cast? (v : Value) : IO (Option MIDIConnectionEvent) := Internal.api "Lasm.JS.Web.MIDIConnectionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIConnectionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional MIDIConnectionEventInit eventInitDict)` -/
-def MIDIConnectionEvent.new (type : String) (eventInitDict : Option MIDIConnectionEventInit := none) : IO MIDIConnectionEvent :=
+@[macro_inline] def MIDIConnectionEvent.new (type : String) (eventInitDict : Option MIDIConnectionEventInit := none) : IO MIDIConnectionEvent := Internal.api "Lasm.JS.Web.MIDIConnectionEvent.new" do
   Lasm.JS.Binding.invoke MIDIConnectionEvent { name := "Lasm.JS.Web.MIDIConnectionEvent.new", module := "globalThis", path := "MIDIConnectionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute MIDIPort? port` -/
-def MIDIConnectionEvent.port (self : MIDIConnectionEvent) : IO (Option MIDIPort) := self.val.get "port" (Option MIDIPort)
+@[macro_inline] def MIDIConnectionEvent.port (self : MIDIConnectionEvent) : IO (Option MIDIPort) := Internal.api "Lasm.JS.Web.MIDIConnectionEvent.port" do
+  self.val.get "port" (Option MIDIPort)
 
 /-- `v instanceof MIDIInputMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIInputMap`). -/
-def MIDIInputMap.cast? (v : Value) : IO (Option MIDIInputMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIInputMap"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIInputMap.cast? (v : Value) : IO (Option MIDIInputMap) := Internal.api "Lasm.JS.Web.MIDIInputMap.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIInputMap"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof MIDIMessageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIMessageEvent`). -/
-def MIDIMessageEvent.cast? (v : Value) : IO (Option MIDIMessageEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIMessageEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIMessageEvent.cast? (v : Value) : IO (Option MIDIMessageEvent) := Internal.api "Lasm.JS.Web.MIDIMessageEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIMessageEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional MIDIMessageEventInit eventInitDict)` -/
-def MIDIMessageEvent.new (type : String) (eventInitDict : Option MIDIMessageEventInit := none) : IO MIDIMessageEvent :=
+@[macro_inline] def MIDIMessageEvent.new (type : String) (eventInitDict : Option MIDIMessageEventInit := none) : IO MIDIMessageEvent := Internal.api "Lasm.JS.Web.MIDIMessageEvent.new" do
   Lasm.JS.Binding.invoke MIDIMessageEvent { name := "Lasm.JS.Web.MIDIMessageEvent.new", module := "globalThis", path := "MIDIMessageEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute Uint8Array? data` -/
-def MIDIMessageEvent.data (self : MIDIMessageEvent) : IO (Option ByteArray) := self.val.get "data" (Option ByteArray)
+@[macro_inline] def MIDIMessageEvent.data (self : MIDIMessageEvent) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.MIDIMessageEvent.data" do
+  self.val.get "data" (Option ByteArray)
 
 /-- `v instanceof MIDIOutputMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIOutputMap`). -/
-def MIDIOutputMap.cast? (v : Value) : IO (Option MIDIOutputMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIOutputMap"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIOutputMap.cast? (v : Value) : IO (Option MIDIOutputMap) := Internal.api "Lasm.JS.Web.MIDIOutputMap.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIOutputMap"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof MIDIPort`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIPort`). -/
-def MIDIPort.cast? (v : Value) : IO (Option MIDIPort) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIPort"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIPort.cast? (v : Value) : IO (Option MIDIPort) := Internal.api "Lasm.JS.Web.MIDIPort.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIPort"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString id` -/
-def MIDIPort.id (self : MIDIPort) : IO String := self.val.get "id" String
+@[macro_inline] def MIDIPort.id (self : MIDIPort) : IO String := Internal.api "Lasm.JS.Web.MIDIPort.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute DOMString? manufacturer` -/
-def MIDIPort.manufacturer (self : MIDIPort) : IO (Option String) := self.val.get "manufacturer" (Option String)
+@[macro_inline] def MIDIPort.manufacturer (self : MIDIPort) : IO (Option String) := Internal.api "Lasm.JS.Web.MIDIPort.manufacturer" do
+  self.val.get "manufacturer" (Option String)
 
 /-- `readonly attribute DOMString? name` -/
-def MIDIPort.name (self : MIDIPort) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def MIDIPort.name (self : MIDIPort) : IO (Option String) := Internal.api "Lasm.JS.Web.MIDIPort.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly attribute MIDIPortType type` -/
-def MIDIPort.type (self : MIDIPort) : IO MIDIPortType := self.val.get "type" MIDIPortType
+@[macro_inline] def MIDIPort.type (self : MIDIPort) : IO MIDIPortType := Internal.api "Lasm.JS.Web.MIDIPort.type" do
+  self.val.get "type" MIDIPortType
 
 /-- `readonly attribute DOMString? version` -/
-def MIDIPort.version (self : MIDIPort) : IO (Option String) := self.val.get "version" (Option String)
+@[macro_inline] def MIDIPort.version (self : MIDIPort) : IO (Option String) := Internal.api "Lasm.JS.Web.MIDIPort.version" do
+  self.val.get "version" (Option String)
 
 /-- `readonly attribute MIDIPortDeviceState state` -/
-def MIDIPort.state (self : MIDIPort) : IO MIDIPortDeviceState := self.val.get "state" MIDIPortDeviceState
+@[macro_inline] def MIDIPort.state (self : MIDIPort) : IO MIDIPortDeviceState := Internal.api "Lasm.JS.Web.MIDIPort.state" do
+  self.val.get "state" MIDIPortDeviceState
 
 /-- `readonly attribute MIDIPortConnectionState connection` -/
-def MIDIPort.connection (self : MIDIPort) : IO MIDIPortConnectionState := self.val.get "connection" MIDIPortConnectionState
+@[macro_inline] def MIDIPort.connection (self : MIDIPort) : IO MIDIPortConnectionState := Internal.api "Lasm.JS.Web.MIDIPort.connection" do
+  self.val.get "connection" MIDIPortConnectionState
 
 /-- `attribute EventHandler onstatechange` -/
-def MIDIPort.onstatechange (self : MIDIPort) : IO (Option EventHandlerNonNull) := self.val.get "onstatechange" (Option EventHandlerNonNull)
+@[macro_inline] def MIDIPort.onstatechange (self : MIDIPort) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MIDIPort.onstatechange" do
+  self.val.get "onstatechange" (Option EventHandlerNonNull)
 
 /-- Sets `onstatechange`: `attribute EventHandler onstatechange` -/
-def MIDIPort.setOnstatechange (self : MIDIPort) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MIDIPort.setOnstatechange (self : MIDIPort) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MIDIPort.setOnstatechange" do
   self.val.set "onstatechange" (toJS value)
 
 /-- `Promise<MIDIPort> open()` -/
-def MIDIPort.«open» (self : MIDIPort) : Async MIDIPort := do
-  let r ← self.val.callMethodAwait "open" (Support.args #[]) Value
+@[macro_inline] def MIDIPort.«open» (self : MIDIPort) : Async MIDIPort := Internal.api "Lasm.JS.Web.MIDIPort.open" do
+  let r ← self.val.callMethodAwait "open" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<MIDIPort> close()` -/
-def MIDIPort.close (self : MIDIPort) : Async MIDIPort := do
-  let r ← self.val.callMethodAwait "close" (Support.args #[]) Value
+@[macro_inline] def MIDIPort.close (self : MIDIPort) : Async MIDIPort := Internal.api "Lasm.JS.Web.MIDIPort.close" do
+  let r ← self.val.callMethodAwait "close" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof MIDIInput`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIInput`). -/
-def MIDIInput.cast? (v : Value) : IO (Option MIDIInput) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIInput"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIInput.cast? (v : Value) : IO (Option MIDIInput) := Internal.api "Lasm.JS.Web.MIDIInput.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIInput"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onmidimessage` -/
-def MIDIInput.onmidimessage (self : MIDIInput) : IO (Option EventHandlerNonNull) := self.val.get "onmidimessage" (Option EventHandlerNonNull)
+@[macro_inline] def MIDIInput.onmidimessage (self : MIDIInput) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MIDIInput.onmidimessage" do
+  self.val.get "onmidimessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmidimessage`: `attribute EventHandler onmidimessage` -/
-def MIDIInput.setOnmidimessage (self : MIDIInput) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MIDIInput.setOnmidimessage (self : MIDIInput) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MIDIInput.setOnmidimessage" do
   self.val.set "onmidimessage" (toJS value)
 
 /-- `v instanceof MIDIOutput`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIDIOutput`). -/
-def MIDIOutput.cast? (v : Value) : IO (Option MIDIOutput) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MIDIOutput"] Value) v) then some { val := v } else none
+@[macro_inline] def MIDIOutput.cast? (v : Value) : IO (Option MIDIOutput) := Internal.api "Lasm.JS.Web.MIDIOutput.cast?" do
+  Internal.cast (Internal.getGlobal ["MIDIOutput"] Value) (fun x => { val := x }) v
 
 /-- `undefined send(sequence<octet> data, optional DOMHighResTimeStamp timestamp)` -/
-def MIDIOutput.send (self : MIDIOutput) (data : Array Nat) (timestamp : Option Float := none) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data, Support.optional timestamp]) Unit
+@[macro_inline] def MIDIOutput.send (self : MIDIOutput) (data : Array Nat) (timestamp : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Web.MIDIOutput.send" do
+  self.val.callMethod "send" (Internal.args #[toJS data, Internal.optional timestamp]) Unit
 
 /-- `undefined clear()` -/
-def MIDIOutput.clear (self : MIDIOutput) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def MIDIOutput.clear (self : MIDIOutput) : IO Unit := Internal.api "Lasm.JS.Web.MIDIOutput.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options)` -/
-def Navigator.requestMIDIAccess (self : Navigator) (options : Option MIDIOptions := none) : Async MIDIAccess := do
-  let r ← self.val.callMethodAwait "requestMIDIAccess" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Navigator.requestMIDIAccess (self : Navigator) (options : Option MIDIOptions := none) : Async MIDIAccess := Internal.api "Lasm.JS.Web.Navigator.requestMIDIAccess" do
+  let r ← self.val.callMethodAwait "requestMIDIAccess" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

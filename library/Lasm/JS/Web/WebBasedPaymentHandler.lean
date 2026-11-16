@@ -6,37 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.WebBasedPaymentHandler
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.PaymentRequest
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PaymentDelegation` (Web-based Payment Handler API (https://w3c.github.io/web-based-payment-handler/)): "shippingAddress", "payerName", "payerPhone", "payerEmail". -/
-inductive PaymentDelegation where
-  /-- "shippingAddress" -/
-  | shippingAddress
-  /-- "payerName" -/
-  | payerName
-  /-- "payerPhone" -/
-  | payerPhone
-  /-- "payerEmail" -/
-  | payerEmail
-  deriving BEq, Repr, Inhabited
-instance : ToJS PaymentDelegation := ⟨fun
-  | .shippingAddress => .string "shippingAddress"
-  | .payerName => .string "payerName"
-  | .payerPhone => .string "payerPhone"
-  | .payerEmail => .string "payerEmail"⟩
-instance : FromJS PaymentDelegation where
-  fromJS
-    | .string "shippingAddress" => .ok .shippingAddress
-    | .string "payerName" => .ok .payerName
-    | .string "payerPhone" => .ok .payerPhone
-    | .string "payerEmail" => .ok .payerEmail
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PaymentDelegation"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PaymentRequestEventInit : ExtendableEventInit` (Web-based Payment Handler API (https://w3c.github.io/web-based-payment-handler/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PaymentRequestEventInit where
@@ -62,17 +41,17 @@ structure PaymentRequestEventInit where
   paymentOptions : Option PaymentOptions := none
   /-- `sequence<PaymentShippingOption> shippingOptions` -/
   shippingOptions : Option (Array PaymentShippingOption) := none
-instance : ToJS PaymentRequestEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("topOrigin", Support.optional d.topOrigin),
-    ("paymentRequestOrigin", Support.optional d.paymentRequestOrigin),
-    ("paymentRequestId", Support.optional d.paymentRequestId),
-    ("methodData", Support.optional d.methodData),
-    ("total", Support.optional d.total),
-    ("modifiers", Support.optional d.modifiers),
-    ("paymentOptions", Support.optional d.paymentOptions),
-    ("shippingOptions", Support.optional d.shippingOptions)]⟩
+instance : ToJS PaymentRequestEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("topOrigin", Internal.optional d.topOrigin),
+    ("paymentRequestOrigin", Internal.optional d.paymentRequestOrigin),
+    ("paymentRequestId", Internal.optional d.paymentRequestId),
+    ("methodData", Internal.optional d.methodData),
+    ("total", Internal.optional d.total),
+    ("modifiers", Internal.optional d.modifiers),
+    ("paymentOptions", Internal.optional d.paymentOptions),
+    ("shippingOptions", Internal.optional d.shippingOptions)]⟩
 
 /-- `dictionary PaymentRequestDetailsUpdate` (Web-based Payment Handler API (https://w3c.github.io/web-based-payment-handler/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PaymentRequestDetailsUpdate where
@@ -88,6 +67,12 @@ structure PaymentRequestDetailsUpdate where
   paymentMethodErrors : Data := .undefined
   /-- `AddressErrors shippingAddressErrors` -/
   shippingAddressErrors : Option AddressErrors := none
+instance : ToJS PaymentRequestDetailsUpdate := ⟨fun d => Internal.fields #[("error", Internal.optional d.error),
+    ("total", Internal.optional d.total),
+    ("modifiers", Internal.optional d.modifiers),
+    ("shippingOptions", Internal.optional d.shippingOptions),
+    ("paymentMethodErrors", d.paymentMethodErrors),
+    ("shippingAddressErrors", Internal.optional d.shippingAddressErrors)]⟩
 instance : FromJS PaymentRequestDetailsUpdate where
   fromJS d := do return {
     error := ← Lasm.JS.readField (Option String) d "error",
@@ -120,16 +105,16 @@ structure AddressInit where
   recipient : Option String := none
   /-- `DOMString phone = ""` -/
   phone : Option String := none
-instance : ToJS AddressInit := ⟨fun d => Support.fields #[("country", Support.optional d.country),
-    ("addressLine", Support.optional d.addressLine),
-    ("region", Support.optional d.region),
-    ("city", Support.optional d.city),
-    ("dependentLocality", Support.optional d.dependentLocality),
-    ("postalCode", Support.optional d.postalCode),
-    ("sortingCode", Support.optional d.sortingCode),
-    ("organization", Support.optional d.organization),
-    ("recipient", Support.optional d.recipient),
-    ("phone", Support.optional d.phone)]⟩
+instance : ToJS AddressInit := ⟨fun d => Internal.fields #[("country", Internal.optional d.country),
+    ("addressLine", Internal.optional d.addressLine),
+    ("region", Internal.optional d.region),
+    ("city", Internal.optional d.city),
+    ("dependentLocality", Internal.optional d.dependentLocality),
+    ("postalCode", Internal.optional d.postalCode),
+    ("sortingCode", Internal.optional d.sortingCode),
+    ("organization", Internal.optional d.organization),
+    ("recipient", Internal.optional d.recipient),
+    ("phone", Internal.optional d.phone)]⟩
 
 /-- `dictionary PaymentHandlerResponse` (Web-based Payment Handler API (https://w3c.github.io/web-based-payment-handler/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PaymentHandlerResponse where
@@ -147,104 +132,122 @@ structure PaymentHandlerResponse where
   shippingAddress : Option AddressInit := none
   /-- `DOMString? shippingOption` -/
   shippingOption : Option String := none
+instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("methodName", Internal.optional d.methodName),
+    ("details", d.details),
+    ("payerName", Internal.optional d.payerName),
+    ("payerEmail", Internal.optional d.payerEmail),
+    ("payerPhone", Internal.optional d.payerPhone),
+    ("shippingAddress", Internal.optional d.shippingAddress),
+    ("shippingOption", Internal.optional d.shippingOption)]⟩
 
 /-- `v instanceof CanMakePaymentEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CanMakePaymentEvent`). -/
-def CanMakePaymentEvent.cast? (v : Value) : IO (Option CanMakePaymentEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CanMakePaymentEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CanMakePaymentEvent.cast? (v : Value) : IO (Option CanMakePaymentEvent) := Internal.api "Lasm.JS.Web.CanMakePaymentEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CanMakePaymentEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type)` -/
-def CanMakePaymentEvent.new (type : String) : IO CanMakePaymentEvent :=
+@[macro_inline] def CanMakePaymentEvent.new (type : String) : IO CanMakePaymentEvent := Internal.api "Lasm.JS.Web.CanMakePaymentEvent.new" do
   Lasm.JS.Binding.invoke CanMakePaymentEvent { name := "Lasm.JS.Web.CanMakePaymentEvent.new", module := "globalThis", path := "CanMakePaymentEvent", construct := true, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
 
 /-- `undefined respondWith(Promise<boolean> canMakePaymentResponse)` -/
-def CanMakePaymentEvent.respondWith (self : CanMakePaymentEvent) (canMakePaymentResponse : Value) : IO Unit :=
-  self.val.callMethod "respondWith" (Support.args #[toJS canMakePaymentResponse]) Unit
+@[macro_inline] def CanMakePaymentEvent.respondWith (self : CanMakePaymentEvent) (canMakePaymentResponse : Value) : IO Unit := Internal.api "Lasm.JS.Web.CanMakePaymentEvent.respondWith" do
+  self.val.callMethod "respondWith" (Internal.args #[toJS canMakePaymentResponse]) Unit
 
 /-- `v instanceof PaymentManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PaymentManager`). -/
-def PaymentManager.cast? (v : Value) : IO (Option PaymentManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PaymentManager"] Value) v) then some { val := v } else none
+@[macro_inline] def PaymentManager.cast? (v : Value) : IO (Option PaymentManager) := Internal.api "Lasm.JS.Web.PaymentManager.cast?" do
+  Internal.cast (Internal.getGlobal ["PaymentManager"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString userHint` -/
-def PaymentManager.userHint (self : PaymentManager) : IO String := self.val.get "userHint" String
+@[macro_inline] def PaymentManager.userHint (self : PaymentManager) : IO String := Internal.api "Lasm.JS.Web.PaymentManager.userHint" do
+  self.val.get "userHint" String
 
 /-- Sets `userHint`: `attribute DOMString userHint` -/
-def PaymentManager.setUserHint (self : PaymentManager) (value : String) : IO Unit :=
+@[macro_inline] def PaymentManager.setUserHint (self : PaymentManager) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.PaymentManager.setUserHint" do
   self.val.set "userHint" (toJS value)
 
 /-- `Promise<undefined> enableDelegations(sequence<PaymentDelegation> delegations)` -/
-def PaymentManager.enableDelegations (self : PaymentManager) (delegations : Array PaymentDelegation) : Async Unit :=
-  self.val.callMethodAwait "enableDelegations" (Support.args #[toJS delegations]) Unit
+@[macro_inline] def PaymentManager.enableDelegations (self : PaymentManager) (delegations : Array PaymentDelegation) : Async Unit := Internal.api "Lasm.JS.Web.PaymentManager.enableDelegations" do
+  self.val.callMethodAwait "enableDelegations" (Internal.args #[toJS delegations]) Unit
 
 /-- `v instanceof PaymentRequestEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PaymentRequestEvent`). -/
-def PaymentRequestEvent.cast? (v : Value) : IO (Option PaymentRequestEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PaymentRequestEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PaymentRequestEvent.cast? (v : Value) : IO (Option PaymentRequestEvent) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PaymentRequestEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional PaymentRequestEventInit eventInitDict)` -/
-def PaymentRequestEvent.new (type : String) (eventInitDict : Option PaymentRequestEventInit := none) : IO PaymentRequestEvent :=
+@[macro_inline] def PaymentRequestEvent.new (type : String) (eventInitDict : Option PaymentRequestEventInit := none) : IO PaymentRequestEvent := Internal.api "Lasm.JS.Web.PaymentRequestEvent.new" do
   Lasm.JS.Binding.invoke PaymentRequestEvent { name := "Lasm.JS.Web.PaymentRequestEvent.new", module := "globalThis", path := "PaymentRequestEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute USVString topOrigin` -/
-def PaymentRequestEvent.topOrigin (self : PaymentRequestEvent) : IO String := self.val.get "topOrigin" String
+@[macro_inline] def PaymentRequestEvent.topOrigin (self : PaymentRequestEvent) : IO String := Internal.api "Lasm.JS.Web.PaymentRequestEvent.topOrigin" do
+  self.val.get "topOrigin" String
 
 /-- `readonly attribute USVString paymentRequestOrigin` -/
-def PaymentRequestEvent.paymentRequestOrigin (self : PaymentRequestEvent) : IO String := self.val.get "paymentRequestOrigin" String
+@[macro_inline] def PaymentRequestEvent.paymentRequestOrigin (self : PaymentRequestEvent) : IO String := Internal.api "Lasm.JS.Web.PaymentRequestEvent.paymentRequestOrigin" do
+  self.val.get "paymentRequestOrigin" String
 
 /-- `readonly attribute DOMString paymentRequestId` -/
-def PaymentRequestEvent.paymentRequestId (self : PaymentRequestEvent) : IO String := self.val.get "paymentRequestId" String
+@[macro_inline] def PaymentRequestEvent.paymentRequestId (self : PaymentRequestEvent) : IO String := Internal.api "Lasm.JS.Web.PaymentRequestEvent.paymentRequestId" do
+  self.val.get "paymentRequestId" String
 
 /-- `readonly attribute FrozenArray<PaymentMethodData> methodData` -/
-def PaymentRequestEvent.methodData (self : PaymentRequestEvent) : IO (Array PaymentMethodData) := self.val.get "methodData" (Array PaymentMethodData)
+@[macro_inline] def PaymentRequestEvent.methodData (self : PaymentRequestEvent) : IO (Array PaymentMethodData) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.methodData" do
+  self.val.get "methodData" (Array PaymentMethodData)
 
 /-- `readonly attribute object total` -/
-def PaymentRequestEvent.total (self : PaymentRequestEvent) : IO Data := self.val.get "total" Data
+@[macro_inline] def PaymentRequestEvent.total (self : PaymentRequestEvent) : IO Data := Internal.api "Lasm.JS.Web.PaymentRequestEvent.total" do
+  self.val.get "total" Data
 
 /-- `readonly attribute FrozenArray<PaymentDetailsModifier> modifiers` -/
-def PaymentRequestEvent.modifiers (self : PaymentRequestEvent) : IO (Array PaymentDetailsModifier) := self.val.get "modifiers" (Array PaymentDetailsModifier)
+@[macro_inline] def PaymentRequestEvent.modifiers (self : PaymentRequestEvent) : IO (Array PaymentDetailsModifier) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.modifiers" do
+  self.val.get "modifiers" (Array PaymentDetailsModifier)
 
 /-- `readonly attribute object? paymentOptions` -/
-def PaymentRequestEvent.paymentOptions (self : PaymentRequestEvent) : IO (Option Data) := self.val.get "paymentOptions" (Option Data)
+@[macro_inline] def PaymentRequestEvent.paymentOptions (self : PaymentRequestEvent) : IO (Option Data) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.paymentOptions" do
+  self.val.get "paymentOptions" (Option Data)
 
 /-- `readonly attribute FrozenArray<PaymentShippingOption>? shippingOptions` -/
-def PaymentRequestEvent.shippingOptions (self : PaymentRequestEvent) : IO (Option (Array PaymentShippingOption)) := self.val.get "shippingOptions" (Option (Array PaymentShippingOption))
+@[macro_inline] def PaymentRequestEvent.shippingOptions (self : PaymentRequestEvent) : IO (Option (Array PaymentShippingOption)) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.shippingOptions" do
+  self.val.get "shippingOptions" (Option (Array PaymentShippingOption))
 
 /-- `Promise<WindowClient?> openWindow(USVString url)` -/
-def PaymentRequestEvent.openWindow (self : PaymentRequestEvent) (url : String) : Async (Option WindowClient) :=
-  self.val.callMethodAwait "openWindow" (Support.args #[toJS url]) (Option WindowClient)
+@[macro_inline] def PaymentRequestEvent.openWindow (self : PaymentRequestEvent) (url : String) : Async (Option WindowClient) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.openWindow" do
+  self.val.callMethodAwait "openWindow" (Internal.args #[toJS url]) (Option WindowClient)
 
 /-- `Promise<PaymentRequestDetailsUpdate?> changePaymentMethod(DOMString methodName, optional object? methodDetails)` -/
-def PaymentRequestEvent.changePaymentMethod (self : PaymentRequestEvent) (methodName : String) (methodDetails : Data := .undefined) : Async (Option PaymentRequestDetailsUpdate) :=
-  self.val.callMethodAwait "changePaymentMethod" (Support.args #[toJS methodName, methodDetails]) (Option PaymentRequestDetailsUpdate)
+@[macro_inline] def PaymentRequestEvent.changePaymentMethod (self : PaymentRequestEvent) (methodName : String) (methodDetails : Data := .undefined) : Async (Option PaymentRequestDetailsUpdate) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.changePaymentMethod" do
+  self.val.callMethodAwait "changePaymentMethod" (Internal.args #[toJS methodName, methodDetails]) (Option PaymentRequestDetailsUpdate)
 
 /-- `Promise<PaymentRequestDetailsUpdate?> changeShippingAddress(optional AddressInit shippingAddress)` -/
-def PaymentRequestEvent.changeShippingAddress (self : PaymentRequestEvent) (shippingAddress : Option AddressInit := none) : Async (Option PaymentRequestDetailsUpdate) :=
-  self.val.callMethodAwait "changeShippingAddress" (Support.args #[Support.optional shippingAddress]) (Option PaymentRequestDetailsUpdate)
+@[macro_inline] def PaymentRequestEvent.changeShippingAddress (self : PaymentRequestEvent) (shippingAddress : Option AddressInit := none) : Async (Option PaymentRequestDetailsUpdate) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.changeShippingAddress" do
+  self.val.callMethodAwait "changeShippingAddress" (Internal.args #[Internal.optional shippingAddress]) (Option PaymentRequestDetailsUpdate)
 
 /-- `Promise<PaymentRequestDetailsUpdate?> changeShippingOption(DOMString shippingOption)` -/
-def PaymentRequestEvent.changeShippingOption (self : PaymentRequestEvent) (shippingOption : String) : Async (Option PaymentRequestDetailsUpdate) :=
-  self.val.callMethodAwait "changeShippingOption" (Support.args #[toJS shippingOption]) (Option PaymentRequestDetailsUpdate)
+@[macro_inline] def PaymentRequestEvent.changeShippingOption (self : PaymentRequestEvent) (shippingOption : String) : Async (Option PaymentRequestDetailsUpdate) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.changeShippingOption" do
+  self.val.callMethodAwait "changeShippingOption" (Internal.args #[toJS shippingOption]) (Option PaymentRequestDetailsUpdate)
 
 /-- `undefined respondWith(Promise<PaymentHandlerResponse> handlerResponsePromise)` -/
-def PaymentRequestEvent.respondWith (self : PaymentRequestEvent) (handlerResponsePromise : Value) : IO Unit :=
-  self.val.callMethod "respondWith" (Support.args #[toJS handlerResponsePromise]) Unit
+@[macro_inline] def PaymentRequestEvent.respondWith (self : PaymentRequestEvent) (handlerResponsePromise : Value) : IO Unit := Internal.api "Lasm.JS.Web.PaymentRequestEvent.respondWith" do
+  self.val.callMethod "respondWith" (Internal.args #[toJS handlerResponsePromise]) Unit
 
 /-- `attribute EventHandler oncanmakepayment` -/
-def ServiceWorkerGlobalScope.oncanmakepayment (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "oncanmakepayment" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.oncanmakepayment (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncanmakepayment" do
+  self.val.get "oncanmakepayment" (Option EventHandlerNonNull)
 
 /-- Sets `oncanmakepayment`: `attribute EventHandler oncanmakepayment` -/
-def ServiceWorkerGlobalScope.setOncanmakepayment (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOncanmakepayment (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncanmakepayment" do
   self.val.set "oncanmakepayment" (toJS value)
 
 /-- `attribute EventHandler onpaymentrequest` -/
-def ServiceWorkerGlobalScope.onpaymentrequest (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onpaymentrequest" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onpaymentrequest (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpaymentrequest" do
+  self.val.get "onpaymentrequest" (Option EventHandlerNonNull)
 
 /-- Sets `onpaymentrequest`: `attribute EventHandler onpaymentrequest` -/
-def ServiceWorkerGlobalScope.setOnpaymentrequest (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnpaymentrequest (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnpaymentrequest" do
   self.val.set "onpaymentrequest" (toJS value)
 
 /-- `readonly attribute PaymentManager paymentManager` -/
-def ServiceWorkerRegistration.paymentManager (self : ServiceWorkerRegistration) : IO PaymentManager := do
+@[macro_inline] def ServiceWorkerRegistration.paymentManager (self : ServiceWorkerRegistration) : IO PaymentManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.paymentManager" do
   let r ← self.val.get "paymentManager" Value
   pure { val := r }
 

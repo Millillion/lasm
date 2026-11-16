@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssFonts
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(unsigned long or sequence<unsigned long>)`: one constructor per member type. -/
 inductive UnsignedLongOrSequenceOfUnsignedLong where
@@ -24,74 +28,79 @@ instance : Coe Nat UnsignedLongOrSequenceOfUnsignedLong := ⟨.unsignedLong⟩
 instance : Coe (Array Nat) UnsignedLongOrSequenceOfUnsignedLong := ⟨.sequence⟩
 
 /-- `v instanceof CSSFontFeatureValuesMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFontFeatureValuesMap`). -/
-def CSSFontFeatureValuesMap.cast? (v : Value) : IO (Option CSSFontFeatureValuesMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFontFeatureValuesMap"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFontFeatureValuesMap.cast? (v : Value) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesMap.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFontFeatureValuesMap"] Value) (fun x => { val := x }) v
 
 /-- `undefined set(CSSOMString featureValueName, (unsigned long or sequence<unsigned long>) values)` -/
-def CSSFontFeatureValuesMap.set (self : CSSFontFeatureValuesMap) (featureValueName : String) (values : UnsignedLongOrSequenceOfUnsignedLong) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS featureValueName, toJS values]) Unit
+@[macro_inline] def CSSFontFeatureValuesMap.set (self : CSSFontFeatureValuesMap) (featureValueName : String) (values : UnsignedLongOrSequenceOfUnsignedLong) : IO Unit := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesMap.set" do
+  self.val.callMethod "set" (Internal.args #[toJS featureValueName, toJS values]) Unit
 
 /-- `v instanceof CSSFontFeatureValuesRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFontFeatureValuesRule`). -/
-def CSSFontFeatureValuesRule.cast? (v : Value) : IO (Option CSSFontFeatureValuesRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFontFeatureValuesRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFontFeatureValuesRule.cast? (v : Value) : IO (Option CSSFontFeatureValuesRule) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFontFeatureValuesRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString fontFamily` -/
-def CSSFontFeatureValuesRule.fontFamily (self : CSSFontFeatureValuesRule) : IO String := self.val.get "fontFamily" String
+@[macro_inline] def CSSFontFeatureValuesRule.fontFamily (self : CSSFontFeatureValuesRule) : IO String := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.fontFamily" do
+  self.val.get "fontFamily" String
 
 /-- Sets `fontFamily`: `attribute CSSOMString fontFamily` -/
-def CSSFontFeatureValuesRule.setFontFamily (self : CSSFontFeatureValuesRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSFontFeatureValuesRule.setFontFamily (self : CSSFontFeatureValuesRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.setFontFamily" do
   self.val.set "fontFamily" (toJS value)
 
 /-- `readonly attribute CSSFontFeatureValuesMap annotation` -/
-def CSSFontFeatureValuesRule.annotation (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.annotation (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.annotation" do
   let r ← self.val.get "annotation" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap ornaments` -/
-def CSSFontFeatureValuesRule.ornaments (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.ornaments (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.ornaments" do
   let r ← self.val.get "ornaments" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap stylistic` -/
-def CSSFontFeatureValuesRule.stylistic (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.stylistic (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.stylistic" do
   let r ← self.val.get "stylistic" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap swash` -/
-def CSSFontFeatureValuesRule.swash (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.swash (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.swash" do
   let r ← self.val.get "swash" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap characterVariant` -/
-def CSSFontFeatureValuesRule.characterVariant (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.characterVariant (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.characterVariant" do
   let r ← self.val.get "characterVariant" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap styleset` -/
-def CSSFontFeatureValuesRule.styleset (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.styleset (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.styleset" do
   let r ← self.val.get "styleset" Value
   pure { val := r }
 
 /-- `readonly attribute CSSFontFeatureValuesMap historicalForms` -/
-def CSSFontFeatureValuesRule.historicalForms (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := do
+@[macro_inline] def CSSFontFeatureValuesRule.historicalForms (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.historicalForms" do
   let r ← self.val.get "historicalForms" Value
   pure { val := r }
 
 /-- `v instanceof CSSFontPaletteValuesRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSFontPaletteValuesRule`). -/
-def CSSFontPaletteValuesRule.cast? (v : Value) : IO (Option CSSFontPaletteValuesRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSFontPaletteValuesRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSFontPaletteValuesRule.cast? (v : Value) : IO (Option CSSFontPaletteValuesRule) := Internal.api "Lasm.JS.Web.CSSFontPaletteValuesRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSFontPaletteValuesRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSFontPaletteValuesRule.name (self : CSSFontPaletteValuesRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSFontPaletteValuesRule.name (self : CSSFontPaletteValuesRule) : IO String := Internal.api "Lasm.JS.Web.CSSFontPaletteValuesRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CSSOMString fontFamily` -/
-def CSSFontPaletteValuesRule.fontFamily (self : CSSFontPaletteValuesRule) : IO String := self.val.get "fontFamily" String
+@[macro_inline] def CSSFontPaletteValuesRule.fontFamily (self : CSSFontPaletteValuesRule) : IO String := Internal.api "Lasm.JS.Web.CSSFontPaletteValuesRule.fontFamily" do
+  self.val.get "fontFamily" String
 
 /-- `readonly attribute CSSOMString basePalette` -/
-def CSSFontPaletteValuesRule.basePalette (self : CSSFontPaletteValuesRule) : IO String := self.val.get "basePalette" String
+@[macro_inline] def CSSFontPaletteValuesRule.basePalette (self : CSSFontPaletteValuesRule) : IO String := Internal.api "Lasm.JS.Web.CSSFontPaletteValuesRule.basePalette" do
+  self.val.get "basePalette" String
 
 /-- `readonly attribute CSSOMString overrideColors` -/
-def CSSFontPaletteValuesRule.overrideColors (self : CSSFontPaletteValuesRule) : IO String := self.val.get "overrideColors" String
+@[macro_inline] def CSSFontPaletteValuesRule.overrideColors (self : CSSFontPaletteValuesRule) : IO String := Internal.api "Lasm.JS.Web.CSSFontPaletteValuesRule.overrideColors" do
+  self.val.get "overrideColors" String
 
 /-- `const unsigned short FONT_FEATURE_VALUES_RULE = 14` -/
 def CSSRule.FONT_FEATURE_VALUES_RULE : Nat := 14

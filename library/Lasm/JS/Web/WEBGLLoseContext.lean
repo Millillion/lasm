@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLLoseContext
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `undefined loseContext()` -/
-def WEBGL_lose_context.loseContext (self : WEBGL_lose_context) : IO Unit :=
-  self.val.callMethod "loseContext" (Support.args #[]) Unit
+@[macro_inline] def WEBGL_lose_context.loseContext (self : WEBGL_lose_context) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_lose_context.loseContext" do
+  self.val.callMethod "loseContext" (Internal.args #[]) Unit
 
 /-- `undefined restoreContext()` -/
-def WEBGL_lose_context.restoreContext (self : WEBGL_lose_context) : IO Unit :=
-  self.val.callMethod "restoreContext" (Support.args #[]) Unit
+@[macro_inline] def WEBGL_lose_context.restoreContext (self : WEBGL_lose_context) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_lose_context.restoreContext" do
+  self.val.callMethod "restoreContext" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

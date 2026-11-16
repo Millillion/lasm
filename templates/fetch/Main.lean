@@ -9,7 +9,9 @@ other edge targets, and Node (through Lasm.Fetch's Node server, for now).
 On Node it listens on $HOST (default 0.0.0.0) and $PORT (default 3000).
 -/
 import App
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lasm.Fetch
 import Lean.Data.Json
 open Lasm.JS Lasm.JS.Web Lean

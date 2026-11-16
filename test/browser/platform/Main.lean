@@ -1,18 +1,32 @@
 /-
 The browser platform suite (docs/BROWSER.md): one app that exercises the web
 platform from Lean in a real browser, through the generated bindings
-(`Lasm.JS.Web.Browser`, docs/JS_BINDINGS.md) and the mount glue
+(`Lasm.JS.Web`, docs/JS_BINDINGS.md) and the mount glue
 (`Lasm.UI.Mount`), run by .github/workflows/browser.yml through
 scripts/browser/browser-ci.mjs on Chromium, Firefox and WebKit. Automatic checks
 run at startup and report to `#results` (JSON) and the `results` port;
 interactive checks (clicks, typing, keys, history) are driven by the runner,
 which reads what the handlers wrote into the page. Bindings.lean holds the
-property checks of the browser tier.
+property checks of Lasm.JS.Web in a browser.
 -/
 import Std.Data.HashMap
 import Std.Async
 import Lasm.JS
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Cssom
+import Lasm.JS.Web.CssomView
+import Lasm.JS.Web.Geometry
+import Lasm.JS.Web.Uievents
+import Lasm.JS.Web.Console
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.FileAPI
+import Lasm.JS.Web.Xhr
+import Lasm.JS.Web.HrTime
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.TrustedTypes
+import Lasm.JS.Web.WaiAria
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webidl
 import Lasm.UI.Mount
 import Bindings
 import PlatformChecks
@@ -247,7 +261,7 @@ def eventFixtures (root : Element) : IO Unit := do
     submitted.setId "submitted"
     discard <| on form "submit" fun e => do
       e.preventDefault
-      let entries ← (← FormData.new (some form.val)).entries
+      let entries ← (← FormData.new (some ({ val := form.val } : HTMLFormElement))).entries
       let text ← entries.toList.mapM fun (k, v) => do
         match v with
         | .usvString t => pure s!"{k}={t}"
@@ -466,7 +480,7 @@ def socketChecks (checks : Checks) : Async Unit := do
     discard <| on ws "message" fun e => do
       let text ← match ← ({ val := e.val } : MessageEvent).data with
         | .string t => pure s!"text:{t}"
-        | .ref buffer _ => do let b ← Support.arrayBufferBytes buffer; pure s!"bytes:{b.toList}"
+        | .ref buffer _ => do let b ← Lasm.JS.Web.Internal.arrayBufferBytes buffer; pure s!"bytes:{b.toList}"
         | d => pure s!"other:{d.describe}"
       messages.modify (·.push text)
       if (← messages.get).size == 2 then got.resolve ()
@@ -611,7 +625,7 @@ def main : IO Unit := do
   canvasChecks checks root
   leanChecks checks
   appChecks checks
-  -- The browser tier's property checks (Bindings.lean).
+  -- Lasm.JS.Web's property checks (Bindings.lean).
   Bindings.run (fun name ok detail => record checks name ok detail) root.val
   -- The rest of the browser platform's property checks (PlatformChecks.lean).
   PlatformChecks.run (fun name ok detail => record checks name ok detail) root

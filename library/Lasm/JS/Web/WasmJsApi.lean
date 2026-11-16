@@ -6,116 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.WasmJsApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ValueType` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)): "i32", "i64", "f32", "f64", "v128", "externref", "anyfunc". -/
-inductive ValueType where
-  /-- "i32" -/
-  | i32
-  /-- "i64" -/
-  | i64
-  /-- "f32" -/
-  | f32
-  /-- "f64" -/
-  | f64
-  /-- "v128" -/
-  | v128
-  /-- "externref" -/
-  | externref
-  /-- "anyfunc" -/
-  | anyfunc
-  deriving BEq, Repr, Inhabited
-instance : ToJS ValueType := ⟨fun
-  | .i32 => .string "i32"
-  | .i64 => .string "i64"
-  | .f32 => .string "f32"
-  | .f64 => .string "f64"
-  | .v128 => .string "v128"
-  | .externref => .string "externref"
-  | .anyfunc => .string "anyfunc"⟩
-instance : FromJS ValueType where
-  fromJS
-    | .string "i32" => .ok .i32
-    | .string "i64" => .ok .i64
-    | .string "f32" => .ok .f32
-    | .string "f64" => .ok .f64
-    | .string "v128" => .ok .v128
-    | .string "externref" => .ok .externref
-    | .string "anyfunc" => .ok .anyfunc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ValueType"
-
-/-- `enum AddressType` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)): "i32", "i64". -/
-inductive AddressType where
-  /-- "i32" -/
-  | i32
-  /-- "i64" -/
-  | i64
-  deriving BEq, Repr, Inhabited
-instance : ToJS AddressType := ⟨fun
-  | .i32 => .string "i32"
-  | .i64 => .string "i64"⟩
-instance : FromJS AddressType where
-  fromJS
-    | .string "i32" => .ok .i32
-    | .string "i64" => .ok .i64
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AddressType"
-
-/-- `enum ImportExportKind` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)): "function", "table", "memory", "global", "tag". -/
-inductive ImportExportKind where
-  /-- "function" -/
-  | function
-  /-- "table" -/
-  | table
-  /-- "memory" -/
-  | memory
-  /-- "global" -/
-  | global
-  /-- "tag" -/
-  | tag
-  deriving BEq, Repr, Inhabited
-instance : ToJS ImportExportKind := ⟨fun
-  | .function => .string "function"
-  | .table => .string "table"
-  | .memory => .string "memory"
-  | .global => .string "global"
-  | .tag => .string "tag"⟩
-instance : FromJS ImportExportKind where
-  fromJS
-    | .string "function" => .ok .function
-    | .string "table" => .ok .table
-    | .string "memory" => .ok .memory
-    | .string "global" => .ok .global
-    | .string "tag" => .ok .tag
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ImportExportKind"
-
-/-- `enum TableKind` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)): "externref", "anyfunc". -/
-inductive TableKind where
-  /-- "externref" -/
-  | externref
-  /-- "anyfunc" -/
-  | anyfunc
-  deriving BEq, Repr, Inhabited
-instance : ToJS TableKind := ⟨fun
-  | .externref => .string "externref"
-  | .anyfunc => .string "anyfunc"⟩
-instance : FromJS TableKind where
-  fromJS
-    | .string "externref" => .ok .externref
-    | .string "anyfunc" => .ok .anyfunc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.TableKind"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ExceptionOptions` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ExceptionOptions where
   /-- `boolean traceStack = false` -/
   traceStack : Option Bool := none
-instance : ToJS ExceptionOptions := ⟨fun d => Support.fields #[("traceStack", Support.optional d.traceStack)]⟩
+instance : ToJS ExceptionOptions := ⟨fun d => Internal.fields #[("traceStack", Internal.optional d.traceStack)]⟩
 
 /-- `dictionary GlobalDescriptor` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GlobalDescriptor where
@@ -123,8 +26,8 @@ structure GlobalDescriptor where
   value : ValueType
   /-- `boolean mutable = false` -/
   mutable : Option Bool := none
-instance : ToJS GlobalDescriptor := ⟨fun d => Support.fields #[("value", toJS d.value),
-    ("mutable", Support.optional d.mutable)]⟩
+instance : ToJS GlobalDescriptor := ⟨fun d => Internal.fields #[("value", toJS d.value),
+    ("mutable", Internal.optional d.mutable)]⟩
 
 /-- `dictionary MemoryDescriptor` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MemoryDescriptor where
@@ -134,9 +37,9 @@ structure MemoryDescriptor where
   maximum : Data := .undefined
   /-- `AddressType address` -/
   address : Option AddressType := none
-instance : ToJS MemoryDescriptor := ⟨fun d => Support.fields #[("initial", toJS d.initial),
+instance : ToJS MemoryDescriptor := ⟨fun d => Internal.fields #[("initial", toJS d.initial),
     ("maximum", d.maximum),
-    ("address", Support.optional d.address)]⟩
+    ("address", Internal.optional d.address)]⟩
 
 /-- `dictionary WebAssemblyCompileOptions` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebAssemblyCompileOptions where
@@ -144,8 +47,8 @@ structure WebAssemblyCompileOptions where
   importedStringConstants : Option String := none
   /-- `sequence<USVString> builtins = []` -/
   builtins : Option (Array String) := none
-instance : ToJS WebAssemblyCompileOptions := ⟨fun d => Support.fields #[("importedStringConstants", Support.optional d.importedStringConstants),
-    ("builtins", Support.optional d.builtins)]⟩
+instance : ToJS WebAssemblyCompileOptions := ⟨fun d => Internal.fields #[("importedStringConstants", Internal.optional d.importedStringConstants),
+    ("builtins", Internal.optional d.builtins)]⟩
 
 /-- `dictionary ModuleExportDescriptor` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ModuleExportDescriptor where
@@ -153,6 +56,8 @@ structure ModuleExportDescriptor where
   name : String
   /-- `required ImportExportKind kind` -/
   kind : ImportExportKind
+instance : ToJS ModuleExportDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("kind", toJS d.kind)]⟩
 instance : FromJS ModuleExportDescriptor where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -167,6 +72,9 @@ structure ModuleImportDescriptor where
   name : String
   /-- `required ImportExportKind kind` -/
   kind : ImportExportKind
+instance : ToJS ModuleImportDescriptor := ⟨fun d => Internal.fields #[("module", toJS d.«module»),
+    ("name", toJS d.name),
+    ("kind", toJS d.kind)]⟩
 instance : FromJS ModuleImportDescriptor where
   fromJS d := do return {
     «module» := ← Lasm.JS.readField String d "module",
@@ -184,16 +92,16 @@ structure TableDescriptor where
   maximum : Data := .undefined
   /-- `AddressType address` -/
   address : Option AddressType := none
-instance : ToJS TableDescriptor := ⟨fun d => Support.fields #[("element", toJS d.element),
+instance : ToJS TableDescriptor := ⟨fun d => Internal.fields #[("element", toJS d.element),
     ("initial", toJS d.initial),
     ("maximum", d.maximum),
-    ("address", Support.optional d.address)]⟩
+    ("address", Internal.optional d.address)]⟩
 
 /-- `dictionary TagType` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TagType where
   /-- `required sequence<ValueType> parameters` -/
   parameters : Array ValueType
-instance : ToJS TagType := ⟨fun d => Support.fields #[("parameters", toJS d.parameters)]⟩
+instance : ToJS TagType := ⟨fun d => Internal.fields #[("parameters", toJS d.parameters)]⟩
 
 /-- `dictionary WebAssemblyInstantiatedSource` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebAssemblyInstantiatedSource where
@@ -201,6 +109,8 @@ structure WebAssemblyInstantiatedSource where
   «module» : WebAssembly.Module
   /-- `required Instance instance` -/
   «instance» : WebAssembly.Instance
+instance : ToJS WebAssemblyInstantiatedSource := ⟨fun d => Internal.fields #[("module", toJS d.«module»),
+    ("instance", toJS d.«instance»)]⟩
 instance : FromJS WebAssemblyInstantiatedSource where
   fromJS d := do return {
     «module» := ← Lasm.JS.readField WebAssembly.Module d "module",
@@ -208,213 +118,223 @@ instance : FromJS WebAssemblyInstantiatedSource where
   typeName := "Lasm.JS.Web.WebAssemblyInstantiatedSource"
 
 /-- `v instanceof WebAssembly.CompileError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.CompileError`). -/
-def WebAssembly.CompileError.cast? (v : Value) : IO (Option WebAssembly.CompileError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "CompileError"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.CompileError.cast? (v : Value) : IO (Option WebAssembly.CompileError) := Internal.api "Lasm.JS.Web.WebAssembly.CompileError.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "CompileError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message)` -/
-def WebAssembly.CompileError.new (message : Option String := none) : IO WebAssembly.CompileError :=
+@[macro_inline] def WebAssembly.CompileError.new (message : Option String := none) : IO WebAssembly.CompileError := Internal.api "Lasm.JS.Web.WebAssembly.CompileError.new" do
   Lasm.JS.Binding.invoke WebAssembly.CompileError { name := "Lasm.JS.Web.WebAssembly.CompileError.new", module := "globalThis", path := "WebAssembly.CompileError", construct := true, arity := 1 }
-    (Support.args #[Support.optional message]) (await := false)
+    (Internal.args #[Internal.optional message]) (await := false)
 
 /-- `readonly attribute DOMString name` -/
-def WebAssembly.CompileError.name (self : WebAssembly.CompileError) : IO String := self.val.get "name" String
+@[macro_inline] def WebAssembly.CompileError.name (self : WebAssembly.CompileError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.CompileError.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString message` -/
-def WebAssembly.CompileError.message (self : WebAssembly.CompileError) : IO String := self.val.get "message" String
+@[macro_inline] def WebAssembly.CompileError.message (self : WebAssembly.CompileError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.CompileError.message" do
+  self.val.get "message" String
 
 /-- `v instanceof WebAssembly.Exception`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Exception`). -/
-def WebAssembly.Exception.cast? (v : Value) : IO (Option WebAssembly.Exception) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Exception"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Exception.cast? (v : Value) : IO (Option WebAssembly.Exception) := Internal.api "Lasm.JS.Web.WebAssembly.Exception.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Exception"] Value) (fun x => { val := x }) v
 
 /-- `constructor(Tag exceptionTag, sequence<any> payload, optional ExceptionOptions options)` -/
-def WebAssembly.Exception.new (exceptionTag : WebAssembly.Tag) (payload : Array Data) (options : Option ExceptionOptions := none) : IO WebAssembly.Exception :=
+@[macro_inline] def WebAssembly.Exception.new (exceptionTag : WebAssembly.Tag) (payload : Array Data) (options : Option ExceptionOptions := none) : IO WebAssembly.Exception := Internal.api "Lasm.JS.Web.WebAssembly.Exception.new" do
   Lasm.JS.Binding.invoke WebAssembly.Exception { name := "Lasm.JS.Web.WebAssembly.Exception.new", module := "globalThis", path := "WebAssembly.Exception", construct := true, arity := 3 }
-    (Support.args #[toJS exceptionTag, toJS payload, Support.optional options]) (await := false)
+    (Internal.args #[toJS exceptionTag, toJS payload, Internal.optional options]) (await := false)
 
 /-- `readonly attribute (DOMString or undefined) stack` -/
-def WebAssembly.Exception.stack (self : WebAssembly.Exception) : IO (Option String) := self.val.get "stack" (Option String)
+@[macro_inline] def WebAssembly.Exception.stack (self : WebAssembly.Exception) : IO (Option String) := Internal.api "Lasm.JS.Web.WebAssembly.Exception.stack" do
+  self.val.get "stack" (Option String)
 
 /-- `any getArg(Tag exceptionTag, unsigned long index)` -/
-def WebAssembly.Exception.getArg (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) (index : Nat) : IO Data :=
-  self.val.callMethod "getArg" (Support.args #[toJS exceptionTag, toJS index]) Data
+@[macro_inline] def WebAssembly.Exception.getArg (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Exception.getArg" do
+  self.val.callMethod "getArg" (Internal.args #[toJS exceptionTag, toJS index]) Data
 
 /-- `boolean is(Tag exceptionTag)` -/
-def WebAssembly.Exception.is (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) : IO Bool :=
-  self.val.callMethod "is" (Support.args #[toJS exceptionTag]) Bool
+@[macro_inline] def WebAssembly.Exception.is (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) : IO Bool := Internal.api "Lasm.JS.Web.WebAssembly.Exception.is" do
+  self.val.callMethod "is" (Internal.args #[toJS exceptionTag]) Bool
 
 /-- `v instanceof WebAssembly.Global`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Global`). -/
-def WebAssembly.Global.cast? (v : Value) : IO (Option WebAssembly.Global) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Global"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Global.cast? (v : Value) : IO (Option WebAssembly.Global) := Internal.api "Lasm.JS.Web.WebAssembly.Global.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Global"] Value) (fun x => { val := x }) v
 
 /-- `constructor(GlobalDescriptor descriptor, optional any v)` -/
-def WebAssembly.Global.new (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO WebAssembly.Global :=
+@[macro_inline] def WebAssembly.Global.new (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO WebAssembly.Global := Internal.api "Lasm.JS.Web.WebAssembly.Global.new" do
   Lasm.JS.Binding.invoke WebAssembly.Global { name := "Lasm.JS.Web.WebAssembly.Global.new", module := "globalThis", path := "WebAssembly.Global", construct := true, arity := 2 }
-    (Support.args #[toJS descriptor, v]) (await := false)
+    (Internal.args #[toJS descriptor, v]) (await := false)
 
 /-- `attribute any value` -/
-def WebAssembly.Global.value (self : WebAssembly.Global) : IO Data := self.val.get "value" Data
+@[macro_inline] def WebAssembly.Global.value (self : WebAssembly.Global) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Global.value" do
+  self.val.get "value" Data
 
 /-- Sets `value`: `attribute any value` -/
-def WebAssembly.Global.setValue (self : WebAssembly.Global) (value : Data) : IO Unit :=
+@[macro_inline] def WebAssembly.Global.setValue (self : WebAssembly.Global) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.WebAssembly.Global.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `any valueOf()` -/
-def WebAssembly.Global.valueOf (self : WebAssembly.Global) : IO Data :=
-  self.val.callMethod "valueOf" (Support.args #[]) Data
+@[macro_inline] def WebAssembly.Global.valueOf (self : WebAssembly.Global) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Global.valueOf" do
+  self.val.callMethod "valueOf" (Internal.args #[]) Data
 
 /-- `v instanceof WebAssembly.Instance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Instance`). -/
-def WebAssembly.Instance.cast? (v : Value) : IO (Option WebAssembly.Instance) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Instance"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Instance.cast? (v : Value) : IO (Option WebAssembly.Instance) := Internal.api "Lasm.JS.Web.WebAssembly.Instance.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Instance"] Value) (fun x => { val := x }) v
 
 /-- `constructor(Module module, optional object importObject)` -/
-def WebAssembly.Instance.new («module» : WebAssembly.Module) (importObject : Data := .undefined) : IO WebAssembly.Instance :=
+@[macro_inline] def WebAssembly.Instance.new («module» : WebAssembly.Module) (importObject : Data := .undefined) : IO WebAssembly.Instance := Internal.api "Lasm.JS.Web.WebAssembly.Instance.new" do
   Lasm.JS.Binding.invoke WebAssembly.Instance { name := "Lasm.JS.Web.WebAssembly.Instance.new", module := "globalThis", path := "WebAssembly.Instance", construct := true, arity := 2 }
-    (Support.args #[toJS «module», importObject]) (await := false)
+    (Internal.args #[toJS «module», importObject]) (await := false)
 
 /-- `readonly attribute object exports` -/
-def WebAssembly.Instance.exports (self : WebAssembly.Instance) : IO Data := self.val.get "exports" Data
+@[macro_inline] def WebAssembly.Instance.exports (self : WebAssembly.Instance) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Instance.exports" do
+  self.val.get "exports" Data
 
 /-- `v instanceof WebAssembly.LinkError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.LinkError`). -/
-def WebAssembly.LinkError.cast? (v : Value) : IO (Option WebAssembly.LinkError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "LinkError"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.LinkError.cast? (v : Value) : IO (Option WebAssembly.LinkError) := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "LinkError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message)` -/
-def WebAssembly.LinkError.new (message : Option String := none) : IO WebAssembly.LinkError :=
+@[macro_inline] def WebAssembly.LinkError.new (message : Option String := none) : IO WebAssembly.LinkError := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.new" do
   Lasm.JS.Binding.invoke WebAssembly.LinkError { name := "Lasm.JS.Web.WebAssembly.LinkError.new", module := "globalThis", path := "WebAssembly.LinkError", construct := true, arity := 1 }
-    (Support.args #[Support.optional message]) (await := false)
+    (Internal.args #[Internal.optional message]) (await := false)
 
 /-- `readonly attribute DOMString name` -/
-def WebAssembly.LinkError.name (self : WebAssembly.LinkError) : IO String := self.val.get "name" String
+@[macro_inline] def WebAssembly.LinkError.name (self : WebAssembly.LinkError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString message` -/
-def WebAssembly.LinkError.message (self : WebAssembly.LinkError) : IO String := self.val.get "message" String
+@[macro_inline] def WebAssembly.LinkError.message (self : WebAssembly.LinkError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.message" do
+  self.val.get "message" String
 
 /-- `v instanceof WebAssembly.Memory`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Memory`). -/
-def WebAssembly.Memory.cast? (v : Value) : IO (Option WebAssembly.Memory) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Memory"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Memory.cast? (v : Value) : IO (Option WebAssembly.Memory) := Internal.api "Lasm.JS.Web.WebAssembly.Memory.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Memory"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MemoryDescriptor descriptor)` -/
-def WebAssembly.Memory.new (descriptor : MemoryDescriptor) : IO WebAssembly.Memory :=
+@[macro_inline] def WebAssembly.Memory.new (descriptor : MemoryDescriptor) : IO WebAssembly.Memory := Internal.api "Lasm.JS.Web.WebAssembly.Memory.new" do
   Lasm.JS.Binding.invoke WebAssembly.Memory { name := "Lasm.JS.Web.WebAssembly.Memory.new", module := "globalThis", path := "WebAssembly.Memory", construct := true, arity := 1 }
-    (Support.args #[toJS descriptor]) (await := false)
+    (Internal.args #[toJS descriptor]) (await := false)
 
 /-- `readonly attribute ArrayBuffer buffer` -/
-def WebAssembly.Memory.buffer (self : WebAssembly.Memory) : IO ByteArray := do
+@[macro_inline] def WebAssembly.Memory.buffer (self : WebAssembly.Memory) : IO ByteArray := Internal.api "Lasm.JS.Web.WebAssembly.Memory.buffer" do
   let r ← self.val.get "buffer" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `AddressValue grow(AddressValue delta)` -/
-def WebAssembly.Memory.grow (self : WebAssembly.Memory) (delta : Data) : IO Data :=
-  self.val.callMethod "grow" (Support.args #[toJS delta]) Data
+@[macro_inline] def WebAssembly.Memory.grow (self : WebAssembly.Memory) (delta : Data) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Memory.grow" do
+  self.val.callMethod "grow" (Internal.args #[toJS delta]) Data
 
 /-- `ArrayBuffer toFixedLengthBuffer()` -/
-def WebAssembly.Memory.toFixedLengthBuffer (self : WebAssembly.Memory) : IO ByteArray := do
-  let r ← self.val.callMethod "toFixedLengthBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def WebAssembly.Memory.toFixedLengthBuffer (self : WebAssembly.Memory) : IO ByteArray := Internal.api "Lasm.JS.Web.WebAssembly.Memory.toFixedLengthBuffer" do
+  let r ← self.val.callMethod "toFixedLengthBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `ArrayBuffer toResizableBuffer()` -/
-def WebAssembly.Memory.toResizableBuffer (self : WebAssembly.Memory) : IO ByteArray := do
-  let r ← self.val.callMethod "toResizableBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def WebAssembly.Memory.toResizableBuffer (self : WebAssembly.Memory) : IO ByteArray := Internal.api "Lasm.JS.Web.WebAssembly.Memory.toResizableBuffer" do
+  let r ← self.val.callMethod "toResizableBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `v instanceof WebAssembly.Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Module`). -/
-def WebAssembly.Module.cast? (v : Value) : IO (Option WebAssembly.Module) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Module"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Module.cast? (v : Value) : IO (Option WebAssembly.Module) := Internal.api "Lasm.JS.Web.WebAssembly.Module.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Module"] Value) (fun x => { val := x }) v
 
 /-- `constructor(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` -/
-def WebAssembly.Module.new (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO WebAssembly.Module :=
+@[macro_inline] def WebAssembly.Module.new (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO WebAssembly.Module := Internal.api "Lasm.JS.Web.WebAssembly.Module.new" do
   Lasm.JS.Binding.invoke WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.Module.new", module := "globalThis", path := "WebAssembly.Module", construct := true, arity := 2 }
-    (Support.args #[toJS bytes, Support.optional options]) (await := false)
+    (Internal.args #[toJS bytes, Internal.optional options]) (await := false)
 
 /-- `static sequence<ModuleExportDescriptor> exports(Module moduleObject)` -/
-def WebAssembly.Module.exports (moduleObject : WebAssembly.Module) : IO (Array ModuleExportDescriptor) :=
+@[macro_inline] def WebAssembly.Module.exports (moduleObject : WebAssembly.Module) : IO (Array ModuleExportDescriptor) := Internal.api "Lasm.JS.Web.WebAssembly.Module.exports" do
   Lasm.JS.Binding.invoke (Array ModuleExportDescriptor) { name := "Lasm.JS.Web.WebAssembly.Module.exports", module := "globalThis", path := "WebAssembly.Module.exports", construct := false, arity := 1 }
-    (Support.args #[toJS moduleObject]) (await := false)
+    (Internal.args #[toJS moduleObject]) (await := false)
 
 /-- `static sequence<ModuleImportDescriptor> imports(Module moduleObject)` -/
-def WebAssembly.Module.imports (moduleObject : WebAssembly.Module) : IO (Array ModuleImportDescriptor) :=
+@[macro_inline] def WebAssembly.Module.imports (moduleObject : WebAssembly.Module) : IO (Array ModuleImportDescriptor) := Internal.api "Lasm.JS.Web.WebAssembly.Module.imports" do
   Lasm.JS.Binding.invoke (Array ModuleImportDescriptor) { name := "Lasm.JS.Web.WebAssembly.Module.imports", module := "globalThis", path := "WebAssembly.Module.imports", construct := false, arity := 1 }
-    (Support.args #[toJS moduleObject]) (await := false)
+    (Internal.args #[toJS moduleObject]) (await := false)
 
 /-- `static sequence<ArrayBuffer> customSections(Module moduleObject, DOMString sectionName)` -/
-def WebAssembly.Module.customSections (moduleObject : WebAssembly.Module) (sectionName : String) : IO (Array ByteArray) := do
+@[macro_inline] def WebAssembly.Module.customSections (moduleObject : WebAssembly.Module) (sectionName : String) : IO (Array ByteArray) := Internal.api "Lasm.JS.Web.WebAssembly.Module.customSections" do
   let r ← Lasm.JS.Binding.invoke (Array Value) { name := "Lasm.JS.Web.WebAssembly.Module.customSections", module := "globalThis", path := "WebAssembly.Module.customSections", construct := false, arity := 2 }
-    (Support.args #[toJS moduleObject, toJS sectionName]) (await := false)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+    (Internal.args #[toJS moduleObject, toJS sectionName]) (await := false)
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `v instanceof WebAssembly.RuntimeError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.RuntimeError`). -/
-def WebAssembly.RuntimeError.cast? (v : Value) : IO (Option WebAssembly.RuntimeError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "RuntimeError"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.RuntimeError.cast? (v : Value) : IO (Option WebAssembly.RuntimeError) := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "RuntimeError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message)` -/
-def WebAssembly.RuntimeError.new (message : Option String := none) : IO WebAssembly.RuntimeError :=
+@[macro_inline] def WebAssembly.RuntimeError.new (message : Option String := none) : IO WebAssembly.RuntimeError := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.new" do
   Lasm.JS.Binding.invoke WebAssembly.RuntimeError { name := "Lasm.JS.Web.WebAssembly.RuntimeError.new", module := "globalThis", path := "WebAssembly.RuntimeError", construct := true, arity := 1 }
-    (Support.args #[Support.optional message]) (await := false)
+    (Internal.args #[Internal.optional message]) (await := false)
 
 /-- `readonly attribute DOMString name` -/
-def WebAssembly.RuntimeError.name (self : WebAssembly.RuntimeError) : IO String := self.val.get "name" String
+@[macro_inline] def WebAssembly.RuntimeError.name (self : WebAssembly.RuntimeError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString message` -/
-def WebAssembly.RuntimeError.message (self : WebAssembly.RuntimeError) : IO String := self.val.get "message" String
+@[macro_inline] def WebAssembly.RuntimeError.message (self : WebAssembly.RuntimeError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.message" do
+  self.val.get "message" String
 
 /-- `v instanceof WebAssembly.Table`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Table`). -/
-def WebAssembly.Table.cast? (v : Value) : IO (Option WebAssembly.Table) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Table"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Table.cast? (v : Value) : IO (Option WebAssembly.Table) := Internal.api "Lasm.JS.Web.WebAssembly.Table.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Table"] Value) (fun x => { val := x }) v
 
 /-- `constructor(TableDescriptor descriptor, optional any value)` -/
-def WebAssembly.Table.new (descriptor : TableDescriptor) (value : Data := .undefined) : IO WebAssembly.Table :=
+@[macro_inline] def WebAssembly.Table.new (descriptor : TableDescriptor) (value : Data := .undefined) : IO WebAssembly.Table := Internal.api "Lasm.JS.Web.WebAssembly.Table.new" do
   Lasm.JS.Binding.invoke WebAssembly.Table { name := "Lasm.JS.Web.WebAssembly.Table.new", module := "globalThis", path := "WebAssembly.Table", construct := true, arity := 2 }
-    (Support.args #[toJS descriptor, value]) (await := false)
+    (Internal.args #[toJS descriptor, value]) (await := false)
 
 /-- `readonly attribute AddressValue length` -/
-def WebAssembly.Table.length (self : WebAssembly.Table) : IO Data := self.val.get "length" Data
+@[macro_inline] def WebAssembly.Table.length (self : WebAssembly.Table) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Table.length" do
+  self.val.get "length" Data
 
 /-- `AddressValue grow(AddressValue delta, optional any value)` -/
-def WebAssembly.Table.grow (self : WebAssembly.Table) (delta : Data) (value : Data := .undefined) : IO Data :=
-  self.val.callMethod "grow" (Support.args #[toJS delta, value]) Data
+@[macro_inline] def WebAssembly.Table.grow (self : WebAssembly.Table) (delta : Data) (value : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Table.grow" do
+  self.val.callMethod "grow" (Internal.args #[toJS delta, value]) Data
 
 /-- `any get(AddressValue index)` -/
-def WebAssembly.Table.get (self : WebAssembly.Table) (index : Data) : IO Data :=
-  self.val.callMethod "get" (Support.args #[toJS index]) Data
+@[macro_inline] def WebAssembly.Table.get (self : WebAssembly.Table) (index : Data) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Table.get" do
+  self.val.callMethod "get" (Internal.args #[toJS index]) Data
 
 /-- `undefined set(AddressValue index, optional any value)` -/
-def WebAssembly.Table.set (self : WebAssembly.Table) (index : Data) (value : Data := .undefined) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS index, value]) Unit
+@[macro_inline] def WebAssembly.Table.set (self : WebAssembly.Table) (index : Data) (value : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.WebAssembly.Table.set" do
+  self.val.callMethod "set" (Internal.args #[toJS index, value]) Unit
 
 /-- `v instanceof WebAssembly.Tag`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Tag`). -/
-def WebAssembly.Tag.cast? (v : Value) : IO (Option WebAssembly.Tag) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Tag"] Value) v) then some { val := v } else none
+@[macro_inline] def WebAssembly.Tag.cast? (v : Value) : IO (Option WebAssembly.Tag) := Internal.api "Lasm.JS.Web.WebAssembly.Tag.cast?" do
+  Internal.cast (Internal.getGlobal ["WebAssembly", "Tag"] Value) (fun x => { val := x }) v
 
 /-- `constructor(TagType type)` -/
-def WebAssembly.Tag.new (type : TagType) : IO WebAssembly.Tag :=
+@[macro_inline] def WebAssembly.Tag.new (type : TagType) : IO WebAssembly.Tag := Internal.api "Lasm.JS.Web.WebAssembly.Tag.new" do
   Lasm.JS.Binding.invoke WebAssembly.Tag { name := "Lasm.JS.Web.WebAssembly.Tag.new", module := "globalThis", path := "WebAssembly.Tag", construct := true, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
 
 /-- `readonly attribute Tag JSTag` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.JSTag : IO WebAssembly.Tag := do
-  let r ← Support.getGlobal ["WebAssembly", "JSTag"] Value
+@[macro_inline] def WebAssembly.JSTag : IO WebAssembly.Tag := Internal.api "Lasm.JS.Web.WebAssembly.JSTag" do
+  let r ← Internal.getGlobal ["WebAssembly", "JSTag"] Value
   pure { val := r }
 
 /-- `boolean validate(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.validate (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO Bool :=
+@[macro_inline] def WebAssembly.validate (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO Bool := Internal.api "Lasm.JS.Web.WebAssembly.validate" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.WebAssembly.validate", module := "globalThis", path := "WebAssembly.validate", construct := false, arity := 2 }
-    (Support.args #[toJS bytes, Support.optional options]) (await := false)
+    (Internal.args #[toJS bytes, Internal.optional options]) (await := false)
 
 /-- `Promise<Module> compile(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.compile (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := do
+@[macro_inline] def WebAssembly.compile (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := Internal.api "Lasm.JS.Web.WebAssembly.compile" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.compile", module := "globalThis", path := "WebAssembly.compile", construct := false, arity := 2 }
-    (Support.args #[toJS bytes, Support.optional options])
+    (Internal.args #[toJS bytes, Internal.optional options])
   pure { val := r }
 
 /-- `Promise<WebAssemblyInstantiatedSource> instantiate(AllowSharedBufferSource bytes, optional object importObject, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.instantiate (bytes : ByteArray) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource :=
+@[macro_inline] def WebAssembly.instantiate (bytes : ByteArray) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource := Internal.api "Lasm.JS.Web.WebAssembly.instantiate" do
   Lasm.JS.Binding.invokeAsync WebAssemblyInstantiatedSource { name := "Lasm.JS.Web.WebAssembly.instantiate", module := "globalThis", path := "WebAssembly.instantiate", construct := false, arity := 3 }
-    (Support.args #[toJS bytes, importObject, Support.optional options])
+    (Internal.args #[toJS bytes, importObject, Internal.optional options])
 
 /-- `Promise<Instance> instantiate(Module moduleObject, optional object importObject)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.instantiateWithModuleObject (moduleObject : WebAssembly.Module) (importObject : Data := .undefined) : Async WebAssembly.Instance := do
+@[macro_inline] def WebAssembly.instantiateWithModuleObject (moduleObject : WebAssembly.Module) (importObject : Data := .undefined) : Async WebAssembly.Instance := Internal.api "Lasm.JS.Web.WebAssembly.instantiateWithModuleObject" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.instantiateWithModuleObject", module := "globalThis", path := "WebAssembly.instantiate", construct := false, arity := 2 }
-    (Support.args #[toJS moduleObject, importObject])
+    (Internal.args #[toJS moduleObject, importObject])
   pure { val := r }
 
 end Lasm.JS.Web

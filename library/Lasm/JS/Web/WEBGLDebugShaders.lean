@@ -6,13 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.WEBGLDebugShaders
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `DOMString getTranslatedShaderSource(WebGLShader shader)` -/
-def WEBGL_debug_shaders.getTranslatedShaderSource (self : WEBGL_debug_shaders) (shader : WebGLShader) : IO String :=
-  self.val.callMethod "getTranslatedShaderSource" (Support.args #[toJS shader]) String
+@[macro_inline] def WEBGL_debug_shaders.getTranslatedShaderSource (self : WEBGL_debug_shaders) (shader : WebGLShader) : IO String := Internal.api "Lasm.JS.Web.WEBGL_debug_shaders.getTranslatedShaderSource" do
+  self.val.callMethod "getTranslatedShaderSource" (Internal.args #[toJS shader]) String
 
 end Lasm.JS.Web

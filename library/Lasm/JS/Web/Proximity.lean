@@ -6,28 +6,35 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.GenericSensor
+import Lasm.JS.Web.Types.Proximity
 import Lasm.JS.Web.GenericSensor
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof ProximitySensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ProximitySensor`). -/
-def ProximitySensor.cast? (v : Value) : IO (Option ProximitySensor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ProximitySensor"] Value) v) then some { val := v } else none
+@[macro_inline] def ProximitySensor.cast? (v : Value) : IO (Option ProximitySensor) := Internal.api "Lasm.JS.Web.ProximitySensor.cast?" do
+  Internal.cast (Internal.getGlobal ["ProximitySensor"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional SensorOptions sensorOptions)` -/
-def ProximitySensor.new (sensorOptions : Option SensorOptions := none) : IO ProximitySensor :=
+@[macro_inline] def ProximitySensor.new (sensorOptions : Option SensorOptions := none) : IO ProximitySensor := Internal.api "Lasm.JS.Web.ProximitySensor.new" do
   Lasm.JS.Binding.invoke ProximitySensor { name := "Lasm.JS.Web.ProximitySensor.new", module := "globalThis", path := "ProximitySensor", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 /-- `readonly attribute double? distance` -/
-def ProximitySensor.distance (self : ProximitySensor) : IO (Option Float) := self.val.get "distance" (Option Float)
+@[macro_inline] def ProximitySensor.distance (self : ProximitySensor) : IO (Option Float) := Internal.api "Lasm.JS.Web.ProximitySensor.distance" do
+  self.val.get "distance" (Option Float)
 
 /-- `readonly attribute double? max` -/
-def ProximitySensor.max (self : ProximitySensor) : IO (Option Float) := self.val.get "max" (Option Float)
+@[macro_inline] def ProximitySensor.max (self : ProximitySensor) : IO (Option Float) := Internal.api "Lasm.JS.Web.ProximitySensor.max" do
+  self.val.get "max" (Option Float)
 
 /-- `readonly attribute boolean? near` -/
-def ProximitySensor.near (self : ProximitySensor) : IO (Option Bool) := self.val.get "near" (Option Bool)
+@[macro_inline] def ProximitySensor.near (self : ProximitySensor) : IO (Option Bool) := Internal.api "Lasm.JS.Web.ProximitySensor.near" do
+  self.val.get "near" (Option Bool)
 
 end Lasm.JS.Web

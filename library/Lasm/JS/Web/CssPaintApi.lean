@@ -6,331 +6,360 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssPaintApi
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Webidl
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary PaintRenderingContext2DSettings` (CSS Painting API Level 1 (https://drafts.css-houdini.org/css-paint-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PaintRenderingContext2DSettings where
+  /-- `boolean alpha = true` -/
+  alpha : Option Bool := none
+instance : ToJS PaintRenderingContext2DSettings := ⟨fun d => Internal.fields #[("alpha", Internal.optional d.alpha)]⟩
 
 /-- `v instanceof PaintRenderingContext2D`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PaintRenderingContext2D`). -/
-def PaintRenderingContext2D.cast? (v : Value) : IO (Option PaintRenderingContext2D) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PaintRenderingContext2D"] Value) v) then some { val := v } else none
+@[macro_inline] def PaintRenderingContext2D.cast? (v : Value) : IO (Option PaintRenderingContext2D) := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.cast?" do
+  Internal.cast (Internal.getGlobal ["PaintRenderingContext2D"] Value) (fun x => { val := x }) v
 
 /-- `attribute unrestricted double globalAlpha` -/
-def PaintRenderingContext2D.globalAlpha (self : PaintRenderingContext2D) : IO Float := self.val.get "globalAlpha" Float
+@[macro_inline] def PaintRenderingContext2D.globalAlpha (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.globalAlpha" do
+  self.val.get "globalAlpha" Float
 
 /-- Sets `globalAlpha`: `attribute unrestricted double globalAlpha` -/
-def PaintRenderingContext2D.setGlobalAlpha (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setGlobalAlpha (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setGlobalAlpha" do
   self.val.set "globalAlpha" (toJS value)
 
 /-- `attribute DOMString globalCompositeOperation` -/
-def PaintRenderingContext2D.globalCompositeOperation (self : PaintRenderingContext2D) : IO String := self.val.get "globalCompositeOperation" String
+@[macro_inline] def PaintRenderingContext2D.globalCompositeOperation (self : PaintRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.globalCompositeOperation" do
+  self.val.get "globalCompositeOperation" String
 
 /-- Sets `globalCompositeOperation`: `attribute DOMString globalCompositeOperation` -/
-def PaintRenderingContext2D.setGlobalCompositeOperation (self : PaintRenderingContext2D) (value : String) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setGlobalCompositeOperation (self : PaintRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setGlobalCompositeOperation" do
   self.val.set "globalCompositeOperation" (toJS value)
 
 /-- `attribute boolean imageSmoothingEnabled` -/
-def PaintRenderingContext2D.imageSmoothingEnabled (self : PaintRenderingContext2D) : IO Bool := self.val.get "imageSmoothingEnabled" Bool
+@[macro_inline] def PaintRenderingContext2D.imageSmoothingEnabled (self : PaintRenderingContext2D) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.imageSmoothingEnabled" do
+  self.val.get "imageSmoothingEnabled" Bool
 
 /-- Sets `imageSmoothingEnabled`: `attribute boolean imageSmoothingEnabled` -/
-def PaintRenderingContext2D.setImageSmoothingEnabled (self : PaintRenderingContext2D) (value : Bool) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setImageSmoothingEnabled (self : PaintRenderingContext2D) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setImageSmoothingEnabled" do
   self.val.set "imageSmoothingEnabled" (toJS value)
 
 /-- `attribute ImageSmoothingQuality imageSmoothingQuality` -/
-def PaintRenderingContext2D.imageSmoothingQuality (self : PaintRenderingContext2D) : IO ImageSmoothingQuality := self.val.get "imageSmoothingQuality" ImageSmoothingQuality
+@[macro_inline] def PaintRenderingContext2D.imageSmoothingQuality (self : PaintRenderingContext2D) : IO ImageSmoothingQuality := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.imageSmoothingQuality" do
+  self.val.get "imageSmoothingQuality" ImageSmoothingQuality
 
 /-- Sets `imageSmoothingQuality`: `attribute ImageSmoothingQuality imageSmoothingQuality` -/
-def PaintRenderingContext2D.setImageSmoothingQuality (self : PaintRenderingContext2D) (value : ImageSmoothingQuality) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setImageSmoothingQuality (self : PaintRenderingContext2D) (value : ImageSmoothingQuality) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setImageSmoothingQuality" do
   self.val.set "imageSmoothingQuality" (toJS value)
 
 /-- `attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle` -/
-def PaintRenderingContext2D.strokeStyle (self : PaintRenderingContext2D) : IO Data := self.val.get "strokeStyle" Data
+@[macro_inline] def PaintRenderingContext2D.strokeStyle (self : PaintRenderingContext2D) : IO Data := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.strokeStyle" do
+  self.val.get "strokeStyle" Data
 
 /-- Sets `strokeStyle`: `attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle` -/
-def PaintRenderingContext2D.setStrokeStyle (self : PaintRenderingContext2D) (value : DOMStringOrCanvasGradientOrCanvasPattern) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setStrokeStyle (self : PaintRenderingContext2D) (value : DOMStringOrCanvasGradientOrCanvasPattern) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setStrokeStyle" do
   self.val.set "strokeStyle" (toJS value)
 
 /-- `attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle` -/
-def PaintRenderingContext2D.fillStyle (self : PaintRenderingContext2D) : IO Data := self.val.get "fillStyle" Data
+@[macro_inline] def PaintRenderingContext2D.fillStyle (self : PaintRenderingContext2D) : IO Data := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.fillStyle" do
+  self.val.get "fillStyle" Data
 
 /-- Sets `fillStyle`: `attribute (DOMString or CanvasGradient or CanvasPattern) fillStyle` -/
-def PaintRenderingContext2D.setFillStyle (self : PaintRenderingContext2D) (value : DOMStringOrCanvasGradientOrCanvasPattern) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setFillStyle (self : PaintRenderingContext2D) (value : DOMStringOrCanvasGradientOrCanvasPattern) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setFillStyle" do
   self.val.set "fillStyle" (toJS value)
 
 /-- `attribute unrestricted double shadowOffsetX` -/
-def PaintRenderingContext2D.shadowOffsetX (self : PaintRenderingContext2D) : IO Float := self.val.get "shadowOffsetX" Float
+@[macro_inline] def PaintRenderingContext2D.shadowOffsetX (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.shadowOffsetX" do
+  self.val.get "shadowOffsetX" Float
 
 /-- Sets `shadowOffsetX`: `attribute unrestricted double shadowOffsetX` -/
-def PaintRenderingContext2D.setShadowOffsetX (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setShadowOffsetX (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setShadowOffsetX" do
   self.val.set "shadowOffsetX" (toJS value)
 
 /-- `attribute unrestricted double shadowOffsetY` -/
-def PaintRenderingContext2D.shadowOffsetY (self : PaintRenderingContext2D) : IO Float := self.val.get "shadowOffsetY" Float
+@[macro_inline] def PaintRenderingContext2D.shadowOffsetY (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.shadowOffsetY" do
+  self.val.get "shadowOffsetY" Float
 
 /-- Sets `shadowOffsetY`: `attribute unrestricted double shadowOffsetY` -/
-def PaintRenderingContext2D.setShadowOffsetY (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setShadowOffsetY (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setShadowOffsetY" do
   self.val.set "shadowOffsetY" (toJS value)
 
 /-- `attribute unrestricted double shadowBlur` -/
-def PaintRenderingContext2D.shadowBlur (self : PaintRenderingContext2D) : IO Float := self.val.get "shadowBlur" Float
+@[macro_inline] def PaintRenderingContext2D.shadowBlur (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.shadowBlur" do
+  self.val.get "shadowBlur" Float
 
 /-- Sets `shadowBlur`: `attribute unrestricted double shadowBlur` -/
-def PaintRenderingContext2D.setShadowBlur (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setShadowBlur (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setShadowBlur" do
   self.val.set "shadowBlur" (toJS value)
 
 /-- `attribute DOMString shadowColor` -/
-def PaintRenderingContext2D.shadowColor (self : PaintRenderingContext2D) : IO String := self.val.get "shadowColor" String
+@[macro_inline] def PaintRenderingContext2D.shadowColor (self : PaintRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.shadowColor" do
+  self.val.get "shadowColor" String
 
 /-- Sets `shadowColor`: `attribute DOMString shadowColor` -/
-def PaintRenderingContext2D.setShadowColor (self : PaintRenderingContext2D) (value : String) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setShadowColor (self : PaintRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setShadowColor" do
   self.val.set "shadowColor" (toJS value)
 
 /-- `attribute unrestricted double lineWidth` -/
-def PaintRenderingContext2D.lineWidth (self : PaintRenderingContext2D) : IO Float := self.val.get "lineWidth" Float
+@[macro_inline] def PaintRenderingContext2D.lineWidth (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.lineWidth" do
+  self.val.get "lineWidth" Float
 
 /-- Sets `lineWidth`: `attribute unrestricted double lineWidth` -/
-def PaintRenderingContext2D.setLineWidth (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setLineWidth (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setLineWidth" do
   self.val.set "lineWidth" (toJS value)
 
 /-- `attribute CanvasLineCap lineCap` -/
-def PaintRenderingContext2D.lineCap (self : PaintRenderingContext2D) : IO CanvasLineCap := self.val.get "lineCap" CanvasLineCap
+@[macro_inline] def PaintRenderingContext2D.lineCap (self : PaintRenderingContext2D) : IO CanvasLineCap := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.lineCap" do
+  self.val.get "lineCap" CanvasLineCap
 
 /-- Sets `lineCap`: `attribute CanvasLineCap lineCap` -/
-def PaintRenderingContext2D.setLineCap (self : PaintRenderingContext2D) (value : CanvasLineCap) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setLineCap (self : PaintRenderingContext2D) (value : CanvasLineCap) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setLineCap" do
   self.val.set "lineCap" (toJS value)
 
 /-- `attribute CanvasLineJoin lineJoin` -/
-def PaintRenderingContext2D.lineJoin (self : PaintRenderingContext2D) : IO CanvasLineJoin := self.val.get "lineJoin" CanvasLineJoin
+@[macro_inline] def PaintRenderingContext2D.lineJoin (self : PaintRenderingContext2D) : IO CanvasLineJoin := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.lineJoin" do
+  self.val.get "lineJoin" CanvasLineJoin
 
 /-- Sets `lineJoin`: `attribute CanvasLineJoin lineJoin` -/
-def PaintRenderingContext2D.setLineJoin (self : PaintRenderingContext2D) (value : CanvasLineJoin) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setLineJoin (self : PaintRenderingContext2D) (value : CanvasLineJoin) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setLineJoin" do
   self.val.set "lineJoin" (toJS value)
 
 /-- `attribute unrestricted double miterLimit` -/
-def PaintRenderingContext2D.miterLimit (self : PaintRenderingContext2D) : IO Float := self.val.get "miterLimit" Float
+@[macro_inline] def PaintRenderingContext2D.miterLimit (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.miterLimit" do
+  self.val.get "miterLimit" Float
 
 /-- Sets `miterLimit`: `attribute unrestricted double miterLimit` -/
-def PaintRenderingContext2D.setMiterLimit (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setMiterLimit (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setMiterLimit" do
   self.val.set "miterLimit" (toJS value)
 
 /-- `attribute unrestricted double lineDashOffset` -/
-def PaintRenderingContext2D.lineDashOffset (self : PaintRenderingContext2D) : IO Float := self.val.get "lineDashOffset" Float
+@[macro_inline] def PaintRenderingContext2D.lineDashOffset (self : PaintRenderingContext2D) : IO Float := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.lineDashOffset" do
+  self.val.get "lineDashOffset" Float
 
 /-- Sets `lineDashOffset`: `attribute unrestricted double lineDashOffset` -/
-def PaintRenderingContext2D.setLineDashOffset (self : PaintRenderingContext2D) (value : Float) : IO Unit :=
+@[macro_inline] def PaintRenderingContext2D.setLineDashOffset (self : PaintRenderingContext2D) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setLineDashOffset" do
   self.val.set "lineDashOffset" (toJS value)
 
 /-- `undefined save()` -/
-def PaintRenderingContext2D.save (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "save" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.save (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.save" do
+  self.val.callMethod "save" (Internal.args #[]) Unit
 
 /-- `undefined restore()` -/
-def PaintRenderingContext2D.restore (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "restore" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.restore (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.restore" do
+  self.val.callMethod "restore" (Internal.args #[]) Unit
 
 /-- `undefined reset()` -/
-def PaintRenderingContext2D.reset (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.reset (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `boolean isContextLost()` -/
-def PaintRenderingContext2D.isContextLost (self : PaintRenderingContext2D) : IO Bool :=
-  self.val.callMethod "isContextLost" (Support.args #[]) Bool
+@[macro_inline] def PaintRenderingContext2D.isContextLost (self : PaintRenderingContext2D) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.isContextLost" do
+  self.val.callMethod "isContextLost" (Internal.args #[]) Bool
 
 /-- `undefined scale(unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.scale (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "scale" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.scale (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.scale" do
+  self.val.callMethod "scale" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `undefined rotate(unrestricted double angle)` -/
-def PaintRenderingContext2D.rotate (self : PaintRenderingContext2D) (angle : Float) : IO Unit :=
-  self.val.callMethod "rotate" (Support.args #[toJS angle]) Unit
+@[macro_inline] def PaintRenderingContext2D.rotate (self : PaintRenderingContext2D) (angle : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.rotate" do
+  self.val.callMethod "rotate" (Internal.args #[toJS angle]) Unit
 
 /-- `undefined translate(unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.translate (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "translate" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.translate (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.translate" do
+  self.val.callMethod "translate" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `undefined transform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f)` -/
-def PaintRenderingContext2D.transform (self : PaintRenderingContext2D) (a : Float) (b : Float) (c : Float) (d : Float) (e : Float) (f : Float) : IO Unit :=
-  self.val.callMethod "transform" (Support.args #[toJS a, toJS b, toJS c, toJS d, toJS e, toJS f]) Unit
+@[macro_inline] def PaintRenderingContext2D.transform (self : PaintRenderingContext2D) (a : Float) (b : Float) (c : Float) (d : Float) (e : Float) (f : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.transform" do
+  self.val.callMethod "transform" (Internal.args #[toJS a, toJS b, toJS c, toJS d, toJS e, toJS f]) Unit
 
 /-- `DOMMatrix getTransform()` -/
-def PaintRenderingContext2D.getTransform (self : PaintRenderingContext2D) : IO DOMMatrix := do
-  let r ← self.val.callMethod "getTransform" (Support.args #[]) Value
+@[macro_inline] def PaintRenderingContext2D.getTransform (self : PaintRenderingContext2D) : IO DOMMatrix := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.getTransform" do
+  let r ← self.val.callMethod "getTransform" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined setTransform(unrestricted double a, unrestricted double b, unrestricted double c, unrestricted double d, unrestricted double e, unrestricted double f)` -/
-def PaintRenderingContext2D.setTransform (self : PaintRenderingContext2D) (a : Float) (b : Float) (c : Float) (d : Float) (e : Float) (f : Float) : IO Unit :=
-  self.val.callMethod "setTransform" (Support.args #[toJS a, toJS b, toJS c, toJS d, toJS e, toJS f]) Unit
+@[macro_inline] def PaintRenderingContext2D.setTransform (self : PaintRenderingContext2D) (a : Float) (b : Float) (c : Float) (d : Float) (e : Float) (f : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setTransform" do
+  self.val.callMethod "setTransform" (Internal.args #[toJS a, toJS b, toJS c, toJS d, toJS e, toJS f]) Unit
 
 /-- `undefined setTransform(optional DOMMatrix2DInit transform)` -/
-def PaintRenderingContext2D.setTransformWithTransform (self : PaintRenderingContext2D) (transform : Option DOMMatrix2DInit := none) : IO Unit :=
-  self.val.callMethod "setTransform" (Support.args #[Support.optional transform]) Unit
+@[macro_inline] def PaintRenderingContext2D.setTransformWithTransform (self : PaintRenderingContext2D) (transform : Option DOMMatrix2DInit := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setTransformWithTransform" do
+  self.val.callMethod "setTransform" (Internal.args #[Internal.optional transform]) Unit
 
 /-- `undefined resetTransform()` -/
-def PaintRenderingContext2D.resetTransform (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "resetTransform" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.resetTransform (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.resetTransform" do
+  self.val.callMethod "resetTransform" (Internal.args #[]) Unit
 
 /-- `CanvasGradient createLinearGradient(double x0, double y0, double x1, double y1)` -/
-def PaintRenderingContext2D.createLinearGradient (self : PaintRenderingContext2D) (x0 : Float) (y0 : Float) (x1 : Float) (y1 : Float) : IO CanvasGradient := do
-  let r ← self.val.callMethod "createLinearGradient" (Support.args #[toJS x0, toJS y0, toJS x1, toJS y1]) Value
+@[macro_inline] def PaintRenderingContext2D.createLinearGradient (self : PaintRenderingContext2D) (x0 : Float) (y0 : Float) (x1 : Float) (y1 : Float) : IO CanvasGradient := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.createLinearGradient" do
+  let r ← self.val.callMethod "createLinearGradient" (Internal.args #[toJS x0, toJS y0, toJS x1, toJS y1]) Value
   pure { val := r }
 
 /-- `CanvasGradient createRadialGradient(double x0, double y0, double r0, double x1, double y1, double r1)` -/
-def PaintRenderingContext2D.createRadialGradient (self : PaintRenderingContext2D) (x0 : Float) (y0 : Float) (r0 : Float) (x1 : Float) (y1 : Float) (r1 : Float) : IO CanvasGradient := do
-  let r ← self.val.callMethod "createRadialGradient" (Support.args #[toJS x0, toJS y0, toJS r0, toJS x1, toJS y1, toJS r1]) Value
+@[macro_inline] def PaintRenderingContext2D.createRadialGradient (self : PaintRenderingContext2D) (x0 : Float) (y0 : Float) (r0 : Float) (x1 : Float) (y1 : Float) (r1 : Float) : IO CanvasGradient := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.createRadialGradient" do
+  let r ← self.val.callMethod "createRadialGradient" (Internal.args #[toJS x0, toJS y0, toJS r0, toJS x1, toJS y1, toJS r1]) Value
   pure { val := r }
 
 /-- `CanvasGradient createConicGradient(double startAngle, double x, double y)` -/
-def PaintRenderingContext2D.createConicGradient (self : PaintRenderingContext2D) (startAngle : Float) (x : Float) (y : Float) : IO CanvasGradient := do
-  let r ← self.val.callMethod "createConicGradient" (Support.args #[toJS startAngle, toJS x, toJS y]) Value
+@[macro_inline] def PaintRenderingContext2D.createConicGradient (self : PaintRenderingContext2D) (startAngle : Float) (x : Float) (y : Float) : IO CanvasGradient := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.createConicGradient" do
+  let r ← self.val.callMethod "createConicGradient" (Internal.args #[toJS startAngle, toJS x, toJS y]) Value
   pure { val := r }
 
 /-- `CanvasPattern? createPattern(CanvasImageSource image, DOMString repetition)` -/
-def PaintRenderingContext2D.createPattern (self : PaintRenderingContext2D) (image : CanvasImageSource) (repetition : String) : IO (Option CanvasPattern) :=
-  self.val.callMethod "createPattern" (Support.args #[toJS image, toJS repetition]) (Option CanvasPattern)
+@[macro_inline] def PaintRenderingContext2D.createPattern (self : PaintRenderingContext2D) (image : CanvasImageSource) (repetition : String) : IO (Option CanvasPattern) := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.createPattern" do
+  self.val.callMethod "createPattern" (Internal.args #[toJS image, toJS repetition]) (Option CanvasPattern)
 
 /-- `undefined clearRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h)` -/
-def PaintRenderingContext2D.clearRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit :=
-  self.val.callMethod "clearRect" (Support.args #[toJS x, toJS y, toJS w, toJS h]) Unit
+@[macro_inline] def PaintRenderingContext2D.clearRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.clearRect" do
+  self.val.callMethod "clearRect" (Internal.args #[toJS x, toJS y, toJS w, toJS h]) Unit
 
 /-- `undefined fillRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h)` -/
-def PaintRenderingContext2D.fillRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit :=
-  self.val.callMethod "fillRect" (Support.args #[toJS x, toJS y, toJS w, toJS h]) Unit
+@[macro_inline] def PaintRenderingContext2D.fillRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.fillRect" do
+  self.val.callMethod "fillRect" (Internal.args #[toJS x, toJS y, toJS w, toJS h]) Unit
 
 /-- `undefined strokeRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h)` -/
-def PaintRenderingContext2D.strokeRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit :=
-  self.val.callMethod "strokeRect" (Support.args #[toJS x, toJS y, toJS w, toJS h]) Unit
+@[macro_inline] def PaintRenderingContext2D.strokeRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.strokeRect" do
+  self.val.callMethod "strokeRect" (Internal.args #[toJS x, toJS y, toJS w, toJS h]) Unit
 
 /-- `undefined beginPath()` -/
-def PaintRenderingContext2D.beginPath (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "beginPath" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.beginPath (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.beginPath" do
+  self.val.callMethod "beginPath" (Internal.args #[]) Unit
 
 /-- `undefined fill(optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.fill (self : PaintRenderingContext2D) (fillRule : Option CanvasFillRule := none) : IO Unit :=
-  self.val.callMethod "fill" (Support.args #[Support.optional fillRule]) Unit
+@[macro_inline] def PaintRenderingContext2D.fill (self : PaintRenderingContext2D) (fillRule : Option CanvasFillRule := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.fill" do
+  self.val.callMethod "fill" (Internal.args #[Internal.optional fillRule]) Unit
 
 /-- `undefined fill(Path2D path, optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.fillWithPath (self : PaintRenderingContext2D) (path : Path2D) (fillRule : Option CanvasFillRule := none) : IO Unit :=
-  self.val.callMethod "fill" (Support.args #[toJS path, Support.optional fillRule]) Unit
+@[macro_inline] def PaintRenderingContext2D.fillWithPath (self : PaintRenderingContext2D) (path : Path2D) (fillRule : Option CanvasFillRule := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.fillWithPath" do
+  self.val.callMethod "fill" (Internal.args #[toJS path, Internal.optional fillRule]) Unit
 
 /-- `undefined stroke()` -/
-def PaintRenderingContext2D.stroke (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "stroke" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.stroke (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.stroke" do
+  self.val.callMethod "stroke" (Internal.args #[]) Unit
 
 /-- `undefined stroke(Path2D path)` -/
-def PaintRenderingContext2D.strokeWithPath (self : PaintRenderingContext2D) (path : Path2D) : IO Unit :=
-  self.val.callMethod "stroke" (Support.args #[toJS path]) Unit
+@[macro_inline] def PaintRenderingContext2D.strokeWithPath (self : PaintRenderingContext2D) (path : Path2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.strokeWithPath" do
+  self.val.callMethod "stroke" (Internal.args #[toJS path]) Unit
 
 /-- `undefined clip(optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.clip (self : PaintRenderingContext2D) (fillRule : Option CanvasFillRule := none) : IO Unit :=
-  self.val.callMethod "clip" (Support.args #[Support.optional fillRule]) Unit
+@[macro_inline] def PaintRenderingContext2D.clip (self : PaintRenderingContext2D) (fillRule : Option CanvasFillRule := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.clip" do
+  self.val.callMethod "clip" (Internal.args #[Internal.optional fillRule]) Unit
 
 /-- `undefined clip(Path2D path, optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.clipWithPath (self : PaintRenderingContext2D) (path : Path2D) (fillRule : Option CanvasFillRule := none) : IO Unit :=
-  self.val.callMethod "clip" (Support.args #[toJS path, Support.optional fillRule]) Unit
+@[macro_inline] def PaintRenderingContext2D.clipWithPath (self : PaintRenderingContext2D) (path : Path2D) (fillRule : Option CanvasFillRule := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.clipWithPath" do
+  self.val.callMethod "clip" (Internal.args #[toJS path, Internal.optional fillRule]) Unit
 
 /-- `boolean isPointInPath(unrestricted double x, unrestricted double y, optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.isPointInPath (self : PaintRenderingContext2D) (x : Float) (y : Float) (fillRule : Option CanvasFillRule := none) : IO Bool :=
-  self.val.callMethod "isPointInPath" (Support.args #[toJS x, toJS y, Support.optional fillRule]) Bool
+@[macro_inline] def PaintRenderingContext2D.isPointInPath (self : PaintRenderingContext2D) (x : Float) (y : Float) (fillRule : Option CanvasFillRule := none) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.isPointInPath" do
+  self.val.callMethod "isPointInPath" (Internal.args #[toJS x, toJS y, Internal.optional fillRule]) Bool
 
 /-- `boolean isPointInPath(Path2D path, unrestricted double x, unrestricted double y, optional CanvasFillRule fillRule)` -/
-def PaintRenderingContext2D.isPointInPathWithPath (self : PaintRenderingContext2D) (path : Path2D) (x : Float) (y : Float) (fillRule : Option CanvasFillRule := none) : IO Bool :=
-  self.val.callMethod "isPointInPath" (Support.args #[toJS path, toJS x, toJS y, Support.optional fillRule]) Bool
+@[macro_inline] def PaintRenderingContext2D.isPointInPathWithPath (self : PaintRenderingContext2D) (path : Path2D) (x : Float) (y : Float) (fillRule : Option CanvasFillRule := none) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.isPointInPathWithPath" do
+  self.val.callMethod "isPointInPath" (Internal.args #[toJS path, toJS x, toJS y, Internal.optional fillRule]) Bool
 
 /-- `boolean isPointInStroke(unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.isPointInStroke (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Bool :=
-  self.val.callMethod "isPointInStroke" (Support.args #[toJS x, toJS y]) Bool
+@[macro_inline] def PaintRenderingContext2D.isPointInStroke (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.isPointInStroke" do
+  self.val.callMethod "isPointInStroke" (Internal.args #[toJS x, toJS y]) Bool
 
 /-- `boolean isPointInStroke(Path2D path, unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.isPointInStrokeWithPath (self : PaintRenderingContext2D) (path : Path2D) (x : Float) (y : Float) : IO Bool :=
-  self.val.callMethod "isPointInStroke" (Support.args #[toJS path, toJS x, toJS y]) Bool
+@[macro_inline] def PaintRenderingContext2D.isPointInStrokeWithPath (self : PaintRenderingContext2D) (path : Path2D) (x : Float) (y : Float) : IO Bool := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.isPointInStrokeWithPath" do
+  self.val.callMethod "isPointInStroke" (Internal.args #[toJS path, toJS x, toJS y]) Bool
 
 /-- `undefined drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy)` -/
-def PaintRenderingContext2D.drawImage (self : PaintRenderingContext2D) (image : CanvasImageSource) (dx : Float) (dy : Float) : IO Unit :=
-  self.val.callMethod "drawImage" (Support.args #[toJS image, toJS dx, toJS dy]) Unit
+@[macro_inline] def PaintRenderingContext2D.drawImage (self : PaintRenderingContext2D) (image : CanvasImageSource) (dx : Float) (dy : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.drawImage" do
+  self.val.callMethod "drawImage" (Internal.args #[toJS image, toJS dx, toJS dy]) Unit
 
 /-- `undefined drawImage(CanvasImageSource image, unrestricted double dx, unrestricted double dy, unrestricted double dw, unrestricted double dh)` -/
-def PaintRenderingContext2D.drawImageWithDw (self : PaintRenderingContext2D) (image : CanvasImageSource) (dx : Float) (dy : Float) (dw : Float) (dh : Float) : IO Unit :=
-  self.val.callMethod "drawImage" (Support.args #[toJS image, toJS dx, toJS dy, toJS dw, toJS dh]) Unit
+@[macro_inline] def PaintRenderingContext2D.drawImageWithDw (self : PaintRenderingContext2D) (image : CanvasImageSource) (dx : Float) (dy : Float) (dw : Float) (dh : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.drawImageWithDw" do
+  self.val.callMethod "drawImage" (Internal.args #[toJS image, toJS dx, toJS dy, toJS dw, toJS dh]) Unit
 
 /-- `undefined drawImage(CanvasImageSource image, unrestricted double sx, unrestricted double sy, unrestricted double sw, unrestricted double sh, unrestricted double dx, unrestricted double dy, unrestricted double dw, unrestricted double dh)` -/
-def PaintRenderingContext2D.drawImageWithSx (self : PaintRenderingContext2D) (image : CanvasImageSource) (sx : Float) (sy : Float) (sw : Float) (sh : Float) (dx : Float) (dy : Float) (dw : Float) (dh : Float) : IO Unit :=
-  self.val.callMethod "drawImage" (Support.args #[toJS image, toJS sx, toJS sy, toJS sw, toJS sh, toJS dx, toJS dy, toJS dw, toJS dh]) Unit
+@[macro_inline] def PaintRenderingContext2D.drawImageWithSx (self : PaintRenderingContext2D) (image : CanvasImageSource) (sx : Float) (sy : Float) (sw : Float) (sh : Float) (dx : Float) (dy : Float) (dw : Float) (dh : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.drawImageWithSx" do
+  self.val.callMethod "drawImage" (Internal.args #[toJS image, toJS sx, toJS sy, toJS sw, toJS sh, toJS dx, toJS dy, toJS dw, toJS dh]) Unit
 
 /-- `undefined setLineDash(sequence<unrestricted double> segments)` -/
-def PaintRenderingContext2D.setLineDash (self : PaintRenderingContext2D) (segments : Array Float) : IO Unit :=
-  self.val.callMethod "setLineDash" (Support.args #[toJS segments]) Unit
+@[macro_inline] def PaintRenderingContext2D.setLineDash (self : PaintRenderingContext2D) (segments : Array Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.setLineDash" do
+  self.val.callMethod "setLineDash" (Internal.args #[toJS segments]) Unit
 
 /-- `sequence<unrestricted double> getLineDash()` -/
-def PaintRenderingContext2D.getLineDash (self : PaintRenderingContext2D) : IO (Array Float) :=
-  self.val.callMethod "getLineDash" (Support.args #[]) (Array Float)
+@[macro_inline] def PaintRenderingContext2D.getLineDash (self : PaintRenderingContext2D) : IO (Array Float) := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.getLineDash" do
+  self.val.callMethod "getLineDash" (Internal.args #[]) (Array Float)
 
 /-- `undefined closePath()` -/
-def PaintRenderingContext2D.closePath (self : PaintRenderingContext2D) : IO Unit :=
-  self.val.callMethod "closePath" (Support.args #[]) Unit
+@[macro_inline] def PaintRenderingContext2D.closePath (self : PaintRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.closePath" do
+  self.val.callMethod "closePath" (Internal.args #[]) Unit
 
 /-- `undefined moveTo(unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.moveTo (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "moveTo" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.moveTo (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.moveTo" do
+  self.val.callMethod "moveTo" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `undefined lineTo(unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.lineTo (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "lineTo" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.lineTo (self : PaintRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.lineTo" do
+  self.val.callMethod "lineTo" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `undefined quadraticCurveTo(unrestricted double cpx, unrestricted double cpy, unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.quadraticCurveTo (self : PaintRenderingContext2D) (cpx : Float) (cpy : Float) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "quadraticCurveTo" (Support.args #[toJS cpx, toJS cpy, toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.quadraticCurveTo (self : PaintRenderingContext2D) (cpx : Float) (cpy : Float) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.quadraticCurveTo" do
+  self.val.callMethod "quadraticCurveTo" (Internal.args #[toJS cpx, toJS cpy, toJS x, toJS y]) Unit
 
 /-- `undefined bezierCurveTo(unrestricted double cp1x, unrestricted double cp1y, unrestricted double cp2x, unrestricted double cp2y, unrestricted double x, unrestricted double y)` -/
-def PaintRenderingContext2D.bezierCurveTo (self : PaintRenderingContext2D) (cp1x : Float) (cp1y : Float) (cp2x : Float) (cp2y : Float) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "bezierCurveTo" (Support.args #[toJS cp1x, toJS cp1y, toJS cp2x, toJS cp2y, toJS x, toJS y]) Unit
+@[macro_inline] def PaintRenderingContext2D.bezierCurveTo (self : PaintRenderingContext2D) (cp1x : Float) (cp1y : Float) (cp2x : Float) (cp2y : Float) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.bezierCurveTo" do
+  self.val.callMethod "bezierCurveTo" (Internal.args #[toJS cp1x, toJS cp1y, toJS cp2x, toJS cp2y, toJS x, toJS y]) Unit
 
 /-- `undefined arcTo(unrestricted double x1, unrestricted double y1, unrestricted double x2, unrestricted double y2, unrestricted double radius)` -/
-def PaintRenderingContext2D.arcTo (self : PaintRenderingContext2D) (x1 : Float) (y1 : Float) (x2 : Float) (y2 : Float) (radius : Float) : IO Unit :=
-  self.val.callMethod "arcTo" (Support.args #[toJS x1, toJS y1, toJS x2, toJS y2, toJS radius]) Unit
+@[macro_inline] def PaintRenderingContext2D.arcTo (self : PaintRenderingContext2D) (x1 : Float) (y1 : Float) (x2 : Float) (y2 : Float) (radius : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.arcTo" do
+  self.val.callMethod "arcTo" (Internal.args #[toJS x1, toJS y1, toJS x2, toJS y2, toJS radius]) Unit
 
 /-- `undefined rect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h)` -/
-def PaintRenderingContext2D.rect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit :=
-  self.val.callMethod "rect" (Support.args #[toJS x, toJS y, toJS w, toJS h]) Unit
+@[macro_inline] def PaintRenderingContext2D.rect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.rect" do
+  self.val.callMethod "rect" (Internal.args #[toJS x, toJS y, toJS w, toJS h]) Unit
 
 /-- `undefined roundRect(unrestricted double x, unrestricted double y, unrestricted double w, unrestricted double h, optional (unrestricted double or DOMPointInit or sequence<(unrestricted double or DOMPointInit)>) radii)` -/
-def PaintRenderingContext2D.roundRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) (radii : Option UnrestrictedDoubleOrDOMPointInitOrSequenceOfUnrestrictedDoubleOrDOMPointInit := none) : IO Unit :=
-  self.val.callMethod "roundRect" (Support.args #[toJS x, toJS y, toJS w, toJS h, Support.optional radii]) Unit
+@[macro_inline] def PaintRenderingContext2D.roundRect (self : PaintRenderingContext2D) (x : Float) (y : Float) (w : Float) (h : Float) (radii : Option UnrestrictedDoubleOrDOMPointInitOrSequenceOfUnrestrictedDoubleOrDOMPointInit := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.roundRect" do
+  self.val.callMethod "roundRect" (Internal.args #[toJS x, toJS y, toJS w, toJS h, Internal.optional radii]) Unit
 
 /-- `undefined arc(unrestricted double x, unrestricted double y, unrestricted double radius, unrestricted double startAngle, unrestricted double endAngle, optional boolean counterclockwise)` -/
-def PaintRenderingContext2D.arc (self : PaintRenderingContext2D) (x : Float) (y : Float) (radius : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit :=
-  self.val.callMethod "arc" (Support.args #[toJS x, toJS y, toJS radius, toJS startAngle, toJS endAngle, Support.optional counterclockwise]) Unit
+@[macro_inline] def PaintRenderingContext2D.arc (self : PaintRenderingContext2D) (x : Float) (y : Float) (radius : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.arc" do
+  self.val.callMethod "arc" (Internal.args #[toJS x, toJS y, toJS radius, toJS startAngle, toJS endAngle, Internal.optional counterclockwise]) Unit
 
 /-- `undefined ellipse(unrestricted double x, unrestricted double y, unrestricted double radiusX, unrestricted double radiusY, unrestricted double rotation, unrestricted double startAngle, unrestricted double endAngle, optional boolean counterclockwise)` -/
-def PaintRenderingContext2D.ellipse (self : PaintRenderingContext2D) (x : Float) (y : Float) (radiusX : Float) (radiusY : Float) (rotation : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit :=
-  self.val.callMethod "ellipse" (Support.args #[toJS x, toJS y, toJS radiusX, toJS radiusY, toJS rotation, toJS startAngle, toJS endAngle, Support.optional counterclockwise]) Unit
+@[macro_inline] def PaintRenderingContext2D.ellipse (self : PaintRenderingContext2D) (x : Float) (y : Float) (radiusX : Float) (radiusY : Float) (rotation : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.PaintRenderingContext2D.ellipse" do
+  self.val.callMethod "ellipse" (Internal.args #[toJS x, toJS y, toJS radiusX, toJS radiusY, toJS rotation, toJS startAngle, toJS endAngle, Internal.optional counterclockwise]) Unit
 
 /-- `v instanceof PaintSize`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PaintSize`). -/
-def PaintSize.cast? (v : Value) : IO (Option PaintSize) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PaintSize"] Value) v) then some { val := v } else none
+@[macro_inline] def PaintSize.cast? (v : Value) : IO (Option PaintSize) := Internal.api "Lasm.JS.Web.PaintSize.cast?" do
+  Internal.cast (Internal.getGlobal ["PaintSize"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double width` -/
-def PaintSize.width (self : PaintSize) : IO Float := self.val.get "width" Float
+@[macro_inline] def PaintSize.width (self : PaintSize) : IO Float := Internal.api "Lasm.JS.Web.PaintSize.width" do
+  self.val.get "width" Float
 
 /-- `readonly attribute double height` -/
-def PaintSize.height (self : PaintSize) : IO Float := self.val.get "height" Float
+@[macro_inline] def PaintSize.height (self : PaintSize) : IO Float := Internal.api "Lasm.JS.Web.PaintSize.height" do
+  self.val.get "height" Float
 
 /-- `v instanceof PaintWorkletGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PaintWorkletGlobalScope`). -/
-def PaintWorkletGlobalScope.cast? (v : Value) : IO (Option PaintWorkletGlobalScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PaintWorkletGlobalScope"] Value) v) then some { val := v } else none
+@[macro_inline] def PaintWorkletGlobalScope.cast? (v : Value) : IO (Option PaintWorkletGlobalScope) := Internal.api "Lasm.JS.Web.PaintWorkletGlobalScope.cast?" do
+  Internal.cast (Internal.getGlobal ["PaintWorkletGlobalScope"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unrestricted double devicePixelRatio` -/
-def PaintWorkletGlobalScope.devicePixelRatio (self : PaintWorkletGlobalScope) : IO Float := self.val.get "devicePixelRatio" Float
+@[macro_inline] def PaintWorkletGlobalScope.devicePixelRatio (self : PaintWorkletGlobalScope) : IO Float := Internal.api "Lasm.JS.Web.PaintWorkletGlobalScope.devicePixelRatio" do
+  self.val.get "devicePixelRatio" Float
 
 /-- `undefined registerPaint(DOMString name, VoidFunction paintCtor)` -/
-def PaintWorkletGlobalScope.registerPaint (self : PaintWorkletGlobalScope) (name : String) (paintCtor : VoidFunction) : IO Unit :=
-  self.val.callMethod "registerPaint" (Support.args #[toJS name, toJS paintCtor]) Unit
+@[macro_inline] def PaintWorkletGlobalScope.registerPaint (self : PaintWorkletGlobalScope) (name : String) (paintCtor : VoidFunction) : IO Unit := Internal.api "Lasm.JS.Web.PaintWorkletGlobalScope.registerPaint" do
+  self.val.callMethod "registerPaint" (Internal.args #[toJS name, toJS paintCtor]) Unit
 
 /-- `readonly attribute Worklet paintWorklet` (CSS Painting API Level 1 (https://drafts.css-houdini.org/css-paint-api-1/)) -/
-def CSS.paintWorklet : IO Worklet := do
-  let r ← Support.getGlobal ["CSS", "paintWorklet"] Value
+@[macro_inline] def CSS.paintWorklet : IO Worklet := Internal.api "Lasm.JS.Web.CSS.paintWorklet" do
+  let r ← Internal.getGlobal ["CSS", "paintWorklet"] Value
   pure { val := r }
 
 end Lasm.JS.Web

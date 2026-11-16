@@ -6,11 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.Pointerevents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.InputDeviceCapabilities
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MouseEventInit : EventModifierInit` (Pointer Events (https://w3c.github.io/pointerevents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MouseEventInit where
@@ -74,36 +83,36 @@ structure MouseEventInit where
   movementX : Option Float := none
   /-- `double movementY = 0` -/
   movementY : Option Float := none
-instance : ToJS MouseEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("ctrlKey", Support.optional d.ctrlKey),
-    ("shiftKey", Support.optional d.shiftKey),
-    ("altKey", Support.optional d.altKey),
-    ("metaKey", Support.optional d.metaKey),
-    ("modifierAltGraph", Support.optional d.modifierAltGraph),
-    ("modifierCapsLock", Support.optional d.modifierCapsLock),
-    ("modifierFn", Support.optional d.modifierFn),
-    ("modifierFnLock", Support.optional d.modifierFnLock),
-    ("modifierHyper", Support.optional d.modifierHyper),
-    ("modifierNumLock", Support.optional d.modifierNumLock),
-    ("modifierScrollLock", Support.optional d.modifierScrollLock),
-    ("modifierSuper", Support.optional d.modifierSuper),
-    ("modifierSymbol", Support.optional d.modifierSymbol),
-    ("modifierSymbolLock", Support.optional d.modifierSymbolLock),
-    ("screenX", Support.optional d.screenX),
-    ("screenY", Support.optional d.screenY),
-    ("clientX", Support.optional d.clientX),
-    ("clientY", Support.optional d.clientY),
-    ("button", Support.optional d.button),
-    ("buttons", Support.optional d.buttons),
-    ("relatedTarget", Support.optional d.relatedTarget),
-    ("movementX", Support.optional d.movementX),
-    ("movementY", Support.optional d.movementY)]⟩
+instance : ToJS MouseEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock),
+    ("screenX", Internal.optional d.screenX),
+    ("screenY", Internal.optional d.screenY),
+    ("clientX", Internal.optional d.clientX),
+    ("clientY", Internal.optional d.clientY),
+    ("button", Internal.optional d.button),
+    ("buttons", Internal.optional d.buttons),
+    ("relatedTarget", Internal.optional d.relatedTarget),
+    ("movementX", Internal.optional d.movementX),
+    ("movementY", Internal.optional d.movementY)]⟩
 
 /-- `dictionary PointerEventInit : MouseEventInit` (Pointer Events (https://w3c.github.io/pointerevents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PointerEventInit where
@@ -197,51 +206,51 @@ structure PointerEventInit where
   coalescedEvents : Option (Array PointerEvent) := none
   /-- `sequence<PointerEvent> predictedEvents = []` -/
   predictedEvents : Option (Array PointerEvent) := none
-instance : ToJS PointerEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("ctrlKey", Support.optional d.ctrlKey),
-    ("shiftKey", Support.optional d.shiftKey),
-    ("altKey", Support.optional d.altKey),
-    ("metaKey", Support.optional d.metaKey),
-    ("modifierAltGraph", Support.optional d.modifierAltGraph),
-    ("modifierCapsLock", Support.optional d.modifierCapsLock),
-    ("modifierFn", Support.optional d.modifierFn),
-    ("modifierFnLock", Support.optional d.modifierFnLock),
-    ("modifierHyper", Support.optional d.modifierHyper),
-    ("modifierNumLock", Support.optional d.modifierNumLock),
-    ("modifierScrollLock", Support.optional d.modifierScrollLock),
-    ("modifierSuper", Support.optional d.modifierSuper),
-    ("modifierSymbol", Support.optional d.modifierSymbol),
-    ("modifierSymbolLock", Support.optional d.modifierSymbolLock),
-    ("screenX", Support.optional d.screenX),
-    ("screenY", Support.optional d.screenY),
-    ("clientX", Support.optional d.clientX),
-    ("clientY", Support.optional d.clientY),
-    ("button", Support.optional d.button),
-    ("buttons", Support.optional d.buttons),
-    ("relatedTarget", Support.optional d.relatedTarget),
-    ("movementX", Support.optional d.movementX),
-    ("movementY", Support.optional d.movementY),
-    ("pointerId", Support.optional d.pointerId),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height),
-    ("pressure", Support.optional d.pressure),
-    ("tangentialPressure", Support.optional d.tangentialPressure),
-    ("tiltX", Support.optional d.tiltX),
-    ("tiltY", Support.optional d.tiltY),
-    ("twist", Support.optional d.twist),
-    ("altitudeAngle", Support.optional d.altitudeAngle),
-    ("azimuthAngle", Support.optional d.azimuthAngle),
-    ("pointerType", Support.optional d.pointerType),
-    ("isPrimary", Support.optional d.isPrimary),
-    ("persistentDeviceId", Support.optional d.persistentDeviceId),
-    ("coalescedEvents", Support.optional d.coalescedEvents),
-    ("predictedEvents", Support.optional d.predictedEvents)]⟩
+instance : ToJS PointerEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock),
+    ("screenX", Internal.optional d.screenX),
+    ("screenY", Internal.optional d.screenY),
+    ("clientX", Internal.optional d.clientX),
+    ("clientY", Internal.optional d.clientY),
+    ("button", Internal.optional d.button),
+    ("buttons", Internal.optional d.buttons),
+    ("relatedTarget", Internal.optional d.relatedTarget),
+    ("movementX", Internal.optional d.movementX),
+    ("movementY", Internal.optional d.movementY),
+    ("pointerId", Internal.optional d.pointerId),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("pressure", Internal.optional d.pressure),
+    ("tangentialPressure", Internal.optional d.tangentialPressure),
+    ("tiltX", Internal.optional d.tiltX),
+    ("tiltY", Internal.optional d.tiltY),
+    ("twist", Internal.optional d.twist),
+    ("altitudeAngle", Internal.optional d.altitudeAngle),
+    ("azimuthAngle", Internal.optional d.azimuthAngle),
+    ("pointerType", Internal.optional d.pointerType),
+    ("isPrimary", Internal.optional d.isPrimary),
+    ("persistentDeviceId", Internal.optional d.persistentDeviceId),
+    ("coalescedEvents", Internal.optional d.coalescedEvents),
+    ("predictedEvents", Internal.optional d.predictedEvents)]⟩
 
 /-- `dictionary WheelEventInit : MouseEventInit` (Pointer Events (https://w3c.github.io/pointerevents/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WheelEventInit where
@@ -315,162 +324,188 @@ structure WheelEventInit where
   deltaMode : Option Nat := none
   /-- `boolean momentum = false` -/
   momentum : Option Bool := none
-instance : ToJS WheelEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("ctrlKey", Support.optional d.ctrlKey),
-    ("shiftKey", Support.optional d.shiftKey),
-    ("altKey", Support.optional d.altKey),
-    ("metaKey", Support.optional d.metaKey),
-    ("modifierAltGraph", Support.optional d.modifierAltGraph),
-    ("modifierCapsLock", Support.optional d.modifierCapsLock),
-    ("modifierFn", Support.optional d.modifierFn),
-    ("modifierFnLock", Support.optional d.modifierFnLock),
-    ("modifierHyper", Support.optional d.modifierHyper),
-    ("modifierNumLock", Support.optional d.modifierNumLock),
-    ("modifierScrollLock", Support.optional d.modifierScrollLock),
-    ("modifierSuper", Support.optional d.modifierSuper),
-    ("modifierSymbol", Support.optional d.modifierSymbol),
-    ("modifierSymbolLock", Support.optional d.modifierSymbolLock),
-    ("screenX", Support.optional d.screenX),
-    ("screenY", Support.optional d.screenY),
-    ("clientX", Support.optional d.clientX),
-    ("clientY", Support.optional d.clientY),
-    ("button", Support.optional d.button),
-    ("buttons", Support.optional d.buttons),
-    ("relatedTarget", Support.optional d.relatedTarget),
-    ("movementX", Support.optional d.movementX),
-    ("movementY", Support.optional d.movementY),
-    ("deltaX", Support.optional d.deltaX),
-    ("deltaY", Support.optional d.deltaY),
-    ("deltaZ", Support.optional d.deltaZ),
-    ("deltaMode", Support.optional d.deltaMode),
-    ("momentum", Support.optional d.momentum)]⟩
+instance : ToJS WheelEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock),
+    ("screenX", Internal.optional d.screenX),
+    ("screenY", Internal.optional d.screenY),
+    ("clientX", Internal.optional d.clientX),
+    ("clientY", Internal.optional d.clientY),
+    ("button", Internal.optional d.button),
+    ("buttons", Internal.optional d.buttons),
+    ("relatedTarget", Internal.optional d.relatedTarget),
+    ("movementX", Internal.optional d.movementX),
+    ("movementY", Internal.optional d.movementY),
+    ("deltaX", Internal.optional d.deltaX),
+    ("deltaY", Internal.optional d.deltaY),
+    ("deltaZ", Internal.optional d.deltaZ),
+    ("deltaMode", Internal.optional d.deltaMode),
+    ("momentum", Internal.optional d.momentum)]⟩
 
 /-- `v instanceof MouseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MouseEvent`). -/
-def MouseEvent.cast? (v : Value) : IO (Option MouseEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MouseEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MouseEvent.cast? (v : Value) : IO (Option MouseEvent) := Internal.api "Lasm.JS.Web.MouseEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MouseEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional MouseEventInit eventInitDict)` -/
-def MouseEvent.new (type : String) (eventInitDict : Option MouseEventInit := none) : IO MouseEvent :=
+@[macro_inline] def MouseEvent.new (type : String) (eventInitDict : Option MouseEventInit := none) : IO MouseEvent := Internal.api "Lasm.JS.Web.MouseEvent.new" do
   Lasm.JS.Binding.invoke MouseEvent { name := "Lasm.JS.Web.MouseEvent.new", module := "globalThis", path := "MouseEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute long screenX` -/
-def MouseEvent.screenX (self : MouseEvent) : IO Int := self.val.get "screenX" Int
+@[macro_inline] def MouseEvent.screenX (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.screenX" do
+  self.val.get "screenX" Int
 
 /-- `readonly attribute long screenY` -/
-def MouseEvent.screenY (self : MouseEvent) : IO Int := self.val.get "screenY" Int
+@[macro_inline] def MouseEvent.screenY (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.screenY" do
+  self.val.get "screenY" Int
 
 /-- `readonly attribute long clientX` -/
-def MouseEvent.clientX (self : MouseEvent) : IO Int := self.val.get "clientX" Int
+@[macro_inline] def MouseEvent.clientX (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.clientX" do
+  self.val.get "clientX" Int
 
 /-- `readonly attribute long clientY` -/
-def MouseEvent.clientY (self : MouseEvent) : IO Int := self.val.get "clientY" Int
+@[macro_inline] def MouseEvent.clientY (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.clientY" do
+  self.val.get "clientY" Int
 
 /-- `readonly attribute long layerX` -/
-def MouseEvent.layerX (self : MouseEvent) : IO Int := self.val.get "layerX" Int
+@[macro_inline] def MouseEvent.layerX (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.layerX" do
+  self.val.get "layerX" Int
 
 /-- `readonly attribute long layerY` -/
-def MouseEvent.layerY (self : MouseEvent) : IO Int := self.val.get "layerY" Int
+@[macro_inline] def MouseEvent.layerY (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.layerY" do
+  self.val.get "layerY" Int
 
 /-- `readonly attribute boolean ctrlKey` -/
-def MouseEvent.ctrlKey (self : MouseEvent) : IO Bool := self.val.get "ctrlKey" Bool
+@[macro_inline] def MouseEvent.ctrlKey (self : MouseEvent) : IO Bool := Internal.api "Lasm.JS.Web.MouseEvent.ctrlKey" do
+  self.val.get "ctrlKey" Bool
 
 /-- `readonly attribute boolean shiftKey` -/
-def MouseEvent.shiftKey (self : MouseEvent) : IO Bool := self.val.get "shiftKey" Bool
+@[macro_inline] def MouseEvent.shiftKey (self : MouseEvent) : IO Bool := Internal.api "Lasm.JS.Web.MouseEvent.shiftKey" do
+  self.val.get "shiftKey" Bool
 
 /-- `readonly attribute boolean altKey` -/
-def MouseEvent.altKey (self : MouseEvent) : IO Bool := self.val.get "altKey" Bool
+@[macro_inline] def MouseEvent.altKey (self : MouseEvent) : IO Bool := Internal.api "Lasm.JS.Web.MouseEvent.altKey" do
+  self.val.get "altKey" Bool
 
 /-- `readonly attribute boolean metaKey` -/
-def MouseEvent.metaKey (self : MouseEvent) : IO Bool := self.val.get "metaKey" Bool
+@[macro_inline] def MouseEvent.metaKey (self : MouseEvent) : IO Bool := Internal.api "Lasm.JS.Web.MouseEvent.metaKey" do
+  self.val.get "metaKey" Bool
 
 /-- `readonly attribute short button` -/
-def MouseEvent.button (self : MouseEvent) : IO Int := self.val.get "button" Int
+@[macro_inline] def MouseEvent.button (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.button" do
+  self.val.get "button" Int
 
 /-- `readonly attribute unsigned short buttons` -/
-def MouseEvent.buttons (self : MouseEvent) : IO Nat := self.val.get "buttons" Nat
+@[macro_inline] def MouseEvent.buttons (self : MouseEvent) : IO Nat := Internal.api "Lasm.JS.Web.MouseEvent.buttons" do
+  self.val.get "buttons" Nat
 
 /-- `readonly attribute EventTarget? relatedTarget` -/
-def MouseEvent.relatedTarget (self : MouseEvent) : IO (Option EventTarget) := self.val.get "relatedTarget" (Option EventTarget)
+@[macro_inline] def MouseEvent.relatedTarget (self : MouseEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.MouseEvent.relatedTarget" do
+  self.val.get "relatedTarget" (Option EventTarget)
 
 /-- `boolean getModifierState(DOMString keyArg)` -/
-def MouseEvent.getModifierState (self : MouseEvent) (keyArg : String) : IO Bool :=
-  self.val.callMethod "getModifierState" (Support.args #[toJS keyArg]) Bool
+@[macro_inline] def MouseEvent.getModifierState (self : MouseEvent) (keyArg : String) : IO Bool := Internal.api "Lasm.JS.Web.MouseEvent.getModifierState" do
+  self.val.callMethod "getModifierState" (Internal.args #[toJS keyArg]) Bool
 
 /-- `undefined initMouseEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional long detailArg, optional long screenXArg, optional long screenYArg, optional long clientXArg, optional long clientYArg, optional boolean ctrlKeyArg, optional boolean altKeyArg, optional boolean shiftKeyArg, optional boolean metaKeyArg, optional short buttonArg, optional EventTarget? relatedTargetArg)` -/
-def MouseEvent.initMouseEvent (self : MouseEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) (screenXArg : Option Int := none) (screenYArg : Option Int := none) (clientXArg : Option Int := none) (clientYArg : Option Int := none) (ctrlKeyArg : Option Bool := none) (altKeyArg : Option Bool := none) (shiftKeyArg : Option Bool := none) (metaKeyArg : Option Bool := none) (buttonArg : Option Int := none) (relatedTargetArg : Option EventTarget := none) : IO Unit :=
-  self.val.callMethod "initMouseEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional detailArg, Support.optional screenXArg, Support.optional screenYArg, Support.optional clientXArg, Support.optional clientYArg, Support.optional ctrlKeyArg, Support.optional altKeyArg, Support.optional shiftKeyArg, Support.optional metaKeyArg, Support.optional buttonArg, Support.optional relatedTargetArg]) Unit
+@[macro_inline] def MouseEvent.initMouseEvent (self : MouseEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) (screenXArg : Option Int := none) (screenYArg : Option Int := none) (clientXArg : Option Int := none) (clientYArg : Option Int := none) (ctrlKeyArg : Option Bool := none) (altKeyArg : Option Bool := none) (shiftKeyArg : Option Bool := none) (metaKeyArg : Option Bool := none) (buttonArg : Option Int := none) (relatedTargetArg : Option EventTarget := none) : IO Unit := Internal.api "Lasm.JS.Web.MouseEvent.initMouseEvent" do
+  self.val.callMethod "initMouseEvent" (Internal.args #[toJS typeArg, Internal.optional bubblesArg, Internal.optional cancelableArg, Internal.optional viewArg, Internal.optional detailArg, Internal.optional screenXArg, Internal.optional screenYArg, Internal.optional clientXArg, Internal.optional clientYArg, Internal.optional ctrlKeyArg, Internal.optional altKeyArg, Internal.optional shiftKeyArg, Internal.optional metaKeyArg, Internal.optional buttonArg, Internal.optional relatedTargetArg]) Unit
 
 /-- `v instanceof PointerEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PointerEvent`). -/
-def PointerEvent.cast? (v : Value) : IO (Option PointerEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PointerEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PointerEvent.cast? (v : Value) : IO (Option PointerEvent) := Internal.api "Lasm.JS.Web.PointerEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PointerEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional PointerEventInit eventInitDict)` -/
-def PointerEvent.new (type : String) (eventInitDict : Option PointerEventInit := none) : IO PointerEvent :=
+@[macro_inline] def PointerEvent.new (type : String) (eventInitDict : Option PointerEventInit := none) : IO PointerEvent := Internal.api "Lasm.JS.Web.PointerEvent.new" do
   Lasm.JS.Binding.invoke PointerEvent { name := "Lasm.JS.Web.PointerEvent.new", module := "globalThis", path := "PointerEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute long pointerId` -/
-def PointerEvent.pointerId (self : PointerEvent) : IO Int := self.val.get "pointerId" Int
+@[macro_inline] def PointerEvent.pointerId (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.pointerId" do
+  self.val.get "pointerId" Int
 
 /-- `readonly attribute double width` -/
-def PointerEvent.width (self : PointerEvent) : IO Float := self.val.get "width" Float
+@[macro_inline] def PointerEvent.width (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.width" do
+  self.val.get "width" Float
 
 /-- `readonly attribute double height` -/
-def PointerEvent.height (self : PointerEvent) : IO Float := self.val.get "height" Float
+@[macro_inline] def PointerEvent.height (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.height" do
+  self.val.get "height" Float
 
 /-- `readonly attribute float pressure` -/
-def PointerEvent.pressure (self : PointerEvent) : IO Float := self.val.get "pressure" Float
+@[macro_inline] def PointerEvent.pressure (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.pressure" do
+  self.val.get "pressure" Float
 
 /-- `readonly attribute float tangentialPressure` -/
-def PointerEvent.tangentialPressure (self : PointerEvent) : IO Float := self.val.get "tangentialPressure" Float
+@[macro_inline] def PointerEvent.tangentialPressure (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.tangentialPressure" do
+  self.val.get "tangentialPressure" Float
 
 /-- `readonly attribute long tiltX` -/
-def PointerEvent.tiltX (self : PointerEvent) : IO Int := self.val.get "tiltX" Int
+@[macro_inline] def PointerEvent.tiltX (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.tiltX" do
+  self.val.get "tiltX" Int
 
 /-- `readonly attribute long tiltY` -/
-def PointerEvent.tiltY (self : PointerEvent) : IO Int := self.val.get "tiltY" Int
+@[macro_inline] def PointerEvent.tiltY (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.tiltY" do
+  self.val.get "tiltY" Int
 
 /-- `readonly attribute long twist` -/
-def PointerEvent.twist (self : PointerEvent) : IO Int := self.val.get "twist" Int
+@[macro_inline] def PointerEvent.twist (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.twist" do
+  self.val.get "twist" Int
 
 /-- `readonly attribute double altitudeAngle` -/
-def PointerEvent.altitudeAngle (self : PointerEvent) : IO Float := self.val.get "altitudeAngle" Float
+@[macro_inline] def PointerEvent.altitudeAngle (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.altitudeAngle" do
+  self.val.get "altitudeAngle" Float
 
 /-- `readonly attribute double azimuthAngle` -/
-def PointerEvent.azimuthAngle (self : PointerEvent) : IO Float := self.val.get "azimuthAngle" Float
+@[macro_inline] def PointerEvent.azimuthAngle (self : PointerEvent) : IO Float := Internal.api "Lasm.JS.Web.PointerEvent.azimuthAngle" do
+  self.val.get "azimuthAngle" Float
 
 /-- `readonly attribute DOMString pointerType` -/
-def PointerEvent.pointerType (self : PointerEvent) : IO String := self.val.get "pointerType" String
+@[macro_inline] def PointerEvent.pointerType (self : PointerEvent) : IO String := Internal.api "Lasm.JS.Web.PointerEvent.pointerType" do
+  self.val.get "pointerType" String
 
 /-- `readonly attribute boolean isPrimary` -/
-def PointerEvent.isPrimary (self : PointerEvent) : IO Bool := self.val.get "isPrimary" Bool
+@[macro_inline] def PointerEvent.isPrimary (self : PointerEvent) : IO Bool := Internal.api "Lasm.JS.Web.PointerEvent.isPrimary" do
+  self.val.get "isPrimary" Bool
 
 /-- `readonly attribute long persistentDeviceId` -/
-def PointerEvent.persistentDeviceId (self : PointerEvent) : IO Int := self.val.get "persistentDeviceId" Int
+@[macro_inline] def PointerEvent.persistentDeviceId (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.persistentDeviceId" do
+  self.val.get "persistentDeviceId" Int
 
 /-- `sequence<PointerEvent> getCoalescedEvents()` -/
-def PointerEvent.getCoalescedEvents (self : PointerEvent) : IO (Array PointerEvent) :=
-  self.val.callMethod "getCoalescedEvents" (Support.args #[]) (Array PointerEvent)
+@[macro_inline] def PointerEvent.getCoalescedEvents (self : PointerEvent) : IO (Array PointerEvent) := Internal.api "Lasm.JS.Web.PointerEvent.getCoalescedEvents" do
+  self.val.callMethod "getCoalescedEvents" (Internal.args #[]) (Array PointerEvent)
 
 /-- `sequence<PointerEvent> getPredictedEvents()` -/
-def PointerEvent.getPredictedEvents (self : PointerEvent) : IO (Array PointerEvent) :=
-  self.val.callMethod "getPredictedEvents" (Support.args #[]) (Array PointerEvent)
+@[macro_inline] def PointerEvent.getPredictedEvents (self : PointerEvent) : IO (Array PointerEvent) := Internal.api "Lasm.JS.Web.PointerEvent.getPredictedEvents" do
+  self.val.callMethod "getPredictedEvents" (Internal.args #[]) (Array PointerEvent)
 
 /-- `v instanceof WheelEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WheelEvent`). -/
-def WheelEvent.cast? (v : Value) : IO (Option WheelEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WheelEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def WheelEvent.cast? (v : Value) : IO (Option WheelEvent) := Internal.api "Lasm.JS.Web.WheelEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["WheelEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional WheelEventInit eventInitDict)` -/
-def WheelEvent.new (type : String) (eventInitDict : Option WheelEventInit := none) : IO WheelEvent :=
+@[macro_inline] def WheelEvent.new (type : String) (eventInitDict : Option WheelEventInit := none) : IO WheelEvent := Internal.api "Lasm.JS.Web.WheelEvent.new" do
   Lasm.JS.Binding.invoke WheelEvent { name := "Lasm.JS.Web.WheelEvent.new", module := "globalThis", path := "WheelEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `const unsigned long DOM_DELTA_PIXEL = 0x00` -/
 def WheelEvent.DOM_DELTA_PIXEL : Nat := 0x00
@@ -482,374 +517,523 @@ def WheelEvent.DOM_DELTA_LINE : Nat := 0x01
 def WheelEvent.DOM_DELTA_PAGE : Nat := 0x02
 
 /-- `readonly attribute double deltaX` -/
-def WheelEvent.deltaX (self : WheelEvent) : IO Float := self.val.get "deltaX" Float
+@[macro_inline] def WheelEvent.deltaX (self : WheelEvent) : IO Float := Internal.api "Lasm.JS.Web.WheelEvent.deltaX" do
+  self.val.get "deltaX" Float
 
 /-- `readonly attribute double deltaY` -/
-def WheelEvent.deltaY (self : WheelEvent) : IO Float := self.val.get "deltaY" Float
+@[macro_inline] def WheelEvent.deltaY (self : WheelEvent) : IO Float := Internal.api "Lasm.JS.Web.WheelEvent.deltaY" do
+  self.val.get "deltaY" Float
 
 /-- `readonly attribute double deltaZ` -/
-def WheelEvent.deltaZ (self : WheelEvent) : IO Float := self.val.get "deltaZ" Float
+@[macro_inline] def WheelEvent.deltaZ (self : WheelEvent) : IO Float := Internal.api "Lasm.JS.Web.WheelEvent.deltaZ" do
+  self.val.get "deltaZ" Float
 
 /-- `readonly attribute unsigned long deltaMode` -/
-def WheelEvent.deltaMode (self : WheelEvent) : IO Nat := self.val.get "deltaMode" Nat
+@[macro_inline] def WheelEvent.deltaMode (self : WheelEvent) : IO Nat := Internal.api "Lasm.JS.Web.WheelEvent.deltaMode" do
+  self.val.get "deltaMode" Nat
 
 /-- `readonly attribute boolean momentum` -/
-def WheelEvent.momentum (self : WheelEvent) : IO Bool := self.val.get "momentum" Bool
+@[macro_inline] def WheelEvent.momentum (self : WheelEvent) : IO Bool := Internal.api "Lasm.JS.Web.WheelEvent.momentum" do
+  self.val.get "momentum" Bool
 
 /-- `attribute EventHandler onpointerover` -/
-def Document.onpointerover (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerover" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerover (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerover" do
+  self.val.get "onpointerover" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerover`: `attribute EventHandler onpointerover` -/
-def Document.setOnpointerover (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerover (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerover" do
   self.val.set "onpointerover" (toJS value)
 
 /-- `attribute EventHandler onpointerenter` -/
-def Document.onpointerenter (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerenter" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerenter (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerenter" do
+  self.val.get "onpointerenter" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerenter`: `attribute EventHandler onpointerenter` -/
-def Document.setOnpointerenter (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerenter (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerenter" do
   self.val.set "onpointerenter" (toJS value)
 
 /-- `attribute EventHandler onpointerdown` -/
-def Document.onpointerdown (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerdown" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerdown (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerdown" do
+  self.val.get "onpointerdown" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerdown`: `attribute EventHandler onpointerdown` -/
-def Document.setOnpointerdown (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerdown (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerdown" do
   self.val.set "onpointerdown" (toJS value)
 
 /-- `attribute EventHandler onpointermove` -/
-def Document.onpointermove (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointermove" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointermove (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointermove" do
+  self.val.get "onpointermove" (Option EventHandlerNonNull)
 
 /-- Sets `onpointermove`: `attribute EventHandler onpointermove` -/
-def Document.setOnpointermove (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointermove (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointermove" do
   self.val.set "onpointermove" (toJS value)
 
 /-- `attribute EventHandler onpointerrawupdate` -/
-def Document.onpointerrawupdate (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerrawupdate (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerrawupdate" do
+  self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerrawupdate`: `attribute EventHandler onpointerrawupdate` -/
-def Document.setOnpointerrawupdate (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerrawupdate (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerrawupdate" do
   self.val.set "onpointerrawupdate" (toJS value)
 
 /-- `attribute EventHandler onpointerup` -/
-def Document.onpointerup (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerup" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerup (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerup" do
+  self.val.get "onpointerup" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerup`: `attribute EventHandler onpointerup` -/
-def Document.setOnpointerup (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerup (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerup" do
   self.val.set "onpointerup" (toJS value)
 
 /-- `attribute EventHandler onpointercancel` -/
-def Document.onpointercancel (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointercancel" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointercancel (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointercancel" do
+  self.val.get "onpointercancel" (Option EventHandlerNonNull)
 
 /-- Sets `onpointercancel`: `attribute EventHandler onpointercancel` -/
-def Document.setOnpointercancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointercancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointercancel" do
   self.val.set "onpointercancel" (toJS value)
 
 /-- `attribute EventHandler onpointerout` -/
-def Document.onpointerout (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerout" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerout (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerout" do
+  self.val.get "onpointerout" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerout`: `attribute EventHandler onpointerout` -/
-def Document.setOnpointerout (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerout (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerout" do
   self.val.set "onpointerout" (toJS value)
 
 /-- `attribute EventHandler onpointerleave` -/
-def Document.onpointerleave (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onpointerleave" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onpointerleave (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerleave" do
+  self.val.get "onpointerleave" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerleave`: `attribute EventHandler onpointerleave` -/
-def Document.setOnpointerleave (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnpointerleave (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnpointerleave" do
   self.val.set "onpointerleave" (toJS value)
 
 /-- `attribute EventHandler ongotpointercapture` -/
-def Document.ongotpointercapture (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ongotpointercapture (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ongotpointercapture" do
+  self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `ongotpointercapture`: `attribute EventHandler ongotpointercapture` -/
-def Document.setOngotpointercapture (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOngotpointercapture (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOngotpointercapture" do
   self.val.set "ongotpointercapture" (toJS value)
 
 /-- `attribute EventHandler onlostpointercapture` -/
-def Document.onlostpointercapture (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onlostpointercapture (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onlostpointercapture" do
+  self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `onlostpointercapture`: `attribute EventHandler onlostpointercapture` -/
-def Document.setOnlostpointercapture (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnlostpointercapture (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnlostpointercapture" do
   self.val.set "onlostpointercapture" (toJS value)
 
 /-- `undefined setPointerCapture(long pointerId)` -/
-def Element.setPointerCapture (self : Element) (pointerId : Int) : IO Unit :=
-  self.val.callMethod "setPointerCapture" (Support.args #[toJS pointerId]) Unit
+@[macro_inline] def Element.setPointerCapture (self : Element) (pointerId : Int) : IO Unit := Internal.api "Lasm.JS.Web.Element.setPointerCapture" do
+  self.val.callMethod "setPointerCapture" (Internal.args #[toJS pointerId]) Unit
 
 /-- `undefined releasePointerCapture(long pointerId)` -/
-def Element.releasePointerCapture (self : Element) (pointerId : Int) : IO Unit :=
-  self.val.callMethod "releasePointerCapture" (Support.args #[toJS pointerId]) Unit
+@[macro_inline] def Element.releasePointerCapture (self : Element) (pointerId : Int) : IO Unit := Internal.api "Lasm.JS.Web.Element.releasePointerCapture" do
+  self.val.callMethod "releasePointerCapture" (Internal.args #[toJS pointerId]) Unit
 
 /-- `boolean hasPointerCapture(long pointerId)` -/
-def Element.hasPointerCapture (self : Element) (pointerId : Int) : IO Bool :=
-  self.val.callMethod "hasPointerCapture" (Support.args #[toJS pointerId]) Bool
+@[macro_inline] def Element.hasPointerCapture (self : Element) (pointerId : Int) : IO Bool := Internal.api "Lasm.JS.Web.Element.hasPointerCapture" do
+  self.val.callMethod "hasPointerCapture" (Internal.args #[toJS pointerId]) Bool
 
 /-- `attribute EventHandler onpointerover` -/
-def HTMLElement.onpointerover (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerover" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerover (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerover" do
+  self.val.get "onpointerover" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerover`: `attribute EventHandler onpointerover` -/
-def HTMLElement.setOnpointerover (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerover (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerover" do
   self.val.set "onpointerover" (toJS value)
 
 /-- `attribute EventHandler onpointerenter` -/
-def HTMLElement.onpointerenter (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerenter" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerenter (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerenter" do
+  self.val.get "onpointerenter" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerenter`: `attribute EventHandler onpointerenter` -/
-def HTMLElement.setOnpointerenter (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerenter (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerenter" do
   self.val.set "onpointerenter" (toJS value)
 
 /-- `attribute EventHandler onpointerdown` -/
-def HTMLElement.onpointerdown (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerdown" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerdown (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerdown" do
+  self.val.get "onpointerdown" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerdown`: `attribute EventHandler onpointerdown` -/
-def HTMLElement.setOnpointerdown (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerdown (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerdown" do
   self.val.set "onpointerdown" (toJS value)
 
 /-- `attribute EventHandler onpointermove` -/
-def HTMLElement.onpointermove (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointermove" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointermove (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointermove" do
+  self.val.get "onpointermove" (Option EventHandlerNonNull)
 
 /-- Sets `onpointermove`: `attribute EventHandler onpointermove` -/
-def HTMLElement.setOnpointermove (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointermove (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointermove" do
   self.val.set "onpointermove" (toJS value)
 
 /-- `attribute EventHandler onpointerrawupdate` -/
-def HTMLElement.onpointerrawupdate (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerrawupdate (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerrawupdate" do
+  self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerrawupdate`: `attribute EventHandler onpointerrawupdate` -/
-def HTMLElement.setOnpointerrawupdate (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerrawupdate (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerrawupdate" do
   self.val.set "onpointerrawupdate" (toJS value)
 
 /-- `attribute EventHandler onpointerup` -/
-def HTMLElement.onpointerup (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerup" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerup (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerup" do
+  self.val.get "onpointerup" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerup`: `attribute EventHandler onpointerup` -/
-def HTMLElement.setOnpointerup (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerup (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerup" do
   self.val.set "onpointerup" (toJS value)
 
 /-- `attribute EventHandler onpointercancel` -/
-def HTMLElement.onpointercancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointercancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointercancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointercancel" do
+  self.val.get "onpointercancel" (Option EventHandlerNonNull)
 
 /-- Sets `onpointercancel`: `attribute EventHandler onpointercancel` -/
-def HTMLElement.setOnpointercancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointercancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointercancel" do
   self.val.set "onpointercancel" (toJS value)
 
 /-- `attribute EventHandler onpointerout` -/
-def HTMLElement.onpointerout (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerout" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerout (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerout" do
+  self.val.get "onpointerout" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerout`: `attribute EventHandler onpointerout` -/
-def HTMLElement.setOnpointerout (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerout (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerout" do
   self.val.set "onpointerout" (toJS value)
 
 /-- `attribute EventHandler onpointerleave` -/
-def HTMLElement.onpointerleave (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerleave" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onpointerleave (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onpointerleave" do
+  self.val.get "onpointerleave" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerleave`: `attribute EventHandler onpointerleave` -/
-def HTMLElement.setOnpointerleave (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnpointerleave (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnpointerleave" do
   self.val.set "onpointerleave" (toJS value)
 
 /-- `attribute EventHandler ongotpointercapture` -/
-def HTMLElement.ongotpointercapture (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ongotpointercapture (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ongotpointercapture" do
+  self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `ongotpointercapture`: `attribute EventHandler ongotpointercapture` -/
-def HTMLElement.setOngotpointercapture (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOngotpointercapture (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOngotpointercapture" do
   self.val.set "ongotpointercapture" (toJS value)
 
 /-- `attribute EventHandler onlostpointercapture` -/
-def HTMLElement.onlostpointercapture (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onlostpointercapture (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onlostpointercapture" do
+  self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `onlostpointercapture`: `attribute EventHandler onlostpointercapture` -/
-def HTMLElement.setOnlostpointercapture (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnlostpointercapture (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnlostpointercapture" do
   self.val.set "onlostpointercapture" (toJS value)
 
 /-- `attribute EventHandler onpointerover` -/
-def MathMLElement.onpointerover (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerover" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerover (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerover" do
+  self.val.get "onpointerover" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerover`: `attribute EventHandler onpointerover` -/
-def MathMLElement.setOnpointerover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerover (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerover" do
   self.val.set "onpointerover" (toJS value)
 
 /-- `attribute EventHandler onpointerenter` -/
-def MathMLElement.onpointerenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerenter" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerenter (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerenter" do
+  self.val.get "onpointerenter" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerenter`: `attribute EventHandler onpointerenter` -/
-def MathMLElement.setOnpointerenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerenter (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerenter" do
   self.val.set "onpointerenter" (toJS value)
 
 /-- `attribute EventHandler onpointerdown` -/
-def MathMLElement.onpointerdown (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerdown" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerdown (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerdown" do
+  self.val.get "onpointerdown" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerdown`: `attribute EventHandler onpointerdown` -/
-def MathMLElement.setOnpointerdown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerdown (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerdown" do
   self.val.set "onpointerdown" (toJS value)
 
 /-- `attribute EventHandler onpointermove` -/
-def MathMLElement.onpointermove (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointermove" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointermove (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointermove" do
+  self.val.get "onpointermove" (Option EventHandlerNonNull)
 
 /-- Sets `onpointermove`: `attribute EventHandler onpointermove` -/
-def MathMLElement.setOnpointermove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointermove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointermove" do
   self.val.set "onpointermove" (toJS value)
 
 /-- `attribute EventHandler onpointerrawupdate` -/
-def MathMLElement.onpointerrawupdate (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerrawupdate (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerrawupdate" do
+  self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerrawupdate`: `attribute EventHandler onpointerrawupdate` -/
-def MathMLElement.setOnpointerrawupdate (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerrawupdate (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerrawupdate" do
   self.val.set "onpointerrawupdate" (toJS value)
 
 /-- `attribute EventHandler onpointerup` -/
-def MathMLElement.onpointerup (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerup" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerup (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerup" do
+  self.val.get "onpointerup" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerup`: `attribute EventHandler onpointerup` -/
-def MathMLElement.setOnpointerup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerup (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerup" do
   self.val.set "onpointerup" (toJS value)
 
 /-- `attribute EventHandler onpointercancel` -/
-def MathMLElement.onpointercancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointercancel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointercancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointercancel" do
+  self.val.get "onpointercancel" (Option EventHandlerNonNull)
 
 /-- Sets `onpointercancel`: `attribute EventHandler onpointercancel` -/
-def MathMLElement.setOnpointercancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointercancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointercancel" do
   self.val.set "onpointercancel" (toJS value)
 
 /-- `attribute EventHandler onpointerout` -/
-def MathMLElement.onpointerout (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerout" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerout (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerout" do
+  self.val.get "onpointerout" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerout`: `attribute EventHandler onpointerout` -/
-def MathMLElement.setOnpointerout (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerout (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerout" do
   self.val.set "onpointerout" (toJS value)
 
 /-- `attribute EventHandler onpointerleave` -/
-def MathMLElement.onpointerleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerleave" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onpointerleave (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onpointerleave" do
+  self.val.get "onpointerleave" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerleave`: `attribute EventHandler onpointerleave` -/
-def MathMLElement.setOnpointerleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnpointerleave (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnpointerleave" do
   self.val.set "onpointerleave" (toJS value)
 
 /-- `attribute EventHandler ongotpointercapture` -/
-def MathMLElement.ongotpointercapture (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ongotpointercapture (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ongotpointercapture" do
+  self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `ongotpointercapture`: `attribute EventHandler ongotpointercapture` -/
-def MathMLElement.setOngotpointercapture (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOngotpointercapture (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOngotpointercapture" do
   self.val.set "ongotpointercapture" (toJS value)
 
 /-- `attribute EventHandler onlostpointercapture` -/
-def MathMLElement.onlostpointercapture (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onlostpointercapture (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onlostpointercapture" do
+  self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `onlostpointercapture`: `attribute EventHandler onlostpointercapture` -/
-def MathMLElement.setOnlostpointercapture (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnlostpointercapture (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnlostpointercapture" do
   self.val.set "onlostpointercapture" (toJS value)
 
 /-- `readonly attribute long maxTouchPoints` -/
-def Navigator.maxTouchPoints (self : Navigator) : IO Int := self.val.get "maxTouchPoints" Int
+@[macro_inline] def Navigator.maxTouchPoints (self : Navigator) : IO Int := Internal.api "Lasm.JS.Web.Navigator.maxTouchPoints" do
+  self.val.get "maxTouchPoints" Int
 
 /-- `attribute EventHandler onpointerover` -/
-def SVGElement.onpointerover (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerover" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerover (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerover" do
+  self.val.get "onpointerover" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerover`: `attribute EventHandler onpointerover` -/
-def SVGElement.setOnpointerover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerover" do
   self.val.set "onpointerover" (toJS value)
 
 /-- `attribute EventHandler onpointerenter` -/
-def SVGElement.onpointerenter (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerenter" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerenter (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerenter" do
+  self.val.get "onpointerenter" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerenter`: `attribute EventHandler onpointerenter` -/
-def SVGElement.setOnpointerenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerenter" do
   self.val.set "onpointerenter" (toJS value)
 
 /-- `attribute EventHandler onpointerdown` -/
-def SVGElement.onpointerdown (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerdown" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerdown (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerdown" do
+  self.val.get "onpointerdown" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerdown`: `attribute EventHandler onpointerdown` -/
-def SVGElement.setOnpointerdown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerdown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerdown" do
   self.val.set "onpointerdown" (toJS value)
 
 /-- `attribute EventHandler onpointermove` -/
-def SVGElement.onpointermove (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointermove" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointermove (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointermove" do
+  self.val.get "onpointermove" (Option EventHandlerNonNull)
 
 /-- Sets `onpointermove`: `attribute EventHandler onpointermove` -/
-def SVGElement.setOnpointermove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointermove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointermove" do
   self.val.set "onpointermove" (toJS value)
 
 /-- `attribute EventHandler onpointerrawupdate` -/
-def SVGElement.onpointerrawupdate (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerrawupdate (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerrawupdate" do
+  self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerrawupdate`: `attribute EventHandler onpointerrawupdate` -/
-def SVGElement.setOnpointerrawupdate (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerrawupdate (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerrawupdate" do
   self.val.set "onpointerrawupdate" (toJS value)
 
 /-- `attribute EventHandler onpointerup` -/
-def SVGElement.onpointerup (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerup" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerup (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerup" do
+  self.val.get "onpointerup" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerup`: `attribute EventHandler onpointerup` -/
-def SVGElement.setOnpointerup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerup" do
   self.val.set "onpointerup" (toJS value)
 
 /-- `attribute EventHandler onpointercancel` -/
-def SVGElement.onpointercancel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointercancel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointercancel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointercancel" do
+  self.val.get "onpointercancel" (Option EventHandlerNonNull)
 
 /-- Sets `onpointercancel`: `attribute EventHandler onpointercancel` -/
-def SVGElement.setOnpointercancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointercancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointercancel" do
   self.val.set "onpointercancel" (toJS value)
 
 /-- `attribute EventHandler onpointerout` -/
-def SVGElement.onpointerout (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerout" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerout (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerout" do
+  self.val.get "onpointerout" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerout`: `attribute EventHandler onpointerout` -/
-def SVGElement.setOnpointerout (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerout (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerout" do
   self.val.set "onpointerout" (toJS value)
 
 /-- `attribute EventHandler onpointerleave` -/
-def SVGElement.onpointerleave (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpointerleave" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpointerleave (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerleave" do
+  self.val.get "onpointerleave" (Option EventHandlerNonNull)
 
 /-- Sets `onpointerleave`: `attribute EventHandler onpointerleave` -/
-def SVGElement.setOnpointerleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpointerleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpointerleave" do
   self.val.set "onpointerleave" (toJS value)
 
 /-- `attribute EventHandler ongotpointercapture` -/
-def SVGElement.ongotpointercapture (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ongotpointercapture (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ongotpointercapture" do
+  self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `ongotpointercapture`: `attribute EventHandler ongotpointercapture` -/
-def SVGElement.setOngotpointercapture (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOngotpointercapture (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOngotpointercapture" do
   self.val.set "ongotpointercapture" (toJS value)
 
 /-- `attribute EventHandler onlostpointercapture` -/
-def SVGElement.onlostpointercapture (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onlostpointercapture (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onlostpointercapture" do
+  self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
 
 /-- Sets `onlostpointercapture`: `attribute EventHandler onlostpointercapture` -/
-def SVGElement.setOnlostpointercapture (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnlostpointercapture (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnlostpointercapture" do
+  self.val.set "onlostpointercapture" (toJS value)
+
+/-- `attribute EventHandler onpointerover` -/
+@[macro_inline] def Window.onpointerover (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerover" do
+  self.val.get "onpointerover" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerover`: `attribute EventHandler onpointerover` -/
+@[macro_inline] def Window.setOnpointerover (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerover" do
+  self.val.set "onpointerover" (toJS value)
+
+/-- `attribute EventHandler onpointerenter` -/
+@[macro_inline] def Window.onpointerenter (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerenter" do
+  self.val.get "onpointerenter" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerenter`: `attribute EventHandler onpointerenter` -/
+@[macro_inline] def Window.setOnpointerenter (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerenter" do
+  self.val.set "onpointerenter" (toJS value)
+
+/-- `attribute EventHandler onpointerdown` -/
+@[macro_inline] def Window.onpointerdown (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerdown" do
+  self.val.get "onpointerdown" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerdown`: `attribute EventHandler onpointerdown` -/
+@[macro_inline] def Window.setOnpointerdown (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerdown" do
+  self.val.set "onpointerdown" (toJS value)
+
+/-- `attribute EventHandler onpointermove` -/
+@[macro_inline] def Window.onpointermove (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointermove" do
+  self.val.get "onpointermove" (Option EventHandlerNonNull)
+
+/-- Sets `onpointermove`: `attribute EventHandler onpointermove` -/
+@[macro_inline] def Window.setOnpointermove (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointermove" do
+  self.val.set "onpointermove" (toJS value)
+
+/-- `attribute EventHandler onpointerrawupdate` -/
+@[macro_inline] def Window.onpointerrawupdate (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerrawupdate" do
+  self.val.get "onpointerrawupdate" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerrawupdate`: `attribute EventHandler onpointerrawupdate` -/
+@[macro_inline] def Window.setOnpointerrawupdate (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerrawupdate" do
+  self.val.set "onpointerrawupdate" (toJS value)
+
+/-- `attribute EventHandler onpointerup` -/
+@[macro_inline] def Window.onpointerup (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerup" do
+  self.val.get "onpointerup" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerup`: `attribute EventHandler onpointerup` -/
+@[macro_inline] def Window.setOnpointerup (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerup" do
+  self.val.set "onpointerup" (toJS value)
+
+/-- `attribute EventHandler onpointercancel` -/
+@[macro_inline] def Window.onpointercancel (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointercancel" do
+  self.val.get "onpointercancel" (Option EventHandlerNonNull)
+
+/-- Sets `onpointercancel`: `attribute EventHandler onpointercancel` -/
+@[macro_inline] def Window.setOnpointercancel (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointercancel" do
+  self.val.set "onpointercancel" (toJS value)
+
+/-- `attribute EventHandler onpointerout` -/
+@[macro_inline] def Window.onpointerout (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerout" do
+  self.val.get "onpointerout" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerout`: `attribute EventHandler onpointerout` -/
+@[macro_inline] def Window.setOnpointerout (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerout" do
+  self.val.set "onpointerout" (toJS value)
+
+/-- `attribute EventHandler onpointerleave` -/
+@[macro_inline] def Window.onpointerleave (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpointerleave" do
+  self.val.get "onpointerleave" (Option EventHandlerNonNull)
+
+/-- Sets `onpointerleave`: `attribute EventHandler onpointerleave` -/
+@[macro_inline] def Window.setOnpointerleave (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpointerleave" do
+  self.val.set "onpointerleave" (toJS value)
+
+/-- `attribute EventHandler ongotpointercapture` -/
+@[macro_inline] def Window.ongotpointercapture (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ongotpointercapture" do
+  self.val.get "ongotpointercapture" (Option EventHandlerNonNull)
+
+/-- Sets `ongotpointercapture`: `attribute EventHandler ongotpointercapture` -/
+@[macro_inline] def Window.setOngotpointercapture (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOngotpointercapture" do
+  self.val.set "ongotpointercapture" (toJS value)
+
+/-- `attribute EventHandler onlostpointercapture` -/
+@[macro_inline] def Window.onlostpointercapture (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onlostpointercapture" do
+  self.val.get "onlostpointercapture" (Option EventHandlerNonNull)
+
+/-- Sets `onlostpointercapture`: `attribute EventHandler onlostpointercapture` -/
+@[macro_inline] def Window.setOnlostpointercapture (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnlostpointercapture" do
   self.val.set "onlostpointercapture" (toJS value)
 
 /-- `attribute EventHandler onpointerover` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerover : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerover"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerover : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerover" do
+  Internal.getGlobal ["onpointerover"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerenter` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerenter : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerenter"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerenter : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerenter" do
+  Internal.getGlobal ["onpointerenter"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerdown` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerdown : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerdown"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerdown : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerdown" do
+  Internal.getGlobal ["onpointerdown"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointermove` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointermove : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointermove"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointermove : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointermove" do
+  Internal.getGlobal ["onpointermove"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerrawupdate` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerrawupdate : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerrawupdate"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerrawupdate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerrawupdate" do
+  Internal.getGlobal ["onpointerrawupdate"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerup` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerup : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerup"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerup : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerup" do
+  Internal.getGlobal ["onpointerup"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointercancel` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointercancel : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointercancel"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointercancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointercancel" do
+  Internal.getGlobal ["onpointercancel"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerout` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerout : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerout"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerout : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerout" do
+  Internal.getGlobal ["onpointerout"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onpointerleave` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onpointerleave : IO (Option EventHandlerNonNull) := Support.getGlobal ["onpointerleave"] (Option EventHandlerNonNull)
+@[macro_inline] def onpointerleave : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerleave" do
+  Internal.getGlobal ["onpointerleave"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ongotpointercapture` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def ongotpointercapture : IO (Option EventHandlerNonNull) := Support.getGlobal ["ongotpointercapture"] (Option EventHandlerNonNull)
+@[macro_inline] def ongotpointercapture : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ongotpointercapture" do
+  Internal.getGlobal ["ongotpointercapture"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onlostpointercapture` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
-def onlostpointercapture : IO (Option EventHandlerNonNull) := Support.getGlobal ["onlostpointercapture"] (Option EventHandlerNonNull)
+@[macro_inline] def onlostpointercapture : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onlostpointercapture" do
+  Internal.getGlobal ["onlostpointercapture"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

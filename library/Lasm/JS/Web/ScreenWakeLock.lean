@@ -6,57 +6,52 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ScreenWakeLock
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum WakeLockType` (Screen Wake Lock API (https://w3c.github.io/screen-wake-lock/)): "screen". -/
-inductive WakeLockType where
-  /-- "screen" -/
-  | screen
-  deriving BEq, Repr, Inhabited
-instance : ToJS WakeLockType := ⟨fun
-  | .screen => .string "screen"⟩
-instance : FromJS WakeLockType where
-  fromJS
-    | .string "screen" => .ok .screen
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WakeLockType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof WakeLock`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WakeLock`). -/
-def WakeLock.cast? (v : Value) : IO (Option WakeLock) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WakeLock"] Value) v) then some { val := v } else none
+@[macro_inline] def WakeLock.cast? (v : Value) : IO (Option WakeLock) := Internal.api "Lasm.JS.Web.WakeLock.cast?" do
+  Internal.cast (Internal.getGlobal ["WakeLock"] Value) (fun x => { val := x }) v
 
 /-- `Promise<WakeLockSentinel> request(optional WakeLockType type)` -/
-def WakeLock.request (self : WakeLock) (type : Option WakeLockType := none) : Async WakeLockSentinel := do
-  let r ← self.val.callMethodAwait "request" (Support.args #[Support.optional type]) Value
+@[macro_inline] def WakeLock.request (self : WakeLock) (type : Option WakeLockType := none) : Async WakeLockSentinel := Internal.api "Lasm.JS.Web.WakeLock.request" do
+  let r ← self.val.callMethodAwait "request" (Internal.args #[Internal.optional type]) Value
   pure { val := r }
 
 /-- `v instanceof WakeLockSentinel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WakeLockSentinel`). -/
-def WakeLockSentinel.cast? (v : Value) : IO (Option WakeLockSentinel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WakeLockSentinel"] Value) v) then some { val := v } else none
+@[macro_inline] def WakeLockSentinel.cast? (v : Value) : IO (Option WakeLockSentinel) := Internal.api "Lasm.JS.Web.WakeLockSentinel.cast?" do
+  Internal.cast (Internal.getGlobal ["WakeLockSentinel"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean released` -/
-def WakeLockSentinel.released (self : WakeLockSentinel) : IO Bool := self.val.get "released" Bool
+@[macro_inline] def WakeLockSentinel.released (self : WakeLockSentinel) : IO Bool := Internal.api "Lasm.JS.Web.WakeLockSentinel.released" do
+  self.val.get "released" Bool
 
 /-- `readonly attribute WakeLockType type` -/
-def WakeLockSentinel.type (self : WakeLockSentinel) : IO WakeLockType := self.val.get "type" WakeLockType
+@[macro_inline] def WakeLockSentinel.type (self : WakeLockSentinel) : IO WakeLockType := Internal.api "Lasm.JS.Web.WakeLockSentinel.type" do
+  self.val.get "type" WakeLockType
 
 /-- `attribute EventHandler onrelease` -/
-def WakeLockSentinel.onrelease (self : WakeLockSentinel) : IO (Option EventHandlerNonNull) := self.val.get "onrelease" (Option EventHandlerNonNull)
+@[macro_inline] def WakeLockSentinel.onrelease (self : WakeLockSentinel) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WakeLockSentinel.onrelease" do
+  self.val.get "onrelease" (Option EventHandlerNonNull)
 
 /-- Sets `onrelease`: `attribute EventHandler onrelease` -/
-def WakeLockSentinel.setOnrelease (self : WakeLockSentinel) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WakeLockSentinel.setOnrelease (self : WakeLockSentinel) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WakeLockSentinel.setOnrelease" do
   self.val.set "onrelease" (toJS value)
 
 /-- `Promise<undefined> release()` -/
-def WakeLockSentinel.release (self : WakeLockSentinel) : Async Unit :=
-  self.val.callMethodAwait "release" (Support.args #[]) Unit
+@[macro_inline] def WakeLockSentinel.release (self : WakeLockSentinel) : Async Unit := Internal.api "Lasm.JS.Web.WakeLockSentinel.release" do
+  self.val.callMethodAwait "release" (Internal.args #[]) Unit
 
 /-- `readonly attribute WakeLock wakeLock` -/
-def Navigator.wakeLock (self : Navigator) : IO WakeLock := do
+@[macro_inline] def Navigator.wakeLock (self : Navigator) : IO WakeLock := Internal.api "Lasm.JS.Web.Navigator.wakeLock" do
   let r ← self.val.get "wakeLock" Value
   pure { val := r }
 

@@ -6,30 +6,57 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CrashReporting
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary CrashReportBody : ReportBody` (Crash Reporting (https://wicg.github.io/crash-reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CrashReportBody where
+  /-- `DOMString reason` -/
+  reason : Option String := none
+  /-- `DOMString stack` -/
+  stack : Option String := none
+  /-- `boolean is_top_level` -/
+  is_top_level : Option Bool := none
+  /-- `DocumentVisibilityState visibility_state` -/
+  visibility_state : Option DocumentVisibilityState := none
+  /-- `object crash_report_api` -/
+  crash_report_api : Data := .undefined
+instance : ToJS CrashReportBody := ⟨fun d => Internal.fields #[("reason", Internal.optional d.reason),
+    ("stack", Internal.optional d.stack),
+    ("is_top_level", Internal.optional d.is_top_level),
+    ("visibility_state", Internal.optional d.visibility_state),
+    ("crash_report_api", d.crash_report_api)]⟩
 
 /-- `v instanceof CrashReportContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CrashReportContext`). -/
-def CrashReportContext.cast? (v : Value) : IO (Option CrashReportContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CrashReportContext"] Value) v) then some { val := v } else none
+@[macro_inline] def CrashReportContext.cast? (v : Value) : IO (Option CrashReportContext) := Internal.api "Lasm.JS.Web.CrashReportContext.cast?" do
+  Internal.cast (Internal.getGlobal ["CrashReportContext"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> initialize(unsigned long long length)` -/
-def CrashReportContext.«initialize» (self : CrashReportContext) (length : Nat) : Async Unit :=
-  self.val.callMethodAwait "initialize" (Support.args #[toJS length]) Unit
+@[macro_inline] def CrashReportContext.«initialize» (self : CrashReportContext) (length : Nat) : Async Unit := Internal.api "Lasm.JS.Web.CrashReportContext.initialize" do
+  self.val.callMethodAwait "initialize" (Internal.args #[toJS length]) Unit
 
 /-- `undefined set(DOMString key, DOMString value)` -/
-def CrashReportContext.set (self : CrashReportContext) (key : String) (value : String) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS key, toJS value]) Unit
+@[macro_inline] def CrashReportContext.set (self : CrashReportContext) (key : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CrashReportContext.set" do
+  self.val.callMethod "set" (Internal.args #[toJS key, toJS value]) Unit
 
 /-- `undefined delete(DOMString key)` -/
-def CrashReportContext.delete (self : CrashReportContext) (key : String) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS key]) Unit
+@[macro_inline] def CrashReportContext.delete (self : CrashReportContext) (key : String) : IO Unit := Internal.api "Lasm.JS.Web.CrashReportContext.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS key]) Unit
+
+/-- `readonly attribute CrashReportContext crashReport` -/
+@[macro_inline] def Window.crashReport (self : Window) : IO CrashReportContext := Internal.api "Lasm.JS.Web.Window.crashReport" do
+  let r ← self.val.get "crashReport" Value
+  pure { val := r }
 
 /-- `readonly attribute CrashReportContext crashReport` (Crash Reporting (https://wicg.github.io/crash-reporting/)) -/
-def crashReport : IO CrashReportContext := do
-  let r ← Support.getGlobal ["crashReport"] Value
+@[macro_inline] def crashReport : IO CrashReportContext := Internal.api "Lasm.JS.Web.crashReport" do
+  let r ← Internal.getGlobal ["crashReport"] Value
   pure { val := r }
 
 end Lasm.JS.Web

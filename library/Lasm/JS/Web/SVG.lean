@@ -6,13 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.TrustedTypes
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.CssPseudo
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(DOMString or TrustedScriptURL)`: one constructor per member type. -/
 inductive DOMStringOrTrustedScriptURL where
@@ -42,14 +50,14 @@ structure SVGBoundingBoxOptions where
   markers : Option Bool := none
   /-- `boolean clipped = false` -/
   clipped : Option Bool := none
-instance : ToJS SVGBoundingBoxOptions := ⟨fun d => Support.fields #[("fill", Support.optional d.fill),
-    ("stroke", Support.optional d.stroke),
-    ("markers", Support.optional d.markers),
-    ("clipped", Support.optional d.clipped)]⟩
+instance : ToJS SVGBoundingBoxOptions := ⟨fun d => Internal.fields #[("fill", Internal.optional d.fill),
+    ("stroke", Internal.optional d.stroke),
+    ("markers", Internal.optional d.markers),
+    ("clipped", Internal.optional d.clipped)]⟩
 
 /-- `v instanceof SVGAngle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAngle`). -/
-def SVGAngle.cast? (v : Value) : IO (Option SVGAngle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAngle"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAngle.cast? (v : Value) : IO (Option SVGAngle) := Internal.api "Lasm.JS.Web.SVGAngle.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAngle"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_ANGLETYPE_UNKNOWN = 0` -/
 def SVGAngle.SVG_ANGLETYPE_UNKNOWN : Nat := 0
@@ -67,785 +75,882 @@ def SVGAngle.SVG_ANGLETYPE_RAD : Nat := 3
 def SVGAngle.SVG_ANGLETYPE_GRAD : Nat := 4
 
 /-- `readonly attribute unsigned short unitType` -/
-def SVGAngle.unitType (self : SVGAngle) : IO Nat := self.val.get "unitType" Nat
+@[macro_inline] def SVGAngle.unitType (self : SVGAngle) : IO Nat := Internal.api "Lasm.JS.Web.SVGAngle.unitType" do
+  self.val.get "unitType" Nat
 
 /-- `attribute float value` -/
-def SVGAngle.value (self : SVGAngle) : IO Float := self.val.get "value" Float
+@[macro_inline] def SVGAngle.value (self : SVGAngle) : IO Float := Internal.api "Lasm.JS.Web.SVGAngle.value" do
+  self.val.get "value" Float
 
 /-- Sets `value`: `attribute float value` -/
-def SVGAngle.setValue (self : SVGAngle) (value : Float) : IO Unit :=
+@[macro_inline] def SVGAngle.setValue (self : SVGAngle) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAngle.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `attribute float valueInSpecifiedUnits` -/
-def SVGAngle.valueInSpecifiedUnits (self : SVGAngle) : IO Float := self.val.get "valueInSpecifiedUnits" Float
+@[macro_inline] def SVGAngle.valueInSpecifiedUnits (self : SVGAngle) : IO Float := Internal.api "Lasm.JS.Web.SVGAngle.valueInSpecifiedUnits" do
+  self.val.get "valueInSpecifiedUnits" Float
 
 /-- Sets `valueInSpecifiedUnits`: `attribute float valueInSpecifiedUnits` -/
-def SVGAngle.setValueInSpecifiedUnits (self : SVGAngle) (value : Float) : IO Unit :=
+@[macro_inline] def SVGAngle.setValueInSpecifiedUnits (self : SVGAngle) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAngle.setValueInSpecifiedUnits" do
   self.val.set "valueInSpecifiedUnits" (toJS value)
 
 /-- `attribute DOMString valueAsString` -/
-def SVGAngle.valueAsString (self : SVGAngle) : IO String := self.val.get "valueAsString" String
+@[macro_inline] def SVGAngle.valueAsString (self : SVGAngle) : IO String := Internal.api "Lasm.JS.Web.SVGAngle.valueAsString" do
+  self.val.get "valueAsString" String
 
 /-- Sets `valueAsString`: `attribute DOMString valueAsString` -/
-def SVGAngle.setValueAsString (self : SVGAngle) (value : String) : IO Unit :=
+@[macro_inline] def SVGAngle.setValueAsString (self : SVGAngle) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAngle.setValueAsString" do
   self.val.set "valueAsString" (toJS value)
 
 /-- `undefined newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits)` -/
-def SVGAngle.newValueSpecifiedUnits (self : SVGAngle) (unitType : Nat) (valueInSpecifiedUnits : Float) : IO Unit :=
-  self.val.callMethod "newValueSpecifiedUnits" (Support.args #[toJS unitType, toJS valueInSpecifiedUnits]) Unit
+@[macro_inline] def SVGAngle.newValueSpecifiedUnits (self : SVGAngle) (unitType : Nat) (valueInSpecifiedUnits : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAngle.newValueSpecifiedUnits" do
+  self.val.callMethod "newValueSpecifiedUnits" (Internal.args #[toJS unitType, toJS valueInSpecifiedUnits]) Unit
 
 /-- `undefined convertToSpecifiedUnits(unsigned short unitType)` -/
-def SVGAngle.convertToSpecifiedUnits (self : SVGAngle) (unitType : Nat) : IO Unit :=
-  self.val.callMethod "convertToSpecifiedUnits" (Support.args #[toJS unitType]) Unit
+@[macro_inline] def SVGAngle.convertToSpecifiedUnits (self : SVGAngle) (unitType : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGAngle.convertToSpecifiedUnits" do
+  self.val.callMethod "convertToSpecifiedUnits" (Internal.args #[toJS unitType]) Unit
 
 /-- `v instanceof SVGAnimatedAngle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedAngle`). -/
-def SVGAnimatedAngle.cast? (v : Value) : IO (Option SVGAnimatedAngle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedAngle"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedAngle.cast? (v : Value) : IO (Option SVGAnimatedAngle) := Internal.api "Lasm.JS.Web.SVGAnimatedAngle.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedAngle"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAngle baseVal` -/
-def SVGAnimatedAngle.baseVal (self : SVGAnimatedAngle) : IO SVGAngle := do
+@[macro_inline] def SVGAnimatedAngle.baseVal (self : SVGAnimatedAngle) : IO SVGAngle := Internal.api "Lasm.JS.Web.SVGAnimatedAngle.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAngle animVal` -/
-def SVGAnimatedAngle.animVal (self : SVGAnimatedAngle) : IO SVGAngle := do
+@[macro_inline] def SVGAnimatedAngle.animVal (self : SVGAnimatedAngle) : IO SVGAngle := Internal.api "Lasm.JS.Web.SVGAnimatedAngle.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGAnimatedBoolean`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedBoolean`). -/
-def SVGAnimatedBoolean.cast? (v : Value) : IO (Option SVGAnimatedBoolean) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedBoolean"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedBoolean.cast? (v : Value) : IO (Option SVGAnimatedBoolean) := Internal.api "Lasm.JS.Web.SVGAnimatedBoolean.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedBoolean"] Value) (fun x => { val := x }) v
 
 /-- `attribute boolean baseVal` -/
-def SVGAnimatedBoolean.baseVal (self : SVGAnimatedBoolean) : IO Bool := self.val.get "baseVal" Bool
+@[macro_inline] def SVGAnimatedBoolean.baseVal (self : SVGAnimatedBoolean) : IO Bool := Internal.api "Lasm.JS.Web.SVGAnimatedBoolean.baseVal" do
+  self.val.get "baseVal" Bool
 
 /-- Sets `baseVal`: `attribute boolean baseVal` -/
-def SVGAnimatedBoolean.setBaseVal (self : SVGAnimatedBoolean) (value : Bool) : IO Unit :=
+@[macro_inline] def SVGAnimatedBoolean.setBaseVal (self : SVGAnimatedBoolean) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimatedBoolean.setBaseVal" do
   self.val.set "baseVal" (toJS value)
 
 /-- `readonly attribute boolean animVal` -/
-def SVGAnimatedBoolean.animVal (self : SVGAnimatedBoolean) : IO Bool := self.val.get "animVal" Bool
+@[macro_inline] def SVGAnimatedBoolean.animVal (self : SVGAnimatedBoolean) : IO Bool := Internal.api "Lasm.JS.Web.SVGAnimatedBoolean.animVal" do
+  self.val.get "animVal" Bool
 
 /-- `v instanceof SVGAnimatedEnumeration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedEnumeration`). -/
-def SVGAnimatedEnumeration.cast? (v : Value) : IO (Option SVGAnimatedEnumeration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedEnumeration"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedEnumeration.cast? (v : Value) : IO (Option SVGAnimatedEnumeration) := Internal.api "Lasm.JS.Web.SVGAnimatedEnumeration.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedEnumeration"] Value) (fun x => { val := x }) v
 
 /-- `attribute unsigned short baseVal` -/
-def SVGAnimatedEnumeration.baseVal (self : SVGAnimatedEnumeration) : IO Nat := self.val.get "baseVal" Nat
+@[macro_inline] def SVGAnimatedEnumeration.baseVal (self : SVGAnimatedEnumeration) : IO Nat := Internal.api "Lasm.JS.Web.SVGAnimatedEnumeration.baseVal" do
+  self.val.get "baseVal" Nat
 
 /-- Sets `baseVal`: `attribute unsigned short baseVal` -/
-def SVGAnimatedEnumeration.setBaseVal (self : SVGAnimatedEnumeration) (value : Nat) : IO Unit :=
+@[macro_inline] def SVGAnimatedEnumeration.setBaseVal (self : SVGAnimatedEnumeration) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimatedEnumeration.setBaseVal" do
   self.val.set "baseVal" (toJS value)
 
 /-- `readonly attribute unsigned short animVal` -/
-def SVGAnimatedEnumeration.animVal (self : SVGAnimatedEnumeration) : IO Nat := self.val.get "animVal" Nat
+@[macro_inline] def SVGAnimatedEnumeration.animVal (self : SVGAnimatedEnumeration) : IO Nat := Internal.api "Lasm.JS.Web.SVGAnimatedEnumeration.animVal" do
+  self.val.get "animVal" Nat
 
 /-- `v instanceof SVGAnimatedInteger`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedInteger`). -/
-def SVGAnimatedInteger.cast? (v : Value) : IO (Option SVGAnimatedInteger) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedInteger"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedInteger.cast? (v : Value) : IO (Option SVGAnimatedInteger) := Internal.api "Lasm.JS.Web.SVGAnimatedInteger.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedInteger"] Value) (fun x => { val := x }) v
 
 /-- `attribute long baseVal` -/
-def SVGAnimatedInteger.baseVal (self : SVGAnimatedInteger) : IO Int := self.val.get "baseVal" Int
+@[macro_inline] def SVGAnimatedInteger.baseVal (self : SVGAnimatedInteger) : IO Int := Internal.api "Lasm.JS.Web.SVGAnimatedInteger.baseVal" do
+  self.val.get "baseVal" Int
 
 /-- Sets `baseVal`: `attribute long baseVal` -/
-def SVGAnimatedInteger.setBaseVal (self : SVGAnimatedInteger) (value : Int) : IO Unit :=
+@[macro_inline] def SVGAnimatedInteger.setBaseVal (self : SVGAnimatedInteger) (value : Int) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimatedInteger.setBaseVal" do
   self.val.set "baseVal" (toJS value)
 
 /-- `readonly attribute long animVal` -/
-def SVGAnimatedInteger.animVal (self : SVGAnimatedInteger) : IO Int := self.val.get "animVal" Int
+@[macro_inline] def SVGAnimatedInteger.animVal (self : SVGAnimatedInteger) : IO Int := Internal.api "Lasm.JS.Web.SVGAnimatedInteger.animVal" do
+  self.val.get "animVal" Int
 
 /-- `v instanceof SVGAnimatedLength`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedLength`). -/
-def SVGAnimatedLength.cast? (v : Value) : IO (Option SVGAnimatedLength) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedLength"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedLength.cast? (v : Value) : IO (Option SVGAnimatedLength) := Internal.api "Lasm.JS.Web.SVGAnimatedLength.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedLength"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGLength baseVal` -/
-def SVGAnimatedLength.baseVal (self : SVGAnimatedLength) : IO SVGLength := do
+@[macro_inline] def SVGAnimatedLength.baseVal (self : SVGAnimatedLength) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGAnimatedLength.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGLength animVal` -/
-def SVGAnimatedLength.animVal (self : SVGAnimatedLength) : IO SVGLength := do
+@[macro_inline] def SVGAnimatedLength.animVal (self : SVGAnimatedLength) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGAnimatedLength.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGAnimatedLengthList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedLengthList`). -/
-def SVGAnimatedLengthList.cast? (v : Value) : IO (Option SVGAnimatedLengthList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedLengthList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedLengthList.cast? (v : Value) : IO (Option SVGAnimatedLengthList) := Internal.api "Lasm.JS.Web.SVGAnimatedLengthList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedLengthList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGLengthList baseVal` -/
-def SVGAnimatedLengthList.baseVal (self : SVGAnimatedLengthList) : IO SVGLengthList := do
+@[macro_inline] def SVGAnimatedLengthList.baseVal (self : SVGAnimatedLengthList) : IO SVGLengthList := Internal.api "Lasm.JS.Web.SVGAnimatedLengthList.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGLengthList animVal` -/
-def SVGAnimatedLengthList.animVal (self : SVGAnimatedLengthList) : IO SVGLengthList := do
+@[macro_inline] def SVGAnimatedLengthList.animVal (self : SVGAnimatedLengthList) : IO SVGLengthList := Internal.api "Lasm.JS.Web.SVGAnimatedLengthList.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGAnimatedNumber`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedNumber`). -/
-def SVGAnimatedNumber.cast? (v : Value) : IO (Option SVGAnimatedNumber) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedNumber"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedNumber.cast? (v : Value) : IO (Option SVGAnimatedNumber) := Internal.api "Lasm.JS.Web.SVGAnimatedNumber.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedNumber"] Value) (fun x => { val := x }) v
 
 /-- `attribute float baseVal` -/
-def SVGAnimatedNumber.baseVal (self : SVGAnimatedNumber) : IO Float := self.val.get "baseVal" Float
+@[macro_inline] def SVGAnimatedNumber.baseVal (self : SVGAnimatedNumber) : IO Float := Internal.api "Lasm.JS.Web.SVGAnimatedNumber.baseVal" do
+  self.val.get "baseVal" Float
 
 /-- Sets `baseVal`: `attribute float baseVal` -/
-def SVGAnimatedNumber.setBaseVal (self : SVGAnimatedNumber) (value : Float) : IO Unit :=
+@[macro_inline] def SVGAnimatedNumber.setBaseVal (self : SVGAnimatedNumber) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimatedNumber.setBaseVal" do
   self.val.set "baseVal" (toJS value)
 
 /-- `readonly attribute float animVal` -/
-def SVGAnimatedNumber.animVal (self : SVGAnimatedNumber) : IO Float := self.val.get "animVal" Float
+@[macro_inline] def SVGAnimatedNumber.animVal (self : SVGAnimatedNumber) : IO Float := Internal.api "Lasm.JS.Web.SVGAnimatedNumber.animVal" do
+  self.val.get "animVal" Float
 
 /-- `v instanceof SVGAnimatedNumberList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedNumberList`). -/
-def SVGAnimatedNumberList.cast? (v : Value) : IO (Option SVGAnimatedNumberList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedNumberList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedNumberList.cast? (v : Value) : IO (Option SVGAnimatedNumberList) := Internal.api "Lasm.JS.Web.SVGAnimatedNumberList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedNumberList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGNumberList baseVal` -/
-def SVGAnimatedNumberList.baseVal (self : SVGAnimatedNumberList) : IO SVGNumberList := do
+@[macro_inline] def SVGAnimatedNumberList.baseVal (self : SVGAnimatedNumberList) : IO SVGNumberList := Internal.api "Lasm.JS.Web.SVGAnimatedNumberList.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGNumberList animVal` -/
-def SVGAnimatedNumberList.animVal (self : SVGAnimatedNumberList) : IO SVGNumberList := do
+@[macro_inline] def SVGAnimatedNumberList.animVal (self : SVGAnimatedNumberList) : IO SVGNumberList := Internal.api "Lasm.JS.Web.SVGAnimatedNumberList.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGAnimatedPreserveAspectRatio`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedPreserveAspectRatio`). -/
-def SVGAnimatedPreserveAspectRatio.cast? (v : Value) : IO (Option SVGAnimatedPreserveAspectRatio) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedPreserveAspectRatio"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedPreserveAspectRatio.cast? (v : Value) : IO (Option SVGAnimatedPreserveAspectRatio) := Internal.api "Lasm.JS.Web.SVGAnimatedPreserveAspectRatio.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedPreserveAspectRatio"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGPreserveAspectRatio baseVal` -/
-def SVGAnimatedPreserveAspectRatio.baseVal (self : SVGAnimatedPreserveAspectRatio) : IO SVGPreserveAspectRatio := do
+@[macro_inline] def SVGAnimatedPreserveAspectRatio.baseVal (self : SVGAnimatedPreserveAspectRatio) : IO SVGPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGAnimatedPreserveAspectRatio.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGPreserveAspectRatio animVal` -/
-def SVGAnimatedPreserveAspectRatio.animVal (self : SVGAnimatedPreserveAspectRatio) : IO SVGPreserveAspectRatio := do
+@[macro_inline] def SVGAnimatedPreserveAspectRatio.animVal (self : SVGAnimatedPreserveAspectRatio) : IO SVGPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGAnimatedPreserveAspectRatio.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGAnimatedRect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedRect`). -/
-def SVGAnimatedRect.cast? (v : Value) : IO (Option SVGAnimatedRect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedRect"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedRect.cast? (v : Value) : IO (Option SVGAnimatedRect) := Internal.api "Lasm.JS.Web.SVGAnimatedRect.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedRect"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGRect baseVal` -/
-def SVGAnimatedRect.baseVal (self : SVGAnimatedRect) : IO Data := self.val.get "baseVal" Data
+@[macro_inline] def SVGAnimatedRect.baseVal (self : SVGAnimatedRect) : IO Data := Internal.api "Lasm.JS.Web.SVGAnimatedRect.baseVal" do
+  self.val.get "baseVal" Data
 
 /-- `readonly attribute SVGRect animVal` -/
-def SVGAnimatedRect.animVal (self : SVGAnimatedRect) : IO Data := self.val.get "animVal" Data
+@[macro_inline] def SVGAnimatedRect.animVal (self : SVGAnimatedRect) : IO Data := Internal.api "Lasm.JS.Web.SVGAnimatedRect.animVal" do
+  self.val.get "animVal" Data
 
 /-- `v instanceof SVGAnimatedString`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedString`). -/
-def SVGAnimatedString.cast? (v : Value) : IO (Option SVGAnimatedString) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedString"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedString.cast? (v : Value) : IO (Option SVGAnimatedString) := Internal.api "Lasm.JS.Web.SVGAnimatedString.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedString"] Value) (fun x => { val := x }) v
 
 /-- `attribute (DOMString or TrustedScriptURL) baseVal` -/
-def SVGAnimatedString.baseVal (self : SVGAnimatedString) : IO DOMStringOrTrustedScriptURL := self.val.get "baseVal" DOMStringOrTrustedScriptURL
+@[macro_inline] def SVGAnimatedString.baseVal (self : SVGAnimatedString) : IO DOMStringOrTrustedScriptURL := Internal.api "Lasm.JS.Web.SVGAnimatedString.baseVal" do
+  self.val.get "baseVal" DOMStringOrTrustedScriptURL
 
 /-- Sets `baseVal`: `attribute (DOMString or TrustedScriptURL) baseVal` -/
-def SVGAnimatedString.setBaseVal (self : SVGAnimatedString) (value : DOMStringOrTrustedScriptURL) : IO Unit :=
+@[macro_inline] def SVGAnimatedString.setBaseVal (self : SVGAnimatedString) (value : DOMStringOrTrustedScriptURL) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimatedString.setBaseVal" do
   self.val.set "baseVal" (toJS value)
 
 /-- `readonly attribute DOMString animVal` -/
-def SVGAnimatedString.animVal (self : SVGAnimatedString) : IO String := self.val.get "animVal" String
+@[macro_inline] def SVGAnimatedString.animVal (self : SVGAnimatedString) : IO String := Internal.api "Lasm.JS.Web.SVGAnimatedString.animVal" do
+  self.val.get "animVal" String
 
 /-- `v instanceof SVGAnimatedTransformList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimatedTransformList`). -/
-def SVGAnimatedTransformList.cast? (v : Value) : IO (Option SVGAnimatedTransformList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimatedTransformList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimatedTransformList.cast? (v : Value) : IO (Option SVGAnimatedTransformList) := Internal.api "Lasm.JS.Web.SVGAnimatedTransformList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimatedTransformList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGTransformList baseVal` -/
-def SVGAnimatedTransformList.baseVal (self : SVGAnimatedTransformList) : IO SVGTransformList := do
+@[macro_inline] def SVGAnimatedTransformList.baseVal (self : SVGAnimatedTransformList) : IO SVGTransformList := Internal.api "Lasm.JS.Web.SVGAnimatedTransformList.baseVal" do
   let r ← self.val.get "baseVal" Value
   pure { val := r }
 
 /-- `readonly attribute SVGTransformList animVal` -/
-def SVGAnimatedTransformList.animVal (self : SVGAnimatedTransformList) : IO SVGTransformList := do
+@[macro_inline] def SVGAnimatedTransformList.animVal (self : SVGAnimatedTransformList) : IO SVGTransformList := Internal.api "Lasm.JS.Web.SVGAnimatedTransformList.animVal" do
   let r ← self.val.get "animVal" Value
   pure { val := r }
 
 /-- `v instanceof SVGElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGElement`). -/
-def SVGElement.cast? (v : Value) : IO (Option SVGElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGElement.cast? (v : Value) : IO (Option SVGElement) := Internal.api "Lasm.JS.Web.SVGElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString className` -/
-def SVGElement.className (self : SVGElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGElement.className (self : SVGElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGElement.className" do
   let r ← self.val.get "className" Value
   pure { val := r }
 
 /-- `readonly attribute SVGSVGElement? ownerSVGElement` -/
-def SVGElement.ownerSVGElement (self : SVGElement) : IO (Option SVGSVGElement) := self.val.get "ownerSVGElement" (Option SVGSVGElement)
+@[macro_inline] def SVGElement.ownerSVGElement (self : SVGElement) : IO (Option SVGSVGElement) := Internal.api "Lasm.JS.Web.SVGElement.ownerSVGElement" do
+  self.val.get "ownerSVGElement" (Option SVGSVGElement)
 
 /-- `readonly attribute SVGElement? viewportElement` -/
-def SVGElement.viewportElement (self : SVGElement) : IO (Option SVGElement) := self.val.get "viewportElement" (Option SVGElement)
+@[macro_inline] def SVGElement.viewportElement (self : SVGElement) : IO (Option SVGElement) := Internal.api "Lasm.JS.Web.SVGElement.viewportElement" do
+  self.val.get "viewportElement" (Option SVGElement)
 
 /-- `attribute EventHandler onabort` -/
-def SVGElement.onabort (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onabort (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def SVGElement.setOnabort (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnabort (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler onauxclick` -/
-def SVGElement.onauxclick (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onauxclick" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onauxclick (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onauxclick" do
+  self.val.get "onauxclick" (Option EventHandlerNonNull)
 
 /-- Sets `onauxclick`: `attribute EventHandler onauxclick` -/
-def SVGElement.setOnauxclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnauxclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnauxclick" do
   self.val.set "onauxclick" (toJS value)
 
 /-- `attribute EventHandler onbeforeinput` -/
-def SVGElement.onbeforeinput (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforeinput" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onbeforeinput (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onbeforeinput" do
+  self.val.get "onbeforeinput" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforeinput`: `attribute EventHandler onbeforeinput` -/
-def SVGElement.setOnbeforeinput (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnbeforeinput (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnbeforeinput" do
   self.val.set "onbeforeinput" (toJS value)
 
 /-- `attribute EventHandler onbeforematch` -/
-def SVGElement.onbeforematch (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforematch" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onbeforematch (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onbeforematch" do
+  self.val.get "onbeforematch" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforematch`: `attribute EventHandler onbeforematch` -/
-def SVGElement.setOnbeforematch (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnbeforematch (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnbeforematch" do
   self.val.set "onbeforematch" (toJS value)
 
 /-- `attribute EventHandler onbeforetoggle` -/
-def SVGElement.onbeforetoggle (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforetoggle" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onbeforetoggle (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onbeforetoggle" do
+  self.val.get "onbeforetoggle" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforetoggle`: `attribute EventHandler onbeforetoggle` -/
-def SVGElement.setOnbeforetoggle (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnbeforetoggle (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnbeforetoggle" do
   self.val.set "onbeforetoggle" (toJS value)
 
 /-- `attribute EventHandler onblur` -/
-def SVGElement.onblur (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onblur" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onblur (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onblur" do
+  self.val.get "onblur" (Option EventHandlerNonNull)
 
 /-- Sets `onblur`: `attribute EventHandler onblur` -/
-def SVGElement.setOnblur (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnblur (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnblur" do
   self.val.set "onblur" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def SVGElement.oncancel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncancel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def SVGElement.setOncancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `attribute EventHandler oncanplay` -/
-def SVGElement.oncanplay (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncanplay" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncanplay (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncanplay" do
+  self.val.get "oncanplay" (Option EventHandlerNonNull)
 
 /-- Sets `oncanplay`: `attribute EventHandler oncanplay` -/
-def SVGElement.setOncanplay (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncanplay (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncanplay" do
   self.val.set "oncanplay" (toJS value)
 
 /-- `attribute EventHandler oncanplaythrough` -/
-def SVGElement.oncanplaythrough (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncanplaythrough" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncanplaythrough (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncanplaythrough" do
+  self.val.get "oncanplaythrough" (Option EventHandlerNonNull)
 
 /-- Sets `oncanplaythrough`: `attribute EventHandler oncanplaythrough` -/
-def SVGElement.setOncanplaythrough (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncanplaythrough (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncanplaythrough" do
   self.val.set "oncanplaythrough" (toJS value)
 
 /-- `attribute EventHandler onchange` -/
-def SVGElement.onchange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onchange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def SVGElement.setOnchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `attribute EventHandler onclick` -/
-def SVGElement.onclick (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onclick" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onclick (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onclick" do
+  self.val.get "onclick" (Option EventHandlerNonNull)
 
 /-- Sets `onclick`: `attribute EventHandler onclick` -/
-def SVGElement.setOnclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnclick" do
   self.val.set "onclick" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def SVGElement.onclose (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onclose (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def SVGElement.setOnclose (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnclose (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `attribute EventHandler oncommand` -/
-def SVGElement.oncommand (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncommand" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncommand (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncommand" do
+  self.val.get "oncommand" (Option EventHandlerNonNull)
 
 /-- Sets `oncommand`: `attribute EventHandler oncommand` -/
-def SVGElement.setOncommand (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncommand (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncommand" do
   self.val.set "oncommand" (toJS value)
 
 /-- `attribute EventHandler oncontextlost` -/
-def SVGElement.oncontextlost (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextlost" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncontextlost (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncontextlost" do
+  self.val.get "oncontextlost" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextlost`: `attribute EventHandler oncontextlost` -/
-def SVGElement.setOncontextlost (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncontextlost (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncontextlost" do
   self.val.set "oncontextlost" (toJS value)
 
 /-- `attribute EventHandler oncontextmenu` -/
-def SVGElement.oncontextmenu (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextmenu" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncontextmenu (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncontextmenu" do
+  self.val.get "oncontextmenu" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextmenu`: `attribute EventHandler oncontextmenu` -/
-def SVGElement.setOncontextmenu (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncontextmenu (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncontextmenu" do
   self.val.set "oncontextmenu" (toJS value)
 
 /-- `attribute EventHandler oncontextrestored` -/
-def SVGElement.oncontextrestored (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncontextrestored" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncontextrestored (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncontextrestored" do
+  self.val.get "oncontextrestored" (Option EventHandlerNonNull)
 
 /-- Sets `oncontextrestored`: `attribute EventHandler oncontextrestored` -/
-def SVGElement.setOncontextrestored (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncontextrestored (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncontextrestored" do
   self.val.set "oncontextrestored" (toJS value)
 
 /-- `attribute EventHandler oncopy` -/
-def SVGElement.oncopy (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncopy" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncopy (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncopy" do
+  self.val.get "oncopy" (Option EventHandlerNonNull)
 
 /-- Sets `oncopy`: `attribute EventHandler oncopy` -/
-def SVGElement.setOncopy (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncopy (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncopy" do
   self.val.set "oncopy" (toJS value)
 
 /-- `attribute EventHandler oncuechange` -/
-def SVGElement.oncuechange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncuechange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncuechange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncuechange" do
+  self.val.get "oncuechange" (Option EventHandlerNonNull)
 
 /-- Sets `oncuechange`: `attribute EventHandler oncuechange` -/
-def SVGElement.setOncuechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncuechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncuechange" do
   self.val.set "oncuechange" (toJS value)
 
 /-- `attribute EventHandler oncut` -/
-def SVGElement.oncut (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oncut" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oncut (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oncut" do
+  self.val.get "oncut" (Option EventHandlerNonNull)
 
 /-- Sets `oncut`: `attribute EventHandler oncut` -/
-def SVGElement.setOncut (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOncut (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOncut" do
   self.val.set "oncut" (toJS value)
 
 /-- `attribute EventHandler ondblclick` -/
-def SVGElement.ondblclick (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondblclick" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondblclick (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondblclick" do
+  self.val.get "ondblclick" (Option EventHandlerNonNull)
 
 /-- Sets `ondblclick`: `attribute EventHandler ondblclick` -/
-def SVGElement.setOndblclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndblclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndblclick" do
   self.val.set "ondblclick" (toJS value)
 
 /-- `attribute EventHandler ondrag` -/
-def SVGElement.ondrag (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondrag" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondrag (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondrag" do
+  self.val.get "ondrag" (Option EventHandlerNonNull)
 
 /-- Sets `ondrag`: `attribute EventHandler ondrag` -/
-def SVGElement.setOndrag (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndrag (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndrag" do
   self.val.set "ondrag" (toJS value)
 
 /-- `attribute EventHandler ondragend` -/
-def SVGElement.ondragend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondragend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondragend" do
+  self.val.get "ondragend" (Option EventHandlerNonNull)
 
 /-- Sets `ondragend`: `attribute EventHandler ondragend` -/
-def SVGElement.setOndragend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndragend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndragend" do
   self.val.set "ondragend" (toJS value)
 
 /-- `attribute EventHandler ondragenter` -/
-def SVGElement.ondragenter (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragenter" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondragenter (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondragenter" do
+  self.val.get "ondragenter" (Option EventHandlerNonNull)
 
 /-- Sets `ondragenter`: `attribute EventHandler ondragenter` -/
-def SVGElement.setOndragenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndragenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndragenter" do
   self.val.set "ondragenter" (toJS value)
 
 /-- `attribute EventHandler ondragleave` -/
-def SVGElement.ondragleave (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragleave" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondragleave (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondragleave" do
+  self.val.get "ondragleave" (Option EventHandlerNonNull)
 
 /-- Sets `ondragleave`: `attribute EventHandler ondragleave` -/
-def SVGElement.setOndragleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndragleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndragleave" do
   self.val.set "ondragleave" (toJS value)
 
 /-- `attribute EventHandler ondragover` -/
-def SVGElement.ondragover (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragover" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondragover (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondragover" do
+  self.val.get "ondragover" (Option EventHandlerNonNull)
 
 /-- Sets `ondragover`: `attribute EventHandler ondragover` -/
-def SVGElement.setOndragover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndragover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndragover" do
   self.val.set "ondragover" (toJS value)
 
 /-- `attribute EventHandler ondragstart` -/
-def SVGElement.ondragstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondragstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondragstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondragstart" do
+  self.val.get "ondragstart" (Option EventHandlerNonNull)
 
 /-- Sets `ondragstart`: `attribute EventHandler ondragstart` -/
-def SVGElement.setOndragstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndragstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndragstart" do
   self.val.set "ondragstart" (toJS value)
 
 /-- `attribute EventHandler ondrop` -/
-def SVGElement.ondrop (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondrop" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondrop (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondrop" do
+  self.val.get "ondrop" (Option EventHandlerNonNull)
 
 /-- Sets `ondrop`: `attribute EventHandler ondrop` -/
-def SVGElement.setOndrop (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndrop (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndrop" do
   self.val.set "ondrop" (toJS value)
 
 /-- `attribute EventHandler ondurationchange` -/
-def SVGElement.ondurationchange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ondurationchange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ondurationchange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ondurationchange" do
+  self.val.get "ondurationchange" (Option EventHandlerNonNull)
 
 /-- Sets `ondurationchange`: `attribute EventHandler ondurationchange` -/
-def SVGElement.setOndurationchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOndurationchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOndurationchange" do
   self.val.set "ondurationchange" (toJS value)
 
 /-- `attribute EventHandler onemptied` -/
-def SVGElement.onemptied (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onemptied" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onemptied (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onemptied" do
+  self.val.get "onemptied" (Option EventHandlerNonNull)
 
 /-- Sets `onemptied`: `attribute EventHandler onemptied` -/
-def SVGElement.setOnemptied (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnemptied (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnemptied" do
   self.val.set "onemptied" (toJS value)
 
 /-- `attribute EventHandler onended` -/
-def SVGElement.onended (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onended" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onended (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onended" do
+  self.val.get "onended" (Option EventHandlerNonNull)
 
 /-- Sets `onended`: `attribute EventHandler onended` -/
-def SVGElement.setOnended (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnended (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnended" do
   self.val.set "onended" (toJS value)
 
 /-- `attribute OnErrorEventHandler onerror` -/
-def SVGElement.onerror (self : SVGElement) : IO (Option OnErrorEventHandlerNonNull) := self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
+@[macro_inline] def SVGElement.onerror (self : SVGElement) : IO (Option OnErrorEventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onerror" do
+  self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute OnErrorEventHandler onerror` -/
-def SVGElement.setOnerror (self : SVGElement) (value : Option OnErrorEventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnerror (self : SVGElement) (value : Option OnErrorEventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onfocus` -/
-def SVGElement.onfocus (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onfocus" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onfocus (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onfocus" do
+  self.val.get "onfocus" (Option EventHandlerNonNull)
 
 /-- Sets `onfocus`: `attribute EventHandler onfocus` -/
-def SVGElement.setOnfocus (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnfocus (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnfocus" do
   self.val.set "onfocus" (toJS value)
 
 /-- `attribute EventHandler onformdata` -/
-def SVGElement.onformdata (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onformdata" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onformdata (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onformdata" do
+  self.val.get "onformdata" (Option EventHandlerNonNull)
 
 /-- Sets `onformdata`: `attribute EventHandler onformdata` -/
-def SVGElement.setOnformdata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnformdata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnformdata" do
   self.val.set "onformdata" (toJS value)
 
 /-- `attribute EventHandler oninput` -/
-def SVGElement.oninput (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oninput" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oninput (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oninput" do
+  self.val.get "oninput" (Option EventHandlerNonNull)
 
 /-- Sets `oninput`: `attribute EventHandler oninput` -/
-def SVGElement.setOninput (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOninput (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOninput" do
   self.val.set "oninput" (toJS value)
 
 /-- `attribute EventHandler oninvalid` -/
-def SVGElement.oninvalid (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "oninvalid" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.oninvalid (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oninvalid" do
+  self.val.get "oninvalid" (Option EventHandlerNonNull)
 
 /-- Sets `oninvalid`: `attribute EventHandler oninvalid` -/
-def SVGElement.setOninvalid (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOninvalid (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOninvalid" do
   self.val.set "oninvalid" (toJS value)
 
 /-- `attribute EventHandler onkeydown` -/
-def SVGElement.onkeydown (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeydown" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onkeydown (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onkeydown" do
+  self.val.get "onkeydown" (Option EventHandlerNonNull)
 
 /-- Sets `onkeydown`: `attribute EventHandler onkeydown` -/
-def SVGElement.setOnkeydown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnkeydown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnkeydown" do
   self.val.set "onkeydown" (toJS value)
 
 /-- `attribute EventHandler onkeypress` -/
-def SVGElement.onkeypress (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeypress" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onkeypress (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onkeypress" do
+  self.val.get "onkeypress" (Option EventHandlerNonNull)
 
 /-- Sets `onkeypress`: `attribute EventHandler onkeypress` -/
-def SVGElement.setOnkeypress (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnkeypress (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnkeypress" do
   self.val.set "onkeypress" (toJS value)
 
 /-- `attribute EventHandler onkeyup` -/
-def SVGElement.onkeyup (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onkeyup" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onkeyup (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onkeyup" do
+  self.val.get "onkeyup" (Option EventHandlerNonNull)
 
 /-- Sets `onkeyup`: `attribute EventHandler onkeyup` -/
-def SVGElement.setOnkeyup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnkeyup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnkeyup" do
   self.val.set "onkeyup" (toJS value)
 
 /-- `attribute EventHandler onload` -/
-def SVGElement.onload (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onload" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onload (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onload" do
+  self.val.get "onload" (Option EventHandlerNonNull)
 
 /-- Sets `onload`: `attribute EventHandler onload` -/
-def SVGElement.setOnload (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnload (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnload" do
   self.val.set "onload" (toJS value)
 
 /-- `attribute EventHandler onloadeddata` -/
-def SVGElement.onloadeddata (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadeddata" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onloadeddata (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onloadeddata" do
+  self.val.get "onloadeddata" (Option EventHandlerNonNull)
 
 /-- Sets `onloadeddata`: `attribute EventHandler onloadeddata` -/
-def SVGElement.setOnloadeddata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnloadeddata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnloadeddata" do
   self.val.set "onloadeddata" (toJS value)
 
 /-- `attribute EventHandler onloadedmetadata` -/
-def SVGElement.onloadedmetadata (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadedmetadata" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onloadedmetadata (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onloadedmetadata" do
+  self.val.get "onloadedmetadata" (Option EventHandlerNonNull)
 
 /-- Sets `onloadedmetadata`: `attribute EventHandler onloadedmetadata` -/
-def SVGElement.setOnloadedmetadata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnloadedmetadata (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnloadedmetadata" do
   self.val.set "onloadedmetadata" (toJS value)
 
 /-- `attribute EventHandler onloadstart` -/
-def SVGElement.onloadstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onloadstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onloadstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onloadstart" do
+  self.val.get "onloadstart" (Option EventHandlerNonNull)
 
 /-- Sets `onloadstart`: `attribute EventHandler onloadstart` -/
-def SVGElement.setOnloadstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnloadstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnloadstart" do
   self.val.set "onloadstart" (toJS value)
 
 /-- `attribute EventHandler onmousedown` -/
-def SVGElement.onmousedown (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmousedown" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmousedown (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmousedown" do
+  self.val.get "onmousedown" (Option EventHandlerNonNull)
 
 /-- Sets `onmousedown`: `attribute EventHandler onmousedown` -/
-def SVGElement.setOnmousedown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmousedown (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmousedown" do
   self.val.set "onmousedown" (toJS value)
 
 /-- `attribute EventHandler onmouseenter` -/
-def SVGElement.onmouseenter (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseenter" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmouseenter (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmouseenter" do
+  self.val.get "onmouseenter" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseenter`: `attribute EventHandler onmouseenter` -/
-def SVGElement.setOnmouseenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmouseenter (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmouseenter" do
   self.val.set "onmouseenter" (toJS value)
 
 /-- `attribute EventHandler onmouseleave` -/
-def SVGElement.onmouseleave (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseleave" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmouseleave (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmouseleave" do
+  self.val.get "onmouseleave" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseleave`: `attribute EventHandler onmouseleave` -/
-def SVGElement.setOnmouseleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmouseleave (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmouseleave" do
   self.val.set "onmouseleave" (toJS value)
 
 /-- `attribute EventHandler onmousemove` -/
-def SVGElement.onmousemove (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmousemove" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmousemove (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmousemove" do
+  self.val.get "onmousemove" (Option EventHandlerNonNull)
 
 /-- Sets `onmousemove`: `attribute EventHandler onmousemove` -/
-def SVGElement.setOnmousemove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmousemove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmousemove" do
   self.val.set "onmousemove" (toJS value)
 
 /-- `attribute EventHandler onmouseout` -/
-def SVGElement.onmouseout (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseout" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmouseout (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmouseout" do
+  self.val.get "onmouseout" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseout`: `attribute EventHandler onmouseout` -/
-def SVGElement.setOnmouseout (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmouseout (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmouseout" do
   self.val.set "onmouseout" (toJS value)
 
 /-- `attribute EventHandler onmouseover` -/
-def SVGElement.onmouseover (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseover" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmouseover (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmouseover" do
+  self.val.get "onmouseover" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseover`: `attribute EventHandler onmouseover` -/
-def SVGElement.setOnmouseover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmouseover (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmouseover" do
   self.val.set "onmouseover" (toJS value)
 
 /-- `attribute EventHandler onmouseup` -/
-def SVGElement.onmouseup (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmouseup" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onmouseup (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onmouseup" do
+  self.val.get "onmouseup" (Option EventHandlerNonNull)
 
 /-- Sets `onmouseup`: `attribute EventHandler onmouseup` -/
-def SVGElement.setOnmouseup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnmouseup (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnmouseup" do
   self.val.set "onmouseup" (toJS value)
 
 /-- `attribute EventHandler onpaste` -/
-def SVGElement.onpaste (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpaste" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpaste (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpaste" do
+  self.val.get "onpaste" (Option EventHandlerNonNull)
 
 /-- Sets `onpaste`: `attribute EventHandler onpaste` -/
-def SVGElement.setOnpaste (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpaste (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpaste" do
   self.val.set "onpaste" (toJS value)
 
 /-- `attribute EventHandler onpause` -/
-def SVGElement.onpause (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpause" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onpause (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpause" do
+  self.val.get "onpause" (Option EventHandlerNonNull)
 
 /-- Sets `onpause`: `attribute EventHandler onpause` -/
-def SVGElement.setOnpause (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnpause (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnpause" do
   self.val.set "onpause" (toJS value)
 
 /-- `attribute EventHandler onplay` -/
-def SVGElement.onplay (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onplay" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onplay (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onplay" do
+  self.val.get "onplay" (Option EventHandlerNonNull)
 
 /-- Sets `onplay`: `attribute EventHandler onplay` -/
-def SVGElement.setOnplay (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnplay (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnplay" do
   self.val.set "onplay" (toJS value)
 
 /-- `attribute EventHandler onplaying` -/
-def SVGElement.onplaying (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onplaying" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onplaying (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onplaying" do
+  self.val.get "onplaying" (Option EventHandlerNonNull)
 
 /-- Sets `onplaying`: `attribute EventHandler onplaying` -/
-def SVGElement.setOnplaying (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnplaying (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnplaying" do
   self.val.set "onplaying" (toJS value)
 
 /-- `attribute EventHandler onprogress` -/
-def SVGElement.onprogress (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onprogress" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onprogress (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onprogress" do
+  self.val.get "onprogress" (Option EventHandlerNonNull)
 
 /-- Sets `onprogress`: `attribute EventHandler onprogress` -/
-def SVGElement.setOnprogress (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnprogress (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnprogress" do
   self.val.set "onprogress" (toJS value)
 
 /-- `attribute EventHandler onratechange` -/
-def SVGElement.onratechange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onratechange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onratechange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onratechange" do
+  self.val.get "onratechange" (Option EventHandlerNonNull)
 
 /-- Sets `onratechange`: `attribute EventHandler onratechange` -/
-def SVGElement.setOnratechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnratechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnratechange" do
   self.val.set "onratechange" (toJS value)
 
 /-- `attribute EventHandler onreset` -/
-def SVGElement.onreset (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onreset" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onreset (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onreset" do
+  self.val.get "onreset" (Option EventHandlerNonNull)
 
 /-- Sets `onreset`: `attribute EventHandler onreset` -/
-def SVGElement.setOnreset (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnreset (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnreset" do
   self.val.set "onreset" (toJS value)
 
 /-- `attribute EventHandler onresize` -/
-def SVGElement.onresize (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onresize" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onresize (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onresize" do
+  self.val.get "onresize" (Option EventHandlerNonNull)
 
 /-- Sets `onresize`: `attribute EventHandler onresize` -/
-def SVGElement.setOnresize (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnresize (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnresize" do
   self.val.set "onresize" (toJS value)
 
 /-- `attribute EventHandler onscroll` -/
-def SVGElement.onscroll (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onscroll" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onscroll (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onscroll" do
+  self.val.get "onscroll" (Option EventHandlerNonNull)
 
 /-- Sets `onscroll`: `attribute EventHandler onscroll` -/
-def SVGElement.setOnscroll (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnscroll (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnscroll" do
   self.val.set "onscroll" (toJS value)
 
 /-- `attribute EventHandler onscrollend` -/
-def SVGElement.onscrollend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onscrollend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onscrollend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onscrollend" do
+  self.val.get "onscrollend" (Option EventHandlerNonNull)
 
 /-- Sets `onscrollend`: `attribute EventHandler onscrollend` -/
-def SVGElement.setOnscrollend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnscrollend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnscrollend" do
   self.val.set "onscrollend" (toJS value)
 
 /-- `attribute EventHandler onsecuritypolicyviolation` -/
-def SVGElement.onsecuritypolicyviolation (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onsecuritypolicyviolation" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onsecuritypolicyviolation (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onsecuritypolicyviolation" do
+  self.val.get "onsecuritypolicyviolation" (Option EventHandlerNonNull)
 
 /-- Sets `onsecuritypolicyviolation`: `attribute EventHandler onsecuritypolicyviolation` -/
-def SVGElement.setOnsecuritypolicyviolation (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnsecuritypolicyviolation (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnsecuritypolicyviolation" do
   self.val.set "onsecuritypolicyviolation" (toJS value)
 
 /-- `attribute EventHandler onseeked` -/
-def SVGElement.onseeked (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onseeked" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onseeked (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onseeked" do
+  self.val.get "onseeked" (Option EventHandlerNonNull)
 
 /-- Sets `onseeked`: `attribute EventHandler onseeked` -/
-def SVGElement.setOnseeked (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnseeked (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnseeked" do
   self.val.set "onseeked" (toJS value)
 
 /-- `attribute EventHandler onseeking` -/
-def SVGElement.onseeking (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onseeking" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onseeking (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onseeking" do
+  self.val.get "onseeking" (Option EventHandlerNonNull)
 
 /-- Sets `onseeking`: `attribute EventHandler onseeking` -/
-def SVGElement.setOnseeking (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnseeking (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnseeking" do
   self.val.set "onseeking" (toJS value)
 
 /-- `attribute EventHandler onselect` -/
-def SVGElement.onselect (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onselect" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onselect (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onselect" do
+  self.val.get "onselect" (Option EventHandlerNonNull)
 
 /-- Sets `onselect`: `attribute EventHandler onselect` -/
-def SVGElement.setOnselect (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnselect (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnselect" do
   self.val.set "onselect" (toJS value)
 
 /-- `attribute EventHandler onslotchange` -/
-def SVGElement.onslotchange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onslotchange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onslotchange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onslotchange" do
+  self.val.get "onslotchange" (Option EventHandlerNonNull)
 
 /-- Sets `onslotchange`: `attribute EventHandler onslotchange` -/
-def SVGElement.setOnslotchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnslotchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnslotchange" do
   self.val.set "onslotchange" (toJS value)
 
 /-- `attribute EventHandler onstalled` -/
-def SVGElement.onstalled (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onstalled" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onstalled (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onstalled" do
+  self.val.get "onstalled" (Option EventHandlerNonNull)
 
 /-- Sets `onstalled`: `attribute EventHandler onstalled` -/
-def SVGElement.setOnstalled (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnstalled (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnstalled" do
   self.val.set "onstalled" (toJS value)
 
 /-- `attribute EventHandler onsubmit` -/
-def SVGElement.onsubmit (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onsubmit" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onsubmit (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onsubmit" do
+  self.val.get "onsubmit" (Option EventHandlerNonNull)
 
 /-- Sets `onsubmit`: `attribute EventHandler onsubmit` -/
-def SVGElement.setOnsubmit (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnsubmit (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnsubmit" do
   self.val.set "onsubmit" (toJS value)
 
 /-- `attribute EventHandler onsuspend` -/
-def SVGElement.onsuspend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onsuspend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onsuspend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onsuspend" do
+  self.val.get "onsuspend" (Option EventHandlerNonNull)
 
 /-- Sets `onsuspend`: `attribute EventHandler onsuspend` -/
-def SVGElement.setOnsuspend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnsuspend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnsuspend" do
   self.val.set "onsuspend" (toJS value)
 
 /-- `attribute EventHandler ontimeupdate` -/
-def SVGElement.ontimeupdate (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontimeupdate" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontimeupdate (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontimeupdate" do
+  self.val.get "ontimeupdate" (Option EventHandlerNonNull)
 
 /-- Sets `ontimeupdate`: `attribute EventHandler ontimeupdate` -/
-def SVGElement.setOntimeupdate (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntimeupdate (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntimeupdate" do
   self.val.set "ontimeupdate" (toJS value)
 
 /-- `attribute EventHandler ontoggle` -/
-def SVGElement.ontoggle (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontoggle" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontoggle (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontoggle" do
+  self.val.get "ontoggle" (Option EventHandlerNonNull)
 
 /-- Sets `ontoggle`: `attribute EventHandler ontoggle` -/
-def SVGElement.setOntoggle (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntoggle (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntoggle" do
   self.val.set "ontoggle" (toJS value)
 
 /-- `attribute EventHandler onvolumechange` -/
-def SVGElement.onvolumechange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onvolumechange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onvolumechange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onvolumechange" do
+  self.val.get "onvolumechange" (Option EventHandlerNonNull)
 
 /-- Sets `onvolumechange`: `attribute EventHandler onvolumechange` -/
-def SVGElement.setOnvolumechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnvolumechange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnvolumechange" do
   self.val.set "onvolumechange" (toJS value)
 
 /-- `attribute EventHandler onwaiting` -/
-def SVGElement.onwaiting (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwaiting" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwaiting (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwaiting" do
+  self.val.get "onwaiting" (Option EventHandlerNonNull)
 
 /-- Sets `onwaiting`: `attribute EventHandler onwaiting` -/
-def SVGElement.setOnwaiting (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwaiting (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwaiting" do
   self.val.set "onwaiting" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationend` -/
-def SVGElement.onwebkitanimationend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwebkitanimationend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwebkitanimationend" do
+  self.val.get "onwebkitanimationend" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationend`: `attribute EventHandler onwebkitanimationend` -/
-def SVGElement.setOnwebkitanimationend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwebkitanimationend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwebkitanimationend" do
   self.val.set "onwebkitanimationend" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationiteration` -/
-def SVGElement.onwebkitanimationiteration (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationiteration" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwebkitanimationiteration (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwebkitanimationiteration" do
+  self.val.get "onwebkitanimationiteration" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationiteration`: `attribute EventHandler onwebkitanimationiteration` -/
-def SVGElement.setOnwebkitanimationiteration (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwebkitanimationiteration (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwebkitanimationiteration" do
   self.val.set "onwebkitanimationiteration" (toJS value)
 
 /-- `attribute EventHandler onwebkitanimationstart` -/
-def SVGElement.onwebkitanimationstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkitanimationstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwebkitanimationstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwebkitanimationstart" do
+  self.val.get "onwebkitanimationstart" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkitanimationstart`: `attribute EventHandler onwebkitanimationstart` -/
-def SVGElement.setOnwebkitanimationstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwebkitanimationstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwebkitanimationstart" do
   self.val.set "onwebkitanimationstart" (toJS value)
 
 /-- `attribute EventHandler onwebkittransitionend` -/
-def SVGElement.onwebkittransitionend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwebkittransitionend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwebkittransitionend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwebkittransitionend" do
+  self.val.get "onwebkittransitionend" (Option EventHandlerNonNull)
 
 /-- Sets `onwebkittransitionend`: `attribute EventHandler onwebkittransitionend` -/
-def SVGElement.setOnwebkittransitionend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwebkittransitionend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwebkittransitionend" do
   self.val.set "onwebkittransitionend" (toJS value)
 
 /-- `attribute EventHandler onwheel` -/
-def SVGElement.onwheel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onwheel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onwheel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onwheel" do
+  self.val.get "onwheel" (Option EventHandlerNonNull)
 
 /-- Sets `onwheel`: `attribute EventHandler onwheel` -/
-def SVGElement.setOnwheel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnwheel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnwheel" do
   self.val.set "onwheel" (toJS value)
 
 /-- `readonly attribute DOMStringMap dataset` -/
-def SVGElement.dataset (self : SVGElement) : IO DOMStringMap := do
+@[macro_inline] def SVGElement.dataset (self : SVGElement) : IO DOMStringMap := Internal.api "Lasm.JS.Web.SVGElement.dataset" do
   let r ← self.val.get "dataset" Value
   pure { val := r }
 
 /-- `attribute DOMString nonce` -/
-def SVGElement.nonce (self : SVGElement) : IO String := self.val.get "nonce" String
+@[macro_inline] def SVGElement.nonce (self : SVGElement) : IO String := Internal.api "Lasm.JS.Web.SVGElement.nonce" do
+  self.val.get "nonce" String
 
 /-- Sets `nonce`: `attribute DOMString nonce` -/
-def SVGElement.setNonce (self : SVGElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGElement.setNonce (self : SVGElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setNonce" do
   self.val.set "nonce" (toJS value)
 
 /-- `attribute boolean autofocus` -/
-def SVGElement.autofocus (self : SVGElement) : IO Bool := self.val.get "autofocus" Bool
+@[macro_inline] def SVGElement.autofocus (self : SVGElement) : IO Bool := Internal.api "Lasm.JS.Web.SVGElement.autofocus" do
+  self.val.get "autofocus" Bool
 
 /-- Sets `autofocus`: `attribute boolean autofocus` -/
-def SVGElement.setAutofocus (self : SVGElement) (value : Bool) : IO Unit :=
+@[macro_inline] def SVGElement.setAutofocus (self : SVGElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setAutofocus" do
   self.val.set "autofocus" (toJS value)
 
 /-- `attribute long tabIndex` -/
-def SVGElement.tabIndex (self : SVGElement) : IO Int := self.val.get "tabIndex" Int
+@[macro_inline] def SVGElement.tabIndex (self : SVGElement) : IO Int := Internal.api "Lasm.JS.Web.SVGElement.tabIndex" do
+  self.val.get "tabIndex" Int
 
 /-- Sets `tabIndex`: `attribute long tabIndex` -/
-def SVGElement.setTabIndex (self : SVGElement) (value : Int) : IO Unit :=
+@[macro_inline] def SVGElement.setTabIndex (self : SVGElement) (value : Int) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setTabIndex" do
   self.val.set "tabIndex" (toJS value)
 
 /-- `undefined focus(optional FocusOptions options)` -/
-def SVGElement.focus (self : SVGElement) (options : Option FocusOptions := none) : IO Unit :=
-  self.val.callMethod "focus" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def SVGElement.focus (self : SVGElement) (options : Option FocusOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.focus" do
+  self.val.callMethod "focus" (Internal.args #[Internal.optional options]) Unit
 
 /-- `undefined blur()` -/
-def SVGElement.blur (self : SVGElement) : IO Unit :=
-  self.val.callMethod "blur" (Support.args #[]) Unit
+@[macro_inline] def SVGElement.blur (self : SVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.blur" do
+  self.val.callMethod "blur" (Internal.args #[]) Unit
 
 /-- `v instanceof SVGLength`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGLength`). -/
-def SVGLength.cast? (v : Value) : IO (Option SVGLength) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGLength"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGLength.cast? (v : Value) : IO (Option SVGLength) := Internal.api "Lasm.JS.Web.SVGLength.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGLength"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_LENGTHTYPE_UNKNOWN = 0` -/
 def SVGLength.SVG_LENGTHTYPE_UNKNOWN : Nat := 0
@@ -881,177 +986,188 @@ def SVGLength.SVG_LENGTHTYPE_PT : Nat := 9
 def SVGLength.SVG_LENGTHTYPE_PC : Nat := 10
 
 /-- `readonly attribute unsigned short unitType` -/
-def SVGLength.unitType (self : SVGLength) : IO Nat := self.val.get "unitType" Nat
+@[macro_inline] def SVGLength.unitType (self : SVGLength) : IO Nat := Internal.api "Lasm.JS.Web.SVGLength.unitType" do
+  self.val.get "unitType" Nat
 
 /-- `attribute float value` -/
-def SVGLength.value (self : SVGLength) : IO Float := self.val.get "value" Float
+@[macro_inline] def SVGLength.value (self : SVGLength) : IO Float := Internal.api "Lasm.JS.Web.SVGLength.value" do
+  self.val.get "value" Float
 
 /-- Sets `value`: `attribute float value` -/
-def SVGLength.setValue (self : SVGLength) (value : Float) : IO Unit :=
+@[macro_inline] def SVGLength.setValue (self : SVGLength) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGLength.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `attribute float valueInSpecifiedUnits` -/
-def SVGLength.valueInSpecifiedUnits (self : SVGLength) : IO Float := self.val.get "valueInSpecifiedUnits" Float
+@[macro_inline] def SVGLength.valueInSpecifiedUnits (self : SVGLength) : IO Float := Internal.api "Lasm.JS.Web.SVGLength.valueInSpecifiedUnits" do
+  self.val.get "valueInSpecifiedUnits" Float
 
 /-- Sets `valueInSpecifiedUnits`: `attribute float valueInSpecifiedUnits` -/
-def SVGLength.setValueInSpecifiedUnits (self : SVGLength) (value : Float) : IO Unit :=
+@[macro_inline] def SVGLength.setValueInSpecifiedUnits (self : SVGLength) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGLength.setValueInSpecifiedUnits" do
   self.val.set "valueInSpecifiedUnits" (toJS value)
 
 /-- `attribute DOMString valueAsString` -/
-def SVGLength.valueAsString (self : SVGLength) : IO String := self.val.get "valueAsString" String
+@[macro_inline] def SVGLength.valueAsString (self : SVGLength) : IO String := Internal.api "Lasm.JS.Web.SVGLength.valueAsString" do
+  self.val.get "valueAsString" String
 
 /-- Sets `valueAsString`: `attribute DOMString valueAsString` -/
-def SVGLength.setValueAsString (self : SVGLength) (value : String) : IO Unit :=
+@[macro_inline] def SVGLength.setValueAsString (self : SVGLength) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGLength.setValueAsString" do
   self.val.set "valueAsString" (toJS value)
 
 /-- `undefined newValueSpecifiedUnits(unsigned short unitType, float valueInSpecifiedUnits)` -/
-def SVGLength.newValueSpecifiedUnits (self : SVGLength) (unitType : Nat) (valueInSpecifiedUnits : Float) : IO Unit :=
-  self.val.callMethod "newValueSpecifiedUnits" (Support.args #[toJS unitType, toJS valueInSpecifiedUnits]) Unit
+@[macro_inline] def SVGLength.newValueSpecifiedUnits (self : SVGLength) (unitType : Nat) (valueInSpecifiedUnits : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGLength.newValueSpecifiedUnits" do
+  self.val.callMethod "newValueSpecifiedUnits" (Internal.args #[toJS unitType, toJS valueInSpecifiedUnits]) Unit
 
 /-- `undefined convertToSpecifiedUnits(unsigned short unitType)` -/
-def SVGLength.convertToSpecifiedUnits (self : SVGLength) (unitType : Nat) : IO Unit :=
-  self.val.callMethod "convertToSpecifiedUnits" (Support.args #[toJS unitType]) Unit
+@[macro_inline] def SVGLength.convertToSpecifiedUnits (self : SVGLength) (unitType : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGLength.convertToSpecifiedUnits" do
+  self.val.callMethod "convertToSpecifiedUnits" (Internal.args #[toJS unitType]) Unit
 
 /-- `v instanceof SVGLengthList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGLengthList`). -/
-def SVGLengthList.cast? (v : Value) : IO (Option SVGLengthList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGLengthList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGLengthList.cast? (v : Value) : IO (Option SVGLengthList) := Internal.api "Lasm.JS.Web.SVGLengthList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGLengthList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SVGLengthList.length (self : SVGLengthList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SVGLengthList.length (self : SVGLengthList) : IO Nat := Internal.api "Lasm.JS.Web.SVGLengthList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute unsigned long numberOfItems` -/
-def SVGLengthList.numberOfItems (self : SVGLengthList) : IO Nat := self.val.get "numberOfItems" Nat
+@[macro_inline] def SVGLengthList.numberOfItems (self : SVGLengthList) : IO Nat := Internal.api "Lasm.JS.Web.SVGLengthList.numberOfItems" do
+  self.val.get "numberOfItems" Nat
 
 /-- `undefined clear()` -/
-def SVGLengthList.clear (self : SVGLengthList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SVGLengthList.clear (self : SVGLengthList) : IO Unit := Internal.api "Lasm.JS.Web.SVGLengthList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `SVGLength initialize(SVGLength newItem)` -/
-def SVGLengthList.«initialize» (self : SVGLengthList) (newItem : SVGLength) : IO SVGLength := do
-  let r ← self.val.callMethod "initialize" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGLengthList.«initialize» (self : SVGLengthList) (newItem : SVGLength) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.initialize" do
+  let r ← self.val.callMethod "initialize" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `getter SVGLength getItem(unsigned long index)` -/
-def SVGLengthList.getItem (self : SVGLengthList) (index : Nat) : IO SVGLength := do
-  let r ← self.val.callMethod "getItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGLengthList.getItem (self : SVGLengthList) (index : Nat) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.getItem" do
+  let r ← self.val.callMethod "getItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGLength insertItemBefore(SVGLength newItem, unsigned long index)` -/
-def SVGLengthList.insertItemBefore (self : SVGLengthList) (newItem : SVGLength) (index : Nat) : IO SVGLength := do
-  let r ← self.val.callMethod "insertItemBefore" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGLengthList.insertItemBefore (self : SVGLengthList) (newItem : SVGLength) (index : Nat) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.insertItemBefore" do
+  let r ← self.val.callMethod "insertItemBefore" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGLength replaceItem(SVGLength newItem, unsigned long index)` -/
-def SVGLengthList.replaceItem (self : SVGLengthList) (newItem : SVGLength) (index : Nat) : IO SVGLength := do
-  let r ← self.val.callMethod "replaceItem" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGLengthList.replaceItem (self : SVGLengthList) (newItem : SVGLength) (index : Nat) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.replaceItem" do
+  let r ← self.val.callMethod "replaceItem" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGLength removeItem(unsigned long index)` -/
-def SVGLengthList.removeItem (self : SVGLengthList) (index : Nat) : IO SVGLength := do
-  let r ← self.val.callMethod "removeItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGLengthList.removeItem (self : SVGLengthList) (index : Nat) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.removeItem" do
+  let r ← self.val.callMethod "removeItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGLength appendItem(SVGLength newItem)` -/
-def SVGLengthList.appendItem (self : SVGLengthList) (newItem : SVGLength) : IO SVGLength := do
-  let r ← self.val.callMethod "appendItem" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGLengthList.appendItem (self : SVGLengthList) (newItem : SVGLength) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGLengthList.appendItem" do
+  let r ← self.val.callMethod "appendItem" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `v instanceof SVGNumber`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGNumber`). -/
-def SVGNumber.cast? (v : Value) : IO (Option SVGNumber) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGNumber"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGNumber.cast? (v : Value) : IO (Option SVGNumber) := Internal.api "Lasm.JS.Web.SVGNumber.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGNumber"] Value) (fun x => { val := x }) v
 
 /-- `attribute float value` -/
-def SVGNumber.value (self : SVGNumber) : IO Float := self.val.get "value" Float
+@[macro_inline] def SVGNumber.value (self : SVGNumber) : IO Float := Internal.api "Lasm.JS.Web.SVGNumber.value" do
+  self.val.get "value" Float
 
 /-- Sets `value`: `attribute float value` -/
-def SVGNumber.setValue (self : SVGNumber) (value : Float) : IO Unit :=
+@[macro_inline] def SVGNumber.setValue (self : SVGNumber) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGNumber.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `v instanceof SVGNumberList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGNumberList`). -/
-def SVGNumberList.cast? (v : Value) : IO (Option SVGNumberList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGNumberList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGNumberList.cast? (v : Value) : IO (Option SVGNumberList) := Internal.api "Lasm.JS.Web.SVGNumberList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGNumberList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SVGNumberList.length (self : SVGNumberList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SVGNumberList.length (self : SVGNumberList) : IO Nat := Internal.api "Lasm.JS.Web.SVGNumberList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute unsigned long numberOfItems` -/
-def SVGNumberList.numberOfItems (self : SVGNumberList) : IO Nat := self.val.get "numberOfItems" Nat
+@[macro_inline] def SVGNumberList.numberOfItems (self : SVGNumberList) : IO Nat := Internal.api "Lasm.JS.Web.SVGNumberList.numberOfItems" do
+  self.val.get "numberOfItems" Nat
 
 /-- `undefined clear()` -/
-def SVGNumberList.clear (self : SVGNumberList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SVGNumberList.clear (self : SVGNumberList) : IO Unit := Internal.api "Lasm.JS.Web.SVGNumberList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `SVGNumber initialize(SVGNumber newItem)` -/
-def SVGNumberList.«initialize» (self : SVGNumberList) (newItem : SVGNumber) : IO SVGNumber := do
-  let r ← self.val.callMethod "initialize" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGNumberList.«initialize» (self : SVGNumberList) (newItem : SVGNumber) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.initialize" do
+  let r ← self.val.callMethod "initialize" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `getter SVGNumber getItem(unsigned long index)` -/
-def SVGNumberList.getItem (self : SVGNumberList) (index : Nat) : IO SVGNumber := do
-  let r ← self.val.callMethod "getItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGNumberList.getItem (self : SVGNumberList) (index : Nat) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.getItem" do
+  let r ← self.val.callMethod "getItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGNumber insertItemBefore(SVGNumber newItem, unsigned long index)` -/
-def SVGNumberList.insertItemBefore (self : SVGNumberList) (newItem : SVGNumber) (index : Nat) : IO SVGNumber := do
-  let r ← self.val.callMethod "insertItemBefore" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGNumberList.insertItemBefore (self : SVGNumberList) (newItem : SVGNumber) (index : Nat) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.insertItemBefore" do
+  let r ← self.val.callMethod "insertItemBefore" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGNumber replaceItem(SVGNumber newItem, unsigned long index)` -/
-def SVGNumberList.replaceItem (self : SVGNumberList) (newItem : SVGNumber) (index : Nat) : IO SVGNumber := do
-  let r ← self.val.callMethod "replaceItem" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGNumberList.replaceItem (self : SVGNumberList) (newItem : SVGNumber) (index : Nat) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.replaceItem" do
+  let r ← self.val.callMethod "replaceItem" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGNumber removeItem(unsigned long index)` -/
-def SVGNumberList.removeItem (self : SVGNumberList) (index : Nat) : IO SVGNumber := do
-  let r ← self.val.callMethod "removeItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGNumberList.removeItem (self : SVGNumberList) (index : Nat) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.removeItem" do
+  let r ← self.val.callMethod "removeItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGNumber appendItem(SVGNumber newItem)` -/
-def SVGNumberList.appendItem (self : SVGNumberList) (newItem : SVGNumber) : IO SVGNumber := do
-  let r ← self.val.callMethod "appendItem" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGNumberList.appendItem (self : SVGNumberList) (newItem : SVGNumber) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGNumberList.appendItem" do
+  let r ← self.val.callMethod "appendItem" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `v instanceof SVGPointList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPointList`). -/
-def SVGPointList.cast? (v : Value) : IO (Option SVGPointList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPointList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPointList.cast? (v : Value) : IO (Option SVGPointList) := Internal.api "Lasm.JS.Web.SVGPointList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPointList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SVGPointList.length (self : SVGPointList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SVGPointList.length (self : SVGPointList) : IO Nat := Internal.api "Lasm.JS.Web.SVGPointList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute unsigned long numberOfItems` -/
-def SVGPointList.numberOfItems (self : SVGPointList) : IO Nat := self.val.get "numberOfItems" Nat
+@[macro_inline] def SVGPointList.numberOfItems (self : SVGPointList) : IO Nat := Internal.api "Lasm.JS.Web.SVGPointList.numberOfItems" do
+  self.val.get "numberOfItems" Nat
 
 /-- `undefined clear()` -/
-def SVGPointList.clear (self : SVGPointList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SVGPointList.clear (self : SVGPointList) : IO Unit := Internal.api "Lasm.JS.Web.SVGPointList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `SVGPoint initialize(SVGPoint newItem)` -/
-def SVGPointList.«initialize» (self : SVGPointList) (newItem : Value) : IO Data :=
-  self.val.callMethod "initialize" (Support.args #[toJS newItem]) Data
+@[macro_inline] def SVGPointList.«initialize» (self : SVGPointList) (newItem : Value) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.initialize" do
+  self.val.callMethod "initialize" (Internal.args #[toJS newItem]) Data
 
 /-- `getter SVGPoint getItem(unsigned long index)` -/
-def SVGPointList.getItem (self : SVGPointList) (index : Nat) : IO Data :=
-  self.val.callMethod "getItem" (Support.args #[toJS index]) Data
+@[macro_inline] def SVGPointList.getItem (self : SVGPointList) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.getItem" do
+  self.val.callMethod "getItem" (Internal.args #[toJS index]) Data
 
 /-- `SVGPoint insertItemBefore(SVGPoint newItem, unsigned long index)` -/
-def SVGPointList.insertItemBefore (self : SVGPointList) (newItem : Value) (index : Nat) : IO Data :=
-  self.val.callMethod "insertItemBefore" (Support.args #[toJS newItem, toJS index]) Data
+@[macro_inline] def SVGPointList.insertItemBefore (self : SVGPointList) (newItem : Value) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.insertItemBefore" do
+  self.val.callMethod "insertItemBefore" (Internal.args #[toJS newItem, toJS index]) Data
 
 /-- `SVGPoint replaceItem(SVGPoint newItem, unsigned long index)` -/
-def SVGPointList.replaceItem (self : SVGPointList) (newItem : Value) (index : Nat) : IO Data :=
-  self.val.callMethod "replaceItem" (Support.args #[toJS newItem, toJS index]) Data
+@[macro_inline] def SVGPointList.replaceItem (self : SVGPointList) (newItem : Value) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.replaceItem" do
+  self.val.callMethod "replaceItem" (Internal.args #[toJS newItem, toJS index]) Data
 
 /-- `SVGPoint removeItem(unsigned long index)` -/
-def SVGPointList.removeItem (self : SVGPointList) (index : Nat) : IO Data :=
-  self.val.callMethod "removeItem" (Support.args #[toJS index]) Data
+@[macro_inline] def SVGPointList.removeItem (self : SVGPointList) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.removeItem" do
+  self.val.callMethod "removeItem" (Internal.args #[toJS index]) Data
 
 /-- `SVGPoint appendItem(SVGPoint newItem)` -/
-def SVGPointList.appendItem (self : SVGPointList) (newItem : Value) : IO Data :=
-  self.val.callMethod "appendItem" (Support.args #[toJS newItem]) Data
+@[macro_inline] def SVGPointList.appendItem (self : SVGPointList) (newItem : Value) : IO Data := Internal.api "Lasm.JS.Web.SVGPointList.appendItem" do
+  self.val.callMethod "appendItem" (Internal.args #[toJS newItem]) Data
 
 /-- `v instanceof SVGPreserveAspectRatio`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPreserveAspectRatio`). -/
-def SVGPreserveAspectRatio.cast? (v : Value) : IO (Option SVGPreserveAspectRatio) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPreserveAspectRatio"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPreserveAspectRatio.cast? (v : Value) : IO (Option SVGPreserveAspectRatio) := Internal.api "Lasm.JS.Web.SVGPreserveAspectRatio.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPreserveAspectRatio"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_PRESERVEASPECTRATIO_UNKNOWN = 0` -/
 def SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_UNKNOWN : Nat := 0
@@ -1096,60 +1212,64 @@ def SVGPreserveAspectRatio.SVG_MEETORSLICE_MEET : Nat := 1
 def SVGPreserveAspectRatio.SVG_MEETORSLICE_SLICE : Nat := 2
 
 /-- `attribute unsigned short align` -/
-def SVGPreserveAspectRatio.align (self : SVGPreserveAspectRatio) : IO Nat := self.val.get "align" Nat
+@[macro_inline] def SVGPreserveAspectRatio.align (self : SVGPreserveAspectRatio) : IO Nat := Internal.api "Lasm.JS.Web.SVGPreserveAspectRatio.align" do
+  self.val.get "align" Nat
 
 /-- Sets `align`: `attribute unsigned short align` -/
-def SVGPreserveAspectRatio.setAlign (self : SVGPreserveAspectRatio) (value : Nat) : IO Unit :=
+@[macro_inline] def SVGPreserveAspectRatio.setAlign (self : SVGPreserveAspectRatio) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGPreserveAspectRatio.setAlign" do
   self.val.set "align" (toJS value)
 
 /-- `attribute unsigned short meetOrSlice` -/
-def SVGPreserveAspectRatio.meetOrSlice (self : SVGPreserveAspectRatio) : IO Nat := self.val.get "meetOrSlice" Nat
+@[macro_inline] def SVGPreserveAspectRatio.meetOrSlice (self : SVGPreserveAspectRatio) : IO Nat := Internal.api "Lasm.JS.Web.SVGPreserveAspectRatio.meetOrSlice" do
+  self.val.get "meetOrSlice" Nat
 
 /-- Sets `meetOrSlice`: `attribute unsigned short meetOrSlice` -/
-def SVGPreserveAspectRatio.setMeetOrSlice (self : SVGPreserveAspectRatio) (value : Nat) : IO Unit :=
+@[macro_inline] def SVGPreserveAspectRatio.setMeetOrSlice (self : SVGPreserveAspectRatio) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGPreserveAspectRatio.setMeetOrSlice" do
   self.val.set "meetOrSlice" (toJS value)
 
 /-- `v instanceof SVGStringList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGStringList`). -/
-def SVGStringList.cast? (v : Value) : IO (Option SVGStringList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGStringList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGStringList.cast? (v : Value) : IO (Option SVGStringList) := Internal.api "Lasm.JS.Web.SVGStringList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGStringList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SVGStringList.length (self : SVGStringList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SVGStringList.length (self : SVGStringList) : IO Nat := Internal.api "Lasm.JS.Web.SVGStringList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute unsigned long numberOfItems` -/
-def SVGStringList.numberOfItems (self : SVGStringList) : IO Nat := self.val.get "numberOfItems" Nat
+@[macro_inline] def SVGStringList.numberOfItems (self : SVGStringList) : IO Nat := Internal.api "Lasm.JS.Web.SVGStringList.numberOfItems" do
+  self.val.get "numberOfItems" Nat
 
 /-- `undefined clear()` -/
-def SVGStringList.clear (self : SVGStringList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SVGStringList.clear (self : SVGStringList) : IO Unit := Internal.api "Lasm.JS.Web.SVGStringList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `DOMString initialize(DOMString newItem)` -/
-def SVGStringList.«initialize» (self : SVGStringList) (newItem : String) : IO String :=
-  self.val.callMethod "initialize" (Support.args #[toJS newItem]) String
+@[macro_inline] def SVGStringList.«initialize» (self : SVGStringList) (newItem : String) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.initialize" do
+  self.val.callMethod "initialize" (Internal.args #[toJS newItem]) String
 
 /-- `getter DOMString getItem(unsigned long index)` -/
-def SVGStringList.getItem (self : SVGStringList) (index : Nat) : IO String :=
-  self.val.callMethod "getItem" (Support.args #[toJS index]) String
+@[macro_inline] def SVGStringList.getItem (self : SVGStringList) (index : Nat) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.getItem" do
+  self.val.callMethod "getItem" (Internal.args #[toJS index]) String
 
 /-- `DOMString insertItemBefore(DOMString newItem, unsigned long index)` -/
-def SVGStringList.insertItemBefore (self : SVGStringList) (newItem : String) (index : Nat) : IO String :=
-  self.val.callMethod "insertItemBefore" (Support.args #[toJS newItem, toJS index]) String
+@[macro_inline] def SVGStringList.insertItemBefore (self : SVGStringList) (newItem : String) (index : Nat) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.insertItemBefore" do
+  self.val.callMethod "insertItemBefore" (Internal.args #[toJS newItem, toJS index]) String
 
 /-- `DOMString replaceItem(DOMString newItem, unsigned long index)` -/
-def SVGStringList.replaceItem (self : SVGStringList) (newItem : String) (index : Nat) : IO String :=
-  self.val.callMethod "replaceItem" (Support.args #[toJS newItem, toJS index]) String
+@[macro_inline] def SVGStringList.replaceItem (self : SVGStringList) (newItem : String) (index : Nat) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.replaceItem" do
+  self.val.callMethod "replaceItem" (Internal.args #[toJS newItem, toJS index]) String
 
 /-- `DOMString removeItem(unsigned long index)` -/
-def SVGStringList.removeItem (self : SVGStringList) (index : Nat) : IO String :=
-  self.val.callMethod "removeItem" (Support.args #[toJS index]) String
+@[macro_inline] def SVGStringList.removeItem (self : SVGStringList) (index : Nat) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.removeItem" do
+  self.val.callMethod "removeItem" (Internal.args #[toJS index]) String
 
 /-- `DOMString appendItem(DOMString newItem)` -/
-def SVGStringList.appendItem (self : SVGStringList) (newItem : String) : IO String :=
-  self.val.callMethod "appendItem" (Support.args #[toJS newItem]) String
+@[macro_inline] def SVGStringList.appendItem (self : SVGStringList) (newItem : String) : IO String := Internal.api "Lasm.JS.Web.SVGStringList.appendItem" do
+  self.val.callMethod "appendItem" (Internal.args #[toJS newItem]) String
 
 /-- `v instanceof SVGTransform`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTransform`). -/
-def SVGTransform.cast? (v : Value) : IO (Option SVGTransform) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTransform"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTransform.cast? (v : Value) : IO (Option SVGTransform) := Internal.api "Lasm.JS.Web.SVGTransform.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTransform"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_TRANSFORM_UNKNOWN = 0` -/
 def SVGTransform.SVG_TRANSFORM_UNKNOWN : Nat := 0
@@ -1173,94 +1293,99 @@ def SVGTransform.SVG_TRANSFORM_SKEWX : Nat := 5
 def SVGTransform.SVG_TRANSFORM_SKEWY : Nat := 6
 
 /-- `readonly attribute unsigned short type` -/
-def SVGTransform.type (self : SVGTransform) : IO Nat := self.val.get "type" Nat
+@[macro_inline] def SVGTransform.type (self : SVGTransform) : IO Nat := Internal.api "Lasm.JS.Web.SVGTransform.type" do
+  self.val.get "type" Nat
 
 /-- `readonly attribute SVGMatrix matrix` -/
-def SVGTransform.matrix (self : SVGTransform) : IO Data := self.val.get "matrix" Data
+@[macro_inline] def SVGTransform.matrix (self : SVGTransform) : IO Data := Internal.api "Lasm.JS.Web.SVGTransform.matrix" do
+  self.val.get "matrix" Data
 
 /-- `readonly attribute float angle` -/
-def SVGTransform.angle (self : SVGTransform) : IO Float := self.val.get "angle" Float
+@[macro_inline] def SVGTransform.angle (self : SVGTransform) : IO Float := Internal.api "Lasm.JS.Web.SVGTransform.angle" do
+  self.val.get "angle" Float
 
 /-- `undefined setMatrix(optional DOMMatrix2DInit matrix)` -/
-def SVGTransform.setMatrix (self : SVGTransform) (matrix : Option DOMMatrix2DInit := none) : IO Unit :=
-  self.val.callMethod "setMatrix" (Support.args #[Support.optional matrix]) Unit
+@[macro_inline] def SVGTransform.setMatrix (self : SVGTransform) (matrix : Option DOMMatrix2DInit := none) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setMatrix" do
+  self.val.callMethod "setMatrix" (Internal.args #[Internal.optional matrix]) Unit
 
 /-- `undefined setTranslate(float tx, float ty)` -/
-def SVGTransform.setTranslate (self : SVGTransform) (tx : Float) (ty : Float) : IO Unit :=
-  self.val.callMethod "setTranslate" (Support.args #[toJS tx, toJS ty]) Unit
+@[macro_inline] def SVGTransform.setTranslate (self : SVGTransform) (tx : Float) (ty : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setTranslate" do
+  self.val.callMethod "setTranslate" (Internal.args #[toJS tx, toJS ty]) Unit
 
 /-- `undefined setScale(float sx, float sy)` -/
-def SVGTransform.setScale (self : SVGTransform) (sx : Float) (sy : Float) : IO Unit :=
-  self.val.callMethod "setScale" (Support.args #[toJS sx, toJS sy]) Unit
+@[macro_inline] def SVGTransform.setScale (self : SVGTransform) (sx : Float) (sy : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setScale" do
+  self.val.callMethod "setScale" (Internal.args #[toJS sx, toJS sy]) Unit
 
 /-- `undefined setRotate(float angle, float cx, float cy)` -/
-def SVGTransform.setRotate (self : SVGTransform) (angle : Float) (cx : Float) (cy : Float) : IO Unit :=
-  self.val.callMethod "setRotate" (Support.args #[toJS angle, toJS cx, toJS cy]) Unit
+@[macro_inline] def SVGTransform.setRotate (self : SVGTransform) (angle : Float) (cx : Float) (cy : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setRotate" do
+  self.val.callMethod "setRotate" (Internal.args #[toJS angle, toJS cx, toJS cy]) Unit
 
 /-- `undefined setSkewX(float angle)` -/
-def SVGTransform.setSkewX (self : SVGTransform) (angle : Float) : IO Unit :=
-  self.val.callMethod "setSkewX" (Support.args #[toJS angle]) Unit
+@[macro_inline] def SVGTransform.setSkewX (self : SVGTransform) (angle : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setSkewX" do
+  self.val.callMethod "setSkewX" (Internal.args #[toJS angle]) Unit
 
 /-- `undefined setSkewY(float angle)` -/
-def SVGTransform.setSkewY (self : SVGTransform) (angle : Float) : IO Unit :=
-  self.val.callMethod "setSkewY" (Support.args #[toJS angle]) Unit
+@[macro_inline] def SVGTransform.setSkewY (self : SVGTransform) (angle : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransform.setSkewY" do
+  self.val.callMethod "setSkewY" (Internal.args #[toJS angle]) Unit
 
 /-- `v instanceof SVGTransformList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTransformList`). -/
-def SVGTransformList.cast? (v : Value) : IO (Option SVGTransformList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTransformList"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTransformList.cast? (v : Value) : IO (Option SVGTransformList) := Internal.api "Lasm.JS.Web.SVGTransformList.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTransformList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def SVGTransformList.length (self : SVGTransformList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def SVGTransformList.length (self : SVGTransformList) : IO Nat := Internal.api "Lasm.JS.Web.SVGTransformList.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute unsigned long numberOfItems` -/
-def SVGTransformList.numberOfItems (self : SVGTransformList) : IO Nat := self.val.get "numberOfItems" Nat
+@[macro_inline] def SVGTransformList.numberOfItems (self : SVGTransformList) : IO Nat := Internal.api "Lasm.JS.Web.SVGTransformList.numberOfItems" do
+  self.val.get "numberOfItems" Nat
 
 /-- `undefined clear()` -/
-def SVGTransformList.clear (self : SVGTransformList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SVGTransformList.clear (self : SVGTransformList) : IO Unit := Internal.api "Lasm.JS.Web.SVGTransformList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `SVGTransform initialize(SVGTransform newItem)` -/
-def SVGTransformList.«initialize» (self : SVGTransformList) (newItem : SVGTransform) : IO SVGTransform := do
-  let r ← self.val.callMethod "initialize" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGTransformList.«initialize» (self : SVGTransformList) (newItem : SVGTransform) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.initialize" do
+  let r ← self.val.callMethod "initialize" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `getter SVGTransform getItem(unsigned long index)` -/
-def SVGTransformList.getItem (self : SVGTransformList) (index : Nat) : IO SVGTransform := do
-  let r ← self.val.callMethod "getItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGTransformList.getItem (self : SVGTransformList) (index : Nat) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.getItem" do
+  let r ← self.val.callMethod "getItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGTransform insertItemBefore(SVGTransform newItem, unsigned long index)` -/
-def SVGTransformList.insertItemBefore (self : SVGTransformList) (newItem : SVGTransform) (index : Nat) : IO SVGTransform := do
-  let r ← self.val.callMethod "insertItemBefore" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGTransformList.insertItemBefore (self : SVGTransformList) (newItem : SVGTransform) (index : Nat) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.insertItemBefore" do
+  let r ← self.val.callMethod "insertItemBefore" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGTransform replaceItem(SVGTransform newItem, unsigned long index)` -/
-def SVGTransformList.replaceItem (self : SVGTransformList) (newItem : SVGTransform) (index : Nat) : IO SVGTransform := do
-  let r ← self.val.callMethod "replaceItem" (Support.args #[toJS newItem, toJS index]) Value
+@[macro_inline] def SVGTransformList.replaceItem (self : SVGTransformList) (newItem : SVGTransform) (index : Nat) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.replaceItem" do
+  let r ← self.val.callMethod "replaceItem" (Internal.args #[toJS newItem, toJS index]) Value
   pure { val := r }
 
 /-- `SVGTransform removeItem(unsigned long index)` -/
-def SVGTransformList.removeItem (self : SVGTransformList) (index : Nat) : IO SVGTransform := do
-  let r ← self.val.callMethod "removeItem" (Support.args #[toJS index]) Value
+@[macro_inline] def SVGTransformList.removeItem (self : SVGTransformList) (index : Nat) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.removeItem" do
+  let r ← self.val.callMethod "removeItem" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `SVGTransform appendItem(SVGTransform newItem)` -/
-def SVGTransformList.appendItem (self : SVGTransformList) (newItem : SVGTransform) : IO SVGTransform := do
-  let r ← self.val.callMethod "appendItem" (Support.args #[toJS newItem]) Value
+@[macro_inline] def SVGTransformList.appendItem (self : SVGTransformList) (newItem : SVGTransform) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.appendItem" do
+  let r ← self.val.callMethod "appendItem" (Internal.args #[toJS newItem]) Value
   pure { val := r }
 
 /-- `SVGTransform createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix)` -/
-def SVGTransformList.createSVGTransformFromMatrix (self : SVGTransformList) (matrix : Option DOMMatrix2DInit := none) : IO SVGTransform := do
-  let r ← self.val.callMethod "createSVGTransformFromMatrix" (Support.args #[Support.optional matrix]) Value
+@[macro_inline] def SVGTransformList.createSVGTransformFromMatrix (self : SVGTransformList) (matrix : Option DOMMatrix2DInit := none) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGTransformList.createSVGTransformFromMatrix" do
+  let r ← self.val.callMethod "createSVGTransformFromMatrix" (Internal.args #[Internal.optional matrix]) Value
   pure { val := r }
 
 /-- `SVGTransform? consolidate()` -/
-def SVGTransformList.consolidate (self : SVGTransformList) : IO (Option SVGTransform) :=
-  self.val.callMethod "consolidate" (Support.args #[]) (Option SVGTransform)
+@[macro_inline] def SVGTransformList.consolidate (self : SVGTransformList) : IO (Option SVGTransform) := Internal.api "Lasm.JS.Web.SVGTransformList.consolidate" do
+  self.val.callMethod "consolidate" (Internal.args #[]) (Option SVGTransform)
 
 /-- `v instanceof SVGUnitTypes`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGUnitTypes`). -/
-def SVGUnitTypes.cast? (v : Value) : IO (Option SVGUnitTypes) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGUnitTypes"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGUnitTypes.cast? (v : Value) : IO (Option SVGUnitTypes) := Internal.api "Lasm.JS.Web.SVGUnitTypes.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGUnitTypes"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_UNIT_TYPE_UNKNOWN = 0` -/
 def SVGUnitTypes.SVG_UNIT_TYPE_UNKNOWN : Nat := 0
@@ -1272,26 +1397,26 @@ def SVGUnitTypes.SVG_UNIT_TYPE_USERSPACEONUSE : Nat := 1
 def SVGUnitTypes.SVG_UNIT_TYPE_OBJECTBOUNDINGBOX : Nat := 2
 
 /-- `v instanceof ShadowAnimation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ShadowAnimation`). -/
-def ShadowAnimation.cast? (v : Value) : IO (Option ShadowAnimation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ShadowAnimation"] Value) v) then some { val := v } else none
+@[macro_inline] def ShadowAnimation.cast? (v : Value) : IO (Option ShadowAnimation) := Internal.api "Lasm.JS.Web.ShadowAnimation.cast?" do
+  Internal.cast (Internal.getGlobal ["ShadowAnimation"] Value) (fun x => { val := x }) v
 
 /-- `constructor(Animation source, (Element or CSSPseudoElement) newTarget)` -/
-def ShadowAnimation.new (source : Animation) (newTarget : ElementOrCSSPseudoElement) : IO ShadowAnimation :=
+@[macro_inline] def ShadowAnimation.new (source : Animation) (newTarget : ElementOrCSSPseudoElement) : IO ShadowAnimation := Internal.api "Lasm.JS.Web.ShadowAnimation.new" do
   Lasm.JS.Binding.invoke ShadowAnimation { name := "Lasm.JS.Web.ShadowAnimation.new", module := "globalThis", path := "ShadowAnimation", construct := true, arity := 2 }
-    (Support.args #[toJS source, toJS newTarget]) (await := false)
+    (Internal.args #[toJS source, toJS newTarget]) (await := false)
 
 /-- `readonly attribute Animation sourceAnimation` -/
-def ShadowAnimation.sourceAnimation (self : ShadowAnimation) : IO Animation := do
+@[macro_inline] def ShadowAnimation.sourceAnimation (self : ShadowAnimation) : IO Animation := Internal.api "Lasm.JS.Web.ShadowAnimation.sourceAnimation" do
   let r ← self.val.get "sourceAnimation" Value
   pure { val := r }
 
 /-- `v instanceof SVGDescElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGDescElement`). -/
-def SVGDescElement.cast? (v : Value) : IO (Option SVGDescElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGDescElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGDescElement.cast? (v : Value) : IO (Option SVGDescElement) := Internal.api "Lasm.JS.Web.SVGDescElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGDescElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGGradientElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGGradientElement`). -/
-def SVGGradientElement.cast? (v : Value) : IO (Option SVGGradientElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGGradientElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGGradientElement.cast? (v : Value) : IO (Option SVGGradientElement) := Internal.api "Lasm.JS.Web.SVGGradientElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGGradientElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_SPREADMETHOD_UNKNOWN = 0` -/
 def SVGGradientElement.SVG_SPREADMETHOD_UNKNOWN : Nat := 0
@@ -1306,59 +1431,59 @@ def SVGGradientElement.SVG_SPREADMETHOD_REFLECT : Nat := 2
 def SVGGradientElement.SVG_SPREADMETHOD_REPEAT : Nat := 3
 
 /-- `readonly attribute SVGAnimatedEnumeration gradientUnits` -/
-def SVGGradientElement.gradientUnits (self : SVGGradientElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGGradientElement.gradientUnits (self : SVGGradientElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGGradientElement.gradientUnits" do
   let r ← self.val.get "gradientUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedTransformList gradientTransform` -/
-def SVGGradientElement.gradientTransform (self : SVGGradientElement) : IO SVGAnimatedTransformList := do
+@[macro_inline] def SVGGradientElement.gradientTransform (self : SVGGradientElement) : IO SVGAnimatedTransformList := Internal.api "Lasm.JS.Web.SVGGradientElement.gradientTransform" do
   let r ← self.val.get "gradientTransform" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration spreadMethod` -/
-def SVGGradientElement.spreadMethod (self : SVGGradientElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGGradientElement.spreadMethod (self : SVGGradientElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGGradientElement.spreadMethod" do
   let r ← self.val.get "spreadMethod" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGGradientElement.href (self : SVGGradientElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGGradientElement.href (self : SVGGradientElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGGradientElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGGraphicsElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGGraphicsElement`). -/
-def SVGGraphicsElement.cast? (v : Value) : IO (Option SVGGraphicsElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGGraphicsElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGGraphicsElement.cast? (v : Value) : IO (Option SVGGraphicsElement) := Internal.api "Lasm.JS.Web.SVGGraphicsElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGGraphicsElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedTransformList transform` -/
-def SVGGraphicsElement.transform (self : SVGGraphicsElement) : IO SVGAnimatedTransformList := do
+@[macro_inline] def SVGGraphicsElement.transform (self : SVGGraphicsElement) : IO SVGAnimatedTransformList := Internal.api "Lasm.JS.Web.SVGGraphicsElement.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- `readonly attribute SVGStringList requiredExtensions` -/
-def SVGGraphicsElement.requiredExtensions (self : SVGGraphicsElement) : IO SVGStringList := do
+@[macro_inline] def SVGGraphicsElement.requiredExtensions (self : SVGGraphicsElement) : IO SVGStringList := Internal.api "Lasm.JS.Web.SVGGraphicsElement.requiredExtensions" do
   let r ← self.val.get "requiredExtensions" Value
   pure { val := r }
 
 /-- `readonly attribute SVGStringList systemLanguage` -/
-def SVGGraphicsElement.systemLanguage (self : SVGGraphicsElement) : IO SVGStringList := do
+@[macro_inline] def SVGGraphicsElement.systemLanguage (self : SVGGraphicsElement) : IO SVGStringList := Internal.api "Lasm.JS.Web.SVGGraphicsElement.systemLanguage" do
   let r ← self.val.get "systemLanguage" Value
   pure { val := r }
 
 /-- `SVGRect getBBox(optional SVGBoundingBoxOptions options)` -/
-def SVGGraphicsElement.getBBox (self : SVGGraphicsElement) (options : Option SVGBoundingBoxOptions := none) : IO Data :=
-  self.val.callMethod "getBBox" (Support.args #[Support.optional options]) Data
+@[macro_inline] def SVGGraphicsElement.getBBox (self : SVGGraphicsElement) (options : Option SVGBoundingBoxOptions := none) : IO Data := Internal.api "Lasm.JS.Web.SVGGraphicsElement.getBBox" do
+  self.val.callMethod "getBBox" (Internal.args #[Internal.optional options]) Data
 
 /-- `SVGMatrix? getCTM()` -/
-def SVGGraphicsElement.getCTM (self : SVGGraphicsElement) : IO (Option Data) :=
-  self.val.callMethod "getCTM" (Support.args #[]) (Option Data)
+@[macro_inline] def SVGGraphicsElement.getCTM (self : SVGGraphicsElement) : IO (Option Data) := Internal.api "Lasm.JS.Web.SVGGraphicsElement.getCTM" do
+  self.val.callMethod "getCTM" (Internal.args #[]) (Option Data)
 
 /-- `SVGMatrix? getScreenCTM()` -/
-def SVGGraphicsElement.getScreenCTM (self : SVGGraphicsElement) : IO (Option Data) :=
-  self.val.callMethod "getScreenCTM" (Support.args #[]) (Option Data)
+@[macro_inline] def SVGGraphicsElement.getScreenCTM (self : SVGGraphicsElement) : IO (Option Data) := Internal.api "Lasm.JS.Web.SVGGraphicsElement.getScreenCTM" do
+  self.val.callMethod "getScreenCTM" (Internal.args #[]) (Option Data)
 
 /-- `v instanceof SVGMarkerElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGMarkerElement`). -/
-def SVGMarkerElement.cast? (v : Value) : IO (Option SVGMarkerElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGMarkerElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGMarkerElement.cast? (v : Value) : IO (Option SVGMarkerElement) := Internal.api "Lasm.JS.Web.SVGMarkerElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGMarkerElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short SVG_MARKERUNITS_UNKNOWN = 0` -/
 def SVGMarkerElement.SVG_MARKERUNITS_UNKNOWN : Nat := 0
@@ -1382,775 +1507,822 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_ANGLE : Nat := 2
 def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 
 /-- `readonly attribute SVGAnimatedLength refX` -/
-def SVGMarkerElement.refX (self : SVGMarkerElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMarkerElement.refX (self : SVGMarkerElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMarkerElement.refX" do
   let r ← self.val.get "refX" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength refY` -/
-def SVGMarkerElement.refY (self : SVGMarkerElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMarkerElement.refY (self : SVGMarkerElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMarkerElement.refY" do
   let r ← self.val.get "refY" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration markerUnits` -/
-def SVGMarkerElement.markerUnits (self : SVGMarkerElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGMarkerElement.markerUnits (self : SVGMarkerElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGMarkerElement.markerUnits" do
   let r ← self.val.get "markerUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength markerWidth` -/
-def SVGMarkerElement.markerWidth (self : SVGMarkerElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMarkerElement.markerWidth (self : SVGMarkerElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMarkerElement.markerWidth" do
   let r ← self.val.get "markerWidth" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength markerHeight` -/
-def SVGMarkerElement.markerHeight (self : SVGMarkerElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMarkerElement.markerHeight (self : SVGMarkerElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMarkerElement.markerHeight" do
   let r ← self.val.get "markerHeight" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration orientType` -/
-def SVGMarkerElement.orientType (self : SVGMarkerElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGMarkerElement.orientType (self : SVGMarkerElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGMarkerElement.orientType" do
   let r ← self.val.get "orientType" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedAngle orientAngle` -/
-def SVGMarkerElement.orientAngle (self : SVGMarkerElement) : IO SVGAnimatedAngle := do
+@[macro_inline] def SVGMarkerElement.orientAngle (self : SVGMarkerElement) : IO SVGAnimatedAngle := Internal.api "Lasm.JS.Web.SVGMarkerElement.orientAngle" do
   let r ← self.val.get "orientAngle" Value
   pure { val := r }
 
 /-- `attribute DOMString orient` -/
-def SVGMarkerElement.orient (self : SVGMarkerElement) : IO String := self.val.get "orient" String
+@[macro_inline] def SVGMarkerElement.orient (self : SVGMarkerElement) : IO String := Internal.api "Lasm.JS.Web.SVGMarkerElement.orient" do
+  self.val.get "orient" String
 
 /-- Sets `orient`: `attribute DOMString orient` -/
-def SVGMarkerElement.setOrient (self : SVGMarkerElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGMarkerElement.setOrient (self : SVGMarkerElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGMarkerElement.setOrient" do
   self.val.set "orient" (toJS value)
 
 /-- `readonly attribute SVGAnimatedRect viewBox` -/
-def SVGMarkerElement.viewBox (self : SVGMarkerElement) : IO SVGAnimatedRect := do
+@[macro_inline] def SVGMarkerElement.viewBox (self : SVGMarkerElement) : IO SVGAnimatedRect := Internal.api "Lasm.JS.Web.SVGMarkerElement.viewBox" do
   let r ← self.val.get "viewBox" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGMarkerElement.preserveAspectRatio (self : SVGMarkerElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGMarkerElement.preserveAspectRatio (self : SVGMarkerElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGMarkerElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `undefined setOrientToAuto()` -/
-def SVGMarkerElement.setOrientToAuto (self : SVGMarkerElement) : IO Unit :=
-  self.val.callMethod "setOrientToAuto" (Support.args #[]) Unit
+@[macro_inline] def SVGMarkerElement.setOrientToAuto (self : SVGMarkerElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGMarkerElement.setOrientToAuto" do
+  self.val.callMethod "setOrientToAuto" (Internal.args #[]) Unit
 
 /-- `undefined setOrientToAngle(SVGAngle angle)` -/
-def SVGMarkerElement.setOrientToAngle (self : SVGMarkerElement) (angle : SVGAngle) : IO Unit :=
-  self.val.callMethod "setOrientToAngle" (Support.args #[toJS angle]) Unit
+@[macro_inline] def SVGMarkerElement.setOrientToAngle (self : SVGMarkerElement) (angle : SVGAngle) : IO Unit := Internal.api "Lasm.JS.Web.SVGMarkerElement.setOrientToAngle" do
+  self.val.callMethod "setOrientToAngle" (Internal.args #[toJS angle]) Unit
 
 /-- `v instanceof SVGMetadataElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGMetadataElement`). -/
-def SVGMetadataElement.cast? (v : Value) : IO (Option SVGMetadataElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGMetadataElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGMetadataElement.cast? (v : Value) : IO (Option SVGMetadataElement) := Internal.api "Lasm.JS.Web.SVGMetadataElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGMetadataElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGPatternElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPatternElement`). -/
-def SVGPatternElement.cast? (v : Value) : IO (Option SVGPatternElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPatternElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPatternElement.cast? (v : Value) : IO (Option SVGPatternElement) := Internal.api "Lasm.JS.Web.SVGPatternElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPatternElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedEnumeration patternUnits` -/
-def SVGPatternElement.patternUnits (self : SVGPatternElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGPatternElement.patternUnits (self : SVGPatternElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGPatternElement.patternUnits" do
   let r ← self.val.get "patternUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration patternContentUnits` -/
-def SVGPatternElement.patternContentUnits (self : SVGPatternElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGPatternElement.patternContentUnits (self : SVGPatternElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGPatternElement.patternContentUnits" do
   let r ← self.val.get "patternContentUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedTransformList patternTransform` -/
-def SVGPatternElement.patternTransform (self : SVGPatternElement) : IO SVGAnimatedTransformList := do
+@[macro_inline] def SVGPatternElement.patternTransform (self : SVGPatternElement) : IO SVGAnimatedTransformList := Internal.api "Lasm.JS.Web.SVGPatternElement.patternTransform" do
   let r ← self.val.get "patternTransform" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGPatternElement.x (self : SVGPatternElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGPatternElement.x (self : SVGPatternElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGPatternElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGPatternElement.y (self : SVGPatternElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGPatternElement.y (self : SVGPatternElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGPatternElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGPatternElement.width (self : SVGPatternElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGPatternElement.width (self : SVGPatternElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGPatternElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGPatternElement.height (self : SVGPatternElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGPatternElement.height (self : SVGPatternElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGPatternElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedRect viewBox` -/
-def SVGPatternElement.viewBox (self : SVGPatternElement) : IO SVGAnimatedRect := do
+@[macro_inline] def SVGPatternElement.viewBox (self : SVGPatternElement) : IO SVGAnimatedRect := Internal.api "Lasm.JS.Web.SVGPatternElement.viewBox" do
   let r ← self.val.get "viewBox" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGPatternElement.preserveAspectRatio (self : SVGPatternElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGPatternElement.preserveAspectRatio (self : SVGPatternElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGPatternElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGPatternElement.href (self : SVGPatternElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGPatternElement.href (self : SVGPatternElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGPatternElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGScriptElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGScriptElement`). -/
-def SVGScriptElement.cast? (v : Value) : IO (Option SVGScriptElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGScriptElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGScriptElement.cast? (v : Value) : IO (Option SVGScriptElement) := Internal.api "Lasm.JS.Web.SVGScriptElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGScriptElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString type` -/
-def SVGScriptElement.type (self : SVGScriptElement) : IO String := self.val.get "type" String
+@[macro_inline] def SVGScriptElement.type (self : SVGScriptElement) : IO String := Internal.api "Lasm.JS.Web.SVGScriptElement.type" do
+  self.val.get "type" String
 
 /-- Sets `type`: `attribute DOMString type` -/
-def SVGScriptElement.setType (self : SVGScriptElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGScriptElement.setType (self : SVGScriptElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGScriptElement.setType" do
   self.val.set "type" (toJS value)
 
 /-- `attribute DOMString? crossOrigin` -/
-def SVGScriptElement.crossOrigin (self : SVGScriptElement) : IO (Option String) := self.val.get "crossOrigin" (Option String)
+@[macro_inline] def SVGScriptElement.crossOrigin (self : SVGScriptElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGScriptElement.crossOrigin" do
+  self.val.get "crossOrigin" (Option String)
 
 /-- Sets `crossOrigin`: `attribute DOMString? crossOrigin` -/
-def SVGScriptElement.setCrossOrigin (self : SVGScriptElement) (value : Option String) : IO Unit :=
+@[macro_inline] def SVGScriptElement.setCrossOrigin (self : SVGScriptElement) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.SVGScriptElement.setCrossOrigin" do
   self.val.set "crossOrigin" (toJS value)
 
 /-- `attribute DOMString referrerPolicy` -/
-def SVGScriptElement.referrerPolicy (self : SVGScriptElement) : IO String := self.val.get "referrerPolicy" String
+@[macro_inline] def SVGScriptElement.referrerPolicy (self : SVGScriptElement) : IO String := Internal.api "Lasm.JS.Web.SVGScriptElement.referrerPolicy" do
+  self.val.get "referrerPolicy" String
 
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
-def SVGScriptElement.setReferrerPolicy (self : SVGScriptElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGScriptElement.setReferrerPolicy (self : SVGScriptElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGScriptElement.setReferrerPolicy" do
   self.val.set "referrerPolicy" (toJS value)
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGScriptElement.href (self : SVGScriptElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGScriptElement.href (self : SVGScriptElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGScriptElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGStopElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGStopElement`). -/
-def SVGStopElement.cast? (v : Value) : IO (Option SVGStopElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGStopElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGStopElement.cast? (v : Value) : IO (Option SVGStopElement) := Internal.api "Lasm.JS.Web.SVGStopElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGStopElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber offset` -/
-def SVGStopElement.offset (self : SVGStopElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGStopElement.offset (self : SVGStopElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGStopElement.offset" do
   let r ← self.val.get "offset" Value
   pure { val := r }
 
 /-- `v instanceof SVGStyleElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGStyleElement`). -/
-def SVGStyleElement.cast? (v : Value) : IO (Option SVGStyleElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGStyleElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGStyleElement.cast? (v : Value) : IO (Option SVGStyleElement) := Internal.api "Lasm.JS.Web.SVGStyleElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGStyleElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString type` -/
-def SVGStyleElement.type (self : SVGStyleElement) : IO String := self.val.get "type" String
+@[macro_inline] def SVGStyleElement.type (self : SVGStyleElement) : IO String := Internal.api "Lasm.JS.Web.SVGStyleElement.type" do
+  self.val.get "type" String
 
 /-- Sets `type`: `attribute DOMString type` -/
-def SVGStyleElement.setType (self : SVGStyleElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGStyleElement.setType (self : SVGStyleElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGStyleElement.setType" do
   self.val.set "type" (toJS value)
 
 /-- `attribute DOMString media` -/
-def SVGStyleElement.media (self : SVGStyleElement) : IO String := self.val.get "media" String
+@[macro_inline] def SVGStyleElement.media (self : SVGStyleElement) : IO String := Internal.api "Lasm.JS.Web.SVGStyleElement.media" do
+  self.val.get "media" String
 
 /-- Sets `media`: `attribute DOMString media` -/
-def SVGStyleElement.setMedia (self : SVGStyleElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGStyleElement.setMedia (self : SVGStyleElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGStyleElement.setMedia" do
   self.val.set "media" (toJS value)
 
 /-- `attribute DOMString title` -/
-def SVGStyleElement.title (self : SVGStyleElement) : IO String := self.val.get "title" String
+@[macro_inline] def SVGStyleElement.title (self : SVGStyleElement) : IO String := Internal.api "Lasm.JS.Web.SVGStyleElement.title" do
+  self.val.get "title" String
 
 /-- Sets `title`: `attribute DOMString title` -/
-def SVGStyleElement.setTitle (self : SVGStyleElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGStyleElement.setTitle (self : SVGStyleElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGStyleElement.setTitle" do
   self.val.set "title" (toJS value)
 
 /-- `attribute boolean disabled` -/
-def SVGStyleElement.disabled (self : SVGStyleElement) : IO Bool := self.val.get "disabled" Bool
+@[macro_inline] def SVGStyleElement.disabled (self : SVGStyleElement) : IO Bool := Internal.api "Lasm.JS.Web.SVGStyleElement.disabled" do
+  self.val.get "disabled" Bool
 
 /-- Sets `disabled`: `attribute boolean disabled` -/
-def SVGStyleElement.setDisabled (self : SVGStyleElement) (value : Bool) : IO Unit :=
+@[macro_inline] def SVGStyleElement.setDisabled (self : SVGStyleElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.SVGStyleElement.setDisabled" do
   self.val.set "disabled" (toJS value)
 
 /-- `readonly attribute CSSStyleSheet? sheet` -/
-def SVGStyleElement.sheet (self : SVGStyleElement) : IO (Option CSSStyleSheet) := self.val.get "sheet" (Option CSSStyleSheet)
+@[macro_inline] def SVGStyleElement.sheet (self : SVGStyleElement) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.SVGStyleElement.sheet" do
+  self.val.get "sheet" (Option CSSStyleSheet)
 
 /-- `v instanceof SVGTitleElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTitleElement`). -/
-def SVGTitleElement.cast? (v : Value) : IO (Option SVGTitleElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTitleElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTitleElement.cast? (v : Value) : IO (Option SVGTitleElement) := Internal.api "Lasm.JS.Web.SVGTitleElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTitleElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGViewElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGViewElement`). -/
-def SVGViewElement.cast? (v : Value) : IO (Option SVGViewElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGViewElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGViewElement.cast? (v : Value) : IO (Option SVGViewElement) := Internal.api "Lasm.JS.Web.SVGViewElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGViewElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedRect viewBox` -/
-def SVGViewElement.viewBox (self : SVGViewElement) : IO SVGAnimatedRect := do
+@[macro_inline] def SVGViewElement.viewBox (self : SVGViewElement) : IO SVGAnimatedRect := Internal.api "Lasm.JS.Web.SVGViewElement.viewBox" do
   let r ← self.val.get "viewBox" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGViewElement.preserveAspectRatio (self : SVGViewElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGViewElement.preserveAspectRatio (self : SVGViewElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGViewElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `v instanceof SVGAElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAElement`). -/
-def SVGAElement.cast? (v : Value) : IO (Option SVGAElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAElement.cast? (v : Value) : IO (Option SVGAElement) := Internal.api "Lasm.JS.Web.SVGAElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString target` -/
-def SVGAElement.target (self : SVGAElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGAElement.target (self : SVGAElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGAElement.target" do
   let r ← self.val.get "target" Value
   pure { val := r }
 
 /-- `attribute DOMString download` -/
-def SVGAElement.download (self : SVGAElement) : IO String := self.val.get "download" String
+@[macro_inline] def SVGAElement.download (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.download" do
+  self.val.get "download" String
 
 /-- Sets `download`: `attribute DOMString download` -/
-def SVGAElement.setDownload (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setDownload (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setDownload" do
   self.val.set "download" (toJS value)
 
 /-- `attribute USVString ping` -/
-def SVGAElement.ping (self : SVGAElement) : IO String := self.val.get "ping" String
+@[macro_inline] def SVGAElement.ping (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.ping" do
+  self.val.get "ping" String
 
 /-- Sets `ping`: `attribute USVString ping` -/
-def SVGAElement.setPing (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setPing (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPing" do
   self.val.set "ping" (toJS value)
 
 /-- `attribute DOMString rel` -/
-def SVGAElement.rel (self : SVGAElement) : IO String := self.val.get "rel" String
+@[macro_inline] def SVGAElement.rel (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.rel" do
+  self.val.get "rel" String
 
 /-- Sets `rel`: `attribute DOMString rel` -/
-def SVGAElement.setRel (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setRel (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setRel" do
   self.val.set "rel" (toJS value)
 
 /-- `readonly attribute DOMTokenList relList` -/
-def SVGAElement.relList (self : SVGAElement) : IO DOMTokenList := do
+@[macro_inline] def SVGAElement.relList (self : SVGAElement) : IO DOMTokenList := Internal.api "Lasm.JS.Web.SVGAElement.relList" do
   let r ← self.val.get "relList" Value
   pure { val := r }
 
 /-- `attribute DOMString referrerPolicy` -/
-def SVGAElement.referrerPolicy (self : SVGAElement) : IO String := self.val.get "referrerPolicy" String
+@[macro_inline] def SVGAElement.referrerPolicy (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.referrerPolicy" do
+  self.val.get "referrerPolicy" String
 
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
-def SVGAElement.setReferrerPolicy (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setReferrerPolicy (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setReferrerPolicy" do
   self.val.set "referrerPolicy" (toJS value)
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGAElement.href (self : SVGAElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGAElement.href (self : SVGAElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGAElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `readonly attribute USVString origin` -/
-def SVGAElement.origin (self : SVGAElement) : IO String := self.val.get "origin" String
+@[macro_inline] def SVGAElement.origin (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.origin" do
+  self.val.get "origin" String
 
 /-- `attribute USVString protocol` -/
-def SVGAElement.protocol (self : SVGAElement) : IO String := self.val.get "protocol" String
+@[macro_inline] def SVGAElement.protocol (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.protocol" do
+  self.val.get "protocol" String
 
 /-- Sets `protocol`: `attribute USVString protocol` -/
-def SVGAElement.setProtocol (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setProtocol (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setProtocol" do
   self.val.set "protocol" (toJS value)
 
 /-- `attribute USVString username` -/
-def SVGAElement.username (self : SVGAElement) : IO String := self.val.get "username" String
+@[macro_inline] def SVGAElement.username (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.username" do
+  self.val.get "username" String
 
 /-- Sets `username`: `attribute USVString username` -/
-def SVGAElement.setUsername (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setUsername (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setUsername" do
   self.val.set "username" (toJS value)
 
 /-- `attribute USVString password` -/
-def SVGAElement.password (self : SVGAElement) : IO String := self.val.get "password" String
+@[macro_inline] def SVGAElement.password (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.password" do
+  self.val.get "password" String
 
 /-- Sets `password`: `attribute USVString password` -/
-def SVGAElement.setPassword (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setPassword (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPassword" do
   self.val.set "password" (toJS value)
 
 /-- `attribute USVString host` -/
-def SVGAElement.host (self : SVGAElement) : IO String := self.val.get "host" String
+@[macro_inline] def SVGAElement.host (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.host" do
+  self.val.get "host" String
 
 /-- Sets `host`: `attribute USVString host` -/
-def SVGAElement.setHost (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setHost (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHost" do
   self.val.set "host" (toJS value)
 
 /-- `attribute USVString hostname` -/
-def SVGAElement.hostname (self : SVGAElement) : IO String := self.val.get "hostname" String
+@[macro_inline] def SVGAElement.hostname (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.hostname" do
+  self.val.get "hostname" String
 
 /-- Sets `hostname`: `attribute USVString hostname` -/
-def SVGAElement.setHostname (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setHostname (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHostname" do
   self.val.set "hostname" (toJS value)
 
 /-- `attribute USVString port` -/
-def SVGAElement.port (self : SVGAElement) : IO String := self.val.get "port" String
+@[macro_inline] def SVGAElement.port (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.port" do
+  self.val.get "port" String
 
 /-- Sets `port`: `attribute USVString port` -/
-def SVGAElement.setPort (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setPort (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPort" do
   self.val.set "port" (toJS value)
 
 /-- `attribute USVString pathname` -/
-def SVGAElement.pathname (self : SVGAElement) : IO String := self.val.get "pathname" String
+@[macro_inline] def SVGAElement.pathname (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.pathname" do
+  self.val.get "pathname" String
 
 /-- Sets `pathname`: `attribute USVString pathname` -/
-def SVGAElement.setPathname (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setPathname (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPathname" do
   self.val.set "pathname" (toJS value)
 
 /-- `attribute USVString search` -/
-def SVGAElement.search (self : SVGAElement) : IO String := self.val.get "search" String
+@[macro_inline] def SVGAElement.search (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.search" do
+  self.val.get "search" String
 
 /-- Sets `search`: `attribute USVString search` -/
-def SVGAElement.setSearch (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setSearch (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setSearch" do
   self.val.set "search" (toJS value)
 
 /-- `attribute USVString hash` -/
-def SVGAElement.hash (self : SVGAElement) : IO String := self.val.get "hash" String
+@[macro_inline] def SVGAElement.hash (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.hash" do
+  self.val.get "hash" String
 
 /-- Sets `hash`: `attribute USVString hash` -/
-def SVGAElement.setHash (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setHash (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHash" do
   self.val.set "hash" (toJS value)
 
 /-- `attribute DOMString hreflang` -/
-def SVGAElement.hreflang (self : SVGAElement) : IO String := self.val.get "hreflang" String
+@[macro_inline] def SVGAElement.hreflang (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.hreflang" do
+  self.val.get "hreflang" String
 
 /-- Sets `hreflang`: `attribute DOMString hreflang` -/
-def SVGAElement.setHreflang (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setHreflang (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHreflang" do
   self.val.set "hreflang" (toJS value)
 
 /-- `attribute DOMString type` -/
-def SVGAElement.type (self : SVGAElement) : IO String := self.val.get "type" String
+@[macro_inline] def SVGAElement.type (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.type" do
+  self.val.get "type" String
 
 /-- Sets `type`: `attribute DOMString type` -/
-def SVGAElement.setType (self : SVGAElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGAElement.setType (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setType" do
   self.val.set "type" (toJS value)
 
 /-- `v instanceof SVGDefsElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGDefsElement`). -/
-def SVGDefsElement.cast? (v : Value) : IO (Option SVGDefsElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGDefsElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGDefsElement.cast? (v : Value) : IO (Option SVGDefsElement) := Internal.api "Lasm.JS.Web.SVGDefsElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGDefsElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGForeignObjectElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGForeignObjectElement`). -/
-def SVGForeignObjectElement.cast? (v : Value) : IO (Option SVGForeignObjectElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGForeignObjectElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGForeignObjectElement.cast? (v : Value) : IO (Option SVGForeignObjectElement) := Internal.api "Lasm.JS.Web.SVGForeignObjectElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGForeignObjectElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGForeignObjectElement.x (self : SVGForeignObjectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGForeignObjectElement.x (self : SVGForeignObjectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGForeignObjectElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGForeignObjectElement.y (self : SVGForeignObjectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGForeignObjectElement.y (self : SVGForeignObjectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGForeignObjectElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGForeignObjectElement.width (self : SVGForeignObjectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGForeignObjectElement.width (self : SVGForeignObjectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGForeignObjectElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGForeignObjectElement.height (self : SVGForeignObjectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGForeignObjectElement.height (self : SVGForeignObjectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGForeignObjectElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `v instanceof SVGGElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGGElement`). -/
-def SVGGElement.cast? (v : Value) : IO (Option SVGGElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGGElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGGElement.cast? (v : Value) : IO (Option SVGGElement) := Internal.api "Lasm.JS.Web.SVGGElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGGElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGGeometryElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGGeometryElement`). -/
-def SVGGeometryElement.cast? (v : Value) : IO (Option SVGGeometryElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGGeometryElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGGeometryElement.cast? (v : Value) : IO (Option SVGGeometryElement) := Internal.api "Lasm.JS.Web.SVGGeometryElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGGeometryElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber pathLength` -/
-def SVGGeometryElement.pathLength (self : SVGGeometryElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGGeometryElement.pathLength (self : SVGGeometryElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGGeometryElement.pathLength" do
   let r ← self.val.get "pathLength" Value
   pure { val := r }
 
 /-- `boolean isPointInFill(optional DOMPointInit point)` -/
-def SVGGeometryElement.isPointInFill (self : SVGGeometryElement) (point : Option DOMPointInit := none) : IO Bool :=
-  self.val.callMethod "isPointInFill" (Support.args #[Support.optional point]) Bool
+@[macro_inline] def SVGGeometryElement.isPointInFill (self : SVGGeometryElement) (point : Option DOMPointInit := none) : IO Bool := Internal.api "Lasm.JS.Web.SVGGeometryElement.isPointInFill" do
+  self.val.callMethod "isPointInFill" (Internal.args #[Internal.optional point]) Bool
 
 /-- `boolean isPointInStroke(optional DOMPointInit point)` -/
-def SVGGeometryElement.isPointInStroke (self : SVGGeometryElement) (point : Option DOMPointInit := none) : IO Bool :=
-  self.val.callMethod "isPointInStroke" (Support.args #[Support.optional point]) Bool
+@[macro_inline] def SVGGeometryElement.isPointInStroke (self : SVGGeometryElement) (point : Option DOMPointInit := none) : IO Bool := Internal.api "Lasm.JS.Web.SVGGeometryElement.isPointInStroke" do
+  self.val.callMethod "isPointInStroke" (Internal.args #[Internal.optional point]) Bool
 
 /-- `float getTotalLength()` -/
-def SVGGeometryElement.getTotalLength (self : SVGGeometryElement) : IO Float :=
-  self.val.callMethod "getTotalLength" (Support.args #[]) Float
+@[macro_inline] def SVGGeometryElement.getTotalLength (self : SVGGeometryElement) : IO Float := Internal.api "Lasm.JS.Web.SVGGeometryElement.getTotalLength" do
+  self.val.callMethod "getTotalLength" (Internal.args #[]) Float
 
 /-- `SVGPoint getPointAtLength(float distance)` -/
-def SVGGeometryElement.getPointAtLength (self : SVGGeometryElement) (distance : Float) : IO Data :=
-  self.val.callMethod "getPointAtLength" (Support.args #[toJS distance]) Data
+@[macro_inline] def SVGGeometryElement.getPointAtLength (self : SVGGeometryElement) (distance : Float) : IO Data := Internal.api "Lasm.JS.Web.SVGGeometryElement.getPointAtLength" do
+  self.val.callMethod "getPointAtLength" (Internal.args #[toJS distance]) Data
 
 /-- `v instanceof SVGImageElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGImageElement`). -/
-def SVGImageElement.cast? (v : Value) : IO (Option SVGImageElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGImageElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGImageElement.cast? (v : Value) : IO (Option SVGImageElement) := Internal.api "Lasm.JS.Web.SVGImageElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGImageElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGImageElement.x (self : SVGImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGImageElement.x (self : SVGImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGImageElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGImageElement.y (self : SVGImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGImageElement.y (self : SVGImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGImageElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGImageElement.width (self : SVGImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGImageElement.width (self : SVGImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGImageElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGImageElement.height (self : SVGImageElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGImageElement.height (self : SVGImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGImageElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGImageElement.preserveAspectRatio (self : SVGImageElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGImageElement.preserveAspectRatio (self : SVGImageElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGImageElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `attribute DOMString? crossOrigin` -/
-def SVGImageElement.crossOrigin (self : SVGImageElement) : IO (Option String) := self.val.get "crossOrigin" (Option String)
+@[macro_inline] def SVGImageElement.crossOrigin (self : SVGImageElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGImageElement.crossOrigin" do
+  self.val.get "crossOrigin" (Option String)
 
 /-- Sets `crossOrigin`: `attribute DOMString? crossOrigin` -/
-def SVGImageElement.setCrossOrigin (self : SVGImageElement) (value : Option String) : IO Unit :=
+@[macro_inline] def SVGImageElement.setCrossOrigin (self : SVGImageElement) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.SVGImageElement.setCrossOrigin" do
   self.val.set "crossOrigin" (toJS value)
 
 /-- `attribute DOMString referrerPolicy` -/
-def SVGImageElement.referrerPolicy (self : SVGImageElement) : IO String := self.val.get "referrerPolicy" String
+@[macro_inline] def SVGImageElement.referrerPolicy (self : SVGImageElement) : IO String := Internal.api "Lasm.JS.Web.SVGImageElement.referrerPolicy" do
+  self.val.get "referrerPolicy" String
 
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
-def SVGImageElement.setReferrerPolicy (self : SVGImageElement) (value : String) : IO Unit :=
+@[macro_inline] def SVGImageElement.setReferrerPolicy (self : SVGImageElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGImageElement.setReferrerPolicy" do
   self.val.set "referrerPolicy" (toJS value)
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGImageElement.href (self : SVGImageElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGImageElement.href (self : SVGImageElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGImageElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGLinearGradientElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGLinearGradientElement`). -/
-def SVGLinearGradientElement.cast? (v : Value) : IO (Option SVGLinearGradientElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGLinearGradientElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGLinearGradientElement.cast? (v : Value) : IO (Option SVGLinearGradientElement) := Internal.api "Lasm.JS.Web.SVGLinearGradientElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGLinearGradientElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x1` -/
-def SVGLinearGradientElement.x1 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLinearGradientElement.x1 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLinearGradientElement.x1" do
   let r ← self.val.get "x1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y1` -/
-def SVGLinearGradientElement.y1 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLinearGradientElement.y1 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLinearGradientElement.y1" do
   let r ← self.val.get "y1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x2` -/
-def SVGLinearGradientElement.x2 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLinearGradientElement.x2 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLinearGradientElement.x2" do
   let r ← self.val.get "x2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y2` -/
-def SVGLinearGradientElement.y2 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLinearGradientElement.y2 (self : SVGLinearGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLinearGradientElement.y2" do
   let r ← self.val.get "y2" Value
   pure { val := r }
 
 /-- `v instanceof SVGRadialGradientElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGRadialGradientElement`). -/
-def SVGRadialGradientElement.cast? (v : Value) : IO (Option SVGRadialGradientElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGRadialGradientElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGRadialGradientElement.cast? (v : Value) : IO (Option SVGRadialGradientElement) := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGRadialGradientElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength cx` -/
-def SVGRadialGradientElement.cx (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.cx (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.cx" do
   let r ← self.val.get "cx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength cy` -/
-def SVGRadialGradientElement.cy (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.cy (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.cy" do
   let r ← self.val.get "cy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength r` -/
-def SVGRadialGradientElement.r (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.r (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.r" do
   let r ← self.val.get "r" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength fx` -/
-def SVGRadialGradientElement.fx (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.fx (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.fx" do
   let r ← self.val.get "fx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength fy` -/
-def SVGRadialGradientElement.fy (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.fy (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.fy" do
   let r ← self.val.get "fy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength fr` -/
-def SVGRadialGradientElement.fr (self : SVGRadialGradientElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRadialGradientElement.fr (self : SVGRadialGradientElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRadialGradientElement.fr" do
   let r ← self.val.get "fr" Value
   pure { val := r }
 
 /-- `v instanceof SVGSVGElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGSVGElement`). -/
-def SVGSVGElement.cast? (v : Value) : IO (Option SVGSVGElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGSVGElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGSVGElement.cast? (v : Value) : IO (Option SVGSVGElement) := Internal.api "Lasm.JS.Web.SVGSVGElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGSVGElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGSVGElement.x (self : SVGSVGElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGSVGElement.x (self : SVGSVGElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGSVGElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGSVGElement.y (self : SVGSVGElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGSVGElement.y (self : SVGSVGElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGSVGElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGSVGElement.width (self : SVGSVGElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGSVGElement.width (self : SVGSVGElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGSVGElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGSVGElement.height (self : SVGSVGElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGSVGElement.height (self : SVGSVGElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGSVGElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `attribute float currentScale` -/
-def SVGSVGElement.currentScale (self : SVGSVGElement) : IO Float := self.val.get "currentScale" Float
+@[macro_inline] def SVGSVGElement.currentScale (self : SVGSVGElement) : IO Float := Internal.api "Lasm.JS.Web.SVGSVGElement.currentScale" do
+  self.val.get "currentScale" Float
 
 /-- Sets `currentScale`: `attribute float currentScale` -/
-def SVGSVGElement.setCurrentScale (self : SVGSVGElement) (value : Float) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setCurrentScale (self : SVGSVGElement) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setCurrentScale" do
   self.val.set "currentScale" (toJS value)
 
 /-- `readonly attribute SVGPoint currentTranslate` -/
-def SVGSVGElement.currentTranslate (self : SVGSVGElement) : IO Data := self.val.get "currentTranslate" Data
+@[macro_inline] def SVGSVGElement.currentTranslate (self : SVGSVGElement) : IO Data := Internal.api "Lasm.JS.Web.SVGSVGElement.currentTranslate" do
+  self.val.get "currentTranslate" Data
 
 /-- `readonly attribute SVGAnimatedRect viewBox` -/
-def SVGSVGElement.viewBox (self : SVGSVGElement) : IO SVGAnimatedRect := do
+@[macro_inline] def SVGSVGElement.viewBox (self : SVGSVGElement) : IO SVGAnimatedRect := Internal.api "Lasm.JS.Web.SVGSVGElement.viewBox" do
   let r ← self.val.get "viewBox" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGSVGElement.preserveAspectRatio (self : SVGSVGElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGSVGElement.preserveAspectRatio (self : SVGSVGElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGSVGElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `attribute EventHandler onafterprint` -/
-def SVGSVGElement.onafterprint (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onafterprint" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onafterprint (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onafterprint" do
+  self.val.get "onafterprint" (Option EventHandlerNonNull)
 
 /-- Sets `onafterprint`: `attribute EventHandler onafterprint` -/
-def SVGSVGElement.setOnafterprint (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnafterprint (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnafterprint" do
   self.val.set "onafterprint" (toJS value)
 
 /-- `attribute EventHandler onbeforeprint` -/
-def SVGSVGElement.onbeforeprint (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onbeforeprint" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onbeforeprint (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onbeforeprint" do
+  self.val.get "onbeforeprint" (Option EventHandlerNonNull)
 
 /-- Sets `onbeforeprint`: `attribute EventHandler onbeforeprint` -/
-def SVGSVGElement.setOnbeforeprint (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnbeforeprint (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnbeforeprint" do
   self.val.set "onbeforeprint" (toJS value)
 
 /-- `attribute OnBeforeUnloadEventHandler onbeforeunload` -/
-def SVGSVGElement.onbeforeunload (self : SVGSVGElement) : IO (Option OnBeforeUnloadEventHandlerNonNull) := self.val.get "onbeforeunload" (Option OnBeforeUnloadEventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onbeforeunload (self : SVGSVGElement) : IO (Option OnBeforeUnloadEventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onbeforeunload" do
+  self.val.get "onbeforeunload" (Option OnBeforeUnloadEventHandlerNonNull)
 
 /-- Sets `onbeforeunload`: `attribute OnBeforeUnloadEventHandler onbeforeunload` -/
-def SVGSVGElement.setOnbeforeunload (self : SVGSVGElement) (value : Option OnBeforeUnloadEventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnbeforeunload (self : SVGSVGElement) (value : Option OnBeforeUnloadEventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnbeforeunload" do
   self.val.set "onbeforeunload" (toJS value)
 
 /-- `attribute EventHandler onhashchange` -/
-def SVGSVGElement.onhashchange (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onhashchange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onhashchange (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onhashchange" do
+  self.val.get "onhashchange" (Option EventHandlerNonNull)
 
 /-- Sets `onhashchange`: `attribute EventHandler onhashchange` -/
-def SVGSVGElement.setOnhashchange (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnhashchange (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnhashchange" do
   self.val.set "onhashchange" (toJS value)
 
 /-- `attribute EventHandler onlanguagechange` -/
-def SVGSVGElement.onlanguagechange (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onlanguagechange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onlanguagechange (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onlanguagechange" do
+  self.val.get "onlanguagechange" (Option EventHandlerNonNull)
 
 /-- Sets `onlanguagechange`: `attribute EventHandler onlanguagechange` -/
-def SVGSVGElement.setOnlanguagechange (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnlanguagechange (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnlanguagechange" do
   self.val.set "onlanguagechange" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def SVGSVGElement.onmessage (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onmessage (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def SVGSVGElement.setOnmessage (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnmessage (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute EventHandler onmessageerror` -/
-def SVGSVGElement.onmessageerror (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onmessageerror" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onmessageerror (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onmessageerror" do
+  self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
-def SVGSVGElement.setOnmessageerror (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnmessageerror (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
 
 /-- `attribute EventHandler onoffline` -/
-def SVGSVGElement.onoffline (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onoffline" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onoffline (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onoffline" do
+  self.val.get "onoffline" (Option EventHandlerNonNull)
 
 /-- Sets `onoffline`: `attribute EventHandler onoffline` -/
-def SVGSVGElement.setOnoffline (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnoffline (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnoffline" do
   self.val.set "onoffline" (toJS value)
 
 /-- `attribute EventHandler ononline` -/
-def SVGSVGElement.ononline (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ononline" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.ononline (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.ononline" do
+  self.val.get "ononline" (Option EventHandlerNonNull)
 
 /-- Sets `ononline`: `attribute EventHandler ononline` -/
-def SVGSVGElement.setOnonline (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnonline (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnonline" do
   self.val.set "ononline" (toJS value)
 
 /-- `attribute EventHandler onpagehide` -/
-def SVGSVGElement.onpagehide (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpagehide" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onpagehide (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onpagehide" do
+  self.val.get "onpagehide" (Option EventHandlerNonNull)
 
 /-- Sets `onpagehide`: `attribute EventHandler onpagehide` -/
-def SVGSVGElement.setOnpagehide (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnpagehide (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnpagehide" do
   self.val.set "onpagehide" (toJS value)
 
 /-- `attribute EventHandler onpagereveal` -/
-def SVGSVGElement.onpagereveal (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpagereveal" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onpagereveal (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onpagereveal" do
+  self.val.get "onpagereveal" (Option EventHandlerNonNull)
 
 /-- Sets `onpagereveal`: `attribute EventHandler onpagereveal` -/
-def SVGSVGElement.setOnpagereveal (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnpagereveal (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnpagereveal" do
   self.val.set "onpagereveal" (toJS value)
 
 /-- `attribute EventHandler onpageshow` -/
-def SVGSVGElement.onpageshow (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpageshow" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onpageshow (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onpageshow" do
+  self.val.get "onpageshow" (Option EventHandlerNonNull)
 
 /-- Sets `onpageshow`: `attribute EventHandler onpageshow` -/
-def SVGSVGElement.setOnpageshow (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnpageshow (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnpageshow" do
   self.val.set "onpageshow" (toJS value)
 
 /-- `attribute EventHandler onpageswap` -/
-def SVGSVGElement.onpageswap (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpageswap" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onpageswap (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onpageswap" do
+  self.val.get "onpageswap" (Option EventHandlerNonNull)
 
 /-- Sets `onpageswap`: `attribute EventHandler onpageswap` -/
-def SVGSVGElement.setOnpageswap (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnpageswap (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnpageswap" do
   self.val.set "onpageswap" (toJS value)
 
 /-- `attribute EventHandler onpopstate` -/
-def SVGSVGElement.onpopstate (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onpopstate" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onpopstate (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onpopstate" do
+  self.val.get "onpopstate" (Option EventHandlerNonNull)
 
 /-- Sets `onpopstate`: `attribute EventHandler onpopstate` -/
-def SVGSVGElement.setOnpopstate (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnpopstate (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnpopstate" do
   self.val.set "onpopstate" (toJS value)
 
 /-- `attribute EventHandler onrejectionhandled` -/
-def SVGSVGElement.onrejectionhandled (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onrejectionhandled (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onrejectionhandled" do
+  self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
 
 /-- Sets `onrejectionhandled`: `attribute EventHandler onrejectionhandled` -/
-def SVGSVGElement.setOnrejectionhandled (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnrejectionhandled (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnrejectionhandled" do
   self.val.set "onrejectionhandled" (toJS value)
 
 /-- `attribute EventHandler onstorage` -/
-def SVGSVGElement.onstorage (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onstorage" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onstorage (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onstorage" do
+  self.val.get "onstorage" (Option EventHandlerNonNull)
 
 /-- Sets `onstorage`: `attribute EventHandler onstorage` -/
-def SVGSVGElement.setOnstorage (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnstorage (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnstorage" do
   self.val.set "onstorage" (toJS value)
 
 /-- `attribute EventHandler onunhandledrejection` -/
-def SVGSVGElement.onunhandledrejection (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onunhandledrejection (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onunhandledrejection" do
+  self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
 
 /-- Sets `onunhandledrejection`: `attribute EventHandler onunhandledrejection` -/
-def SVGSVGElement.setOnunhandledrejection (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnunhandledrejection (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnunhandledrejection" do
   self.val.set "onunhandledrejection" (toJS value)
 
 /-- `attribute EventHandler onunload` -/
-def SVGSVGElement.onunload (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onunload" (Option EventHandlerNonNull)
+@[macro_inline] def SVGSVGElement.onunload (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.onunload" do
+  self.val.get "onunload" (Option EventHandlerNonNull)
 
 /-- Sets `onunload`: `attribute EventHandler onunload` -/
-def SVGSVGElement.setOnunload (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGSVGElement.setOnunload (self : SVGSVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setOnunload" do
   self.val.set "onunload" (toJS value)
 
 /-- `NodeList getIntersectionList(SVGRect rect, SVGElement? referenceElement)` -/
-def SVGSVGElement.getIntersectionList (self : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO NodeList := do
-  let r ← self.val.callMethod "getIntersectionList" (Support.args #[toJS rect, toJS referenceElement]) Value
+@[macro_inline] def SVGSVGElement.getIntersectionList (self : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO NodeList := Internal.api "Lasm.JS.Web.SVGSVGElement.getIntersectionList" do
+  let r ← self.val.callMethod "getIntersectionList" (Internal.args #[toJS rect, toJS referenceElement]) Value
   pure { val := r }
 
 /-- `NodeList getEnclosureList(SVGRect rect, SVGElement? referenceElement)` -/
-def SVGSVGElement.getEnclosureList (self : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO NodeList := do
-  let r ← self.val.callMethod "getEnclosureList" (Support.args #[toJS rect, toJS referenceElement]) Value
+@[macro_inline] def SVGSVGElement.getEnclosureList (self : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO NodeList := Internal.api "Lasm.JS.Web.SVGSVGElement.getEnclosureList" do
+  let r ← self.val.callMethod "getEnclosureList" (Internal.args #[toJS rect, toJS referenceElement]) Value
   pure { val := r }
 
 /-- `boolean checkIntersection(SVGElement element, SVGRect rect)` -/
-def SVGSVGElement.checkIntersection (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool :=
-  self.val.callMethod "checkIntersection" (Support.args #[toJS element, toJS rect]) Bool
+@[macro_inline] def SVGSVGElement.checkIntersection (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool := Internal.api "Lasm.JS.Web.SVGSVGElement.checkIntersection" do
+  self.val.callMethod "checkIntersection" (Internal.args #[toJS element, toJS rect]) Bool
 
 /-- `boolean checkEnclosure(SVGElement element, SVGRect rect)` -/
-def SVGSVGElement.checkEnclosure (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool :=
-  self.val.callMethod "checkEnclosure" (Support.args #[toJS element, toJS rect]) Bool
+@[macro_inline] def SVGSVGElement.checkEnclosure (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool := Internal.api "Lasm.JS.Web.SVGSVGElement.checkEnclosure" do
+  self.val.callMethod "checkEnclosure" (Internal.args #[toJS element, toJS rect]) Bool
 
 /-- `undefined deselectAll()` -/
-def SVGSVGElement.deselectAll (self : SVGSVGElement) : IO Unit :=
-  self.val.callMethod "deselectAll" (Support.args #[]) Unit
+@[macro_inline] def SVGSVGElement.deselectAll (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.deselectAll" do
+  self.val.callMethod "deselectAll" (Internal.args #[]) Unit
 
 /-- `SVGNumber createSVGNumber()` -/
-def SVGSVGElement.createSVGNumber (self : SVGSVGElement) : IO SVGNumber := do
-  let r ← self.val.callMethod "createSVGNumber" (Support.args #[]) Value
+@[macro_inline] def SVGSVGElement.createSVGNumber (self : SVGSVGElement) : IO SVGNumber := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGNumber" do
+  let r ← self.val.callMethod "createSVGNumber" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `SVGLength createSVGLength()` -/
-def SVGSVGElement.createSVGLength (self : SVGSVGElement) : IO SVGLength := do
-  let r ← self.val.callMethod "createSVGLength" (Support.args #[]) Value
+@[macro_inline] def SVGSVGElement.createSVGLength (self : SVGSVGElement) : IO SVGLength := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGLength" do
+  let r ← self.val.callMethod "createSVGLength" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `SVGAngle createSVGAngle()` -/
-def SVGSVGElement.createSVGAngle (self : SVGSVGElement) : IO SVGAngle := do
-  let r ← self.val.callMethod "createSVGAngle" (Support.args #[]) Value
+@[macro_inline] def SVGSVGElement.createSVGAngle (self : SVGSVGElement) : IO SVGAngle := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGAngle" do
+  let r ← self.val.callMethod "createSVGAngle" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `SVGPoint createSVGPoint()` -/
-def SVGSVGElement.createSVGPoint (self : SVGSVGElement) : IO Data :=
-  self.val.callMethod "createSVGPoint" (Support.args #[]) Data
+@[macro_inline] def SVGSVGElement.createSVGPoint (self : SVGSVGElement) : IO Data := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGPoint" do
+  self.val.callMethod "createSVGPoint" (Internal.args #[]) Data
 
 /-- `SVGMatrix createSVGMatrix()` -/
-def SVGSVGElement.createSVGMatrix (self : SVGSVGElement) : IO Data :=
-  self.val.callMethod "createSVGMatrix" (Support.args #[]) Data
+@[macro_inline] def SVGSVGElement.createSVGMatrix (self : SVGSVGElement) : IO Data := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGMatrix" do
+  self.val.callMethod "createSVGMatrix" (Internal.args #[]) Data
 
 /-- `SVGRect createSVGRect()` -/
-def SVGSVGElement.createSVGRect (self : SVGSVGElement) : IO Data :=
-  self.val.callMethod "createSVGRect" (Support.args #[]) Data
+@[macro_inline] def SVGSVGElement.createSVGRect (self : SVGSVGElement) : IO Data := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGRect" do
+  self.val.callMethod "createSVGRect" (Internal.args #[]) Data
 
 /-- `SVGTransform createSVGTransform()` -/
-def SVGSVGElement.createSVGTransform (self : SVGSVGElement) : IO SVGTransform := do
-  let r ← self.val.callMethod "createSVGTransform" (Support.args #[]) Value
+@[macro_inline] def SVGSVGElement.createSVGTransform (self : SVGSVGElement) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGTransform" do
+  let r ← self.val.callMethod "createSVGTransform" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `SVGTransform createSVGTransformFromMatrix(optional DOMMatrix2DInit matrix)` -/
-def SVGSVGElement.createSVGTransformFromMatrix (self : SVGSVGElement) (matrix : Option DOMMatrix2DInit := none) : IO SVGTransform := do
-  let r ← self.val.callMethod "createSVGTransformFromMatrix" (Support.args #[Support.optional matrix]) Value
+@[macro_inline] def SVGSVGElement.createSVGTransformFromMatrix (self : SVGSVGElement) (matrix : Option DOMMatrix2DInit := none) : IO SVGTransform := Internal.api "Lasm.JS.Web.SVGSVGElement.createSVGTransformFromMatrix" do
+  let r ← self.val.callMethod "createSVGTransformFromMatrix" (Internal.args #[Internal.optional matrix]) Value
   pure { val := r }
 
 /-- `Element? getElementById(DOMString elementId)` -/
-def SVGSVGElement.getElementById (self : SVGSVGElement) (elementId : String) : IO (Option Element) :=
-  self.val.callMethod "getElementById" (Support.args #[toJS elementId]) (Option Element)
+@[macro_inline] def SVGSVGElement.getElementById (self : SVGSVGElement) (elementId : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.SVGSVGElement.getElementById" do
+  self.val.callMethod "getElementById" (Internal.args #[toJS elementId]) (Option Element)
 
 /-- `unsigned long suspendRedraw(unsigned long maxWaitMilliseconds)` -/
-def SVGSVGElement.suspendRedraw (self : SVGSVGElement) (maxWaitMilliseconds : Nat) : IO Nat :=
-  self.val.callMethod "suspendRedraw" (Support.args #[toJS maxWaitMilliseconds]) Nat
+@[macro_inline] def SVGSVGElement.suspendRedraw (self : SVGSVGElement) (maxWaitMilliseconds : Nat) : IO Nat := Internal.api "Lasm.JS.Web.SVGSVGElement.suspendRedraw" do
+  self.val.callMethod "suspendRedraw" (Internal.args #[toJS maxWaitMilliseconds]) Nat
 
 /-- `undefined unsuspendRedraw(unsigned long suspendHandleID)` -/
-def SVGSVGElement.unsuspendRedraw (self : SVGSVGElement) (suspendHandleID : Nat) : IO Unit :=
-  self.val.callMethod "unsuspendRedraw" (Support.args #[toJS suspendHandleID]) Unit
+@[macro_inline] def SVGSVGElement.unsuspendRedraw (self : SVGSVGElement) (suspendHandleID : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.unsuspendRedraw" do
+  self.val.callMethod "unsuspendRedraw" (Internal.args #[toJS suspendHandleID]) Unit
 
 /-- `undefined unsuspendRedrawAll()` -/
-def SVGSVGElement.unsuspendRedrawAll (self : SVGSVGElement) : IO Unit :=
-  self.val.callMethod "unsuspendRedrawAll" (Support.args #[]) Unit
+@[macro_inline] def SVGSVGElement.unsuspendRedrawAll (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.unsuspendRedrawAll" do
+  self.val.callMethod "unsuspendRedrawAll" (Internal.args #[]) Unit
 
 /-- `undefined forceRedraw()` -/
-def SVGSVGElement.forceRedraw (self : SVGSVGElement) : IO Unit :=
-  self.val.callMethod "forceRedraw" (Support.args #[]) Unit
+@[macro_inline] def SVGSVGElement.forceRedraw (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.forceRedraw" do
+  self.val.callMethod "forceRedraw" (Internal.args #[]) Unit
 
 /-- `v instanceof SVGSwitchElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGSwitchElement`). -/
-def SVGSwitchElement.cast? (v : Value) : IO (Option SVGSwitchElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGSwitchElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGSwitchElement.cast? (v : Value) : IO (Option SVGSwitchElement) := Internal.api "Lasm.JS.Web.SVGSwitchElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGSwitchElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGSymbolElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGSymbolElement`). -/
-def SVGSymbolElement.cast? (v : Value) : IO (Option SVGSymbolElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGSymbolElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGSymbolElement.cast? (v : Value) : IO (Option SVGSymbolElement) := Internal.api "Lasm.JS.Web.SVGSymbolElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGSymbolElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedRect viewBox` -/
-def SVGSymbolElement.viewBox (self : SVGSymbolElement) : IO SVGAnimatedRect := do
+@[macro_inline] def SVGSymbolElement.viewBox (self : SVGSymbolElement) : IO SVGAnimatedRect := Internal.api "Lasm.JS.Web.SVGSymbolElement.viewBox" do
   let r ← self.val.get "viewBox" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedPreserveAspectRatio preserveAspectRatio` -/
-def SVGSymbolElement.preserveAspectRatio (self : SVGSymbolElement) : IO SVGAnimatedPreserveAspectRatio := do
+@[macro_inline] def SVGSymbolElement.preserveAspectRatio (self : SVGSymbolElement) : IO SVGAnimatedPreserveAspectRatio := Internal.api "Lasm.JS.Web.SVGSymbolElement.preserveAspectRatio" do
   let r ← self.val.get "preserveAspectRatio" Value
   pure { val := r }
 
 /-- `v instanceof SVGTextContentElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTextContentElement`). -/
-def SVGTextContentElement.cast? (v : Value) : IO (Option SVGTextContentElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTextContentElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTextContentElement.cast? (v : Value) : IO (Option SVGTextContentElement) := Internal.api "Lasm.JS.Web.SVGTextContentElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTextContentElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short LENGTHADJUST_UNKNOWN = 0` -/
 def SVGTextContentElement.LENGTHADJUST_UNKNOWN : Nat := 0
@@ -2162,212 +2334,212 @@ def SVGTextContentElement.LENGTHADJUST_SPACING : Nat := 1
 def SVGTextContentElement.LENGTHADJUST_SPACINGANDGLYPHS : Nat := 2
 
 /-- `readonly attribute SVGAnimatedLength textLength` -/
-def SVGTextContentElement.textLength (self : SVGTextContentElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGTextContentElement.textLength (self : SVGTextContentElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGTextContentElement.textLength" do
   let r ← self.val.get "textLength" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration lengthAdjust` -/
-def SVGTextContentElement.lengthAdjust (self : SVGTextContentElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGTextContentElement.lengthAdjust (self : SVGTextContentElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGTextContentElement.lengthAdjust" do
   let r ← self.val.get "lengthAdjust" Value
   pure { val := r }
 
 /-- `long getNumberOfChars()` -/
-def SVGTextContentElement.getNumberOfChars (self : SVGTextContentElement) : IO Int :=
-  self.val.callMethod "getNumberOfChars" (Support.args #[]) Int
+@[macro_inline] def SVGTextContentElement.getNumberOfChars (self : SVGTextContentElement) : IO Int := Internal.api "Lasm.JS.Web.SVGTextContentElement.getNumberOfChars" do
+  self.val.callMethod "getNumberOfChars" (Internal.args #[]) Int
 
 /-- `float getComputedTextLength()` -/
-def SVGTextContentElement.getComputedTextLength (self : SVGTextContentElement) : IO Float :=
-  self.val.callMethod "getComputedTextLength" (Support.args #[]) Float
+@[macro_inline] def SVGTextContentElement.getComputedTextLength (self : SVGTextContentElement) : IO Float := Internal.api "Lasm.JS.Web.SVGTextContentElement.getComputedTextLength" do
+  self.val.callMethod "getComputedTextLength" (Internal.args #[]) Float
 
 /-- `float getSubStringLength(unsigned long charnum, unsigned long nchars)` -/
-def SVGTextContentElement.getSubStringLength (self : SVGTextContentElement) (charnum : Nat) (nchars : Nat) : IO Float :=
-  self.val.callMethod "getSubStringLength" (Support.args #[toJS charnum, toJS nchars]) Float
+@[macro_inline] def SVGTextContentElement.getSubStringLength (self : SVGTextContentElement) (charnum : Nat) (nchars : Nat) : IO Float := Internal.api "Lasm.JS.Web.SVGTextContentElement.getSubStringLength" do
+  self.val.callMethod "getSubStringLength" (Internal.args #[toJS charnum, toJS nchars]) Float
 
 /-- `SVGPoint getStartPositionOfChar(unsigned long charnum)` -/
-def SVGTextContentElement.getStartPositionOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data :=
-  self.val.callMethod "getStartPositionOfChar" (Support.args #[toJS charnum]) Data
+@[macro_inline] def SVGTextContentElement.getStartPositionOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGTextContentElement.getStartPositionOfChar" do
+  self.val.callMethod "getStartPositionOfChar" (Internal.args #[toJS charnum]) Data
 
 /-- `SVGPoint getEndPositionOfChar(unsigned long charnum)` -/
-def SVGTextContentElement.getEndPositionOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data :=
-  self.val.callMethod "getEndPositionOfChar" (Support.args #[toJS charnum]) Data
+@[macro_inline] def SVGTextContentElement.getEndPositionOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGTextContentElement.getEndPositionOfChar" do
+  self.val.callMethod "getEndPositionOfChar" (Internal.args #[toJS charnum]) Data
 
 /-- `SVGRect getExtentOfChar(unsigned long charnum)` -/
-def SVGTextContentElement.getExtentOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data :=
-  self.val.callMethod "getExtentOfChar" (Support.args #[toJS charnum]) Data
+@[macro_inline] def SVGTextContentElement.getExtentOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Data := Internal.api "Lasm.JS.Web.SVGTextContentElement.getExtentOfChar" do
+  self.val.callMethod "getExtentOfChar" (Internal.args #[toJS charnum]) Data
 
 /-- `float getRotationOfChar(unsigned long charnum)` -/
-def SVGTextContentElement.getRotationOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Float :=
-  self.val.callMethod "getRotationOfChar" (Support.args #[toJS charnum]) Float
+@[macro_inline] def SVGTextContentElement.getRotationOfChar (self : SVGTextContentElement) (charnum : Nat) : IO Float := Internal.api "Lasm.JS.Web.SVGTextContentElement.getRotationOfChar" do
+  self.val.callMethod "getRotationOfChar" (Internal.args #[toJS charnum]) Float
 
 /-- `long getCharNumAtPosition(optional DOMPointInit point)` -/
-def SVGTextContentElement.getCharNumAtPosition (self : SVGTextContentElement) (point : Option DOMPointInit := none) : IO Int :=
-  self.val.callMethod "getCharNumAtPosition" (Support.args #[Support.optional point]) Int
+@[macro_inline] def SVGTextContentElement.getCharNumAtPosition (self : SVGTextContentElement) (point : Option DOMPointInit := none) : IO Int := Internal.api "Lasm.JS.Web.SVGTextContentElement.getCharNumAtPosition" do
+  self.val.callMethod "getCharNumAtPosition" (Internal.args #[Internal.optional point]) Int
 
 /-- `undefined selectSubString(unsigned long charnum, unsigned long nchars)` -/
-def SVGTextContentElement.selectSubString (self : SVGTextContentElement) (charnum : Nat) (nchars : Nat) : IO Unit :=
-  self.val.callMethod "selectSubString" (Support.args #[toJS charnum, toJS nchars]) Unit
+@[macro_inline] def SVGTextContentElement.selectSubString (self : SVGTextContentElement) (charnum : Nat) (nchars : Nat) : IO Unit := Internal.api "Lasm.JS.Web.SVGTextContentElement.selectSubString" do
+  self.val.callMethod "selectSubString" (Internal.args #[toJS charnum, toJS nchars]) Unit
 
 /-- `v instanceof SVGUseElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGUseElement`). -/
-def SVGUseElement.cast? (v : Value) : IO (Option SVGUseElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGUseElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGUseElement.cast? (v : Value) : IO (Option SVGUseElement) := Internal.api "Lasm.JS.Web.SVGUseElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGUseElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGUseElement.x (self : SVGUseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGUseElement.x (self : SVGUseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGUseElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGUseElement.y (self : SVGUseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGUseElement.y (self : SVGUseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGUseElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGUseElement.width (self : SVGUseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGUseElement.width (self : SVGUseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGUseElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGUseElement.height (self : SVGUseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGUseElement.height (self : SVGUseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGUseElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGUseElement.href (self : SVGUseElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGUseElement.href (self : SVGUseElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGUseElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGCircleElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGCircleElement`). -/
-def SVGCircleElement.cast? (v : Value) : IO (Option SVGCircleElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGCircleElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGCircleElement.cast? (v : Value) : IO (Option SVGCircleElement) := Internal.api "Lasm.JS.Web.SVGCircleElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGCircleElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength cx` -/
-def SVGCircleElement.cx (self : SVGCircleElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGCircleElement.cx (self : SVGCircleElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGCircleElement.cx" do
   let r ← self.val.get "cx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength cy` -/
-def SVGCircleElement.cy (self : SVGCircleElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGCircleElement.cy (self : SVGCircleElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGCircleElement.cy" do
   let r ← self.val.get "cy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength r` -/
-def SVGCircleElement.r (self : SVGCircleElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGCircleElement.r (self : SVGCircleElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGCircleElement.r" do
   let r ← self.val.get "r" Value
   pure { val := r }
 
 /-- `v instanceof SVGEllipseElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGEllipseElement`). -/
-def SVGEllipseElement.cast? (v : Value) : IO (Option SVGEllipseElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGEllipseElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGEllipseElement.cast? (v : Value) : IO (Option SVGEllipseElement) := Internal.api "Lasm.JS.Web.SVGEllipseElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGEllipseElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength cx` -/
-def SVGEllipseElement.cx (self : SVGEllipseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGEllipseElement.cx (self : SVGEllipseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGEllipseElement.cx" do
   let r ← self.val.get "cx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength cy` -/
-def SVGEllipseElement.cy (self : SVGEllipseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGEllipseElement.cy (self : SVGEllipseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGEllipseElement.cy" do
   let r ← self.val.get "cy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength rx` -/
-def SVGEllipseElement.rx (self : SVGEllipseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGEllipseElement.rx (self : SVGEllipseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGEllipseElement.rx" do
   let r ← self.val.get "rx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength ry` -/
-def SVGEllipseElement.ry (self : SVGEllipseElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGEllipseElement.ry (self : SVGEllipseElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGEllipseElement.ry" do
   let r ← self.val.get "ry" Value
   pure { val := r }
 
 /-- `v instanceof SVGLineElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGLineElement`). -/
-def SVGLineElement.cast? (v : Value) : IO (Option SVGLineElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGLineElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGLineElement.cast? (v : Value) : IO (Option SVGLineElement) := Internal.api "Lasm.JS.Web.SVGLineElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGLineElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x1` -/
-def SVGLineElement.x1 (self : SVGLineElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLineElement.x1 (self : SVGLineElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLineElement.x1" do
   let r ← self.val.get "x1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y1` -/
-def SVGLineElement.y1 (self : SVGLineElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLineElement.y1 (self : SVGLineElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLineElement.y1" do
   let r ← self.val.get "y1" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x2` -/
-def SVGLineElement.x2 (self : SVGLineElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLineElement.x2 (self : SVGLineElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLineElement.x2" do
   let r ← self.val.get "x2" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y2` -/
-def SVGLineElement.y2 (self : SVGLineElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGLineElement.y2 (self : SVGLineElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGLineElement.y2" do
   let r ← self.val.get "y2" Value
   pure { val := r }
 
 /-- `v instanceof SVGPolygonElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPolygonElement`). -/
-def SVGPolygonElement.cast? (v : Value) : IO (Option SVGPolygonElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPolygonElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPolygonElement.cast? (v : Value) : IO (Option SVGPolygonElement) := Internal.api "Lasm.JS.Web.SVGPolygonElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPolygonElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGPointList points` -/
-def SVGPolygonElement.points (self : SVGPolygonElement) : IO SVGPointList := do
+@[macro_inline] def SVGPolygonElement.points (self : SVGPolygonElement) : IO SVGPointList := Internal.api "Lasm.JS.Web.SVGPolygonElement.points" do
   let r ← self.val.get "points" Value
   pure { val := r }
 
 /-- `readonly attribute SVGPointList animatedPoints` -/
-def SVGPolygonElement.animatedPoints (self : SVGPolygonElement) : IO SVGPointList := do
+@[macro_inline] def SVGPolygonElement.animatedPoints (self : SVGPolygonElement) : IO SVGPointList := Internal.api "Lasm.JS.Web.SVGPolygonElement.animatedPoints" do
   let r ← self.val.get "animatedPoints" Value
   pure { val := r }
 
 /-- `v instanceof SVGPolylineElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPolylineElement`). -/
-def SVGPolylineElement.cast? (v : Value) : IO (Option SVGPolylineElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPolylineElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPolylineElement.cast? (v : Value) : IO (Option SVGPolylineElement) := Internal.api "Lasm.JS.Web.SVGPolylineElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPolylineElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGPointList points` -/
-def SVGPolylineElement.points (self : SVGPolylineElement) : IO SVGPointList := do
+@[macro_inline] def SVGPolylineElement.points (self : SVGPolylineElement) : IO SVGPointList := Internal.api "Lasm.JS.Web.SVGPolylineElement.points" do
   let r ← self.val.get "points" Value
   pure { val := r }
 
 /-- `readonly attribute SVGPointList animatedPoints` -/
-def SVGPolylineElement.animatedPoints (self : SVGPolylineElement) : IO SVGPointList := do
+@[macro_inline] def SVGPolylineElement.animatedPoints (self : SVGPolylineElement) : IO SVGPointList := Internal.api "Lasm.JS.Web.SVGPolylineElement.animatedPoints" do
   let r ← self.val.get "animatedPoints" Value
   pure { val := r }
 
 /-- `v instanceof SVGRectElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGRectElement`). -/
-def SVGRectElement.cast? (v : Value) : IO (Option SVGRectElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGRectElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGRectElement.cast? (v : Value) : IO (Option SVGRectElement) := Internal.api "Lasm.JS.Web.SVGRectElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGRectElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGRectElement.x (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.x (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGRectElement.y (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.y (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGRectElement.width (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.width (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGRectElement.height (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.height (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength rx` -/
-def SVGRectElement.rx (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.rx (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.rx" do
   let r ← self.val.get "rx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength ry` -/
-def SVGRectElement.ry (self : SVGRectElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGRectElement.ry (self : SVGRectElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGRectElement.ry" do
   let r ← self.val.get "ry" Value
   pure { val := r }
 
 /-- `v instanceof SVGTextPathElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTextPathElement`). -/
-def SVGTextPathElement.cast? (v : Value) : IO (Option SVGTextPathElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTextPathElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTextPathElement.cast? (v : Value) : IO (Option SVGTextPathElement) := Internal.api "Lasm.JS.Web.SVGTextPathElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTextPathElement"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short TEXTPATH_METHODTYPE_UNKNOWN = 0` -/
 def SVGTextPathElement.TEXTPATH_METHODTYPE_UNKNOWN : Nat := 0
@@ -2397,68 +2569,69 @@ def SVGTextPathElement.TEXTPATH_SIDETYPE_LEFT : Nat := 1
 def SVGTextPathElement.TEXTPATH_SIDETYPE_RIGHT : Nat := 2
 
 /-- `readonly attribute SVGAnimatedLength startOffset` -/
-def SVGTextPathElement.startOffset (self : SVGTextPathElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGTextPathElement.startOffset (self : SVGTextPathElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGTextPathElement.startOffset" do
   let r ← self.val.get "startOffset" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration method` -/
-def SVGTextPathElement.method (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGTextPathElement.method (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGTextPathElement.method" do
   let r ← self.val.get "method" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration spacing` -/
-def SVGTextPathElement.spacing (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGTextPathElement.spacing (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGTextPathElement.spacing" do
   let r ← self.val.get "spacing" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration side` -/
-def SVGTextPathElement.side (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGTextPathElement.side (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGTextPathElement.side" do
   let r ← self.val.get "side" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGTextPathElement.href (self : SVGTextPathElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGTextPathElement.href (self : SVGTextPathElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGTextPathElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof SVGTextPositioningElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTextPositioningElement`). -/
-def SVGTextPositioningElement.cast? (v : Value) : IO (Option SVGTextPositioningElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTextPositioningElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTextPositioningElement.cast? (v : Value) : IO (Option SVGTextPositioningElement) := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTextPositioningElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedLengthList x` -/
-def SVGTextPositioningElement.x (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := do
+@[macro_inline] def SVGTextPositioningElement.x (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLengthList y` -/
-def SVGTextPositioningElement.y (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := do
+@[macro_inline] def SVGTextPositioningElement.y (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLengthList dx` -/
-def SVGTextPositioningElement.dx (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := do
+@[macro_inline] def SVGTextPositioningElement.dx (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.dx" do
   let r ← self.val.get "dx" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLengthList dy` -/
-def SVGTextPositioningElement.dy (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := do
+@[macro_inline] def SVGTextPositioningElement.dy (self : SVGTextPositioningElement) : IO SVGAnimatedLengthList := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.dy" do
   let r ← self.val.get "dy" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedNumberList rotate` -/
-def SVGTextPositioningElement.rotate (self : SVGTextPositioningElement) : IO SVGAnimatedNumberList := do
+@[macro_inline] def SVGTextPositioningElement.rotate (self : SVGTextPositioningElement) : IO SVGAnimatedNumberList := Internal.api "Lasm.JS.Web.SVGTextPositioningElement.rotate" do
   let r ← self.val.get "rotate" Value
   pure { val := r }
 
 /-- `v instanceof SVGTSpanElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTSpanElement`). -/
-def SVGTSpanElement.cast? (v : Value) : IO (Option SVGTSpanElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTSpanElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTSpanElement.cast? (v : Value) : IO (Option SVGTSpanElement) := Internal.api "Lasm.JS.Web.SVGTSpanElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTSpanElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGTextElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGTextElement`). -/
-def SVGTextElement.cast? (v : Value) : IO (Option SVGTextElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGTextElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGTextElement.cast? (v : Value) : IO (Option SVGTextElement) := Internal.api "Lasm.JS.Web.SVGTextElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGTextElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGSVGElement? rootElement` -/
-def Document.rootElement (self : Document) : IO (Option SVGSVGElement) := self.val.get "rootElement" (Option SVGSVGElement)
+@[macro_inline] def Document.rootElement (self : Document) : IO (Option SVGSVGElement) := Internal.api "Lasm.JS.Web.Document.rootElement" do
+  self.val.get "rootElement" (Option SVGSVGElement)
 
 end Lasm.JS.Web

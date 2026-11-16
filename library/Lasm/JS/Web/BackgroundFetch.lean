@@ -6,7 +6,10 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.BackgroundFetch
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.ImageResource
@@ -14,60 +17,9 @@ import Lasm.JS.Web.ServiceWorkers
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum BackgroundFetchResult` (Background Fetch (https://wicg.github.io/background-fetch/)): "", "success", "failure". -/
-inductive BackgroundFetchResult where
-  /-- "" -/
-  | empty
-  /-- "success" -/
-  | success
-  /-- "failure" -/
-  | failure
-  deriving BEq, Repr, Inhabited
-instance : ToJS BackgroundFetchResult := ⟨fun
-  | .empty => .string ""
-  | .success => .string "success"
-  | .failure => .string "failure"⟩
-instance : FromJS BackgroundFetchResult where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "success" => .ok .success
-    | .string "failure" => .ok .failure
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BackgroundFetchResult"
-
-/-- `enum BackgroundFetchFailureReason` (Background Fetch (https://wicg.github.io/background-fetch/)): "", "aborted", "bad-status", "fetch-error", "quota-exceeded", "download-total-exceeded". -/
-inductive BackgroundFetchFailureReason where
-  /-- "" -/
-  | empty
-  /-- "aborted" -/
-  | aborted
-  /-- "bad-status" -/
-  | badStatus
-  /-- "fetch-error" -/
-  | fetchError
-  /-- "quota-exceeded" -/
-  | quotaExceeded
-  /-- "download-total-exceeded" -/
-  | downloadTotalExceeded
-  deriving BEq, Repr, Inhabited
-instance : ToJS BackgroundFetchFailureReason := ⟨fun
-  | .empty => .string ""
-  | .aborted => .string "aborted"
-  | .badStatus => .string "bad-status"
-  | .fetchError => .string "fetch-error"
-  | .quotaExceeded => .string "quota-exceeded"
-  | .downloadTotalExceeded => .string "download-total-exceeded"⟩
-instance : FromJS BackgroundFetchFailureReason where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "aborted" => .ok .aborted
-    | .string "bad-status" => .ok .badStatus
-    | .string "fetch-error" => .ok .fetchError
-    | .string "quota-exceeded" => .ok .quotaExceeded
-    | .string "download-total-exceeded" => .ok .downloadTotalExceeded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BackgroundFetchFailureReason"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BackgroundFetchEventInit : ExtendableEventInit` (Background Fetch (https://wicg.github.io/background-fetch/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BackgroundFetchEventInit where
@@ -79,9 +31,9 @@ structure BackgroundFetchEventInit where
   composed : Option Bool := none
   /-- `required BackgroundFetchRegistration registration` -/
   registration : BackgroundFetchRegistration
-instance : ToJS BackgroundFetchEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS BackgroundFetchEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("registration", toJS d.registration)]⟩
 
 /-- `(Request or USVString or sequence<RequestInfo>)`: one constructor per member type. -/
@@ -108,9 +60,9 @@ structure BackgroundFetchOptions where
   title : Option String := none
   /-- `unsigned long long downloadTotal = 0` -/
   downloadTotal : Option Nat := none
-instance : ToJS BackgroundFetchOptions := ⟨fun d => Support.fields #[("icons", Support.optional d.icons),
-    ("title", Support.optional d.title),
-    ("downloadTotal", Support.optional d.downloadTotal)]⟩
+instance : ToJS BackgroundFetchOptions := ⟨fun d => Internal.fields #[("icons", Internal.optional d.icons),
+    ("title", Internal.optional d.title),
+    ("downloadTotal", Internal.optional d.downloadTotal)]⟩
 
 /-- `dictionary BackgroundFetchUIOptions` (Background Fetch (https://wicg.github.io/background-fetch/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BackgroundFetchUIOptions where
@@ -118,146 +70,159 @@ structure BackgroundFetchUIOptions where
   icons : Option (Array ImageResource) := none
   /-- `DOMString title` -/
   title : Option String := none
-instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Support.fields #[("icons", Support.optional d.icons),
-    ("title", Support.optional d.title)]⟩
+instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icons", Internal.optional d.icons),
+    ("title", Internal.optional d.title)]⟩
 
 /-- `v instanceof BackgroundFetchEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BackgroundFetchEvent`). -/
-def BackgroundFetchEvent.cast? (v : Value) : IO (Option BackgroundFetchEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BackgroundFetchEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BackgroundFetchEvent.cast? (v : Value) : IO (Option BackgroundFetchEvent) := Internal.api "Lasm.JS.Web.BackgroundFetchEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BackgroundFetchEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, BackgroundFetchEventInit init)` -/
-def BackgroundFetchEvent.new (type : String) (init : BackgroundFetchEventInit) : IO BackgroundFetchEvent :=
+@[macro_inline] def BackgroundFetchEvent.new (type : String) (init : BackgroundFetchEventInit) : IO BackgroundFetchEvent := Internal.api "Lasm.JS.Web.BackgroundFetchEvent.new" do
   Lasm.JS.Binding.invoke BackgroundFetchEvent { name := "Lasm.JS.Web.BackgroundFetchEvent.new", module := "globalThis", path := "BackgroundFetchEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `readonly attribute BackgroundFetchRegistration registration` -/
-def BackgroundFetchEvent.registration (self : BackgroundFetchEvent) : IO BackgroundFetchRegistration := do
+@[macro_inline] def BackgroundFetchEvent.registration (self : BackgroundFetchEvent) : IO BackgroundFetchRegistration := Internal.api "Lasm.JS.Web.BackgroundFetchEvent.registration" do
   let r ← self.val.get "registration" Value
   pure { val := r }
 
 /-- `v instanceof BackgroundFetchManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BackgroundFetchManager`). -/
-def BackgroundFetchManager.cast? (v : Value) : IO (Option BackgroundFetchManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BackgroundFetchManager"] Value) v) then some { val := v } else none
+@[macro_inline] def BackgroundFetchManager.cast? (v : Value) : IO (Option BackgroundFetchManager) := Internal.api "Lasm.JS.Web.BackgroundFetchManager.cast?" do
+  Internal.cast (Internal.getGlobal ["BackgroundFetchManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<BackgroundFetchRegistration> fetch(DOMString id, (RequestInfo or sequence<RequestInfo>) requests, optional BackgroundFetchOptions options)` -/
-def BackgroundFetchManager.fetch (self : BackgroundFetchManager) (id : String) (requests : RequestOrUSVStringOrSequenceOfRequestInfo) (options : Option BackgroundFetchOptions := none) : Async BackgroundFetchRegistration := do
-  let r ← self.val.callMethodAwait "fetch" (Support.args #[toJS id, toJS requests, Support.optional options]) Value
+@[macro_inline] def BackgroundFetchManager.fetch (self : BackgroundFetchManager) (id : String) (requests : RequestOrUSVStringOrSequenceOfRequestInfo) (options : Option BackgroundFetchOptions := none) : Async BackgroundFetchRegistration := Internal.api "Lasm.JS.Web.BackgroundFetchManager.fetch" do
+  let r ← self.val.callMethodAwait "fetch" (Internal.args #[toJS id, toJS requests, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<BackgroundFetchRegistration?> get(DOMString id)` -/
-def BackgroundFetchManager.get (self : BackgroundFetchManager) (id : String) : Async (Option BackgroundFetchRegistration) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS id]) (Option BackgroundFetchRegistration)
+@[macro_inline] def BackgroundFetchManager.get (self : BackgroundFetchManager) (id : String) : Async (Option BackgroundFetchRegistration) := Internal.api "Lasm.JS.Web.BackgroundFetchManager.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS id]) (Option BackgroundFetchRegistration)
 
 /-- `Promise<sequence<DOMString>> getIds()` -/
-def BackgroundFetchManager.getIds (self : BackgroundFetchManager) : Async (Array String) :=
-  self.val.callMethodAwait "getIds" (Support.args #[]) (Array String)
+@[macro_inline] def BackgroundFetchManager.getIds (self : BackgroundFetchManager) : Async (Array String) := Internal.api "Lasm.JS.Web.BackgroundFetchManager.getIds" do
+  self.val.callMethodAwait "getIds" (Internal.args #[]) (Array String)
 
 /-- `v instanceof BackgroundFetchRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BackgroundFetchRecord`). -/
-def BackgroundFetchRecord.cast? (v : Value) : IO (Option BackgroundFetchRecord) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BackgroundFetchRecord"] Value) v) then some { val := v } else none
+@[macro_inline] def BackgroundFetchRecord.cast? (v : Value) : IO (Option BackgroundFetchRecord) := Internal.api "Lasm.JS.Web.BackgroundFetchRecord.cast?" do
+  Internal.cast (Internal.getGlobal ["BackgroundFetchRecord"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Request request` -/
-def BackgroundFetchRecord.request (self : BackgroundFetchRecord) : IO Request := do
+@[macro_inline] def BackgroundFetchRecord.request (self : BackgroundFetchRecord) : IO Request := Internal.api "Lasm.JS.Web.BackgroundFetchRecord.request" do
   let r ← self.val.get "request" Value
   pure { val := r }
 
 /-- `readonly attribute Promise<Response> responseReady` -/
-def BackgroundFetchRecord.responseReady (self : BackgroundFetchRecord) : Async Response := do
+@[macro_inline] def BackgroundFetchRecord.responseReady (self : BackgroundFetchRecord) : Async Response := Internal.api "Lasm.JS.Web.BackgroundFetchRecord.responseReady" do
   let p ← self.val.get "responseReady" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `v instanceof BackgroundFetchRegistration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BackgroundFetchRegistration`). -/
-def BackgroundFetchRegistration.cast? (v : Value) : IO (Option BackgroundFetchRegistration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BackgroundFetchRegistration"] Value) v) then some { val := v } else none
+@[macro_inline] def BackgroundFetchRegistration.cast? (v : Value) : IO (Option BackgroundFetchRegistration) := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.cast?" do
+  Internal.cast (Internal.getGlobal ["BackgroundFetchRegistration"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString id` -/
-def BackgroundFetchRegistration.id (self : BackgroundFetchRegistration) : IO String := self.val.get "id" String
+@[macro_inline] def BackgroundFetchRegistration.id (self : BackgroundFetchRegistration) : IO String := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute unsigned long long uploadTotal` -/
-def BackgroundFetchRegistration.uploadTotal (self : BackgroundFetchRegistration) : IO Nat := self.val.get "uploadTotal" Nat
+@[macro_inline] def BackgroundFetchRegistration.uploadTotal (self : BackgroundFetchRegistration) : IO Nat := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.uploadTotal" do
+  self.val.get "uploadTotal" Nat
 
 /-- `readonly attribute unsigned long long uploaded` -/
-def BackgroundFetchRegistration.uploaded (self : BackgroundFetchRegistration) : IO Nat := self.val.get "uploaded" Nat
+@[macro_inline] def BackgroundFetchRegistration.uploaded (self : BackgroundFetchRegistration) : IO Nat := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.uploaded" do
+  self.val.get "uploaded" Nat
 
 /-- `readonly attribute unsigned long long downloadTotal` -/
-def BackgroundFetchRegistration.downloadTotal (self : BackgroundFetchRegistration) : IO Nat := self.val.get "downloadTotal" Nat
+@[macro_inline] def BackgroundFetchRegistration.downloadTotal (self : BackgroundFetchRegistration) : IO Nat := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.downloadTotal" do
+  self.val.get "downloadTotal" Nat
 
 /-- `readonly attribute unsigned long long downloaded` -/
-def BackgroundFetchRegistration.downloaded (self : BackgroundFetchRegistration) : IO Nat := self.val.get "downloaded" Nat
+@[macro_inline] def BackgroundFetchRegistration.downloaded (self : BackgroundFetchRegistration) : IO Nat := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.downloaded" do
+  self.val.get "downloaded" Nat
 
 /-- `readonly attribute BackgroundFetchResult result` -/
-def BackgroundFetchRegistration.result (self : BackgroundFetchRegistration) : IO BackgroundFetchResult := self.val.get "result" BackgroundFetchResult
+@[macro_inline] def BackgroundFetchRegistration.result (self : BackgroundFetchRegistration) : IO BackgroundFetchResult := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.result" do
+  self.val.get "result" BackgroundFetchResult
 
 /-- `readonly attribute BackgroundFetchFailureReason failureReason` -/
-def BackgroundFetchRegistration.failureReason (self : BackgroundFetchRegistration) : IO BackgroundFetchFailureReason := self.val.get "failureReason" BackgroundFetchFailureReason
+@[macro_inline] def BackgroundFetchRegistration.failureReason (self : BackgroundFetchRegistration) : IO BackgroundFetchFailureReason := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.failureReason" do
+  self.val.get "failureReason" BackgroundFetchFailureReason
 
 /-- `readonly attribute boolean recordsAvailable` -/
-def BackgroundFetchRegistration.recordsAvailable (self : BackgroundFetchRegistration) : IO Bool := self.val.get "recordsAvailable" Bool
+@[macro_inline] def BackgroundFetchRegistration.recordsAvailable (self : BackgroundFetchRegistration) : IO Bool := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.recordsAvailable" do
+  self.val.get "recordsAvailable" Bool
 
 /-- `attribute EventHandler onprogress` -/
-def BackgroundFetchRegistration.onprogress (self : BackgroundFetchRegistration) : IO (Option EventHandlerNonNull) := self.val.get "onprogress" (Option EventHandlerNonNull)
+@[macro_inline] def BackgroundFetchRegistration.onprogress (self : BackgroundFetchRegistration) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.onprogress" do
+  self.val.get "onprogress" (Option EventHandlerNonNull)
 
 /-- Sets `onprogress`: `attribute EventHandler onprogress` -/
-def BackgroundFetchRegistration.setOnprogress (self : BackgroundFetchRegistration) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BackgroundFetchRegistration.setOnprogress (self : BackgroundFetchRegistration) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.setOnprogress" do
   self.val.set "onprogress" (toJS value)
 
 /-- `Promise<boolean> abort()` -/
-def BackgroundFetchRegistration.abort (self : BackgroundFetchRegistration) : Async Bool :=
-  self.val.callMethodAwait "abort" (Support.args #[]) Bool
+@[macro_inline] def BackgroundFetchRegistration.abort (self : BackgroundFetchRegistration) : Async Bool := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.abort" do
+  self.val.callMethodAwait "abort" (Internal.args #[]) Bool
 
 /-- `Promise<BackgroundFetchRecord> match(RequestInfo request, optional CacheQueryOptions options)` -/
-def BackgroundFetchRegistration.«match» (self : BackgroundFetchRegistration) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async BackgroundFetchRecord := do
-  let r ← self.val.callMethodAwait "match" (Support.args #[toJS request, Support.optional options]) Value
+@[macro_inline] def BackgroundFetchRegistration.«match» (self : BackgroundFetchRegistration) (request : RequestInfo) (options : Option CacheQueryOptions := none) : Async BackgroundFetchRecord := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.match" do
+  let r ← self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<sequence<BackgroundFetchRecord>> matchAll(optional RequestInfo request, optional CacheQueryOptions options)` -/
-def BackgroundFetchRegistration.matchAll (self : BackgroundFetchRegistration) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array BackgroundFetchRecord) :=
-  self.val.callMethodAwait "matchAll" (Support.args #[Support.optional request, Support.optional options]) (Array BackgroundFetchRecord)
+@[macro_inline] def BackgroundFetchRegistration.matchAll (self : BackgroundFetchRegistration) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array BackgroundFetchRecord) := Internal.api "Lasm.JS.Web.BackgroundFetchRegistration.matchAll" do
+  self.val.callMethodAwait "matchAll" (Internal.args #[Internal.optional request, Internal.optional options]) (Array BackgroundFetchRecord)
 
 /-- `v instanceof BackgroundFetchUpdateUIEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BackgroundFetchUpdateUIEvent`). -/
-def BackgroundFetchUpdateUIEvent.cast? (v : Value) : IO (Option BackgroundFetchUpdateUIEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BackgroundFetchUpdateUIEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BackgroundFetchUpdateUIEvent.cast? (v : Value) : IO (Option BackgroundFetchUpdateUIEvent) := Internal.api "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BackgroundFetchUpdateUIEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, BackgroundFetchEventInit init)` -/
-def BackgroundFetchUpdateUIEvent.new (type : String) (init : BackgroundFetchEventInit) : IO BackgroundFetchUpdateUIEvent :=
+@[macro_inline] def BackgroundFetchUpdateUIEvent.new (type : String) (init : BackgroundFetchEventInit) : IO BackgroundFetchUpdateUIEvent := Internal.api "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.new" do
   Lasm.JS.Binding.invoke BackgroundFetchUpdateUIEvent { name := "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.new", module := "globalThis", path := "BackgroundFetchUpdateUIEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `Promise<undefined> updateUI(optional BackgroundFetchUIOptions options)` -/
-def BackgroundFetchUpdateUIEvent.updateUI (self : BackgroundFetchUpdateUIEvent) (options : Option BackgroundFetchUIOptions := none) : Async Unit :=
-  self.val.callMethodAwait "updateUI" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def BackgroundFetchUpdateUIEvent.updateUI (self : BackgroundFetchUpdateUIEvent) (options : Option BackgroundFetchUIOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.updateUI" do
+  self.val.callMethodAwait "updateUI" (Internal.args #[Internal.optional options]) Unit
 
 /-- `attribute EventHandler onbackgroundfetchsuccess` -/
-def ServiceWorkerGlobalScope.onbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onbackgroundfetchsuccess" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchsuccess" do
+  self.val.get "onbackgroundfetchsuccess" (Option EventHandlerNonNull)
 
 /-- Sets `onbackgroundfetchsuccess`: `attribute EventHandler onbackgroundfetchsuccess` -/
-def ServiceWorkerGlobalScope.setOnbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchsuccess" do
   self.val.set "onbackgroundfetchsuccess" (toJS value)
 
 /-- `attribute EventHandler onbackgroundfetchfail` -/
-def ServiceWorkerGlobalScope.onbackgroundfetchfail (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onbackgroundfetchfail" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchfail (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchfail" do
+  self.val.get "onbackgroundfetchfail" (Option EventHandlerNonNull)
 
 /-- Sets `onbackgroundfetchfail`: `attribute EventHandler onbackgroundfetchfail` -/
-def ServiceWorkerGlobalScope.setOnbackgroundfetchfail (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchfail (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchfail" do
   self.val.set "onbackgroundfetchfail" (toJS value)
 
 /-- `attribute EventHandler onbackgroundfetchabort` -/
-def ServiceWorkerGlobalScope.onbackgroundfetchabort (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onbackgroundfetchabort" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchabort (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchabort" do
+  self.val.get "onbackgroundfetchabort" (Option EventHandlerNonNull)
 
 /-- Sets `onbackgroundfetchabort`: `attribute EventHandler onbackgroundfetchabort` -/
-def ServiceWorkerGlobalScope.setOnbackgroundfetchabort (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchabort (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchabort" do
   self.val.set "onbackgroundfetchabort" (toJS value)
 
 /-- `attribute EventHandler onbackgroundfetchclick` -/
-def ServiceWorkerGlobalScope.onbackgroundfetchclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onbackgroundfetchclick" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchclick" do
+  self.val.get "onbackgroundfetchclick" (Option EventHandlerNonNull)
 
 /-- Sets `onbackgroundfetchclick`: `attribute EventHandler onbackgroundfetchclick` -/
-def ServiceWorkerGlobalScope.setOnbackgroundfetchclick (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchclick (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchclick" do
   self.val.set "onbackgroundfetchclick" (toJS value)
 
 /-- `readonly attribute BackgroundFetchManager backgroundFetch` -/
-def ServiceWorkerRegistration.backgroundFetch (self : ServiceWorkerRegistration) : IO BackgroundFetchManager := do
+@[macro_inline] def ServiceWorkerRegistration.backgroundFetch (self : ServiceWorkerRegistration) : IO BackgroundFetchManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.backgroundFetch" do
   let r ← self.val.get "backgroundFetch" Value
   pure { val := r }
 

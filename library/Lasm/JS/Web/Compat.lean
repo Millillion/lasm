@@ -6,23 +6,41 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute EventHandler onorientationchange` -/
-def HTMLBodyElement.onorientationchange (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := self.val.get "onorientationchange" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLBodyElement.onorientationchange (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLBodyElement.onorientationchange" do
+  self.val.get "onorientationchange" (Option EventHandlerNonNull)
 
 /-- Sets `onorientationchange`: `attribute EventHandler onorientationchange` -/
-def HTMLBodyElement.setOnorientationchange (self : HTMLBodyElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLBodyElement.setOnorientationchange (self : HTMLBodyElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLBodyElement.setOnorientationchange" do
+  self.val.set "onorientationchange" (toJS value)
+
+/-- `readonly attribute short orientation` -/
+@[macro_inline] def Window.orientation (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.orientation" do
+  self.val.get "orientation" Int
+
+/-- `attribute EventHandler onorientationchange` -/
+@[macro_inline] def Window.onorientationchange (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onorientationchange" do
+  self.val.get "onorientationchange" (Option EventHandlerNonNull)
+
+/-- Sets `onorientationchange`: `attribute EventHandler onorientationchange` -/
+@[macro_inline] def Window.setOnorientationchange (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnorientationchange" do
   self.val.set "onorientationchange" (toJS value)
 
 /-- `readonly attribute short orientation` (Compatibility Standard (https://compat.spec.whatwg.org/)) -/
-def orientation : IO Int := Support.getGlobal ["orientation"] Int
+@[macro_inline] def orientation : IO Int := Internal.api "Lasm.JS.Web.orientation" do
+  Internal.getGlobal ["orientation"] Int
 
 /-- `attribute EventHandler onorientationchange` (Compatibility Standard (https://compat.spec.whatwg.org/)) -/
-def onorientationchange : IO (Option EventHandlerNonNull) := Support.getGlobal ["onorientationchange"] (Option EventHandlerNonNull)
+@[macro_inline] def onorientationchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onorientationchange" do
+  Internal.getGlobal ["onorientationchange"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

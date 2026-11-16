@@ -6,10 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Pointerevents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.InkEnhancement
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary InkTrailStyle` (Ink API (https://wicg.github.io/ink-enhancement/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InkTrailStyle where
@@ -17,37 +23,38 @@ structure InkTrailStyle where
   color : String
   /-- `required unrestricted double diameter` -/
   diameter : Float
-instance : ToJS InkTrailStyle := ⟨fun d => Support.fields #[("color", toJS d.color),
+instance : ToJS InkTrailStyle := ⟨fun d => Internal.fields #[("color", toJS d.color),
     ("diameter", toJS d.diameter)]⟩
 
 /-- `dictionary InkPresenterParam` (Ink API (https://wicg.github.io/ink-enhancement/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InkPresenterParam where
   /-- `Element? presentationArea = null` -/
   presentationArea : Option Element := none
-instance : ToJS InkPresenterParam := ⟨fun d => Support.fields #[("presentationArea", Support.optional d.presentationArea)]⟩
+instance : ToJS InkPresenterParam := ⟨fun d => Internal.fields #[("presentationArea", Internal.optional d.presentationArea)]⟩
 
 /-- `v instanceof DelegatedInkTrailPresenter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DelegatedInkTrailPresenter`). -/
-def DelegatedInkTrailPresenter.cast? (v : Value) : IO (Option DelegatedInkTrailPresenter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DelegatedInkTrailPresenter"] Value) v) then some { val := v } else none
+@[macro_inline] def DelegatedInkTrailPresenter.cast? (v : Value) : IO (Option DelegatedInkTrailPresenter) := Internal.api "Lasm.JS.Web.DelegatedInkTrailPresenter.cast?" do
+  Internal.cast (Internal.getGlobal ["DelegatedInkTrailPresenter"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Element? presentationArea` -/
-def DelegatedInkTrailPresenter.presentationArea (self : DelegatedInkTrailPresenter) : IO (Option Element) := self.val.get "presentationArea" (Option Element)
+@[macro_inline] def DelegatedInkTrailPresenter.presentationArea (self : DelegatedInkTrailPresenter) : IO (Option Element) := Internal.api "Lasm.JS.Web.DelegatedInkTrailPresenter.presentationArea" do
+  self.val.get "presentationArea" (Option Element)
 
 /-- `undefined updateInkTrailStartPoint(PointerEvent event, InkTrailStyle style)` -/
-def DelegatedInkTrailPresenter.updateInkTrailStartPoint (self : DelegatedInkTrailPresenter) (event : PointerEvent) (style : InkTrailStyle) : IO Unit :=
-  self.val.callMethod "updateInkTrailStartPoint" (Support.args #[toJS event, toJS style]) Unit
+@[macro_inline] def DelegatedInkTrailPresenter.updateInkTrailStartPoint (self : DelegatedInkTrailPresenter) (event : PointerEvent) (style : InkTrailStyle) : IO Unit := Internal.api "Lasm.JS.Web.DelegatedInkTrailPresenter.updateInkTrailStartPoint" do
+  self.val.callMethod "updateInkTrailStartPoint" (Internal.args #[toJS event, toJS style]) Unit
 
 /-- `v instanceof Ink`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Ink`). -/
-def Ink.cast? (v : Value) : IO (Option Ink) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Ink"] Value) v) then some { val := v } else none
+@[macro_inline] def Ink.cast? (v : Value) : IO (Option Ink) := Internal.api "Lasm.JS.Web.Ink.cast?" do
+  Internal.cast (Internal.getGlobal ["Ink"] Value) (fun x => { val := x }) v
 
 /-- `Promise<DelegatedInkTrailPresenter> requestPresenter(optional InkPresenterParam param)` -/
-def Ink.requestPresenter (self : Ink) (param : Option InkPresenterParam := none) : Async DelegatedInkTrailPresenter := do
-  let r ← self.val.callMethodAwait "requestPresenter" (Support.args #[Support.optional param]) Value
+@[macro_inline] def Ink.requestPresenter (self : Ink) (param : Option InkPresenterParam := none) : Async DelegatedInkTrailPresenter := Internal.api "Lasm.JS.Web.Ink.requestPresenter" do
+  let r ← self.val.callMethodAwait "requestPresenter" (Internal.args #[Internal.optional param]) Value
   pure { val := r }
 
 /-- `readonly attribute Ink ink` -/
-def Navigator.ink (self : Navigator) : IO Ink := do
+@[macro_inline] def Navigator.ink (self : Navigator) : IO Ink := Internal.api "Lasm.JS.Web.Navigator.ink" do
   let r ← self.val.get "ink" Value
   pure { val := r }
 

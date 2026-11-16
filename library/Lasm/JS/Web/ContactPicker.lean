@@ -6,45 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ContactPicker
+import Lasm.JS.Web.Types.FileAPI
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ContactProperty` (Contact Picker API (https://w3c.github.io/contact-picker/)): "address", "email", "icon", "name", "tel". -/
-inductive ContactProperty where
-  /-- "address" -/
-  | address
-  /-- "email" -/
-  | email
-  /-- "icon" -/
-  | icon
-  /-- "name" -/
-  | name
-  /-- "tel" -/
-  | tel
-  deriving BEq, Repr, Inhabited
-instance : ToJS ContactProperty := ⟨fun
-  | .address => .string "address"
-  | .email => .string "email"
-  | .icon => .string "icon"
-  | .name => .string "name"
-  | .tel => .string "tel"⟩
-instance : FromJS ContactProperty where
-  fromJS
-    | .string "address" => .ok .address
-    | .string "email" => .ok .email
-    | .string "icon" => .ok .icon
-    | .string "name" => .ok .name
-    | .string "tel" => .ok .tel
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ContactProperty"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ContactsSelectOptions` (Contact Picker API (https://w3c.github.io/contact-picker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContactsSelectOptions where
   /-- `boolean multiple = false` -/
   multiple : Option Bool := none
-instance : ToJS ContactsSelectOptions := ⟨fun d => Support.fields #[("multiple", Support.optional d.multiple)]⟩
+instance : ToJS ContactsSelectOptions := ⟨fun d => Internal.fields #[("multiple", Internal.optional d.multiple)]⟩
 
 /-- `dictionary ContactInfo` (Contact Picker API (https://w3c.github.io/contact-picker/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContactInfo where
@@ -58,6 +34,11 @@ structure ContactInfo where
   name : Option (Array String) := none
   /-- `sequence<DOMString> tel` -/
   tel : Option (Array String) := none
+instance : ToJS ContactInfo := ⟨fun d => Internal.fields #[("address", Internal.optional d.address),
+    ("email", Internal.optional d.email),
+    ("icon", Internal.optional d.icon),
+    ("name", Internal.optional d.name),
+    ("tel", Internal.optional d.tel)]⟩
 instance : FromJS ContactInfo where
   fromJS d := do return {
     address := ← Lasm.JS.readField (Option (Array ContactAddress)) d "address",
@@ -68,57 +49,67 @@ instance : FromJS ContactInfo where
   typeName := "Lasm.JS.Web.ContactInfo"
 
 /-- `v instanceof ContactAddress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ContactAddress`). -/
-def ContactAddress.cast? (v : Value) : IO (Option ContactAddress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ContactAddress"] Value) v) then some { val := v } else none
+@[macro_inline] def ContactAddress.cast? (v : Value) : IO (Option ContactAddress) := Internal.api "Lasm.JS.Web.ContactAddress.cast?" do
+  Internal.cast (Internal.getGlobal ["ContactAddress"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString city` -/
-def ContactAddress.city (self : ContactAddress) : IO String := self.val.get "city" String
+@[macro_inline] def ContactAddress.city (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.city" do
+  self.val.get "city" String
 
 /-- `readonly attribute DOMString country` -/
-def ContactAddress.country (self : ContactAddress) : IO String := self.val.get "country" String
+@[macro_inline] def ContactAddress.country (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.country" do
+  self.val.get "country" String
 
 /-- `readonly attribute DOMString dependentLocality` -/
-def ContactAddress.dependentLocality (self : ContactAddress) : IO String := self.val.get "dependentLocality" String
+@[macro_inline] def ContactAddress.dependentLocality (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.dependentLocality" do
+  self.val.get "dependentLocality" String
 
 /-- `readonly attribute DOMString organization` -/
-def ContactAddress.organization (self : ContactAddress) : IO String := self.val.get "organization" String
+@[macro_inline] def ContactAddress.organization (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.organization" do
+  self.val.get "organization" String
 
 /-- `readonly attribute DOMString phone` -/
-def ContactAddress.phone (self : ContactAddress) : IO String := self.val.get "phone" String
+@[macro_inline] def ContactAddress.phone (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.phone" do
+  self.val.get "phone" String
 
 /-- `readonly attribute DOMString postalCode` -/
-def ContactAddress.postalCode (self : ContactAddress) : IO String := self.val.get "postalCode" String
+@[macro_inline] def ContactAddress.postalCode (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.postalCode" do
+  self.val.get "postalCode" String
 
 /-- `readonly attribute DOMString recipient` -/
-def ContactAddress.recipient (self : ContactAddress) : IO String := self.val.get "recipient" String
+@[macro_inline] def ContactAddress.recipient (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.recipient" do
+  self.val.get "recipient" String
 
 /-- `readonly attribute DOMString region` -/
-def ContactAddress.region (self : ContactAddress) : IO String := self.val.get "region" String
+@[macro_inline] def ContactAddress.region (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.region" do
+  self.val.get "region" String
 
 /-- `readonly attribute DOMString sortingCode` -/
-def ContactAddress.sortingCode (self : ContactAddress) : IO String := self.val.get "sortingCode" String
+@[macro_inline] def ContactAddress.sortingCode (self : ContactAddress) : IO String := Internal.api "Lasm.JS.Web.ContactAddress.sortingCode" do
+  self.val.get "sortingCode" String
 
 /-- `readonly attribute FrozenArray<DOMString> addressLine` -/
-def ContactAddress.addressLine (self : ContactAddress) : IO (Array String) := self.val.get "addressLine" (Array String)
+@[macro_inline] def ContactAddress.addressLine (self : ContactAddress) : IO (Array String) := Internal.api "Lasm.JS.Web.ContactAddress.addressLine" do
+  self.val.get "addressLine" (Array String)
 
 /-- `object toJSON()` -/
-def ContactAddress.toJSON (self : ContactAddress) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def ContactAddress.toJSON (self : ContactAddress) : IO Data := Internal.api "Lasm.JS.Web.ContactAddress.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof ContactsManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ContactsManager`). -/
-def ContactsManager.cast? (v : Value) : IO (Option ContactsManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ContactsManager"] Value) v) then some { val := v } else none
+@[macro_inline] def ContactsManager.cast? (v : Value) : IO (Option ContactsManager) := Internal.api "Lasm.JS.Web.ContactsManager.cast?" do
+  Internal.cast (Internal.getGlobal ["ContactsManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<sequence<ContactProperty>> getProperties()` -/
-def ContactsManager.getProperties (self : ContactsManager) : Async (Array ContactProperty) :=
-  self.val.callMethodAwait "getProperties" (Support.args #[]) (Array ContactProperty)
+@[macro_inline] def ContactsManager.getProperties (self : ContactsManager) : Async (Array ContactProperty) := Internal.api "Lasm.JS.Web.ContactsManager.getProperties" do
+  self.val.callMethodAwait "getProperties" (Internal.args #[]) (Array ContactProperty)
 
 /-- `Promise<sequence<ContactInfo>> select(sequence<ContactProperty> properties, optional ContactsSelectOptions options)` -/
-def ContactsManager.select (self : ContactsManager) (properties : Array ContactProperty) (options : Option ContactsSelectOptions := none) : Async (Array ContactInfo) :=
-  self.val.callMethodAwait "select" (Support.args #[toJS properties, Support.optional options]) (Array ContactInfo)
+@[macro_inline] def ContactsManager.select (self : ContactsManager) (properties : Array ContactProperty) (options : Option ContactsSelectOptions := none) : Async (Array ContactInfo) := Internal.api "Lasm.JS.Web.ContactsManager.select" do
+  self.val.callMethodAwait "select" (Internal.args #[toJS properties, Internal.optional options]) (Array ContactInfo)
 
 /-- `readonly attribute ContactsManager contacts` -/
-def Navigator.contacts (self : Navigator) : IO ContactsManager := do
+@[macro_inline] def Navigator.contacts (self : Navigator) : IO ContactsManager := Internal.api "Lasm.JS.Web.Navigator.contacts" do
   let r ← self.val.get "contacts" Value
   pure { val := r }
 

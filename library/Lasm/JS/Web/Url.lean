@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Url
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(sequence<sequence<USVString>> or record<USVString, USVString> or USVString)`: one constructor per member type. -/
 inductive SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString where
@@ -28,162 +31,176 @@ instance : Coe (Record String) SequenceOfSequenceOfUSVStringOrRecordOfUSVStringO
 instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := ⟨.usvString⟩
 
 /-- `v instanceof URL`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URL`). -/
-def URL.cast? (v : Value) : IO (Option URL) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URL"] Value) v) then some { val := v } else none
+@[macro_inline] def URL.cast? (v : Value) : IO (Option URL) := Internal.api "Lasm.JS.Web.URL.cast?" do
+  Internal.cast (Internal.getGlobal ["URL"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USVString url, optional USVString base)` -/
-def URL.new (url : String) (base : Option String := none) : IO URL :=
+@[macro_inline] def URL.new (url : String) (base : Option String := none) : IO URL := Internal.api "Lasm.JS.Web.URL.new" do
   Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new", module := "globalThis", path := "URL", construct := true, arity := 2 }
-    (Support.args #[toJS url, Support.optional base]) (await := false)
+    (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
 /-- `stringifier attribute USVString href` -/
-def URL.href (self : URL) : IO String := self.val.get "href" String
+@[macro_inline] def URL.href (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.href" do
+  self.val.get "href" String
 
 /-- Sets `href`: `stringifier attribute USVString href` -/
-def URL.setHref (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setHref (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setHref" do
   self.val.set "href" (toJS value)
 
 /-- The stringifier (`href`). -/
-def URL.toString (self : URL) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def URL.toString (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `readonly attribute USVString origin` -/
-def URL.origin (self : URL) : IO String := self.val.get "origin" String
+@[macro_inline] def URL.origin (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.origin" do
+  self.val.get "origin" String
 
 /-- `attribute USVString protocol` -/
-def URL.protocol (self : URL) : IO String := self.val.get "protocol" String
+@[macro_inline] def URL.protocol (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.protocol" do
+  self.val.get "protocol" String
 
 /-- Sets `protocol`: `attribute USVString protocol` -/
-def URL.setProtocol (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setProtocol (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setProtocol" do
   self.val.set "protocol" (toJS value)
 
 /-- `attribute USVString username` -/
-def URL.username (self : URL) : IO String := self.val.get "username" String
+@[macro_inline] def URL.username (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.username" do
+  self.val.get "username" String
 
 /-- Sets `username`: `attribute USVString username` -/
-def URL.setUsername (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setUsername (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setUsername" do
   self.val.set "username" (toJS value)
 
 /-- `attribute USVString password` -/
-def URL.password (self : URL) : IO String := self.val.get "password" String
+@[macro_inline] def URL.password (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.password" do
+  self.val.get "password" String
 
 /-- Sets `password`: `attribute USVString password` -/
-def URL.setPassword (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setPassword (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setPassword" do
   self.val.set "password" (toJS value)
 
 /-- `attribute USVString host` -/
-def URL.host (self : URL) : IO String := self.val.get "host" String
+@[macro_inline] def URL.host (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.host" do
+  self.val.get "host" String
 
 /-- Sets `host`: `attribute USVString host` -/
-def URL.setHost (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setHost (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setHost" do
   self.val.set "host" (toJS value)
 
 /-- `attribute USVString hostname` -/
-def URL.hostname (self : URL) : IO String := self.val.get "hostname" String
+@[macro_inline] def URL.hostname (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.hostname" do
+  self.val.get "hostname" String
 
 /-- Sets `hostname`: `attribute USVString hostname` -/
-def URL.setHostname (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setHostname (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setHostname" do
   self.val.set "hostname" (toJS value)
 
 /-- `attribute USVString port` -/
-def URL.port (self : URL) : IO String := self.val.get "port" String
+@[macro_inline] def URL.port (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.port" do
+  self.val.get "port" String
 
 /-- Sets `port`: `attribute USVString port` -/
-def URL.setPort (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setPort (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setPort" do
   self.val.set "port" (toJS value)
 
 /-- `attribute USVString pathname` -/
-def URL.pathname (self : URL) : IO String := self.val.get "pathname" String
+@[macro_inline] def URL.pathname (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.pathname" do
+  self.val.get "pathname" String
 
 /-- Sets `pathname`: `attribute USVString pathname` -/
-def URL.setPathname (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setPathname (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setPathname" do
   self.val.set "pathname" (toJS value)
 
 /-- `attribute USVString search` -/
-def URL.search (self : URL) : IO String := self.val.get "search" String
+@[macro_inline] def URL.search (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.search" do
+  self.val.get "search" String
 
 /-- Sets `search`: `attribute USVString search` -/
-def URL.setSearch (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setSearch (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setSearch" do
   self.val.set "search" (toJS value)
 
 /-- `readonly attribute URLSearchParams searchParams` -/
-def URL.searchParams (self : URL) : IO URLSearchParams := do
+@[macro_inline] def URL.searchParams (self : URL) : IO URLSearchParams := Internal.api "Lasm.JS.Web.URL.searchParams" do
   let r ← self.val.get "searchParams" Value
   pure { val := r }
 
 /-- `attribute USVString hash` -/
-def URL.hash (self : URL) : IO String := self.val.get "hash" String
+@[macro_inline] def URL.hash (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.hash" do
+  self.val.get "hash" String
 
 /-- Sets `hash`: `attribute USVString hash` -/
-def URL.setHash (self : URL) (value : String) : IO Unit :=
+@[macro_inline] def URL.setHash (self : URL) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.setHash" do
   self.val.set "hash" (toJS value)
 
 /-- `static URL? parse(USVString url, optional USVString base)` -/
-def URL.parse (url : String) (base : Option String := none) : IO (Option URL) :=
+@[macro_inline] def URL.parse (url : String) (base : Option String := none) : IO (Option URL) := Internal.api "Lasm.JS.Web.URL.parse" do
   Lasm.JS.Binding.invoke (Option URL) { name := "Lasm.JS.Web.URL.parse", module := "globalThis", path := "URL.parse", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional base]) (await := false)
+    (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
 /-- `static boolean canParse(USVString url, optional USVString base)` -/
-def URL.canParse (url : String) (base : Option String := none) : IO Bool :=
+@[macro_inline] def URL.canParse (url : String) (base : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.URL.canParse" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.URL.canParse", module := "globalThis", path := "URL.canParse", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional base]) (await := false)
+    (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
 /-- `USVString toJSON()` -/
-def URL.toJSON (self : URL) : IO String :=
-  self.val.callMethod "toJSON" (Support.args #[]) String
+@[macro_inline] def URL.toJSON (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) String
 
 /-- `v instanceof URLSearchParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLSearchParams`). -/
-def URLSearchParams.cast? (v : Value) : IO (Option URLSearchParams) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLSearchParams"] Value) v) then some { val := v } else none
+@[macro_inline] def URLSearchParams.cast? (v : Value) : IO (Option URLSearchParams) := Internal.api "Lasm.JS.Web.URLSearchParams.cast?" do
+  Internal.cast (Internal.getGlobal ["URLSearchParams"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init)` -/
-def URLSearchParams.new (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO URLSearchParams :=
+@[macro_inline] def URLSearchParams.new (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO URLSearchParams := Internal.api "Lasm.JS.Web.URLSearchParams.new" do
   Lasm.JS.Binding.invoke URLSearchParams { name := "Lasm.JS.Web.URLSearchParams.new", module := "globalThis", path := "URLSearchParams", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute unsigned long size` -/
-def URLSearchParams.size (self : URLSearchParams) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def URLSearchParams.size (self : URLSearchParams) : IO Nat := Internal.api "Lasm.JS.Web.URLSearchParams.size" do
+  self.val.get "size" Nat
 
 /-- The stringifier. -/
-def URLSearchParams.toString (self : URLSearchParams) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def URLSearchParams.toString (self : URLSearchParams) : IO String := Internal.api "Lasm.JS.Web.URLSearchParams.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `undefined append(USVString name, USVString value)` -/
-def URLSearchParams.append (self : URLSearchParams) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "append" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def URLSearchParams.append (self : URLSearchParams) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URLSearchParams.append" do
+  self.val.callMethod "append" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined delete(USVString name, optional USVString value)` -/
-def URLSearchParams.delete (self : URLSearchParams) (name : String) (value : Option String := none) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS name, Support.optional value]) Unit
+@[macro_inline] def URLSearchParams.delete (self : URLSearchParams) (name : String) (value : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.URLSearchParams.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS name, Internal.optional value]) Unit
 
 /-- `USVString? get(USVString name)` -/
-def URLSearchParams.get (self : URLSearchParams) (name : String) : IO (Option String) :=
-  self.val.callMethod "get" (Support.args #[toJS name]) (Option String)
+@[macro_inline] def URLSearchParams.get (self : URLSearchParams) (name : String) : IO (Option String) := Internal.api "Lasm.JS.Web.URLSearchParams.get" do
+  self.val.callMethod "get" (Internal.args #[toJS name]) (Option String)
 
 /-- `sequence<USVString> getAll(USVString name)` -/
-def URLSearchParams.getAll (self : URLSearchParams) (name : String) : IO (Array String) :=
-  self.val.callMethod "getAll" (Support.args #[toJS name]) (Array String)
+@[macro_inline] def URLSearchParams.getAll (self : URLSearchParams) (name : String) : IO (Array String) := Internal.api "Lasm.JS.Web.URLSearchParams.getAll" do
+  self.val.callMethod "getAll" (Internal.args #[toJS name]) (Array String)
 
 /-- `boolean has(USVString name, optional USVString value)` -/
-def URLSearchParams.has (self : URLSearchParams) (name : String) (value : Option String := none) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS name, Support.optional value]) Bool
+@[macro_inline] def URLSearchParams.has (self : URLSearchParams) (name : String) (value : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.URLSearchParams.has" do
+  self.val.callMethod "has" (Internal.args #[toJS name, Internal.optional value]) Bool
 
 /-- `undefined set(USVString name, USVString value)` -/
-def URLSearchParams.set (self : URLSearchParams) (name : String) (value : String) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def URLSearchParams.set (self : URLSearchParams) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.URLSearchParams.set" do
+  self.val.callMethod "set" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `undefined sort()` -/
-def URLSearchParams.sort (self : URLSearchParams) : IO Unit :=
-  self.val.callMethod "sort" (Support.args #[]) Unit
+@[macro_inline] def URLSearchParams.sort (self : URLSearchParams) : IO Unit := Internal.api "Lasm.JS.Web.URLSearchParams.sort" do
+  self.val.callMethod "sort" (Internal.args #[]) Unit
 
 /-- `iterable<USVString, USVString>`: `entries()`, collected into an array. -/
-def URLSearchParams.entries (self : URLSearchParams) : IO (Array (String × String)) :=
-  Support.iterate self.val "entries" (Array (String × String))
+@[macro_inline] def URLSearchParams.entries (self : URLSearchParams) : IO (Array (String × String)) := Internal.api "Lasm.JS.Web.URLSearchParams.entries" do
+  Internal.iterate self.val "entries" (Array (String × String))
 
 /-- `iterable<USVString, USVString>`: `keys()`, collected into an array. -/
-def URLSearchParams.keys (self : URLSearchParams) : IO (Array String) :=
-  Support.iterate self.val "keys" (Array String)
+@[macro_inline] def URLSearchParams.keys (self : URLSearchParams) : IO (Array String) := Internal.api "Lasm.JS.Web.URLSearchParams.keys" do
+  Internal.iterate self.val "keys" (Array String)
 
 /-- `iterable<USVString, USVString>`: `values()`, collected into an array. -/
-def URLSearchParams.values (self : URLSearchParams) : IO (Array String) :=
-  Support.iterate self.val "values" (Array String)
+@[macro_inline] def URLSearchParams.values (self : URLSearchParams) : IO (Array String) := Internal.api "Lasm.JS.Web.URLSearchParams.values" do
+  Internal.iterate self.val "values" (Array String)
 
 end Lasm.JS.Web

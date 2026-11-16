@@ -6,40 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.FencedFrame
+import Lasm.JS.Web.Types.MathmlCore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FenceReportingDestination` (Fenced Frame (https://wicg.github.io/fenced-frame/)): "buyer", "seller", "component-seller", "direct-seller", "shared-storage-select-url". -/
-inductive FenceReportingDestination where
-  /-- "buyer" -/
-  | buyer
-  /-- "seller" -/
-  | seller
-  /-- "component-seller" -/
-  | componentSeller
-  /-- "direct-seller" -/
-  | directSeller
-  /-- "shared-storage-select-url" -/
-  | sharedStorageSelectUrl
-  deriving BEq, Repr, Inhabited
-instance : ToJS FenceReportingDestination := ⟨fun
-  | .buyer => .string "buyer"
-  | .seller => .string "seller"
-  | .componentSeller => .string "component-seller"
-  | .directSeller => .string "direct-seller"
-  | .sharedStorageSelectUrl => .string "shared-storage-select-url"⟩
-instance : FromJS FenceReportingDestination where
-  fromJS
-    | .string "buyer" => .ok .buyer
-    | .string "seller" => .ok .seller
-    | .string "component-seller" => .ok .componentSeller
-    | .string "direct-seller" => .ok .directSeller
-    | .string "shared-storage-select-url" => .ok .sharedStorageSelectUrl
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FenceReportingDestination"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FenceEvent` (Fenced Frame (https://wicg.github.io/fenced-frame/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FenceEvent where
@@ -55,12 +33,12 @@ structure FenceEvent where
   once : Option Bool := none
   /-- `USVString destinationURL` -/
   destinationURL : Option String := none
-instance : ToJS FenceEvent := ⟨fun d => Support.fields #[("eventType", Support.optional d.eventType),
-    ("eventData", Support.optional d.eventData),
-    ("destination", Support.optional d.destination),
-    ("crossOriginExposed", Support.optional d.crossOriginExposed),
-    ("once", Support.optional d.once),
-    ("destinationURL", Support.optional d.destinationURL)]⟩
+instance : ToJS FenceEvent := ⟨fun d => Internal.fields #[("eventType", Internal.optional d.eventType),
+    ("eventData", Internal.optional d.eventData),
+    ("destination", Internal.optional d.destination),
+    ("crossOriginExposed", Internal.optional d.crossOriginExposed),
+    ("once", Internal.optional d.once),
+    ("destinationURL", Internal.optional d.destinationURL)]⟩
 
 /-- `typedef FenceEvent or DOMString ReportEventType`: one constructor per member type. -/
 inductive ReportEventType where
@@ -87,123 +65,145 @@ instance : Coe String UrnOrConfig := ⟨.usvString⟩
 instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
 
 /-- `v instanceof Fence`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Fence`). -/
-def Fence.cast? (v : Value) : IO (Option Fence) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Fence"] Value) v) then some { val := v } else none
+@[macro_inline] def Fence.cast? (v : Value) : IO (Option Fence) := Internal.api "Lasm.JS.Web.Fence.cast?" do
+  Internal.cast (Internal.getGlobal ["Fence"] Value) (fun x => { val := x }) v
 
 /-- `undefined reportEvent(optional ReportEventType event)` -/
-def Fence.reportEvent (self : Fence) (event : Option ReportEventType := none) : IO Unit :=
-  self.val.callMethod "reportEvent" (Support.args #[Support.optional event]) Unit
+@[macro_inline] def Fence.reportEvent (self : Fence) (event : Option ReportEventType := none) : IO Unit := Internal.api "Lasm.JS.Web.Fence.reportEvent" do
+  self.val.callMethod "reportEvent" (Internal.args #[Internal.optional event]) Unit
 
 /-- `undefined setReportEventDataForAutomaticBeacons(optional FenceEvent event)` -/
-def Fence.setReportEventDataForAutomaticBeacons (self : Fence) (event : Option FenceEvent := none) : IO Unit :=
-  self.val.callMethod "setReportEventDataForAutomaticBeacons" (Support.args #[Support.optional event]) Unit
+@[macro_inline] def Fence.setReportEventDataForAutomaticBeacons (self : Fence) (event : Option FenceEvent := none) : IO Unit := Internal.api "Lasm.JS.Web.Fence.setReportEventDataForAutomaticBeacons" do
+  self.val.callMethod "setReportEventDataForAutomaticBeacons" (Internal.args #[Internal.optional event]) Unit
 
 /-- `sequence<FencedFrameConfig> getNestedConfigs()` -/
-def Fence.getNestedConfigs (self : Fence) : IO (Array FencedFrameConfig) :=
-  self.val.callMethod "getNestedConfigs" (Support.args #[]) (Array FencedFrameConfig)
+@[macro_inline] def Fence.getNestedConfigs (self : Fence) : IO (Array FencedFrameConfig) := Internal.api "Lasm.JS.Web.Fence.getNestedConfigs" do
+  self.val.callMethod "getNestedConfigs" (Internal.args #[]) (Array FencedFrameConfig)
 
 /-- `Promise<undefined> disableUntrustedNetwork()` -/
-def Fence.disableUntrustedNetwork (self : Fence) : Async Unit :=
-  self.val.callMethodAwait "disableUntrustedNetwork" (Support.args #[]) Unit
+@[macro_inline] def Fence.disableUntrustedNetwork (self : Fence) : Async Unit := Internal.api "Lasm.JS.Web.Fence.disableUntrustedNetwork" do
+  self.val.callMethodAwait "disableUntrustedNetwork" (Internal.args #[]) Unit
 
 /-- `undefined notifyEvent(Event event)` -/
-def Fence.notifyEvent (self : Fence) (event : Event) : IO Unit :=
-  self.val.callMethod "notifyEvent" (Support.args #[toJS event]) Unit
+@[macro_inline] def Fence.notifyEvent (self : Fence) (event : Event) : IO Unit := Internal.api "Lasm.JS.Web.Fence.notifyEvent" do
+  self.val.callMethod "notifyEvent" (Internal.args #[toJS event]) Unit
 
 /-- `v instanceof FencedFrameConfig`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FencedFrameConfig`). -/
-def FencedFrameConfig.cast? (v : Value) : IO (Option FencedFrameConfig) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FencedFrameConfig"] Value) v) then some { val := v } else none
+@[macro_inline] def FencedFrameConfig.cast? (v : Value) : IO (Option FencedFrameConfig) := Internal.api "Lasm.JS.Web.FencedFrameConfig.cast?" do
+  Internal.cast (Internal.getGlobal ["FencedFrameConfig"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USVString url)` -/
-def FencedFrameConfig.new (url : String) : IO FencedFrameConfig :=
+@[macro_inline] def FencedFrameConfig.new (url : String) : IO FencedFrameConfig := Internal.api "Lasm.JS.Web.FencedFrameConfig.new" do
   Lasm.JS.Binding.invoke FencedFrameConfig { name := "Lasm.JS.Web.FencedFrameConfig.new", module := "globalThis", path := "FencedFrameConfig", construct := true, arity := 1 }
-    (Support.args #[toJS url]) (await := false)
+    (Internal.args #[toJS url]) (await := false)
 
 /-- `undefined setSharedStorageContext(DOMString contextString)` -/
-def FencedFrameConfig.setSharedStorageContext (self : FencedFrameConfig) (contextString : String) : IO Unit :=
-  self.val.callMethod "setSharedStorageContext" (Support.args #[toJS contextString]) Unit
+@[macro_inline] def FencedFrameConfig.setSharedStorageContext (self : FencedFrameConfig) (contextString : String) : IO Unit := Internal.api "Lasm.JS.Web.FencedFrameConfig.setSharedStorageContext" do
+  self.val.callMethod "setSharedStorageContext" (Internal.args #[toJS contextString]) Unit
 
 /-- `v instanceof HTMLFencedFrameElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLFencedFrameElement`). -/
-def HTMLFencedFrameElement.cast? (v : Value) : IO (Option HTMLFencedFrameElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLFencedFrameElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLFencedFrameElement.cast? (v : Value) : IO (Option HTMLFencedFrameElement) := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLFencedFrameElement"] Value) (fun x => { val := x }) v
 
 /-- `attribute FencedFrameConfig? config` -/
-def HTMLFencedFrameElement.config (self : HTMLFencedFrameElement) : IO (Option FencedFrameConfig) := self.val.get "config" (Option FencedFrameConfig)
+@[macro_inline] def HTMLFencedFrameElement.config (self : HTMLFencedFrameElement) : IO (Option FencedFrameConfig) := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.config" do
+  self.val.get "config" (Option FencedFrameConfig)
 
 /-- Sets `config`: `attribute FencedFrameConfig? config` -/
-def HTMLFencedFrameElement.setConfig (self : HTMLFencedFrameElement) (value : Option FencedFrameConfig) : IO Unit :=
+@[macro_inline] def HTMLFencedFrameElement.setConfig (self : HTMLFencedFrameElement) (value : Option FencedFrameConfig) : IO Unit := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.setConfig" do
   self.val.set "config" (toJS value)
 
 /-- `attribute DOMString width` -/
-def HTMLFencedFrameElement.width (self : HTMLFencedFrameElement) : IO String := self.val.get "width" String
+@[macro_inline] def HTMLFencedFrameElement.width (self : HTMLFencedFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.width" do
+  self.val.get "width" String
 
 /-- Sets `width`: `attribute DOMString width` -/
-def HTMLFencedFrameElement.setWidth (self : HTMLFencedFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLFencedFrameElement.setWidth (self : HTMLFencedFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.setWidth" do
   self.val.set "width" (toJS value)
 
 /-- `attribute DOMString height` -/
-def HTMLFencedFrameElement.height (self : HTMLFencedFrameElement) : IO String := self.val.get "height" String
+@[macro_inline] def HTMLFencedFrameElement.height (self : HTMLFencedFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.height" do
+  self.val.get "height" String
 
 /-- Sets `height`: `attribute DOMString height` -/
-def HTMLFencedFrameElement.setHeight (self : HTMLFencedFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLFencedFrameElement.setHeight (self : HTMLFencedFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.setHeight" do
   self.val.set "height" (toJS value)
 
 /-- `readonly attribute DOMTokenList sandbox` -/
-def HTMLFencedFrameElement.sandbox (self : HTMLFencedFrameElement) : IO DOMTokenList := do
+@[macro_inline] def HTMLFencedFrameElement.sandbox (self : HTMLFencedFrameElement) : IO DOMTokenList := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.sandbox" do
   let r ← self.val.get "sandbox" Value
   pure { val := r }
 
 /-- `attribute DOMString allow` -/
-def HTMLFencedFrameElement.allow (self : HTMLFencedFrameElement) : IO String := self.val.get "allow" String
+@[macro_inline] def HTMLFencedFrameElement.allow (self : HTMLFencedFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.allow" do
+  self.val.get "allow" String
 
 /-- Sets `allow`: `attribute DOMString allow` -/
-def HTMLFencedFrameElement.setAllow (self : HTMLFencedFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLFencedFrameElement.setAllow (self : HTMLFencedFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLFencedFrameElement.setAllow" do
   self.val.set "allow" (toJS value)
 
 /-- `attribute EventHandler onfencedtreeclick` -/
-def Document.onfencedtreeclick (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onfencedtreeclick (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onfencedtreeclick" do
+  self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
 
 /-- Sets `onfencedtreeclick`: `attribute EventHandler onfencedtreeclick` -/
-def Document.setOnfencedtreeclick (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnfencedtreeclick (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnfencedtreeclick" do
   self.val.set "onfencedtreeclick" (toJS value)
 
 /-- `attribute EventHandler onfencedtreeclick` -/
-def HTMLElement.onfencedtreeclick (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onfencedtreeclick (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onfencedtreeclick" do
+  self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
 
 /-- Sets `onfencedtreeclick`: `attribute EventHandler onfencedtreeclick` -/
-def HTMLElement.setOnfencedtreeclick (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnfencedtreeclick (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnfencedtreeclick" do
   self.val.set "onfencedtreeclick" (toJS value)
 
 /-- `attribute EventHandler onfencedtreeclick` -/
-def MathMLElement.onfencedtreeclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onfencedtreeclick (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onfencedtreeclick" do
+  self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
 
 /-- Sets `onfencedtreeclick`: `attribute EventHandler onfencedtreeclick` -/
-def MathMLElement.setOnfencedtreeclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnfencedtreeclick (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnfencedtreeclick" do
   self.val.set "onfencedtreeclick" (toJS value)
 
 /-- `Promise<undefined> deprecatedReplaceInURN(UrnOrConfig urnOrConfig, record<USVString, USVString> replacements)` -/
-def Navigator.deprecatedReplaceInURN (self : Navigator) (urnOrConfig : UrnOrConfig) (replacements : Record String) : Async Unit :=
-  self.val.callMethodAwait "deprecatedReplaceInURN" (Support.args #[toJS urnOrConfig, toJS replacements]) Unit
+@[macro_inline] def Navigator.deprecatedReplaceInURN (self : Navigator) (urnOrConfig : UrnOrConfig) (replacements : Record String) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.deprecatedReplaceInURN" do
+  self.val.callMethodAwait "deprecatedReplaceInURN" (Internal.args #[toJS urnOrConfig, toJS replacements]) Unit
 
 /-- `Promise<USVString> deprecatedURNtoURL(UrnOrConfig urnOrConfig, optional boolean send_reports)` -/
-def Navigator.deprecatedURNtoURL (self : Navigator) (urnOrConfig : UrnOrConfig) (send_reports : Option Bool := none) : Async String :=
-  self.val.callMethodAwait "deprecatedURNtoURL" (Support.args #[toJS urnOrConfig, Support.optional send_reports]) String
+@[macro_inline] def Navigator.deprecatedURNtoURL (self : Navigator) (urnOrConfig : UrnOrConfig) (send_reports : Option Bool := none) : Async String := Internal.api "Lasm.JS.Web.Navigator.deprecatedURNtoURL" do
+  self.val.callMethodAwait "deprecatedURNtoURL" (Internal.args #[toJS urnOrConfig, Internal.optional send_reports]) String
 
 /-- `sequence<USVString> adAuctionComponents(unsigned short numAdComponents)` -/
-def Navigator.adAuctionComponents (self : Navigator) (numAdComponents : Nat) : IO (Array String) :=
-  self.val.callMethod "adAuctionComponents" (Support.args #[toJS numAdComponents]) (Array String)
+@[macro_inline] def Navigator.adAuctionComponents (self : Navigator) (numAdComponents : Nat) : IO (Array String) := Internal.api "Lasm.JS.Web.Navigator.adAuctionComponents" do
+  self.val.callMethod "adAuctionComponents" (Internal.args #[toJS numAdComponents]) (Array String)
 
 /-- `attribute EventHandler onfencedtreeclick` -/
-def SVGElement.onfencedtreeclick (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onfencedtreeclick (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onfencedtreeclick" do
+  self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
 
 /-- Sets `onfencedtreeclick`: `attribute EventHandler onfencedtreeclick` -/
-def SVGElement.setOnfencedtreeclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnfencedtreeclick (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnfencedtreeclick" do
+  self.val.set "onfencedtreeclick" (toJS value)
+
+/-- `readonly attribute Fence? fence` -/
+@[macro_inline] def Window.fence (self : Window) : IO (Option Fence) := Internal.api "Lasm.JS.Web.Window.fence" do
+  self.val.get "fence" (Option Fence)
+
+/-- `attribute EventHandler onfencedtreeclick` -/
+@[macro_inline] def Window.onfencedtreeclick (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onfencedtreeclick" do
+  self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
+
+/-- Sets `onfencedtreeclick`: `attribute EventHandler onfencedtreeclick` -/
+@[macro_inline] def Window.setOnfencedtreeclick (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnfencedtreeclick" do
   self.val.set "onfencedtreeclick" (toJS value)
 
 /-- `readonly attribute Fence? fence` (Fenced Frame (https://wicg.github.io/fenced-frame/)) -/
-def fence : IO (Option Fence) := Support.getGlobal ["fence"] (Option Fence)
+@[macro_inline] def fence : IO (Option Fence) := Internal.api "Lasm.JS.Web.fence" do
+  Internal.getGlobal ["fence"] (Option Fence)
 
 /-- `attribute EventHandler onfencedtreeclick` (Fenced Frame (https://wicg.github.io/fenced-frame/)) -/
-def onfencedtreeclick : IO (Option EventHandlerNonNull) := Support.getGlobal ["onfencedtreeclick"] (Option EventHandlerNonNull)
+@[macro_inline] def onfencedtreeclick : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onfencedtreeclick" do
+  Internal.getGlobal ["onfencedtreeclick"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

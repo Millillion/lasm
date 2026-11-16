@@ -6,27 +6,31 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.IsInputPending
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary IsInputPendingOptions` (Early detection of input events (https://wicg.github.io/is-input-pending/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IsInputPendingOptions where
   /-- `boolean includeContinuous = false` -/
   includeContinuous : Option Bool := none
-instance : ToJS IsInputPendingOptions := ⟨fun d => Support.fields #[("includeContinuous", Support.optional d.includeContinuous)]⟩
+instance : ToJS IsInputPendingOptions := ⟨fun d => Internal.fields #[("includeContinuous", Internal.optional d.includeContinuous)]⟩
 
 /-- `v instanceof Scheduling`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Scheduling`). -/
-def Scheduling.cast? (v : Value) : IO (Option Scheduling) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Scheduling"] Value) v) then some { val := v } else none
+@[macro_inline] def Scheduling.cast? (v : Value) : IO (Option Scheduling) := Internal.api "Lasm.JS.Web.Scheduling.cast?" do
+  Internal.cast (Internal.getGlobal ["Scheduling"] Value) (fun x => { val := x }) v
 
 /-- `boolean isInputPending(optional IsInputPendingOptions isInputPendingOptions)` -/
-def Scheduling.isInputPending (self : Scheduling) (isInputPendingOptions : Option IsInputPendingOptions := none) : IO Bool :=
-  self.val.callMethod "isInputPending" (Support.args #[Support.optional isInputPendingOptions]) Bool
+@[macro_inline] def Scheduling.isInputPending (self : Scheduling) (isInputPendingOptions : Option IsInputPendingOptions := none) : IO Bool := Internal.api "Lasm.JS.Web.Scheduling.isInputPending" do
+  self.val.callMethod "isInputPending" (Internal.args #[Internal.optional isInputPendingOptions]) Bool
 
 /-- `readonly attribute Scheduling scheduling` -/
-def Navigator.scheduling (self : Navigator) : IO Scheduling := do
+@[macro_inline] def Navigator.scheduling (self : Navigator) : IO Scheduling := Internal.api "Lasm.JS.Web.Navigator.scheduling" do
   let r ← self.val.get "scheduling" Value
   pure { val := r }
 

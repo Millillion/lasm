@@ -6,16 +6,36 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ConnectionAllowlists
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary ConnectionAllowlistViolationReport : ReportBody` (Connection Allowlists (https://wicg.github.io/connection-allowlists/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ConnectionAllowlistViolationReport where
+  /-- `USVString url` -/
+  url : Option String := none
+  /-- `USVString connection` -/
+  connection : Option String := none
+  /-- `sequence<DOMString> allowlist` -/
+  allowlist : Option (Array String) := none
+  /-- `ConnectionAllowlistDisposition disposition` -/
+  disposition : Option ConnectionAllowlistDisposition := none
+instance : ToJS ConnectionAllowlistViolationReport := ⟨fun d => Internal.fields #[("url", Internal.optional d.url),
+    ("connection", Internal.optional d.connection),
+    ("allowlist", Internal.optional d.allowlist),
+    ("disposition", Internal.optional d.disposition)]⟩
 
 /-- `attribute DOMString connectionAllowlist` -/
-def HTMLIFrameElement.connectionAllowlist (self : HTMLIFrameElement) : IO String := self.val.get "connectionAllowlist" String
+@[macro_inline] def HTMLIFrameElement.connectionAllowlist (self : HTMLIFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLIFrameElement.connectionAllowlist" do
+  self.val.get "connectionAllowlist" String
 
 /-- Sets `connectionAllowlist`: `attribute DOMString connectionAllowlist` -/
-def HTMLIFrameElement.setConnectionAllowlist (self : HTMLIFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLIFrameElement.setConnectionAllowlist (self : HTMLIFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setConnectionAllowlist" do
   self.val.set "connectionAllowlist" (toJS value)
 
 end Lasm.JS.Web

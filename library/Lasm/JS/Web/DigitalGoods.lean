@@ -6,28 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.DigitalGoods
 import Lasm.JS.Web.PaymentRequest
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ItemType` (Digital Goods API (https://wicg.github.io/digital-goods/)): "product", "subscription". -/
-inductive ItemType where
-  /-- "product" -/
-  | product
-  /-- "subscription" -/
-  | subscription
-  deriving BEq, Repr, Inhabited
-instance : ToJS ItemType := ⟨fun
-  | .product => .string "product"
-  | .subscription => .string "subscription"⟩
-instance : FromJS ItemType where
-  fromJS
-    | .string "product" => .ok .product
-    | .string "subscription" => .ok .subscription
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ItemType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ItemDetails` (Digital Goods API (https://wicg.github.io/digital-goods/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ItemDetails where
@@ -53,6 +40,17 @@ structure ItemDetails where
   introductoryPricePeriod : Option String := none
   /-- `unsigned long long introductoryPriceCycles` -/
   introductoryPriceCycles : Option Nat := none
+instance : ToJS ItemDetails := ⟨fun d => Internal.fields #[("itemId", toJS d.itemId),
+    ("title", toJS d.title),
+    ("price", toJS d.price),
+    ("type", Internal.optional d.type),
+    ("description", Internal.optional d.description),
+    ("iconURLs", Internal.optional d.iconURLs),
+    ("subscriptionPeriod", Internal.optional d.subscriptionPeriod),
+    ("freeTrialPeriod", Internal.optional d.freeTrialPeriod),
+    ("introductoryPrice", Internal.optional d.introductoryPrice),
+    ("introductoryPricePeriod", Internal.optional d.introductoryPricePeriod),
+    ("introductoryPriceCycles", Internal.optional d.introductoryPriceCycles)]⟩
 instance : FromJS ItemDetails where
   fromJS d := do return {
     itemId := ← Lasm.JS.readField String d "itemId",
@@ -74,6 +72,8 @@ structure PurchaseDetails where
   itemId : String
   /-- `required DOMString purchaseToken` -/
   purchaseToken : String
+instance : ToJS PurchaseDetails := ⟨fun d => Internal.fields #[("itemId", toJS d.itemId),
+    ("purchaseToken", toJS d.purchaseToken)]⟩
 instance : FromJS PurchaseDetails where
   fromJS d := do return {
     itemId := ← Lasm.JS.readField String d "itemId",
@@ -81,29 +81,34 @@ instance : FromJS PurchaseDetails where
   typeName := "Lasm.JS.Web.PurchaseDetails"
 
 /-- `v instanceof DigitalGoodsService`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DigitalGoodsService`). -/
-def DigitalGoodsService.cast? (v : Value) : IO (Option DigitalGoodsService) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DigitalGoodsService"] Value) v) then some { val := v } else none
+@[macro_inline] def DigitalGoodsService.cast? (v : Value) : IO (Option DigitalGoodsService) := Internal.api "Lasm.JS.Web.DigitalGoodsService.cast?" do
+  Internal.cast (Internal.getGlobal ["DigitalGoodsService"] Value) (fun x => { val := x }) v
 
 /-- `Promise<sequence<ItemDetails>> getDetails(sequence<DOMString> itemIds)` -/
-def DigitalGoodsService.getDetails (self : DigitalGoodsService) (itemIds : Array String) : Async (Array ItemDetails) :=
-  self.val.callMethodAwait "getDetails" (Support.args #[toJS itemIds]) (Array ItemDetails)
+@[macro_inline] def DigitalGoodsService.getDetails (self : DigitalGoodsService) (itemIds : Array String) : Async (Array ItemDetails) := Internal.api "Lasm.JS.Web.DigitalGoodsService.getDetails" do
+  self.val.callMethodAwait "getDetails" (Internal.args #[toJS itemIds]) (Array ItemDetails)
 
 /-- `Promise<sequence<PurchaseDetails>> listPurchases()` -/
-def DigitalGoodsService.listPurchases (self : DigitalGoodsService) : Async (Array PurchaseDetails) :=
-  self.val.callMethodAwait "listPurchases" (Support.args #[]) (Array PurchaseDetails)
+@[macro_inline] def DigitalGoodsService.listPurchases (self : DigitalGoodsService) : Async (Array PurchaseDetails) := Internal.api "Lasm.JS.Web.DigitalGoodsService.listPurchases" do
+  self.val.callMethodAwait "listPurchases" (Internal.args #[]) (Array PurchaseDetails)
 
 /-- `Promise<sequence<PurchaseDetails>> listPurchaseHistory()` -/
-def DigitalGoodsService.listPurchaseHistory (self : DigitalGoodsService) : Async (Array PurchaseDetails) :=
-  self.val.callMethodAwait "listPurchaseHistory" (Support.args #[]) (Array PurchaseDetails)
+@[macro_inline] def DigitalGoodsService.listPurchaseHistory (self : DigitalGoodsService) : Async (Array PurchaseDetails) := Internal.api "Lasm.JS.Web.DigitalGoodsService.listPurchaseHistory" do
+  self.val.callMethodAwait "listPurchaseHistory" (Internal.args #[]) (Array PurchaseDetails)
 
 /-- `Promise<undefined> consume(DOMString purchaseToken)` -/
-def DigitalGoodsService.consume (self : DigitalGoodsService) (purchaseToken : String) : Async Unit :=
-  self.val.callMethodAwait "consume" (Support.args #[toJS purchaseToken]) Unit
+@[macro_inline] def DigitalGoodsService.consume (self : DigitalGoodsService) (purchaseToken : String) : Async Unit := Internal.api "Lasm.JS.Web.DigitalGoodsService.consume" do
+  self.val.callMethodAwait "consume" (Internal.args #[toJS purchaseToken]) Unit
+
+/-- `Promise<DigitalGoodsService> getDigitalGoodsService(DOMString serviceProvider)` -/
+@[macro_inline] def Window.getDigitalGoodsService (self : Window) (serviceProvider : String) : Async DigitalGoodsService := Internal.api "Lasm.JS.Web.Window.getDigitalGoodsService" do
+  let r ← self.val.callMethodAwait "getDigitalGoodsService" (Internal.args #[toJS serviceProvider]) Value
+  pure { val := r }
 
 /-- `Promise<DigitalGoodsService> getDigitalGoodsService(DOMString serviceProvider)` (Digital Goods API (https://wicg.github.io/digital-goods/)) -/
-def getDigitalGoodsService (serviceProvider : String) : Async DigitalGoodsService := do
+@[macro_inline] def getDigitalGoodsService (serviceProvider : String) : Async DigitalGoodsService := Internal.api "Lasm.JS.Web.getDigitalGoodsService" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.getDigitalGoodsService", module := "globalThis", path := "getDigitalGoodsService", construct := false, arity := 1 }
-    (Support.args #[toJS serviceProvider])
+    (Internal.args #[toJS serviceProvider])
   pure { val := r }
 
 end Lasm.JS.Web

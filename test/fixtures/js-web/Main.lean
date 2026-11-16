@@ -19,7 +19,21 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 of the response to any request (Workers allow timers and I/O only inside one).
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Compression
+import Lasm.JS.Web.Console
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Encoding
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.FileAPI
+import Lasm.JS.Web.HrTime
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.Urlpattern
+import Lasm.JS.Web.WasmJsApi
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Web.Xhr
 import Wpt
 import Surface
 open Lasm.JS Lasm.JS.Web
@@ -512,12 +526,8 @@ def messaging (r : Checks) : Async Unit := do
   runSection r "messaging.messageEvent" do
     let me ← MessageEvent.new "message" (some { data := .string "d", origin := some "o" })
     expect r "MessageEvent" (dataEq (← me.data) (.string "d") && (← me.origin) == "o" && (← me.ports).isEmpty) ""
-  runSection r "messaging.errorEvent" do
-    let ee ← ErrorEvent.new "error" (some { message := some "boom", lineno := some 3 })
-    expect r "ErrorEvent" ((← ee.message) == "boom" && (← ee.lineno) == 3) ""
-  runSection r "messaging.promiseRejectionEvent" do
-    let pr ← PromiseRejectionEvent.new "unhandledrejection" { promise := toJS (← promiseResolve .null), reason := .string "r" }
-    expect r "PromiseRejectionEvent" (dataEq (← pr.reason) (.string "r")) ""
+  -- ErrorEvent and PromiseRejectionEvent are not on every target here (lasm build --target refuses them where the
+  -- compatibility data says so): test/browser/platform/PlatformChecks.lean checks them.
 
 /-! Fetch: Headers, Request, Response, FormData, fetch -/
 
@@ -599,7 +609,7 @@ def fetching (r : Checks) : Async Unit := do
     -- FormData
     let form ← FormData.new
     form.append "a" "1"; form.append "a" "2"
-    form.appendWithBlobValue "f" (← Blob.new (some #[.bufferSource (bytesOf [1, 2, 3])])) (some "x.bin")
+    form.appendBlob "f" (← Blob.new (some #[.bufferSource (bytesOf [1, 2, 3])])) (some "x.bin")
     let names := (← form.getAll "a").map fun | .usvString s => s | _ => "?"
     expect r "FormData getAll" (names == #["1", "2"]) ""
     match ← form.get "f" with

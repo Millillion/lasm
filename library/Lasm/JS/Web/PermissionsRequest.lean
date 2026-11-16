@@ -6,14 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Permissions
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<PermissionStatus> request(object permissionDesc)` -/
-def Permissions.request (self : Permissions) (permissionDesc : Data) : Async PermissionStatus := do
-  let r ← self.val.callMethodAwait "request" (Support.args #[toJS permissionDesc]) Value
+@[macro_inline] def Permissions.request (self : Permissions) (permissionDesc : Data) : Async PermissionStatus := Internal.api "Lasm.JS.Web.Permissions.request" do
+  let r ← self.val.callMethodAwait "request" (Internal.args #[toJS permissionDesc]) Value
   pure { val := r }
 
 end Lasm.JS.Web

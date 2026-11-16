@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Encoding
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary TextDecoderOptions` (Encoding Standard (https://encoding.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextDecoderOptions where
@@ -17,14 +21,14 @@ structure TextDecoderOptions where
   fatal : Option Bool := none
   /-- `boolean ignoreBOM = false` -/
   ignoreBOM : Option Bool := none
-instance : ToJS TextDecoderOptions := ⟨fun d => Support.fields #[("fatal", Support.optional d.fatal),
-    ("ignoreBOM", Support.optional d.ignoreBOM)]⟩
+instance : ToJS TextDecoderOptions := ⟨fun d => Internal.fields #[("fatal", Internal.optional d.fatal),
+    ("ignoreBOM", Internal.optional d.ignoreBOM)]⟩
 
 /-- `dictionary TextDecodeOptions` (Encoding Standard (https://encoding.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextDecodeOptions where
   /-- `boolean stream = false` -/
   stream : Option Bool := none
-instance : ToJS TextDecodeOptions := ⟨fun d => Support.fields #[("stream", Support.optional d.stream)]⟩
+instance : ToJS TextDecodeOptions := ⟨fun d => Internal.fields #[("stream", Internal.optional d.stream)]⟩
 
 /-- `dictionary TextEncoderEncodeIntoResult` (Encoding Standard (https://encoding.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextEncoderEncodeIntoResult where
@@ -32,6 +36,8 @@ structure TextEncoderEncodeIntoResult where
   read : Option Nat := none
   /-- `unsigned long long written` -/
   written : Option Nat := none
+instance : ToJS TextEncoderEncodeIntoResult := ⟨fun d => Internal.fields #[("read", Internal.optional d.read),
+    ("written", Internal.optional d.written)]⟩
 instance : FromJS TextEncoderEncodeIntoResult where
   fromJS d := do return {
     read := ← Lasm.JS.readField (Option Nat) d "read",
@@ -39,94 +45,102 @@ instance : FromJS TextEncoderEncodeIntoResult where
   typeName := "Lasm.JS.Web.TextEncoderEncodeIntoResult"
 
 /-- `v instanceof TextDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextDecoder`). -/
-def TextDecoder.cast? (v : Value) : IO (Option TextDecoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoder"] Value) v) then some { val := v } else none
+@[macro_inline] def TextDecoder.cast? (v : Value) : IO (Option TextDecoder) := Internal.api "Lasm.JS.Web.TextDecoder.cast?" do
+  Internal.cast (Internal.getGlobal ["TextDecoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString label, optional TextDecoderOptions options)` -/
-def TextDecoder.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoder :=
+@[macro_inline] def TextDecoder.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoder := Internal.api "Lasm.JS.Web.TextDecoder.new" do
   Lasm.JS.Binding.invoke TextDecoder { name := "Lasm.JS.Web.TextDecoder.new", module := "globalThis", path := "TextDecoder", construct := true, arity := 2 }
-    (Support.args #[Support.optional label, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
 
 /-- `readonly attribute DOMString encoding` -/
-def TextDecoder.encoding (self : TextDecoder) : IO String := self.val.get "encoding" String
+@[macro_inline] def TextDecoder.encoding (self : TextDecoder) : IO String := Internal.api "Lasm.JS.Web.TextDecoder.encoding" do
+  self.val.get "encoding" String
 
 /-- `readonly attribute boolean fatal` -/
-def TextDecoder.fatal (self : TextDecoder) : IO Bool := self.val.get "fatal" Bool
+@[macro_inline] def TextDecoder.fatal (self : TextDecoder) : IO Bool := Internal.api "Lasm.JS.Web.TextDecoder.fatal" do
+  self.val.get "fatal" Bool
 
 /-- `readonly attribute boolean ignoreBOM` -/
-def TextDecoder.ignoreBOM (self : TextDecoder) : IO Bool := self.val.get "ignoreBOM" Bool
+@[macro_inline] def TextDecoder.ignoreBOM (self : TextDecoder) : IO Bool := Internal.api "Lasm.JS.Web.TextDecoder.ignoreBOM" do
+  self.val.get "ignoreBOM" Bool
 
 /-- `USVString decode(optional AllowSharedBufferSource input, optional TextDecodeOptions options)` -/
-def TextDecoder.decode (self : TextDecoder) (input : Option ByteArray := none) (options : Option TextDecodeOptions := none) : IO String :=
-  self.val.callMethod "decode" (Support.args #[Support.optional input, Support.optional options]) String
+@[macro_inline] def TextDecoder.decode (self : TextDecoder) (input : Option ByteArray := none) (options : Option TextDecodeOptions := none) : IO String := Internal.api "Lasm.JS.Web.TextDecoder.decode" do
+  self.val.callMethod "decode" (Internal.args #[Internal.optional input, Internal.optional options]) String
 
 /-- `v instanceof TextDecoderStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextDecoderStream`). -/
-def TextDecoderStream.cast? (v : Value) : IO (Option TextDecoderStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoderStream"] Value) v) then some { val := v } else none
+@[macro_inline] def TextDecoderStream.cast? (v : Value) : IO (Option TextDecoderStream) := Internal.api "Lasm.JS.Web.TextDecoderStream.cast?" do
+  Internal.cast (Internal.getGlobal ["TextDecoderStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString label, optional TextDecoderOptions options)` -/
-def TextDecoderStream.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoderStream :=
+@[macro_inline] def TextDecoderStream.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoderStream := Internal.api "Lasm.JS.Web.TextDecoderStream.new" do
   Lasm.JS.Binding.invoke TextDecoderStream { name := "Lasm.JS.Web.TextDecoderStream.new", module := "globalThis", path := "TextDecoderStream", construct := true, arity := 2 }
-    (Support.args #[Support.optional label, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
 
 /-- `readonly attribute DOMString encoding` -/
-def TextDecoderStream.encoding (self : TextDecoderStream) : IO String := self.val.get "encoding" String
+@[macro_inline] def TextDecoderStream.encoding (self : TextDecoderStream) : IO String := Internal.api "Lasm.JS.Web.TextDecoderStream.encoding" do
+  self.val.get "encoding" String
 
 /-- `readonly attribute boolean fatal` -/
-def TextDecoderStream.fatal (self : TextDecoderStream) : IO Bool := self.val.get "fatal" Bool
+@[macro_inline] def TextDecoderStream.fatal (self : TextDecoderStream) : IO Bool := Internal.api "Lasm.JS.Web.TextDecoderStream.fatal" do
+  self.val.get "fatal" Bool
 
 /-- `readonly attribute boolean ignoreBOM` -/
-def TextDecoderStream.ignoreBOM (self : TextDecoderStream) : IO Bool := self.val.get "ignoreBOM" Bool
+@[macro_inline] def TextDecoderStream.ignoreBOM (self : TextDecoderStream) : IO Bool := Internal.api "Lasm.JS.Web.TextDecoderStream.ignoreBOM" do
+  self.val.get "ignoreBOM" Bool
 
 /-- `readonly attribute ReadableStream readable` -/
-def TextDecoderStream.readable (self : TextDecoderStream) : IO ReadableStream := do
+@[macro_inline] def TextDecoderStream.readable (self : TextDecoderStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.TextDecoderStream.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TextDecoderStream.writable (self : TextDecoderStream) : IO WritableStream := do
+@[macro_inline] def TextDecoderStream.writable (self : TextDecoderStream) : IO WritableStream := Internal.api "Lasm.JS.Web.TextDecoderStream.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `v instanceof TextEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextEncoder`). -/
-def TextEncoder.cast? (v : Value) : IO (Option TextEncoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoder"] Value) v) then some { val := v } else none
+@[macro_inline] def TextEncoder.cast? (v : Value) : IO (Option TextEncoder) := Internal.api "Lasm.JS.Web.TextEncoder.cast?" do
+  Internal.cast (Internal.getGlobal ["TextEncoder"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def TextEncoder.new : IO TextEncoder :=
+@[macro_inline] def TextEncoder.new : IO TextEncoder := Internal.api "Lasm.JS.Web.TextEncoder.new" do
   Lasm.JS.Binding.invoke TextEncoder { name := "Lasm.JS.Web.TextEncoder.new", module := "globalThis", path := "TextEncoder", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute DOMString encoding` -/
-def TextEncoder.encoding (self : TextEncoder) : IO String := self.val.get "encoding" String
+@[macro_inline] def TextEncoder.encoding (self : TextEncoder) : IO String := Internal.api "Lasm.JS.Web.TextEncoder.encoding" do
+  self.val.get "encoding" String
 
 /-- `Uint8Array encode(optional USVString input)` -/
-def TextEncoder.encode (self : TextEncoder) (input : Option String := none) : IO ByteArray :=
-  self.val.callMethod "encode" (Support.args #[Support.optional input]) ByteArray
+@[macro_inline] def TextEncoder.encode (self : TextEncoder) (input : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Web.TextEncoder.encode" do
+  self.val.callMethod "encode" (Internal.args #[Internal.optional input]) ByteArray
 
 /-- `TextEncoderEncodeIntoResult encodeInto(USVString source, Uint8Array destination)` -/
-def TextEncoder.encodeInto (self : TextEncoder) (source : String) (destination : ByteArray) : IO TextEncoderEncodeIntoResult :=
-  self.val.callMethod "encodeInto" (Support.args #[toJS source, toJS destination]) TextEncoderEncodeIntoResult
+@[macro_inline] def TextEncoder.encodeInto (self : TextEncoder) (source : String) (destination : ByteArray) : IO TextEncoderEncodeIntoResult := Internal.api "Lasm.JS.Web.TextEncoder.encodeInto" do
+  self.val.callMethod "encodeInto" (Internal.args #[toJS source, toJS destination]) TextEncoderEncodeIntoResult
 
 /-- `v instanceof TextEncoderStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextEncoderStream`). -/
-def TextEncoderStream.cast? (v : Value) : IO (Option TextEncoderStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoderStream"] Value) v) then some { val := v } else none
+@[macro_inline] def TextEncoderStream.cast? (v : Value) : IO (Option TextEncoderStream) := Internal.api "Lasm.JS.Web.TextEncoderStream.cast?" do
+  Internal.cast (Internal.getGlobal ["TextEncoderStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def TextEncoderStream.new : IO TextEncoderStream :=
+@[macro_inline] def TextEncoderStream.new : IO TextEncoderStream := Internal.api "Lasm.JS.Web.TextEncoderStream.new" do
   Lasm.JS.Binding.invoke TextEncoderStream { name := "Lasm.JS.Web.TextEncoderStream.new", module := "globalThis", path := "TextEncoderStream", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `readonly attribute DOMString encoding` -/
-def TextEncoderStream.encoding (self : TextEncoderStream) : IO String := self.val.get "encoding" String
+@[macro_inline] def TextEncoderStream.encoding (self : TextEncoderStream) : IO String := Internal.api "Lasm.JS.Web.TextEncoderStream.encoding" do
+  self.val.get "encoding" String
 
 /-- `readonly attribute ReadableStream readable` -/
-def TextEncoderStream.readable (self : TextEncoderStream) : IO ReadableStream := do
+@[macro_inline] def TextEncoderStream.readable (self : TextEncoderStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.TextEncoderStream.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TextEncoderStream.writable (self : TextEncoderStream) : IO WritableStream := do
+@[macro_inline] def TextEncoderStream.writable (self : TextEncoderStream) : IO WritableStream := Internal.api "Lasm.JS.Web.TextEncoderStream.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 

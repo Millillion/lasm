@@ -6,136 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webvtt
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum DirectionSetting` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "", "rl", "lr". -/
-inductive DirectionSetting where
-  /-- "" -/
-  | empty
-  /-- "rl" -/
-  | rl
-  /-- "lr" -/
-  | lr
-  deriving BEq, Repr, Inhabited
-instance : ToJS DirectionSetting := ⟨fun
-  | .empty => .string ""
-  | .rl => .string "rl"
-  | .lr => .string "lr"⟩
-instance : FromJS DirectionSetting where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "rl" => .ok .rl
-    | .string "lr" => .ok .lr
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.DirectionSetting"
-
-/-- `enum AutoKeyword` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "auto". -/
-inductive AutoKeyword where
-  /-- "auto" -/
-  | auto
-  deriving BEq, Repr, Inhabited
-instance : ToJS AutoKeyword := ⟨fun
-  | .auto => .string "auto"⟩
-instance : FromJS AutoKeyword where
-  fromJS
-    | .string "auto" => .ok .auto
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AutoKeyword"
-
-/-- `enum LineAlignSetting` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "start", "center", "end". -/
-inductive LineAlignSetting where
-  /-- "start" -/
-  | start
-  /-- "center" -/
-  | center
-  /-- "end" -/
-  | «end»
-  deriving BEq, Repr, Inhabited
-instance : ToJS LineAlignSetting := ⟨fun
-  | .start => .string "start"
-  | .center => .string "center"
-  | .«end» => .string "end"⟩
-instance : FromJS LineAlignSetting where
-  fromJS
-    | .string "start" => .ok .start
-    | .string "center" => .ok .center
-    | .string "end" => .ok .«end»
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LineAlignSetting"
-
-/-- `enum PositionAlignSetting` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "line-left", "center", "line-right", "auto". -/
-inductive PositionAlignSetting where
-  /-- "line-left" -/
-  | lineLeft
-  /-- "center" -/
-  | center
-  /-- "line-right" -/
-  | lineRight
-  /-- "auto" -/
-  | auto
-  deriving BEq, Repr, Inhabited
-instance : ToJS PositionAlignSetting := ⟨fun
-  | .lineLeft => .string "line-left"
-  | .center => .string "center"
-  | .lineRight => .string "line-right"
-  | .auto => .string "auto"⟩
-instance : FromJS PositionAlignSetting where
-  fromJS
-    | .string "line-left" => .ok .lineLeft
-    | .string "center" => .ok .center
-    | .string "line-right" => .ok .lineRight
-    | .string "auto" => .ok .auto
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PositionAlignSetting"
-
-/-- `enum AlignSetting` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "start", "center", "end", "left", "right". -/
-inductive AlignSetting where
-  /-- "start" -/
-  | start
-  /-- "center" -/
-  | center
-  /-- "end" -/
-  | «end»
-  /-- "left" -/
-  | left
-  /-- "right" -/
-  | right
-  deriving BEq, Repr, Inhabited
-instance : ToJS AlignSetting := ⟨fun
-  | .start => .string "start"
-  | .center => .string "center"
-  | .«end» => .string "end"
-  | .left => .string "left"
-  | .right => .string "right"⟩
-instance : FromJS AlignSetting where
-  fromJS
-    | .string "start" => .ok .start
-    | .string "center" => .ok .center
-    | .string "end" => .ok .«end»
-    | .string "left" => .ok .left
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AlignSetting"
-
-/-- `enum ScrollSetting` (WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)): "", "up". -/
-inductive ScrollSetting where
-  /-- "" -/
-  | empty
-  /-- "up" -/
-  | up
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScrollSetting := ⟨fun
-  | .empty => .string ""
-  | .up => .string "up"⟩
-instance : FromJS ScrollSetting where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "up" => .ok .up
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScrollSetting"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef double or AutoKeyword LineAndPositionSetting`: one constructor per member type. -/
 inductive LineAndPositionSetting where
@@ -156,152 +35,170 @@ instance : FromJS LineAndPositionSetting where
   typeName := "Lasm.JS.Web.LineAndPositionSetting"
 
 /-- `v instanceof VTTCue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VTTCue`). -/
-def VTTCue.cast? (v : Value) : IO (Option VTTCue) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VTTCue"] Value) v) then some { val := v } else none
+@[macro_inline] def VTTCue.cast? (v : Value) : IO (Option VTTCue) := Internal.api "Lasm.JS.Web.VTTCue.cast?" do
+  Internal.cast (Internal.getGlobal ["VTTCue"] Value) (fun x => { val := x }) v
 
 /-- `constructor(double startTime, unrestricted double endTime, DOMString text)` -/
-def VTTCue.new (startTime : Float) (endTime : Float) (text : String) : IO VTTCue :=
+@[macro_inline] def VTTCue.new (startTime : Float) (endTime : Float) (text : String) : IO VTTCue := Internal.api "Lasm.JS.Web.VTTCue.new" do
   Lasm.JS.Binding.invoke VTTCue { name := "Lasm.JS.Web.VTTCue.new", module := "globalThis", path := "VTTCue", construct := true, arity := 3 }
-    (Support.args #[toJS startTime, toJS endTime, toJS text]) (await := false)
+    (Internal.args #[toJS startTime, toJS endTime, toJS text]) (await := false)
 
 /-- `attribute VTTRegion? region` -/
-def VTTCue.region (self : VTTCue) : IO (Option VTTRegion) := self.val.get "region" (Option VTTRegion)
+@[macro_inline] def VTTCue.region (self : VTTCue) : IO (Option VTTRegion) := Internal.api "Lasm.JS.Web.VTTCue.region" do
+  self.val.get "region" (Option VTTRegion)
 
 /-- Sets `region`: `attribute VTTRegion? region` -/
-def VTTCue.setRegion (self : VTTCue) (value : Option VTTRegion) : IO Unit :=
+@[macro_inline] def VTTCue.setRegion (self : VTTCue) (value : Option VTTRegion) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setRegion" do
   self.val.set "region" (toJS value)
 
 /-- `attribute DirectionSetting vertical` -/
-def VTTCue.vertical (self : VTTCue) : IO DirectionSetting := self.val.get "vertical" DirectionSetting
+@[macro_inline] def VTTCue.vertical (self : VTTCue) : IO DirectionSetting := Internal.api "Lasm.JS.Web.VTTCue.vertical" do
+  self.val.get "vertical" DirectionSetting
 
 /-- Sets `vertical`: `attribute DirectionSetting vertical` -/
-def VTTCue.setVertical (self : VTTCue) (value : DirectionSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setVertical (self : VTTCue) (value : DirectionSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setVertical" do
   self.val.set "vertical" (toJS value)
 
 /-- `attribute boolean snapToLines` -/
-def VTTCue.snapToLines (self : VTTCue) : IO Bool := self.val.get "snapToLines" Bool
+@[macro_inline] def VTTCue.snapToLines (self : VTTCue) : IO Bool := Internal.api "Lasm.JS.Web.VTTCue.snapToLines" do
+  self.val.get "snapToLines" Bool
 
 /-- Sets `snapToLines`: `attribute boolean snapToLines` -/
-def VTTCue.setSnapToLines (self : VTTCue) (value : Bool) : IO Unit :=
+@[macro_inline] def VTTCue.setSnapToLines (self : VTTCue) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setSnapToLines" do
   self.val.set "snapToLines" (toJS value)
 
 /-- `attribute LineAndPositionSetting line` -/
-def VTTCue.line (self : VTTCue) : IO LineAndPositionSetting := self.val.get "line" LineAndPositionSetting
+@[macro_inline] def VTTCue.line (self : VTTCue) : IO LineAndPositionSetting := Internal.api "Lasm.JS.Web.VTTCue.line" do
+  self.val.get "line" LineAndPositionSetting
 
 /-- Sets `line`: `attribute LineAndPositionSetting line` -/
-def VTTCue.setLine (self : VTTCue) (value : LineAndPositionSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setLine (self : VTTCue) (value : LineAndPositionSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setLine" do
   self.val.set "line" (toJS value)
 
 /-- `attribute LineAlignSetting lineAlign` -/
-def VTTCue.lineAlign (self : VTTCue) : IO LineAlignSetting := self.val.get "lineAlign" LineAlignSetting
+@[macro_inline] def VTTCue.lineAlign (self : VTTCue) : IO LineAlignSetting := Internal.api "Lasm.JS.Web.VTTCue.lineAlign" do
+  self.val.get "lineAlign" LineAlignSetting
 
 /-- Sets `lineAlign`: `attribute LineAlignSetting lineAlign` -/
-def VTTCue.setLineAlign (self : VTTCue) (value : LineAlignSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setLineAlign (self : VTTCue) (value : LineAlignSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setLineAlign" do
   self.val.set "lineAlign" (toJS value)
 
 /-- `attribute LineAndPositionSetting position` -/
-def VTTCue.position (self : VTTCue) : IO LineAndPositionSetting := self.val.get "position" LineAndPositionSetting
+@[macro_inline] def VTTCue.position (self : VTTCue) : IO LineAndPositionSetting := Internal.api "Lasm.JS.Web.VTTCue.position" do
+  self.val.get "position" LineAndPositionSetting
 
 /-- Sets `position`: `attribute LineAndPositionSetting position` -/
-def VTTCue.setPosition (self : VTTCue) (value : LineAndPositionSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setPosition (self : VTTCue) (value : LineAndPositionSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setPosition" do
   self.val.set "position" (toJS value)
 
 /-- `attribute PositionAlignSetting positionAlign` -/
-def VTTCue.positionAlign (self : VTTCue) : IO PositionAlignSetting := self.val.get "positionAlign" PositionAlignSetting
+@[macro_inline] def VTTCue.positionAlign (self : VTTCue) : IO PositionAlignSetting := Internal.api "Lasm.JS.Web.VTTCue.positionAlign" do
+  self.val.get "positionAlign" PositionAlignSetting
 
 /-- Sets `positionAlign`: `attribute PositionAlignSetting positionAlign` -/
-def VTTCue.setPositionAlign (self : VTTCue) (value : PositionAlignSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setPositionAlign (self : VTTCue) (value : PositionAlignSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setPositionAlign" do
   self.val.set "positionAlign" (toJS value)
 
 /-- `attribute double size` -/
-def VTTCue.size (self : VTTCue) : IO Float := self.val.get "size" Float
+@[macro_inline] def VTTCue.size (self : VTTCue) : IO Float := Internal.api "Lasm.JS.Web.VTTCue.size" do
+  self.val.get "size" Float
 
 /-- Sets `size`: `attribute double size` -/
-def VTTCue.setSize (self : VTTCue) (value : Float) : IO Unit :=
+@[macro_inline] def VTTCue.setSize (self : VTTCue) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setSize" do
   self.val.set "size" (toJS value)
 
 /-- `attribute AlignSetting align` -/
-def VTTCue.align (self : VTTCue) : IO AlignSetting := self.val.get "align" AlignSetting
+@[macro_inline] def VTTCue.align (self : VTTCue) : IO AlignSetting := Internal.api "Lasm.JS.Web.VTTCue.align" do
+  self.val.get "align" AlignSetting
 
 /-- Sets `align`: `attribute AlignSetting align` -/
-def VTTCue.setAlign (self : VTTCue) (value : AlignSetting) : IO Unit :=
+@[macro_inline] def VTTCue.setAlign (self : VTTCue) (value : AlignSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setAlign" do
   self.val.set "align" (toJS value)
 
 /-- `attribute DOMString text` -/
-def VTTCue.text (self : VTTCue) : IO String := self.val.get "text" String
+@[macro_inline] def VTTCue.text (self : VTTCue) : IO String := Internal.api "Lasm.JS.Web.VTTCue.text" do
+  self.val.get "text" String
 
 /-- Sets `text`: `attribute DOMString text` -/
-def VTTCue.setText (self : VTTCue) (value : String) : IO Unit :=
+@[macro_inline] def VTTCue.setText (self : VTTCue) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setText" do
   self.val.set "text" (toJS value)
 
 /-- `DocumentFragment getCueAsHTML()` -/
-def VTTCue.getCueAsHTML (self : VTTCue) : IO DocumentFragment := do
-  let r ← self.val.callMethod "getCueAsHTML" (Support.args #[]) Value
+@[macro_inline] def VTTCue.getCueAsHTML (self : VTTCue) : IO DocumentFragment := Internal.api "Lasm.JS.Web.VTTCue.getCueAsHTML" do
+  let r ← self.val.callMethod "getCueAsHTML" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof VTTRegion`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VTTRegion`). -/
-def VTTRegion.cast? (v : Value) : IO (Option VTTRegion) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VTTRegion"] Value) v) then some { val := v } else none
+@[macro_inline] def VTTRegion.cast? (v : Value) : IO (Option VTTRegion) := Internal.api "Lasm.JS.Web.VTTRegion.cast?" do
+  Internal.cast (Internal.getGlobal ["VTTRegion"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def VTTRegion.new : IO VTTRegion :=
+@[macro_inline] def VTTRegion.new : IO VTTRegion := Internal.api "Lasm.JS.Web.VTTRegion.new" do
   Lasm.JS.Binding.invoke VTTRegion { name := "Lasm.JS.Web.VTTRegion.new", module := "globalThis", path := "VTTRegion", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `attribute DOMString id` -/
-def VTTRegion.id (self : VTTRegion) : IO String := self.val.get "id" String
+@[macro_inline] def VTTRegion.id (self : VTTRegion) : IO String := Internal.api "Lasm.JS.Web.VTTRegion.id" do
+  self.val.get "id" String
 
 /-- Sets `id`: `attribute DOMString id` -/
-def VTTRegion.setId (self : VTTRegion) (value : String) : IO Unit :=
+@[macro_inline] def VTTRegion.setId (self : VTTRegion) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setId" do
   self.val.set "id" (toJS value)
 
 /-- `attribute double width` -/
-def VTTRegion.width (self : VTTRegion) : IO Float := self.val.get "width" Float
+@[macro_inline] def VTTRegion.width (self : VTTRegion) : IO Float := Internal.api "Lasm.JS.Web.VTTRegion.width" do
+  self.val.get "width" Float
 
 /-- Sets `width`: `attribute double width` -/
-def VTTRegion.setWidth (self : VTTRegion) (value : Float) : IO Unit :=
+@[macro_inline] def VTTRegion.setWidth (self : VTTRegion) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setWidth" do
   self.val.set "width" (toJS value)
 
 /-- `attribute unsigned long lines` -/
-def VTTRegion.lines (self : VTTRegion) : IO Nat := self.val.get "lines" Nat
+@[macro_inline] def VTTRegion.lines (self : VTTRegion) : IO Nat := Internal.api "Lasm.JS.Web.VTTRegion.lines" do
+  self.val.get "lines" Nat
 
 /-- Sets `lines`: `attribute unsigned long lines` -/
-def VTTRegion.setLines (self : VTTRegion) (value : Nat) : IO Unit :=
+@[macro_inline] def VTTRegion.setLines (self : VTTRegion) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setLines" do
   self.val.set "lines" (toJS value)
 
 /-- `attribute double regionAnchorX` -/
-def VTTRegion.regionAnchorX (self : VTTRegion) : IO Float := self.val.get "regionAnchorX" Float
+@[macro_inline] def VTTRegion.regionAnchorX (self : VTTRegion) : IO Float := Internal.api "Lasm.JS.Web.VTTRegion.regionAnchorX" do
+  self.val.get "regionAnchorX" Float
 
 /-- Sets `regionAnchorX`: `attribute double regionAnchorX` -/
-def VTTRegion.setRegionAnchorX (self : VTTRegion) (value : Float) : IO Unit :=
+@[macro_inline] def VTTRegion.setRegionAnchorX (self : VTTRegion) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setRegionAnchorX" do
   self.val.set "regionAnchorX" (toJS value)
 
 /-- `attribute double regionAnchorY` -/
-def VTTRegion.regionAnchorY (self : VTTRegion) : IO Float := self.val.get "regionAnchorY" Float
+@[macro_inline] def VTTRegion.regionAnchorY (self : VTTRegion) : IO Float := Internal.api "Lasm.JS.Web.VTTRegion.regionAnchorY" do
+  self.val.get "regionAnchorY" Float
 
 /-- Sets `regionAnchorY`: `attribute double regionAnchorY` -/
-def VTTRegion.setRegionAnchorY (self : VTTRegion) (value : Float) : IO Unit :=
+@[macro_inline] def VTTRegion.setRegionAnchorY (self : VTTRegion) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setRegionAnchorY" do
   self.val.set "regionAnchorY" (toJS value)
 
 /-- `attribute double viewportAnchorX` -/
-def VTTRegion.viewportAnchorX (self : VTTRegion) : IO Float := self.val.get "viewportAnchorX" Float
+@[macro_inline] def VTTRegion.viewportAnchorX (self : VTTRegion) : IO Float := Internal.api "Lasm.JS.Web.VTTRegion.viewportAnchorX" do
+  self.val.get "viewportAnchorX" Float
 
 /-- Sets `viewportAnchorX`: `attribute double viewportAnchorX` -/
-def VTTRegion.setViewportAnchorX (self : VTTRegion) (value : Float) : IO Unit :=
+@[macro_inline] def VTTRegion.setViewportAnchorX (self : VTTRegion) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setViewportAnchorX" do
   self.val.set "viewportAnchorX" (toJS value)
 
 /-- `attribute double viewportAnchorY` -/
-def VTTRegion.viewportAnchorY (self : VTTRegion) : IO Float := self.val.get "viewportAnchorY" Float
+@[macro_inline] def VTTRegion.viewportAnchorY (self : VTTRegion) : IO Float := Internal.api "Lasm.JS.Web.VTTRegion.viewportAnchorY" do
+  self.val.get "viewportAnchorY" Float
 
 /-- Sets `viewportAnchorY`: `attribute double viewportAnchorY` -/
-def VTTRegion.setViewportAnchorY (self : VTTRegion) (value : Float) : IO Unit :=
+@[macro_inline] def VTTRegion.setViewportAnchorY (self : VTTRegion) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setViewportAnchorY" do
   self.val.set "viewportAnchorY" (toJS value)
 
 /-- `attribute ScrollSetting scroll` -/
-def VTTRegion.scroll (self : VTTRegion) : IO ScrollSetting := self.val.get "scroll" ScrollSetting
+@[macro_inline] def VTTRegion.scroll (self : VTTRegion) : IO ScrollSetting := Internal.api "Lasm.JS.Web.VTTRegion.scroll" do
+  self.val.get "scroll" ScrollSetting
 
 /-- Sets `scroll`: `attribute ScrollSetting scroll` -/
-def VTTRegion.setScroll (self : VTTRegion) (value : ScrollSetting) : IO Unit :=
+@[macro_inline] def VTTRegion.setScroll (self : VTTRegion) (value : ScrollSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTRegion.setScroll" do
   self.val.set "scroll" (toJS value)
 
 end Lasm.JS.Web

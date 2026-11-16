@@ -6,28 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.MediaSource
+import Lasm.JS.Web.Types.Url
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum EndingType` (File API (https://w3c.github.io/FileAPI/)): "transparent", "native". -/
-inductive EndingType where
-  /-- "transparent" -/
-  | transparent
-  /-- "native" -/
-  | native
-  deriving BEq, Repr, Inhabited
-instance : ToJS EndingType := ⟨fun
-  | .transparent => .string "transparent"
-  | .native => .string "native"⟩
-instance : FromJS EndingType where
-  fromJS
-    | .string "transparent" => .ok .transparent
-    | .string "native" => .ok .native
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.EndingType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef BufferSource or Blob or USVString BlobPart`: one constructor per member type. -/
 inductive BlobPart where
@@ -51,8 +42,8 @@ structure BlobPropertyBag where
   type : Option String := none
   /-- `EndingType endings = "transparent"` -/
   endings : Option EndingType := none
-instance : ToJS BlobPropertyBag := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("endings", Support.optional d.endings)]⟩
+instance : ToJS BlobPropertyBag := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("endings", Internal.optional d.endings)]⟩
 
 /-- `(DOMString or ArrayBuffer)`: one constructor per member type. -/
 inductive DOMStringOrArrayBuffer where
@@ -64,7 +55,7 @@ inductive DOMStringOrArrayBuffer where
 def DOMStringOrArrayBuffer.decode (d : Data) : IO DOMStringOrArrayBuffer :=
   match d with
   | .string _ => do return .domString (← Lasm.JS.decodeAs String "DOMStringOrArrayBuffer" d)
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "DOMStringOrArrayBuffer" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "DOMStringOrArrayBuffer" d))
   | _ => throw (IO.userError s!"Lasm.JS.Web: expected a DOMStringOrArrayBuffer, received JavaScript {d.describe}")
 
 /-- `dictionary FilePropertyBag : BlobPropertyBag` (File API (https://w3c.github.io/FileAPI/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -75,9 +66,9 @@ structure FilePropertyBag where
   endings : Option EndingType := none
   /-- `long long lastModified` -/
   lastModified : Option Int := none
-instance : ToJS FilePropertyBag := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("endings", Support.optional d.endings),
-    ("lastModified", Support.optional d.lastModified)]⟩
+instance : ToJS FilePropertyBag := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("endings", Internal.optional d.endings),
+    ("lastModified", Internal.optional d.lastModified)]⟩
 
 /-- `(Blob or MediaSource)`: one constructor per member type. -/
 inductive BlobOrMediaSource where
@@ -92,67 +83,70 @@ instance : Coe Blob BlobOrMediaSource := ⟨.blob⟩
 instance : Coe MediaSource BlobOrMediaSource := ⟨.mediaSource⟩
 
 /-- `v instanceof Blob`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Blob`). -/
-def Blob.cast? (v : Value) : IO (Option Blob) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Blob"] Value) v) then some { val := v } else none
+@[macro_inline] def Blob.cast? (v : Value) : IO (Option Blob) := Internal.api "Lasm.JS.Web.Blob.cast?" do
+  Internal.cast (Internal.getGlobal ["Blob"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional sequence<BlobPart> blobParts, optional BlobPropertyBag options)` -/
-def Blob.new (blobParts : Option (Array BlobPart) := none) (options : Option BlobPropertyBag := none) : IO Blob :=
+@[macro_inline] def Blob.new (blobParts : Option (Array BlobPart) := none) (options : Option BlobPropertyBag := none) : IO Blob := Internal.api "Lasm.JS.Web.Blob.new" do
   Lasm.JS.Binding.invoke Blob { name := "Lasm.JS.Web.Blob.new", module := "globalThis", path := "Blob", construct := true, arity := 2 }
-    (Support.args #[Support.optional blobParts, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional blobParts, Internal.optional options]) (await := false)
 
 /-- `readonly attribute unsigned long long size` -/
-def Blob.size (self : Blob) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def Blob.size (self : Blob) : IO Nat := Internal.api "Lasm.JS.Web.Blob.size" do
+  self.val.get "size" Nat
 
 /-- `readonly attribute DOMString type` -/
-def Blob.type (self : Blob) : IO String := self.val.get "type" String
+@[macro_inline] def Blob.type (self : Blob) : IO String := Internal.api "Lasm.JS.Web.Blob.type" do
+  self.val.get "type" String
 
 /-- `Blob slice(optional long long start, optional long long end, optional DOMString contentType)` -/
-def Blob.slice (self : Blob) (start : Option Int := none) («end» : Option Int := none) (contentType : Option String := none) : IO Blob := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional start, Support.optional «end», Support.optional contentType]) Value
+@[macro_inline] def Blob.slice (self : Blob) (start : Option Int := none) («end» : Option Int := none) (contentType : Option String := none) : IO Blob := Internal.api "Lasm.JS.Web.Blob.slice" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional start, Internal.optional «end», Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `ReadableStream stream()` -/
-def Blob.stream (self : Blob) : IO ReadableStream := do
-  let r ← self.val.callMethod "stream" (Support.args #[]) Value
+@[macro_inline] def Blob.stream (self : Blob) : IO ReadableStream := Internal.api "Lasm.JS.Web.Blob.stream" do
+  let r ← self.val.callMethod "stream" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<USVString> text()` -/
-def Blob.text (self : Blob) : Async String :=
-  self.val.callMethodAwait "text" (Support.args #[]) String
+@[macro_inline] def Blob.text (self : Blob) : Async String := Internal.api "Lasm.JS.Web.Blob.text" do
+  self.val.callMethodAwait "text" (Internal.args #[]) String
 
 /-- `Promise<ArrayBuffer> arrayBuffer()` -/
-def Blob.arrayBuffer (self : Blob) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "arrayBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def Blob.arrayBuffer (self : Blob) : Async ByteArray := Internal.api "Lasm.JS.Web.Blob.arrayBuffer" do
+  let r ← self.val.callMethodAwait "arrayBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `ReadableStream textStream()` -/
-def Blob.textStream (self : Blob) : IO ReadableStream := do
-  let r ← self.val.callMethod "textStream" (Support.args #[]) Value
+@[macro_inline] def Blob.textStream (self : Blob) : IO ReadableStream := Internal.api "Lasm.JS.Web.Blob.textStream" do
+  let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<Uint8Array> bytes()` -/
-def Blob.bytes (self : Blob) : Async ByteArray :=
-  self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def Blob.bytes (self : Blob) : Async ByteArray := Internal.api "Lasm.JS.Web.Blob.bytes" do
+  self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
 /-- `v instanceof FileList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileList`). -/
-def FileList.cast? (v : Value) : IO (Option FileList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileList"] Value) v) then some { val := v } else none
+@[macro_inline] def FileList.cast? (v : Value) : IO (Option FileList) := Internal.api "Lasm.JS.Web.FileList.cast?" do
+  Internal.cast (Internal.getGlobal ["FileList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def FileList.length (self : FileList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def FileList.length (self : FileList) : IO Nat := Internal.api "Lasm.JS.Web.FileList.length" do
+  self.val.get "length" Nat
 
 /-- `getter File? item(unsigned long index)` -/
-def FileList.item (self : FileList) (index : Nat) : IO (Option File) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option File)
+@[macro_inline] def FileList.item (self : FileList) (index : Nat) : IO (Option File) := Internal.api "Lasm.JS.Web.FileList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option File)
 
 /-- `v instanceof FileReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileReader`). -/
-def FileReader.cast? (v : Value) : IO (Option FileReader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileReader"] Value) v) then some { val := v } else none
+@[macro_inline] def FileReader.cast? (v : Value) : IO (Option FileReader) := Internal.api "Lasm.JS.Web.FileReader.cast?" do
+  Internal.cast (Internal.getGlobal ["FileReader"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def FileReader.new : IO FileReader :=
+@[macro_inline] def FileReader.new : IO FileReader := Internal.api "Lasm.JS.Web.FileReader.new" do
   Lasm.JS.Binding.invoke FileReader { name := "Lasm.JS.Web.FileReader.new", module := "globalThis", path := "FileReader", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `const unsigned short EMPTY = 0` -/
 def FileReader.EMPTY : Nat := 0
@@ -164,127 +158,137 @@ def FileReader.LOADING : Nat := 1
 def FileReader.DONE : Nat := 2
 
 /-- `readonly attribute unsigned short readyState` -/
-def FileReader.readyState (self : FileReader) : IO Nat := self.val.get "readyState" Nat
+@[macro_inline] def FileReader.readyState (self : FileReader) : IO Nat := Internal.api "Lasm.JS.Web.FileReader.readyState" do
+  self.val.get "readyState" Nat
 
 /-- `readonly attribute (DOMString or ArrayBuffer)? result` -/
-def FileReader.result (self : FileReader) : IO (Option DOMStringOrArrayBuffer) := do
+@[macro_inline] def FileReader.result (self : FileReader) : IO (Option DOMStringOrArrayBuffer) := Internal.api "Lasm.JS.Web.FileReader.result" do
   let r ← self.val.get "result" (Option Data)
   (fun x => x.mapM DOMStringOrArrayBuffer.decode) r
 
 /-- `readonly attribute DOMException? error` -/
-def FileReader.error (self : FileReader) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def FileReader.error (self : FileReader) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.FileReader.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `attribute EventHandler onloadstart` -/
-def FileReader.onloadstart (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onloadstart" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onloadstart (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onloadstart" do
+  self.val.get "onloadstart" (Option EventHandlerNonNull)
 
 /-- Sets `onloadstart`: `attribute EventHandler onloadstart` -/
-def FileReader.setOnloadstart (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnloadstart (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnloadstart" do
   self.val.set "onloadstart" (toJS value)
 
 /-- `attribute EventHandler onprogress` -/
-def FileReader.onprogress (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onprogress" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onprogress (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onprogress" do
+  self.val.get "onprogress" (Option EventHandlerNonNull)
 
 /-- Sets `onprogress`: `attribute EventHandler onprogress` -/
-def FileReader.setOnprogress (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnprogress (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnprogress" do
   self.val.set "onprogress" (toJS value)
 
 /-- `attribute EventHandler onload` -/
-def FileReader.onload (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onload" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onload (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onload" do
+  self.val.get "onload" (Option EventHandlerNonNull)
 
 /-- Sets `onload`: `attribute EventHandler onload` -/
-def FileReader.setOnload (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnload (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnload" do
   self.val.set "onload" (toJS value)
 
 /-- `attribute EventHandler onabort` -/
-def FileReader.onabort (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onabort (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def FileReader.setOnabort (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnabort (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def FileReader.onerror (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onerror (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def FileReader.setOnerror (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnerror (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onloadend` -/
-def FileReader.onloadend (self : FileReader) : IO (Option EventHandlerNonNull) := self.val.get "onloadend" (Option EventHandlerNonNull)
+@[macro_inline] def FileReader.onloadend (self : FileReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FileReader.onloadend" do
+  self.val.get "onloadend" (Option EventHandlerNonNull)
 
 /-- Sets `onloadend`: `attribute EventHandler onloadend` -/
-def FileReader.setOnloadend (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FileReader.setOnloadend (self : FileReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.setOnloadend" do
   self.val.set "onloadend" (toJS value)
 
 /-- `undefined readAsArrayBuffer(Blob blob)` -/
-def FileReader.readAsArrayBuffer (self : FileReader) (blob : Blob) : IO Unit :=
-  self.val.callMethod "readAsArrayBuffer" (Support.args #[toJS blob]) Unit
+@[macro_inline] def FileReader.readAsArrayBuffer (self : FileReader) (blob : Blob) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.readAsArrayBuffer" do
+  self.val.callMethod "readAsArrayBuffer" (Internal.args #[toJS blob]) Unit
 
 /-- `undefined readAsBinaryString(Blob blob)` -/
-def FileReader.readAsBinaryString (self : FileReader) (blob : Blob) : IO Unit :=
-  self.val.callMethod "readAsBinaryString" (Support.args #[toJS blob]) Unit
+@[macro_inline] def FileReader.readAsBinaryString (self : FileReader) (blob : Blob) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.readAsBinaryString" do
+  self.val.callMethod "readAsBinaryString" (Internal.args #[toJS blob]) Unit
 
 /-- `undefined readAsText(Blob blob, optional DOMString encoding)` -/
-def FileReader.readAsText (self : FileReader) (blob : Blob) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "readAsText" (Support.args #[toJS blob, Support.optional encoding]) Unit
+@[macro_inline] def FileReader.readAsText (self : FileReader) (blob : Blob) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.readAsText" do
+  self.val.callMethod "readAsText" (Internal.args #[toJS blob, Internal.optional encoding]) Unit
 
 /-- `undefined readAsDataURL(Blob blob)` -/
-def FileReader.readAsDataURL (self : FileReader) (blob : Blob) : IO Unit :=
-  self.val.callMethod "readAsDataURL" (Support.args #[toJS blob]) Unit
+@[macro_inline] def FileReader.readAsDataURL (self : FileReader) (blob : Blob) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.readAsDataURL" do
+  self.val.callMethod "readAsDataURL" (Internal.args #[toJS blob]) Unit
 
 /-- `undefined abort()` -/
-def FileReader.abort (self : FileReader) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[]) Unit
+@[macro_inline] def FileReader.abort (self : FileReader) : IO Unit := Internal.api "Lasm.JS.Web.FileReader.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
 
 /-- `v instanceof FileReaderSync`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileReaderSync`). -/
-def FileReaderSync.cast? (v : Value) : IO (Option FileReaderSync) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileReaderSync"] Value) v) then some { val := v } else none
+@[macro_inline] def FileReaderSync.cast? (v : Value) : IO (Option FileReaderSync) := Internal.api "Lasm.JS.Web.FileReaderSync.cast?" do
+  Internal.cast (Internal.getGlobal ["FileReaderSync"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def FileReaderSync.new : IO FileReaderSync :=
+@[macro_inline] def FileReaderSync.new : IO FileReaderSync := Internal.api "Lasm.JS.Web.FileReaderSync.new" do
   Lasm.JS.Binding.invoke FileReaderSync { name := "Lasm.JS.Web.FileReaderSync.new", module := "globalThis", path := "FileReaderSync", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `ArrayBuffer readAsArrayBuffer(Blob blob)` -/
-def FileReaderSync.readAsArrayBuffer (self : FileReaderSync) (blob : Blob) : IO ByteArray := do
-  let r ← self.val.callMethod "readAsArrayBuffer" (Support.args #[toJS blob]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def FileReaderSync.readAsArrayBuffer (self : FileReaderSync) (blob : Blob) : IO ByteArray := Internal.api "Lasm.JS.Web.FileReaderSync.readAsArrayBuffer" do
+  let r ← self.val.callMethod "readAsArrayBuffer" (Internal.args #[toJS blob]) Value
+  Internal.arrayBufferBytes r
 
 /-- `DOMString readAsBinaryString(Blob blob)` -/
-def FileReaderSync.readAsBinaryString (self : FileReaderSync) (blob : Blob) : IO String :=
-  self.val.callMethod "readAsBinaryString" (Support.args #[toJS blob]) String
+@[macro_inline] def FileReaderSync.readAsBinaryString (self : FileReaderSync) (blob : Blob) : IO String := Internal.api "Lasm.JS.Web.FileReaderSync.readAsBinaryString" do
+  self.val.callMethod "readAsBinaryString" (Internal.args #[toJS blob]) String
 
 /-- `DOMString readAsText(Blob blob, optional DOMString encoding)` -/
-def FileReaderSync.readAsText (self : FileReaderSync) (blob : Blob) (encoding : Option String := none) : IO String :=
-  self.val.callMethod "readAsText" (Support.args #[toJS blob, Support.optional encoding]) String
+@[macro_inline] def FileReaderSync.readAsText (self : FileReaderSync) (blob : Blob) (encoding : Option String := none) : IO String := Internal.api "Lasm.JS.Web.FileReaderSync.readAsText" do
+  self.val.callMethod "readAsText" (Internal.args #[toJS blob, Internal.optional encoding]) String
 
 /-- `DOMString readAsDataURL(Blob blob)` -/
-def FileReaderSync.readAsDataURL (self : FileReaderSync) (blob : Blob) : IO String :=
-  self.val.callMethod "readAsDataURL" (Support.args #[toJS blob]) String
+@[macro_inline] def FileReaderSync.readAsDataURL (self : FileReaderSync) (blob : Blob) : IO String := Internal.api "Lasm.JS.Web.FileReaderSync.readAsDataURL" do
+  self.val.callMethod "readAsDataURL" (Internal.args #[toJS blob]) String
 
 /-- `v instanceof File`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `File`). -/
-def File.cast? (v : Value) : IO (Option File) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["File"] Value) v) then some { val := v } else none
+@[macro_inline] def File.cast? (v : Value) : IO (Option File) := Internal.api "Lasm.JS.Web.File.cast?" do
+  Internal.cast (Internal.getGlobal ["File"] Value) (fun x => { val := x }) v
 
 /-- `constructor(sequence<BlobPart> fileBits, USVString fileName, optional FilePropertyBag options)` -/
-def File.new (fileBits : Array BlobPart) (fileName : String) (options : Option FilePropertyBag := none) : IO File :=
+@[macro_inline] def File.new (fileBits : Array BlobPart) (fileName : String) (options : Option FilePropertyBag := none) : IO File := Internal.api "Lasm.JS.Web.File.new" do
   Lasm.JS.Binding.invoke File { name := "Lasm.JS.Web.File.new", module := "globalThis", path := "File", construct := true, arity := 3 }
-    (Support.args #[toJS fileBits, toJS fileName, Support.optional options]) (await := false)
+    (Internal.args #[toJS fileBits, toJS fileName, Internal.optional options]) (await := false)
 
 /-- `readonly attribute DOMString name` -/
-def File.name (self : File) : IO String := self.val.get "name" String
+@[macro_inline] def File.name (self : File) : IO String := Internal.api "Lasm.JS.Web.File.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute long long lastModified` -/
-def File.lastModified (self : File) : IO Int := self.val.get "lastModified" Int
+@[macro_inline] def File.lastModified (self : File) : IO Int := Internal.api "Lasm.JS.Web.File.lastModified" do
+  self.val.get "lastModified" Int
 
 /-- `static DOMString createObjectURL((Blob or MediaSource) obj)` -/
-def URL.createObjectURL (obj : BlobOrMediaSource) : IO String :=
+@[macro_inline] def URL.createObjectURL (obj : BlobOrMediaSource) : IO String := Internal.api "Lasm.JS.Web.URL.createObjectURL" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.URL.createObjectURL", module := "globalThis", path := "URL.createObjectURL", construct := false, arity := 1 }
-    (Support.args #[toJS obj]) (await := false)
+    (Internal.args #[toJS obj]) (await := false)
 
 /-- `static undefined revokeObjectURL(DOMString url)` -/
-def URL.revokeObjectURL (url : String) : IO Unit :=
+@[macro_inline] def URL.revokeObjectURL (url : String) : IO Unit := Internal.api "Lasm.JS.Web.URL.revokeObjectURL" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.URL.revokeObjectURL", module := "globalThis", path := "URL.revokeObjectURL", construct := false, arity := 1 }
-    (Support.args #[toJS url]) (await := false)
+    (Internal.args #[toJS url]) (await := false)
 
 end Lasm.JS.Web

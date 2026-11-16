@@ -6,74 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.PresentationApi
+import Lasm.JS.Web.Types.Websockets
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PresentationConnectionState` (Presentation API (https://w3c.github.io/presentation-api/)): "connecting", "connected", "closed", "terminated". -/
-inductive PresentationConnectionState where
-  /-- "connecting" -/
-  | connecting
-  /-- "connected" -/
-  | connected
-  /-- "closed" -/
-  | closed
-  /-- "terminated" -/
-  | terminated
-  deriving BEq, Repr, Inhabited
-instance : ToJS PresentationConnectionState := ⟨fun
-  | .connecting => .string "connecting"
-  | .connected => .string "connected"
-  | .closed => .string "closed"
-  | .terminated => .string "terminated"⟩
-instance : FromJS PresentationConnectionState where
-  fromJS
-    | .string "connecting" => .ok .connecting
-    | .string "connected" => .ok .connected
-    | .string "closed" => .ok .closed
-    | .string "terminated" => .ok .terminated
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PresentationConnectionState"
-
-/-- `enum BinaryType` (WebSockets Standard (https://websockets.spec.whatwg.org/)): "blob", "arraybuffer". -/
-inductive BinaryType where
-  /-- "blob" -/
-  | blob
-  /-- "arraybuffer" -/
-  | arraybuffer
-  deriving BEq, Repr, Inhabited
-instance : ToJS BinaryType := ⟨fun
-  | .blob => .string "blob"
-  | .arraybuffer => .string "arraybuffer"⟩
-instance : FromJS BinaryType where
-  fromJS
-    | .string "blob" => .ok .blob
-    | .string "arraybuffer" => .ok .arraybuffer
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BinaryType"
-
-/-- `enum PresentationConnectionCloseReason` (Presentation API (https://w3c.github.io/presentation-api/)): "error", "closed", "wentaway". -/
-inductive PresentationConnectionCloseReason where
-  /-- "error" -/
-  | error
-  /-- "closed" -/
-  | closed
-  /-- "wentaway" -/
-  | wentaway
-  deriving BEq, Repr, Inhabited
-instance : ToJS PresentationConnectionCloseReason := ⟨fun
-  | .error => .string "error"
-  | .closed => .string "closed"
-  | .wentaway => .string "wentaway"⟩
-instance : FromJS PresentationConnectionCloseReason where
-  fromJS
-    | .string "error" => .ok .error
-    | .string "closed" => .ok .closed
-    | .string "wentaway" => .ok .wentaway
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PresentationConnectionCloseReason"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PresentationConnectionAvailableEventInit : EventInit` (Presentation API (https://w3c.github.io/presentation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PresentationConnectionAvailableEventInit where
@@ -85,9 +29,9 @@ structure PresentationConnectionAvailableEventInit where
   composed : Option Bool := none
   /-- `required PresentationConnection connection` -/
   connection : PresentationConnection
-instance : ToJS PresentationConnectionAvailableEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS PresentationConnectionAvailableEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("connection", toJS d.connection)]⟩
 
 /-- `dictionary PresentationConnectionCloseEventInit : EventInit` (Presentation API (https://w3c.github.io/presentation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -102,203 +46,220 @@ structure PresentationConnectionCloseEventInit where
   reason : PresentationConnectionCloseReason
   /-- `DOMString message = ""` -/
   message : Option String := none
-instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("reason", toJS d.reason),
-    ("message", Support.optional d.message)]⟩
+    ("message", Internal.optional d.message)]⟩
 
 /-- `v instanceof Presentation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Presentation`). -/
-def Presentation.cast? (v : Value) : IO (Option Presentation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Presentation"] Value) v) then some { val := v } else none
+@[macro_inline] def Presentation.cast? (v : Value) : IO (Option Presentation) := Internal.api "Lasm.JS.Web.Presentation.cast?" do
+  Internal.cast (Internal.getGlobal ["Presentation"] Value) (fun x => { val := x }) v
 
 /-- `attribute PresentationRequest? defaultRequest` -/
-def Presentation.defaultRequest (self : Presentation) : IO (Option PresentationRequest) := self.val.get "defaultRequest" (Option PresentationRequest)
+@[macro_inline] def Presentation.defaultRequest (self : Presentation) : IO (Option PresentationRequest) := Internal.api "Lasm.JS.Web.Presentation.defaultRequest" do
+  self.val.get "defaultRequest" (Option PresentationRequest)
 
 /-- Sets `defaultRequest`: `attribute PresentationRequest? defaultRequest` -/
-def Presentation.setDefaultRequest (self : Presentation) (value : Option PresentationRequest) : IO Unit :=
+@[macro_inline] def Presentation.setDefaultRequest (self : Presentation) (value : Option PresentationRequest) : IO Unit := Internal.api "Lasm.JS.Web.Presentation.setDefaultRequest" do
   self.val.set "defaultRequest" (toJS value)
 
 /-- `readonly attribute PresentationReceiver? receiver` -/
-def Presentation.receiver (self : Presentation) : IO (Option PresentationReceiver) := self.val.get "receiver" (Option PresentationReceiver)
+@[macro_inline] def Presentation.receiver (self : Presentation) : IO (Option PresentationReceiver) := Internal.api "Lasm.JS.Web.Presentation.receiver" do
+  self.val.get "receiver" (Option PresentationReceiver)
 
 /-- `v instanceof PresentationAvailability`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationAvailability`). -/
-def PresentationAvailability.cast? (v : Value) : IO (Option PresentationAvailability) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationAvailability"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationAvailability.cast? (v : Value) : IO (Option PresentationAvailability) := Internal.api "Lasm.JS.Web.PresentationAvailability.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationAvailability"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean value` -/
-def PresentationAvailability.value (self : PresentationAvailability) : IO Bool := self.val.get "value" Bool
+@[macro_inline] def PresentationAvailability.value (self : PresentationAvailability) : IO Bool := Internal.api "Lasm.JS.Web.PresentationAvailability.value" do
+  self.val.get "value" Bool
 
 /-- `attribute EventHandler onchange` -/
-def PresentationAvailability.onchange (self : PresentationAvailability) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationAvailability.onchange (self : PresentationAvailability) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationAvailability.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def PresentationAvailability.setOnchange (self : PresentationAvailability) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationAvailability.setOnchange (self : PresentationAvailability) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationAvailability.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `v instanceof PresentationConnection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationConnection`). -/
-def PresentationConnection.cast? (v : Value) : IO (Option PresentationConnection) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationConnection"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationConnection.cast? (v : Value) : IO (Option PresentationConnection) := Internal.api "Lasm.JS.Web.PresentationConnection.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationConnection"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString id` -/
-def PresentationConnection.id (self : PresentationConnection) : IO String := self.val.get "id" String
+@[macro_inline] def PresentationConnection.id (self : PresentationConnection) : IO String := Internal.api "Lasm.JS.Web.PresentationConnection.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute USVString url` -/
-def PresentationConnection.url (self : PresentationConnection) : IO String := self.val.get "url" String
+@[macro_inline] def PresentationConnection.url (self : PresentationConnection) : IO String := Internal.api "Lasm.JS.Web.PresentationConnection.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute PresentationConnectionState state` -/
-def PresentationConnection.state (self : PresentationConnection) : IO PresentationConnectionState := self.val.get "state" PresentationConnectionState
+@[macro_inline] def PresentationConnection.state (self : PresentationConnection) : IO PresentationConnectionState := Internal.api "Lasm.JS.Web.PresentationConnection.state" do
+  self.val.get "state" PresentationConnectionState
 
 /-- `attribute EventHandler onconnect` -/
-def PresentationConnection.onconnect (self : PresentationConnection) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationConnection.onconnect (self : PresentationConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationConnection.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def PresentationConnection.setOnconnect (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationConnection.setOnconnect (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def PresentationConnection.onclose (self : PresentationConnection) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationConnection.onclose (self : PresentationConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationConnection.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def PresentationConnection.setOnclose (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationConnection.setOnclose (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `attribute EventHandler onterminate` -/
-def PresentationConnection.onterminate (self : PresentationConnection) : IO (Option EventHandlerNonNull) := self.val.get "onterminate" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationConnection.onterminate (self : PresentationConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationConnection.onterminate" do
+  self.val.get "onterminate" (Option EventHandlerNonNull)
 
 /-- Sets `onterminate`: `attribute EventHandler onterminate` -/
-def PresentationConnection.setOnterminate (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationConnection.setOnterminate (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.setOnterminate" do
   self.val.set "onterminate" (toJS value)
 
 /-- `attribute BinaryType binaryType` -/
-def PresentationConnection.binaryType (self : PresentationConnection) : IO BinaryType := self.val.get "binaryType" BinaryType
+@[macro_inline] def PresentationConnection.binaryType (self : PresentationConnection) : IO BinaryType := Internal.api "Lasm.JS.Web.PresentationConnection.binaryType" do
+  self.val.get "binaryType" BinaryType
 
 /-- Sets `binaryType`: `attribute BinaryType binaryType` -/
-def PresentationConnection.setBinaryType (self : PresentationConnection) (value : BinaryType) : IO Unit :=
+@[macro_inline] def PresentationConnection.setBinaryType (self : PresentationConnection) (value : BinaryType) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.setBinaryType" do
   self.val.set "binaryType" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def PresentationConnection.onmessage (self : PresentationConnection) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationConnection.onmessage (self : PresentationConnection) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationConnection.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def PresentationConnection.setOnmessage (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationConnection.setOnmessage (self : PresentationConnection) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `undefined close()` -/
-def PresentationConnection.close (self : PresentationConnection) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def PresentationConnection.close (self : PresentationConnection) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `undefined terminate()` -/
-def PresentationConnection.terminate (self : PresentationConnection) : IO Unit :=
-  self.val.callMethod "terminate" (Support.args #[]) Unit
+@[macro_inline] def PresentationConnection.terminate (self : PresentationConnection) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.terminate" do
+  self.val.callMethod "terminate" (Internal.args #[]) Unit
 
 /-- `undefined send(DOMString message)` -/
-def PresentationConnection.send (self : PresentationConnection) (message : String) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS message]) Unit
+@[macro_inline] def PresentationConnection.send (self : PresentationConnection) (message : String) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.send" do
+  self.val.callMethod "send" (Internal.args #[toJS message]) Unit
 
 /-- `undefined send(Blob data)` -/
-def PresentationConnection.sendWithData (self : PresentationConnection) (data : Blob) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def PresentationConnection.sendWithData (self : PresentationConnection) (data : Blob) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.sendWithData" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBuffer data)` -/
-def PresentationConnection.sendWithArrayBuffer (self : PresentationConnection) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def PresentationConnection.sendWithArrayBuffer (self : PresentationConnection) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.sendWithArrayBuffer" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBufferView data)` -/
-def PresentationConnection.sendWithArrayBufferView (self : PresentationConnection) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def PresentationConnection.sendWithArrayBufferView (self : PresentationConnection) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnection.sendWithArrayBufferView" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 /-- `v instanceof PresentationConnectionAvailableEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationConnectionAvailableEvent`). -/
-def PresentationConnectionAvailableEvent.cast? (v : Value) : IO (Option PresentationConnectionAvailableEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationConnectionAvailableEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationConnectionAvailableEvent.cast? (v : Value) : IO (Option PresentationConnectionAvailableEvent) := Internal.api "Lasm.JS.Web.PresentationConnectionAvailableEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationConnectionAvailableEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, PresentationConnectionAvailableEventInit eventInitDict)` -/
-def PresentationConnectionAvailableEvent.new (type : String) (eventInitDict : PresentationConnectionAvailableEventInit) : IO PresentationConnectionAvailableEvent :=
+@[macro_inline] def PresentationConnectionAvailableEvent.new (type : String) (eventInitDict : PresentationConnectionAvailableEventInit) : IO PresentationConnectionAvailableEvent := Internal.api "Lasm.JS.Web.PresentationConnectionAvailableEvent.new" do
   Lasm.JS.Binding.invoke PresentationConnectionAvailableEvent { name := "Lasm.JS.Web.PresentationConnectionAvailableEvent.new", module := "globalThis", path := "PresentationConnectionAvailableEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute PresentationConnection connection` -/
-def PresentationConnectionAvailableEvent.connection (self : PresentationConnectionAvailableEvent) : IO PresentationConnection := do
+@[macro_inline] def PresentationConnectionAvailableEvent.connection (self : PresentationConnectionAvailableEvent) : IO PresentationConnection := Internal.api "Lasm.JS.Web.PresentationConnectionAvailableEvent.connection" do
   let r ← self.val.get "connection" Value
   pure { val := r }
 
 /-- `v instanceof PresentationConnectionCloseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationConnectionCloseEvent`). -/
-def PresentationConnectionCloseEvent.cast? (v : Value) : IO (Option PresentationConnectionCloseEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationConnectionCloseEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationConnectionCloseEvent.cast? (v : Value) : IO (Option PresentationConnectionCloseEvent) := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationConnectionCloseEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, PresentationConnectionCloseEventInit eventInitDict)` -/
-def PresentationConnectionCloseEvent.new (type : String) (eventInitDict : PresentationConnectionCloseEventInit) : IO PresentationConnectionCloseEvent :=
+@[macro_inline] def PresentationConnectionCloseEvent.new (type : String) (eventInitDict : PresentationConnectionCloseEventInit) : IO PresentationConnectionCloseEvent := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.new" do
   Lasm.JS.Binding.invoke PresentationConnectionCloseEvent { name := "Lasm.JS.Web.PresentationConnectionCloseEvent.new", module := "globalThis", path := "PresentationConnectionCloseEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute PresentationConnectionCloseReason reason` -/
-def PresentationConnectionCloseEvent.reason (self : PresentationConnectionCloseEvent) : IO PresentationConnectionCloseReason := self.val.get "reason" PresentationConnectionCloseReason
+@[macro_inline] def PresentationConnectionCloseEvent.reason (self : PresentationConnectionCloseEvent) : IO PresentationConnectionCloseReason := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.reason" do
+  self.val.get "reason" PresentationConnectionCloseReason
 
 /-- `readonly attribute DOMString message` -/
-def PresentationConnectionCloseEvent.message (self : PresentationConnectionCloseEvent) : IO String := self.val.get "message" String
+@[macro_inline] def PresentationConnectionCloseEvent.message (self : PresentationConnectionCloseEvent) : IO String := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.message" do
+  self.val.get "message" String
 
 /-- `v instanceof PresentationConnectionList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationConnectionList`). -/
-def PresentationConnectionList.cast? (v : Value) : IO (Option PresentationConnectionList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationConnectionList"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationConnectionList.cast? (v : Value) : IO (Option PresentationConnectionList) := Internal.api "Lasm.JS.Web.PresentationConnectionList.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationConnectionList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<PresentationConnection> connections` -/
-def PresentationConnectionList.connections (self : PresentationConnectionList) : IO (Array PresentationConnection) := self.val.get "connections" (Array PresentationConnection)
+@[macro_inline] def PresentationConnectionList.connections (self : PresentationConnectionList) : IO (Array PresentationConnection) := Internal.api "Lasm.JS.Web.PresentationConnectionList.connections" do
+  self.val.get "connections" (Array PresentationConnection)
 
 /-- `attribute EventHandler onconnectionavailable` -/
-def PresentationConnectionList.onconnectionavailable (self : PresentationConnectionList) : IO (Option EventHandlerNonNull) := self.val.get "onconnectionavailable" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationConnectionList.onconnectionavailable (self : PresentationConnectionList) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationConnectionList.onconnectionavailable" do
+  self.val.get "onconnectionavailable" (Option EventHandlerNonNull)
 
 /-- Sets `onconnectionavailable`: `attribute EventHandler onconnectionavailable` -/
-def PresentationConnectionList.setOnconnectionavailable (self : PresentationConnectionList) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationConnectionList.setOnconnectionavailable (self : PresentationConnectionList) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationConnectionList.setOnconnectionavailable" do
   self.val.set "onconnectionavailable" (toJS value)
 
 /-- `v instanceof PresentationReceiver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationReceiver`). -/
-def PresentationReceiver.cast? (v : Value) : IO (Option PresentationReceiver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationReceiver"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationReceiver.cast? (v : Value) : IO (Option PresentationReceiver) := Internal.api "Lasm.JS.Web.PresentationReceiver.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationReceiver"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Promise<PresentationConnectionList> connectionList` -/
-def PresentationReceiver.connectionList (self : PresentationReceiver) : Async PresentationConnectionList := do
+@[macro_inline] def PresentationReceiver.connectionList (self : PresentationReceiver) : Async PresentationConnectionList := Internal.api "Lasm.JS.Web.PresentationReceiver.connectionList" do
   let p ← self.val.get "connectionList" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `v instanceof PresentationRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PresentationRequest`). -/
-def PresentationRequest.cast? (v : Value) : IO (Option PresentationRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PresentationRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def PresentationRequest.cast? (v : Value) : IO (Option PresentationRequest) := Internal.api "Lasm.JS.Web.PresentationRequest.cast?" do
+  Internal.cast (Internal.getGlobal ["PresentationRequest"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USVString url)` -/
-def PresentationRequest.new (url : String) : IO PresentationRequest :=
+@[macro_inline] def PresentationRequest.new (url : String) : IO PresentationRequest := Internal.api "Lasm.JS.Web.PresentationRequest.new" do
   Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.new", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
-    (Support.args #[toJS url]) (await := false)
+    (Internal.args #[toJS url]) (await := false)
 
 /-- `constructor(sequence<USVString> urls)` -/
-def PresentationRequest.newWithUrls (urls : Array String) : IO PresentationRequest :=
+@[macro_inline] def PresentationRequest.newWithUrls (urls : Array String) : IO PresentationRequest := Internal.api "Lasm.JS.Web.PresentationRequest.newWithUrls" do
   Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.newWithUrls", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
-    (Support.args #[toJS urls]) (await := false)
+    (Internal.args #[toJS urls]) (await := false)
 
 /-- `attribute EventHandler onconnectionavailable` -/
-def PresentationRequest.onconnectionavailable (self : PresentationRequest) : IO (Option EventHandlerNonNull) := self.val.get "onconnectionavailable" (Option EventHandlerNonNull)
+@[macro_inline] def PresentationRequest.onconnectionavailable (self : PresentationRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationRequest.onconnectionavailable" do
+  self.val.get "onconnectionavailable" (Option EventHandlerNonNull)
 
 /-- Sets `onconnectionavailable`: `attribute EventHandler onconnectionavailable` -/
-def PresentationRequest.setOnconnectionavailable (self : PresentationRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PresentationRequest.setOnconnectionavailable (self : PresentationRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PresentationRequest.setOnconnectionavailable" do
   self.val.set "onconnectionavailable" (toJS value)
 
 /-- `Promise<PresentationConnection> start()` -/
-def PresentationRequest.start (self : PresentationRequest) : Async PresentationConnection := do
-  let r ← self.val.callMethodAwait "start" (Support.args #[]) Value
+@[macro_inline] def PresentationRequest.start (self : PresentationRequest) : Async PresentationConnection := Internal.api "Lasm.JS.Web.PresentationRequest.start" do
+  let r ← self.val.callMethodAwait "start" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<PresentationConnection> reconnect(USVString presentationId)` -/
-def PresentationRequest.reconnect (self : PresentationRequest) (presentationId : String) : Async PresentationConnection := do
-  let r ← self.val.callMethodAwait "reconnect" (Support.args #[toJS presentationId]) Value
+@[macro_inline] def PresentationRequest.reconnect (self : PresentationRequest) (presentationId : String) : Async PresentationConnection := Internal.api "Lasm.JS.Web.PresentationRequest.reconnect" do
+  let r ← self.val.callMethodAwait "reconnect" (Internal.args #[toJS presentationId]) Value
   pure { val := r }
 
 /-- `Promise<PresentationAvailability> getAvailability()` -/
-def PresentationRequest.getAvailability (self : PresentationRequest) : Async PresentationAvailability := do
-  let r ← self.val.callMethodAwait "getAvailability" (Support.args #[]) Value
+@[macro_inline] def PresentationRequest.getAvailability (self : PresentationRequest) : Async PresentationAvailability := Internal.api "Lasm.JS.Web.PresentationRequest.getAvailability" do
+  let r ← self.val.callMethodAwait "getAvailability" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readonly attribute Presentation presentation` -/
-def Navigator.presentation (self : Navigator) : IO Presentation := do
+@[macro_inline] def Navigator.presentation (self : Navigator) : IO Presentation := Internal.api "Lasm.JS.Web.Navigator.presentation" do
   let r ← self.val.get "presentation" Value
   pure { val := r }
 

@@ -6,47 +6,39 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.PageLifecycle
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ClientLifecycleState` (Page Lifecycle (https://wicg.github.io/page-lifecycle/)): "active", "frozen". -/
-inductive ClientLifecycleState where
-  /-- "active" -/
-  | active
-  /-- "frozen" -/
-  | frozen
-  deriving BEq, Repr, Inhabited
-instance : ToJS ClientLifecycleState := ⟨fun
-  | .active => .string "active"
-  | .frozen => .string "frozen"⟩
-instance : FromJS ClientLifecycleState where
-  fromJS
-    | .string "active" => .ok .active
-    | .string "frozen" => .ok .frozen
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ClientLifecycleState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute ClientLifecycleState lifecycleState` -/
-def Client.lifecycleState (self : Client) : IO ClientLifecycleState := self.val.get "lifecycleState" ClientLifecycleState
+@[macro_inline] def Client.lifecycleState (self : Client) : IO ClientLifecycleState := Internal.api "Lasm.JS.Web.Client.lifecycleState" do
+  self.val.get "lifecycleState" ClientLifecycleState
 
 /-- `attribute EventHandler onfreeze` -/
-def Document.onfreeze (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onfreeze" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onfreeze (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onfreeze" do
+  self.val.get "onfreeze" (Option EventHandlerNonNull)
 
 /-- Sets `onfreeze`: `attribute EventHandler onfreeze` -/
-def Document.setOnfreeze (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnfreeze (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnfreeze" do
   self.val.set "onfreeze" (toJS value)
 
 /-- `attribute EventHandler onresume` -/
-def Document.onresume (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onresume" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onresume (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onresume" do
+  self.val.get "onresume" (Option EventHandlerNonNull)
 
 /-- Sets `onresume`: `attribute EventHandler onresume` -/
-def Document.setOnresume (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnresume (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnresume" do
   self.val.set "onresume" (toJS value)
 
 /-- `readonly attribute boolean wasDiscarded` -/
-def Document.wasDiscarded (self : Document) : IO Bool := self.val.get "wasDiscarded" Bool
+@[macro_inline] def Document.wasDiscarded (self : Document) : IO Bool := Internal.api "Lasm.JS.Web.Document.wasDiscarded" do
+  self.val.get "wasDiscarded" Bool
 
 end Lasm.JS.Web

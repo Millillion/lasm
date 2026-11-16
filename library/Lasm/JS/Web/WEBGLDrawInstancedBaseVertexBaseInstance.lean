@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLDrawInstancedBaseVertexBaseInstance
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `undefined drawArraysInstancedBaseInstanceWEBGL(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount, GLuint baseInstance)` -/
-def WEBGL_draw_instanced_base_vertex_base_instance.drawArraysInstancedBaseInstanceWEBGL (self : WEBGL_draw_instanced_base_vertex_base_instance) (mode : Nat) (first : Int) (count : Int) (instanceCount : Int) (baseInstance : Nat) : IO Unit :=
-  self.val.callMethod "drawArraysInstancedBaseInstanceWEBGL" (Support.args #[toJS mode, toJS first, toJS count, toJS instanceCount, toJS baseInstance]) Unit
+@[macro_inline] def WEBGL_draw_instanced_base_vertex_base_instance.drawArraysInstancedBaseInstanceWEBGL (self : WEBGL_draw_instanced_base_vertex_base_instance) (mode : Nat) (first : Int) (count : Int) (instanceCount : Int) (baseInstance : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_draw_instanced_base_vertex_base_instance.drawArraysInstancedBaseInstanceWEBGL" do
+  self.val.callMethod "drawArraysInstancedBaseInstanceWEBGL" (Internal.args #[toJS mode, toJS first, toJS count, toJS instanceCount, toJS baseInstance]) Unit
 
 /-- `undefined drawElementsInstancedBaseVertexBaseInstanceWEBGL(GLenum mode, GLsizei count, GLenum type, GLintptr offset, GLsizei instanceCount, GLint baseVertex, GLuint baseInstance)` -/
-def WEBGL_draw_instanced_base_vertex_base_instance.drawElementsInstancedBaseVertexBaseInstanceWEBGL (self : WEBGL_draw_instanced_base_vertex_base_instance) (mode : Nat) (count : Int) (type : Nat) (offset : Int) (instanceCount : Int) (baseVertex : Int) (baseInstance : Nat) : IO Unit :=
-  self.val.callMethod "drawElementsInstancedBaseVertexBaseInstanceWEBGL" (Support.args #[toJS mode, toJS count, toJS type, toJS offset, toJS instanceCount, toJS baseVertex, toJS baseInstance]) Unit
+@[macro_inline] def WEBGL_draw_instanced_base_vertex_base_instance.drawElementsInstancedBaseVertexBaseInstanceWEBGL (self : WEBGL_draw_instanced_base_vertex_base_instance) (mode : Nat) (count : Int) (type : Nat) (offset : Int) (instanceCount : Int) (baseVertex : Int) (baseInstance : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_draw_instanced_base_vertex_base_instance.drawElementsInstancedBaseVertexBaseInstanceWEBGL" do
+  self.val.callMethod "drawElementsInstancedBaseVertexBaseInstanceWEBGL" (Internal.args #[toJS mode, toJS count, toJS type, toJS offset, toJS instanceCount, toJS baseVertex, toJS baseInstance]) Unit
 
 end Lasm.JS.Web

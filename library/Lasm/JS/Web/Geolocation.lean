@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Geolocation
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback PositionCallback = undefined (GeolocationPosition position)` (Geolocation (https://w3c.github.io/geolocation/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PositionCallback where
@@ -20,10 +24,10 @@ instance : ToJS PositionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PositionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.PositionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PositionCallback.ofFn (f : GeolocationPosition → Async Unit) : IO PositionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg GeolocationPosition args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg GeolocationPosition args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PositionCallback.ofSyncFn (f : GeolocationPosition → IO Unit) : IO PositionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg GeolocationPosition args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg GeolocationPosition args 0)) }
 
 /-- `callback PositionErrorCallback = undefined (GeolocationPositionError positionError)` (Geolocation (https://w3c.github.io/geolocation/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PositionErrorCallback where
@@ -34,10 +38,10 @@ instance : ToJS PositionErrorCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PositionErrorCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.PositionErrorCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PositionErrorCallback.ofFn (f : GeolocationPositionError → Async Unit) : IO PositionErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg GeolocationPositionError args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg GeolocationPositionError args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PositionErrorCallback.ofSyncFn (f : GeolocationPositionError → IO Unit) : IO PositionErrorCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg GeolocationPositionError args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg GeolocationPositionError args 0)) }
 
 /-- `dictionary PositionOptions` (Geolocation (https://w3c.github.io/geolocation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PositionOptions where
@@ -47,74 +51,82 @@ structure PositionOptions where
   timeout : Option Nat := none
   /-- `unsigned long maximumAge = 0` -/
   maximumAge : Option Nat := none
-instance : ToJS PositionOptions := ⟨fun d => Support.fields #[("enableHighAccuracy", Support.optional d.enableHighAccuracy),
-    ("timeout", Support.optional d.timeout),
-    ("maximumAge", Support.optional d.maximumAge)]⟩
+instance : ToJS PositionOptions := ⟨fun d => Internal.fields #[("enableHighAccuracy", Internal.optional d.enableHighAccuracy),
+    ("timeout", Internal.optional d.timeout),
+    ("maximumAge", Internal.optional d.maximumAge)]⟩
 
 /-- `v instanceof Geolocation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Geolocation`). -/
-def Geolocation.cast? (v : Value) : IO (Option Geolocation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Geolocation"] Value) v) then some { val := v } else none
+@[macro_inline] def Geolocation.cast? (v : Value) : IO (Option Geolocation) := Internal.api "Lasm.JS.Web.Geolocation.cast?" do
+  Internal.cast (Internal.getGlobal ["Geolocation"] Value) (fun x => { val := x }) v
 
 /-- `undefined getCurrentPosition(PositionCallback successCallback, optional PositionErrorCallback? errorCallback, optional PositionOptions options)` -/
-def Geolocation.getCurrentPosition (self : Geolocation) (successCallback : PositionCallback) (errorCallback : Option PositionErrorCallback := none) (options : Option PositionOptions := none) : IO Unit :=
-  self.val.callMethod "getCurrentPosition" (Support.args #[toJS successCallback, Support.optional errorCallback, Support.optional options]) Unit
+@[macro_inline] def Geolocation.getCurrentPosition (self : Geolocation) (successCallback : PositionCallback) (errorCallback : Option PositionErrorCallback := none) (options : Option PositionOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Geolocation.getCurrentPosition" do
+  self.val.callMethod "getCurrentPosition" (Internal.args #[toJS successCallback, Internal.optional errorCallback, Internal.optional options]) Unit
 
 /-- `long watchPosition(PositionCallback successCallback, optional PositionErrorCallback? errorCallback, optional PositionOptions options)` -/
-def Geolocation.watchPosition (self : Geolocation) (successCallback : PositionCallback) (errorCallback : Option PositionErrorCallback := none) (options : Option PositionOptions := none) : IO Int :=
-  self.val.callMethod "watchPosition" (Support.args #[toJS successCallback, Support.optional errorCallback, Support.optional options]) Int
+@[macro_inline] def Geolocation.watchPosition (self : Geolocation) (successCallback : PositionCallback) (errorCallback : Option PositionErrorCallback := none) (options : Option PositionOptions := none) : IO Int := Internal.api "Lasm.JS.Web.Geolocation.watchPosition" do
+  self.val.callMethod "watchPosition" (Internal.args #[toJS successCallback, Internal.optional errorCallback, Internal.optional options]) Int
 
 /-- `undefined clearWatch(long watchId)` -/
-def Geolocation.clearWatch (self : Geolocation) (watchId : Int) : IO Unit :=
-  self.val.callMethod "clearWatch" (Support.args #[toJS watchId]) Unit
+@[macro_inline] def Geolocation.clearWatch (self : Geolocation) (watchId : Int) : IO Unit := Internal.api "Lasm.JS.Web.Geolocation.clearWatch" do
+  self.val.callMethod "clearWatch" (Internal.args #[toJS watchId]) Unit
 
 /-- `v instanceof GeolocationCoordinates`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GeolocationCoordinates`). -/
-def GeolocationCoordinates.cast? (v : Value) : IO (Option GeolocationCoordinates) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GeolocationCoordinates"] Value) v) then some { val := v } else none
+@[macro_inline] def GeolocationCoordinates.cast? (v : Value) : IO (Option GeolocationCoordinates) := Internal.api "Lasm.JS.Web.GeolocationCoordinates.cast?" do
+  Internal.cast (Internal.getGlobal ["GeolocationCoordinates"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double accuracy` -/
-def GeolocationCoordinates.accuracy (self : GeolocationCoordinates) : IO Float := self.val.get "accuracy" Float
+@[macro_inline] def GeolocationCoordinates.accuracy (self : GeolocationCoordinates) : IO Float := Internal.api "Lasm.JS.Web.GeolocationCoordinates.accuracy" do
+  self.val.get "accuracy" Float
 
 /-- `readonly attribute double latitude` -/
-def GeolocationCoordinates.latitude (self : GeolocationCoordinates) : IO Float := self.val.get "latitude" Float
+@[macro_inline] def GeolocationCoordinates.latitude (self : GeolocationCoordinates) : IO Float := Internal.api "Lasm.JS.Web.GeolocationCoordinates.latitude" do
+  self.val.get "latitude" Float
 
 /-- `readonly attribute double longitude` -/
-def GeolocationCoordinates.longitude (self : GeolocationCoordinates) : IO Float := self.val.get "longitude" Float
+@[macro_inline] def GeolocationCoordinates.longitude (self : GeolocationCoordinates) : IO Float := Internal.api "Lasm.JS.Web.GeolocationCoordinates.longitude" do
+  self.val.get "longitude" Float
 
 /-- `readonly attribute double? altitude` -/
-def GeolocationCoordinates.altitude (self : GeolocationCoordinates) : IO (Option Float) := self.val.get "altitude" (Option Float)
+@[macro_inline] def GeolocationCoordinates.altitude (self : GeolocationCoordinates) : IO (Option Float) := Internal.api "Lasm.JS.Web.GeolocationCoordinates.altitude" do
+  self.val.get "altitude" (Option Float)
 
 /-- `readonly attribute double? altitudeAccuracy` -/
-def GeolocationCoordinates.altitudeAccuracy (self : GeolocationCoordinates) : IO (Option Float) := self.val.get "altitudeAccuracy" (Option Float)
+@[macro_inline] def GeolocationCoordinates.altitudeAccuracy (self : GeolocationCoordinates) : IO (Option Float) := Internal.api "Lasm.JS.Web.GeolocationCoordinates.altitudeAccuracy" do
+  self.val.get "altitudeAccuracy" (Option Float)
 
 /-- `readonly attribute double? heading` -/
-def GeolocationCoordinates.heading (self : GeolocationCoordinates) : IO (Option Float) := self.val.get "heading" (Option Float)
+@[macro_inline] def GeolocationCoordinates.heading (self : GeolocationCoordinates) : IO (Option Float) := Internal.api "Lasm.JS.Web.GeolocationCoordinates.heading" do
+  self.val.get "heading" (Option Float)
 
 /-- `readonly attribute double? speed` -/
-def GeolocationCoordinates.speed (self : GeolocationCoordinates) : IO (Option Float) := self.val.get "speed" (Option Float)
+@[macro_inline] def GeolocationCoordinates.speed (self : GeolocationCoordinates) : IO (Option Float) := Internal.api "Lasm.JS.Web.GeolocationCoordinates.speed" do
+  self.val.get "speed" (Option Float)
 
 /-- `object toJSON()` -/
-def GeolocationCoordinates.toJSON (self : GeolocationCoordinates) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def GeolocationCoordinates.toJSON (self : GeolocationCoordinates) : IO Data := Internal.api "Lasm.JS.Web.GeolocationCoordinates.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof GeolocationPosition`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GeolocationPosition`). -/
-def GeolocationPosition.cast? (v : Value) : IO (Option GeolocationPosition) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GeolocationPosition"] Value) v) then some { val := v } else none
+@[macro_inline] def GeolocationPosition.cast? (v : Value) : IO (Option GeolocationPosition) := Internal.api "Lasm.JS.Web.GeolocationPosition.cast?" do
+  Internal.cast (Internal.getGlobal ["GeolocationPosition"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GeolocationCoordinates coords` -/
-def GeolocationPosition.coords (self : GeolocationPosition) : IO GeolocationCoordinates := do
+@[macro_inline] def GeolocationPosition.coords (self : GeolocationPosition) : IO GeolocationCoordinates := Internal.api "Lasm.JS.Web.GeolocationPosition.coords" do
   let r ← self.val.get "coords" Value
   pure { val := r }
 
 /-- `readonly attribute EpochTimeStamp timestamp` -/
-def GeolocationPosition.timestamp (self : GeolocationPosition) : IO Nat := self.val.get "timestamp" Nat
+@[macro_inline] def GeolocationPosition.timestamp (self : GeolocationPosition) : IO Nat := Internal.api "Lasm.JS.Web.GeolocationPosition.timestamp" do
+  self.val.get "timestamp" Nat
 
 /-- `object toJSON()` -/
-def GeolocationPosition.toJSON (self : GeolocationPosition) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def GeolocationPosition.toJSON (self : GeolocationPosition) : IO Data := Internal.api "Lasm.JS.Web.GeolocationPosition.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof GeolocationPositionError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GeolocationPositionError`). -/
-def GeolocationPositionError.cast? (v : Value) : IO (Option GeolocationPositionError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["GeolocationPositionError"] Value) v) then some { val := v } else none
+@[macro_inline] def GeolocationPositionError.cast? (v : Value) : IO (Option GeolocationPositionError) := Internal.api "Lasm.JS.Web.GeolocationPositionError.cast?" do
+  Internal.cast (Internal.getGlobal ["GeolocationPositionError"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short PERMISSION_DENIED = 1` -/
 def GeolocationPositionError.PERMISSION_DENIED : Nat := 1
@@ -126,13 +138,15 @@ def GeolocationPositionError.POSITION_UNAVAILABLE : Nat := 2
 def GeolocationPositionError.TIMEOUT : Nat := 3
 
 /-- `readonly attribute unsigned short code` -/
-def GeolocationPositionError.code (self : GeolocationPositionError) : IO Nat := self.val.get "code" Nat
+@[macro_inline] def GeolocationPositionError.code (self : GeolocationPositionError) : IO Nat := Internal.api "Lasm.JS.Web.GeolocationPositionError.code" do
+  self.val.get "code" Nat
 
 /-- `readonly attribute DOMString message` -/
-def GeolocationPositionError.message (self : GeolocationPositionError) : IO String := self.val.get "message" String
+@[macro_inline] def GeolocationPositionError.message (self : GeolocationPositionError) : IO String := Internal.api "Lasm.JS.Web.GeolocationPositionError.message" do
+  self.val.get "message" String
 
 /-- `readonly attribute Geolocation geolocation` -/
-def Navigator.geolocation (self : Navigator) : IO Geolocation := do
+@[macro_inline] def Navigator.geolocation (self : Navigator) : IO Geolocation := Internal.api "Lasm.JS.Web.Navigator.geolocation" do
   let r ← self.val.get "geolocation" Value
   pure { val := r }
 

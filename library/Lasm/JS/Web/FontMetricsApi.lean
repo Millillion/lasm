@@ -6,87 +6,109 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssTypedOm
+import Lasm.JS.Web.Types.FontMetricsApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof Baseline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Baseline`). -/
-def Baseline.cast? (v : Value) : IO (Option Baseline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Baseline"] Value) v) then some { val := v } else none
+@[macro_inline] def Baseline.cast? (v : Value) : IO (Option Baseline) := Internal.api "Lasm.JS.Web.Baseline.cast?" do
+  Internal.cast (Internal.getGlobal ["Baseline"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def Baseline.name (self : Baseline) : IO String := self.val.get "name" String
+@[macro_inline] def Baseline.name (self : Baseline) : IO String := Internal.api "Lasm.JS.Web.Baseline.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute double value` -/
-def Baseline.value (self : Baseline) : IO Float := self.val.get "value" Float
+@[macro_inline] def Baseline.value (self : Baseline) : IO Float := Internal.api "Lasm.JS.Web.Baseline.value" do
+  self.val.get "value" Float
 
 /-- `v instanceof Font`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Font`). -/
-def Font.cast? (v : Value) : IO (Option Font) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Font"] Value) v) then some { val := v } else none
+@[macro_inline] def Font.cast? (v : Value) : IO (Option Font) := Internal.api "Lasm.JS.Web.Font.cast?" do
+  Internal.cast (Internal.getGlobal ["Font"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def Font.name (self : Font) : IO String := self.val.get "name" String
+@[macro_inline] def Font.name (self : Font) : IO String := Internal.api "Lasm.JS.Web.Font.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute unsigned long glyphsRendered` -/
-def Font.glyphsRendered (self : Font) : IO Nat := self.val.get "glyphsRendered" Nat
+@[macro_inline] def Font.glyphsRendered (self : Font) : IO Nat := Internal.api "Lasm.JS.Web.Font.glyphsRendered" do
+  self.val.get "glyphsRendered" Nat
 
 /-- `v instanceof FontMetrics`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontMetrics`). -/
-def FontMetrics.cast? (v : Value) : IO (Option FontMetrics) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontMetrics"] Value) v) then some { val := v } else none
+@[macro_inline] def FontMetrics.cast? (v : Value) : IO (Option FontMetrics) := Internal.api "Lasm.JS.Web.FontMetrics.cast?" do
+  Internal.cast (Internal.getGlobal ["FontMetrics"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double width` -/
-def FontMetrics.width (self : FontMetrics) : IO Float := self.val.get "width" Float
+@[macro_inline] def FontMetrics.width (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.width" do
+  self.val.get "width" Float
 
 /-- `readonly attribute FrozenArray<double> advances` -/
-def FontMetrics.advances (self : FontMetrics) : IO (Array Float) := self.val.get "advances" (Array Float)
+@[macro_inline] def FontMetrics.advances (self : FontMetrics) : IO (Array Float) := Internal.api "Lasm.JS.Web.FontMetrics.advances" do
+  self.val.get "advances" (Array Float)
 
 /-- `readonly attribute double boundingBoxLeft` -/
-def FontMetrics.boundingBoxLeft (self : FontMetrics) : IO Float := self.val.get "boundingBoxLeft" Float
+@[macro_inline] def FontMetrics.boundingBoxLeft (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.boundingBoxLeft" do
+  self.val.get "boundingBoxLeft" Float
 
 /-- `readonly attribute double boundingBoxRight` -/
-def FontMetrics.boundingBoxRight (self : FontMetrics) : IO Float := self.val.get "boundingBoxRight" Float
+@[macro_inline] def FontMetrics.boundingBoxRight (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.boundingBoxRight" do
+  self.val.get "boundingBoxRight" Float
 
 /-- `readonly attribute double height` -/
-def FontMetrics.height (self : FontMetrics) : IO Float := self.val.get "height" Float
+@[macro_inline] def FontMetrics.height (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.height" do
+  self.val.get "height" Float
 
 /-- `readonly attribute double emHeightAscent` -/
-def FontMetrics.emHeightAscent (self : FontMetrics) : IO Float := self.val.get "emHeightAscent" Float
+@[macro_inline] def FontMetrics.emHeightAscent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.emHeightAscent" do
+  self.val.get "emHeightAscent" Float
 
 /-- `readonly attribute double emHeightDescent` -/
-def FontMetrics.emHeightDescent (self : FontMetrics) : IO Float := self.val.get "emHeightDescent" Float
+@[macro_inline] def FontMetrics.emHeightDescent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.emHeightDescent" do
+  self.val.get "emHeightDescent" Float
 
 /-- `readonly attribute double boundingBoxAscent` -/
-def FontMetrics.boundingBoxAscent (self : FontMetrics) : IO Float := self.val.get "boundingBoxAscent" Float
+@[macro_inline] def FontMetrics.boundingBoxAscent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.boundingBoxAscent" do
+  self.val.get "boundingBoxAscent" Float
 
 /-- `readonly attribute double boundingBoxDescent` -/
-def FontMetrics.boundingBoxDescent (self : FontMetrics) : IO Float := self.val.get "boundingBoxDescent" Float
+@[macro_inline] def FontMetrics.boundingBoxDescent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.boundingBoxDescent" do
+  self.val.get "boundingBoxDescent" Float
 
 /-- `readonly attribute double fontBoundingBoxAscent` -/
-def FontMetrics.fontBoundingBoxAscent (self : FontMetrics) : IO Float := self.val.get "fontBoundingBoxAscent" Float
+@[macro_inline] def FontMetrics.fontBoundingBoxAscent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.fontBoundingBoxAscent" do
+  self.val.get "fontBoundingBoxAscent" Float
 
 /-- `readonly attribute double fontBoundingBoxDescent` -/
-def FontMetrics.fontBoundingBoxDescent (self : FontMetrics) : IO Float := self.val.get "fontBoundingBoxDescent" Float
+@[macro_inline] def FontMetrics.fontBoundingBoxDescent (self : FontMetrics) : IO Float := Internal.api "Lasm.JS.Web.FontMetrics.fontBoundingBoxDescent" do
+  self.val.get "fontBoundingBoxDescent" Float
 
 /-- `readonly attribute Baseline dominantBaseline` -/
-def FontMetrics.dominantBaseline (self : FontMetrics) : IO Baseline := do
+@[macro_inline] def FontMetrics.dominantBaseline (self : FontMetrics) : IO Baseline := Internal.api "Lasm.JS.Web.FontMetrics.dominantBaseline" do
   let r ← self.val.get "dominantBaseline" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<Baseline> baselines` -/
-def FontMetrics.baselines (self : FontMetrics) : IO (Array Baseline) := self.val.get "baselines" (Array Baseline)
+@[macro_inline] def FontMetrics.baselines (self : FontMetrics) : IO (Array Baseline) := Internal.api "Lasm.JS.Web.FontMetrics.baselines" do
+  self.val.get "baselines" (Array Baseline)
 
 /-- `readonly attribute FrozenArray<Font> fonts` -/
-def FontMetrics.fonts (self : FontMetrics) : IO (Array Font) := self.val.get "fonts" (Array Font)
+@[macro_inline] def FontMetrics.fonts (self : FontMetrics) : IO (Array Font) := Internal.api "Lasm.JS.Web.FontMetrics.fonts" do
+  self.val.get "fonts" (Array Font)
 
 /-- `FontMetrics measureElement(Element element)` -/
-def Document.measureElement (self : Document) (element : Element) : IO FontMetrics := do
-  let r ← self.val.callMethod "measureElement" (Support.args #[toJS element]) Value
+@[macro_inline] def Document.measureElement (self : Document) (element : Element) : IO FontMetrics := Internal.api "Lasm.JS.Web.Document.measureElement" do
+  let r ← self.val.callMethod "measureElement" (Internal.args #[toJS element]) Value
   pure { val := r }
 
 /-- `FontMetrics measureText(DOMString text, StylePropertyMapReadOnly styleMap)` -/
-def Document.measureText (self : Document) (text : String) (styleMap : StylePropertyMapReadOnly) : IO FontMetrics := do
-  let r ← self.val.callMethod "measureText" (Support.args #[toJS text, toJS styleMap]) Value
+@[macro_inline] def Document.measureText (self : Document) (text : String) (styleMap : StylePropertyMapReadOnly) : IO FontMetrics := Internal.api "Lasm.JS.Web.Document.measureText" do
+  let r ← self.val.callMethod "measureText" (Internal.args #[toJS text, toJS styleMap]) Value
   pure { val := r }
 
 end Lasm.JS.Web

@@ -6,15 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.EXTPolygonOffsetClamp
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum POLYGON_OFFSET_CLAMP_EXT = 0x8E1B` -/
 def EXT_polygon_offset_clamp.POLYGON_OFFSET_CLAMP_EXT : Nat := 0x8E1B
 
 /-- `undefined polygonOffsetClampEXT(GLfloat factor, GLfloat units, GLfloat clamp)` -/
-def EXT_polygon_offset_clamp.polygonOffsetClampEXT (self : EXT_polygon_offset_clamp) (factor : Float) (units : Float) (clamp : Float) : IO Unit :=
-  self.val.callMethod "polygonOffsetClampEXT" (Support.args #[toJS factor, toJS units, toJS clamp]) Unit
+@[macro_inline] def EXT_polygon_offset_clamp.polygonOffsetClampEXT (self : EXT_polygon_offset_clamp) (factor : Float) (units : Float) (clamp : Float) : IO Unit := Internal.api "Lasm.JS.Web.EXT_polygon_offset_clamp.polygonOffsetClampEXT" do
+  self.val.callMethod "polygonOffsetClampEXT" (Internal.args #[toJS factor, toJS units, toJS clamp]) Unit
 
 end Lasm.JS.Web

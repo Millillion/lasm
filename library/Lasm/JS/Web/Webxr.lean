@@ -6,7 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.Webgl2
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.WebxrDepthSensing
@@ -14,144 +20,9 @@ import Lasm.JS.Web.WebxrDomOverlays
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRHandedness` (WebXR Device API (https://immersive-web.github.io/webxr/)): "none", "left", "right". -/
-inductive XRHandedness where
-  /-- "none" -/
-  | none
-  /-- "left" -/
-  | left
-  /-- "right" -/
-  | right
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRHandedness := ⟨fun
-  | .none => .string "none"
-  | .left => .string "left"
-  | .right => .string "right"⟩
-instance : FromJS XRHandedness where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "left" => .ok .left
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRHandedness"
-
-/-- `enum XRTargetRayMode` (WebXR Device API (https://immersive-web.github.io/webxr/)): "gaze", "tracked-pointer", "screen", "transient-pointer". -/
-inductive XRTargetRayMode where
-  /-- "gaze" -/
-  | gaze
-  /-- "tracked-pointer" -/
-  | trackedPointer
-  /-- "screen" -/
-  | screen
-  /-- "transient-pointer" -/
-  | transientPointer
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRTargetRayMode := ⟨fun
-  | .gaze => .string "gaze"
-  | .trackedPointer => .string "tracked-pointer"
-  | .screen => .string "screen"
-  | .transientPointer => .string "transient-pointer"⟩
-instance : FromJS XRTargetRayMode where
-  fromJS
-    | .string "gaze" => .ok .gaze
-    | .string "tracked-pointer" => .ok .trackedPointer
-    | .string "screen" => .ok .screen
-    | .string "transient-pointer" => .ok .transientPointer
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRTargetRayMode"
-
-/-- `enum XRVisibilityState` (WebXR Device API (https://immersive-web.github.io/webxr/)): "visible", "visible-blurred", "hidden". -/
-inductive XRVisibilityState where
-  /-- "visible" -/
-  | visible
-  /-- "visible-blurred" -/
-  | visibleBlurred
-  /-- "hidden" -/
-  | hidden
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRVisibilityState := ⟨fun
-  | .visible => .string "visible"
-  | .visibleBlurred => .string "visible-blurred"
-  | .hidden => .string "hidden"⟩
-instance : FromJS XRVisibilityState where
-  fromJS
-    | .string "visible" => .ok .visible
-    | .string "visible-blurred" => .ok .visibleBlurred
-    | .string "hidden" => .ok .hidden
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRVisibilityState"
-
-/-- `enum XRReferenceSpaceType` (WebXR Device API (https://immersive-web.github.io/webxr/)): "viewer", "local", "local-floor", "bounded-floor", "unbounded". -/
-inductive XRReferenceSpaceType where
-  /-- "viewer" -/
-  | viewer
-  /-- "local" -/
-  | «local»
-  /-- "local-floor" -/
-  | localFloor
-  /-- "bounded-floor" -/
-  | boundedFloor
-  /-- "unbounded" -/
-  | unbounded
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRReferenceSpaceType := ⟨fun
-  | .viewer => .string "viewer"
-  | .«local» => .string "local"
-  | .localFloor => .string "local-floor"
-  | .boundedFloor => .string "bounded-floor"
-  | .unbounded => .string "unbounded"⟩
-instance : FromJS XRReferenceSpaceType where
-  fromJS
-    | .string "viewer" => .ok .viewer
-    | .string "local" => .ok .«local»
-    | .string "local-floor" => .ok .localFloor
-    | .string "bounded-floor" => .ok .boundedFloor
-    | .string "unbounded" => .ok .unbounded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRReferenceSpaceType"
-
-/-- `enum XRSessionMode` (WebXR Device API (https://immersive-web.github.io/webxr/)): "inline", "immersive-vr", "immersive-ar". -/
-inductive XRSessionMode where
-  /-- "inline" -/
-  | inline
-  /-- "immersive-vr" -/
-  | immersiveVr
-  /-- "immersive-ar" -/
-  | immersiveAr
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRSessionMode := ⟨fun
-  | .inline => .string "inline"
-  | .immersiveVr => .string "immersive-vr"
-  | .immersiveAr => .string "immersive-ar"⟩
-instance : FromJS XRSessionMode where
-  fromJS
-    | .string "inline" => .ok .inline
-    | .string "immersive-vr" => .ok .immersiveVr
-    | .string "immersive-ar" => .ok .immersiveAr
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRSessionMode"
-
-/-- `enum XREye` (WebXR Device API (https://immersive-web.github.io/webxr/)): "none", "left", "right". -/
-inductive XREye where
-  /-- "none" -/
-  | none
-  /-- "left" -/
-  | left
-  /-- "right" -/
-  | right
-  deriving BEq, Repr, Inhabited
-instance : ToJS XREye := ⟨fun
-  | .none => .string "none"
-  | .left => .string "left"
-  | .right => .string "right"⟩
-instance : FromJS XREye where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "left" => .ok .left
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XREye"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRInputSourceEventInit : EventInit` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRInputSourceEventInit where
@@ -165,9 +36,9 @@ structure XRInputSourceEventInit where
   frame : XRFrame
   /-- `required XRInputSource inputSource` -/
   inputSource : XRInputSource
-instance : ToJS XRInputSourceEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRInputSourceEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("frame", toJS d.frame),
     ("inputSource", toJS d.inputSource)]⟩
 
@@ -185,9 +56,9 @@ structure XRInputSourcesChangeEventInit where
   added : Array XRInputSource
   /-- `required sequence<XRInputSource> removed` -/
   removed : Array XRInputSource
-instance : ToJS XRInputSourcesChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRInputSourcesChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("session", toJS d.session),
     ("added", toJS d.added),
     ("removed", toJS d.removed)]⟩
@@ -204,11 +75,11 @@ structure XRReferenceSpaceEventInit where
   referenceSpace : XRReferenceSpace
   /-- `XRRigidTransform? transform = null` -/
   transform : Option XRRigidTransform := none
-instance : ToJS XRReferenceSpaceEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRReferenceSpaceEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("referenceSpace", toJS d.referenceSpace),
-    ("transform", Support.optional d.transform)]⟩
+    ("transform", Internal.optional d.transform)]⟩
 
 /-- `dictionary XRRenderStateInit` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRRenderStateInit where
@@ -224,12 +95,12 @@ structure XRRenderStateInit where
   baseLayer : Option XRWebGLLayer := none
   /-- `sequence<XRLayer>? layers` -/
   layers : Option (Array XRLayer) := none
-instance : ToJS XRRenderStateInit := ⟨fun d => Support.fields #[("depthNear", Support.optional d.depthNear),
-    ("depthFar", Support.optional d.depthFar),
-    ("passthroughFullyObscured", Support.optional d.passthroughFullyObscured),
-    ("inlineVerticalFieldOfView", Support.optional d.inlineVerticalFieldOfView),
-    ("baseLayer", Support.optional d.baseLayer),
-    ("layers", Support.optional d.layers)]⟩
+instance : ToJS XRRenderStateInit := ⟨fun d => Internal.fields #[("depthNear", Internal.optional d.depthNear),
+    ("depthFar", Internal.optional d.depthFar),
+    ("passthroughFullyObscured", Internal.optional d.passthroughFullyObscured),
+    ("inlineVerticalFieldOfView", Internal.optional d.inlineVerticalFieldOfView),
+    ("baseLayer", Internal.optional d.baseLayer),
+    ("layers", Internal.optional d.layers)]⟩
 
 /-- `callback XRFrameRequestCallback = undefined (DOMHighResTimeStamp time, XRFrame frame)` (WebXR Device API (https://immersive-web.github.io/webxr/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure XRFrameRequestCallback where
@@ -240,10 +111,10 @@ instance : ToJS XRFrameRequestCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS XRFrameRequestCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.XRFrameRequestCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def XRFrameRequestCallback.ofFn (f : Float → XRFrame → Async Unit) : IO XRFrameRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg XRFrame args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg XRFrame args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def XRFrameRequestCallback.ofSyncFn (f : Float → XRFrame → IO Unit) : IO XRFrameRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg XRFrame args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg XRFrame args 1)) }
 
 /-- `dictionary XRSessionEventInit : EventInit` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRSessionEventInit where
@@ -255,9 +126,9 @@ structure XRSessionEventInit where
   composed : Option Bool := none
   /-- `required XRSession session` -/
   session : XRSession
-instance : ToJS XRSessionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRSessionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("session", toJS d.session)]⟩
 
 /-- `dictionary XRSessionInit` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -270,10 +141,10 @@ structure XRSessionInit where
   depthSensing : Option XRDepthStateInit := none
   /-- `XRDOMOverlayInit? domOverlay` -/
   domOverlay : Option XRDOMOverlayInit := none
-instance : ToJS XRSessionInit := ⟨fun d => Support.fields #[("requiredFeatures", Support.optional d.requiredFeatures),
-    ("optionalFeatures", Support.optional d.optionalFeatures),
-    ("depthSensing", Support.optional d.depthSensing),
-    ("domOverlay", Support.optional d.domOverlay)]⟩
+instance : ToJS XRSessionInit := ⟨fun d => Internal.fields #[("requiredFeatures", Internal.optional d.requiredFeatures),
+    ("optionalFeatures", Internal.optional d.optionalFeatures),
+    ("depthSensing", Internal.optional d.depthSensing),
+    ("domOverlay", Internal.optional d.domOverlay)]⟩
 
 /-- `dictionary XRVisibilityMaskChangeEventInit : EventInit` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRVisibilityMaskChangeEventInit where
@@ -293,9 +164,9 @@ structure XRVisibilityMaskChangeEventInit where
   vertices : ByteArray
   /-- `required Uint32Array indices` -/
   indices : ByteArray
-instance : ToJS XRVisibilityMaskChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS XRVisibilityMaskChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("session", toJS d.session),
     ("eye", toJS d.eye),
     ("index", toJS d.index),
@@ -328,528 +199,604 @@ structure XRWebGLLayerInit where
   ignoreDepthValues : Option Bool := none
   /-- `double framebufferScaleFactor = 1.0` -/
   framebufferScaleFactor : Option Float := none
-instance : ToJS XRWebGLLayerInit := ⟨fun d => Support.fields #[("antialias", Support.optional d.antialias),
-    ("depth", Support.optional d.depth),
-    ("stencil", Support.optional d.stencil),
-    ("alpha", Support.optional d.alpha),
-    ("ignoreDepthValues", Support.optional d.ignoreDepthValues),
-    ("framebufferScaleFactor", Support.optional d.framebufferScaleFactor)]⟩
+instance : ToJS XRWebGLLayerInit := ⟨fun d => Internal.fields #[("antialias", Internal.optional d.antialias),
+    ("depth", Internal.optional d.depth),
+    ("stencil", Internal.optional d.stencil),
+    ("alpha", Internal.optional d.alpha),
+    ("ignoreDepthValues", Internal.optional d.ignoreDepthValues),
+    ("framebufferScaleFactor", Internal.optional d.framebufferScaleFactor)]⟩
+
+/-- `dictionary XRSessionSupportedPermissionDescriptor : PermissionDescriptor` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure XRSessionSupportedPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `XRSessionMode mode` -/
+  mode : Option XRSessionMode := none
+instance : ToJS XRSessionSupportedPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("mode", Internal.optional d.mode)]⟩
+
+/-- `dictionary XRPermissionDescriptor : PermissionDescriptor` (WebXR Device API (https://immersive-web.github.io/webxr/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure XRPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `XRSessionMode mode` -/
+  mode : Option XRSessionMode := none
+  /-- `sequence<DOMString> requiredFeatures` -/
+  requiredFeatures : Option (Array String) := none
+  /-- `sequence<DOMString> optionalFeatures` -/
+  optionalFeatures : Option (Array String) := none
+instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("mode", Internal.optional d.mode),
+    ("requiredFeatures", Internal.optional d.requiredFeatures),
+    ("optionalFeatures", Internal.optional d.optionalFeatures)]⟩
 
 /-- `v instanceof XRFrame`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRFrame`). -/
-def XRFrame.cast? (v : Value) : IO (Option XRFrame) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRFrame"] Value) v) then some { val := v } else none
+@[macro_inline] def XRFrame.cast? (v : Value) : IO (Option XRFrame) := Internal.api "Lasm.JS.Web.XRFrame.cast?" do
+  Internal.cast (Internal.getGlobal ["XRFrame"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRSession session` -/
-def XRFrame.session (self : XRFrame) : IO XRSession := do
+@[macro_inline] def XRFrame.session (self : XRFrame) : IO XRSession := Internal.api "Lasm.JS.Web.XRFrame.session" do
   let r ← self.val.get "session" Value
   pure { val := r }
 
 /-- `readonly attribute DOMHighResTimeStamp predictedDisplayTime` -/
-def XRFrame.predictedDisplayTime (self : XRFrame) : IO Float := self.val.get "predictedDisplayTime" Float
+@[macro_inline] def XRFrame.predictedDisplayTime (self : XRFrame) : IO Float := Internal.api "Lasm.JS.Web.XRFrame.predictedDisplayTime" do
+  self.val.get "predictedDisplayTime" Float
 
 /-- `XRViewerPose? getViewerPose(XRReferenceSpace referenceSpace)` -/
-def XRFrame.getViewerPose (self : XRFrame) (referenceSpace : XRReferenceSpace) : IO (Option XRViewerPose) :=
-  self.val.callMethod "getViewerPose" (Support.args #[toJS referenceSpace]) (Option XRViewerPose)
+@[macro_inline] def XRFrame.getViewerPose (self : XRFrame) (referenceSpace : XRReferenceSpace) : IO (Option XRViewerPose) := Internal.api "Lasm.JS.Web.XRFrame.getViewerPose" do
+  self.val.callMethod "getViewerPose" (Internal.args #[toJS referenceSpace]) (Option XRViewerPose)
 
 /-- `XRPose? getPose(XRSpace space, XRSpace baseSpace)` -/
-def XRFrame.getPose (self : XRFrame) (space : XRSpace) (baseSpace : XRSpace) : IO (Option XRPose) :=
-  self.val.callMethod "getPose" (Support.args #[toJS space, toJS baseSpace]) (Option XRPose)
+@[macro_inline] def XRFrame.getPose (self : XRFrame) (space : XRSpace) (baseSpace : XRSpace) : IO (Option XRPose) := Internal.api "Lasm.JS.Web.XRFrame.getPose" do
+  self.val.callMethod "getPose" (Internal.args #[toJS space, toJS baseSpace]) (Option XRPose)
 
 /-- `v instanceof XRInputSource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRInputSource`). -/
-def XRInputSource.cast? (v : Value) : IO (Option XRInputSource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRInputSource"] Value) v) then some { val := v } else none
+@[macro_inline] def XRInputSource.cast? (v : Value) : IO (Option XRInputSource) := Internal.api "Lasm.JS.Web.XRInputSource.cast?" do
+  Internal.cast (Internal.getGlobal ["XRInputSource"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRHandedness handedness` -/
-def XRInputSource.handedness (self : XRInputSource) : IO XRHandedness := self.val.get "handedness" XRHandedness
+@[macro_inline] def XRInputSource.handedness (self : XRInputSource) : IO XRHandedness := Internal.api "Lasm.JS.Web.XRInputSource.handedness" do
+  self.val.get "handedness" XRHandedness
 
 /-- `readonly attribute XRTargetRayMode targetRayMode` -/
-def XRInputSource.targetRayMode (self : XRInputSource) : IO XRTargetRayMode := self.val.get "targetRayMode" XRTargetRayMode
+@[macro_inline] def XRInputSource.targetRayMode (self : XRInputSource) : IO XRTargetRayMode := Internal.api "Lasm.JS.Web.XRInputSource.targetRayMode" do
+  self.val.get "targetRayMode" XRTargetRayMode
 
 /-- `readonly attribute XRSpace targetRaySpace` -/
-def XRInputSource.targetRaySpace (self : XRInputSource) : IO XRSpace := do
+@[macro_inline] def XRInputSource.targetRaySpace (self : XRInputSource) : IO XRSpace := Internal.api "Lasm.JS.Web.XRInputSource.targetRaySpace" do
   let r ← self.val.get "targetRaySpace" Value
   pure { val := r }
 
 /-- `readonly attribute XRSpace? gripSpace` -/
-def XRInputSource.gripSpace (self : XRInputSource) : IO (Option XRSpace) := self.val.get "gripSpace" (Option XRSpace)
+@[macro_inline] def XRInputSource.gripSpace (self : XRInputSource) : IO (Option XRSpace) := Internal.api "Lasm.JS.Web.XRInputSource.gripSpace" do
+  self.val.get "gripSpace" (Option XRSpace)
 
 /-- `readonly attribute FrozenArray<DOMString> profiles` -/
-def XRInputSource.profiles (self : XRInputSource) : IO (Array String) := self.val.get "profiles" (Array String)
+@[macro_inline] def XRInputSource.profiles (self : XRInputSource) : IO (Array String) := Internal.api "Lasm.JS.Web.XRInputSource.profiles" do
+  self.val.get "profiles" (Array String)
 
 /-- `readonly attribute boolean skipRendering` -/
-def XRInputSource.skipRendering (self : XRInputSource) : IO Bool := self.val.get "skipRendering" Bool
+@[macro_inline] def XRInputSource.skipRendering (self : XRInputSource) : IO Bool := Internal.api "Lasm.JS.Web.XRInputSource.skipRendering" do
+  self.val.get "skipRendering" Bool
 
 /-- `v instanceof XRInputSourceArray`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRInputSourceArray`). -/
-def XRInputSourceArray.cast? (v : Value) : IO (Option XRInputSourceArray) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRInputSourceArray"] Value) v) then some { val := v } else none
+@[macro_inline] def XRInputSourceArray.cast? (v : Value) : IO (Option XRInputSourceArray) := Internal.api "Lasm.JS.Web.XRInputSourceArray.cast?" do
+  Internal.cast (Internal.getGlobal ["XRInputSourceArray"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def XRInputSourceArray.length (self : XRInputSourceArray) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def XRInputSourceArray.length (self : XRInputSourceArray) : IO Nat := Internal.api "Lasm.JS.Web.XRInputSourceArray.length" do
+  self.val.get "length" Nat
 
 /-- `iterable<XRInputSource>`: `values()`, collected into an array. -/
-def XRInputSourceArray.values (self : XRInputSourceArray) : IO (Array XRInputSource) :=
-  Support.iterate self.val "values" (Array XRInputSource)
+@[macro_inline] def XRInputSourceArray.values (self : XRInputSourceArray) : IO (Array XRInputSource) := Internal.api "Lasm.JS.Web.XRInputSourceArray.values" do
+  Internal.iterate self.val "values" (Array XRInputSource)
 
 /-- `v instanceof XRInputSourceEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRInputSourceEvent`). -/
-def XRInputSourceEvent.cast? (v : Value) : IO (Option XRInputSourceEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRInputSourceEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRInputSourceEvent.cast? (v : Value) : IO (Option XRInputSourceEvent) := Internal.api "Lasm.JS.Web.XRInputSourceEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRInputSourceEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRInputSourceEventInit eventInitDict)` -/
-def XRInputSourceEvent.new (type : String) (eventInitDict : XRInputSourceEventInit) : IO XRInputSourceEvent :=
+@[macro_inline] def XRInputSourceEvent.new (type : String) (eventInitDict : XRInputSourceEventInit) : IO XRInputSourceEvent := Internal.api "Lasm.JS.Web.XRInputSourceEvent.new" do
   Lasm.JS.Binding.invoke XRInputSourceEvent { name := "Lasm.JS.Web.XRInputSourceEvent.new", module := "globalThis", path := "XRInputSourceEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRFrame frame` -/
-def XRInputSourceEvent.frame (self : XRInputSourceEvent) : IO XRFrame := do
+@[macro_inline] def XRInputSourceEvent.frame (self : XRInputSourceEvent) : IO XRFrame := Internal.api "Lasm.JS.Web.XRInputSourceEvent.frame" do
   let r ← self.val.get "frame" Value
   pure { val := r }
 
 /-- `readonly attribute XRInputSource inputSource` -/
-def XRInputSourceEvent.inputSource (self : XRInputSourceEvent) : IO XRInputSource := do
+@[macro_inline] def XRInputSourceEvent.inputSource (self : XRInputSourceEvent) : IO XRInputSource := Internal.api "Lasm.JS.Web.XRInputSourceEvent.inputSource" do
   let r ← self.val.get "inputSource" Value
   pure { val := r }
 
 /-- `v instanceof XRInputSourcesChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRInputSourcesChangeEvent`). -/
-def XRInputSourcesChangeEvent.cast? (v : Value) : IO (Option XRInputSourcesChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRInputSourcesChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRInputSourcesChangeEvent.cast? (v : Value) : IO (Option XRInputSourcesChangeEvent) := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRInputSourcesChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRInputSourcesChangeEventInit eventInitDict)` -/
-def XRInputSourcesChangeEvent.new (type : String) (eventInitDict : XRInputSourcesChangeEventInit) : IO XRInputSourcesChangeEvent :=
+@[macro_inline] def XRInputSourcesChangeEvent.new (type : String) (eventInitDict : XRInputSourcesChangeEventInit) : IO XRInputSourcesChangeEvent := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.new" do
   Lasm.JS.Binding.invoke XRInputSourcesChangeEvent { name := "Lasm.JS.Web.XRInputSourcesChangeEvent.new", module := "globalThis", path := "XRInputSourcesChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRSession session` -/
-def XRInputSourcesChangeEvent.session (self : XRInputSourcesChangeEvent) : IO XRSession := do
+@[macro_inline] def XRInputSourcesChangeEvent.session (self : XRInputSourcesChangeEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.session" do
   let r ← self.val.get "session" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<XRInputSource> added` -/
-def XRInputSourcesChangeEvent.added (self : XRInputSourcesChangeEvent) : IO (Array XRInputSource) := self.val.get "added" (Array XRInputSource)
+@[macro_inline] def XRInputSourcesChangeEvent.added (self : XRInputSourcesChangeEvent) : IO (Array XRInputSource) := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.added" do
+  self.val.get "added" (Array XRInputSource)
 
 /-- `readonly attribute FrozenArray<XRInputSource> removed` -/
-def XRInputSourcesChangeEvent.removed (self : XRInputSourcesChangeEvent) : IO (Array XRInputSource) := self.val.get "removed" (Array XRInputSource)
+@[macro_inline] def XRInputSourcesChangeEvent.removed (self : XRInputSourcesChangeEvent) : IO (Array XRInputSource) := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.removed" do
+  self.val.get "removed" (Array XRInputSource)
 
 /-- `v instanceof XRLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRLayer`). -/
-def XRLayer.cast? (v : Value) : IO (Option XRLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRLayer.cast? (v : Value) : IO (Option XRLayer) := Internal.api "Lasm.JS.Web.XRLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRLayer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof XRPermissionStatus`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRPermissionStatus`). -/
-def XRPermissionStatus.cast? (v : Value) : IO (Option XRPermissionStatus) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRPermissionStatus"] Value) v) then some { val := v } else none
+@[macro_inline] def XRPermissionStatus.cast? (v : Value) : IO (Option XRPermissionStatus) := Internal.api "Lasm.JS.Web.XRPermissionStatus.cast?" do
+  Internal.cast (Internal.getGlobal ["XRPermissionStatus"] Value) (fun x => { val := x }) v
 
 /-- `attribute FrozenArray<DOMString> granted` -/
-def XRPermissionStatus.granted (self : XRPermissionStatus) : IO (Array String) := self.val.get "granted" (Array String)
+@[macro_inline] def XRPermissionStatus.granted (self : XRPermissionStatus) : IO (Array String) := Internal.api "Lasm.JS.Web.XRPermissionStatus.granted" do
+  self.val.get "granted" (Array String)
 
 /-- Sets `granted`: `attribute FrozenArray<DOMString> granted` -/
-def XRPermissionStatus.setGranted (self : XRPermissionStatus) (value : Array String) : IO Unit :=
+@[macro_inline] def XRPermissionStatus.setGranted (self : XRPermissionStatus) (value : Array String) : IO Unit := Internal.api "Lasm.JS.Web.XRPermissionStatus.setGranted" do
   self.val.set "granted" (toJS value)
 
 /-- `v instanceof XRPose`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRPose`). -/
-def XRPose.cast? (v : Value) : IO (Option XRPose) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRPose"] Value) v) then some { val := v } else none
+@[macro_inline] def XRPose.cast? (v : Value) : IO (Option XRPose) := Internal.api "Lasm.JS.Web.XRPose.cast?" do
+  Internal.cast (Internal.getGlobal ["XRPose"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRRigidTransform transform` -/
-def XRPose.transform (self : XRPose) : IO XRRigidTransform := do
+@[macro_inline] def XRPose.transform (self : XRPose) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRPose.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPointReadOnly? linearVelocity` -/
-def XRPose.linearVelocity (self : XRPose) : IO (Option DOMPointReadOnly) := self.val.get "linearVelocity" (Option DOMPointReadOnly)
+@[macro_inline] def XRPose.linearVelocity (self : XRPose) : IO (Option DOMPointReadOnly) := Internal.api "Lasm.JS.Web.XRPose.linearVelocity" do
+  self.val.get "linearVelocity" (Option DOMPointReadOnly)
 
 /-- `readonly attribute DOMPointReadOnly? angularVelocity` -/
-def XRPose.angularVelocity (self : XRPose) : IO (Option DOMPointReadOnly) := self.val.get "angularVelocity" (Option DOMPointReadOnly)
+@[macro_inline] def XRPose.angularVelocity (self : XRPose) : IO (Option DOMPointReadOnly) := Internal.api "Lasm.JS.Web.XRPose.angularVelocity" do
+  self.val.get "angularVelocity" (Option DOMPointReadOnly)
 
 /-- `readonly attribute boolean emulatedPosition` -/
-def XRPose.emulatedPosition (self : XRPose) : IO Bool := self.val.get "emulatedPosition" Bool
+@[macro_inline] def XRPose.emulatedPosition (self : XRPose) : IO Bool := Internal.api "Lasm.JS.Web.XRPose.emulatedPosition" do
+  self.val.get "emulatedPosition" Bool
 
 /-- `v instanceof XRReferenceSpaceEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRReferenceSpaceEvent`). -/
-def XRReferenceSpaceEvent.cast? (v : Value) : IO (Option XRReferenceSpaceEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRReferenceSpaceEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRReferenceSpaceEvent.cast? (v : Value) : IO (Option XRReferenceSpaceEvent) := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRReferenceSpaceEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRReferenceSpaceEventInit eventInitDict)` -/
-def XRReferenceSpaceEvent.new (type : String) (eventInitDict : XRReferenceSpaceEventInit) : IO XRReferenceSpaceEvent :=
+@[macro_inline] def XRReferenceSpaceEvent.new (type : String) (eventInitDict : XRReferenceSpaceEventInit) : IO XRReferenceSpaceEvent := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.new" do
   Lasm.JS.Binding.invoke XRReferenceSpaceEvent { name := "Lasm.JS.Web.XRReferenceSpaceEvent.new", module := "globalThis", path := "XRReferenceSpaceEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRReferenceSpace referenceSpace` -/
-def XRReferenceSpaceEvent.referenceSpace (self : XRReferenceSpaceEvent) : IO XRReferenceSpace := do
+@[macro_inline] def XRReferenceSpaceEvent.referenceSpace (self : XRReferenceSpaceEvent) : IO XRReferenceSpace := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.referenceSpace" do
   let r ← self.val.get "referenceSpace" Value
   pure { val := r }
 
 /-- `readonly attribute XRRigidTransform? transform` -/
-def XRReferenceSpaceEvent.transform (self : XRReferenceSpaceEvent) : IO (Option XRRigidTransform) := self.val.get "transform" (Option XRRigidTransform)
+@[macro_inline] def XRReferenceSpaceEvent.transform (self : XRReferenceSpaceEvent) : IO (Option XRRigidTransform) := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.transform" do
+  self.val.get "transform" (Option XRRigidTransform)
 
 /-- `v instanceof XRRenderState`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRRenderState`). -/
-def XRRenderState.cast? (v : Value) : IO (Option XRRenderState) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRRenderState"] Value) v) then some { val := v } else none
+@[macro_inline] def XRRenderState.cast? (v : Value) : IO (Option XRRenderState) := Internal.api "Lasm.JS.Web.XRRenderState.cast?" do
+  Internal.cast (Internal.getGlobal ["XRRenderState"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double depthNear` -/
-def XRRenderState.depthNear (self : XRRenderState) : IO Float := self.val.get "depthNear" Float
+@[macro_inline] def XRRenderState.depthNear (self : XRRenderState) : IO Float := Internal.api "Lasm.JS.Web.XRRenderState.depthNear" do
+  self.val.get "depthNear" Float
 
 /-- `readonly attribute double depthFar` -/
-def XRRenderState.depthFar (self : XRRenderState) : IO Float := self.val.get "depthFar" Float
+@[macro_inline] def XRRenderState.depthFar (self : XRRenderState) : IO Float := Internal.api "Lasm.JS.Web.XRRenderState.depthFar" do
+  self.val.get "depthFar" Float
 
 /-- `readonly attribute boolean? passthroughFullyObscured` -/
-def XRRenderState.passthroughFullyObscured (self : XRRenderState) : IO (Option Bool) := self.val.get "passthroughFullyObscured" (Option Bool)
+@[macro_inline] def XRRenderState.passthroughFullyObscured (self : XRRenderState) : IO (Option Bool) := Internal.api "Lasm.JS.Web.XRRenderState.passthroughFullyObscured" do
+  self.val.get "passthroughFullyObscured" (Option Bool)
 
 /-- `readonly attribute double? inlineVerticalFieldOfView` -/
-def XRRenderState.inlineVerticalFieldOfView (self : XRRenderState) : IO (Option Float) := self.val.get "inlineVerticalFieldOfView" (Option Float)
+@[macro_inline] def XRRenderState.inlineVerticalFieldOfView (self : XRRenderState) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRRenderState.inlineVerticalFieldOfView" do
+  self.val.get "inlineVerticalFieldOfView" (Option Float)
 
 /-- `readonly attribute XRWebGLLayer? baseLayer` -/
-def XRRenderState.baseLayer (self : XRRenderState) : IO (Option XRWebGLLayer) := self.val.get "baseLayer" (Option XRWebGLLayer)
+@[macro_inline] def XRRenderState.baseLayer (self : XRRenderState) : IO (Option XRWebGLLayer) := Internal.api "Lasm.JS.Web.XRRenderState.baseLayer" do
+  self.val.get "baseLayer" (Option XRWebGLLayer)
 
 /-- `v instanceof XRRigidTransform`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRRigidTransform`). -/
-def XRRigidTransform.cast? (v : Value) : IO (Option XRRigidTransform) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRRigidTransform"] Value) v) then some { val := v } else none
+@[macro_inline] def XRRigidTransform.cast? (v : Value) : IO (Option XRRigidTransform) := Internal.api "Lasm.JS.Web.XRRigidTransform.cast?" do
+  Internal.cast (Internal.getGlobal ["XRRigidTransform"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMPointInit position, optional DOMPointInit orientation)` -/
-def XRRigidTransform.new (position : Option DOMPointInit := none) (orientation : Option DOMPointInit := none) : IO XRRigidTransform :=
+@[macro_inline] def XRRigidTransform.new (position : Option DOMPointInit := none) (orientation : Option DOMPointInit := none) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRRigidTransform.new" do
   Lasm.JS.Binding.invoke XRRigidTransform { name := "Lasm.JS.Web.XRRigidTransform.new", module := "globalThis", path := "XRRigidTransform", construct := true, arity := 2 }
-    (Support.args #[Support.optional position, Support.optional orientation]) (await := false)
+    (Internal.args #[Internal.optional position, Internal.optional orientation]) (await := false)
 
 /-- `readonly attribute DOMPointReadOnly position` -/
-def XRRigidTransform.position (self : XRRigidTransform) : IO DOMPointReadOnly := do
+@[macro_inline] def XRRigidTransform.position (self : XRRigidTransform) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRigidTransform.position" do
   let r ← self.val.get "position" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPointReadOnly orientation` -/
-def XRRigidTransform.orientation (self : XRRigidTransform) : IO DOMPointReadOnly := do
+@[macro_inline] def XRRigidTransform.orientation (self : XRRigidTransform) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRigidTransform.orientation" do
   let r ← self.val.get "orientation" Value
   pure { val := r }
 
 /-- `readonly attribute Float32Array matrix` -/
-def XRRigidTransform.matrix (self : XRRigidTransform) : IO ByteArray := do
+@[macro_inline] def XRRigidTransform.matrix (self : XRRigidTransform) : IO ByteArray := Internal.api "Lasm.JS.Web.XRRigidTransform.matrix" do
   let r ← self.val.get "matrix" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute XRRigidTransform inverse` -/
-def XRRigidTransform.inverse (self : XRRigidTransform) : IO XRRigidTransform := do
+@[macro_inline] def XRRigidTransform.inverse (self : XRRigidTransform) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRRigidTransform.inverse" do
   let r ← self.val.get "inverse" Value
   pure { val := r }
 
 /-- `v instanceof XRSession`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRSession`). -/
-def XRSession.cast? (v : Value) : IO (Option XRSession) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRSession"] Value) v) then some { val := v } else none
+@[macro_inline] def XRSession.cast? (v : Value) : IO (Option XRSession) := Internal.api "Lasm.JS.Web.XRSession.cast?" do
+  Internal.cast (Internal.getGlobal ["XRSession"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XRVisibilityState visibilityState` -/
-def XRSession.visibilityState (self : XRSession) : IO XRVisibilityState := self.val.get "visibilityState" XRVisibilityState
+@[macro_inline] def XRSession.visibilityState (self : XRSession) : IO XRVisibilityState := Internal.api "Lasm.JS.Web.XRSession.visibilityState" do
+  self.val.get "visibilityState" XRVisibilityState
 
 /-- `readonly attribute float? frameRate` -/
-def XRSession.frameRate (self : XRSession) : IO (Option Float) := self.val.get "frameRate" (Option Float)
+@[macro_inline] def XRSession.frameRate (self : XRSession) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRSession.frameRate" do
+  self.val.get "frameRate" (Option Float)
 
 /-- `readonly attribute Float32Array? supportedFrameRates` -/
-def XRSession.supportedFrameRates (self : XRSession) : IO (Option ByteArray) := do
+@[macro_inline] def XRSession.supportedFrameRates (self : XRSession) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.XRSession.supportedFrameRates" do
   let r ← self.val.get "supportedFrameRates" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute XRRenderState renderState` -/
-def XRSession.renderState (self : XRSession) : IO XRRenderState := do
+@[macro_inline] def XRSession.renderState (self : XRSession) : IO XRRenderState := Internal.api "Lasm.JS.Web.XRSession.renderState" do
   let r ← self.val.get "renderState" Value
   pure { val := r }
 
 /-- `readonly attribute XRInputSourceArray inputSources` -/
-def XRSession.inputSources (self : XRSession) : IO XRInputSourceArray := do
+@[macro_inline] def XRSession.inputSources (self : XRSession) : IO XRInputSourceArray := Internal.api "Lasm.JS.Web.XRSession.inputSources" do
   let r ← self.val.get "inputSources" Value
   pure { val := r }
 
 /-- `readonly attribute XRInputSourceArray trackedSources` -/
-def XRSession.trackedSources (self : XRSession) : IO XRInputSourceArray := do
+@[macro_inline] def XRSession.trackedSources (self : XRSession) : IO XRInputSourceArray := Internal.api "Lasm.JS.Web.XRSession.trackedSources" do
   let r ← self.val.get "trackedSources" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<DOMString> enabledFeatures` -/
-def XRSession.enabledFeatures (self : XRSession) : IO (Array String) := self.val.get "enabledFeatures" (Array String)
+@[macro_inline] def XRSession.enabledFeatures (self : XRSession) : IO (Array String) := Internal.api "Lasm.JS.Web.XRSession.enabledFeatures" do
+  self.val.get "enabledFeatures" (Array String)
 
 /-- `readonly attribute boolean isSystemKeyboardSupported` -/
-def XRSession.isSystemKeyboardSupported (self : XRSession) : IO Bool := self.val.get "isSystemKeyboardSupported" Bool
+@[macro_inline] def XRSession.isSystemKeyboardSupported (self : XRSession) : IO Bool := Internal.api "Lasm.JS.Web.XRSession.isSystemKeyboardSupported" do
+  self.val.get "isSystemKeyboardSupported" Bool
 
 /-- `attribute EventHandler onend` -/
-def XRSession.onend (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onend" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onend (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onend" do
+  self.val.get "onend" (Option EventHandlerNonNull)
 
 /-- Sets `onend`: `attribute EventHandler onend` -/
-def XRSession.setOnend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnend" do
   self.val.set "onend" (toJS value)
 
 /-- `attribute EventHandler oninputsourceschange` -/
-def XRSession.oninputsourceschange (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "oninputsourceschange" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.oninputsourceschange (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.oninputsourceschange" do
+  self.val.get "oninputsourceschange" (Option EventHandlerNonNull)
 
 /-- Sets `oninputsourceschange`: `attribute EventHandler oninputsourceschange` -/
-def XRSession.setOninputsourceschange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOninputsourceschange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOninputsourceschange" do
   self.val.set "oninputsourceschange" (toJS value)
 
 /-- `attribute EventHandler onselect` -/
-def XRSession.onselect (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onselect" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onselect (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onselect" do
+  self.val.get "onselect" (Option EventHandlerNonNull)
 
 /-- Sets `onselect`: `attribute EventHandler onselect` -/
-def XRSession.setOnselect (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnselect (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnselect" do
   self.val.set "onselect" (toJS value)
 
 /-- `attribute EventHandler onselectstart` -/
-def XRSession.onselectstart (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onselectstart" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onselectstart (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
 
 /-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
-def XRSession.setOnselectstart (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnselectstart (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnselectstart" do
   self.val.set "onselectstart" (toJS value)
 
 /-- `attribute EventHandler onselectend` -/
-def XRSession.onselectend (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onselectend" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onselectend (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onselectend" do
+  self.val.get "onselectend" (Option EventHandlerNonNull)
 
 /-- Sets `onselectend`: `attribute EventHandler onselectend` -/
-def XRSession.setOnselectend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnselectend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnselectend" do
   self.val.set "onselectend" (toJS value)
 
 /-- `attribute EventHandler onsqueeze` -/
-def XRSession.onsqueeze (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onsqueeze" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onsqueeze (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onsqueeze" do
+  self.val.get "onsqueeze" (Option EventHandlerNonNull)
 
 /-- Sets `onsqueeze`: `attribute EventHandler onsqueeze` -/
-def XRSession.setOnsqueeze (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnsqueeze (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnsqueeze" do
   self.val.set "onsqueeze" (toJS value)
 
 /-- `attribute EventHandler onsqueezestart` -/
-def XRSession.onsqueezestart (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onsqueezestart" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onsqueezestart (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onsqueezestart" do
+  self.val.get "onsqueezestart" (Option EventHandlerNonNull)
 
 /-- Sets `onsqueezestart`: `attribute EventHandler onsqueezestart` -/
-def XRSession.setOnsqueezestart (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnsqueezestart (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnsqueezestart" do
   self.val.set "onsqueezestart" (toJS value)
 
 /-- `attribute EventHandler onsqueezeend` -/
-def XRSession.onsqueezeend (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onsqueezeend" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onsqueezeend (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onsqueezeend" do
+  self.val.get "onsqueezeend" (Option EventHandlerNonNull)
 
 /-- Sets `onsqueezeend`: `attribute EventHandler onsqueezeend` -/
-def XRSession.setOnsqueezeend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnsqueezeend (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnsqueezeend" do
   self.val.set "onsqueezeend" (toJS value)
 
 /-- `attribute EventHandler onvisibilitychange` -/
-def XRSession.onvisibilitychange (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onvisibilitychange" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onvisibilitychange (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onvisibilitychange" do
+  self.val.get "onvisibilitychange" (Option EventHandlerNonNull)
 
 /-- Sets `onvisibilitychange`: `attribute EventHandler onvisibilitychange` -/
-def XRSession.setOnvisibilitychange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnvisibilitychange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnvisibilitychange" do
   self.val.set "onvisibilitychange" (toJS value)
 
 /-- `attribute EventHandler onframeratechange` -/
-def XRSession.onframeratechange (self : XRSession) : IO (Option EventHandlerNonNull) := self.val.get "onframeratechange" (Option EventHandlerNonNull)
+@[macro_inline] def XRSession.onframeratechange (self : XRSession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSession.onframeratechange" do
+  self.val.get "onframeratechange" (Option EventHandlerNonNull)
 
 /-- Sets `onframeratechange`: `attribute EventHandler onframeratechange` -/
-def XRSession.setOnframeratechange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSession.setOnframeratechange (self : XRSession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.setOnframeratechange" do
   self.val.set "onframeratechange" (toJS value)
 
 /-- `undefined updateRenderState(optional XRRenderStateInit state)` -/
-def XRSession.updateRenderState (self : XRSession) (state : Option XRRenderStateInit := none) : IO Unit :=
-  self.val.callMethod "updateRenderState" (Support.args #[Support.optional state]) Unit
+@[macro_inline] def XRSession.updateRenderState (self : XRSession) (state : Option XRRenderStateInit := none) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.updateRenderState" do
+  self.val.callMethod "updateRenderState" (Internal.args #[Internal.optional state]) Unit
 
 /-- `Promise<undefined> updateTargetFrameRate(float rate)` -/
-def XRSession.updateTargetFrameRate (self : XRSession) (rate : Float) : Async Unit :=
-  self.val.callMethodAwait "updateTargetFrameRate" (Support.args #[toJS rate]) Unit
+@[macro_inline] def XRSession.updateTargetFrameRate (self : XRSession) (rate : Float) : Async Unit := Internal.api "Lasm.JS.Web.XRSession.updateTargetFrameRate" do
+  self.val.callMethodAwait "updateTargetFrameRate" (Internal.args #[toJS rate]) Unit
 
 /-- `Promise<XRReferenceSpace> requestReferenceSpace(XRReferenceSpaceType type)` -/
-def XRSession.requestReferenceSpace (self : XRSession) (type : XRReferenceSpaceType) : Async XRReferenceSpace := do
-  let r ← self.val.callMethodAwait "requestReferenceSpace" (Support.args #[toJS type]) Value
+@[macro_inline] def XRSession.requestReferenceSpace (self : XRSession) (type : XRReferenceSpaceType) : Async XRReferenceSpace := Internal.api "Lasm.JS.Web.XRSession.requestReferenceSpace" do
+  let r ← self.val.callMethodAwait "requestReferenceSpace" (Internal.args #[toJS type]) Value
   pure { val := r }
 
 /-- `unsigned long requestAnimationFrame(XRFrameRequestCallback callback)` -/
-def XRSession.requestAnimationFrame (self : XRSession) (callback : XRFrameRequestCallback) : IO Nat :=
-  self.val.callMethod "requestAnimationFrame" (Support.args #[toJS callback]) Nat
+@[macro_inline] def XRSession.requestAnimationFrame (self : XRSession) (callback : XRFrameRequestCallback) : IO Nat := Internal.api "Lasm.JS.Web.XRSession.requestAnimationFrame" do
+  self.val.callMethod "requestAnimationFrame" (Internal.args #[toJS callback]) Nat
 
 /-- `undefined cancelAnimationFrame(unsigned long handle)` -/
-def XRSession.cancelAnimationFrame (self : XRSession) (handle : Nat) : IO Unit :=
-  self.val.callMethod "cancelAnimationFrame" (Support.args #[toJS handle]) Unit
+@[macro_inline] def XRSession.cancelAnimationFrame (self : XRSession) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.cancelAnimationFrame" do
+  self.val.callMethod "cancelAnimationFrame" (Internal.args #[toJS handle]) Unit
 
 /-- `Promise<undefined> end()` -/
-def XRSession.«end» (self : XRSession) : Async Unit :=
-  self.val.callMethodAwait "end" (Support.args #[]) Unit
+@[macro_inline] def XRSession.«end» (self : XRSession) : Async Unit := Internal.api "Lasm.JS.Web.XRSession.end" do
+  self.val.callMethodAwait "end" (Internal.args #[]) Unit
 
 /-- `v instanceof XRSessionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRSessionEvent`). -/
-def XRSessionEvent.cast? (v : Value) : IO (Option XRSessionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRSessionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRSessionEvent.cast? (v : Value) : IO (Option XRSessionEvent) := Internal.api "Lasm.JS.Web.XRSessionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRSessionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRSessionEventInit eventInitDict)` -/
-def XRSessionEvent.new (type : String) (eventInitDict : XRSessionEventInit) : IO XRSessionEvent :=
+@[macro_inline] def XRSessionEvent.new (type : String) (eventInitDict : XRSessionEventInit) : IO XRSessionEvent := Internal.api "Lasm.JS.Web.XRSessionEvent.new" do
   Lasm.JS.Binding.invoke XRSessionEvent { name := "Lasm.JS.Web.XRSessionEvent.new", module := "globalThis", path := "XRSessionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRSession session` -/
-def XRSessionEvent.session (self : XRSessionEvent) : IO XRSession := do
+@[macro_inline] def XRSessionEvent.session (self : XRSessionEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRSessionEvent.session" do
   let r ← self.val.get "session" Value
   pure { val := r }
 
 /-- `v instanceof XRSpace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRSpace`). -/
-def XRSpace.cast? (v : Value) : IO (Option XRSpace) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRSpace"] Value) v) then some { val := v } else none
+@[macro_inline] def XRSpace.cast? (v : Value) : IO (Option XRSpace) := Internal.api "Lasm.JS.Web.XRSpace.cast?" do
+  Internal.cast (Internal.getGlobal ["XRSpace"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof XRSystem`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRSystem`). -/
-def XRSystem.cast? (v : Value) : IO (Option XRSystem) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRSystem"] Value) v) then some { val := v } else none
+@[macro_inline] def XRSystem.cast? (v : Value) : IO (Option XRSystem) := Internal.api "Lasm.JS.Web.XRSystem.cast?" do
+  Internal.cast (Internal.getGlobal ["XRSystem"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler ondevicechange` -/
-def XRSystem.ondevicechange (self : XRSystem) : IO (Option EventHandlerNonNull) := self.val.get "ondevicechange" (Option EventHandlerNonNull)
+@[macro_inline] def XRSystem.ondevicechange (self : XRSystem) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRSystem.ondevicechange" do
+  self.val.get "ondevicechange" (Option EventHandlerNonNull)
 
 /-- Sets `ondevicechange`: `attribute EventHandler ondevicechange` -/
-def XRSystem.setOndevicechange (self : XRSystem) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRSystem.setOndevicechange (self : XRSystem) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRSystem.setOndevicechange" do
   self.val.set "ondevicechange" (toJS value)
 
 /-- `Promise<boolean> isSessionSupported(XRSessionMode mode)` -/
-def XRSystem.isSessionSupported (self : XRSystem) (mode : XRSessionMode) : Async Bool :=
-  self.val.callMethodAwait "isSessionSupported" (Support.args #[toJS mode]) Bool
+@[macro_inline] def XRSystem.isSessionSupported (self : XRSystem) (mode : XRSessionMode) : Async Bool := Internal.api "Lasm.JS.Web.XRSystem.isSessionSupported" do
+  self.val.callMethodAwait "isSessionSupported" (Internal.args #[toJS mode]) Bool
 
 /-- `Promise<XRSession> requestSession(XRSessionMode mode, optional XRSessionInit options)` -/
-def XRSystem.requestSession (self : XRSystem) (mode : XRSessionMode) (options : Option XRSessionInit := none) : Async XRSession := do
-  let r ← self.val.callMethodAwait "requestSession" (Support.args #[toJS mode, Support.optional options]) Value
+@[macro_inline] def XRSystem.requestSession (self : XRSystem) (mode : XRSessionMode) (options : Option XRSessionInit := none) : Async XRSession := Internal.api "Lasm.JS.Web.XRSystem.requestSession" do
+  let r ← self.val.callMethodAwait "requestSession" (Internal.args #[toJS mode, Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof XRView`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRView`). -/
-def XRView.cast? (v : Value) : IO (Option XRView) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRView"] Value) v) then some { val := v } else none
+@[macro_inline] def XRView.cast? (v : Value) : IO (Option XRView) := Internal.api "Lasm.JS.Web.XRView.cast?" do
+  Internal.cast (Internal.getGlobal ["XRView"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute XREye eye` -/
-def XRView.eye (self : XRView) : IO XREye := self.val.get "eye" XREye
+@[macro_inline] def XRView.eye (self : XRView) : IO XREye := Internal.api "Lasm.JS.Web.XRView.eye" do
+  self.val.get "eye" XREye
 
 /-- `readonly attribute unsigned long index` -/
-def XRView.index (self : XRView) : IO Nat := self.val.get "index" Nat
+@[macro_inline] def XRView.index (self : XRView) : IO Nat := Internal.api "Lasm.JS.Web.XRView.index" do
+  self.val.get "index" Nat
 
 /-- `readonly attribute double? recommendedViewportScale` -/
-def XRView.recommendedViewportScale (self : XRView) : IO (Option Float) := self.val.get "recommendedViewportScale" (Option Float)
+@[macro_inline] def XRView.recommendedViewportScale (self : XRView) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRView.recommendedViewportScale" do
+  self.val.get "recommendedViewportScale" (Option Float)
 
 /-- `readonly attribute Float32Array projectionMatrix` -/
-def XRView.projectionMatrix (self : XRView) : IO ByteArray := do
+@[macro_inline] def XRView.projectionMatrix (self : XRView) : IO ByteArray := Internal.api "Lasm.JS.Web.XRView.projectionMatrix" do
   let r ← self.val.get "projectionMatrix" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute XRRigidTransform transform` -/
-def XRView.transform (self : XRView) : IO XRRigidTransform := do
+@[macro_inline] def XRView.transform (self : XRView) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRView.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- `undefined requestViewportScale(double? scale)` -/
-def XRView.requestViewportScale (self : XRView) (scale : Option Float) : IO Unit :=
-  self.val.callMethod "requestViewportScale" (Support.args #[toJS scale]) Unit
+@[macro_inline] def XRView.requestViewportScale (self : XRView) (scale : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.XRView.requestViewportScale" do
+  self.val.callMethod "requestViewportScale" (Internal.args #[toJS scale]) Unit
 
 /-- `v instanceof XRViewport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRViewport`). -/
-def XRViewport.cast? (v : Value) : IO (Option XRViewport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRViewport"] Value) v) then some { val := v } else none
+@[macro_inline] def XRViewport.cast? (v : Value) : IO (Option XRViewport) := Internal.api "Lasm.JS.Web.XRViewport.cast?" do
+  Internal.cast (Internal.getGlobal ["XRViewport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute long x` -/
-def XRViewport.x (self : XRViewport) : IO Int := self.val.get "x" Int
+@[macro_inline] def XRViewport.x (self : XRViewport) : IO Int := Internal.api "Lasm.JS.Web.XRViewport.x" do
+  self.val.get "x" Int
 
 /-- `readonly attribute long y` -/
-def XRViewport.y (self : XRViewport) : IO Int := self.val.get "y" Int
+@[macro_inline] def XRViewport.y (self : XRViewport) : IO Int := Internal.api "Lasm.JS.Web.XRViewport.y" do
+  self.val.get "y" Int
 
 /-- `readonly attribute long width` -/
-def XRViewport.width (self : XRViewport) : IO Int := self.val.get "width" Int
+@[macro_inline] def XRViewport.width (self : XRViewport) : IO Int := Internal.api "Lasm.JS.Web.XRViewport.width" do
+  self.val.get "width" Int
 
 /-- `readonly attribute long height` -/
-def XRViewport.height (self : XRViewport) : IO Int := self.val.get "height" Int
+@[macro_inline] def XRViewport.height (self : XRViewport) : IO Int := Internal.api "Lasm.JS.Web.XRViewport.height" do
+  self.val.get "height" Int
 
 /-- `v instanceof XRVisibilityMaskChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRVisibilityMaskChangeEvent`). -/
-def XRVisibilityMaskChangeEvent.cast? (v : Value) : IO (Option XRVisibilityMaskChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRVisibilityMaskChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def XRVisibilityMaskChangeEvent.cast? (v : Value) : IO (Option XRVisibilityMaskChangeEvent) := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["XRVisibilityMaskChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, XRVisibilityMaskChangeEventInit eventInitDict)` -/
-def XRVisibilityMaskChangeEvent.new (type : String) (eventInitDict : XRVisibilityMaskChangeEventInit) : IO XRVisibilityMaskChangeEvent :=
+@[macro_inline] def XRVisibilityMaskChangeEvent.new (type : String) (eventInitDict : XRVisibilityMaskChangeEventInit) : IO XRVisibilityMaskChangeEvent := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.new" do
   Lasm.JS.Binding.invoke XRVisibilityMaskChangeEvent { name := "Lasm.JS.Web.XRVisibilityMaskChangeEvent.new", module := "globalThis", path := "XRVisibilityMaskChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute XRSession session` -/
-def XRVisibilityMaskChangeEvent.session (self : XRVisibilityMaskChangeEvent) : IO XRSession := do
+@[macro_inline] def XRVisibilityMaskChangeEvent.session (self : XRVisibilityMaskChangeEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.session" do
   let r ← self.val.get "session" Value
   pure { val := r }
 
 /-- `readonly attribute XREye eye` -/
-def XRVisibilityMaskChangeEvent.eye (self : XRVisibilityMaskChangeEvent) : IO XREye := self.val.get "eye" XREye
+@[macro_inline] def XRVisibilityMaskChangeEvent.eye (self : XRVisibilityMaskChangeEvent) : IO XREye := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.eye" do
+  self.val.get "eye" XREye
 
 /-- `readonly attribute unsigned long index` -/
-def XRVisibilityMaskChangeEvent.index (self : XRVisibilityMaskChangeEvent) : IO Nat := self.val.get "index" Nat
+@[macro_inline] def XRVisibilityMaskChangeEvent.index (self : XRVisibilityMaskChangeEvent) : IO Nat := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.index" do
+  self.val.get "index" Nat
 
 /-- `readonly attribute Float32Array vertices` -/
-def XRVisibilityMaskChangeEvent.vertices (self : XRVisibilityMaskChangeEvent) : IO ByteArray := do
+@[macro_inline] def XRVisibilityMaskChangeEvent.vertices (self : XRVisibilityMaskChangeEvent) : IO ByteArray := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.vertices" do
   let r ← self.val.get "vertices" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute Uint32Array indices` -/
-def XRVisibilityMaskChangeEvent.indices (self : XRVisibilityMaskChangeEvent) : IO ByteArray := do
+@[macro_inline] def XRVisibilityMaskChangeEvent.indices (self : XRVisibilityMaskChangeEvent) : IO ByteArray := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.indices" do
   let r ← self.val.get "indices" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `v instanceof XRReferenceSpace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRReferenceSpace`). -/
-def XRReferenceSpace.cast? (v : Value) : IO (Option XRReferenceSpace) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRReferenceSpace"] Value) v) then some { val := v } else none
+@[macro_inline] def XRReferenceSpace.cast? (v : Value) : IO (Option XRReferenceSpace) := Internal.api "Lasm.JS.Web.XRReferenceSpace.cast?" do
+  Internal.cast (Internal.getGlobal ["XRReferenceSpace"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onreset` -/
-def XRReferenceSpace.onreset (self : XRReferenceSpace) : IO (Option EventHandlerNonNull) := self.val.get "onreset" (Option EventHandlerNonNull)
+@[macro_inline] def XRReferenceSpace.onreset (self : XRReferenceSpace) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.XRReferenceSpace.onreset" do
+  self.val.get "onreset" (Option EventHandlerNonNull)
 
 /-- Sets `onreset`: `attribute EventHandler onreset` -/
-def XRReferenceSpace.setOnreset (self : XRReferenceSpace) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def XRReferenceSpace.setOnreset (self : XRReferenceSpace) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.XRReferenceSpace.setOnreset" do
   self.val.set "onreset" (toJS value)
 
 /-- `XRReferenceSpace getOffsetReferenceSpace(XRRigidTransform originOffset)` -/
-def XRReferenceSpace.getOffsetReferenceSpace (self : XRReferenceSpace) (originOffset : XRRigidTransform) : IO XRReferenceSpace := do
-  let r ← self.val.callMethod "getOffsetReferenceSpace" (Support.args #[toJS originOffset]) Value
+@[macro_inline] def XRReferenceSpace.getOffsetReferenceSpace (self : XRReferenceSpace) (originOffset : XRRigidTransform) : IO XRReferenceSpace := Internal.api "Lasm.JS.Web.XRReferenceSpace.getOffsetReferenceSpace" do
+  let r ← self.val.callMethod "getOffsetReferenceSpace" (Internal.args #[toJS originOffset]) Value
   pure { val := r }
 
 /-- `v instanceof XRViewerPose`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRViewerPose`). -/
-def XRViewerPose.cast? (v : Value) : IO (Option XRViewerPose) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRViewerPose"] Value) v) then some { val := v } else none
+@[macro_inline] def XRViewerPose.cast? (v : Value) : IO (Option XRViewerPose) := Internal.api "Lasm.JS.Web.XRViewerPose.cast?" do
+  Internal.cast (Internal.getGlobal ["XRViewerPose"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<XRView> views` -/
-def XRViewerPose.views (self : XRViewerPose) : IO (Array XRView) := self.val.get "views" (Array XRView)
+@[macro_inline] def XRViewerPose.views (self : XRViewerPose) : IO (Array XRView) := Internal.api "Lasm.JS.Web.XRViewerPose.views" do
+  self.val.get "views" (Array XRView)
 
 /-- `v instanceof XRWebGLLayer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRWebGLLayer`). -/
-def XRWebGLLayer.cast? (v : Value) : IO (Option XRWebGLLayer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRWebGLLayer"] Value) v) then some { val := v } else none
+@[macro_inline] def XRWebGLLayer.cast? (v : Value) : IO (Option XRWebGLLayer) := Internal.api "Lasm.JS.Web.XRWebGLLayer.cast?" do
+  Internal.cast (Internal.getGlobal ["XRWebGLLayer"] Value) (fun x => { val := x }) v
 
 /-- `constructor(XRSession session, XRWebGLRenderingContext context, optional XRWebGLLayerInit layerInit)` -/
-def XRWebGLLayer.new (session : XRSession) (context : XRWebGLRenderingContext) (layerInit : Option XRWebGLLayerInit := none) : IO XRWebGLLayer :=
+@[macro_inline] def XRWebGLLayer.new (session : XRSession) (context : XRWebGLRenderingContext) (layerInit : Option XRWebGLLayerInit := none) : IO XRWebGLLayer := Internal.api "Lasm.JS.Web.XRWebGLLayer.new" do
   Lasm.JS.Binding.invoke XRWebGLLayer { name := "Lasm.JS.Web.XRWebGLLayer.new", module := "globalThis", path := "XRWebGLLayer", construct := true, arity := 3 }
-    (Support.args #[toJS session, toJS context, Support.optional layerInit]) (await := false)
+    (Internal.args #[toJS session, toJS context, Internal.optional layerInit]) (await := false)
 
 /-- `readonly attribute boolean antialias` -/
-def XRWebGLLayer.antialias (self : XRWebGLLayer) : IO Bool := self.val.get "antialias" Bool
+@[macro_inline] def XRWebGLLayer.antialias (self : XRWebGLLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRWebGLLayer.antialias" do
+  self.val.get "antialias" Bool
 
 /-- `readonly attribute boolean ignoreDepthValues` -/
-def XRWebGLLayer.ignoreDepthValues (self : XRWebGLLayer) : IO Bool := self.val.get "ignoreDepthValues" Bool
+@[macro_inline] def XRWebGLLayer.ignoreDepthValues (self : XRWebGLLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRWebGLLayer.ignoreDepthValues" do
+  self.val.get "ignoreDepthValues" Bool
 
 /-- `attribute float? fixedFoveation` -/
-def XRWebGLLayer.fixedFoveation (self : XRWebGLLayer) : IO (Option Float) := self.val.get "fixedFoveation" (Option Float)
+@[macro_inline] def XRWebGLLayer.fixedFoveation (self : XRWebGLLayer) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRWebGLLayer.fixedFoveation" do
+  self.val.get "fixedFoveation" (Option Float)
 
 /-- Sets `fixedFoveation`: `attribute float? fixedFoveation` -/
-def XRWebGLLayer.setFixedFoveation (self : XRWebGLLayer) (value : Option Float) : IO Unit :=
+@[macro_inline] def XRWebGLLayer.setFixedFoveation (self : XRWebGLLayer) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.XRWebGLLayer.setFixedFoveation" do
   self.val.set "fixedFoveation" (toJS value)
 
 /-- `readonly attribute WebGLFramebuffer? framebuffer` -/
-def XRWebGLLayer.framebuffer (self : XRWebGLLayer) : IO (Option WebGLFramebuffer) := self.val.get "framebuffer" (Option WebGLFramebuffer)
+@[macro_inline] def XRWebGLLayer.framebuffer (self : XRWebGLLayer) : IO (Option WebGLFramebuffer) := Internal.api "Lasm.JS.Web.XRWebGLLayer.framebuffer" do
+  self.val.get "framebuffer" (Option WebGLFramebuffer)
 
 /-- `readonly attribute unsigned long framebufferWidth` -/
-def XRWebGLLayer.framebufferWidth (self : XRWebGLLayer) : IO Nat := self.val.get "framebufferWidth" Nat
+@[macro_inline] def XRWebGLLayer.framebufferWidth (self : XRWebGLLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRWebGLLayer.framebufferWidth" do
+  self.val.get "framebufferWidth" Nat
 
 /-- `readonly attribute unsigned long framebufferHeight` -/
-def XRWebGLLayer.framebufferHeight (self : XRWebGLLayer) : IO Nat := self.val.get "framebufferHeight" Nat
+@[macro_inline] def XRWebGLLayer.framebufferHeight (self : XRWebGLLayer) : IO Nat := Internal.api "Lasm.JS.Web.XRWebGLLayer.framebufferHeight" do
+  self.val.get "framebufferHeight" Nat
 
 /-- `XRViewport? getViewport(XRView view)` -/
-def XRWebGLLayer.getViewport (self : XRWebGLLayer) (view : XRView) : IO (Option XRViewport) :=
-  self.val.callMethod "getViewport" (Support.args #[toJS view]) (Option XRViewport)
+@[macro_inline] def XRWebGLLayer.getViewport (self : XRWebGLLayer) (view : XRView) : IO (Option XRViewport) := Internal.api "Lasm.JS.Web.XRWebGLLayer.getViewport" do
+  self.val.callMethod "getViewport" (Internal.args #[toJS view]) (Option XRViewport)
 
 /-- `static double getNativeFramebufferScaleFactor(XRSession session)` -/
-def XRWebGLLayer.getNativeFramebufferScaleFactor (session : XRSession) : IO Float :=
+@[macro_inline] def XRWebGLLayer.getNativeFramebufferScaleFactor (session : XRSession) : IO Float := Internal.api "Lasm.JS.Web.XRWebGLLayer.getNativeFramebufferScaleFactor" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Web.XRWebGLLayer.getNativeFramebufferScaleFactor", module := "globalThis", path := "XRWebGLLayer.getNativeFramebufferScaleFactor", construct := false, arity := 1 }
-    (Support.args #[toJS session]) (await := false)
+    (Internal.args #[toJS session]) (await := false)
 
 /-- `v instanceof XRBoundedReferenceSpace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRBoundedReferenceSpace`). -/
-def XRBoundedReferenceSpace.cast? (v : Value) : IO (Option XRBoundedReferenceSpace) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRBoundedReferenceSpace"] Value) v) then some { val := v } else none
+@[macro_inline] def XRBoundedReferenceSpace.cast? (v : Value) : IO (Option XRBoundedReferenceSpace) := Internal.api "Lasm.JS.Web.XRBoundedReferenceSpace.cast?" do
+  Internal.cast (Internal.getGlobal ["XRBoundedReferenceSpace"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<DOMPointReadOnly> boundsGeometry` -/
-def XRBoundedReferenceSpace.boundsGeometry (self : XRBoundedReferenceSpace) : IO (Array DOMPointReadOnly) := self.val.get "boundsGeometry" (Array DOMPointReadOnly)
+@[macro_inline] def XRBoundedReferenceSpace.boundsGeometry (self : XRBoundedReferenceSpace) : IO (Array DOMPointReadOnly) := Internal.api "Lasm.JS.Web.XRBoundedReferenceSpace.boundsGeometry" do
+  self.val.get "boundsGeometry" (Array DOMPointReadOnly)
 
 /-- `readonly attribute XRSystem xr` -/
-def Navigator.xr (self : Navigator) : IO XRSystem := do
+@[macro_inline] def Navigator.xr (self : Navigator) : IO XRSystem := Internal.api "Lasm.JS.Web.Navigator.xr" do
   let r ← self.val.get "xr" Value
   pure { val := r }
 
 /-- `Promise<undefined> makeXRCompatible()` -/
-def WebGL2RenderingContext.makeXRCompatible (self : WebGL2RenderingContext) : Async Unit :=
-  self.val.callMethodAwait "makeXRCompatible" (Support.args #[]) Unit
+@[macro_inline] def WebGL2RenderingContext.makeXRCompatible (self : WebGL2RenderingContext) : Async Unit := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.makeXRCompatible" do
+  self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> makeXRCompatible()` -/
-def WebGLRenderingContext.makeXRCompatible (self : WebGLRenderingContext) : Async Unit :=
-  self.val.callMethodAwait "makeXRCompatible" (Support.args #[]) Unit
+@[macro_inline] def WebGLRenderingContext.makeXRCompatible (self : WebGLRenderingContext) : Async Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.makeXRCompatible" do
+  self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLDrawBuffers
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum COLOR_ATTACHMENT0_WEBGL = 0x8CE0` -/
 def WEBGL_draw_buffers.COLOR_ATTACHMENT0_WEBGL : Nat := 0x8CE0
@@ -113,7 +117,7 @@ def WEBGL_draw_buffers.MAX_COLOR_ATTACHMENTS_WEBGL : Nat := 0x8CDF
 def WEBGL_draw_buffers.MAX_DRAW_BUFFERS_WEBGL : Nat := 0x8824
 
 /-- `undefined drawBuffersWEBGL(sequence<GLenum> buffers)` -/
-def WEBGL_draw_buffers.drawBuffersWEBGL (self : WEBGL_draw_buffers) (buffers : Array Nat) : IO Unit :=
-  self.val.callMethod "drawBuffersWEBGL" (Support.args #[toJS buffers]) Unit
+@[macro_inline] def WEBGL_draw_buffers.drawBuffersWEBGL (self : WEBGL_draw_buffers) (buffers : Array Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_draw_buffers.drawBuffersWEBGL" do
+  self.val.callMethod "drawBuffersWEBGL" (Internal.args #[toJS buffers]) Unit
 
 end Lasm.JS.Web

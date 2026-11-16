@@ -6,46 +6,68 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.FileSystemAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary PermissionDescriptor` (Permissions (https://w3c.github.io/permissions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+instance : ToJS PermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name)]⟩
+
+/-- `dictionary PermissionSetParameters` (Permissions (https://w3c.github.io/permissions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PermissionSetParameters where
+  /-- `required object descriptor` -/
+  descriptor : Data
+  /-- `required PermissionState state` -/
+  state : PermissionState
+instance : ToJS PermissionSetParameters := ⟨fun d => Internal.fields #[("descriptor", toJS d.descriptor),
+    ("state", toJS d.state)]⟩
 
 /-- `v instanceof PermissionStatus`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PermissionStatus`). -/
-def PermissionStatus.cast? (v : Value) : IO (Option PermissionStatus) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PermissionStatus"] Value) v) then some { val := v } else none
+@[macro_inline] def PermissionStatus.cast? (v : Value) : IO (Option PermissionStatus) := Internal.api "Lasm.JS.Web.PermissionStatus.cast?" do
+  Internal.cast (Internal.getGlobal ["PermissionStatus"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute PermissionState state` -/
-def PermissionStatus.state (self : PermissionStatus) : IO PermissionState := self.val.get "state" PermissionState
+@[macro_inline] def PermissionStatus.state (self : PermissionStatus) : IO PermissionState := Internal.api "Lasm.JS.Web.PermissionStatus.state" do
+  self.val.get "state" PermissionState
 
 /-- `readonly attribute DOMString name` -/
-def PermissionStatus.name (self : PermissionStatus) : IO String := self.val.get "name" String
+@[macro_inline] def PermissionStatus.name (self : PermissionStatus) : IO String := Internal.api "Lasm.JS.Web.PermissionStatus.name" do
+  self.val.get "name" String
 
 /-- `attribute EventHandler onchange` -/
-def PermissionStatus.onchange (self : PermissionStatus) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def PermissionStatus.onchange (self : PermissionStatus) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PermissionStatus.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def PermissionStatus.setOnchange (self : PermissionStatus) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def PermissionStatus.setOnchange (self : PermissionStatus) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.PermissionStatus.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `v instanceof Permissions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Permissions`). -/
-def Permissions.cast? (v : Value) : IO (Option Permissions) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Permissions"] Value) v) then some { val := v } else none
+@[macro_inline] def Permissions.cast? (v : Value) : IO (Option Permissions) := Internal.api "Lasm.JS.Web.Permissions.cast?" do
+  Internal.cast (Internal.getGlobal ["Permissions"] Value) (fun x => { val := x }) v
 
 /-- `Promise<PermissionStatus> query(object permissionDesc)` -/
-def Permissions.query (self : Permissions) (permissionDesc : Data) : Async PermissionStatus := do
-  let r ← self.val.callMethodAwait "query" (Support.args #[toJS permissionDesc]) Value
+@[macro_inline] def Permissions.query (self : Permissions) (permissionDesc : Data) : Async PermissionStatus := Internal.api "Lasm.JS.Web.Permissions.query" do
+  let r ← self.val.callMethodAwait "query" (Internal.args #[toJS permissionDesc]) Value
   pure { val := r }
 
 /-- `readonly attribute Permissions permissions` -/
-def Navigator.permissions (self : Navigator) : IO Permissions := do
+@[macro_inline] def Navigator.permissions (self : Navigator) : IO Permissions := Internal.api "Lasm.JS.Web.Navigator.permissions" do
   let r ← self.val.get "permissions" Value
   pure { val := r }
 
 /-- `readonly attribute Permissions permissions` -/
-def WorkerNavigator.permissions (self : WorkerNavigator) : IO Permissions := do
+@[macro_inline] def WorkerNavigator.permissions (self : WorkerNavigator) : IO Permissions := Internal.api "Lasm.JS.Web.WorkerNavigator.permissions" do
   let r ← self.val.get "permissions" Value
   pure { val := r }
 

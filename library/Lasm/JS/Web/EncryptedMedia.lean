@@ -6,144 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.EncryptedMedia
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MediaKeyMessageType` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)): "license-request", "license-renewal", "license-release", "individualization-request". -/
-inductive MediaKeyMessageType where
-  /-- "license-request" -/
-  | licenseRequest
-  /-- "license-renewal" -/
-  | licenseRenewal
-  /-- "license-release" -/
-  | licenseRelease
-  /-- "individualization-request" -/
-  | individualizationRequest
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaKeyMessageType := ⟨fun
-  | .licenseRequest => .string "license-request"
-  | .licenseRenewal => .string "license-renewal"
-  | .licenseRelease => .string "license-release"
-  | .individualizationRequest => .string "individualization-request"⟩
-instance : FromJS MediaKeyMessageType where
-  fromJS
-    | .string "license-request" => .ok .licenseRequest
-    | .string "license-renewal" => .ok .licenseRenewal
-    | .string "license-release" => .ok .licenseRelease
-    | .string "individualization-request" => .ok .individualizationRequest
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaKeyMessageType"
-
-/-- `enum MediaKeySessionClosedReason` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)): "internal-error", "closed-by-application", "release-acknowledged", "hardware-context-reset", "resource-evicted". -/
-inductive MediaKeySessionClosedReason where
-  /-- "internal-error" -/
-  | internalError
-  /-- "closed-by-application" -/
-  | closedByApplication
-  /-- "release-acknowledged" -/
-  | releaseAcknowledged
-  /-- "hardware-context-reset" -/
-  | hardwareContextReset
-  /-- "resource-evicted" -/
-  | resourceEvicted
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaKeySessionClosedReason := ⟨fun
-  | .internalError => .string "internal-error"
-  | .closedByApplication => .string "closed-by-application"
-  | .releaseAcknowledged => .string "release-acknowledged"
-  | .hardwareContextReset => .string "hardware-context-reset"
-  | .resourceEvicted => .string "resource-evicted"⟩
-instance : FromJS MediaKeySessionClosedReason where
-  fromJS
-    | .string "internal-error" => .ok .internalError
-    | .string "closed-by-application" => .ok .closedByApplication
-    | .string "release-acknowledged" => .ok .releaseAcknowledged
-    | .string "hardware-context-reset" => .ok .hardwareContextReset
-    | .string "resource-evicted" => .ok .resourceEvicted
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaKeySessionClosedReason"
-
-/-- `enum MediaKeyStatus` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)): "usable", "expired", "released", "output-restricted", "output-downscaled", "usable-in-future", "status-pending", "internal-error". -/
-inductive MediaKeyStatus where
-  /-- "usable" -/
-  | usable
-  /-- "expired" -/
-  | expired
-  /-- "released" -/
-  | released
-  /-- "output-restricted" -/
-  | outputRestricted
-  /-- "output-downscaled" -/
-  | outputDownscaled
-  /-- "usable-in-future" -/
-  | usableInFuture
-  /-- "status-pending" -/
-  | statusPending
-  /-- "internal-error" -/
-  | internalError
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaKeyStatus := ⟨fun
-  | .usable => .string "usable"
-  | .expired => .string "expired"
-  | .released => .string "released"
-  | .outputRestricted => .string "output-restricted"
-  | .outputDownscaled => .string "output-downscaled"
-  | .usableInFuture => .string "usable-in-future"
-  | .statusPending => .string "status-pending"
-  | .internalError => .string "internal-error"⟩
-instance : FromJS MediaKeyStatus where
-  fromJS
-    | .string "usable" => .ok .usable
-    | .string "expired" => .ok .expired
-    | .string "released" => .ok .released
-    | .string "output-restricted" => .ok .outputRestricted
-    | .string "output-downscaled" => .ok .outputDownscaled
-    | .string "usable-in-future" => .ok .usableInFuture
-    | .string "status-pending" => .ok .statusPending
-    | .string "internal-error" => .ok .internalError
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaKeyStatus"
-
-/-- `enum MediaKeysRequirement` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)): "required", "optional", "not-allowed". -/
-inductive MediaKeysRequirement where
-  /-- "required" -/
-  | required
-  /-- "optional" -/
-  | optional
-  /-- "not-allowed" -/
-  | notAllowed
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaKeysRequirement := ⟨fun
-  | .required => .string "required"
-  | .optional => .string "optional"
-  | .notAllowed => .string "not-allowed"⟩
-instance : FromJS MediaKeysRequirement where
-  fromJS
-    | .string "required" => .ok .required
-    | .string "optional" => .ok .optional
-    | .string "not-allowed" => .ok .notAllowed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaKeysRequirement"
-
-/-- `enum MediaKeySessionType` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)): "temporary", "persistent-license". -/
-inductive MediaKeySessionType where
-  /-- "temporary" -/
-  | temporary
-  /-- "persistent-license" -/
-  | persistentLicense
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaKeySessionType := ⟨fun
-  | .temporary => .string "temporary"
-  | .persistentLicense => .string "persistent-license"⟩
-instance : FromJS MediaKeySessionType where
-  fromJS
-    | .string "temporary" => .ok .temporary
-    | .string "persistent-license" => .ok .persistentLicense
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaKeySessionType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MediaEncryptedEventInit : EventInit` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaEncryptedEventInit where
@@ -157,11 +29,11 @@ structure MediaEncryptedEventInit where
   initDataType : Option String := none
   /-- `ArrayBuffer? initData = null` -/
   initData : Option ByteArray := none
-instance : ToJS MediaEncryptedEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("initDataType", Support.optional d.initDataType),
-    ("initData", Support.optional d.initData)]⟩
+instance : ToJS MediaEncryptedEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("initDataType", Internal.optional d.initDataType),
+    ("initData", Internal.optional d.initData)]⟩
 
 /-- `dictionary MediaKeyMessageEventInit : EventInit` (Encrypted Media Extensions (https://w3c.github.io/encrypted-media/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaKeyMessageEventInit where
@@ -175,9 +47,9 @@ structure MediaKeyMessageEventInit where
   messageType : MediaKeyMessageType
   /-- `required ArrayBuffer message` -/
   message : ByteArray
-instance : ToJS MediaKeyMessageEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS MediaKeyMessageEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("messageType", toJS d.messageType),
     ("message", toJS d.message)]⟩
 
@@ -189,9 +61,9 @@ structure MediaKeySystemMediaCapability where
   encryptionScheme : Option String := none
   /-- `DOMString robustness = ""` -/
   robustness : Option String := none
-instance : ToJS MediaKeySystemMediaCapability := ⟨fun d => Support.fields #[("contentType", Support.optional d.contentType),
-    ("encryptionScheme", Support.optional d.encryptionScheme),
-    ("robustness", Support.optional d.robustness)]⟩
+instance : ToJS MediaKeySystemMediaCapability := ⟨fun d => Internal.fields #[("contentType", Internal.optional d.contentType),
+    ("encryptionScheme", Internal.optional d.encryptionScheme),
+    ("robustness", Internal.optional d.robustness)]⟩
 instance : FromJS MediaKeySystemMediaCapability where
   fromJS d := do return {
     contentType := ← Lasm.JS.readField (Option String) d "contentType",
@@ -215,13 +87,13 @@ structure MediaKeySystemConfiguration where
   persistentState : Option MediaKeysRequirement := none
   /-- `sequence<DOMString> sessionTypes` -/
   sessionTypes : Option (Array String) := none
-instance : ToJS MediaKeySystemConfiguration := ⟨fun d => Support.fields #[("label", Support.optional d.label),
-    ("initDataTypes", Support.optional d.initDataTypes),
-    ("audioCapabilities", Support.optional d.audioCapabilities),
-    ("videoCapabilities", Support.optional d.videoCapabilities),
-    ("distinctiveIdentifier", Support.optional d.distinctiveIdentifier),
-    ("persistentState", Support.optional d.persistentState),
-    ("sessionTypes", Support.optional d.sessionTypes)]⟩
+instance : ToJS MediaKeySystemConfiguration := ⟨fun d => Internal.fields #[("label", Internal.optional d.label),
+    ("initDataTypes", Internal.optional d.initDataTypes),
+    ("audioCapabilities", Internal.optional d.audioCapabilities),
+    ("videoCapabilities", Internal.optional d.videoCapabilities),
+    ("distinctiveIdentifier", Internal.optional d.distinctiveIdentifier),
+    ("persistentState", Internal.optional d.persistentState),
+    ("sessionTypes", Internal.optional d.sessionTypes)]⟩
 instance : FromJS MediaKeySystemConfiguration where
   fromJS d := do return {
     label := ← Lasm.JS.readField (Option String) d "label",
@@ -237,168 +109,179 @@ instance : FromJS MediaKeySystemConfiguration where
 structure MediaKeysPolicy where
   /-- `DOMString minHdcpVersion` -/
   minHdcpVersion : Option String := none
-instance : ToJS MediaKeysPolicy := ⟨fun d => Support.fields #[("minHdcpVersion", Support.optional d.minHdcpVersion)]⟩
+instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersion", Internal.optional d.minHdcpVersion)]⟩
 
 /-- `v instanceof MediaEncryptedEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaEncryptedEvent`). -/
-def MediaEncryptedEvent.cast? (v : Value) : IO (Option MediaEncryptedEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaEncryptedEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaEncryptedEvent.cast? (v : Value) : IO (Option MediaEncryptedEvent) := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaEncryptedEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional MediaEncryptedEventInit eventInitDict)` -/
-def MediaEncryptedEvent.new (type : String) (eventInitDict : Option MediaEncryptedEventInit := none) : IO MediaEncryptedEvent :=
+@[macro_inline] def MediaEncryptedEvent.new (type : String) (eventInitDict : Option MediaEncryptedEventInit := none) : IO MediaEncryptedEvent := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.new" do
   Lasm.JS.Binding.invoke MediaEncryptedEvent { name := "Lasm.JS.Web.MediaEncryptedEvent.new", module := "globalThis", path := "MediaEncryptedEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString initDataType` -/
-def MediaEncryptedEvent.initDataType (self : MediaEncryptedEvent) : IO String := self.val.get "initDataType" String
+@[macro_inline] def MediaEncryptedEvent.initDataType (self : MediaEncryptedEvent) : IO String := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.initDataType" do
+  self.val.get "initDataType" String
 
 /-- `readonly attribute ArrayBuffer? initData` -/
-def MediaEncryptedEvent.initData (self : MediaEncryptedEvent) : IO (Option ByteArray) := do
+@[macro_inline] def MediaEncryptedEvent.initData (self : MediaEncryptedEvent) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.initData" do
   let r ← self.val.get "initData" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `v instanceof MediaKeyMessageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeyMessageEvent`). -/
-def MediaKeyMessageEvent.cast? (v : Value) : IO (Option MediaKeyMessageEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaKeyMessageEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaKeyMessageEvent.cast? (v : Value) : IO (Option MediaKeyMessageEvent) := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaKeyMessageEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, MediaKeyMessageEventInit eventInitDict)` -/
-def MediaKeyMessageEvent.new (type : String) (eventInitDict : MediaKeyMessageEventInit) : IO MediaKeyMessageEvent :=
+@[macro_inline] def MediaKeyMessageEvent.new (type : String) (eventInitDict : MediaKeyMessageEventInit) : IO MediaKeyMessageEvent := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.new" do
   Lasm.JS.Binding.invoke MediaKeyMessageEvent { name := "Lasm.JS.Web.MediaKeyMessageEvent.new", module := "globalThis", path := "MediaKeyMessageEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute MediaKeyMessageType messageType` -/
-def MediaKeyMessageEvent.messageType (self : MediaKeyMessageEvent) : IO MediaKeyMessageType := self.val.get "messageType" MediaKeyMessageType
+@[macro_inline] def MediaKeyMessageEvent.messageType (self : MediaKeyMessageEvent) : IO MediaKeyMessageType := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.messageType" do
+  self.val.get "messageType" MediaKeyMessageType
 
 /-- `readonly attribute ArrayBuffer message` -/
-def MediaKeyMessageEvent.message (self : MediaKeyMessageEvent) : IO ByteArray := do
+@[macro_inline] def MediaKeyMessageEvent.message (self : MediaKeyMessageEvent) : IO ByteArray := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.message" do
   let r ← self.val.get "message" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `v instanceof MediaKeySession`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeySession`). -/
-def MediaKeySession.cast? (v : Value) : IO (Option MediaKeySession) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaKeySession"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaKeySession.cast? (v : Value) : IO (Option MediaKeySession) := Internal.api "Lasm.JS.Web.MediaKeySession.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaKeySession"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString sessionId` -/
-def MediaKeySession.sessionId (self : MediaKeySession) : IO String := self.val.get "sessionId" String
+@[macro_inline] def MediaKeySession.sessionId (self : MediaKeySession) : IO String := Internal.api "Lasm.JS.Web.MediaKeySession.sessionId" do
+  self.val.get "sessionId" String
 
 /-- `readonly attribute unrestricted double expiration` -/
-def MediaKeySession.expiration (self : MediaKeySession) : IO Float := self.val.get "expiration" Float
+@[macro_inline] def MediaKeySession.expiration (self : MediaKeySession) : IO Float := Internal.api "Lasm.JS.Web.MediaKeySession.expiration" do
+  self.val.get "expiration" Float
 
 /-- `readonly attribute Promise<MediaKeySessionClosedReason> closed` -/
-def MediaKeySession.closed (self : MediaKeySession) : Async MediaKeySessionClosedReason := do
+@[macro_inline] def MediaKeySession.closed (self : MediaKeySession) : Async MediaKeySessionClosedReason := Internal.api "Lasm.JS.Web.MediaKeySession.closed" do
   let p ← self.val.get "closed" Value
   p.await MediaKeySessionClosedReason
 
 /-- `readonly attribute MediaKeyStatusMap keyStatuses` -/
-def MediaKeySession.keyStatuses (self : MediaKeySession) : IO MediaKeyStatusMap := do
+@[macro_inline] def MediaKeySession.keyStatuses (self : MediaKeySession) : IO MediaKeyStatusMap := Internal.api "Lasm.JS.Web.MediaKeySession.keyStatuses" do
   let r ← self.val.get "keyStatuses" Value
   pure { val := r }
 
 /-- `attribute EventHandler onkeystatuseschange` -/
-def MediaKeySession.onkeystatuseschange (self : MediaKeySession) : IO (Option EventHandlerNonNull) := self.val.get "onkeystatuseschange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaKeySession.onkeystatuseschange (self : MediaKeySession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaKeySession.onkeystatuseschange" do
+  self.val.get "onkeystatuseschange" (Option EventHandlerNonNull)
 
 /-- Sets `onkeystatuseschange`: `attribute EventHandler onkeystatuseschange` -/
-def MediaKeySession.setOnkeystatuseschange (self : MediaKeySession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaKeySession.setOnkeystatuseschange (self : MediaKeySession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaKeySession.setOnkeystatuseschange" do
   self.val.set "onkeystatuseschange" (toJS value)
 
 /-- `attribute EventHandler onmessage` -/
-def MediaKeySession.onmessage (self : MediaKeySession) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def MediaKeySession.onmessage (self : MediaKeySession) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaKeySession.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def MediaKeySession.setOnmessage (self : MediaKeySession) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaKeySession.setOnmessage (self : MediaKeySession) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaKeySession.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `Promise<undefined> generateRequest(DOMString initDataType, BufferSource initData)` -/
-def MediaKeySession.generateRequest (self : MediaKeySession) (initDataType : String) (initData : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "generateRequest" (Support.args #[toJS initDataType, toJS initData]) Unit
+@[macro_inline] def MediaKeySession.generateRequest (self : MediaKeySession) (initDataType : String) (initData : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.MediaKeySession.generateRequest" do
+  self.val.callMethodAwait "generateRequest" (Internal.args #[toJS initDataType, toJS initData]) Unit
 
 /-- `Promise<boolean> load(DOMString sessionId)` -/
-def MediaKeySession.load (self : MediaKeySession) (sessionId : String) : Async Bool :=
-  self.val.callMethodAwait "load" (Support.args #[toJS sessionId]) Bool
+@[macro_inline] def MediaKeySession.load (self : MediaKeySession) (sessionId : String) : Async Bool := Internal.api "Lasm.JS.Web.MediaKeySession.load" do
+  self.val.callMethodAwait "load" (Internal.args #[toJS sessionId]) Bool
 
 /-- `Promise<undefined> update(BufferSource response)` -/
-def MediaKeySession.update (self : MediaKeySession) (response : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "update" (Support.args #[toJS response]) Unit
+@[macro_inline] def MediaKeySession.update (self : MediaKeySession) (response : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.MediaKeySession.update" do
+  self.val.callMethodAwait "update" (Internal.args #[toJS response]) Unit
 
 /-- `Promise<undefined> close()` -/
-def MediaKeySession.close (self : MediaKeySession) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def MediaKeySession.close (self : MediaKeySession) : Async Unit := Internal.api "Lasm.JS.Web.MediaKeySession.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> remove()` -/
-def MediaKeySession.remove (self : MediaKeySession) : Async Unit :=
-  self.val.callMethodAwait "remove" (Support.args #[]) Unit
+@[macro_inline] def MediaKeySession.remove (self : MediaKeySession) : Async Unit := Internal.api "Lasm.JS.Web.MediaKeySession.remove" do
+  self.val.callMethodAwait "remove" (Internal.args #[]) Unit
 
 /-- `v instanceof MediaKeyStatusMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeyStatusMap`). -/
-def MediaKeyStatusMap.cast? (v : Value) : IO (Option MediaKeyStatusMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaKeyStatusMap"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaKeyStatusMap.cast? (v : Value) : IO (Option MediaKeyStatusMap) := Internal.api "Lasm.JS.Web.MediaKeyStatusMap.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaKeyStatusMap"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long size` -/
-def MediaKeyStatusMap.size (self : MediaKeyStatusMap) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def MediaKeyStatusMap.size (self : MediaKeyStatusMap) : IO Nat := Internal.api "Lasm.JS.Web.MediaKeyStatusMap.size" do
+  self.val.get "size" Nat
 
 /-- `boolean has(BufferSource keyId)` -/
-def MediaKeyStatusMap.has (self : MediaKeyStatusMap) (keyId : ByteArray) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS keyId]) Bool
+@[macro_inline] def MediaKeyStatusMap.has (self : MediaKeyStatusMap) (keyId : ByteArray) : IO Bool := Internal.api "Lasm.JS.Web.MediaKeyStatusMap.has" do
+  self.val.callMethod "has" (Internal.args #[toJS keyId]) Bool
 
 /-- `(MediaKeyStatus or undefined) get(BufferSource keyId)` -/
-def MediaKeyStatusMap.get (self : MediaKeyStatusMap) (keyId : ByteArray) : IO (Option MediaKeyStatus) :=
-  self.val.callMethod "get" (Support.args #[toJS keyId]) (Option MediaKeyStatus)
+@[macro_inline] def MediaKeyStatusMap.get (self : MediaKeyStatusMap) (keyId : ByteArray) : IO (Option MediaKeyStatus) := Internal.api "Lasm.JS.Web.MediaKeyStatusMap.get" do
+  self.val.callMethod "get" (Internal.args #[toJS keyId]) (Option MediaKeyStatus)
 
 /-- `v instanceof MediaKeySystemAccess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeySystemAccess`). -/
-def MediaKeySystemAccess.cast? (v : Value) : IO (Option MediaKeySystemAccess) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaKeySystemAccess"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaKeySystemAccess.cast? (v : Value) : IO (Option MediaKeySystemAccess) := Internal.api "Lasm.JS.Web.MediaKeySystemAccess.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaKeySystemAccess"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString keySystem` -/
-def MediaKeySystemAccess.keySystem (self : MediaKeySystemAccess) : IO String := self.val.get "keySystem" String
+@[macro_inline] def MediaKeySystemAccess.keySystem (self : MediaKeySystemAccess) : IO String := Internal.api "Lasm.JS.Web.MediaKeySystemAccess.keySystem" do
+  self.val.get "keySystem" String
 
 /-- `MediaKeySystemConfiguration getConfiguration()` -/
-def MediaKeySystemAccess.getConfiguration (self : MediaKeySystemAccess) : IO MediaKeySystemConfiguration :=
-  self.val.callMethod "getConfiguration" (Support.args #[]) MediaKeySystemConfiguration
+@[macro_inline] def MediaKeySystemAccess.getConfiguration (self : MediaKeySystemAccess) : IO MediaKeySystemConfiguration := Internal.api "Lasm.JS.Web.MediaKeySystemAccess.getConfiguration" do
+  self.val.callMethod "getConfiguration" (Internal.args #[]) MediaKeySystemConfiguration
 
 /-- `Promise<MediaKeys> createMediaKeys()` -/
-def MediaKeySystemAccess.createMediaKeys (self : MediaKeySystemAccess) : Async MediaKeys := do
-  let r ← self.val.callMethodAwait "createMediaKeys" (Support.args #[]) Value
+@[macro_inline] def MediaKeySystemAccess.createMediaKeys (self : MediaKeySystemAccess) : Async MediaKeys := Internal.api "Lasm.JS.Web.MediaKeySystemAccess.createMediaKeys" do
+  let r ← self.val.callMethodAwait "createMediaKeys" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof MediaKeys`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeys`). -/
-def MediaKeys.cast? (v : Value) : IO (Option MediaKeys) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaKeys"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaKeys.cast? (v : Value) : IO (Option MediaKeys) := Internal.api "Lasm.JS.Web.MediaKeys.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaKeys"] Value) (fun x => { val := x }) v
 
 /-- `MediaKeySession createSession(optional MediaKeySessionType sessionType)` -/
-def MediaKeys.createSession (self : MediaKeys) (sessionType : Option MediaKeySessionType := none) : IO MediaKeySession := do
-  let r ← self.val.callMethod "createSession" (Support.args #[Support.optional sessionType]) Value
+@[macro_inline] def MediaKeys.createSession (self : MediaKeys) (sessionType : Option MediaKeySessionType := none) : IO MediaKeySession := Internal.api "Lasm.JS.Web.MediaKeys.createSession" do
+  let r ← self.val.callMethod "createSession" (Internal.args #[Internal.optional sessionType]) Value
   pure { val := r }
 
 /-- `Promise<MediaKeyStatus> getStatusForPolicy(optional MediaKeysPolicy policy)` -/
-def MediaKeys.getStatusForPolicy (self : MediaKeys) (policy : Option MediaKeysPolicy := none) : Async MediaKeyStatus :=
-  self.val.callMethodAwait "getStatusForPolicy" (Support.args #[Support.optional policy]) MediaKeyStatus
+@[macro_inline] def MediaKeys.getStatusForPolicy (self : MediaKeys) (policy : Option MediaKeysPolicy := none) : Async MediaKeyStatus := Internal.api "Lasm.JS.Web.MediaKeys.getStatusForPolicy" do
+  self.val.callMethodAwait "getStatusForPolicy" (Internal.args #[Internal.optional policy]) MediaKeyStatus
 
 /-- `Promise<boolean> setServerCertificate(BufferSource serverCertificate)` -/
-def MediaKeys.setServerCertificate (self : MediaKeys) (serverCertificate : ByteArray) : Async Bool :=
-  self.val.callMethodAwait "setServerCertificate" (Support.args #[toJS serverCertificate]) Bool
+@[macro_inline] def MediaKeys.setServerCertificate (self : MediaKeys) (serverCertificate : ByteArray) : Async Bool := Internal.api "Lasm.JS.Web.MediaKeys.setServerCertificate" do
+  self.val.callMethodAwait "setServerCertificate" (Internal.args #[toJS serverCertificate]) Bool
 
 /-- `readonly attribute MediaKeys? mediaKeys` -/
-def HTMLMediaElement.mediaKeys (self : HTMLMediaElement) : IO (Option MediaKeys) := self.val.get "mediaKeys" (Option MediaKeys)
+@[macro_inline] def HTMLMediaElement.mediaKeys (self : HTMLMediaElement) : IO (Option MediaKeys) := Internal.api "Lasm.JS.Web.HTMLMediaElement.mediaKeys" do
+  self.val.get "mediaKeys" (Option MediaKeys)
 
 /-- `attribute EventHandler onencrypted` -/
-def HTMLMediaElement.onencrypted (self : HTMLMediaElement) : IO (Option EventHandlerNonNull) := self.val.get "onencrypted" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLMediaElement.onencrypted (self : HTMLMediaElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLMediaElement.onencrypted" do
+  self.val.get "onencrypted" (Option EventHandlerNonNull)
 
 /-- Sets `onencrypted`: `attribute EventHandler onencrypted` -/
-def HTMLMediaElement.setOnencrypted (self : HTMLMediaElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLMediaElement.setOnencrypted (self : HTMLMediaElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setOnencrypted" do
   self.val.set "onencrypted" (toJS value)
 
 /-- `attribute EventHandler onwaitingforkey` -/
-def HTMLMediaElement.onwaitingforkey (self : HTMLMediaElement) : IO (Option EventHandlerNonNull) := self.val.get "onwaitingforkey" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLMediaElement.onwaitingforkey (self : HTMLMediaElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLMediaElement.onwaitingforkey" do
+  self.val.get "onwaitingforkey" (Option EventHandlerNonNull)
 
 /-- Sets `onwaitingforkey`: `attribute EventHandler onwaitingforkey` -/
-def HTMLMediaElement.setOnwaitingforkey (self : HTMLMediaElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLMediaElement.setOnwaitingforkey (self : HTMLMediaElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setOnwaitingforkey" do
   self.val.set "onwaitingforkey" (toJS value)
 
 /-- `Promise<undefined> setMediaKeys(MediaKeys? mediaKeys)` -/
-def HTMLMediaElement.setMediaKeys (self : HTMLMediaElement) (mediaKeys : Option MediaKeys) : Async Unit :=
-  self.val.callMethodAwait "setMediaKeys" (Support.args #[toJS mediaKeys]) Unit
+@[macro_inline] def HTMLMediaElement.setMediaKeys (self : HTMLMediaElement) (mediaKeys : Option MediaKeys) : Async Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setMediaKeys" do
+  self.val.callMethodAwait "setMediaKeys" (Internal.args #[toJS mediaKeys]) Unit
 
 /-- `Promise<MediaKeySystemAccess> requestMediaKeySystemAccess(DOMString keySystem, sequence<MediaKeySystemConfiguration> supportedConfigurations)` -/
-def Navigator.requestMediaKeySystemAccess (self : Navigator) (keySystem : String) (supportedConfigurations : Array MediaKeySystemConfiguration) : Async MediaKeySystemAccess := do
-  let r ← self.val.callMethodAwait "requestMediaKeySystemAccess" (Support.args #[toJS keySystem, toJS supportedConfigurations]) Value
+@[macro_inline] def Navigator.requestMediaKeySystemAccess (self : Navigator) (keySystem : String) (supportedConfigurations : Array MediaKeySystemConfiguration) : Async MediaKeySystemAccess := Internal.api "Lasm.JS.Web.Navigator.requestMediaKeySystemAccess" do
+  let r ← self.val.callMethodAwait "requestMediaKeySystemAccess" (Internal.args #[toJS keySystem, toJS supportedConfigurations]) Value
   pure { val := r }
 
 end Lasm.JS.Web

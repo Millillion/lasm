@@ -6,129 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Mediasession
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MediaSessionPlaybackState` (Media Session (https://w3c.github.io/mediasession/)): "none", "paused", "playing". -/
-inductive MediaSessionPlaybackState where
-  /-- "none" -/
-  | none
-  /-- "paused" -/
-  | paused
-  /-- "playing" -/
-  | playing
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaSessionPlaybackState := ⟨fun
-  | .none => .string "none"
-  | .paused => .string "paused"
-  | .playing => .string "playing"⟩
-instance : FromJS MediaSessionPlaybackState where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "paused" => .ok .paused
-    | .string "playing" => .ok .playing
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaSessionPlaybackState"
-
-/-- `enum MediaSessionAction` (Media Session (https://w3c.github.io/mediasession/)): "play", "pause", "seekbackward", "seekforward", "previoustrack", "nexttrack", "skipad", "stop", "seekto", "togglemicrophone", "togglecamera", "togglescreenshare", "hangup", "previousslide", "nextslide", "enterpictureinpicture", "voiceactivity". -/
-inductive MediaSessionAction where
-  /-- "play" -/
-  | play
-  /-- "pause" -/
-  | pause
-  /-- "seekbackward" -/
-  | seekbackward
-  /-- "seekforward" -/
-  | seekforward
-  /-- "previoustrack" -/
-  | previoustrack
-  /-- "nexttrack" -/
-  | nexttrack
-  /-- "skipad" -/
-  | skipad
-  /-- "stop" -/
-  | stop
-  /-- "seekto" -/
-  | seekto
-  /-- "togglemicrophone" -/
-  | togglemicrophone
-  /-- "togglecamera" -/
-  | togglecamera
-  /-- "togglescreenshare" -/
-  | togglescreenshare
-  /-- "hangup" -/
-  | hangup
-  /-- "previousslide" -/
-  | previousslide
-  /-- "nextslide" -/
-  | nextslide
-  /-- "enterpictureinpicture" -/
-  | enterpictureinpicture
-  /-- "voiceactivity" -/
-  | voiceactivity
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaSessionAction := ⟨fun
-  | .play => .string "play"
-  | .pause => .string "pause"
-  | .seekbackward => .string "seekbackward"
-  | .seekforward => .string "seekforward"
-  | .previoustrack => .string "previoustrack"
-  | .nexttrack => .string "nexttrack"
-  | .skipad => .string "skipad"
-  | .stop => .string "stop"
-  | .seekto => .string "seekto"
-  | .togglemicrophone => .string "togglemicrophone"
-  | .togglecamera => .string "togglecamera"
-  | .togglescreenshare => .string "togglescreenshare"
-  | .hangup => .string "hangup"
-  | .previousslide => .string "previousslide"
-  | .nextslide => .string "nextslide"
-  | .enterpictureinpicture => .string "enterpictureinpicture"
-  | .voiceactivity => .string "voiceactivity"⟩
-instance : FromJS MediaSessionAction where
-  fromJS
-    | .string "play" => .ok .play
-    | .string "pause" => .ok .pause
-    | .string "seekbackward" => .ok .seekbackward
-    | .string "seekforward" => .ok .seekforward
-    | .string "previoustrack" => .ok .previoustrack
-    | .string "nexttrack" => .ok .nexttrack
-    | .string "skipad" => .ok .skipad
-    | .string "stop" => .ok .stop
-    | .string "seekto" => .ok .seekto
-    | .string "togglemicrophone" => .ok .togglemicrophone
-    | .string "togglecamera" => .ok .togglecamera
-    | .string "togglescreenshare" => .ok .togglescreenshare
-    | .string "hangup" => .ok .hangup
-    | .string "previousslide" => .ok .previousslide
-    | .string "nextslide" => .ok .nextslide
-    | .string "enterpictureinpicture" => .ok .enterpictureinpicture
-    | .string "voiceactivity" => .ok .voiceactivity
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaSessionAction"
-
-/-- `enum MediaSessionEnterPictureInPictureReason` (Media Session (https://w3c.github.io/mediasession/)): "other", "useraction", "contentoccluded". -/
-inductive MediaSessionEnterPictureInPictureReason where
-  /-- "other" -/
-  | other
-  /-- "useraction" -/
-  | useraction
-  /-- "contentoccluded" -/
-  | contentoccluded
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaSessionEnterPictureInPictureReason := ⟨fun
-  | .other => .string "other"
-  | .useraction => .string "useraction"
-  | .contentoccluded => .string "contentoccluded"⟩
-instance : FromJS MediaSessionEnterPictureInPictureReason where
-  fromJS
-    | .string "other" => .ok .other
-    | .string "useraction" => .ok .useraction
-    | .string "contentoccluded" => .ok .contentoccluded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaSessionEnterPictureInPictureReason"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MediaImage` (Media Session (https://w3c.github.io/mediasession/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaImage where
@@ -138,9 +23,9 @@ structure MediaImage where
   sizes : Option String := none
   /-- `DOMString type = ""` -/
   type : Option String := none
-instance : ToJS MediaImage := ⟨fun d => Support.fields #[("src", toJS d.src),
-    ("sizes", Support.optional d.sizes),
-    ("type", Support.optional d.type)]⟩
+instance : ToJS MediaImage := ⟨fun d => Internal.fields #[("src", toJS d.src),
+    ("sizes", Internal.optional d.sizes),
+    ("type", Internal.optional d.type)]⟩
 instance : FromJS MediaImage where
   fromJS d := do return {
     src := ← Lasm.JS.readField String d "src",
@@ -156,9 +41,9 @@ structure ChapterInformationInit where
   startTime : Option Float := none
   /-- `sequence<MediaImage> artwork = []` -/
   artwork : Option (Array MediaImage) := none
-instance : ToJS ChapterInformationInit := ⟨fun d => Support.fields #[("title", Support.optional d.title),
-    ("startTime", Support.optional d.startTime),
-    ("artwork", Support.optional d.artwork)]⟩
+instance : ToJS ChapterInformationInit := ⟨fun d => Internal.fields #[("title", Internal.optional d.title),
+    ("startTime", Internal.optional d.startTime),
+    ("artwork", Internal.optional d.artwork)]⟩
 
 /-- `dictionary MediaMetadataInit` (Media Session (https://w3c.github.io/mediasession/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaMetadataInit where
@@ -172,11 +57,11 @@ structure MediaMetadataInit where
   artwork : Option (Array MediaImage) := none
   /-- `sequence<ChapterInformationInit> chapterInfo = []` -/
   chapterInfo : Option (Array ChapterInformationInit) := none
-instance : ToJS MediaMetadataInit := ⟨fun d => Support.fields #[("title", Support.optional d.title),
-    ("artist", Support.optional d.artist),
-    ("album", Support.optional d.album),
-    ("artwork", Support.optional d.artwork),
-    ("chapterInfo", Support.optional d.chapterInfo)]⟩
+instance : ToJS MediaMetadataInit := ⟨fun d => Internal.fields #[("title", Internal.optional d.title),
+    ("artist", Internal.optional d.artist),
+    ("album", Internal.optional d.album),
+    ("artwork", Internal.optional d.artwork),
+    ("chapterInfo", Internal.optional d.chapterInfo)]⟩
 
 /-- `dictionary MediaSessionActionDetails` (Media Session (https://w3c.github.io/mediasession/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaSessionActionDetails where
@@ -192,6 +77,12 @@ structure MediaSessionActionDetails where
   isActivating : Option Bool := none
   /-- `MediaSessionEnterPictureInPictureReason enterPictureInPictureReason` -/
   enterPictureInPictureReason : Option MediaSessionEnterPictureInPictureReason := none
+instance : ToJS MediaSessionActionDetails := ⟨fun d => Internal.fields #[("action", toJS d.action),
+    ("seekOffset", Internal.optional d.seekOffset),
+    ("seekTime", Internal.optional d.seekTime),
+    ("fastSeek", Internal.optional d.fastSeek),
+    ("isActivating", Internal.optional d.isActivating),
+    ("enterPictureInPictureReason", Internal.optional d.enterPictureInPictureReason)]⟩
 instance : FromJS MediaSessionActionDetails where
   fromJS d := do return {
     action := ← Lasm.JS.readField MediaSessionAction d "action",
@@ -211,10 +102,10 @@ instance : ToJS MediaSessionActionHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MediaSessionActionHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.MediaSessionActionHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MediaSessionActionHandler.ofFn (f : MediaSessionActionDetails → Async Unit) : IO MediaSessionActionHandler := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg MediaSessionActionDetails args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg MediaSessionActionDetails args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MediaSessionActionHandler.ofSyncFn (f : MediaSessionActionDetails → IO Unit) : IO MediaSessionActionHandler := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg MediaSessionActionDetails args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg MediaSessionActionDetails args 0)) }
 
 /-- `dictionary MediaPositionState` (Media Session (https://w3c.github.io/mediasession/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaPositionState where
@@ -224,103 +115,113 @@ structure MediaPositionState where
   playbackRate : Option Float := none
   /-- `double position` -/
   position : Option Float := none
-instance : ToJS MediaPositionState := ⟨fun d => Support.fields #[("duration", Support.optional d.duration),
-    ("playbackRate", Support.optional d.playbackRate),
-    ("position", Support.optional d.position)]⟩
+instance : ToJS MediaPositionState := ⟨fun d => Internal.fields #[("duration", Internal.optional d.duration),
+    ("playbackRate", Internal.optional d.playbackRate),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `v instanceof ChapterInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChapterInformation`). -/
-def ChapterInformation.cast? (v : Value) : IO (Option ChapterInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ChapterInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def ChapterInformation.cast? (v : Value) : IO (Option ChapterInformation) := Internal.api "Lasm.JS.Web.ChapterInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["ChapterInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString title` -/
-def ChapterInformation.title (self : ChapterInformation) : IO String := self.val.get "title" String
+@[macro_inline] def ChapterInformation.title (self : ChapterInformation) : IO String := Internal.api "Lasm.JS.Web.ChapterInformation.title" do
+  self.val.get "title" String
 
 /-- `readonly attribute double startTime` -/
-def ChapterInformation.startTime (self : ChapterInformation) : IO Float := self.val.get "startTime" Float
+@[macro_inline] def ChapterInformation.startTime (self : ChapterInformation) : IO Float := Internal.api "Lasm.JS.Web.ChapterInformation.startTime" do
+  self.val.get "startTime" Float
 
 /-- `readonly attribute FrozenArray<MediaImage> artwork` -/
-def ChapterInformation.artwork (self : ChapterInformation) : IO (Array MediaImage) := self.val.get "artwork" (Array MediaImage)
+@[macro_inline] def ChapterInformation.artwork (self : ChapterInformation) : IO (Array MediaImage) := Internal.api "Lasm.JS.Web.ChapterInformation.artwork" do
+  self.val.get "artwork" (Array MediaImage)
 
 /-- `v instanceof MediaMetadata`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaMetadata`). -/
-def MediaMetadata.cast? (v : Value) : IO (Option MediaMetadata) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaMetadata"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaMetadata.cast? (v : Value) : IO (Option MediaMetadata) := Internal.api "Lasm.JS.Web.MediaMetadata.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaMetadata"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional MediaMetadataInit init)` -/
-def MediaMetadata.new (init : Option MediaMetadataInit := none) : IO MediaMetadata :=
+@[macro_inline] def MediaMetadata.new (init : Option MediaMetadataInit := none) : IO MediaMetadata := Internal.api "Lasm.JS.Web.MediaMetadata.new" do
   Lasm.JS.Binding.invoke MediaMetadata { name := "Lasm.JS.Web.MediaMetadata.new", module := "globalThis", path := "MediaMetadata", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `attribute DOMString title` -/
-def MediaMetadata.title (self : MediaMetadata) : IO String := self.val.get "title" String
+@[macro_inline] def MediaMetadata.title (self : MediaMetadata) : IO String := Internal.api "Lasm.JS.Web.MediaMetadata.title" do
+  self.val.get "title" String
 
 /-- Sets `title`: `attribute DOMString title` -/
-def MediaMetadata.setTitle (self : MediaMetadata) (value : String) : IO Unit :=
+@[macro_inline] def MediaMetadata.setTitle (self : MediaMetadata) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaMetadata.setTitle" do
   self.val.set "title" (toJS value)
 
 /-- `attribute DOMString artist` -/
-def MediaMetadata.artist (self : MediaMetadata) : IO String := self.val.get "artist" String
+@[macro_inline] def MediaMetadata.artist (self : MediaMetadata) : IO String := Internal.api "Lasm.JS.Web.MediaMetadata.artist" do
+  self.val.get "artist" String
 
 /-- Sets `artist`: `attribute DOMString artist` -/
-def MediaMetadata.setArtist (self : MediaMetadata) (value : String) : IO Unit :=
+@[macro_inline] def MediaMetadata.setArtist (self : MediaMetadata) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaMetadata.setArtist" do
   self.val.set "artist" (toJS value)
 
 /-- `attribute DOMString album` -/
-def MediaMetadata.album (self : MediaMetadata) : IO String := self.val.get "album" String
+@[macro_inline] def MediaMetadata.album (self : MediaMetadata) : IO String := Internal.api "Lasm.JS.Web.MediaMetadata.album" do
+  self.val.get "album" String
 
 /-- Sets `album`: `attribute DOMString album` -/
-def MediaMetadata.setAlbum (self : MediaMetadata) (value : String) : IO Unit :=
+@[macro_inline] def MediaMetadata.setAlbum (self : MediaMetadata) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaMetadata.setAlbum" do
   self.val.set "album" (toJS value)
 
 /-- `attribute FrozenArray<object> artwork` -/
-def MediaMetadata.artwork (self : MediaMetadata) : IO (Array Data) := self.val.get "artwork" (Array Data)
+@[macro_inline] def MediaMetadata.artwork (self : MediaMetadata) : IO (Array Data) := Internal.api "Lasm.JS.Web.MediaMetadata.artwork" do
+  self.val.get "artwork" (Array Data)
 
 /-- Sets `artwork`: `attribute FrozenArray<object> artwork` -/
-def MediaMetadata.setArtwork (self : MediaMetadata) (value : Array Data) : IO Unit :=
+@[macro_inline] def MediaMetadata.setArtwork (self : MediaMetadata) (value : Array Data) : IO Unit := Internal.api "Lasm.JS.Web.MediaMetadata.setArtwork" do
   self.val.set "artwork" (toJS value)
 
 /-- `readonly attribute FrozenArray<ChapterInformation> chapterInfo` -/
-def MediaMetadata.chapterInfo (self : MediaMetadata) : IO (Array ChapterInformation) := self.val.get "chapterInfo" (Array ChapterInformation)
+@[macro_inline] def MediaMetadata.chapterInfo (self : MediaMetadata) : IO (Array ChapterInformation) := Internal.api "Lasm.JS.Web.MediaMetadata.chapterInfo" do
+  self.val.get "chapterInfo" (Array ChapterInformation)
 
 /-- `v instanceof MediaSession`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaSession`). -/
-def MediaSession.cast? (v : Value) : IO (Option MediaSession) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaSession"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaSession.cast? (v : Value) : IO (Option MediaSession) := Internal.api "Lasm.JS.Web.MediaSession.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaSession"] Value) (fun x => { val := x }) v
 
 /-- `attribute MediaMetadata? metadata` -/
-def MediaSession.metadata (self : MediaSession) : IO (Option MediaMetadata) := self.val.get "metadata" (Option MediaMetadata)
+@[macro_inline] def MediaSession.metadata (self : MediaSession) : IO (Option MediaMetadata) := Internal.api "Lasm.JS.Web.MediaSession.metadata" do
+  self.val.get "metadata" (Option MediaMetadata)
 
 /-- Sets `metadata`: `attribute MediaMetadata? metadata` -/
-def MediaSession.setMetadata (self : MediaSession) (value : Option MediaMetadata) : IO Unit :=
+@[macro_inline] def MediaSession.setMetadata (self : MediaSession) (value : Option MediaMetadata) : IO Unit := Internal.api "Lasm.JS.Web.MediaSession.setMetadata" do
   self.val.set "metadata" (toJS value)
 
 /-- `attribute MediaSessionPlaybackState playbackState` -/
-def MediaSession.playbackState (self : MediaSession) : IO MediaSessionPlaybackState := self.val.get "playbackState" MediaSessionPlaybackState
+@[macro_inline] def MediaSession.playbackState (self : MediaSession) : IO MediaSessionPlaybackState := Internal.api "Lasm.JS.Web.MediaSession.playbackState" do
+  self.val.get "playbackState" MediaSessionPlaybackState
 
 /-- Sets `playbackState`: `attribute MediaSessionPlaybackState playbackState` -/
-def MediaSession.setPlaybackState (self : MediaSession) (value : MediaSessionPlaybackState) : IO Unit :=
+@[macro_inline] def MediaSession.setPlaybackState (self : MediaSession) (value : MediaSessionPlaybackState) : IO Unit := Internal.api "Lasm.JS.Web.MediaSession.setPlaybackState" do
   self.val.set "playbackState" (toJS value)
 
 /-- `undefined setActionHandler(MediaSessionAction action, MediaSessionActionHandler? handler)` -/
-def MediaSession.setActionHandler (self : MediaSession) (action : MediaSessionAction) (handler : Option MediaSessionActionHandler) : IO Unit :=
-  self.val.callMethod "setActionHandler" (Support.args #[toJS action, toJS handler]) Unit
+@[macro_inline] def MediaSession.setActionHandler (self : MediaSession) (action : MediaSessionAction) (handler : Option MediaSessionActionHandler) : IO Unit := Internal.api "Lasm.JS.Web.MediaSession.setActionHandler" do
+  self.val.callMethod "setActionHandler" (Internal.args #[toJS action, toJS handler]) Unit
 
 /-- `undefined setPositionState(optional MediaPositionState state)` -/
-def MediaSession.setPositionState (self : MediaSession) (state : Option MediaPositionState := none) : IO Unit :=
-  self.val.callMethod "setPositionState" (Support.args #[Support.optional state]) Unit
+@[macro_inline] def MediaSession.setPositionState (self : MediaSession) (state : Option MediaPositionState := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaSession.setPositionState" do
+  self.val.callMethod "setPositionState" (Internal.args #[Internal.optional state]) Unit
 
 /-- `Promise<undefined> setMicrophoneActive(boolean active)` -/
-def MediaSession.setMicrophoneActive (self : MediaSession) (active : Bool) : Async Unit :=
-  self.val.callMethodAwait "setMicrophoneActive" (Support.args #[toJS active]) Unit
+@[macro_inline] def MediaSession.setMicrophoneActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setMicrophoneActive" do
+  self.val.callMethodAwait "setMicrophoneActive" (Internal.args #[toJS active]) Unit
 
 /-- `Promise<undefined> setCameraActive(boolean active)` -/
-def MediaSession.setCameraActive (self : MediaSession) (active : Bool) : Async Unit :=
-  self.val.callMethodAwait "setCameraActive" (Support.args #[toJS active]) Unit
+@[macro_inline] def MediaSession.setCameraActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setCameraActive" do
+  self.val.callMethodAwait "setCameraActive" (Internal.args #[toJS active]) Unit
 
 /-- `Promise<undefined> setScreenshareActive(boolean active)` -/
-def MediaSession.setScreenshareActive (self : MediaSession) (active : Bool) : Async Unit :=
-  self.val.callMethodAwait "setScreenshareActive" (Support.args #[toJS active]) Unit
+@[macro_inline] def MediaSession.setScreenshareActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setScreenshareActive" do
+  self.val.callMethodAwait "setScreenshareActive" (Internal.args #[toJS active]) Unit
 
 /-- `readonly attribute MediaSession mediaSession` -/
-def Navigator.mediaSession (self : Navigator) : IO MediaSession := do
+@[macro_inline] def Navigator.mediaSession (self : Navigator) : IO MediaSession := Internal.api "Lasm.JS.Web.Navigator.mediaSession" do
   let r ← self.val.get "mediaSession" Value
   pure { val := r }
 

@@ -6,11 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.MediacaptureStreams
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CaptureHandleConfig` (Capture Handle - Bootstrapping Collaboration when Screensharing (https://w3c.github.io/mediacapture-handle/identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaptureHandleConfig where
@@ -20,9 +23,9 @@ structure CaptureHandleConfig where
   handle : Option String := none
   /-- `sequence<DOMString> permittedOrigins = []` -/
   permittedOrigins : Option (Array String) := none
-instance : ToJS CaptureHandleConfig := ⟨fun d => Support.fields #[("exposeOrigin", Support.optional d.exposeOrigin),
-    ("handle", Support.optional d.handle),
-    ("permittedOrigins", Support.optional d.permittedOrigins)]⟩
+instance : ToJS CaptureHandleConfig := ⟨fun d => Internal.fields #[("exposeOrigin", Internal.optional d.exposeOrigin),
+    ("handle", Internal.optional d.handle),
+    ("permittedOrigins", Internal.optional d.permittedOrigins)]⟩
 
 /-- `dictionary CaptureHandle` (Capture Handle - Bootstrapping Collaboration when Screensharing (https://w3c.github.io/mediacapture-handle/identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaptureHandle where
@@ -30,6 +33,8 @@ structure CaptureHandle where
   origin : Option String := none
   /-- `DOMString handle` -/
   handle : Option String := none
+instance : ToJS CaptureHandle := ⟨fun d => Internal.fields #[("origin", Internal.optional d.origin),
+    ("handle", Internal.optional d.handle)]⟩
 instance : FromJS CaptureHandle where
   fromJS d := do return {
     origin := ← Lasm.JS.readField (Option String) d "origin",
@@ -37,18 +42,19 @@ instance : FromJS CaptureHandle where
   typeName := "Lasm.JS.Web.CaptureHandle"
 
 /-- `undefined setCaptureHandleConfig(optional CaptureHandleConfig config)` -/
-def MediaDevices.setCaptureHandleConfig (self : MediaDevices) (config : Option CaptureHandleConfig := none) : IO Unit :=
-  self.val.callMethod "setCaptureHandleConfig" (Support.args #[Support.optional config]) Unit
+@[macro_inline] def MediaDevices.setCaptureHandleConfig (self : MediaDevices) (config : Option CaptureHandleConfig := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaDevices.setCaptureHandleConfig" do
+  self.val.callMethod "setCaptureHandleConfig" (Internal.args #[Internal.optional config]) Unit
 
 /-- `attribute EventHandler oncapturehandlechange` -/
-def MediaStreamTrack.oncapturehandlechange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "oncapturehandlechange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.oncapturehandlechange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.oncapturehandlechange" do
+  self.val.get "oncapturehandlechange" (Option EventHandlerNonNull)
 
 /-- Sets `oncapturehandlechange`: `attribute EventHandler oncapturehandlechange` -/
-def MediaStreamTrack.setOncapturehandlechange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOncapturehandlechange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOncapturehandlechange" do
   self.val.set "oncapturehandlechange" (toJS value)
 
 /-- `CaptureHandle? getCaptureHandle()` -/
-def MediaStreamTrack.getCaptureHandle (self : MediaStreamTrack) : IO (Option CaptureHandle) :=
-  self.val.callMethod "getCaptureHandle" (Support.args #[]) (Option CaptureHandle)
+@[macro_inline] def MediaStreamTrack.getCaptureHandle (self : MediaStreamTrack) : IO (Option CaptureHandle) := Internal.api "Lasm.JS.Web.MediaStreamTrack.getCaptureHandle" do
+  self.val.callMethod "getCaptureHandle" (Internal.args #[]) (Option CaptureHandle)
 
 end Lasm.JS.Web

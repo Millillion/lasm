@@ -6,11 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.WebNfc
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary NDEFRecordInit` (Web NFC (https://w3c-cg.github.io/web-nfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NDEFRecordInit where
@@ -26,24 +30,24 @@ structure NDEFRecordInit where
   lang : Option String := none
   /-- `any data` -/
   data : Data := .undefined
-instance : ToJS NDEFRecordInit := ⟨fun d => Support.fields #[("recordType", toJS d.recordType),
-    ("mediaType", Support.optional d.mediaType),
-    ("id", Support.optional d.id),
-    ("encoding", Support.optional d.encoding),
-    ("lang", Support.optional d.lang),
+instance : ToJS NDEFRecordInit := ⟨fun d => Internal.fields #[("recordType", toJS d.recordType),
+    ("mediaType", Internal.optional d.mediaType),
+    ("id", Internal.optional d.id),
+    ("encoding", Internal.optional d.encoding),
+    ("lang", Internal.optional d.lang),
     ("data", d.data)]⟩
 
 /-- `dictionary NDEFMessageInit` (Web NFC (https://w3c-cg.github.io/web-nfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NDEFMessageInit where
   /-- `required sequence<NDEFRecordInit> records` -/
   records : Array NDEFRecordInit
-instance : ToJS NDEFMessageInit := ⟨fun d => Support.fields #[("records", toJS d.records)]⟩
+instance : ToJS NDEFMessageInit := ⟨fun d => Internal.fields #[("records", toJS d.records)]⟩
 
 /-- `dictionary NDEFScanOptions` (Web NFC (https://w3c-cg.github.io/web-nfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NDEFScanOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS NDEFScanOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS NDEFScanOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `typedef DOMString or BufferSource or NDEFMessageInit NDEFMessageSource`: one constructor per member type. -/
 inductive NDEFMessageSource where
@@ -67,14 +71,14 @@ structure NDEFWriteOptions where
   overwrite : Option Bool := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance : ToJS NDEFWriteOptions := ⟨fun d => Support.fields #[("overwrite", Support.optional d.overwrite),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS NDEFWriteOptions := ⟨fun d => Internal.fields #[("overwrite", Internal.optional d.overwrite),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary NDEFMakeReadOnlyOptions` (Web NFC (https://w3c-cg.github.io/web-nfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NDEFMakeReadOnlyOptions where
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance : ToJS NDEFMakeReadOnlyOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS NDEFMakeReadOnlyOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary NDEFReadingEventInit : EventInit` (Web NFC (https://w3c-cg.github.io/web-nfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NDEFReadingEventInit where
@@ -88,107 +92,116 @@ structure NDEFReadingEventInit where
   serialNumber : Option String := none
   /-- `required NDEFMessageInit message` -/
   message : NDEFMessageInit
-instance : ToJS NDEFReadingEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("serialNumber", Support.optional d.serialNumber),
+instance : ToJS NDEFReadingEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("serialNumber", Internal.optional d.serialNumber),
     ("message", toJS d.message)]⟩
 
 /-- `v instanceof NDEFMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NDEFMessage`). -/
-def NDEFMessage.cast? (v : Value) : IO (Option NDEFMessage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NDEFMessage"] Value) v) then some { val := v } else none
+@[macro_inline] def NDEFMessage.cast? (v : Value) : IO (Option NDEFMessage) := Internal.api "Lasm.JS.Web.NDEFMessage.cast?" do
+  Internal.cast (Internal.getGlobal ["NDEFMessage"] Value) (fun x => { val := x }) v
 
 /-- `constructor(NDEFMessageInit messageInit)` -/
-def NDEFMessage.new (messageInit : NDEFMessageInit) : IO NDEFMessage :=
+@[macro_inline] def NDEFMessage.new (messageInit : NDEFMessageInit) : IO NDEFMessage := Internal.api "Lasm.JS.Web.NDEFMessage.new" do
   Lasm.JS.Binding.invoke NDEFMessage { name := "Lasm.JS.Web.NDEFMessage.new", module := "globalThis", path := "NDEFMessage", construct := true, arity := 1 }
-    (Support.args #[toJS messageInit]) (await := false)
+    (Internal.args #[toJS messageInit]) (await := false)
 
 /-- `readonly attribute FrozenArray<NDEFRecord> records` -/
-def NDEFMessage.records (self : NDEFMessage) : IO (Array NDEFRecord) := self.val.get "records" (Array NDEFRecord)
+@[macro_inline] def NDEFMessage.records (self : NDEFMessage) : IO (Array NDEFRecord) := Internal.api "Lasm.JS.Web.NDEFMessage.records" do
+  self.val.get "records" (Array NDEFRecord)
 
 /-- `v instanceof NDEFReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NDEFReader`). -/
-def NDEFReader.cast? (v : Value) : IO (Option NDEFReader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NDEFReader"] Value) v) then some { val := v } else none
+@[macro_inline] def NDEFReader.cast? (v : Value) : IO (Option NDEFReader) := Internal.api "Lasm.JS.Web.NDEFReader.cast?" do
+  Internal.cast (Internal.getGlobal ["NDEFReader"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def NDEFReader.new : IO NDEFReader :=
+@[macro_inline] def NDEFReader.new : IO NDEFReader := Internal.api "Lasm.JS.Web.NDEFReader.new" do
   Lasm.JS.Binding.invoke NDEFReader { name := "Lasm.JS.Web.NDEFReader.new", module := "globalThis", path := "NDEFReader", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `attribute EventHandler onreading` -/
-def NDEFReader.onreading (self : NDEFReader) : IO (Option EventHandlerNonNull) := self.val.get "onreading" (Option EventHandlerNonNull)
+@[macro_inline] def NDEFReader.onreading (self : NDEFReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.NDEFReader.onreading" do
+  self.val.get "onreading" (Option EventHandlerNonNull)
 
 /-- Sets `onreading`: `attribute EventHandler onreading` -/
-def NDEFReader.setOnreading (self : NDEFReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def NDEFReader.setOnreading (self : NDEFReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.NDEFReader.setOnreading" do
   self.val.set "onreading" (toJS value)
 
 /-- `attribute EventHandler onreadingerror` -/
-def NDEFReader.onreadingerror (self : NDEFReader) : IO (Option EventHandlerNonNull) := self.val.get "onreadingerror" (Option EventHandlerNonNull)
+@[macro_inline] def NDEFReader.onreadingerror (self : NDEFReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.NDEFReader.onreadingerror" do
+  self.val.get "onreadingerror" (Option EventHandlerNonNull)
 
 /-- Sets `onreadingerror`: `attribute EventHandler onreadingerror` -/
-def NDEFReader.setOnreadingerror (self : NDEFReader) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def NDEFReader.setOnreadingerror (self : NDEFReader) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.NDEFReader.setOnreadingerror" do
   self.val.set "onreadingerror" (toJS value)
 
 /-- `Promise<undefined> scan(optional NDEFScanOptions options)` -/
-def NDEFReader.scan (self : NDEFReader) (options : Option NDEFScanOptions := none) : Async Unit :=
-  self.val.callMethodAwait "scan" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def NDEFReader.scan (self : NDEFReader) (options : Option NDEFScanOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.NDEFReader.scan" do
+  self.val.callMethodAwait "scan" (Internal.args #[Internal.optional options]) Unit
 
 /-- `Promise<undefined> write(NDEFMessageSource message, optional NDEFWriteOptions options)` -/
-def NDEFReader.write (self : NDEFReader) (message : NDEFMessageSource) (options : Option NDEFWriteOptions := none) : Async Unit :=
-  self.val.callMethodAwait "write" (Support.args #[toJS message, Support.optional options]) Unit
+@[macro_inline] def NDEFReader.write (self : NDEFReader) (message : NDEFMessageSource) (options : Option NDEFWriteOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.NDEFReader.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS message, Internal.optional options]) Unit
 
 /-- `Promise<undefined> makeReadOnly(optional NDEFMakeReadOnlyOptions options)` -/
-def NDEFReader.makeReadOnly (self : NDEFReader) (options : Option NDEFMakeReadOnlyOptions := none) : Async Unit :=
-  self.val.callMethodAwait "makeReadOnly" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def NDEFReader.makeReadOnly (self : NDEFReader) (options : Option NDEFMakeReadOnlyOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.NDEFReader.makeReadOnly" do
+  self.val.callMethodAwait "makeReadOnly" (Internal.args #[Internal.optional options]) Unit
 
 /-- `v instanceof NDEFReadingEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NDEFReadingEvent`). -/
-def NDEFReadingEvent.cast? (v : Value) : IO (Option NDEFReadingEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NDEFReadingEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def NDEFReadingEvent.cast? (v : Value) : IO (Option NDEFReadingEvent) := Internal.api "Lasm.JS.Web.NDEFReadingEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["NDEFReadingEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, NDEFReadingEventInit readingEventInitDict)` -/
-def NDEFReadingEvent.new (type : String) (readingEventInitDict : NDEFReadingEventInit) : IO NDEFReadingEvent :=
+@[macro_inline] def NDEFReadingEvent.new (type : String) (readingEventInitDict : NDEFReadingEventInit) : IO NDEFReadingEvent := Internal.api "Lasm.JS.Web.NDEFReadingEvent.new" do
   Lasm.JS.Binding.invoke NDEFReadingEvent { name := "Lasm.JS.Web.NDEFReadingEvent.new", module := "globalThis", path := "NDEFReadingEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS readingEventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS readingEventInitDict]) (await := false)
 
 /-- `readonly attribute DOMString serialNumber` -/
-def NDEFReadingEvent.serialNumber (self : NDEFReadingEvent) : IO String := self.val.get "serialNumber" String
+@[macro_inline] def NDEFReadingEvent.serialNumber (self : NDEFReadingEvent) : IO String := Internal.api "Lasm.JS.Web.NDEFReadingEvent.serialNumber" do
+  self.val.get "serialNumber" String
 
 /-- `readonly attribute NDEFMessage message` -/
-def NDEFReadingEvent.message (self : NDEFReadingEvent) : IO NDEFMessage := do
+@[macro_inline] def NDEFReadingEvent.message (self : NDEFReadingEvent) : IO NDEFMessage := Internal.api "Lasm.JS.Web.NDEFReadingEvent.message" do
   let r ← self.val.get "message" Value
   pure { val := r }
 
 /-- `v instanceof NDEFRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NDEFRecord`). -/
-def NDEFRecord.cast? (v : Value) : IO (Option NDEFRecord) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NDEFRecord"] Value) v) then some { val := v } else none
+@[macro_inline] def NDEFRecord.cast? (v : Value) : IO (Option NDEFRecord) := Internal.api "Lasm.JS.Web.NDEFRecord.cast?" do
+  Internal.cast (Internal.getGlobal ["NDEFRecord"] Value) (fun x => { val := x }) v
 
 /-- `constructor(NDEFRecordInit recordInit)` -/
-def NDEFRecord.new (recordInit : NDEFRecordInit) : IO NDEFRecord :=
+@[macro_inline] def NDEFRecord.new (recordInit : NDEFRecordInit) : IO NDEFRecord := Internal.api "Lasm.JS.Web.NDEFRecord.new" do
   Lasm.JS.Binding.invoke NDEFRecord { name := "Lasm.JS.Web.NDEFRecord.new", module := "globalThis", path := "NDEFRecord", construct := true, arity := 1 }
-    (Support.args #[toJS recordInit]) (await := false)
+    (Internal.args #[toJS recordInit]) (await := false)
 
 /-- `readonly attribute USVString recordType` -/
-def NDEFRecord.recordType (self : NDEFRecord) : IO String := self.val.get "recordType" String
+@[macro_inline] def NDEFRecord.recordType (self : NDEFRecord) : IO String := Internal.api "Lasm.JS.Web.NDEFRecord.recordType" do
+  self.val.get "recordType" String
 
 /-- `readonly attribute USVString? mediaType` -/
-def NDEFRecord.mediaType (self : NDEFRecord) : IO (Option String) := self.val.get "mediaType" (Option String)
+@[macro_inline] def NDEFRecord.mediaType (self : NDEFRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.NDEFRecord.mediaType" do
+  self.val.get "mediaType" (Option String)
 
 /-- `readonly attribute USVString? id` -/
-def NDEFRecord.id (self : NDEFRecord) : IO (Option String) := self.val.get "id" (Option String)
+@[macro_inline] def NDEFRecord.id (self : NDEFRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.NDEFRecord.id" do
+  self.val.get "id" (Option String)
 
 /-- `readonly attribute DataView? data` -/
-def NDEFRecord.data (self : NDEFRecord) : IO (Option ByteArray) := do
+@[macro_inline] def NDEFRecord.data (self : NDEFRecord) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.NDEFRecord.data" do
   let r ← self.val.get "data" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `readonly attribute USVString? encoding` -/
-def NDEFRecord.encoding (self : NDEFRecord) : IO (Option String) := self.val.get "encoding" (Option String)
+@[macro_inline] def NDEFRecord.encoding (self : NDEFRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.NDEFRecord.encoding" do
+  self.val.get "encoding" (Option String)
 
 /-- `readonly attribute USVString? lang` -/
-def NDEFRecord.lang (self : NDEFRecord) : IO (Option String) := self.val.get "lang" (Option String)
+@[macro_inline] def NDEFRecord.lang (self : NDEFRecord) : IO (Option String) := Internal.api "Lasm.JS.Web.NDEFRecord.lang" do
+  self.val.get "lang" (Option String)
 
 /-- `sequence<NDEFRecord>? toRecords()` -/
-def NDEFRecord.toRecords (self : NDEFRecord) : IO (Option (Array NDEFRecord)) :=
-  self.val.callMethod "toRecords" (Support.args #[]) (Option (Array NDEFRecord))
+@[macro_inline] def NDEFRecord.toRecords (self : NDEFRecord) : IO (Option (Array NDEFRecord)) := Internal.api "Lasm.JS.Web.NDEFRecord.toRecords" do
+  self.val.callMethod "toRecords" (Internal.args #[]) (Option (Array NDEFRecord))
 
 end Lasm.JS.Web

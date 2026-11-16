@@ -6,180 +6,154 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.LongAnimationFrames
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ScriptInvokerType` (Long Animation Frames API (https://w3c.github.io/long-animation-frames/)): "classic-script", "module-script", "event-listener", "user-callback", "resolve-promise", "reject-promise". -/
-inductive ScriptInvokerType where
-  /-- "classic-script" -/
-  | classicScript
-  /-- "module-script" -/
-  | moduleScript
-  /-- "event-listener" -/
-  | eventListener
-  /-- "user-callback" -/
-  | userCallback
-  /-- "resolve-promise" -/
-  | resolvePromise
-  /-- "reject-promise" -/
-  | rejectPromise
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScriptInvokerType := ⟨fun
-  | .classicScript => .string "classic-script"
-  | .moduleScript => .string "module-script"
-  | .eventListener => .string "event-listener"
-  | .userCallback => .string "user-callback"
-  | .resolvePromise => .string "resolve-promise"
-  | .rejectPromise => .string "reject-promise"⟩
-instance : FromJS ScriptInvokerType where
-  fromJS
-    | .string "classic-script" => .ok .classicScript
-    | .string "module-script" => .ok .moduleScript
-    | .string "event-listener" => .ok .eventListener
-    | .string "user-callback" => .ok .userCallback
-    | .string "resolve-promise" => .ok .resolvePromise
-    | .string "reject-promise" => .ok .rejectPromise
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScriptInvokerType"
-
-/-- `enum ScriptWindowAttribution` (Long Animation Frames API (https://w3c.github.io/long-animation-frames/)): "self", "descendant", "ancestor", "same-page", "other". -/
-inductive ScriptWindowAttribution where
-  /-- "self" -/
-  | self
-  /-- "descendant" -/
-  | descendant
-  /-- "ancestor" -/
-  | ancestor
-  /-- "same-page" -/
-  | samePage
-  /-- "other" -/
-  | other
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScriptWindowAttribution := ⟨fun
-  | .self => .string "self"
-  | .descendant => .string "descendant"
-  | .ancestor => .string "ancestor"
-  | .samePage => .string "same-page"
-  | .other => .string "other"⟩
-instance : FromJS ScriptWindowAttribution where
-  fromJS
-    | .string "self" => .ok .self
-    | .string "descendant" => .ok .descendant
-    | .string "ancestor" => .ok .ancestor
-    | .string "same-page" => .ok .samePage
-    | .string "other" => .ok .other
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScriptWindowAttribution"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceLongAnimationFrameTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceLongAnimationFrameTiming`). -/
-def PerformanceLongAnimationFrameTiming.cast? (v : Value) : IO (Option PerformanceLongAnimationFrameTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceLongAnimationFrameTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceLongAnimationFrameTiming.cast? (v : Value) : IO (Option PerformanceLongAnimationFrameTiming) := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceLongAnimationFrameTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp startTime` -/
-def PerformanceLongAnimationFrameTiming.startTime (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "startTime" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.startTime (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.startTime" do
+  self.val.get "startTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp duration` -/
-def PerformanceLongAnimationFrameTiming.duration (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "duration" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.duration (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.duration" do
+  self.val.get "duration" Float
 
 /-- `readonly attribute DOMString name` -/
-def PerformanceLongAnimationFrameTiming.name (self : PerformanceLongAnimationFrameTiming) : IO String := self.val.get "name" String
+@[macro_inline] def PerformanceLongAnimationFrameTiming.name (self : PerformanceLongAnimationFrameTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString entryType` -/
-def PerformanceLongAnimationFrameTiming.entryType (self : PerformanceLongAnimationFrameTiming) : IO String := self.val.get "entryType" String
+@[macro_inline] def PerformanceLongAnimationFrameTiming.entryType (self : PerformanceLongAnimationFrameTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.entryType" do
+  self.val.get "entryType" String
 
 /-- `readonly attribute DOMHighResTimeStamp renderStart` -/
-def PerformanceLongAnimationFrameTiming.renderStart (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "renderStart" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.renderStart (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.renderStart" do
+  self.val.get "renderStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp styleAndLayoutStart` -/
-def PerformanceLongAnimationFrameTiming.styleAndLayoutStart (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "styleAndLayoutStart" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.styleAndLayoutStart (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.styleAndLayoutStart" do
+  self.val.get "styleAndLayoutStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp styleDuration` -/
-def PerformanceLongAnimationFrameTiming.styleDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "styleDuration" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.styleDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.styleDuration" do
+  self.val.get "styleDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp layoutDuration` -/
-def PerformanceLongAnimationFrameTiming.layoutDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "layoutDuration" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.layoutDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.layoutDuration" do
+  self.val.get "layoutDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp blockingDuration` -/
-def PerformanceLongAnimationFrameTiming.blockingDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "blockingDuration" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.blockingDuration (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.blockingDuration" do
+  self.val.get "blockingDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp firstUIEventTimestamp` -/
-def PerformanceLongAnimationFrameTiming.firstUIEventTimestamp (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "firstUIEventTimestamp" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.firstUIEventTimestamp (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.firstUIEventTimestamp" do
+  self.val.get "firstUIEventTimestamp" Float
 
 /-- `readonly attribute FrozenArray<PerformanceScriptTiming> scripts` -/
-def PerformanceLongAnimationFrameTiming.scripts (self : PerformanceLongAnimationFrameTiming) : IO (Array PerformanceScriptTiming) := self.val.get "scripts" (Array PerformanceScriptTiming)
+@[macro_inline] def PerformanceLongAnimationFrameTiming.scripts (self : PerformanceLongAnimationFrameTiming) : IO (Array PerformanceScriptTiming) := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.scripts" do
+  self.val.get "scripts" (Array PerformanceScriptTiming)
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def PerformanceLongAnimationFrameTiming.paintTime (self : PerformanceLongAnimationFrameTiming) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def PerformanceLongAnimationFrameTiming.paintTime (self : PerformanceLongAnimationFrameTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def PerformanceLongAnimationFrameTiming.presentationTime (self : PerformanceLongAnimationFrameTiming) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def PerformanceLongAnimationFrameTiming.presentationTime (self : PerformanceLongAnimationFrameTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def PerformanceLongAnimationFrameTiming.toJSON (self : PerformanceLongAnimationFrameTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceLongAnimationFrameTiming.toJSON (self : PerformanceLongAnimationFrameTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceLongAnimationFrameTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceScriptTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceScriptTiming`). -/
-def PerformanceScriptTiming.cast? (v : Value) : IO (Option PerformanceScriptTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceScriptTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceScriptTiming.cast? (v : Value) : IO (Option PerformanceScriptTiming) := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceScriptTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp startTime` -/
-def PerformanceScriptTiming.startTime (self : PerformanceScriptTiming) : IO Float := self.val.get "startTime" Float
+@[macro_inline] def PerformanceScriptTiming.startTime (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.startTime" do
+  self.val.get "startTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp duration` -/
-def PerformanceScriptTiming.duration (self : PerformanceScriptTiming) : IO Float := self.val.get "duration" Float
+@[macro_inline] def PerformanceScriptTiming.duration (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.duration" do
+  self.val.get "duration" Float
 
 /-- `readonly attribute DOMString name` -/
-def PerformanceScriptTiming.name (self : PerformanceScriptTiming) : IO String := self.val.get "name" String
+@[macro_inline] def PerformanceScriptTiming.name (self : PerformanceScriptTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString entryType` -/
-def PerformanceScriptTiming.entryType (self : PerformanceScriptTiming) : IO String := self.val.get "entryType" String
+@[macro_inline] def PerformanceScriptTiming.entryType (self : PerformanceScriptTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.entryType" do
+  self.val.get "entryType" String
 
 /-- `readonly attribute ScriptInvokerType invokerType` -/
-def PerformanceScriptTiming.invokerType (self : PerformanceScriptTiming) : IO ScriptInvokerType := self.val.get "invokerType" ScriptInvokerType
+@[macro_inline] def PerformanceScriptTiming.invokerType (self : PerformanceScriptTiming) : IO ScriptInvokerType := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.invokerType" do
+  self.val.get "invokerType" ScriptInvokerType
 
 /-- `readonly attribute DOMString invoker` -/
-def PerformanceScriptTiming.invoker (self : PerformanceScriptTiming) : IO String := self.val.get "invoker" String
+@[macro_inline] def PerformanceScriptTiming.invoker (self : PerformanceScriptTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.invoker" do
+  self.val.get "invoker" String
 
 /-- `readonly attribute DOMHighResTimeStamp executionStart` -/
-def PerformanceScriptTiming.executionStart (self : PerformanceScriptTiming) : IO Float := self.val.get "executionStart" Float
+@[macro_inline] def PerformanceScriptTiming.executionStart (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.executionStart" do
+  self.val.get "executionStart" Float
 
 /-- `readonly attribute DOMString sourceURL` -/
-def PerformanceScriptTiming.sourceURL (self : PerformanceScriptTiming) : IO String := self.val.get "sourceURL" String
+@[macro_inline] def PerformanceScriptTiming.sourceURL (self : PerformanceScriptTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.sourceURL" do
+  self.val.get "sourceURL" String
 
 /-- `readonly attribute DOMString sourceFunctionName` -/
-def PerformanceScriptTiming.sourceFunctionName (self : PerformanceScriptTiming) : IO String := self.val.get "sourceFunctionName" String
+@[macro_inline] def PerformanceScriptTiming.sourceFunctionName (self : PerformanceScriptTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.sourceFunctionName" do
+  self.val.get "sourceFunctionName" String
 
 /-- `readonly attribute long long sourceCharPosition` -/
-def PerformanceScriptTiming.sourceCharPosition (self : PerformanceScriptTiming) : IO Int := self.val.get "sourceCharPosition" Int
+@[macro_inline] def PerformanceScriptTiming.sourceCharPosition (self : PerformanceScriptTiming) : IO Int := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.sourceCharPosition" do
+  self.val.get "sourceCharPosition" Int
 
 /-- `readonly attribute long long sourceLine` -/
-def PerformanceScriptTiming.sourceLine (self : PerformanceScriptTiming) : IO Int := self.val.get "sourceLine" Int
+@[macro_inline] def PerformanceScriptTiming.sourceLine (self : PerformanceScriptTiming) : IO Int := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.sourceLine" do
+  self.val.get "sourceLine" Int
 
 /-- `readonly attribute long long sourceColumn` -/
-def PerformanceScriptTiming.sourceColumn (self : PerformanceScriptTiming) : IO Int := self.val.get "sourceColumn" Int
+@[macro_inline] def PerformanceScriptTiming.sourceColumn (self : PerformanceScriptTiming) : IO Int := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.sourceColumn" do
+  self.val.get "sourceColumn" Int
 
 /-- `readonly attribute DOMHighResTimeStamp pauseDuration` -/
-def PerformanceScriptTiming.pauseDuration (self : PerformanceScriptTiming) : IO Float := self.val.get "pauseDuration" Float
+@[macro_inline] def PerformanceScriptTiming.pauseDuration (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.pauseDuration" do
+  self.val.get "pauseDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp forcedStyleAndLayoutDuration` -/
-def PerformanceScriptTiming.forcedStyleAndLayoutDuration (self : PerformanceScriptTiming) : IO Float := self.val.get "forcedStyleAndLayoutDuration" Float
+@[macro_inline] def PerformanceScriptTiming.forcedStyleAndLayoutDuration (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.forcedStyleAndLayoutDuration" do
+  self.val.get "forcedStyleAndLayoutDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp forcedStyleDuration` -/
-def PerformanceScriptTiming.forcedStyleDuration (self : PerformanceScriptTiming) : IO Float := self.val.get "forcedStyleDuration" Float
+@[macro_inline] def PerformanceScriptTiming.forcedStyleDuration (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.forcedStyleDuration" do
+  self.val.get "forcedStyleDuration" Float
 
 /-- `readonly attribute DOMHighResTimeStamp forcedLayoutDuration` -/
-def PerformanceScriptTiming.forcedLayoutDuration (self : PerformanceScriptTiming) : IO Float := self.val.get "forcedLayoutDuration" Float
+@[macro_inline] def PerformanceScriptTiming.forcedLayoutDuration (self : PerformanceScriptTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.forcedLayoutDuration" do
+  self.val.get "forcedLayoutDuration" Float
 
 /-- `readonly attribute Window? window` -/
-def PerformanceScriptTiming.window (self : PerformanceScriptTiming) : IO (Option Window) := self.val.get "window" (Option Window)
+@[macro_inline] def PerformanceScriptTiming.window (self : PerformanceScriptTiming) : IO (Option Window) := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.window" do
+  self.val.get "window" (Option Window)
 
 /-- `readonly attribute ScriptWindowAttribution windowAttribution` -/
-def PerformanceScriptTiming.windowAttribution (self : PerformanceScriptTiming) : IO ScriptWindowAttribution := self.val.get "windowAttribution" ScriptWindowAttribution
+@[macro_inline] def PerformanceScriptTiming.windowAttribution (self : PerformanceScriptTiming) : IO ScriptWindowAttribution := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.windowAttribution" do
+  self.val.get "windowAttribution" ScriptWindowAttribution
 
 /-- `object toJSON()` -/
-def PerformanceScriptTiming.toJSON (self : PerformanceScriptTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceScriptTiming.toJSON (self : PerformanceScriptTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceScriptTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 end Lasm.JS.Web

@@ -6,29 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Notifications
+import Lasm.JS.Web.Types.PushApi
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.FileSystemAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PushEncryptionKeyName` (Push API (https://w3c.github.io/push-api/)): "p256dh", "auth". -/
-inductive PushEncryptionKeyName where
-  /-- "p256dh" -/
-  | p256dh
-  /-- "auth" -/
-  | auth
-  deriving BEq, Repr, Inhabited
-instance : ToJS PushEncryptionKeyName := ⟨fun
-  | .p256dh => .string "p256dh"
-  | .auth => .string "auth"⟩
-instance : FromJS PushEncryptionKeyName where
-  fromJS
-    | .string "p256dh" => .ok .p256dh
-    | .string "auth" => .ok .auth
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PushEncryptionKeyName"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef BufferSource or USVString PushMessageDataInit`: one constructor per member type. -/
 inductive PushMessageDataInit where
@@ -54,11 +44,11 @@ structure PushEventInit where
   data : Option PushMessageDataInit := none
   /-- `Notification? notification = null` -/
   notification : Option Notification := none
-instance : ToJS PushEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("data", Support.optional d.data),
-    ("notification", Support.optional d.notification)]⟩
+instance : ToJS PushEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("data", Internal.optional d.data),
+    ("notification", Internal.optional d.notification)]⟩
 
 /-- `(BufferSource or DOMString)`: one constructor per member type. -/
 inductive BufferSourceOrDOMString where
@@ -78,8 +68,8 @@ structure PushSubscriptionOptionsInit where
   userVisibleOnly : Option Bool := none
   /-- `(BufferSource or DOMString)? applicationServerKey = null` -/
   applicationServerKey : Option BufferSourceOrDOMString := none
-instance : ToJS PushSubscriptionOptionsInit := ⟨fun d => Support.fields #[("userVisibleOnly", Support.optional d.userVisibleOnly),
-    ("applicationServerKey", Support.optional d.applicationServerKey)]⟩
+instance : ToJS PushSubscriptionOptionsInit := ⟨fun d => Internal.fields #[("userVisibleOnly", Internal.optional d.userVisibleOnly),
+    ("applicationServerKey", Internal.optional d.applicationServerKey)]⟩
 
 /-- `dictionary PushSubscriptionKeys` (Push API (https://w3c.github.io/push-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PushSubscriptionKeys where
@@ -87,6 +77,8 @@ structure PushSubscriptionKeys where
   p256dh : Option String := none
   /-- `USVString auth` -/
   auth : Option String := none
+instance : ToJS PushSubscriptionKeys := ⟨fun d => Internal.fields #[("p256dh", Internal.optional d.p256dh),
+    ("auth", Internal.optional d.auth)]⟩
 instance : FromJS PushSubscriptionKeys where
   fromJS d := do return {
     p256dh := ← Lasm.JS.readField (Option String) d "p256dh",
@@ -101,6 +93,9 @@ structure PushSubscriptionJSON where
   expirationTime : Option Nat := none
   /-- `PushSubscriptionKeys keys` -/
   keys : Option PushSubscriptionKeys := none
+instance : ToJS PushSubscriptionJSON := ⟨fun d => Internal.fields #[("endpoint", Internal.optional d.endpoint),
+    ("expirationTime", Internal.optional d.expirationTime),
+    ("keys", Internal.optional d.keys)]⟩
 instance : FromJS PushSubscriptionJSON where
   fromJS d := do return {
     endpoint := ← Lasm.JS.readField (Option String) d "endpoint",
@@ -120,150 +115,174 @@ structure PushSubscriptionChangeEventInit where
   newSubscription : Option PushSubscription := none
   /-- `PushSubscription oldSubscription = null` -/
   oldSubscription : Option PushSubscription := none
-instance : ToJS PushSubscriptionChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("newSubscription", Support.optional d.newSubscription),
-    ("oldSubscription", Support.optional d.oldSubscription)]⟩
+instance : ToJS PushSubscriptionChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("newSubscription", Internal.optional d.newSubscription),
+    ("oldSubscription", Internal.optional d.oldSubscription)]⟩
+
+/-- `dictionary PushPermissionDescriptor : PermissionDescriptor` (Push API (https://w3c.github.io/push-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PushPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `boolean userVisibleOnly = false` -/
+  userVisibleOnly : Option Bool := none
+instance : ToJS PushPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("userVisibleOnly", Internal.optional d.userVisibleOnly)]⟩
 
 /-- `v instanceof PushEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushEvent`). -/
-def PushEvent.cast? (v : Value) : IO (Option PushEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PushEvent.cast? (v : Value) : IO (Option PushEvent) := Internal.api "Lasm.JS.Web.PushEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PushEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional PushEventInit eventInitDict)` -/
-def PushEvent.new (type : String) (eventInitDict : Option PushEventInit := none) : IO PushEvent :=
+@[macro_inline] def PushEvent.new (type : String) (eventInitDict : Option PushEventInit := none) : IO PushEvent := Internal.api "Lasm.JS.Web.PushEvent.new" do
   Lasm.JS.Binding.invoke PushEvent { name := "Lasm.JS.Web.PushEvent.new", module := "globalThis", path := "PushEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute PushMessageData? data` -/
-def PushEvent.data (self : PushEvent) : IO (Option PushMessageData) := self.val.get "data" (Option PushMessageData)
+@[macro_inline] def PushEvent.data (self : PushEvent) : IO (Option PushMessageData) := Internal.api "Lasm.JS.Web.PushEvent.data" do
+  self.val.get "data" (Option PushMessageData)
 
 /-- `readonly attribute Notification? notification` -/
-def PushEvent.notification (self : PushEvent) : IO (Option Notification) := self.val.get "notification" (Option Notification)
+@[macro_inline] def PushEvent.notification (self : PushEvent) : IO (Option Notification) := Internal.api "Lasm.JS.Web.PushEvent.notification" do
+  self.val.get "notification" (Option Notification)
 
 /-- `v instanceof PushManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushManager`). -/
-def PushManager.cast? (v : Value) : IO (Option PushManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushManager"] Value) v) then some { val := v } else none
+@[macro_inline] def PushManager.cast? (v : Value) : IO (Option PushManager) := Internal.api "Lasm.JS.Web.PushManager.cast?" do
+  Internal.cast (Internal.getGlobal ["PushManager"] Value) (fun x => { val := x }) v
 
 /-- `static readonly attribute FrozenArray<DOMString> supportedContentEncodings` -/
-def PushManager.supportedContentEncodings : IO (Array String) := Support.getGlobal ["PushManager", "supportedContentEncodings"] (Array String)
+@[macro_inline] def PushManager.supportedContentEncodings : IO (Array String) := Internal.api "Lasm.JS.Web.PushManager.supportedContentEncodings" do
+  Internal.getGlobal ["PushManager", "supportedContentEncodings"] (Array String)
 
 /-- `Promise<PushSubscription> subscribe(optional PushSubscriptionOptionsInit options)` -/
-def PushManager.subscribe (self : PushManager) (options : Option PushSubscriptionOptionsInit := none) : Async PushSubscription := do
-  let r ← self.val.callMethodAwait "subscribe" (Support.args #[Support.optional options]) Value
+@[macro_inline] def PushManager.subscribe (self : PushManager) (options : Option PushSubscriptionOptionsInit := none) : Async PushSubscription := Internal.api "Lasm.JS.Web.PushManager.subscribe" do
+  let r ← self.val.callMethodAwait "subscribe" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<PushSubscription?> getSubscription()` -/
-def PushManager.getSubscription (self : PushManager) : Async (Option PushSubscription) :=
-  self.val.callMethodAwait "getSubscription" (Support.args #[]) (Option PushSubscription)
+@[macro_inline] def PushManager.getSubscription (self : PushManager) : Async (Option PushSubscription) := Internal.api "Lasm.JS.Web.PushManager.getSubscription" do
+  self.val.callMethodAwait "getSubscription" (Internal.args #[]) (Option PushSubscription)
 
 /-- `Promise<PermissionState> permissionState(optional PushSubscriptionOptionsInit options)` -/
-def PushManager.permissionState (self : PushManager) (options : Option PushSubscriptionOptionsInit := none) : Async PermissionState :=
-  self.val.callMethodAwait "permissionState" (Support.args #[Support.optional options]) PermissionState
+@[macro_inline] def PushManager.permissionState (self : PushManager) (options : Option PushSubscriptionOptionsInit := none) : Async PermissionState := Internal.api "Lasm.JS.Web.PushManager.permissionState" do
+  self.val.callMethodAwait "permissionState" (Internal.args #[Internal.optional options]) PermissionState
 
 /-- `v instanceof PushMessageData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushMessageData`). -/
-def PushMessageData.cast? (v : Value) : IO (Option PushMessageData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushMessageData"] Value) v) then some { val := v } else none
+@[macro_inline] def PushMessageData.cast? (v : Value) : IO (Option PushMessageData) := Internal.api "Lasm.JS.Web.PushMessageData.cast?" do
+  Internal.cast (Internal.getGlobal ["PushMessageData"] Value) (fun x => { val := x }) v
 
 /-- `ArrayBuffer arrayBuffer()` -/
-def PushMessageData.arrayBuffer (self : PushMessageData) : IO ByteArray := do
-  let r ← self.val.callMethod "arrayBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def PushMessageData.arrayBuffer (self : PushMessageData) : IO ByteArray := Internal.api "Lasm.JS.Web.PushMessageData.arrayBuffer" do
+  let r ← self.val.callMethod "arrayBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Blob blob()` -/
-def PushMessageData.blob (self : PushMessageData) : IO Blob := do
-  let r ← self.val.callMethod "blob" (Support.args #[]) Value
+@[macro_inline] def PushMessageData.blob (self : PushMessageData) : IO Blob := Internal.api "Lasm.JS.Web.PushMessageData.blob" do
+  let r ← self.val.callMethod "blob" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Uint8Array bytes()` -/
-def PushMessageData.bytes (self : PushMessageData) : IO ByteArray :=
-  self.val.callMethod "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def PushMessageData.bytes (self : PushMessageData) : IO ByteArray := Internal.api "Lasm.JS.Web.PushMessageData.bytes" do
+  self.val.callMethod "bytes" (Internal.args #[]) ByteArray
 
 /-- `any json()` -/
-def PushMessageData.json (self : PushMessageData) : IO Data :=
-  self.val.callMethod "json" (Support.args #[]) Data
+@[macro_inline] def PushMessageData.json (self : PushMessageData) : IO Data := Internal.api "Lasm.JS.Web.PushMessageData.json" do
+  self.val.callMethod "json" (Internal.args #[]) Data
 
 /-- `USVString text()` -/
-def PushMessageData.text (self : PushMessageData) : IO String :=
-  self.val.callMethod "text" (Support.args #[]) String
+@[macro_inline] def PushMessageData.text (self : PushMessageData) : IO String := Internal.api "Lasm.JS.Web.PushMessageData.text" do
+  self.val.callMethod "text" (Internal.args #[]) String
 
 /-- `v instanceof PushSubscription`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushSubscription`). -/
-def PushSubscription.cast? (v : Value) : IO (Option PushSubscription) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushSubscription"] Value) v) then some { val := v } else none
+@[macro_inline] def PushSubscription.cast? (v : Value) : IO (Option PushSubscription) := Internal.api "Lasm.JS.Web.PushSubscription.cast?" do
+  Internal.cast (Internal.getGlobal ["PushSubscription"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString endpoint` -/
-def PushSubscription.endpoint (self : PushSubscription) : IO String := self.val.get "endpoint" String
+@[macro_inline] def PushSubscription.endpoint (self : PushSubscription) : IO String := Internal.api "Lasm.JS.Web.PushSubscription.endpoint" do
+  self.val.get "endpoint" String
 
 /-- `readonly attribute EpochTimeStamp? expirationTime` -/
-def PushSubscription.expirationTime (self : PushSubscription) : IO (Option Nat) := self.val.get "expirationTime" (Option Nat)
+@[macro_inline] def PushSubscription.expirationTime (self : PushSubscription) : IO (Option Nat) := Internal.api "Lasm.JS.Web.PushSubscription.expirationTime" do
+  self.val.get "expirationTime" (Option Nat)
 
 /-- `readonly attribute PushSubscriptionOptions options` -/
-def PushSubscription.options (self : PushSubscription) : IO PushSubscriptionOptions := do
+@[macro_inline] def PushSubscription.options (self : PushSubscription) : IO PushSubscriptionOptions := Internal.api "Lasm.JS.Web.PushSubscription.options" do
   let r ← self.val.get "options" Value
   pure { val := r }
 
 /-- `ArrayBuffer? getKey(PushEncryptionKeyName name)` -/
-def PushSubscription.getKey (self : PushSubscription) (name : PushEncryptionKeyName) : IO (Option ByteArray) := do
-  let r ← self.val.callMethod "getKey" (Support.args #[toJS name]) (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+@[macro_inline] def PushSubscription.getKey (self : PushSubscription) (name : PushEncryptionKeyName) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.PushSubscription.getKey" do
+  let r ← self.val.callMethod "getKey" (Internal.args #[toJS name]) (Option Value)
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `Promise<boolean> unsubscribe()` -/
-def PushSubscription.unsubscribe (self : PushSubscription) : Async Bool :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[]) Bool
+@[macro_inline] def PushSubscription.unsubscribe (self : PushSubscription) : Async Bool := Internal.api "Lasm.JS.Web.PushSubscription.unsubscribe" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[]) Bool
 
 /-- `PushSubscriptionJSON toJSON()` -/
-def PushSubscription.toJSON (self : PushSubscription) : IO PushSubscriptionJSON :=
-  self.val.callMethod "toJSON" (Support.args #[]) PushSubscriptionJSON
+@[macro_inline] def PushSubscription.toJSON (self : PushSubscription) : IO PushSubscriptionJSON := Internal.api "Lasm.JS.Web.PushSubscription.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) PushSubscriptionJSON
 
 /-- `v instanceof PushSubscriptionChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushSubscriptionChangeEvent`). -/
-def PushSubscriptionChangeEvent.cast? (v : Value) : IO (Option PushSubscriptionChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushSubscriptionChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def PushSubscriptionChangeEvent.cast? (v : Value) : IO (Option PushSubscriptionChangeEvent) := Internal.api "Lasm.JS.Web.PushSubscriptionChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["PushSubscriptionChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional PushSubscriptionChangeEventInit eventInitDict)` -/
-def PushSubscriptionChangeEvent.new (type : String) (eventInitDict : Option PushSubscriptionChangeEventInit := none) : IO PushSubscriptionChangeEvent :=
+@[macro_inline] def PushSubscriptionChangeEvent.new (type : String) (eventInitDict : Option PushSubscriptionChangeEventInit := none) : IO PushSubscriptionChangeEvent := Internal.api "Lasm.JS.Web.PushSubscriptionChangeEvent.new" do
   Lasm.JS.Binding.invoke PushSubscriptionChangeEvent { name := "Lasm.JS.Web.PushSubscriptionChangeEvent.new", module := "globalThis", path := "PushSubscriptionChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute PushSubscription? newSubscription` -/
-def PushSubscriptionChangeEvent.newSubscription (self : PushSubscriptionChangeEvent) : IO (Option PushSubscription) := self.val.get "newSubscription" (Option PushSubscription)
+@[macro_inline] def PushSubscriptionChangeEvent.newSubscription (self : PushSubscriptionChangeEvent) : IO (Option PushSubscription) := Internal.api "Lasm.JS.Web.PushSubscriptionChangeEvent.newSubscription" do
+  self.val.get "newSubscription" (Option PushSubscription)
 
 /-- `readonly attribute PushSubscription? oldSubscription` -/
-def PushSubscriptionChangeEvent.oldSubscription (self : PushSubscriptionChangeEvent) : IO (Option PushSubscription) := self.val.get "oldSubscription" (Option PushSubscription)
+@[macro_inline] def PushSubscriptionChangeEvent.oldSubscription (self : PushSubscriptionChangeEvent) : IO (Option PushSubscription) := Internal.api "Lasm.JS.Web.PushSubscriptionChangeEvent.oldSubscription" do
+  self.val.get "oldSubscription" (Option PushSubscription)
 
 /-- `v instanceof PushSubscriptionOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PushSubscriptionOptions`). -/
-def PushSubscriptionOptions.cast? (v : Value) : IO (Option PushSubscriptionOptions) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PushSubscriptionOptions"] Value) v) then some { val := v } else none
+@[macro_inline] def PushSubscriptionOptions.cast? (v : Value) : IO (Option PushSubscriptionOptions) := Internal.api "Lasm.JS.Web.PushSubscriptionOptions.cast?" do
+  Internal.cast (Internal.getGlobal ["PushSubscriptionOptions"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean userVisibleOnly` -/
-def PushSubscriptionOptions.userVisibleOnly (self : PushSubscriptionOptions) : IO Bool := self.val.get "userVisibleOnly" Bool
+@[macro_inline] def PushSubscriptionOptions.userVisibleOnly (self : PushSubscriptionOptions) : IO Bool := Internal.api "Lasm.JS.Web.PushSubscriptionOptions.userVisibleOnly" do
+  self.val.get "userVisibleOnly" Bool
 
 /-- `readonly attribute ArrayBuffer? applicationServerKey` -/
-def PushSubscriptionOptions.applicationServerKey (self : PushSubscriptionOptions) : IO (Option ByteArray) := do
+@[macro_inline] def PushSubscriptionOptions.applicationServerKey (self : PushSubscriptionOptions) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.PushSubscriptionOptions.applicationServerKey" do
   let r ← self.val.get "applicationServerKey" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `attribute EventHandler onpush` -/
-def ServiceWorkerGlobalScope.onpush (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onpush" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onpush (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpush" do
+  self.val.get "onpush" (Option EventHandlerNonNull)
 
 /-- Sets `onpush`: `attribute EventHandler onpush` -/
-def ServiceWorkerGlobalScope.setOnpush (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnpush (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnpush" do
   self.val.set "onpush" (toJS value)
 
 /-- `attribute EventHandler onpushsubscriptionchange` -/
-def ServiceWorkerGlobalScope.onpushsubscriptionchange (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onpushsubscriptionchange" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onpushsubscriptionchange (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpushsubscriptionchange" do
+  self.val.get "onpushsubscriptionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onpushsubscriptionchange`: `attribute EventHandler onpushsubscriptionchange` -/
-def ServiceWorkerGlobalScope.setOnpushsubscriptionchange (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnpushsubscriptionchange (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnpushsubscriptionchange" do
   self.val.set "onpushsubscriptionchange" (toJS value)
 
 /-- `readonly attribute PushManager pushManager` -/
-def ServiceWorkerRegistration.pushManager (self : ServiceWorkerRegistration) : IO PushManager := do
+@[macro_inline] def ServiceWorkerRegistration.pushManager (self : ServiceWorkerRegistration) : IO PushManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.pushManager" do
+  let r ← self.val.get "pushManager" Value
+  pure { val := r }
+
+/-- `readonly attribute PushManager pushManager` -/
+@[macro_inline] def Window.pushManager (self : Window) : IO PushManager := Internal.api "Lasm.JS.Web.Window.pushManager" do
   let r ← self.val.get "pushManager" Value
   pure { val := r }
 
 /-- `readonly attribute PushManager pushManager` (Push API (https://w3c.github.io/push-api/)) -/
-def pushManager : IO PushManager := do
-  let r ← Support.getGlobal ["pushManager"] Value
+@[macro_inline] def pushManager : IO PushManager := Internal.api "Lasm.JS.Web.pushManager" do
+  let r ← Internal.getGlobal ["pushManager"] Value
   pure { val := r }
 
 end Lasm.JS.Web

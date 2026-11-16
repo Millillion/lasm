@@ -6,41 +6,54 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.LargestContentfulPaint
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof LargestContentfulPaint`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LargestContentfulPaint`). -/
-def LargestContentfulPaint.cast? (v : Value) : IO (Option LargestContentfulPaint) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LargestContentfulPaint"] Value) v) then some { val := v } else none
+@[macro_inline] def LargestContentfulPaint.cast? (v : Value) : IO (Option LargestContentfulPaint) := Internal.api "Lasm.JS.Web.LargestContentfulPaint.cast?" do
+  Internal.cast (Internal.getGlobal ["LargestContentfulPaint"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp loadTime` -/
-def LargestContentfulPaint.loadTime (self : LargestContentfulPaint) : IO Float := self.val.get "loadTime" Float
+@[macro_inline] def LargestContentfulPaint.loadTime (self : LargestContentfulPaint) : IO Float := Internal.api "Lasm.JS.Web.LargestContentfulPaint.loadTime" do
+  self.val.get "loadTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp renderTime` -/
-def LargestContentfulPaint.renderTime (self : LargestContentfulPaint) : IO Float := self.val.get "renderTime" Float
+@[macro_inline] def LargestContentfulPaint.renderTime (self : LargestContentfulPaint) : IO Float := Internal.api "Lasm.JS.Web.LargestContentfulPaint.renderTime" do
+  self.val.get "renderTime" Float
 
 /-- `readonly attribute unsigned long size` -/
-def LargestContentfulPaint.size (self : LargestContentfulPaint) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def LargestContentfulPaint.size (self : LargestContentfulPaint) : IO Nat := Internal.api "Lasm.JS.Web.LargestContentfulPaint.size" do
+  self.val.get "size" Nat
 
 /-- `readonly attribute DOMString id` -/
-def LargestContentfulPaint.id (self : LargestContentfulPaint) : IO String := self.val.get "id" String
+@[macro_inline] def LargestContentfulPaint.id (self : LargestContentfulPaint) : IO String := Internal.api "Lasm.JS.Web.LargestContentfulPaint.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute DOMString url` -/
-def LargestContentfulPaint.url (self : LargestContentfulPaint) : IO String := self.val.get "url" String
+@[macro_inline] def LargestContentfulPaint.url (self : LargestContentfulPaint) : IO String := Internal.api "Lasm.JS.Web.LargestContentfulPaint.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute Element? element` -/
-def LargestContentfulPaint.element (self : LargestContentfulPaint) : IO (Option Element) := self.val.get "element" (Option Element)
+@[macro_inline] def LargestContentfulPaint.element (self : LargestContentfulPaint) : IO (Option Element) := Internal.api "Lasm.JS.Web.LargestContentfulPaint.element" do
+  self.val.get "element" (Option Element)
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def LargestContentfulPaint.paintTime (self : LargestContentfulPaint) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def LargestContentfulPaint.paintTime (self : LargestContentfulPaint) : IO Float := Internal.api "Lasm.JS.Web.LargestContentfulPaint.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def LargestContentfulPaint.presentationTime (self : LargestContentfulPaint) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def LargestContentfulPaint.presentationTime (self : LargestContentfulPaint) : IO (Option Float) := Internal.api "Lasm.JS.Web.LargestContentfulPaint.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def LargestContentfulPaint.toJSON (self : LargestContentfulPaint) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def LargestContentfulPaint.toJSON (self : LargestContentfulPaint) : IO Data := Internal.api "Lasm.JS.Web.LargestContentfulPaint.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 end Lasm.JS.Web

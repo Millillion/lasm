@@ -1,0 +1,26 @@
+{
+  "$comment": "Corrections to the compatibility data that scripts/bindings/web-availability.mjs reads, for `lasm build --target`'s check (docs/JS_BINDINGS.md, \"Availability per target\"). Each entry: the API's compatibility path (api.Window.navigator) or Lean name, the runtimes it corrects, `available`, why, a link (the upstream report, or Lasm's evidence), and its decision in docs/API_DECISIONS.md.",
+  "overrides": [
+    { "api": "api.Window.navigator", "runtimes": ["node", "bun", "workerd"], "available": true, "decision": "0.3-19",
+      "why": "the global navigator: the data records it under api.Navigator for these runtimes (BCD: Node 21; runtime-compat: Bun, workerd), not under Window; js-web conformance reads navigator.userAgent on each",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "api.MessageChannel.MessageChannel", "runtimes": ["workerd"], "available": true, "decision": "0.3-19",
+      "why": "workerd constructs MessageChannel; js-web conformance posts a structured clone through one on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "api.File.File", "runtimes": ["bun"], "available": true, "decision": "0.3-19",
+      "why": "Bun 1.4.4 (Lasm's pinned Bun) constructs File; the data describes Bun 1.3.3",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "api.CompressionStream.CompressionStream", "runtimes": ["bun"], "available": true, "decision": "0.3-19",
+      "why": "Bun 1.4.4 constructs CompressionStream (the data lists the interface on Bun but not its constructor)",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "api.DecompressionStream.DecompressionStream", "runtimes": ["bun"], "available": true, "decision": "0.3-19",
+      "why": "Bun 1.4.4 constructs DecompressionStream (the data lists the interface on Bun but not its constructor)",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "api.URLPattern.URLPattern", "runtimes": ["bun"], "available": true, "decision": "0.3-19",
+      "why": "Bun 1.4.4 (Lasm's pinned Bun) has URLPattern; the data describes Bun 1.3.3",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean" },
+    { "api": "webassembly.api.CompileError.CompileError", "runtimes": ["bun", "workerd", "edge-light", "netlify"], "available": true, "decision": "0.3-19",
+      "why": "WebAssembly.CompileError is part of every engine's WebAssembly; runtime-compat lists no WebAssembly error classes",
+      "link": "https://webassembly.github.io/spec/js-api/#error-objects" }
+  ]
+}

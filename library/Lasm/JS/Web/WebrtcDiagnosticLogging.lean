@@ -6,30 +6,33 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webrtc
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary RTCDiagnosticLoggingOptions` (WebRTC Diagnostic Logging API (https://wicg.github.io/webrtc-diagnostic-logging/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCDiagnosticLoggingOptions where
   /-- `record<DOMString, DOMString> metadata` -/
   metadata : Option (Record String) := none
-instance : ToJS RTCDiagnosticLoggingOptions := ⟨fun d => Support.fields #[("metadata", Support.optional d.metadata)]⟩
+instance : ToJS RTCDiagnosticLoggingOptions := ⟨fun d => Internal.fields #[("metadata", Internal.optional d.metadata)]⟩
 
 /-- `static DOMString startDiagnosticLogging(optional RTCDiagnosticLoggingOptions options)` -/
-def RTCPeerConnection.startDiagnosticLogging (options : Option RTCDiagnosticLoggingOptions := none) : IO String :=
+@[macro_inline] def RTCPeerConnection.startDiagnosticLogging (options : Option RTCDiagnosticLoggingOptions := none) : IO String := Internal.api "Lasm.JS.Web.RTCPeerConnection.startDiagnosticLogging" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.RTCPeerConnection.startDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.startDiagnosticLogging", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `static undefined stopDiagnosticLogging()` -/
-def RTCPeerConnection.stopDiagnosticLogging : IO Unit :=
+@[macro_inline] def RTCPeerConnection.stopDiagnosticLogging : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.stopDiagnosticLogging", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static undefined cancelDiagnosticLogging()` -/
-def RTCPeerConnection.cancelDiagnosticLogging : IO Unit :=
+@[macro_inline] def RTCPeerConnection.cancelDiagnosticLogging : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.cancelDiagnosticLogging", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Web

@@ -6,65 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssTypedOm
+import Lasm.JS.Web.Types.CssLayoutApi
 import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum BreakType` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)): "none", "line", "column", "page", "region". -/
-inductive BreakType where
-  /-- "none" -/
-  | none
-  /-- "line" -/
-  | line
-  /-- "column" -/
-  | column
-  /-- "page" -/
-  | page
-  /-- "region" -/
-  | region
-  deriving BEq, Repr, Inhabited
-instance : ToJS BreakType := ⟨fun
-  | .none => .string "none"
-  | .line => .string "line"
-  | .column => .string "column"
-  | .page => .string "page"
-  | .region => .string "region"⟩
-instance : FromJS BreakType where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "line" => .ok .line
-    | .string "column" => .ok .column
-    | .string "page" => .ok .page
-    | .string "region" => .ok .region
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BreakType"
-
-/-- `enum BlockFragmentationType` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)): "none", "page", "column", "region". -/
-inductive BlockFragmentationType where
-  /-- "none" -/
-  | none
-  /-- "page" -/
-  | page
-  /-- "column" -/
-  | column
-  /-- "region" -/
-  | region
-  deriving BEq, Repr, Inhabited
-instance : ToJS BlockFragmentationType := ⟨fun
-  | .none => .string "none"
-  | .page => .string "page"
-  | .column => .string "column"
-  | .region => .string "region"⟩
-instance : FromJS BlockFragmentationType where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "page" => .ok .page
-    | .string "column" => .ok .column
-    | .string "region" => .ok .region
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.BlockFragmentationType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BreakTokenOptions` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BreakTokenOptions where
@@ -72,7 +23,7 @@ structure BreakTokenOptions where
   childBreakTokens : Option (Array ChildBreakToken) := none
   /-- `any data = null` -/
   data : Data := .undefined
-instance : ToJS BreakTokenOptions := ⟨fun d => Support.fields #[("childBreakTokens", Support.optional d.childBreakTokens),
+instance : ToJS BreakTokenOptions := ⟨fun d => Internal.fields #[("childBreakTokens", Internal.optional d.childBreakTokens),
     ("data", d.data)]⟩
 
 /-- `dictionary FragmentResultOptions` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -89,12 +40,12 @@ structure FragmentResultOptions where
   data : Data := .undefined
   /-- `BreakTokenOptions breakToken = null` -/
   breakToken : Option BreakTokenOptions := none
-instance : ToJS FragmentResultOptions := ⟨fun d => Support.fields #[("inlineSize", Support.optional d.inlineSize),
-    ("blockSize", Support.optional d.blockSize),
-    ("autoBlockSize", Support.optional d.autoBlockSize),
-    ("childFragments", Support.optional d.childFragments),
+instance : ToJS FragmentResultOptions := ⟨fun d => Internal.fields #[("inlineSize", Internal.optional d.inlineSize),
+    ("blockSize", Internal.optional d.blockSize),
+    ("autoBlockSize", Internal.optional d.autoBlockSize),
+    ("childFragments", Internal.optional d.childFragments),
     ("data", d.data),
-    ("breakToken", Support.optional d.breakToken)]⟩
+    ("breakToken", Internal.optional d.breakToken)]⟩
 
 /-- `dictionary LayoutConstraintsOptions` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LayoutConstraintsOptions where
@@ -116,176 +67,222 @@ structure LayoutConstraintsOptions where
   blockFragmentationType : Option BlockFragmentationType := none
   /-- `any data` -/
   data : Data := .undefined
-instance : ToJS LayoutConstraintsOptions := ⟨fun d => Support.fields #[("availableInlineSize", Support.optional d.availableInlineSize),
-    ("availableBlockSize", Support.optional d.availableBlockSize),
-    ("fixedInlineSize", Support.optional d.fixedInlineSize),
-    ("fixedBlockSize", Support.optional d.fixedBlockSize),
-    ("percentageInlineSize", Support.optional d.percentageInlineSize),
-    ("percentageBlockSize", Support.optional d.percentageBlockSize),
-    ("blockFragmentationOffset", Support.optional d.blockFragmentationOffset),
-    ("blockFragmentationType", Support.optional d.blockFragmentationType),
+instance : ToJS LayoutConstraintsOptions := ⟨fun d => Internal.fields #[("availableInlineSize", Internal.optional d.availableInlineSize),
+    ("availableBlockSize", Internal.optional d.availableBlockSize),
+    ("fixedInlineSize", Internal.optional d.fixedInlineSize),
+    ("fixedBlockSize", Internal.optional d.fixedBlockSize),
+    ("percentageInlineSize", Internal.optional d.percentageInlineSize),
+    ("percentageBlockSize", Internal.optional d.percentageBlockSize),
+    ("blockFragmentationOffset", Internal.optional d.blockFragmentationOffset),
+    ("blockFragmentationType", Internal.optional d.blockFragmentationType),
     ("data", d.data)]⟩
 
+/-- `dictionary LayoutOptions` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure LayoutOptions where
+  /-- `ChildDisplayType childDisplay = "block"` -/
+  childDisplay : Option ChildDisplayType := none
+  /-- `LayoutSizingMode sizing = "block-like"` -/
+  sizing : Option LayoutSizingMode := none
+instance : ToJS LayoutOptions := ⟨fun d => Internal.fields #[("childDisplay", Internal.optional d.childDisplay),
+    ("sizing", Internal.optional d.sizing)]⟩
+
+/-- `dictionary IntrinsicSizesResultOptions` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure IntrinsicSizesResultOptions where
+  /-- `double maxContentSize` -/
+  maxContentSize : Option Float := none
+  /-- `double minContentSize` -/
+  minContentSize : Option Float := none
+instance : ToJS IntrinsicSizesResultOptions := ⟨fun d => Internal.fields #[("maxContentSize", Internal.optional d.maxContentSize),
+    ("minContentSize", Internal.optional d.minContentSize)]⟩
+
 /-- `v instanceof BreakToken`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BreakToken`). -/
-def BreakToken.cast? (v : Value) : IO (Option BreakToken) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BreakToken"] Value) v) then some { val := v } else none
+@[macro_inline] def BreakToken.cast? (v : Value) : IO (Option BreakToken) := Internal.api "Lasm.JS.Web.BreakToken.cast?" do
+  Internal.cast (Internal.getGlobal ["BreakToken"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<ChildBreakToken> childBreakTokens` -/
-def BreakToken.childBreakTokens (self : BreakToken) : IO (Array ChildBreakToken) := self.val.get "childBreakTokens" (Array ChildBreakToken)
+@[macro_inline] def BreakToken.childBreakTokens (self : BreakToken) : IO (Array ChildBreakToken) := Internal.api "Lasm.JS.Web.BreakToken.childBreakTokens" do
+  self.val.get "childBreakTokens" (Array ChildBreakToken)
 
 /-- `readonly attribute any data` -/
-def BreakToken.data (self : BreakToken) : IO Data := self.val.get "data" Data
+@[macro_inline] def BreakToken.data (self : BreakToken) : IO Data := Internal.api "Lasm.JS.Web.BreakToken.data" do
+  self.val.get "data" Data
 
 /-- `v instanceof ChildBreakToken`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildBreakToken`). -/
-def ChildBreakToken.cast? (v : Value) : IO (Option ChildBreakToken) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ChildBreakToken"] Value) v) then some { val := v } else none
+@[macro_inline] def ChildBreakToken.cast? (v : Value) : IO (Option ChildBreakToken) := Internal.api "Lasm.JS.Web.ChildBreakToken.cast?" do
+  Internal.cast (Internal.getGlobal ["ChildBreakToken"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute BreakType breakType` -/
-def ChildBreakToken.breakType (self : ChildBreakToken) : IO BreakType := self.val.get "breakType" BreakType
+@[macro_inline] def ChildBreakToken.breakType (self : ChildBreakToken) : IO BreakType := Internal.api "Lasm.JS.Web.ChildBreakToken.breakType" do
+  self.val.get "breakType" BreakType
 
 /-- `readonly attribute LayoutChild child` -/
-def ChildBreakToken.child (self : ChildBreakToken) : IO LayoutChild := do
+@[macro_inline] def ChildBreakToken.child (self : ChildBreakToken) : IO LayoutChild := Internal.api "Lasm.JS.Web.ChildBreakToken.child" do
   let r ← self.val.get "child" Value
   pure { val := r }
 
 /-- `v instanceof FragmentResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FragmentResult`). -/
-def FragmentResult.cast? (v : Value) : IO (Option FragmentResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FragmentResult"] Value) v) then some { val := v } else none
+@[macro_inline] def FragmentResult.cast? (v : Value) : IO (Option FragmentResult) := Internal.api "Lasm.JS.Web.FragmentResult.cast?" do
+  Internal.cast (Internal.getGlobal ["FragmentResult"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional FragmentResultOptions options)` -/
-def FragmentResult.new (options : Option FragmentResultOptions := none) : IO FragmentResult :=
+@[macro_inline] def FragmentResult.new (options : Option FragmentResultOptions := none) : IO FragmentResult := Internal.api "Lasm.JS.Web.FragmentResult.new" do
   Lasm.JS.Binding.invoke FragmentResult { name := "Lasm.JS.Web.FragmentResult.new", module := "globalThis", path := "FragmentResult", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute double inlineSize` -/
-def FragmentResult.inlineSize (self : FragmentResult) : IO Float := self.val.get "inlineSize" Float
+@[macro_inline] def FragmentResult.inlineSize (self : FragmentResult) : IO Float := Internal.api "Lasm.JS.Web.FragmentResult.inlineSize" do
+  self.val.get "inlineSize" Float
 
 /-- `readonly attribute double blockSize` -/
-def FragmentResult.blockSize (self : FragmentResult) : IO Float := self.val.get "blockSize" Float
+@[macro_inline] def FragmentResult.blockSize (self : FragmentResult) : IO Float := Internal.api "Lasm.JS.Web.FragmentResult.blockSize" do
+  self.val.get "blockSize" Float
 
 /-- `v instanceof IntrinsicSizes`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IntrinsicSizes`). -/
-def IntrinsicSizes.cast? (v : Value) : IO (Option IntrinsicSizes) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IntrinsicSizes"] Value) v) then some { val := v } else none
+@[macro_inline] def IntrinsicSizes.cast? (v : Value) : IO (Option IntrinsicSizes) := Internal.api "Lasm.JS.Web.IntrinsicSizes.cast?" do
+  Internal.cast (Internal.getGlobal ["IntrinsicSizes"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double minContentSize` -/
-def IntrinsicSizes.minContentSize (self : IntrinsicSizes) : IO Float := self.val.get "minContentSize" Float
+@[macro_inline] def IntrinsicSizes.minContentSize (self : IntrinsicSizes) : IO Float := Internal.api "Lasm.JS.Web.IntrinsicSizes.minContentSize" do
+  self.val.get "minContentSize" Float
 
 /-- `readonly attribute double maxContentSize` -/
-def IntrinsicSizes.maxContentSize (self : IntrinsicSizes) : IO Float := self.val.get "maxContentSize" Float
+@[macro_inline] def IntrinsicSizes.maxContentSize (self : IntrinsicSizes) : IO Float := Internal.api "Lasm.JS.Web.IntrinsicSizes.maxContentSize" do
+  self.val.get "maxContentSize" Float
 
 /-- `v instanceof LayoutChild`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutChild`). -/
-def LayoutChild.cast? (v : Value) : IO (Option LayoutChild) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutChild"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutChild.cast? (v : Value) : IO (Option LayoutChild) := Internal.api "Lasm.JS.Web.LayoutChild.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutChild"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute StylePropertyMapReadOnly styleMap` -/
-def LayoutChild.styleMap (self : LayoutChild) : IO StylePropertyMapReadOnly := do
+@[macro_inline] def LayoutChild.styleMap (self : LayoutChild) : IO StylePropertyMapReadOnly := Internal.api "Lasm.JS.Web.LayoutChild.styleMap" do
   let r ← self.val.get "styleMap" Value
   pure { val := r }
 
 /-- `Promise<IntrinsicSizes> intrinsicSizes()` -/
-def LayoutChild.intrinsicSizes (self : LayoutChild) : Async IntrinsicSizes := do
-  let r ← self.val.callMethodAwait "intrinsicSizes" (Support.args #[]) Value
+@[macro_inline] def LayoutChild.intrinsicSizes (self : LayoutChild) : Async IntrinsicSizes := Internal.api "Lasm.JS.Web.LayoutChild.intrinsicSizes" do
+  let r ← self.val.callMethodAwait "intrinsicSizes" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<LayoutFragment> layoutNextFragment(LayoutConstraintsOptions constraints, ChildBreakToken breakToken)` -/
-def LayoutChild.layoutNextFragment (self : LayoutChild) (constraints : LayoutConstraintsOptions) (breakToken : ChildBreakToken) : Async LayoutFragment := do
-  let r ← self.val.callMethodAwait "layoutNextFragment" (Support.args #[toJS constraints, toJS breakToken]) Value
+@[macro_inline] def LayoutChild.layoutNextFragment (self : LayoutChild) (constraints : LayoutConstraintsOptions) (breakToken : ChildBreakToken) : Async LayoutFragment := Internal.api "Lasm.JS.Web.LayoutChild.layoutNextFragment" do
+  let r ← self.val.callMethodAwait "layoutNextFragment" (Internal.args #[toJS constraints, toJS breakToken]) Value
   pure { val := r }
 
 /-- `v instanceof LayoutConstraints`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutConstraints`). -/
-def LayoutConstraints.cast? (v : Value) : IO (Option LayoutConstraints) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutConstraints"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutConstraints.cast? (v : Value) : IO (Option LayoutConstraints) := Internal.api "Lasm.JS.Web.LayoutConstraints.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutConstraints"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double availableInlineSize` -/
-def LayoutConstraints.availableInlineSize (self : LayoutConstraints) : IO Float := self.val.get "availableInlineSize" Float
+@[macro_inline] def LayoutConstraints.availableInlineSize (self : LayoutConstraints) : IO Float := Internal.api "Lasm.JS.Web.LayoutConstraints.availableInlineSize" do
+  self.val.get "availableInlineSize" Float
 
 /-- `readonly attribute double availableBlockSize` -/
-def LayoutConstraints.availableBlockSize (self : LayoutConstraints) : IO Float := self.val.get "availableBlockSize" Float
+@[macro_inline] def LayoutConstraints.availableBlockSize (self : LayoutConstraints) : IO Float := Internal.api "Lasm.JS.Web.LayoutConstraints.availableBlockSize" do
+  self.val.get "availableBlockSize" Float
 
 /-- `readonly attribute double? fixedInlineSize` -/
-def LayoutConstraints.fixedInlineSize (self : LayoutConstraints) : IO (Option Float) := self.val.get "fixedInlineSize" (Option Float)
+@[macro_inline] def LayoutConstraints.fixedInlineSize (self : LayoutConstraints) : IO (Option Float) := Internal.api "Lasm.JS.Web.LayoutConstraints.fixedInlineSize" do
+  self.val.get "fixedInlineSize" (Option Float)
 
 /-- `readonly attribute double? fixedBlockSize` -/
-def LayoutConstraints.fixedBlockSize (self : LayoutConstraints) : IO (Option Float) := self.val.get "fixedBlockSize" (Option Float)
+@[macro_inline] def LayoutConstraints.fixedBlockSize (self : LayoutConstraints) : IO (Option Float) := Internal.api "Lasm.JS.Web.LayoutConstraints.fixedBlockSize" do
+  self.val.get "fixedBlockSize" (Option Float)
 
 /-- `readonly attribute double percentageInlineSize` -/
-def LayoutConstraints.percentageInlineSize (self : LayoutConstraints) : IO Float := self.val.get "percentageInlineSize" Float
+@[macro_inline] def LayoutConstraints.percentageInlineSize (self : LayoutConstraints) : IO Float := Internal.api "Lasm.JS.Web.LayoutConstraints.percentageInlineSize" do
+  self.val.get "percentageInlineSize" Float
 
 /-- `readonly attribute double percentageBlockSize` -/
-def LayoutConstraints.percentageBlockSize (self : LayoutConstraints) : IO Float := self.val.get "percentageBlockSize" Float
+@[macro_inline] def LayoutConstraints.percentageBlockSize (self : LayoutConstraints) : IO Float := Internal.api "Lasm.JS.Web.LayoutConstraints.percentageBlockSize" do
+  self.val.get "percentageBlockSize" Float
 
 /-- `readonly attribute double? blockFragmentationOffset` -/
-def LayoutConstraints.blockFragmentationOffset (self : LayoutConstraints) : IO (Option Float) := self.val.get "blockFragmentationOffset" (Option Float)
+@[macro_inline] def LayoutConstraints.blockFragmentationOffset (self : LayoutConstraints) : IO (Option Float) := Internal.api "Lasm.JS.Web.LayoutConstraints.blockFragmentationOffset" do
+  self.val.get "blockFragmentationOffset" (Option Float)
 
 /-- `readonly attribute BlockFragmentationType blockFragmentationType` -/
-def LayoutConstraints.blockFragmentationType (self : LayoutConstraints) : IO BlockFragmentationType := self.val.get "blockFragmentationType" BlockFragmentationType
+@[macro_inline] def LayoutConstraints.blockFragmentationType (self : LayoutConstraints) : IO BlockFragmentationType := Internal.api "Lasm.JS.Web.LayoutConstraints.blockFragmentationType" do
+  self.val.get "blockFragmentationType" BlockFragmentationType
 
 /-- `readonly attribute any data` -/
-def LayoutConstraints.data (self : LayoutConstraints) : IO Data := self.val.get "data" Data
+@[macro_inline] def LayoutConstraints.data (self : LayoutConstraints) : IO Data := Internal.api "Lasm.JS.Web.LayoutConstraints.data" do
+  self.val.get "data" Data
 
 /-- `v instanceof LayoutEdges`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutEdges`). -/
-def LayoutEdges.cast? (v : Value) : IO (Option LayoutEdges) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutEdges"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutEdges.cast? (v : Value) : IO (Option LayoutEdges) := Internal.api "Lasm.JS.Web.LayoutEdges.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutEdges"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double inlineStart` -/
-def LayoutEdges.inlineStart (self : LayoutEdges) : IO Float := self.val.get "inlineStart" Float
+@[macro_inline] def LayoutEdges.inlineStart (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.inlineStart" do
+  self.val.get "inlineStart" Float
 
 /-- `readonly attribute double inlineEnd` -/
-def LayoutEdges.inlineEnd (self : LayoutEdges) : IO Float := self.val.get "inlineEnd" Float
+@[macro_inline] def LayoutEdges.inlineEnd (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.inlineEnd" do
+  self.val.get "inlineEnd" Float
 
 /-- `readonly attribute double blockStart` -/
-def LayoutEdges.blockStart (self : LayoutEdges) : IO Float := self.val.get "blockStart" Float
+@[macro_inline] def LayoutEdges.blockStart (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.blockStart" do
+  self.val.get "blockStart" Float
 
 /-- `readonly attribute double blockEnd` -/
-def LayoutEdges.blockEnd (self : LayoutEdges) : IO Float := self.val.get "blockEnd" Float
+@[macro_inline] def LayoutEdges.blockEnd (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.blockEnd" do
+  self.val.get "blockEnd" Float
 
 /-- `readonly attribute double inline` -/
-def LayoutEdges.inline (self : LayoutEdges) : IO Float := self.val.get "inline" Float
+@[macro_inline] def LayoutEdges.inline (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.inline" do
+  self.val.get "inline" Float
 
 /-- `readonly attribute double block` -/
-def LayoutEdges.block (self : LayoutEdges) : IO Float := self.val.get "block" Float
+@[macro_inline] def LayoutEdges.block (self : LayoutEdges) : IO Float := Internal.api "Lasm.JS.Web.LayoutEdges.block" do
+  self.val.get "block" Float
 
 /-- `v instanceof LayoutFragment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutFragment`). -/
-def LayoutFragment.cast? (v : Value) : IO (Option LayoutFragment) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutFragment"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutFragment.cast? (v : Value) : IO (Option LayoutFragment) := Internal.api "Lasm.JS.Web.LayoutFragment.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutFragment"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double inlineSize` -/
-def LayoutFragment.inlineSize (self : LayoutFragment) : IO Float := self.val.get "inlineSize" Float
+@[macro_inline] def LayoutFragment.inlineSize (self : LayoutFragment) : IO Float := Internal.api "Lasm.JS.Web.LayoutFragment.inlineSize" do
+  self.val.get "inlineSize" Float
 
 /-- `readonly attribute double blockSize` -/
-def LayoutFragment.blockSize (self : LayoutFragment) : IO Float := self.val.get "blockSize" Float
+@[macro_inline] def LayoutFragment.blockSize (self : LayoutFragment) : IO Float := Internal.api "Lasm.JS.Web.LayoutFragment.blockSize" do
+  self.val.get "blockSize" Float
 
 /-- `attribute double inlineOffset` -/
-def LayoutFragment.inlineOffset (self : LayoutFragment) : IO Float := self.val.get "inlineOffset" Float
+@[macro_inline] def LayoutFragment.inlineOffset (self : LayoutFragment) : IO Float := Internal.api "Lasm.JS.Web.LayoutFragment.inlineOffset" do
+  self.val.get "inlineOffset" Float
 
 /-- Sets `inlineOffset`: `attribute double inlineOffset` -/
-def LayoutFragment.setInlineOffset (self : LayoutFragment) (value : Float) : IO Unit :=
+@[macro_inline] def LayoutFragment.setInlineOffset (self : LayoutFragment) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.LayoutFragment.setInlineOffset" do
   self.val.set "inlineOffset" (toJS value)
 
 /-- `attribute double blockOffset` -/
-def LayoutFragment.blockOffset (self : LayoutFragment) : IO Float := self.val.get "blockOffset" Float
+@[macro_inline] def LayoutFragment.blockOffset (self : LayoutFragment) : IO Float := Internal.api "Lasm.JS.Web.LayoutFragment.blockOffset" do
+  self.val.get "blockOffset" Float
 
 /-- Sets `blockOffset`: `attribute double blockOffset` -/
-def LayoutFragment.setBlockOffset (self : LayoutFragment) (value : Float) : IO Unit :=
+@[macro_inline] def LayoutFragment.setBlockOffset (self : LayoutFragment) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.LayoutFragment.setBlockOffset" do
   self.val.set "blockOffset" (toJS value)
 
 /-- `readonly attribute any data` -/
-def LayoutFragment.data (self : LayoutFragment) : IO Data := self.val.get "data" Data
+@[macro_inline] def LayoutFragment.data (self : LayoutFragment) : IO Data := Internal.api "Lasm.JS.Web.LayoutFragment.data" do
+  self.val.get "data" Data
 
 /-- `readonly attribute ChildBreakToken? breakToken` -/
-def LayoutFragment.breakToken (self : LayoutFragment) : IO (Option ChildBreakToken) := self.val.get "breakToken" (Option ChildBreakToken)
+@[macro_inline] def LayoutFragment.breakToken (self : LayoutFragment) : IO (Option ChildBreakToken) := Internal.api "Lasm.JS.Web.LayoutFragment.breakToken" do
+  self.val.get "breakToken" (Option ChildBreakToken)
 
 /-- `v instanceof LayoutWorkletGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LayoutWorkletGlobalScope`). -/
-def LayoutWorkletGlobalScope.cast? (v : Value) : IO (Option LayoutWorkletGlobalScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LayoutWorkletGlobalScope"] Value) v) then some { val := v } else none
+@[macro_inline] def LayoutWorkletGlobalScope.cast? (v : Value) : IO (Option LayoutWorkletGlobalScope) := Internal.api "Lasm.JS.Web.LayoutWorkletGlobalScope.cast?" do
+  Internal.cast (Internal.getGlobal ["LayoutWorkletGlobalScope"] Value) (fun x => { val := x }) v
 
 /-- `undefined registerLayout(DOMString name, VoidFunction layoutCtor)` -/
-def LayoutWorkletGlobalScope.registerLayout (self : LayoutWorkletGlobalScope) (name : String) (layoutCtor : VoidFunction) : IO Unit :=
-  self.val.callMethod "registerLayout" (Support.args #[toJS name, toJS layoutCtor]) Unit
+@[macro_inline] def LayoutWorkletGlobalScope.registerLayout (self : LayoutWorkletGlobalScope) (name : String) (layoutCtor : VoidFunction) : IO Unit := Internal.api "Lasm.JS.Web.LayoutWorkletGlobalScope.registerLayout" do
+  self.val.callMethod "registerLayout" (Internal.args #[toJS name, toJS layoutCtor]) Unit
 
 /-- `readonly attribute Worklet layoutWorklet` (CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)) -/
-def CSS.layoutWorklet : IO Worklet := do
-  let r ← Support.getGlobal ["CSS", "layoutWorklet"] Value
+@[macro_inline] def CSS.layoutWorklet : IO Worklet := Internal.api "Lasm.JS.Web.CSS.layoutWorklet" do
+  let r ← Internal.getGlobal ["CSS", "layoutWorklet"] Value
   pure { val := r }
 
 end Lasm.JS.Web

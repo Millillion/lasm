@@ -6,56 +6,35 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.CredentialManagement
+import Lasm.JS.Web.Types.PaymentRequest
+import Lasm.JS.Web.Types.SecurePaymentConfirmationAndWebauthn
 import Lasm.JS.Web.FidoClientToAuthenticatorProtocol
 import Lasm.JS.Web.PaymentRequest
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum SecurePaymentConfirmationAvailability` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)): "available", "unavailable-unknown-reason", "unavailable-feature-not-enabled", "unavailable-no-permission-policy", "unavailable-no-user-verifying-platform-authenticator". -/
-inductive SecurePaymentConfirmationAvailability where
-  /-- "available" -/
-  | available
-  /-- "unavailable-unknown-reason" -/
-  | unavailableUnknownReason
-  /-- "unavailable-feature-not-enabled" -/
-  | unavailableFeatureNotEnabled
-  /-- "unavailable-no-permission-policy" -/
-  | unavailableNoPermissionPolicy
-  /-- "unavailable-no-user-verifying-platform-authenticator" -/
-  | unavailableNoUserVerifyingPlatformAuthenticator
-  deriving BEq, Repr, Inhabited
-instance : ToJS SecurePaymentConfirmationAvailability := ⟨fun
-  | .available => .string "available"
-  | .unavailableUnknownReason => .string "unavailable-unknown-reason"
-  | .unavailableFeatureNotEnabled => .string "unavailable-feature-not-enabled"
-  | .unavailableNoPermissionPolicy => .string "unavailable-no-permission-policy"
-  | .unavailableNoUserVerifyingPlatformAuthenticator => .string "unavailable-no-user-verifying-platform-authenticator"⟩
-instance : FromJS SecurePaymentConfirmationAvailability where
-  fromJS
-    | .string "available" => .ok .available
-    | .string "unavailable-unknown-reason" => .ok .unavailableUnknownReason
-    | .string "unavailable-feature-not-enabled" => .ok .unavailableFeatureNotEnabled
-    | .string "unavailable-no-permission-policy" => .ok .unavailableNoPermissionPolicy
-    | .string "unavailable-no-user-verifying-platform-authenticator" => .ok .unavailableNoUserVerifyingPlatformAuthenticator
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SecurePaymentConfirmationAvailability"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary BrowserBoundSignature` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserBoundSignature where
   /-- `required ArrayBuffer signature` -/
   signature : ByteArray
+instance : ToJS BrowserBoundSignature := ⟨fun d => Internal.fields #[("signature", toJS d.signature)]⟩
 
 /-- `dictionary AuthenticationExtensionsPaymentOutputs` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsPaymentOutputs where
   /-- `BrowserBoundSignature browserBoundSignature` -/
   browserBoundSignature : Option BrowserBoundSignature := none
+instance : ToJS AuthenticationExtensionsPaymentOutputs := ⟨fun d => Internal.fields #[("browserBoundSignature", Internal.optional d.browserBoundSignature)]⟩
 
 /-- `dictionary CredentialPropertiesOutput` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CredentialPropertiesOutput where
   /-- `boolean rk` -/
   rk : Option Bool := none
+instance : ToJS CredentialPropertiesOutput := ⟨fun d => Internal.fields #[("rk", Internal.optional d.rk)]⟩
 instance : FromJS CredentialPropertiesOutput where
   fromJS d := do return {
     rk := ← Lasm.JS.readField (Option Bool) d "rk" }
@@ -67,8 +46,8 @@ structure AuthenticationExtensionsPRFValues where
   first : ByteArray
   /-- `BufferSource second` -/
   second : Option ByteArray := none
-instance : ToJS AuthenticationExtensionsPRFValues := ⟨fun d => Support.fields #[("first", toJS d.first),
-    ("second", Support.optional d.second)]⟩
+instance : ToJS AuthenticationExtensionsPRFValues := ⟨fun d => Internal.fields #[("first", toJS d.first),
+    ("second", Internal.optional d.second)]⟩
 
 /-- `dictionary AuthenticationExtensionsPRFOutputs` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsPRFOutputs where
@@ -76,6 +55,8 @@ structure AuthenticationExtensionsPRFOutputs where
   enabled : Option Bool := none
   /-- `AuthenticationExtensionsPRFValues results` -/
   results : Option AuthenticationExtensionsPRFValues := none
+instance : ToJS AuthenticationExtensionsPRFOutputs := ⟨fun d => Internal.fields #[("enabled", Internal.optional d.enabled),
+    ("results", Internal.optional d.results)]⟩
 
 /-- `dictionary AuthenticationExtensionsLargeBlobOutputs` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsLargeBlobOutputs where
@@ -85,6 +66,9 @@ structure AuthenticationExtensionsLargeBlobOutputs where
   blob : Option ByteArray := none
   /-- `boolean written` -/
   written : Option Bool := none
+instance : ToJS AuthenticationExtensionsLargeBlobOutputs := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("blob", Internal.optional d.blob),
+    ("written", Internal.optional d.written)]⟩
 
 /-- `dictionary AuthenticationExtensionsClientOutputs` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsClientOutputs where
@@ -110,6 +94,17 @@ structure AuthenticationExtensionsClientOutputs where
   largeBlob : Option AuthenticationExtensionsLargeBlobOutputs := none
   /-- `boolean remoteClientDataJSON` -/
   remoteClientDataJSON : Option Bool := none
+instance : ToJS AuthenticationExtensionsClientOutputs := ⟨fun d => Internal.fields #[("credBlob", Internal.optional d.credBlob),
+    ("getCredBlob", Internal.optional d.getCredBlob),
+    ("hmacCreateSecret", Internal.optional d.hmacCreateSecret),
+    ("hmacGetSecret", Internal.optional d.hmacGetSecret),
+    ("payment", Internal.optional d.payment),
+    ("appid", Internal.optional d.appid),
+    ("appidExclude", Internal.optional d.appidExclude),
+    ("credProps", Internal.optional d.credProps),
+    ("prf", Internal.optional d.prf),
+    ("largeBlob", Internal.optional d.largeBlob),
+    ("remoteClientDataJSON", Internal.optional d.remoteClientDataJSON)]⟩
 
 /-- `dictionary PublicKeyCredentialRpEntity : PublicKeyCredentialEntity` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialRpEntity where
@@ -117,8 +112,8 @@ structure PublicKeyCredentialRpEntity where
   name : String
   /-- `DOMString id` -/
   id : Option String := none
-instance : ToJS PublicKeyCredentialRpEntity := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("id", Support.optional d.id)]⟩
+instance : ToJS PublicKeyCredentialRpEntity := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("id", Internal.optional d.id)]⟩
 instance : FromJS PublicKeyCredentialRpEntity where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -133,7 +128,7 @@ structure PublicKeyCredentialUserEntityJSON where
   name : String
   /-- `required DOMString displayName` -/
   displayName : String
-instance : ToJS PublicKeyCredentialUserEntityJSON := ⟨fun d => Support.fields #[("id", toJS d.id),
+instance : ToJS PublicKeyCredentialUserEntityJSON := ⟨fun d => Internal.fields #[("id", toJS d.id),
     ("name", toJS d.name),
     ("displayName", toJS d.displayName)]⟩
 
@@ -143,7 +138,7 @@ structure PublicKeyCredentialParameters where
   type : String
   /-- `required COSEAlgorithmIdentifier alg` -/
   alg : Int
-instance : ToJS PublicKeyCredentialParameters := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS PublicKeyCredentialParameters := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("alg", toJS d.alg)]⟩
 instance : FromJS PublicKeyCredentialParameters where
   fromJS d := do return {
@@ -159,9 +154,9 @@ structure PublicKeyCredentialDescriptorJSON where
   id : String
   /-- `sequence<DOMString> transports` -/
   transports : Option (Array String) := none
-instance : ToJS PublicKeyCredentialDescriptorJSON := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS PublicKeyCredentialDescriptorJSON := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("id", toJS d.id),
-    ("transports", Support.optional d.transports)]⟩
+    ("transports", Internal.optional d.transports)]⟩
 
 /-- `dictionary AuthenticatorSelectionCriteria` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticatorSelectionCriteria where
@@ -173,10 +168,10 @@ structure AuthenticatorSelectionCriteria where
   requireResidentKey : Option Bool := none
   /-- `DOMString userVerification = "preferred"` -/
   userVerification : Option String := none
-instance : ToJS AuthenticatorSelectionCriteria := ⟨fun d => Support.fields #[("authenticatorAttachment", Support.optional d.authenticatorAttachment),
-    ("residentKey", Support.optional d.residentKey),
-    ("requireResidentKey", Support.optional d.requireResidentKey),
-    ("userVerification", Support.optional d.userVerification)]⟩
+instance : ToJS AuthenticatorSelectionCriteria := ⟨fun d => Internal.fields #[("authenticatorAttachment", Internal.optional d.authenticatorAttachment),
+    ("residentKey", Internal.optional d.residentKey),
+    ("requireResidentKey", Internal.optional d.requireResidentKey),
+    ("userVerification", Internal.optional d.userVerification)]⟩
 instance : FromJS AuthenticatorSelectionCriteria where
   fromJS d := do return {
     authenticatorAttachment := ← Lasm.JS.readField (Option String) d "authenticatorAttachment",
@@ -191,8 +186,8 @@ structure AuthenticationExtensionsPRFValuesJSON where
   first : String
   /-- `Base64URLString second` -/
   second : Option String := none
-instance : ToJS AuthenticationExtensionsPRFValuesJSON := ⟨fun d => Support.fields #[("first", toJS d.first),
-    ("second", Support.optional d.second)]⟩
+instance : ToJS AuthenticationExtensionsPRFValuesJSON := ⟨fun d => Internal.fields #[("first", toJS d.first),
+    ("second", Internal.optional d.second)]⟩
 
 /-- `dictionary AuthenticationExtensionsPRFInputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsPRFInputsJSON where
@@ -200,8 +195,8 @@ structure AuthenticationExtensionsPRFInputsJSON where
   eval : Option AuthenticationExtensionsPRFValuesJSON := none
   /-- `record<DOMString, AuthenticationExtensionsPRFValuesJSON> evalByCredential` -/
   evalByCredential : Option (Record AuthenticationExtensionsPRFValuesJSON) := none
-instance : ToJS AuthenticationExtensionsPRFInputsJSON := ⟨fun d => Support.fields #[("eval", Support.optional d.eval),
-    ("evalByCredential", Support.optional d.evalByCredential)]⟩
+instance : ToJS AuthenticationExtensionsPRFInputsJSON := ⟨fun d => Internal.fields #[("eval", Internal.optional d.eval),
+    ("evalByCredential", Internal.optional d.evalByCredential)]⟩
 
 /-- `dictionary AuthenticationExtensionsLargeBlobInputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsLargeBlobInputsJSON where
@@ -211,9 +206,9 @@ structure AuthenticationExtensionsLargeBlobInputsJSON where
   read : Option Bool := none
   /-- `Base64URLString write` -/
   write : Option String := none
-instance : ToJS AuthenticationExtensionsLargeBlobInputsJSON := ⟨fun d => Support.fields #[("support", Support.optional d.support),
-    ("read", Support.optional d.read),
-    ("write", Support.optional d.write)]⟩
+instance : ToJS AuthenticationExtensionsLargeBlobInputsJSON := ⟨fun d => Internal.fields #[("support", Internal.optional d.support),
+    ("read", Internal.optional d.read),
+    ("write", Internal.optional d.write)]⟩
 
 /-- `dictionary AuthenticationExtensionsClientInputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsClientInputsJSON where
@@ -229,12 +224,12 @@ structure AuthenticationExtensionsClientInputsJSON where
   largeBlob : Option AuthenticationExtensionsLargeBlobInputsJSON := none
   /-- `DOMString remoteClientDataJSON` -/
   remoteClientDataJSON : Option String := none
-instance : ToJS AuthenticationExtensionsClientInputsJSON := ⟨fun d => Support.fields #[("appid", Support.optional d.appid),
-    ("appidExclude", Support.optional d.appidExclude),
-    ("credProps", Support.optional d.credProps),
-    ("prf", Support.optional d.prf),
-    ("largeBlob", Support.optional d.largeBlob),
-    ("remoteClientDataJSON", Support.optional d.remoteClientDataJSON)]⟩
+instance : ToJS AuthenticationExtensionsClientInputsJSON := ⟨fun d => Internal.fields #[("appid", Internal.optional d.appid),
+    ("appidExclude", Internal.optional d.appidExclude),
+    ("credProps", Internal.optional d.credProps),
+    ("prf", Internal.optional d.prf),
+    ("largeBlob", Internal.optional d.largeBlob),
+    ("remoteClientDataJSON", Internal.optional d.remoteClientDataJSON)]⟩
 
 /-- `dictionary PublicKeyCredentialCreationOptionsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialCreationOptionsJSON where
@@ -260,17 +255,17 @@ structure PublicKeyCredentialCreationOptionsJSON where
   attestationFormats : Option (Array String) := none
   /-- `AuthenticationExtensionsClientInputsJSON extensions` -/
   extensions : Option AuthenticationExtensionsClientInputsJSON := none
-instance : ToJS PublicKeyCredentialCreationOptionsJSON := ⟨fun d => Support.fields #[("rp", toJS d.rp),
+instance : ToJS PublicKeyCredentialCreationOptionsJSON := ⟨fun d => Internal.fields #[("rp", toJS d.rp),
     ("user", toJS d.user),
     ("challenge", toJS d.challenge),
     ("pubKeyCredParams", toJS d.pubKeyCredParams),
-    ("timeout", Support.optional d.timeout),
-    ("excludeCredentials", Support.optional d.excludeCredentials),
-    ("authenticatorSelection", Support.optional d.authenticatorSelection),
-    ("hints", Support.optional d.hints),
-    ("attestation", Support.optional d.attestation),
-    ("attestationFormats", Support.optional d.attestationFormats),
-    ("extensions", Support.optional d.extensions)]⟩
+    ("timeout", Internal.optional d.timeout),
+    ("excludeCredentials", Internal.optional d.excludeCredentials),
+    ("authenticatorSelection", Internal.optional d.authenticatorSelection),
+    ("hints", Internal.optional d.hints),
+    ("attestation", Internal.optional d.attestation),
+    ("attestationFormats", Internal.optional d.attestationFormats),
+    ("extensions", Internal.optional d.extensions)]⟩
 
 /-- `dictionary PublicKeyCredentialUserEntity : PublicKeyCredentialEntity` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialUserEntity where
@@ -280,7 +275,7 @@ structure PublicKeyCredentialUserEntity where
   id : ByteArray
   /-- `required DOMString displayName` -/
   displayName : String
-instance : ToJS PublicKeyCredentialUserEntity := ⟨fun d => Support.fields #[("name", toJS d.name),
+instance : ToJS PublicKeyCredentialUserEntity := ⟨fun d => Internal.fields #[("name", toJS d.name),
     ("id", toJS d.id),
     ("displayName", toJS d.displayName)]⟩
 
@@ -292,9 +287,9 @@ structure PublicKeyCredentialDescriptor where
   id : ByteArray
   /-- `sequence<DOMString> transports` -/
   transports : Option (Array String) := none
-instance : ToJS PublicKeyCredentialDescriptor := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS PublicKeyCredentialDescriptor := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("id", toJS d.id),
-    ("transports", Support.optional d.transports)]⟩
+    ("transports", Internal.optional d.transports)]⟩
 
 /-- `dictionary PaymentEntityLogo` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PaymentEntityLogo where
@@ -302,7 +297,7 @@ structure PaymentEntityLogo where
   url : String
   /-- `required USVString label` -/
   label : String
-instance : ToJS PaymentEntityLogo := ⟨fun d => Support.fields #[("url", toJS d.url),
+instance : ToJS PaymentEntityLogo := ⟨fun d => Internal.fields #[("url", toJS d.url),
     ("label", toJS d.label)]⟩
 instance : FromJS PaymentEntityLogo where
   fromJS d := do return {
@@ -320,10 +315,10 @@ structure PaymentCredentialInstrument where
   iconMustBeShown : Option Bool := none
   /-- `USVString details` -/
   details : Option String := none
-instance : ToJS PaymentCredentialInstrument := ⟨fun d => Support.fields #[("displayName", toJS d.displayName),
+instance : ToJS PaymentCredentialInstrument := ⟨fun d => Internal.fields #[("displayName", toJS d.displayName),
     ("icon", toJS d.icon),
-    ("iconMustBeShown", Support.optional d.iconMustBeShown),
-    ("details", Support.optional d.details)]⟩
+    ("iconMustBeShown", Internal.optional d.iconMustBeShown),
+    ("details", Internal.optional d.details)]⟩
 instance : FromJS PaymentCredentialInstrument where
   fromJS d := do return {
     displayName := ← Lasm.JS.readField String d "displayName",
@@ -352,15 +347,15 @@ structure AuthenticationExtensionsPaymentInputs where
   total : Option PaymentCurrencyAmount := none
   /-- `PaymentCredentialInstrument instrument` -/
   instrument : Option PaymentCredentialInstrument := none
-instance : ToJS AuthenticationExtensionsPaymentInputs := ⟨fun d => Support.fields #[("isPayment", Support.optional d.isPayment),
-    ("browserBoundPubKeyCredParams", Support.optional d.browserBoundPubKeyCredParams),
-    ("rpId", Support.optional d.rpId),
-    ("topOrigin", Support.optional d.topOrigin),
-    ("payeeName", Support.optional d.payeeName),
-    ("payeeOrigin", Support.optional d.payeeOrigin),
-    ("paymentEntitiesLogos", Support.optional d.paymentEntitiesLogos),
-    ("total", Support.optional d.total),
-    ("instrument", Support.optional d.instrument)]⟩
+instance : ToJS AuthenticationExtensionsPaymentInputs := ⟨fun d => Internal.fields #[("isPayment", Internal.optional d.isPayment),
+    ("browserBoundPubKeyCredParams", Internal.optional d.browserBoundPubKeyCredParams),
+    ("rpId", Internal.optional d.rpId),
+    ("topOrigin", Internal.optional d.topOrigin),
+    ("payeeName", Internal.optional d.payeeName),
+    ("payeeOrigin", Internal.optional d.payeeOrigin),
+    ("paymentEntitiesLogos", Internal.optional d.paymentEntitiesLogos),
+    ("total", Internal.optional d.total),
+    ("instrument", Internal.optional d.instrument)]⟩
 instance : FromJS AuthenticationExtensionsPaymentInputs where
   fromJS d := do return {
     isPayment := ← Lasm.JS.readField (Option Bool) d "isPayment",
@@ -380,8 +375,8 @@ structure AuthenticationExtensionsPRFInputs where
   eval : Option AuthenticationExtensionsPRFValues := none
   /-- `record<DOMString, AuthenticationExtensionsPRFValues> evalByCredential` -/
   evalByCredential : Option (Record AuthenticationExtensionsPRFValues) := none
-instance : ToJS AuthenticationExtensionsPRFInputs := ⟨fun d => Support.fields #[("eval", Support.optional d.eval),
-    ("evalByCredential", Support.optional d.evalByCredential)]⟩
+instance : ToJS AuthenticationExtensionsPRFInputs := ⟨fun d => Internal.fields #[("eval", Internal.optional d.eval),
+    ("evalByCredential", Internal.optional d.evalByCredential)]⟩
 
 /-- `dictionary AuthenticationExtensionsLargeBlobInputs` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsLargeBlobInputs where
@@ -391,9 +386,9 @@ structure AuthenticationExtensionsLargeBlobInputs where
   read : Option Bool := none
   /-- `BufferSource write` -/
   write : Option ByteArray := none
-instance : ToJS AuthenticationExtensionsLargeBlobInputs := ⟨fun d => Support.fields #[("support", Support.optional d.support),
-    ("read", Support.optional d.read),
-    ("write", Support.optional d.write)]⟩
+instance : ToJS AuthenticationExtensionsLargeBlobInputs := ⟨fun d => Internal.fields #[("support", Internal.optional d.support),
+    ("read", Internal.optional d.read),
+    ("write", Internal.optional d.write)]⟩
 
 /-- `dictionary AuthenticationExtensionsClientInputs` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AuthenticationExtensionsClientInputs where
@@ -427,21 +422,21 @@ structure AuthenticationExtensionsClientInputs where
   largeBlob : Option AuthenticationExtensionsLargeBlobInputs := none
   /-- `DOMString remoteClientDataJSON` -/
   remoteClientDataJSON : Option String := none
-instance : ToJS AuthenticationExtensionsClientInputs := ⟨fun d => Support.fields #[("credentialProtectionPolicy", Support.optional d.credentialProtectionPolicy),
-    ("enforceCredentialProtectionPolicy", Support.optional d.enforceCredentialProtectionPolicy),
-    ("credBlob", Support.optional d.credBlob),
-    ("getCredBlob", Support.optional d.getCredBlob),
-    ("minPinLength", Support.optional d.minPinLength),
-    ("pinComplexityPolicy", Support.optional d.pinComplexityPolicy),
-    ("hmacCreateSecret", Support.optional d.hmacCreateSecret),
-    ("hmacGetSecret", Support.optional d.hmacGetSecret),
-    ("payment", Support.optional d.payment),
-    ("appid", Support.optional d.appid),
-    ("appidExclude", Support.optional d.appidExclude),
-    ("credProps", Support.optional d.credProps),
-    ("prf", Support.optional d.prf),
-    ("largeBlob", Support.optional d.largeBlob),
-    ("remoteClientDataJSON", Support.optional d.remoteClientDataJSON)]⟩
+instance : ToJS AuthenticationExtensionsClientInputs := ⟨fun d => Internal.fields #[("credentialProtectionPolicy", Internal.optional d.credentialProtectionPolicy),
+    ("enforceCredentialProtectionPolicy", Internal.optional d.enforceCredentialProtectionPolicy),
+    ("credBlob", Internal.optional d.credBlob),
+    ("getCredBlob", Internal.optional d.getCredBlob),
+    ("minPinLength", Internal.optional d.minPinLength),
+    ("pinComplexityPolicy", Internal.optional d.pinComplexityPolicy),
+    ("hmacCreateSecret", Internal.optional d.hmacCreateSecret),
+    ("hmacGetSecret", Internal.optional d.hmacGetSecret),
+    ("payment", Internal.optional d.payment),
+    ("appid", Internal.optional d.appid),
+    ("appidExclude", Internal.optional d.appidExclude),
+    ("credProps", Internal.optional d.credProps),
+    ("prf", Internal.optional d.prf),
+    ("largeBlob", Internal.optional d.largeBlob),
+    ("remoteClientDataJSON", Internal.optional d.remoteClientDataJSON)]⟩
 
 /-- `dictionary PublicKeyCredentialCreationOptions` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialCreationOptions where
@@ -467,17 +462,17 @@ structure PublicKeyCredentialCreationOptions where
   attestationFormats : Option (Array String) := none
   /-- `AuthenticationExtensionsClientInputs extensions` -/
   extensions : Option AuthenticationExtensionsClientInputs := none
-instance : ToJS PublicKeyCredentialCreationOptions := ⟨fun d => Support.fields #[("rp", toJS d.rp),
+instance : ToJS PublicKeyCredentialCreationOptions := ⟨fun d => Internal.fields #[("rp", toJS d.rp),
     ("user", toJS d.user),
     ("challenge", toJS d.challenge),
     ("pubKeyCredParams", toJS d.pubKeyCredParams),
-    ("timeout", Support.optional d.timeout),
-    ("excludeCredentials", Support.optional d.excludeCredentials),
-    ("authenticatorSelection", Support.optional d.authenticatorSelection),
-    ("hints", Support.optional d.hints),
-    ("attestation", Support.optional d.attestation),
-    ("attestationFormats", Support.optional d.attestationFormats),
-    ("extensions", Support.optional d.extensions)]⟩
+    ("timeout", Internal.optional d.timeout),
+    ("excludeCredentials", Internal.optional d.excludeCredentials),
+    ("authenticatorSelection", Internal.optional d.authenticatorSelection),
+    ("hints", Internal.optional d.hints),
+    ("attestation", Internal.optional d.attestation),
+    ("attestationFormats", Internal.optional d.attestationFormats),
+    ("extensions", Internal.optional d.extensions)]⟩
 
 /-- `dictionary PublicKeyCredentialRequestOptionsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialRequestOptionsJSON where
@@ -495,13 +490,13 @@ structure PublicKeyCredentialRequestOptionsJSON where
   hints : Option (Array String) := none
   /-- `AuthenticationExtensionsClientInputsJSON extensions` -/
   extensions : Option AuthenticationExtensionsClientInputsJSON := none
-instance : ToJS PublicKeyCredentialRequestOptionsJSON := ⟨fun d => Support.fields #[("challenge", toJS d.challenge),
-    ("timeout", Support.optional d.timeout),
-    ("rpId", Support.optional d.rpId),
-    ("allowCredentials", Support.optional d.allowCredentials),
-    ("userVerification", Support.optional d.userVerification),
-    ("hints", Support.optional d.hints),
-    ("extensions", Support.optional d.extensions)]⟩
+instance : ToJS PublicKeyCredentialRequestOptionsJSON := ⟨fun d => Internal.fields #[("challenge", toJS d.challenge),
+    ("timeout", Internal.optional d.timeout),
+    ("rpId", Internal.optional d.rpId),
+    ("allowCredentials", Internal.optional d.allowCredentials),
+    ("userVerification", Internal.optional d.userVerification),
+    ("hints", Internal.optional d.hints),
+    ("extensions", Internal.optional d.extensions)]⟩
 
 /-- `dictionary PublicKeyCredentialRequestOptions` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PublicKeyCredentialRequestOptions where
@@ -519,13 +514,13 @@ structure PublicKeyCredentialRequestOptions where
   hints : Option (Array String) := none
   /-- `AuthenticationExtensionsClientInputs extensions` -/
   extensions : Option AuthenticationExtensionsClientInputs := none
-instance : ToJS PublicKeyCredentialRequestOptions := ⟨fun d => Support.fields #[("challenge", toJS d.challenge),
-    ("timeout", Support.optional d.timeout),
-    ("rpId", Support.optional d.rpId),
-    ("allowCredentials", Support.optional d.allowCredentials),
-    ("userVerification", Support.optional d.userVerification),
-    ("hints", Support.optional d.hints),
-    ("extensions", Support.optional d.extensions)]⟩
+instance : ToJS PublicKeyCredentialRequestOptions := ⟨fun d => Internal.fields #[("challenge", toJS d.challenge),
+    ("timeout", Internal.optional d.timeout),
+    ("rpId", Internal.optional d.rpId),
+    ("allowCredentials", Internal.optional d.allowCredentials),
+    ("userVerification", Internal.optional d.userVerification),
+    ("hints", Internal.optional d.hints),
+    ("extensions", Internal.optional d.extensions)]⟩
 
 /-- `dictionary UnknownCredentialOptions` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UnknownCredentialOptions where
@@ -533,7 +528,7 @@ structure UnknownCredentialOptions where
   rpId : String
   /-- `required Base64URLString credentialId` -/
   credentialId : String
-instance : ToJS UnknownCredentialOptions := ⟨fun d => Support.fields #[("rpId", toJS d.rpId),
+instance : ToJS UnknownCredentialOptions := ⟨fun d => Internal.fields #[("rpId", toJS d.rpId),
     ("credentialId", toJS d.credentialId)]⟩
 
 /-- `dictionary AllAcceptedCredentialsOptions` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -544,7 +539,7 @@ structure AllAcceptedCredentialsOptions where
   userId : String
   /-- `required sequence<Base64URLString> allAcceptedCredentialIds` -/
   allAcceptedCredentialIds : Array String
-instance : ToJS AllAcceptedCredentialsOptions := ⟨fun d => Support.fields #[("rpId", toJS d.rpId),
+instance : ToJS AllAcceptedCredentialsOptions := ⟨fun d => Internal.fields #[("rpId", toJS d.rpId),
     ("userId", toJS d.userId),
     ("allAcceptedCredentialIds", toJS d.allAcceptedCredentialIds)]⟩
 
@@ -558,141 +553,400 @@ structure CurrentUserDetailsOptions where
   name : String
   /-- `required DOMString displayName` -/
   displayName : String
-instance : ToJS CurrentUserDetailsOptions := ⟨fun d => Support.fields #[("rpId", toJS d.rpId),
+instance : ToJS CurrentUserDetailsOptions := ⟨fun d => Internal.fields #[("rpId", toJS d.rpId),
     ("userId", toJS d.userId),
     ("name", toJS d.name),
     ("displayName", toJS d.displayName)]⟩
 
+/-- `dictionary SecurePaymentConfirmationRequest` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SecurePaymentConfirmationRequest where
+  /-- `required BufferSource challenge` -/
+  challenge : ByteArray
+  /-- `required USVString rpId` -/
+  rpId : String
+  /-- `required sequence<BufferSource> credentialIds` -/
+  credentialIds : Array ByteArray
+  /-- `required PaymentCredentialInstrument instrument` -/
+  instrument : PaymentCredentialInstrument
+  /-- `unsigned long timeout` -/
+  timeout : Option Nat := none
+  /-- `USVString payeeName` -/
+  payeeName : Option String := none
+  /-- `USVString payeeOrigin` -/
+  payeeOrigin : Option String := none
+  /-- `sequence<PaymentEntityLogo> paymentEntitiesLogos` -/
+  paymentEntitiesLogos : Option (Array PaymentEntityLogo) := none
+  /-- `AuthenticationExtensionsClientInputs extensions` -/
+  extensions : Option AuthenticationExtensionsClientInputs := none
+  /-- `sequence<PublicKeyCredentialParameters> browserBoundPubKeyCredParams` -/
+  browserBoundPubKeyCredParams : Option (Array PublicKeyCredentialParameters) := none
+  /-- `sequence<USVString> locale` -/
+  locale : Option (Array String) := none
+  /-- `boolean showOptOut` -/
+  showOptOut : Option Bool := none
+instance : ToJS SecurePaymentConfirmationRequest := ⟨fun d => Internal.fields #[("challenge", toJS d.challenge),
+    ("rpId", toJS d.rpId),
+    ("credentialIds", toJS d.credentialIds),
+    ("instrument", toJS d.instrument),
+    ("timeout", Internal.optional d.timeout),
+    ("payeeName", Internal.optional d.payeeName),
+    ("payeeOrigin", Internal.optional d.payeeOrigin),
+    ("paymentEntitiesLogos", Internal.optional d.paymentEntitiesLogos),
+    ("extensions", Internal.optional d.extensions),
+    ("browserBoundPubKeyCredParams", Internal.optional d.browserBoundPubKeyCredParams),
+    ("locale", Internal.optional d.locale),
+    ("showOptOut", Internal.optional d.showOptOut)]⟩
+
+/-- `dictionary CollectedClientAdditionalPaymentData` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CollectedClientAdditionalPaymentData where
+  /-- `required USVString rpId` -/
+  rpId : String
+  /-- `required USVString topOrigin` -/
+  topOrigin : String
+  /-- `USVString payeeName` -/
+  payeeName : Option String := none
+  /-- `USVString payeeOrigin` -/
+  payeeOrigin : Option String := none
+  /-- `sequence<PaymentEntityLogo> paymentEntitiesLogos` -/
+  paymentEntitiesLogos : Option (Array PaymentEntityLogo) := none
+  /-- `required PaymentCurrencyAmount total` -/
+  total : PaymentCurrencyAmount
+  /-- `required PaymentCredentialInstrument instrument` -/
+  instrument : PaymentCredentialInstrument
+  /-- `USVString browserBoundPublicKey` -/
+  browserBoundPublicKey : Option String := none
+instance : ToJS CollectedClientAdditionalPaymentData := ⟨fun d => Internal.fields #[("rpId", toJS d.rpId),
+    ("topOrigin", toJS d.topOrigin),
+    ("payeeName", Internal.optional d.payeeName),
+    ("payeeOrigin", Internal.optional d.payeeOrigin),
+    ("paymentEntitiesLogos", Internal.optional d.paymentEntitiesLogos),
+    ("total", toJS d.total),
+    ("instrument", toJS d.instrument),
+    ("browserBoundPublicKey", Internal.optional d.browserBoundPublicKey)]⟩
+
+/-- `dictionary CollectedClientAdditionalPaymentRegistrationData` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CollectedClientAdditionalPaymentRegistrationData where
+  /-- `USVString browserBoundPublicKey` -/
+  browserBoundPublicKey : Option String := none
+instance : ToJS CollectedClientAdditionalPaymentRegistrationData := ⟨fun d => Internal.fields #[("browserBoundPublicKey", Internal.optional d.browserBoundPublicKey)]⟩
+
+/-- `(CollectedClientAdditionalPaymentData or CollectedClientAdditionalPaymentRegistrationData)`: one constructor per member type. -/
+inductive CollectedClientAdditionalPaymentDataOrCollectedClientAdditionalPaymentRegistrationData where
+  /-- `CollectedClientAdditionalPaymentData` -/
+  | collectedClientAdditionalPaymentData (value : CollectedClientAdditionalPaymentData)
+  /-- `CollectedClientAdditionalPaymentRegistrationData` -/
+  | collectedClientAdditionalPaymentRegistrationData (value : CollectedClientAdditionalPaymentRegistrationData)
+instance : ToJS CollectedClientAdditionalPaymentDataOrCollectedClientAdditionalPaymentRegistrationData := ⟨fun
+  | .collectedClientAdditionalPaymentData v => toJS v
+  | .collectedClientAdditionalPaymentRegistrationData v => toJS v⟩
+instance : Coe CollectedClientAdditionalPaymentData CollectedClientAdditionalPaymentDataOrCollectedClientAdditionalPaymentRegistrationData := ⟨.collectedClientAdditionalPaymentData⟩
+instance : Coe CollectedClientAdditionalPaymentRegistrationData CollectedClientAdditionalPaymentDataOrCollectedClientAdditionalPaymentRegistrationData := ⟨.collectedClientAdditionalPaymentRegistrationData⟩
+
+/-- `dictionary CollectedClientPaymentData : CollectedClientData` (Secure Payment Confirmation (https://w3c.github.io/secure-payment-confirmation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CollectedClientPaymentData where
+  /-- `required DOMString type` -/
+  type : String
+  /-- `required DOMString challenge` -/
+  challenge : String
+  /-- `required DOMString origin` -/
+  origin : String
+  /-- `boolean crossOrigin` -/
+  crossOrigin : Option Bool := none
+  /-- `DOMString topOrigin` -/
+  topOrigin : Option String := none
+  /-- `required (CollectedClientAdditionalPaymentData or CollectedClientAdditionalPaymentRegistrationData) payment` -/
+  payment : CollectedClientAdditionalPaymentDataOrCollectedClientAdditionalPaymentRegistrationData
+instance : ToJS CollectedClientPaymentData := ⟨fun d => Internal.fields #[("type", toJS d.type),
+    ("challenge", toJS d.challenge),
+    ("origin", toJS d.origin),
+    ("crossOrigin", Internal.optional d.crossOrigin),
+    ("topOrigin", Internal.optional d.topOrigin),
+    ("payment", toJS d.payment)]⟩
+
+/-- `dictionary AuthenticatorAttestationResponseJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticatorAttestationResponseJSON where
+  /-- `required Base64URLString clientDataJSON` -/
+  clientDataJSON : String
+  /-- `required Base64URLString authenticatorData` -/
+  authenticatorData : String
+  /-- `required sequence<DOMString> transports` -/
+  transports : Array String
+  /-- `Base64URLString publicKey` -/
+  publicKey : Option String := none
+  /-- `required COSEAlgorithmIdentifier publicKeyAlgorithm` -/
+  publicKeyAlgorithm : Int
+  /-- `required Base64URLString attestationObject` -/
+  attestationObject : String
+instance : ToJS AuthenticatorAttestationResponseJSON := ⟨fun d => Internal.fields #[("clientDataJSON", toJS d.clientDataJSON),
+    ("authenticatorData", toJS d.authenticatorData),
+    ("transports", toJS d.transports),
+    ("publicKey", Internal.optional d.publicKey),
+    ("publicKeyAlgorithm", toJS d.publicKeyAlgorithm),
+    ("attestationObject", toJS d.attestationObject)]⟩
+
+/-- `dictionary AuthenticationExtensionsPRFOutputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticationExtensionsPRFOutputsJSON where
+  /-- `boolean enabled` -/
+  enabled : Option Bool := none
+  /-- `AuthenticationExtensionsPRFValuesJSON results` -/
+  results : Option AuthenticationExtensionsPRFValuesJSON := none
+instance : ToJS AuthenticationExtensionsPRFOutputsJSON := ⟨fun d => Internal.fields #[("enabled", Internal.optional d.enabled),
+    ("results", Internal.optional d.results)]⟩
+
+/-- `dictionary AuthenticationExtensionsLargeBlobOutputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticationExtensionsLargeBlobOutputsJSON where
+  /-- `boolean supported` -/
+  supported : Option Bool := none
+  /-- `Base64URLString blob` -/
+  blob : Option String := none
+  /-- `boolean written` -/
+  written : Option Bool := none
+instance : ToJS AuthenticationExtensionsLargeBlobOutputsJSON := ⟨fun d => Internal.fields #[("supported", Internal.optional d.supported),
+    ("blob", Internal.optional d.blob),
+    ("written", Internal.optional d.written)]⟩
+
+/-- `dictionary AuthenticationExtensionsClientOutputsJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticationExtensionsClientOutputsJSON where
+  /-- `boolean appid` -/
+  appid : Option Bool := none
+  /-- `boolean appidExclude` -/
+  appidExclude : Option Bool := none
+  /-- `CredentialPropertiesOutput credProps` -/
+  credProps : Option CredentialPropertiesOutput := none
+  /-- `AuthenticationExtensionsPRFOutputsJSON prf` -/
+  prf : Option AuthenticationExtensionsPRFOutputsJSON := none
+  /-- `AuthenticationExtensionsLargeBlobOutputsJSON largeBlob` -/
+  largeBlob : Option AuthenticationExtensionsLargeBlobOutputsJSON := none
+  /-- `boolean remoteClientDataJSON` -/
+  remoteClientDataJSON : Option Bool := none
+instance : ToJS AuthenticationExtensionsClientOutputsJSON := ⟨fun d => Internal.fields #[("appid", Internal.optional d.appid),
+    ("appidExclude", Internal.optional d.appidExclude),
+    ("credProps", Internal.optional d.credProps),
+    ("prf", Internal.optional d.prf),
+    ("largeBlob", Internal.optional d.largeBlob),
+    ("remoteClientDataJSON", Internal.optional d.remoteClientDataJSON)]⟩
+
+/-- `dictionary RegistrationResponseJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RegistrationResponseJSON where
+  /-- `required DOMString id` -/
+  id : String
+  /-- `required Base64URLString rawId` -/
+  rawId : String
+  /-- `required AuthenticatorAttestationResponseJSON response` -/
+  response : AuthenticatorAttestationResponseJSON
+  /-- `DOMString authenticatorAttachment` -/
+  authenticatorAttachment : Option String := none
+  /-- `required AuthenticationExtensionsClientOutputsJSON clientExtensionResults` -/
+  clientExtensionResults : AuthenticationExtensionsClientOutputsJSON
+  /-- `required DOMString type` -/
+  type : String
+instance : ToJS RegistrationResponseJSON := ⟨fun d => Internal.fields #[("id", toJS d.id),
+    ("rawId", toJS d.rawId),
+    ("response", toJS d.response),
+    ("authenticatorAttachment", Internal.optional d.authenticatorAttachment),
+    ("clientExtensionResults", toJS d.clientExtensionResults),
+    ("type", toJS d.type)]⟩
+
+/-- `dictionary AuthenticatorAssertionResponseJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticatorAssertionResponseJSON where
+  /-- `required Base64URLString clientDataJSON` -/
+  clientDataJSON : String
+  /-- `required Base64URLString authenticatorData` -/
+  authenticatorData : String
+  /-- `required Base64URLString signature` -/
+  signature : String
+  /-- `Base64URLString userHandle` -/
+  userHandle : Option String := none
+instance : ToJS AuthenticatorAssertionResponseJSON := ⟨fun d => Internal.fields #[("clientDataJSON", toJS d.clientDataJSON),
+    ("authenticatorData", toJS d.authenticatorData),
+    ("signature", toJS d.signature),
+    ("userHandle", Internal.optional d.userHandle)]⟩
+
+/-- `dictionary AuthenticationResponseJSON` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AuthenticationResponseJSON where
+  /-- `required DOMString id` -/
+  id : String
+  /-- `required Base64URLString rawId` -/
+  rawId : String
+  /-- `required AuthenticatorAssertionResponseJSON response` -/
+  response : AuthenticatorAssertionResponseJSON
+  /-- `DOMString authenticatorAttachment` -/
+  authenticatorAttachment : Option String := none
+  /-- `required AuthenticationExtensionsClientOutputsJSON clientExtensionResults` -/
+  clientExtensionResults : AuthenticationExtensionsClientOutputsJSON
+  /-- `required DOMString type` -/
+  type : String
+instance : ToJS AuthenticationResponseJSON := ⟨fun d => Internal.fields #[("id", toJS d.id),
+    ("rawId", toJS d.rawId),
+    ("response", toJS d.response),
+    ("authenticatorAttachment", Internal.optional d.authenticatorAttachment),
+    ("clientExtensionResults", toJS d.clientExtensionResults),
+    ("type", toJS d.type)]⟩
+
+/-- `dictionary PublicKeyCredentialEntity` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PublicKeyCredentialEntity where
+  /-- `required DOMString name` -/
+  name : String
+instance : ToJS PublicKeyCredentialEntity := ⟨fun d => Internal.fields #[("name", toJS d.name)]⟩
+
+/-- `dictionary CollectedClientData` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CollectedClientData where
+  /-- `required DOMString type` -/
+  type : String
+  /-- `required DOMString challenge` -/
+  challenge : String
+  /-- `required DOMString origin` -/
+  origin : String
+  /-- `boolean crossOrigin` -/
+  crossOrigin : Option Bool := none
+  /-- `DOMString topOrigin` -/
+  topOrigin : Option String := none
+instance : ToJS CollectedClientData := ⟨fun d => Internal.fields #[("type", toJS d.type),
+    ("challenge", toJS d.challenge),
+    ("origin", toJS d.origin),
+    ("crossOrigin", Internal.optional d.crossOrigin),
+    ("topOrigin", Internal.optional d.topOrigin)]⟩
+
+/-- `dictionary TokenBinding` (Web Authentication: An API for accessing Public Key Credentials - Level 3 (https://w3c.github.io/webauthn/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure TokenBinding where
+  /-- `required DOMString status` -/
+  status : String
+  /-- `DOMString id` -/
+  id : Option String := none
+instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.status),
+    ("id", Internal.optional d.id)]⟩
+
 /-- `v instanceof AuthenticatorResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AuthenticatorResponse`). -/
-def AuthenticatorResponse.cast? (v : Value) : IO (Option AuthenticatorResponse) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AuthenticatorResponse"] Value) v) then some { val := v } else none
+@[macro_inline] def AuthenticatorResponse.cast? (v : Value) : IO (Option AuthenticatorResponse) := Internal.api "Lasm.JS.Web.AuthenticatorResponse.cast?" do
+  Internal.cast (Internal.getGlobal ["AuthenticatorResponse"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ArrayBuffer clientDataJSON` -/
-def AuthenticatorResponse.clientDataJSON (self : AuthenticatorResponse) : IO ByteArray := do
+@[macro_inline] def AuthenticatorResponse.clientDataJSON (self : AuthenticatorResponse) : IO ByteArray := Internal.api "Lasm.JS.Web.AuthenticatorResponse.clientDataJSON" do
   let r ← self.val.get "clientDataJSON" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `v instanceof PublicKeyCredential`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PublicKeyCredential`). -/
-def PublicKeyCredential.cast? (v : Value) : IO (Option PublicKeyCredential) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PublicKeyCredential"] Value) v) then some { val := v } else none
+@[macro_inline] def PublicKeyCredential.cast? (v : Value) : IO (Option PublicKeyCredential) := Internal.api "Lasm.JS.Web.PublicKeyCredential.cast?" do
+  Internal.cast (Internal.getGlobal ["PublicKeyCredential"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ArrayBuffer rawId` -/
-def PublicKeyCredential.rawId (self : PublicKeyCredential) : IO ByteArray := do
+@[macro_inline] def PublicKeyCredential.rawId (self : PublicKeyCredential) : IO ByteArray := Internal.api "Lasm.JS.Web.PublicKeyCredential.rawId" do
   let r ← self.val.get "rawId" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `readonly attribute AuthenticatorResponse response` -/
-def PublicKeyCredential.response (self : PublicKeyCredential) : IO AuthenticatorResponse := do
+@[macro_inline] def PublicKeyCredential.response (self : PublicKeyCredential) : IO AuthenticatorResponse := Internal.api "Lasm.JS.Web.PublicKeyCredential.response" do
   let r ← self.val.get "response" Value
   pure { val := r }
 
 /-- `readonly attribute DOMString? authenticatorAttachment` -/
-def PublicKeyCredential.authenticatorAttachment (self : PublicKeyCredential) : IO (Option String) := self.val.get "authenticatorAttachment" (Option String)
+@[macro_inline] def PublicKeyCredential.authenticatorAttachment (self : PublicKeyCredential) : IO (Option String) := Internal.api "Lasm.JS.Web.PublicKeyCredential.authenticatorAttachment" do
+  self.val.get "authenticatorAttachment" (Option String)
 
 /-- `AuthenticationExtensionsClientOutputs getClientExtensionResults()` -/
-def PublicKeyCredential.getClientExtensionResults (self : PublicKeyCredential) : IO Data :=
-  self.val.callMethod "getClientExtensionResults" (Support.args #[]) Data
+@[macro_inline] def PublicKeyCredential.getClientExtensionResults (self : PublicKeyCredential) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.getClientExtensionResults" do
+  self.val.callMethod "getClientExtensionResults" (Internal.args #[]) Data
 
 /-- `static Promise<boolean> isConditionalMediationAvailable()` -/
-def PublicKeyCredential.isConditionalMediationAvailable : Async Bool :=
+@[macro_inline] def PublicKeyCredential.isConditionalMediationAvailable : Async Bool := Internal.api "Lasm.JS.Web.PublicKeyCredential.isConditionalMediationAvailable" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isConditionalMediationAvailable", module := "globalThis", path := "PublicKeyCredential.isConditionalMediationAvailable", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `PublicKeyCredentialJSON toJSON()` -/
-def PublicKeyCredential.toJSON (self : PublicKeyCredential) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PublicKeyCredential.toJSON (self : PublicKeyCredential) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `static Promise<boolean> isUserVerifyingPlatformAuthenticatorAvailable()` -/
-def PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable : Async Bool :=
+@[macro_inline] def PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable : Async Bool := Internal.api "Lasm.JS.Web.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable", module := "globalThis", path := "PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `static Promise<PublicKeyCredentialClientCapabilities> getClientCapabilities()` -/
-def PublicKeyCredential.getClientCapabilities : Async (Record Bool) := do
+@[macro_inline] def PublicKeyCredential.getClientCapabilities : Async (Record Bool) := Internal.api "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities", module := "globalThis", path := "PublicKeyCredential.getClientCapabilities", construct := false, arity := 0 }
-    (Support.args #[])
-  Support.recordOf Bool r
+    (Internal.args #[])
+  Internal.recordOf Bool r
 
 /-- `static PublicKeyCredentialCreationOptions parseCreationOptionsFromJSON(PublicKeyCredentialCreationOptionsJSON options)` -/
-def PublicKeyCredential.parseCreationOptionsFromJSON (options : PublicKeyCredentialCreationOptionsJSON) : IO Data :=
+@[macro_inline] def PublicKeyCredential.parseCreationOptionsFromJSON (options : PublicKeyCredentialCreationOptionsJSON) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON", module := "globalThis", path := "PublicKeyCredential.parseCreationOptionsFromJSON", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `static PublicKeyCredentialRequestOptions parseRequestOptionsFromJSON(PublicKeyCredentialRequestOptionsJSON options)` -/
-def PublicKeyCredential.parseRequestOptionsFromJSON (options : PublicKeyCredentialRequestOptionsJSON) : IO Data :=
+@[macro_inline] def PublicKeyCredential.parseRequestOptionsFromJSON (options : PublicKeyCredentialRequestOptionsJSON) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON", module := "globalThis", path := "PublicKeyCredential.parseRequestOptionsFromJSON", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `static Promise<undefined> signalUnknownCredential(UnknownCredentialOptions options)` -/
-def PublicKeyCredential.signalUnknownCredential (options : UnknownCredentialOptions) : Async Unit :=
+@[macro_inline] def PublicKeyCredential.signalUnknownCredential (options : UnknownCredentialOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential", module := "globalThis", path := "PublicKeyCredential.signalUnknownCredential", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `static Promise<undefined> signalAllAcceptedCredentials(AllAcceptedCredentialsOptions options)` -/
-def PublicKeyCredential.signalAllAcceptedCredentials (options : AllAcceptedCredentialsOptions) : Async Unit :=
+@[macro_inline] def PublicKeyCredential.signalAllAcceptedCredentials (options : AllAcceptedCredentialsOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials", module := "globalThis", path := "PublicKeyCredential.signalAllAcceptedCredentials", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `static Promise<undefined> signalCurrentUserDetails(CurrentUserDetailsOptions options)` -/
-def PublicKeyCredential.signalCurrentUserDetails (options : CurrentUserDetailsOptions) : Async Unit :=
+@[macro_inline] def PublicKeyCredential.signalCurrentUserDetails (options : CurrentUserDetailsOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails", module := "globalThis", path := "PublicKeyCredential.signalCurrentUserDetails", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `v instanceof AuthenticatorAssertionResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AuthenticatorAssertionResponse`). -/
-def AuthenticatorAssertionResponse.cast? (v : Value) : IO (Option AuthenticatorAssertionResponse) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AuthenticatorAssertionResponse"] Value) v) then some { val := v } else none
+@[macro_inline] def AuthenticatorAssertionResponse.cast? (v : Value) : IO (Option AuthenticatorAssertionResponse) := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.cast?" do
+  Internal.cast (Internal.getGlobal ["AuthenticatorAssertionResponse"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ArrayBuffer authenticatorData` -/
-def AuthenticatorAssertionResponse.authenticatorData (self : AuthenticatorAssertionResponse) : IO ByteArray := do
+@[macro_inline] def AuthenticatorAssertionResponse.authenticatorData (self : AuthenticatorAssertionResponse) : IO ByteArray := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.authenticatorData" do
   let r ← self.val.get "authenticatorData" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `readonly attribute ArrayBuffer signature` -/
-def AuthenticatorAssertionResponse.signature (self : AuthenticatorAssertionResponse) : IO ByteArray := do
+@[macro_inline] def AuthenticatorAssertionResponse.signature (self : AuthenticatorAssertionResponse) : IO ByteArray := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.signature" do
   let r ← self.val.get "signature" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `readonly attribute ArrayBuffer? userHandle` -/
-def AuthenticatorAssertionResponse.userHandle (self : AuthenticatorAssertionResponse) : IO (Option ByteArray) := do
+@[macro_inline] def AuthenticatorAssertionResponse.userHandle (self : AuthenticatorAssertionResponse) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.userHandle" do
   let r ← self.val.get "userHandle" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `v instanceof AuthenticatorAttestationResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AuthenticatorAttestationResponse`). -/
-def AuthenticatorAttestationResponse.cast? (v : Value) : IO (Option AuthenticatorAttestationResponse) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AuthenticatorAttestationResponse"] Value) v) then some { val := v } else none
+@[macro_inline] def AuthenticatorAttestationResponse.cast? (v : Value) : IO (Option AuthenticatorAttestationResponse) := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.cast?" do
+  Internal.cast (Internal.getGlobal ["AuthenticatorAttestationResponse"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ArrayBuffer attestationObject` -/
-def AuthenticatorAttestationResponse.attestationObject (self : AuthenticatorAttestationResponse) : IO ByteArray := do
+@[macro_inline] def AuthenticatorAttestationResponse.attestationObject (self : AuthenticatorAttestationResponse) : IO ByteArray := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.attestationObject" do
   let r ← self.val.get "attestationObject" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `sequence<DOMString> getTransports()` -/
-def AuthenticatorAttestationResponse.getTransports (self : AuthenticatorAttestationResponse) : IO (Array String) :=
-  self.val.callMethod "getTransports" (Support.args #[]) (Array String)
+@[macro_inline] def AuthenticatorAttestationResponse.getTransports (self : AuthenticatorAttestationResponse) : IO (Array String) := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getTransports" do
+  self.val.callMethod "getTransports" (Internal.args #[]) (Array String)
 
 /-- `ArrayBuffer getAuthenticatorData()` -/
-def AuthenticatorAttestationResponse.getAuthenticatorData (self : AuthenticatorAttestationResponse) : IO ByteArray := do
-  let r ← self.val.callMethod "getAuthenticatorData" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def AuthenticatorAttestationResponse.getAuthenticatorData (self : AuthenticatorAttestationResponse) : IO ByteArray := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getAuthenticatorData" do
+  let r ← self.val.callMethod "getAuthenticatorData" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `ArrayBuffer? getPublicKey()` -/
-def AuthenticatorAttestationResponse.getPublicKey (self : AuthenticatorAttestationResponse) : IO (Option ByteArray) := do
-  let r ← self.val.callMethod "getPublicKey" (Support.args #[]) (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+@[macro_inline] def AuthenticatorAttestationResponse.getPublicKey (self : AuthenticatorAttestationResponse) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getPublicKey" do
+  let r ← self.val.callMethod "getPublicKey" (Internal.args #[]) (Option Value)
+  (fun x => x.mapM Internal.arrayBufferBytes) r
 
 /-- `COSEAlgorithmIdentifier getPublicKeyAlgorithm()` -/
-def AuthenticatorAttestationResponse.getPublicKeyAlgorithm (self : AuthenticatorAttestationResponse) : IO Int :=
-  self.val.callMethod "getPublicKeyAlgorithm" (Support.args #[]) Int
+@[macro_inline] def AuthenticatorAttestationResponse.getPublicKeyAlgorithm (self : AuthenticatorAttestationResponse) : IO Int := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getPublicKeyAlgorithm" do
+  self.val.callMethod "getPublicKeyAlgorithm" (Internal.args #[]) Int
 
 /-- `static Promise<SecurePaymentConfirmationAvailability> securePaymentConfirmationAvailability()` -/
-def PaymentRequest.securePaymentConfirmationAvailability : Async SecurePaymentConfirmationAvailability :=
+@[macro_inline] def PaymentRequest.securePaymentConfirmationAvailability : Async SecurePaymentConfirmationAvailability := Internal.api "Lasm.JS.Web.PaymentRequest.securePaymentConfirmationAvailability" do
   Lasm.JS.Binding.invokeAsync SecurePaymentConfirmationAvailability { name := "Lasm.JS.Web.PaymentRequest.securePaymentConfirmationAvailability", module := "globalThis", path := "PaymentRequest.securePaymentConfirmationAvailability", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `static Promise<SecurePaymentConfirmationCapabilities> getSecurePaymentConfirmationCapabilities()` -/
-def PaymentRequest.getSecurePaymentConfirmationCapabilities : Async (Record Bool) := do
+@[macro_inline] def PaymentRequest.getSecurePaymentConfirmationCapabilities : Async (Record Bool) := Internal.api "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities", module := "globalThis", path := "PaymentRequest.getSecurePaymentConfirmationCapabilities", construct := false, arity := 0 }
-    (Support.args #[])
-  Support.recordOf Bool r
+    (Internal.args #[])
+  Internal.recordOf Bool r
 
 end Lasm.JS.Web

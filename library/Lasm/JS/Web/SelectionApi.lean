@@ -6,183 +6,229 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.MathmlCore
+import Lasm.JS.Web.Types.SelectionApi
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary GetComposedRangesOptions` (Selection API (https://w3c.github.io/selection-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GetComposedRangesOptions where
   /-- `sequence<ShadowRoot> shadowRoots = []` -/
   shadowRoots : Option (Array ShadowRoot) := none
-instance : ToJS GetComposedRangesOptions := ⟨fun d => Support.fields #[("shadowRoots", Support.optional d.shadowRoots)]⟩
+instance : ToJS GetComposedRangesOptions := ⟨fun d => Internal.fields #[("shadowRoots", Internal.optional d.shadowRoots)]⟩
 
 /-- `v instanceof Selection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Selection`). -/
-def Selection.cast? (v : Value) : IO (Option Selection) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Selection"] Value) v) then some { val := v } else none
+@[macro_inline] def Selection.cast? (v : Value) : IO (Option Selection) := Internal.api "Lasm.JS.Web.Selection.cast?" do
+  Internal.cast (Internal.getGlobal ["Selection"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node? anchorNode` -/
-def Selection.anchorNode (self : Selection) : IO (Option Node) := self.val.get "anchorNode" (Option Node)
+@[macro_inline] def Selection.anchorNode (self : Selection) : IO (Option Node) := Internal.api "Lasm.JS.Web.Selection.anchorNode" do
+  self.val.get "anchorNode" (Option Node)
 
 /-- `readonly attribute unsigned long anchorOffset` -/
-def Selection.anchorOffset (self : Selection) : IO Nat := self.val.get "anchorOffset" Nat
+@[macro_inline] def Selection.anchorOffset (self : Selection) : IO Nat := Internal.api "Lasm.JS.Web.Selection.anchorOffset" do
+  self.val.get "anchorOffset" Nat
 
 /-- `readonly attribute Node? focusNode` -/
-def Selection.focusNode (self : Selection) : IO (Option Node) := self.val.get "focusNode" (Option Node)
+@[macro_inline] def Selection.focusNode (self : Selection) : IO (Option Node) := Internal.api "Lasm.JS.Web.Selection.focusNode" do
+  self.val.get "focusNode" (Option Node)
 
 /-- `readonly attribute unsigned long focusOffset` -/
-def Selection.focusOffset (self : Selection) : IO Nat := self.val.get "focusOffset" Nat
+@[macro_inline] def Selection.focusOffset (self : Selection) : IO Nat := Internal.api "Lasm.JS.Web.Selection.focusOffset" do
+  self.val.get "focusOffset" Nat
 
 /-- `readonly attribute boolean isCollapsed` -/
-def Selection.isCollapsed (self : Selection) : IO Bool := self.val.get "isCollapsed" Bool
+@[macro_inline] def Selection.isCollapsed (self : Selection) : IO Bool := Internal.api "Lasm.JS.Web.Selection.isCollapsed" do
+  self.val.get "isCollapsed" Bool
 
 /-- `readonly attribute unsigned long rangeCount` -/
-def Selection.rangeCount (self : Selection) : IO Nat := self.val.get "rangeCount" Nat
+@[macro_inline] def Selection.rangeCount (self : Selection) : IO Nat := Internal.api "Lasm.JS.Web.Selection.rangeCount" do
+  self.val.get "rangeCount" Nat
 
 /-- `readonly attribute DOMString type` -/
-def Selection.type (self : Selection) : IO String := self.val.get "type" String
+@[macro_inline] def Selection.type (self : Selection) : IO String := Internal.api "Lasm.JS.Web.Selection.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute DOMString direction` -/
-def Selection.direction (self : Selection) : IO String := self.val.get "direction" String
+@[macro_inline] def Selection.direction (self : Selection) : IO String := Internal.api "Lasm.JS.Web.Selection.direction" do
+  self.val.get "direction" String
 
 /-- The stringifier. -/
-def Selection.toString (self : Selection) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def Selection.toString (self : Selection) : IO String := Internal.api "Lasm.JS.Web.Selection.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `Range getRangeAt(unsigned long index)` -/
-def Selection.getRangeAt (self : Selection) (index : Nat) : IO Range := do
-  let r ← self.val.callMethod "getRangeAt" (Support.args #[toJS index]) Value
+@[macro_inline] def Selection.getRangeAt (self : Selection) (index : Nat) : IO Range := Internal.api "Lasm.JS.Web.Selection.getRangeAt" do
+  let r ← self.val.callMethod "getRangeAt" (Internal.args #[toJS index]) Value
   pure { val := r }
 
 /-- `undefined addRange(Range range)` -/
-def Selection.addRange (self : Selection) (range : Range) : IO Unit :=
-  self.val.callMethod "addRange" (Support.args #[toJS range]) Unit
+@[macro_inline] def Selection.addRange (self : Selection) (range : Range) : IO Unit := Internal.api "Lasm.JS.Web.Selection.addRange" do
+  self.val.callMethod "addRange" (Internal.args #[toJS range]) Unit
 
 /-- `undefined removeRange(Range range)` -/
-def Selection.removeRange (self : Selection) (range : Range) : IO Unit :=
-  self.val.callMethod "removeRange" (Support.args #[toJS range]) Unit
+@[macro_inline] def Selection.removeRange (self : Selection) (range : Range) : IO Unit := Internal.api "Lasm.JS.Web.Selection.removeRange" do
+  self.val.callMethod "removeRange" (Internal.args #[toJS range]) Unit
 
 /-- `undefined removeAllRanges()` -/
-def Selection.removeAllRanges (self : Selection) : IO Unit :=
-  self.val.callMethod "removeAllRanges" (Support.args #[]) Unit
+@[macro_inline] def Selection.removeAllRanges (self : Selection) : IO Unit := Internal.api "Lasm.JS.Web.Selection.removeAllRanges" do
+  self.val.callMethod "removeAllRanges" (Internal.args #[]) Unit
 
 /-- `undefined empty()` -/
-def Selection.empty (self : Selection) : IO Unit :=
-  self.val.callMethod "empty" (Support.args #[]) Unit
+@[macro_inline] def Selection.empty (self : Selection) : IO Unit := Internal.api "Lasm.JS.Web.Selection.empty" do
+  self.val.callMethod "empty" (Internal.args #[]) Unit
 
 /-- `sequence<StaticRange> getComposedRanges(optional GetComposedRangesOptions options)` -/
-def Selection.getComposedRanges (self : Selection) (options : Option GetComposedRangesOptions := none) : IO (Array StaticRange) :=
-  self.val.callMethod "getComposedRanges" (Support.args #[Support.optional options]) (Array StaticRange)
+@[macro_inline] def Selection.getComposedRanges (self : Selection) (options : Option GetComposedRangesOptions := none) : IO (Array StaticRange) := Internal.api "Lasm.JS.Web.Selection.getComposedRanges" do
+  self.val.callMethod "getComposedRanges" (Internal.args #[Internal.optional options]) (Array StaticRange)
 
 /-- `undefined collapse(Node? node, optional unsigned long offset)` -/
-def Selection.collapse (self : Selection) (node : Option Node) (offset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "collapse" (Support.args #[toJS node, Support.optional offset]) Unit
+@[macro_inline] def Selection.collapse (self : Selection) (node : Option Node) (offset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.Selection.collapse" do
+  self.val.callMethod "collapse" (Internal.args #[toJS node, Internal.optional offset]) Unit
 
 /-- `undefined setPosition(Node? node, optional unsigned long offset)` -/
-def Selection.setPosition (self : Selection) (node : Option Node) (offset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "setPosition" (Support.args #[toJS node, Support.optional offset]) Unit
+@[macro_inline] def Selection.setPosition (self : Selection) (node : Option Node) (offset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.Selection.setPosition" do
+  self.val.callMethod "setPosition" (Internal.args #[toJS node, Internal.optional offset]) Unit
 
 /-- `undefined collapseToStart()` -/
-def Selection.collapseToStart (self : Selection) : IO Unit :=
-  self.val.callMethod "collapseToStart" (Support.args #[]) Unit
+@[macro_inline] def Selection.collapseToStart (self : Selection) : IO Unit := Internal.api "Lasm.JS.Web.Selection.collapseToStart" do
+  self.val.callMethod "collapseToStart" (Internal.args #[]) Unit
 
 /-- `undefined collapseToEnd()` -/
-def Selection.collapseToEnd (self : Selection) : IO Unit :=
-  self.val.callMethod "collapseToEnd" (Support.args #[]) Unit
+@[macro_inline] def Selection.collapseToEnd (self : Selection) : IO Unit := Internal.api "Lasm.JS.Web.Selection.collapseToEnd" do
+  self.val.callMethod "collapseToEnd" (Internal.args #[]) Unit
 
 /-- `undefined extend(Node node, optional unsigned long offset)` -/
-def Selection.extend (self : Selection) (node : Node) (offset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "extend" (Support.args #[toJS node, Support.optional offset]) Unit
+@[macro_inline] def Selection.extend (self : Selection) (node : Node) (offset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.Selection.extend" do
+  self.val.callMethod "extend" (Internal.args #[toJS node, Internal.optional offset]) Unit
 
 /-- `undefined setBaseAndExtent(Node anchorNode, unsigned long anchorOffset, Node focusNode, unsigned long focusOffset)` -/
-def Selection.setBaseAndExtent (self : Selection) (anchorNode : Node) (anchorOffset : Nat) (focusNode : Node) (focusOffset : Nat) : IO Unit :=
-  self.val.callMethod "setBaseAndExtent" (Support.args #[toJS anchorNode, toJS anchorOffset, toJS focusNode, toJS focusOffset]) Unit
+@[macro_inline] def Selection.setBaseAndExtent (self : Selection) (anchorNode : Node) (anchorOffset : Nat) (focusNode : Node) (focusOffset : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Selection.setBaseAndExtent" do
+  self.val.callMethod "setBaseAndExtent" (Internal.args #[toJS anchorNode, toJS anchorOffset, toJS focusNode, toJS focusOffset]) Unit
 
 /-- `undefined selectAllChildren(Node node)` -/
-def Selection.selectAllChildren (self : Selection) (node : Node) : IO Unit :=
-  self.val.callMethod "selectAllChildren" (Support.args #[toJS node]) Unit
+@[macro_inline] def Selection.selectAllChildren (self : Selection) (node : Node) : IO Unit := Internal.api "Lasm.JS.Web.Selection.selectAllChildren" do
+  self.val.callMethod "selectAllChildren" (Internal.args #[toJS node]) Unit
 
 /-- `undefined modify(optional DOMString alter, optional DOMString direction, optional DOMString granularity)` -/
-def Selection.modify (self : Selection) (alter : Option String := none) (direction : Option String := none) (granularity : Option String := none) : IO Unit :=
-  self.val.callMethod "modify" (Support.args #[Support.optional alter, Support.optional direction, Support.optional granularity]) Unit
+@[macro_inline] def Selection.modify (self : Selection) (alter : Option String := none) (direction : Option String := none) (granularity : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.Selection.modify" do
+  self.val.callMethod "modify" (Internal.args #[Internal.optional alter, Internal.optional direction, Internal.optional granularity]) Unit
 
 /-- `undefined deleteFromDocument()` -/
-def Selection.deleteFromDocument (self : Selection) : IO Unit :=
-  self.val.callMethod "deleteFromDocument" (Support.args #[]) Unit
+@[macro_inline] def Selection.deleteFromDocument (self : Selection) : IO Unit := Internal.api "Lasm.JS.Web.Selection.deleteFromDocument" do
+  self.val.callMethod "deleteFromDocument" (Internal.args #[]) Unit
 
 /-- `boolean containsNode(Node node, optional boolean allowPartialContainment)` -/
-def Selection.containsNode (self : Selection) (node : Node) (allowPartialContainment : Option Bool := none) : IO Bool :=
-  self.val.callMethod "containsNode" (Support.args #[toJS node, Support.optional allowPartialContainment]) Bool
+@[macro_inline] def Selection.containsNode (self : Selection) (node : Node) (allowPartialContainment : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Web.Selection.containsNode" do
+  self.val.callMethod "containsNode" (Internal.args #[toJS node, Internal.optional allowPartialContainment]) Bool
 
 /-- `attribute EventHandler onselectstart` -/
-def Document.onselectstart (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onselectstart" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onselectstart (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
 
 /-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
-def Document.setOnselectstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnselectstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnselectstart" do
   self.val.set "onselectstart" (toJS value)
 
 /-- `attribute EventHandler onselectionchange` -/
-def Document.onselectionchange (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "onselectionchange" (Option EventHandlerNonNull)
+@[macro_inline] def Document.onselectionchange (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onselectionchange" do
+  self.val.get "onselectionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onselectionchange`: `attribute EventHandler onselectionchange` -/
-def Document.setOnselectionchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOnselectionchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnselectionchange" do
   self.val.set "onselectionchange" (toJS value)
 
 /-- `Selection? getSelection()` -/
-def Document.getSelection (self : Document) : IO (Option Selection) :=
-  self.val.callMethod "getSelection" (Support.args #[]) (Option Selection)
+@[macro_inline] def Document.getSelection (self : Document) : IO (Option Selection) := Internal.api "Lasm.JS.Web.Document.getSelection" do
+  self.val.callMethod "getSelection" (Internal.args #[]) (Option Selection)
 
 /-- `attribute EventHandler onselectstart` -/
-def HTMLElement.onselectstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectstart" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onselectstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
 
 /-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
-def HTMLElement.setOnselectstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnselectstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnselectstart" do
   self.val.set "onselectstart" (toJS value)
 
 /-- `attribute EventHandler onselectionchange` -/
-def HTMLElement.onselectionchange (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectionchange" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.onselectionchange (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.onselectionchange" do
+  self.val.get "onselectionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onselectionchange`: `attribute EventHandler onselectionchange` -/
-def HTMLElement.setOnselectionchange (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOnselectionchange (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOnselectionchange" do
   self.val.set "onselectionchange" (toJS value)
 
 /-- `attribute EventHandler onselectstart` -/
-def MathMLElement.onselectstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onselectstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
 
 /-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
-def MathMLElement.setOnselectstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnselectstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnselectstart" do
   self.val.set "onselectstart" (toJS value)
 
 /-- `attribute EventHandler onselectionchange` -/
-def MathMLElement.onselectionchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectionchange" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.onselectionchange (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.onselectionchange" do
+  self.val.get "onselectionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onselectionchange`: `attribute EventHandler onselectionchange` -/
-def MathMLElement.setOnselectionchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOnselectionchange (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOnselectionchange" do
   self.val.set "onselectionchange" (toJS value)
 
 /-- `attribute EventHandler onselectstart` -/
-def SVGElement.onselectstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onselectstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
 
 /-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
-def SVGElement.setOnselectstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnselectstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnselectstart" do
   self.val.set "onselectstart" (toJS value)
 
 /-- `attribute EventHandler onselectionchange` -/
-def SVGElement.onselectionchange (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "onselectionchange" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.onselectionchange (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onselectionchange" do
+  self.val.get "onselectionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onselectionchange`: `attribute EventHandler onselectionchange` -/
-def SVGElement.setOnselectionchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOnselectionchange (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOnselectionchange" do
   self.val.set "onselectionchange" (toJS value)
+
+/-- `attribute EventHandler onselectstart` -/
+@[macro_inline] def Window.onselectstart (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onselectstart" do
+  self.val.get "onselectstart" (Option EventHandlerNonNull)
+
+/-- Sets `onselectstart`: `attribute EventHandler onselectstart` -/
+@[macro_inline] def Window.setOnselectstart (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnselectstart" do
+  self.val.set "onselectstart" (toJS value)
+
+/-- `attribute EventHandler onselectionchange` -/
+@[macro_inline] def Window.onselectionchange (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onselectionchange" do
+  self.val.get "onselectionchange" (Option EventHandlerNonNull)
+
+/-- Sets `onselectionchange`: `attribute EventHandler onselectionchange` -/
+@[macro_inline] def Window.setOnselectionchange (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnselectionchange" do
+  self.val.set "onselectionchange" (toJS value)
+
+/-- `Selection? getSelection()` -/
+@[macro_inline] def Window.getSelection (self : Window) : IO (Option Selection) := Internal.api "Lasm.JS.Web.Window.getSelection" do
+  self.val.callMethod "getSelection" (Internal.args #[]) (Option Selection)
 
 /-- `attribute EventHandler onselectstart` (Selection API (https://w3c.github.io/selection-api/)) -/
-def onselectstart : IO (Option EventHandlerNonNull) := Support.getGlobal ["onselectstart"] (Option EventHandlerNonNull)
+@[macro_inline] def onselectstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onselectstart" do
+  Internal.getGlobal ["onselectstart"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler onselectionchange` (Selection API (https://w3c.github.io/selection-api/)) -/
-def onselectionchange : IO (Option EventHandlerNonNull) := Support.getGlobal ["onselectionchange"] (Option EventHandlerNonNull)
+@[macro_inline] def onselectionchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onselectionchange" do
+  Internal.getGlobal ["onselectionchange"] (Option EventHandlerNonNull)
 
 /-- `Selection? getSelection()` (Selection API (https://w3c.github.io/selection-api/)) -/
-def getSelection : IO (Option Selection) :=
+@[macro_inline] def getSelection : IO (Option Selection) := Internal.api "Lasm.JS.Web.getSelection" do
   Lasm.JS.Binding.invoke (Option Selection) { name := "Lasm.JS.Web.getSelection", module := "globalThis", path := "getSelection", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Web

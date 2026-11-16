@@ -6,129 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webcrypto
+import Lasm.JS.Web.Types.WebcryptoModernAlgos
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum KeyType` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)): "public", "private", "secret". -/
-inductive KeyType where
-  /-- "public" -/
-  | «public»
-  /-- "private" -/
-  | «private»
-  /-- "secret" -/
-  | secret
-  deriving BEq, Repr, Inhabited
-instance : ToJS KeyType := ⟨fun
-  | .«public» => .string "public"
-  | .«private» => .string "private"
-  | .secret => .string "secret"⟩
-instance : FromJS KeyType where
-  fromJS
-    | .string "public" => .ok .«public»
-    | .string "private" => .ok .«private»
-    | .string "secret" => .ok .secret
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.KeyType"
-
-/-- `enum KeyUsage` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)): "encrypt", "decrypt", "sign", "verify", "deriveKey", "deriveBits", "wrapKey", "unwrapKey", "encapsulateKey", "encapsulateBits", "decapsulateKey", "decapsulateBits". -/
-inductive KeyUsage where
-  /-- "encrypt" -/
-  | encrypt
-  /-- "decrypt" -/
-  | decrypt
-  /-- "sign" -/
-  | sign
-  /-- "verify" -/
-  | verify
-  /-- "deriveKey" -/
-  | deriveKey
-  /-- "deriveBits" -/
-  | deriveBits
-  /-- "wrapKey" -/
-  | wrapKey
-  /-- "unwrapKey" -/
-  | unwrapKey
-  /-- "encapsulateKey" -/
-  | encapsulateKey
-  /-- "encapsulateBits" -/
-  | encapsulateBits
-  /-- "decapsulateKey" -/
-  | decapsulateKey
-  /-- "decapsulateBits" -/
-  | decapsulateBits
-  deriving BEq, Repr, Inhabited
-instance : ToJS KeyUsage := ⟨fun
-  | .encrypt => .string "encrypt"
-  | .decrypt => .string "decrypt"
-  | .sign => .string "sign"
-  | .verify => .string "verify"
-  | .deriveKey => .string "deriveKey"
-  | .deriveBits => .string "deriveBits"
-  | .wrapKey => .string "wrapKey"
-  | .unwrapKey => .string "unwrapKey"
-  | .encapsulateKey => .string "encapsulateKey"
-  | .encapsulateBits => .string "encapsulateBits"
-  | .decapsulateKey => .string "decapsulateKey"
-  | .decapsulateBits => .string "decapsulateBits"⟩
-instance : FromJS KeyUsage where
-  fromJS
-    | .string "encrypt" => .ok .encrypt
-    | .string "decrypt" => .ok .decrypt
-    | .string "sign" => .ok .sign
-    | .string "verify" => .ok .verify
-    | .string "deriveKey" => .ok .deriveKey
-    | .string "deriveBits" => .ok .deriveBits
-    | .string "wrapKey" => .ok .wrapKey
-    | .string "unwrapKey" => .ok .unwrapKey
-    | .string "encapsulateKey" => .ok .encapsulateKey
-    | .string "encapsulateBits" => .ok .encapsulateBits
-    | .string "decapsulateKey" => .ok .decapsulateKey
-    | .string "decapsulateBits" => .ok .decapsulateBits
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.KeyUsage"
-
-/-- `enum KeyFormat` (Modern Algorithms in the Web Cryptography API (https://wicg.github.io/webcrypto-modern-algos/)): "raw-public", "raw-private", "raw-seed", "raw-secret", "raw", "spki", "pkcs8", "jwk". -/
-inductive KeyFormat where
-  /-- "raw-public" -/
-  | rawPublic
-  /-- "raw-private" -/
-  | rawPrivate
-  /-- "raw-seed" -/
-  | rawSeed
-  /-- "raw-secret" -/
-  | rawSecret
-  /-- "raw" -/
-  | raw
-  /-- "spki" -/
-  | spki
-  /-- "pkcs8" -/
-  | pkcs8
-  /-- "jwk" -/
-  | jwk
-  deriving BEq, Repr, Inhabited
-instance : ToJS KeyFormat := ⟨fun
-  | .rawPublic => .string "raw-public"
-  | .rawPrivate => .string "raw-private"
-  | .rawSeed => .string "raw-seed"
-  | .rawSecret => .string "raw-secret"
-  | .raw => .string "raw"
-  | .spki => .string "spki"
-  | .pkcs8 => .string "pkcs8"
-  | .jwk => .string "jwk"⟩
-instance : FromJS KeyFormat where
-  fromJS
-    | .string "raw-public" => .ok .rawPublic
-    | .string "raw-private" => .ok .rawPrivate
-    | .string "raw-seed" => .ok .rawSeed
-    | .string "raw-secret" => .ok .rawSecret
-    | .string "raw" => .ok .raw
-    | .string "spki" => .ok .spki
-    | .string "pkcs8" => .ok .pkcs8
-    | .string "jwk" => .ok .jwk
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.KeyFormat"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef object or DOMString AlgorithmIdentifier`: one constructor per member type. -/
 inductive AlgorithmIdentifier where
@@ -147,6 +33,8 @@ structure CryptoKeyPair where
   publicKey : Option CryptoKey := none
   /-- `CryptoKey privateKey` -/
   privateKey : Option CryptoKey := none
+instance : ToJS CryptoKeyPair := ⟨fun d => Internal.fields #[("publicKey", Internal.optional d.publicKey),
+    ("privateKey", Internal.optional d.privateKey)]⟩
 instance : FromJS CryptoKeyPair where
   fromJS d := do return {
     publicKey := ← Lasm.JS.readField (Option CryptoKey) d "publicKey",
@@ -174,9 +62,9 @@ structure RsaOtherPrimesInfo where
   d : Option String := none
   /-- `DOMString t` -/
   t : Option String := none
-instance : ToJS RsaOtherPrimesInfo := ⟨fun d => Support.fields #[("r", Support.optional d.r),
-    ("d", Support.optional d.d),
-    ("t", Support.optional d.t)]⟩
+instance : ToJS RsaOtherPrimesInfo := ⟨fun d => Internal.fields #[("r", Internal.optional d.r),
+    ("d", Internal.optional d.d),
+    ("t", Internal.optional d.t)]⟩
 instance : FromJS RsaOtherPrimesInfo where
   fromJS d := do return {
     r := ← Lasm.JS.readField (Option String) d "r",
@@ -226,26 +114,26 @@ structure JsonWebKey where
   pub : Option String := none
   /-- `DOMString priv` -/
   priv : Option String := none
-instance : ToJS JsonWebKey := ⟨fun d => Support.fields #[("kty", Support.optional d.kty),
-    ("use", Support.optional d.use),
-    ("key_ops", Support.optional d.key_ops),
-    ("alg", Support.optional d.alg),
-    ("ext", Support.optional d.ext),
-    ("crv", Support.optional d.crv),
-    ("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("d", Support.optional d.d),
-    ("n", Support.optional d.n),
-    ("e", Support.optional d.e),
-    ("p", Support.optional d.p),
-    ("q", Support.optional d.q),
-    ("dp", Support.optional d.dp),
-    ("dq", Support.optional d.dq),
-    ("qi", Support.optional d.qi),
-    ("oth", Support.optional d.oth),
-    ("k", Support.optional d.k),
-    ("pub", Support.optional d.pub),
-    ("priv", Support.optional d.priv)]⟩
+instance : ToJS JsonWebKey := ⟨fun d => Internal.fields #[("kty", Internal.optional d.kty),
+    ("use", Internal.optional d.use),
+    ("key_ops", Internal.optional d.key_ops),
+    ("alg", Internal.optional d.alg),
+    ("ext", Internal.optional d.ext),
+    ("crv", Internal.optional d.crv),
+    ("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("d", Internal.optional d.d),
+    ("n", Internal.optional d.n),
+    ("e", Internal.optional d.e),
+    ("p", Internal.optional d.p),
+    ("q", Internal.optional d.q),
+    ("dp", Internal.optional d.dp),
+    ("dq", Internal.optional d.dq),
+    ("qi", Internal.optional d.qi),
+    ("oth", Internal.optional d.oth),
+    ("k", Internal.optional d.k),
+    ("pub", Internal.optional d.pub),
+    ("priv", Internal.optional d.priv)]⟩
 instance : FromJS JsonWebKey where
   fromJS d := do return {
     kty := ← Lasm.JS.readField (Option String) d "kty",
@@ -291,114 +179,390 @@ inductive ArrayBufferOrJsonWebKey where
 /-- Reads a `ArrayBufferOrJsonWebKey` (one member is an ArrayBuffer, copied with one more host call). -/
 def ArrayBufferOrJsonWebKey.decode (d : Data) : IO ArrayBufferOrJsonWebKey :=
   match d with
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrJsonWebKey" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrJsonWebKey" d))
   | .object _ => do return .jsonWebKey (← Lasm.JS.decodeAs JsonWebKey "ArrayBufferOrJsonWebKey" d)
   | _ => throw (IO.userError s!"Lasm.JS.Web: expected a ArrayBufferOrJsonWebKey, received JavaScript {d.describe}")
 
+/-- `dictionary Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Algorithm where
+  /-- `required DOMString name` -/
+  name : String
+instance : ToJS Algorithm := ⟨fun d => Internal.fields #[("name", toJS d.name)]⟩
+
+/-- `dictionary KeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure KeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+instance : ToJS KeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name)]⟩
+
+/-- `dictionary RsaKeyGenParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long modulusLength` -/
+  modulusLength : Nat
+  /-- `required BigInteger publicExponent` -/
+  publicExponent : ByteArray
+instance : ToJS RsaKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("modulusLength", toJS d.modulusLength),
+    ("publicExponent", toJS d.publicExponent)]⟩
+
+/-- `dictionary RsaHashedKeyGenParams : RsaKeyGenParams` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaHashedKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long modulusLength` -/
+  modulusLength : Nat
+  /-- `required BigInteger publicExponent` -/
+  publicExponent : ByteArray
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+instance : ToJS RsaHashedKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("modulusLength", toJS d.modulusLength),
+    ("publicExponent", toJS d.publicExponent),
+    ("hash", toJS d.hash)]⟩
+
+/-- `dictionary RsaKeyAlgorithm : KeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long modulusLength` -/
+  modulusLength : Nat
+  /-- `required BigInteger publicExponent` -/
+  publicExponent : ByteArray
+instance : ToJS RsaKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("modulusLength", toJS d.modulusLength),
+    ("publicExponent", toJS d.publicExponent)]⟩
+
+/-- `dictionary RsaHashedKeyAlgorithm : RsaKeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaHashedKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long modulusLength` -/
+  modulusLength : Nat
+  /-- `required BigInteger publicExponent` -/
+  publicExponent : ByteArray
+  /-- `required KeyAlgorithm hash` -/
+  hash : KeyAlgorithm
+instance : ToJS RsaHashedKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("modulusLength", toJS d.modulusLength),
+    ("publicExponent", toJS d.publicExponent),
+    ("hash", toJS d.hash)]⟩
+
+/-- `dictionary RsaHashedImportParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaHashedImportParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+instance : ToJS RsaHashedImportParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash)]⟩
+
+/-- `dictionary RsaPssParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaPssParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned long saltLength` -/
+  saltLength : Nat
+instance : ToJS RsaPssParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("saltLength", toJS d.saltLength)]⟩
+
+/-- `dictionary RsaOaepParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RsaOaepParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `BufferSource label` -/
+  label : Option ByteArray := none
+instance : ToJS RsaOaepParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("label", Internal.optional d.label)]⟩
+
+/-- `dictionary EcdsaParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EcdsaParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+instance : ToJS EcdsaParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash)]⟩
+
+/-- `dictionary EcKeyGenParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EcKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required NamedCurve namedCurve` -/
+  namedCurve : String
+instance : ToJS EcKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("namedCurve", toJS d.namedCurve)]⟩
+
+/-- `dictionary EcKeyAlgorithm : KeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EcKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required NamedCurve namedCurve` -/
+  namedCurve : String
+instance : ToJS EcKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("namedCurve", toJS d.namedCurve)]⟩
+
+/-- `dictionary EcKeyImportParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EcKeyImportParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required NamedCurve namedCurve` -/
+  namedCurve : String
+instance : ToJS EcKeyImportParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("namedCurve", toJS d.namedCurve)]⟩
+
+/-- `dictionary EcdhKeyDeriveParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure EcdhKeyDeriveParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required CryptoKey public` -/
+  «public» : CryptoKey
+instance : ToJS EcdhKeyDeriveParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("public", toJS d.«public»)]⟩
+
+/-- `dictionary AesCtrParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesCtrParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource counter` -/
+  counter : ByteArray
+  /-- `required octet length` -/
+  length : Nat
+instance : ToJS AesCtrParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("counter", toJS d.counter),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary AesKeyAlgorithm : KeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned short length` -/
+  length : Nat
+instance : ToJS AesKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary AesKeyGenParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned short length` -/
+  length : Nat
+instance : ToJS AesKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary AesDerivedKeyParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesDerivedKeyParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required unsigned short length` -/
+  length : Nat
+instance : ToJS AesDerivedKeyParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary AesCbcParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesCbcParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource iv` -/
+  iv : ByteArray
+instance : ToJS AesCbcParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("iv", toJS d.iv)]⟩
+
+/-- `dictionary AesGcmParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AesGcmParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource iv` -/
+  iv : ByteArray
+  /-- `BufferSource additionalData` -/
+  additionalData : Option ByteArray := none
+  /-- `octet tagLength` -/
+  tagLength : Option Nat := none
+instance : ToJS AesGcmParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("iv", toJS d.iv),
+    ("additionalData", Internal.optional d.additionalData),
+    ("tagLength", Internal.optional d.tagLength)]⟩
+
+/-- `dictionary HmacImportParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure HmacImportParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+  /-- `unsigned long length` -/
+  length : Option Nat := none
+instance : ToJS HmacImportParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash),
+    ("length", Internal.optional d.length)]⟩
+
+/-- `dictionary HmacKeyAlgorithm : KeyAlgorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure HmacKeyAlgorithm where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required KeyAlgorithm hash` -/
+  hash : KeyAlgorithm
+  /-- `required unsigned long length` -/
+  length : Nat
+instance : ToJS HmacKeyAlgorithm := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash),
+    ("length", toJS d.length)]⟩
+
+/-- `dictionary HmacKeyGenParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure HmacKeyGenParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+  /-- `unsigned long length` -/
+  length : Option Nat := none
+instance : ToJS HmacKeyGenParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash),
+    ("length", Internal.optional d.length)]⟩
+
+/-- `dictionary HkdfParams : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure HkdfParams where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+  /-- `required BufferSource salt` -/
+  salt : ByteArray
+  /-- `required BufferSource info` -/
+  info : ByteArray
+instance : ToJS HkdfParams := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("hash", toJS d.hash),
+    ("salt", toJS d.salt),
+    ("info", toJS d.info)]⟩
+
+/-- `dictionary Pbkdf2Params : Algorithm` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Pbkdf2Params where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `required BufferSource salt` -/
+  salt : ByteArray
+  /-- `required unsigned long iterations` -/
+  iterations : Nat
+  /-- `required HashAlgorithmIdentifier hash` -/
+  hash : AlgorithmIdentifier
+instance : ToJS Pbkdf2Params := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("salt", toJS d.salt),
+    ("iterations", toJS d.iterations),
+    ("hash", toJS d.hash)]⟩
+
 /-- `v instanceof Crypto`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Crypto`). -/
-def Crypto.cast? (v : Value) : IO (Option Crypto) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Crypto"] Value) v) then some { val := v } else none
+@[macro_inline] def Crypto.cast? (v : Value) : IO (Option Crypto) := Internal.api "Lasm.JS.Web.Crypto.cast?" do
+  Internal.cast (Internal.getGlobal ["Crypto"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SubtleCrypto subtle` -/
-def Crypto.subtle (self : Crypto) : IO SubtleCrypto := do
+@[macro_inline] def Crypto.subtle (self : Crypto) : IO SubtleCrypto := Internal.api "Lasm.JS.Web.Crypto.subtle" do
   let r ← self.val.get "subtle" Value
   pure { val := r }
 
 /-- `ArrayBufferView getRandomValues(ArrayBufferView array)` -/
-def Crypto.getRandomValues (self : Crypto) (array : ByteArray) : IO ByteArray := do
-  let r ← self.val.callMethod "getRandomValues" (Support.args #[toJS array]) Data
-  Support.viewBytes r
+@[macro_inline] def Crypto.getRandomValues (self : Crypto) (array : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Web.Crypto.getRandomValues" do
+  let r ← self.val.callMethod "getRandomValues" (Internal.args #[toJS array]) Data
+  Internal.viewBytes r
 
 /-- `DOMString randomUUID()` -/
-def Crypto.randomUUID (self : Crypto) : IO String :=
-  self.val.callMethod "randomUUID" (Support.args #[]) String
+@[macro_inline] def Crypto.randomUUID (self : Crypto) : IO String := Internal.api "Lasm.JS.Web.Crypto.randomUUID" do
+  self.val.callMethod "randomUUID" (Internal.args #[]) String
 
 /-- `v instanceof CryptoKey`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CryptoKey`). -/
-def CryptoKey.cast? (v : Value) : IO (Option CryptoKey) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CryptoKey"] Value) v) then some { val := v } else none
+@[macro_inline] def CryptoKey.cast? (v : Value) : IO (Option CryptoKey) := Internal.api "Lasm.JS.Web.CryptoKey.cast?" do
+  Internal.cast (Internal.getGlobal ["CryptoKey"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute KeyType type` -/
-def CryptoKey.type (self : CryptoKey) : IO KeyType := self.val.get "type" KeyType
+@[macro_inline] def CryptoKey.type (self : CryptoKey) : IO KeyType := Internal.api "Lasm.JS.Web.CryptoKey.type" do
+  self.val.get "type" KeyType
 
 /-- `readonly attribute boolean extractable` -/
-def CryptoKey.extractable (self : CryptoKey) : IO Bool := self.val.get "extractable" Bool
+@[macro_inline] def CryptoKey.extractable (self : CryptoKey) : IO Bool := Internal.api "Lasm.JS.Web.CryptoKey.extractable" do
+  self.val.get "extractable" Bool
 
 /-- `readonly attribute object algorithm` -/
-def CryptoKey.algorithm (self : CryptoKey) : IO Data := self.val.get "algorithm" Data
+@[macro_inline] def CryptoKey.algorithm (self : CryptoKey) : IO Data := Internal.api "Lasm.JS.Web.CryptoKey.algorithm" do
+  self.val.get "algorithm" Data
 
 /-- `readonly attribute object usages` -/
-def CryptoKey.usages (self : CryptoKey) : IO Data := self.val.get "usages" Data
+@[macro_inline] def CryptoKey.usages (self : CryptoKey) : IO Data := Internal.api "Lasm.JS.Web.CryptoKey.usages" do
+  self.val.get "usages" Data
 
 /-- `v instanceof SubtleCrypto`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SubtleCrypto`). -/
-def SubtleCrypto.cast? (v : Value) : IO (Option SubtleCrypto) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SubtleCrypto"] Value) v) then some { val := v } else none
+@[macro_inline] def SubtleCrypto.cast? (v : Value) : IO (Option SubtleCrypto) := Internal.api "Lasm.JS.Web.SubtleCrypto.cast?" do
+  Internal.cast (Internal.getGlobal ["SubtleCrypto"] Value) (fun x => { val := x }) v
 
 /-- `Promise<ArrayBuffer> encrypt(AlgorithmIdentifier algorithm, CryptoKey key, BufferSource data)` -/
-def SubtleCrypto.encrypt (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "encrypt" (Support.args #[toJS algorithm, toJS key, toJS data]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.encrypt (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.encrypt" do
+  let r ← self.val.callMethodAwait "encrypt" (Internal.args #[toJS algorithm, toJS key, toJS data]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<ArrayBuffer> decrypt(AlgorithmIdentifier algorithm, CryptoKey key, BufferSource data)` -/
-def SubtleCrypto.decrypt (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "decrypt" (Support.args #[toJS algorithm, toJS key, toJS data]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.decrypt (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.decrypt" do
+  let r ← self.val.callMethodAwait "decrypt" (Internal.args #[toJS algorithm, toJS key, toJS data]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<ArrayBuffer> sign(AlgorithmIdentifier algorithm, CryptoKey key, BufferSource data)` -/
-def SubtleCrypto.sign (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "sign" (Support.args #[toJS algorithm, toJS key, toJS data]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.sign (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.sign" do
+  let r ← self.val.callMethodAwait "sign" (Internal.args #[toJS algorithm, toJS key, toJS data]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<boolean> verify(AlgorithmIdentifier algorithm, CryptoKey key, BufferSource signature, BufferSource data)` -/
-def SubtleCrypto.verify (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (signature : ByteArray) (data : ByteArray) : Async Bool :=
-  self.val.callMethodAwait "verify" (Support.args #[toJS algorithm, toJS key, toJS signature, toJS data]) Bool
+@[macro_inline] def SubtleCrypto.verify (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (signature : ByteArray) (data : ByteArray) : Async Bool := Internal.api "Lasm.JS.Web.SubtleCrypto.verify" do
+  self.val.callMethodAwait "verify" (Internal.args #[toJS algorithm, toJS key, toJS signature, toJS data]) Bool
 
 /-- `Promise<ArrayBuffer> digest(AlgorithmIdentifier algorithm, BufferSource data)` -/
-def SubtleCrypto.digest (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (data : ByteArray) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "digest" (Support.args #[toJS algorithm, toJS data]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.digest (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (data : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.digest" do
+  let r ← self.val.callMethodAwait "digest" (Internal.args #[toJS algorithm, toJS data]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<(CryptoKey or CryptoKeyPair)> generateKey(AlgorithmIdentifier algorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.generateKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKeyOrCryptoKeyPair :=
-  self.val.callMethodAwait "generateKey" (Support.args #[toJS algorithm, toJS extractable, toJS keyUsages]) CryptoKeyOrCryptoKeyPair
+@[macro_inline] def SubtleCrypto.generateKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKeyOrCryptoKeyPair := Internal.api "Lasm.JS.Web.SubtleCrypto.generateKey" do
+  self.val.callMethodAwait "generateKey" (Internal.args #[toJS algorithm, toJS extractable, toJS keyUsages]) CryptoKeyOrCryptoKeyPair
 
 /-- `Promise<CryptoKey> deriveKey(AlgorithmIdentifier algorithm, CryptoKey baseKey, AlgorithmIdentifier derivedKeyType, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.deriveKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (derivedKeyType : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
-  let r ← self.val.callMethodAwait "deriveKey" (Support.args #[toJS algorithm, toJS baseKey, toJS derivedKeyType, toJS extractable, toJS keyUsages]) Value
+@[macro_inline] def SubtleCrypto.deriveKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (derivedKeyType : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.deriveKey" do
+  let r ← self.val.callMethodAwait "deriveKey" (Internal.args #[toJS algorithm, toJS baseKey, toJS derivedKeyType, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `Promise<ArrayBuffer> deriveBits(AlgorithmIdentifier algorithm, CryptoKey baseKey, optional unsigned long? length)` -/
-def SubtleCrypto.deriveBits (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (length : Option Nat := none) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "deriveBits" (Support.args #[toJS algorithm, toJS baseKey, Support.optional length]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.deriveBits (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (length : Option Nat := none) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.deriveBits" do
+  let r ← self.val.callMethodAwait "deriveBits" (Internal.args #[toJS algorithm, toJS baseKey, Internal.optional length]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<CryptoKey> importKey(KeyFormat format, (BufferSource or JsonWebKey) keyData, AlgorithmIdentifier algorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.importKey (self : SubtleCrypto) (format : KeyFormat) (keyData : BufferSourceOrJsonWebKey) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
-  let r ← self.val.callMethodAwait "importKey" (Support.args #[toJS format, toJS keyData, toJS algorithm, toJS extractable, toJS keyUsages]) Value
+@[macro_inline] def SubtleCrypto.importKey (self : SubtleCrypto) (format : KeyFormat) (keyData : BufferSourceOrJsonWebKey) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.importKey" do
+  let r ← self.val.callMethodAwait "importKey" (Internal.args #[toJS format, toJS keyData, toJS algorithm, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `Promise<(ArrayBuffer or JsonWebKey)> exportKey(KeyFormat format, CryptoKey key)` -/
-def SubtleCrypto.exportKey (self : SubtleCrypto) (format : KeyFormat) (key : CryptoKey) : Async ArrayBufferOrJsonWebKey := do
-  let r ← self.val.callMethodAwait "exportKey" (Support.args #[toJS format, toJS key]) Data
+@[macro_inline] def SubtleCrypto.exportKey (self : SubtleCrypto) (format : KeyFormat) (key : CryptoKey) : Async ArrayBufferOrJsonWebKey := Internal.api "Lasm.JS.Web.SubtleCrypto.exportKey" do
+  let r ← self.val.callMethodAwait "exportKey" (Internal.args #[toJS format, toJS key]) Data
   ArrayBufferOrJsonWebKey.decode r
 
 /-- `Promise<ArrayBuffer> wrapKey(KeyFormat format, CryptoKey key, CryptoKey wrappingKey, AlgorithmIdentifier wrapAlgorithm)` -/
-def SubtleCrypto.wrapKey (self : SubtleCrypto) (format : KeyFormat) (key : CryptoKey) (wrappingKey : CryptoKey) (wrapAlgorithm : AlgorithmIdentifier) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "wrapKey" (Support.args #[toJS format, toJS key, toJS wrappingKey, toJS wrapAlgorithm]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubtleCrypto.wrapKey (self : SubtleCrypto) (format : KeyFormat) (key : CryptoKey) (wrappingKey : CryptoKey) (wrapAlgorithm : AlgorithmIdentifier) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.wrapKey" do
+  let r ← self.val.callMethodAwait "wrapKey" (Internal.args #[toJS format, toJS key, toJS wrappingKey, toJS wrapAlgorithm]) Value
+  Internal.arrayBufferBytes r
 
 /-- `Promise<CryptoKey> unwrapKey(KeyFormat format, BufferSource wrappedKey, CryptoKey unwrappingKey, AlgorithmIdentifier unwrapAlgorithm, AlgorithmIdentifier unwrappedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.unwrapKey (self : SubtleCrypto) (format : KeyFormat) (wrappedKey : ByteArray) (unwrappingKey : CryptoKey) (unwrapAlgorithm : AlgorithmIdentifier) (unwrappedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
-  let r ← self.val.callMethodAwait "unwrapKey" (Support.args #[toJS format, toJS wrappedKey, toJS unwrappingKey, toJS unwrapAlgorithm, toJS unwrappedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
+@[macro_inline] def SubtleCrypto.unwrapKey (self : SubtleCrypto) (format : KeyFormat) (wrappedKey : ByteArray) (unwrappingKey : CryptoKey) (unwrapAlgorithm : AlgorithmIdentifier) (unwrappedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.unwrapKey" do
+  let r ← self.val.callMethodAwait "unwrapKey" (Internal.args #[toJS format, toJS wrappedKey, toJS unwrappingKey, toJS unwrapAlgorithm, toJS unwrappedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `readonly attribute Crypto crypto` -/
-def WorkerGlobalScope.crypto (self : WorkerGlobalScope) : IO Crypto := do
+@[macro_inline] def Window.crypto (self : Window) : IO Crypto := Internal.api "Lasm.JS.Web.Window.crypto" do
+  let r ← self.val.get "crypto" Value
+  pure { val := r }
+
+/-- `readonly attribute Crypto crypto` -/
+@[macro_inline] def WorkerGlobalScope.crypto (self : WorkerGlobalScope) : IO Crypto := Internal.api "Lasm.JS.Web.WorkerGlobalScope.crypto" do
   let r ← self.val.get "crypto" Value
   pure { val := r }
 
 /-- `readonly attribute Crypto crypto` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)) -/
-def crypto : IO Crypto := do
-  let r ← Support.getGlobal ["crypto"] Value
+@[macro_inline] def crypto : IO Crypto := Internal.api "Lasm.JS.Web.crypto" do
+  let r ← Internal.getGlobal ["crypto"] Value
   pure { val := r }
 
 end Lasm.JS.Web

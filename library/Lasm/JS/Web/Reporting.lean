@@ -6,13 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Reporting
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ReportBody` (Reporting API (https://w3c.github.io/reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReportBody where
+instance : ToJS ReportBody := ⟨fun _ => Internal.fields #[]⟩
 instance : FromJS ReportBody where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Web.ReportBody"
@@ -25,6 +29,9 @@ structure Report where
   url : Option String := none
   /-- `ReportBody? body` -/
   body : Option ReportBody := none
+instance : ToJS Report := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("url", Internal.optional d.url),
+    ("body", Internal.optional d.body)]⟩
 instance : FromJS Report where
   fromJS d := do return {
     type := ← Lasm.JS.readField (Option String) d "type",
@@ -41,10 +48,10 @@ instance : ToJS ReportingObserverCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ReportingObserverCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ReportingObserverCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ReportingObserverCallback.ofFn (f : (Array Report) → ReportingObserver → Async Unit) : IO ReportingObserverCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array Report) args 0) (← Support.arg ReportingObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Array Report) args 0) (← Internal.arg ReportingObserver args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ReportingObserverCallback.ofSyncFn (f : (Array Report) → ReportingObserver → IO Unit) : IO ReportingObserverCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array Report) args 0) (← Support.arg ReportingObserver args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Array Report) args 0) (← Internal.arg ReportingObserver args 1)) }
 
 /-- `dictionary ReportingObserverOptions` (Reporting API (https://w3c.github.io/reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReportingObserverOptions where
@@ -52,28 +59,37 @@ structure ReportingObserverOptions where
   types : Option (Array String) := none
   /-- `boolean buffered = false` -/
   buffered : Option Bool := none
-instance : ToJS ReportingObserverOptions := ⟨fun d => Support.fields #[("types", Support.optional d.types),
-    ("buffered", Support.optional d.buffered)]⟩
+instance : ToJS ReportingObserverOptions := ⟨fun d => Internal.fields #[("types", Internal.optional d.types),
+    ("buffered", Internal.optional d.buffered)]⟩
+
+/-- `dictionary GenerateTestReportParameters` (Reporting API (https://w3c.github.io/reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure GenerateTestReportParameters where
+  /-- `required DOMString message` -/
+  message : String
+  /-- `DOMString group = "default"` -/
+  group : Option String := none
+instance : ToJS GenerateTestReportParameters := ⟨fun d => Internal.fields #[("message", toJS d.message),
+    ("group", Internal.optional d.group)]⟩
 
 /-- `v instanceof ReportingObserver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReportingObserver`). -/
-def ReportingObserver.cast? (v : Value) : IO (Option ReportingObserver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReportingObserver"] Value) v) then some { val := v } else none
+@[macro_inline] def ReportingObserver.cast? (v : Value) : IO (Option ReportingObserver) := Internal.api "Lasm.JS.Web.ReportingObserver.cast?" do
+  Internal.cast (Internal.getGlobal ["ReportingObserver"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ReportingObserverCallback callback, optional ReportingObserverOptions options)` -/
-def ReportingObserver.new (callback : ReportingObserverCallback) (options : Option ReportingObserverOptions := none) : IO ReportingObserver :=
+@[macro_inline] def ReportingObserver.new (callback : ReportingObserverCallback) (options : Option ReportingObserverOptions := none) : IO ReportingObserver := Internal.api "Lasm.JS.Web.ReportingObserver.new" do
   Lasm.JS.Binding.invoke ReportingObserver { name := "Lasm.JS.Web.ReportingObserver.new", module := "globalThis", path := "ReportingObserver", construct := true, arity := 2 }
-    (Support.args #[toJS callback, Support.optional options]) (await := false)
+    (Internal.args #[toJS callback, Internal.optional options]) (await := false)
 
 /-- `undefined observe()` -/
-def ReportingObserver.observe (self : ReportingObserver) : IO Unit :=
-  self.val.callMethod "observe" (Support.args #[]) Unit
+@[macro_inline] def ReportingObserver.observe (self : ReportingObserver) : IO Unit := Internal.api "Lasm.JS.Web.ReportingObserver.observe" do
+  self.val.callMethod "observe" (Internal.args #[]) Unit
 
 /-- `undefined disconnect()` -/
-def ReportingObserver.disconnect (self : ReportingObserver) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def ReportingObserver.disconnect (self : ReportingObserver) : IO Unit := Internal.api "Lasm.JS.Web.ReportingObserver.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `ReportList takeRecords()` -/
-def ReportingObserver.takeRecords (self : ReportingObserver) : IO (Array Report) :=
-  self.val.callMethod "takeRecords" (Support.args #[]) (Array Report)
+@[macro_inline] def ReportingObserver.takeRecords (self : ReportingObserver) : IO (Array Report) := Internal.api "Lasm.JS.Web.ReportingObserver.takeRecords" do
+  self.val.callMethod "takeRecords" (Internal.args #[]) (Array Report)
 
 end Lasm.JS.Web

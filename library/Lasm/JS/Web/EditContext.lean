@@ -6,61 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.EditContext
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum UnderlineStyle` (EditContext API (https://w3c.github.io/edit-context/)): "none", "solid", "dotted", "dashed", "wavy". -/
-inductive UnderlineStyle where
-  /-- "none" -/
-  | none
-  /-- "solid" -/
-  | solid
-  /-- "dotted" -/
-  | dotted
-  /-- "dashed" -/
-  | dashed
-  /-- "wavy" -/
-  | wavy
-  deriving BEq, Repr, Inhabited
-instance : ToJS UnderlineStyle := ⟨fun
-  | .none => .string "none"
-  | .solid => .string "solid"
-  | .dotted => .string "dotted"
-  | .dashed => .string "dashed"
-  | .wavy => .string "wavy"⟩
-instance : FromJS UnderlineStyle where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "solid" => .ok .solid
-    | .string "dotted" => .ok .dotted
-    | .string "dashed" => .ok .dashed
-    | .string "wavy" => .ok .wavy
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.UnderlineStyle"
-
-/-- `enum UnderlineThickness` (EditContext API (https://w3c.github.io/edit-context/)): "none", "thin", "thick". -/
-inductive UnderlineThickness where
-  /-- "none" -/
-  | none
-  /-- "thin" -/
-  | thin
-  /-- "thick" -/
-  | thick
-  deriving BEq, Repr, Inhabited
-instance : ToJS UnderlineThickness := ⟨fun
-  | .none => .string "none"
-  | .thin => .string "thin"
-  | .thick => .string "thick"⟩
-instance : FromJS UnderlineThickness where
-  fromJS
-    | .string "none" => .ok .none
-    | .string "thin" => .ok .thin
-    | .string "thick" => .ok .thick
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.UnderlineThickness"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CharacterBoundsUpdateEventInit : EventInit` (EditContext API (https://w3c.github.io/edit-context/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CharacterBoundsUpdateEventInit where
@@ -74,11 +30,11 @@ structure CharacterBoundsUpdateEventInit where
   rangeStart : Option Nat := none
   /-- `unsigned long rangeEnd = 0` -/
   rangeEnd : Option Nat := none
-instance : ToJS CharacterBoundsUpdateEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("rangeStart", Support.optional d.rangeStart),
-    ("rangeEnd", Support.optional d.rangeEnd)]⟩
+instance : ToJS CharacterBoundsUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("rangeStart", Internal.optional d.rangeStart),
+    ("rangeEnd", Internal.optional d.rangeEnd)]⟩
 
 /-- `dictionary EditContextInit` (EditContext API (https://w3c.github.io/edit-context/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EditContextInit where
@@ -88,9 +44,9 @@ structure EditContextInit where
   selectionStart : Option Nat := none
   /-- `unsigned long selectionEnd = 0` -/
   selectionEnd : Option Nat := none
-instance : ToJS EditContextInit := ⟨fun d => Support.fields #[("text", Support.optional d.text),
-    ("selectionStart", Support.optional d.selectionStart),
-    ("selectionEnd", Support.optional d.selectionEnd)]⟩
+instance : ToJS EditContextInit := ⟨fun d => Internal.fields #[("text", Internal.optional d.text),
+    ("selectionStart", Internal.optional d.selectionStart),
+    ("selectionEnd", Internal.optional d.selectionEnd)]⟩
 
 /-- `dictionary TextFormatInit` (EditContext API (https://w3c.github.io/edit-context/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextFormatInit where
@@ -102,10 +58,10 @@ structure TextFormatInit where
   underlineStyle : Option UnderlineStyle := none
   /-- `UnderlineThickness underlineThickness = "none"` -/
   underlineThickness : Option UnderlineThickness := none
-instance : ToJS TextFormatInit := ⟨fun d => Support.fields #[("rangeStart", Support.optional d.rangeStart),
-    ("rangeEnd", Support.optional d.rangeEnd),
-    ("underlineStyle", Support.optional d.underlineStyle),
-    ("underlineThickness", Support.optional d.underlineThickness)]⟩
+instance : ToJS TextFormatInit := ⟨fun d => Internal.fields #[("rangeStart", Internal.optional d.rangeStart),
+    ("rangeEnd", Internal.optional d.rangeEnd),
+    ("underlineStyle", Internal.optional d.underlineStyle),
+    ("underlineThickness", Internal.optional d.underlineThickness)]⟩
 
 /-- `dictionary TextFormatUpdateEventInit : EventInit` (EditContext API (https://w3c.github.io/edit-context/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextFormatUpdateEventInit where
@@ -117,10 +73,10 @@ structure TextFormatUpdateEventInit where
   composed : Option Bool := none
   /-- `sequence<TextFormat> textFormats = []` -/
   textFormats : Option (Array TextFormat) := none
-instance : ToJS TextFormatUpdateEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("textFormats", Support.optional d.textFormats)]⟩
+instance : ToJS TextFormatUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("textFormats", Internal.optional d.textFormats)]⟩
 
 /-- `dictionary TextUpdateEventInit : EventInit` (EditContext API (https://w3c.github.io/edit-context/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextUpdateEventInit where
@@ -140,177 +96,198 @@ structure TextUpdateEventInit where
   selectionStart : Option Nat := none
   /-- `unsigned long selectionEnd = 0` -/
   selectionEnd : Option Nat := none
-instance : ToJS TextUpdateEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("updateRangeStart", Support.optional d.updateRangeStart),
-    ("updateRangeEnd", Support.optional d.updateRangeEnd),
-    ("text", Support.optional d.text),
-    ("selectionStart", Support.optional d.selectionStart),
-    ("selectionEnd", Support.optional d.selectionEnd)]⟩
+instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("updateRangeStart", Internal.optional d.updateRangeStart),
+    ("updateRangeEnd", Internal.optional d.updateRangeEnd),
+    ("text", Internal.optional d.text),
+    ("selectionStart", Internal.optional d.selectionStart),
+    ("selectionEnd", Internal.optional d.selectionEnd)]⟩
 
 /-- `v instanceof CharacterBoundsUpdateEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CharacterBoundsUpdateEvent`). -/
-def CharacterBoundsUpdateEvent.cast? (v : Value) : IO (Option CharacterBoundsUpdateEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CharacterBoundsUpdateEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CharacterBoundsUpdateEvent.cast? (v : Value) : IO (Option CharacterBoundsUpdateEvent) := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CharacterBoundsUpdateEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CharacterBoundsUpdateEventInit options)` -/
-def CharacterBoundsUpdateEvent.new (type : String) (options : Option CharacterBoundsUpdateEventInit := none) : IO CharacterBoundsUpdateEvent :=
+@[macro_inline] def CharacterBoundsUpdateEvent.new (type : String) (options : Option CharacterBoundsUpdateEventInit := none) : IO CharacterBoundsUpdateEvent := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.new" do
   Lasm.JS.Binding.invoke CharacterBoundsUpdateEvent { name := "Lasm.JS.Web.CharacterBoundsUpdateEvent.new", module := "globalThis", path := "CharacterBoundsUpdateEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional options]) (await := false)
+    (Internal.args #[toJS type, Internal.optional options]) (await := false)
 
 /-- `readonly attribute unsigned long rangeStart` -/
-def CharacterBoundsUpdateEvent.rangeStart (self : CharacterBoundsUpdateEvent) : IO Nat := self.val.get "rangeStart" Nat
+@[macro_inline] def CharacterBoundsUpdateEvent.rangeStart (self : CharacterBoundsUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.rangeStart" do
+  self.val.get "rangeStart" Nat
 
 /-- `readonly attribute unsigned long rangeEnd` -/
-def CharacterBoundsUpdateEvent.rangeEnd (self : CharacterBoundsUpdateEvent) : IO Nat := self.val.get "rangeEnd" Nat
+@[macro_inline] def CharacterBoundsUpdateEvent.rangeEnd (self : CharacterBoundsUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.rangeEnd" do
+  self.val.get "rangeEnd" Nat
 
 /-- `v instanceof EditContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EditContext`). -/
-def EditContext.cast? (v : Value) : IO (Option EditContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EditContext"] Value) v) then some { val := v } else none
+@[macro_inline] def EditContext.cast? (v : Value) : IO (Option EditContext) := Internal.api "Lasm.JS.Web.EditContext.cast?" do
+  Internal.cast (Internal.getGlobal ["EditContext"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional EditContextInit options)` -/
-def EditContext.new (options : Option EditContextInit := none) : IO EditContext :=
+@[macro_inline] def EditContext.new (options : Option EditContextInit := none) : IO EditContext := Internal.api "Lasm.JS.Web.EditContext.new" do
   Lasm.JS.Binding.invoke EditContext { name := "Lasm.JS.Web.EditContext.new", module := "globalThis", path := "EditContext", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute DOMString text` -/
-def EditContext.text (self : EditContext) : IO String := self.val.get "text" String
+@[macro_inline] def EditContext.text (self : EditContext) : IO String := Internal.api "Lasm.JS.Web.EditContext.text" do
+  self.val.get "text" String
 
 /-- `readonly attribute unsigned long selectionStart` -/
-def EditContext.selectionStart (self : EditContext) : IO Nat := self.val.get "selectionStart" Nat
+@[macro_inline] def EditContext.selectionStart (self : EditContext) : IO Nat := Internal.api "Lasm.JS.Web.EditContext.selectionStart" do
+  self.val.get "selectionStart" Nat
 
 /-- `readonly attribute unsigned long selectionEnd` -/
-def EditContext.selectionEnd (self : EditContext) : IO Nat := self.val.get "selectionEnd" Nat
+@[macro_inline] def EditContext.selectionEnd (self : EditContext) : IO Nat := Internal.api "Lasm.JS.Web.EditContext.selectionEnd" do
+  self.val.get "selectionEnd" Nat
 
 /-- `readonly attribute unsigned long characterBoundsRangeStart` -/
-def EditContext.characterBoundsRangeStart (self : EditContext) : IO Nat := self.val.get "characterBoundsRangeStart" Nat
+@[macro_inline] def EditContext.characterBoundsRangeStart (self : EditContext) : IO Nat := Internal.api "Lasm.JS.Web.EditContext.characterBoundsRangeStart" do
+  self.val.get "characterBoundsRangeStart" Nat
 
 /-- `attribute EventHandler ontextupdate` -/
-def EditContext.ontextupdate (self : EditContext) : IO (Option EventHandlerNonNull) := self.val.get "ontextupdate" (Option EventHandlerNonNull)
+@[macro_inline] def EditContext.ontextupdate (self : EditContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.EditContext.ontextupdate" do
+  self.val.get "ontextupdate" (Option EventHandlerNonNull)
 
 /-- Sets `ontextupdate`: `attribute EventHandler ontextupdate` -/
-def EditContext.setOntextupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def EditContext.setOntextupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.setOntextupdate" do
   self.val.set "ontextupdate" (toJS value)
 
 /-- `attribute EventHandler ontextformatupdate` -/
-def EditContext.ontextformatupdate (self : EditContext) : IO (Option EventHandlerNonNull) := self.val.get "ontextformatupdate" (Option EventHandlerNonNull)
+@[macro_inline] def EditContext.ontextformatupdate (self : EditContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.EditContext.ontextformatupdate" do
+  self.val.get "ontextformatupdate" (Option EventHandlerNonNull)
 
 /-- Sets `ontextformatupdate`: `attribute EventHandler ontextformatupdate` -/
-def EditContext.setOntextformatupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def EditContext.setOntextformatupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.setOntextformatupdate" do
   self.val.set "ontextformatupdate" (toJS value)
 
 /-- `attribute EventHandler oncharacterboundsupdate` -/
-def EditContext.oncharacterboundsupdate (self : EditContext) : IO (Option EventHandlerNonNull) := self.val.get "oncharacterboundsupdate" (Option EventHandlerNonNull)
+@[macro_inline] def EditContext.oncharacterboundsupdate (self : EditContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.EditContext.oncharacterboundsupdate" do
+  self.val.get "oncharacterboundsupdate" (Option EventHandlerNonNull)
 
 /-- Sets `oncharacterboundsupdate`: `attribute EventHandler oncharacterboundsupdate` -/
-def EditContext.setOncharacterboundsupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def EditContext.setOncharacterboundsupdate (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.setOncharacterboundsupdate" do
   self.val.set "oncharacterboundsupdate" (toJS value)
 
 /-- `attribute EventHandler oncompositionstart` -/
-def EditContext.oncompositionstart (self : EditContext) : IO (Option EventHandlerNonNull) := self.val.get "oncompositionstart" (Option EventHandlerNonNull)
+@[macro_inline] def EditContext.oncompositionstart (self : EditContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.EditContext.oncompositionstart" do
+  self.val.get "oncompositionstart" (Option EventHandlerNonNull)
 
 /-- Sets `oncompositionstart`: `attribute EventHandler oncompositionstart` -/
-def EditContext.setOncompositionstart (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def EditContext.setOncompositionstart (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.setOncompositionstart" do
   self.val.set "oncompositionstart" (toJS value)
 
 /-- `attribute EventHandler oncompositionend` -/
-def EditContext.oncompositionend (self : EditContext) : IO (Option EventHandlerNonNull) := self.val.get "oncompositionend" (Option EventHandlerNonNull)
+@[macro_inline] def EditContext.oncompositionend (self : EditContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.EditContext.oncompositionend" do
+  self.val.get "oncompositionend" (Option EventHandlerNonNull)
 
 /-- Sets `oncompositionend`: `attribute EventHandler oncompositionend` -/
-def EditContext.setOncompositionend (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def EditContext.setOncompositionend (self : EditContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.setOncompositionend" do
   self.val.set "oncompositionend" (toJS value)
 
 /-- `undefined updateText(unsigned long rangeStart, unsigned long rangeEnd, DOMString text)` -/
-def EditContext.updateText (self : EditContext) (rangeStart : Nat) (rangeEnd : Nat) (text : String) : IO Unit :=
-  self.val.callMethod "updateText" (Support.args #[toJS rangeStart, toJS rangeEnd, toJS text]) Unit
+@[macro_inline] def EditContext.updateText (self : EditContext) (rangeStart : Nat) (rangeEnd : Nat) (text : String) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.updateText" do
+  self.val.callMethod "updateText" (Internal.args #[toJS rangeStart, toJS rangeEnd, toJS text]) Unit
 
 /-- `undefined updateSelection(unsigned long start, unsigned long end)` -/
-def EditContext.updateSelection (self : EditContext) (start : Nat) («end» : Nat) : IO Unit :=
-  self.val.callMethod "updateSelection" (Support.args #[toJS start, toJS «end»]) Unit
+@[macro_inline] def EditContext.updateSelection (self : EditContext) (start : Nat) («end» : Nat) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.updateSelection" do
+  self.val.callMethod "updateSelection" (Internal.args #[toJS start, toJS «end»]) Unit
 
 /-- `undefined updateControlBounds(DOMRect controlBounds)` -/
-def EditContext.updateControlBounds (self : EditContext) (controlBounds : DOMRect) : IO Unit :=
-  self.val.callMethod "updateControlBounds" (Support.args #[toJS controlBounds]) Unit
+@[macro_inline] def EditContext.updateControlBounds (self : EditContext) (controlBounds : DOMRect) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.updateControlBounds" do
+  self.val.callMethod "updateControlBounds" (Internal.args #[toJS controlBounds]) Unit
 
 /-- `undefined updateSelectionBounds(DOMRect selectionBounds)` -/
-def EditContext.updateSelectionBounds (self : EditContext) (selectionBounds : DOMRect) : IO Unit :=
-  self.val.callMethod "updateSelectionBounds" (Support.args #[toJS selectionBounds]) Unit
+@[macro_inline] def EditContext.updateSelectionBounds (self : EditContext) (selectionBounds : DOMRect) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.updateSelectionBounds" do
+  self.val.callMethod "updateSelectionBounds" (Internal.args #[toJS selectionBounds]) Unit
 
 /-- `undefined updateCharacterBounds(unsigned long rangeStart, sequence<DOMRect> characterBounds)` -/
-def EditContext.updateCharacterBounds (self : EditContext) (rangeStart : Nat) (characterBounds : Array DOMRect) : IO Unit :=
-  self.val.callMethod "updateCharacterBounds" (Support.args #[toJS rangeStart, toJS characterBounds]) Unit
+@[macro_inline] def EditContext.updateCharacterBounds (self : EditContext) (rangeStart : Nat) (characterBounds : Array DOMRect) : IO Unit := Internal.api "Lasm.JS.Web.EditContext.updateCharacterBounds" do
+  self.val.callMethod "updateCharacterBounds" (Internal.args #[toJS rangeStart, toJS characterBounds]) Unit
 
 /-- `sequence<HTMLElement> attachedElements()` -/
-def EditContext.attachedElements (self : EditContext) : IO (Array HTMLElement) :=
-  self.val.callMethod "attachedElements" (Support.args #[]) (Array HTMLElement)
+@[macro_inline] def EditContext.attachedElements (self : EditContext) : IO (Array HTMLElement) := Internal.api "Lasm.JS.Web.EditContext.attachedElements" do
+  self.val.callMethod "attachedElements" (Internal.args #[]) (Array HTMLElement)
 
 /-- `sequence<DOMRect> characterBounds()` -/
-def EditContext.characterBounds (self : EditContext) : IO (Array DOMRect) :=
-  self.val.callMethod "characterBounds" (Support.args #[]) (Array DOMRect)
+@[macro_inline] def EditContext.characterBounds (self : EditContext) : IO (Array DOMRect) := Internal.api "Lasm.JS.Web.EditContext.characterBounds" do
+  self.val.callMethod "characterBounds" (Internal.args #[]) (Array DOMRect)
 
 /-- `v instanceof TextFormat`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextFormat`). -/
-def TextFormat.cast? (v : Value) : IO (Option TextFormat) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextFormat"] Value) v) then some { val := v } else none
+@[macro_inline] def TextFormat.cast? (v : Value) : IO (Option TextFormat) := Internal.api "Lasm.JS.Web.TextFormat.cast?" do
+  Internal.cast (Internal.getGlobal ["TextFormat"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional TextFormatInit options)` -/
-def TextFormat.new (options : Option TextFormatInit := none) : IO TextFormat :=
+@[macro_inline] def TextFormat.new (options : Option TextFormatInit := none) : IO TextFormat := Internal.api "Lasm.JS.Web.TextFormat.new" do
   Lasm.JS.Binding.invoke TextFormat { name := "Lasm.JS.Web.TextFormat.new", module := "globalThis", path := "TextFormat", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute unsigned long rangeStart` -/
-def TextFormat.rangeStart (self : TextFormat) : IO Nat := self.val.get "rangeStart" Nat
+@[macro_inline] def TextFormat.rangeStart (self : TextFormat) : IO Nat := Internal.api "Lasm.JS.Web.TextFormat.rangeStart" do
+  self.val.get "rangeStart" Nat
 
 /-- `readonly attribute unsigned long rangeEnd` -/
-def TextFormat.rangeEnd (self : TextFormat) : IO Nat := self.val.get "rangeEnd" Nat
+@[macro_inline] def TextFormat.rangeEnd (self : TextFormat) : IO Nat := Internal.api "Lasm.JS.Web.TextFormat.rangeEnd" do
+  self.val.get "rangeEnd" Nat
 
 /-- `readonly attribute UnderlineStyle underlineStyle` -/
-def TextFormat.underlineStyle (self : TextFormat) : IO UnderlineStyle := self.val.get "underlineStyle" UnderlineStyle
+@[macro_inline] def TextFormat.underlineStyle (self : TextFormat) : IO UnderlineStyle := Internal.api "Lasm.JS.Web.TextFormat.underlineStyle" do
+  self.val.get "underlineStyle" UnderlineStyle
 
 /-- `readonly attribute UnderlineThickness underlineThickness` -/
-def TextFormat.underlineThickness (self : TextFormat) : IO UnderlineThickness := self.val.get "underlineThickness" UnderlineThickness
+@[macro_inline] def TextFormat.underlineThickness (self : TextFormat) : IO UnderlineThickness := Internal.api "Lasm.JS.Web.TextFormat.underlineThickness" do
+  self.val.get "underlineThickness" UnderlineThickness
 
 /-- `v instanceof TextFormatUpdateEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextFormatUpdateEvent`). -/
-def TextFormatUpdateEvent.cast? (v : Value) : IO (Option TextFormatUpdateEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextFormatUpdateEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TextFormatUpdateEvent.cast? (v : Value) : IO (Option TextFormatUpdateEvent) := Internal.api "Lasm.JS.Web.TextFormatUpdateEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TextFormatUpdateEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional TextFormatUpdateEventInit options)` -/
-def TextFormatUpdateEvent.new (type : String) (options : Option TextFormatUpdateEventInit := none) : IO TextFormatUpdateEvent :=
+@[macro_inline] def TextFormatUpdateEvent.new (type : String) (options : Option TextFormatUpdateEventInit := none) : IO TextFormatUpdateEvent := Internal.api "Lasm.JS.Web.TextFormatUpdateEvent.new" do
   Lasm.JS.Binding.invoke TextFormatUpdateEvent { name := "Lasm.JS.Web.TextFormatUpdateEvent.new", module := "globalThis", path := "TextFormatUpdateEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional options]) (await := false)
+    (Internal.args #[toJS type, Internal.optional options]) (await := false)
 
 /-- `sequence<TextFormat> getTextFormats()` -/
-def TextFormatUpdateEvent.getTextFormats (self : TextFormatUpdateEvent) : IO (Array TextFormat) :=
-  self.val.callMethod "getTextFormats" (Support.args #[]) (Array TextFormat)
+@[macro_inline] def TextFormatUpdateEvent.getTextFormats (self : TextFormatUpdateEvent) : IO (Array TextFormat) := Internal.api "Lasm.JS.Web.TextFormatUpdateEvent.getTextFormats" do
+  self.val.callMethod "getTextFormats" (Internal.args #[]) (Array TextFormat)
 
 /-- `v instanceof TextUpdateEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextUpdateEvent`). -/
-def TextUpdateEvent.cast? (v : Value) : IO (Option TextUpdateEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextUpdateEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TextUpdateEvent.cast? (v : Value) : IO (Option TextUpdateEvent) := Internal.api "Lasm.JS.Web.TextUpdateEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TextUpdateEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional TextUpdateEventInit options)` -/
-def TextUpdateEvent.new (type : String) (options : Option TextUpdateEventInit := none) : IO TextUpdateEvent :=
+@[macro_inline] def TextUpdateEvent.new (type : String) (options : Option TextUpdateEventInit := none) : IO TextUpdateEvent := Internal.api "Lasm.JS.Web.TextUpdateEvent.new" do
   Lasm.JS.Binding.invoke TextUpdateEvent { name := "Lasm.JS.Web.TextUpdateEvent.new", module := "globalThis", path := "TextUpdateEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional options]) (await := false)
+    (Internal.args #[toJS type, Internal.optional options]) (await := false)
 
 /-- `readonly attribute unsigned long updateRangeStart` -/
-def TextUpdateEvent.updateRangeStart (self : TextUpdateEvent) : IO Nat := self.val.get "updateRangeStart" Nat
+@[macro_inline] def TextUpdateEvent.updateRangeStart (self : TextUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.TextUpdateEvent.updateRangeStart" do
+  self.val.get "updateRangeStart" Nat
 
 /-- `readonly attribute unsigned long updateRangeEnd` -/
-def TextUpdateEvent.updateRangeEnd (self : TextUpdateEvent) : IO Nat := self.val.get "updateRangeEnd" Nat
+@[macro_inline] def TextUpdateEvent.updateRangeEnd (self : TextUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.TextUpdateEvent.updateRangeEnd" do
+  self.val.get "updateRangeEnd" Nat
 
 /-- `readonly attribute DOMString text` -/
-def TextUpdateEvent.text (self : TextUpdateEvent) : IO String := self.val.get "text" String
+@[macro_inline] def TextUpdateEvent.text (self : TextUpdateEvent) : IO String := Internal.api "Lasm.JS.Web.TextUpdateEvent.text" do
+  self.val.get "text" String
 
 /-- `readonly attribute unsigned long selectionStart` -/
-def TextUpdateEvent.selectionStart (self : TextUpdateEvent) : IO Nat := self.val.get "selectionStart" Nat
+@[macro_inline] def TextUpdateEvent.selectionStart (self : TextUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.TextUpdateEvent.selectionStart" do
+  self.val.get "selectionStart" Nat
 
 /-- `readonly attribute unsigned long selectionEnd` -/
-def TextUpdateEvent.selectionEnd (self : TextUpdateEvent) : IO Nat := self.val.get "selectionEnd" Nat
+@[macro_inline] def TextUpdateEvent.selectionEnd (self : TextUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.TextUpdateEvent.selectionEnd" do
+  self.val.get "selectionEnd" Nat
 
 /-- `attribute EditContext? editContext` -/
-def HTMLElement.editContext (self : HTMLElement) : IO (Option EditContext) := self.val.get "editContext" (Option EditContext)
+@[macro_inline] def HTMLElement.editContext (self : HTMLElement) : IO (Option EditContext) := Internal.api "Lasm.JS.Web.HTMLElement.editContext" do
+  self.val.get "editContext" (Option EditContext)
 
 /-- Sets `editContext`: `attribute EditContext? editContext` -/
-def HTMLElement.setEditContext (self : HTMLElement) (value : Option EditContext) : IO Unit :=
+@[macro_inline] def HTMLElement.setEditContext (self : HTMLElement) (value : Option EditContext) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setEditContext" do
   self.val.set "editContext" (toJS value)
 
 end Lasm.JS.Web

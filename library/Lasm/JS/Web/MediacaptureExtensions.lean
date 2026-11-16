@@ -6,7 +6,10 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureExtensions
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.ImageCapture
@@ -14,35 +17,9 @@ import Lasm.JS.Web.MediacaptureStreams
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum SegmentType` (Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)): "human-face", "left-eye", "right-eye", "eye", "mouth". -/
-inductive SegmentType where
-  /-- "human-face" -/
-  | humanFace
-  /-- "left-eye" -/
-  | leftEye
-  /-- "right-eye" -/
-  | rightEye
-  /-- "eye" -/
-  | eye
-  /-- "mouth" -/
-  | mouth
-  deriving BEq, Repr, Inhabited
-instance : ToJS SegmentType := ⟨fun
-  | .humanFace => .string "human-face"
-  | .leftEye => .string "left-eye"
-  | .rightEye => .string "right-eye"
-  | .eye => .string "eye"
-  | .mouth => .string "mouth"⟩
-instance : FromJS SegmentType where
-  fromJS
-    | .string "human-face" => .ok .humanFace
-    | .string "left-eye" => .ok .leftEye
-    | .string "right-eye" => .ok .rightEye
-    | .string "eye" => .ok .eye
-    | .string "mouth" => .ok .mouth
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SegmentType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HTMLMediaStreamConstraints` (Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HTMLMediaStreamConstraints where
@@ -50,8 +27,8 @@ structure HTMLMediaStreamConstraints where
   video : Option MediaTrackConstraintSet := none
   /-- `MediaTrackConstraintSet audio` -/
   audio : Option MediaTrackConstraintSet := none
-instance : ToJS HTMLMediaStreamConstraints := ⟨fun d => Support.fields #[("video", Support.optional d.video),
-    ("audio", Support.optional d.audio)]⟩
+instance : ToJS HTMLMediaStreamConstraints := ⟨fun d => Internal.fields #[("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio)]⟩
 
 /-- `dictionary Segment` (Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Segment where
@@ -67,12 +44,12 @@ structure Segment where
   centerPoint : Option Point2D := none
   /-- `DOMRectInit boundingBox` -/
   boundingBox : Option DOMRectInit := none
-instance : ToJS Segment := ⟨fun d => Support.fields #[("type", toJS d.type),
+instance : ToJS Segment := ⟨fun d => Internal.fields #[("type", toJS d.type),
     ("id", toJS d.id),
-    ("partOf", Support.optional d.partOf),
+    ("partOf", Internal.optional d.partOf),
     ("probability", toJS d.probability),
-    ("centerPoint", Support.optional d.centerPoint),
-    ("boundingBox", Support.optional d.boundingBox)]⟩
+    ("centerPoint", Internal.optional d.centerPoint),
+    ("boundingBox", Internal.optional d.boundingBox)]⟩
 instance : FromJS Segment where
   fromJS d := do return {
     type := ← Lasm.JS.readField SegmentType d "type",
@@ -87,171 +64,201 @@ instance : FromJS Segment where
 structure BackgroundBlur where
   /-- `required boolean enabled` -/
   enabled : Bool
-instance : ToJS BackgroundBlur := ⟨fun d => Support.fields #[("enabled", toJS d.enabled)]⟩
+instance : ToJS BackgroundBlur := ⟨fun d => Internal.fields #[("enabled", toJS d.enabled)]⟩
 instance : FromJS BackgroundBlur where
   fromJS d := do return {
     enabled := ← Lasm.JS.readField Bool d "enabled" }
   typeName := "Lasm.JS.Web.BackgroundBlur"
 
+/-- `dictionary MediaEffectInfo` (Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MediaEffectInfo where
+  /-- `required boolean enabled` -/
+  enabled : Bool
+instance : ToJS MediaEffectInfo := ⟨fun d => Internal.fields #[("enabled", toJS d.enabled)]⟩
+
 /-- `v instanceof HTMLCameraElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLCameraElement`). -/
-def HTMLCameraElement.cast? (v : Value) : IO (Option HTMLCameraElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLCameraElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLCameraElement.cast? (v : Value) : IO (Option HTMLCameraElement) := Internal.api "Lasm.JS.Web.HTMLCameraElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLCameraElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaStreamTrack? track` -/
-def HTMLCameraElement.track (self : HTMLCameraElement) : IO (Option MediaStreamTrack) := self.val.get "track" (Option MediaStreamTrack)
+@[macro_inline] def HTMLCameraElement.track (self : HTMLCameraElement) : IO (Option MediaStreamTrack) := Internal.api "Lasm.JS.Web.HTMLCameraElement.track" do
+  self.val.get "track" (Option MediaStreamTrack)
 
 /-- `readonly attribute DOMException? error` -/
-def HTMLCameraElement.error (self : HTMLCameraElement) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def HTMLCameraElement.error (self : HTMLCameraElement) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.HTMLCameraElement.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `attribute EventHandler ontrack` -/
-def HTMLCameraElement.ontrack (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := self.val.get "ontrack" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLCameraElement.ontrack (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLCameraElement.ontrack" do
+  self.val.get "ontrack" (Option EventHandlerNonNull)
 
 /-- Sets `ontrack`: `attribute EventHandler ontrack` -/
-def HTMLCameraElement.setOntrack (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLCameraElement.setOntrack (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLCameraElement.setOntrack" do
   self.val.set "ontrack" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def HTMLCameraElement.onerror (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLCameraElement.onerror (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLCameraElement.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def HTMLCameraElement.setOnerror (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLCameraElement.setOnerror (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLCameraElement.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def HTMLCameraElement.oncancel (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLCameraElement.oncancel (self : HTMLCameraElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLCameraElement.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def HTMLCameraElement.setOncancel (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLCameraElement.setOncancel (self : HTMLCameraElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLCameraElement.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `undefined setConstraints(optional MediaTrackConstraintSet constraints)` -/
-def HTMLCameraElement.setConstraints (self : HTMLCameraElement) (constraints : Option MediaTrackConstraintSet := none) : IO Unit :=
-  self.val.callMethod "setConstraints" (Support.args #[Support.optional constraints]) Unit
+@[macro_inline] def HTMLCameraElement.setConstraints (self : HTMLCameraElement) (constraints : Option MediaTrackConstraintSet := none) : IO Unit := Internal.api "Lasm.JS.Web.HTMLCameraElement.setConstraints" do
+  self.val.callMethod "setConstraints" (Internal.args #[Internal.optional constraints]) Unit
 
 /-- `v instanceof HTMLMicrophoneElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLMicrophoneElement`). -/
-def HTMLMicrophoneElement.cast? (v : Value) : IO (Option HTMLMicrophoneElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLMicrophoneElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLMicrophoneElement.cast? (v : Value) : IO (Option HTMLMicrophoneElement) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLMicrophoneElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaStreamTrack? track` -/
-def HTMLMicrophoneElement.track (self : HTMLMicrophoneElement) : IO (Option MediaStreamTrack) := self.val.get "track" (Option MediaStreamTrack)
+@[macro_inline] def HTMLMicrophoneElement.track (self : HTMLMicrophoneElement) : IO (Option MediaStreamTrack) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.track" do
+  self.val.get "track" (Option MediaStreamTrack)
 
 /-- `readonly attribute DOMException? error` -/
-def HTMLMicrophoneElement.error (self : HTMLMicrophoneElement) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def HTMLMicrophoneElement.error (self : HTMLMicrophoneElement) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `attribute EventHandler ontrack` -/
-def HTMLMicrophoneElement.ontrack (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := self.val.get "ontrack" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLMicrophoneElement.ontrack (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.ontrack" do
+  self.val.get "ontrack" (Option EventHandlerNonNull)
 
 /-- Sets `ontrack`: `attribute EventHandler ontrack` -/
-def HTMLMicrophoneElement.setOntrack (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLMicrophoneElement.setOntrack (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.setOntrack" do
   self.val.set "ontrack" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def HTMLMicrophoneElement.onerror (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLMicrophoneElement.onerror (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def HTMLMicrophoneElement.setOnerror (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLMicrophoneElement.setOnerror (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def HTMLMicrophoneElement.oncancel (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLMicrophoneElement.oncancel (self : HTMLMicrophoneElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def HTMLMicrophoneElement.setOncancel (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLMicrophoneElement.setOncancel (self : HTMLMicrophoneElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `undefined setConstraints(optional MediaTrackConstraintSet constraints)` -/
-def HTMLMicrophoneElement.setConstraints (self : HTMLMicrophoneElement) (constraints : Option MediaTrackConstraintSet := none) : IO Unit :=
-  self.val.callMethod "setConstraints" (Support.args #[Support.optional constraints]) Unit
+@[macro_inline] def HTMLMicrophoneElement.setConstraints (self : HTMLMicrophoneElement) (constraints : Option MediaTrackConstraintSet := none) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMicrophoneElement.setConstraints" do
+  self.val.callMethod "setConstraints" (Internal.args #[Internal.optional constraints]) Unit
 
 /-- `v instanceof HTMLUserMediaElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLUserMediaElement`). -/
-def HTMLUserMediaElement.cast? (v : Value) : IO (Option HTMLUserMediaElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLUserMediaElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLUserMediaElement.cast? (v : Value) : IO (Option HTMLUserMediaElement) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLUserMediaElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaStream? stream` -/
-def HTMLUserMediaElement.stream (self : HTMLUserMediaElement) : IO (Option MediaStream) := self.val.get "stream" (Option MediaStream)
+@[macro_inline] def HTMLUserMediaElement.stream (self : HTMLUserMediaElement) : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.stream" do
+  self.val.get "stream" (Option MediaStream)
 
 /-- `readonly attribute DOMException? error` -/
-def HTMLUserMediaElement.error (self : HTMLUserMediaElement) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def HTMLUserMediaElement.error (self : HTMLUserMediaElement) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `attribute EventHandler onstream` -/
-def HTMLUserMediaElement.onstream (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := self.val.get "onstream" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLUserMediaElement.onstream (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.onstream" do
+  self.val.get "onstream" (Option EventHandlerNonNull)
 
 /-- Sets `onstream`: `attribute EventHandler onstream` -/
-def HTMLUserMediaElement.setOnstream (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLUserMediaElement.setOnstream (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.setOnstream" do
   self.val.set "onstream" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def HTMLUserMediaElement.onerror (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLUserMediaElement.onerror (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def HTMLUserMediaElement.setOnerror (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLUserMediaElement.setOnerror (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler oncancel` -/
-def HTMLUserMediaElement.oncancel (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := self.val.get "oncancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLUserMediaElement.oncancel (self : HTMLUserMediaElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.oncancel" do
+  self.val.get "oncancel" (Option EventHandlerNonNull)
 
 /-- Sets `oncancel`: `attribute EventHandler oncancel` -/
-def HTMLUserMediaElement.setOncancel (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLUserMediaElement.setOncancel (self : HTMLUserMediaElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.setOncancel" do
   self.val.set "oncancel" (toJS value)
 
 /-- `undefined setConstraints(optional HTMLMediaStreamConstraints constraints)` -/
-def HTMLUserMediaElement.setConstraints (self : HTMLUserMediaElement) (constraints : Option HTMLMediaStreamConstraints := none) : IO Unit :=
-  self.val.callMethod "setConstraints" (Support.args #[Support.optional constraints]) Unit
+@[macro_inline] def HTMLUserMediaElement.setConstraints (self : HTMLUserMediaElement) (constraints : Option HTMLMediaStreamConstraints := none) : IO Unit := Internal.api "Lasm.JS.Web.HTMLUserMediaElement.setConstraints" do
+  self.val.callMethod "setConstraints" (Internal.args #[Internal.optional constraints]) Unit
 
 /-- `v instanceof MediaStreamTrackAudioStats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackAudioStats`). -/
-def MediaStreamTrackAudioStats.cast? (v : Value) : IO (Option MediaStreamTrackAudioStats) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrackAudioStats"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrackAudioStats.cast? (v : Value) : IO (Option MediaStreamTrackAudioStats) := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrackAudioStats"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp latency` -/
-def MediaStreamTrackAudioStats.latency (self : MediaStreamTrackAudioStats) : IO Float := self.val.get "latency" Float
+@[macro_inline] def MediaStreamTrackAudioStats.latency (self : MediaStreamTrackAudioStats) : IO Float := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.latency" do
+  self.val.get "latency" Float
 
 /-- `readonly attribute DOMHighResTimeStamp averageLatency` -/
-def MediaStreamTrackAudioStats.averageLatency (self : MediaStreamTrackAudioStats) : IO Float := self.val.get "averageLatency" Float
+@[macro_inline] def MediaStreamTrackAudioStats.averageLatency (self : MediaStreamTrackAudioStats) : IO Float := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.averageLatency" do
+  self.val.get "averageLatency" Float
 
 /-- `readonly attribute DOMHighResTimeStamp minimumLatency` -/
-def MediaStreamTrackAudioStats.minimumLatency (self : MediaStreamTrackAudioStats) : IO Float := self.val.get "minimumLatency" Float
+@[macro_inline] def MediaStreamTrackAudioStats.minimumLatency (self : MediaStreamTrackAudioStats) : IO Float := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.minimumLatency" do
+  self.val.get "minimumLatency" Float
 
 /-- `readonly attribute DOMHighResTimeStamp maximumLatency` -/
-def MediaStreamTrackAudioStats.maximumLatency (self : MediaStreamTrackAudioStats) : IO Float := self.val.get "maximumLatency" Float
+@[macro_inline] def MediaStreamTrackAudioStats.maximumLatency (self : MediaStreamTrackAudioStats) : IO Float := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.maximumLatency" do
+  self.val.get "maximumLatency" Float
 
 /-- `undefined resetLatency()` -/
-def MediaStreamTrackAudioStats.resetLatency (self : MediaStreamTrackAudioStats) : IO Unit :=
-  self.val.callMethod "resetLatency" (Support.args #[]) Unit
+@[macro_inline] def MediaStreamTrackAudioStats.resetLatency (self : MediaStreamTrackAudioStats) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.resetLatency" do
+  self.val.callMethod "resetLatency" (Internal.args #[]) Unit
 
 /-- `object toJSON()` -/
-def MediaStreamTrackAudioStats.toJSON (self : MediaStreamTrackAudioStats) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def MediaStreamTrackAudioStats.toJSON (self : MediaStreamTrackAudioStats) : IO Data := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioStats.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof MediaStreamTrackVideoStats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackVideoStats`). -/
-def MediaStreamTrackVideoStats.cast? (v : Value) : IO (Option MediaStreamTrackVideoStats) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrackVideoStats"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrackVideoStats.cast? (v : Value) : IO (Option MediaStreamTrackVideoStats) := Internal.api "Lasm.JS.Web.MediaStreamTrackVideoStats.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrackVideoStats"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long long deliveredFrames` -/
-def MediaStreamTrackVideoStats.deliveredFrames (self : MediaStreamTrackVideoStats) : IO Nat := self.val.get "deliveredFrames" Nat
+@[macro_inline] def MediaStreamTrackVideoStats.deliveredFrames (self : MediaStreamTrackVideoStats) : IO Nat := Internal.api "Lasm.JS.Web.MediaStreamTrackVideoStats.deliveredFrames" do
+  self.val.get "deliveredFrames" Nat
 
 /-- `readonly attribute unsigned long long discardedFrames` -/
-def MediaStreamTrackVideoStats.discardedFrames (self : MediaStreamTrackVideoStats) : IO Nat := self.val.get "discardedFrames" Nat
+@[macro_inline] def MediaStreamTrackVideoStats.discardedFrames (self : MediaStreamTrackVideoStats) : IO Nat := Internal.api "Lasm.JS.Web.MediaStreamTrackVideoStats.discardedFrames" do
+  self.val.get "discardedFrames" Nat
 
 /-- `readonly attribute unsigned long long totalFrames` -/
-def MediaStreamTrackVideoStats.totalFrames (self : MediaStreamTrackVideoStats) : IO Nat := self.val.get "totalFrames" Nat
+@[macro_inline] def MediaStreamTrackVideoStats.totalFrames (self : MediaStreamTrackVideoStats) : IO Nat := Internal.api "Lasm.JS.Web.MediaStreamTrackVideoStats.totalFrames" do
+  self.val.get "totalFrames" Nat
 
 /-- `object toJSON()` -/
-def MediaStreamTrackVideoStats.toJSON (self : MediaStreamTrackVideoStats) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def MediaStreamTrackVideoStats.toJSON (self : MediaStreamTrackVideoStats) : IO Data := Internal.api "Lasm.JS.Web.MediaStreamTrackVideoStats.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `readonly attribute GetUserMediaSemantics defaultSemantics` -/
-def MediaDevices.defaultSemantics (self : MediaDevices) : IO GetUserMediaSemantics := self.val.get "defaultSemantics" GetUserMediaSemantics
+@[macro_inline] def MediaDevices.defaultSemantics (self : MediaDevices) : IO GetUserMediaSemantics := Internal.api "Lasm.JS.Web.MediaDevices.defaultSemantics" do
+  self.val.get "defaultSemantics" GetUserMediaSemantics
 
 /-- `readonly attribute (MediaStreamTrackAudioStats or MediaStreamTrackVideoStats)? stats` -/
-def MediaStreamTrack.stats (self : MediaStreamTrack) : IO (Option Value) := do
+@[macro_inline] def MediaStreamTrack.stats (self : MediaStreamTrack) : IO (Option Value) := Internal.api "Lasm.JS.Web.MediaStreamTrack.stats" do
   let r ← self.val.get "stats" Data
-  Support.optionalValue r
+  Internal.optionalValue r
 
 /-- `attribute EventHandler onconfigurationchange` -/
-def MediaStreamTrack.onconfigurationchange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "onconfigurationchange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.onconfigurationchange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onconfigurationchange" do
+  self.val.get "onconfigurationchange" (Option EventHandlerNonNull)
 
 /-- Sets `onconfigurationchange`: `attribute EventHandler onconfigurationchange` -/
-def MediaStreamTrack.setOnconfigurationchange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOnconfigurationchange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnconfigurationchange" do
   self.val.set "onconfigurationchange" (toJS value)
 
 end Lasm.JS.Web

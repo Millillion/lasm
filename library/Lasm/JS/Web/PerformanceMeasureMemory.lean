@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.HrTime
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MemoryAttributionContainer` (Measure Memory API (https://wicg.github.io/performance-measure-memory/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MemoryAttributionContainer where
@@ -17,6 +20,8 @@ structure MemoryAttributionContainer where
   id : Option String := none
   /-- `USVString src` -/
   src : Option String := none
+instance : ToJS MemoryAttributionContainer := ⟨fun d => Internal.fields #[("id", Internal.optional d.id),
+    ("src", Internal.optional d.src)]⟩
 instance : FromJS MemoryAttributionContainer where
   fromJS d := do return {
     id := ← Lasm.JS.readField (Option String) d "id",
@@ -31,6 +36,9 @@ structure MemoryAttribution where
   container : Option MemoryAttributionContainer := none
   /-- `DOMString scope` -/
   scope : Option String := none
+instance : ToJS MemoryAttribution := ⟨fun d => Internal.fields #[("url", Internal.optional d.url),
+    ("container", Internal.optional d.container),
+    ("scope", Internal.optional d.scope)]⟩
 instance : FromJS MemoryAttribution where
   fromJS d := do return {
     url := ← Lasm.JS.readField (Option String) d "url",
@@ -46,6 +54,9 @@ structure MemoryBreakdownEntry where
   attribution : Option (Array MemoryAttribution) := none
   /-- `sequence<DOMString> types` -/
   types : Option (Array String) := none
+instance : ToJS MemoryBreakdownEntry := ⟨fun d => Internal.fields #[("bytes", Internal.optional d.bytes),
+    ("attribution", Internal.optional d.attribution),
+    ("types", Internal.optional d.types)]⟩
 instance : FromJS MemoryBreakdownEntry where
   fromJS d := do return {
     bytes := ← Lasm.JS.readField (Option Nat) d "bytes",
@@ -59,6 +70,8 @@ structure MemoryMeasurement where
   bytes : Option Nat := none
   /-- `sequence<MemoryBreakdownEntry> breakdown` -/
   breakdown : Option (Array MemoryBreakdownEntry) := none
+instance : ToJS MemoryMeasurement := ⟨fun d => Internal.fields #[("bytes", Internal.optional d.bytes),
+    ("breakdown", Internal.optional d.breakdown)]⟩
 instance : FromJS MemoryMeasurement where
   fromJS d := do return {
     bytes := ← Lasm.JS.readField (Option Nat) d "bytes",
@@ -66,7 +79,7 @@ instance : FromJS MemoryMeasurement where
   typeName := "Lasm.JS.Web.MemoryMeasurement"
 
 /-- `Promise<MemoryMeasurement> measureUserAgentSpecificMemory()` -/
-def Performance.measureUserAgentSpecificMemory (self : Performance) : Async MemoryMeasurement :=
-  self.val.callMethodAwait "measureUserAgentSpecificMemory" (Support.args #[]) MemoryMeasurement
+@[macro_inline] def Performance.measureUserAgentSpecificMemory (self : Performance) : Async MemoryMeasurement := Internal.api "Lasm.JS.Web.Performance.measureUserAgentSpecificMemory" do
+  self.val.callMethodAwait "measureUserAgentSpecificMemory" (Internal.args #[]) MemoryMeasurement
 
 end Lasm.JS.Web

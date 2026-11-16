@@ -6,53 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.Notifications
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum NotificationDirection` (Notifications API Standard (https://notifications.spec.whatwg.org/)): "auto", "ltr", "rtl". -/
-inductive NotificationDirection where
-  /-- "auto" -/
-  | auto
-  /-- "ltr" -/
-  | ltr
-  /-- "rtl" -/
-  | rtl
-  deriving BEq, Repr, Inhabited
-instance : ToJS NotificationDirection := ⟨fun
-  | .auto => .string "auto"
-  | .ltr => .string "ltr"
-  | .rtl => .string "rtl"⟩
-instance : FromJS NotificationDirection where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "ltr" => .ok .ltr
-    | .string "rtl" => .ok .rtl
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.NotificationDirection"
-
-/-- `enum NotificationPermission` (Notifications API Standard (https://notifications.spec.whatwg.org/)): "default", "denied", "granted". -/
-inductive NotificationPermission where
-  /-- "default" -/
-  | default
-  /-- "denied" -/
-  | denied
-  /-- "granted" -/
-  | granted
-  deriving BEq, Repr, Inhabited
-instance : ToJS NotificationPermission := ⟨fun
-  | .default => .string "default"
-  | .denied => .string "denied"
-  | .granted => .string "granted"⟩
-instance : FromJS NotificationPermission where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "denied" => .ok .denied
-    | .string "granted" => .ok .granted
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.NotificationPermission"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary NotificationAction` (Notifications API Standard (https://notifications.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NotificationAction where
@@ -64,10 +27,10 @@ structure NotificationAction where
   navigate : Option String := none
   /-- `USVString icon` -/
   icon : Option String := none
-instance : ToJS NotificationAction := ⟨fun d => Support.fields #[("action", toJS d.action),
+instance : ToJS NotificationAction := ⟨fun d => Internal.fields #[("action", toJS d.action),
     ("title", toJS d.title),
-    ("navigate", Support.optional d.navigate),
-    ("icon", Support.optional d.icon)]⟩
+    ("navigate", Internal.optional d.navigate),
+    ("icon", Internal.optional d.icon)]⟩
 instance : FromJS NotificationAction where
   fromJS d := do return {
     action := ← Lasm.JS.readField String d "action",
@@ -106,20 +69,20 @@ structure NotificationOptions where
   data : Data := .undefined
   /-- `sequence<NotificationAction> actions = []` -/
   actions : Option (Array NotificationAction) := none
-instance : ToJS NotificationOptions := ⟨fun d => Support.fields #[("dir", Support.optional d.dir),
-    ("lang", Support.optional d.lang),
-    ("body", Support.optional d.body),
-    ("navigate", Support.optional d.navigate),
-    ("tag", Support.optional d.tag),
-    ("image", Support.optional d.image),
-    ("icon", Support.optional d.icon),
-    ("badge", Support.optional d.badge),
-    ("timestamp", Support.optional d.timestamp),
-    ("renotify", Support.optional d.renotify),
-    ("silent", Support.optional d.silent),
-    ("requireInteraction", Support.optional d.requireInteraction),
+instance : ToJS NotificationOptions := ⟨fun d => Internal.fields #[("dir", Internal.optional d.dir),
+    ("lang", Internal.optional d.lang),
+    ("body", Internal.optional d.body),
+    ("navigate", Internal.optional d.navigate),
+    ("tag", Internal.optional d.tag),
+    ("image", Internal.optional d.image),
+    ("icon", Internal.optional d.icon),
+    ("badge", Internal.optional d.badge),
+    ("timestamp", Internal.optional d.timestamp),
+    ("renotify", Internal.optional d.renotify),
+    ("silent", Internal.optional d.silent),
+    ("requireInteraction", Internal.optional d.requireInteraction),
     ("data", d.data),
-    ("actions", Support.optional d.actions)]⟩
+    ("actions", Internal.optional d.actions)]⟩
 
 /-- `callback NotificationPermissionCallback = undefined (NotificationPermission permission)` (Notifications API Standard (https://notifications.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure NotificationPermissionCallback where
@@ -130,10 +93,10 @@ instance : ToJS NotificationPermissionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS NotificationPermissionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.NotificationPermissionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def NotificationPermissionCallback.ofFn (f : NotificationPermission → Async Unit) : IO NotificationPermissionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg NotificationPermission args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg NotificationPermission args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def NotificationPermissionCallback.ofSyncFn (f : NotificationPermission → IO Unit) : IO NotificationPermissionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg NotificationPermission args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg NotificationPermission args 0)) }
 
 /-- `dictionary NotificationEventInit : ExtendableEventInit` (Notifications API Standard (https://notifications.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NotificationEventInit where
@@ -147,152 +110,176 @@ structure NotificationEventInit where
   notification : Notification
   /-- `DOMString action = ""` -/
   action : Option String := none
-instance : ToJS NotificationEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS NotificationEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("notification", toJS d.notification),
-    ("action", Support.optional d.action)]⟩
+    ("action", Internal.optional d.action)]⟩
 
 /-- `dictionary GetNotificationOptions` (Notifications API Standard (https://notifications.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GetNotificationOptions where
   /-- `DOMString tag = ""` -/
   tag : Option String := none
-instance : ToJS GetNotificationOptions := ⟨fun d => Support.fields #[("tag", Support.optional d.tag)]⟩
+instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", Internal.optional d.tag)]⟩
 
 /-- `v instanceof Notification`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Notification`). -/
-def Notification.cast? (v : Value) : IO (Option Notification) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Notification"] Value) v) then some { val := v } else none
+@[macro_inline] def Notification.cast? (v : Value) : IO (Option Notification) := Internal.api "Lasm.JS.Web.Notification.cast?" do
+  Internal.cast (Internal.getGlobal ["Notification"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString title, optional NotificationOptions options)` -/
-def Notification.new (title : String) (options : Option NotificationOptions := none) : IO Notification :=
+@[macro_inline] def Notification.new (title : String) (options : Option NotificationOptions := none) : IO Notification := Internal.api "Lasm.JS.Web.Notification.new" do
   Lasm.JS.Binding.invoke Notification { name := "Lasm.JS.Web.Notification.new", module := "globalThis", path := "Notification", construct := true, arity := 2 }
-    (Support.args #[toJS title, Support.optional options]) (await := false)
+    (Internal.args #[toJS title, Internal.optional options]) (await := false)
 
 /-- `static readonly attribute NotificationPermission permission` -/
-def Notification.permission : IO NotificationPermission := Support.getGlobal ["Notification", "permission"] NotificationPermission
+@[macro_inline] def Notification.permission : IO NotificationPermission := Internal.api "Lasm.JS.Web.Notification.permission" do
+  Internal.getGlobal ["Notification", "permission"] NotificationPermission
 
 /-- `static readonly attribute unsigned long maxActions` -/
-def Notification.maxActions : IO Nat := Support.getGlobal ["Notification", "maxActions"] Nat
+@[macro_inline] def Notification.maxActions : IO Nat := Internal.api "Lasm.JS.Web.Notification.maxActions" do
+  Internal.getGlobal ["Notification", "maxActions"] Nat
 
 /-- `attribute EventHandler onclick` -/
-def Notification.onclick (self : Notification) : IO (Option EventHandlerNonNull) := self.val.get "onclick" (Option EventHandlerNonNull)
+@[macro_inline] def Notification.onclick (self : Notification) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Notification.onclick" do
+  self.val.get "onclick" (Option EventHandlerNonNull)
 
 /-- Sets `onclick`: `attribute EventHandler onclick` -/
-def Notification.setOnclick (self : Notification) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Notification.setOnclick (self : Notification) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Notification.setOnclick" do
   self.val.set "onclick" (toJS value)
 
 /-- `attribute EventHandler onshow` -/
-def Notification.onshow (self : Notification) : IO (Option EventHandlerNonNull) := self.val.get "onshow" (Option EventHandlerNonNull)
+@[macro_inline] def Notification.onshow (self : Notification) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Notification.onshow" do
+  self.val.get "onshow" (Option EventHandlerNonNull)
 
 /-- Sets `onshow`: `attribute EventHandler onshow` -/
-def Notification.setOnshow (self : Notification) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Notification.setOnshow (self : Notification) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Notification.setOnshow" do
   self.val.set "onshow" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def Notification.onerror (self : Notification) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def Notification.onerror (self : Notification) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Notification.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def Notification.setOnerror (self : Notification) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Notification.setOnerror (self : Notification) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Notification.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def Notification.onclose (self : Notification) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def Notification.onclose (self : Notification) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Notification.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def Notification.setOnclose (self : Notification) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Notification.setOnclose (self : Notification) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Notification.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `readonly attribute DOMString title` -/
-def Notification.title (self : Notification) : IO String := self.val.get "title" String
+@[macro_inline] def Notification.title (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.title" do
+  self.val.get "title" String
 
 /-- `readonly attribute NotificationDirection dir` -/
-def Notification.dir (self : Notification) : IO NotificationDirection := self.val.get "dir" NotificationDirection
+@[macro_inline] def Notification.dir (self : Notification) : IO NotificationDirection := Internal.api "Lasm.JS.Web.Notification.dir" do
+  self.val.get "dir" NotificationDirection
 
 /-- `readonly attribute DOMString lang` -/
-def Notification.lang (self : Notification) : IO String := self.val.get "lang" String
+@[macro_inline] def Notification.lang (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.lang" do
+  self.val.get "lang" String
 
 /-- `readonly attribute DOMString body` -/
-def Notification.body (self : Notification) : IO String := self.val.get "body" String
+@[macro_inline] def Notification.body (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.body" do
+  self.val.get "body" String
 
 /-- `readonly attribute USVString navigate` -/
-def Notification.navigate (self : Notification) : IO String := self.val.get "navigate" String
+@[macro_inline] def Notification.navigate (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.navigate" do
+  self.val.get "navigate" String
 
 /-- `readonly attribute DOMString tag` -/
-def Notification.tag (self : Notification) : IO String := self.val.get "tag" String
+@[macro_inline] def Notification.tag (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.tag" do
+  self.val.get "tag" String
 
 /-- `readonly attribute USVString image` -/
-def Notification.image (self : Notification) : IO String := self.val.get "image" String
+@[macro_inline] def Notification.image (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.image" do
+  self.val.get "image" String
 
 /-- `readonly attribute USVString icon` -/
-def Notification.icon (self : Notification) : IO String := self.val.get "icon" String
+@[macro_inline] def Notification.icon (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.icon" do
+  self.val.get "icon" String
 
 /-- `readonly attribute USVString badge` -/
-def Notification.badge (self : Notification) : IO String := self.val.get "badge" String
+@[macro_inline] def Notification.badge (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.badge" do
+  self.val.get "badge" String
 
 /-- `readonly attribute EpochTimeStamp timestamp` -/
-def Notification.timestamp (self : Notification) : IO Nat := self.val.get "timestamp" Nat
+@[macro_inline] def Notification.timestamp (self : Notification) : IO Nat := Internal.api "Lasm.JS.Web.Notification.timestamp" do
+  self.val.get "timestamp" Nat
 
 /-- `readonly attribute boolean renotify` -/
-def Notification.renotify (self : Notification) : IO Bool := self.val.get "renotify" Bool
+@[macro_inline] def Notification.renotify (self : Notification) : IO Bool := Internal.api "Lasm.JS.Web.Notification.renotify" do
+  self.val.get "renotify" Bool
 
 /-- `readonly attribute boolean? silent` -/
-def Notification.silent (self : Notification) : IO (Option Bool) := self.val.get "silent" (Option Bool)
+@[macro_inline] def Notification.silent (self : Notification) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Notification.silent" do
+  self.val.get "silent" (Option Bool)
 
 /-- `readonly attribute boolean requireInteraction` -/
-def Notification.requireInteraction (self : Notification) : IO Bool := self.val.get "requireInteraction" Bool
+@[macro_inline] def Notification.requireInteraction (self : Notification) : IO Bool := Internal.api "Lasm.JS.Web.Notification.requireInteraction" do
+  self.val.get "requireInteraction" Bool
 
 /-- `readonly attribute any data` -/
-def Notification.data (self : Notification) : IO Data := self.val.get "data" Data
+@[macro_inline] def Notification.data (self : Notification) : IO Data := Internal.api "Lasm.JS.Web.Notification.data" do
+  self.val.get "data" Data
 
 /-- `readonly attribute FrozenArray<NotificationAction> actions` -/
-def Notification.actions (self : Notification) : IO (Array NotificationAction) := self.val.get "actions" (Array NotificationAction)
+@[macro_inline] def Notification.actions (self : Notification) : IO (Array NotificationAction) := Internal.api "Lasm.JS.Web.Notification.actions" do
+  self.val.get "actions" (Array NotificationAction)
 
 /-- `static Promise<NotificationPermission> requestPermission(optional NotificationPermissionCallback deprecatedCallback)` -/
-def Notification.requestPermission (deprecatedCallback : Option NotificationPermissionCallback := none) : Async NotificationPermission :=
+@[macro_inline] def Notification.requestPermission (deprecatedCallback : Option NotificationPermissionCallback := none) : Async NotificationPermission := Internal.api "Lasm.JS.Web.Notification.requestPermission" do
   Lasm.JS.Binding.invokeAsync NotificationPermission { name := "Lasm.JS.Web.Notification.requestPermission", module := "globalThis", path := "Notification.requestPermission", construct := false, arity := 1 }
-    (Support.args #[Support.optional deprecatedCallback])
+    (Internal.args #[Internal.optional deprecatedCallback])
 
 /-- `undefined close()` -/
-def Notification.close (self : Notification) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Notification.close (self : Notification) : IO Unit := Internal.api "Lasm.JS.Web.Notification.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `v instanceof NotificationEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NotificationEvent`). -/
-def NotificationEvent.cast? (v : Value) : IO (Option NotificationEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NotificationEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def NotificationEvent.cast? (v : Value) : IO (Option NotificationEvent) := Internal.api "Lasm.JS.Web.NotificationEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["NotificationEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, NotificationEventInit eventInitDict)` -/
-def NotificationEvent.new (type : String) (eventInitDict : NotificationEventInit) : IO NotificationEvent :=
+@[macro_inline] def NotificationEvent.new (type : String) (eventInitDict : NotificationEventInit) : IO NotificationEvent := Internal.api "Lasm.JS.Web.NotificationEvent.new" do
   Lasm.JS.Binding.invoke NotificationEvent { name := "Lasm.JS.Web.NotificationEvent.new", module := "globalThis", path := "NotificationEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute Notification notification` -/
-def NotificationEvent.notification (self : NotificationEvent) : IO Notification := do
+@[macro_inline] def NotificationEvent.notification (self : NotificationEvent) : IO Notification := Internal.api "Lasm.JS.Web.NotificationEvent.notification" do
   let r ← self.val.get "notification" Value
   pure { val := r }
 
 /-- `readonly attribute DOMString action` -/
-def NotificationEvent.action (self : NotificationEvent) : IO String := self.val.get "action" String
+@[macro_inline] def NotificationEvent.action (self : NotificationEvent) : IO String := Internal.api "Lasm.JS.Web.NotificationEvent.action" do
+  self.val.get "action" String
 
 /-- `attribute EventHandler onnotificationclick` -/
-def ServiceWorkerGlobalScope.onnotificationclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onnotificationclick" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onnotificationclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onnotificationclick" do
+  self.val.get "onnotificationclick" (Option EventHandlerNonNull)
 
 /-- Sets `onnotificationclick`: `attribute EventHandler onnotificationclick` -/
-def ServiceWorkerGlobalScope.setOnnotificationclick (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnnotificationclick (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnnotificationclick" do
   self.val.set "onnotificationclick" (toJS value)
 
 /-- `attribute EventHandler onnotificationclose` -/
-def ServiceWorkerGlobalScope.onnotificationclose (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onnotificationclose" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onnotificationclose (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onnotificationclose" do
+  self.val.get "onnotificationclose" (Option EventHandlerNonNull)
 
 /-- Sets `onnotificationclose`: `attribute EventHandler onnotificationclose` -/
-def ServiceWorkerGlobalScope.setOnnotificationclose (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnnotificationclose (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnnotificationclose" do
   self.val.set "onnotificationclose" (toJS value)
 
 /-- `Promise<undefined> showNotification(DOMString title, optional NotificationOptions options)` -/
-def ServiceWorkerRegistration.showNotification (self : ServiceWorkerRegistration) (title : String) (options : Option NotificationOptions := none) : Async Unit :=
-  self.val.callMethodAwait "showNotification" (Support.args #[toJS title, Support.optional options]) Unit
+@[macro_inline] def ServiceWorkerRegistration.showNotification (self : ServiceWorkerRegistration) (title : String) (options : Option NotificationOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.showNotification" do
+  self.val.callMethodAwait "showNotification" (Internal.args #[toJS title, Internal.optional options]) Unit
 
 /-- `Promise<sequence<Notification>> getNotifications(optional GetNotificationOptions filter)` -/
-def ServiceWorkerRegistration.getNotifications (self : ServiceWorkerRegistration) (filter : Option GetNotificationOptions := none) : Async (Array Notification) :=
-  self.val.callMethodAwait "getNotifications" (Support.args #[Support.optional filter]) (Array Notification)
+@[macro_inline] def ServiceWorkerRegistration.getNotifications (self : ServiceWorkerRegistration) (filter : Option GetNotificationOptions := none) : Async (Array Notification) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.getNotifications" do
+  self.val.callMethodAwait "getNotifications" (Internal.args #[Internal.optional filter]) (Array Notification)
 
 end Lasm.JS.Web

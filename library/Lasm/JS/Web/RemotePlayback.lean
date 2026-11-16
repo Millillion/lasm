@@ -6,32 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.RemotePlayback
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum RemotePlaybackState` (Remote Playback API (https://w3c.github.io/remote-playback/)): "connecting", "connected", "disconnected". -/
-inductive RemotePlaybackState where
-  /-- "connecting" -/
-  | connecting
-  /-- "connected" -/
-  | connected
-  /-- "disconnected" -/
-  | disconnected
-  deriving BEq, Repr, Inhabited
-instance : ToJS RemotePlaybackState := ⟨fun
-  | .connecting => .string "connecting"
-  | .connected => .string "connected"
-  | .disconnected => .string "disconnected"⟩
-instance : FromJS RemotePlaybackState where
-  fromJS
-    | .string "connecting" => .ok .connecting
-    | .string "connected" => .ok .connected
-    | .string "disconnected" => .ok .disconnected
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RemotePlaybackState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback RemotePlaybackAvailabilityCallback = undefined (boolean available)` (Remote Playback API (https://w3c.github.io/remote-playback/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure RemotePlaybackAvailabilityCallback where
@@ -42,61 +26,66 @@ instance : ToJS RemotePlaybackAvailabilityCallback := ⟨fun x => .ref x.val ""�
 instance : FromJS RemotePlaybackAvailabilityCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.RemotePlaybackAvailabilityCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def RemotePlaybackAvailabilityCallback.ofFn (f : Bool → Async Unit) : IO RemotePlaybackAvailabilityCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Bool args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def RemotePlaybackAvailabilityCallback.ofSyncFn (f : Bool → IO Unit) : IO RemotePlaybackAvailabilityCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Bool args 0)) }
 
 /-- `v instanceof RemotePlayback`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RemotePlayback`). -/
-def RemotePlayback.cast? (v : Value) : IO (Option RemotePlayback) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RemotePlayback"] Value) v) then some { val := v } else none
+@[macro_inline] def RemotePlayback.cast? (v : Value) : IO (Option RemotePlayback) := Internal.api "Lasm.JS.Web.RemotePlayback.cast?" do
+  Internal.cast (Internal.getGlobal ["RemotePlayback"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RemotePlaybackState state` -/
-def RemotePlayback.state (self : RemotePlayback) : IO RemotePlaybackState := self.val.get "state" RemotePlaybackState
+@[macro_inline] def RemotePlayback.state (self : RemotePlayback) : IO RemotePlaybackState := Internal.api "Lasm.JS.Web.RemotePlayback.state" do
+  self.val.get "state" RemotePlaybackState
 
 /-- `attribute EventHandler onconnecting` -/
-def RemotePlayback.onconnecting (self : RemotePlayback) : IO (Option EventHandlerNonNull) := self.val.get "onconnecting" (Option EventHandlerNonNull)
+@[macro_inline] def RemotePlayback.onconnecting (self : RemotePlayback) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RemotePlayback.onconnecting" do
+  self.val.get "onconnecting" (Option EventHandlerNonNull)
 
 /-- Sets `onconnecting`: `attribute EventHandler onconnecting` -/
-def RemotePlayback.setOnconnecting (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RemotePlayback.setOnconnecting (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RemotePlayback.setOnconnecting" do
   self.val.set "onconnecting" (toJS value)
 
 /-- `attribute EventHandler onconnect` -/
-def RemotePlayback.onconnect (self : RemotePlayback) : IO (Option EventHandlerNonNull) := self.val.get "onconnect" (Option EventHandlerNonNull)
+@[macro_inline] def RemotePlayback.onconnect (self : RemotePlayback) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RemotePlayback.onconnect" do
+  self.val.get "onconnect" (Option EventHandlerNonNull)
 
 /-- Sets `onconnect`: `attribute EventHandler onconnect` -/
-def RemotePlayback.setOnconnect (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RemotePlayback.setOnconnect (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RemotePlayback.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `attribute EventHandler ondisconnect` -/
-def RemotePlayback.ondisconnect (self : RemotePlayback) : IO (Option EventHandlerNonNull) := self.val.get "ondisconnect" (Option EventHandlerNonNull)
+@[macro_inline] def RemotePlayback.ondisconnect (self : RemotePlayback) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RemotePlayback.ondisconnect" do
+  self.val.get "ondisconnect" (Option EventHandlerNonNull)
 
 /-- Sets `ondisconnect`: `attribute EventHandler ondisconnect` -/
-def RemotePlayback.setOndisconnect (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RemotePlayback.setOndisconnect (self : RemotePlayback) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RemotePlayback.setOndisconnect" do
   self.val.set "ondisconnect" (toJS value)
 
 /-- `Promise<long> watchAvailability(RemotePlaybackAvailabilityCallback callback)` -/
-def RemotePlayback.watchAvailability (self : RemotePlayback) (callback : RemotePlaybackAvailabilityCallback) : Async Int :=
-  self.val.callMethodAwait "watchAvailability" (Support.args #[toJS callback]) Int
+@[macro_inline] def RemotePlayback.watchAvailability (self : RemotePlayback) (callback : RemotePlaybackAvailabilityCallback) : Async Int := Internal.api "Lasm.JS.Web.RemotePlayback.watchAvailability" do
+  self.val.callMethodAwait "watchAvailability" (Internal.args #[toJS callback]) Int
 
 /-- `Promise<undefined> cancelWatchAvailability(optional long id)` -/
-def RemotePlayback.cancelWatchAvailability (self : RemotePlayback) (id : Option Int := none) : Async Unit :=
-  self.val.callMethodAwait "cancelWatchAvailability" (Support.args #[Support.optional id]) Unit
+@[macro_inline] def RemotePlayback.cancelWatchAvailability (self : RemotePlayback) (id : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Web.RemotePlayback.cancelWatchAvailability" do
+  self.val.callMethodAwait "cancelWatchAvailability" (Internal.args #[Internal.optional id]) Unit
 
 /-- `Promise<undefined> prompt()` -/
-def RemotePlayback.prompt (self : RemotePlayback) : Async Unit :=
-  self.val.callMethodAwait "prompt" (Support.args #[]) Unit
+@[macro_inline] def RemotePlayback.prompt (self : RemotePlayback) : Async Unit := Internal.api "Lasm.JS.Web.RemotePlayback.prompt" do
+  self.val.callMethodAwait "prompt" (Internal.args #[]) Unit
 
 /-- `readonly attribute RemotePlayback remote` -/
-def HTMLMediaElement.remote (self : HTMLMediaElement) : IO RemotePlayback := do
+@[macro_inline] def HTMLMediaElement.remote (self : HTMLMediaElement) : IO RemotePlayback := Internal.api "Lasm.JS.Web.HTMLMediaElement.remote" do
   let r ← self.val.get "remote" Value
   pure { val := r }
 
 /-- `attribute boolean disableRemotePlayback` -/
-def HTMLMediaElement.disableRemotePlayback (self : HTMLMediaElement) : IO Bool := self.val.get "disableRemotePlayback" Bool
+@[macro_inline] def HTMLMediaElement.disableRemotePlayback (self : HTMLMediaElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLMediaElement.disableRemotePlayback" do
+  self.val.get "disableRemotePlayback" Bool
 
 /-- Sets `disableRemotePlayback`: `attribute boolean disableRemotePlayback` -/
-def HTMLMediaElement.setDisableRemotePlayback (self : HTMLMediaElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLMediaElement.setDisableRemotePlayback (self : HTMLMediaElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setDisableRemotePlayback" do
   self.val.set "disableRemotePlayback" (toJS value)
 
 end Lasm.JS.Web

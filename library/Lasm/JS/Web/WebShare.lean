@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.FileAPI
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ShareData` (Web Share API (https://w3c.github.io/web-share/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ShareData where
@@ -21,17 +25,17 @@ structure ShareData where
   text : Option String := none
   /-- `USVString url` -/
   url : Option String := none
-instance : ToJS ShareData := ⟨fun d => Support.fields #[("files", Support.optional d.files),
-    ("title", Support.optional d.title),
-    ("text", Support.optional d.text),
-    ("url", Support.optional d.url)]⟩
+instance : ToJS ShareData := ⟨fun d => Internal.fields #[("files", Internal.optional d.files),
+    ("title", Internal.optional d.title),
+    ("text", Internal.optional d.text),
+    ("url", Internal.optional d.url)]⟩
 
 /-- `Promise<undefined> share(optional ShareData data)` -/
-def Navigator.share (self : Navigator) (data : Option ShareData := none) : Async Unit :=
-  self.val.callMethodAwait "share" (Support.args #[Support.optional data]) Unit
+@[macro_inline] def Navigator.share (self : Navigator) (data : Option ShareData := none) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.share" do
+  self.val.callMethodAwait "share" (Internal.args #[Internal.optional data]) Unit
 
 /-- `boolean canShare(optional ShareData data)` -/
-def Navigator.canShare (self : Navigator) (data : Option ShareData := none) : IO Bool :=
-  self.val.callMethod "canShare" (Support.args #[Support.optional data]) Bool
+@[macro_inline] def Navigator.canShare (self : Navigator) (data : Option ShareData := none) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.canShare" do
+  self.val.callMethod "canShare" (Internal.args #[Internal.optional data]) Bool
 
 end Lasm.JS.Web

@@ -6,21 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.WasmJsApi
 import Lasm.JS.Web.WasmJsApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `Promise<Module> compileStreaming(Promise<Response> source, optional WebAssemblyCompileOptions options)` (WebAssembly Web API (https://webassembly.github.io/spec/web-api/)) -/
-def WebAssembly.compileStreaming (source : Value) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := do
+@[macro_inline] def WebAssembly.compileStreaming (source : Value) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := Internal.api "Lasm.JS.Web.WebAssembly.compileStreaming" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.compileStreaming", module := "globalThis", path := "WebAssembly.compileStreaming", construct := false, arity := 2 }
-    (Support.args #[toJS source, Support.optional options])
+    (Internal.args #[toJS source, Internal.optional options])
   pure { val := r }
 
 /-- `Promise<WebAssemblyInstantiatedSource> instantiateStreaming(Promise<Response> source, optional object importObject, optional WebAssemblyCompileOptions options)` (WebAssembly Web API (https://webassembly.github.io/spec/web-api/)) -/
-def WebAssembly.instantiateStreaming (source : Value) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource :=
+@[macro_inline] def WebAssembly.instantiateStreaming (source : Value) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource := Internal.api "Lasm.JS.Web.WebAssembly.instantiateStreaming" do
   Lasm.JS.Binding.invokeAsync WebAssemblyInstantiatedSource { name := "Lasm.JS.Web.WebAssembly.instantiateStreaming", module := "globalThis", path := "WebAssembly.instantiateStreaming", construct := false, arity := 3 }
-    (Support.args #[toJS source, importObject, Support.optional options])
+    (Internal.args #[toJS source, importObject, Internal.optional options])
 
 end Lasm.JS.Web

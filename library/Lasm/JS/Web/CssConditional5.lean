@@ -6,10 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssConditional
+import Lasm.JS.Web.Types.CssConditional5
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CSSContainerCondition` (CSS Conditional Rules Module Level 5 (https://drafts.csswg.org/css-conditional-5/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CSSContainerCondition where
@@ -17,6 +22,8 @@ structure CSSContainerCondition where
   name : String
   /-- `required CSSOMString query` -/
   query : String
+instance : ToJS CSSContainerCondition := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("query", toJS d.query)]⟩
 instance : FromJS CSSContainerCondition where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -24,23 +31,27 @@ instance : FromJS CSSContainerCondition where
   typeName := "Lasm.JS.Web.CSSContainerCondition"
 
 /-- `v instanceof CSSContainerRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSContainerRule`). -/
-def CSSContainerRule.cast? (v : Value) : IO (Option CSSContainerRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSContainerRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSContainerRule.cast? (v : Value) : IO (Option CSSContainerRule) := Internal.api "Lasm.JS.Web.CSSContainerRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSContainerRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString containerName` -/
-def CSSContainerRule.containerName (self : CSSContainerRule) : IO String := self.val.get "containerName" String
+@[macro_inline] def CSSContainerRule.containerName (self : CSSContainerRule) : IO String := Internal.api "Lasm.JS.Web.CSSContainerRule.containerName" do
+  self.val.get "containerName" String
 
 /-- `readonly attribute CSSOMString containerQuery` -/
-def CSSContainerRule.containerQuery (self : CSSContainerRule) : IO String := self.val.get "containerQuery" String
+@[macro_inline] def CSSContainerRule.containerQuery (self : CSSContainerRule) : IO String := Internal.api "Lasm.JS.Web.CSSContainerRule.containerQuery" do
+  self.val.get "containerQuery" String
 
 /-- `readonly attribute FrozenArray<CSSContainerCondition> conditions` -/
-def CSSContainerRule.conditions (self : CSSContainerRule) : IO (Array CSSContainerCondition) := self.val.get "conditions" (Array CSSContainerCondition)
+@[macro_inline] def CSSContainerRule.conditions (self : CSSContainerRule) : IO (Array CSSContainerCondition) := Internal.api "Lasm.JS.Web.CSSContainerRule.conditions" do
+  self.val.get "conditions" (Array CSSContainerCondition)
 
 /-- `v instanceof CSSSupportsConditionRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSSupportsConditionRule`). -/
-def CSSSupportsConditionRule.cast? (v : Value) : IO (Option CSSSupportsConditionRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSSupportsConditionRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSSupportsConditionRule.cast? (v : Value) : IO (Option CSSSupportsConditionRule) := Internal.api "Lasm.JS.Web.CSSSupportsConditionRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSSupportsConditionRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSSupportsConditionRule.name (self : CSSSupportsConditionRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSSupportsConditionRule.name (self : CSSSupportsConditionRule) : IO String := Internal.api "Lasm.JS.Web.CSSSupportsConditionRule.name" do
+  self.val.get "name" String
 
 end Lasm.JS.Web

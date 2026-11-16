@@ -6,35 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.PointerAnimations
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PointerAxis` (Pointer-driven Animations Module Level 1 (https://drafts.csswg.org/pointer-animations-1/)): "block", "inline", "x", "y". -/
-inductive PointerAxis where
-  /-- "block" -/
-  | block
-  /-- "inline" -/
-  | inline
-  /-- "x" -/
-  | x
-  /-- "y" -/
-  | y
-  deriving BEq, Repr, Inhabited
-instance : ToJS PointerAxis := ⟨fun
-  | .block => .string "block"
-  | .inline => .string "inline"
-  | .x => .string "x"
-  | .y => .string "y"⟩
-instance : FromJS PointerAxis where
-  fromJS
-    | .string "block" => .ok .block
-    | .string "inline" => .ok .inline
-    | .string "x" => .ok .x
-    | .string "y" => .ok .y
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PointerAxis"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PointerTimelineOptions` (Pointer-driven Animations Module Level 1 (https://drafts.csswg.org/pointer-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PointerTimelineOptions where
@@ -42,22 +22,24 @@ structure PointerTimelineOptions where
   source : Option Element := none
   /-- `PointerAxis axis = "block"` -/
   axis : Option PointerAxis := none
-instance : ToJS PointerTimelineOptions := ⟨fun d => Support.fields #[("source", Support.optional d.source),
-    ("axis", Support.optional d.axis)]⟩
+instance : ToJS PointerTimelineOptions := ⟨fun d => Internal.fields #[("source", Internal.optional d.source),
+    ("axis", Internal.optional d.axis)]⟩
 
 /-- `v instanceof PointerTimeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PointerTimeline`). -/
-def PointerTimeline.cast? (v : Value) : IO (Option PointerTimeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PointerTimeline"] Value) v) then some { val := v } else none
+@[macro_inline] def PointerTimeline.cast? (v : Value) : IO (Option PointerTimeline) := Internal.api "Lasm.JS.Web.PointerTimeline.cast?" do
+  Internal.cast (Internal.getGlobal ["PointerTimeline"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional PointerTimelineOptions options)` -/
-def PointerTimeline.new (options : Option PointerTimelineOptions := none) : IO PointerTimeline :=
+@[macro_inline] def PointerTimeline.new (options : Option PointerTimelineOptions := none) : IO PointerTimeline := Internal.api "Lasm.JS.Web.PointerTimeline.new" do
   Lasm.JS.Binding.invoke PointerTimeline { name := "Lasm.JS.Web.PointerTimeline.new", module := "globalThis", path := "PointerTimeline", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute Element? source` -/
-def PointerTimeline.source (self : PointerTimeline) : IO (Option Element) := self.val.get "source" (Option Element)
+@[macro_inline] def PointerTimeline.source (self : PointerTimeline) : IO (Option Element) := Internal.api "Lasm.JS.Web.PointerTimeline.source" do
+  self.val.get "source" (Option Element)
 
 /-- `readonly attribute PointerAxis axis` -/
-def PointerTimeline.axis (self : PointerTimeline) : IO PointerAxis := self.val.get "axis" PointerAxis
+@[macro_inline] def PointerTimeline.axis (self : PointerTimeline) : IO PointerAxis := Internal.api "Lasm.JS.Web.PointerTimeline.axis" do
+  self.val.get "axis" PointerAxis
 
 end Lasm.JS.Web

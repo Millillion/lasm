@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.AutofillEvent
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AutofillEventInit : EventInit` (Autofill Event (https://wicg.github.io/autofill-event/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AutofillEventInit where
@@ -23,11 +27,11 @@ structure AutofillEventInit where
   autofillValues : Option (Array (Array Data)) := none
   /-- `boolean allowRefill = true` -/
   allowRefill : Option Bool := none
-instance : ToJS AutofillEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("autofillValues", Support.optional d.autofillValues),
-    ("allowRefill", Support.optional d.allowRefill)]⟩
+instance : ToJS AutofillEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("autofillValues", Internal.optional d.autofillValues),
+    ("allowRefill", Internal.optional d.allowRefill)]⟩
 
 /-- `callback RefillCallback = Promise<undefined> ()` (Autofill Event (https://wicg.github.io/autofill-event/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure RefillCallback where
@@ -44,18 +48,20 @@ def RefillCallback.ofSyncFn (f : IO Unit) : IO RefillCallback := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `v instanceof AutofillEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AutofillEvent`). -/
-def AutofillEvent.cast? (v : Value) : IO (Option AutofillEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AutofillEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def AutofillEvent.cast? (v : Value) : IO (Option AutofillEvent) := Internal.api "Lasm.JS.Web.AutofillEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["AutofillEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional AutofillEventInit eventInitDict)` -/
-def AutofillEvent.new (type : String) (eventInitDict : Option AutofillEventInit := none) : IO AutofillEvent :=
+@[macro_inline] def AutofillEvent.new (type : String) (eventInitDict : Option AutofillEventInit := none) : IO AutofillEvent := Internal.api "Lasm.JS.Web.AutofillEvent.new" do
   Lasm.JS.Binding.invoke AutofillEvent { name := "Lasm.JS.Web.AutofillEvent.new", module := "globalThis", path := "AutofillEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<AutofillValueEntry> autofillValues` -/
-def AutofillEvent.autofillValues (self : AutofillEvent) : IO (Array (Array Data)) := self.val.get "autofillValues" (Array (Array Data))
+@[macro_inline] def AutofillEvent.autofillValues (self : AutofillEvent) : IO (Array (Array Data)) := Internal.api "Lasm.JS.Web.AutofillEvent.autofillValues" do
+  self.val.get "autofillValues" (Array (Array Data))
 
 /-- `readonly attribute RefillCallback? refill` -/
-def AutofillEvent.refill (self : AutofillEvent) : IO (Option RefillCallback) := self.val.get "refill" (Option RefillCallback)
+@[macro_inline] def AutofillEvent.refill (self : AutofillEvent) : IO (Option RefillCallback) := Internal.api "Lasm.JS.Web.AutofillEvent.refill" do
+  self.val.get "refill" (Option RefillCallback)
 
 end Lasm.JS.Web

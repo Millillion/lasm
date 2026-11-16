@@ -6,11 +6,18 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.Fs
+import Lasm.JS.Web.Types.IndexedDB
+import Lasm.JS.Web.Types.StorageBuckets
 import Lasm.JS.Web.Storage
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary StorageBucketOptions` (Storage Buckets API (https://wicg.github.io/storage-buckets/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StorageBucketOptions where
@@ -20,76 +27,77 @@ structure StorageBucketOptions where
   quota : Option Nat := none
   /-- `DOMHighResTimeStamp expires` -/
   expires : Option Float := none
-instance : ToJS StorageBucketOptions := ⟨fun d => Support.fields #[("persisted", Support.optional d.persisted),
-    ("quota", Support.optional d.quota),
-    ("expires", Support.optional d.expires)]⟩
+instance : ToJS StorageBucketOptions := ⟨fun d => Internal.fields #[("persisted", Internal.optional d.persisted),
+    ("quota", Internal.optional d.quota),
+    ("expires", Internal.optional d.expires)]⟩
 
 /-- `v instanceof StorageBucket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StorageBucket`). -/
-def StorageBucket.cast? (v : Value) : IO (Option StorageBucket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageBucket"] Value) v) then some { val := v } else none
+@[macro_inline] def StorageBucket.cast? (v : Value) : IO (Option StorageBucket) := Internal.api "Lasm.JS.Web.StorageBucket.cast?" do
+  Internal.cast (Internal.getGlobal ["StorageBucket"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def StorageBucket.name (self : StorageBucket) : IO String := self.val.get "name" String
+@[macro_inline] def StorageBucket.name (self : StorageBucket) : IO String := Internal.api "Lasm.JS.Web.StorageBucket.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute IDBFactory indexedDB` -/
-def StorageBucket.indexedDB (self : StorageBucket) : IO IDBFactory := do
+@[macro_inline] def StorageBucket.indexedDB (self : StorageBucket) : IO IDBFactory := Internal.api "Lasm.JS.Web.StorageBucket.indexedDB" do
   let r ← self.val.get "indexedDB" Value
   pure { val := r }
 
 /-- `readonly attribute CacheStorage caches` -/
-def StorageBucket.caches (self : StorageBucket) : IO CacheStorage := do
+@[macro_inline] def StorageBucket.caches (self : StorageBucket) : IO CacheStorage := Internal.api "Lasm.JS.Web.StorageBucket.caches" do
   let r ← self.val.get "caches" Value
   pure { val := r }
 
 /-- `Promise<boolean> persist()` -/
-def StorageBucket.persist (self : StorageBucket) : Async Bool :=
-  self.val.callMethodAwait "persist" (Support.args #[]) Bool
+@[macro_inline] def StorageBucket.persist (self : StorageBucket) : Async Bool := Internal.api "Lasm.JS.Web.StorageBucket.persist" do
+  self.val.callMethodAwait "persist" (Internal.args #[]) Bool
 
 /-- `Promise<boolean> persisted()` -/
-def StorageBucket.persisted (self : StorageBucket) : Async Bool :=
-  self.val.callMethodAwait "persisted" (Support.args #[]) Bool
+@[macro_inline] def StorageBucket.persisted (self : StorageBucket) : Async Bool := Internal.api "Lasm.JS.Web.StorageBucket.persisted" do
+  self.val.callMethodAwait "persisted" (Internal.args #[]) Bool
 
 /-- `Promise<StorageEstimate> estimate()` -/
-def StorageBucket.estimate (self : StorageBucket) : Async StorageEstimate :=
-  self.val.callMethodAwait "estimate" (Support.args #[]) StorageEstimate
+@[macro_inline] def StorageBucket.estimate (self : StorageBucket) : Async StorageEstimate := Internal.api "Lasm.JS.Web.StorageBucket.estimate" do
+  self.val.callMethodAwait "estimate" (Internal.args #[]) StorageEstimate
 
 /-- `Promise<undefined> setExpires(DOMHighResTimeStamp expires)` -/
-def StorageBucket.setExpires (self : StorageBucket) (expires : Float) : Async Unit :=
-  self.val.callMethodAwait "setExpires" (Support.args #[toJS expires]) Unit
+@[macro_inline] def StorageBucket.setExpires (self : StorageBucket) (expires : Float) : Async Unit := Internal.api "Lasm.JS.Web.StorageBucket.setExpires" do
+  self.val.callMethodAwait "setExpires" (Internal.args #[toJS expires]) Unit
 
 /-- `Promise<DOMHighResTimeStamp?> expires()` -/
-def StorageBucket.expires (self : StorageBucket) : Async (Option Float) :=
-  self.val.callMethodAwait "expires" (Support.args #[]) (Option Float)
+@[macro_inline] def StorageBucket.expires (self : StorageBucket) : Async (Option Float) := Internal.api "Lasm.JS.Web.StorageBucket.expires" do
+  self.val.callMethodAwait "expires" (Internal.args #[]) (Option Float)
 
 /-- `Promise<FileSystemDirectoryHandle> getDirectory()` -/
-def StorageBucket.getDirectory (self : StorageBucket) : Async FileSystemDirectoryHandle := do
-  let r ← self.val.callMethodAwait "getDirectory" (Support.args #[]) Value
+@[macro_inline] def StorageBucket.getDirectory (self : StorageBucket) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.StorageBucket.getDirectory" do
+  let r ← self.val.callMethodAwait "getDirectory" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof StorageBucketManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StorageBucketManager`). -/
-def StorageBucketManager.cast? (v : Value) : IO (Option StorageBucketManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageBucketManager"] Value) v) then some { val := v } else none
+@[macro_inline] def StorageBucketManager.cast? (v : Value) : IO (Option StorageBucketManager) := Internal.api "Lasm.JS.Web.StorageBucketManager.cast?" do
+  Internal.cast (Internal.getGlobal ["StorageBucketManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<StorageBucket> open(DOMString name, optional StorageBucketOptions options)` -/
-def StorageBucketManager.«open» (self : StorageBucketManager) (name : String) (options : Option StorageBucketOptions := none) : Async StorageBucket := do
-  let r ← self.val.callMethodAwait "open" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def StorageBucketManager.«open» (self : StorageBucketManager) (name : String) (options : Option StorageBucketOptions := none) : Async StorageBucket := Internal.api "Lasm.JS.Web.StorageBucketManager.open" do
+  let r ← self.val.callMethodAwait "open" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<sequence<DOMString>> keys()` -/
-def StorageBucketManager.keys (self : StorageBucketManager) : Async (Array String) :=
-  self.val.callMethodAwait "keys" (Support.args #[]) (Array String)
+@[macro_inline] def StorageBucketManager.keys (self : StorageBucketManager) : Async (Array String) := Internal.api "Lasm.JS.Web.StorageBucketManager.keys" do
+  self.val.callMethodAwait "keys" (Internal.args #[]) (Array String)
 
 /-- `Promise<undefined> delete(DOMString name)` -/
-def StorageBucketManager.delete (self : StorageBucketManager) (name : String) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS name]) Unit
+@[macro_inline] def StorageBucketManager.delete (self : StorageBucketManager) (name : String) : Async Unit := Internal.api "Lasm.JS.Web.StorageBucketManager.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS name]) Unit
 
 /-- `readonly attribute StorageBucketManager storageBuckets` -/
-def Navigator.storageBuckets (self : Navigator) : IO StorageBucketManager := do
+@[macro_inline] def Navigator.storageBuckets (self : Navigator) : IO StorageBucketManager := Internal.api "Lasm.JS.Web.Navigator.storageBuckets" do
   let r ← self.val.get "storageBuckets" Value
   pure { val := r }
 
 /-- `readonly attribute StorageBucketManager storageBuckets` -/
-def WorkerNavigator.storageBuckets (self : WorkerNavigator) : IO StorageBucketManager := do
+@[macro_inline] def WorkerNavigator.storageBuckets (self : WorkerNavigator) : IO StorageBucketManager := Internal.api "Lasm.JS.Web.WorkerNavigator.storageBuckets" do
   let r ← self.val.get "storageBuckets" Value
   pure { val := r }
 

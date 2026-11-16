@@ -6,30 +6,36 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ManagedConfiguration
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof NavigatorManagedData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NavigatorManagedData`). -/
-def NavigatorManagedData.cast? (v : Value) : IO (Option NavigatorManagedData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NavigatorManagedData"] Value) v) then some { val := v } else none
+@[macro_inline] def NavigatorManagedData.cast? (v : Value) : IO (Option NavigatorManagedData) := Internal.api "Lasm.JS.Web.NavigatorManagedData.cast?" do
+  Internal.cast (Internal.getGlobal ["NavigatorManagedData"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onmanagedconfigurationchange` -/
-def NavigatorManagedData.onmanagedconfigurationchange (self : NavigatorManagedData) : IO (Option EventHandlerNonNull) := self.val.get "onmanagedconfigurationchange" (Option EventHandlerNonNull)
+@[macro_inline] def NavigatorManagedData.onmanagedconfigurationchange (self : NavigatorManagedData) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.NavigatorManagedData.onmanagedconfigurationchange" do
+  self.val.get "onmanagedconfigurationchange" (Option EventHandlerNonNull)
 
 /-- Sets `onmanagedconfigurationchange`: `attribute EventHandler onmanagedconfigurationchange` -/
-def NavigatorManagedData.setOnmanagedconfigurationchange (self : NavigatorManagedData) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def NavigatorManagedData.setOnmanagedconfigurationchange (self : NavigatorManagedData) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.NavigatorManagedData.setOnmanagedconfigurationchange" do
   self.val.set "onmanagedconfigurationchange" (toJS value)
 
 /-- `Promise<record<DOMString, object>> getManagedConfiguration(sequence<DOMString> keys)` -/
-def NavigatorManagedData.getManagedConfiguration (self : NavigatorManagedData) (keys : Array String) : Async (Record Data) := do
-  let r ← self.val.callMethodAwait "getManagedConfiguration" (Support.args #[toJS keys]) Value
-  Support.recordOf Data r
+@[macro_inline] def NavigatorManagedData.getManagedConfiguration (self : NavigatorManagedData) (keys : Array String) : Async (Record Data) := Internal.api "Lasm.JS.Web.NavigatorManagedData.getManagedConfiguration" do
+  let r ← self.val.callMethodAwait "getManagedConfiguration" (Internal.args #[toJS keys]) Value
+  Internal.recordOf Data r
 
 /-- `readonly attribute NavigatorManagedData managed` -/
-def Navigator.managed (self : Navigator) : IO NavigatorManagedData := do
+@[macro_inline] def Navigator.managed (self : Navigator) : IO NavigatorManagedData := Internal.api "Lasm.JS.Web.Navigator.managed" do
   let r ← self.val.get "managed" Value
   pure { val := r }
 

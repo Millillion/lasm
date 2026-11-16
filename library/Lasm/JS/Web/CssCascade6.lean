@@ -6,19 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssCascade6
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSScopeRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSScopeRule`). -/
-def CSSScopeRule.cast? (v : Value) : IO (Option CSSScopeRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSScopeRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSScopeRule.cast? (v : Value) : IO (Option CSSScopeRule) := Internal.api "Lasm.JS.Web.CSSScopeRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSScopeRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString? start` -/
-def CSSScopeRule.start (self : CSSScopeRule) : IO (Option String) := self.val.get "start" (Option String)
+@[macro_inline] def CSSScopeRule.start (self : CSSScopeRule) : IO (Option String) := Internal.api "Lasm.JS.Web.CSSScopeRule.start" do
+  self.val.get "start" (Option String)
 
 /-- `readonly attribute CSSOMString? end` -/
-def CSSScopeRule.«end» (self : CSSScopeRule) : IO (Option String) := self.val.get "end" (Option String)
+@[macro_inline] def CSSScopeRule.«end» (self : CSSScopeRule) : IO (Option String) := Internal.api "Lasm.JS.Web.CSSScopeRule.end" do
+  self.val.get "end" (Option String)
 
 end Lasm.JS.Web

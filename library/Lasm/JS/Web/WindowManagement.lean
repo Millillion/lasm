@@ -6,100 +6,140 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssomView
+import Lasm.JS.Web.Types.WindowManagement
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof ScreenDetailed`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ScreenDetailed`). -/
-def ScreenDetailed.cast? (v : Value) : IO (Option ScreenDetailed) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ScreenDetailed"] Value) v) then some { val := v } else none
+@[macro_inline] def ScreenDetailed.cast? (v : Value) : IO (Option ScreenDetailed) := Internal.api "Lasm.JS.Web.ScreenDetailed.cast?" do
+  Internal.cast (Internal.getGlobal ["ScreenDetailed"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute long availLeft` -/
-def ScreenDetailed.availLeft (self : ScreenDetailed) : IO Int := self.val.get "availLeft" Int
+@[macro_inline] def ScreenDetailed.availLeft (self : ScreenDetailed) : IO Int := Internal.api "Lasm.JS.Web.ScreenDetailed.availLeft" do
+  self.val.get "availLeft" Int
 
 /-- `readonly attribute long availTop` -/
-def ScreenDetailed.availTop (self : ScreenDetailed) : IO Int := self.val.get "availTop" Int
+@[macro_inline] def ScreenDetailed.availTop (self : ScreenDetailed) : IO Int := Internal.api "Lasm.JS.Web.ScreenDetailed.availTop" do
+  self.val.get "availTop" Int
 
 /-- `readonly attribute long left` -/
-def ScreenDetailed.left (self : ScreenDetailed) : IO Int := self.val.get "left" Int
+@[macro_inline] def ScreenDetailed.left (self : ScreenDetailed) : IO Int := Internal.api "Lasm.JS.Web.ScreenDetailed.left" do
+  self.val.get "left" Int
 
 /-- `readonly attribute long top` -/
-def ScreenDetailed.top (self : ScreenDetailed) : IO Int := self.val.get "top" Int
+@[macro_inline] def ScreenDetailed.top (self : ScreenDetailed) : IO Int := Internal.api "Lasm.JS.Web.ScreenDetailed.top" do
+  self.val.get "top" Int
 
 /-- `readonly attribute boolean isPrimary` -/
-def ScreenDetailed.isPrimary (self : ScreenDetailed) : IO Bool := self.val.get "isPrimary" Bool
+@[macro_inline] def ScreenDetailed.isPrimary (self : ScreenDetailed) : IO Bool := Internal.api "Lasm.JS.Web.ScreenDetailed.isPrimary" do
+  self.val.get "isPrimary" Bool
 
 /-- `readonly attribute boolean isInternal` -/
-def ScreenDetailed.isInternal (self : ScreenDetailed) : IO Bool := self.val.get "isInternal" Bool
+@[macro_inline] def ScreenDetailed.isInternal (self : ScreenDetailed) : IO Bool := Internal.api "Lasm.JS.Web.ScreenDetailed.isInternal" do
+  self.val.get "isInternal" Bool
 
 /-- `readonly attribute float devicePixelRatio` -/
-def ScreenDetailed.devicePixelRatio (self : ScreenDetailed) : IO Float := self.val.get "devicePixelRatio" Float
+@[macro_inline] def ScreenDetailed.devicePixelRatio (self : ScreenDetailed) : IO Float := Internal.api "Lasm.JS.Web.ScreenDetailed.devicePixelRatio" do
+  self.val.get "devicePixelRatio" Float
 
 /-- `readonly attribute DOMString label` -/
-def ScreenDetailed.label (self : ScreenDetailed) : IO String := self.val.get "label" String
+@[macro_inline] def ScreenDetailed.label (self : ScreenDetailed) : IO String := Internal.api "Lasm.JS.Web.ScreenDetailed.label" do
+  self.val.get "label" String
 
 /-- `v instanceof ScreenDetails`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ScreenDetails`). -/
-def ScreenDetails.cast? (v : Value) : IO (Option ScreenDetails) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ScreenDetails"] Value) v) then some { val := v } else none
+@[macro_inline] def ScreenDetails.cast? (v : Value) : IO (Option ScreenDetails) := Internal.api "Lasm.JS.Web.ScreenDetails.cast?" do
+  Internal.cast (Internal.getGlobal ["ScreenDetails"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<ScreenDetailed> screens` -/
-def ScreenDetails.screens (self : ScreenDetails) : IO (Array ScreenDetailed) := self.val.get "screens" (Array ScreenDetailed)
+@[macro_inline] def ScreenDetails.screens (self : ScreenDetails) : IO (Array ScreenDetailed) := Internal.api "Lasm.JS.Web.ScreenDetails.screens" do
+  self.val.get "screens" (Array ScreenDetailed)
 
 /-- `readonly attribute ScreenDetailed currentScreen` -/
-def ScreenDetails.currentScreen (self : ScreenDetails) : IO ScreenDetailed := do
+@[macro_inline] def ScreenDetails.currentScreen (self : ScreenDetails) : IO ScreenDetailed := Internal.api "Lasm.JS.Web.ScreenDetails.currentScreen" do
   let r ← self.val.get "currentScreen" Value
   pure { val := r }
 
 /-- `attribute EventHandler onscreenschange` -/
-def ScreenDetails.onscreenschange (self : ScreenDetails) : IO (Option EventHandlerNonNull) := self.val.get "onscreenschange" (Option EventHandlerNonNull)
+@[macro_inline] def ScreenDetails.onscreenschange (self : ScreenDetails) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ScreenDetails.onscreenschange" do
+  self.val.get "onscreenschange" (Option EventHandlerNonNull)
 
 /-- Sets `onscreenschange`: `attribute EventHandler onscreenschange` -/
-def ScreenDetails.setOnscreenschange (self : ScreenDetails) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ScreenDetails.setOnscreenschange (self : ScreenDetails) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ScreenDetails.setOnscreenschange" do
   self.val.set "onscreenschange" (toJS value)
 
 /-- `attribute EventHandler oncurrentscreenchange` -/
-def ScreenDetails.oncurrentscreenchange (self : ScreenDetails) : IO (Option EventHandlerNonNull) := self.val.get "oncurrentscreenchange" (Option EventHandlerNonNull)
+@[macro_inline] def ScreenDetails.oncurrentscreenchange (self : ScreenDetails) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ScreenDetails.oncurrentscreenchange" do
+  self.val.get "oncurrentscreenchange" (Option EventHandlerNonNull)
 
 /-- Sets `oncurrentscreenchange`: `attribute EventHandler oncurrentscreenchange` -/
-def ScreenDetails.setOncurrentscreenchange (self : ScreenDetails) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ScreenDetails.setOncurrentscreenchange (self : ScreenDetails) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ScreenDetails.setOncurrentscreenchange" do
   self.val.set "oncurrentscreenchange" (toJS value)
 
 /-- `readonly attribute boolean isExtended` -/
-def Screen.isExtended (self : Screen) : IO Bool := self.val.get "isExtended" Bool
+@[macro_inline] def Screen.isExtended (self : Screen) : IO Bool := Internal.api "Lasm.JS.Web.Screen.isExtended" do
+  self.val.get "isExtended" Bool
 
 /-- `attribute EventHandler onchange` -/
-def Screen.onchange (self : Screen) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def Screen.onchange (self : Screen) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Screen.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def Screen.setOnchange (self : Screen) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Screen.setOnchange (self : Screen) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Screen.setOnchange" do
   self.val.set "onchange" (toJS value)
 
+/-- `Promise<ScreenDetails> getScreenDetails()` -/
+@[macro_inline] def Window.getScreenDetails (self : Window) : Async ScreenDetails := Internal.api "Lasm.JS.Web.Window.getScreenDetails" do
+  let r ← self.val.callMethodAwait "getScreenDetails" (Internal.args #[]) Value
+  pure { val := r }
+
+/-- `Promise<undefined> minimize()` -/
+@[macro_inline] def Window.minimize (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.minimize" do
+  self.val.callMethodAwait "minimize" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> maximize()` -/
+@[macro_inline] def Window.maximize (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.maximize" do
+  self.val.callMethodAwait "maximize" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> restore()` -/
+@[macro_inline] def Window.restore (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.restore" do
+  self.val.callMethodAwait "restore" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> setResizable(boolean resizable)` -/
+@[macro_inline] def Window.setResizable (self : Window) (resizable : Bool) : Async Unit := Internal.api "Lasm.JS.Web.Window.setResizable" do
+  self.val.callMethodAwait "setResizable" (Internal.args #[toJS resizable]) Unit
+
 /-- `Promise<ScreenDetails> getScreenDetails()` (Window Management (https://w3c.github.io/window-management/)) -/
-def getScreenDetails : Async ScreenDetails := do
+@[macro_inline] def getScreenDetails : Async ScreenDetails := Internal.api "Lasm.JS.Web.getScreenDetails" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.getScreenDetails", module := "globalThis", path := "getScreenDetails", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
   pure { val := r }
 
 /-- `Promise<undefined> minimize()` (Window Management (https://w3c.github.io/window-management/)) -/
-def minimize : Async Unit :=
+@[macro_inline] def minimize : Async Unit := Internal.api "Lasm.JS.Web.minimize" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.minimize", module := "globalThis", path := "minimize", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<undefined> maximize()` (Window Management (https://w3c.github.io/window-management/)) -/
-def maximize : Async Unit :=
+@[macro_inline] def maximize : Async Unit := Internal.api "Lasm.JS.Web.maximize" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.maximize", module := "globalThis", path := "maximize", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<undefined> restore()` (Window Management (https://w3c.github.io/window-management/)) -/
-def restore : Async Unit :=
+@[macro_inline] def restore : Async Unit := Internal.api "Lasm.JS.Web.restore" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.restore", module := "globalThis", path := "restore", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `Promise<undefined> setResizable(boolean resizable)` (Window Management (https://w3c.github.io/window-management/)) -/
-def setResizable (resizable : Bool) : Async Unit :=
+@[macro_inline] def setResizable (resizable : Bool) : Async Unit := Internal.api "Lasm.JS.Web.setResizable" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.setResizable", module := "globalThis", path := "setResizable", construct := false, arity := 1 }
-    (Support.args #[toJS resizable])
+    (Internal.args #[toJS resizable])
 
 end Lasm.JS.Web

@@ -6,48 +6,55 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssConditional
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSConditionRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSConditionRule`). -/
-def CSSConditionRule.cast? (v : Value) : IO (Option CSSConditionRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSConditionRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSConditionRule.cast? (v : Value) : IO (Option CSSConditionRule) := Internal.api "Lasm.JS.Web.CSSConditionRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSConditionRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString conditionText` -/
-def CSSConditionRule.conditionText (self : CSSConditionRule) : IO String := self.val.get "conditionText" String
+@[macro_inline] def CSSConditionRule.conditionText (self : CSSConditionRule) : IO String := Internal.api "Lasm.JS.Web.CSSConditionRule.conditionText" do
+  self.val.get "conditionText" String
 
 /-- `v instanceof CSSMediaRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSMediaRule`). -/
-def CSSMediaRule.cast? (v : Value) : IO (Option CSSMediaRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSMediaRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSMediaRule.cast? (v : Value) : IO (Option CSSMediaRule) := Internal.api "Lasm.JS.Web.CSSMediaRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSMediaRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute MediaList media` -/
-def CSSMediaRule.media (self : CSSMediaRule) : IO MediaList := do
+@[macro_inline] def CSSMediaRule.media (self : CSSMediaRule) : IO MediaList := Internal.api "Lasm.JS.Web.CSSMediaRule.media" do
   let r ← self.val.get "media" Value
   pure { val := r }
 
 /-- `readonly attribute boolean matches` -/
-def CSSMediaRule.«matches» (self : CSSMediaRule) : IO Bool := self.val.get "matches" Bool
+@[macro_inline] def CSSMediaRule.«matches» (self : CSSMediaRule) : IO Bool := Internal.api "Lasm.JS.Web.CSSMediaRule.matches" do
+  self.val.get "matches" Bool
 
 /-- `v instanceof CSSSupportsRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSSupportsRule`). -/
-def CSSSupportsRule.cast? (v : Value) : IO (Option CSSSupportsRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSSupportsRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSSupportsRule.cast? (v : Value) : IO (Option CSSSupportsRule) := Internal.api "Lasm.JS.Web.CSSSupportsRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSSupportsRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean matches` -/
-def CSSSupportsRule.«matches» (self : CSSSupportsRule) : IO Bool := self.val.get "matches" Bool
+@[macro_inline] def CSSSupportsRule.«matches» (self : CSSSupportsRule) : IO Bool := Internal.api "Lasm.JS.Web.CSSSupportsRule.matches" do
+  self.val.get "matches" Bool
 
 /-- `const unsigned short SUPPORTS_RULE = 12` -/
 def CSSRule.SUPPORTS_RULE : Nat := 12
 
 /-- `boolean supports(CSSOMString property, CSSOMString value)` (CSS Conditional Rules Module Level 3 (https://drafts.csswg.org/css-conditional-3/)) -/
-def CSS.supports (property : String) (value : String) : IO Bool :=
+@[macro_inline] def CSS.supports (property : String) (value : String) : IO Bool := Internal.api "Lasm.JS.Web.CSS.supports" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.CSS.supports", module := "globalThis", path := "CSS.supports", construct := false, arity := 2 }
-    (Support.args #[toJS property, toJS value]) (await := false)
+    (Internal.args #[toJS property, toJS value]) (await := false)
 
 /-- `boolean supports(CSSOMString conditionText)` (CSS Conditional Rules Module Level 3 (https://drafts.csswg.org/css-conditional-3/)) -/
-def CSS.supportsWithConditionText (conditionText : String) : IO Bool :=
+@[macro_inline] def CSS.supportsWithConditionText (conditionText : String) : IO Bool := Internal.api "Lasm.JS.Web.CSS.supportsWithConditionText" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.CSS.supportsWithConditionText", module := "globalThis", path := "CSS.supports", construct := false, arity := 1 }
-    (Support.args #[toJS conditionText]) (await := false)
+    (Internal.args #[toJS conditionText]) (await := false)
 
 end Lasm.JS.Web

@@ -9,5 +9,17 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary Ed448Params : Algorithm` (Secure Curves in the Web Cryptography API (https://wicg.github.io/webcrypto-secure-curves/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Ed448Params where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `BufferSource context` -/
+  context : Option ByteArray := none
+instance : ToJS Ed448Params := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("context", Internal.optional d.context)]⟩
 
 end Lasm.JS.Web

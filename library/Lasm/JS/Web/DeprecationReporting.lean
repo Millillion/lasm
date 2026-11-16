@@ -9,5 +9,29 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
+/-- `dictionary DeprecationReportBody : ReportBody` (Deprecation Reporting (https://wicg.github.io/deprecation-reporting/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DeprecationReportBody where
+  /-- `DOMString id` -/
+  id : Option String := none
+  /-- `object? anticipatedRemoval` -/
+  anticipatedRemoval : Data := .undefined
+  /-- `DOMString message` -/
+  message : Option String := none
+  /-- `DOMString? sourceFile` -/
+  sourceFile : Option String := none
+  /-- `unsigned long? lineNumber` -/
+  lineNumber : Option Nat := none
+  /-- `unsigned long? columnNumber` -/
+  columnNumber : Option Nat := none
+instance : ToJS DeprecationReportBody := ⟨fun d => Internal.fields #[("id", Internal.optional d.id),
+    ("anticipatedRemoval", d.anticipatedRemoval),
+    ("message", Internal.optional d.message),
+    ("sourceFile", Internal.optional d.sourceFile),
+    ("lineNumber", Internal.optional d.lineNumber),
+    ("columnNumber", Internal.optional d.columnNumber)]⟩
 
 end Lasm.JS.Web

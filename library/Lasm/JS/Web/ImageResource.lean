@@ -9,6 +9,9 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ImageResource` (Image Resource (https://w3c.github.io/image-resource/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageResource where
@@ -20,10 +23,10 @@ structure ImageResource where
   type : Option String := none
   /-- `DOMString label` -/
   label : Option String := none
-instance : ToJS ImageResource := ⟨fun d => Support.fields #[("src", toJS d.src),
-    ("sizes", Support.optional d.sizes),
-    ("type", Support.optional d.type),
-    ("label", Support.optional d.label)]⟩
+instance : ToJS ImageResource := ⟨fun d => Internal.fields #[("src", toJS d.src),
+    ("sizes", Internal.optional d.sizes),
+    ("type", Internal.optional d.type),
+    ("label", Internal.optional d.label)]⟩
 instance : FromJS ImageResource where
   fromJS d := do return {
     src := ← Lasm.JS.readField String d "src",

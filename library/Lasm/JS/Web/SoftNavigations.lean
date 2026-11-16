@@ -6,56 +6,68 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
-import Lasm.JS.Web.Html
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.LargestContentfulPaint
+import Lasm.JS.Web.Types.SoftNavigations
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof InteractionContentfulPaint`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InteractionContentfulPaint`). -/
-def InteractionContentfulPaint.cast? (v : Value) : IO (Option InteractionContentfulPaint) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InteractionContentfulPaint"] Value) v) then some { val := v } else none
+@[macro_inline] def InteractionContentfulPaint.cast? (v : Value) : IO (Option InteractionContentfulPaint) := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.cast?" do
+  Internal.cast (Internal.getGlobal ["InteractionContentfulPaint"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute LargestContentfulPaint largestContentfulPaint` -/
-def InteractionContentfulPaint.largestContentfulPaint (self : InteractionContentfulPaint) : IO LargestContentfulPaint := do
+@[macro_inline] def InteractionContentfulPaint.largestContentfulPaint (self : InteractionContentfulPaint) : IO LargestContentfulPaint := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.largestContentfulPaint" do
   let r ← self.val.get "largestContentfulPaint" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long long interactionId` -/
-def InteractionContentfulPaint.interactionId (self : InteractionContentfulPaint) : IO Nat := self.val.get "interactionId" Nat
+@[macro_inline] def InteractionContentfulPaint.interactionId (self : InteractionContentfulPaint) : IO Nat := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.interactionId" do
+  self.val.get "interactionId" Nat
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def InteractionContentfulPaint.paintTime (self : InteractionContentfulPaint) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def InteractionContentfulPaint.paintTime (self : InteractionContentfulPaint) : IO Float := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def InteractionContentfulPaint.presentationTime (self : InteractionContentfulPaint) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def InteractionContentfulPaint.presentationTime (self : InteractionContentfulPaint) : IO (Option Float) := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def InteractionContentfulPaint.toJSON (self : InteractionContentfulPaint) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def InteractionContentfulPaint.toJSON (self : InteractionContentfulPaint) : IO Data := Internal.api "Lasm.JS.Web.InteractionContentfulPaint.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceSoftNavigation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceSoftNavigation`). -/
-def PerformanceSoftNavigation.cast? (v : Value) : IO (Option PerformanceSoftNavigation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceSoftNavigation"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceSoftNavigation.cast? (v : Value) : IO (Option PerformanceSoftNavigation) := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceSoftNavigation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute NavigationType navigationType` -/
-def PerformanceSoftNavigation.navigationType (self : PerformanceSoftNavigation) : IO NavigationType := self.val.get "navigationType" NavigationType
+@[macro_inline] def PerformanceSoftNavigation.navigationType (self : PerformanceSoftNavigation) : IO NavigationType := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.navigationType" do
+  self.val.get "navigationType" NavigationType
 
 /-- `readonly attribute unsigned long long interactionId` -/
-def PerformanceSoftNavigation.interactionId (self : PerformanceSoftNavigation) : IO Nat := self.val.get "interactionId" Nat
+@[macro_inline] def PerformanceSoftNavigation.interactionId (self : PerformanceSoftNavigation) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.interactionId" do
+  self.val.get "interactionId" Nat
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def PerformanceSoftNavigation.paintTime (self : PerformanceSoftNavigation) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def PerformanceSoftNavigation.paintTime (self : PerformanceSoftNavigation) : IO Float := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def PerformanceSoftNavigation.presentationTime (self : PerformanceSoftNavigation) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def PerformanceSoftNavigation.presentationTime (self : PerformanceSoftNavigation) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `InteractionContentfulPaint? getLargestInteractionContentfulPaint()` -/
-def PerformanceSoftNavigation.getLargestInteractionContentfulPaint (self : PerformanceSoftNavigation) : IO (Option InteractionContentfulPaint) :=
-  self.val.callMethod "getLargestInteractionContentfulPaint" (Support.args #[]) (Option InteractionContentfulPaint)
+@[macro_inline] def PerformanceSoftNavigation.getLargestInteractionContentfulPaint (self : PerformanceSoftNavigation) : IO (Option InteractionContentfulPaint) := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.getLargestInteractionContentfulPaint" do
+  self.val.callMethod "getLargestInteractionContentfulPaint" (Internal.args #[]) (Option InteractionContentfulPaint)
 
 /-- `object toJSON()` -/
-def PerformanceSoftNavigation.toJSON (self : PerformanceSoftNavigation) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceSoftNavigation.toJSON (self : PerformanceSoftNavigation) : IO Data := Internal.api "Lasm.JS.Web.PerformanceSoftNavigation.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 end Lasm.JS.Web

@@ -6,41 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.ContentIndex
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.ImageResource
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ContentCategory` (Content Index (https://wicg.github.io/content-index/spec/)): "", "homepage", "article", "video", "audio". -/
-inductive ContentCategory where
-  /-- "" -/
-  | empty
-  /-- "homepage" -/
-  | homepage
-  /-- "article" -/
-  | article
-  /-- "video" -/
-  | video
-  /-- "audio" -/
-  | audio
-  deriving BEq, Repr, Inhabited
-instance : ToJS ContentCategory := ⟨fun
-  | .empty => .string ""
-  | .homepage => .string "homepage"
-  | .article => .string "article"
-  | .video => .string "video"
-  | .audio => .string "audio"⟩
-instance : FromJS ContentCategory where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "homepage" => .ok .homepage
-    | .string "article" => .ok .article
-    | .string "video" => .ok .video
-    | .string "audio" => .ok .audio
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ContentCategory"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ContentDescription` (Content Index (https://wicg.github.io/content-index/spec/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContentDescription where
@@ -56,11 +31,11 @@ structure ContentDescription where
   icons : Option (Array ImageResource) := none
   /-- `required USVString url` -/
   url : String
-instance : ToJS ContentDescription := ⟨fun d => Support.fields #[("id", toJS d.id),
+instance : ToJS ContentDescription := ⟨fun d => Internal.fields #[("id", toJS d.id),
     ("title", toJS d.title),
     ("description", toJS d.description),
-    ("category", Support.optional d.category),
-    ("icons", Support.optional d.icons),
+    ("category", Internal.optional d.category),
+    ("icons", Internal.optional d.icons),
     ("url", toJS d.url)]⟩
 instance : FromJS ContentDescription where
   fromJS d := do return {
@@ -82,48 +57,50 @@ structure ContentIndexEventInit where
   composed : Option Bool := none
   /-- `required DOMString id` -/
   id : String
-instance : ToJS ContentIndexEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS ContentIndexEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("id", toJS d.id)]⟩
 
 /-- `v instanceof ContentIndex`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ContentIndex`). -/
-def ContentIndex.cast? (v : Value) : IO (Option ContentIndex) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ContentIndex"] Value) v) then some { val := v } else none
+@[macro_inline] def ContentIndex.cast? (v : Value) : IO (Option ContentIndex) := Internal.api "Lasm.JS.Web.ContentIndex.cast?" do
+  Internal.cast (Internal.getGlobal ["ContentIndex"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> add(ContentDescription description)` -/
-def ContentIndex.add (self : ContentIndex) (description : ContentDescription) : Async Unit :=
-  self.val.callMethodAwait "add" (Support.args #[toJS description]) Unit
+@[macro_inline] def ContentIndex.add (self : ContentIndex) (description : ContentDescription) : Async Unit := Internal.api "Lasm.JS.Web.ContentIndex.add" do
+  self.val.callMethodAwait "add" (Internal.args #[toJS description]) Unit
 
 /-- `Promise<undefined> delete(DOMString id)` -/
-def ContentIndex.delete (self : ContentIndex) (id : String) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS id]) Unit
+@[macro_inline] def ContentIndex.delete (self : ContentIndex) (id : String) : Async Unit := Internal.api "Lasm.JS.Web.ContentIndex.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS id]) Unit
 
 /-- `Promise<sequence<ContentDescription>> getAll()` -/
-def ContentIndex.getAll (self : ContentIndex) : Async (Array ContentDescription) :=
-  self.val.callMethodAwait "getAll" (Support.args #[]) (Array ContentDescription)
+@[macro_inline] def ContentIndex.getAll (self : ContentIndex) : Async (Array ContentDescription) := Internal.api "Lasm.JS.Web.ContentIndex.getAll" do
+  self.val.callMethodAwait "getAll" (Internal.args #[]) (Array ContentDescription)
 
 /-- `v instanceof ContentIndexEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ContentIndexEvent`). -/
-def ContentIndexEvent.cast? (v : Value) : IO (Option ContentIndexEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ContentIndexEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ContentIndexEvent.cast? (v : Value) : IO (Option ContentIndexEvent) := Internal.api "Lasm.JS.Web.ContentIndexEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ContentIndexEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, ContentIndexEventInit init)` -/
-def ContentIndexEvent.new (type : String) (init : ContentIndexEventInit) : IO ContentIndexEvent :=
+@[macro_inline] def ContentIndexEvent.new (type : String) (init : ContentIndexEventInit) : IO ContentIndexEvent := Internal.api "Lasm.JS.Web.ContentIndexEvent.new" do
   Lasm.JS.Binding.invoke ContentIndexEvent { name := "Lasm.JS.Web.ContentIndexEvent.new", module := "globalThis", path := "ContentIndexEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `readonly attribute DOMString id` -/
-def ContentIndexEvent.id (self : ContentIndexEvent) : IO String := self.val.get "id" String
+@[macro_inline] def ContentIndexEvent.id (self : ContentIndexEvent) : IO String := Internal.api "Lasm.JS.Web.ContentIndexEvent.id" do
+  self.val.get "id" String
 
 /-- `attribute EventHandler oncontentdelete` -/
-def ServiceWorkerGlobalScope.oncontentdelete (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "oncontentdelete" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.oncontentdelete (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncontentdelete" do
+  self.val.get "oncontentdelete" (Option EventHandlerNonNull)
 
 /-- Sets `oncontentdelete`: `attribute EventHandler oncontentdelete` -/
-def ServiceWorkerGlobalScope.setOncontentdelete (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOncontentdelete (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncontentdelete" do
   self.val.set "oncontentdelete" (toJS value)
 
 /-- `readonly attribute ContentIndex index` -/
-def ServiceWorkerRegistration.index (self : ServiceWorkerRegistration) : IO ContentIndex := do
+@[macro_inline] def ServiceWorkerRegistration.index (self : ServiceWorkerRegistration) : IO ContentIndex := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.index" do
   let r ← self.val.get "index" Value
   pure { val := r }
 

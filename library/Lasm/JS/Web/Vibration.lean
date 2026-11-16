@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef unsigned long or sequence<unsigned long> VibratePattern`: one constructor per member type. -/
 inductive VibratePattern where
@@ -24,7 +27,7 @@ instance : Coe Nat VibratePattern := ⟨.unsignedLong⟩
 instance : Coe (Array Nat) VibratePattern := ⟨.sequence⟩
 
 /-- `boolean vibrate(VibratePattern pattern)` -/
-def Navigator.vibrate (self : Navigator) (pattern : VibratePattern) : IO Bool :=
-  self.val.callMethod "vibrate" (Support.args #[toJS pattern]) Bool
+@[macro_inline] def Navigator.vibrate (self : Navigator) (pattern : VibratePattern) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.vibrate" do
+  self.val.callMethod "vibrate" (Internal.args #[toJS pattern]) Bool
 
 end Lasm.JS.Web

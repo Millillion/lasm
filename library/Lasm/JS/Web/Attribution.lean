@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Attribution
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary AttributionImpressionOptions` (Attribution Level 1 (https://w3c.github.io/attribution/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AttributionImpressionOptions where
@@ -25,15 +29,16 @@ structure AttributionImpressionOptions where
   lifetimeDays : Option Nat := none
   /-- `long priority = 0` -/
   priority : Option Int := none
-instance : ToJS AttributionImpressionOptions := ⟨fun d => Support.fields #[("histogramIndex", toJS d.histogramIndex),
-    ("matchValue", Support.optional d.matchValue),
-    ("conversionSites", Support.optional d.conversionSites),
-    ("conversionCallers", Support.optional d.conversionCallers),
-    ("lifetimeDays", Support.optional d.lifetimeDays),
-    ("priority", Support.optional d.priority)]⟩
+instance : ToJS AttributionImpressionOptions := ⟨fun d => Internal.fields #[("histogramIndex", toJS d.histogramIndex),
+    ("matchValue", Internal.optional d.matchValue),
+    ("conversionSites", Internal.optional d.conversionSites),
+    ("conversionCallers", Internal.optional d.conversionCallers),
+    ("lifetimeDays", Internal.optional d.lifetimeDays),
+    ("priority", Internal.optional d.priority)]⟩
 
 /-- `dictionary AttributionImpressionResult` (Attribution Level 1 (https://w3c.github.io/attribution/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AttributionImpressionResult where
+instance : ToJS AttributionImpressionResult := ⟨fun _ => Internal.fields #[]⟩
 instance : FromJS AttributionImpressionResult where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Web.AttributionImpressionResult"
@@ -60,49 +65,56 @@ structure AttributionConversionOptions where
   value : Option Nat := none
   /-- `unsigned long maxValue = 1` -/
   maxValue : Option Nat := none
-instance : ToJS AttributionConversionOptions := ⟨fun d => Support.fields #[("aggregationService", toJS d.aggregationService),
-    ("epsilon", Support.optional d.epsilon),
+instance : ToJS AttributionConversionOptions := ⟨fun d => Internal.fields #[("aggregationService", toJS d.aggregationService),
+    ("epsilon", Internal.optional d.epsilon),
     ("histogramSize", toJS d.histogramSize),
-    ("lookbackDays", Support.optional d.lookbackDays),
-    ("matchValues", Support.optional d.matchValues),
-    ("impressionSites", Support.optional d.impressionSites),
-    ("impressionCallers", Support.optional d.impressionCallers),
-    ("credit", Support.optional d.credit),
-    ("value", Support.optional d.value),
-    ("maxValue", Support.optional d.maxValue)]⟩
+    ("lookbackDays", Internal.optional d.lookbackDays),
+    ("matchValues", Internal.optional d.matchValues),
+    ("impressionSites", Internal.optional d.impressionSites),
+    ("impressionCallers", Internal.optional d.impressionCallers),
+    ("credit", Internal.optional d.credit),
+    ("value", Internal.optional d.value),
+    ("maxValue", Internal.optional d.maxValue)]⟩
 
 /-- `dictionary AttributionConversionResult` (Attribution Level 1 (https://w3c.github.io/attribution/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AttributionConversionResult where
   /-- `required Uint8Array report` -/
   report : ByteArray
+instance : ToJS AttributionConversionResult := ⟨fun d => Internal.fields #[("report", toJS d.report)]⟩
 instance : FromJS AttributionConversionResult where
   fromJS d := do return {
     report := ← Lasm.JS.readField ByteArray d "report" }
   typeName := "Lasm.JS.Web.AttributionConversionResult"
 
+/-- `dictionary AttributionAggregationService` (Attribution Level 1 (https://w3c.github.io/attribution/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AttributionAggregationService where
+  /-- `required AttributionAggregationProtocol protocol` -/
+  protocol : AttributionAggregationProtocol
+instance : ToJS AttributionAggregationService := ⟨fun d => Internal.fields #[("protocol", toJS d.protocol)]⟩
+
 /-- `v instanceof Attribution`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Attribution`). -/
-def Attribution.cast? (v : Value) : IO (Option Attribution) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Attribution"] Value) v) then some { val := v } else none
+@[macro_inline] def Attribution.cast? (v : Value) : IO (Option Attribution) := Internal.api "Lasm.JS.Web.Attribution.cast?" do
+  Internal.cast (Internal.getGlobal ["Attribution"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute AttributionAggregationServices aggregationServices` -/
-def Attribution.aggregationServices (self : Attribution) : IO AttributionAggregationServices := do
+@[macro_inline] def Attribution.aggregationServices (self : Attribution) : IO AttributionAggregationServices := Internal.api "Lasm.JS.Web.Attribution.aggregationServices" do
   let r ← self.val.get "aggregationServices" Value
   pure { val := r }
 
 /-- `Promise<AttributionImpressionResult> saveImpression(AttributionImpressionOptions options)` -/
-def Attribution.saveImpression (self : Attribution) (options : AttributionImpressionOptions) : Async AttributionImpressionResult :=
-  self.val.callMethodAwait "saveImpression" (Support.args #[toJS options]) AttributionImpressionResult
+@[macro_inline] def Attribution.saveImpression (self : Attribution) (options : AttributionImpressionOptions) : Async AttributionImpressionResult := Internal.api "Lasm.JS.Web.Attribution.saveImpression" do
+  self.val.callMethodAwait "saveImpression" (Internal.args #[toJS options]) AttributionImpressionResult
 
 /-- `Promise<AttributionConversionResult> measureConversion(AttributionConversionOptions options)` -/
-def Attribution.measureConversion (self : Attribution) (options : AttributionConversionOptions) : Async AttributionConversionResult :=
-  self.val.callMethodAwait "measureConversion" (Support.args #[toJS options]) AttributionConversionResult
+@[macro_inline] def Attribution.measureConversion (self : Attribution) (options : AttributionConversionOptions) : Async AttributionConversionResult := Internal.api "Lasm.JS.Web.Attribution.measureConversion" do
+  self.val.callMethodAwait "measureConversion" (Internal.args #[toJS options]) AttributionConversionResult
 
 /-- `v instanceof AttributionAggregationServices`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AttributionAggregationServices`). -/
-def AttributionAggregationServices.cast? (v : Value) : IO (Option AttributionAggregationServices) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AttributionAggregationServices"] Value) v) then some { val := v } else none
+@[macro_inline] def AttributionAggregationServices.cast? (v : Value) : IO (Option AttributionAggregationServices) := Internal.api "Lasm.JS.Web.AttributionAggregationServices.cast?" do
+  Internal.cast (Internal.getGlobal ["AttributionAggregationServices"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Attribution attribution` -/
-def Navigator.attribution (self : Navigator) : IO Attribution := do
+@[macro_inline] def Navigator.attribution (self : Navigator) : IO Attribution := Internal.api "Lasm.JS.Web.Navigator.attribution" do
   let r ← self.val.get "attribution" Value
   pure { val := r }
 

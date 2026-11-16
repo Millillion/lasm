@@ -6,15 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute boolean globalPrivacyControl` -/
-def Navigator.globalPrivacyControl (self : Navigator) : IO Bool := self.val.get "globalPrivacyControl" Bool
+@[macro_inline] def Navigator.globalPrivacyControl (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.globalPrivacyControl" do
+  self.val.get "globalPrivacyControl" Bool
 
 /-- `readonly attribute boolean globalPrivacyControl` -/
-def WorkerNavigator.globalPrivacyControl (self : WorkerNavigator) : IO Bool := self.val.get "globalPrivacyControl" Bool
+@[macro_inline] def WorkerNavigator.globalPrivacyControl (self : WorkerNavigator) : IO Bool := Internal.api "Lasm.JS.Web.WorkerNavigator.globalPrivacyControl" do
+  self.val.get "globalPrivacyControl" Bool
 
 end Lasm.JS.Web

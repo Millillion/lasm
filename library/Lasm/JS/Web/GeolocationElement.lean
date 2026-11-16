@@ -6,120 +6,92 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.Geolocation
+import Lasm.JS.Web.Types.GeolocationElement
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.FileSystemAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ActivationBlockersMixinBlockerReason` (The HTML Geolocation Element (https://wicg.github.io/PEPC/geolocation-element.html)): "", "illegal_subframe", "unsuccessful_registration", "recently_attached", "intersection_changed", "intersection_out_of_viewport_or_clipped", "intersection_occluded_or_distorted", "style_invalid", "type_invalid". -/
-inductive ActivationBlockersMixinBlockerReason where
-  /-- "" -/
-  | empty
-  /-- "illegal_subframe" -/
-  | illegalSubframe
-  /-- "unsuccessful_registration" -/
-  | unsuccessfulRegistration
-  /-- "recently_attached" -/
-  | recentlyAttached
-  /-- "intersection_changed" -/
-  | intersectionChanged
-  /-- "intersection_out_of_viewport_or_clipped" -/
-  | intersectionOutOfViewportOrClipped
-  /-- "intersection_occluded_or_distorted" -/
-  | intersectionOccludedOrDistorted
-  /-- "style_invalid" -/
-  | styleInvalid
-  /-- "type_invalid" -/
-  | typeInvalid
-  deriving BEq, Repr, Inhabited
-instance : ToJS ActivationBlockersMixinBlockerReason := ⟨fun
-  | .empty => .string ""
-  | .illegalSubframe => .string "illegal_subframe"
-  | .unsuccessfulRegistration => .string "unsuccessful_registration"
-  | .recentlyAttached => .string "recently_attached"
-  | .intersectionChanged => .string "intersection_changed"
-  | .intersectionOutOfViewportOrClipped => .string "intersection_out_of_viewport_or_clipped"
-  | .intersectionOccludedOrDistorted => .string "intersection_occluded_or_distorted"
-  | .styleInvalid => .string "style_invalid"
-  | .typeInvalid => .string "type_invalid"⟩
-instance : FromJS ActivationBlockersMixinBlockerReason where
-  fromJS
-    | .string "" => .ok .empty
-    | .string "illegal_subframe" => .ok .illegalSubframe
-    | .string "unsuccessful_registration" => .ok .unsuccessfulRegistration
-    | .string "recently_attached" => .ok .recentlyAttached
-    | .string "intersection_changed" => .ok .intersectionChanged
-    | .string "intersection_out_of_viewport_or_clipped" => .ok .intersectionOutOfViewportOrClipped
-    | .string "intersection_occluded_or_distorted" => .ok .intersectionOccludedOrDistorted
-    | .string "style_invalid" => .ok .styleInvalid
-    | .string "type_invalid" => .ok .typeInvalid
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ActivationBlockersMixinBlockerReason"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof HTMLGeolocationElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLGeolocationElement`). -/
-def HTMLGeolocationElement.cast? (v : Value) : IO (Option HTMLGeolocationElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLGeolocationElement"] Value) v) then some { val := v } else none
+@[macro_inline] def HTMLGeolocationElement.cast? (v : Value) : IO (Option HTMLGeolocationElement) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.cast?" do
+  Internal.cast (Internal.getGlobal ["HTMLGeolocationElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GeolocationPosition? position` -/
-def HTMLGeolocationElement.position (self : HTMLGeolocationElement) : IO (Option GeolocationPosition) := self.val.get "position" (Option GeolocationPosition)
+@[macro_inline] def HTMLGeolocationElement.position (self : HTMLGeolocationElement) : IO (Option GeolocationPosition) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.position" do
+  self.val.get "position" (Option GeolocationPosition)
 
 /-- `readonly attribute GeolocationPositionError? error` -/
-def HTMLGeolocationElement.error (self : HTMLGeolocationElement) : IO (Option GeolocationPositionError) := self.val.get "error" (Option GeolocationPositionError)
+@[macro_inline] def HTMLGeolocationElement.error (self : HTMLGeolocationElement) : IO (Option GeolocationPositionError) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.error" do
+  self.val.get "error" (Option GeolocationPositionError)
 
 /-- `attribute boolean autolocate` -/
-def HTMLGeolocationElement.autolocate (self : HTMLGeolocationElement) : IO Bool := self.val.get "autolocate" Bool
+@[macro_inline] def HTMLGeolocationElement.autolocate (self : HTMLGeolocationElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.autolocate" do
+  self.val.get "autolocate" Bool
 
 /-- Sets `autolocate`: `attribute boolean autolocate` -/
-def HTMLGeolocationElement.setAutolocate (self : HTMLGeolocationElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setAutolocate (self : HTMLGeolocationElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setAutolocate" do
   self.val.set "autolocate" (toJS value)
 
 /-- `attribute boolean watch` -/
-def HTMLGeolocationElement.watch (self : HTMLGeolocationElement) : IO Bool := self.val.get "watch" Bool
+@[macro_inline] def HTMLGeolocationElement.watch (self : HTMLGeolocationElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.watch" do
+  self.val.get "watch" Bool
 
 /-- Sets `watch`: `attribute boolean watch` -/
-def HTMLGeolocationElement.setWatch (self : HTMLGeolocationElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setWatch (self : HTMLGeolocationElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setWatch" do
   self.val.set "watch" (toJS value)
 
 /-- `attribute EventHandler onlocation` -/
-def HTMLGeolocationElement.onlocation (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := self.val.get "onlocation" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLGeolocationElement.onlocation (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.onlocation" do
+  self.val.get "onlocation" (Option EventHandlerNonNull)
 
 /-- Sets `onlocation`: `attribute EventHandler onlocation` -/
-def HTMLGeolocationElement.setOnlocation (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setOnlocation (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setOnlocation" do
   self.val.set "onlocation" (toJS value)
 
 /-- `readonly attribute boolean isValid` -/
-def HTMLGeolocationElement.isValid (self : HTMLGeolocationElement) : IO Bool := self.val.get "isValid" Bool
+@[macro_inline] def HTMLGeolocationElement.isValid (self : HTMLGeolocationElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.isValid" do
+  self.val.get "isValid" Bool
 
 /-- `readonly attribute ActivationBlockersMixinBlockerReason invalidReason` -/
-def HTMLGeolocationElement.invalidReason (self : HTMLGeolocationElement) : IO ActivationBlockersMixinBlockerReason := self.val.get "invalidReason" ActivationBlockersMixinBlockerReason
+@[macro_inline] def HTMLGeolocationElement.invalidReason (self : HTMLGeolocationElement) : IO ActivationBlockersMixinBlockerReason := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.invalidReason" do
+  self.val.get "invalidReason" ActivationBlockersMixinBlockerReason
 
 /-- `attribute EventHandler onvalidationstatuschange` -/
-def HTMLGeolocationElement.onvalidationstatuschange (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := self.val.get "onvalidationstatuschange" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLGeolocationElement.onvalidationstatuschange (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.onvalidationstatuschange" do
+  self.val.get "onvalidationstatuschange" (Option EventHandlerNonNull)
 
 /-- Sets `onvalidationstatuschange`: `attribute EventHandler onvalidationstatuschange` -/
-def HTMLGeolocationElement.setOnvalidationstatuschange (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setOnvalidationstatuschange (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setOnvalidationstatuschange" do
   self.val.set "onvalidationstatuschange" (toJS value)
 
 /-- `readonly attribute PermissionState initialPermissionStatus` -/
-def HTMLGeolocationElement.initialPermissionStatus (self : HTMLGeolocationElement) : IO PermissionState := self.val.get "initialPermissionStatus" PermissionState
+@[macro_inline] def HTMLGeolocationElement.initialPermissionStatus (self : HTMLGeolocationElement) : IO PermissionState := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.initialPermissionStatus" do
+  self.val.get "initialPermissionStatus" PermissionState
 
 /-- `readonly attribute PermissionState permissionStatus` -/
-def HTMLGeolocationElement.permissionStatus (self : HTMLGeolocationElement) : IO PermissionState := self.val.get "permissionStatus" PermissionState
+@[macro_inline] def HTMLGeolocationElement.permissionStatus (self : HTMLGeolocationElement) : IO PermissionState := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.permissionStatus" do
+  self.val.get "permissionStatus" PermissionState
 
 /-- `attribute EventHandler onpromptaction` -/
-def HTMLGeolocationElement.onpromptaction (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := self.val.get "onpromptaction" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLGeolocationElement.onpromptaction (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.onpromptaction" do
+  self.val.get "onpromptaction" (Option EventHandlerNonNull)
 
 /-- Sets `onpromptaction`: `attribute EventHandler onpromptaction` -/
-def HTMLGeolocationElement.setOnpromptaction (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setOnpromptaction (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setOnpromptaction" do
   self.val.set "onpromptaction" (toJS value)
 
 /-- `attribute EventHandler onpromptdismiss` -/
-def HTMLGeolocationElement.onpromptdismiss (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := self.val.get "onpromptdismiss" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLGeolocationElement.onpromptdismiss (self : HTMLGeolocationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.onpromptdismiss" do
+  self.val.get "onpromptdismiss" (Option EventHandlerNonNull)
 
 /-- Sets `onpromptdismiss`: `attribute EventHandler onpromptdismiss` -/
-def HTMLGeolocationElement.setOnpromptdismiss (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLGeolocationElement.setOnpromptdismiss (self : HTMLGeolocationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLGeolocationElement.setOnpromptdismiss" do
   self.val.set "onpromptdismiss" (toJS value)
 
 end Lasm.JS.Web

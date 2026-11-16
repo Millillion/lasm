@@ -6,26 +6,31 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.KeyboardLock
+import Lasm.JS.Web.Types.KeyboardMap
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof KeyboardLayoutMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyboardLayoutMap`). -/
-def KeyboardLayoutMap.cast? (v : Value) : IO (Option KeyboardLayoutMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["KeyboardLayoutMap"] Value) v) then some { val := v } else none
+@[macro_inline] def KeyboardLayoutMap.cast? (v : Value) : IO (Option KeyboardLayoutMap) := Internal.api "Lasm.JS.Web.KeyboardLayoutMap.cast?" do
+  Internal.cast (Internal.getGlobal ["KeyboardLayoutMap"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onlayoutchange` -/
-def Keyboard.onlayoutchange (self : Keyboard) : IO (Option EventHandlerNonNull) := self.val.get "onlayoutchange" (Option EventHandlerNonNull)
+@[macro_inline] def Keyboard.onlayoutchange (self : Keyboard) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Keyboard.onlayoutchange" do
+  self.val.get "onlayoutchange" (Option EventHandlerNonNull)
 
 /-- Sets `onlayoutchange`: `attribute EventHandler onlayoutchange` -/
-def Keyboard.setOnlayoutchange (self : Keyboard) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Keyboard.setOnlayoutchange (self : Keyboard) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Keyboard.setOnlayoutchange" do
   self.val.set "onlayoutchange" (toJS value)
 
 /-- `Promise<KeyboardLayoutMap> getLayoutMap()` -/
-def Keyboard.getLayoutMap (self : Keyboard) : Async KeyboardLayoutMap := do
-  let r ← self.val.callMethodAwait "getLayoutMap" (Support.args #[]) Value
+@[macro_inline] def Keyboard.getLayoutMap (self : Keyboard) : Async KeyboardLayoutMap := Internal.api "Lasm.JS.Web.Keyboard.getLayoutMap" do
+  let r ← self.val.callMethodAwait "getLayoutMap" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

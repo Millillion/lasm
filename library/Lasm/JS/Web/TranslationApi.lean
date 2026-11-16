@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.WritingAssistanceApis
+import Lasm.JS.Web.Types.TranslationApi
 import Lasm.JS.Web.WritingAssistanceApis
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary LanguageDetectorCreateOptions : LanguageDetectorCreateCoreOptions` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageDetectorCreateOptions where
@@ -20,21 +26,21 @@ structure LanguageDetectorCreateOptions where
   signal : Option AbortSignal := none
   /-- `CreateMonitorCallback monitor` -/
   monitor : Option CreateMonitorCallback := none
-instance : ToJS LanguageDetectorCreateOptions := ⟨fun d => Support.fields #[("expectedInputLanguages", Support.optional d.expectedInputLanguages),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor)]⟩
+instance : ToJS LanguageDetectorCreateOptions := ⟨fun d => Internal.fields #[("expectedInputLanguages", Internal.optional d.expectedInputLanguages),
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor)]⟩
 
 /-- `dictionary LanguageDetectorCreateCoreOptions` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageDetectorCreateCoreOptions where
   /-- `sequence<DOMString> expectedInputLanguages` -/
   expectedInputLanguages : Option (Array String) := none
-instance : ToJS LanguageDetectorCreateCoreOptions := ⟨fun d => Support.fields #[("expectedInputLanguages", Support.optional d.expectedInputLanguages)]⟩
+instance : ToJS LanguageDetectorCreateCoreOptions := ⟨fun d => Internal.fields #[("expectedInputLanguages", Internal.optional d.expectedInputLanguages)]⟩
 
 /-- `dictionary LanguageDetectorDetectOptions` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageDetectorDetectOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS LanguageDetectorDetectOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS LanguageDetectorDetectOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary LanguageDetectionResult` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure LanguageDetectionResult where
@@ -42,6 +48,8 @@ structure LanguageDetectionResult where
   detectedLanguage : Option String := none
   /-- `double confidence` -/
   confidence : Option Float := none
+instance : ToJS LanguageDetectionResult := ⟨fun d => Internal.fields #[("detectedLanguage", Internal.optional d.detectedLanguage),
+    ("confidence", Internal.optional d.confidence)]⟩
 instance : FromJS LanguageDetectionResult where
   fromJS d := do return {
     detectedLanguage := ← Lasm.JS.readField (Option String) d "detectedLanguage",
@@ -58,10 +66,10 @@ structure TranslatorCreateOptions where
   signal : Option AbortSignal := none
   /-- `CreateMonitorCallback monitor` -/
   monitor : Option CreateMonitorCallback := none
-instance : ToJS TranslatorCreateOptions := ⟨fun d => Support.fields #[("sourceLanguage", toJS d.sourceLanguage),
+instance : ToJS TranslatorCreateOptions := ⟨fun d => Internal.fields #[("sourceLanguage", toJS d.sourceLanguage),
     ("targetLanguage", toJS d.targetLanguage),
-    ("signal", Support.optional d.signal),
-    ("monitor", Support.optional d.monitor)]⟩
+    ("signal", Internal.optional d.signal),
+    ("monitor", Internal.optional d.monitor)]⟩
 
 /-- `dictionary TranslatorCreateCoreOptions` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TranslatorCreateCoreOptions where
@@ -69,87 +77,92 @@ structure TranslatorCreateCoreOptions where
   sourceLanguage : String
   /-- `required DOMString targetLanguage` -/
   targetLanguage : String
-instance : ToJS TranslatorCreateCoreOptions := ⟨fun d => Support.fields #[("sourceLanguage", toJS d.sourceLanguage),
+instance : ToJS TranslatorCreateCoreOptions := ⟨fun d => Internal.fields #[("sourceLanguage", toJS d.sourceLanguage),
     ("targetLanguage", toJS d.targetLanguage)]⟩
 
 /-- `dictionary TranslatorTranslateOptions` (Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TranslatorTranslateOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS TranslatorTranslateOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS TranslatorTranslateOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof LanguageDetector`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LanguageDetector`). -/
-def LanguageDetector.cast? (v : Value) : IO (Option LanguageDetector) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LanguageDetector"] Value) v) then some { val := v } else none
+@[macro_inline] def LanguageDetector.cast? (v : Value) : IO (Option LanguageDetector) := Internal.api "Lasm.JS.Web.LanguageDetector.cast?" do
+  Internal.cast (Internal.getGlobal ["LanguageDetector"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<DOMString>? expectedInputLanguages` -/
-def LanguageDetector.expectedInputLanguages (self : LanguageDetector) : IO (Option (Array String)) := self.val.get "expectedInputLanguages" (Option (Array String))
+@[macro_inline] def LanguageDetector.expectedInputLanguages (self : LanguageDetector) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.LanguageDetector.expectedInputLanguages" do
+  self.val.get "expectedInputLanguages" (Option (Array String))
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def LanguageDetector.inputQuota (self : LanguageDetector) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def LanguageDetector.inputQuota (self : LanguageDetector) : IO Float := Internal.api "Lasm.JS.Web.LanguageDetector.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `static Promise<LanguageDetector> create(optional LanguageDetectorCreateOptions options)` -/
-def LanguageDetector.create (options : Option LanguageDetectorCreateOptions := none) : Async LanguageDetector := do
+@[macro_inline] def LanguageDetector.create (options : Option LanguageDetectorCreateOptions := none) : Async LanguageDetector := Internal.api "Lasm.JS.Web.LanguageDetector.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.LanguageDetector.create", module := "globalThis", path := "LanguageDetector.create", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(optional LanguageDetectorCreateCoreOptions options)` -/
-def LanguageDetector.availability (options : Option LanguageDetectorCreateCoreOptions := none) : Async Availability :=
+@[macro_inline] def LanguageDetector.availability (options : Option LanguageDetectorCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.LanguageDetector.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageDetector.availability", module := "globalThis", path := "LanguageDetector.availability", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<sequence<LanguageDetectionResult>> detect(DOMString input, optional LanguageDetectorDetectOptions options)` -/
-def LanguageDetector.detect (self : LanguageDetector) (input : String) (options : Option LanguageDetectorDetectOptions := none) : Async (Array LanguageDetectionResult) :=
-  self.val.callMethodAwait "detect" (Support.args #[toJS input, Support.optional options]) (Array LanguageDetectionResult)
+@[macro_inline] def LanguageDetector.detect (self : LanguageDetector) (input : String) (options : Option LanguageDetectorDetectOptions := none) : Async (Array LanguageDetectionResult) := Internal.api "Lasm.JS.Web.LanguageDetector.detect" do
+  self.val.callMethodAwait "detect" (Internal.args #[toJS input, Internal.optional options]) (Array LanguageDetectionResult)
 
 /-- `Promise<double> measureInputUsage(DOMString input, optional LanguageDetectorDetectOptions options)` -/
-def LanguageDetector.measureInputUsage (self : LanguageDetector) (input : String) (options : Option LanguageDetectorDetectOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def LanguageDetector.measureInputUsage (self : LanguageDetector) (input : String) (options : Option LanguageDetectorDetectOptions := none) : Async Float := Internal.api "Lasm.JS.Web.LanguageDetector.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `undefined destroy()` -/
-def LanguageDetector.destroy (self : LanguageDetector) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def LanguageDetector.destroy (self : LanguageDetector) : IO Unit := Internal.api "Lasm.JS.Web.LanguageDetector.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- `v instanceof Translator`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Translator`). -/
-def Translator.cast? (v : Value) : IO (Option Translator) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Translator"] Value) v) then some { val := v } else none
+@[macro_inline] def Translator.cast? (v : Value) : IO (Option Translator) := Internal.api "Lasm.JS.Web.Translator.cast?" do
+  Internal.cast (Internal.getGlobal ["Translator"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString sourceLanguage` -/
-def Translator.sourceLanguage (self : Translator) : IO String := self.val.get "sourceLanguage" String
+@[macro_inline] def Translator.sourceLanguage (self : Translator) : IO String := Internal.api "Lasm.JS.Web.Translator.sourceLanguage" do
+  self.val.get "sourceLanguage" String
 
 /-- `readonly attribute DOMString targetLanguage` -/
-def Translator.targetLanguage (self : Translator) : IO String := self.val.get "targetLanguage" String
+@[macro_inline] def Translator.targetLanguage (self : Translator) : IO String := Internal.api "Lasm.JS.Web.Translator.targetLanguage" do
+  self.val.get "targetLanguage" String
 
 /-- `readonly attribute unrestricted double inputQuota` -/
-def Translator.inputQuota (self : Translator) : IO Float := self.val.get "inputQuota" Float
+@[macro_inline] def Translator.inputQuota (self : Translator) : IO Float := Internal.api "Lasm.JS.Web.Translator.inputQuota" do
+  self.val.get "inputQuota" Float
 
 /-- `static Promise<Translator> create(TranslatorCreateOptions options)` -/
-def Translator.create (options : TranslatorCreateOptions) : Async Translator := do
+@[macro_inline] def Translator.create (options : TranslatorCreateOptions) : Async Translator := Internal.api "Lasm.JS.Web.Translator.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Translator.create", module := "globalThis", path := "Translator.create", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `static Promise<Availability> availability(TranslatorCreateCoreOptions options)` -/
-def Translator.availability (options : TranslatorCreateCoreOptions) : Async Availability :=
+@[macro_inline] def Translator.availability (options : TranslatorCreateCoreOptions) : Async Availability := Internal.api "Lasm.JS.Web.Translator.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Translator.availability", module := "globalThis", path := "Translator.availability", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
 
 /-- `Promise<DOMString> translate(DOMString input, optional TranslatorTranslateOptions options)` -/
-def Translator.translate (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : Async String :=
-  self.val.callMethodAwait "translate" (Support.args #[toJS input, Support.optional options]) String
+@[macro_inline] def Translator.translate (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : Async String := Internal.api "Lasm.JS.Web.Translator.translate" do
+  self.val.callMethodAwait "translate" (Internal.args #[toJS input, Internal.optional options]) String
 
 /-- `ReadableStream translateStreaming(DOMString input, optional TranslatorTranslateOptions options)` -/
-def Translator.translateStreaming (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "translateStreaming" (Support.args #[toJS input, Support.optional options]) Value
+@[macro_inline] def Translator.translateStreaming (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Web.Translator.translateStreaming" do
+  let r ← self.val.callMethod "translateStreaming" (Internal.args #[toJS input, Internal.optional options]) Value
   pure { val := r }
 
 /-- `Promise<double> measureInputUsage(DOMString input, optional TranslatorTranslateOptions options)` -/
-def Translator.measureInputUsage (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : Async Float :=
-  self.val.callMethodAwait "measureInputUsage" (Support.args #[toJS input, Support.optional options]) Float
+@[macro_inline] def Translator.measureInputUsage (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : Async Float := Internal.api "Lasm.JS.Web.Translator.measureInputUsage" do
+  self.val.callMethodAwait "measureInputUsage" (Internal.args #[toJS input, Internal.optional options]) Float
 
 /-- `undefined destroy()` -/
-def Translator.destroy (self : Translator) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def Translator.destroy (self : Translator) : IO Unit := Internal.api "Lasm.JS.Web.Translator.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 end Lasm.JS.Web

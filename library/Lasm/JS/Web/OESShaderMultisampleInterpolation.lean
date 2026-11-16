@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.OESShaderMultisampleInterpolation
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum MIN_FRAGMENT_INTERPOLATION_OFFSET_OES = 0x8E5B` -/
 def OES_shader_multisample_interpolation.MIN_FRAGMENT_INTERPOLATION_OFFSET_OES : Nat := 0x8E5B

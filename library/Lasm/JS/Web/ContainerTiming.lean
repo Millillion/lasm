@@ -6,57 +6,72 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ContainerTiming
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceContainerTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceContainerTiming`). -/
-def PerformanceContainerTiming.cast? (v : Value) : IO (Option PerformanceContainerTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceContainerTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceContainerTiming.cast? (v : Value) : IO (Option PerformanceContainerTiming) := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceContainerTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString identifier` -/
-def PerformanceContainerTiming.identifier (self : PerformanceContainerTiming) : IO String := self.val.get "identifier" String
+@[macro_inline] def PerformanceContainerTiming.identifier (self : PerformanceContainerTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.identifier" do
+  self.val.get "identifier" String
 
 /-- `readonly attribute DOMRectReadOnly intersectionRect` -/
-def PerformanceContainerTiming.intersectionRect (self : PerformanceContainerTiming) : IO DOMRectReadOnly := do
+@[macro_inline] def PerformanceContainerTiming.intersectionRect (self : PerformanceContainerTiming) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.intersectionRect" do
   let r ← self.val.get "intersectionRect" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long long size` -/
-def PerformanceContainerTiming.size (self : PerformanceContainerTiming) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def PerformanceContainerTiming.size (self : PerformanceContainerTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.size" do
+  self.val.get "size" Nat
 
 /-- `readonly attribute DOMHighResTimeStamp firstRenderTime` -/
-def PerformanceContainerTiming.firstRenderTime (self : PerformanceContainerTiming) : IO Float := self.val.get "firstRenderTime" Float
+@[macro_inline] def PerformanceContainerTiming.firstRenderTime (self : PerformanceContainerTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.firstRenderTime" do
+  self.val.get "firstRenderTime" Float
 
 /-- `readonly attribute HTMLElement? lastPaintedElement` -/
-def PerformanceContainerTiming.lastPaintedElement (self : PerformanceContainerTiming) : IO (Option HTMLElement) := self.val.get "lastPaintedElement" (Option HTMLElement)
+@[macro_inline] def PerformanceContainerTiming.lastPaintedElement (self : PerformanceContainerTiming) : IO (Option HTMLElement) := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.lastPaintedElement" do
+  self.val.get "lastPaintedElement" (Option HTMLElement)
 
 /-- `readonly attribute HTMLElement? rootElement` -/
-def PerformanceContainerTiming.rootElement (self : PerformanceContainerTiming) : IO (Option HTMLElement) := self.val.get "rootElement" (Option HTMLElement)
+@[macro_inline] def PerformanceContainerTiming.rootElement (self : PerformanceContainerTiming) : IO (Option HTMLElement) := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.rootElement" do
+  self.val.get "rootElement" (Option HTMLElement)
 
 /-- `readonly attribute DOMHighResTimeStamp paintTime` -/
-def PerformanceContainerTiming.paintTime (self : PerformanceContainerTiming) : IO Float := self.val.get "paintTime" Float
+@[macro_inline] def PerformanceContainerTiming.paintTime (self : PerformanceContainerTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.paintTime" do
+  self.val.get "paintTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
-def PerformanceContainerTiming.presentationTime (self : PerformanceContainerTiming) : IO (Option Float) := self.val.get "presentationTime" (Option Float)
+@[macro_inline] def PerformanceContainerTiming.presentationTime (self : PerformanceContainerTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.presentationTime" do
+  self.val.get "presentationTime" (Option Float)
 
 /-- `object toJSON()` -/
-def PerformanceContainerTiming.toJSON (self : PerformanceContainerTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceContainerTiming.toJSON (self : PerformanceContainerTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceContainerTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `attribute DOMString containerTiming` -/
-def HTMLElement.containerTiming (self : HTMLElement) : IO String := self.val.get "containerTiming" String
+@[macro_inline] def HTMLElement.containerTiming (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.containerTiming" do
+  self.val.get "containerTiming" String
 
 /-- Sets `containerTiming`: `attribute DOMString containerTiming` -/
-def HTMLElement.setContainerTiming (self : HTMLElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLElement.setContainerTiming (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setContainerTiming" do
   self.val.set "containerTiming" (toJS value)
 
 /-- `attribute boolean containerTimingIgnore` -/
-def HTMLElement.containerTimingIgnore (self : HTMLElement) : IO Bool := self.val.get "containerTimingIgnore" Bool
+@[macro_inline] def HTMLElement.containerTimingIgnore (self : HTMLElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLElement.containerTimingIgnore" do
+  self.val.get "containerTimingIgnore" Bool
 
 /-- Sets `containerTimingIgnore`: `attribute boolean containerTimingIgnore` -/
-def HTMLElement.setContainerTimingIgnore (self : HTMLElement) (value : Bool) : IO Unit :=
+@[macro_inline] def HTMLElement.setContainerTimingIgnore (self : HTMLElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setContainerTimingIgnore" do
   self.val.set "containerTimingIgnore" (toJS value)
 
 end Lasm.JS.Web

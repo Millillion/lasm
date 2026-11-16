@@ -9,6 +9,9 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary FlacEncoderConfig` (FLAC WebCodecs Registration (https://w3c.github.io/webcodecs/flac_codec_registration.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FlacEncoderConfig where
@@ -16,8 +19,8 @@ structure FlacEncoderConfig where
   blockSize : Option Nat := none
   /-- `unsigned long compressLevel = 5` -/
   compressLevel : Option Nat := none
-instance : ToJS FlacEncoderConfig := ⟨fun d => Support.fields #[("blockSize", Support.optional d.blockSize),
-    ("compressLevel", Support.optional d.compressLevel)]⟩
+instance : ToJS FlacEncoderConfig := ⟨fun d => Internal.fields #[("blockSize", Internal.optional d.blockSize),
+    ("compressLevel", Internal.optional d.compressLevel)]⟩
 instance : FromJS FlacEncoderConfig where
   fromJS d := do return {
     blockSize := ← Lasm.JS.readField (Option Nat) d "blockSize",

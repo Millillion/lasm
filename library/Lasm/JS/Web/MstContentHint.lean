@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.MediacaptureStreams
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute DOMString contentHint` -/
-def MediaStreamTrack.contentHint (self : MediaStreamTrack) : IO String := self.val.get "contentHint" String
+@[macro_inline] def MediaStreamTrack.contentHint (self : MediaStreamTrack) : IO String := Internal.api "Lasm.JS.Web.MediaStreamTrack.contentHint" do
+  self.val.get "contentHint" String
 
 /-- Sets `contentHint`: `attribute DOMString contentHint` -/
-def MediaStreamTrack.setContentHint (self : MediaStreamTrack) (value : String) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setContentHint (self : MediaStreamTrack) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setContentHint" do
   self.val.set "contentHint" (toJS value)
 
 end Lasm.JS.Web

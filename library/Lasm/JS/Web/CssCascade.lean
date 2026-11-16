@@ -6,23 +6,29 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssCascade
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSLayerBlockRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSLayerBlockRule`). -/
-def CSSLayerBlockRule.cast? (v : Value) : IO (Option CSSLayerBlockRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSLayerBlockRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSLayerBlockRule.cast? (v : Value) : IO (Option CSSLayerBlockRule) := Internal.api "Lasm.JS.Web.CSSLayerBlockRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSLayerBlockRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSLayerBlockRule.name (self : CSSLayerBlockRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSLayerBlockRule.name (self : CSSLayerBlockRule) : IO String := Internal.api "Lasm.JS.Web.CSSLayerBlockRule.name" do
+  self.val.get "name" String
 
 /-- `v instanceof CSSLayerStatementRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSLayerStatementRule`). -/
-def CSSLayerStatementRule.cast? (v : Value) : IO (Option CSSLayerStatementRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSLayerStatementRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSLayerStatementRule.cast? (v : Value) : IO (Option CSSLayerStatementRule) := Internal.api "Lasm.JS.Web.CSSLayerStatementRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSLayerStatementRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<CSSOMString> nameList` -/
-def CSSLayerStatementRule.nameList (self : CSSLayerStatementRule) : IO (Array String) := self.val.get "nameList" (Array String)
+@[macro_inline] def CSSLayerStatementRule.nameList (self : CSSLayerStatementRule) : IO (Array String) := Internal.api "Lasm.JS.Web.CSSLayerStatementRule.nameList" do
+  self.val.get "nameList" (Array String)
 
 end Lasm.JS.Web

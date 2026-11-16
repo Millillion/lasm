@@ -6,135 +6,147 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.SvgAnimations
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof SVGAnimationElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimationElement`). -/
-def SVGAnimationElement.cast? (v : Value) : IO (Option SVGAnimationElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimationElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimationElement.cast? (v : Value) : IO (Option SVGAnimationElement) := Internal.api "Lasm.JS.Web.SVGAnimationElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimationElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGElement? targetElement` -/
-def SVGAnimationElement.targetElement (self : SVGAnimationElement) : IO (Option SVGElement) := self.val.get "targetElement" (Option SVGElement)
+@[macro_inline] def SVGAnimationElement.targetElement (self : SVGAnimationElement) : IO (Option SVGElement) := Internal.api "Lasm.JS.Web.SVGAnimationElement.targetElement" do
+  self.val.get "targetElement" (Option SVGElement)
 
 /-- `attribute EventHandler onbegin` -/
-def SVGAnimationElement.onbegin (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := self.val.get "onbegin" (Option EventHandlerNonNull)
+@[macro_inline] def SVGAnimationElement.onbegin (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGAnimationElement.onbegin" do
+  self.val.get "onbegin" (Option EventHandlerNonNull)
 
 /-- Sets `onbegin`: `attribute EventHandler onbegin` -/
-def SVGAnimationElement.setOnbegin (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGAnimationElement.setOnbegin (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.setOnbegin" do
   self.val.set "onbegin" (toJS value)
 
 /-- `attribute EventHandler onend` -/
-def SVGAnimationElement.onend (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := self.val.get "onend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGAnimationElement.onend (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGAnimationElement.onend" do
+  self.val.get "onend" (Option EventHandlerNonNull)
 
 /-- Sets `onend`: `attribute EventHandler onend` -/
-def SVGAnimationElement.setOnend (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGAnimationElement.setOnend (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.setOnend" do
   self.val.set "onend" (toJS value)
 
 /-- `attribute EventHandler onrepeat` -/
-def SVGAnimationElement.onrepeat (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := self.val.get "onrepeat" (Option EventHandlerNonNull)
+@[macro_inline] def SVGAnimationElement.onrepeat (self : SVGAnimationElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGAnimationElement.onrepeat" do
+  self.val.get "onrepeat" (Option EventHandlerNonNull)
 
 /-- Sets `onrepeat`: `attribute EventHandler onrepeat` -/
-def SVGAnimationElement.setOnrepeat (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGAnimationElement.setOnrepeat (self : SVGAnimationElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.setOnrepeat" do
   self.val.set "onrepeat" (toJS value)
 
 /-- `readonly attribute SVGStringList requiredExtensions` -/
-def SVGAnimationElement.requiredExtensions (self : SVGAnimationElement) : IO SVGStringList := do
+@[macro_inline] def SVGAnimationElement.requiredExtensions (self : SVGAnimationElement) : IO SVGStringList := Internal.api "Lasm.JS.Web.SVGAnimationElement.requiredExtensions" do
   let r ← self.val.get "requiredExtensions" Value
   pure { val := r }
 
 /-- `readonly attribute SVGStringList systemLanguage` -/
-def SVGAnimationElement.systemLanguage (self : SVGAnimationElement) : IO SVGStringList := do
+@[macro_inline] def SVGAnimationElement.systemLanguage (self : SVGAnimationElement) : IO SVGStringList := Internal.api "Lasm.JS.Web.SVGAnimationElement.systemLanguage" do
   let r ← self.val.get "systemLanguage" Value
   pure { val := r }
 
 /-- `float getStartTime()` -/
-def SVGAnimationElement.getStartTime (self : SVGAnimationElement) : IO Float :=
-  self.val.callMethod "getStartTime" (Support.args #[]) Float
+@[macro_inline] def SVGAnimationElement.getStartTime (self : SVGAnimationElement) : IO Float := Internal.api "Lasm.JS.Web.SVGAnimationElement.getStartTime" do
+  self.val.callMethod "getStartTime" (Internal.args #[]) Float
 
 /-- `float getCurrentTime()` -/
-def SVGAnimationElement.getCurrentTime (self : SVGAnimationElement) : IO Float :=
-  self.val.callMethod "getCurrentTime" (Support.args #[]) Float
+@[macro_inline] def SVGAnimationElement.getCurrentTime (self : SVGAnimationElement) : IO Float := Internal.api "Lasm.JS.Web.SVGAnimationElement.getCurrentTime" do
+  self.val.callMethod "getCurrentTime" (Internal.args #[]) Float
 
 /-- `float getSimpleDuration()` -/
-def SVGAnimationElement.getSimpleDuration (self : SVGAnimationElement) : IO Float :=
-  self.val.callMethod "getSimpleDuration" (Support.args #[]) Float
+@[macro_inline] def SVGAnimationElement.getSimpleDuration (self : SVGAnimationElement) : IO Float := Internal.api "Lasm.JS.Web.SVGAnimationElement.getSimpleDuration" do
+  self.val.callMethod "getSimpleDuration" (Internal.args #[]) Float
 
 /-- `undefined beginElement()` -/
-def SVGAnimationElement.beginElement (self : SVGAnimationElement) : IO Unit :=
-  self.val.callMethod "beginElement" (Support.args #[]) Unit
+@[macro_inline] def SVGAnimationElement.beginElement (self : SVGAnimationElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.beginElement" do
+  self.val.callMethod "beginElement" (Internal.args #[]) Unit
 
 /-- `undefined beginElementAt(float offset)` -/
-def SVGAnimationElement.beginElementAt (self : SVGAnimationElement) (offset : Float) : IO Unit :=
-  self.val.callMethod "beginElementAt" (Support.args #[toJS offset]) Unit
+@[macro_inline] def SVGAnimationElement.beginElementAt (self : SVGAnimationElement) (offset : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.beginElementAt" do
+  self.val.callMethod "beginElementAt" (Internal.args #[toJS offset]) Unit
 
 /-- `undefined endElement()` -/
-def SVGAnimationElement.endElement (self : SVGAnimationElement) : IO Unit :=
-  self.val.callMethod "endElement" (Support.args #[]) Unit
+@[macro_inline] def SVGAnimationElement.endElement (self : SVGAnimationElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.endElement" do
+  self.val.callMethod "endElement" (Internal.args #[]) Unit
 
 /-- `undefined endElementAt(float offset)` -/
-def SVGAnimationElement.endElementAt (self : SVGAnimationElement) (offset : Float) : IO Unit :=
-  self.val.callMethod "endElementAt" (Support.args #[toJS offset]) Unit
+@[macro_inline] def SVGAnimationElement.endElementAt (self : SVGAnimationElement) (offset : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGAnimationElement.endElementAt" do
+  self.val.callMethod "endElementAt" (Internal.args #[toJS offset]) Unit
 
 /-- `v instanceof SVGMPathElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGMPathElement`). -/
-def SVGMPathElement.cast? (v : Value) : IO (Option SVGMPathElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGMPathElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGMPathElement.cast? (v : Value) : IO (Option SVGMPathElement) := Internal.api "Lasm.JS.Web.SVGMPathElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGMPathElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedString href` -/
-def SVGMPathElement.href (self : SVGMPathElement) : IO SVGAnimatedString := do
+@[macro_inline] def SVGMPathElement.href (self : SVGMPathElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGMPathElement.href" do
   let r ← self.val.get "href" Value
   pure { val := r }
 
 /-- `v instanceof TimeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TimeEvent`). -/
-def TimeEvent.cast? (v : Value) : IO (Option TimeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TimeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TimeEvent.cast? (v : Value) : IO (Option TimeEvent) := Internal.api "Lasm.JS.Web.TimeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TimeEvent"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute WindowProxy? view` -/
-def TimeEvent.view (self : TimeEvent) : IO (Option Window) := self.val.get "view" (Option Window)
+@[macro_inline] def TimeEvent.view (self : TimeEvent) : IO (Option Window) := Internal.api "Lasm.JS.Web.TimeEvent.view" do
+  self.val.get "view" (Option Window)
 
 /-- `readonly attribute long detail` -/
-def TimeEvent.detail (self : TimeEvent) : IO Int := self.val.get "detail" Int
+@[macro_inline] def TimeEvent.detail (self : TimeEvent) : IO Int := Internal.api "Lasm.JS.Web.TimeEvent.detail" do
+  self.val.get "detail" Int
 
 /-- `undefined initTimeEvent(DOMString typeArg, optional Window? viewArg, optional long detailArg)` -/
-def TimeEvent.initTimeEvent (self : TimeEvent) (typeArg : String) (viewArg : Option Window := none) (detailArg : Option Int := none) : IO Unit :=
-  self.val.callMethod "initTimeEvent" (Support.args #[toJS typeArg, Support.optional viewArg, Support.optional detailArg]) Unit
+@[macro_inline] def TimeEvent.initTimeEvent (self : TimeEvent) (typeArg : String) (viewArg : Option Window := none) (detailArg : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Web.TimeEvent.initTimeEvent" do
+  self.val.callMethod "initTimeEvent" (Internal.args #[toJS typeArg, Internal.optional viewArg, Internal.optional detailArg]) Unit
 
 /-- `v instanceof SVGAnimateElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimateElement`). -/
-def SVGAnimateElement.cast? (v : Value) : IO (Option SVGAnimateElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimateElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimateElement.cast? (v : Value) : IO (Option SVGAnimateElement) := Internal.api "Lasm.JS.Web.SVGAnimateElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimateElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGAnimateMotionElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimateMotionElement`). -/
-def SVGAnimateMotionElement.cast? (v : Value) : IO (Option SVGAnimateMotionElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimateMotionElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimateMotionElement.cast? (v : Value) : IO (Option SVGAnimateMotionElement) := Internal.api "Lasm.JS.Web.SVGAnimateMotionElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimateMotionElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGAnimateTransformElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGAnimateTransformElement`). -/
-def SVGAnimateTransformElement.cast? (v : Value) : IO (Option SVGAnimateTransformElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGAnimateTransformElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGAnimateTransformElement.cast? (v : Value) : IO (Option SVGAnimateTransformElement) := Internal.api "Lasm.JS.Web.SVGAnimateTransformElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGAnimateTransformElement"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof SVGSetElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGSetElement`). -/
-def SVGSetElement.cast? (v : Value) : IO (Option SVGSetElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGSetElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGSetElement.cast? (v : Value) : IO (Option SVGSetElement) := Internal.api "Lasm.JS.Web.SVGSetElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGSetElement"] Value) (fun x => { val := x }) v
 
 /-- `undefined pauseAnimations()` -/
-def SVGSVGElement.pauseAnimations (self : SVGSVGElement) : IO Unit :=
-  self.val.callMethod "pauseAnimations" (Support.args #[]) Unit
+@[macro_inline] def SVGSVGElement.pauseAnimations (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.pauseAnimations" do
+  self.val.callMethod "pauseAnimations" (Internal.args #[]) Unit
 
 /-- `undefined unpauseAnimations()` -/
-def SVGSVGElement.unpauseAnimations (self : SVGSVGElement) : IO Unit :=
-  self.val.callMethod "unpauseAnimations" (Support.args #[]) Unit
+@[macro_inline] def SVGSVGElement.unpauseAnimations (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.unpauseAnimations" do
+  self.val.callMethod "unpauseAnimations" (Internal.args #[]) Unit
 
 /-- `boolean animationsPaused()` -/
-def SVGSVGElement.animationsPaused (self : SVGSVGElement) : IO Bool :=
-  self.val.callMethod "animationsPaused" (Support.args #[]) Bool
+@[macro_inline] def SVGSVGElement.animationsPaused (self : SVGSVGElement) : IO Bool := Internal.api "Lasm.JS.Web.SVGSVGElement.animationsPaused" do
+  self.val.callMethod "animationsPaused" (Internal.args #[]) Bool
 
 /-- `float getCurrentTime()` -/
-def SVGSVGElement.getCurrentTime (self : SVGSVGElement) : IO Float :=
-  self.val.callMethod "getCurrentTime" (Support.args #[]) Float
+@[macro_inline] def SVGSVGElement.getCurrentTime (self : SVGSVGElement) : IO Float := Internal.api "Lasm.JS.Web.SVGSVGElement.getCurrentTime" do
+  self.val.callMethod "getCurrentTime" (Internal.args #[]) Float
 
 /-- `undefined setCurrentTime(float seconds)` -/
-def SVGSVGElement.setCurrentTime (self : SVGSVGElement) (seconds : Float) : IO Unit :=
-  self.val.callMethod "setCurrentTime" (Support.args #[toJS seconds]) Unit
+@[macro_inline] def SVGSVGElement.setCurrentTime (self : SVGSVGElement) (seconds : Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.setCurrentTime" do
+  self.val.callMethod "setCurrentTime" (Internal.args #[toJS seconds]) Unit
 
 end Lasm.JS.Web

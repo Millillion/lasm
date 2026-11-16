@@ -6,27 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.GenericSensor
+import Lasm.JS.Web.Types.Gyroscope
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum GyroscopeLocalCoordinateSystem` (Gyroscope (https://w3c.github.io/gyroscope/)): "device", "screen". -/
-inductive GyroscopeLocalCoordinateSystem where
-  /-- "device" -/
-  | device
-  /-- "screen" -/
-  | screen
-  deriving BEq, Repr, Inhabited
-instance : ToJS GyroscopeLocalCoordinateSystem := ⟨fun
-  | .device => .string "device"
-  | .screen => .string "screen"⟩
-instance : FromJS GyroscopeLocalCoordinateSystem where
-  fromJS
-    | .string "device" => .ok .device
-    | .string "screen" => .ok .screen
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GyroscopeLocalCoordinateSystem"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary GyroscopeSensorOptions : SensorOptions` (Gyroscope (https://w3c.github.io/gyroscope/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GyroscopeSensorOptions where
@@ -34,25 +21,28 @@ structure GyroscopeSensorOptions where
   frequency : Option Float := none
   /-- `GyroscopeLocalCoordinateSystem referenceFrame = "device"` -/
   referenceFrame : Option GyroscopeLocalCoordinateSystem := none
-instance : ToJS GyroscopeSensorOptions := ⟨fun d => Support.fields #[("frequency", Support.optional d.frequency),
-    ("referenceFrame", Support.optional d.referenceFrame)]⟩
+instance : ToJS GyroscopeSensorOptions := ⟨fun d => Internal.fields #[("frequency", Internal.optional d.frequency),
+    ("referenceFrame", Internal.optional d.referenceFrame)]⟩
 
 /-- `v instanceof Gyroscope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Gyroscope`). -/
-def Gyroscope.cast? (v : Value) : IO (Option Gyroscope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Gyroscope"] Value) v) then some { val := v } else none
+@[macro_inline] def Gyroscope.cast? (v : Value) : IO (Option Gyroscope) := Internal.api "Lasm.JS.Web.Gyroscope.cast?" do
+  Internal.cast (Internal.getGlobal ["Gyroscope"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional GyroscopeSensorOptions sensorOptions)` -/
-def Gyroscope.new (sensorOptions : Option GyroscopeSensorOptions := none) : IO Gyroscope :=
+@[macro_inline] def Gyroscope.new (sensorOptions : Option GyroscopeSensorOptions := none) : IO Gyroscope := Internal.api "Lasm.JS.Web.Gyroscope.new" do
   Lasm.JS.Binding.invoke Gyroscope { name := "Lasm.JS.Web.Gyroscope.new", module := "globalThis", path := "Gyroscope", construct := true, arity := 1 }
-    (Support.args #[Support.optional sensorOptions]) (await := false)
+    (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
 /-- `readonly attribute double? x` -/
-def Gyroscope.x (self : Gyroscope) : IO (Option Float) := self.val.get "x" (Option Float)
+@[macro_inline] def Gyroscope.x (self : Gyroscope) : IO (Option Float) := Internal.api "Lasm.JS.Web.Gyroscope.x" do
+  self.val.get "x" (Option Float)
 
 /-- `readonly attribute double? y` -/
-def Gyroscope.y (self : Gyroscope) : IO (Option Float) := self.val.get "y" (Option Float)
+@[macro_inline] def Gyroscope.y (self : Gyroscope) : IO (Option Float) := Internal.api "Lasm.JS.Web.Gyroscope.y" do
+  self.val.get "y" (Option Float)
 
 /-- `readonly attribute double? z` -/
-def Gyroscope.z (self : Gyroscope) : IO (Option Float) := self.val.get "z" (Option Float)
+@[macro_inline] def Gyroscope.z (self : Gyroscope) : IO (Option Float) := Internal.api "Lasm.JS.Web.Gyroscope.z" do
+  self.val.get "z" (Option Float)
 
 end Lasm.JS.Web

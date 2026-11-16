@@ -6,16 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute DataTransfer? dataTransfer` -/
-def InputEvent.dataTransfer (self : InputEvent) : IO (Option DataTransfer) := self.val.get "dataTransfer" (Option DataTransfer)
+@[macro_inline] def InputEvent.dataTransfer (self : InputEvent) : IO (Option DataTransfer) := Internal.api "Lasm.JS.Web.InputEvent.dataTransfer" do
+  self.val.get "dataTransfer" (Option DataTransfer)
 
 /-- `sequence<StaticRange> getTargetRanges()` -/
-def InputEvent.getTargetRanges (self : InputEvent) : IO (Array StaticRange) :=
-  self.val.callMethod "getTargetRanges" (Support.args #[]) (Array StaticRange)
+@[macro_inline] def InputEvent.getTargetRanges (self : InputEvent) : IO (Array StaticRange) := Internal.api "Lasm.JS.Web.InputEvent.getTargetRanges" do
+  self.val.callMethod "getTargetRanges" (Internal.args #[]) (Array StaticRange)
 
 end Lasm.JS.Web

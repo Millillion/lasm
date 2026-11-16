@@ -6,41 +6,54 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.LocalFontAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary QueryOptions` (Local Font Access API (https://wicg.github.io/local-font-access/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueryOptions where
   /-- `sequence<DOMString> postscriptNames` -/
   postscriptNames : Option (Array String) := none
-instance : ToJS QueryOptions := ⟨fun d => Support.fields #[("postscriptNames", Support.optional d.postscriptNames)]⟩
+instance : ToJS QueryOptions := ⟨fun d => Internal.fields #[("postscriptNames", Internal.optional d.postscriptNames)]⟩
 
 /-- `v instanceof FontData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontData`). -/
-def FontData.cast? (v : Value) : IO (Option FontData) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontData"] Value) v) then some { val := v } else none
+@[macro_inline] def FontData.cast? (v : Value) : IO (Option FontData) := Internal.api "Lasm.JS.Web.FontData.cast?" do
+  Internal.cast (Internal.getGlobal ["FontData"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString postscriptName` -/
-def FontData.postscriptName (self : FontData) : IO String := self.val.get "postscriptName" String
+@[macro_inline] def FontData.postscriptName (self : FontData) : IO String := Internal.api "Lasm.JS.Web.FontData.postscriptName" do
+  self.val.get "postscriptName" String
 
 /-- `readonly attribute USVString fullName` -/
-def FontData.fullName (self : FontData) : IO String := self.val.get "fullName" String
+@[macro_inline] def FontData.fullName (self : FontData) : IO String := Internal.api "Lasm.JS.Web.FontData.fullName" do
+  self.val.get "fullName" String
 
 /-- `readonly attribute USVString family` -/
-def FontData.family (self : FontData) : IO String := self.val.get "family" String
+@[macro_inline] def FontData.family (self : FontData) : IO String := Internal.api "Lasm.JS.Web.FontData.family" do
+  self.val.get "family" String
 
 /-- `readonly attribute USVString style` -/
-def FontData.style (self : FontData) : IO String := self.val.get "style" String
+@[macro_inline] def FontData.style (self : FontData) : IO String := Internal.api "Lasm.JS.Web.FontData.style" do
+  self.val.get "style" String
 
 /-- `Promise<Blob> blob()` -/
-def FontData.blob (self : FontData) : Async Blob := do
-  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+@[macro_inline] def FontData.blob (self : FontData) : Async Blob := Internal.api "Lasm.JS.Web.FontData.blob" do
+  let r ← self.val.callMethodAwait "blob" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `Promise<sequence<FontData>> queryLocalFonts(optional QueryOptions options)` -/
+@[macro_inline] def Window.queryLocalFonts (self : Window) (options : Option QueryOptions := none) : Async (Array FontData) := Internal.api "Lasm.JS.Web.Window.queryLocalFonts" do
+  self.val.callMethodAwait "queryLocalFonts" (Internal.args #[Internal.optional options]) (Array FontData)
+
 /-- `Promise<sequence<FontData>> queryLocalFonts(optional QueryOptions options)` (Local Font Access API (https://wicg.github.io/local-font-access/)) -/
-def queryLocalFonts (options : Option QueryOptions := none) : Async (Array FontData) :=
+@[macro_inline] def queryLocalFonts (options : Option QueryOptions := none) : Async (Array FontData) := Internal.api "Lasm.JS.Web.queryLocalFonts" do
   Lasm.JS.Binding.invokeAsync (Array FontData) { name := "Lasm.JS.Web.queryLocalFonts", module := "globalThis", path := "queryLocalFonts", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 end Lasm.JS.Web

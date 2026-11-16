@@ -6,28 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Uievents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.InputDeviceCapabilities
+import Lasm.JS.Web.Types.MathmlCore
+import Lasm.JS.Web.Types.TouchEvents
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum TouchType` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)): "direct", "stylus". -/
-inductive TouchType where
-  /-- "direct" -/
-  | direct
-  /-- "stylus" -/
-  | stylus
-  deriving BEq, Repr, Inhabited
-instance : ToJS TouchType := ⟨fun
-  | .direct => .string "direct"
-  | .stylus => .string "stylus"⟩
-instance : FromJS TouchType where
-  fromJS
-    | .string "direct" => .ok .direct
-    | .string "stylus" => .ok .stylus
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.TouchType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary TouchInit` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TouchInit where
@@ -61,21 +53,21 @@ structure TouchInit where
   azimuthAngle : Option Float := none
   /-- `TouchType touchType = "direct"` -/
   touchType : Option TouchType := none
-instance : ToJS TouchInit := ⟨fun d => Support.fields #[("identifier", toJS d.identifier),
+instance : ToJS TouchInit := ⟨fun d => Internal.fields #[("identifier", toJS d.identifier),
     ("target", toJS d.target),
-    ("clientX", Support.optional d.clientX),
-    ("clientY", Support.optional d.clientY),
-    ("screenX", Support.optional d.screenX),
-    ("screenY", Support.optional d.screenY),
-    ("pageX", Support.optional d.pageX),
-    ("pageY", Support.optional d.pageY),
-    ("radiusX", Support.optional d.radiusX),
-    ("radiusY", Support.optional d.radiusY),
-    ("rotationAngle", Support.optional d.rotationAngle),
-    ("force", Support.optional d.force),
-    ("altitudeAngle", Support.optional d.altitudeAngle),
-    ("azimuthAngle", Support.optional d.azimuthAngle),
-    ("touchType", Support.optional d.touchType)]⟩
+    ("clientX", Internal.optional d.clientX),
+    ("clientY", Internal.optional d.clientY),
+    ("screenX", Internal.optional d.screenX),
+    ("screenY", Internal.optional d.screenY),
+    ("pageX", Internal.optional d.pageX),
+    ("pageY", Internal.optional d.pageY),
+    ("radiusX", Internal.optional d.radiusX),
+    ("radiusY", Internal.optional d.radiusY),
+    ("rotationAngle", Internal.optional d.rotationAngle),
+    ("force", Internal.optional d.force),
+    ("altitudeAngle", Internal.optional d.altitudeAngle),
+    ("azimuthAngle", Internal.optional d.azimuthAngle),
+    ("touchType", Internal.optional d.touchType)]⟩
 
 /-- `dictionary TouchEventInit : EventModifierInit` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TouchEventInit where
@@ -127,260 +119,331 @@ structure TouchEventInit where
   targetTouches : Option (Array Touch) := none
   /-- `sequence<Touch> changedTouches = []` -/
   changedTouches : Option (Array Touch) := none
-instance : ToJS TouchEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("sourceCapabilities", Support.optional d.sourceCapabilities),
-    ("view", Support.optional d.view),
-    ("detail", Support.optional d.detail),
-    ("which", Support.optional d.which),
-    ("ctrlKey", Support.optional d.ctrlKey),
-    ("shiftKey", Support.optional d.shiftKey),
-    ("altKey", Support.optional d.altKey),
-    ("metaKey", Support.optional d.metaKey),
-    ("modifierAltGraph", Support.optional d.modifierAltGraph),
-    ("modifierCapsLock", Support.optional d.modifierCapsLock),
-    ("modifierFn", Support.optional d.modifierFn),
-    ("modifierFnLock", Support.optional d.modifierFnLock),
-    ("modifierHyper", Support.optional d.modifierHyper),
-    ("modifierNumLock", Support.optional d.modifierNumLock),
-    ("modifierScrollLock", Support.optional d.modifierScrollLock),
-    ("modifierSuper", Support.optional d.modifierSuper),
-    ("modifierSymbol", Support.optional d.modifierSymbol),
-    ("modifierSymbolLock", Support.optional d.modifierSymbolLock),
-    ("touches", Support.optional d.touches),
-    ("targetTouches", Support.optional d.targetTouches),
-    ("changedTouches", Support.optional d.changedTouches)]⟩
+instance : ToJS TouchEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("sourceCapabilities", Internal.optional d.sourceCapabilities),
+    ("view", Internal.optional d.view),
+    ("detail", Internal.optional d.detail),
+    ("which", Internal.optional d.which),
+    ("ctrlKey", Internal.optional d.ctrlKey),
+    ("shiftKey", Internal.optional d.shiftKey),
+    ("altKey", Internal.optional d.altKey),
+    ("metaKey", Internal.optional d.metaKey),
+    ("modifierAltGraph", Internal.optional d.modifierAltGraph),
+    ("modifierCapsLock", Internal.optional d.modifierCapsLock),
+    ("modifierFn", Internal.optional d.modifierFn),
+    ("modifierFnLock", Internal.optional d.modifierFnLock),
+    ("modifierHyper", Internal.optional d.modifierHyper),
+    ("modifierNumLock", Internal.optional d.modifierNumLock),
+    ("modifierScrollLock", Internal.optional d.modifierScrollLock),
+    ("modifierSuper", Internal.optional d.modifierSuper),
+    ("modifierSymbol", Internal.optional d.modifierSymbol),
+    ("modifierSymbolLock", Internal.optional d.modifierSymbolLock),
+    ("touches", Internal.optional d.touches),
+    ("targetTouches", Internal.optional d.targetTouches),
+    ("changedTouches", Internal.optional d.changedTouches)]⟩
 
 /-- `v instanceof Touch`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Touch`). -/
-def Touch.cast? (v : Value) : IO (Option Touch) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Touch"] Value) v) then some { val := v } else none
+@[macro_inline] def Touch.cast? (v : Value) : IO (Option Touch) := Internal.api "Lasm.JS.Web.Touch.cast?" do
+  Internal.cast (Internal.getGlobal ["Touch"] Value) (fun x => { val := x }) v
 
 /-- `constructor(TouchInit touchInitDict)` -/
-def Touch.new (touchInitDict : TouchInit) : IO Touch :=
+@[macro_inline] def Touch.new (touchInitDict : TouchInit) : IO Touch := Internal.api "Lasm.JS.Web.Touch.new" do
   Lasm.JS.Binding.invoke Touch { name := "Lasm.JS.Web.Touch.new", module := "globalThis", path := "Touch", construct := true, arity := 1 }
-    (Support.args #[toJS touchInitDict]) (await := false)
+    (Internal.args #[toJS touchInitDict]) (await := false)
 
 /-- `readonly attribute long identifier` -/
-def Touch.identifier (self : Touch) : IO Int := self.val.get "identifier" Int
+@[macro_inline] def Touch.identifier (self : Touch) : IO Int := Internal.api "Lasm.JS.Web.Touch.identifier" do
+  self.val.get "identifier" Int
 
 /-- `readonly attribute EventTarget target` -/
-def Touch.target (self : Touch) : IO EventTarget := do
+@[macro_inline] def Touch.target (self : Touch) : IO EventTarget := Internal.api "Lasm.JS.Web.Touch.target" do
   let r ← self.val.get "target" Value
   pure { val := r }
 
 /-- `readonly attribute double screenX` -/
-def Touch.screenX (self : Touch) : IO Float := self.val.get "screenX" Float
+@[macro_inline] def Touch.screenX (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.screenX" do
+  self.val.get "screenX" Float
 
 /-- `readonly attribute double screenY` -/
-def Touch.screenY (self : Touch) : IO Float := self.val.get "screenY" Float
+@[macro_inline] def Touch.screenY (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.screenY" do
+  self.val.get "screenY" Float
 
 /-- `readonly attribute double clientX` -/
-def Touch.clientX (self : Touch) : IO Float := self.val.get "clientX" Float
+@[macro_inline] def Touch.clientX (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.clientX" do
+  self.val.get "clientX" Float
 
 /-- `readonly attribute double clientY` -/
-def Touch.clientY (self : Touch) : IO Float := self.val.get "clientY" Float
+@[macro_inline] def Touch.clientY (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.clientY" do
+  self.val.get "clientY" Float
 
 /-- `readonly attribute double pageX` -/
-def Touch.pageX (self : Touch) : IO Float := self.val.get "pageX" Float
+@[macro_inline] def Touch.pageX (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.pageX" do
+  self.val.get "pageX" Float
 
 /-- `readonly attribute double pageY` -/
-def Touch.pageY (self : Touch) : IO Float := self.val.get "pageY" Float
+@[macro_inline] def Touch.pageY (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.pageY" do
+  self.val.get "pageY" Float
 
 /-- `readonly attribute float radiusX` -/
-def Touch.radiusX (self : Touch) : IO Float := self.val.get "radiusX" Float
+@[macro_inline] def Touch.radiusX (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.radiusX" do
+  self.val.get "radiusX" Float
 
 /-- `readonly attribute float radiusY` -/
-def Touch.radiusY (self : Touch) : IO Float := self.val.get "radiusY" Float
+@[macro_inline] def Touch.radiusY (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.radiusY" do
+  self.val.get "radiusY" Float
 
 /-- `readonly attribute float rotationAngle` -/
-def Touch.rotationAngle (self : Touch) : IO Float := self.val.get "rotationAngle" Float
+@[macro_inline] def Touch.rotationAngle (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.rotationAngle" do
+  self.val.get "rotationAngle" Float
 
 /-- `readonly attribute float force` -/
-def Touch.force (self : Touch) : IO Float := self.val.get "force" Float
+@[macro_inline] def Touch.force (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.force" do
+  self.val.get "force" Float
 
 /-- `readonly attribute float altitudeAngle` -/
-def Touch.altitudeAngle (self : Touch) : IO Float := self.val.get "altitudeAngle" Float
+@[macro_inline] def Touch.altitudeAngle (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.altitudeAngle" do
+  self.val.get "altitudeAngle" Float
 
 /-- `readonly attribute float azimuthAngle` -/
-def Touch.azimuthAngle (self : Touch) : IO Float := self.val.get "azimuthAngle" Float
+@[macro_inline] def Touch.azimuthAngle (self : Touch) : IO Float := Internal.api "Lasm.JS.Web.Touch.azimuthAngle" do
+  self.val.get "azimuthAngle" Float
 
 /-- `readonly attribute TouchType touchType` -/
-def Touch.touchType (self : Touch) : IO TouchType := self.val.get "touchType" TouchType
+@[macro_inline] def Touch.touchType (self : Touch) : IO TouchType := Internal.api "Lasm.JS.Web.Touch.touchType" do
+  self.val.get "touchType" TouchType
 
 /-- `v instanceof TouchEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TouchEvent`). -/
-def TouchEvent.cast? (v : Value) : IO (Option TouchEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TouchEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def TouchEvent.cast? (v : Value) : IO (Option TouchEvent) := Internal.api "Lasm.JS.Web.TouchEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["TouchEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional TouchEventInit eventInitDict)` -/
-def TouchEvent.new (type : String) (eventInitDict : Option TouchEventInit := none) : IO TouchEvent :=
+@[macro_inline] def TouchEvent.new (type : String) (eventInitDict : Option TouchEventInit := none) : IO TouchEvent := Internal.api "Lasm.JS.Web.TouchEvent.new" do
   Lasm.JS.Binding.invoke TouchEvent { name := "Lasm.JS.Web.TouchEvent.new", module := "globalThis", path := "TouchEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute TouchList touches` -/
-def TouchEvent.touches (self : TouchEvent) : IO TouchList := do
+@[macro_inline] def TouchEvent.touches (self : TouchEvent) : IO TouchList := Internal.api "Lasm.JS.Web.TouchEvent.touches" do
   let r ← self.val.get "touches" Value
   pure { val := r }
 
 /-- `readonly attribute TouchList targetTouches` -/
-def TouchEvent.targetTouches (self : TouchEvent) : IO TouchList := do
+@[macro_inline] def TouchEvent.targetTouches (self : TouchEvent) : IO TouchList := Internal.api "Lasm.JS.Web.TouchEvent.targetTouches" do
   let r ← self.val.get "targetTouches" Value
   pure { val := r }
 
 /-- `readonly attribute TouchList changedTouches` -/
-def TouchEvent.changedTouches (self : TouchEvent) : IO TouchList := do
+@[macro_inline] def TouchEvent.changedTouches (self : TouchEvent) : IO TouchList := Internal.api "Lasm.JS.Web.TouchEvent.changedTouches" do
   let r ← self.val.get "changedTouches" Value
   pure { val := r }
 
 /-- `readonly attribute boolean altKey` -/
-def TouchEvent.altKey (self : TouchEvent) : IO Bool := self.val.get "altKey" Bool
+@[macro_inline] def TouchEvent.altKey (self : TouchEvent) : IO Bool := Internal.api "Lasm.JS.Web.TouchEvent.altKey" do
+  self.val.get "altKey" Bool
 
 /-- `readonly attribute boolean metaKey` -/
-def TouchEvent.metaKey (self : TouchEvent) : IO Bool := self.val.get "metaKey" Bool
+@[macro_inline] def TouchEvent.metaKey (self : TouchEvent) : IO Bool := Internal.api "Lasm.JS.Web.TouchEvent.metaKey" do
+  self.val.get "metaKey" Bool
 
 /-- `readonly attribute boolean ctrlKey` -/
-def TouchEvent.ctrlKey (self : TouchEvent) : IO Bool := self.val.get "ctrlKey" Bool
+@[macro_inline] def TouchEvent.ctrlKey (self : TouchEvent) : IO Bool := Internal.api "Lasm.JS.Web.TouchEvent.ctrlKey" do
+  self.val.get "ctrlKey" Bool
 
 /-- `readonly attribute boolean shiftKey` -/
-def TouchEvent.shiftKey (self : TouchEvent) : IO Bool := self.val.get "shiftKey" Bool
+@[macro_inline] def TouchEvent.shiftKey (self : TouchEvent) : IO Bool := Internal.api "Lasm.JS.Web.TouchEvent.shiftKey" do
+  self.val.get "shiftKey" Bool
 
 /-- `getter boolean getModifierState(DOMString keyArg)` -/
-def TouchEvent.getModifierState (self : TouchEvent) (keyArg : String) : IO Bool :=
-  self.val.callMethod "getModifierState" (Support.args #[toJS keyArg]) Bool
+@[macro_inline] def TouchEvent.getModifierState (self : TouchEvent) (keyArg : String) : IO Bool := Internal.api "Lasm.JS.Web.TouchEvent.getModifierState" do
+  self.val.callMethod "getModifierState" (Internal.args #[toJS keyArg]) Bool
 
 /-- `v instanceof TouchList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TouchList`). -/
-def TouchList.cast? (v : Value) : IO (Option TouchList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TouchList"] Value) v) then some { val := v } else none
+@[macro_inline] def TouchList.cast? (v : Value) : IO (Option TouchList) := Internal.api "Lasm.JS.Web.TouchList.cast?" do
+  Internal.cast (Internal.getGlobal ["TouchList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def TouchList.length (self : TouchList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def TouchList.length (self : TouchList) : IO Nat := Internal.api "Lasm.JS.Web.TouchList.length" do
+  self.val.get "length" Nat
 
 /-- `getter Touch? item(unsigned long index)` -/
-def TouchList.item (self : TouchList) (index : Nat) : IO (Option Touch) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option Touch)
+@[macro_inline] def TouchList.item (self : TouchList) (index : Nat) : IO (Option Touch) := Internal.api "Lasm.JS.Web.TouchList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option Touch)
 
 /-- `attribute EventHandler ontouchstart` -/
-def Document.ontouchstart (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontouchstart" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontouchstart (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontouchstart" do
+  self.val.get "ontouchstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchstart`: `attribute EventHandler ontouchstart` -/
-def Document.setOntouchstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntouchstart (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntouchstart" do
   self.val.set "ontouchstart" (toJS value)
 
 /-- `attribute EventHandler ontouchend` -/
-def Document.ontouchend (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontouchend" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontouchend (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontouchend" do
+  self.val.get "ontouchend" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchend`: `attribute EventHandler ontouchend` -/
-def Document.setOntouchend (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntouchend (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntouchend" do
   self.val.set "ontouchend" (toJS value)
 
 /-- `attribute EventHandler ontouchmove` -/
-def Document.ontouchmove (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontouchmove" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontouchmove (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontouchmove" do
+  self.val.get "ontouchmove" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchmove`: `attribute EventHandler ontouchmove` -/
-def Document.setOntouchmove (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntouchmove (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntouchmove" do
   self.val.set "ontouchmove" (toJS value)
 
 /-- `attribute EventHandler ontouchcancel` -/
-def Document.ontouchcancel (self : Document) : IO (Option EventHandlerNonNull) := self.val.get "ontouchcancel" (Option EventHandlerNonNull)
+@[macro_inline] def Document.ontouchcancel (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.ontouchcancel" do
+  self.val.get "ontouchcancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchcancel`: `attribute EventHandler ontouchcancel` -/
-def Document.setOntouchcancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Document.setOntouchcancel (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOntouchcancel" do
   self.val.set "ontouchcancel" (toJS value)
 
 /-- `attribute EventHandler ontouchstart` -/
-def HTMLElement.ontouchstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchstart" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontouchstart (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontouchstart" do
+  self.val.get "ontouchstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchstart`: `attribute EventHandler ontouchstart` -/
-def HTMLElement.setOntouchstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntouchstart (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntouchstart" do
   self.val.set "ontouchstart" (toJS value)
 
 /-- `attribute EventHandler ontouchend` -/
-def HTMLElement.ontouchend (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchend" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontouchend (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontouchend" do
+  self.val.get "ontouchend" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchend`: `attribute EventHandler ontouchend` -/
-def HTMLElement.setOntouchend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntouchend (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntouchend" do
   self.val.set "ontouchend" (toJS value)
 
 /-- `attribute EventHandler ontouchmove` -/
-def HTMLElement.ontouchmove (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchmove" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontouchmove (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontouchmove" do
+  self.val.get "ontouchmove" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchmove`: `attribute EventHandler ontouchmove` -/
-def HTMLElement.setOntouchmove (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntouchmove (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntouchmove" do
   self.val.set "ontouchmove" (toJS value)
 
 /-- `attribute EventHandler ontouchcancel` -/
-def HTMLElement.ontouchcancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchcancel" (Option EventHandlerNonNull)
+@[macro_inline] def HTMLElement.ontouchcancel (self : HTMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLElement.ontouchcancel" do
+  self.val.get "ontouchcancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchcancel`: `attribute EventHandler ontouchcancel` -/
-def HTMLElement.setOntouchcancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def HTMLElement.setOntouchcancel (self : HTMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setOntouchcancel" do
   self.val.set "ontouchcancel" (toJS value)
 
 /-- `attribute EventHandler ontouchstart` -/
-def MathMLElement.ontouchstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchstart" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontouchstart (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontouchstart" do
+  self.val.get "ontouchstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchstart`: `attribute EventHandler ontouchstart` -/
-def MathMLElement.setOntouchstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntouchstart (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntouchstart" do
   self.val.set "ontouchstart" (toJS value)
 
 /-- `attribute EventHandler ontouchend` -/
-def MathMLElement.ontouchend (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchend" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontouchend (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontouchend" do
+  self.val.get "ontouchend" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchend`: `attribute EventHandler ontouchend` -/
-def MathMLElement.setOntouchend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntouchend (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntouchend" do
   self.val.set "ontouchend" (toJS value)
 
 /-- `attribute EventHandler ontouchmove` -/
-def MathMLElement.ontouchmove (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchmove" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontouchmove (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontouchmove" do
+  self.val.get "ontouchmove" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchmove`: `attribute EventHandler ontouchmove` -/
-def MathMLElement.setOntouchmove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntouchmove (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntouchmove" do
   self.val.set "ontouchmove" (toJS value)
 
 /-- `attribute EventHandler ontouchcancel` -/
-def MathMLElement.ontouchcancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchcancel" (Option EventHandlerNonNull)
+@[macro_inline] def MathMLElement.ontouchcancel (self : MathMLElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MathMLElement.ontouchcancel" do
+  self.val.get "ontouchcancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchcancel`: `attribute EventHandler ontouchcancel` -/
-def MathMLElement.setOntouchcancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MathMLElement.setOntouchcancel (self : MathMLElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MathMLElement.setOntouchcancel" do
   self.val.set "ontouchcancel" (toJS value)
 
 /-- `attribute EventHandler ontouchstart` -/
-def SVGElement.ontouchstart (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchstart" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontouchstart (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontouchstart" do
+  self.val.get "ontouchstart" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchstart`: `attribute EventHandler ontouchstart` -/
-def SVGElement.setOntouchstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntouchstart (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntouchstart" do
   self.val.set "ontouchstart" (toJS value)
 
 /-- `attribute EventHandler ontouchend` -/
-def SVGElement.ontouchend (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchend" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontouchend (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontouchend" do
+  self.val.get "ontouchend" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchend`: `attribute EventHandler ontouchend` -/
-def SVGElement.setOntouchend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntouchend (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntouchend" do
   self.val.set "ontouchend" (toJS value)
 
 /-- `attribute EventHandler ontouchmove` -/
-def SVGElement.ontouchmove (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchmove" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontouchmove (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontouchmove" do
+  self.val.get "ontouchmove" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchmove`: `attribute EventHandler ontouchmove` -/
-def SVGElement.setOntouchmove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntouchmove (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntouchmove" do
   self.val.set "ontouchmove" (toJS value)
 
 /-- `attribute EventHandler ontouchcancel` -/
-def SVGElement.ontouchcancel (self : SVGElement) : IO (Option EventHandlerNonNull) := self.val.get "ontouchcancel" (Option EventHandlerNonNull)
+@[macro_inline] def SVGElement.ontouchcancel (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.ontouchcancel" do
+  self.val.get "ontouchcancel" (Option EventHandlerNonNull)
 
 /-- Sets `ontouchcancel`: `attribute EventHandler ontouchcancel` -/
-def SVGElement.setOntouchcancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def SVGElement.setOntouchcancel (self : SVGElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.SVGElement.setOntouchcancel" do
+  self.val.set "ontouchcancel" (toJS value)
+
+/-- `attribute EventHandler ontouchstart` -/
+@[macro_inline] def Window.ontouchstart (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontouchstart" do
+  self.val.get "ontouchstart" (Option EventHandlerNonNull)
+
+/-- Sets `ontouchstart`: `attribute EventHandler ontouchstart` -/
+@[macro_inline] def Window.setOntouchstart (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntouchstart" do
+  self.val.set "ontouchstart" (toJS value)
+
+/-- `attribute EventHandler ontouchend` -/
+@[macro_inline] def Window.ontouchend (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontouchend" do
+  self.val.get "ontouchend" (Option EventHandlerNonNull)
+
+/-- Sets `ontouchend`: `attribute EventHandler ontouchend` -/
+@[macro_inline] def Window.setOntouchend (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntouchend" do
+  self.val.set "ontouchend" (toJS value)
+
+/-- `attribute EventHandler ontouchmove` -/
+@[macro_inline] def Window.ontouchmove (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontouchmove" do
+  self.val.get "ontouchmove" (Option EventHandlerNonNull)
+
+/-- Sets `ontouchmove`: `attribute EventHandler ontouchmove` -/
+@[macro_inline] def Window.setOntouchmove (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntouchmove" do
+  self.val.set "ontouchmove" (toJS value)
+
+/-- `attribute EventHandler ontouchcancel` -/
+@[macro_inline] def Window.ontouchcancel (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ontouchcancel" do
+  self.val.get "ontouchcancel" (Option EventHandlerNonNull)
+
+/-- Sets `ontouchcancel`: `attribute EventHandler ontouchcancel` -/
+@[macro_inline] def Window.setOntouchcancel (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOntouchcancel" do
   self.val.set "ontouchcancel" (toJS value)
 
 /-- `attribute EventHandler ontouchstart` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
-def ontouchstart : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontouchstart"] (Option EventHandlerNonNull)
+@[macro_inline] def ontouchstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchstart" do
+  Internal.getGlobal ["ontouchstart"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontouchend` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
-def ontouchend : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontouchend"] (Option EventHandlerNonNull)
+@[macro_inline] def ontouchend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchend" do
+  Internal.getGlobal ["ontouchend"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontouchmove` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
-def ontouchmove : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontouchmove"] (Option EventHandlerNonNull)
+@[macro_inline] def ontouchmove : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchmove" do
+  Internal.getGlobal ["ontouchmove"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ontouchcancel` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
-def ontouchcancel : IO (Option EventHandlerNonNull) := Support.getGlobal ["ontouchcancel"] (Option EventHandlerNonNull)
+@[macro_inline] def ontouchcancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchcancel" do
+  Internal.getGlobal ["ontouchcancel"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

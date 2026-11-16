@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.EXTDisjointTimerQueryWebgl2
+import Lasm.JS.Web.Types.Webgl2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum QUERY_COUNTER_BITS_EXT = 0x8864` -/
 def EXT_disjoint_timer_query_webgl2.QUERY_COUNTER_BITS_EXT : Nat := 0x8864
@@ -24,7 +28,7 @@ def EXT_disjoint_timer_query_webgl2.TIMESTAMP_EXT : Nat := 0x8E28
 def EXT_disjoint_timer_query_webgl2.GPU_DISJOINT_EXT : Nat := 0x8FBB
 
 /-- `undefined queryCounterEXT(WebGLQuery query, GLenum target)` -/
-def EXT_disjoint_timer_query_webgl2.queryCounterEXT (self : EXT_disjoint_timer_query_webgl2) (query : WebGLQuery) (target : Nat) : IO Unit :=
-  self.val.callMethod "queryCounterEXT" (Support.args #[toJS query, toJS target]) Unit
+@[macro_inline] def EXT_disjoint_timer_query_webgl2.queryCounterEXT (self : EXT_disjoint_timer_query_webgl2) (query : WebGLQuery) (target : Nat) : IO Unit := Internal.api "Lasm.JS.Web.EXT_disjoint_timer_query_webgl2.queryCounterEXT" do
+  self.val.callMethod "queryCounterEXT" (Internal.args #[toJS query, toJS target]) Unit
 
 end Lasm.JS.Web

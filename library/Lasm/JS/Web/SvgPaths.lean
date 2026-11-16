@@ -6,59 +6,66 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.SvgPaths
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SVGPathDataSettings` (SVG Paths (https://svgwg.org/specs/paths/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SVGPathDataSettings where
   /-- `boolean normalize = false` -/
   normalize : Option Bool := none
-instance : ToJS SVGPathDataSettings := ⟨fun d => Support.fields #[("normalize", Support.optional d.normalize)]⟩
+instance : ToJS SVGPathDataSettings := ⟨fun d => Internal.fields #[("normalize", Internal.optional d.normalize)]⟩
 
 /-- `v instanceof SVGPathElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGPathElement`). -/
-def SVGPathElement.cast? (v : Value) : IO (Option SVGPathElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGPathElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGPathElement.cast? (v : Value) : IO (Option SVGPathElement) := Internal.api "Lasm.JS.Web.SVGPathElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGPathElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedNumber pathLength` -/
-def SVGPathElement.pathLength (self : SVGPathElement) : IO SVGAnimatedNumber := do
+@[macro_inline] def SVGPathElement.pathLength (self : SVGPathElement) : IO SVGAnimatedNumber := Internal.api "Lasm.JS.Web.SVGPathElement.pathLength" do
   let r ← self.val.get "pathLength" Value
   pure { val := r }
 
 /-- `float getTotalLength()` -/
-def SVGPathElement.getTotalLength (self : SVGPathElement) : IO Float :=
-  self.val.callMethod "getTotalLength" (Support.args #[]) Float
+@[macro_inline] def SVGPathElement.getTotalLength (self : SVGPathElement) : IO Float := Internal.api "Lasm.JS.Web.SVGPathElement.getTotalLength" do
+  self.val.callMethod "getTotalLength" (Internal.args #[]) Float
 
 /-- `DOMPoint getPointAtLength(float distance)` -/
-def SVGPathElement.getPointAtLength (self : SVGPathElement) (distance : Float) : IO DOMPoint := do
-  let r ← self.val.callMethod "getPointAtLength" (Support.args #[toJS distance]) Value
+@[macro_inline] def SVGPathElement.getPointAtLength (self : SVGPathElement) (distance : Float) : IO DOMPoint := Internal.api "Lasm.JS.Web.SVGPathElement.getPointAtLength" do
+  let r ← self.val.callMethod "getPointAtLength" (Internal.args #[toJS distance]) Value
   pure { val := r }
 
 /-- `SVGPathSegment? getPathSegmentAtLength(float distance)` -/
-def SVGPathElement.getPathSegmentAtLength (self : SVGPathElement) (distance : Float) : IO (Option SVGPathSegment) :=
-  self.val.callMethod "getPathSegmentAtLength" (Support.args #[toJS distance]) (Option SVGPathSegment)
+@[macro_inline] def SVGPathElement.getPathSegmentAtLength (self : SVGPathElement) (distance : Float) : IO (Option SVGPathSegment) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathSegmentAtLength" do
+  self.val.callMethod "getPathSegmentAtLength" (Internal.args #[toJS distance]) (Option SVGPathSegment)
 
 /-- `sequence<SVGPathSegment> getPathData(optional SVGPathDataSettings settings)` -/
-def SVGPathElement.getPathData (self : SVGPathElement) (settings : Option SVGPathDataSettings := none) : IO (Array SVGPathSegment) :=
-  self.val.callMethod "getPathData" (Support.args #[Support.optional settings]) (Array SVGPathSegment)
+@[macro_inline] def SVGPathElement.getPathData (self : SVGPathElement) (settings : Option SVGPathDataSettings := none) : IO (Array SVGPathSegment) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathData" do
+  self.val.callMethod "getPathData" (Internal.args #[Internal.optional settings]) (Array SVGPathSegment)
 
 /-- `undefined setPathData(sequence<SVGPathSegment> pathData)` -/
-def SVGPathElement.setPathData (self : SVGPathElement) (pathData : Array SVGPathSegment) : IO Unit :=
-  self.val.callMethod "setPathData" (Support.args #[toJS pathData]) Unit
+@[macro_inline] def SVGPathElement.setPathData (self : SVGPathElement) (pathData : Array SVGPathSegment) : IO Unit := Internal.api "Lasm.JS.Web.SVGPathElement.setPathData" do
+  self.val.callMethod "setPathData" (Internal.args #[toJS pathData]) Unit
 
 /-- `attribute DOMString type` -/
-def SVGPathSegment.type (self : SVGPathSegment) : IO String := self.val.get "type" String
+@[macro_inline] def SVGPathSegment.type (self : SVGPathSegment) : IO String := Internal.api "Lasm.JS.Web.SVGPathSegment.type" do
+  self.val.get "type" String
 
 /-- Sets `type`: `attribute DOMString type` -/
-def SVGPathSegment.setType (self : SVGPathSegment) (value : String) : IO Unit :=
+@[macro_inline] def SVGPathSegment.setType (self : SVGPathSegment) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGPathSegment.setType" do
   self.val.set "type" (toJS value)
 
 /-- `attribute FrozenArray<float> values` -/
-def SVGPathSegment.values (self : SVGPathSegment) : IO (Array Float) := self.val.get "values" (Array Float)
+@[macro_inline] def SVGPathSegment.values (self : SVGPathSegment) : IO (Array Float) := Internal.api "Lasm.JS.Web.SVGPathSegment.values" do
+  self.val.get "values" (Array Float)
 
 /-- Sets `values`: `attribute FrozenArray<float> values` -/
-def SVGPathSegment.setValues (self : SVGPathSegment) (value : Array Float) : IO Unit :=
+@[macro_inline] def SVGPathSegment.setValues (self : SVGPathSegment) (value : Array Float) : IO Unit := Internal.api "Lasm.JS.Web.SVGPathSegment.setValues" do
   self.val.set "values" (toJS value)
 
 end Lasm.JS.Web

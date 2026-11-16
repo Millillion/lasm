@@ -6,101 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Pointerevents
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssPseudo
+import Lasm.JS.Web.Types.CssomView
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Dom
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CSSBoxType` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)): "margin", "border", "padding", "content". -/
-inductive CSSBoxType where
-  /-- "margin" -/
-  | margin
-  /-- "border" -/
-  | border
-  /-- "padding" -/
-  | padding
-  /-- "content" -/
-  | content
-  deriving BEq, Repr, Inhabited
-instance : ToJS CSSBoxType := ⟨fun
-  | .margin => .string "margin"
-  | .border => .string "border"
-  | .padding => .string "padding"
-  | .content => .string "content"⟩
-instance : FromJS CSSBoxType where
-  fromJS
-    | .string "margin" => .ok .margin
-    | .string "border" => .ok .border
-    | .string "padding" => .ok .padding
-    | .string "content" => .ok .content
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CSSBoxType"
-
-/-- `enum ScrollBehavior` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)): "auto", "instant", "smooth". -/
-inductive ScrollBehavior where
-  /-- "auto" -/
-  | auto
-  /-- "instant" -/
-  | instant
-  /-- "smooth" -/
-  | smooth
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScrollBehavior := ⟨fun
-  | .auto => .string "auto"
-  | .instant => .string "instant"
-  | .smooth => .string "smooth"⟩
-instance : FromJS ScrollBehavior where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "instant" => .ok .instant
-    | .string "smooth" => .ok .smooth
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScrollBehavior"
-
-/-- `enum ScrollLogicalPosition` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)): "start", "center", "end", "nearest". -/
-inductive ScrollLogicalPosition where
-  /-- "start" -/
-  | start
-  /-- "center" -/
-  | center
-  /-- "end" -/
-  | «end»
-  /-- "nearest" -/
-  | nearest
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScrollLogicalPosition := ⟨fun
-  | .start => .string "start"
-  | .center => .string "center"
-  | .«end» => .string "end"
-  | .nearest => .string "nearest"⟩
-instance : FromJS ScrollLogicalPosition where
-  fromJS
-    | .string "start" => .ok .start
-    | .string "center" => .ok .center
-    | .string "end" => .ok .«end»
-    | .string "nearest" => .ok .nearest
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScrollLogicalPosition"
-
-/-- `enum ScrollIntoViewContainer` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)): "all", "nearest". -/
-inductive ScrollIntoViewContainer where
-  /-- "all" -/
-  | all
-  /-- "nearest" -/
-  | nearest
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScrollIntoViewContainer := ⟨fun
-  | .all => .string "all"
-  | .nearest => .string "nearest"⟩
-instance : FromJS ScrollIntoViewContainer where
-  fromJS
-    | .string "all" => .ok .all
-    | .string "nearest" => .ok .nearest
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScrollIntoViewContainer"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary MediaQueryListEventInit : EventInit` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaQueryListEventInit where
@@ -114,11 +34,11 @@ structure MediaQueryListEventInit where
   media : Option String := none
   /-- `boolean matches = false` -/
   «matches» : Option Bool := none
-instance : ToJS MediaQueryListEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("media", Support.optional d.media),
-    ("matches", Support.optional d.«matches»)]⟩
+instance : ToJS MediaQueryListEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("media", Internal.optional d.media),
+    ("matches", Internal.optional d.«matches»)]⟩
 
 /-- `typedef Text or Element or CSSPseudoElement or Document GeometryNode`: one constructor per member type. -/
 inductive GeometryNode where
@@ -146,8 +66,8 @@ structure BoxQuadOptions where
   box : Option CSSBoxType := none
   /-- `GeometryNode relativeTo` -/
   relativeTo : Option GeometryNode := none
-instance : ToJS BoxQuadOptions := ⟨fun d => Support.fields #[("box", Support.optional d.box),
-    ("relativeTo", Support.optional d.relativeTo)]⟩
+instance : ToJS BoxQuadOptions := ⟨fun d => Internal.fields #[("box", Internal.optional d.box),
+    ("relativeTo", Internal.optional d.relativeTo)]⟩
 
 /-- `dictionary ConvertCoordinateOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConvertCoordinateOptions where
@@ -155,14 +75,14 @@ structure ConvertCoordinateOptions where
   fromBox : Option CSSBoxType := none
   /-- `CSSBoxType toBox = "border"` -/
   toBox : Option CSSBoxType := none
-instance : ToJS ConvertCoordinateOptions := ⟨fun d => Support.fields #[("fromBox", Support.optional d.fromBox),
-    ("toBox", Support.optional d.toBox)]⟩
+instance : ToJS ConvertCoordinateOptions := ⟨fun d => Internal.fields #[("fromBox", Internal.optional d.fromBox),
+    ("toBox", Internal.optional d.toBox)]⟩
 
 /-- `dictionary CaretPositionFromPointOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaretPositionFromPointOptions where
   /-- `sequence<ShadowRoot> shadowRoots = []` -/
   shadowRoots : Option (Array ShadowRoot) := none
-instance : ToJS CaretPositionFromPointOptions := ⟨fun d => Support.fields #[("shadowRoots", Support.optional d.shadowRoots)]⟩
+instance : ToJS CaretPositionFromPointOptions := ⟨fun d => Internal.fields #[("shadowRoots", Internal.optional d.shadowRoots)]⟩
 
 /-- `dictionary CheckVisibilityOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CheckVisibilityOptions where
@@ -176,11 +96,11 @@ structure CheckVisibilityOptions where
   opacityProperty : Option Bool := none
   /-- `boolean visibilityProperty = false` -/
   visibilityProperty : Option Bool := none
-instance : ToJS CheckVisibilityOptions := ⟨fun d => Support.fields #[("checkOpacity", Support.optional d.checkOpacity),
-    ("checkVisibilityCSS", Support.optional d.checkVisibilityCSS),
-    ("contentVisibilityAuto", Support.optional d.contentVisibilityAuto),
-    ("opacityProperty", Support.optional d.opacityProperty),
-    ("visibilityProperty", Support.optional d.visibilityProperty)]⟩
+instance : ToJS CheckVisibilityOptions := ⟨fun d => Internal.fields #[("checkOpacity", Internal.optional d.checkOpacity),
+    ("checkVisibilityCSS", Internal.optional d.checkVisibilityCSS),
+    ("contentVisibilityAuto", Internal.optional d.contentVisibilityAuto),
+    ("opacityProperty", Internal.optional d.opacityProperty),
+    ("visibilityProperty", Internal.optional d.visibilityProperty)]⟩
 
 /-- `dictionary ScrollIntoViewOptions : ScrollOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ScrollIntoViewOptions where
@@ -192,10 +112,10 @@ structure ScrollIntoViewOptions where
   inline : Option ScrollLogicalPosition := none
   /-- `ScrollIntoViewContainer container = "all"` -/
   container : Option ScrollIntoViewContainer := none
-instance : ToJS ScrollIntoViewOptions := ⟨fun d => Support.fields #[("behavior", Support.optional d.behavior),
-    ("block", Support.optional d.block),
-    ("inline", Support.optional d.inline),
-    ("container", Support.optional d.container)]⟩
+instance : ToJS ScrollIntoViewOptions := ⟨fun d => Internal.fields #[("behavior", Internal.optional d.behavior),
+    ("block", Internal.optional d.block),
+    ("inline", Internal.optional d.inline),
+    ("container", Internal.optional d.container)]⟩
 
 /-- `(boolean or ScrollIntoViewOptions)`: one constructor per member type. -/
 inductive BooleanOrScrollIntoViewOptions where
@@ -217,455 +137,633 @@ structure ScrollToOptions where
   left : Option Float := none
   /-- `unrestricted double top` -/
   top : Option Float := none
-instance : ToJS ScrollToOptions := ⟨fun d => Support.fields #[("behavior", Support.optional d.behavior),
-    ("left", Support.optional d.left),
-    ("top", Support.optional d.top)]⟩
+instance : ToJS ScrollToOptions := ⟨fun d => Internal.fields #[("behavior", Internal.optional d.behavior),
+    ("left", Internal.optional d.left),
+    ("top", Internal.optional d.top)]⟩
+
+/-- `dictionary ScrollOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ScrollOptions where
+  /-- `ScrollBehavior behavior = "auto"` -/
+  behavior : Option ScrollBehavior := none
+instance : ToJS ScrollOptions := ⟨fun d => Internal.fields #[("behavior", Internal.optional d.behavior)]⟩
+
+/-- `dictionary ScrollResult` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ScrollResult where
+  /-- `required boolean interrupted` -/
+  interrupted : Bool
+instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", toJS d.interrupted)]⟩
 
 /-- `v instanceof CaretPosition`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CaretPosition`). -/
-def CaretPosition.cast? (v : Value) : IO (Option CaretPosition) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CaretPosition"] Value) v) then some { val := v } else none
+@[macro_inline] def CaretPosition.cast? (v : Value) : IO (Option CaretPosition) := Internal.api "Lasm.JS.Web.CaretPosition.cast?" do
+  Internal.cast (Internal.getGlobal ["CaretPosition"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute Node offsetNode` -/
-def CaretPosition.offsetNode (self : CaretPosition) : IO Node := do
+@[macro_inline] def CaretPosition.offsetNode (self : CaretPosition) : IO Node := Internal.api "Lasm.JS.Web.CaretPosition.offsetNode" do
   let r ← self.val.get "offsetNode" Value
   pure { val := r }
 
 /-- `readonly attribute unsigned long offset` -/
-def CaretPosition.offset (self : CaretPosition) : IO Nat := self.val.get "offset" Nat
+@[macro_inline] def CaretPosition.offset (self : CaretPosition) : IO Nat := Internal.api "Lasm.JS.Web.CaretPosition.offset" do
+  self.val.get "offset" Nat
 
 /-- `DOMRect? getClientRect()` -/
-def CaretPosition.getClientRect (self : CaretPosition) : IO (Option DOMRect) :=
-  self.val.callMethod "getClientRect" (Support.args #[]) (Option DOMRect)
+@[macro_inline] def CaretPosition.getClientRect (self : CaretPosition) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.CaretPosition.getClientRect" do
+  self.val.callMethod "getClientRect" (Internal.args #[]) (Option DOMRect)
 
 /-- `v instanceof MediaQueryList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryList`). -/
-def MediaQueryList.cast? (v : Value) : IO (Option MediaQueryList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryList"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaQueryList.cast? (v : Value) : IO (Option MediaQueryList) := Internal.api "Lasm.JS.Web.MediaQueryList.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaQueryList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString media` -/
-def MediaQueryList.media (self : MediaQueryList) : IO String := self.val.get "media" String
+@[macro_inline] def MediaQueryList.media (self : MediaQueryList) : IO String := Internal.api "Lasm.JS.Web.MediaQueryList.media" do
+  self.val.get "media" String
 
 /-- `readonly attribute boolean matches` -/
-def MediaQueryList.«matches» (self : MediaQueryList) : IO Bool := self.val.get "matches" Bool
+@[macro_inline] def MediaQueryList.«matches» (self : MediaQueryList) : IO Bool := Internal.api "Lasm.JS.Web.MediaQueryList.matches" do
+  self.val.get "matches" Bool
 
 /-- `attribute EventHandler onchange` -/
-def MediaQueryList.onchange (self : MediaQueryList) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaQueryList.onchange (self : MediaQueryList) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaQueryList.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def MediaQueryList.setOnchange (self : MediaQueryList) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaQueryList.setOnchange (self : MediaQueryList) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaQueryList.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `undefined addListener(EventListener? callback)` -/
-def MediaQueryList.addListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit :=
-  self.val.callMethod "addListener" (Support.args #[toJS callback]) Unit
+@[macro_inline] def MediaQueryList.addListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit := Internal.api "Lasm.JS.Web.MediaQueryList.addListener" do
+  self.val.callMethod "addListener" (Internal.args #[toJS callback]) Unit
 
 /-- `undefined removeListener(EventListener? callback)` -/
-def MediaQueryList.removeListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit :=
-  self.val.callMethod "removeListener" (Support.args #[toJS callback]) Unit
+@[macro_inline] def MediaQueryList.removeListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit := Internal.api "Lasm.JS.Web.MediaQueryList.removeListener" do
+  self.val.callMethod "removeListener" (Internal.args #[toJS callback]) Unit
 
 /-- `v instanceof MediaQueryListEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryListEvent`). -/
-def MediaQueryListEvent.cast? (v : Value) : IO (Option MediaQueryListEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryListEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaQueryListEvent.cast? (v : Value) : IO (Option MediaQueryListEvent) := Internal.api "Lasm.JS.Web.MediaQueryListEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaQueryListEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CSSOMString type, optional MediaQueryListEventInit eventInitDict)` -/
-def MediaQueryListEvent.new (type : String) (eventInitDict : Option MediaQueryListEventInit := none) : IO MediaQueryListEvent :=
+@[macro_inline] def MediaQueryListEvent.new (type : String) (eventInitDict : Option MediaQueryListEventInit := none) : IO MediaQueryListEvent := Internal.api "Lasm.JS.Web.MediaQueryListEvent.new" do
   Lasm.JS.Binding.invoke MediaQueryListEvent { name := "Lasm.JS.Web.MediaQueryListEvent.new", module := "globalThis", path := "MediaQueryListEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute CSSOMString media` -/
-def MediaQueryListEvent.media (self : MediaQueryListEvent) : IO String := self.val.get "media" String
+@[macro_inline] def MediaQueryListEvent.media (self : MediaQueryListEvent) : IO String := Internal.api "Lasm.JS.Web.MediaQueryListEvent.media" do
+  self.val.get "media" String
 
 /-- `readonly attribute boolean matches` -/
-def MediaQueryListEvent.«matches» (self : MediaQueryListEvent) : IO Bool := self.val.get "matches" Bool
+@[macro_inline] def MediaQueryListEvent.«matches» (self : MediaQueryListEvent) : IO Bool := Internal.api "Lasm.JS.Web.MediaQueryListEvent.matches" do
+  self.val.get "matches" Bool
 
 /-- `v instanceof Screen`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Screen`). -/
-def Screen.cast? (v : Value) : IO (Option Screen) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Screen"] Value) v) then some { val := v } else none
+@[macro_inline] def Screen.cast? (v : Value) : IO (Option Screen) := Internal.api "Lasm.JS.Web.Screen.cast?" do
+  Internal.cast (Internal.getGlobal ["Screen"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute long availWidth` -/
-def Screen.availWidth (self : Screen) : IO Int := self.val.get "availWidth" Int
+@[macro_inline] def Screen.availWidth (self : Screen) : IO Int := Internal.api "Lasm.JS.Web.Screen.availWidth" do
+  self.val.get "availWidth" Int
 
 /-- `readonly attribute long availHeight` -/
-def Screen.availHeight (self : Screen) : IO Int := self.val.get "availHeight" Int
+@[macro_inline] def Screen.availHeight (self : Screen) : IO Int := Internal.api "Lasm.JS.Web.Screen.availHeight" do
+  self.val.get "availHeight" Int
 
 /-- `readonly attribute long width` -/
-def Screen.width (self : Screen) : IO Int := self.val.get "width" Int
+@[macro_inline] def Screen.width (self : Screen) : IO Int := Internal.api "Lasm.JS.Web.Screen.width" do
+  self.val.get "width" Int
 
 /-- `readonly attribute long height` -/
-def Screen.height (self : Screen) : IO Int := self.val.get "height" Int
+@[macro_inline] def Screen.height (self : Screen) : IO Int := Internal.api "Lasm.JS.Web.Screen.height" do
+  self.val.get "height" Int
 
 /-- `readonly attribute unsigned long colorDepth` -/
-def Screen.colorDepth (self : Screen) : IO Nat := self.val.get "colorDepth" Nat
+@[macro_inline] def Screen.colorDepth (self : Screen) : IO Nat := Internal.api "Lasm.JS.Web.Screen.colorDepth" do
+  self.val.get "colorDepth" Nat
 
 /-- `readonly attribute unsigned long pixelDepth` -/
-def Screen.pixelDepth (self : Screen) : IO Nat := self.val.get "pixelDepth" Nat
+@[macro_inline] def Screen.pixelDepth (self : Screen) : IO Nat := Internal.api "Lasm.JS.Web.Screen.pixelDepth" do
+  self.val.get "pixelDepth" Nat
 
 /-- `v instanceof VisualViewport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VisualViewport`). -/
-def VisualViewport.cast? (v : Value) : IO (Option VisualViewport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["VisualViewport"] Value) v) then some { val := v } else none
+@[macro_inline] def VisualViewport.cast? (v : Value) : IO (Option VisualViewport) := Internal.api "Lasm.JS.Web.VisualViewport.cast?" do
+  Internal.cast (Internal.getGlobal ["VisualViewport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double offsetLeft` -/
-def VisualViewport.offsetLeft (self : VisualViewport) : IO Float := self.val.get "offsetLeft" Float
+@[macro_inline] def VisualViewport.offsetLeft (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.offsetLeft" do
+  self.val.get "offsetLeft" Float
 
 /-- `readonly attribute double offsetTop` -/
-def VisualViewport.offsetTop (self : VisualViewport) : IO Float := self.val.get "offsetTop" Float
+@[macro_inline] def VisualViewport.offsetTop (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.offsetTop" do
+  self.val.get "offsetTop" Float
 
 /-- `readonly attribute double pageLeft` -/
-def VisualViewport.pageLeft (self : VisualViewport) : IO Float := self.val.get "pageLeft" Float
+@[macro_inline] def VisualViewport.pageLeft (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.pageLeft" do
+  self.val.get "pageLeft" Float
 
 /-- `readonly attribute double pageTop` -/
-def VisualViewport.pageTop (self : VisualViewport) : IO Float := self.val.get "pageTop" Float
+@[macro_inline] def VisualViewport.pageTop (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.pageTop" do
+  self.val.get "pageTop" Float
 
 /-- `readonly attribute double width` -/
-def VisualViewport.width (self : VisualViewport) : IO Float := self.val.get "width" Float
+@[macro_inline] def VisualViewport.width (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.width" do
+  self.val.get "width" Float
 
 /-- `readonly attribute double height` -/
-def VisualViewport.height (self : VisualViewport) : IO Float := self.val.get "height" Float
+@[macro_inline] def VisualViewport.height (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.height" do
+  self.val.get "height" Float
 
 /-- `readonly attribute double scale` -/
-def VisualViewport.scale (self : VisualViewport) : IO Float := self.val.get "scale" Float
+@[macro_inline] def VisualViewport.scale (self : VisualViewport) : IO Float := Internal.api "Lasm.JS.Web.VisualViewport.scale" do
+  self.val.get "scale" Float
 
 /-- `attribute EventHandler onresize` -/
-def VisualViewport.onresize (self : VisualViewport) : IO (Option EventHandlerNonNull) := self.val.get "onresize" (Option EventHandlerNonNull)
+@[macro_inline] def VisualViewport.onresize (self : VisualViewport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VisualViewport.onresize" do
+  self.val.get "onresize" (Option EventHandlerNonNull)
 
 /-- Sets `onresize`: `attribute EventHandler onresize` -/
-def VisualViewport.setOnresize (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VisualViewport.setOnresize (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VisualViewport.setOnresize" do
   self.val.set "onresize" (toJS value)
 
 /-- `attribute EventHandler onscroll` -/
-def VisualViewport.onscroll (self : VisualViewport) : IO (Option EventHandlerNonNull) := self.val.get "onscroll" (Option EventHandlerNonNull)
+@[macro_inline] def VisualViewport.onscroll (self : VisualViewport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VisualViewport.onscroll" do
+  self.val.get "onscroll" (Option EventHandlerNonNull)
 
 /-- Sets `onscroll`: `attribute EventHandler onscroll` -/
-def VisualViewport.setOnscroll (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VisualViewport.setOnscroll (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VisualViewport.setOnscroll" do
   self.val.set "onscroll" (toJS value)
 
 /-- `attribute EventHandler onscrollend` -/
-def VisualViewport.onscrollend (self : VisualViewport) : IO (Option EventHandlerNonNull) := self.val.get "onscrollend" (Option EventHandlerNonNull)
+@[macro_inline] def VisualViewport.onscrollend (self : VisualViewport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VisualViewport.onscrollend" do
+  self.val.get "onscrollend" (Option EventHandlerNonNull)
 
 /-- Sets `onscrollend`: `attribute EventHandler onscrollend` -/
-def VisualViewport.setOnscrollend (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def VisualViewport.setOnscrollend (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VisualViewport.setOnscrollend" do
   self.val.set "onscrollend" (toJS value)
 
 /-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def CSSPseudoElement.getBoxQuads (self : CSSPseudoElement) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array DOMQuad)
+@[macro_inline] def CSSPseudoElement.getBoxQuads (self : CSSPseudoElement) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.CSSPseudoElement.getBoxQuads" do
+  self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def CSSPseudoElement.convertQuadFromNode (self : CSSPseudoElement) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Value
+@[macro_inline] def CSSPseudoElement.convertQuadFromNode (self : CSSPseudoElement) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.CSSPseudoElement.convertQuadFromNode" do
+  let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def CSSPseudoElement.convertRectFromNode (self : CSSPseudoElement) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Value
+@[macro_inline] def CSSPseudoElement.convertRectFromNode (self : CSSPseudoElement) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.CSSPseudoElement.convertRectFromNode" do
+  let r ← self.val.callMethod "convertRectFromNode" (Internal.args #[toJS rect, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def CSSPseudoElement.convertPointFromNode (self : CSSPseudoElement) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Value
+@[macro_inline] def CSSPseudoElement.convertPointFromNode (self : CSSPseudoElement) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.CSSPseudoElement.convertPointFromNode" do
+  let r ← self.val.callMethod "convertPointFromNode" (Internal.args #[toJS point, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `readonly attribute Element? scrollingElement` -/
-def Document.scrollingElement (self : Document) : IO (Option Element) := self.val.get "scrollingElement" (Option Element)
+@[macro_inline] def Document.scrollingElement (self : Document) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.scrollingElement" do
+  self.val.get "scrollingElement" (Option Element)
 
 /-- `Element? elementFromPoint(double x, double y)` -/
-def Document.elementFromPoint (self : Document) (x : Float) (y : Float) : IO (Option Element) :=
-  self.val.callMethod "elementFromPoint" (Support.args #[toJS x, toJS y]) (Option Element)
+@[macro_inline] def Document.elementFromPoint (self : Document) (x : Float) (y : Float) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.elementFromPoint" do
+  self.val.callMethod "elementFromPoint" (Internal.args #[toJS x, toJS y]) (Option Element)
 
 /-- `sequence<Element> elementsFromPoint(double x, double y)` -/
-def Document.elementsFromPoint (self : Document) (x : Float) (y : Float) : IO (Array Element) :=
-  self.val.callMethod "elementsFromPoint" (Support.args #[toJS x, toJS y]) (Array Element)
+@[macro_inline] def Document.elementsFromPoint (self : Document) (x : Float) (y : Float) : IO (Array Element) := Internal.api "Lasm.JS.Web.Document.elementsFromPoint" do
+  self.val.callMethod "elementsFromPoint" (Internal.args #[toJS x, toJS y]) (Array Element)
 
 /-- `CaretPosition? caretPositionFromPoint(double x, double y, optional CaretPositionFromPointOptions options)` -/
-def Document.caretPositionFromPoint (self : Document) (x : Float) (y : Float) (options : Option CaretPositionFromPointOptions := none) : IO (Option CaretPosition) :=
-  self.val.callMethod "caretPositionFromPoint" (Support.args #[toJS x, toJS y, Support.optional options]) (Option CaretPosition)
+@[macro_inline] def Document.caretPositionFromPoint (self : Document) (x : Float) (y : Float) (options : Option CaretPositionFromPointOptions := none) : IO (Option CaretPosition) := Internal.api "Lasm.JS.Web.Document.caretPositionFromPoint" do
+  self.val.callMethod "caretPositionFromPoint" (Internal.args #[toJS x, toJS y, Internal.optional options]) (Option CaretPosition)
 
 /-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Document.getBoxQuads (self : Document) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array DOMQuad)
+@[macro_inline] def Document.getBoxQuads (self : Document) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Document.getBoxQuads" do
+  self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertQuadFromNode (self : Document) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Value
+@[macro_inline] def Document.convertQuadFromNode (self : Document) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Document.convertQuadFromNode" do
+  let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertRectFromNode (self : Document) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Value
+@[macro_inline] def Document.convertRectFromNode (self : Document) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Document.convertRectFromNode" do
+  let r ← self.val.callMethod "convertRectFromNode" (Internal.args #[toJS rect, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertPointFromNode (self : Document) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Value
+@[macro_inline] def Document.convertPointFromNode (self : Document) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.Document.convertPointFromNode" do
+  let r ← self.val.callMethod "convertPointFromNode" (Internal.args #[toJS point, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `attribute unrestricted double scrollTop` -/
-def Element.scrollTop (self : Element) : IO Float := self.val.get "scrollTop" Float
+@[macro_inline] def Element.scrollTop (self : Element) : IO Float := Internal.api "Lasm.JS.Web.Element.scrollTop" do
+  self.val.get "scrollTop" Float
 
 /-- Sets `scrollTop`: `attribute unrestricted double scrollTop` -/
-def Element.setScrollTop (self : Element) (value : Float) : IO Unit :=
+@[macro_inline] def Element.setScrollTop (self : Element) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.Element.setScrollTop" do
   self.val.set "scrollTop" (toJS value)
 
 /-- `attribute unrestricted double scrollLeft` -/
-def Element.scrollLeft (self : Element) : IO Float := self.val.get "scrollLeft" Float
+@[macro_inline] def Element.scrollLeft (self : Element) : IO Float := Internal.api "Lasm.JS.Web.Element.scrollLeft" do
+  self.val.get "scrollLeft" Float
 
 /-- Sets `scrollLeft`: `attribute unrestricted double scrollLeft` -/
-def Element.setScrollLeft (self : Element) (value : Float) : IO Unit :=
+@[macro_inline] def Element.setScrollLeft (self : Element) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.Element.setScrollLeft" do
   self.val.set "scrollLeft" (toJS value)
 
 /-- `readonly attribute long scrollWidth` -/
-def Element.scrollWidth (self : Element) : IO Int := self.val.get "scrollWidth" Int
+@[macro_inline] def Element.scrollWidth (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.scrollWidth" do
+  self.val.get "scrollWidth" Int
 
 /-- `readonly attribute long scrollHeight` -/
-def Element.scrollHeight (self : Element) : IO Int := self.val.get "scrollHeight" Int
+@[macro_inline] def Element.scrollHeight (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.scrollHeight" do
+  self.val.get "scrollHeight" Int
 
 /-- `readonly attribute long clientTop` -/
-def Element.clientTop (self : Element) : IO Int := self.val.get "clientTop" Int
+@[macro_inline] def Element.clientTop (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.clientTop" do
+  self.val.get "clientTop" Int
 
 /-- `readonly attribute long clientLeft` -/
-def Element.clientLeft (self : Element) : IO Int := self.val.get "clientLeft" Int
+@[macro_inline] def Element.clientLeft (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.clientLeft" do
+  self.val.get "clientLeft" Int
 
 /-- `readonly attribute long clientWidth` -/
-def Element.clientWidth (self : Element) : IO Int := self.val.get "clientWidth" Int
+@[macro_inline] def Element.clientWidth (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.clientWidth" do
+  self.val.get "clientWidth" Int
 
 /-- `readonly attribute long clientHeight` -/
-def Element.clientHeight (self : Element) : IO Int := self.val.get "clientHeight" Int
+@[macro_inline] def Element.clientHeight (self : Element) : IO Int := Internal.api "Lasm.JS.Web.Element.clientHeight" do
+  self.val.get "clientHeight" Int
 
 /-- `readonly attribute double currentCSSZoom` -/
-def Element.currentCSSZoom (self : Element) : IO Float := self.val.get "currentCSSZoom" Float
+@[macro_inline] def Element.currentCSSZoom (self : Element) : IO Float := Internal.api "Lasm.JS.Web.Element.currentCSSZoom" do
+  self.val.get "currentCSSZoom" Float
 
 /-- `DOMRectList getClientRects()` -/
-def Element.getClientRects (self : Element) : IO DOMRectList := do
-  let r ← self.val.callMethod "getClientRects" (Support.args #[]) Value
+@[macro_inline] def Element.getClientRects (self : Element) : IO DOMRectList := Internal.api "Lasm.JS.Web.Element.getClientRects" do
+  let r ← self.val.callMethod "getClientRects" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMRect getBoundingClientRect()` -/
-def Element.getBoundingClientRect (self : Element) : IO DOMRect := do
-  let r ← self.val.callMethod "getBoundingClientRect" (Support.args #[]) Value
+@[macro_inline] def Element.getBoundingClientRect (self : Element) : IO DOMRect := Internal.api "Lasm.JS.Web.Element.getBoundingClientRect" do
+  let r ← self.val.callMethod "getBoundingClientRect" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `boolean checkVisibility(optional CheckVisibilityOptions options)` -/
-def Element.checkVisibility (self : Element) (options : Option CheckVisibilityOptions := none) : IO Bool :=
-  self.val.callMethod "checkVisibility" (Support.args #[Support.optional options]) Bool
+@[macro_inline] def Element.checkVisibility (self : Element) (options : Option CheckVisibilityOptions := none) : IO Bool := Internal.api "Lasm.JS.Web.Element.checkVisibility" do
+  self.val.callMethod "checkVisibility" (Internal.args #[Internal.optional options]) Bool
 
 /-- `Promise<ScrollResult> scrollIntoView(optional (boolean or ScrollIntoViewOptions) arg)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollIntoView (self : Element) (arg : Option BooleanOrScrollIntoViewOptions := none) : Async Unit :=
-  self.val.callMethodAwait "scrollIntoView" (Support.args #[Support.optional arg]) Unit
+@[macro_inline] def Element.scrollIntoView (self : Element) (arg : Option BooleanOrScrollIntoViewOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollIntoView" do
+  self.val.callMethodAwait "scrollIntoView" (Internal.args #[Internal.optional arg]) Unit
 
 /-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scroll (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
-  self.val.callMethodAwait "scroll" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def Element.scroll (self : Element) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Element.scroll" do
+  self.val.callMethodAwait "scroll" (Internal.args #[Internal.optional options]) Unit
 
 /-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
-  self.val.callMethodAwait "scroll" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def Element.scrollWithX (self : Element) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollWithX" do
+  self.val.callMethodAwait "scroll" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollTo (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def Element.scrollTo (self : Element) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollTo" do
+  self.val.callMethodAwait "scrollTo" (Internal.args #[Internal.optional options]) Unit
 
 /-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollToWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def Element.scrollToWithX (self : Element) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollToWithX" do
+  self.val.callMethodAwait "scrollTo" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollBy (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def Element.scrollBy (self : Element) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollBy" do
+  self.val.callMethodAwait "scrollBy" (Internal.args #[Internal.optional options]) Unit
 
 /-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
-def Element.scrollByWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[toJS x, toJS y]) Unit
+@[macro_inline] def Element.scrollByWithX (self : Element) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Element.scrollByWithX" do
+  self.val.callMethodAwait "scrollBy" (Internal.args #[toJS x, toJS y]) Unit
 
 /-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Element.getBoxQuads (self : Element) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array DOMQuad)
+@[macro_inline] def Element.getBoxQuads (self : Element) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Element.getBoxQuads" do
+  self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertQuadFromNode (self : Element) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Value
+@[macro_inline] def Element.convertQuadFromNode (self : Element) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Element.convertQuadFromNode" do
+  let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertRectFromNode (self : Element) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Value
+@[macro_inline] def Element.convertRectFromNode (self : Element) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Element.convertRectFromNode" do
+  let r ← self.val.callMethod "convertRectFromNode" (Internal.args #[toJS rect, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertPointFromNode (self : Element) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Value
+@[macro_inline] def Element.convertPointFromNode (self : Element) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.Element.convertPointFromNode" do
+  let r ← self.val.callMethod "convertPointFromNode" (Internal.args #[toJS point, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `readonly attribute Element? scrollParent` -/
-def HTMLElement.scrollParent (self : HTMLElement) : IO (Option Element) := self.val.get "scrollParent" (Option Element)
+@[macro_inline] def HTMLElement.scrollParent (self : HTMLElement) : IO (Option Element) := Internal.api "Lasm.JS.Web.HTMLElement.scrollParent" do
+  self.val.get "scrollParent" (Option Element)
 
 /-- `readonly attribute Element? offsetParent` -/
-def HTMLElement.offsetParent (self : HTMLElement) : IO (Option Element) := self.val.get "offsetParent" (Option Element)
+@[macro_inline] def HTMLElement.offsetParent (self : HTMLElement) : IO (Option Element) := Internal.api "Lasm.JS.Web.HTMLElement.offsetParent" do
+  self.val.get "offsetParent" (Option Element)
 
 /-- `readonly attribute long offsetTop` -/
-def HTMLElement.offsetTop (self : HTMLElement) : IO Int := self.val.get "offsetTop" Int
+@[macro_inline] def HTMLElement.offsetTop (self : HTMLElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLElement.offsetTop" do
+  self.val.get "offsetTop" Int
 
 /-- `readonly attribute long offsetLeft` -/
-def HTMLElement.offsetLeft (self : HTMLElement) : IO Int := self.val.get "offsetLeft" Int
+@[macro_inline] def HTMLElement.offsetLeft (self : HTMLElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLElement.offsetLeft" do
+  self.val.get "offsetLeft" Int
 
 /-- `readonly attribute long offsetWidth` -/
-def HTMLElement.offsetWidth (self : HTMLElement) : IO Int := self.val.get "offsetWidth" Int
+@[macro_inline] def HTMLElement.offsetWidth (self : HTMLElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLElement.offsetWidth" do
+  self.val.get "offsetWidth" Int
 
 /-- `readonly attribute long offsetHeight` -/
-def HTMLElement.offsetHeight (self : HTMLElement) : IO Int := self.val.get "offsetHeight" Int
+@[macro_inline] def HTMLElement.offsetHeight (self : HTMLElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLElement.offsetHeight" do
+  self.val.get "offsetHeight" Int
 
 /-- `readonly attribute long x` -/
-def HTMLImageElement.x (self : HTMLImageElement) : IO Int := self.val.get "x" Int
+@[macro_inline] def HTMLImageElement.x (self : HTMLImageElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLImageElement.x" do
+  self.val.get "x" Int
 
 /-- `readonly attribute long y` -/
-def HTMLImageElement.y (self : HTMLImageElement) : IO Int := self.val.get "y" Int
+@[macro_inline] def HTMLImageElement.y (self : HTMLImageElement) : IO Int := Internal.api "Lasm.JS.Web.HTMLImageElement.y" do
+  self.val.get "y" Int
 
 /-- `readonly attribute double pageX` -/
-def MouseEvent.pageX (self : MouseEvent) : IO Float := self.val.get "pageX" Float
+@[macro_inline] def MouseEvent.pageX (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.pageX" do
+  self.val.get "pageX" Float
 
 /-- `readonly attribute double pageY` -/
-def MouseEvent.pageY (self : MouseEvent) : IO Float := self.val.get "pageY" Float
+@[macro_inline] def MouseEvent.pageY (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.pageY" do
+  self.val.get "pageY" Float
 
 /-- `readonly attribute double x` -/
-def MouseEvent.x (self : MouseEvent) : IO Float := self.val.get "x" Float
+@[macro_inline] def MouseEvent.x (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.x" do
+  self.val.get "x" Float
 
 /-- `readonly attribute double y` -/
-def MouseEvent.y (self : MouseEvent) : IO Float := self.val.get "y" Float
+@[macro_inline] def MouseEvent.y (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.y" do
+  self.val.get "y" Float
 
 /-- `readonly attribute double offsetX` -/
-def MouseEvent.offsetX (self : MouseEvent) : IO Float := self.val.get "offsetX" Float
+@[macro_inline] def MouseEvent.offsetX (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.offsetX" do
+  self.val.get "offsetX" Float
 
 /-- `readonly attribute double offsetY` -/
-def MouseEvent.offsetY (self : MouseEvent) : IO Float := self.val.get "offsetY" Float
+@[macro_inline] def MouseEvent.offsetY (self : MouseEvent) : IO Float := Internal.api "Lasm.JS.Web.MouseEvent.offsetY" do
+  self.val.get "offsetY" Float
 
 /-- `DOMRectList getClientRects()` -/
-def Range.getClientRects (self : Range) : IO DOMRectList := do
-  let r ← self.val.callMethod "getClientRects" (Support.args #[]) Value
+@[macro_inline] def Range.getClientRects (self : Range) : IO DOMRectList := Internal.api "Lasm.JS.Web.Range.getClientRects" do
+  let r ← self.val.callMethod "getClientRects" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMRect getBoundingClientRect()` -/
-def Range.getBoundingClientRect (self : Range) : IO DOMRect := do
-  let r ← self.val.callMethod "getBoundingClientRect" (Support.args #[]) Value
+@[macro_inline] def Range.getBoundingClientRect (self : Range) : IO DOMRect := Internal.api "Lasm.JS.Web.Range.getBoundingClientRect" do
+  let r ← self.val.callMethod "getBoundingClientRect" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Text.getBoxQuads (self : Text) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array DOMQuad)
+@[macro_inline] def Text.getBoxQuads (self : Text) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Text.getBoxQuads" do
+  self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertQuadFromNode (self : Text) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Value
+@[macro_inline] def Text.convertQuadFromNode (self : Text) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Text.convertQuadFromNode" do
+  let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertRectFromNode (self : Text) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := do
-  let r ← self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Value
+@[macro_inline] def Text.convertRectFromNode (self : Text) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Text.convertRectFromNode" do
+  let r ← self.val.callMethod "convertRectFromNode" (Internal.args #[toJS rect, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
 /-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertPointFromNode (self : Text) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Value
+@[macro_inline] def Text.convertPointFromNode (self : Text) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.Text.convertPointFromNode" do
+  let r ← self.val.callMethod "convertPointFromNode" (Internal.args #[toJS point, toJS «from», Internal.optional options]) Value
   pure { val := r }
 
+/-- `readonly attribute Screen screen` -/
+@[macro_inline] def Window.screen (self : Window) : IO Screen := Internal.api "Lasm.JS.Web.Window.screen" do
+  let r ← self.val.get "screen" Value
+  pure { val := r }
+
+/-- `readonly attribute VisualViewport? visualViewport` -/
+@[macro_inline] def Window.visualViewport (self : Window) : IO (Option VisualViewport) := Internal.api "Lasm.JS.Web.Window.visualViewport" do
+  self.val.get "visualViewport" (Option VisualViewport)
+
+/-- `readonly attribute long innerWidth` -/
+@[macro_inline] def Window.innerWidth (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.innerWidth" do
+  self.val.get "innerWidth" Int
+
+/-- `readonly attribute long innerHeight` -/
+@[macro_inline] def Window.innerHeight (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.innerHeight" do
+  self.val.get "innerHeight" Int
+
+/-- `readonly attribute double scrollX` -/
+@[macro_inline] def Window.scrollX (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.scrollX" do
+  self.val.get "scrollX" Float
+
+/-- `readonly attribute double pageXOffset` -/
+@[macro_inline] def Window.pageXOffset (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.pageXOffset" do
+  self.val.get "pageXOffset" Float
+
+/-- `readonly attribute double scrollY` -/
+@[macro_inline] def Window.scrollY (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.scrollY" do
+  self.val.get "scrollY" Float
+
+/-- `readonly attribute double pageYOffset` -/
+@[macro_inline] def Window.pageYOffset (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.pageYOffset" do
+  self.val.get "pageYOffset" Float
+
+/-- `readonly attribute long screenX` -/
+@[macro_inline] def Window.screenX (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenX" do
+  self.val.get "screenX" Int
+
+/-- `readonly attribute long screenLeft` -/
+@[macro_inline] def Window.screenLeft (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenLeft" do
+  self.val.get "screenLeft" Int
+
+/-- `readonly attribute long screenY` -/
+@[macro_inline] def Window.screenY (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenY" do
+  self.val.get "screenY" Int
+
+/-- `readonly attribute long screenTop` -/
+@[macro_inline] def Window.screenTop (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenTop" do
+  self.val.get "screenTop" Int
+
+/-- `readonly attribute long outerWidth` -/
+@[macro_inline] def Window.outerWidth (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.outerWidth" do
+  self.val.get "outerWidth" Int
+
+/-- `readonly attribute long outerHeight` -/
+@[macro_inline] def Window.outerHeight (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.outerHeight" do
+  self.val.get "outerHeight" Int
+
+/-- `readonly attribute double devicePixelRatio` -/
+@[macro_inline] def Window.devicePixelRatio (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.devicePixelRatio" do
+  self.val.get "devicePixelRatio" Float
+
+/-- `MediaQueryList matchMedia(CSSOMString query)` -/
+@[macro_inline] def Window.matchMedia (self : Window) (query : String) : IO MediaQueryList := Internal.api "Lasm.JS.Web.Window.matchMedia" do
+  let r ← self.val.callMethod "matchMedia" (Internal.args #[toJS query]) Value
+  pure { val := r }
+
+/-- `undefined moveTo(long x, long y)` -/
+@[macro_inline] def Window.moveTo (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.moveTo" do
+  self.val.callMethod "moveTo" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `undefined moveBy(long x, long y)` -/
+@[macro_inline] def Window.moveBy (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.moveBy" do
+  self.val.callMethod "moveBy" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `undefined resizeTo(long width, long height)` -/
+@[macro_inline] def Window.resizeTo (self : Window) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.resizeTo" do
+  self.val.callMethod "resizeTo" (Internal.args #[toJS width, toJS height]) Unit
+
+/-- `undefined resizeBy(long x, long y)` -/
+@[macro_inline] def Window.resizeBy (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.resizeBy" do
+  self.val.callMethod "resizeBy" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scroll (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scroll" do
+  self.val.callMethodAwait "scroll" (Internal.args #[Internal.optional options]) Unit
+
+/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scrollWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollWithX" do
+  self.val.callMethodAwait "scroll" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scrollTo (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollTo" do
+  self.val.callMethodAwait "scrollTo" (Internal.args #[Internal.optional options]) Unit
+
+/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scrollToWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollToWithX" do
+  self.val.callMethodAwait "scrollTo" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scrollBy (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollBy" do
+  self.val.callMethodAwait "scrollBy" (Internal.args #[Internal.optional options]) Unit
+
+/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+@[macro_inline] def Window.scrollByWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollByWithX" do
+  self.val.callMethodAwait "scrollBy" (Internal.args #[toJS x, toJS y]) Unit
+
 /-- `readonly attribute Screen screen` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def screen : IO Screen := do
-  let r ← Support.getGlobal ["screen"] Value
+@[macro_inline] def screen : IO Screen := Internal.api "Lasm.JS.Web.screen" do
+  let r ← Internal.getGlobal ["screen"] Value
   pure { val := r }
 
 /-- `readonly attribute VisualViewport? visualViewport` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def visualViewport : IO (Option VisualViewport) := Support.getGlobal ["visualViewport"] (Option VisualViewport)
+@[macro_inline] def visualViewport : IO (Option VisualViewport) := Internal.api "Lasm.JS.Web.visualViewport" do
+  Internal.getGlobal ["visualViewport"] (Option VisualViewport)
 
 /-- `readonly attribute long innerWidth` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def innerWidth : IO Int := Support.getGlobal ["innerWidth"] Int
+@[macro_inline] def innerWidth : IO Int := Internal.api "Lasm.JS.Web.innerWidth" do
+  Internal.getGlobal ["innerWidth"] Int
 
 /-- `readonly attribute long innerHeight` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def innerHeight : IO Int := Support.getGlobal ["innerHeight"] Int
+@[macro_inline] def innerHeight : IO Int := Internal.api "Lasm.JS.Web.innerHeight" do
+  Internal.getGlobal ["innerHeight"] Int
 
 /-- `readonly attribute double scrollX` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollX : IO Float := Support.getGlobal ["scrollX"] Float
+@[macro_inline] def scrollX : IO Float := Internal.api "Lasm.JS.Web.scrollX" do
+  Internal.getGlobal ["scrollX"] Float
 
 /-- `readonly attribute double pageXOffset` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def pageXOffset : IO Float := Support.getGlobal ["pageXOffset"] Float
+@[macro_inline] def pageXOffset : IO Float := Internal.api "Lasm.JS.Web.pageXOffset" do
+  Internal.getGlobal ["pageXOffset"] Float
 
 /-- `readonly attribute double scrollY` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollY : IO Float := Support.getGlobal ["scrollY"] Float
+@[macro_inline] def scrollY : IO Float := Internal.api "Lasm.JS.Web.scrollY" do
+  Internal.getGlobal ["scrollY"] Float
 
 /-- `readonly attribute double pageYOffset` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def pageYOffset : IO Float := Support.getGlobal ["pageYOffset"] Float
+@[macro_inline] def pageYOffset : IO Float := Internal.api "Lasm.JS.Web.pageYOffset" do
+  Internal.getGlobal ["pageYOffset"] Float
 
 /-- `readonly attribute long screenX` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def screenX : IO Int := Support.getGlobal ["screenX"] Int
+@[macro_inline] def screenX : IO Int := Internal.api "Lasm.JS.Web.screenX" do
+  Internal.getGlobal ["screenX"] Int
 
 /-- `readonly attribute long screenLeft` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def screenLeft : IO Int := Support.getGlobal ["screenLeft"] Int
+@[macro_inline] def screenLeft : IO Int := Internal.api "Lasm.JS.Web.screenLeft" do
+  Internal.getGlobal ["screenLeft"] Int
 
 /-- `readonly attribute long screenY` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def screenY : IO Int := Support.getGlobal ["screenY"] Int
+@[macro_inline] def screenY : IO Int := Internal.api "Lasm.JS.Web.screenY" do
+  Internal.getGlobal ["screenY"] Int
 
 /-- `readonly attribute long screenTop` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def screenTop : IO Int := Support.getGlobal ["screenTop"] Int
+@[macro_inline] def screenTop : IO Int := Internal.api "Lasm.JS.Web.screenTop" do
+  Internal.getGlobal ["screenTop"] Int
 
 /-- `readonly attribute long outerWidth` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def outerWidth : IO Int := Support.getGlobal ["outerWidth"] Int
+@[macro_inline] def outerWidth : IO Int := Internal.api "Lasm.JS.Web.outerWidth" do
+  Internal.getGlobal ["outerWidth"] Int
 
 /-- `readonly attribute long outerHeight` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def outerHeight : IO Int := Support.getGlobal ["outerHeight"] Int
+@[macro_inline] def outerHeight : IO Int := Internal.api "Lasm.JS.Web.outerHeight" do
+  Internal.getGlobal ["outerHeight"] Int
 
 /-- `readonly attribute double devicePixelRatio` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def devicePixelRatio : IO Float := Support.getGlobal ["devicePixelRatio"] Float
+@[macro_inline] def devicePixelRatio : IO Float := Internal.api "Lasm.JS.Web.devicePixelRatio" do
+  Internal.getGlobal ["devicePixelRatio"] Float
 
 /-- `MediaQueryList matchMedia(CSSOMString query)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def matchMedia (query : String) : IO MediaQueryList := do
+@[macro_inline] def matchMedia (query : String) : IO MediaQueryList := Internal.api "Lasm.JS.Web.matchMedia" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.matchMedia", module := "globalThis", path := "matchMedia", construct := false, arity := 1 }
-    (Support.args #[toJS query]) (await := false)
+    (Internal.args #[toJS query]) (await := false)
   pure { val := r }
 
 /-- `undefined moveTo(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def moveTo (x : Int) (y : Int) : IO Unit :=
+@[macro_inline] def moveTo (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.moveTo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveTo", module := "globalThis", path := "moveTo", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y]) (await := false)
+    (Internal.args #[toJS x, toJS y]) (await := false)
 
 /-- `undefined moveBy(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def moveBy (x : Int) (y : Int) : IO Unit :=
+@[macro_inline] def moveBy (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.moveBy" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveBy", module := "globalThis", path := "moveBy", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y]) (await := false)
+    (Internal.args #[toJS x, toJS y]) (await := false)
 
 /-- `undefined resizeTo(long width, long height)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def resizeTo (width : Int) (height : Int) : IO Unit :=
+@[macro_inline] def resizeTo (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.resizeTo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeTo", module := "globalThis", path := "resizeTo", construct := false, arity := 2 }
-    (Support.args #[toJS width, toJS height]) (await := false)
+    (Internal.args #[toJS width, toJS height]) (await := false)
 
 /-- `undefined resizeBy(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def resizeBy (x : Int) (y : Int) : IO Unit :=
+@[macro_inline] def resizeBy (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.resizeBy" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeBy", module := "globalThis", path := "resizeBy", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y]) (await := false)
+    (Internal.args #[toJS x, toJS y]) (await := false)
 
 /-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scroll (options : Option ScrollToOptions := none) : Async Unit :=
+@[macro_inline] def scroll (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scroll" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scroll", module := "globalThis", path := "scroll", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollWithX (x : Float) (y : Float) : Async Unit :=
+@[macro_inline] def scrollWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollWithX", module := "globalThis", path := "scroll", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y])
+    (Internal.args #[toJS x, toJS y])
 
 /-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollTo (options : Option ScrollToOptions := none) : Async Unit :=
+@[macro_inline] def scrollTo (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scrollTo" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollTo", module := "globalThis", path := "scrollTo", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollToWithX (x : Float) (y : Float) : Async Unit :=
+@[macro_inline] def scrollToWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollToWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollToWithX", module := "globalThis", path := "scrollTo", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y])
+    (Internal.args #[toJS x, toJS y])
 
 /-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollBy (options : Option ScrollToOptions := none) : Async Unit :=
+@[macro_inline] def scrollBy (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scrollBy" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollBy", module := "globalThis", path := "scrollBy", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
-def scrollByWithX (x : Float) (y : Float) : Async Unit :=
+@[macro_inline] def scrollByWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollByWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollByWithX", module := "globalThis", path := "scrollBy", construct := false, arity := 2 }
-    (Support.args #[toJS x, toJS y])
+    (Internal.args #[toJS x, toJS y])
 
 end Lasm.JS.Web

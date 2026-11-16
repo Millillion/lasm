@@ -4,6 +4,9 @@ Lasm.JS.Web.Support: the few definitions the generated standard bindings
 with: WebIDL records, optional and variadic arguments, dictionaries, and
 reading ArrayBuffers and iterables. Hand-written; the mapping is in
 docs/JS_BINDINGS.md ("Standard bindings").
+
+The helpers are in `Lasm.JS.Web.Internal`: internal to the generated bindings, with no stability promise
+(docs/API_DECISIONS.md 0.3-3); programs use Lasm.JS directly. `Record` is public.
 -/
 import Lasm.JS.Core
 
@@ -26,7 +29,7 @@ instance [FromJS α] : FromJS (Record α) where
     | _ => .error ""
   typeName := s!"Lasm.JS.Web.Record ({FromJS.typeName α})"
 
-namespace Support
+namespace Internal
 
 /-- An optional argument or dictionary member: `none` is JavaScript `undefined` (left out). -/
 def optional [ToJS α] : Option α → Data
@@ -94,7 +97,7 @@ def cloneAs (α : Type) [FromJS α] (v : Value) : IO α :=
 /-- `Array.from(o[method]())`, read as `α`: the entries, keys or values of an iterable. -/
 def iterate (o : Value) (method : String) (α : Type) [FromJS α] : IO α := do
   let iterator ← o.callMethod method #[] Value
-  Binding.invoke α { name := "Lasm.JS.Web.Support.iterate", module := "globalThis", path := "Array.from", construct := false, arity := 1 } #[.ref iterator ""] (await := false)
+  Binding.invoke α { name := "Lasm.JS.Web.Internal.iterate", module := "globalThis", path := "Array.from", construct := false, arity := 1 } #[.ref iterator ""] (await := false)
 
 /-- `globalThis.a.b…`, read as `α`. -/
 def getGlobal (path : List String) (α : Type) [FromJS α] : IO α := do
@@ -113,5 +116,21 @@ def isInstance (ctor : IO Value) (v : Value) : IO Bool := do
     proto.callMethod "isPrototypeOf" #[.ref v ""] Bool
   catch _ => return false
 
-end Support
+/-- `Object.entries(v)`, read as a record of `α`: a record result whose object is not plain
+(Node's `process.env`; Deno's is a Proxy, which `structuredClone` rejects). -/
+def recordOf (α : Type) [FromJS α] (v : Value) : IO (Record α) := do
+  let entries ← Lasm.JS.Binding.invoke (Array (String × α)) { name := "Lasm.JS.Web.Internal.recordOf", module := "globalThis", path := "Object.entries", construct := false, arity := 1 }
+    #[.ref v ""] (await := false)
+  return ⟨entries⟩
+
+/-- `v instanceof C` as a handle (the generated `I.cast?`, rule A12): `some (mk v)` when `v` is a `C`. -/
+def cast (ctor : IO Value) (mk : Value → α) (v : Value) : IO (Option α) := do
+  return if (← isInstance ctor v) then some (mk v) else none
+
+/-- A generated binding's call, named (docs/API_DECISIONS.md 0.3-12): an error names the binding, and
+`lasm build --target`'s availability check finds a program's web APIs by these names in its C. -/
+@[inline] def api [Monad m] [MonadExcept IO.Error m] (name : String) (act : m α) : m α :=
+  tryCatch act fun e => throw (IO.userError s!"{name}: {e}")
+
+end Internal
 end Lasm.JS.Web

@@ -6,134 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.ScreenCapture
 import Lasm.JS.Web.MediacaptureStreams
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CaptureStartFocusBehavior` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "focus-capturing-application", "focus-captured-surface", "no-focus-change". -/
-inductive CaptureStartFocusBehavior where
-  /-- "focus-capturing-application" -/
-  | focusCapturingApplication
-  /-- "focus-captured-surface" -/
-  | focusCapturedSurface
-  /-- "no-focus-change" -/
-  | noFocusChange
-  deriving BEq, Repr, Inhabited
-instance : ToJS CaptureStartFocusBehavior := ⟨fun
-  | .focusCapturingApplication => .string "focus-capturing-application"
-  | .focusCapturedSurface => .string "focus-captured-surface"
-  | .noFocusChange => .string "no-focus-change"⟩
-instance : FromJS CaptureStartFocusBehavior where
-  fromJS
-    | .string "focus-capturing-application" => .ok .focusCapturingApplication
-    | .string "focus-captured-surface" => .ok .focusCapturedSurface
-    | .string "no-focus-change" => .ok .noFocusChange
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CaptureStartFocusBehavior"
-
-/-- `enum SelfCapturePreferenceEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "include", "exclude". -/
-inductive SelfCapturePreferenceEnum where
-  /-- "include" -/
-  | «include»
-  /-- "exclude" -/
-  | exclude
-  deriving BEq, Repr, Inhabited
-instance : ToJS SelfCapturePreferenceEnum := ⟨fun
-  | .«include» => .string "include"
-  | .exclude => .string "exclude"⟩
-instance : FromJS SelfCapturePreferenceEnum where
-  fromJS
-    | .string "include" => .ok .«include»
-    | .string "exclude" => .ok .exclude
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SelfCapturePreferenceEnum"
-
-/-- `enum SystemAudioPreferenceEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "include", "exclude". -/
-inductive SystemAudioPreferenceEnum where
-  /-- "include" -/
-  | «include»
-  /-- "exclude" -/
-  | exclude
-  deriving BEq, Repr, Inhabited
-instance : ToJS SystemAudioPreferenceEnum := ⟨fun
-  | .«include» => .string "include"
-  | .exclude => .string "exclude"⟩
-instance : FromJS SystemAudioPreferenceEnum where
-  fromJS
-    | .string "include" => .ok .«include»
-    | .string "exclude" => .ok .exclude
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SystemAudioPreferenceEnum"
-
-/-- `enum WindowAudioPreferenceEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "system", "window", "exclude". -/
-inductive WindowAudioPreferenceEnum where
-  /-- "system" -/
-  | system
-  /-- "window" -/
-  | window
-  /-- "exclude" -/
-  | exclude
-  deriving BEq, Repr, Inhabited
-instance : ToJS WindowAudioPreferenceEnum := ⟨fun
-  | .system => .string "system"
-  | .window => .string "window"
-  | .exclude => .string "exclude"⟩
-instance : FromJS WindowAudioPreferenceEnum where
-  fromJS
-    | .string "system" => .ok .system
-    | .string "window" => .ok .window
-    | .string "exclude" => .ok .exclude
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WindowAudioPreferenceEnum"
-
-/-- `enum SurfaceSwitchingPreferenceEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "include", "exclude". -/
-inductive SurfaceSwitchingPreferenceEnum where
-  /-- "include" -/
-  | «include»
-  /-- "exclude" -/
-  | exclude
-  deriving BEq, Repr, Inhabited
-instance : ToJS SurfaceSwitchingPreferenceEnum := ⟨fun
-  | .«include» => .string "include"
-  | .exclude => .string "exclude"⟩
-instance : FromJS SurfaceSwitchingPreferenceEnum where
-  fromJS
-    | .string "include" => .ok .«include»
-    | .string "exclude" => .ok .exclude
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.SurfaceSwitchingPreferenceEnum"
-
-/-- `enum MonitorTypeSurfacesEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "include", "exclude". -/
-inductive MonitorTypeSurfacesEnum where
-  /-- "include" -/
-  | «include»
-  /-- "exclude" -/
-  | exclude
-  deriving BEq, Repr, Inhabited
-instance : ToJS MonitorTypeSurfacesEnum := ⟨fun
-  | .«include» => .string "include"
-  | .exclude => .string "exclude"⟩
-instance : FromJS MonitorTypeSurfacesEnum where
-  fromJS
-    | .string "include" => .ok .«include»
-    | .string "exclude" => .ok .exclude
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MonitorTypeSurfacesEnum"
-
-/-- `enum AudioSelectionPreferenceEnum` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)): "preferred". -/
-inductive AudioSelectionPreferenceEnum where
-  /-- "preferred" -/
-  | preferred
-  deriving BEq, Repr, Inhabited
-instance : ToJS AudioSelectionPreferenceEnum := ⟨fun
-  | .preferred => .string "preferred"⟩
-instance : FromJS AudioSelectionPreferenceEnum where
-  fromJS
-    | .string "preferred" => .ok .preferred
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.AudioSelectionPreferenceEnum"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary DisplayMediaStreamOptions` (Screen Capture (https://w3c.github.io/mediacapture-screen-share/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DisplayMediaStreamOptions where
@@ -155,32 +37,32 @@ structure DisplayMediaStreamOptions where
   monitorTypeSurfaces : Option MonitorTypeSurfacesEnum := none
   /-- `AudioSelectionPreferenceEnum audioSelection` -/
   audioSelection : Option AudioSelectionPreferenceEnum := none
-instance : ToJS DisplayMediaStreamOptions := ⟨fun d => Support.fields #[("video", Support.optional d.video),
-    ("audio", Support.optional d.audio),
-    ("controller", Support.optional d.controller),
-    ("selfBrowserSurface", Support.optional d.selfBrowserSurface),
-    ("systemAudio", Support.optional d.systemAudio),
-    ("windowAudio", Support.optional d.windowAudio),
-    ("surfaceSwitching", Support.optional d.surfaceSwitching),
-    ("monitorTypeSurfaces", Support.optional d.monitorTypeSurfaces),
-    ("audioSelection", Support.optional d.audioSelection)]⟩
+instance : ToJS DisplayMediaStreamOptions := ⟨fun d => Internal.fields #[("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio),
+    ("controller", Internal.optional d.controller),
+    ("selfBrowserSurface", Internal.optional d.selfBrowserSurface),
+    ("systemAudio", Internal.optional d.systemAudio),
+    ("windowAudio", Internal.optional d.windowAudio),
+    ("surfaceSwitching", Internal.optional d.surfaceSwitching),
+    ("monitorTypeSurfaces", Internal.optional d.monitorTypeSurfaces),
+    ("audioSelection", Internal.optional d.audioSelection)]⟩
 
 /-- `v instanceof CaptureController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CaptureController`). -/
-def CaptureController.cast? (v : Value) : IO (Option CaptureController) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CaptureController"] Value) v) then some { val := v } else none
+@[macro_inline] def CaptureController.cast? (v : Value) : IO (Option CaptureController) := Internal.api "Lasm.JS.Web.CaptureController.cast?" do
+  Internal.cast (Internal.getGlobal ["CaptureController"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def CaptureController.new : IO CaptureController :=
+@[macro_inline] def CaptureController.new : IO CaptureController := Internal.api "Lasm.JS.Web.CaptureController.new" do
   Lasm.JS.Binding.invoke CaptureController { name := "Lasm.JS.Web.CaptureController.new", module := "globalThis", path := "CaptureController", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `undefined setFocusBehavior(CaptureStartFocusBehavior focusBehavior)` -/
-def CaptureController.setFocusBehavior (self : CaptureController) (focusBehavior : CaptureStartFocusBehavior) : IO Unit :=
-  self.val.callMethod "setFocusBehavior" (Support.args #[toJS focusBehavior]) Unit
+@[macro_inline] def CaptureController.setFocusBehavior (self : CaptureController) (focusBehavior : CaptureStartFocusBehavior) : IO Unit := Internal.api "Lasm.JS.Web.CaptureController.setFocusBehavior" do
+  self.val.callMethod "setFocusBehavior" (Internal.args #[toJS focusBehavior]) Unit
 
 /-- `Promise<MediaStream> getDisplayMedia(optional DisplayMediaStreamOptions options)` -/
-def MediaDevices.getDisplayMedia (self : MediaDevices) (options : Option DisplayMediaStreamOptions := none) : Async MediaStream := do
-  let r ← self.val.callMethodAwait "getDisplayMedia" (Support.args #[Support.optional options]) Value
+@[macro_inline] def MediaDevices.getDisplayMedia (self : MediaDevices) (options : Option DisplayMediaStreamOptions := none) : Async MediaStream := Internal.api "Lasm.JS.Web.MediaDevices.getDisplayMedia" do
+  let r ← self.val.callMethodAwait "getDisplayMedia" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

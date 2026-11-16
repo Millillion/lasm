@@ -17,7 +17,12 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 lines for generated members a runtime lacks, and `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
@@ -291,7 +296,7 @@ def currentProcess (r : Checks) : Async Unit := do
   expect r "uptime" ((← process.uptime) > 0) ""
   expect r "memoryUsage" ((← process.memoryUsage).field "rss" matches .number _) ""
   -- kill pid 0 tests that the process exists (signal 0) without signalling it
-  process.kill pid.toNat.toFloat (some (.double 0))
+  process.kill (pid.toNat : Int) (some (.double 0))
   expect r "kill with signal 0" true ""
   -- title is a string
   discard process.title

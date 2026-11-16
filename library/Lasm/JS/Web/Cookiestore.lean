@@ -6,32 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.Cookiestore
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum CookieSameSite` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)): "strict", "lax", "none". -/
-inductive CookieSameSite where
-  /-- "strict" -/
-  | strict
-  /-- "lax" -/
-  | lax
-  /-- "none" -/
-  | none
-  deriving BEq, Repr, Inhabited
-instance : ToJS CookieSameSite := ⟨fun
-  | .strict => .string "strict"
-  | .lax => .string "lax"
-  | .none => .string "none"⟩
-instance : FromJS CookieSameSite where
-  fromJS
-    | .string "strict" => .ok .strict
-    | .string "lax" => .ok .lax
-    | .string "none" => .ok .none
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CookieSameSite"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CookieListItem` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CookieListItem where
@@ -39,8 +24,8 @@ structure CookieListItem where
   name : Option String := none
   /-- `USVString value` -/
   value : Option String := none
-instance : ToJS CookieListItem := ⟨fun d => Support.fields #[("name", Support.optional d.name),
-    ("value", Support.optional d.value)]⟩
+instance : ToJS CookieListItem := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("value", Internal.optional d.value)]⟩
 instance : FromJS CookieListItem where
   fromJS d := do return {
     name := ← Lasm.JS.readField (Option String) d "name",
@@ -59,11 +44,11 @@ structure CookieChangeEventInit where
   changed : Option (Array CookieListItem) := none
   /-- `CookieList deleted` -/
   deleted : Option (Array CookieListItem) := none
-instance : ToJS CookieChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("changed", Support.optional d.changed),
-    ("deleted", Support.optional d.deleted)]⟩
+instance : ToJS CookieChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("changed", Internal.optional d.changed),
+    ("deleted", Internal.optional d.deleted)]⟩
 
 /-- `dictionary CookieStoreGetOptions` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CookieStoreGetOptions where
@@ -71,8 +56,8 @@ structure CookieStoreGetOptions where
   name : Option String := none
   /-- `USVString url` -/
   url : Option String := none
-instance : ToJS CookieStoreGetOptions := ⟨fun d => Support.fields #[("name", Support.optional d.name),
-    ("url", Support.optional d.url)]⟩
+instance : ToJS CookieStoreGetOptions := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("url", Internal.optional d.url)]⟩
 instance : FromJS CookieStoreGetOptions where
   fromJS d := do return {
     name := ← Lasm.JS.readField (Option String) d "name",
@@ -97,14 +82,14 @@ structure CookieInit where
   partitioned : Option Bool := none
   /-- `long long? maxAge = null` -/
   maxAge : Option Int := none
-instance : ToJS CookieInit := ⟨fun d => Support.fields #[("name", toJS d.name),
+instance : ToJS CookieInit := ⟨fun d => Internal.fields #[("name", toJS d.name),
     ("value", toJS d.value),
-    ("expires", Support.optional d.expires),
-    ("domain", Support.optional d.domain),
-    ("path", Support.optional d.path),
-    ("sameSite", Support.optional d.sameSite),
-    ("partitioned", Support.optional d.partitioned),
-    ("maxAge", Support.optional d.maxAge)]⟩
+    ("expires", Internal.optional d.expires),
+    ("domain", Internal.optional d.domain),
+    ("path", Internal.optional d.path),
+    ("sameSite", Internal.optional d.sameSite),
+    ("partitioned", Internal.optional d.partitioned),
+    ("maxAge", Internal.optional d.maxAge)]⟩
 
 /-- `dictionary CookieStoreDeleteOptions` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CookieStoreDeleteOptions where
@@ -116,10 +101,10 @@ structure CookieStoreDeleteOptions where
   path : Option String := none
   /-- `boolean partitioned = false` -/
   partitioned : Option Bool := none
-instance : ToJS CookieStoreDeleteOptions := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("domain", Support.optional d.domain),
-    ("path", Support.optional d.path),
-    ("partitioned", Support.optional d.partitioned)]⟩
+instance : ToJS CookieStoreDeleteOptions := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("domain", Internal.optional d.domain),
+    ("path", Internal.optional d.path),
+    ("partitioned", Internal.optional d.partitioned)]⟩
 
 /-- `dictionary ExtendableCookieChangeEventInit : ExtendableEventInit` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ExtendableCookieChangeEventInit where
@@ -133,121 +118,132 @@ structure ExtendableCookieChangeEventInit where
   changed : Option (Array CookieListItem) := none
   /-- `CookieList deleted` -/
   deleted : Option (Array CookieListItem) := none
-instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("changed", Support.optional d.changed),
-    ("deleted", Support.optional d.deleted)]⟩
+instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("changed", Internal.optional d.changed),
+    ("deleted", Internal.optional d.deleted)]⟩
 
 /-- `v instanceof CookieChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CookieChangeEvent`). -/
-def CookieChangeEvent.cast? (v : Value) : IO (Option CookieChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CookieChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CookieChangeEvent.cast? (v : Value) : IO (Option CookieChangeEvent) := Internal.api "Lasm.JS.Web.CookieChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CookieChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CookieChangeEventInit eventInitDict)` -/
-def CookieChangeEvent.new (type : String) (eventInitDict : Option CookieChangeEventInit := none) : IO CookieChangeEvent :=
+@[macro_inline] def CookieChangeEvent.new (type : String) (eventInitDict : Option CookieChangeEventInit := none) : IO CookieChangeEvent := Internal.api "Lasm.JS.Web.CookieChangeEvent.new" do
   Lasm.JS.Binding.invoke CookieChangeEvent { name := "Lasm.JS.Web.CookieChangeEvent.new", module := "globalThis", path := "CookieChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<CookieListItem> changed` -/
-def CookieChangeEvent.changed (self : CookieChangeEvent) : IO (Array CookieListItem) := self.val.get "changed" (Array CookieListItem)
+@[macro_inline] def CookieChangeEvent.changed (self : CookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.CookieChangeEvent.changed" do
+  self.val.get "changed" (Array CookieListItem)
 
 /-- `readonly attribute FrozenArray<CookieListItem> deleted` -/
-def CookieChangeEvent.deleted (self : CookieChangeEvent) : IO (Array CookieListItem) := self.val.get "deleted" (Array CookieListItem)
+@[macro_inline] def CookieChangeEvent.deleted (self : CookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.CookieChangeEvent.deleted" do
+  self.val.get "deleted" (Array CookieListItem)
 
 /-- `v instanceof CookieStore`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CookieStore`). -/
-def CookieStore.cast? (v : Value) : IO (Option CookieStore) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CookieStore"] Value) v) then some { val := v } else none
+@[macro_inline] def CookieStore.cast? (v : Value) : IO (Option CookieStore) := Internal.api "Lasm.JS.Web.CookieStore.cast?" do
+  Internal.cast (Internal.getGlobal ["CookieStore"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onchange` -/
-def CookieStore.onchange (self : CookieStore) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def CookieStore.onchange (self : CookieStore) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.CookieStore.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def CookieStore.setOnchange (self : CookieStore) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def CookieStore.setOnchange (self : CookieStore) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.CookieStore.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `Promise<CookieListItem?> get(USVString name)` -/
-def CookieStore.get (self : CookieStore) (name : String) : Async (Option CookieListItem) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS name]) (Option CookieListItem)
+@[macro_inline] def CookieStore.get (self : CookieStore) (name : String) : Async (Option CookieListItem) := Internal.api "Lasm.JS.Web.CookieStore.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS name]) (Option CookieListItem)
 
 /-- `Promise<CookieListItem?> get(optional CookieStoreGetOptions options)` -/
-def CookieStore.getWithOptions (self : CookieStore) (options : Option CookieStoreGetOptions := none) : Async (Option CookieListItem) :=
-  self.val.callMethodAwait "get" (Support.args #[Support.optional options]) (Option CookieListItem)
+@[macro_inline] def CookieStore.getWithOptions (self : CookieStore) (options : Option CookieStoreGetOptions := none) : Async (Option CookieListItem) := Internal.api "Lasm.JS.Web.CookieStore.getWithOptions" do
+  self.val.callMethodAwait "get" (Internal.args #[Internal.optional options]) (Option CookieListItem)
 
 /-- `Promise<CookieList> getAll(USVString name)` -/
-def CookieStore.getAll (self : CookieStore) (name : String) : Async (Array CookieListItem) :=
-  self.val.callMethodAwait "getAll" (Support.args #[toJS name]) (Array CookieListItem)
+@[macro_inline] def CookieStore.getAll (self : CookieStore) (name : String) : Async (Array CookieListItem) := Internal.api "Lasm.JS.Web.CookieStore.getAll" do
+  self.val.callMethodAwait "getAll" (Internal.args #[toJS name]) (Array CookieListItem)
 
 /-- `Promise<CookieList> getAll(optional CookieStoreGetOptions options)` -/
-def CookieStore.getAllWithOptions (self : CookieStore) (options : Option CookieStoreGetOptions := none) : Async (Array CookieListItem) :=
-  self.val.callMethodAwait "getAll" (Support.args #[Support.optional options]) (Array CookieListItem)
+@[macro_inline] def CookieStore.getAllWithOptions (self : CookieStore) (options : Option CookieStoreGetOptions := none) : Async (Array CookieListItem) := Internal.api "Lasm.JS.Web.CookieStore.getAllWithOptions" do
+  self.val.callMethodAwait "getAll" (Internal.args #[Internal.optional options]) (Array CookieListItem)
 
 /-- `Promise<undefined> set(USVString name, USVString value)` -/
-def CookieStore.set (self : CookieStore) (name : String) (value : String) : Async Unit :=
-  self.val.callMethodAwait "set" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def CookieStore.set (self : CookieStore) (name : String) (value : String) : Async Unit := Internal.api "Lasm.JS.Web.CookieStore.set" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `Promise<undefined> set(CookieInit options)` -/
-def CookieStore.setWithOptions (self : CookieStore) (options : CookieInit) : Async Unit :=
-  self.val.callMethodAwait "set" (Support.args #[toJS options]) Unit
+@[macro_inline] def CookieStore.setWithOptions (self : CookieStore) (options : CookieInit) : Async Unit := Internal.api "Lasm.JS.Web.CookieStore.setWithOptions" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS options]) Unit
 
 /-- `Promise<undefined> delete(USVString name)` -/
-def CookieStore.delete (self : CookieStore) (name : String) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS name]) Unit
+@[macro_inline] def CookieStore.delete (self : CookieStore) (name : String) : Async Unit := Internal.api "Lasm.JS.Web.CookieStore.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS name]) Unit
 
 /-- `Promise<undefined> delete(CookieStoreDeleteOptions options)` -/
-def CookieStore.deleteWithOptions (self : CookieStore) (options : CookieStoreDeleteOptions) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS options]) Unit
+@[macro_inline] def CookieStore.deleteWithOptions (self : CookieStore) (options : CookieStoreDeleteOptions) : Async Unit := Internal.api "Lasm.JS.Web.CookieStore.deleteWithOptions" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS options]) Unit
 
 /-- `v instanceof CookieStoreManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CookieStoreManager`). -/
-def CookieStoreManager.cast? (v : Value) : IO (Option CookieStoreManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CookieStoreManager"] Value) v) then some { val := v } else none
+@[macro_inline] def CookieStoreManager.cast? (v : Value) : IO (Option CookieStoreManager) := Internal.api "Lasm.JS.Web.CookieStoreManager.cast?" do
+  Internal.cast (Internal.getGlobal ["CookieStoreManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> subscribe(sequence<CookieStoreGetOptions> subscriptions)` -/
-def CookieStoreManager.subscribe (self : CookieStoreManager) (subscriptions : Array CookieStoreGetOptions) : Async Unit :=
-  self.val.callMethodAwait "subscribe" (Support.args #[toJS subscriptions]) Unit
+@[macro_inline] def CookieStoreManager.subscribe (self : CookieStoreManager) (subscriptions : Array CookieStoreGetOptions) : Async Unit := Internal.api "Lasm.JS.Web.CookieStoreManager.subscribe" do
+  self.val.callMethodAwait "subscribe" (Internal.args #[toJS subscriptions]) Unit
 
 /-- `Promise<sequence<CookieStoreGetOptions>> getSubscriptions()` -/
-def CookieStoreManager.getSubscriptions (self : CookieStoreManager) : Async (Array CookieStoreGetOptions) :=
-  self.val.callMethodAwait "getSubscriptions" (Support.args #[]) (Array CookieStoreGetOptions)
+@[macro_inline] def CookieStoreManager.getSubscriptions (self : CookieStoreManager) : Async (Array CookieStoreGetOptions) := Internal.api "Lasm.JS.Web.CookieStoreManager.getSubscriptions" do
+  self.val.callMethodAwait "getSubscriptions" (Internal.args #[]) (Array CookieStoreGetOptions)
 
 /-- `Promise<undefined> unsubscribe(sequence<CookieStoreGetOptions> subscriptions)` -/
-def CookieStoreManager.unsubscribe (self : CookieStoreManager) (subscriptions : Array CookieStoreGetOptions) : Async Unit :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[toJS subscriptions]) Unit
+@[macro_inline] def CookieStoreManager.unsubscribe (self : CookieStoreManager) (subscriptions : Array CookieStoreGetOptions) : Async Unit := Internal.api "Lasm.JS.Web.CookieStoreManager.unsubscribe" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[toJS subscriptions]) Unit
 
 /-- `v instanceof ExtendableCookieChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ExtendableCookieChangeEvent`). -/
-def ExtendableCookieChangeEvent.cast? (v : Value) : IO (Option ExtendableCookieChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ExtendableCookieChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ExtendableCookieChangeEvent.cast? (v : Value) : IO (Option ExtendableCookieChangeEvent) := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ExtendableCookieChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ExtendableCookieChangeEventInit eventInitDict)` -/
-def ExtendableCookieChangeEvent.new (type : String) (eventInitDict : Option ExtendableCookieChangeEventInit := none) : IO ExtendableCookieChangeEvent :=
+@[macro_inline] def ExtendableCookieChangeEvent.new (type : String) (eventInitDict : Option ExtendableCookieChangeEventInit := none) : IO ExtendableCookieChangeEvent := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.new" do
   Lasm.JS.Binding.invoke ExtendableCookieChangeEvent { name := "Lasm.JS.Web.ExtendableCookieChangeEvent.new", module := "globalThis", path := "ExtendableCookieChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<CookieListItem> changed` -/
-def ExtendableCookieChangeEvent.changed (self : ExtendableCookieChangeEvent) : IO (Array CookieListItem) := self.val.get "changed" (Array CookieListItem)
+@[macro_inline] def ExtendableCookieChangeEvent.changed (self : ExtendableCookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.changed" do
+  self.val.get "changed" (Array CookieListItem)
 
 /-- `readonly attribute FrozenArray<CookieListItem> deleted` -/
-def ExtendableCookieChangeEvent.deleted (self : ExtendableCookieChangeEvent) : IO (Array CookieListItem) := self.val.get "deleted" (Array CookieListItem)
+@[macro_inline] def ExtendableCookieChangeEvent.deleted (self : ExtendableCookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.deleted" do
+  self.val.get "deleted" (Array CookieListItem)
 
 /-- `readonly attribute CookieStore cookieStore` -/
-def ServiceWorkerGlobalScope.cookieStore (self : ServiceWorkerGlobalScope) : IO CookieStore := do
+@[macro_inline] def ServiceWorkerGlobalScope.cookieStore (self : ServiceWorkerGlobalScope) : IO CookieStore := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.cookieStore" do
   let r ← self.val.get "cookieStore" Value
   pure { val := r }
 
 /-- `attribute EventHandler oncookiechange` -/
-def ServiceWorkerGlobalScope.oncookiechange (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "oncookiechange" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.oncookiechange (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncookiechange" do
+  self.val.get "oncookiechange" (Option EventHandlerNonNull)
 
 /-- Sets `oncookiechange`: `attribute EventHandler oncookiechange` -/
-def ServiceWorkerGlobalScope.setOncookiechange (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOncookiechange (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncookiechange" do
   self.val.set "oncookiechange" (toJS value)
 
 /-- `readonly attribute CookieStoreManager cookies` -/
-def ServiceWorkerRegistration.cookies (self : ServiceWorkerRegistration) : IO CookieStoreManager := do
+@[macro_inline] def ServiceWorkerRegistration.cookies (self : ServiceWorkerRegistration) : IO CookieStoreManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.cookies" do
   let r ← self.val.get "cookies" Value
   pure { val := r }
 
+/-- `readonly attribute CookieStore cookieStore` -/
+@[macro_inline] def Window.cookieStore (self : Window) : IO CookieStore := Internal.api "Lasm.JS.Web.Window.cookieStore" do
+  let r ← self.val.get "cookieStore" Value
+  pure { val := r }
+
 /-- `readonly attribute CookieStore cookieStore` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)) -/
-def cookieStore : IO CookieStore := do
-  let r ← Support.getGlobal ["cookieStore"] Value
+@[macro_inline] def cookieStore : IO CookieStore := Internal.api "Lasm.JS.Web.cookieStore" do
+  let r ← Internal.getGlobal ["cookieStore"] Value
   pure { val := r }
 
 end Lasm.JS.Web

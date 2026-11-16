@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute unsigned long attributionSourceId` -/
-def HTMLAnchorElement.attributionSourceId (self : HTMLAnchorElement) : IO Nat := self.val.get "attributionSourceId" Nat
+@[macro_inline] def HTMLAnchorElement.attributionSourceId (self : HTMLAnchorElement) : IO Nat := Internal.api "Lasm.JS.Web.HTMLAnchorElement.attributionSourceId" do
+  self.val.get "attributionSourceId" Nat
 
 /-- Sets `attributionSourceId`: `attribute unsigned long attributionSourceId` -/
-def HTMLAnchorElement.setAttributionSourceId (self : HTMLAnchorElement) (value : Nat) : IO Unit :=
+@[macro_inline] def HTMLAnchorElement.setAttributionSourceId (self : HTMLAnchorElement) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.HTMLAnchorElement.setAttributionSourceId" do
   self.val.set "attributionSourceId" (toJS value)
 
 end Lasm.JS.Web

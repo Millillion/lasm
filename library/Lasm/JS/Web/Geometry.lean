@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(DOMString or sequence<unrestricted double>)`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfUnrestrictedDouble where
@@ -71,29 +74,29 @@ structure DOMMatrixInit where
   m44 : Option Float := none
   /-- `boolean is2D` -/
   is2D : Option Bool := none
-instance : ToJS DOMMatrixInit := ⟨fun d => Support.fields #[("a", Support.optional d.a),
-    ("b", Support.optional d.b),
-    ("c", Support.optional d.c),
-    ("d", Support.optional d.d),
-    ("e", Support.optional d.e),
-    ("f", Support.optional d.f),
-    ("m11", Support.optional d.m11),
-    ("m12", Support.optional d.m12),
-    ("m21", Support.optional d.m21),
-    ("m22", Support.optional d.m22),
-    ("m41", Support.optional d.m41),
-    ("m42", Support.optional d.m42),
-    ("m13", Support.optional d.m13),
-    ("m14", Support.optional d.m14),
-    ("m23", Support.optional d.m23),
-    ("m24", Support.optional d.m24),
-    ("m31", Support.optional d.m31),
-    ("m32", Support.optional d.m32),
-    ("m33", Support.optional d.m33),
-    ("m34", Support.optional d.m34),
-    ("m43", Support.optional d.m43),
-    ("m44", Support.optional d.m44),
-    ("is2D", Support.optional d.is2D)]⟩
+instance : ToJS DOMMatrixInit := ⟨fun d => Internal.fields #[("a", Internal.optional d.a),
+    ("b", Internal.optional d.b),
+    ("c", Internal.optional d.c),
+    ("d", Internal.optional d.d),
+    ("e", Internal.optional d.e),
+    ("f", Internal.optional d.f),
+    ("m11", Internal.optional d.m11),
+    ("m12", Internal.optional d.m12),
+    ("m21", Internal.optional d.m21),
+    ("m22", Internal.optional d.m22),
+    ("m41", Internal.optional d.m41),
+    ("m42", Internal.optional d.m42),
+    ("m13", Internal.optional d.m13),
+    ("m14", Internal.optional d.m14),
+    ("m23", Internal.optional d.m23),
+    ("m24", Internal.optional d.m24),
+    ("m31", Internal.optional d.m31),
+    ("m32", Internal.optional d.m32),
+    ("m33", Internal.optional d.m33),
+    ("m34", Internal.optional d.m34),
+    ("m43", Internal.optional d.m43),
+    ("m44", Internal.optional d.m44),
+    ("is2D", Internal.optional d.is2D)]⟩
 
 /-- `dictionary DOMPointInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DOMPointInit where
@@ -105,10 +108,10 @@ structure DOMPointInit where
   z : Option Float := none
   /-- `unrestricted double w = 1` -/
   w : Option Float := none
-instance : ToJS DOMPointInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("z", Support.optional d.z),
-    ("w", Support.optional d.w)]⟩
+instance : ToJS DOMPointInit := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("z", Internal.optional d.z),
+    ("w", Internal.optional d.w)]⟩
 
 /-- `dictionary DOMRectInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DOMRectInit where
@@ -120,10 +123,10 @@ structure DOMRectInit where
   width : Option Float := none
   /-- `unrestricted double height = 0` -/
   height : Option Float := none
-instance : ToJS DOMRectInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height)]⟩
+instance : ToJS DOMRectInit := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height)]⟩
 instance : FromJS DOMRectInit where
   fromJS d := do return {
     x := ← Lasm.JS.readField (Option Float) d "x",
@@ -142,10 +145,10 @@ structure DOMQuadInit where
   p3 : Option DOMPointInit := none
   /-- `DOMPointInit p4` -/
   p4 : Option DOMPointInit := none
-instance : ToJS DOMQuadInit := ⟨fun d => Support.fields #[("p1", Support.optional d.p1),
-    ("p2", Support.optional d.p2),
-    ("p3", Support.optional d.p3),
-    ("p4", Support.optional d.p4)]⟩
+instance : ToJS DOMQuadInit := ⟨fun d => Internal.fields #[("p1", Internal.optional d.p1),
+    ("p2", Internal.optional d.p2),
+    ("p3", Internal.optional d.p3),
+    ("p4", Internal.optional d.p4)]⟩
 
 /-- `dictionary DOMMatrix2DInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DOMMatrix2DInit where
@@ -173,674 +176,742 @@ structure DOMMatrix2DInit where
   m41 : Option Float := none
   /-- `unrestricted double m42` -/
   m42 : Option Float := none
-instance : ToJS DOMMatrix2DInit := ⟨fun d => Support.fields #[("a", Support.optional d.a),
-    ("b", Support.optional d.b),
-    ("c", Support.optional d.c),
-    ("d", Support.optional d.d),
-    ("e", Support.optional d.e),
-    ("f", Support.optional d.f),
-    ("m11", Support.optional d.m11),
-    ("m12", Support.optional d.m12),
-    ("m21", Support.optional d.m21),
-    ("m22", Support.optional d.m22),
-    ("m41", Support.optional d.m41),
-    ("m42", Support.optional d.m42)]⟩
+instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.optional d.a),
+    ("b", Internal.optional d.b),
+    ("c", Internal.optional d.c),
+    ("d", Internal.optional d.d),
+    ("e", Internal.optional d.e),
+    ("f", Internal.optional d.f),
+    ("m11", Internal.optional d.m11),
+    ("m12", Internal.optional d.m12),
+    ("m21", Internal.optional d.m21),
+    ("m22", Internal.optional d.m22),
+    ("m41", Internal.optional d.m41),
+    ("m42", Internal.optional d.m42)]⟩
 
 /-- `v instanceof DOMMatrixReadOnly`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMMatrixReadOnly`). -/
-def DOMMatrixReadOnly.cast? (v : Value) : IO (Option DOMMatrixReadOnly) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMMatrixReadOnly"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMMatrixReadOnly.cast? (v : Value) : IO (Option DOMMatrixReadOnly) := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMMatrixReadOnly"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional (DOMString or sequence<unrestricted double>) init)` -/
-def DOMMatrixReadOnly.new (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO DOMMatrixReadOnly :=
+@[macro_inline] def DOMMatrixReadOnly.new (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.new" do
   Lasm.JS.Binding.invoke DOMMatrixReadOnly { name := "Lasm.JS.Web.DOMMatrixReadOnly.new", module := "globalThis", path := "DOMMatrixReadOnly", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly attribute unrestricted double a` -/
-def DOMMatrixReadOnly.a (self : DOMMatrixReadOnly) : IO Float := self.val.get "a" Float
+@[macro_inline] def DOMMatrixReadOnly.a (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.a" do
+  self.val.get "a" Float
 
 /-- `readonly attribute unrestricted double b` -/
-def DOMMatrixReadOnly.b (self : DOMMatrixReadOnly) : IO Float := self.val.get "b" Float
+@[macro_inline] def DOMMatrixReadOnly.b (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.b" do
+  self.val.get "b" Float
 
 /-- `readonly attribute unrestricted double c` -/
-def DOMMatrixReadOnly.c (self : DOMMatrixReadOnly) : IO Float := self.val.get "c" Float
+@[macro_inline] def DOMMatrixReadOnly.c (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.c" do
+  self.val.get "c" Float
 
 /-- `readonly attribute unrestricted double d` -/
-def DOMMatrixReadOnly.d (self : DOMMatrixReadOnly) : IO Float := self.val.get "d" Float
+@[macro_inline] def DOMMatrixReadOnly.d (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.d" do
+  self.val.get "d" Float
 
 /-- `readonly attribute unrestricted double e` -/
-def DOMMatrixReadOnly.e (self : DOMMatrixReadOnly) : IO Float := self.val.get "e" Float
+@[macro_inline] def DOMMatrixReadOnly.e (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.e" do
+  self.val.get "e" Float
 
 /-- `readonly attribute unrestricted double f` -/
-def DOMMatrixReadOnly.f (self : DOMMatrixReadOnly) : IO Float := self.val.get "f" Float
+@[macro_inline] def DOMMatrixReadOnly.f (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.f" do
+  self.val.get "f" Float
 
 /-- `readonly attribute unrestricted double m11` -/
-def DOMMatrixReadOnly.m11 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m11" Float
+@[macro_inline] def DOMMatrixReadOnly.m11 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m11" do
+  self.val.get "m11" Float
 
 /-- `readonly attribute unrestricted double m12` -/
-def DOMMatrixReadOnly.m12 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m12" Float
+@[macro_inline] def DOMMatrixReadOnly.m12 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m12" do
+  self.val.get "m12" Float
 
 /-- `readonly attribute unrestricted double m13` -/
-def DOMMatrixReadOnly.m13 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m13" Float
+@[macro_inline] def DOMMatrixReadOnly.m13 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m13" do
+  self.val.get "m13" Float
 
 /-- `readonly attribute unrestricted double m14` -/
-def DOMMatrixReadOnly.m14 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m14" Float
+@[macro_inline] def DOMMatrixReadOnly.m14 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m14" do
+  self.val.get "m14" Float
 
 /-- `readonly attribute unrestricted double m21` -/
-def DOMMatrixReadOnly.m21 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m21" Float
+@[macro_inline] def DOMMatrixReadOnly.m21 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m21" do
+  self.val.get "m21" Float
 
 /-- `readonly attribute unrestricted double m22` -/
-def DOMMatrixReadOnly.m22 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m22" Float
+@[macro_inline] def DOMMatrixReadOnly.m22 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m22" do
+  self.val.get "m22" Float
 
 /-- `readonly attribute unrestricted double m23` -/
-def DOMMatrixReadOnly.m23 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m23" Float
+@[macro_inline] def DOMMatrixReadOnly.m23 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m23" do
+  self.val.get "m23" Float
 
 /-- `readonly attribute unrestricted double m24` -/
-def DOMMatrixReadOnly.m24 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m24" Float
+@[macro_inline] def DOMMatrixReadOnly.m24 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m24" do
+  self.val.get "m24" Float
 
 /-- `readonly attribute unrestricted double m31` -/
-def DOMMatrixReadOnly.m31 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m31" Float
+@[macro_inline] def DOMMatrixReadOnly.m31 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m31" do
+  self.val.get "m31" Float
 
 /-- `readonly attribute unrestricted double m32` -/
-def DOMMatrixReadOnly.m32 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m32" Float
+@[macro_inline] def DOMMatrixReadOnly.m32 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m32" do
+  self.val.get "m32" Float
 
 /-- `readonly attribute unrestricted double m33` -/
-def DOMMatrixReadOnly.m33 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m33" Float
+@[macro_inline] def DOMMatrixReadOnly.m33 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m33" do
+  self.val.get "m33" Float
 
 /-- `readonly attribute unrestricted double m34` -/
-def DOMMatrixReadOnly.m34 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m34" Float
+@[macro_inline] def DOMMatrixReadOnly.m34 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m34" do
+  self.val.get "m34" Float
 
 /-- `readonly attribute unrestricted double m41` -/
-def DOMMatrixReadOnly.m41 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m41" Float
+@[macro_inline] def DOMMatrixReadOnly.m41 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m41" do
+  self.val.get "m41" Float
 
 /-- `readonly attribute unrestricted double m42` -/
-def DOMMatrixReadOnly.m42 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m42" Float
+@[macro_inline] def DOMMatrixReadOnly.m42 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m42" do
+  self.val.get "m42" Float
 
 /-- `readonly attribute unrestricted double m43` -/
-def DOMMatrixReadOnly.m43 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m43" Float
+@[macro_inline] def DOMMatrixReadOnly.m43 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m43" do
+  self.val.get "m43" Float
 
 /-- `readonly attribute unrestricted double m44` -/
-def DOMMatrixReadOnly.m44 (self : DOMMatrixReadOnly) : IO Float := self.val.get "m44" Float
+@[macro_inline] def DOMMatrixReadOnly.m44 (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.m44" do
+  self.val.get "m44" Float
 
 /-- `readonly attribute boolean is2D` -/
-def DOMMatrixReadOnly.is2D (self : DOMMatrixReadOnly) : IO Bool := self.val.get "is2D" Bool
+@[macro_inline] def DOMMatrixReadOnly.is2D (self : DOMMatrixReadOnly) : IO Bool := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.is2D" do
+  self.val.get "is2D" Bool
 
 /-- `readonly attribute boolean isIdentity` -/
-def DOMMatrixReadOnly.isIdentity (self : DOMMatrixReadOnly) : IO Bool := self.val.get "isIdentity" Bool
+@[macro_inline] def DOMMatrixReadOnly.isIdentity (self : DOMMatrixReadOnly) : IO Bool := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.isIdentity" do
+  self.val.get "isIdentity" Bool
 
 /-- The stringifier. -/
-def DOMMatrixReadOnly.toString (self : DOMMatrixReadOnly) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def DOMMatrixReadOnly.toString (self : DOMMatrixReadOnly) : IO String := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `static DOMMatrixReadOnly fromMatrix(optional DOMMatrixInit other)` -/
-def DOMMatrixReadOnly.fromMatrix (other : Option DOMMatrixInit := none) : IO DOMMatrixReadOnly := do
+@[macro_inline] def DOMMatrixReadOnly.fromMatrix (other : Option DOMMatrixInit := none) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromMatrix" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromMatrix", module := "globalThis", path := "DOMMatrixReadOnly.fromMatrix", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `static DOMMatrixReadOnly fromFloat32Array(Float32Array array32)` -/
-def DOMMatrixReadOnly.fromFloat32Array (array32 : ByteArray) : IO DOMMatrixReadOnly := do
-  let array32View ← Support.typedArray "Float32Array" array32
+@[macro_inline] def DOMMatrixReadOnly.fromFloat32Array (array32 : ByteArray) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat32Array" do
+  let array32View ← Internal.typedArray "Float32Array" array32
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat32Array", module := "globalThis", path := "DOMMatrixReadOnly.fromFloat32Array", construct := false, arity := 1 }
-    (Support.args #[.ref array32View ""]) (await := false)
+    (Internal.args #[.ref array32View ""]) (await := false)
   pure { val := r }
 
 /-- `static DOMMatrixReadOnly fromFloat64Array(Float64Array array64)` -/
-def DOMMatrixReadOnly.fromFloat64Array (array64 : ByteArray) : IO DOMMatrixReadOnly := do
-  let array64View ← Support.typedArray "Float64Array" array64
+@[macro_inline] def DOMMatrixReadOnly.fromFloat64Array (array64 : ByteArray) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array" do
+  let array64View ← Internal.typedArray "Float64Array" array64
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array", module := "globalThis", path := "DOMMatrixReadOnly.fromFloat64Array", construct := false, arity := 1 }
-    (Support.args #[.ref array64View ""]) (await := false)
+    (Internal.args #[.ref array64View ""]) (await := false)
   pure { val := r }
 
 /-- `DOMMatrix translate(optional unrestricted double tx, optional unrestricted double ty, optional unrestricted double tz)` -/
-def DOMMatrixReadOnly.translate (self : DOMMatrixReadOnly) (tx : Option Float := none) (ty : Option Float := none) (tz : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "translate" (Support.args #[Support.optional tx, Support.optional ty, Support.optional tz]) Value
+@[macro_inline] def DOMMatrixReadOnly.translate (self : DOMMatrixReadOnly) (tx : Option Float := none) (ty : Option Float := none) (tz : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.translate" do
+  let r ← self.val.callMethod "translate" (Internal.args #[Internal.optional tx, Internal.optional ty, Internal.optional tz]) Value
   pure { val := r }
 
 /-- `DOMMatrix scale(optional unrestricted double scaleX, optional unrestricted double scaleY, optional unrestricted double scaleZ, optional unrestricted double originX, optional unrestricted double originY, optional unrestricted double originZ)` -/
-def DOMMatrixReadOnly.scale (self : DOMMatrixReadOnly) (scaleX : Option Float := none) (scaleY : Option Float := none) (scaleZ : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "scale" (Support.args #[Support.optional scaleX, Support.optional scaleY, Support.optional scaleZ, Support.optional originX, Support.optional originY, Support.optional originZ]) Value
+@[macro_inline] def DOMMatrixReadOnly.scale (self : DOMMatrixReadOnly) (scaleX : Option Float := none) (scaleY : Option Float := none) (scaleZ : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.scale" do
+  let r ← self.val.callMethod "scale" (Internal.args #[Internal.optional scaleX, Internal.optional scaleY, Internal.optional scaleZ, Internal.optional originX, Internal.optional originY, Internal.optional originZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix scaleNonUniform(optional unrestricted double scaleX, optional unrestricted double scaleY)` -/
-def DOMMatrixReadOnly.scaleNonUniform (self : DOMMatrixReadOnly) (scaleX : Option Float := none) (scaleY : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "scaleNonUniform" (Support.args #[Support.optional scaleX, Support.optional scaleY]) Value
+@[macro_inline] def DOMMatrixReadOnly.scaleNonUniform (self : DOMMatrixReadOnly) (scaleX : Option Float := none) (scaleY : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.scaleNonUniform" do
+  let r ← self.val.callMethod "scaleNonUniform" (Internal.args #[Internal.optional scaleX, Internal.optional scaleY]) Value
   pure { val := r }
 
 /-- `DOMMatrix scale3d(optional unrestricted double scale, optional unrestricted double originX, optional unrestricted double originY, optional unrestricted double originZ)` -/
-def DOMMatrixReadOnly.scale3d (self : DOMMatrixReadOnly) (scale : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "scale3d" (Support.args #[Support.optional scale, Support.optional originX, Support.optional originY, Support.optional originZ]) Value
+@[macro_inline] def DOMMatrixReadOnly.scale3d (self : DOMMatrixReadOnly) (scale : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.scale3d" do
+  let r ← self.val.callMethod "scale3d" (Internal.args #[Internal.optional scale, Internal.optional originX, Internal.optional originY, Internal.optional originZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotate(optional unrestricted double rotX, optional unrestricted double rotY, optional unrestricted double rotZ)` -/
-def DOMMatrixReadOnly.rotate (self : DOMMatrixReadOnly) (rotX : Option Float := none) (rotY : Option Float := none) (rotZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotate" (Support.args #[Support.optional rotX, Support.optional rotY, Support.optional rotZ]) Value
+@[macro_inline] def DOMMatrixReadOnly.rotate (self : DOMMatrixReadOnly) (rotX : Option Float := none) (rotY : Option Float := none) (rotZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.rotate" do
+  let r ← self.val.callMethod "rotate" (Internal.args #[Internal.optional rotX, Internal.optional rotY, Internal.optional rotZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotateFromVector(optional unrestricted double x, optional unrestricted double y)` -/
-def DOMMatrixReadOnly.rotateFromVector (self : DOMMatrixReadOnly) (x : Option Float := none) (y : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotateFromVector" (Support.args #[Support.optional x, Support.optional y]) Value
+@[macro_inline] def DOMMatrixReadOnly.rotateFromVector (self : DOMMatrixReadOnly) (x : Option Float := none) (y : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.rotateFromVector" do
+  let r ← self.val.callMethod "rotateFromVector" (Internal.args #[Internal.optional x, Internal.optional y]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotateAxisAngle(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double angle)` -/
-def DOMMatrixReadOnly.rotateAxisAngle (self : DOMMatrixReadOnly) (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (angle : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotateAxisAngle" (Support.args #[Support.optional x, Support.optional y, Support.optional z, Support.optional angle]) Value
+@[macro_inline] def DOMMatrixReadOnly.rotateAxisAngle (self : DOMMatrixReadOnly) (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (angle : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.rotateAxisAngle" do
+  let r ← self.val.callMethod "rotateAxisAngle" (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional angle]) Value
   pure { val := r }
 
 /-- `DOMMatrix skewX(optional unrestricted double sx)` -/
-def DOMMatrixReadOnly.skewX (self : DOMMatrixReadOnly) (sx : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "skewX" (Support.args #[Support.optional sx]) Value
+@[macro_inline] def DOMMatrixReadOnly.skewX (self : DOMMatrixReadOnly) (sx : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.skewX" do
+  let r ← self.val.callMethod "skewX" (Internal.args #[Internal.optional sx]) Value
   pure { val := r }
 
 /-- `DOMMatrix skewY(optional unrestricted double sy)` -/
-def DOMMatrixReadOnly.skewY (self : DOMMatrixReadOnly) (sy : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "skewY" (Support.args #[Support.optional sy]) Value
+@[macro_inline] def DOMMatrixReadOnly.skewY (self : DOMMatrixReadOnly) (sy : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.skewY" do
+  let r ← self.val.callMethod "skewY" (Internal.args #[Internal.optional sy]) Value
   pure { val := r }
 
 /-- `DOMMatrix multiply(optional DOMMatrixInit other)` -/
-def DOMMatrixReadOnly.multiply (self : DOMMatrixReadOnly) (other : Option DOMMatrixInit := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "multiply" (Support.args #[Support.optional other]) Value
+@[macro_inline] def DOMMatrixReadOnly.multiply (self : DOMMatrixReadOnly) (other : Option DOMMatrixInit := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.multiply" do
+  let r ← self.val.callMethod "multiply" (Internal.args #[Internal.optional other]) Value
   pure { val := r }
 
 /-- `DOMMatrix flipX()` -/
-def DOMMatrixReadOnly.flipX (self : DOMMatrixReadOnly) : IO DOMMatrix := do
-  let r ← self.val.callMethod "flipX" (Support.args #[]) Value
+@[macro_inline] def DOMMatrixReadOnly.flipX (self : DOMMatrixReadOnly) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.flipX" do
+  let r ← self.val.callMethod "flipX" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMMatrix flipY()` -/
-def DOMMatrixReadOnly.flipY (self : DOMMatrixReadOnly) : IO DOMMatrix := do
-  let r ← self.val.callMethod "flipY" (Support.args #[]) Value
+@[macro_inline] def DOMMatrixReadOnly.flipY (self : DOMMatrixReadOnly) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.flipY" do
+  let r ← self.val.callMethod "flipY" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMMatrix inverse()` -/
-def DOMMatrixReadOnly.inverse (self : DOMMatrixReadOnly) : IO DOMMatrix := do
-  let r ← self.val.callMethod "inverse" (Support.args #[]) Value
+@[macro_inline] def DOMMatrixReadOnly.inverse (self : DOMMatrixReadOnly) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.inverse" do
+  let r ← self.val.callMethod "inverse" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMPoint transformPoint(optional DOMPointInit point)` -/
-def DOMMatrixReadOnly.transformPoint (self : DOMMatrixReadOnly) (point : Option DOMPointInit := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "transformPoint" (Support.args #[Support.optional point]) Value
+@[macro_inline] def DOMMatrixReadOnly.transformPoint (self : DOMMatrixReadOnly) (point : Option DOMPointInit := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.transformPoint" do
+  let r ← self.val.callMethod "transformPoint" (Internal.args #[Internal.optional point]) Value
   pure { val := r }
 
 /-- `Float32Array toFloat32Array()` -/
-def DOMMatrixReadOnly.toFloat32Array (self : DOMMatrixReadOnly) : IO ByteArray := do
-  let r ← self.val.callMethod "toFloat32Array" (Support.args #[]) Data
-  Support.viewBytes r
+@[macro_inline] def DOMMatrixReadOnly.toFloat32Array (self : DOMMatrixReadOnly) : IO ByteArray := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.toFloat32Array" do
+  let r ← self.val.callMethod "toFloat32Array" (Internal.args #[]) Data
+  Internal.viewBytes r
 
 /-- `Float64Array toFloat64Array()` -/
-def DOMMatrixReadOnly.toFloat64Array (self : DOMMatrixReadOnly) : IO ByteArray := do
-  let r ← self.val.callMethod "toFloat64Array" (Support.args #[]) Data
-  Support.viewBytes r
+@[macro_inline] def DOMMatrixReadOnly.toFloat64Array (self : DOMMatrixReadOnly) : IO ByteArray := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.toFloat64Array" do
+  let r ← self.val.callMethod "toFloat64Array" (Internal.args #[]) Data
+  Internal.viewBytes r
 
 /-- `object toJSON()` -/
-def DOMMatrixReadOnly.toJSON (self : DOMMatrixReadOnly) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def DOMMatrixReadOnly.toJSON (self : DOMMatrixReadOnly) : IO Data := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof DOMPointReadOnly`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMPointReadOnly`). -/
-def DOMPointReadOnly.cast? (v : Value) : IO (Option DOMPointReadOnly) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMPointReadOnly"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMPointReadOnly.cast? (v : Value) : IO (Option DOMPointReadOnly) := Internal.api "Lasm.JS.Web.DOMPointReadOnly.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMPointReadOnly"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double w)` -/
-def DOMPointReadOnly.new (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO DOMPointReadOnly :=
+@[macro_inline] def DOMPointReadOnly.new (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.DOMPointReadOnly.new" do
   Lasm.JS.Binding.invoke DOMPointReadOnly { name := "Lasm.JS.Web.DOMPointReadOnly.new", module := "globalThis", path := "DOMPointReadOnly", construct := true, arity := 4 }
-    (Support.args #[Support.optional x, Support.optional y, Support.optional z, Support.optional w]) (await := false)
+    (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
 
 /-- `readonly attribute unrestricted double x` -/
-def DOMPointReadOnly.x (self : DOMPointReadOnly) : IO Float := self.val.get "x" Float
+@[macro_inline] def DOMPointReadOnly.x (self : DOMPointReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMPointReadOnly.x" do
+  self.val.get "x" Float
 
 /-- `readonly attribute unrestricted double y` -/
-def DOMPointReadOnly.y (self : DOMPointReadOnly) : IO Float := self.val.get "y" Float
+@[macro_inline] def DOMPointReadOnly.y (self : DOMPointReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMPointReadOnly.y" do
+  self.val.get "y" Float
 
 /-- `readonly attribute unrestricted double z` -/
-def DOMPointReadOnly.z (self : DOMPointReadOnly) : IO Float := self.val.get "z" Float
+@[macro_inline] def DOMPointReadOnly.z (self : DOMPointReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMPointReadOnly.z" do
+  self.val.get "z" Float
 
 /-- `readonly attribute unrestricted double w` -/
-def DOMPointReadOnly.w (self : DOMPointReadOnly) : IO Float := self.val.get "w" Float
+@[macro_inline] def DOMPointReadOnly.w (self : DOMPointReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMPointReadOnly.w" do
+  self.val.get "w" Float
 
 /-- `static DOMPointReadOnly fromPoint(optional DOMPointInit other)` -/
-def DOMPointReadOnly.fromPoint (other : Option DOMPointInit := none) : IO DOMPointReadOnly := do
+@[macro_inline] def DOMPointReadOnly.fromPoint (other : Option DOMPointInit := none) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.DOMPointReadOnly.fromPoint" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMPointReadOnly.fromPoint", module := "globalThis", path := "DOMPointReadOnly.fromPoint", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `DOMPoint matrixTransform(optional DOMMatrixInit matrix)` -/
-def DOMPointReadOnly.matrixTransform (self : DOMPointReadOnly) (matrix : Option DOMMatrixInit := none) : IO DOMPoint := do
-  let r ← self.val.callMethod "matrixTransform" (Support.args #[Support.optional matrix]) Value
+@[macro_inline] def DOMPointReadOnly.matrixTransform (self : DOMPointReadOnly) (matrix : Option DOMMatrixInit := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMPointReadOnly.matrixTransform" do
+  let r ← self.val.callMethod "matrixTransform" (Internal.args #[Internal.optional matrix]) Value
   pure { val := r }
 
 /-- `object toJSON()` -/
-def DOMPointReadOnly.toJSON (self : DOMPointReadOnly) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def DOMPointReadOnly.toJSON (self : DOMPointReadOnly) : IO Data := Internal.api "Lasm.JS.Web.DOMPointReadOnly.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof DOMQuad`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMQuad`). -/
-def DOMQuad.cast? (v : Value) : IO (Option DOMQuad) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMQuad"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMQuad.cast? (v : Value) : IO (Option DOMQuad) := Internal.api "Lasm.JS.Web.DOMQuad.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMQuad"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMPointInit p1, optional DOMPointInit p2, optional DOMPointInit p3, optional DOMPointInit p4)` -/
-def DOMQuad.new (p1 : Option DOMPointInit := none) (p2 : Option DOMPointInit := none) (p3 : Option DOMPointInit := none) (p4 : Option DOMPointInit := none) : IO DOMQuad :=
+@[macro_inline] def DOMQuad.new (p1 : Option DOMPointInit := none) (p2 : Option DOMPointInit := none) (p3 : Option DOMPointInit := none) (p4 : Option DOMPointInit := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.DOMQuad.new" do
   Lasm.JS.Binding.invoke DOMQuad { name := "Lasm.JS.Web.DOMQuad.new", module := "globalThis", path := "DOMQuad", construct := true, arity := 4 }
-    (Support.args #[Support.optional p1, Support.optional p2, Support.optional p3, Support.optional p4]) (await := false)
+    (Internal.args #[Internal.optional p1, Internal.optional p2, Internal.optional p3, Internal.optional p4]) (await := false)
 
 /-- `readonly attribute DOMPoint p1` -/
-def DOMQuad.p1 (self : DOMQuad) : IO DOMPoint := do
+@[macro_inline] def DOMQuad.p1 (self : DOMQuad) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMQuad.p1" do
   let r ← self.val.get "p1" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPoint p2` -/
-def DOMQuad.p2 (self : DOMQuad) : IO DOMPoint := do
+@[macro_inline] def DOMQuad.p2 (self : DOMQuad) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMQuad.p2" do
   let r ← self.val.get "p2" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPoint p3` -/
-def DOMQuad.p3 (self : DOMQuad) : IO DOMPoint := do
+@[macro_inline] def DOMQuad.p3 (self : DOMQuad) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMQuad.p3" do
   let r ← self.val.get "p3" Value
   pure { val := r }
 
 /-- `readonly attribute DOMPoint p4` -/
-def DOMQuad.p4 (self : DOMQuad) : IO DOMPoint := do
+@[macro_inline] def DOMQuad.p4 (self : DOMQuad) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMQuad.p4" do
   let r ← self.val.get "p4" Value
   pure { val := r }
 
 /-- `static DOMQuad fromRect(optional DOMRectInit other)` -/
-def DOMQuad.fromRect (other : Option DOMRectInit := none) : IO DOMQuad := do
+@[macro_inline] def DOMQuad.fromRect (other : Option DOMRectInit := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.DOMQuad.fromRect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMQuad.fromRect", module := "globalThis", path := "DOMQuad.fromRect", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `static DOMQuad fromQuad(optional DOMQuadInit other)` -/
-def DOMQuad.fromQuad (other : Option DOMQuadInit := none) : IO DOMQuad := do
+@[macro_inline] def DOMQuad.fromQuad (other : Option DOMQuadInit := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.DOMQuad.fromQuad" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMQuad.fromQuad", module := "globalThis", path := "DOMQuad.fromQuad", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `DOMRect getBounds()` -/
-def DOMQuad.getBounds (self : DOMQuad) : IO DOMRect := do
-  let r ← self.val.callMethod "getBounds" (Support.args #[]) Value
+@[macro_inline] def DOMQuad.getBounds (self : DOMQuad) : IO DOMRect := Internal.api "Lasm.JS.Web.DOMQuad.getBounds" do
+  let r ← self.val.callMethod "getBounds" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `object toJSON()` -/
-def DOMQuad.toJSON (self : DOMQuad) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def DOMQuad.toJSON (self : DOMQuad) : IO Data := Internal.api "Lasm.JS.Web.DOMQuad.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof DOMRectList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRectList`). -/
-def DOMRectList.cast? (v : Value) : IO (Option DOMRectList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectList"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMRectList.cast? (v : Value) : IO (Option DOMRectList) := Internal.api "Lasm.JS.Web.DOMRectList.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMRectList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def DOMRectList.length (self : DOMRectList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def DOMRectList.length (self : DOMRectList) : IO Nat := Internal.api "Lasm.JS.Web.DOMRectList.length" do
+  self.val.get "length" Nat
 
 /-- `getter DOMRect? item(unsigned long index)` -/
-def DOMRectList.item (self : DOMRectList) (index : Nat) : IO (Option DOMRect) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option DOMRect)
+@[macro_inline] def DOMRectList.item (self : DOMRectList) (index : Nat) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.DOMRectList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option DOMRect)
 
 /-- `v instanceof DOMRectReadOnly`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRectReadOnly`). -/
-def DOMRectReadOnly.cast? (v : Value) : IO (Option DOMRectReadOnly) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectReadOnly"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMRectReadOnly.cast? (v : Value) : IO (Option DOMRectReadOnly) := Internal.api "Lasm.JS.Web.DOMRectReadOnly.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMRectReadOnly"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` -/
-def DOMRectReadOnly.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRectReadOnly :=
+@[macro_inline] def DOMRectReadOnly.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.DOMRectReadOnly.new" do
   Lasm.JS.Binding.invoke DOMRectReadOnly { name := "Lasm.JS.Web.DOMRectReadOnly.new", module := "globalThis", path := "DOMRectReadOnly", construct := true, arity := 4 }
-    (Support.args #[Support.optional x, Support.optional y, Support.optional width, Support.optional height]) (await := false)
+    (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
 
 /-- `readonly attribute unrestricted double x` -/
-def DOMRectReadOnly.x (self : DOMRectReadOnly) : IO Float := self.val.get "x" Float
+@[macro_inline] def DOMRectReadOnly.x (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.x" do
+  self.val.get "x" Float
 
 /-- `readonly attribute unrestricted double y` -/
-def DOMRectReadOnly.y (self : DOMRectReadOnly) : IO Float := self.val.get "y" Float
+@[macro_inline] def DOMRectReadOnly.y (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.y" do
+  self.val.get "y" Float
 
 /-- `readonly attribute unrestricted double width` -/
-def DOMRectReadOnly.width (self : DOMRectReadOnly) : IO Float := self.val.get "width" Float
+@[macro_inline] def DOMRectReadOnly.width (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.width" do
+  self.val.get "width" Float
 
 /-- `readonly attribute unrestricted double height` -/
-def DOMRectReadOnly.height (self : DOMRectReadOnly) : IO Float := self.val.get "height" Float
+@[macro_inline] def DOMRectReadOnly.height (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.height" do
+  self.val.get "height" Float
 
 /-- `readonly attribute unrestricted double top` -/
-def DOMRectReadOnly.top (self : DOMRectReadOnly) : IO Float := self.val.get "top" Float
+@[macro_inline] def DOMRectReadOnly.top (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.top" do
+  self.val.get "top" Float
 
 /-- `readonly attribute unrestricted double right` -/
-def DOMRectReadOnly.right (self : DOMRectReadOnly) : IO Float := self.val.get "right" Float
+@[macro_inline] def DOMRectReadOnly.right (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.right" do
+  self.val.get "right" Float
 
 /-- `readonly attribute unrestricted double bottom` -/
-def DOMRectReadOnly.bottom (self : DOMRectReadOnly) : IO Float := self.val.get "bottom" Float
+@[macro_inline] def DOMRectReadOnly.bottom (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.bottom" do
+  self.val.get "bottom" Float
 
 /-- `readonly attribute unrestricted double left` -/
-def DOMRectReadOnly.left (self : DOMRectReadOnly) : IO Float := self.val.get "left" Float
+@[macro_inline] def DOMRectReadOnly.left (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.left" do
+  self.val.get "left" Float
 
 /-- `static DOMRectReadOnly fromRect(optional DOMRectInit other)` -/
-def DOMRectReadOnly.fromRect (other : Option DOMRectInit := none) : IO DOMRectReadOnly := do
+@[macro_inline] def DOMRectReadOnly.fromRect (other : Option DOMRectInit := none) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.DOMRectReadOnly.fromRect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMRectReadOnly.fromRect", module := "globalThis", path := "DOMRectReadOnly.fromRect", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `object toJSON()` -/
-def DOMRectReadOnly.toJSON (self : DOMRectReadOnly) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def DOMRectReadOnly.toJSON (self : DOMRectReadOnly) : IO Data := Internal.api "Lasm.JS.Web.DOMRectReadOnly.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof DOMMatrix`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMMatrix`). -/
-def DOMMatrix.cast? (v : Value) : IO (Option DOMMatrix) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMMatrix"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMMatrix.cast? (v : Value) : IO (Option DOMMatrix) := Internal.api "Lasm.JS.Web.DOMMatrix.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMMatrix"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional (DOMString or sequence<unrestricted double>) init)` -/
-def DOMMatrix.new (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO DOMMatrix :=
+@[macro_inline] def DOMMatrix.new (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.new" do
   Lasm.JS.Binding.invoke DOMMatrix { name := "Lasm.JS.Web.DOMMatrix.new", module := "globalThis", path := "DOMMatrix", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `inherit attribute unrestricted double a` -/
-def DOMMatrix.a (self : DOMMatrix) : IO Float := self.val.get "a" Float
+@[macro_inline] def DOMMatrix.a (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.a" do
+  self.val.get "a" Float
 
 /-- Sets `a`: `inherit attribute unrestricted double a` -/
-def DOMMatrix.setA (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setA (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setA" do
   self.val.set "a" (toJS value)
 
 /-- `inherit attribute unrestricted double b` -/
-def DOMMatrix.b (self : DOMMatrix) : IO Float := self.val.get "b" Float
+@[macro_inline] def DOMMatrix.b (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.b" do
+  self.val.get "b" Float
 
 /-- Sets `b`: `inherit attribute unrestricted double b` -/
-def DOMMatrix.setB (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setB (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setB" do
   self.val.set "b" (toJS value)
 
 /-- `inherit attribute unrestricted double c` -/
-def DOMMatrix.c (self : DOMMatrix) : IO Float := self.val.get "c" Float
+@[macro_inline] def DOMMatrix.c (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.c" do
+  self.val.get "c" Float
 
 /-- Sets `c`: `inherit attribute unrestricted double c` -/
-def DOMMatrix.setC (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setC (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setC" do
   self.val.set "c" (toJS value)
 
 /-- `inherit attribute unrestricted double d` -/
-def DOMMatrix.d (self : DOMMatrix) : IO Float := self.val.get "d" Float
+@[macro_inline] def DOMMatrix.d (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.d" do
+  self.val.get "d" Float
 
 /-- Sets `d`: `inherit attribute unrestricted double d` -/
-def DOMMatrix.setD (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setD (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setD" do
   self.val.set "d" (toJS value)
 
 /-- `inherit attribute unrestricted double e` -/
-def DOMMatrix.e (self : DOMMatrix) : IO Float := self.val.get "e" Float
+@[macro_inline] def DOMMatrix.e (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.e" do
+  self.val.get "e" Float
 
 /-- Sets `e`: `inherit attribute unrestricted double e` -/
-def DOMMatrix.setE (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setE (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setE" do
   self.val.set "e" (toJS value)
 
 /-- `inherit attribute unrestricted double f` -/
-def DOMMatrix.f (self : DOMMatrix) : IO Float := self.val.get "f" Float
+@[macro_inline] def DOMMatrix.f (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.f" do
+  self.val.get "f" Float
 
 /-- Sets `f`: `inherit attribute unrestricted double f` -/
-def DOMMatrix.setF (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setF (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setF" do
   self.val.set "f" (toJS value)
 
 /-- `inherit attribute unrestricted double m11` -/
-def DOMMatrix.m11 (self : DOMMatrix) : IO Float := self.val.get "m11" Float
+@[macro_inline] def DOMMatrix.m11 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m11" do
+  self.val.get "m11" Float
 
 /-- Sets `m11`: `inherit attribute unrestricted double m11` -/
-def DOMMatrix.setM11 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM11 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM11" do
   self.val.set "m11" (toJS value)
 
 /-- `inherit attribute unrestricted double m12` -/
-def DOMMatrix.m12 (self : DOMMatrix) : IO Float := self.val.get "m12" Float
+@[macro_inline] def DOMMatrix.m12 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m12" do
+  self.val.get "m12" Float
 
 /-- Sets `m12`: `inherit attribute unrestricted double m12` -/
-def DOMMatrix.setM12 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM12 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM12" do
   self.val.set "m12" (toJS value)
 
 /-- `inherit attribute unrestricted double m13` -/
-def DOMMatrix.m13 (self : DOMMatrix) : IO Float := self.val.get "m13" Float
+@[macro_inline] def DOMMatrix.m13 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m13" do
+  self.val.get "m13" Float
 
 /-- Sets `m13`: `inherit attribute unrestricted double m13` -/
-def DOMMatrix.setM13 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM13 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM13" do
   self.val.set "m13" (toJS value)
 
 /-- `inherit attribute unrestricted double m14` -/
-def DOMMatrix.m14 (self : DOMMatrix) : IO Float := self.val.get "m14" Float
+@[macro_inline] def DOMMatrix.m14 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m14" do
+  self.val.get "m14" Float
 
 /-- Sets `m14`: `inherit attribute unrestricted double m14` -/
-def DOMMatrix.setM14 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM14 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM14" do
   self.val.set "m14" (toJS value)
 
 /-- `inherit attribute unrestricted double m21` -/
-def DOMMatrix.m21 (self : DOMMatrix) : IO Float := self.val.get "m21" Float
+@[macro_inline] def DOMMatrix.m21 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m21" do
+  self.val.get "m21" Float
 
 /-- Sets `m21`: `inherit attribute unrestricted double m21` -/
-def DOMMatrix.setM21 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM21 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM21" do
   self.val.set "m21" (toJS value)
 
 /-- `inherit attribute unrestricted double m22` -/
-def DOMMatrix.m22 (self : DOMMatrix) : IO Float := self.val.get "m22" Float
+@[macro_inline] def DOMMatrix.m22 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m22" do
+  self.val.get "m22" Float
 
 /-- Sets `m22`: `inherit attribute unrestricted double m22` -/
-def DOMMatrix.setM22 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM22 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM22" do
   self.val.set "m22" (toJS value)
 
 /-- `inherit attribute unrestricted double m23` -/
-def DOMMatrix.m23 (self : DOMMatrix) : IO Float := self.val.get "m23" Float
+@[macro_inline] def DOMMatrix.m23 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m23" do
+  self.val.get "m23" Float
 
 /-- Sets `m23`: `inherit attribute unrestricted double m23` -/
-def DOMMatrix.setM23 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM23 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM23" do
   self.val.set "m23" (toJS value)
 
 /-- `inherit attribute unrestricted double m24` -/
-def DOMMatrix.m24 (self : DOMMatrix) : IO Float := self.val.get "m24" Float
+@[macro_inline] def DOMMatrix.m24 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m24" do
+  self.val.get "m24" Float
 
 /-- Sets `m24`: `inherit attribute unrestricted double m24` -/
-def DOMMatrix.setM24 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM24 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM24" do
   self.val.set "m24" (toJS value)
 
 /-- `inherit attribute unrestricted double m31` -/
-def DOMMatrix.m31 (self : DOMMatrix) : IO Float := self.val.get "m31" Float
+@[macro_inline] def DOMMatrix.m31 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m31" do
+  self.val.get "m31" Float
 
 /-- Sets `m31`: `inherit attribute unrestricted double m31` -/
-def DOMMatrix.setM31 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM31 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM31" do
   self.val.set "m31" (toJS value)
 
 /-- `inherit attribute unrestricted double m32` -/
-def DOMMatrix.m32 (self : DOMMatrix) : IO Float := self.val.get "m32" Float
+@[macro_inline] def DOMMatrix.m32 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m32" do
+  self.val.get "m32" Float
 
 /-- Sets `m32`: `inherit attribute unrestricted double m32` -/
-def DOMMatrix.setM32 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM32 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM32" do
   self.val.set "m32" (toJS value)
 
 /-- `inherit attribute unrestricted double m33` -/
-def DOMMatrix.m33 (self : DOMMatrix) : IO Float := self.val.get "m33" Float
+@[macro_inline] def DOMMatrix.m33 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m33" do
+  self.val.get "m33" Float
 
 /-- Sets `m33`: `inherit attribute unrestricted double m33` -/
-def DOMMatrix.setM33 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM33 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM33" do
   self.val.set "m33" (toJS value)
 
 /-- `inherit attribute unrestricted double m34` -/
-def DOMMatrix.m34 (self : DOMMatrix) : IO Float := self.val.get "m34" Float
+@[macro_inline] def DOMMatrix.m34 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m34" do
+  self.val.get "m34" Float
 
 /-- Sets `m34`: `inherit attribute unrestricted double m34` -/
-def DOMMatrix.setM34 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM34 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM34" do
   self.val.set "m34" (toJS value)
 
 /-- `inherit attribute unrestricted double m41` -/
-def DOMMatrix.m41 (self : DOMMatrix) : IO Float := self.val.get "m41" Float
+@[macro_inline] def DOMMatrix.m41 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m41" do
+  self.val.get "m41" Float
 
 /-- Sets `m41`: `inherit attribute unrestricted double m41` -/
-def DOMMatrix.setM41 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM41 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM41" do
   self.val.set "m41" (toJS value)
 
 /-- `inherit attribute unrestricted double m42` -/
-def DOMMatrix.m42 (self : DOMMatrix) : IO Float := self.val.get "m42" Float
+@[macro_inline] def DOMMatrix.m42 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m42" do
+  self.val.get "m42" Float
 
 /-- Sets `m42`: `inherit attribute unrestricted double m42` -/
-def DOMMatrix.setM42 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM42 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM42" do
   self.val.set "m42" (toJS value)
 
 /-- `inherit attribute unrestricted double m43` -/
-def DOMMatrix.m43 (self : DOMMatrix) : IO Float := self.val.get "m43" Float
+@[macro_inline] def DOMMatrix.m43 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m43" do
+  self.val.get "m43" Float
 
 /-- Sets `m43`: `inherit attribute unrestricted double m43` -/
-def DOMMatrix.setM43 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM43 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM43" do
   self.val.set "m43" (toJS value)
 
 /-- `inherit attribute unrestricted double m44` -/
-def DOMMatrix.m44 (self : DOMMatrix) : IO Float := self.val.get "m44" Float
+@[macro_inline] def DOMMatrix.m44 (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.m44" do
+  self.val.get "m44" Float
 
 /-- Sets `m44`: `inherit attribute unrestricted double m44` -/
-def DOMMatrix.setM44 (self : DOMMatrix) (value : Float) : IO Unit :=
+@[macro_inline] def DOMMatrix.setM44 (self : DOMMatrix) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMMatrix.setM44" do
   self.val.set "m44" (toJS value)
 
 /-- `static DOMMatrix fromMatrix(optional DOMMatrixInit other)` -/
-def DOMMatrix.fromMatrix (other : Option DOMMatrixInit := none) : IO DOMMatrix := do
+@[macro_inline] def DOMMatrix.fromMatrix (other : Option DOMMatrixInit := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.fromMatrix" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromMatrix", module := "globalThis", path := "DOMMatrix.fromMatrix", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `static DOMMatrix fromFloat32Array(Float32Array array32)` -/
-def DOMMatrix.fromFloat32Array (array32 : ByteArray) : IO DOMMatrix := do
-  let array32View ← Support.typedArray "Float32Array" array32
+@[macro_inline] def DOMMatrix.fromFloat32Array (array32 : ByteArray) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat32Array" do
+  let array32View ← Internal.typedArray "Float32Array" array32
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromFloat32Array", module := "globalThis", path := "DOMMatrix.fromFloat32Array", construct := false, arity := 1 }
-    (Support.args #[.ref array32View ""]) (await := false)
+    (Internal.args #[.ref array32View ""]) (await := false)
   pure { val := r }
 
 /-- `static DOMMatrix fromFloat64Array(Float64Array array64)` -/
-def DOMMatrix.fromFloat64Array (array64 : ByteArray) : IO DOMMatrix := do
-  let array64View ← Support.typedArray "Float64Array" array64
+@[macro_inline] def DOMMatrix.fromFloat64Array (array64 : ByteArray) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat64Array" do
+  let array64View ← Internal.typedArray "Float64Array" array64
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromFloat64Array", module := "globalThis", path := "DOMMatrix.fromFloat64Array", construct := false, arity := 1 }
-    (Support.args #[.ref array64View ""]) (await := false)
+    (Internal.args #[.ref array64View ""]) (await := false)
   pure { val := r }
 
 /-- `DOMMatrix multiplySelf(optional DOMMatrixInit other)` -/
-def DOMMatrix.multiplySelf (self : DOMMatrix) (other : Option DOMMatrixInit := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "multiplySelf" (Support.args #[Support.optional other]) Value
+@[macro_inline] def DOMMatrix.multiplySelf (self : DOMMatrix) (other : Option DOMMatrixInit := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.multiplySelf" do
+  let r ← self.val.callMethod "multiplySelf" (Internal.args #[Internal.optional other]) Value
   pure { val := r }
 
 /-- `DOMMatrix preMultiplySelf(optional DOMMatrixInit other)` -/
-def DOMMatrix.preMultiplySelf (self : DOMMatrix) (other : Option DOMMatrixInit := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "preMultiplySelf" (Support.args #[Support.optional other]) Value
+@[macro_inline] def DOMMatrix.preMultiplySelf (self : DOMMatrix) (other : Option DOMMatrixInit := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.preMultiplySelf" do
+  let r ← self.val.callMethod "preMultiplySelf" (Internal.args #[Internal.optional other]) Value
   pure { val := r }
 
 /-- `DOMMatrix translateSelf(optional unrestricted double tx, optional unrestricted double ty, optional unrestricted double tz)` -/
-def DOMMatrix.translateSelf (self : DOMMatrix) (tx : Option Float := none) (ty : Option Float := none) (tz : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "translateSelf" (Support.args #[Support.optional tx, Support.optional ty, Support.optional tz]) Value
+@[macro_inline] def DOMMatrix.translateSelf (self : DOMMatrix) (tx : Option Float := none) (ty : Option Float := none) (tz : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.translateSelf" do
+  let r ← self.val.callMethod "translateSelf" (Internal.args #[Internal.optional tx, Internal.optional ty, Internal.optional tz]) Value
   pure { val := r }
 
 /-- `DOMMatrix scaleSelf(optional unrestricted double scaleX, optional unrestricted double scaleY, optional unrestricted double scaleZ, optional unrestricted double originX, optional unrestricted double originY, optional unrestricted double originZ)` -/
-def DOMMatrix.scaleSelf (self : DOMMatrix) (scaleX : Option Float := none) (scaleY : Option Float := none) (scaleZ : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "scaleSelf" (Support.args #[Support.optional scaleX, Support.optional scaleY, Support.optional scaleZ, Support.optional originX, Support.optional originY, Support.optional originZ]) Value
+@[macro_inline] def DOMMatrix.scaleSelf (self : DOMMatrix) (scaleX : Option Float := none) (scaleY : Option Float := none) (scaleZ : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.scaleSelf" do
+  let r ← self.val.callMethod "scaleSelf" (Internal.args #[Internal.optional scaleX, Internal.optional scaleY, Internal.optional scaleZ, Internal.optional originX, Internal.optional originY, Internal.optional originZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix scale3dSelf(optional unrestricted double scale, optional unrestricted double originX, optional unrestricted double originY, optional unrestricted double originZ)` -/
-def DOMMatrix.scale3dSelf (self : DOMMatrix) (scale : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "scale3dSelf" (Support.args #[Support.optional scale, Support.optional originX, Support.optional originY, Support.optional originZ]) Value
+@[macro_inline] def DOMMatrix.scale3dSelf (self : DOMMatrix) (scale : Option Float := none) (originX : Option Float := none) (originY : Option Float := none) (originZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.scale3dSelf" do
+  let r ← self.val.callMethod "scale3dSelf" (Internal.args #[Internal.optional scale, Internal.optional originX, Internal.optional originY, Internal.optional originZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotateSelf(optional unrestricted double rotX, optional unrestricted double rotY, optional unrestricted double rotZ)` -/
-def DOMMatrix.rotateSelf (self : DOMMatrix) (rotX : Option Float := none) (rotY : Option Float := none) (rotZ : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotateSelf" (Support.args #[Support.optional rotX, Support.optional rotY, Support.optional rotZ]) Value
+@[macro_inline] def DOMMatrix.rotateSelf (self : DOMMatrix) (rotX : Option Float := none) (rotY : Option Float := none) (rotZ : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.rotateSelf" do
+  let r ← self.val.callMethod "rotateSelf" (Internal.args #[Internal.optional rotX, Internal.optional rotY, Internal.optional rotZ]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotateFromVectorSelf(optional unrestricted double x, optional unrestricted double y)` -/
-def DOMMatrix.rotateFromVectorSelf (self : DOMMatrix) (x : Option Float := none) (y : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotateFromVectorSelf" (Support.args #[Support.optional x, Support.optional y]) Value
+@[macro_inline] def DOMMatrix.rotateFromVectorSelf (self : DOMMatrix) (x : Option Float := none) (y : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.rotateFromVectorSelf" do
+  let r ← self.val.callMethod "rotateFromVectorSelf" (Internal.args #[Internal.optional x, Internal.optional y]) Value
   pure { val := r }
 
 /-- `DOMMatrix rotateAxisAngleSelf(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double angle)` -/
-def DOMMatrix.rotateAxisAngleSelf (self : DOMMatrix) (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (angle : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "rotateAxisAngleSelf" (Support.args #[Support.optional x, Support.optional y, Support.optional z, Support.optional angle]) Value
+@[macro_inline] def DOMMatrix.rotateAxisAngleSelf (self : DOMMatrix) (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (angle : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.rotateAxisAngleSelf" do
+  let r ← self.val.callMethod "rotateAxisAngleSelf" (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional angle]) Value
   pure { val := r }
 
 /-- `DOMMatrix skewXSelf(optional unrestricted double sx)` -/
-def DOMMatrix.skewXSelf (self : DOMMatrix) (sx : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "skewXSelf" (Support.args #[Support.optional sx]) Value
+@[macro_inline] def DOMMatrix.skewXSelf (self : DOMMatrix) (sx : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.skewXSelf" do
+  let r ← self.val.callMethod "skewXSelf" (Internal.args #[Internal.optional sx]) Value
   pure { val := r }
 
 /-- `DOMMatrix skewYSelf(optional unrestricted double sy)` -/
-def DOMMatrix.skewYSelf (self : DOMMatrix) (sy : Option Float := none) : IO DOMMatrix := do
-  let r ← self.val.callMethod "skewYSelf" (Support.args #[Support.optional sy]) Value
+@[macro_inline] def DOMMatrix.skewYSelf (self : DOMMatrix) (sy : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.skewYSelf" do
+  let r ← self.val.callMethod "skewYSelf" (Internal.args #[Internal.optional sy]) Value
   pure { val := r }
 
 /-- `DOMMatrix invertSelf()` -/
-def DOMMatrix.invertSelf (self : DOMMatrix) : IO DOMMatrix := do
-  let r ← self.val.callMethod "invertSelf" (Support.args #[]) Value
+@[macro_inline] def DOMMatrix.invertSelf (self : DOMMatrix) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.invertSelf" do
+  let r ← self.val.callMethod "invertSelf" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `DOMMatrix setMatrixValue(DOMString transformList)` -/
-def DOMMatrix.setMatrixValue (self : DOMMatrix) (transformList : String) : IO DOMMatrix := do
-  let r ← self.val.callMethod "setMatrixValue" (Support.args #[toJS transformList]) Value
+@[macro_inline] def DOMMatrix.setMatrixValue (self : DOMMatrix) (transformList : String) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.setMatrixValue" do
+  let r ← self.val.callMethod "setMatrixValue" (Internal.args #[toJS transformList]) Value
   pure { val := r }
 
 /-- `v instanceof DOMPoint`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMPoint`). -/
-def DOMPoint.cast? (v : Value) : IO (Option DOMPoint) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMPoint"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMPoint.cast? (v : Value) : IO (Option DOMPoint) := Internal.api "Lasm.JS.Web.DOMPoint.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMPoint"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double w)` -/
-def DOMPoint.new (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO DOMPoint :=
+@[macro_inline] def DOMPoint.new (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMPoint.new" do
   Lasm.JS.Binding.invoke DOMPoint { name := "Lasm.JS.Web.DOMPoint.new", module := "globalThis", path := "DOMPoint", construct := true, arity := 4 }
-    (Support.args #[Support.optional x, Support.optional y, Support.optional z, Support.optional w]) (await := false)
+    (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
 
 /-- `inherit attribute unrestricted double x` -/
-def DOMPoint.x (self : DOMPoint) : IO Float := self.val.get "x" Float
+@[macro_inline] def DOMPoint.x (self : DOMPoint) : IO Float := Internal.api "Lasm.JS.Web.DOMPoint.x" do
+  self.val.get "x" Float
 
 /-- Sets `x`: `inherit attribute unrestricted double x` -/
-def DOMPoint.setX (self : DOMPoint) (value : Float) : IO Unit :=
+@[macro_inline] def DOMPoint.setX (self : DOMPoint) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMPoint.setX" do
   self.val.set "x" (toJS value)
 
 /-- `inherit attribute unrestricted double y` -/
-def DOMPoint.y (self : DOMPoint) : IO Float := self.val.get "y" Float
+@[macro_inline] def DOMPoint.y (self : DOMPoint) : IO Float := Internal.api "Lasm.JS.Web.DOMPoint.y" do
+  self.val.get "y" Float
 
 /-- Sets `y`: `inherit attribute unrestricted double y` -/
-def DOMPoint.setY (self : DOMPoint) (value : Float) : IO Unit :=
+@[macro_inline] def DOMPoint.setY (self : DOMPoint) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMPoint.setY" do
   self.val.set "y" (toJS value)
 
 /-- `inherit attribute unrestricted double z` -/
-def DOMPoint.z (self : DOMPoint) : IO Float := self.val.get "z" Float
+@[macro_inline] def DOMPoint.z (self : DOMPoint) : IO Float := Internal.api "Lasm.JS.Web.DOMPoint.z" do
+  self.val.get "z" Float
 
 /-- Sets `z`: `inherit attribute unrestricted double z` -/
-def DOMPoint.setZ (self : DOMPoint) (value : Float) : IO Unit :=
+@[macro_inline] def DOMPoint.setZ (self : DOMPoint) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMPoint.setZ" do
   self.val.set "z" (toJS value)
 
 /-- `inherit attribute unrestricted double w` -/
-def DOMPoint.w (self : DOMPoint) : IO Float := self.val.get "w" Float
+@[macro_inline] def DOMPoint.w (self : DOMPoint) : IO Float := Internal.api "Lasm.JS.Web.DOMPoint.w" do
+  self.val.get "w" Float
 
 /-- Sets `w`: `inherit attribute unrestricted double w` -/
-def DOMPoint.setW (self : DOMPoint) (value : Float) : IO Unit :=
+@[macro_inline] def DOMPoint.setW (self : DOMPoint) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMPoint.setW" do
   self.val.set "w" (toJS value)
 
 /-- `static DOMPoint fromPoint(optional DOMPointInit other)` -/
-def DOMPoint.fromPoint (other : Option DOMPointInit := none) : IO DOMPoint := do
+@[macro_inline] def DOMPoint.fromPoint (other : Option DOMPointInit := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMPoint.fromPoint" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMPoint.fromPoint", module := "globalThis", path := "DOMPoint.fromPoint", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 /-- `v instanceof DOMRect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRect`). -/
-def DOMRect.cast? (v : Value) : IO (Option DOMRect) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRect"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMRect.cast? (v : Value) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.DOMRect.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMRect"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` -/
-def DOMRect.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRect :=
+@[macro_inline] def DOMRect.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRect := Internal.api "Lasm.JS.Web.DOMRect.new" do
   Lasm.JS.Binding.invoke DOMRect { name := "Lasm.JS.Web.DOMRect.new", module := "globalThis", path := "DOMRect", construct := true, arity := 4 }
-    (Support.args #[Support.optional x, Support.optional y, Support.optional width, Support.optional height]) (await := false)
+    (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
 
 /-- `inherit attribute unrestricted double x` -/
-def DOMRect.x (self : DOMRect) : IO Float := self.val.get "x" Float
+@[macro_inline] def DOMRect.x (self : DOMRect) : IO Float := Internal.api "Lasm.JS.Web.DOMRect.x" do
+  self.val.get "x" Float
 
 /-- Sets `x`: `inherit attribute unrestricted double x` -/
-def DOMRect.setX (self : DOMRect) (value : Float) : IO Unit :=
+@[macro_inline] def DOMRect.setX (self : DOMRect) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMRect.setX" do
   self.val.set "x" (toJS value)
 
 /-- `inherit attribute unrestricted double y` -/
-def DOMRect.y (self : DOMRect) : IO Float := self.val.get "y" Float
+@[macro_inline] def DOMRect.y (self : DOMRect) : IO Float := Internal.api "Lasm.JS.Web.DOMRect.y" do
+  self.val.get "y" Float
 
 /-- Sets `y`: `inherit attribute unrestricted double y` -/
-def DOMRect.setY (self : DOMRect) (value : Float) : IO Unit :=
+@[macro_inline] def DOMRect.setY (self : DOMRect) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMRect.setY" do
   self.val.set "y" (toJS value)
 
 /-- `inherit attribute unrestricted double width` -/
-def DOMRect.width (self : DOMRect) : IO Float := self.val.get "width" Float
+@[macro_inline] def DOMRect.width (self : DOMRect) : IO Float := Internal.api "Lasm.JS.Web.DOMRect.width" do
+  self.val.get "width" Float
 
 /-- Sets `width`: `inherit attribute unrestricted double width` -/
-def DOMRect.setWidth (self : DOMRect) (value : Float) : IO Unit :=
+@[macro_inline] def DOMRect.setWidth (self : DOMRect) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMRect.setWidth" do
   self.val.set "width" (toJS value)
 
 /-- `inherit attribute unrestricted double height` -/
-def DOMRect.height (self : DOMRect) : IO Float := self.val.get "height" Float
+@[macro_inline] def DOMRect.height (self : DOMRect) : IO Float := Internal.api "Lasm.JS.Web.DOMRect.height" do
+  self.val.get "height" Float
 
 /-- Sets `height`: `inherit attribute unrestricted double height` -/
-def DOMRect.setHeight (self : DOMRect) (value : Float) : IO Unit :=
+@[macro_inline] def DOMRect.setHeight (self : DOMRect) (value : Float) : IO Unit := Internal.api "Lasm.JS.Web.DOMRect.setHeight" do
   self.val.set "height" (toJS value)
 
 /-- `static DOMRect fromRect(optional DOMRectInit other)` -/
-def DOMRect.fromRect (other : Option DOMRectInit := none) : IO DOMRect := do
+@[macro_inline] def DOMRect.fromRect (other : Option DOMRectInit := none) : IO DOMRect := Internal.api "Lasm.JS.Web.DOMRect.fromRect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMRect.fromRect", module := "globalThis", path := "DOMRect.fromRect", construct := false, arity := 1 }
-    (Support.args #[Support.optional other]) (await := false)
+    (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Web

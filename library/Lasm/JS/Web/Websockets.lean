@@ -6,14 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Websockets
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.CrossOriginStorage
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 import Lasm.JS.Web.Fs
-import Lasm.JS.Web.PresentationApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary CloseEventInit : EventInit` (WebSockets Standard (https://websockets.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CloseEventInit where
@@ -29,39 +32,42 @@ structure CloseEventInit where
   code : Option Nat := none
   /-- `USVString reason = ""` -/
   reason : Option String := none
-instance : ToJS CloseEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("wasClean", Support.optional d.wasClean),
-    ("code", Support.optional d.code),
-    ("reason", Support.optional d.reason)]⟩
+instance : ToJS CloseEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("wasClean", Internal.optional d.wasClean),
+    ("code", Internal.optional d.code),
+    ("reason", Internal.optional d.reason)]⟩
 
 /-- `v instanceof CloseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CloseEvent`). -/
-def CloseEvent.cast? (v : Value) : IO (Option CloseEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CloseEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def CloseEvent.cast? (v : Value) : IO (Option CloseEvent) := Internal.api "Lasm.JS.Web.CloseEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["CloseEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional CloseEventInit eventInitDict)` -/
-def CloseEvent.new (type : String) (eventInitDict : Option CloseEventInit := none) : IO CloseEvent :=
+@[macro_inline] def CloseEvent.new (type : String) (eventInitDict : Option CloseEventInit := none) : IO CloseEvent := Internal.api "Lasm.JS.Web.CloseEvent.new" do
   Lasm.JS.Binding.invoke CloseEvent { name := "Lasm.JS.Web.CloseEvent.new", module := "globalThis", path := "CloseEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute boolean wasClean` -/
-def CloseEvent.wasClean (self : CloseEvent) : IO Bool := self.val.get "wasClean" Bool
+@[macro_inline] def CloseEvent.wasClean (self : CloseEvent) : IO Bool := Internal.api "Lasm.JS.Web.CloseEvent.wasClean" do
+  self.val.get "wasClean" Bool
 
 /-- `readonly attribute unsigned short code` -/
-def CloseEvent.code (self : CloseEvent) : IO Nat := self.val.get "code" Nat
+@[macro_inline] def CloseEvent.code (self : CloseEvent) : IO Nat := Internal.api "Lasm.JS.Web.CloseEvent.code" do
+  self.val.get "code" Nat
 
 /-- `readonly attribute USVString reason` -/
-def CloseEvent.reason (self : CloseEvent) : IO String := self.val.get "reason" String
+@[macro_inline] def CloseEvent.reason (self : CloseEvent) : IO String := Internal.api "Lasm.JS.Web.CloseEvent.reason" do
+  self.val.get "reason" String
 
 /-- `v instanceof WebSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebSocket`). -/
-def WebSocket.cast? (v : Value) : IO (Option WebSocket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebSocket"] Value) v) then some { val := v } else none
+@[macro_inline] def WebSocket.cast? (v : Value) : IO (Option WebSocket) := Internal.api "Lasm.JS.Web.WebSocket.cast?" do
+  Internal.cast (Internal.getGlobal ["WebSocket"] Value) (fun x => { val := x }) v
 
 /-- `constructor(USVString url, optional (DOMString or sequence<DOMString>) protocols)` -/
-def WebSocket.new (url : String) (protocols : Option DOMStringOrSequenceOfDOMString := none) : IO WebSocket :=
+@[macro_inline] def WebSocket.new (url : String) (protocols : Option DOMStringOrSequenceOfDOMString := none) : IO WebSocket := Internal.api "Lasm.JS.Web.WebSocket.new" do
   Lasm.JS.Binding.invoke WebSocket { name := "Lasm.JS.Web.WebSocket.new", module := "globalThis", path := "WebSocket", construct := true, arity := 2 }
-    (Support.args #[toJS url, Support.optional protocols]) (await := false)
+    (Internal.args #[toJS url, Internal.optional protocols]) (await := false)
 
 /-- `const unsigned short CONNECTING = 0` -/
 def WebSocket.CONNECTING : Nat := 0
@@ -76,61 +82,71 @@ def WebSocket.CLOSING : Nat := 2
 def WebSocket.CLOSED : Nat := 3
 
 /-- `readonly attribute USVString url` -/
-def WebSocket.url (self : WebSocket) : IO String := self.val.get "url" String
+@[macro_inline] def WebSocket.url (self : WebSocket) : IO String := Internal.api "Lasm.JS.Web.WebSocket.url" do
+  self.val.get "url" String
 
 /-- `readonly attribute unsigned short readyState` -/
-def WebSocket.readyState (self : WebSocket) : IO Nat := self.val.get "readyState" Nat
+@[macro_inline] def WebSocket.readyState (self : WebSocket) : IO Nat := Internal.api "Lasm.JS.Web.WebSocket.readyState" do
+  self.val.get "readyState" Nat
 
 /-- `readonly attribute unsigned long long bufferedAmount` -/
-def WebSocket.bufferedAmount (self : WebSocket) : IO Nat := self.val.get "bufferedAmount" Nat
+@[macro_inline] def WebSocket.bufferedAmount (self : WebSocket) : IO Nat := Internal.api "Lasm.JS.Web.WebSocket.bufferedAmount" do
+  self.val.get "bufferedAmount" Nat
 
 /-- `attribute EventHandler onopen` -/
-def WebSocket.onopen (self : WebSocket) : IO (Option EventHandlerNonNull) := self.val.get "onopen" (Option EventHandlerNonNull)
+@[macro_inline] def WebSocket.onopen (self : WebSocket) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WebSocket.onopen" do
+  self.val.get "onopen" (Option EventHandlerNonNull)
 
 /-- Sets `onopen`: `attribute EventHandler onopen` -/
-def WebSocket.setOnopen (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WebSocket.setOnopen (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setOnopen" do
   self.val.set "onopen" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def WebSocket.onerror (self : WebSocket) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def WebSocket.onerror (self : WebSocket) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WebSocket.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def WebSocket.setOnerror (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WebSocket.setOnerror (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def WebSocket.onclose (self : WebSocket) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def WebSocket.onclose (self : WebSocket) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WebSocket.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def WebSocket.setOnclose (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WebSocket.setOnclose (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `readonly attribute DOMString extensions` -/
-def WebSocket.extensions (self : WebSocket) : IO String := self.val.get "extensions" String
+@[macro_inline] def WebSocket.extensions (self : WebSocket) : IO String := Internal.api "Lasm.JS.Web.WebSocket.extensions" do
+  self.val.get "extensions" String
 
 /-- `readonly attribute DOMString protocol` -/
-def WebSocket.protocol (self : WebSocket) : IO String := self.val.get "protocol" String
+@[macro_inline] def WebSocket.protocol (self : WebSocket) : IO String := Internal.api "Lasm.JS.Web.WebSocket.protocol" do
+  self.val.get "protocol" String
 
 /-- `attribute EventHandler onmessage` -/
-def WebSocket.onmessage (self : WebSocket) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
+@[macro_inline] def WebSocket.onmessage (self : WebSocket) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WebSocket.onmessage" do
+  self.val.get "onmessage" (Option EventHandlerNonNull)
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
-def WebSocket.setOnmessage (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def WebSocket.setOnmessage (self : WebSocket) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setOnmessage" do
   self.val.set "onmessage" (toJS value)
 
 /-- `attribute BinaryType binaryType` -/
-def WebSocket.binaryType (self : WebSocket) : IO BinaryType := self.val.get "binaryType" BinaryType
+@[macro_inline] def WebSocket.binaryType (self : WebSocket) : IO BinaryType := Internal.api "Lasm.JS.Web.WebSocket.binaryType" do
+  self.val.get "binaryType" BinaryType
 
 /-- Sets `binaryType`: `attribute BinaryType binaryType` -/
-def WebSocket.setBinaryType (self : WebSocket) (value : BinaryType) : IO Unit :=
+@[macro_inline] def WebSocket.setBinaryType (self : WebSocket) (value : BinaryType) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setBinaryType" do
   self.val.set "binaryType" (toJS value)
 
 /-- `undefined close(optional unsigned short code, optional USVString reason)` -/
-def WebSocket.close (self : WebSocket) (code : Option Nat := none) (reason : Option String := none) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[Support.optional code, Support.optional reason]) Unit
+@[macro_inline] def WebSocket.close (self : WebSocket) (code : Option Nat := none) (reason : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.close" do
+  self.val.callMethod "close" (Internal.args #[Internal.optional code, Internal.optional reason]) Unit
 
 /-- `undefined send((BufferSource or Blob or USVString) data)` -/
-def WebSocket.send (self : WebSocket) (data : BufferSourceOrBlobOrUSVString) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Unit
+@[macro_inline] def WebSocket.send (self : WebSocket) (data : BufferSourceOrBlobOrUSVString) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.send" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Unit
 
 end Lasm.JS.Web

@@ -6,12 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.WEBGLShaderPixelLocalStorage
 import Lasm.JS.Web.Webgl1
 import Lasm.JS.Web.Webgl2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum MAX_PIXEL_LOCAL_STORAGE_PLANES_WEBGL = 0x96E0` -/
 def WEBGL_shader_pixel_local_storage.MAX_PIXEL_LOCAL_STORAGE_PLANES_WEBGL : Nat := 0x96E0
@@ -62,39 +66,39 @@ def WEBGL_shader_pixel_local_storage.PIXEL_LOCAL_CLEAR_VALUE_UNSIGNED_INT_WEBGL 
 def WEBGL_shader_pixel_local_storage.PIXEL_LOCAL_USAGE_ALWAYS_NONCOHERENT_BIT_WEBGL : Nat := 0x1
 
 /-- `GLboolean isCoherent()` -/
-def WEBGL_shader_pixel_local_storage.isCoherent (self : WEBGL_shader_pixel_local_storage) : IO Bool :=
-  self.val.callMethod "isCoherent" (Support.args #[]) Bool
+@[macro_inline] def WEBGL_shader_pixel_local_storage.isCoherent (self : WEBGL_shader_pixel_local_storage) : IO Bool := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.isCoherent" do
+  self.val.callMethod "isCoherent" (Internal.args #[]) Bool
 
 /-- `undefined framebufferTexturePixelLocalStorageWEBGL(GLint plane, WebGLTexture? texture, GLint level, GLint layer, GLbitfield usage)` -/
-def WEBGL_shader_pixel_local_storage.framebufferTexturePixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (texture : Option WebGLTexture) (level : Int) (layer : Int) (usage : Nat) : IO Unit :=
-  self.val.callMethod "framebufferTexturePixelLocalStorageWEBGL" (Support.args #[toJS plane, toJS texture, toJS level, toJS layer, toJS usage]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.framebufferTexturePixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (texture : Option WebGLTexture) (level : Int) (layer : Int) (usage : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.framebufferTexturePixelLocalStorageWEBGL" do
+  self.val.callMethod "framebufferTexturePixelLocalStorageWEBGL" (Internal.args #[toJS plane, toJS texture, toJS level, toJS layer, toJS usage]) Unit
 
 /-- `undefined framebufferPixelLocalClearValuefvWEBGL(GLint plane, Float32List value, optional unsigned long long srcOffset)` -/
-def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValuefvWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Float32List) (srcOffset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "framebufferPixelLocalClearValuefvWEBGL" (Support.args #[toJS plane, toJS value, Support.optional srcOffset]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValuefvWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Float32List) (srcOffset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValuefvWEBGL" do
+  self.val.callMethod "framebufferPixelLocalClearValuefvWEBGL" (Internal.args #[toJS plane, toJS value, Internal.optional srcOffset]) Unit
 
 /-- `undefined framebufferPixelLocalClearValueivWEBGL(GLint plane, Int32List value, optional unsigned long long srcOffset)` -/
-def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueivWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Int32List) (srcOffset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "framebufferPixelLocalClearValueivWEBGL" (Support.args #[toJS plane, toJS value, Support.optional srcOffset]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueivWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Int32List) (srcOffset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueivWEBGL" do
+  self.val.callMethod "framebufferPixelLocalClearValueivWEBGL" (Internal.args #[toJS plane, toJS value, Internal.optional srcOffset]) Unit
 
 /-- `undefined framebufferPixelLocalClearValueuivWEBGL(GLint plane, Uint32List value, optional unsigned long long srcOffset)` -/
-def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueuivWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Uint32List) (srcOffset : Option Nat := none) : IO Unit :=
-  self.val.callMethod "framebufferPixelLocalClearValueuivWEBGL" (Support.args #[toJS plane, toJS value, Support.optional srcOffset]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueuivWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (value : Uint32List) (srcOffset : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.framebufferPixelLocalClearValueuivWEBGL" do
+  self.val.callMethod "framebufferPixelLocalClearValueuivWEBGL" (Internal.args #[toJS plane, toJS value, Internal.optional srcOffset]) Unit
 
 /-- `undefined beginPixelLocalStorageWEBGL(sequence<GLenum> loadops)` -/
-def WEBGL_shader_pixel_local_storage.beginPixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (loadops : Array Nat) : IO Unit :=
-  self.val.callMethod "beginPixelLocalStorageWEBGL" (Support.args #[toJS loadops]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.beginPixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (loadops : Array Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.beginPixelLocalStorageWEBGL" do
+  self.val.callMethod "beginPixelLocalStorageWEBGL" (Internal.args #[toJS loadops]) Unit
 
 /-- `undefined endPixelLocalStorageWEBGL(sequence<GLenum> storeops)` -/
-def WEBGL_shader_pixel_local_storage.endPixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (storeops : Array Nat) : IO Unit :=
-  self.val.callMethod "endPixelLocalStorageWEBGL" (Support.args #[toJS storeops]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.endPixelLocalStorageWEBGL (self : WEBGL_shader_pixel_local_storage) (storeops : Array Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.endPixelLocalStorageWEBGL" do
+  self.val.callMethod "endPixelLocalStorageWEBGL" (Internal.args #[toJS storeops]) Unit
 
 /-- `undefined pixelLocalStorageBarrierWEBGL()` -/
-def WEBGL_shader_pixel_local_storage.pixelLocalStorageBarrierWEBGL (self : WEBGL_shader_pixel_local_storage) : IO Unit :=
-  self.val.callMethod "pixelLocalStorageBarrierWEBGL" (Support.args #[]) Unit
+@[macro_inline] def WEBGL_shader_pixel_local_storage.pixelLocalStorageBarrierWEBGL (self : WEBGL_shader_pixel_local_storage) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.pixelLocalStorageBarrierWEBGL" do
+  self.val.callMethod "pixelLocalStorageBarrierWEBGL" (Internal.args #[]) Unit
 
 /-- `any getFramebufferPixelLocalStorageParameterWEBGL(GLint plane, GLenum pname)` -/
-def WEBGL_shader_pixel_local_storage.getFramebufferPixelLocalStorageParameterWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (pname : Nat) : IO Data :=
-  self.val.callMethod "getFramebufferPixelLocalStorageParameterWEBGL" (Support.args #[toJS plane, toJS pname]) Data
+@[macro_inline] def WEBGL_shader_pixel_local_storage.getFramebufferPixelLocalStorageParameterWEBGL (self : WEBGL_shader_pixel_local_storage) (plane : Int) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WEBGL_shader_pixel_local_storage.getFramebufferPixelLocalStorageParameterWEBGL" do
+  self.val.callMethod "getFramebufferPixelLocalStorageParameterWEBGL" (Internal.args #[toJS plane, toJS pname]) Data
 
 end Lasm.JS.Web

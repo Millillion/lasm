@@ -6,105 +6,47 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssomView
+import Lasm.JS.Web.Types.ScreenOrientation
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum OrientationLockType` (Screen Orientation (https://w3c.github.io/screen-orientation/)): "any", "natural", "landscape", "portrait", "portrait-primary", "portrait-secondary", "landscape-primary", "landscape-secondary". -/
-inductive OrientationLockType where
-  /-- "any" -/
-  | any
-  /-- "natural" -/
-  | natural
-  /-- "landscape" -/
-  | landscape
-  /-- "portrait" -/
-  | portrait
-  /-- "portrait-primary" -/
-  | portraitPrimary
-  /-- "portrait-secondary" -/
-  | portraitSecondary
-  /-- "landscape-primary" -/
-  | landscapePrimary
-  /-- "landscape-secondary" -/
-  | landscapeSecondary
-  deriving BEq, Repr, Inhabited
-instance : ToJS OrientationLockType := ⟨fun
-  | .any => .string "any"
-  | .natural => .string "natural"
-  | .landscape => .string "landscape"
-  | .portrait => .string "portrait"
-  | .portraitPrimary => .string "portrait-primary"
-  | .portraitSecondary => .string "portrait-secondary"
-  | .landscapePrimary => .string "landscape-primary"
-  | .landscapeSecondary => .string "landscape-secondary"⟩
-instance : FromJS OrientationLockType where
-  fromJS
-    | .string "any" => .ok .any
-    | .string "natural" => .ok .natural
-    | .string "landscape" => .ok .landscape
-    | .string "portrait" => .ok .portrait
-    | .string "portrait-primary" => .ok .portraitPrimary
-    | .string "portrait-secondary" => .ok .portraitSecondary
-    | .string "landscape-primary" => .ok .landscapePrimary
-    | .string "landscape-secondary" => .ok .landscapeSecondary
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.OrientationLockType"
-
-/-- `enum OrientationType` (Screen Orientation (https://w3c.github.io/screen-orientation/)): "portrait-primary", "portrait-secondary", "landscape-primary", "landscape-secondary". -/
-inductive OrientationType where
-  /-- "portrait-primary" -/
-  | portraitPrimary
-  /-- "portrait-secondary" -/
-  | portraitSecondary
-  /-- "landscape-primary" -/
-  | landscapePrimary
-  /-- "landscape-secondary" -/
-  | landscapeSecondary
-  deriving BEq, Repr, Inhabited
-instance : ToJS OrientationType := ⟨fun
-  | .portraitPrimary => .string "portrait-primary"
-  | .portraitSecondary => .string "portrait-secondary"
-  | .landscapePrimary => .string "landscape-primary"
-  | .landscapeSecondary => .string "landscape-secondary"⟩
-instance : FromJS OrientationType where
-  fromJS
-    | .string "portrait-primary" => .ok .portraitPrimary
-    | .string "portrait-secondary" => .ok .portraitSecondary
-    | .string "landscape-primary" => .ok .landscapePrimary
-    | .string "landscape-secondary" => .ok .landscapeSecondary
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.OrientationType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof ScreenOrientation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ScreenOrientation`). -/
-def ScreenOrientation.cast? (v : Value) : IO (Option ScreenOrientation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ScreenOrientation"] Value) v) then some { val := v } else none
+@[macro_inline] def ScreenOrientation.cast? (v : Value) : IO (Option ScreenOrientation) := Internal.api "Lasm.JS.Web.ScreenOrientation.cast?" do
+  Internal.cast (Internal.getGlobal ["ScreenOrientation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute OrientationType type` -/
-def ScreenOrientation.type (self : ScreenOrientation) : IO OrientationType := self.val.get "type" OrientationType
+@[macro_inline] def ScreenOrientation.type (self : ScreenOrientation) : IO OrientationType := Internal.api "Lasm.JS.Web.ScreenOrientation.type" do
+  self.val.get "type" OrientationType
 
 /-- `readonly attribute unsigned short angle` -/
-def ScreenOrientation.angle (self : ScreenOrientation) : IO Nat := self.val.get "angle" Nat
+@[macro_inline] def ScreenOrientation.angle (self : ScreenOrientation) : IO Nat := Internal.api "Lasm.JS.Web.ScreenOrientation.angle" do
+  self.val.get "angle" Nat
 
 /-- `attribute EventHandler onchange` -/
-def ScreenOrientation.onchange (self : ScreenOrientation) : IO (Option EventHandlerNonNull) := self.val.get "onchange" (Option EventHandlerNonNull)
+@[macro_inline] def ScreenOrientation.onchange (self : ScreenOrientation) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ScreenOrientation.onchange" do
+  self.val.get "onchange" (Option EventHandlerNonNull)
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
-def ScreenOrientation.setOnchange (self : ScreenOrientation) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ScreenOrientation.setOnchange (self : ScreenOrientation) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ScreenOrientation.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `Promise<undefined> lock(OrientationLockType orientation)` -/
-def ScreenOrientation.lock (self : ScreenOrientation) (orientation : OrientationLockType) : Async Unit :=
-  self.val.callMethodAwait "lock" (Support.args #[toJS orientation]) Unit
+@[macro_inline] def ScreenOrientation.lock (self : ScreenOrientation) (orientation : OrientationLockType) : Async Unit := Internal.api "Lasm.JS.Web.ScreenOrientation.lock" do
+  self.val.callMethodAwait "lock" (Internal.args #[toJS orientation]) Unit
 
 /-- `undefined unlock()` -/
-def ScreenOrientation.unlock (self : ScreenOrientation) : IO Unit :=
-  self.val.callMethod "unlock" (Support.args #[]) Unit
+@[macro_inline] def ScreenOrientation.unlock (self : ScreenOrientation) : IO Unit := Internal.api "Lasm.JS.Web.ScreenOrientation.unlock" do
+  self.val.callMethod "unlock" (Internal.args #[]) Unit
 
 /-- `readonly attribute ScreenOrientation orientation` -/
-def Screen.orientation (self : Screen) : IO ScreenOrientation := do
+@[macro_inline] def Screen.orientation (self : Screen) : IO ScreenOrientation := Internal.api "Lasm.JS.Web.Screen.orientation" do
   let r ← self.val.get "orientation" Value
   pure { val := r }
 

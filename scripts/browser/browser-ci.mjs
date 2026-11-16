@@ -4,7 +4,7 @@
 // browser output with its lasm-manifest.json) served by scripts/browser/test-server.mjs:
 //   - counter (lasm init --template web): mount, clicks, start time cold and warm,
 //     bytes transferred;
-//   - platform (test/browser/platform): every automatic check (Lasm.JS.Web.Browser, Lasm.UI.Mount), the
+//   - platform (test/browser/platform): every automatic check (Lasm.JS.Web, Lasm.UI.Mount), the
 //     interactive ones (clicks, typing, keys, prevented defaults, pointer, forms),
 //     the console, ports and messages, a second app on the page, unmount, and a
 //     blocking wait stopping the instance;
@@ -114,7 +114,7 @@ async function platform(server, name, manifest) {
     const results = JSON.parse(await page.textContent('#app #results'));
     for (const r of results) expect(name, r.name, r.ok, r.detail);
     expect(name, 'platform.automatic-checks', results.length >= 40, `${results.length} checks`);
-    // Generated members of Lasm.JS.Web's browser tier this engine lacks (test/browser/platform/Bindings.lean): recorded, never a failure.
+    // Generated members of Lasm.JS.Web this engine lacks (test/browser/platform/Bindings.lean): recorded, never a failure.
     report.apps[name].bindingsMissing = ((await page.textContent('#app #bindings-missing').catch(() => null)) ?? '').split('\n').filter(Boolean);
     const text = selector => page.textContent(`#app ${selector}`);
     step('events');

@@ -6,11 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Observable
 import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback SubscribeCallback = undefined (Subscriber subscriber)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SubscribeCallback where
@@ -21,10 +25,10 @@ instance : ToJS SubscribeCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SubscribeCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.SubscribeCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SubscribeCallback.ofFn (f : Subscriber → Async Unit) : IO SubscribeCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Subscriber args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Subscriber args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SubscribeCallback.ofSyncFn (f : Subscriber → IO Unit) : IO SubscribeCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Subscriber args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Subscriber args 0)) }
 
 /-- `callback ObservableSubscriptionCallback = undefined (any value)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ObservableSubscriptionCallback where
@@ -35,10 +39,10 @@ instance : ToJS ObservableSubscriptionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ObservableSubscriptionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ObservableSubscriptionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ObservableSubscriptionCallback.ofFn (f : Data → Async Unit) : IO ObservableSubscriptionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ObservableSubscriptionCallback.ofSyncFn (f : Data → IO Unit) : IO ObservableSubscriptionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `dictionary SubscriptionObserver` (Observable (https://wicg.github.io/observable/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SubscriptionObserver where
@@ -48,9 +52,9 @@ structure SubscriptionObserver where
   error : Option ObservableSubscriptionCallback := none
   /-- `VoidFunction complete` -/
   complete : Option VoidFunction := none
-instance : ToJS SubscriptionObserver := ⟨fun d => Support.fields #[("next", Support.optional d.next),
-    ("error", Support.optional d.error),
-    ("complete", Support.optional d.complete)]⟩
+instance : ToJS SubscriptionObserver := ⟨fun d => Internal.fields #[("next", Internal.optional d.next),
+    ("error", Internal.optional d.error),
+    ("complete", Internal.optional d.complete)]⟩
 
 /-- `typedef ObservableSubscriptionCallback or SubscriptionObserver ObserverUnion`: one constructor per member type. -/
 inductive ObserverUnion where
@@ -68,7 +72,7 @@ instance : Coe SubscriptionObserver ObserverUnion := ⟨.subscriptionObserver⟩
 structure SubscribeOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS SubscribeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS SubscribeOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `callback Mapper = any (any value, unsigned long long index)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Mapper where
@@ -79,10 +83,10 @@ instance : ToJS Mapper := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Mapper := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Mapper", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Mapper.ofFn (f : Data → Nat → Async Data) : IO Mapper := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Mapper.ofSyncFn (f : Data → Nat → IO Data) : IO Mapper := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 
 /-- `callback Predicate = boolean (any value, unsigned long long index)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Predicate where
@@ -93,10 +97,10 @@ instance : ToJS Predicate := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Predicate := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Predicate", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Predicate.ofFn (f : Data → Nat → Async Bool) : IO Predicate := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Predicate.ofSyncFn (f : Data → Nat → IO Bool) : IO Predicate := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 
 /-- `callback ObservableInspectorAbortHandler = undefined (any value)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ObservableInspectorAbortHandler where
@@ -107,10 +111,10 @@ instance : ToJS ObservableInspectorAbortHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ObservableInspectorAbortHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ObservableInspectorAbortHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ObservableInspectorAbortHandler.ofFn (f : Data → Async Unit) : IO ObservableInspectorAbortHandler := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ObservableInspectorAbortHandler.ofSyncFn (f : Data → IO Unit) : IO ObservableInspectorAbortHandler := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `dictionary ObservableInspector` (Observable (https://wicg.github.io/observable/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ObservableInspector where
@@ -124,11 +128,11 @@ structure ObservableInspector where
   subscribe : Option VoidFunction := none
   /-- `ObservableInspectorAbortHandler abort` -/
   abort : Option ObservableInspectorAbortHandler := none
-instance : ToJS ObservableInspector := ⟨fun d => Support.fields #[("next", Support.optional d.next),
-    ("error", Support.optional d.error),
-    ("complete", Support.optional d.complete),
-    ("subscribe", Support.optional d.subscribe),
-    ("abort", Support.optional d.abort)]⟩
+instance : ToJS ObservableInspector := ⟨fun d => Internal.fields #[("next", Internal.optional d.next),
+    ("error", Internal.optional d.error),
+    ("complete", Internal.optional d.complete),
+    ("subscribe", Internal.optional d.subscribe),
+    ("abort", Internal.optional d.abort)]⟩
 
 /-- `typedef ObservableSubscriptionCallback or ObservableInspector ObservableInspectorUnion`: one constructor per member type. -/
 inductive ObservableInspectorUnion where
@@ -151,10 +155,10 @@ instance : ToJS CatchCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CatchCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.CatchCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def CatchCallback.ofFn (f : Data → Async Data) : IO CatchCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def CatchCallback.ofSyncFn (f : Data → IO Data) : IO CatchCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback Visitor = undefined (any value, unsigned long long index)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Visitor where
@@ -165,10 +169,10 @@ instance : ToJS Visitor := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Visitor := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Visitor", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Visitor.ofFn (f : Data → Nat → Async Unit) : IO Visitor := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Visitor.ofSyncFn (f : Data → Nat → IO Unit) : IO Visitor := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Nat args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Nat args 1)) }
 
 /-- `callback Reducer = any (any accumulator, any currentValue, unsigned long long index)` (Observable (https://wicg.github.io/observable/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Reducer where
@@ -179,10 +183,10 @@ instance : ToJS Reducer := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Reducer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Reducer", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Reducer.ofFn (f : Data → Data → Nat → Async Data) : IO Reducer := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1) (← Support.arg Nat args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1) (← Internal.arg Nat args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Reducer.ofSyncFn (f : Data → Data → Nat → IO Data) : IO Reducer := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1) (← Support.arg Nat args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1) (← Internal.arg Nat args 2)) }
 
 /-- `dictionary ObservableEventListenerOptions` (Observable (https://wicg.github.io/observable/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ObservableEventListenerOptions where
@@ -190,141 +194,142 @@ structure ObservableEventListenerOptions where
   capture : Option Bool := none
   /-- `boolean passive` -/
   passive : Option Bool := none
-instance : ToJS ObservableEventListenerOptions := ⟨fun d => Support.fields #[("capture", Support.optional d.capture),
-    ("passive", Support.optional d.passive)]⟩
+instance : ToJS ObservableEventListenerOptions := ⟨fun d => Internal.fields #[("capture", Internal.optional d.capture),
+    ("passive", Internal.optional d.passive)]⟩
 
 /-- `v instanceof Observable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Observable`). -/
-def Observable.cast? (v : Value) : IO (Option Observable) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Observable"] Value) v) then some { val := v } else none
+@[macro_inline] def Observable.cast? (v : Value) : IO (Option Observable) := Internal.api "Lasm.JS.Web.Observable.cast?" do
+  Internal.cast (Internal.getGlobal ["Observable"] Value) (fun x => { val := x }) v
 
 /-- `constructor(SubscribeCallback callback)` -/
-def Observable.new (callback : SubscribeCallback) : IO Observable :=
+@[macro_inline] def Observable.new (callback : SubscribeCallback) : IO Observable := Internal.api "Lasm.JS.Web.Observable.new" do
   Lasm.JS.Binding.invoke Observable { name := "Lasm.JS.Web.Observable.new", module := "globalThis", path := "Observable", construct := true, arity := 1 }
-    (Support.args #[toJS callback]) (await := false)
+    (Internal.args #[toJS callback]) (await := false)
 
 /-- `undefined subscribe(optional ObserverUnion observer, optional SubscribeOptions options)` -/
-def Observable.subscribe (self : Observable) (observer : Option ObserverUnion := none) (options : Option SubscribeOptions := none) : IO Unit :=
-  self.val.callMethod "subscribe" (Support.args #[Support.optional observer, Support.optional options]) Unit
+@[macro_inline] def Observable.subscribe (self : Observable) (observer : Option ObserverUnion := none) (options : Option SubscribeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Observable.subscribe" do
+  self.val.callMethod "subscribe" (Internal.args #[Internal.optional observer, Internal.optional options]) Unit
 
 /-- `static Observable from(any value)` -/
-def Observable.«from» (value : Data) : IO Observable := do
+@[macro_inline] def Observable.«from» (value : Data) : IO Observable := Internal.api "Lasm.JS.Web.Observable.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Observable.from", module := "globalThis", path := "Observable.from", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
 /-- `Observable takeUntil(any value)` -/
-def Observable.takeUntil (self : Observable) (value : Data) : IO Observable := do
-  let r ← self.val.callMethod "takeUntil" (Support.args #[toJS value]) Value
+@[macro_inline] def Observable.takeUntil (self : Observable) (value : Data) : IO Observable := Internal.api "Lasm.JS.Web.Observable.takeUntil" do
+  let r ← self.val.callMethod "takeUntil" (Internal.args #[toJS value]) Value
   pure { val := r }
 
 /-- `Observable map(Mapper mapper)` -/
-def Observable.map (self : Observable) (mapper : Mapper) : IO Observable := do
-  let r ← self.val.callMethod "map" (Support.args #[toJS mapper]) Value
+@[macro_inline] def Observable.map (self : Observable) (mapper : Mapper) : IO Observable := Internal.api "Lasm.JS.Web.Observable.map" do
+  let r ← self.val.callMethod "map" (Internal.args #[toJS mapper]) Value
   pure { val := r }
 
 /-- `Observable filter(Predicate predicate)` -/
-def Observable.filter (self : Observable) (predicate : Predicate) : IO Observable := do
-  let r ← self.val.callMethod "filter" (Support.args #[toJS predicate]) Value
+@[macro_inline] def Observable.filter (self : Observable) (predicate : Predicate) : IO Observable := Internal.api "Lasm.JS.Web.Observable.filter" do
+  let r ← self.val.callMethod "filter" (Internal.args #[toJS predicate]) Value
   pure { val := r }
 
 /-- `Observable take(unsigned long long amount)` -/
-def Observable.take (self : Observable) (amount : Nat) : IO Observable := do
-  let r ← self.val.callMethod "take" (Support.args #[toJS amount]) Value
+@[macro_inline] def Observable.take (self : Observable) (amount : Nat) : IO Observable := Internal.api "Lasm.JS.Web.Observable.take" do
+  let r ← self.val.callMethod "take" (Internal.args #[toJS amount]) Value
   pure { val := r }
 
 /-- `Observable drop(unsigned long long amount)` -/
-def Observable.drop (self : Observable) (amount : Nat) : IO Observable := do
-  let r ← self.val.callMethod "drop" (Support.args #[toJS amount]) Value
+@[macro_inline] def Observable.drop (self : Observable) (amount : Nat) : IO Observable := Internal.api "Lasm.JS.Web.Observable.drop" do
+  let r ← self.val.callMethod "drop" (Internal.args #[toJS amount]) Value
   pure { val := r }
 
 /-- `Observable flatMap(Mapper mapper)` -/
-def Observable.flatMap (self : Observable) (mapper : Mapper) : IO Observable := do
-  let r ← self.val.callMethod "flatMap" (Support.args #[toJS mapper]) Value
+@[macro_inline] def Observable.flatMap (self : Observable) (mapper : Mapper) : IO Observable := Internal.api "Lasm.JS.Web.Observable.flatMap" do
+  let r ← self.val.callMethod "flatMap" (Internal.args #[toJS mapper]) Value
   pure { val := r }
 
 /-- `Observable switchMap(Mapper mapper)` -/
-def Observable.switchMap (self : Observable) (mapper : Mapper) : IO Observable := do
-  let r ← self.val.callMethod "switchMap" (Support.args #[toJS mapper]) Value
+@[macro_inline] def Observable.switchMap (self : Observable) (mapper : Mapper) : IO Observable := Internal.api "Lasm.JS.Web.Observable.switchMap" do
+  let r ← self.val.callMethod "switchMap" (Internal.args #[toJS mapper]) Value
   pure { val := r }
 
 /-- `Observable inspect(optional ObservableInspectorUnion inspectorUnion)` -/
-def Observable.inspect (self : Observable) (inspectorUnion : Option ObservableInspectorUnion := none) : IO Observable := do
-  let r ← self.val.callMethod "inspect" (Support.args #[Support.optional inspectorUnion]) Value
+@[macro_inline] def Observable.inspect (self : Observable) (inspectorUnion : Option ObservableInspectorUnion := none) : IO Observable := Internal.api "Lasm.JS.Web.Observable.inspect" do
+  let r ← self.val.callMethod "inspect" (Internal.args #[Internal.optional inspectorUnion]) Value
   pure { val := r }
 
 /-- `Observable catch(CatchCallback callback)` -/
-def Observable.«catch» (self : Observable) (callback : CatchCallback) : IO Observable := do
-  let r ← self.val.callMethod "catch" (Support.args #[toJS callback]) Value
+@[macro_inline] def Observable.«catch» (self : Observable) (callback : CatchCallback) : IO Observable := Internal.api "Lasm.JS.Web.Observable.catch" do
+  let r ← self.val.callMethod "catch" (Internal.args #[toJS callback]) Value
   pure { val := r }
 
 /-- `Observable finally(VoidFunction callback)` -/
-def Observable.«finally» (self : Observable) (callback : VoidFunction) : IO Observable := do
-  let r ← self.val.callMethod "finally" (Support.args #[toJS callback]) Value
+@[macro_inline] def Observable.«finally» (self : Observable) (callback : VoidFunction) : IO Observable := Internal.api "Lasm.JS.Web.Observable.finally" do
+  let r ← self.val.callMethod "finally" (Internal.args #[toJS callback]) Value
   pure { val := r }
 
 /-- `Promise<sequence<any>> toArray(optional SubscribeOptions options)` -/
-def Observable.toArray (self : Observable) (options : Option SubscribeOptions := none) : Async (Array Data) :=
-  self.val.callMethodAwait "toArray" (Support.args #[Support.optional options]) (Array Data)
+@[macro_inline] def Observable.toArray (self : Observable) (options : Option SubscribeOptions := none) : Async (Array Data) := Internal.api "Lasm.JS.Web.Observable.toArray" do
+  self.val.callMethodAwait "toArray" (Internal.args #[Internal.optional options]) (Array Data)
 
 /-- `Promise<undefined> forEach(Visitor callback, optional SubscribeOptions options)` -/
-def Observable.forEach (self : Observable) (callback : Visitor) (options : Option SubscribeOptions := none) : Async Unit :=
-  self.val.callMethodAwait "forEach" (Support.args #[toJS callback, Support.optional options]) Unit
+@[macro_inline] def Observable.forEach (self : Observable) (callback : Visitor) (options : Option SubscribeOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Observable.forEach" do
+  self.val.callMethodAwait "forEach" (Internal.args #[toJS callback, Internal.optional options]) Unit
 
 /-- `Promise<boolean> every(Predicate predicate, optional SubscribeOptions options)` -/
-def Observable.every (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Bool :=
-  self.val.callMethodAwait "every" (Support.args #[toJS predicate, Support.optional options]) Bool
+@[macro_inline] def Observable.every (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Bool := Internal.api "Lasm.JS.Web.Observable.every" do
+  self.val.callMethodAwait "every" (Internal.args #[toJS predicate, Internal.optional options]) Bool
 
 /-- `Promise<any> first(optional SubscribeOptions options)` -/
-def Observable.first (self : Observable) (options : Option SubscribeOptions := none) : Async Data :=
-  self.val.callMethodAwait "first" (Support.args #[Support.optional options]) Data
+@[macro_inline] def Observable.first (self : Observable) (options : Option SubscribeOptions := none) : Async Data := Internal.api "Lasm.JS.Web.Observable.first" do
+  self.val.callMethodAwait "first" (Internal.args #[Internal.optional options]) Data
 
 /-- `Promise<any> last(optional SubscribeOptions options)` -/
-def Observable.last (self : Observable) (options : Option SubscribeOptions := none) : Async Data :=
-  self.val.callMethodAwait "last" (Support.args #[Support.optional options]) Data
+@[macro_inline] def Observable.last (self : Observable) (options : Option SubscribeOptions := none) : Async Data := Internal.api "Lasm.JS.Web.Observable.last" do
+  self.val.callMethodAwait "last" (Internal.args #[Internal.optional options]) Data
 
 /-- `Promise<any> find(Predicate predicate, optional SubscribeOptions options)` -/
-def Observable.find (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Data :=
-  self.val.callMethodAwait "find" (Support.args #[toJS predicate, Support.optional options]) Data
+@[macro_inline] def Observable.find (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Data := Internal.api "Lasm.JS.Web.Observable.find" do
+  self.val.callMethodAwait "find" (Internal.args #[toJS predicate, Internal.optional options]) Data
 
 /-- `Promise<boolean> some(Predicate predicate, optional SubscribeOptions options)` -/
-def Observable.some (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Bool :=
-  self.val.callMethodAwait "some" (Support.args #[toJS predicate, Support.optional options]) Bool
+@[macro_inline] def Observable.some (self : Observable) (predicate : Predicate) (options : Option SubscribeOptions := none) : Async Bool := Internal.api "Lasm.JS.Web.Observable.some" do
+  self.val.callMethodAwait "some" (Internal.args #[toJS predicate, Internal.optional options]) Bool
 
 /-- `Promise<any> reduce(Reducer reducer, optional any initialValue, optional SubscribeOptions options)` -/
-def Observable.reduce (self : Observable) (reducer : Reducer) (initialValue : Data := .undefined) (options : Option SubscribeOptions := none) : Async Data :=
-  self.val.callMethodAwait "reduce" (Support.args #[toJS reducer, initialValue, Support.optional options]) Data
+@[macro_inline] def Observable.reduce (self : Observable) (reducer : Reducer) (initialValue : Data := .undefined) (options : Option SubscribeOptions := none) : Async Data := Internal.api "Lasm.JS.Web.Observable.reduce" do
+  self.val.callMethodAwait "reduce" (Internal.args #[toJS reducer, initialValue, Internal.optional options]) Data
 
 /-- `v instanceof Subscriber`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Subscriber`). -/
-def Subscriber.cast? (v : Value) : IO (Option Subscriber) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Subscriber"] Value) v) then some { val := v } else none
+@[macro_inline] def Subscriber.cast? (v : Value) : IO (Option Subscriber) := Internal.api "Lasm.JS.Web.Subscriber.cast?" do
+  Internal.cast (Internal.getGlobal ["Subscriber"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean active` -/
-def Subscriber.active (self : Subscriber) : IO Bool := self.val.get "active" Bool
+@[macro_inline] def Subscriber.active (self : Subscriber) : IO Bool := Internal.api "Lasm.JS.Web.Subscriber.active" do
+  self.val.get "active" Bool
 
 /-- `readonly attribute AbortSignal signal` -/
-def Subscriber.signal (self : Subscriber) : IO AbortSignal := do
+@[macro_inline] def Subscriber.signal (self : Subscriber) : IO AbortSignal := Internal.api "Lasm.JS.Web.Subscriber.signal" do
   let r ← self.val.get "signal" Value
   pure { val := r }
 
 /-- `undefined next(any value)` -/
-def Subscriber.next (self : Subscriber) (value : Data) : IO Unit :=
-  self.val.callMethod "next" (Support.args #[toJS value]) Unit
+@[macro_inline] def Subscriber.next (self : Subscriber) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.Subscriber.next" do
+  self.val.callMethod "next" (Internal.args #[toJS value]) Unit
 
 /-- `undefined error(any error)` -/
-def Subscriber.error (self : Subscriber) (error : Data) : IO Unit :=
-  self.val.callMethod "error" (Support.args #[toJS error]) Unit
+@[macro_inline] def Subscriber.error (self : Subscriber) (error : Data) : IO Unit := Internal.api "Lasm.JS.Web.Subscriber.error" do
+  self.val.callMethod "error" (Internal.args #[toJS error]) Unit
 
 /-- `undefined complete()` -/
-def Subscriber.complete (self : Subscriber) : IO Unit :=
-  self.val.callMethod "complete" (Support.args #[]) Unit
+@[macro_inline] def Subscriber.complete (self : Subscriber) : IO Unit := Internal.api "Lasm.JS.Web.Subscriber.complete" do
+  self.val.callMethod "complete" (Internal.args #[]) Unit
 
 /-- `undefined addTeardown(VoidFunction teardown)` -/
-def Subscriber.addTeardown (self : Subscriber) (teardown : VoidFunction) : IO Unit :=
-  self.val.callMethod "addTeardown" (Support.args #[toJS teardown]) Unit
+@[macro_inline] def Subscriber.addTeardown (self : Subscriber) (teardown : VoidFunction) : IO Unit := Internal.api "Lasm.JS.Web.Subscriber.addTeardown" do
+  self.val.callMethod "addTeardown" (Internal.args #[toJS teardown]) Unit
 
 /-- `Observable when(DOMString type, optional ObservableEventListenerOptions options)` -/
-def EventTarget.when (self : EventTarget) (type : String) (options : Option ObservableEventListenerOptions := none) : IO Observable := do
-  let r ← self.val.callMethod "when" (Support.args #[toJS type, Support.optional options]) Value
+@[macro_inline] def EventTarget.when (self : EventTarget) (type : String) (options : Option ObservableEventListenerOptions := none) : IO Observable := Internal.api "Lasm.JS.Web.EventTarget.when" do
+  let r ← self.val.callMethod "when" (Internal.args #[toJS type, Internal.optional options]) Value
   pure { val := r }
 
 end Lasm.JS.Web

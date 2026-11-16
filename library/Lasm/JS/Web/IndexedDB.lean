@@ -6,102 +6,24 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.IndexedDB
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.CrossOriginStorage
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum IDBCursorDirection` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)): "next", "nextunique", "prev", "prevunique". -/
-inductive IDBCursorDirection where
-  /-- "next" -/
-  | next
-  /-- "nextunique" -/
-  | nextunique
-  /-- "prev" -/
-  | prev
-  /-- "prevunique" -/
-  | prevunique
-  deriving BEq, Repr, Inhabited
-instance : ToJS IDBCursorDirection := ⟨fun
-  | .next => .string "next"
-  | .nextunique => .string "nextunique"
-  | .prev => .string "prev"
-  | .prevunique => .string "prevunique"⟩
-instance : FromJS IDBCursorDirection where
-  fromJS
-    | .string "next" => .ok .next
-    | .string "nextunique" => .ok .nextunique
-    | .string "prev" => .ok .prev
-    | .string "prevunique" => .ok .prevunique
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IDBCursorDirection"
-
-/-- `enum IDBTransactionMode` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)): "readonly", "readwrite", "versionchange". -/
-inductive IDBTransactionMode where
-  /-- "readonly" -/
-  | readonly
-  /-- "readwrite" -/
-  | readwrite
-  /-- "versionchange" -/
-  | versionchange
-  deriving BEq, Repr, Inhabited
-instance : ToJS IDBTransactionMode := ⟨fun
-  | .readonly => .string "readonly"
-  | .readwrite => .string "readwrite"
-  | .versionchange => .string "versionchange"⟩
-instance : FromJS IDBTransactionMode where
-  fromJS
-    | .string "readonly" => .ok .readonly
-    | .string "readwrite" => .ok .readwrite
-    | .string "versionchange" => .ok .versionchange
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IDBTransactionMode"
-
-/-- `enum IDBTransactionDurability` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)): "default", "strict", "relaxed". -/
-inductive IDBTransactionDurability where
-  /-- "default" -/
-  | default
-  /-- "strict" -/
-  | strict
-  /-- "relaxed" -/
-  | relaxed
-  deriving BEq, Repr, Inhabited
-instance : ToJS IDBTransactionDurability := ⟨fun
-  | .default => .string "default"
-  | .strict => .string "strict"
-  | .relaxed => .string "relaxed"⟩
-instance : FromJS IDBTransactionDurability where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "strict" => .ok .strict
-    | .string "relaxed" => .ok .relaxed
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IDBTransactionDurability"
-
-/-- `enum IDBRequestReadyState` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)): "pending", "done". -/
-inductive IDBRequestReadyState where
-  /-- "pending" -/
-  | pending
-  /-- "done" -/
-  | done
-  deriving BEq, Repr, Inhabited
-instance : ToJS IDBRequestReadyState := ⟨fun
-  | .pending => .string "pending"
-  | .done => .string "done"⟩
-instance : FromJS IDBRequestReadyState where
-  fromJS
-    | .string "pending" => .ok .pending
-    | .string "done" => .ok .done
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.IDBRequestReadyState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary IDBTransactionOptions` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IDBTransactionOptions where
   /-- `IDBTransactionDurability durability = "default"` -/
   durability : Option IDBTransactionDurability := none
-instance : ToJS IDBTransactionOptions := ⟨fun d => Support.fields #[("durability", Support.optional d.durability)]⟩
+instance : ToJS IDBTransactionOptions := ⟨fun d => Internal.fields #[("durability", Internal.optional d.durability)]⟩
 
 /-- `dictionary IDBObjectStoreParameters` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IDBObjectStoreParameters where
@@ -109,8 +31,8 @@ structure IDBObjectStoreParameters where
   keyPath : Option DOMStringOrSequenceOfDOMString := none
   /-- `boolean autoIncrement = false` -/
   autoIncrement : Option Bool := none
-instance : ToJS IDBObjectStoreParameters := ⟨fun d => Support.fields #[("keyPath", Support.optional d.keyPath),
-    ("autoIncrement", Support.optional d.autoIncrement)]⟩
+instance : ToJS IDBObjectStoreParameters := ⟨fun d => Internal.fields #[("keyPath", Internal.optional d.keyPath),
+    ("autoIncrement", Internal.optional d.autoIncrement)]⟩
 
 /-- `dictionary IDBDatabaseInfo` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IDBDatabaseInfo where
@@ -118,6 +40,8 @@ structure IDBDatabaseInfo where
   name : Option String := none
   /-- `unsigned long long version` -/
   version : Option Nat := none
+instance : ToJS IDBDatabaseInfo := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("version", Internal.optional d.version)]⟩
 instance : FromJS IDBDatabaseInfo where
   fromJS d := do return {
     name := ← Lasm.JS.readField (Option String) d "name",
@@ -132,9 +56,9 @@ structure IDBGetAllOptions where
   count : Option Nat := none
   /-- `IDBCursorDirection direction = "next"` -/
   direction : Option IDBCursorDirection := none
-instance : ToJS IDBGetAllOptions := ⟨fun d => Support.fields #[("query", d.query),
-    ("count", Support.optional d.count),
-    ("direction", Support.optional d.direction)]⟩
+instance : ToJS IDBGetAllOptions := ⟨fun d => Internal.fields #[("query", d.query),
+    ("count", Internal.optional d.count),
+    ("direction", Internal.optional d.direction)]⟩
 
 /-- `dictionary IDBIndexParameters` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IDBIndexParameters where
@@ -142,8 +66,8 @@ structure IDBIndexParameters where
   unique : Option Bool := none
   /-- `boolean multiEntry = false` -/
   multiEntry : Option Bool := none
-instance : ToJS IDBIndexParameters := ⟨fun d => Support.fields #[("unique", Support.optional d.unique),
-    ("multiEntry", Support.optional d.multiEntry)]⟩
+instance : ToJS IDBIndexParameters := ⟨fun d => Internal.fields #[("unique", Internal.optional d.unique),
+    ("multiEntry", Internal.optional d.multiEntry)]⟩
 
 /-- `dictionary IDBVersionChangeEventInit : EventInit` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IDBVersionChangeEventInit where
@@ -157,501 +81,547 @@ structure IDBVersionChangeEventInit where
   oldVersion : Option Nat := none
   /-- `unsigned long long? newVersion = null` -/
   newVersion : Option Nat := none
-instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("oldVersion", Support.optional d.oldVersion),
-    ("newVersion", Support.optional d.newVersion)]⟩
+instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("oldVersion", Internal.optional d.oldVersion),
+    ("newVersion", Internal.optional d.newVersion)]⟩
 
 /-- `v instanceof IDBCursor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBCursor`). -/
-def IDBCursor.cast? (v : Value) : IO (Option IDBCursor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBCursor"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBCursor.cast? (v : Value) : IO (Option IDBCursor) := Internal.api "Lasm.JS.Web.IDBCursor.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBCursor"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute (IDBObjectStore or IDBIndex) source` -/
-def IDBCursor.source (self : IDBCursor) : IO Value := self.val.get "source" Value
+@[macro_inline] def IDBCursor.source (self : IDBCursor) : IO Value := Internal.api "Lasm.JS.Web.IDBCursor.source" do
+  self.val.get "source" Value
 
 /-- `readonly attribute IDBCursorDirection direction` -/
-def IDBCursor.direction (self : IDBCursor) : IO IDBCursorDirection := self.val.get "direction" IDBCursorDirection
+@[macro_inline] def IDBCursor.direction (self : IDBCursor) : IO IDBCursorDirection := Internal.api "Lasm.JS.Web.IDBCursor.direction" do
+  self.val.get "direction" IDBCursorDirection
 
 /-- `readonly attribute any key` -/
-def IDBCursor.key (self : IDBCursor) : IO Data := self.val.get "key" Data
+@[macro_inline] def IDBCursor.key (self : IDBCursor) : IO Data := Internal.api "Lasm.JS.Web.IDBCursor.key" do
+  self.val.get "key" Data
 
 /-- `readonly attribute any primaryKey` -/
-def IDBCursor.primaryKey (self : IDBCursor) : IO Data := self.val.get "primaryKey" Data
+@[macro_inline] def IDBCursor.primaryKey (self : IDBCursor) : IO Data := Internal.api "Lasm.JS.Web.IDBCursor.primaryKey" do
+  self.val.get "primaryKey" Data
 
 /-- `readonly attribute IDBRequest request` -/
-def IDBCursor.request (self : IDBCursor) : IO IDBRequest := do
+@[macro_inline] def IDBCursor.request (self : IDBCursor) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBCursor.request" do
   let r ← self.val.get "request" Value
   pure { val := r }
 
 /-- `undefined advance(unsigned long count)` -/
-def IDBCursor.advance (self : IDBCursor) (count : Nat) : IO Unit :=
-  self.val.callMethod "advance" (Support.args #[toJS count]) Unit
+@[macro_inline] def IDBCursor.advance (self : IDBCursor) (count : Nat) : IO Unit := Internal.api "Lasm.JS.Web.IDBCursor.advance" do
+  self.val.callMethod "advance" (Internal.args #[toJS count]) Unit
 
 /-- `undefined continue(optional any key)` -/
-def IDBCursor.«continue» (self : IDBCursor) (key : Data := .undefined) : IO Unit :=
-  self.val.callMethod "continue" (Support.args #[key]) Unit
+@[macro_inline] def IDBCursor.«continue» (self : IDBCursor) (key : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.IDBCursor.continue" do
+  self.val.callMethod "continue" (Internal.args #[key]) Unit
 
 /-- `undefined continuePrimaryKey(any key, any primaryKey)` -/
-def IDBCursor.continuePrimaryKey (self : IDBCursor) (key : Data) (primaryKey : Data) : IO Unit :=
-  self.val.callMethod "continuePrimaryKey" (Support.args #[toJS key, toJS primaryKey]) Unit
+@[macro_inline] def IDBCursor.continuePrimaryKey (self : IDBCursor) (key : Data) (primaryKey : Data) : IO Unit := Internal.api "Lasm.JS.Web.IDBCursor.continuePrimaryKey" do
+  self.val.callMethod "continuePrimaryKey" (Internal.args #[toJS key, toJS primaryKey]) Unit
 
 /-- `IDBRequest update(any value)` -/
-def IDBCursor.update (self : IDBCursor) (value : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS value]) Value
+@[macro_inline] def IDBCursor.update (self : IDBCursor) (value : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBCursor.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS value]) Value
   pure { val := r }
 
 /-- `IDBRequest delete()` -/
-def IDBCursor.delete (self : IDBCursor) : IO IDBRequest := do
-  let r ← self.val.callMethod "delete" (Support.args #[]) Value
+@[macro_inline] def IDBCursor.delete (self : IDBCursor) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBCursor.delete" do
+  let r ← self.val.callMethod "delete" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof IDBDatabase`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBDatabase`). -/
-def IDBDatabase.cast? (v : Value) : IO (Option IDBDatabase) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBDatabase"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBDatabase.cast? (v : Value) : IO (Option IDBDatabase) := Internal.api "Lasm.JS.Web.IDBDatabase.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBDatabase"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def IDBDatabase.name (self : IDBDatabase) : IO String := self.val.get "name" String
+@[macro_inline] def IDBDatabase.name (self : IDBDatabase) : IO String := Internal.api "Lasm.JS.Web.IDBDatabase.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute unsigned long long version` -/
-def IDBDatabase.version (self : IDBDatabase) : IO Nat := self.val.get "version" Nat
+@[macro_inline] def IDBDatabase.version (self : IDBDatabase) : IO Nat := Internal.api "Lasm.JS.Web.IDBDatabase.version" do
+  self.val.get "version" Nat
 
 /-- `readonly attribute DOMStringList objectStoreNames` -/
-def IDBDatabase.objectStoreNames (self : IDBDatabase) : IO DOMStringList := do
+@[macro_inline] def IDBDatabase.objectStoreNames (self : IDBDatabase) : IO DOMStringList := Internal.api "Lasm.JS.Web.IDBDatabase.objectStoreNames" do
   let r ← self.val.get "objectStoreNames" Value
   pure { val := r }
 
 /-- `attribute EventHandler onabort` -/
-def IDBDatabase.onabort (self : IDBDatabase) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def IDBDatabase.onabort (self : IDBDatabase) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBDatabase.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def IDBDatabase.setOnabort (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBDatabase.setOnabort (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler onclose` -/
-def IDBDatabase.onclose (self : IDBDatabase) : IO (Option EventHandlerNonNull) := self.val.get "onclose" (Option EventHandlerNonNull)
+@[macro_inline] def IDBDatabase.onclose (self : IDBDatabase) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBDatabase.onclose" do
+  self.val.get "onclose" (Option EventHandlerNonNull)
 
 /-- Sets `onclose`: `attribute EventHandler onclose` -/
-def IDBDatabase.setOnclose (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBDatabase.setOnclose (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def IDBDatabase.onerror (self : IDBDatabase) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def IDBDatabase.onerror (self : IDBDatabase) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBDatabase.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def IDBDatabase.setOnerror (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBDatabase.setOnerror (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onversionchange` -/
-def IDBDatabase.onversionchange (self : IDBDatabase) : IO (Option EventHandlerNonNull) := self.val.get "onversionchange" (Option EventHandlerNonNull)
+@[macro_inline] def IDBDatabase.onversionchange (self : IDBDatabase) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBDatabase.onversionchange" do
+  self.val.get "onversionchange" (Option EventHandlerNonNull)
 
 /-- Sets `onversionchange`: `attribute EventHandler onversionchange` -/
-def IDBDatabase.setOnversionchange (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBDatabase.setOnversionchange (self : IDBDatabase) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.setOnversionchange" do
   self.val.set "onversionchange" (toJS value)
 
 /-- `IDBTransaction transaction((DOMString or sequence<DOMString>) storeNames, optional IDBTransactionMode mode, optional IDBTransactionOptions options)` -/
-def IDBDatabase.transaction (self : IDBDatabase) (storeNames : DOMStringOrSequenceOfDOMString) (mode : Option IDBTransactionMode := none) (options : Option IDBTransactionOptions := none) : IO IDBTransaction := do
-  let r ← self.val.callMethod "transaction" (Support.args #[toJS storeNames, Support.optional mode, Support.optional options]) Value
+@[macro_inline] def IDBDatabase.transaction (self : IDBDatabase) (storeNames : DOMStringOrSequenceOfDOMString) (mode : Option IDBTransactionMode := none) (options : Option IDBTransactionOptions := none) : IO IDBTransaction := Internal.api "Lasm.JS.Web.IDBDatabase.transaction" do
+  let r ← self.val.callMethod "transaction" (Internal.args #[toJS storeNames, Internal.optional mode, Internal.optional options]) Value
   pure { val := r }
 
 /-- `undefined close()` -/
-def IDBDatabase.close (self : IDBDatabase) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def IDBDatabase.close (self : IDBDatabase) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `IDBObjectStore createObjectStore(DOMString name, optional IDBObjectStoreParameters options)` -/
-def IDBDatabase.createObjectStore (self : IDBDatabase) (name : String) (options : Option IDBObjectStoreParameters := none) : IO IDBObjectStore := do
-  let r ← self.val.callMethod "createObjectStore" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def IDBDatabase.createObjectStore (self : IDBDatabase) (name : String) (options : Option IDBObjectStoreParameters := none) : IO IDBObjectStore := Internal.api "Lasm.JS.Web.IDBDatabase.createObjectStore" do
+  let r ← self.val.callMethod "createObjectStore" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- `undefined deleteObjectStore(DOMString name)` -/
-def IDBDatabase.deleteObjectStore (self : IDBDatabase) (name : String) : IO Unit :=
-  self.val.callMethod "deleteObjectStore" (Support.args #[toJS name]) Unit
+@[macro_inline] def IDBDatabase.deleteObjectStore (self : IDBDatabase) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.IDBDatabase.deleteObjectStore" do
+  self.val.callMethod "deleteObjectStore" (Internal.args #[toJS name]) Unit
 
 /-- `v instanceof IDBFactory`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBFactory`). -/
-def IDBFactory.cast? (v : Value) : IO (Option IDBFactory) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBFactory"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBFactory.cast? (v : Value) : IO (Option IDBFactory) := Internal.api "Lasm.JS.Web.IDBFactory.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBFactory"] Value) (fun x => { val := x }) v
 
 /-- `IDBOpenDBRequest open(DOMString name, optional unsigned long long version)` -/
-def IDBFactory.«open» (self : IDBFactory) (name : String) (version : Option Nat := none) : IO IDBOpenDBRequest := do
-  let r ← self.val.callMethod "open" (Support.args #[toJS name, Support.optional version]) Value
+@[macro_inline] def IDBFactory.«open» (self : IDBFactory) (name : String) (version : Option Nat := none) : IO IDBOpenDBRequest := Internal.api "Lasm.JS.Web.IDBFactory.open" do
+  let r ← self.val.callMethod "open" (Internal.args #[toJS name, Internal.optional version]) Value
   pure { val := r }
 
 /-- `IDBOpenDBRequest deleteDatabase(DOMString name)` -/
-def IDBFactory.deleteDatabase (self : IDBFactory) (name : String) : IO IDBOpenDBRequest := do
-  let r ← self.val.callMethod "deleteDatabase" (Support.args #[toJS name]) Value
+@[macro_inline] def IDBFactory.deleteDatabase (self : IDBFactory) (name : String) : IO IDBOpenDBRequest := Internal.api "Lasm.JS.Web.IDBFactory.deleteDatabase" do
+  let r ← self.val.callMethod "deleteDatabase" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `Promise<sequence<IDBDatabaseInfo>> databases()` -/
-def IDBFactory.databases (self : IDBFactory) : Async (Array IDBDatabaseInfo) :=
-  self.val.callMethodAwait "databases" (Support.args #[]) (Array IDBDatabaseInfo)
+@[macro_inline] def IDBFactory.databases (self : IDBFactory) : Async (Array IDBDatabaseInfo) := Internal.api "Lasm.JS.Web.IDBFactory.databases" do
+  self.val.callMethodAwait "databases" (Internal.args #[]) (Array IDBDatabaseInfo)
 
 /-- `short cmp(any first, any second)` -/
-def IDBFactory.cmp (self : IDBFactory) (first : Data) (second : Data) : IO Int :=
-  self.val.callMethod "cmp" (Support.args #[toJS first, toJS second]) Int
+@[macro_inline] def IDBFactory.cmp (self : IDBFactory) (first : Data) (second : Data) : IO Int := Internal.api "Lasm.JS.Web.IDBFactory.cmp" do
+  self.val.callMethod "cmp" (Internal.args #[toJS first, toJS second]) Int
 
 /-- `v instanceof IDBIndex`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBIndex`). -/
-def IDBIndex.cast? (v : Value) : IO (Option IDBIndex) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBIndex"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBIndex.cast? (v : Value) : IO (Option IDBIndex) := Internal.api "Lasm.JS.Web.IDBIndex.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBIndex"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString name` -/
-def IDBIndex.name (self : IDBIndex) : IO String := self.val.get "name" String
+@[macro_inline] def IDBIndex.name (self : IDBIndex) : IO String := Internal.api "Lasm.JS.Web.IDBIndex.name" do
+  self.val.get "name" String
 
 /-- Sets `name`: `attribute DOMString name` -/
-def IDBIndex.setName (self : IDBIndex) (value : String) : IO Unit :=
+@[macro_inline] def IDBIndex.setName (self : IDBIndex) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.IDBIndex.setName" do
   self.val.set "name" (toJS value)
 
 /-- `readonly attribute IDBObjectStore objectStore` -/
-def IDBIndex.objectStore (self : IDBIndex) : IO IDBObjectStore := do
+@[macro_inline] def IDBIndex.objectStore (self : IDBIndex) : IO IDBObjectStore := Internal.api "Lasm.JS.Web.IDBIndex.objectStore" do
   let r ← self.val.get "objectStore" Value
   pure { val := r }
 
 /-- `readonly attribute any keyPath` -/
-def IDBIndex.keyPath (self : IDBIndex) : IO Data := self.val.get "keyPath" Data
+@[macro_inline] def IDBIndex.keyPath (self : IDBIndex) : IO Data := Internal.api "Lasm.JS.Web.IDBIndex.keyPath" do
+  self.val.get "keyPath" Data
 
 /-- `readonly attribute boolean multiEntry` -/
-def IDBIndex.multiEntry (self : IDBIndex) : IO Bool := self.val.get "multiEntry" Bool
+@[macro_inline] def IDBIndex.multiEntry (self : IDBIndex) : IO Bool := Internal.api "Lasm.JS.Web.IDBIndex.multiEntry" do
+  self.val.get "multiEntry" Bool
 
 /-- `readonly attribute boolean unique` -/
-def IDBIndex.unique (self : IDBIndex) : IO Bool := self.val.get "unique" Bool
+@[macro_inline] def IDBIndex.unique (self : IDBIndex) : IO Bool := Internal.api "Lasm.JS.Web.IDBIndex.unique" do
+  self.val.get "unique" Bool
 
 /-- `IDBRequest get(any query)` -/
-def IDBIndex.get (self : IDBIndex) (query : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "get" (Support.args #[toJS query]) Value
+@[macro_inline] def IDBIndex.get (self : IDBIndex) (query : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.get" do
+  let r ← self.val.callMethod "get" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `IDBRequest getKey(any query)` -/
-def IDBIndex.getKey (self : IDBIndex) (query : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "getKey" (Support.args #[toJS query]) Value
+@[macro_inline] def IDBIndex.getKey (self : IDBIndex) (query : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.getKey" do
+  let r ← self.val.callMethod "getKey" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `IDBRequest getAll(optional any queryOrOptions, optional unsigned long count)` -/
-def IDBIndex.getAll (self : IDBIndex) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAll" (Support.args #[queryOrOptions, Support.optional count]) Value
+@[macro_inline] def IDBIndex.getAll (self : IDBIndex) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.getAll" do
+  let r ← self.val.callMethod "getAll" (Internal.args #[queryOrOptions, Internal.optional count]) Value
   pure { val := r }
 
 /-- `IDBRequest getAllKeys(optional any queryOrOptions, optional unsigned long count)` -/
-def IDBIndex.getAllKeys (self : IDBIndex) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAllKeys" (Support.args #[queryOrOptions, Support.optional count]) Value
+@[macro_inline] def IDBIndex.getAllKeys (self : IDBIndex) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.getAllKeys" do
+  let r ← self.val.callMethod "getAllKeys" (Internal.args #[queryOrOptions, Internal.optional count]) Value
   pure { val := r }
 
 /-- `IDBRequest getAllRecords(optional IDBGetAllOptions options)` -/
-def IDBIndex.getAllRecords (self : IDBIndex) (options : Option IDBGetAllOptions := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAllRecords" (Support.args #[Support.optional options]) Value
+@[macro_inline] def IDBIndex.getAllRecords (self : IDBIndex) (options : Option IDBGetAllOptions := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.getAllRecords" do
+  let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `IDBRequest count(optional any query)` -/
-def IDBIndex.count (self : IDBIndex) (query : Data := .undefined) : IO IDBRequest := do
-  let r ← self.val.callMethod "count" (Support.args #[query]) Value
+@[macro_inline] def IDBIndex.count (self : IDBIndex) (query : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.count" do
+  let r ← self.val.callMethod "count" (Internal.args #[query]) Value
   pure { val := r }
 
 /-- `IDBRequest openCursor(optional any query, optional IDBCursorDirection direction)` -/
-def IDBIndex.openCursor (self : IDBIndex) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "openCursor" (Support.args #[query, Support.optional direction]) Value
+@[macro_inline] def IDBIndex.openCursor (self : IDBIndex) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.openCursor" do
+  let r ← self.val.callMethod "openCursor" (Internal.args #[query, Internal.optional direction]) Value
   pure { val := r }
 
 /-- `IDBRequest openKeyCursor(optional any query, optional IDBCursorDirection direction)` -/
-def IDBIndex.openKeyCursor (self : IDBIndex) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "openKeyCursor" (Support.args #[query, Support.optional direction]) Value
+@[macro_inline] def IDBIndex.openKeyCursor (self : IDBIndex) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.openKeyCursor" do
+  let r ← self.val.callMethod "openKeyCursor" (Internal.args #[query, Internal.optional direction]) Value
   pure { val := r }
 
 /-- `v instanceof IDBKeyRange`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBKeyRange`). -/
-def IDBKeyRange.cast? (v : Value) : IO (Option IDBKeyRange) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBKeyRange"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBKeyRange.cast? (v : Value) : IO (Option IDBKeyRange) := Internal.api "Lasm.JS.Web.IDBKeyRange.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBKeyRange"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any lower` -/
-def IDBKeyRange.lower (self : IDBKeyRange) : IO Data := self.val.get "lower" Data
+@[macro_inline] def IDBKeyRange.lower (self : IDBKeyRange) : IO Data := Internal.api "Lasm.JS.Web.IDBKeyRange.lower" do
+  self.val.get "lower" Data
 
 /-- `readonly attribute any upper` -/
-def IDBKeyRange.upper (self : IDBKeyRange) : IO Data := self.val.get "upper" Data
+@[macro_inline] def IDBKeyRange.upper (self : IDBKeyRange) : IO Data := Internal.api "Lasm.JS.Web.IDBKeyRange.upper" do
+  self.val.get "upper" Data
 
 /-- `readonly attribute boolean lowerOpen` -/
-def IDBKeyRange.lowerOpen (self : IDBKeyRange) : IO Bool := self.val.get "lowerOpen" Bool
+@[macro_inline] def IDBKeyRange.lowerOpen (self : IDBKeyRange) : IO Bool := Internal.api "Lasm.JS.Web.IDBKeyRange.lowerOpen" do
+  self.val.get "lowerOpen" Bool
 
 /-- `readonly attribute boolean upperOpen` -/
-def IDBKeyRange.upperOpen (self : IDBKeyRange) : IO Bool := self.val.get "upperOpen" Bool
+@[macro_inline] def IDBKeyRange.upperOpen (self : IDBKeyRange) : IO Bool := Internal.api "Lasm.JS.Web.IDBKeyRange.upperOpen" do
+  self.val.get "upperOpen" Bool
 
 /-- `static IDBKeyRange only(any value)` -/
-def IDBKeyRange.only (value : Data) : IO IDBKeyRange := do
+@[macro_inline] def IDBKeyRange.only (value : Data) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.only" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.only", module := "globalThis", path := "IDBKeyRange.only", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
 /-- `static IDBKeyRange lowerBound(any lower, optional boolean open)` -/
-def IDBKeyRange.lowerBound (lower : Data) («open» : Option Bool := none) : IO IDBKeyRange := do
+@[macro_inline] def IDBKeyRange.lowerBound (lower : Data) («open» : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.lowerBound" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.lowerBound", module := "globalThis", path := "IDBKeyRange.lowerBound", construct := false, arity := 2 }
-    (Support.args #[toJS lower, Support.optional «open»]) (await := false)
+    (Internal.args #[toJS lower, Internal.optional «open»]) (await := false)
   pure { val := r }
 
 /-- `static IDBKeyRange upperBound(any upper, optional boolean open)` -/
-def IDBKeyRange.upperBound (upper : Data) («open» : Option Bool := none) : IO IDBKeyRange := do
+@[macro_inline] def IDBKeyRange.upperBound (upper : Data) («open» : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.upperBound" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.upperBound", module := "globalThis", path := "IDBKeyRange.upperBound", construct := false, arity := 2 }
-    (Support.args #[toJS upper, Support.optional «open»]) (await := false)
+    (Internal.args #[toJS upper, Internal.optional «open»]) (await := false)
   pure { val := r }
 
 /-- `static IDBKeyRange bound(any lower, any upper, optional boolean lowerOpen, optional boolean upperOpen)` -/
-def IDBKeyRange.bound (lower : Data) (upper : Data) (lowerOpen : Option Bool := none) (upperOpen : Option Bool := none) : IO IDBKeyRange := do
+@[macro_inline] def IDBKeyRange.bound (lower : Data) (upper : Data) (lowerOpen : Option Bool := none) (upperOpen : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.bound" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.bound", module := "globalThis", path := "IDBKeyRange.bound", construct := false, arity := 4 }
-    (Support.args #[toJS lower, toJS upper, Support.optional lowerOpen, Support.optional upperOpen]) (await := false)
+    (Internal.args #[toJS lower, toJS upper, Internal.optional lowerOpen, Internal.optional upperOpen]) (await := false)
   pure { val := r }
 
 /-- `boolean includes(any key)` -/
-def IDBKeyRange.includes (self : IDBKeyRange) (key : Data) : IO Bool :=
-  self.val.callMethod "includes" (Support.args #[toJS key]) Bool
+@[macro_inline] def IDBKeyRange.includes (self : IDBKeyRange) (key : Data) : IO Bool := Internal.api "Lasm.JS.Web.IDBKeyRange.includes" do
+  self.val.callMethod "includes" (Internal.args #[toJS key]) Bool
 
 /-- `v instanceof IDBObjectStore`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBObjectStore`). -/
-def IDBObjectStore.cast? (v : Value) : IO (Option IDBObjectStore) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBObjectStore"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBObjectStore.cast? (v : Value) : IO (Option IDBObjectStore) := Internal.api "Lasm.JS.Web.IDBObjectStore.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBObjectStore"] Value) (fun x => { val := x }) v
 
 /-- `attribute DOMString name` -/
-def IDBObjectStore.name (self : IDBObjectStore) : IO String := self.val.get "name" String
+@[macro_inline] def IDBObjectStore.name (self : IDBObjectStore) : IO String := Internal.api "Lasm.JS.Web.IDBObjectStore.name" do
+  self.val.get "name" String
 
 /-- Sets `name`: `attribute DOMString name` -/
-def IDBObjectStore.setName (self : IDBObjectStore) (value : String) : IO Unit :=
+@[macro_inline] def IDBObjectStore.setName (self : IDBObjectStore) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.IDBObjectStore.setName" do
   self.val.set "name" (toJS value)
 
 /-- `readonly attribute any keyPath` -/
-def IDBObjectStore.keyPath (self : IDBObjectStore) : IO Data := self.val.get "keyPath" Data
+@[macro_inline] def IDBObjectStore.keyPath (self : IDBObjectStore) : IO Data := Internal.api "Lasm.JS.Web.IDBObjectStore.keyPath" do
+  self.val.get "keyPath" Data
 
 /-- `readonly attribute DOMStringList indexNames` -/
-def IDBObjectStore.indexNames (self : IDBObjectStore) : IO DOMStringList := do
+@[macro_inline] def IDBObjectStore.indexNames (self : IDBObjectStore) : IO DOMStringList := Internal.api "Lasm.JS.Web.IDBObjectStore.indexNames" do
   let r ← self.val.get "indexNames" Value
   pure { val := r }
 
 /-- `readonly attribute IDBTransaction transaction` -/
-def IDBObjectStore.transaction (self : IDBObjectStore) : IO IDBTransaction := do
+@[macro_inline] def IDBObjectStore.transaction (self : IDBObjectStore) : IO IDBTransaction := Internal.api "Lasm.JS.Web.IDBObjectStore.transaction" do
   let r ← self.val.get "transaction" Value
   pure { val := r }
 
 /-- `readonly attribute boolean autoIncrement` -/
-def IDBObjectStore.autoIncrement (self : IDBObjectStore) : IO Bool := self.val.get "autoIncrement" Bool
+@[macro_inline] def IDBObjectStore.autoIncrement (self : IDBObjectStore) : IO Bool := Internal.api "Lasm.JS.Web.IDBObjectStore.autoIncrement" do
+  self.val.get "autoIncrement" Bool
 
 /-- `IDBRequest put(any value, optional any key)` -/
-def IDBObjectStore.put (self : IDBObjectStore) (value : Data) (key : Data := .undefined) : IO IDBRequest := do
-  let r ← self.val.callMethod "put" (Support.args #[toJS value, key]) Value
+@[macro_inline] def IDBObjectStore.put (self : IDBObjectStore) (value : Data) (key : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.put" do
+  let r ← self.val.callMethod "put" (Internal.args #[toJS value, key]) Value
   pure { val := r }
 
 /-- `IDBRequest add(any value, optional any key)` -/
-def IDBObjectStore.add (self : IDBObjectStore) (value : Data) (key : Data := .undefined) : IO IDBRequest := do
-  let r ← self.val.callMethod "add" (Support.args #[toJS value, key]) Value
+@[macro_inline] def IDBObjectStore.add (self : IDBObjectStore) (value : Data) (key : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.add" do
+  let r ← self.val.callMethod "add" (Internal.args #[toJS value, key]) Value
   pure { val := r }
 
 /-- `IDBRequest delete(any query)` -/
-def IDBObjectStore.delete (self : IDBObjectStore) (query : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "delete" (Support.args #[toJS query]) Value
+@[macro_inline] def IDBObjectStore.delete (self : IDBObjectStore) (query : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.delete" do
+  let r ← self.val.callMethod "delete" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `IDBRequest clear()` -/
-def IDBObjectStore.clear (self : IDBObjectStore) : IO IDBRequest := do
-  let r ← self.val.callMethod "clear" (Support.args #[]) Value
+@[macro_inline] def IDBObjectStore.clear (self : IDBObjectStore) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.clear" do
+  let r ← self.val.callMethod "clear" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `IDBRequest get(any query)` -/
-def IDBObjectStore.get (self : IDBObjectStore) (query : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "get" (Support.args #[toJS query]) Value
+@[macro_inline] def IDBObjectStore.get (self : IDBObjectStore) (query : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.get" do
+  let r ← self.val.callMethod "get" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `IDBRequest getKey(any query)` -/
-def IDBObjectStore.getKey (self : IDBObjectStore) (query : Data) : IO IDBRequest := do
-  let r ← self.val.callMethod "getKey" (Support.args #[toJS query]) Value
+@[macro_inline] def IDBObjectStore.getKey (self : IDBObjectStore) (query : Data) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.getKey" do
+  let r ← self.val.callMethod "getKey" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `IDBRequest getAll(optional any queryOrOptions, optional unsigned long count)` -/
-def IDBObjectStore.getAll (self : IDBObjectStore) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAll" (Support.args #[queryOrOptions, Support.optional count]) Value
+@[macro_inline] def IDBObjectStore.getAll (self : IDBObjectStore) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.getAll" do
+  let r ← self.val.callMethod "getAll" (Internal.args #[queryOrOptions, Internal.optional count]) Value
   pure { val := r }
 
 /-- `IDBRequest getAllKeys(optional any queryOrOptions, optional unsigned long count)` -/
-def IDBObjectStore.getAllKeys (self : IDBObjectStore) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAllKeys" (Support.args #[queryOrOptions, Support.optional count]) Value
+@[macro_inline] def IDBObjectStore.getAllKeys (self : IDBObjectStore) (queryOrOptions : Data := .undefined) (count : Option Nat := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.getAllKeys" do
+  let r ← self.val.callMethod "getAllKeys" (Internal.args #[queryOrOptions, Internal.optional count]) Value
   pure { val := r }
 
 /-- `IDBRequest getAllRecords(optional IDBGetAllOptions options)` -/
-def IDBObjectStore.getAllRecords (self : IDBObjectStore) (options : Option IDBGetAllOptions := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "getAllRecords" (Support.args #[Support.optional options]) Value
+@[macro_inline] def IDBObjectStore.getAllRecords (self : IDBObjectStore) (options : Option IDBGetAllOptions := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.getAllRecords" do
+  let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `IDBRequest count(optional any query)` -/
-def IDBObjectStore.count (self : IDBObjectStore) (query : Data := .undefined) : IO IDBRequest := do
-  let r ← self.val.callMethod "count" (Support.args #[query]) Value
+@[macro_inline] def IDBObjectStore.count (self : IDBObjectStore) (query : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.count" do
+  let r ← self.val.callMethod "count" (Internal.args #[query]) Value
   pure { val := r }
 
 /-- `IDBRequest openCursor(optional any query, optional IDBCursorDirection direction)` -/
-def IDBObjectStore.openCursor (self : IDBObjectStore) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "openCursor" (Support.args #[query, Support.optional direction]) Value
+@[macro_inline] def IDBObjectStore.openCursor (self : IDBObjectStore) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.openCursor" do
+  let r ← self.val.callMethod "openCursor" (Internal.args #[query, Internal.optional direction]) Value
   pure { val := r }
 
 /-- `IDBRequest openKeyCursor(optional any query, optional IDBCursorDirection direction)` -/
-def IDBObjectStore.openKeyCursor (self : IDBObjectStore) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := do
-  let r ← self.val.callMethod "openKeyCursor" (Support.args #[query, Support.optional direction]) Value
+@[macro_inline] def IDBObjectStore.openKeyCursor (self : IDBObjectStore) (query : Data := .undefined) (direction : Option IDBCursorDirection := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.openKeyCursor" do
+  let r ← self.val.callMethod "openKeyCursor" (Internal.args #[query, Internal.optional direction]) Value
   pure { val := r }
 
 /-- `IDBIndex index(DOMString name)` -/
-def IDBObjectStore.index (self : IDBObjectStore) (name : String) : IO IDBIndex := do
-  let r ← self.val.callMethod "index" (Support.args #[toJS name]) Value
+@[macro_inline] def IDBObjectStore.index (self : IDBObjectStore) (name : String) : IO IDBIndex := Internal.api "Lasm.JS.Web.IDBObjectStore.index" do
+  let r ← self.val.callMethod "index" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `IDBIndex createIndex(DOMString name, (DOMString or sequence<DOMString>) keyPath, optional IDBIndexParameters options)` -/
-def IDBObjectStore.createIndex (self : IDBObjectStore) (name : String) (keyPath : DOMStringOrSequenceOfDOMString) (options : Option IDBIndexParameters := none) : IO IDBIndex := do
-  let r ← self.val.callMethod "createIndex" (Support.args #[toJS name, toJS keyPath, Support.optional options]) Value
+@[macro_inline] def IDBObjectStore.createIndex (self : IDBObjectStore) (name : String) (keyPath : DOMStringOrSequenceOfDOMString) (options : Option IDBIndexParameters := none) : IO IDBIndex := Internal.api "Lasm.JS.Web.IDBObjectStore.createIndex" do
+  let r ← self.val.callMethod "createIndex" (Internal.args #[toJS name, toJS keyPath, Internal.optional options]) Value
   pure { val := r }
 
 /-- `undefined deleteIndex(DOMString name)` -/
-def IDBObjectStore.deleteIndex (self : IDBObjectStore) (name : String) : IO Unit :=
-  self.val.callMethod "deleteIndex" (Support.args #[toJS name]) Unit
+@[macro_inline] def IDBObjectStore.deleteIndex (self : IDBObjectStore) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.IDBObjectStore.deleteIndex" do
+  self.val.callMethod "deleteIndex" (Internal.args #[toJS name]) Unit
 
 /-- `v instanceof IDBRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBRecord`). -/
-def IDBRecord.cast? (v : Value) : IO (Option IDBRecord) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBRecord"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBRecord.cast? (v : Value) : IO (Option IDBRecord) := Internal.api "Lasm.JS.Web.IDBRecord.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBRecord"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any key` -/
-def IDBRecord.key (self : IDBRecord) : IO Data := self.val.get "key" Data
+@[macro_inline] def IDBRecord.key (self : IDBRecord) : IO Data := Internal.api "Lasm.JS.Web.IDBRecord.key" do
+  self.val.get "key" Data
 
 /-- `readonly attribute any primaryKey` -/
-def IDBRecord.primaryKey (self : IDBRecord) : IO Data := self.val.get "primaryKey" Data
+@[macro_inline] def IDBRecord.primaryKey (self : IDBRecord) : IO Data := Internal.api "Lasm.JS.Web.IDBRecord.primaryKey" do
+  self.val.get "primaryKey" Data
 
 /-- `readonly attribute any value` -/
-def IDBRecord.value (self : IDBRecord) : IO Data := self.val.get "value" Data
+@[macro_inline] def IDBRecord.value (self : IDBRecord) : IO Data := Internal.api "Lasm.JS.Web.IDBRecord.value" do
+  self.val.get "value" Data
 
 /-- `v instanceof IDBRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBRequest`). -/
-def IDBRequest.cast? (v : Value) : IO (Option IDBRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBRequest.cast? (v : Value) : IO (Option IDBRequest) := Internal.api "Lasm.JS.Web.IDBRequest.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBRequest"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any result` -/
-def IDBRequest.result (self : IDBRequest) : IO Data := self.val.get "result" Data
+@[macro_inline] def IDBRequest.result (self : IDBRequest) : IO Data := Internal.api "Lasm.JS.Web.IDBRequest.result" do
+  self.val.get "result" Data
 
 /-- `readonly attribute DOMException? error` -/
-def IDBRequest.error (self : IDBRequest) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def IDBRequest.error (self : IDBRequest) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.IDBRequest.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `readonly attribute (IDBObjectStore or IDBIndex or IDBCursor)? source` -/
-def IDBRequest.source (self : IDBRequest) : IO (Option Value) := do
+@[macro_inline] def IDBRequest.source (self : IDBRequest) : IO (Option Value) := Internal.api "Lasm.JS.Web.IDBRequest.source" do
   let r ← self.val.get "source" Data
-  Support.optionalValue r
+  Internal.optionalValue r
 
 /-- `readonly attribute IDBTransaction? transaction` -/
-def IDBRequest.transaction (self : IDBRequest) : IO (Option IDBTransaction) := self.val.get "transaction" (Option IDBTransaction)
+@[macro_inline] def IDBRequest.transaction (self : IDBRequest) : IO (Option IDBTransaction) := Internal.api "Lasm.JS.Web.IDBRequest.transaction" do
+  self.val.get "transaction" (Option IDBTransaction)
 
 /-- `readonly attribute IDBRequestReadyState readyState` -/
-def IDBRequest.readyState (self : IDBRequest) : IO IDBRequestReadyState := self.val.get "readyState" IDBRequestReadyState
+@[macro_inline] def IDBRequest.readyState (self : IDBRequest) : IO IDBRequestReadyState := Internal.api "Lasm.JS.Web.IDBRequest.readyState" do
+  self.val.get "readyState" IDBRequestReadyState
 
 /-- `attribute EventHandler onsuccess` -/
-def IDBRequest.onsuccess (self : IDBRequest) : IO (Option EventHandlerNonNull) := self.val.get "onsuccess" (Option EventHandlerNonNull)
+@[macro_inline] def IDBRequest.onsuccess (self : IDBRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBRequest.onsuccess" do
+  self.val.get "onsuccess" (Option EventHandlerNonNull)
 
 /-- Sets `onsuccess`: `attribute EventHandler onsuccess` -/
-def IDBRequest.setOnsuccess (self : IDBRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBRequest.setOnsuccess (self : IDBRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBRequest.setOnsuccess" do
   self.val.set "onsuccess" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def IDBRequest.onerror (self : IDBRequest) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def IDBRequest.onerror (self : IDBRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBRequest.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def IDBRequest.setOnerror (self : IDBRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBRequest.setOnerror (self : IDBRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBRequest.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `v instanceof IDBTransaction`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBTransaction`). -/
-def IDBTransaction.cast? (v : Value) : IO (Option IDBTransaction) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBTransaction"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBTransaction.cast? (v : Value) : IO (Option IDBTransaction) := Internal.api "Lasm.JS.Web.IDBTransaction.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBTransaction"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMStringList objectStoreNames` -/
-def IDBTransaction.objectStoreNames (self : IDBTransaction) : IO DOMStringList := do
+@[macro_inline] def IDBTransaction.objectStoreNames (self : IDBTransaction) : IO DOMStringList := Internal.api "Lasm.JS.Web.IDBTransaction.objectStoreNames" do
   let r ← self.val.get "objectStoreNames" Value
   pure { val := r }
 
 /-- `readonly attribute IDBTransactionMode mode` -/
-def IDBTransaction.mode (self : IDBTransaction) : IO IDBTransactionMode := self.val.get "mode" IDBTransactionMode
+@[macro_inline] def IDBTransaction.mode (self : IDBTransaction) : IO IDBTransactionMode := Internal.api "Lasm.JS.Web.IDBTransaction.mode" do
+  self.val.get "mode" IDBTransactionMode
 
 /-- `readonly attribute IDBTransactionDurability durability` -/
-def IDBTransaction.durability (self : IDBTransaction) : IO IDBTransactionDurability := self.val.get "durability" IDBTransactionDurability
+@[macro_inline] def IDBTransaction.durability (self : IDBTransaction) : IO IDBTransactionDurability := Internal.api "Lasm.JS.Web.IDBTransaction.durability" do
+  self.val.get "durability" IDBTransactionDurability
 
 /-- `readonly attribute IDBDatabase db` -/
-def IDBTransaction.db (self : IDBTransaction) : IO IDBDatabase := do
+@[macro_inline] def IDBTransaction.db (self : IDBTransaction) : IO IDBDatabase := Internal.api "Lasm.JS.Web.IDBTransaction.db" do
   let r ← self.val.get "db" Value
   pure { val := r }
 
 /-- `readonly attribute DOMException? error` -/
-def IDBTransaction.error (self : IDBTransaction) : IO (Option DOMException) := self.val.get "error" (Option DOMException)
+@[macro_inline] def IDBTransaction.error (self : IDBTransaction) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.IDBTransaction.error" do
+  self.val.get "error" (Option DOMException)
 
 /-- `attribute EventHandler onabort` -/
-def IDBTransaction.onabort (self : IDBTransaction) : IO (Option EventHandlerNonNull) := self.val.get "onabort" (Option EventHandlerNonNull)
+@[macro_inline] def IDBTransaction.onabort (self : IDBTransaction) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBTransaction.onabort" do
+  self.val.get "onabort" (Option EventHandlerNonNull)
 
 /-- Sets `onabort`: `attribute EventHandler onabort` -/
-def IDBTransaction.setOnabort (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBTransaction.setOnabort (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBTransaction.setOnabort" do
   self.val.set "onabort" (toJS value)
 
 /-- `attribute EventHandler oncomplete` -/
-def IDBTransaction.oncomplete (self : IDBTransaction) : IO (Option EventHandlerNonNull) := self.val.get "oncomplete" (Option EventHandlerNonNull)
+@[macro_inline] def IDBTransaction.oncomplete (self : IDBTransaction) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBTransaction.oncomplete" do
+  self.val.get "oncomplete" (Option EventHandlerNonNull)
 
 /-- Sets `oncomplete`: `attribute EventHandler oncomplete` -/
-def IDBTransaction.setOncomplete (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBTransaction.setOncomplete (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBTransaction.setOncomplete" do
   self.val.set "oncomplete" (toJS value)
 
 /-- `attribute EventHandler onerror` -/
-def IDBTransaction.onerror (self : IDBTransaction) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def IDBTransaction.onerror (self : IDBTransaction) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBTransaction.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def IDBTransaction.setOnerror (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBTransaction.setOnerror (self : IDBTransaction) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBTransaction.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `IDBObjectStore objectStore(DOMString name)` -/
-def IDBTransaction.objectStore (self : IDBTransaction) (name : String) : IO IDBObjectStore := do
-  let r ← self.val.callMethod "objectStore" (Support.args #[toJS name]) Value
+@[macro_inline] def IDBTransaction.objectStore (self : IDBTransaction) (name : String) : IO IDBObjectStore := Internal.api "Lasm.JS.Web.IDBTransaction.objectStore" do
+  let r ← self.val.callMethod "objectStore" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `undefined commit()` -/
-def IDBTransaction.commit (self : IDBTransaction) : IO Unit :=
-  self.val.callMethod "commit" (Support.args #[]) Unit
+@[macro_inline] def IDBTransaction.commit (self : IDBTransaction) : IO Unit := Internal.api "Lasm.JS.Web.IDBTransaction.commit" do
+  self.val.callMethod "commit" (Internal.args #[]) Unit
 
 /-- `undefined abort()` -/
-def IDBTransaction.abort (self : IDBTransaction) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[]) Unit
+@[macro_inline] def IDBTransaction.abort (self : IDBTransaction) : IO Unit := Internal.api "Lasm.JS.Web.IDBTransaction.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
 
 /-- `v instanceof IDBVersionChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBVersionChangeEvent`). -/
-def IDBVersionChangeEvent.cast? (v : Value) : IO (Option IDBVersionChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBVersionChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBVersionChangeEvent.cast? (v : Value) : IO (Option IDBVersionChangeEvent) := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBVersionChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional IDBVersionChangeEventInit eventInitDict)` -/
-def IDBVersionChangeEvent.new (type : String) (eventInitDict : Option IDBVersionChangeEventInit := none) : IO IDBVersionChangeEvent :=
+@[macro_inline] def IDBVersionChangeEvent.new (type : String) (eventInitDict : Option IDBVersionChangeEventInit := none) : IO IDBVersionChangeEvent := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.new" do
   Lasm.JS.Binding.invoke IDBVersionChangeEvent { name := "Lasm.JS.Web.IDBVersionChangeEvent.new", module := "globalThis", path := "IDBVersionChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute unsigned long long oldVersion` -/
-def IDBVersionChangeEvent.oldVersion (self : IDBVersionChangeEvent) : IO Nat := self.val.get "oldVersion" Nat
+@[macro_inline] def IDBVersionChangeEvent.oldVersion (self : IDBVersionChangeEvent) : IO Nat := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.oldVersion" do
+  self.val.get "oldVersion" Nat
 
 /-- `readonly attribute unsigned long long? newVersion` -/
-def IDBVersionChangeEvent.newVersion (self : IDBVersionChangeEvent) : IO (Option Nat) := self.val.get "newVersion" (Option Nat)
+@[macro_inline] def IDBVersionChangeEvent.newVersion (self : IDBVersionChangeEvent) : IO (Option Nat) := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.newVersion" do
+  self.val.get "newVersion" (Option Nat)
 
 /-- `v instanceof IDBCursorWithValue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBCursorWithValue`). -/
-def IDBCursorWithValue.cast? (v : Value) : IO (Option IDBCursorWithValue) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBCursorWithValue"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBCursorWithValue.cast? (v : Value) : IO (Option IDBCursorWithValue) := Internal.api "Lasm.JS.Web.IDBCursorWithValue.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBCursorWithValue"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute any value` -/
-def IDBCursorWithValue.value (self : IDBCursorWithValue) : IO Data := self.val.get "value" Data
+@[macro_inline] def IDBCursorWithValue.value (self : IDBCursorWithValue) : IO Data := Internal.api "Lasm.JS.Web.IDBCursorWithValue.value" do
+  self.val.get "value" Data
 
 /-- `v instanceof IDBOpenDBRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IDBOpenDBRequest`). -/
-def IDBOpenDBRequest.cast? (v : Value) : IO (Option IDBOpenDBRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["IDBOpenDBRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def IDBOpenDBRequest.cast? (v : Value) : IO (Option IDBOpenDBRequest) := Internal.api "Lasm.JS.Web.IDBOpenDBRequest.cast?" do
+  Internal.cast (Internal.getGlobal ["IDBOpenDBRequest"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onblocked` -/
-def IDBOpenDBRequest.onblocked (self : IDBOpenDBRequest) : IO (Option EventHandlerNonNull) := self.val.get "onblocked" (Option EventHandlerNonNull)
+@[macro_inline] def IDBOpenDBRequest.onblocked (self : IDBOpenDBRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBOpenDBRequest.onblocked" do
+  self.val.get "onblocked" (Option EventHandlerNonNull)
 
 /-- Sets `onblocked`: `attribute EventHandler onblocked` -/
-def IDBOpenDBRequest.setOnblocked (self : IDBOpenDBRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBOpenDBRequest.setOnblocked (self : IDBOpenDBRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBOpenDBRequest.setOnblocked" do
   self.val.set "onblocked" (toJS value)
 
 /-- `attribute EventHandler onupgradeneeded` -/
-def IDBOpenDBRequest.onupgradeneeded (self : IDBOpenDBRequest) : IO (Option EventHandlerNonNull) := self.val.get "onupgradeneeded" (Option EventHandlerNonNull)
+@[macro_inline] def IDBOpenDBRequest.onupgradeneeded (self : IDBOpenDBRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.IDBOpenDBRequest.onupgradeneeded" do
+  self.val.get "onupgradeneeded" (Option EventHandlerNonNull)
 
 /-- Sets `onupgradeneeded`: `attribute EventHandler onupgradeneeded` -/
-def IDBOpenDBRequest.setOnupgradeneeded (self : IDBOpenDBRequest) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def IDBOpenDBRequest.setOnupgradeneeded (self : IDBOpenDBRequest) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.IDBOpenDBRequest.setOnupgradeneeded" do
   self.val.set "onupgradeneeded" (toJS value)
 
 /-- `readonly attribute IDBFactory indexedDB` -/
-def WorkerGlobalScope.indexedDB (self : WorkerGlobalScope) : IO IDBFactory := do
+@[macro_inline] def Window.indexedDB (self : Window) : IO IDBFactory := Internal.api "Lasm.JS.Web.Window.indexedDB" do
+  let r ← self.val.get "indexedDB" Value
+  pure { val := r }
+
+/-- `readonly attribute IDBFactory indexedDB` -/
+@[macro_inline] def WorkerGlobalScope.indexedDB (self : WorkerGlobalScope) : IO IDBFactory := Internal.api "Lasm.JS.Web.WorkerGlobalScope.indexedDB" do
   let r ← self.val.get "indexedDB" Value
   pure { val := r }
 
 /-- `readonly attribute IDBFactory indexedDB` (Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)) -/
-def indexedDB : IO IDBFactory := do
-  let r ← Support.getGlobal ["indexedDB"] Value
+@[macro_inline] def indexedDB : IO IDBFactory := Internal.api "Lasm.JS.Web.indexedDB" do
+  let r ← Internal.getGlobal ["indexedDB"] Value
   pure { val := r }
 
 end Lasm.JS.Web

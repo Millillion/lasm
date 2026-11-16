@@ -6,16 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `attribute DOMString csp` -/
-def HTMLIFrameElement.csp (self : HTMLIFrameElement) : IO String := self.val.get "csp" String
+@[macro_inline] def HTMLIFrameElement.csp (self : HTMLIFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLIFrameElement.csp" do
+  self.val.get "csp" String
 
 /-- Sets `csp`: `attribute DOMString csp` -/
-def HTMLIFrameElement.setCsp (self : HTMLIFrameElement) (value : String) : IO Unit :=
+@[macro_inline] def HTMLIFrameElement.setCsp (self : HTMLIFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setCsp" do
   self.val.set "csp" (toJS value)
 
 end Lasm.JS.Web

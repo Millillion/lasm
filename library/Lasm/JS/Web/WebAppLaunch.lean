@@ -6,10 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Fs
+import Lasm.JS.Web.Types.WebAppLaunch
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `callback LaunchConsumer = any (LaunchParams params)` (Web App Launch Handler API (https://wicg.github.io/web-app-launch/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure LaunchConsumer where
@@ -20,32 +25,39 @@ instance : ToJS LaunchConsumer := ⟨fun x => .ref x.val ""⟩
 instance : FromJS LaunchConsumer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.LaunchConsumer", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def LaunchConsumer.ofFn (f : LaunchParams → Async Data) : IO LaunchConsumer := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg LaunchParams args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg LaunchParams args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def LaunchConsumer.ofSyncFn (f : LaunchParams → IO Data) : IO LaunchConsumer := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg LaunchParams args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg LaunchParams args 0)) }
 
 /-- `v instanceof LaunchParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LaunchParams`). -/
-def LaunchParams.cast? (v : Value) : IO (Option LaunchParams) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LaunchParams"] Value) v) then some { val := v } else none
+@[macro_inline] def LaunchParams.cast? (v : Value) : IO (Option LaunchParams) := Internal.api "Lasm.JS.Web.LaunchParams.cast?" do
+  Internal.cast (Internal.getGlobal ["LaunchParams"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString? targetURL` -/
-def LaunchParams.targetURL (self : LaunchParams) : IO (Option String) := self.val.get "targetURL" (Option String)
+@[macro_inline] def LaunchParams.targetURL (self : LaunchParams) : IO (Option String) := Internal.api "Lasm.JS.Web.LaunchParams.targetURL" do
+  self.val.get "targetURL" (Option String)
 
 /-- `readonly attribute FrozenArray<FileSystemHandle> files` -/
-def LaunchParams.files (self : LaunchParams) : IO (Array FileSystemHandle) := self.val.get "files" (Array FileSystemHandle)
+@[macro_inline] def LaunchParams.files (self : LaunchParams) : IO (Array FileSystemHandle) := Internal.api "Lasm.JS.Web.LaunchParams.files" do
+  self.val.get "files" (Array FileSystemHandle)
 
 /-- `v instanceof LaunchQueue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LaunchQueue`). -/
-def LaunchQueue.cast? (v : Value) : IO (Option LaunchQueue) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["LaunchQueue"] Value) v) then some { val := v } else none
+@[macro_inline] def LaunchQueue.cast? (v : Value) : IO (Option LaunchQueue) := Internal.api "Lasm.JS.Web.LaunchQueue.cast?" do
+  Internal.cast (Internal.getGlobal ["LaunchQueue"] Value) (fun x => { val := x }) v
 
 /-- `undefined setConsumer(LaunchConsumer consumer)` -/
-def LaunchQueue.setConsumer (self : LaunchQueue) (consumer : LaunchConsumer) : IO Unit :=
-  self.val.callMethod "setConsumer" (Support.args #[toJS consumer]) Unit
+@[macro_inline] def LaunchQueue.setConsumer (self : LaunchQueue) (consumer : LaunchConsumer) : IO Unit := Internal.api "Lasm.JS.Web.LaunchQueue.setConsumer" do
+  self.val.callMethod "setConsumer" (Internal.args #[toJS consumer]) Unit
+
+/-- `readonly attribute LaunchQueue launchQueue` -/
+@[macro_inline] def Window.launchQueue (self : Window) : IO LaunchQueue := Internal.api "Lasm.JS.Web.Window.launchQueue" do
+  let r ← self.val.get "launchQueue" Value
+  pure { val := r }
 
 /-- `readonly attribute LaunchQueue launchQueue` (Web App Launch Handler API (https://wicg.github.io/web-app-launch/)) -/
-def launchQueue : IO LaunchQueue := do
-  let r ← Support.getGlobal ["launchQueue"] Value
+@[macro_inline] def launchQueue : IO LaunchQueue := Internal.api "Lasm.JS.Web.launchQueue" do
+  let r ← Internal.getGlobal ["launchQueue"] Value
   pure { val := r }
 
 end Lasm.JS.Web

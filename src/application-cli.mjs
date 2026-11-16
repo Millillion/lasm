@@ -131,6 +131,8 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   buildOptions = nodeOptions;
   // A dev build only links the Node program for its inputs: nobody runs its Node output.
   const linkOnly = buildOptions.profile === 'dev';
+  // The target's web APIs are checked by the build (src/web-availability.mjs).
+  buildOptions = { ...buildOptions, webTarget: target };
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
   const found = await findEdgeProgram({ result, nodeRuntime, suspend });
   let program = found.cached;
@@ -277,7 +279,7 @@ export async function runApplicationCli(argv) {
     return runApplicationChild(runtimeExecutable, [...scriptPrefix(), join(output, 'main.mjs'), ...options.args],
       `Could not start ${target === 'bun' ? 'Bun' : 'Deno'} to run the application.`);
   }
-  const result = await buildApplicationWithProgress(options.input, buildOptions);
+  const result = await buildApplicationWithProgress(options.input, { ...buildOptions, webTarget: target ?? 'node' });
   await editor();
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {

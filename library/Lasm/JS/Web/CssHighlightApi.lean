@@ -6,37 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssHighlightApi
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum HighlightType` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)): "highlight", "spelling-error", "grammar-error". -/
-inductive HighlightType where
-  /-- "highlight" -/
-  | highlight
-  /-- "spelling-error" -/
-  | spellingError
-  /-- "grammar-error" -/
-  | grammarError
-  deriving BEq, Repr, Inhabited
-instance : ToJS HighlightType := ⟨fun
-  | .highlight => .string "highlight"
-  | .spellingError => .string "spelling-error"
-  | .grammarError => .string "grammar-error"⟩
-instance : FromJS HighlightType where
-  fromJS
-    | .string "highlight" => .ok .highlight
-    | .string "spelling-error" => .ok .spellingError
-    | .string "grammar-error" => .ok .grammarError
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HighlightType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HighlightsFromPointOptions` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HighlightsFromPointOptions where
   /-- `sequence<ShadowRoot> shadowRoots = []` -/
   shadowRoots : Option (Array ShadowRoot) := none
-instance : ToJS HighlightsFromPointOptions := ⟨fun d => Support.fields #[("shadowRoots", Support.optional d.shadowRoots)]⟩
+instance : ToJS HighlightsFromPointOptions := ⟨fun d => Internal.fields #[("shadowRoots", Internal.optional d.shadowRoots)]⟩
 
 /-- `dictionary HighlightHitResult` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HighlightHitResult where
@@ -44,6 +27,8 @@ structure HighlightHitResult where
   highlight : Option Highlight := none
   /-- `sequence<AbstractRange> ranges` -/
   ranges : Option (Array AbstractRange) := none
+instance : ToJS HighlightHitResult := ⟨fun d => Internal.fields #[("highlight", Internal.optional d.highlight),
+    ("ranges", Internal.optional d.ranges)]⟩
 instance : FromJS HighlightHitResult where
   fromJS d := do return {
     highlight := ← Lasm.JS.readField (Option Highlight) d "highlight",
@@ -51,39 +36,41 @@ instance : FromJS HighlightHitResult where
   typeName := "Lasm.JS.Web.HighlightHitResult"
 
 /-- `v instanceof Highlight`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Highlight`). -/
-def Highlight.cast? (v : Value) : IO (Option Highlight) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Highlight"] Value) v) then some { val := v } else none
+@[macro_inline] def Highlight.cast? (v : Value) : IO (Option Highlight) := Internal.api "Lasm.JS.Web.Highlight.cast?" do
+  Internal.cast (Internal.getGlobal ["Highlight"] Value) (fun x => { val := x }) v
 
 /-- `constructor(AbstractRange... initialRanges)` -/
-def Highlight.new (initialRanges : Array AbstractRange := #[]) : IO Highlight :=
+@[macro_inline] def Highlight.new (initialRanges : Array AbstractRange := #[]) : IO Highlight := Internal.api "Lasm.JS.Web.Highlight.new" do
   Lasm.JS.Binding.invoke Highlight { name := "Lasm.JS.Web.Highlight.new", module := "globalThis", path := "Highlight", construct := true, arity := 1 }
-    (Support.argsWith #[] (initialRanges.map toJS)) (await := false)
+    (Internal.argsWith #[] (initialRanges.map toJS)) (await := false)
 
 /-- `attribute long priority` -/
-def Highlight.priority (self : Highlight) : IO Int := self.val.get "priority" Int
+@[macro_inline] def Highlight.priority (self : Highlight) : IO Int := Internal.api "Lasm.JS.Web.Highlight.priority" do
+  self.val.get "priority" Int
 
 /-- Sets `priority`: `attribute long priority` -/
-def Highlight.setPriority (self : Highlight) (value : Int) : IO Unit :=
+@[macro_inline] def Highlight.setPriority (self : Highlight) (value : Int) : IO Unit := Internal.api "Lasm.JS.Web.Highlight.setPriority" do
   self.val.set "priority" (toJS value)
 
 /-- `attribute HighlightType type` -/
-def Highlight.type (self : Highlight) : IO HighlightType := self.val.get "type" HighlightType
+@[macro_inline] def Highlight.type (self : Highlight) : IO HighlightType := Internal.api "Lasm.JS.Web.Highlight.type" do
+  self.val.get "type" HighlightType
 
 /-- Sets `type`: `attribute HighlightType type` -/
-def Highlight.setType (self : Highlight) (value : HighlightType) : IO Unit :=
+@[macro_inline] def Highlight.setType (self : Highlight) (value : HighlightType) : IO Unit := Internal.api "Lasm.JS.Web.Highlight.setType" do
   self.val.set "type" (toJS value)
 
 /-- `v instanceof HighlightRegistry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HighlightRegistry`). -/
-def HighlightRegistry.cast? (v : Value) : IO (Option HighlightRegistry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HighlightRegistry"] Value) v) then some { val := v } else none
+@[macro_inline] def HighlightRegistry.cast? (v : Value) : IO (Option HighlightRegistry) := Internal.api "Lasm.JS.Web.HighlightRegistry.cast?" do
+  Internal.cast (Internal.getGlobal ["HighlightRegistry"] Value) (fun x => { val := x }) v
 
 /-- `sequence<HighlightHitResult> highlightsFromPoint(float x, float y, optional HighlightsFromPointOptions options)` -/
-def HighlightRegistry.highlightsFromPoint (self : HighlightRegistry) (x : Float) (y : Float) (options : Option HighlightsFromPointOptions := none) : IO (Array HighlightHitResult) :=
-  self.val.callMethod "highlightsFromPoint" (Support.args #[toJS x, toJS y, Support.optional options]) (Array HighlightHitResult)
+@[macro_inline] def HighlightRegistry.highlightsFromPoint (self : HighlightRegistry) (x : Float) (y : Float) (options : Option HighlightsFromPointOptions := none) : IO (Array HighlightHitResult) := Internal.api "Lasm.JS.Web.HighlightRegistry.highlightsFromPoint" do
+  self.val.callMethod "highlightsFromPoint" (Internal.args #[toJS x, toJS y, Internal.optional options]) (Array HighlightHitResult)
 
 /-- `readonly attribute HighlightRegistry highlights` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)) -/
-def CSS.highlights : IO HighlightRegistry := do
-  let r ← Support.getGlobal ["CSS", "highlights"] Value
+@[macro_inline] def CSS.highlights : IO HighlightRegistry := Internal.api "Lasm.JS.Web.CSS.highlights" do
+  let r ← Internal.getGlobal ["CSS", "highlights"] Value
   pure { val := r }
 
 end Lasm.JS.Web

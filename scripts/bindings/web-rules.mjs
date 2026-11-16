@@ -1,5 +1,5 @@
 // Lasm.JS.Web is the whole web platform of the pinned @webref/idl, generated as it is by
-// scripts/bindings/generate-web.mjs (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/API_DECISIONS.md 0.3-8).
+// scripts/bindings/generate-web.mjs (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/API_DECISIONS.md 0.3-1).
 // There is no list of interfaces: this file holds only what the mapping cannot read from the IDL, and the
 // few things it cannot generate. Each entry names its decision in docs/API_DECISIONS.md.
 
@@ -27,7 +27,7 @@ export const numberResults = ['setTimeout', 'setInterval'];
 export const aliases = { WindowProxy: 'Window' };
 
 /** Operations the specs now type as returning a promise of a dictionary (CSSOM View's ScrollResult) that the
- * engines implement as returning undefined: read as Promise<undefined>, which awaits either (0.3-11). */
+ * engines implement as returning undefined: read as Promise<undefined>, which awaits either (0.3-13). */
 export const undefinedPromises = ['Element.scroll', 'Element.scrollTo', 'Element.scrollBy', 'Element.scrollIntoView',
   'Window.scroll', 'Window.scrollTo', 'Window.scrollBy'];
 

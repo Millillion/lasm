@@ -6,19 +6,26 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.CssAnimations
+import Lasm.JS.Web.Types.CssAnimations2
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSAnimation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSAnimation`). -/
-def CSSAnimation.cast? (v : Value) : IO (Option CSSAnimation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSAnimation"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSAnimation.cast? (v : Value) : IO (Option CSSAnimation) := Internal.api "Lasm.JS.Web.CSSAnimation.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSAnimation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString animationName` -/
-def CSSAnimation.animationName (self : CSSAnimation) : IO String := self.val.get "animationName" String
+@[macro_inline] def CSSAnimation.animationName (self : CSSAnimation) : IO String := Internal.api "Lasm.JS.Web.CSSAnimation.animationName" do
+  self.val.get "animationName" String
 
 /-- `readonly attribute CSSAnimation? animation` -/
-def AnimationEvent.animation (self : AnimationEvent) : IO (Option CSSAnimation) := self.val.get "animation" (Option CSSAnimation)
+@[macro_inline] def AnimationEvent.animation (self : AnimationEvent) : IO (Option CSSAnimation) := Internal.api "Lasm.JS.Web.AnimationEvent.animation" do
+  self.val.get "animation" (Option CSSAnimation)
 
 end Lasm.JS.Web

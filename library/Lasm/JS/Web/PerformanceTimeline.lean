@@ -6,15 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.HrTime
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PerformanceObserverCallbackOptions` (Performance Timeline (https://w3c.github.io/performance-timeline/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PerformanceObserverCallbackOptions where
   /-- `unsigned long long droppedEntriesCount` -/
   droppedEntriesCount : Option Nat := none
+instance : ToJS PerformanceObserverCallbackOptions := ⟨fun d => Internal.fields #[("droppedEntriesCount", Internal.optional d.droppedEntriesCount)]⟩
 instance : FromJS PerformanceObserverCallbackOptions where
   fromJS d := do return {
     droppedEntriesCount := ← Lasm.JS.readField (Option Nat) d "droppedEntriesCount" }
@@ -29,10 +34,10 @@ instance : ToJS PerformanceObserverCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PerformanceObserverCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.PerformanceObserverCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PerformanceObserverCallback.ofFn (f : PerformanceObserverEntryList → PerformanceObserver → (Option PerformanceObserverCallbackOptions) → Async Unit) : IO PerformanceObserverCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg PerformanceObserverEntryList args 0) (← Support.arg PerformanceObserver args 1) (← Support.arg (Option PerformanceObserverCallbackOptions) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg PerformanceObserverEntryList args 0) (← Internal.arg PerformanceObserver args 1) (← Internal.arg (Option PerformanceObserverCallbackOptions) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PerformanceObserverCallback.ofSyncFn (f : PerformanceObserverEntryList → PerformanceObserver → (Option PerformanceObserverCallbackOptions) → IO Unit) : IO PerformanceObserverCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg PerformanceObserverEntryList args 0) (← Support.arg PerformanceObserver args 1) (← Support.arg (Option PerformanceObserverCallbackOptions) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg PerformanceObserverEntryList args 0) (← Internal.arg PerformanceObserver args 1) (← Internal.arg (Option PerformanceObserverCallbackOptions) args 2)) }
 
 /-- `dictionary PerformanceObserverInit` (Performance Timeline (https://w3c.github.io/performance-timeline/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PerformanceObserverInit where
@@ -44,87 +49,94 @@ structure PerformanceObserverInit where
   type : Option String := none
   /-- `boolean buffered` -/
   buffered : Option Bool := none
-instance : ToJS PerformanceObserverInit := ⟨fun d => Support.fields #[("durationThreshold", Support.optional d.durationThreshold),
-    ("entryTypes", Support.optional d.entryTypes),
-    ("type", Support.optional d.type),
-    ("buffered", Support.optional d.buffered)]⟩
+instance : ToJS PerformanceObserverInit := ⟨fun d => Internal.fields #[("durationThreshold", Internal.optional d.durationThreshold),
+    ("entryTypes", Internal.optional d.entryTypes),
+    ("type", Internal.optional d.type),
+    ("buffered", Internal.optional d.buffered)]⟩
 
 /-- `v instanceof PerformanceEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceEntry`). -/
-def PerformanceEntry.cast? (v : Value) : IO (Option PerformanceEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceEntry.cast? (v : Value) : IO (Option PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceEntry.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceEntry"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long long id` -/
-def PerformanceEntry.id (self : PerformanceEntry) : IO Nat := self.val.get "id" Nat
+@[macro_inline] def PerformanceEntry.id (self : PerformanceEntry) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceEntry.id" do
+  self.val.get "id" Nat
 
 /-- `readonly attribute DOMString name` -/
-def PerformanceEntry.name (self : PerformanceEntry) : IO String := self.val.get "name" String
+@[macro_inline] def PerformanceEntry.name (self : PerformanceEntry) : IO String := Internal.api "Lasm.JS.Web.PerformanceEntry.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString entryType` -/
-def PerformanceEntry.entryType (self : PerformanceEntry) : IO String := self.val.get "entryType" String
+@[macro_inline] def PerformanceEntry.entryType (self : PerformanceEntry) : IO String := Internal.api "Lasm.JS.Web.PerformanceEntry.entryType" do
+  self.val.get "entryType" String
 
 /-- `readonly attribute DOMHighResTimeStamp startTime` -/
-def PerformanceEntry.startTime (self : PerformanceEntry) : IO Float := self.val.get "startTime" Float
+@[macro_inline] def PerformanceEntry.startTime (self : PerformanceEntry) : IO Float := Internal.api "Lasm.JS.Web.PerformanceEntry.startTime" do
+  self.val.get "startTime" Float
 
 /-- `readonly attribute DOMHighResTimeStamp duration` -/
-def PerformanceEntry.duration (self : PerformanceEntry) : IO Float := self.val.get "duration" Float
+@[macro_inline] def PerformanceEntry.duration (self : PerformanceEntry) : IO Float := Internal.api "Lasm.JS.Web.PerformanceEntry.duration" do
+  self.val.get "duration" Float
 
 /-- `readonly attribute unsigned long long navigationId` -/
-def PerformanceEntry.navigationId (self : PerformanceEntry) : IO Nat := self.val.get "navigationId" Nat
+@[macro_inline] def PerformanceEntry.navigationId (self : PerformanceEntry) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceEntry.navigationId" do
+  self.val.get "navigationId" Nat
 
 /-- `object toJSON()` -/
-def PerformanceEntry.toJSON (self : PerformanceEntry) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceEntry.toJSON (self : PerformanceEntry) : IO Data := Internal.api "Lasm.JS.Web.PerformanceEntry.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof PerformanceObserver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceObserver`). -/
-def PerformanceObserver.cast? (v : Value) : IO (Option PerformanceObserver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceObserver"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceObserver.cast? (v : Value) : IO (Option PerformanceObserver) := Internal.api "Lasm.JS.Web.PerformanceObserver.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceObserver"] Value) (fun x => { val := x }) v
 
 /-- `constructor(PerformanceObserverCallback callback)` -/
-def PerformanceObserver.new (callback : PerformanceObserverCallback) : IO PerformanceObserver :=
+@[macro_inline] def PerformanceObserver.new (callback : PerformanceObserverCallback) : IO PerformanceObserver := Internal.api "Lasm.JS.Web.PerformanceObserver.new" do
   Lasm.JS.Binding.invoke PerformanceObserver { name := "Lasm.JS.Web.PerformanceObserver.new", module := "globalThis", path := "PerformanceObserver", construct := true, arity := 1 }
-    (Support.args #[toJS callback]) (await := false)
+    (Internal.args #[toJS callback]) (await := false)
 
 /-- `static readonly attribute FrozenArray<DOMString> supportedEntryTypes` -/
-def PerformanceObserver.supportedEntryTypes : IO (Array String) := Support.getGlobal ["PerformanceObserver", "supportedEntryTypes"] (Array String)
+@[macro_inline] def PerformanceObserver.supportedEntryTypes : IO (Array String) := Internal.api "Lasm.JS.Web.PerformanceObserver.supportedEntryTypes" do
+  Internal.getGlobal ["PerformanceObserver", "supportedEntryTypes"] (Array String)
 
 /-- `undefined observe(optional PerformanceObserverInit options)` -/
-def PerformanceObserver.observe (self : PerformanceObserver) (options : Option PerformanceObserverInit := none) : IO Unit :=
-  self.val.callMethod "observe" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def PerformanceObserver.observe (self : PerformanceObserver) (options : Option PerformanceObserverInit := none) : IO Unit := Internal.api "Lasm.JS.Web.PerformanceObserver.observe" do
+  self.val.callMethod "observe" (Internal.args #[Internal.optional options]) Unit
 
 /-- `undefined disconnect()` -/
-def PerformanceObserver.disconnect (self : PerformanceObserver) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def PerformanceObserver.disconnect (self : PerformanceObserver) : IO Unit := Internal.api "Lasm.JS.Web.PerformanceObserver.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `PerformanceEntryList takeRecords()` -/
-def PerformanceObserver.takeRecords (self : PerformanceObserver) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "takeRecords" (Support.args #[]) (Array PerformanceEntry)
+@[macro_inline] def PerformanceObserver.takeRecords (self : PerformanceObserver) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserver.takeRecords" do
+  self.val.callMethod "takeRecords" (Internal.args #[]) (Array PerformanceEntry)
 
 /-- `v instanceof PerformanceObserverEntryList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceObserverEntryList`). -/
-def PerformanceObserverEntryList.cast? (v : Value) : IO (Option PerformanceObserverEntryList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceObserverEntryList"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceObserverEntryList.cast? (v : Value) : IO (Option PerformanceObserverEntryList) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceObserverEntryList"] Value) (fun x => { val := x }) v
 
 /-- `PerformanceEntryList getEntries()` -/
-def PerformanceObserverEntryList.getEntries (self : PerformanceObserverEntryList) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntries" (Support.args #[]) (Array PerformanceEntry)
+@[macro_inline] def PerformanceObserverEntryList.getEntries (self : PerformanceObserverEntryList) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntries" do
+  self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
 
 /-- `PerformanceEntryList getEntriesByType(DOMString type)` -/
-def PerformanceObserverEntryList.getEntriesByType (self : PerformanceObserverEntryList) (type : String) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntriesByType" (Support.args #[toJS type]) (Array PerformanceEntry)
+@[macro_inline] def PerformanceObserverEntryList.getEntriesByType (self : PerformanceObserverEntryList) (type : String) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByType" do
+  self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
 
 /-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` -/
-def PerformanceObserverEntryList.getEntriesByName (self : PerformanceObserverEntryList) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntriesByName" (Support.args #[toJS name, Support.optional type]) (Array PerformanceEntry)
+@[macro_inline] def PerformanceObserverEntryList.getEntriesByName (self : PerformanceObserverEntryList) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByName" do
+  self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
 
 /-- `PerformanceEntryList getEntries()` -/
-def Performance.getEntries (self : Performance) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntries" (Support.args #[]) (Array PerformanceEntry)
+@[macro_inline] def Performance.getEntries (self : Performance) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntries" do
+  self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
 
 /-- `PerformanceEntryList getEntriesByType(DOMString type)` -/
-def Performance.getEntriesByType (self : Performance) (type : String) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntriesByType" (Support.args #[toJS type]) (Array PerformanceEntry)
+@[macro_inline] def Performance.getEntriesByType (self : Performance) (type : String) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntriesByType" do
+  self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
 
 /-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` -/
-def Performance.getEntriesByName (self : Performance) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) :=
-  self.val.callMethod "getEntriesByName" (Support.args #[toJS name, Support.optional type]) (Array PerformanceEntry)
+@[macro_inline] def Performance.getEntriesByName (self : Performance) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntriesByName" do
+  self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
 
 end Lasm.JS.Web

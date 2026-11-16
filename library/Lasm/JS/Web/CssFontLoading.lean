@@ -6,53 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssFontLoading
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FontFaceLoadStatus` (CSS Font Loading Module Level 3 (https://drafts.csswg.org/css-font-loading-3/)): "unloaded", "loading", "loaded", "error". -/
-inductive FontFaceLoadStatus where
-  /-- "unloaded" -/
-  | unloaded
-  /-- "loading" -/
-  | loading
-  /-- "loaded" -/
-  | loaded
-  /-- "error" -/
-  | error
-  deriving BEq, Repr, Inhabited
-instance : ToJS FontFaceLoadStatus := ⟨fun
-  | .unloaded => .string "unloaded"
-  | .loading => .string "loading"
-  | .loaded => .string "loaded"
-  | .error => .string "error"⟩
-instance : FromJS FontFaceLoadStatus where
-  fromJS
-    | .string "unloaded" => .ok .unloaded
-    | .string "loading" => .ok .loading
-    | .string "loaded" => .ok .loaded
-    | .string "error" => .ok .error
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FontFaceLoadStatus"
-
-/-- `enum FontFaceSetLoadStatus` (CSS Font Loading Module Level 3 (https://drafts.csswg.org/css-font-loading-3/)): "loading", "loaded". -/
-inductive FontFaceSetLoadStatus where
-  /-- "loading" -/
-  | loading
-  /-- "loaded" -/
-  | loaded
-  deriving BEq, Repr, Inhabited
-instance : ToJS FontFaceSetLoadStatus := ⟨fun
-  | .loading => .string "loading"
-  | .loaded => .string "loaded"⟩
-instance : FromJS FontFaceSetLoadStatus where
-  fromJS
-    | .string "loading" => .ok .loading
-    | .string "loaded" => .ok .loaded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FontFaceSetLoadStatus"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(CSSOMString or BufferSource)`: one constructor per member type. -/
 inductive CSSOMStringOrBufferSource where
@@ -88,16 +51,16 @@ structure FontFaceDescriptors where
   descentOverride : Option String := none
   /-- `CSSOMString lineGapOverride = "normal"` -/
   lineGapOverride : Option String := none
-instance : ToJS FontFaceDescriptors := ⟨fun d => Support.fields #[("style", Support.optional d.style),
-    ("weight", Support.optional d.weight),
-    ("stretch", Support.optional d.stretch),
-    ("unicodeRange", Support.optional d.unicodeRange),
-    ("featureSettings", Support.optional d.featureSettings),
-    ("variationSettings", Support.optional d.variationSettings),
-    ("display", Support.optional d.display),
-    ("ascentOverride", Support.optional d.ascentOverride),
-    ("descentOverride", Support.optional d.descentOverride),
-    ("lineGapOverride", Support.optional d.lineGapOverride)]⟩
+instance : ToJS FontFaceDescriptors := ⟨fun d => Internal.fields #[("style", Internal.optional d.style),
+    ("weight", Internal.optional d.weight),
+    ("stretch", Internal.optional d.stretch),
+    ("unicodeRange", Internal.optional d.unicodeRange),
+    ("featureSettings", Internal.optional d.featureSettings),
+    ("variationSettings", Internal.optional d.variationSettings),
+    ("display", Internal.optional d.display),
+    ("ascentOverride", Internal.optional d.ascentOverride),
+    ("descentOverride", Internal.optional d.descentOverride),
+    ("lineGapOverride", Internal.optional d.lineGapOverride)]⟩
 
 /-- `dictionary FontFaceSetLoadEventInit : EventInit` (CSS Font Loading Module Level 3 (https://drafts.csswg.org/css-font-loading-3/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FontFaceSetLoadEventInit where
@@ -109,255 +72,281 @@ structure FontFaceSetLoadEventInit where
   composed : Option Bool := none
   /-- `sequence<FontFace> fontfaces = []` -/
   fontfaces : Option (Array FontFace) := none
-instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("fontfaces", Support.optional d.fontfaces)]⟩
+instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("fontfaces", Internal.optional d.fontfaces)]⟩
 
 /-- `v instanceof FontFace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFace`). -/
-def FontFace.cast? (v : Value) : IO (Option FontFace) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFace"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFace.cast? (v : Value) : IO (Option FontFace) := Internal.api "Lasm.JS.Web.FontFace.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFace"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CSSOMString family, (CSSOMString or BufferSource) source, optional FontFaceDescriptors descriptors)` -/
-def FontFace.new (family : String) (source : CSSOMStringOrBufferSource) (descriptors : Option FontFaceDescriptors := none) : IO FontFace :=
+@[macro_inline] def FontFace.new (family : String) (source : CSSOMStringOrBufferSource) (descriptors : Option FontFaceDescriptors := none) : IO FontFace := Internal.api "Lasm.JS.Web.FontFace.new" do
   Lasm.JS.Binding.invoke FontFace { name := "Lasm.JS.Web.FontFace.new", module := "globalThis", path := "FontFace", construct := true, arity := 3 }
-    (Support.args #[toJS family, toJS source, Support.optional descriptors]) (await := false)
+    (Internal.args #[toJS family, toJS source, Internal.optional descriptors]) (await := false)
 
 /-- `attribute CSSOMString family` -/
-def FontFace.family (self : FontFace) : IO String := self.val.get "family" String
+@[macro_inline] def FontFace.family (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.family" do
+  self.val.get "family" String
 
 /-- Sets `family`: `attribute CSSOMString family` -/
-def FontFace.setFamily (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setFamily (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setFamily" do
   self.val.set "family" (toJS value)
 
 /-- `attribute CSSOMString style` -/
-def FontFace.style (self : FontFace) : IO String := self.val.get "style" String
+@[macro_inline] def FontFace.style (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.style" do
+  self.val.get "style" String
 
 /-- Sets `style`: `attribute CSSOMString style` -/
-def FontFace.setStyle (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setStyle (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setStyle" do
   self.val.set "style" (toJS value)
 
 /-- `attribute CSSOMString weight` -/
-def FontFace.weight (self : FontFace) : IO String := self.val.get "weight" String
+@[macro_inline] def FontFace.weight (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.weight" do
+  self.val.get "weight" String
 
 /-- Sets `weight`: `attribute CSSOMString weight` -/
-def FontFace.setWeight (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setWeight (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setWeight" do
   self.val.set "weight" (toJS value)
 
 /-- `attribute CSSOMString stretch` -/
-def FontFace.stretch (self : FontFace) : IO String := self.val.get "stretch" String
+@[macro_inline] def FontFace.stretch (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.stretch" do
+  self.val.get "stretch" String
 
 /-- Sets `stretch`: `attribute CSSOMString stretch` -/
-def FontFace.setStretch (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setStretch (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setStretch" do
   self.val.set "stretch" (toJS value)
 
 /-- `attribute CSSOMString unicodeRange` -/
-def FontFace.unicodeRange (self : FontFace) : IO String := self.val.get "unicodeRange" String
+@[macro_inline] def FontFace.unicodeRange (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.unicodeRange" do
+  self.val.get "unicodeRange" String
 
 /-- Sets `unicodeRange`: `attribute CSSOMString unicodeRange` -/
-def FontFace.setUnicodeRange (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setUnicodeRange (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setUnicodeRange" do
   self.val.set "unicodeRange" (toJS value)
 
 /-- `attribute CSSOMString featureSettings` -/
-def FontFace.featureSettings (self : FontFace) : IO String := self.val.get "featureSettings" String
+@[macro_inline] def FontFace.featureSettings (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.featureSettings" do
+  self.val.get "featureSettings" String
 
 /-- Sets `featureSettings`: `attribute CSSOMString featureSettings` -/
-def FontFace.setFeatureSettings (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setFeatureSettings (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setFeatureSettings" do
   self.val.set "featureSettings" (toJS value)
 
 /-- `attribute CSSOMString variationSettings` -/
-def FontFace.variationSettings (self : FontFace) : IO String := self.val.get "variationSettings" String
+@[macro_inline] def FontFace.variationSettings (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.variationSettings" do
+  self.val.get "variationSettings" String
 
 /-- Sets `variationSettings`: `attribute CSSOMString variationSettings` -/
-def FontFace.setVariationSettings (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setVariationSettings (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setVariationSettings" do
   self.val.set "variationSettings" (toJS value)
 
 /-- `attribute CSSOMString display` -/
-def FontFace.display (self : FontFace) : IO String := self.val.get "display" String
+@[macro_inline] def FontFace.display (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.display" do
+  self.val.get "display" String
 
 /-- Sets `display`: `attribute CSSOMString display` -/
-def FontFace.setDisplay (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setDisplay (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setDisplay" do
   self.val.set "display" (toJS value)
 
 /-- `attribute CSSOMString ascentOverride` -/
-def FontFace.ascentOverride (self : FontFace) : IO String := self.val.get "ascentOverride" String
+@[macro_inline] def FontFace.ascentOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.ascentOverride" do
+  self.val.get "ascentOverride" String
 
 /-- Sets `ascentOverride`: `attribute CSSOMString ascentOverride` -/
-def FontFace.setAscentOverride (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setAscentOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setAscentOverride" do
   self.val.set "ascentOverride" (toJS value)
 
 /-- `attribute CSSOMString descentOverride` -/
-def FontFace.descentOverride (self : FontFace) : IO String := self.val.get "descentOverride" String
+@[macro_inline] def FontFace.descentOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.descentOverride" do
+  self.val.get "descentOverride" String
 
 /-- Sets `descentOverride`: `attribute CSSOMString descentOverride` -/
-def FontFace.setDescentOverride (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setDescentOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setDescentOverride" do
   self.val.set "descentOverride" (toJS value)
 
 /-- `attribute CSSOMString lineGapOverride` -/
-def FontFace.lineGapOverride (self : FontFace) : IO String := self.val.get "lineGapOverride" String
+@[macro_inline] def FontFace.lineGapOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.lineGapOverride" do
+  self.val.get "lineGapOverride" String
 
 /-- Sets `lineGapOverride`: `attribute CSSOMString lineGapOverride` -/
-def FontFace.setLineGapOverride (self : FontFace) (value : String) : IO Unit :=
+@[macro_inline] def FontFace.setLineGapOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setLineGapOverride" do
   self.val.set "lineGapOverride" (toJS value)
 
 /-- `readonly attribute FontFaceLoadStatus status` -/
-def FontFace.status (self : FontFace) : IO FontFaceLoadStatus := self.val.get "status" FontFaceLoadStatus
+@[macro_inline] def FontFace.status (self : FontFace) : IO FontFaceLoadStatus := Internal.api "Lasm.JS.Web.FontFace.status" do
+  self.val.get "status" FontFaceLoadStatus
 
 /-- `readonly attribute Promise<FontFace> loaded` -/
-def FontFace.loaded (self : FontFace) : Async FontFace := do
+@[macro_inline] def FontFace.loaded (self : FontFace) : Async FontFace := Internal.api "Lasm.JS.Web.FontFace.loaded" do
   let p ← self.val.get "loaded" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `readonly attribute FontFaceFeatures features` -/
-def FontFace.features (self : FontFace) : IO FontFaceFeatures := do
+@[macro_inline] def FontFace.features (self : FontFace) : IO FontFaceFeatures := Internal.api "Lasm.JS.Web.FontFace.features" do
   let r ← self.val.get "features" Value
   pure { val := r }
 
 /-- `readonly attribute FontFaceVariations variations` -/
-def FontFace.variations (self : FontFace) : IO FontFaceVariations := do
+@[macro_inline] def FontFace.variations (self : FontFace) : IO FontFaceVariations := Internal.api "Lasm.JS.Web.FontFace.variations" do
   let r ← self.val.get "variations" Value
   pure { val := r }
 
 /-- `readonly attribute FontFacePalettes palettes` -/
-def FontFace.palettes (self : FontFace) : IO FontFacePalettes := do
+@[macro_inline] def FontFace.palettes (self : FontFace) : IO FontFacePalettes := Internal.api "Lasm.JS.Web.FontFace.palettes" do
   let r ← self.val.get "palettes" Value
   pure { val := r }
 
 /-- `Promise<FontFace> load()` -/
-def FontFace.load (self : FontFace) : Async FontFace := do
-  let r ← self.val.callMethodAwait "load" (Support.args #[]) Value
+@[macro_inline] def FontFace.load (self : FontFace) : Async FontFace := Internal.api "Lasm.JS.Web.FontFace.load" do
+  let r ← self.val.callMethodAwait "load" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof FontFaceFeatures`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFaceFeatures`). -/
-def FontFaceFeatures.cast? (v : Value) : IO (Option FontFaceFeatures) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFaceFeatures"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFaceFeatures.cast? (v : Value) : IO (Option FontFaceFeatures) := Internal.api "Lasm.JS.Web.FontFaceFeatures.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFaceFeatures"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof FontFacePalette`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFacePalette`). -/
-def FontFacePalette.cast? (v : Value) : IO (Option FontFacePalette) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFacePalette"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFacePalette.cast? (v : Value) : IO (Option FontFacePalette) := Internal.api "Lasm.JS.Web.FontFacePalette.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFacePalette"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def FontFacePalette.length (self : FontFacePalette) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def FontFacePalette.length (self : FontFacePalette) : IO Nat := Internal.api "Lasm.JS.Web.FontFacePalette.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute boolean usableWithLightBackground` -/
-def FontFacePalette.usableWithLightBackground (self : FontFacePalette) : IO Bool := self.val.get "usableWithLightBackground" Bool
+@[macro_inline] def FontFacePalette.usableWithLightBackground (self : FontFacePalette) : IO Bool := Internal.api "Lasm.JS.Web.FontFacePalette.usableWithLightBackground" do
+  self.val.get "usableWithLightBackground" Bool
 
 /-- `readonly attribute boolean usableWithDarkBackground` -/
-def FontFacePalette.usableWithDarkBackground (self : FontFacePalette) : IO Bool := self.val.get "usableWithDarkBackground" Bool
+@[macro_inline] def FontFacePalette.usableWithDarkBackground (self : FontFacePalette) : IO Bool := Internal.api "Lasm.JS.Web.FontFacePalette.usableWithDarkBackground" do
+  self.val.get "usableWithDarkBackground" Bool
 
 /-- `iterable<DOMString>`: `values()`, collected into an array. -/
-def FontFacePalette.values (self : FontFacePalette) : IO (Array String) :=
-  Support.iterate self.val "values" (Array String)
+@[macro_inline] def FontFacePalette.values (self : FontFacePalette) : IO (Array String) := Internal.api "Lasm.JS.Web.FontFacePalette.values" do
+  Internal.iterate self.val "values" (Array String)
 
 /-- `v instanceof FontFacePalettes`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFacePalettes`). -/
-def FontFacePalettes.cast? (v : Value) : IO (Option FontFacePalettes) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFacePalettes"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFacePalettes.cast? (v : Value) : IO (Option FontFacePalettes) := Internal.api "Lasm.JS.Web.FontFacePalettes.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFacePalettes"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def FontFacePalettes.length (self : FontFacePalettes) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def FontFacePalettes.length (self : FontFacePalettes) : IO Nat := Internal.api "Lasm.JS.Web.FontFacePalettes.length" do
+  self.val.get "length" Nat
 
 /-- `iterable<FontFacePalette>`: `values()`, collected into an array. -/
-def FontFacePalettes.values (self : FontFacePalettes) : IO (Array FontFacePalette) :=
-  Support.iterate self.val "values" (Array FontFacePalette)
+@[macro_inline] def FontFacePalettes.values (self : FontFacePalettes) : IO (Array FontFacePalette) := Internal.api "Lasm.JS.Web.FontFacePalettes.values" do
+  Internal.iterate self.val "values" (Array FontFacePalette)
 
 /-- `v instanceof FontFaceSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFaceSet`). -/
-def FontFaceSet.cast? (v : Value) : IO (Option FontFaceSet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFaceSet"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFaceSet.cast? (v : Value) : IO (Option FontFaceSet) := Internal.api "Lasm.JS.Web.FontFaceSet.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFaceSet"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onloading` -/
-def FontFaceSet.onloading (self : FontFaceSet) : IO (Option EventHandlerNonNull) := self.val.get "onloading" (Option EventHandlerNonNull)
+@[macro_inline] def FontFaceSet.onloading (self : FontFaceSet) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FontFaceSet.onloading" do
+  self.val.get "onloading" (Option EventHandlerNonNull)
 
 /-- Sets `onloading`: `attribute EventHandler onloading` -/
-def FontFaceSet.setOnloading (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FontFaceSet.setOnloading (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FontFaceSet.setOnloading" do
   self.val.set "onloading" (toJS value)
 
 /-- `attribute EventHandler onloadingdone` -/
-def FontFaceSet.onloadingdone (self : FontFaceSet) : IO (Option EventHandlerNonNull) := self.val.get "onloadingdone" (Option EventHandlerNonNull)
+@[macro_inline] def FontFaceSet.onloadingdone (self : FontFaceSet) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FontFaceSet.onloadingdone" do
+  self.val.get "onloadingdone" (Option EventHandlerNonNull)
 
 /-- Sets `onloadingdone`: `attribute EventHandler onloadingdone` -/
-def FontFaceSet.setOnloadingdone (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FontFaceSet.setOnloadingdone (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FontFaceSet.setOnloadingdone" do
   self.val.set "onloadingdone" (toJS value)
 
 /-- `attribute EventHandler onloadingerror` -/
-def FontFaceSet.onloadingerror (self : FontFaceSet) : IO (Option EventHandlerNonNull) := self.val.get "onloadingerror" (Option EventHandlerNonNull)
+@[macro_inline] def FontFaceSet.onloadingerror (self : FontFaceSet) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.FontFaceSet.onloadingerror" do
+  self.val.get "onloadingerror" (Option EventHandlerNonNull)
 
 /-- Sets `onloadingerror`: `attribute EventHandler onloadingerror` -/
-def FontFaceSet.setOnloadingerror (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def FontFaceSet.setOnloadingerror (self : FontFaceSet) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.FontFaceSet.setOnloadingerror" do
   self.val.set "onloadingerror" (toJS value)
 
 /-- `readonly attribute Promise<FontFaceSet> ready` -/
-def FontFaceSet.ready (self : FontFaceSet) : Async FontFaceSet := do
+@[macro_inline] def FontFaceSet.ready (self : FontFaceSet) : Async FontFaceSet := Internal.api "Lasm.JS.Web.FontFaceSet.ready" do
   let p ← self.val.get "ready" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `readonly attribute FontFaceSetLoadStatus status` -/
-def FontFaceSet.status (self : FontFaceSet) : IO FontFaceSetLoadStatus := self.val.get "status" FontFaceSetLoadStatus
+@[macro_inline] def FontFaceSet.status (self : FontFaceSet) : IO FontFaceSetLoadStatus := Internal.api "Lasm.JS.Web.FontFaceSet.status" do
+  self.val.get "status" FontFaceSetLoadStatus
 
 /-- `FontFaceSet add(FontFace font)` -/
-def FontFaceSet.add (self : FontFaceSet) (font : FontFace) : IO FontFaceSet := do
-  let r ← self.val.callMethod "add" (Support.args #[toJS font]) Value
+@[macro_inline] def FontFaceSet.add (self : FontFaceSet) (font : FontFace) : IO FontFaceSet := Internal.api "Lasm.JS.Web.FontFaceSet.add" do
+  let r ← self.val.callMethod "add" (Internal.args #[toJS font]) Value
   pure { val := r }
 
 /-- `boolean delete(FontFace font)` -/
-def FontFaceSet.delete (self : FontFaceSet) (font : FontFace) : IO Bool :=
-  self.val.callMethod "delete" (Support.args #[toJS font]) Bool
+@[macro_inline] def FontFaceSet.delete (self : FontFaceSet) (font : FontFace) : IO Bool := Internal.api "Lasm.JS.Web.FontFaceSet.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS font]) Bool
 
 /-- `undefined clear()` -/
-def FontFaceSet.clear (self : FontFaceSet) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def FontFaceSet.clear (self : FontFaceSet) : IO Unit := Internal.api "Lasm.JS.Web.FontFaceSet.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `Promise<sequence<FontFace>> load(CSSOMString font, optional CSSOMString text)` -/
-def FontFaceSet.load (self : FontFaceSet) (font : String) (text : Option String := none) : Async (Array FontFace) :=
-  self.val.callMethodAwait "load" (Support.args #[toJS font, Support.optional text]) (Array FontFace)
+@[macro_inline] def FontFaceSet.load (self : FontFaceSet) (font : String) (text : Option String := none) : Async (Array FontFace) := Internal.api "Lasm.JS.Web.FontFaceSet.load" do
+  self.val.callMethodAwait "load" (Internal.args #[toJS font, Internal.optional text]) (Array FontFace)
 
 /-- `boolean check(CSSOMString font, optional CSSOMString text)` -/
-def FontFaceSet.check (self : FontFaceSet) (font : String) (text : Option String := none) : IO Bool :=
-  self.val.callMethod "check" (Support.args #[toJS font, Support.optional text]) Bool
+@[macro_inline] def FontFaceSet.check (self : FontFaceSet) (font : String) (text : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.FontFaceSet.check" do
+  self.val.callMethod "check" (Internal.args #[toJS font, Internal.optional text]) Bool
 
 /-- `v instanceof FontFaceSetLoadEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFaceSetLoadEvent`). -/
-def FontFaceSetLoadEvent.cast? (v : Value) : IO (Option FontFaceSetLoadEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFaceSetLoadEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFaceSetLoadEvent.cast? (v : Value) : IO (Option FontFaceSetLoadEvent) := Internal.api "Lasm.JS.Web.FontFaceSetLoadEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFaceSetLoadEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(CSSOMString type, optional FontFaceSetLoadEventInit eventInitDict)` -/
-def FontFaceSetLoadEvent.new (type : String) (eventInitDict : Option FontFaceSetLoadEventInit := none) : IO FontFaceSetLoadEvent :=
+@[macro_inline] def FontFaceSetLoadEvent.new (type : String) (eventInitDict : Option FontFaceSetLoadEventInit := none) : IO FontFaceSetLoadEvent := Internal.api "Lasm.JS.Web.FontFaceSetLoadEvent.new" do
   Lasm.JS.Binding.invoke FontFaceSetLoadEvent { name := "Lasm.JS.Web.FontFaceSetLoadEvent.new", module := "globalThis", path := "FontFaceSetLoadEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<FontFace> fontfaces` -/
-def FontFaceSetLoadEvent.fontfaces (self : FontFaceSetLoadEvent) : IO (Array FontFace) := self.val.get "fontfaces" (Array FontFace)
+@[macro_inline] def FontFaceSetLoadEvent.fontfaces (self : FontFaceSetLoadEvent) : IO (Array FontFace) := Internal.api "Lasm.JS.Web.FontFaceSetLoadEvent.fontfaces" do
+  self.val.get "fontfaces" (Array FontFace)
 
 /-- `v instanceof FontFaceVariationAxis`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFaceVariationAxis`). -/
-def FontFaceVariationAxis.cast? (v : Value) : IO (Option FontFaceVariationAxis) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFaceVariationAxis"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFaceVariationAxis.cast? (v : Value) : IO (Option FontFaceVariationAxis) := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFaceVariationAxis"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString name` -/
-def FontFaceVariationAxis.name (self : FontFaceVariationAxis) : IO String := self.val.get "name" String
+@[macro_inline] def FontFaceVariationAxis.name (self : FontFaceVariationAxis) : IO String := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString axisTag` -/
-def FontFaceVariationAxis.axisTag (self : FontFaceVariationAxis) : IO String := self.val.get "axisTag" String
+@[macro_inline] def FontFaceVariationAxis.axisTag (self : FontFaceVariationAxis) : IO String := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.axisTag" do
+  self.val.get "axisTag" String
 
 /-- `readonly attribute double minimumValue` -/
-def FontFaceVariationAxis.minimumValue (self : FontFaceVariationAxis) : IO Float := self.val.get "minimumValue" Float
+@[macro_inline] def FontFaceVariationAxis.minimumValue (self : FontFaceVariationAxis) : IO Float := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.minimumValue" do
+  self.val.get "minimumValue" Float
 
 /-- `readonly attribute double maximumValue` -/
-def FontFaceVariationAxis.maximumValue (self : FontFaceVariationAxis) : IO Float := self.val.get "maximumValue" Float
+@[macro_inline] def FontFaceVariationAxis.maximumValue (self : FontFaceVariationAxis) : IO Float := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.maximumValue" do
+  self.val.get "maximumValue" Float
 
 /-- `readonly attribute double defaultValue` -/
-def FontFaceVariationAxis.defaultValue (self : FontFaceVariationAxis) : IO Float := self.val.get "defaultValue" Float
+@[macro_inline] def FontFaceVariationAxis.defaultValue (self : FontFaceVariationAxis) : IO Float := Internal.api "Lasm.JS.Web.FontFaceVariationAxis.defaultValue" do
+  self.val.get "defaultValue" Float
 
 /-- `v instanceof FontFaceVariations`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FontFaceVariations`). -/
-def FontFaceVariations.cast? (v : Value) : IO (Option FontFaceVariations) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FontFaceVariations"] Value) v) then some { val := v } else none
+@[macro_inline] def FontFaceVariations.cast? (v : Value) : IO (Option FontFaceVariations) := Internal.api "Lasm.JS.Web.FontFaceVariations.cast?" do
+  Internal.cast (Internal.getGlobal ["FontFaceVariations"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FontFaceSet fonts` -/
-def Document.fonts (self : Document) : IO FontFaceSet := do
+@[macro_inline] def Document.fonts (self : Document) : IO FontFaceSet := Internal.api "Lasm.JS.Web.Document.fonts" do
   let r ← self.val.get "fonts" Value
   pure { val := r }
 
 /-- `readonly attribute FontFaceSet fonts` -/
-def WorkerGlobalScope.fonts (self : WorkerGlobalScope) : IO FontFaceSet := do
+@[macro_inline] def WorkerGlobalScope.fonts (self : WorkerGlobalScope) : IO FontFaceSet := Internal.api "Lasm.JS.Web.WorkerGlobalScope.fonts" do
   let r ← self.val.get "fonts" Value
   pure { val := r }
 

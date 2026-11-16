@@ -6,10 +6,14 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Storage
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary StorageEstimate` (Storage Standard (https://storage.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StorageEstimate where
@@ -17,6 +21,8 @@ structure StorageEstimate where
   usage : Option Nat := none
   /-- `unsigned long long quota` -/
   quota : Option Nat := none
+instance : ToJS StorageEstimate := ⟨fun d => Internal.fields #[("usage", Internal.optional d.usage),
+    ("quota", Internal.optional d.quota)]⟩
 instance : FromJS StorageEstimate where
   fromJS d := do return {
     usage := ← Lasm.JS.readField (Option Nat) d "usage",
@@ -24,28 +30,28 @@ instance : FromJS StorageEstimate where
   typeName := "Lasm.JS.Web.StorageEstimate"
 
 /-- `v instanceof StorageManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StorageManager`). -/
-def StorageManager.cast? (v : Value) : IO (Option StorageManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageManager"] Value) v) then some { val := v } else none
+@[macro_inline] def StorageManager.cast? (v : Value) : IO (Option StorageManager) := Internal.api "Lasm.JS.Web.StorageManager.cast?" do
+  Internal.cast (Internal.getGlobal ["StorageManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<boolean> persisted()` -/
-def StorageManager.persisted (self : StorageManager) : Async Bool :=
-  self.val.callMethodAwait "persisted" (Support.args #[]) Bool
+@[macro_inline] def StorageManager.persisted (self : StorageManager) : Async Bool := Internal.api "Lasm.JS.Web.StorageManager.persisted" do
+  self.val.callMethodAwait "persisted" (Internal.args #[]) Bool
 
 /-- `Promise<boolean> persist()` -/
-def StorageManager.persist (self : StorageManager) : Async Bool :=
-  self.val.callMethodAwait "persist" (Support.args #[]) Bool
+@[macro_inline] def StorageManager.persist (self : StorageManager) : Async Bool := Internal.api "Lasm.JS.Web.StorageManager.persist" do
+  self.val.callMethodAwait "persist" (Internal.args #[]) Bool
 
 /-- `Promise<StorageEstimate> estimate()` -/
-def StorageManager.estimate (self : StorageManager) : Async StorageEstimate :=
-  self.val.callMethodAwait "estimate" (Support.args #[]) StorageEstimate
+@[macro_inline] def StorageManager.estimate (self : StorageManager) : Async StorageEstimate := Internal.api "Lasm.JS.Web.StorageManager.estimate" do
+  self.val.callMethodAwait "estimate" (Internal.args #[]) StorageEstimate
 
 /-- `readonly attribute StorageManager storage` -/
-def Navigator.storage (self : Navigator) : IO StorageManager := do
+@[macro_inline] def Navigator.storage (self : Navigator) : IO StorageManager := Internal.api "Lasm.JS.Web.Navigator.storage" do
   let r ← self.val.get "storage" Value
   pure { val := r }
 
 /-- `readonly attribute StorageManager storage` -/
-def WorkerNavigator.storage (self : WorkerNavigator) : IO StorageManager := do
+@[macro_inline] def WorkerNavigator.storage (self : WorkerNavigator) : IO StorageManager := Internal.api "Lasm.JS.Web.WorkerNavigator.storage" do
   let r ← self.val.get "storage" Value
   pure { val := r }
 

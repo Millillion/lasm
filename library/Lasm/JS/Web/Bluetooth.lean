@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.Bluetooth
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `typedef DOMString or unsigned long BluetoothServiceUUID`: one constructor per member type. -/
 inductive BluetoothServiceUUID where
@@ -38,8 +44,8 @@ structure BluetoothManufacturerDataFilterInit where
   mask : Option ByteArray := none
   /-- `required unsigned short companyIdentifier` -/
   companyIdentifier : Nat
-instance : ToJS BluetoothManufacturerDataFilterInit := ⟨fun d => Support.fields #[("dataPrefix", Support.optional d.dataPrefix),
-    ("mask", Support.optional d.mask),
+instance : ToJS BluetoothManufacturerDataFilterInit := ⟨fun d => Internal.fields #[("dataPrefix", Internal.optional d.dataPrefix),
+    ("mask", Internal.optional d.mask),
     ("companyIdentifier", toJS d.companyIdentifier)]⟩
 
 /-- `dictionary BluetoothServiceDataFilterInit : BluetoothDataFilterInit` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -50,8 +56,8 @@ structure BluetoothServiceDataFilterInit where
   mask : Option ByteArray := none
   /-- `required BluetoothServiceUUID service` -/
   service : BluetoothServiceUUID
-instance : ToJS BluetoothServiceDataFilterInit := ⟨fun d => Support.fields #[("dataPrefix", Support.optional d.dataPrefix),
-    ("mask", Support.optional d.mask),
+instance : ToJS BluetoothServiceDataFilterInit := ⟨fun d => Internal.fields #[("dataPrefix", Internal.optional d.dataPrefix),
+    ("mask", Internal.optional d.mask),
     ("service", toJS d.service)]⟩
 
 /-- `dictionary BluetoothLEScanFilterInit` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -66,11 +72,11 @@ structure BluetoothLEScanFilterInit where
   manufacturerData : Option (Array BluetoothManufacturerDataFilterInit) := none
   /-- `sequence<BluetoothServiceDataFilterInit> serviceData` -/
   serviceData : Option (Array BluetoothServiceDataFilterInit) := none
-instance : ToJS BluetoothLEScanFilterInit := ⟨fun d => Support.fields #[("services", Support.optional d.services),
-    ("name", Support.optional d.name),
-    ("namePrefix", Support.optional d.namePrefix),
-    ("manufacturerData", Support.optional d.manufacturerData),
-    ("serviceData", Support.optional d.serviceData)]⟩
+instance : ToJS BluetoothLEScanFilterInit := ⟨fun d => Internal.fields #[("services", Internal.optional d.services),
+    ("name", Internal.optional d.name),
+    ("namePrefix", Internal.optional d.namePrefix),
+    ("manufacturerData", Internal.optional d.manufacturerData),
+    ("serviceData", Internal.optional d.serviceData)]⟩
 
 /-- `dictionary RequestDeviceOptions` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestDeviceOptions where
@@ -84,11 +90,11 @@ structure RequestDeviceOptions where
   optionalManufacturerData : Option (Array Nat) := none
   /-- `boolean acceptAllDevices = false` -/
   acceptAllDevices : Option Bool := none
-instance : ToJS RequestDeviceOptions := ⟨fun d => Support.fields #[("filters", Support.optional d.filters),
-    ("exclusionFilters", Support.optional d.exclusionFilters),
-    ("optionalServices", Support.optional d.optionalServices),
-    ("optionalManufacturerData", Support.optional d.optionalManufacturerData),
-    ("acceptAllDevices", Support.optional d.acceptAllDevices)]⟩
+instance : ToJS RequestDeviceOptions := ⟨fun d => Internal.fields #[("filters", Internal.optional d.filters),
+    ("exclusionFilters", Internal.optional d.exclusionFilters),
+    ("optionalServices", Internal.optional d.optionalServices),
+    ("optionalManufacturerData", Internal.optional d.optionalManufacturerData),
+    ("acceptAllDevices", Internal.optional d.acceptAllDevices)]⟩
 
 /-- `(DOMString or unsigned long)`: one constructor per member type. -/
 inductive DOMStringOrUnsignedLong where
@@ -126,23 +132,23 @@ structure BluetoothAdvertisingEventInit where
   manufacturerData : Option BluetoothManufacturerDataMap := none
   /-- `BluetoothServiceDataMap serviceData` -/
   serviceData : Option BluetoothServiceDataMap := none
-instance : ToJS BluetoothAdvertisingEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS BluetoothAdvertisingEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("device", toJS d.device),
-    ("uuids", Support.optional d.uuids),
-    ("name", Support.optional d.name),
-    ("appearance", Support.optional d.appearance),
-    ("txPower", Support.optional d.txPower),
-    ("rssi", Support.optional d.rssi),
-    ("manufacturerData", Support.optional d.manufacturerData),
-    ("serviceData", Support.optional d.serviceData)]⟩
+    ("uuids", Internal.optional d.uuids),
+    ("name", Internal.optional d.name),
+    ("appearance", Internal.optional d.appearance),
+    ("txPower", Internal.optional d.txPower),
+    ("rssi", Internal.optional d.rssi),
+    ("manufacturerData", Internal.optional d.manufacturerData),
+    ("serviceData", Internal.optional d.serviceData)]⟩
 
 /-- `dictionary WatchAdvertisementsOptions` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WatchAdvertisementsOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS WatchAdvertisementsOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS WatchAdvertisementsOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `typedef DOMString or unsigned long BluetoothDescriptorUUID`: one constructor per member type. -/
 inductive BluetoothDescriptorUUID where
@@ -178,9 +184,9 @@ structure ValueEventInit where
   composed : Option Bool := none
   /-- `any value = null` -/
   value : Data := .undefined
-instance : ToJS ValueEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS ValueEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("value", d.value)]⟩
 
 /-- `dictionary BluetoothDataFilterInit` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -189,453 +195,551 @@ structure BluetoothDataFilterInit where
   dataPrefix : Option ByteArray := none
   /-- `BufferSource mask` -/
   mask : Option ByteArray := none
-instance : ToJS BluetoothDataFilterInit := ⟨fun d => Support.fields #[("dataPrefix", Support.optional d.dataPrefix),
-    ("mask", Support.optional d.mask)]⟩
+instance : ToJS BluetoothDataFilterInit := ⟨fun d => Internal.fields #[("dataPrefix", Internal.optional d.dataPrefix),
+    ("mask", Internal.optional d.mask)]⟩
+
+/-- `dictionary BluetoothPermissionDescriptor : PermissionDescriptor` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BluetoothPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `DOMString deviceId` -/
+  deviceId : Option String := none
+  /-- `sequence<BluetoothLEScanFilterInit> filters` -/
+  filters : Option (Array BluetoothLEScanFilterInit) := none
+  /-- `sequence<BluetoothServiceUUID> optionalServices = []` -/
+  optionalServices : Option (Array BluetoothServiceUUID) := none
+  /-- `sequence<unsigned short> optionalManufacturerData = []` -/
+  optionalManufacturerData : Option (Array Nat) := none
+  /-- `boolean acceptAllDevices = false` -/
+  acceptAllDevices : Option Bool := none
+instance : ToJS BluetoothPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("deviceId", Internal.optional d.deviceId),
+    ("filters", Internal.optional d.filters),
+    ("optionalServices", Internal.optional d.optionalServices),
+    ("optionalManufacturerData", Internal.optional d.optionalManufacturerData),
+    ("acceptAllDevices", Internal.optional d.acceptAllDevices)]⟩
+
+/-- `(DOMString or sequence<UUID>)`: one constructor per member type. -/
+inductive DOMStringOrSequenceOfUUID where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `sequence<UUID>` -/
+  | sequence (value : Array String)
+instance : ToJS DOMStringOrSequenceOfUUID := ⟨fun
+  | .domString v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe String DOMStringOrSequenceOfUUID := ⟨.domString⟩
+instance : Coe (Array String) DOMStringOrSequenceOfUUID := ⟨.sequence⟩
+
+/-- `dictionary AllowedBluetoothDevice` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AllowedBluetoothDevice where
+  /-- `required DOMString deviceId` -/
+  deviceId : String
+  /-- `required boolean mayUseGATT` -/
+  mayUseGATT : Bool
+  /-- `required (DOMString or sequence<UUID>) allowedServices` -/
+  allowedServices : DOMStringOrSequenceOfUUID
+  /-- `required sequence<unsigned short> allowedManufacturerData` -/
+  allowedManufacturerData : Array Nat
+instance : ToJS AllowedBluetoothDevice := ⟨fun d => Internal.fields #[("deviceId", toJS d.deviceId),
+    ("mayUseGATT", toJS d.mayUseGATT),
+    ("allowedServices", toJS d.allowedServices),
+    ("allowedManufacturerData", toJS d.allowedManufacturerData)]⟩
+
+/-- `dictionary BluetoothPermissionStorage` (Web Bluetooth (https://bluetooth.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BluetoothPermissionStorage where
+  /-- `required sequence<AllowedBluetoothDevice> allowedDevices` -/
+  allowedDevices : Array AllowedBluetoothDevice
+instance : ToJS BluetoothPermissionStorage := ⟨fun d => Internal.fields #[("allowedDevices", toJS d.allowedDevices)]⟩
 
 /-- `v instanceof Bluetooth`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Bluetooth`). -/
-def Bluetooth.cast? (v : Value) : IO (Option Bluetooth) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Bluetooth"] Value) v) then some { val := v } else none
+@[macro_inline] def Bluetooth.cast? (v : Value) : IO (Option Bluetooth) := Internal.api "Lasm.JS.Web.Bluetooth.cast?" do
+  Internal.cast (Internal.getGlobal ["Bluetooth"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler onavailabilitychanged` -/
-def Bluetooth.onavailabilitychanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "onavailabilitychanged" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.onavailabilitychanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.onavailabilitychanged" do
+  self.val.get "onavailabilitychanged" (Option EventHandlerNonNull)
 
 /-- Sets `onavailabilitychanged`: `attribute EventHandler onavailabilitychanged` -/
-def Bluetooth.setOnavailabilitychanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOnavailabilitychanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOnavailabilitychanged" do
   self.val.set "onavailabilitychanged" (toJS value)
 
 /-- `readonly attribute BluetoothDevice? referringDevice` -/
-def Bluetooth.referringDevice (self : Bluetooth) : IO (Option BluetoothDevice) := self.val.get "referringDevice" (Option BluetoothDevice)
+@[macro_inline] def Bluetooth.referringDevice (self : Bluetooth) : IO (Option BluetoothDevice) := Internal.api "Lasm.JS.Web.Bluetooth.referringDevice" do
+  self.val.get "referringDevice" (Option BluetoothDevice)
 
 /-- `attribute EventHandler onadvertisementreceived` -/
-def Bluetooth.onadvertisementreceived (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "onadvertisementreceived" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.onadvertisementreceived (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.onadvertisementreceived" do
+  self.val.get "onadvertisementreceived" (Option EventHandlerNonNull)
 
 /-- Sets `onadvertisementreceived`: `attribute EventHandler onadvertisementreceived` -/
-def Bluetooth.setOnadvertisementreceived (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOnadvertisementreceived (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOnadvertisementreceived" do
   self.val.set "onadvertisementreceived" (toJS value)
 
 /-- `attribute EventHandler ongattserverdisconnected` -/
-def Bluetooth.ongattserverdisconnected (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "ongattserverdisconnected" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.ongattserverdisconnected (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.ongattserverdisconnected" do
+  self.val.get "ongattserverdisconnected" (Option EventHandlerNonNull)
 
 /-- Sets `ongattserverdisconnected`: `attribute EventHandler ongattserverdisconnected` -/
-def Bluetooth.setOngattserverdisconnected (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOngattserverdisconnected (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOngattserverdisconnected" do
   self.val.set "ongattserverdisconnected" (toJS value)
 
 /-- `attribute EventHandler oncharacteristicvaluechanged` -/
-def Bluetooth.oncharacteristicvaluechanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.oncharacteristicvaluechanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.oncharacteristicvaluechanged" do
+  self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
 
 /-- Sets `oncharacteristicvaluechanged`: `attribute EventHandler oncharacteristicvaluechanged` -/
-def Bluetooth.setOncharacteristicvaluechanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOncharacteristicvaluechanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOncharacteristicvaluechanged" do
   self.val.set "oncharacteristicvaluechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceadded` -/
-def Bluetooth.onserviceadded (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "onserviceadded" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.onserviceadded (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.onserviceadded" do
+  self.val.get "onserviceadded" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceadded`: `attribute EventHandler onserviceadded` -/
-def Bluetooth.setOnserviceadded (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOnserviceadded (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOnserviceadded" do
   self.val.set "onserviceadded" (toJS value)
 
 /-- `attribute EventHandler onservicechanged` -/
-def Bluetooth.onservicechanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "onservicechanged" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.onservicechanged (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.onservicechanged" do
+  self.val.get "onservicechanged" (Option EventHandlerNonNull)
 
 /-- Sets `onservicechanged`: `attribute EventHandler onservicechanged` -/
-def Bluetooth.setOnservicechanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOnservicechanged (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOnservicechanged" do
   self.val.set "onservicechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceremoved` -/
-def Bluetooth.onserviceremoved (self : Bluetooth) : IO (Option EventHandlerNonNull) := self.val.get "onserviceremoved" (Option EventHandlerNonNull)
+@[macro_inline] def Bluetooth.onserviceremoved (self : Bluetooth) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Bluetooth.onserviceremoved" do
+  self.val.get "onserviceremoved" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceremoved`: `attribute EventHandler onserviceremoved` -/
-def Bluetooth.setOnserviceremoved (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Bluetooth.setOnserviceremoved (self : Bluetooth) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Bluetooth.setOnserviceremoved" do
   self.val.set "onserviceremoved" (toJS value)
 
 /-- `Promise<boolean> getAvailability()` -/
-def Bluetooth.getAvailability (self : Bluetooth) : Async Bool :=
-  self.val.callMethodAwait "getAvailability" (Support.args #[]) Bool
+@[macro_inline] def Bluetooth.getAvailability (self : Bluetooth) : Async Bool := Internal.api "Lasm.JS.Web.Bluetooth.getAvailability" do
+  self.val.callMethodAwait "getAvailability" (Internal.args #[]) Bool
 
 /-- `Promise<sequence<BluetoothDevice>> getDevices()` -/
-def Bluetooth.getDevices (self : Bluetooth) : Async (Array BluetoothDevice) :=
-  self.val.callMethodAwait "getDevices" (Support.args #[]) (Array BluetoothDevice)
+@[macro_inline] def Bluetooth.getDevices (self : Bluetooth) : Async (Array BluetoothDevice) := Internal.api "Lasm.JS.Web.Bluetooth.getDevices" do
+  self.val.callMethodAwait "getDevices" (Internal.args #[]) (Array BluetoothDevice)
 
 /-- `Promise<BluetoothDevice> requestDevice(optional RequestDeviceOptions options)` -/
-def Bluetooth.requestDevice (self : Bluetooth) (options : Option RequestDeviceOptions := none) : Async BluetoothDevice := do
-  let r ← self.val.callMethodAwait "requestDevice" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Bluetooth.requestDevice (self : Bluetooth) (options : Option RequestDeviceOptions := none) : Async BluetoothDevice := Internal.api "Lasm.JS.Web.Bluetooth.requestDevice" do
+  let r ← self.val.callMethodAwait "requestDevice" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof BluetoothAdvertisingEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothAdvertisingEvent`). -/
-def BluetoothAdvertisingEvent.cast? (v : Value) : IO (Option BluetoothAdvertisingEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothAdvertisingEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothAdvertisingEvent.cast? (v : Value) : IO (Option BluetoothAdvertisingEvent) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothAdvertisingEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, BluetoothAdvertisingEventInit init)` -/
-def BluetoothAdvertisingEvent.new (type : String) (init : BluetoothAdvertisingEventInit) : IO BluetoothAdvertisingEvent :=
+@[macro_inline] def BluetoothAdvertisingEvent.new (type : String) (init : BluetoothAdvertisingEventInit) : IO BluetoothAdvertisingEvent := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.new" do
   Lasm.JS.Binding.invoke BluetoothAdvertisingEvent { name := "Lasm.JS.Web.BluetoothAdvertisingEvent.new", module := "globalThis", path := "BluetoothAdvertisingEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `readonly attribute BluetoothDevice device` -/
-def BluetoothAdvertisingEvent.device (self : BluetoothAdvertisingEvent) : IO BluetoothDevice := do
+@[macro_inline] def BluetoothAdvertisingEvent.device (self : BluetoothAdvertisingEvent) : IO BluetoothDevice := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `readonly attribute FrozenArray<UUID> uuids` -/
-def BluetoothAdvertisingEvent.uuids (self : BluetoothAdvertisingEvent) : IO (Array String) := self.val.get "uuids" (Array String)
+@[macro_inline] def BluetoothAdvertisingEvent.uuids (self : BluetoothAdvertisingEvent) : IO (Array String) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.uuids" do
+  self.val.get "uuids" (Array String)
 
 /-- `readonly attribute DOMString? name` -/
-def BluetoothAdvertisingEvent.name (self : BluetoothAdvertisingEvent) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def BluetoothAdvertisingEvent.name (self : BluetoothAdvertisingEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly attribute unsigned short? appearance` -/
-def BluetoothAdvertisingEvent.appearance (self : BluetoothAdvertisingEvent) : IO (Option Nat) := self.val.get "appearance" (Option Nat)
+@[macro_inline] def BluetoothAdvertisingEvent.appearance (self : BluetoothAdvertisingEvent) : IO (Option Nat) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.appearance" do
+  self.val.get "appearance" (Option Nat)
 
 /-- `readonly attribute byte? txPower` -/
-def BluetoothAdvertisingEvent.txPower (self : BluetoothAdvertisingEvent) : IO (Option Int) := self.val.get "txPower" (Option Int)
+@[macro_inline] def BluetoothAdvertisingEvent.txPower (self : BluetoothAdvertisingEvent) : IO (Option Int) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.txPower" do
+  self.val.get "txPower" (Option Int)
 
 /-- `readonly attribute byte? rssi` -/
-def BluetoothAdvertisingEvent.rssi (self : BluetoothAdvertisingEvent) : IO (Option Int) := self.val.get "rssi" (Option Int)
+@[macro_inline] def BluetoothAdvertisingEvent.rssi (self : BluetoothAdvertisingEvent) : IO (Option Int) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.rssi" do
+  self.val.get "rssi" (Option Int)
 
 /-- `readonly attribute BluetoothManufacturerDataMap manufacturerData` -/
-def BluetoothAdvertisingEvent.manufacturerData (self : BluetoothAdvertisingEvent) : IO BluetoothManufacturerDataMap := do
+@[macro_inline] def BluetoothAdvertisingEvent.manufacturerData (self : BluetoothAdvertisingEvent) : IO BluetoothManufacturerDataMap := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.manufacturerData" do
   let r ← self.val.get "manufacturerData" Value
   pure { val := r }
 
 /-- `readonly attribute BluetoothServiceDataMap serviceData` -/
-def BluetoothAdvertisingEvent.serviceData (self : BluetoothAdvertisingEvent) : IO BluetoothServiceDataMap := do
+@[macro_inline] def BluetoothAdvertisingEvent.serviceData (self : BluetoothAdvertisingEvent) : IO BluetoothServiceDataMap := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.serviceData" do
   let r ← self.val.get "serviceData" Value
   pure { val := r }
 
 /-- `v instanceof BluetoothCharacteristicProperties`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothCharacteristicProperties`). -/
-def BluetoothCharacteristicProperties.cast? (v : Value) : IO (Option BluetoothCharacteristicProperties) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothCharacteristicProperties"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothCharacteristicProperties.cast? (v : Value) : IO (Option BluetoothCharacteristicProperties) := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothCharacteristicProperties"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute boolean broadcast` -/
-def BluetoothCharacteristicProperties.broadcast (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "broadcast" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.broadcast (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.broadcast" do
+  self.val.get "broadcast" Bool
 
 /-- `readonly attribute boolean read` -/
-def BluetoothCharacteristicProperties.read (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "read" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.read (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.read" do
+  self.val.get "read" Bool
 
 /-- `readonly attribute boolean writeWithoutResponse` -/
-def BluetoothCharacteristicProperties.writeWithoutResponse (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "writeWithoutResponse" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.writeWithoutResponse (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.writeWithoutResponse" do
+  self.val.get "writeWithoutResponse" Bool
 
 /-- `readonly attribute boolean write` -/
-def BluetoothCharacteristicProperties.write (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "write" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.write (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.write" do
+  self.val.get "write" Bool
 
 /-- `readonly attribute boolean notify` -/
-def BluetoothCharacteristicProperties.notify (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "notify" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.notify (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.notify" do
+  self.val.get "notify" Bool
 
 /-- `readonly attribute boolean indicate` -/
-def BluetoothCharacteristicProperties.indicate (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "indicate" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.indicate (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.indicate" do
+  self.val.get "indicate" Bool
 
 /-- `readonly attribute boolean authenticatedSignedWrites` -/
-def BluetoothCharacteristicProperties.authenticatedSignedWrites (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "authenticatedSignedWrites" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.authenticatedSignedWrites (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.authenticatedSignedWrites" do
+  self.val.get "authenticatedSignedWrites" Bool
 
 /-- `readonly attribute boolean reliableWrite` -/
-def BluetoothCharacteristicProperties.reliableWrite (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "reliableWrite" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.reliableWrite (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.reliableWrite" do
+  self.val.get "reliableWrite" Bool
 
 /-- `readonly attribute boolean writableAuxiliaries` -/
-def BluetoothCharacteristicProperties.writableAuxiliaries (self : BluetoothCharacteristicProperties) : IO Bool := self.val.get "writableAuxiliaries" Bool
+@[macro_inline] def BluetoothCharacteristicProperties.writableAuxiliaries (self : BluetoothCharacteristicProperties) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothCharacteristicProperties.writableAuxiliaries" do
+  self.val.get "writableAuxiliaries" Bool
 
 /-- `v instanceof BluetoothDevice`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothDevice`). -/
-def BluetoothDevice.cast? (v : Value) : IO (Option BluetoothDevice) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothDevice"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothDevice.cast? (v : Value) : IO (Option BluetoothDevice) := Internal.api "Lasm.JS.Web.BluetoothDevice.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothDevice"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString id` -/
-def BluetoothDevice.id (self : BluetoothDevice) : IO String := self.val.get "id" String
+@[macro_inline] def BluetoothDevice.id (self : BluetoothDevice) : IO String := Internal.api "Lasm.JS.Web.BluetoothDevice.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute DOMString? name` -/
-def BluetoothDevice.name (self : BluetoothDevice) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def BluetoothDevice.name (self : BluetoothDevice) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothDevice.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly attribute BluetoothRemoteGATTServer? gatt` -/
-def BluetoothDevice.gatt (self : BluetoothDevice) : IO (Option BluetoothRemoteGATTServer) := self.val.get "gatt" (Option BluetoothRemoteGATTServer)
+@[macro_inline] def BluetoothDevice.gatt (self : BluetoothDevice) : IO (Option BluetoothRemoteGATTServer) := Internal.api "Lasm.JS.Web.BluetoothDevice.gatt" do
+  self.val.get "gatt" (Option BluetoothRemoteGATTServer)
 
 /-- `readonly attribute boolean watchingAdvertisements` -/
-def BluetoothDevice.watchingAdvertisements (self : BluetoothDevice) : IO Bool := self.val.get "watchingAdvertisements" Bool
+@[macro_inline] def BluetoothDevice.watchingAdvertisements (self : BluetoothDevice) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothDevice.watchingAdvertisements" do
+  self.val.get "watchingAdvertisements" Bool
 
 /-- `attribute EventHandler onadvertisementreceived` -/
-def BluetoothDevice.onadvertisementreceived (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "onadvertisementreceived" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.onadvertisementreceived (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.onadvertisementreceived" do
+  self.val.get "onadvertisementreceived" (Option EventHandlerNonNull)
 
 /-- Sets `onadvertisementreceived`: `attribute EventHandler onadvertisementreceived` -/
-def BluetoothDevice.setOnadvertisementreceived (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOnadvertisementreceived (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOnadvertisementreceived" do
   self.val.set "onadvertisementreceived" (toJS value)
 
 /-- `attribute EventHandler ongattserverdisconnected` -/
-def BluetoothDevice.ongattserverdisconnected (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "ongattserverdisconnected" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.ongattserverdisconnected (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.ongattserverdisconnected" do
+  self.val.get "ongattserverdisconnected" (Option EventHandlerNonNull)
 
 /-- Sets `ongattserverdisconnected`: `attribute EventHandler ongattserverdisconnected` -/
-def BluetoothDevice.setOngattserverdisconnected (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOngattserverdisconnected (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOngattserverdisconnected" do
   self.val.set "ongattserverdisconnected" (toJS value)
 
 /-- `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothDevice.oncharacteristicvaluechanged (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.oncharacteristicvaluechanged (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.oncharacteristicvaluechanged" do
+  self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
 
 /-- Sets `oncharacteristicvaluechanged`: `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothDevice.setOncharacteristicvaluechanged (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOncharacteristicvaluechanged (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOncharacteristicvaluechanged" do
   self.val.set "oncharacteristicvaluechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceadded` -/
-def BluetoothDevice.onserviceadded (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "onserviceadded" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.onserviceadded (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.onserviceadded" do
+  self.val.get "onserviceadded" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceadded`: `attribute EventHandler onserviceadded` -/
-def BluetoothDevice.setOnserviceadded (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOnserviceadded (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOnserviceadded" do
   self.val.set "onserviceadded" (toJS value)
 
 /-- `attribute EventHandler onservicechanged` -/
-def BluetoothDevice.onservicechanged (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "onservicechanged" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.onservicechanged (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.onservicechanged" do
+  self.val.get "onservicechanged" (Option EventHandlerNonNull)
 
 /-- Sets `onservicechanged`: `attribute EventHandler onservicechanged` -/
-def BluetoothDevice.setOnservicechanged (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOnservicechanged (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOnservicechanged" do
   self.val.set "onservicechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceremoved` -/
-def BluetoothDevice.onserviceremoved (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := self.val.get "onserviceremoved" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothDevice.onserviceremoved (self : BluetoothDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothDevice.onserviceremoved" do
+  self.val.get "onserviceremoved" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceremoved`: `attribute EventHandler onserviceremoved` -/
-def BluetoothDevice.setOnserviceremoved (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothDevice.setOnserviceremoved (self : BluetoothDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.setOnserviceremoved" do
   self.val.set "onserviceremoved" (toJS value)
 
 /-- `Promise<undefined> forget()` -/
-def BluetoothDevice.forget (self : BluetoothDevice) : Async Unit :=
-  self.val.callMethodAwait "forget" (Support.args #[]) Unit
+@[macro_inline] def BluetoothDevice.forget (self : BluetoothDevice) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.forget" do
+  self.val.callMethodAwait "forget" (Internal.args #[]) Unit
 
 /-- `Promise<undefined> watchAdvertisements(optional WatchAdvertisementsOptions options)` -/
-def BluetoothDevice.watchAdvertisements (self : BluetoothDevice) (options : Option WatchAdvertisementsOptions := none) : Async Unit :=
-  self.val.callMethodAwait "watchAdvertisements" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def BluetoothDevice.watchAdvertisements (self : BluetoothDevice) (options : Option WatchAdvertisementsOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothDevice.watchAdvertisements" do
+  self.val.callMethodAwait "watchAdvertisements" (Internal.args #[Internal.optional options]) Unit
 
 /-- `v instanceof BluetoothManufacturerDataMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothManufacturerDataMap`). -/
-def BluetoothManufacturerDataMap.cast? (v : Value) : IO (Option BluetoothManufacturerDataMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothManufacturerDataMap"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothManufacturerDataMap.cast? (v : Value) : IO (Option BluetoothManufacturerDataMap) := Internal.api "Lasm.JS.Web.BluetoothManufacturerDataMap.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothManufacturerDataMap"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof BluetoothPermissionResult`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothPermissionResult`). -/
-def BluetoothPermissionResult.cast? (v : Value) : IO (Option BluetoothPermissionResult) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothPermissionResult"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothPermissionResult.cast? (v : Value) : IO (Option BluetoothPermissionResult) := Internal.api "Lasm.JS.Web.BluetoothPermissionResult.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothPermissionResult"] Value) (fun x => { val := x }) v
 
 /-- `attribute FrozenArray<BluetoothDevice> devices` -/
-def BluetoothPermissionResult.devices (self : BluetoothPermissionResult) : IO (Array BluetoothDevice) := self.val.get "devices" (Array BluetoothDevice)
+@[macro_inline] def BluetoothPermissionResult.devices (self : BluetoothPermissionResult) : IO (Array BluetoothDevice) := Internal.api "Lasm.JS.Web.BluetoothPermissionResult.devices" do
+  self.val.get "devices" (Array BluetoothDevice)
 
 /-- Sets `devices`: `attribute FrozenArray<BluetoothDevice> devices` -/
-def BluetoothPermissionResult.setDevices (self : BluetoothPermissionResult) (value : Array BluetoothDevice) : IO Unit :=
+@[macro_inline] def BluetoothPermissionResult.setDevices (self : BluetoothPermissionResult) (value : Array BluetoothDevice) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothPermissionResult.setDevices" do
   self.val.set "devices" (toJS value)
 
 /-- `v instanceof BluetoothRemoteGATTCharacteristic`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothRemoteGATTCharacteristic`). -/
-def BluetoothRemoteGATTCharacteristic.cast? (v : Value) : IO (Option BluetoothRemoteGATTCharacteristic) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothRemoteGATTCharacteristic"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.cast? (v : Value) : IO (Option BluetoothRemoteGATTCharacteristic) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothRemoteGATTCharacteristic"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute BluetoothRemoteGATTService service` -/
-def BluetoothRemoteGATTCharacteristic.service (self : BluetoothRemoteGATTCharacteristic) : IO BluetoothRemoteGATTService := do
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.service (self : BluetoothRemoteGATTCharacteristic) : IO BluetoothRemoteGATTService := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.service" do
   let r ← self.val.get "service" Value
   pure { val := r }
 
 /-- `readonly attribute UUID uuid` -/
-def BluetoothRemoteGATTCharacteristic.uuid (self : BluetoothRemoteGATTCharacteristic) : IO String := self.val.get "uuid" String
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.uuid (self : BluetoothRemoteGATTCharacteristic) : IO String := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.uuid" do
+  self.val.get "uuid" String
 
 /-- `readonly attribute BluetoothCharacteristicProperties properties` -/
-def BluetoothRemoteGATTCharacteristic.properties (self : BluetoothRemoteGATTCharacteristic) : IO BluetoothCharacteristicProperties := do
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.properties (self : BluetoothRemoteGATTCharacteristic) : IO BluetoothCharacteristicProperties := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.properties" do
   let r ← self.val.get "properties" Value
   pure { val := r }
 
 /-- `readonly attribute DataView? value` -/
-def BluetoothRemoteGATTCharacteristic.value (self : BluetoothRemoteGATTCharacteristic) : IO (Option ByteArray) := do
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.value (self : BluetoothRemoteGATTCharacteristic) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.value" do
   let r ← self.val.get "value" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothRemoteGATTCharacteristic.oncharacteristicvaluechanged (self : BluetoothRemoteGATTCharacteristic) : IO (Option EventHandlerNonNull) := self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.oncharacteristicvaluechanged (self : BluetoothRemoteGATTCharacteristic) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.oncharacteristicvaluechanged" do
+  self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
 
 /-- Sets `oncharacteristicvaluechanged`: `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothRemoteGATTCharacteristic.setOncharacteristicvaluechanged (self : BluetoothRemoteGATTCharacteristic) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.setOncharacteristicvaluechanged (self : BluetoothRemoteGATTCharacteristic) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.setOncharacteristicvaluechanged" do
   self.val.set "oncharacteristicvaluechanged" (toJS value)
 
 /-- `Promise<BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor)` -/
-def BluetoothRemoteGATTCharacteristic.getDescriptor (self : BluetoothRemoteGATTCharacteristic) (descriptor : BluetoothDescriptorUUID) : Async BluetoothRemoteGATTDescriptor := do
-  let r ← self.val.callMethodAwait "getDescriptor" (Support.args #[toJS descriptor]) Value
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.getDescriptor (self : BluetoothRemoteGATTCharacteristic) (descriptor : BluetoothDescriptorUUID) : Async BluetoothRemoteGATTDescriptor := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.getDescriptor" do
+  let r ← self.val.callMethodAwait "getDescriptor" (Internal.args #[toJS descriptor]) Value
   pure { val := r }
 
 /-- `Promise<sequence<BluetoothRemoteGATTDescriptor>> getDescriptors(optional BluetoothDescriptorUUID descriptor)` -/
-def BluetoothRemoteGATTCharacteristic.getDescriptors (self : BluetoothRemoteGATTCharacteristic) (descriptor : Option BluetoothDescriptorUUID := none) : Async (Array BluetoothRemoteGATTDescriptor) :=
-  self.val.callMethodAwait "getDescriptors" (Support.args #[Support.optional descriptor]) (Array BluetoothRemoteGATTDescriptor)
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.getDescriptors (self : BluetoothRemoteGATTCharacteristic) (descriptor : Option BluetoothDescriptorUUID := none) : Async (Array BluetoothRemoteGATTDescriptor) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.getDescriptors" do
+  self.val.callMethodAwait "getDescriptors" (Internal.args #[Internal.optional descriptor]) (Array BluetoothRemoteGATTDescriptor)
 
 /-- `Promise<DataView> readValue()` -/
-def BluetoothRemoteGATTCharacteristic.readValue (self : BluetoothRemoteGATTCharacteristic) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "readValue" (Support.args #[]) Data
-  Support.viewBytes r
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.readValue (self : BluetoothRemoteGATTCharacteristic) : Async ByteArray := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.readValue" do
+  let r ← self.val.callMethodAwait "readValue" (Internal.args #[]) Data
+  Internal.viewBytes r
 
 /-- `Promise<undefined> writeValue(BufferSource value)` -/
-def BluetoothRemoteGATTCharacteristic.writeValue (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "writeValue" (Support.args #[toJS value]) Unit
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.writeValue (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.writeValue" do
+  self.val.callMethodAwait "writeValue" (Internal.args #[toJS value]) Unit
 
 /-- `Promise<undefined> writeValueWithResponse(BufferSource value)` -/
-def BluetoothRemoteGATTCharacteristic.writeValueWithResponse (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "writeValueWithResponse" (Support.args #[toJS value]) Unit
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.writeValueWithResponse (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.writeValueWithResponse" do
+  self.val.callMethodAwait "writeValueWithResponse" (Internal.args #[toJS value]) Unit
 
 /-- `Promise<undefined> writeValueWithoutResponse(BufferSource value)` -/
-def BluetoothRemoteGATTCharacteristic.writeValueWithoutResponse (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "writeValueWithoutResponse" (Support.args #[toJS value]) Unit
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.writeValueWithoutResponse (self : BluetoothRemoteGATTCharacteristic) (value : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.writeValueWithoutResponse" do
+  self.val.callMethodAwait "writeValueWithoutResponse" (Internal.args #[toJS value]) Unit
 
 /-- `Promise<BluetoothRemoteGATTCharacteristic> startNotifications()` -/
-def BluetoothRemoteGATTCharacteristic.startNotifications (self : BluetoothRemoteGATTCharacteristic) : Async BluetoothRemoteGATTCharacteristic := do
-  let r ← self.val.callMethodAwait "startNotifications" (Support.args #[]) Value
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.startNotifications (self : BluetoothRemoteGATTCharacteristic) : Async BluetoothRemoteGATTCharacteristic := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.startNotifications" do
+  let r ← self.val.callMethodAwait "startNotifications" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Promise<BluetoothRemoteGATTCharacteristic> stopNotifications()` -/
-def BluetoothRemoteGATTCharacteristic.stopNotifications (self : BluetoothRemoteGATTCharacteristic) : Async BluetoothRemoteGATTCharacteristic := do
-  let r ← self.val.callMethodAwait "stopNotifications" (Support.args #[]) Value
+@[macro_inline] def BluetoothRemoteGATTCharacteristic.stopNotifications (self : BluetoothRemoteGATTCharacteristic) : Async BluetoothRemoteGATTCharacteristic := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTCharacteristic.stopNotifications" do
+  let r ← self.val.callMethodAwait "stopNotifications" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof BluetoothRemoteGATTDescriptor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothRemoteGATTDescriptor`). -/
-def BluetoothRemoteGATTDescriptor.cast? (v : Value) : IO (Option BluetoothRemoteGATTDescriptor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothRemoteGATTDescriptor"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothRemoteGATTDescriptor.cast? (v : Value) : IO (Option BluetoothRemoteGATTDescriptor) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothRemoteGATTDescriptor"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute BluetoothRemoteGATTCharacteristic characteristic` -/
-def BluetoothRemoteGATTDescriptor.characteristic (self : BluetoothRemoteGATTDescriptor) : IO BluetoothRemoteGATTCharacteristic := do
+@[macro_inline] def BluetoothRemoteGATTDescriptor.characteristic (self : BluetoothRemoteGATTDescriptor) : IO BluetoothRemoteGATTCharacteristic := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.characteristic" do
   let r ← self.val.get "characteristic" Value
   pure { val := r }
 
 /-- `readonly attribute UUID uuid` -/
-def BluetoothRemoteGATTDescriptor.uuid (self : BluetoothRemoteGATTDescriptor) : IO String := self.val.get "uuid" String
+@[macro_inline] def BluetoothRemoteGATTDescriptor.uuid (self : BluetoothRemoteGATTDescriptor) : IO String := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.uuid" do
+  self.val.get "uuid" String
 
 /-- `readonly attribute DataView? value` -/
-def BluetoothRemoteGATTDescriptor.value (self : BluetoothRemoteGATTDescriptor) : IO (Option ByteArray) := do
+@[macro_inline] def BluetoothRemoteGATTDescriptor.value (self : BluetoothRemoteGATTDescriptor) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.value" do
   let r ← self.val.get "value" (Option Data)
-  (fun x => x.mapM Support.viewBytes) r
+  (fun x => x.mapM Internal.viewBytes) r
 
 /-- `Promise<DataView> readValue()` -/
-def BluetoothRemoteGATTDescriptor.readValue (self : BluetoothRemoteGATTDescriptor) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "readValue" (Support.args #[]) Data
-  Support.viewBytes r
+@[macro_inline] def BluetoothRemoteGATTDescriptor.readValue (self : BluetoothRemoteGATTDescriptor) : Async ByteArray := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.readValue" do
+  let r ← self.val.callMethodAwait "readValue" (Internal.args #[]) Data
+  Internal.viewBytes r
 
 /-- `Promise<undefined> writeValue(BufferSource value)` -/
-def BluetoothRemoteGATTDescriptor.writeValue (self : BluetoothRemoteGATTDescriptor) (value : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "writeValue" (Support.args #[toJS value]) Unit
+@[macro_inline] def BluetoothRemoteGATTDescriptor.writeValue (self : BluetoothRemoteGATTDescriptor) (value : ByteArray) : Async Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTDescriptor.writeValue" do
+  self.val.callMethodAwait "writeValue" (Internal.args #[toJS value]) Unit
 
 /-- `v instanceof BluetoothRemoteGATTServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothRemoteGATTServer`). -/
-def BluetoothRemoteGATTServer.cast? (v : Value) : IO (Option BluetoothRemoteGATTServer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothRemoteGATTServer"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothRemoteGATTServer.cast? (v : Value) : IO (Option BluetoothRemoteGATTServer) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothRemoteGATTServer"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute BluetoothDevice device` -/
-def BluetoothRemoteGATTServer.device (self : BluetoothRemoteGATTServer) : IO BluetoothDevice := do
+@[macro_inline] def BluetoothRemoteGATTServer.device (self : BluetoothRemoteGATTServer) : IO BluetoothDevice := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `readonly attribute boolean connected` -/
-def BluetoothRemoteGATTServer.connected (self : BluetoothRemoteGATTServer) : IO Bool := self.val.get "connected" Bool
+@[macro_inline] def BluetoothRemoteGATTServer.connected (self : BluetoothRemoteGATTServer) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.connected" do
+  self.val.get "connected" Bool
 
 /-- `Promise<BluetoothRemoteGATTServer> connect()` -/
-def BluetoothRemoteGATTServer.connect (self : BluetoothRemoteGATTServer) : Async BluetoothRemoteGATTServer := do
-  let r ← self.val.callMethodAwait "connect" (Support.args #[]) Value
+@[macro_inline] def BluetoothRemoteGATTServer.connect (self : BluetoothRemoteGATTServer) : Async BluetoothRemoteGATTServer := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.connect" do
+  let r ← self.val.callMethodAwait "connect" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined disconnect()` -/
-def BluetoothRemoteGATTServer.disconnect (self : BluetoothRemoteGATTServer) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def BluetoothRemoteGATTServer.disconnect (self : BluetoothRemoteGATTServer) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `Promise<BluetoothRemoteGATTService> getPrimaryService(BluetoothServiceUUID service)` -/
-def BluetoothRemoteGATTServer.getPrimaryService (self : BluetoothRemoteGATTServer) (service : BluetoothServiceUUID) : Async BluetoothRemoteGATTService := do
-  let r ← self.val.callMethodAwait "getPrimaryService" (Support.args #[toJS service]) Value
+@[macro_inline] def BluetoothRemoteGATTServer.getPrimaryService (self : BluetoothRemoteGATTServer) (service : BluetoothServiceUUID) : Async BluetoothRemoteGATTService := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.getPrimaryService" do
+  let r ← self.val.callMethodAwait "getPrimaryService" (Internal.args #[toJS service]) Value
   pure { val := r }
 
 /-- `Promise<sequence<BluetoothRemoteGATTService>> getPrimaryServices(optional BluetoothServiceUUID service)` -/
-def BluetoothRemoteGATTServer.getPrimaryServices (self : BluetoothRemoteGATTServer) (service : Option BluetoothServiceUUID := none) : Async (Array BluetoothRemoteGATTService) :=
-  self.val.callMethodAwait "getPrimaryServices" (Support.args #[Support.optional service]) (Array BluetoothRemoteGATTService)
+@[macro_inline] def BluetoothRemoteGATTServer.getPrimaryServices (self : BluetoothRemoteGATTServer) (service : Option BluetoothServiceUUID := none) : Async (Array BluetoothRemoteGATTService) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTServer.getPrimaryServices" do
+  self.val.callMethodAwait "getPrimaryServices" (Internal.args #[Internal.optional service]) (Array BluetoothRemoteGATTService)
 
 /-- `v instanceof BluetoothRemoteGATTService`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothRemoteGATTService`). -/
-def BluetoothRemoteGATTService.cast? (v : Value) : IO (Option BluetoothRemoteGATTService) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothRemoteGATTService"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothRemoteGATTService.cast? (v : Value) : IO (Option BluetoothRemoteGATTService) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothRemoteGATTService"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute BluetoothDevice device` -/
-def BluetoothRemoteGATTService.device (self : BluetoothRemoteGATTService) : IO BluetoothDevice := do
+@[macro_inline] def BluetoothRemoteGATTService.device (self : BluetoothRemoteGATTService) : IO BluetoothDevice := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.device" do
   let r ← self.val.get "device" Value
   pure { val := r }
 
 /-- `readonly attribute UUID uuid` -/
-def BluetoothRemoteGATTService.uuid (self : BluetoothRemoteGATTService) : IO String := self.val.get "uuid" String
+@[macro_inline] def BluetoothRemoteGATTService.uuid (self : BluetoothRemoteGATTService) : IO String := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.uuid" do
+  self.val.get "uuid" String
 
 /-- `readonly attribute boolean isPrimary` -/
-def BluetoothRemoteGATTService.isPrimary (self : BluetoothRemoteGATTService) : IO Bool := self.val.get "isPrimary" Bool
+@[macro_inline] def BluetoothRemoteGATTService.isPrimary (self : BluetoothRemoteGATTService) : IO Bool := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.isPrimary" do
+  self.val.get "isPrimary" Bool
 
 /-- `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothRemoteGATTService.oncharacteristicvaluechanged (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothRemoteGATTService.oncharacteristicvaluechanged (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.oncharacteristicvaluechanged" do
+  self.val.get "oncharacteristicvaluechanged" (Option EventHandlerNonNull)
 
 /-- Sets `oncharacteristicvaluechanged`: `attribute EventHandler oncharacteristicvaluechanged` -/
-def BluetoothRemoteGATTService.setOncharacteristicvaluechanged (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothRemoteGATTService.setOncharacteristicvaluechanged (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.setOncharacteristicvaluechanged" do
   self.val.set "oncharacteristicvaluechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceadded` -/
-def BluetoothRemoteGATTService.onserviceadded (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := self.val.get "onserviceadded" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothRemoteGATTService.onserviceadded (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.onserviceadded" do
+  self.val.get "onserviceadded" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceadded`: `attribute EventHandler onserviceadded` -/
-def BluetoothRemoteGATTService.setOnserviceadded (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothRemoteGATTService.setOnserviceadded (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.setOnserviceadded" do
   self.val.set "onserviceadded" (toJS value)
 
 /-- `attribute EventHandler onservicechanged` -/
-def BluetoothRemoteGATTService.onservicechanged (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := self.val.get "onservicechanged" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothRemoteGATTService.onservicechanged (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.onservicechanged" do
+  self.val.get "onservicechanged" (Option EventHandlerNonNull)
 
 /-- Sets `onservicechanged`: `attribute EventHandler onservicechanged` -/
-def BluetoothRemoteGATTService.setOnservicechanged (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothRemoteGATTService.setOnservicechanged (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.setOnservicechanged" do
   self.val.set "onservicechanged" (toJS value)
 
 /-- `attribute EventHandler onserviceremoved` -/
-def BluetoothRemoteGATTService.onserviceremoved (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := self.val.get "onserviceremoved" (Option EventHandlerNonNull)
+@[macro_inline] def BluetoothRemoteGATTService.onserviceremoved (self : BluetoothRemoteGATTService) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.onserviceremoved" do
+  self.val.get "onserviceremoved" (Option EventHandlerNonNull)
 
 /-- Sets `onserviceremoved`: `attribute EventHandler onserviceremoved` -/
-def BluetoothRemoteGATTService.setOnserviceremoved (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def BluetoothRemoteGATTService.setOnserviceremoved (self : BluetoothRemoteGATTService) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.setOnserviceremoved" do
   self.val.set "onserviceremoved" (toJS value)
 
 /-- `Promise<BluetoothRemoteGATTCharacteristic> getCharacteristic(BluetoothCharacteristicUUID characteristic)` -/
-def BluetoothRemoteGATTService.getCharacteristic (self : BluetoothRemoteGATTService) (characteristic : BluetoothCharacteristicUUID) : Async BluetoothRemoteGATTCharacteristic := do
-  let r ← self.val.callMethodAwait "getCharacteristic" (Support.args #[toJS characteristic]) Value
+@[macro_inline] def BluetoothRemoteGATTService.getCharacteristic (self : BluetoothRemoteGATTService) (characteristic : BluetoothCharacteristicUUID) : Async BluetoothRemoteGATTCharacteristic := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.getCharacteristic" do
+  let r ← self.val.callMethodAwait "getCharacteristic" (Internal.args #[toJS characteristic]) Value
   pure { val := r }
 
 /-- `Promise<sequence<BluetoothRemoteGATTCharacteristic>> getCharacteristics(optional BluetoothCharacteristicUUID characteristic)` -/
-def BluetoothRemoteGATTService.getCharacteristics (self : BluetoothRemoteGATTService) (characteristic : Option BluetoothCharacteristicUUID := none) : Async (Array BluetoothRemoteGATTCharacteristic) :=
-  self.val.callMethodAwait "getCharacteristics" (Support.args #[Support.optional characteristic]) (Array BluetoothRemoteGATTCharacteristic)
+@[macro_inline] def BluetoothRemoteGATTService.getCharacteristics (self : BluetoothRemoteGATTService) (characteristic : Option BluetoothCharacteristicUUID := none) : Async (Array BluetoothRemoteGATTCharacteristic) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.getCharacteristics" do
+  self.val.callMethodAwait "getCharacteristics" (Internal.args #[Internal.optional characteristic]) (Array BluetoothRemoteGATTCharacteristic)
 
 /-- `Promise<BluetoothRemoteGATTService> getIncludedService(BluetoothServiceUUID service)` -/
-def BluetoothRemoteGATTService.getIncludedService (self : BluetoothRemoteGATTService) (service : BluetoothServiceUUID) : Async BluetoothRemoteGATTService := do
-  let r ← self.val.callMethodAwait "getIncludedService" (Support.args #[toJS service]) Value
+@[macro_inline] def BluetoothRemoteGATTService.getIncludedService (self : BluetoothRemoteGATTService) (service : BluetoothServiceUUID) : Async BluetoothRemoteGATTService := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.getIncludedService" do
+  let r ← self.val.callMethodAwait "getIncludedService" (Internal.args #[toJS service]) Value
   pure { val := r }
 
 /-- `Promise<sequence<BluetoothRemoteGATTService>> getIncludedServices(optional BluetoothServiceUUID service)` -/
-def BluetoothRemoteGATTService.getIncludedServices (self : BluetoothRemoteGATTService) (service : Option BluetoothServiceUUID := none) : Async (Array BluetoothRemoteGATTService) :=
-  self.val.callMethodAwait "getIncludedServices" (Support.args #[Support.optional service]) (Array BluetoothRemoteGATTService)
+@[macro_inline] def BluetoothRemoteGATTService.getIncludedServices (self : BluetoothRemoteGATTService) (service : Option BluetoothServiceUUID := none) : Async (Array BluetoothRemoteGATTService) := Internal.api "Lasm.JS.Web.BluetoothRemoteGATTService.getIncludedServices" do
+  self.val.callMethodAwait "getIncludedServices" (Internal.args #[Internal.optional service]) (Array BluetoothRemoteGATTService)
 
 /-- `v instanceof BluetoothServiceDataMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothServiceDataMap`). -/
-def BluetoothServiceDataMap.cast? (v : Value) : IO (Option BluetoothServiceDataMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothServiceDataMap"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothServiceDataMap.cast? (v : Value) : IO (Option BluetoothServiceDataMap) := Internal.api "Lasm.JS.Web.BluetoothServiceDataMap.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothServiceDataMap"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof BluetoothUUID`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothUUID`). -/
-def BluetoothUUID.cast? (v : Value) : IO (Option BluetoothUUID) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BluetoothUUID"] Value) v) then some { val := v } else none
+@[macro_inline] def BluetoothUUID.cast? (v : Value) : IO (Option BluetoothUUID) := Internal.api "Lasm.JS.Web.BluetoothUUID.cast?" do
+  Internal.cast (Internal.getGlobal ["BluetoothUUID"] Value) (fun x => { val := x }) v
 
 /-- `static UUID getService((DOMString or unsigned long) name)` -/
-def BluetoothUUID.getService (name : DOMStringOrUnsignedLong) : IO String :=
+@[macro_inline] def BluetoothUUID.getService (name : DOMStringOrUnsignedLong) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.getService" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getService", module := "globalThis", path := "BluetoothUUID.getService", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
 
 /-- `static UUID getCharacteristic((DOMString or unsigned long) name)` -/
-def BluetoothUUID.getCharacteristic (name : DOMStringOrUnsignedLong) : IO String :=
+@[macro_inline] def BluetoothUUID.getCharacteristic (name : DOMStringOrUnsignedLong) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.getCharacteristic" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getCharacteristic", module := "globalThis", path := "BluetoothUUID.getCharacteristic", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
 
 /-- `static UUID getDescriptor((DOMString or unsigned long) name)` -/
-def BluetoothUUID.getDescriptor (name : DOMStringOrUnsignedLong) : IO String :=
+@[macro_inline] def BluetoothUUID.getDescriptor (name : DOMStringOrUnsignedLong) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.getDescriptor" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getDescriptor", module := "globalThis", path := "BluetoothUUID.getDescriptor", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
 
 /-- `static UUID canonicalUUID(unsigned long alias)` -/
-def BluetoothUUID.canonicalUUID (alias : Nat) : IO String :=
+@[macro_inline] def BluetoothUUID.canonicalUUID (alias : Nat) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.canonicalUUID" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.canonicalUUID", module := "globalThis", path := "BluetoothUUID.canonicalUUID", construct := false, arity := 1 }
-    (Support.args #[toJS alias]) (await := false)
+    (Internal.args #[toJS alias]) (await := false)
 
 /-- `v instanceof ValueEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ValueEvent`). -/
-def ValueEvent.cast? (v : Value) : IO (Option ValueEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ValueEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ValueEvent.cast? (v : Value) : IO (Option ValueEvent) := Internal.api "Lasm.JS.Web.ValueEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ValueEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ValueEventInit initDict)` -/
-def ValueEvent.new (type : String) (initDict : Option ValueEventInit := none) : IO ValueEvent :=
+@[macro_inline] def ValueEvent.new (type : String) (initDict : Option ValueEventInit := none) : IO ValueEvent := Internal.api "Lasm.JS.Web.ValueEvent.new" do
   Lasm.JS.Binding.invoke ValueEvent { name := "Lasm.JS.Web.ValueEvent.new", module := "globalThis", path := "ValueEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional initDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional initDict]) (await := false)
 
 /-- `readonly attribute any value` -/
-def ValueEvent.value (self : ValueEvent) : IO Data := self.val.get "value" Data
+@[macro_inline] def ValueEvent.value (self : ValueEvent) : IO Data := Internal.api "Lasm.JS.Web.ValueEvent.value" do
+  self.val.get "value" Data
 
 /-- `readonly attribute Bluetooth bluetooth` -/
-def Navigator.bluetooth (self : Navigator) : IO Bluetooth := do
+@[macro_inline] def Navigator.bluetooth (self : Navigator) : IO Bluetooth := Internal.api "Lasm.JS.Web.Navigator.bluetooth" do
   let r ← self.val.get "bluetooth" Value
   pure { val := r }
 

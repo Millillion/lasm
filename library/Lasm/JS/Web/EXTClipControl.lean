@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.EXTClipControl
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum LOWER_LEFT_EXT = 0x8CA1` -/
 def EXT_clip_control.LOWER_LEFT_EXT : Nat := 0x8CA1
@@ -29,7 +33,7 @@ def EXT_clip_control.CLIP_ORIGIN_EXT : Nat := 0x935C
 def EXT_clip_control.CLIP_DEPTH_MODE_EXT : Nat := 0x935D
 
 /-- `undefined clipControlEXT(GLenum origin, GLenum depth)` -/
-def EXT_clip_control.clipControlEXT (self : EXT_clip_control) (origin : Nat) (depth : Nat) : IO Unit :=
-  self.val.callMethod "clipControlEXT" (Support.args #[toJS origin, toJS depth]) Unit
+@[macro_inline] def EXT_clip_control.clipControlEXT (self : EXT_clip_control) (origin : Nat) (depth : Nat) : IO Unit := Internal.api "Lasm.JS.Web.EXT_clip_control.clipControlEXT" do
+  self.val.callMethod "clipControlEXT" (Internal.args #[toJS origin, toJS depth]) Unit
 
 end Lasm.JS.Web

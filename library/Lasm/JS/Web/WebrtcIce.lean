@@ -6,12 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webrtc
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Webrtc
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary RTCIceGatherOptions` (IceTransport Extensions for WebRTC (https://w3c.github.io/webrtc-ice/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIceGatherOptions where
@@ -19,42 +22,44 @@ structure RTCIceGatherOptions where
   gatherPolicy : Option RTCIceTransportPolicy := none
   /-- `sequence<RTCIceServer> iceServers` -/
   iceServers : Option (Array RTCIceServer) := none
-instance : ToJS RTCIceGatherOptions := ⟨fun d => Support.fields #[("gatherPolicy", Support.optional d.gatherPolicy),
-    ("iceServers", Support.optional d.iceServers)]⟩
+instance : ToJS RTCIceGatherOptions := ⟨fun d => Internal.fields #[("gatherPolicy", Internal.optional d.gatherPolicy),
+    ("iceServers", Internal.optional d.iceServers)]⟩
 
 /-- `constructor()` -/
-def RTCIceTransport.new : IO RTCIceTransport :=
+@[macro_inline] def RTCIceTransport.new : IO RTCIceTransport := Internal.api "Lasm.JS.Web.RTCIceTransport.new" do
   Lasm.JS.Binding.invoke RTCIceTransport { name := "Lasm.JS.Web.RTCIceTransport.new", module := "globalThis", path := "RTCIceTransport", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `attribute EventHandler onerror` -/
-def RTCIceTransport.onerror (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := self.val.get "onerror" (Option EventHandlerNonNull)
+@[macro_inline] def RTCIceTransport.onerror (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.onerror" do
+  self.val.get "onerror" (Option EventHandlerNonNull)
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
-def RTCIceTransport.setOnerror (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCIceTransport.setOnerror (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.setOnerror" do
   self.val.set "onerror" (toJS value)
 
 /-- `attribute EventHandler onicecandidate` -/
-def RTCIceTransport.onicecandidate (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := self.val.get "onicecandidate" (Option EventHandlerNonNull)
+@[macro_inline] def RTCIceTransport.onicecandidate (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.onicecandidate" do
+  self.val.get "onicecandidate" (Option EventHandlerNonNull)
 
 /-- Sets `onicecandidate`: `attribute EventHandler onicecandidate` -/
-def RTCIceTransport.setOnicecandidate (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def RTCIceTransport.setOnicecandidate (self : RTCIceTransport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.setOnicecandidate" do
   self.val.set "onicecandidate" (toJS value)
 
 /-- `undefined gather(optional RTCIceGatherOptions options)` -/
-def RTCIceTransport.gather (self : RTCIceTransport) (options : Option RTCIceGatherOptions := none) : IO Unit :=
-  self.val.callMethod "gather" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def RTCIceTransport.gather (self : RTCIceTransport) (options : Option RTCIceGatherOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.gather" do
+  self.val.callMethod "gather" (Internal.args #[Internal.optional options]) Unit
 
 /-- `undefined start(optional RTCIceParameters remoteParameters, optional RTCIceRole role)` -/
-def RTCIceTransport.start (self : RTCIceTransport) (remoteParameters : Option RTCIceParameters := none) (role : Option RTCIceRole := none) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[Support.optional remoteParameters, Support.optional role]) Unit
+@[macro_inline] def RTCIceTransport.start (self : RTCIceTransport) (remoteParameters : Option RTCIceParameters := none) (role : Option RTCIceRole := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.start" do
+  self.val.callMethod "start" (Internal.args #[Internal.optional remoteParameters, Internal.optional role]) Unit
 
 /-- `undefined stop()` -/
-def RTCIceTransport.stop (self : RTCIceTransport) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def RTCIceTransport.stop (self : RTCIceTransport) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `undefined addRemoteCandidate(optional RTCIceCandidateInit remoteCandidate)` -/
-def RTCIceTransport.addRemoteCandidate (self : RTCIceTransport) (remoteCandidate : Option RTCIceCandidateInit := none) : IO Unit :=
-  self.val.callMethod "addRemoteCandidate" (Support.args #[Support.optional remoteCandidate]) Unit
+@[macro_inline] def RTCIceTransport.addRemoteCandidate (self : RTCIceTransport) (remoteCandidate : Option RTCIceCandidateInit := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCIceTransport.addRemoteCandidate" do
+  self.val.callMethod "addRemoteCandidate" (Internal.args #[Internal.optional remoteCandidate]) Unit
 
 end Lasm.JS.Web

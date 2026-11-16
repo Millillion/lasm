@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLProvokingVertex
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `const GLenum FIRST_VERTEX_CONVENTION_WEBGL = 0x8E4D` -/
 def WEBGL_provoking_vertex.FIRST_VERTEX_CONVENTION_WEBGL : Nat := 0x8E4D
@@ -20,7 +24,7 @@ def WEBGL_provoking_vertex.LAST_VERTEX_CONVENTION_WEBGL : Nat := 0x8E4E
 def WEBGL_provoking_vertex.PROVOKING_VERTEX_WEBGL : Nat := 0x8E4F
 
 /-- `undefined provokingVertexWEBGL(GLenum provokeMode)` -/
-def WEBGL_provoking_vertex.provokingVertexWEBGL (self : WEBGL_provoking_vertex) (provokeMode : Nat) : IO Unit :=
-  self.val.callMethod "provokingVertexWEBGL" (Support.args #[toJS provokeMode]) Unit
+@[macro_inline] def WEBGL_provoking_vertex.provokingVertexWEBGL (self : WEBGL_provoking_vertex) (provokeMode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_provoking_vertex.provokingVertexWEBGL" do
+  self.val.callMethod "provokingVertexWEBGL" (Internal.args #[toJS provokeMode]) Unit
 
 end Lasm.JS.Web

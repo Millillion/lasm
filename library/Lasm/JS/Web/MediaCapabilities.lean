@@ -6,112 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
-import Lasm.JS.Web.EncryptedMedia
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.EncryptedMedia
+import Lasm.JS.Web.Types.MediaCapabilities
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum HdrMetadataType` (Media Capabilities (https://w3c.github.io/media-capabilities/)): "smpteSt2086", "smpteSt2094-10", "smpteSt2094-40". -/
-inductive HdrMetadataType where
-  /-- "smpteSt2086" -/
-  | smpteSt2086
-  /-- "smpteSt2094-10" -/
-  | smpteSt209410
-  /-- "smpteSt2094-40" -/
-  | smpteSt209440
-  deriving BEq, Repr, Inhabited
-instance : ToJS HdrMetadataType := ⟨fun
-  | .smpteSt2086 => .string "smpteSt2086"
-  | .smpteSt209410 => .string "smpteSt2094-10"
-  | .smpteSt209440 => .string "smpteSt2094-40"⟩
-instance : FromJS HdrMetadataType where
-  fromJS
-    | .string "smpteSt2086" => .ok .smpteSt2086
-    | .string "smpteSt2094-10" => .ok .smpteSt209410
-    | .string "smpteSt2094-40" => .ok .smpteSt209440
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HdrMetadataType"
-
-/-- `enum ColorGamut` (Media Capabilities (https://w3c.github.io/media-capabilities/)): "srgb", "p3", "rec2020". -/
-inductive ColorGamut where
-  /-- "srgb" -/
-  | srgb
-  /-- "p3" -/
-  | p3
-  /-- "rec2020" -/
-  | rec2020
-  deriving BEq, Repr, Inhabited
-instance : ToJS ColorGamut := ⟨fun
-  | .srgb => .string "srgb"
-  | .p3 => .string "p3"
-  | .rec2020 => .string "rec2020"⟩
-instance : FromJS ColorGamut where
-  fromJS
-    | .string "srgb" => .ok .srgb
-    | .string "p3" => .ok .p3
-    | .string "rec2020" => .ok .rec2020
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ColorGamut"
-
-/-- `enum TransferFunction` (Media Capabilities (https://w3c.github.io/media-capabilities/)): "srgb", "pq", "hlg". -/
-inductive TransferFunction where
-  /-- "srgb" -/
-  | srgb
-  /-- "pq" -/
-  | pq
-  /-- "hlg" -/
-  | hlg
-  deriving BEq, Repr, Inhabited
-instance : ToJS TransferFunction := ⟨fun
-  | .srgb => .string "srgb"
-  | .pq => .string "pq"
-  | .hlg => .string "hlg"⟩
-instance : FromJS TransferFunction where
-  fromJS
-    | .string "srgb" => .ok .srgb
-    | .string "pq" => .ok .pq
-    | .string "hlg" => .ok .hlg
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.TransferFunction"
-
-/-- `enum MediaDecodingType` (Media Capabilities (https://w3c.github.io/media-capabilities/)): "file", "media-source", "webrtc". -/
-inductive MediaDecodingType where
-  /-- "file" -/
-  | file
-  /-- "media-source" -/
-  | mediaSource
-  /-- "webrtc" -/
-  | webrtc
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaDecodingType := ⟨fun
-  | .file => .string "file"
-  | .mediaSource => .string "media-source"
-  | .webrtc => .string "webrtc"⟩
-instance : FromJS MediaDecodingType where
-  fromJS
-    | .string "file" => .ok .file
-    | .string "media-source" => .ok .mediaSource
-    | .string "webrtc" => .ok .webrtc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaDecodingType"
-
-/-- `enum MediaEncodingType` (Media Capabilities (https://w3c.github.io/media-capabilities/)): "record", "webrtc". -/
-inductive MediaEncodingType where
-  /-- "record" -/
-  | record
-  /-- "webrtc" -/
-  | webrtc
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaEncodingType := ⟨fun
-  | .record => .string "record"
-  | .webrtc => .string "webrtc"⟩
-instance : FromJS MediaEncodingType where
-  fromJS
-    | .string "record" => .ok .record
-    | .string "webrtc" => .ok .webrtc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaEncodingType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary VideoConfiguration` (Media Capabilities (https://w3c.github.io/media-capabilities/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoConfiguration where
@@ -137,17 +40,17 @@ structure VideoConfiguration where
   scalabilityMode : Option String := none
   /-- `boolean spatialScalability` -/
   spatialScalability : Option Bool := none
-instance : ToJS VideoConfiguration := ⟨fun d => Support.fields #[("contentType", toJS d.contentType),
+instance : ToJS VideoConfiguration := ⟨fun d => Internal.fields #[("contentType", toJS d.contentType),
     ("width", toJS d.width),
     ("height", toJS d.height),
     ("bitrate", toJS d.bitrate),
     ("framerate", toJS d.framerate),
-    ("hasAlphaChannel", Support.optional d.hasAlphaChannel),
-    ("hdrMetadataType", Support.optional d.hdrMetadataType),
-    ("colorGamut", Support.optional d.colorGamut),
-    ("transferFunction", Support.optional d.transferFunction),
-    ("scalabilityMode", Support.optional d.scalabilityMode),
-    ("spatialScalability", Support.optional d.spatialScalability)]⟩
+    ("hasAlphaChannel", Internal.optional d.hasAlphaChannel),
+    ("hdrMetadataType", Internal.optional d.hdrMetadataType),
+    ("colorGamut", Internal.optional d.colorGamut),
+    ("transferFunction", Internal.optional d.transferFunction),
+    ("scalabilityMode", Internal.optional d.scalabilityMode),
+    ("spatialScalability", Internal.optional d.spatialScalability)]⟩
 instance : FromJS VideoConfiguration where
   fromJS d := do return {
     contentType := ← Lasm.JS.readField String d "contentType",
@@ -175,11 +78,11 @@ structure AudioConfiguration where
   samplerate : Option Nat := none
   /-- `boolean spatialRendering` -/
   spatialRendering : Option Bool := none
-instance : ToJS AudioConfiguration := ⟨fun d => Support.fields #[("contentType", toJS d.contentType),
-    ("channels", Support.optional d.channels),
-    ("bitrate", Support.optional d.bitrate),
-    ("samplerate", Support.optional d.samplerate),
-    ("spatialRendering", Support.optional d.spatialRendering)]⟩
+instance : ToJS AudioConfiguration := ⟨fun d => Internal.fields #[("contentType", toJS d.contentType),
+    ("channels", Internal.optional d.channels),
+    ("bitrate", Internal.optional d.bitrate),
+    ("samplerate", Internal.optional d.samplerate),
+    ("spatialRendering", Internal.optional d.spatialRendering)]⟩
 instance : FromJS AudioConfiguration where
   fromJS d := do return {
     contentType := ← Lasm.JS.readField String d "contentType",
@@ -195,8 +98,8 @@ structure KeySystemTrackConfiguration where
   robustness : Option String := none
   /-- `DOMString? encryptionScheme = null` -/
   encryptionScheme : Option String := none
-instance : ToJS KeySystemTrackConfiguration := ⟨fun d => Support.fields #[("robustness", Support.optional d.robustness),
-    ("encryptionScheme", Support.optional d.encryptionScheme)]⟩
+instance : ToJS KeySystemTrackConfiguration := ⟨fun d => Internal.fields #[("robustness", Internal.optional d.robustness),
+    ("encryptionScheme", Internal.optional d.encryptionScheme)]⟩
 instance : FromJS KeySystemTrackConfiguration where
   fromJS d := do return {
     robustness := ← Lasm.JS.readField (Option String) d "robustness",
@@ -219,13 +122,13 @@ structure MediaCapabilitiesKeySystemConfiguration where
   audio : Option KeySystemTrackConfiguration := none
   /-- `KeySystemTrackConfiguration video` -/
   video : Option KeySystemTrackConfiguration := none
-instance : ToJS MediaCapabilitiesKeySystemConfiguration := ⟨fun d => Support.fields #[("keySystem", toJS d.keySystem),
-    ("initDataType", Support.optional d.initDataType),
-    ("distinctiveIdentifier", Support.optional d.distinctiveIdentifier),
-    ("persistentState", Support.optional d.persistentState),
-    ("sessionTypes", Support.optional d.sessionTypes),
-    ("audio", Support.optional d.audio),
-    ("video", Support.optional d.video)]⟩
+instance : ToJS MediaCapabilitiesKeySystemConfiguration := ⟨fun d => Internal.fields #[("keySystem", toJS d.keySystem),
+    ("initDataType", Internal.optional d.initDataType),
+    ("distinctiveIdentifier", Internal.optional d.distinctiveIdentifier),
+    ("persistentState", Internal.optional d.persistentState),
+    ("sessionTypes", Internal.optional d.sessionTypes),
+    ("audio", Internal.optional d.audio),
+    ("video", Internal.optional d.video)]⟩
 instance : FromJS MediaCapabilitiesKeySystemConfiguration where
   fromJS d := do return {
     keySystem := ← Lasm.JS.readField String d "keySystem",
@@ -247,10 +150,10 @@ structure MediaDecodingConfiguration where
   type : MediaDecodingType
   /-- `MediaCapabilitiesKeySystemConfiguration keySystemConfiguration` -/
   keySystemConfiguration : Option MediaCapabilitiesKeySystemConfiguration := none
-instance : ToJS MediaDecodingConfiguration := ⟨fun d => Support.fields #[("video", Support.optional d.video),
-    ("audio", Support.optional d.audio),
+instance : ToJS MediaDecodingConfiguration := ⟨fun d => Internal.fields #[("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio),
     ("type", toJS d.type),
-    ("keySystemConfiguration", Support.optional d.keySystemConfiguration)]⟩
+    ("keySystemConfiguration", Internal.optional d.keySystemConfiguration)]⟩
 instance : FromJS MediaDecodingConfiguration where
   fromJS d := do return {
     video := ← Lasm.JS.readField (Option VideoConfiguration) d "video",
@@ -271,6 +174,11 @@ structure MediaCapabilitiesDecodingInfo where
   keySystemAccess : Option MediaKeySystemAccess
   /-- `required MediaDecodingConfiguration configuration` -/
   configuration : MediaDecodingConfiguration
+instance : ToJS MediaCapabilitiesDecodingInfo := ⟨fun d => Internal.fields #[("supported", toJS d.supported),
+    ("smooth", toJS d.smooth),
+    ("powerEfficient", toJS d.powerEfficient),
+    ("keySystemAccess", toJS d.keySystemAccess),
+    ("configuration", toJS d.configuration)]⟩
 instance : FromJS MediaCapabilitiesDecodingInfo where
   fromJS d := do return {
     supported := ← Lasm.JS.readField Bool d "supported",
@@ -288,8 +196,8 @@ structure MediaEncodingConfiguration where
   audio : Option AudioConfiguration := none
   /-- `required MediaEncodingType type` -/
   type : MediaEncodingType
-instance : ToJS MediaEncodingConfiguration := ⟨fun d => Support.fields #[("video", Support.optional d.video),
-    ("audio", Support.optional d.audio),
+instance : ToJS MediaEncodingConfiguration := ⟨fun d => Internal.fields #[("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio),
     ("type", toJS d.type)]⟩
 instance : FromJS MediaEncodingConfiguration where
   fromJS d := do return {
@@ -308,6 +216,10 @@ structure MediaCapabilitiesEncodingInfo where
   powerEfficient : Bool
   /-- `required MediaEncodingConfiguration configuration` -/
   configuration : MediaEncodingConfiguration
+instance : ToJS MediaCapabilitiesEncodingInfo := ⟨fun d => Internal.fields #[("supported", toJS d.supported),
+    ("smooth", toJS d.smooth),
+    ("powerEfficient", toJS d.powerEfficient),
+    ("configuration", toJS d.configuration)]⟩
 instance : FromJS MediaCapabilitiesEncodingInfo where
   fromJS d := do return {
     supported := ← Lasm.JS.readField Bool d "supported",
@@ -316,25 +228,46 @@ instance : FromJS MediaCapabilitiesEncodingInfo where
     configuration := ← Lasm.JS.readField MediaEncodingConfiguration d "configuration" }
   typeName := "Lasm.JS.Web.MediaCapabilitiesEncodingInfo"
 
+/-- `dictionary MediaConfiguration` (Media Capabilities (https://w3c.github.io/media-capabilities/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MediaConfiguration where
+  /-- `VideoConfiguration video` -/
+  video : Option VideoConfiguration := none
+  /-- `AudioConfiguration audio` -/
+  audio : Option AudioConfiguration := none
+instance : ToJS MediaConfiguration := ⟨fun d => Internal.fields #[("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio)]⟩
+
+/-- `dictionary MediaCapabilitiesInfo` (Media Capabilities (https://w3c.github.io/media-capabilities/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MediaCapabilitiesInfo where
+  /-- `required boolean supported` -/
+  supported : Bool
+  /-- `required boolean smooth` -/
+  smooth : Bool
+  /-- `required boolean powerEfficient` -/
+  powerEfficient : Bool
+instance : ToJS MediaCapabilitiesInfo := ⟨fun d => Internal.fields #[("supported", toJS d.supported),
+    ("smooth", toJS d.smooth),
+    ("powerEfficient", toJS d.powerEfficient)]⟩
+
 /-- `v instanceof MediaCapabilities`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaCapabilities`). -/
-def MediaCapabilities.cast? (v : Value) : IO (Option MediaCapabilities) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaCapabilities"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaCapabilities.cast? (v : Value) : IO (Option MediaCapabilities) := Internal.api "Lasm.JS.Web.MediaCapabilities.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaCapabilities"] Value) (fun x => { val := x }) v
 
 /-- `Promise<MediaCapabilitiesDecodingInfo> decodingInfo(MediaDecodingConfiguration configuration)` -/
-def MediaCapabilities.decodingInfo (self : MediaCapabilities) (configuration : MediaDecodingConfiguration) : Async MediaCapabilitiesDecodingInfo :=
-  self.val.callMethodAwait "decodingInfo" (Support.args #[toJS configuration]) MediaCapabilitiesDecodingInfo
+@[macro_inline] def MediaCapabilities.decodingInfo (self : MediaCapabilities) (configuration : MediaDecodingConfiguration) : Async MediaCapabilitiesDecodingInfo := Internal.api "Lasm.JS.Web.MediaCapabilities.decodingInfo" do
+  self.val.callMethodAwait "decodingInfo" (Internal.args #[toJS configuration]) MediaCapabilitiesDecodingInfo
 
 /-- `Promise<MediaCapabilitiesEncodingInfo> encodingInfo(MediaEncodingConfiguration configuration)` -/
-def MediaCapabilities.encodingInfo (self : MediaCapabilities) (configuration : MediaEncodingConfiguration) : Async MediaCapabilitiesEncodingInfo :=
-  self.val.callMethodAwait "encodingInfo" (Support.args #[toJS configuration]) MediaCapabilitiesEncodingInfo
+@[macro_inline] def MediaCapabilities.encodingInfo (self : MediaCapabilities) (configuration : MediaEncodingConfiguration) : Async MediaCapabilitiesEncodingInfo := Internal.api "Lasm.JS.Web.MediaCapabilities.encodingInfo" do
+  self.val.callMethodAwait "encodingInfo" (Internal.args #[toJS configuration]) MediaCapabilitiesEncodingInfo
 
 /-- `readonly attribute MediaCapabilities mediaCapabilities` -/
-def Navigator.mediaCapabilities (self : Navigator) : IO MediaCapabilities := do
+@[macro_inline] def Navigator.mediaCapabilities (self : Navigator) : IO MediaCapabilities := Internal.api "Lasm.JS.Web.Navigator.mediaCapabilities" do
   let r ← self.val.get "mediaCapabilities" Value
   pure { val := r }
 
 /-- `readonly attribute MediaCapabilities mediaCapabilities` -/
-def WorkerNavigator.mediaCapabilities (self : WorkerNavigator) : IO MediaCapabilities := do
+@[macro_inline] def WorkerNavigator.mediaCapabilities (self : WorkerNavigator) : IO MediaCapabilities := Internal.api "Lasm.JS.Web.WorkerNavigator.mediaCapabilities" do
   let r ← self.val.get "mediaCapabilities" Value
   pure { val := r }
 

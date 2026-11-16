@@ -6,32 +6,37 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureRegion
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof BrowserCaptureMediaStreamTrack`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrowserCaptureMediaStreamTrack`). -/
-def BrowserCaptureMediaStreamTrack.cast? (v : Value) : IO (Option BrowserCaptureMediaStreamTrack) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["BrowserCaptureMediaStreamTrack"] Value) v) then some { val := v } else none
+@[macro_inline] def BrowserCaptureMediaStreamTrack.cast? (v : Value) : IO (Option BrowserCaptureMediaStreamTrack) := Internal.api "Lasm.JS.Web.BrowserCaptureMediaStreamTrack.cast?" do
+  Internal.cast (Internal.getGlobal ["BrowserCaptureMediaStreamTrack"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> cropTo(CropTarget? cropTarget)` -/
-def BrowserCaptureMediaStreamTrack.cropTo (self : BrowserCaptureMediaStreamTrack) (cropTarget : Option CropTarget) : Async Unit :=
-  self.val.callMethodAwait "cropTo" (Support.args #[toJS cropTarget]) Unit
+@[macro_inline] def BrowserCaptureMediaStreamTrack.cropTo (self : BrowserCaptureMediaStreamTrack) (cropTarget : Option CropTarget) : Async Unit := Internal.api "Lasm.JS.Web.BrowserCaptureMediaStreamTrack.cropTo" do
+  self.val.callMethodAwait "cropTo" (Internal.args #[toJS cropTarget]) Unit
 
 /-- `BrowserCaptureMediaStreamTrack clone()` -/
-def BrowserCaptureMediaStreamTrack.clone (self : BrowserCaptureMediaStreamTrack) : IO BrowserCaptureMediaStreamTrack := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def BrowserCaptureMediaStreamTrack.clone (self : BrowserCaptureMediaStreamTrack) : IO BrowserCaptureMediaStreamTrack := Internal.api "Lasm.JS.Web.BrowserCaptureMediaStreamTrack.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof CropTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CropTarget`). -/
-def CropTarget.cast? (v : Value) : IO (Option CropTarget) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CropTarget"] Value) v) then some { val := v } else none
+@[macro_inline] def CropTarget.cast? (v : Value) : IO (Option CropTarget) := Internal.api "Lasm.JS.Web.CropTarget.cast?" do
+  Internal.cast (Internal.getGlobal ["CropTarget"] Value) (fun x => { val := x }) v
 
 /-- `static Promise<CropTarget> fromElement(Element element)` -/
-def CropTarget.fromElement (element : Element) : Async CropTarget := do
+@[macro_inline] def CropTarget.fromElement (element : Element) : Async CropTarget := Internal.api "Lasm.JS.Web.CropTarget.fromElement" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.CropTarget.fromElement", module := "globalThis", path := "CropTarget.fromElement", construct := false, arity := 1 }
-    (Support.args #[toJS element])
+    (Internal.args #[toJS element])
   pure { val := r }
 
 end Lasm.JS.Web

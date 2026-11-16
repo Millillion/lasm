@@ -6,17 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.ScrollToTextFragment
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof FragmentDirective`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FragmentDirective`). -/
-def FragmentDirective.cast? (v : Value) : IO (Option FragmentDirective) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FragmentDirective"] Value) v) then some { val := v } else none
+@[macro_inline] def FragmentDirective.cast? (v : Value) : IO (Option FragmentDirective) := Internal.api "Lasm.JS.Web.FragmentDirective.cast?" do
+  Internal.cast (Internal.getGlobal ["FragmentDirective"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FragmentDirective fragmentDirective` -/
-def Document.fragmentDirective (self : Document) : IO FragmentDirective := do
+@[macro_inline] def Document.fragmentDirective (self : Document) : IO FragmentDirective := Internal.api "Lasm.JS.Web.Document.fragmentDirective" do
   let r ← self.val.get "fragmentDirective" Value
   pure { val := r }
 

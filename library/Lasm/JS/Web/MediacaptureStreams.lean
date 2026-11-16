@@ -6,68 +6,20 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Webidl
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.MediacaptureExtensions
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.CrossOriginStorage
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 import Lasm.JS.Web.ImageCapture
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum MediaDeviceKind` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)): "audioinput", "audiooutput", "videoinput". -/
-inductive MediaDeviceKind where
-  /-- "audioinput" -/
-  | audioinput
-  /-- "audiooutput" -/
-  | audiooutput
-  /-- "videoinput" -/
-  | videoinput
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaDeviceKind := ⟨fun
-  | .audioinput => .string "audioinput"
-  | .audiooutput => .string "audiooutput"
-  | .videoinput => .string "videoinput"⟩
-instance : FromJS MediaDeviceKind where
-  fromJS
-    | .string "audioinput" => .ok .audioinput
-    | .string "audiooutput" => .ok .audiooutput
-    | .string "videoinput" => .ok .videoinput
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaDeviceKind"
-
-/-- `enum GetUserMediaSemantics` (Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)): "browser-chooses", "user-chooses". -/
-inductive GetUserMediaSemantics where
-  /-- "browser-chooses" -/
-  | browserChooses
-  /-- "user-chooses" -/
-  | userChooses
-  deriving BEq, Repr, Inhabited
-instance : ToJS GetUserMediaSemantics := ⟨fun
-  | .browserChooses => .string "browser-chooses"
-  | .userChooses => .string "user-chooses"⟩
-instance : FromJS GetUserMediaSemantics where
-  fromJS
-    | .string "browser-chooses" => .ok .browserChooses
-    | .string "user-chooses" => .ok .userChooses
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.GetUserMediaSemantics"
-
-/-- `enum MediaStreamTrackState` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)): "live", "ended". -/
-inductive MediaStreamTrackState where
-  /-- "live" -/
-  | live
-  /-- "ended" -/
-  | ended
-  deriving BEq, Repr, Inhabited
-instance : ToJS MediaStreamTrackState := ⟨fun
-  | .live => .string "live"
-  | .ended => .string "ended"⟩
-instance : FromJS MediaStreamTrackState where
-  fromJS
-    | .string "live" => .ok .live
-    | .string "ended" => .ok .ended
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.MediaStreamTrackState"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary DeviceChangeEventInit : EventInit` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DeviceChangeEventInit where
@@ -79,10 +31,10 @@ structure DeviceChangeEventInit where
   composed : Option Bool := none
   /-- `sequence<MediaDeviceInfo> devices = []` -/
   devices : Option (Array MediaDeviceInfo) := none
-instance : ToJS DeviceChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("devices", Support.optional d.devices)]⟩
+instance : ToJS DeviceChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("devices", Internal.optional d.devices)]⟩
 
 /-- `dictionary MediaTrackSupportedConstraints` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MediaTrackSupportedConstraints where
@@ -178,6 +130,52 @@ structure MediaTrackSupportedConstraints where
   restrictOwnAudio : Option Bool := none
   /-- `boolean suppressLocalAudioPlayback = true` -/
   suppressLocalAudioPlayback : Option Bool := none
+instance : ToJS MediaTrackSupportedConstraints := ⟨fun d => Internal.fields #[("whiteBalanceMode", Internal.optional d.whiteBalanceMode),
+    ("exposureMode", Internal.optional d.exposureMode),
+    ("focusMode", Internal.optional d.focusMode),
+    ("pointsOfInterest", Internal.optional d.pointsOfInterest),
+    ("exposureCompensation", Internal.optional d.exposureCompensation),
+    ("exposureTime", Internal.optional d.exposureTime),
+    ("colorTemperature", Internal.optional d.colorTemperature),
+    ("iso", Internal.optional d.iso),
+    ("brightness", Internal.optional d.brightness),
+    ("contrast", Internal.optional d.contrast),
+    ("pan", Internal.optional d.pan),
+    ("saturation", Internal.optional d.saturation),
+    ("sharpness", Internal.optional d.sharpness),
+    ("focusDistance", Internal.optional d.focusDistance),
+    ("tilt", Internal.optional d.tilt),
+    ("zoom", Internal.optional d.zoom),
+    ("torch", Internal.optional d.torch),
+    ("powerEfficient", Internal.optional d.powerEfficient),
+    ("powerEfficientPixelFormat", Internal.optional d.powerEfficientPixelFormat),
+    ("gestureReactions", Internal.optional d.gestureReactions),
+    ("faceFraming", Internal.optional d.faceFraming),
+    ("eyeGazeCorrection", Internal.optional d.eyeGazeCorrection),
+    ("voiceIsolation", Internal.optional d.voiceIsolation),
+    ("humanFaceDetectionMode", Internal.optional d.humanFaceDetectionMode),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("aspectRatio", Internal.optional d.aspectRatio),
+    ("frameRate", Internal.optional d.frameRate),
+    ("facingMode", Internal.optional d.facingMode),
+    ("resizeMode", Internal.optional d.resizeMode),
+    ("sampleRate", Internal.optional d.sampleRate),
+    ("sampleSize", Internal.optional d.sampleSize),
+    ("echoCancellation", Internal.optional d.echoCancellation),
+    ("autoGainControl", Internal.optional d.autoGainControl),
+    ("noiseSuppression", Internal.optional d.noiseSuppression),
+    ("latency", Internal.optional d.latency),
+    ("channelCount", Internal.optional d.channelCount),
+    ("deviceId", Internal.optional d.deviceId),
+    ("groupId", Internal.optional d.groupId),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("displaySurface", Internal.optional d.displaySurface),
+    ("logicalSurface", Internal.optional d.logicalSurface),
+    ("cursor", Internal.optional d.cursor),
+    ("restrictOwnAudio", Internal.optional d.restrictOwnAudio),
+    ("suppressLocalAudioPlayback", Internal.optional d.suppressLocalAudioPlayback)]⟩
 instance : FromJS MediaTrackSupportedConstraints where
   fromJS d := do return {
     whiteBalanceMode := ← Lasm.JS.readField (Option Bool) d "whiteBalanceMode",
@@ -234,8 +232,8 @@ structure ConstrainDOMStringParameters where
   exact : Option DOMStringOrSequenceOfDOMString := none
   /-- `(DOMString or sequence<DOMString>) ideal` -/
   ideal : Option DOMStringOrSequenceOfDOMString := none
-instance : ToJS ConstrainDOMStringParameters := ⟨fun d => Support.fields #[("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainDOMStringParameters := ⟨fun d => Internal.fields #[("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainDOMStringParameters where
   fromJS d := do return {
     exact := ← Lasm.JS.readField (Option DOMStringOrSequenceOfDOMString) d "exact",
@@ -275,10 +273,10 @@ structure ConstrainDoubleRange where
   exact : Option Float := none
   /-- `double ideal` -/
   ideal : Option Float := none
-instance : ToJS ConstrainDoubleRange := ⟨fun d => Support.fields #[("max", Support.optional d.max),
-    ("min", Support.optional d.min),
-    ("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainDoubleRange := ⟨fun d => Internal.fields #[("max", Internal.optional d.max),
+    ("min", Internal.optional d.min),
+    ("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainDoubleRange where
   fromJS d := do return {
     max := ← Lasm.JS.readField (Option Float) d "max",
@@ -334,8 +332,8 @@ structure ConstrainBooleanParameters where
   exact : Option Bool := none
   /-- `boolean ideal` -/
   ideal : Option Bool := none
-instance : ToJS ConstrainBooleanParameters := ⟨fun d => Support.fields #[("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainBooleanParameters := ⟨fun d => Internal.fields #[("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainBooleanParameters where
   fromJS d := do return {
     exact := ← Lasm.JS.readField (Option Bool) d "exact",
@@ -370,10 +368,10 @@ structure ConstrainULongRange where
   exact : Option Nat := none
   /-- `unsigned long ideal` -/
   ideal : Option Nat := none
-instance : ToJS ConstrainULongRange := ⟨fun d => Support.fields #[("max", Support.optional d.max),
-    ("min", Support.optional d.min),
-    ("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainULongRange := ⟨fun d => Internal.fields #[("max", Internal.optional d.max),
+    ("min", Internal.optional d.min),
+    ("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainULongRange where
   fromJS d := do return {
     max := ← Lasm.JS.readField (Option Nat) d "max",
@@ -424,8 +422,8 @@ structure ConstrainBooleanOrDOMStringParameters where
   exact : Option BooleanOrDOMString := none
   /-- `(boolean or DOMString) ideal` -/
   ideal : Option BooleanOrDOMString := none
-instance : ToJS ConstrainBooleanOrDOMStringParameters := ⟨fun d => Support.fields #[("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainBooleanOrDOMStringParameters := ⟨fun d => Internal.fields #[("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainBooleanOrDOMStringParameters where
   fromJS d := do return {
     exact := ← Lasm.JS.readField (Option BooleanOrDOMString) d "exact",
@@ -545,50 +543,50 @@ structure MediaTrackConstraintSet where
   restrictOwnAudio : Option ConstrainBoolean := none
   /-- `ConstrainBoolean suppressLocalAudioPlayback` -/
   suppressLocalAudioPlayback : Option ConstrainBoolean := none
-instance : ToJS MediaTrackConstraintSet := ⟨fun d => Support.fields #[("whiteBalanceMode", Support.optional d.whiteBalanceMode),
-    ("exposureMode", Support.optional d.exposureMode),
-    ("focusMode", Support.optional d.focusMode),
-    ("pointsOfInterest", Support.optional d.pointsOfInterest),
-    ("exposureCompensation", Support.optional d.exposureCompensation),
-    ("exposureTime", Support.optional d.exposureTime),
-    ("colorTemperature", Support.optional d.colorTemperature),
-    ("iso", Support.optional d.iso),
-    ("brightness", Support.optional d.brightness),
-    ("contrast", Support.optional d.contrast),
-    ("saturation", Support.optional d.saturation),
-    ("sharpness", Support.optional d.sharpness),
-    ("focusDistance", Support.optional d.focusDistance),
-    ("pan", Support.optional d.pan),
-    ("tilt", Support.optional d.tilt),
-    ("zoom", Support.optional d.zoom),
-    ("torch", Support.optional d.torch),
-    ("gestureReactions", Support.optional d.gestureReactions),
-    ("faceFraming", Support.optional d.faceFraming),
-    ("eyeGazeCorrection", Support.optional d.eyeGazeCorrection),
-    ("voiceIsolation", Support.optional d.voiceIsolation),
-    ("humanFaceDetectionMode", Support.optional d.humanFaceDetectionMode),
-    ("backgroundSegmentationMask", Support.optional d.backgroundSegmentationMask),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height),
-    ("aspectRatio", Support.optional d.aspectRatio),
-    ("frameRate", Support.optional d.frameRate),
-    ("facingMode", Support.optional d.facingMode),
-    ("resizeMode", Support.optional d.resizeMode),
-    ("sampleRate", Support.optional d.sampleRate),
-    ("sampleSize", Support.optional d.sampleSize),
-    ("echoCancellation", Support.optional d.echoCancellation),
-    ("autoGainControl", Support.optional d.autoGainControl),
-    ("noiseSuppression", Support.optional d.noiseSuppression),
-    ("latency", Support.optional d.latency),
-    ("channelCount", Support.optional d.channelCount),
-    ("deviceId", Support.optional d.deviceId),
-    ("groupId", Support.optional d.groupId),
-    ("backgroundBlur", Support.optional d.backgroundBlur),
-    ("displaySurface", Support.optional d.displaySurface),
-    ("logicalSurface", Support.optional d.logicalSurface),
-    ("cursor", Support.optional d.cursor),
-    ("restrictOwnAudio", Support.optional d.restrictOwnAudio),
-    ("suppressLocalAudioPlayback", Support.optional d.suppressLocalAudioPlayback)]⟩
+instance : ToJS MediaTrackConstraintSet := ⟨fun d => Internal.fields #[("whiteBalanceMode", Internal.optional d.whiteBalanceMode),
+    ("exposureMode", Internal.optional d.exposureMode),
+    ("focusMode", Internal.optional d.focusMode),
+    ("pointsOfInterest", Internal.optional d.pointsOfInterest),
+    ("exposureCompensation", Internal.optional d.exposureCompensation),
+    ("exposureTime", Internal.optional d.exposureTime),
+    ("colorTemperature", Internal.optional d.colorTemperature),
+    ("iso", Internal.optional d.iso),
+    ("brightness", Internal.optional d.brightness),
+    ("contrast", Internal.optional d.contrast),
+    ("saturation", Internal.optional d.saturation),
+    ("sharpness", Internal.optional d.sharpness),
+    ("focusDistance", Internal.optional d.focusDistance),
+    ("pan", Internal.optional d.pan),
+    ("tilt", Internal.optional d.tilt),
+    ("zoom", Internal.optional d.zoom),
+    ("torch", Internal.optional d.torch),
+    ("gestureReactions", Internal.optional d.gestureReactions),
+    ("faceFraming", Internal.optional d.faceFraming),
+    ("eyeGazeCorrection", Internal.optional d.eyeGazeCorrection),
+    ("voiceIsolation", Internal.optional d.voiceIsolation),
+    ("humanFaceDetectionMode", Internal.optional d.humanFaceDetectionMode),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("aspectRatio", Internal.optional d.aspectRatio),
+    ("frameRate", Internal.optional d.frameRate),
+    ("facingMode", Internal.optional d.facingMode),
+    ("resizeMode", Internal.optional d.resizeMode),
+    ("sampleRate", Internal.optional d.sampleRate),
+    ("sampleSize", Internal.optional d.sampleSize),
+    ("echoCancellation", Internal.optional d.echoCancellation),
+    ("autoGainControl", Internal.optional d.autoGainControl),
+    ("noiseSuppression", Internal.optional d.noiseSuppression),
+    ("latency", Internal.optional d.latency),
+    ("channelCount", Internal.optional d.channelCount),
+    ("deviceId", Internal.optional d.deviceId),
+    ("groupId", Internal.optional d.groupId),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("displaySurface", Internal.optional d.displaySurface),
+    ("logicalSurface", Internal.optional d.logicalSurface),
+    ("cursor", Internal.optional d.cursor),
+    ("restrictOwnAudio", Internal.optional d.restrictOwnAudio),
+    ("suppressLocalAudioPlayback", Internal.optional d.suppressLocalAudioPlayback)]⟩
 instance : FromJS MediaTrackConstraintSet where
   fromJS d := do return {
     whiteBalanceMode := ← Lasm.JS.readField (Option ConstrainDOMString) d "whiteBalanceMode",
@@ -729,51 +727,51 @@ structure MediaTrackConstraints where
   suppressLocalAudioPlayback : Option ConstrainBoolean := none
   /-- `sequence<MediaTrackConstraintSet> advanced` -/
   advanced : Option (Array MediaTrackConstraintSet) := none
-instance : ToJS MediaTrackConstraints := ⟨fun d => Support.fields #[("whiteBalanceMode", Support.optional d.whiteBalanceMode),
-    ("exposureMode", Support.optional d.exposureMode),
-    ("focusMode", Support.optional d.focusMode),
-    ("pointsOfInterest", Support.optional d.pointsOfInterest),
-    ("exposureCompensation", Support.optional d.exposureCompensation),
-    ("exposureTime", Support.optional d.exposureTime),
-    ("colorTemperature", Support.optional d.colorTemperature),
-    ("iso", Support.optional d.iso),
-    ("brightness", Support.optional d.brightness),
-    ("contrast", Support.optional d.contrast),
-    ("saturation", Support.optional d.saturation),
-    ("sharpness", Support.optional d.sharpness),
-    ("focusDistance", Support.optional d.focusDistance),
-    ("pan", Support.optional d.pan),
-    ("tilt", Support.optional d.tilt),
-    ("zoom", Support.optional d.zoom),
-    ("torch", Support.optional d.torch),
-    ("gestureReactions", Support.optional d.gestureReactions),
-    ("faceFraming", Support.optional d.faceFraming),
-    ("eyeGazeCorrection", Support.optional d.eyeGazeCorrection),
-    ("voiceIsolation", Support.optional d.voiceIsolation),
-    ("humanFaceDetectionMode", Support.optional d.humanFaceDetectionMode),
-    ("backgroundSegmentationMask", Support.optional d.backgroundSegmentationMask),
-    ("width", Support.optional d.width),
-    ("height", Support.optional d.height),
-    ("aspectRatio", Support.optional d.aspectRatio),
-    ("frameRate", Support.optional d.frameRate),
-    ("facingMode", Support.optional d.facingMode),
-    ("resizeMode", Support.optional d.resizeMode),
-    ("sampleRate", Support.optional d.sampleRate),
-    ("sampleSize", Support.optional d.sampleSize),
-    ("echoCancellation", Support.optional d.echoCancellation),
-    ("autoGainControl", Support.optional d.autoGainControl),
-    ("noiseSuppression", Support.optional d.noiseSuppression),
-    ("latency", Support.optional d.latency),
-    ("channelCount", Support.optional d.channelCount),
-    ("deviceId", Support.optional d.deviceId),
-    ("groupId", Support.optional d.groupId),
-    ("backgroundBlur", Support.optional d.backgroundBlur),
-    ("displaySurface", Support.optional d.displaySurface),
-    ("logicalSurface", Support.optional d.logicalSurface),
-    ("cursor", Support.optional d.cursor),
-    ("restrictOwnAudio", Support.optional d.restrictOwnAudio),
-    ("suppressLocalAudioPlayback", Support.optional d.suppressLocalAudioPlayback),
-    ("advanced", Support.optional d.advanced)]⟩
+instance : ToJS MediaTrackConstraints := ⟨fun d => Internal.fields #[("whiteBalanceMode", Internal.optional d.whiteBalanceMode),
+    ("exposureMode", Internal.optional d.exposureMode),
+    ("focusMode", Internal.optional d.focusMode),
+    ("pointsOfInterest", Internal.optional d.pointsOfInterest),
+    ("exposureCompensation", Internal.optional d.exposureCompensation),
+    ("exposureTime", Internal.optional d.exposureTime),
+    ("colorTemperature", Internal.optional d.colorTemperature),
+    ("iso", Internal.optional d.iso),
+    ("brightness", Internal.optional d.brightness),
+    ("contrast", Internal.optional d.contrast),
+    ("saturation", Internal.optional d.saturation),
+    ("sharpness", Internal.optional d.sharpness),
+    ("focusDistance", Internal.optional d.focusDistance),
+    ("pan", Internal.optional d.pan),
+    ("tilt", Internal.optional d.tilt),
+    ("zoom", Internal.optional d.zoom),
+    ("torch", Internal.optional d.torch),
+    ("gestureReactions", Internal.optional d.gestureReactions),
+    ("faceFraming", Internal.optional d.faceFraming),
+    ("eyeGazeCorrection", Internal.optional d.eyeGazeCorrection),
+    ("voiceIsolation", Internal.optional d.voiceIsolation),
+    ("humanFaceDetectionMode", Internal.optional d.humanFaceDetectionMode),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("aspectRatio", Internal.optional d.aspectRatio),
+    ("frameRate", Internal.optional d.frameRate),
+    ("facingMode", Internal.optional d.facingMode),
+    ("resizeMode", Internal.optional d.resizeMode),
+    ("sampleRate", Internal.optional d.sampleRate),
+    ("sampleSize", Internal.optional d.sampleSize),
+    ("echoCancellation", Internal.optional d.echoCancellation),
+    ("autoGainControl", Internal.optional d.autoGainControl),
+    ("noiseSuppression", Internal.optional d.noiseSuppression),
+    ("latency", Internal.optional d.latency),
+    ("channelCount", Internal.optional d.channelCount),
+    ("deviceId", Internal.optional d.deviceId),
+    ("groupId", Internal.optional d.groupId),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("displaySurface", Internal.optional d.displaySurface),
+    ("logicalSurface", Internal.optional d.logicalSurface),
+    ("cursor", Internal.optional d.cursor),
+    ("restrictOwnAudio", Internal.optional d.restrictOwnAudio),
+    ("suppressLocalAudioPlayback", Internal.optional d.suppressLocalAudioPlayback),
+    ("advanced", Internal.optional d.advanced)]⟩
 instance : FromJS MediaTrackConstraints where
   fromJS d := do return {
     whiteBalanceMode := ← Lasm.JS.readField (Option ConstrainDOMString) d "whiteBalanceMode",
@@ -847,11 +845,11 @@ structure MediaStreamConstraints where
   preferCurrentTab : Option Bool := none
   /-- `DOMString peerIdentity` -/
   peerIdentity : Option String := none
-instance : ToJS MediaStreamConstraints := ⟨fun d => Support.fields #[("semantics", Support.optional d.semantics),
-    ("video", Support.optional d.video),
-    ("audio", Support.optional d.audio),
-    ("preferCurrentTab", Support.optional d.preferCurrentTab),
-    ("peerIdentity", Support.optional d.peerIdentity)]⟩
+instance : ToJS MediaStreamConstraints := ⟨fun d => Internal.fields #[("semantics", Internal.optional d.semantics),
+    ("video", Internal.optional d.video),
+    ("audio", Internal.optional d.audio),
+    ("preferCurrentTab", Internal.optional d.preferCurrentTab),
+    ("peerIdentity", Internal.optional d.peerIdentity)]⟩
 
 /-- `dictionary ULongRange` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ULongRange where
@@ -859,6 +857,8 @@ structure ULongRange where
   max : Option Nat := none
   /-- `unsigned long min` -/
   min : Option Nat := none
+instance : ToJS ULongRange := ⟨fun d => Internal.fields #[("max", Internal.optional d.max),
+    ("min", Internal.optional d.min)]⟩
 instance : FromJS ULongRange where
   fromJS d := do return {
     max := ← Lasm.JS.readField (Option Nat) d "max",
@@ -871,6 +871,8 @@ structure DoubleRange where
   max : Option Float := none
   /-- `double min` -/
   min : Option Float := none
+instance : ToJS DoubleRange := ⟨fun d => Internal.fields #[("max", Internal.optional d.max),
+    ("min", Internal.optional d.min)]⟩
 instance : FromJS DoubleRange where
   fromJS d := do return {
     max := ← Lasm.JS.readField (Option Float) d "max",
@@ -965,6 +967,49 @@ structure MediaTrackCapabilities where
   logicalSurface : Option Bool := none
   /-- `sequence<DOMString> cursor` -/
   cursor : Option (Array String) := none
+instance : ToJS MediaTrackCapabilities := ⟨fun d => Internal.fields #[("whiteBalanceMode", Internal.optional d.whiteBalanceMode),
+    ("exposureMode", Internal.optional d.exposureMode),
+    ("focusMode", Internal.optional d.focusMode),
+    ("exposureCompensation", Internal.optional d.exposureCompensation),
+    ("exposureTime", Internal.optional d.exposureTime),
+    ("colorTemperature", Internal.optional d.colorTemperature),
+    ("iso", Internal.optional d.iso),
+    ("brightness", Internal.optional d.brightness),
+    ("contrast", Internal.optional d.contrast),
+    ("saturation", Internal.optional d.saturation),
+    ("sharpness", Internal.optional d.sharpness),
+    ("focusDistance", Internal.optional d.focusDistance),
+    ("pan", Internal.optional d.pan),
+    ("tilt", Internal.optional d.tilt),
+    ("zoom", Internal.optional d.zoom),
+    ("torch", Internal.optional d.torch),
+    ("powerEfficient", Internal.optional d.powerEfficient),
+    ("powerEfficientPixelFormat", Internal.optional d.powerEfficientPixelFormat),
+    ("gestureReactions", Internal.optional d.gestureReactions),
+    ("faceFraming", Internal.optional d.faceFraming),
+    ("eyeGazeCorrection", Internal.optional d.eyeGazeCorrection),
+    ("voiceIsolation", Internal.optional d.voiceIsolation),
+    ("humanFaceDetectionMode", Internal.optional d.humanFaceDetectionMode),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("aspectRatio", Internal.optional d.aspectRatio),
+    ("frameRate", Internal.optional d.frameRate),
+    ("facingMode", Internal.optional d.facingMode),
+    ("resizeMode", Internal.optional d.resizeMode),
+    ("sampleRate", Internal.optional d.sampleRate),
+    ("sampleSize", Internal.optional d.sampleSize),
+    ("echoCancellation", Internal.optional d.echoCancellation),
+    ("autoGainControl", Internal.optional d.autoGainControl),
+    ("noiseSuppression", Internal.optional d.noiseSuppression),
+    ("latency", Internal.optional d.latency),
+    ("channelCount", Internal.optional d.channelCount),
+    ("deviceId", Internal.optional d.deviceId),
+    ("groupId", Internal.optional d.groupId),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("displaySurface", Internal.optional d.displaySurface),
+    ("logicalSurface", Internal.optional d.logicalSurface),
+    ("cursor", Internal.optional d.cursor)]⟩
 instance : FromJS MediaTrackCapabilities where
   fromJS d := do return {
     whiteBalanceMode := ← Lasm.JS.readField (Option (Array String)) d "whiteBalanceMode",
@@ -1108,6 +1153,53 @@ structure MediaTrackSettings where
   suppressLocalAudioPlayback : Option Bool := none
   /-- `double screenPixelRatio` -/
   screenPixelRatio : Option Float := none
+instance : ToJS MediaTrackSettings := ⟨fun d => Internal.fields #[("whiteBalanceMode", Internal.optional d.whiteBalanceMode),
+    ("exposureMode", Internal.optional d.exposureMode),
+    ("focusMode", Internal.optional d.focusMode),
+    ("pointsOfInterest", Internal.optional d.pointsOfInterest),
+    ("exposureCompensation", Internal.optional d.exposureCompensation),
+    ("exposureTime", Internal.optional d.exposureTime),
+    ("colorTemperature", Internal.optional d.colorTemperature),
+    ("iso", Internal.optional d.iso),
+    ("brightness", Internal.optional d.brightness),
+    ("contrast", Internal.optional d.contrast),
+    ("saturation", Internal.optional d.saturation),
+    ("sharpness", Internal.optional d.sharpness),
+    ("focusDistance", Internal.optional d.focusDistance),
+    ("pan", Internal.optional d.pan),
+    ("tilt", Internal.optional d.tilt),
+    ("zoom", Internal.optional d.zoom),
+    ("torch", Internal.optional d.torch),
+    ("powerEfficient", Internal.optional d.powerEfficient),
+    ("powerEfficientPixelFormat", Internal.optional d.powerEfficientPixelFormat),
+    ("gestureReactions", Internal.optional d.gestureReactions),
+    ("faceFraming", Internal.optional d.faceFraming),
+    ("eyeGazeCorrection", Internal.optional d.eyeGazeCorrection),
+    ("voiceIsolation", Internal.optional d.voiceIsolation),
+    ("humanFaceDetectionMode", Internal.optional d.humanFaceDetectionMode),
+    ("backgroundSegmentationMask", Internal.optional d.backgroundSegmentationMask),
+    ("width", Internal.optional d.width),
+    ("height", Internal.optional d.height),
+    ("aspectRatio", Internal.optional d.aspectRatio),
+    ("frameRate", Internal.optional d.frameRate),
+    ("facingMode", Internal.optional d.facingMode),
+    ("resizeMode", Internal.optional d.resizeMode),
+    ("sampleRate", Internal.optional d.sampleRate),
+    ("sampleSize", Internal.optional d.sampleSize),
+    ("echoCancellation", Internal.optional d.echoCancellation),
+    ("autoGainControl", Internal.optional d.autoGainControl),
+    ("noiseSuppression", Internal.optional d.noiseSuppression),
+    ("latency", Internal.optional d.latency),
+    ("channelCount", Internal.optional d.channelCount),
+    ("deviceId", Internal.optional d.deviceId),
+    ("groupId", Internal.optional d.groupId),
+    ("backgroundBlur", Internal.optional d.backgroundBlur),
+    ("displaySurface", Internal.optional d.displaySurface),
+    ("logicalSurface", Internal.optional d.logicalSurface),
+    ("cursor", Internal.optional d.cursor),
+    ("restrictOwnAudio", Internal.optional d.restrictOwnAudio),
+    ("suppressLocalAudioPlayback", Internal.optional d.suppressLocalAudioPlayback),
+    ("screenPixelRatio", Internal.optional d.screenPixelRatio)]⟩
 instance : FromJS MediaTrackSettings where
   fromJS d := do return {
     whiteBalanceMode := ← Lasm.JS.readField (Option String) d "whiteBalanceMode",
@@ -1169,246 +1261,276 @@ structure MediaStreamTrackEventInit where
   composed : Option Bool := none
   /-- `required MediaStreamTrack track` -/
   track : MediaStreamTrack
-instance : ToJS MediaStreamTrackEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS MediaStreamTrackEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("track", toJS d.track)]⟩
 
+/-- `dictionary CameraDevicePermissionDescriptor : PermissionDescriptor` (Media Capture and Streams (https://w3c.github.io/mediacapture-main/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure CameraDevicePermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `boolean panTiltZoom = false` -/
+  panTiltZoom : Option Bool := none
+instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("panTiltZoom", Internal.optional d.panTiltZoom)]⟩
+
 /-- `v instanceof DeviceChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceChangeEvent`). -/
-def DeviceChangeEvent.cast? (v : Value) : IO (Option DeviceChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DeviceChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def DeviceChangeEvent.cast? (v : Value) : IO (Option DeviceChangeEvent) := Internal.api "Lasm.JS.Web.DeviceChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["DeviceChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional DeviceChangeEventInit eventInitDict)` -/
-def DeviceChangeEvent.new (type : String) (eventInitDict : Option DeviceChangeEventInit := none) : IO DeviceChangeEvent :=
+@[macro_inline] def DeviceChangeEvent.new (type : String) (eventInitDict : Option DeviceChangeEventInit := none) : IO DeviceChangeEvent := Internal.api "Lasm.JS.Web.DeviceChangeEvent.new" do
   Lasm.JS.Binding.invoke DeviceChangeEvent { name := "Lasm.JS.Web.DeviceChangeEvent.new", module := "globalThis", path := "DeviceChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<MediaDeviceInfo> devices` -/
-def DeviceChangeEvent.devices (self : DeviceChangeEvent) : IO (Array MediaDeviceInfo) := self.val.get "devices" (Array MediaDeviceInfo)
+@[macro_inline] def DeviceChangeEvent.devices (self : DeviceChangeEvent) : IO (Array MediaDeviceInfo) := Internal.api "Lasm.JS.Web.DeviceChangeEvent.devices" do
+  self.val.get "devices" (Array MediaDeviceInfo)
 
 /-- `readonly attribute FrozenArray<MediaDeviceInfo> userInsertedDevices` -/
-def DeviceChangeEvent.userInsertedDevices (self : DeviceChangeEvent) : IO (Array MediaDeviceInfo) := self.val.get "userInsertedDevices" (Array MediaDeviceInfo)
+@[macro_inline] def DeviceChangeEvent.userInsertedDevices (self : DeviceChangeEvent) : IO (Array MediaDeviceInfo) := Internal.api "Lasm.JS.Web.DeviceChangeEvent.userInsertedDevices" do
+  self.val.get "userInsertedDevices" (Array MediaDeviceInfo)
 
 /-- `v instanceof MediaDeviceInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaDeviceInfo`). -/
-def MediaDeviceInfo.cast? (v : Value) : IO (Option MediaDeviceInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaDeviceInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaDeviceInfo.cast? (v : Value) : IO (Option MediaDeviceInfo) := Internal.api "Lasm.JS.Web.MediaDeviceInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaDeviceInfo"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString deviceId` -/
-def MediaDeviceInfo.deviceId (self : MediaDeviceInfo) : IO String := self.val.get "deviceId" String
+@[macro_inline] def MediaDeviceInfo.deviceId (self : MediaDeviceInfo) : IO String := Internal.api "Lasm.JS.Web.MediaDeviceInfo.deviceId" do
+  self.val.get "deviceId" String
 
 /-- `readonly attribute MediaDeviceKind kind` -/
-def MediaDeviceInfo.kind (self : MediaDeviceInfo) : IO MediaDeviceKind := self.val.get "kind" MediaDeviceKind
+@[macro_inline] def MediaDeviceInfo.kind (self : MediaDeviceInfo) : IO MediaDeviceKind := Internal.api "Lasm.JS.Web.MediaDeviceInfo.kind" do
+  self.val.get "kind" MediaDeviceKind
 
 /-- `readonly attribute DOMString label` -/
-def MediaDeviceInfo.label (self : MediaDeviceInfo) : IO String := self.val.get "label" String
+@[macro_inline] def MediaDeviceInfo.label (self : MediaDeviceInfo) : IO String := Internal.api "Lasm.JS.Web.MediaDeviceInfo.label" do
+  self.val.get "label" String
 
 /-- `readonly attribute DOMString groupId` -/
-def MediaDeviceInfo.groupId (self : MediaDeviceInfo) : IO String := self.val.get "groupId" String
+@[macro_inline] def MediaDeviceInfo.groupId (self : MediaDeviceInfo) : IO String := Internal.api "Lasm.JS.Web.MediaDeviceInfo.groupId" do
+  self.val.get "groupId" String
 
 /-- `object toJSON()` -/
-def MediaDeviceInfo.toJSON (self : MediaDeviceInfo) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def MediaDeviceInfo.toJSON (self : MediaDeviceInfo) : IO Data := Internal.api "Lasm.JS.Web.MediaDeviceInfo.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `v instanceof MediaDevices`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaDevices`). -/
-def MediaDevices.cast? (v : Value) : IO (Option MediaDevices) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaDevices"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaDevices.cast? (v : Value) : IO (Option MediaDevices) := Internal.api "Lasm.JS.Web.MediaDevices.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaDevices"] Value) (fun x => { val := x }) v
 
 /-- `attribute EventHandler ondevicechange` -/
-def MediaDevices.ondevicechange (self : MediaDevices) : IO (Option EventHandlerNonNull) := self.val.get "ondevicechange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaDevices.ondevicechange (self : MediaDevices) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaDevices.ondevicechange" do
+  self.val.get "ondevicechange" (Option EventHandlerNonNull)
 
 /-- Sets `ondevicechange`: `attribute EventHandler ondevicechange` -/
-def MediaDevices.setOndevicechange (self : MediaDevices) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaDevices.setOndevicechange (self : MediaDevices) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaDevices.setOndevicechange" do
   self.val.set "ondevicechange" (toJS value)
 
 /-- `Promise<sequence<MediaDeviceInfo>> enumerateDevices()` -/
-def MediaDevices.enumerateDevices (self : MediaDevices) : Async (Array MediaDeviceInfo) :=
-  self.val.callMethodAwait "enumerateDevices" (Support.args #[]) (Array MediaDeviceInfo)
+@[macro_inline] def MediaDevices.enumerateDevices (self : MediaDevices) : Async (Array MediaDeviceInfo) := Internal.api "Lasm.JS.Web.MediaDevices.enumerateDevices" do
+  self.val.callMethodAwait "enumerateDevices" (Internal.args #[]) (Array MediaDeviceInfo)
 
 /-- `MediaTrackSupportedConstraints getSupportedConstraints()` -/
-def MediaDevices.getSupportedConstraints (self : MediaDevices) : IO MediaTrackSupportedConstraints :=
-  self.val.callMethod "getSupportedConstraints" (Support.args #[]) MediaTrackSupportedConstraints
+@[macro_inline] def MediaDevices.getSupportedConstraints (self : MediaDevices) : IO MediaTrackSupportedConstraints := Internal.api "Lasm.JS.Web.MediaDevices.getSupportedConstraints" do
+  self.val.callMethod "getSupportedConstraints" (Internal.args #[]) MediaTrackSupportedConstraints
 
 /-- `Promise<MediaStream> getUserMedia(optional MediaStreamConstraints constraints)` -/
-def MediaDevices.getUserMedia (self : MediaDevices) (constraints : Option MediaStreamConstraints := none) : Async MediaStream := do
-  let r ← self.val.callMethodAwait "getUserMedia" (Support.args #[Support.optional constraints]) Value
+@[macro_inline] def MediaDevices.getUserMedia (self : MediaDevices) (constraints : Option MediaStreamConstraints := none) : Async MediaStream := Internal.api "Lasm.JS.Web.MediaDevices.getUserMedia" do
+  let r ← self.val.callMethodAwait "getUserMedia" (Internal.args #[Internal.optional constraints]) Value
   pure { val := r }
 
 /-- `v instanceof MediaStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStream`). -/
-def MediaStream.cast? (v : Value) : IO (Option MediaStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStream"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStream.cast? (v : Value) : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.MediaStream.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStream"] Value) (fun x => { val := x }) v
 
 /-- `constructor()` -/
-def MediaStream.new : IO MediaStream :=
+@[macro_inline] def MediaStream.new : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.new" do
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.new", module := "globalThis", path := "MediaStream", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `constructor(MediaStream stream)` -/
-def MediaStream.newWithStream (stream : MediaStream) : IO MediaStream :=
+@[macro_inline] def MediaStream.newWithStream (stream : MediaStream) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.newWithStream" do
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithStream", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
-    (Support.args #[toJS stream]) (await := false)
+    (Internal.args #[toJS stream]) (await := false)
 
 /-- `constructor(sequence<MediaStreamTrack> tracks)` -/
-def MediaStream.newWithTracks (tracks : Array MediaStreamTrack) : IO MediaStream :=
+@[macro_inline] def MediaStream.newWithTracks (tracks : Array MediaStreamTrack) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.newWithTracks" do
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithTracks", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
-    (Support.args #[toJS tracks]) (await := false)
+    (Internal.args #[toJS tracks]) (await := false)
 
 /-- `readonly attribute DOMString id` -/
-def MediaStream.id (self : MediaStream) : IO String := self.val.get "id" String
+@[macro_inline] def MediaStream.id (self : MediaStream) : IO String := Internal.api "Lasm.JS.Web.MediaStream.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute boolean active` -/
-def MediaStream.active (self : MediaStream) : IO Bool := self.val.get "active" Bool
+@[macro_inline] def MediaStream.active (self : MediaStream) : IO Bool := Internal.api "Lasm.JS.Web.MediaStream.active" do
+  self.val.get "active" Bool
 
 /-- `attribute EventHandler onaddtrack` -/
-def MediaStream.onaddtrack (self : MediaStream) : IO (Option EventHandlerNonNull) := self.val.get "onaddtrack" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStream.onaddtrack (self : MediaStream) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStream.onaddtrack" do
+  self.val.get "onaddtrack" (Option EventHandlerNonNull)
 
 /-- Sets `onaddtrack`: `attribute EventHandler onaddtrack` -/
-def MediaStream.setOnaddtrack (self : MediaStream) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStream.setOnaddtrack (self : MediaStream) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStream.setOnaddtrack" do
   self.val.set "onaddtrack" (toJS value)
 
 /-- `attribute EventHandler onremovetrack` -/
-def MediaStream.onremovetrack (self : MediaStream) : IO (Option EventHandlerNonNull) := self.val.get "onremovetrack" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStream.onremovetrack (self : MediaStream) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStream.onremovetrack" do
+  self.val.get "onremovetrack" (Option EventHandlerNonNull)
 
 /-- Sets `onremovetrack`: `attribute EventHandler onremovetrack` -/
-def MediaStream.setOnremovetrack (self : MediaStream) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStream.setOnremovetrack (self : MediaStream) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStream.setOnremovetrack" do
   self.val.set "onremovetrack" (toJS value)
 
 /-- `sequence<MediaStreamTrack> getAudioTracks()` -/
-def MediaStream.getAudioTracks (self : MediaStream) : IO (Array MediaStreamTrack) :=
-  self.val.callMethod "getAudioTracks" (Support.args #[]) (Array MediaStreamTrack)
+@[macro_inline] def MediaStream.getAudioTracks (self : MediaStream) : IO (Array MediaStreamTrack) := Internal.api "Lasm.JS.Web.MediaStream.getAudioTracks" do
+  self.val.callMethod "getAudioTracks" (Internal.args #[]) (Array MediaStreamTrack)
 
 /-- `sequence<MediaStreamTrack> getVideoTracks()` -/
-def MediaStream.getVideoTracks (self : MediaStream) : IO (Array MediaStreamTrack) :=
-  self.val.callMethod "getVideoTracks" (Support.args #[]) (Array MediaStreamTrack)
+@[macro_inline] def MediaStream.getVideoTracks (self : MediaStream) : IO (Array MediaStreamTrack) := Internal.api "Lasm.JS.Web.MediaStream.getVideoTracks" do
+  self.val.callMethod "getVideoTracks" (Internal.args #[]) (Array MediaStreamTrack)
 
 /-- `sequence<MediaStreamTrack> getTracks()` -/
-def MediaStream.getTracks (self : MediaStream) : IO (Array MediaStreamTrack) :=
-  self.val.callMethod "getTracks" (Support.args #[]) (Array MediaStreamTrack)
+@[macro_inline] def MediaStream.getTracks (self : MediaStream) : IO (Array MediaStreamTrack) := Internal.api "Lasm.JS.Web.MediaStream.getTracks" do
+  self.val.callMethod "getTracks" (Internal.args #[]) (Array MediaStreamTrack)
 
 /-- `MediaStreamTrack? getTrackById(DOMString trackId)` -/
-def MediaStream.getTrackById (self : MediaStream) (trackId : String) : IO (Option MediaStreamTrack) :=
-  self.val.callMethod "getTrackById" (Support.args #[toJS trackId]) (Option MediaStreamTrack)
+@[macro_inline] def MediaStream.getTrackById (self : MediaStream) (trackId : String) : IO (Option MediaStreamTrack) := Internal.api "Lasm.JS.Web.MediaStream.getTrackById" do
+  self.val.callMethod "getTrackById" (Internal.args #[toJS trackId]) (Option MediaStreamTrack)
 
 /-- `undefined addTrack(MediaStreamTrack track)` -/
-def MediaStream.addTrack (self : MediaStream) (track : MediaStreamTrack) : IO Unit :=
-  self.val.callMethod "addTrack" (Support.args #[toJS track]) Unit
+@[macro_inline] def MediaStream.addTrack (self : MediaStream) (track : MediaStreamTrack) : IO Unit := Internal.api "Lasm.JS.Web.MediaStream.addTrack" do
+  self.val.callMethod "addTrack" (Internal.args #[toJS track]) Unit
 
 /-- `undefined removeTrack(MediaStreamTrack track)` -/
-def MediaStream.removeTrack (self : MediaStream) (track : MediaStreamTrack) : IO Unit :=
-  self.val.callMethod "removeTrack" (Support.args #[toJS track]) Unit
+@[macro_inline] def MediaStream.removeTrack (self : MediaStream) (track : MediaStreamTrack) : IO Unit := Internal.api "Lasm.JS.Web.MediaStream.removeTrack" do
+  self.val.callMethod "removeTrack" (Internal.args #[toJS track]) Unit
 
 /-- `MediaStream clone()` -/
-def MediaStream.clone (self : MediaStream) : IO MediaStream := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def MediaStream.clone (self : MediaStream) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof MediaStreamTrack`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrack`). -/
-def MediaStreamTrack.cast? (v : Value) : IO (Option MediaStreamTrack) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrack"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrack.cast? (v : Value) : IO (Option MediaStreamTrack) := Internal.api "Lasm.JS.Web.MediaStreamTrack.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrack"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString kind` -/
-def MediaStreamTrack.kind (self : MediaStreamTrack) : IO String := self.val.get "kind" String
+@[macro_inline] def MediaStreamTrack.kind (self : MediaStreamTrack) : IO String := Internal.api "Lasm.JS.Web.MediaStreamTrack.kind" do
+  self.val.get "kind" String
 
 /-- `readonly attribute DOMString id` -/
-def MediaStreamTrack.id (self : MediaStreamTrack) : IO String := self.val.get "id" String
+@[macro_inline] def MediaStreamTrack.id (self : MediaStreamTrack) : IO String := Internal.api "Lasm.JS.Web.MediaStreamTrack.id" do
+  self.val.get "id" String
 
 /-- `readonly attribute DOMString label` -/
-def MediaStreamTrack.label (self : MediaStreamTrack) : IO String := self.val.get "label" String
+@[macro_inline] def MediaStreamTrack.label (self : MediaStreamTrack) : IO String := Internal.api "Lasm.JS.Web.MediaStreamTrack.label" do
+  self.val.get "label" String
 
 /-- `attribute boolean enabled` -/
-def MediaStreamTrack.enabled (self : MediaStreamTrack) : IO Bool := self.val.get "enabled" Bool
+@[macro_inline] def MediaStreamTrack.enabled (self : MediaStreamTrack) : IO Bool := Internal.api "Lasm.JS.Web.MediaStreamTrack.enabled" do
+  self.val.get "enabled" Bool
 
 /-- Sets `enabled`: `attribute boolean enabled` -/
-def MediaStreamTrack.setEnabled (self : MediaStreamTrack) (value : Bool) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setEnabled (self : MediaStreamTrack) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setEnabled" do
   self.val.set "enabled" (toJS value)
 
 /-- `readonly attribute boolean muted` -/
-def MediaStreamTrack.muted (self : MediaStreamTrack) : IO Bool := self.val.get "muted" Bool
+@[macro_inline] def MediaStreamTrack.muted (self : MediaStreamTrack) : IO Bool := Internal.api "Lasm.JS.Web.MediaStreamTrack.muted" do
+  self.val.get "muted" Bool
 
 /-- `attribute EventHandler onmute` -/
-def MediaStreamTrack.onmute (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "onmute" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.onmute (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onmute" do
+  self.val.get "onmute" (Option EventHandlerNonNull)
 
 /-- Sets `onmute`: `attribute EventHandler onmute` -/
-def MediaStreamTrack.setOnmute (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOnmute (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnmute" do
   self.val.set "onmute" (toJS value)
 
 /-- `attribute EventHandler onunmute` -/
-def MediaStreamTrack.onunmute (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "onunmute" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.onunmute (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onunmute" do
+  self.val.get "onunmute" (Option EventHandlerNonNull)
 
 /-- Sets `onunmute`: `attribute EventHandler onunmute` -/
-def MediaStreamTrack.setOnunmute (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOnunmute (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnunmute" do
   self.val.set "onunmute" (toJS value)
 
 /-- `readonly attribute MediaStreamTrackState readyState` -/
-def MediaStreamTrack.readyState (self : MediaStreamTrack) : IO MediaStreamTrackState := self.val.get "readyState" MediaStreamTrackState
+@[macro_inline] def MediaStreamTrack.readyState (self : MediaStreamTrack) : IO MediaStreamTrackState := Internal.api "Lasm.JS.Web.MediaStreamTrack.readyState" do
+  self.val.get "readyState" MediaStreamTrackState
 
 /-- `attribute EventHandler onended` -/
-def MediaStreamTrack.onended (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "onended" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.onended (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onended" do
+  self.val.get "onended" (Option EventHandlerNonNull)
 
 /-- Sets `onended`: `attribute EventHandler onended` -/
-def MediaStreamTrack.setOnended (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOnended (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnended" do
   self.val.set "onended" (toJS value)
 
 /-- `MediaStreamTrack clone()` -/
-def MediaStreamTrack.clone (self : MediaStreamTrack) : IO MediaStreamTrack := do
-  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+@[macro_inline] def MediaStreamTrack.clone (self : MediaStreamTrack) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.MediaStreamTrack.clone" do
+  let r ← self.val.callMethod "clone" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined stop()` -/
-def MediaStreamTrack.stop (self : MediaStreamTrack) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def MediaStreamTrack.stop (self : MediaStreamTrack) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `MediaTrackCapabilities getCapabilities()` -/
-def MediaStreamTrack.getCapabilities (self : MediaStreamTrack) : IO MediaTrackCapabilities :=
-  self.val.callMethod "getCapabilities" (Support.args #[]) MediaTrackCapabilities
+@[macro_inline] def MediaStreamTrack.getCapabilities (self : MediaStreamTrack) : IO MediaTrackCapabilities := Internal.api "Lasm.JS.Web.MediaStreamTrack.getCapabilities" do
+  self.val.callMethod "getCapabilities" (Internal.args #[]) MediaTrackCapabilities
 
 /-- `MediaTrackConstraints getConstraints()` -/
-def MediaStreamTrack.getConstraints (self : MediaStreamTrack) : IO MediaTrackConstraints :=
-  self.val.callMethod "getConstraints" (Support.args #[]) MediaTrackConstraints
+@[macro_inline] def MediaStreamTrack.getConstraints (self : MediaStreamTrack) : IO MediaTrackConstraints := Internal.api "Lasm.JS.Web.MediaStreamTrack.getConstraints" do
+  self.val.callMethod "getConstraints" (Internal.args #[]) MediaTrackConstraints
 
 /-- `MediaTrackSettings getSettings()` -/
-def MediaStreamTrack.getSettings (self : MediaStreamTrack) : IO MediaTrackSettings :=
-  self.val.callMethod "getSettings" (Support.args #[]) MediaTrackSettings
+@[macro_inline] def MediaStreamTrack.getSettings (self : MediaStreamTrack) : IO MediaTrackSettings := Internal.api "Lasm.JS.Web.MediaStreamTrack.getSettings" do
+  self.val.callMethod "getSettings" (Internal.args #[]) MediaTrackSettings
 
 /-- `Promise<undefined> applyConstraints(optional MediaTrackConstraints constraints)` -/
-def MediaStreamTrack.applyConstraints (self : MediaStreamTrack) (constraints : Option MediaTrackConstraints := none) : Async Unit :=
-  self.val.callMethodAwait "applyConstraints" (Support.args #[Support.optional constraints]) Unit
+@[macro_inline] def MediaStreamTrack.applyConstraints (self : MediaStreamTrack) (constraints : Option MediaTrackConstraints := none) : Async Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.applyConstraints" do
+  self.val.callMethodAwait "applyConstraints" (Internal.args #[Internal.optional constraints]) Unit
 
 /-- `v instanceof MediaStreamTrackEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackEvent`). -/
-def MediaStreamTrackEvent.cast? (v : Value) : IO (Option MediaStreamTrackEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaStreamTrackEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaStreamTrackEvent.cast? (v : Value) : IO (Option MediaStreamTrackEvent) := Internal.api "Lasm.JS.Web.MediaStreamTrackEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaStreamTrackEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, MediaStreamTrackEventInit eventInitDict)` -/
-def MediaStreamTrackEvent.new (type : String) (eventInitDict : MediaStreamTrackEventInit) : IO MediaStreamTrackEvent :=
+@[macro_inline] def MediaStreamTrackEvent.new (type : String) (eventInitDict : MediaStreamTrackEventInit) : IO MediaStreamTrackEvent := Internal.api "Lasm.JS.Web.MediaStreamTrackEvent.new" do
   Lasm.JS.Binding.invoke MediaStreamTrackEvent { name := "Lasm.JS.Web.MediaStreamTrackEvent.new", module := "globalThis", path := "MediaStreamTrackEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS eventInitDict]) (await := false)
+    (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
 /-- `readonly attribute MediaStreamTrack track` -/
-def MediaStreamTrackEvent.track (self : MediaStreamTrackEvent) : IO MediaStreamTrack := do
+@[macro_inline] def MediaStreamTrackEvent.track (self : MediaStreamTrackEvent) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.MediaStreamTrackEvent.track" do
   let r ← self.val.get "track" Value
   pure { val := r }
 
 /-- `v instanceof OverconstrainedError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OverconstrainedError`). -/
-def OverconstrainedError.cast? (v : Value) : IO (Option OverconstrainedError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["OverconstrainedError"] Value) v) then some { val := v } else none
+@[macro_inline] def OverconstrainedError.cast? (v : Value) : IO (Option OverconstrainedError) := Internal.api "Lasm.JS.Web.OverconstrainedError.cast?" do
+  Internal.cast (Internal.getGlobal ["OverconstrainedError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString constraint, optional DOMString message)` -/
-def OverconstrainedError.new (constraint : String) (message : Option String := none) : IO OverconstrainedError :=
+@[macro_inline] def OverconstrainedError.new (constraint : String) (message : Option String := none) : IO OverconstrainedError := Internal.api "Lasm.JS.Web.OverconstrainedError.new" do
   Lasm.JS.Binding.invoke OverconstrainedError { name := "Lasm.JS.Web.OverconstrainedError.new", module := "globalThis", path := "OverconstrainedError", construct := true, arity := 2 }
-    (Support.args #[toJS constraint, Support.optional message]) (await := false)
+    (Internal.args #[toJS constraint, Internal.optional message]) (await := false)
 
 /-- `readonly attribute DOMString constraint` -/
-def OverconstrainedError.constraint (self : OverconstrainedError) : IO String := self.val.get "constraint" String
+@[macro_inline] def OverconstrainedError.constraint (self : OverconstrainedError) : IO String := Internal.api "Lasm.JS.Web.OverconstrainedError.constraint" do
+  self.val.get "constraint" String
 
 /-- `v instanceof InputDeviceInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InputDeviceInfo`). -/
-def InputDeviceInfo.cast? (v : Value) : IO (Option InputDeviceInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InputDeviceInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def InputDeviceInfo.cast? (v : Value) : IO (Option InputDeviceInfo) := Internal.api "Lasm.JS.Web.InputDeviceInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["InputDeviceInfo"] Value) (fun x => { val := x }) v
 
 /-- `MediaTrackCapabilities getCapabilities()` -/
-def InputDeviceInfo.getCapabilities (self : InputDeviceInfo) : IO MediaTrackCapabilities :=
-  self.val.callMethod "getCapabilities" (Support.args #[]) MediaTrackCapabilities
+@[macro_inline] def InputDeviceInfo.getCapabilities (self : InputDeviceInfo) : IO MediaTrackCapabilities := Internal.api "Lasm.JS.Web.InputDeviceInfo.getCapabilities" do
+  self.val.callMethod "getCapabilities" (Internal.args #[]) MediaTrackCapabilities
 
 /-- `readonly attribute MediaDevices mediaDevices` -/
-def Navigator.mediaDevices (self : Navigator) : IO MediaDevices := do
+@[macro_inline] def Navigator.mediaDevices (self : Navigator) : IO MediaDevices := Internal.api "Lasm.JS.Web.Navigator.mediaDevices" do
   let r ← self.val.get "mediaDevices" Value
   pure { val := r }
 

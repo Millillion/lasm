@@ -6,83 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webxr
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.Webgpu
+import Lasm.JS.Web.Types.WebxrDepthSensing
+import Lasm.JS.Web.Types.Webxrlayers
+import Lasm.JS.Web.Types.WebxrWebgpuBinding
 import Lasm.JS.Web.Webgpu
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum XRTextureType` (WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)): "texture", "texture-array". -/
-inductive XRTextureType where
-  /-- "texture" -/
-  | texture
-  /-- "texture-array" -/
-  | textureArray
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRTextureType := ⟨fun
-  | .texture => .string "texture"
-  | .textureArray => .string "texture-array"⟩
-instance : FromJS XRTextureType where
-  fromJS
-    | .string "texture" => .ok .texture
-    | .string "texture-array" => .ok .textureArray
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRTextureType"
-
-/-- `enum XRDepthUsage` (WebXR Depth Sensing Module (https://immersive-web.github.io/depth-sensing/)): "cpu-optimized", "gpu-optimized". -/
-inductive XRDepthUsage where
-  /-- "cpu-optimized" -/
-  | cpuOptimized
-  /-- "gpu-optimized" -/
-  | gpuOptimized
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRDepthUsage := ⟨fun
-  | .cpuOptimized => .string "cpu-optimized"
-  | .gpuOptimized => .string "gpu-optimized"⟩
-instance : FromJS XRDepthUsage where
-  fromJS
-    | .string "cpu-optimized" => .ok .cpuOptimized
-    | .string "gpu-optimized" => .ok .gpuOptimized
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRDepthUsage"
-
-/-- `enum XRDepthDataFormat` (WebXR Depth Sensing Module (https://immersive-web.github.io/depth-sensing/)): "luminance-alpha", "float32", "unsigned-short". -/
-inductive XRDepthDataFormat where
-  /-- "luminance-alpha" -/
-  | luminanceAlpha
-  /-- "float32" -/
-  | float32
-  /-- "unsigned-short" -/
-  | unsignedShort
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRDepthDataFormat := ⟨fun
-  | .luminanceAlpha => .string "luminance-alpha"
-  | .float32 => .string "float32"
-  | .unsignedShort => .string "unsigned-short"⟩
-instance : FromJS XRDepthDataFormat where
-  fromJS
-    | .string "luminance-alpha" => .ok .luminanceAlpha
-    | .string "float32" => .ok .float32
-    | .string "unsigned-short" => .ok .unsignedShort
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRDepthDataFormat"
-
-/-- `enum XRDepthType` (WebXR Depth Sensing Module (https://immersive-web.github.io/depth-sensing/)): "raw", "smooth". -/
-inductive XRDepthType where
-  /-- "raw" -/
-  | raw
-  /-- "smooth" -/
-  | smooth
-  deriving BEq, Repr, Inhabited
-instance : ToJS XRDepthType := ⟨fun
-  | .raw => .string "raw"
-  | .smooth => .string "smooth"⟩
-instance : FromJS XRDepthType where
-  fromJS
-    | .string "raw" => .ok .raw
-    | .string "smooth" => .ok .smooth
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.XRDepthType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary XRDepthStateInit` (WebXR Depth Sensing Module (https://immersive-web.github.io/depth-sensing/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XRDepthStateInit where
@@ -94,110 +30,119 @@ structure XRDepthStateInit where
   depthTypeRequest : Option (Array XRDepthType) := none
   /-- `boolean matchDepthView = true` -/
   matchDepthView : Option Bool := none
-instance : ToJS XRDepthStateInit := ⟨fun d => Support.fields #[("usagePreference", toJS d.usagePreference),
+instance : ToJS XRDepthStateInit := ⟨fun d => Internal.fields #[("usagePreference", toJS d.usagePreference),
     ("dataFormatPreference", toJS d.dataFormatPreference),
-    ("depthTypeRequest", Support.optional d.depthTypeRequest),
-    ("matchDepthView", Support.optional d.matchDepthView)]⟩
+    ("depthTypeRequest", Internal.optional d.depthTypeRequest),
+    ("matchDepthView", Internal.optional d.matchDepthView)]⟩
 
 /-- `v instanceof XRDepthInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRDepthInformation`). -/
-def XRDepthInformation.cast? (v : Value) : IO (Option XRDepthInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRDepthInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def XRDepthInformation.cast? (v : Value) : IO (Option XRDepthInformation) := Internal.api "Lasm.JS.Web.XRDepthInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["XRDepthInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long width` -/
-def XRDepthInformation.width (self : XRDepthInformation) : IO Nat := self.val.get "width" Nat
+@[macro_inline] def XRDepthInformation.width (self : XRDepthInformation) : IO Nat := Internal.api "Lasm.JS.Web.XRDepthInformation.width" do
+  self.val.get "width" Nat
 
 /-- `readonly attribute unsigned long height` -/
-def XRDepthInformation.height (self : XRDepthInformation) : IO Nat := self.val.get "height" Nat
+@[macro_inline] def XRDepthInformation.height (self : XRDepthInformation) : IO Nat := Internal.api "Lasm.JS.Web.XRDepthInformation.height" do
+  self.val.get "height" Nat
 
 /-- `readonly attribute XRRigidTransform normDepthBufferFromNormView` -/
-def XRDepthInformation.normDepthBufferFromNormView (self : XRDepthInformation) : IO XRRigidTransform := do
+@[macro_inline] def XRDepthInformation.normDepthBufferFromNormView (self : XRDepthInformation) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRDepthInformation.normDepthBufferFromNormView" do
   let r ← self.val.get "normDepthBufferFromNormView" Value
   pure { val := r }
 
 /-- `readonly attribute float rawValueToMeters` -/
-def XRDepthInformation.rawValueToMeters (self : XRDepthInformation) : IO Float := self.val.get "rawValueToMeters" Float
+@[macro_inline] def XRDepthInformation.rawValueToMeters (self : XRDepthInformation) : IO Float := Internal.api "Lasm.JS.Web.XRDepthInformation.rawValueToMeters" do
+  self.val.get "rawValueToMeters" Float
 
 /-- `readonly attribute Float32Array projectionMatrix` -/
-def XRDepthInformation.projectionMatrix (self : XRDepthInformation) : IO ByteArray := do
+@[macro_inline] def XRDepthInformation.projectionMatrix (self : XRDepthInformation) : IO ByteArray := Internal.api "Lasm.JS.Web.XRDepthInformation.projectionMatrix" do
   let r ← self.val.get "projectionMatrix" Data
-  Support.viewBytes r
+  Internal.viewBytes r
 
 /-- `readonly attribute XRRigidTransform transform` -/
-def XRDepthInformation.transform (self : XRDepthInformation) : IO XRRigidTransform := do
+@[macro_inline] def XRDepthInformation.transform (self : XRDepthInformation) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRDepthInformation.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- `v instanceof XRCPUDepthInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRCPUDepthInformation`). -/
-def XRCPUDepthInformation.cast? (v : Value) : IO (Option XRCPUDepthInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRCPUDepthInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def XRCPUDepthInformation.cast? (v : Value) : IO (Option XRCPUDepthInformation) := Internal.api "Lasm.JS.Web.XRCPUDepthInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["XRCPUDepthInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute ArrayBuffer data` -/
-def XRCPUDepthInformation.data (self : XRCPUDepthInformation) : IO ByteArray := do
+@[macro_inline] def XRCPUDepthInformation.data (self : XRCPUDepthInformation) : IO ByteArray := Internal.api "Lasm.JS.Web.XRCPUDepthInformation.data" do
   let r ← self.val.get "data" Value
-  Support.arrayBufferBytes r
+  Internal.arrayBufferBytes r
 
 /-- `float getDepthInMeters(float x, float y)` -/
-def XRCPUDepthInformation.getDepthInMeters (self : XRCPUDepthInformation) (x : Float) (y : Float) : IO Float :=
-  self.val.callMethod "getDepthInMeters" (Support.args #[toJS x, toJS y]) Float
+@[macro_inline] def XRCPUDepthInformation.getDepthInMeters (self : XRCPUDepthInformation) (x : Float) (y : Float) : IO Float := Internal.api "Lasm.JS.Web.XRCPUDepthInformation.getDepthInMeters" do
+  self.val.callMethod "getDepthInMeters" (Internal.args #[toJS x, toJS y]) Float
 
 /-- `v instanceof XRGPUDepthInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRGPUDepthInformation`). -/
-def XRGPUDepthInformation.cast? (v : Value) : IO (Option XRGPUDepthInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRGPUDepthInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def XRGPUDepthInformation.cast? (v : Value) : IO (Option XRGPUDepthInformation) := Internal.api "Lasm.JS.Web.XRGPUDepthInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["XRGPUDepthInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GPUTexture texture` -/
-def XRGPUDepthInformation.texture (self : XRGPUDepthInformation) : IO GPUTexture := do
+@[macro_inline] def XRGPUDepthInformation.texture (self : XRGPUDepthInformation) : IO GPUTexture := Internal.api "Lasm.JS.Web.XRGPUDepthInformation.texture" do
   let r ← self.val.get "texture" Value
   pure { val := r }
 
 /-- `GPUTextureViewDescriptor getViewDescriptor()` -/
-def XRGPUDepthInformation.getViewDescriptor (self : XRGPUDepthInformation) : IO GPUTextureViewDescriptor :=
-  self.val.callMethod "getViewDescriptor" (Support.args #[]) GPUTextureViewDescriptor
+@[macro_inline] def XRGPUDepthInformation.getViewDescriptor (self : XRGPUDepthInformation) : IO GPUTextureViewDescriptor := Internal.api "Lasm.JS.Web.XRGPUDepthInformation.getViewDescriptor" do
+  self.val.callMethod "getViewDescriptor" (Internal.args #[]) GPUTextureViewDescriptor
 
 /-- `v instanceof XRWebGLDepthInformation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRWebGLDepthInformation`). -/
-def XRWebGLDepthInformation.cast? (v : Value) : IO (Option XRWebGLDepthInformation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["XRWebGLDepthInformation"] Value) v) then some { val := v } else none
+@[macro_inline] def XRWebGLDepthInformation.cast? (v : Value) : IO (Option XRWebGLDepthInformation) := Internal.api "Lasm.JS.Web.XRWebGLDepthInformation.cast?" do
+  Internal.cast (Internal.getGlobal ["XRWebGLDepthInformation"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute WebGLTexture texture` -/
-def XRWebGLDepthInformation.texture (self : XRWebGLDepthInformation) : IO WebGLTexture := do
+@[macro_inline] def XRWebGLDepthInformation.texture (self : XRWebGLDepthInformation) : IO WebGLTexture := Internal.api "Lasm.JS.Web.XRWebGLDepthInformation.texture" do
   let r ← self.val.get "texture" Value
   pure { val := r }
 
 /-- `readonly attribute XRTextureType textureType` -/
-def XRWebGLDepthInformation.textureType (self : XRWebGLDepthInformation) : IO XRTextureType := self.val.get "textureType" XRTextureType
+@[macro_inline] def XRWebGLDepthInformation.textureType (self : XRWebGLDepthInformation) : IO XRTextureType := Internal.api "Lasm.JS.Web.XRWebGLDepthInformation.textureType" do
+  self.val.get "textureType" XRTextureType
 
 /-- `readonly attribute unsigned long? imageIndex` -/
-def XRWebGLDepthInformation.imageIndex (self : XRWebGLDepthInformation) : IO (Option Nat) := self.val.get "imageIndex" (Option Nat)
+@[macro_inline] def XRWebGLDepthInformation.imageIndex (self : XRWebGLDepthInformation) : IO (Option Nat) := Internal.api "Lasm.JS.Web.XRWebGLDepthInformation.imageIndex" do
+  self.val.get "imageIndex" (Option Nat)
 
 /-- `XRCPUDepthInformation? getDepthInformation(XRView view)` -/
-def XRFrame.getDepthInformation (self : XRFrame) (view : XRView) : IO (Option XRCPUDepthInformation) :=
-  self.val.callMethod "getDepthInformation" (Support.args #[toJS view]) (Option XRCPUDepthInformation)
+@[macro_inline] def XRFrame.getDepthInformation (self : XRFrame) (view : XRView) : IO (Option XRCPUDepthInformation) := Internal.api "Lasm.JS.Web.XRFrame.getDepthInformation" do
+  self.val.callMethod "getDepthInformation" (Internal.args #[toJS view]) (Option XRCPUDepthInformation)
 
 /-- `XRGPUDepthInformation? getDepthInformation(XRView view)` -/
-def XRGPUBinding.getDepthInformation (self : XRGPUBinding) (view : XRView) : IO (Option XRGPUDepthInformation) :=
-  self.val.callMethod "getDepthInformation" (Support.args #[toJS view]) (Option XRGPUDepthInformation)
+@[macro_inline] def XRGPUBinding.getDepthInformation (self : XRGPUBinding) (view : XRView) : IO (Option XRGPUDepthInformation) := Internal.api "Lasm.JS.Web.XRGPUBinding.getDepthInformation" do
+  self.val.callMethod "getDepthInformation" (Internal.args #[toJS view]) (Option XRGPUDepthInformation)
 
 /-- `readonly attribute XRDepthUsage depthUsage` -/
-def XRSession.depthUsage (self : XRSession) : IO XRDepthUsage := self.val.get "depthUsage" XRDepthUsage
+@[macro_inline] def XRSession.depthUsage (self : XRSession) : IO XRDepthUsage := Internal.api "Lasm.JS.Web.XRSession.depthUsage" do
+  self.val.get "depthUsage" XRDepthUsage
 
 /-- `readonly attribute XRDepthDataFormat depthDataFormat` -/
-def XRSession.depthDataFormat (self : XRSession) : IO XRDepthDataFormat := self.val.get "depthDataFormat" XRDepthDataFormat
+@[macro_inline] def XRSession.depthDataFormat (self : XRSession) : IO XRDepthDataFormat := Internal.api "Lasm.JS.Web.XRSession.depthDataFormat" do
+  self.val.get "depthDataFormat" XRDepthDataFormat
 
 /-- `readonly attribute XRDepthType? depthType` -/
-def XRSession.depthType (self : XRSession) : IO (Option XRDepthType) := self.val.get "depthType" (Option XRDepthType)
+@[macro_inline] def XRSession.depthType (self : XRSession) : IO (Option XRDepthType) := Internal.api "Lasm.JS.Web.XRSession.depthType" do
+  self.val.get "depthType" (Option XRDepthType)
 
 /-- `readonly attribute boolean? depthActive` -/
-def XRSession.depthActive (self : XRSession) : IO (Option Bool) := self.val.get "depthActive" (Option Bool)
+@[macro_inline] def XRSession.depthActive (self : XRSession) : IO (Option Bool) := Internal.api "Lasm.JS.Web.XRSession.depthActive" do
+  self.val.get "depthActive" (Option Bool)
 
 /-- `undefined pauseDepthSensing()` -/
-def XRSession.pauseDepthSensing (self : XRSession) : IO Unit :=
-  self.val.callMethod "pauseDepthSensing" (Support.args #[]) Unit
+@[macro_inline] def XRSession.pauseDepthSensing (self : XRSession) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.pauseDepthSensing" do
+  self.val.callMethod "pauseDepthSensing" (Internal.args #[]) Unit
 
 /-- `undefined resumeDepthSensing()` -/
-def XRSession.resumeDepthSensing (self : XRSession) : IO Unit :=
-  self.val.callMethod "resumeDepthSensing" (Support.args #[]) Unit
+@[macro_inline] def XRSession.resumeDepthSensing (self : XRSession) : IO Unit := Internal.api "Lasm.JS.Web.XRSession.resumeDepthSensing" do
+  self.val.callMethod "resumeDepthSensing" (Internal.args #[]) Unit
 
 /-- `XRWebGLDepthInformation? getDepthInformation(XRView view)` -/
-def XRWebGLBinding.getDepthInformation (self : XRWebGLBinding) (view : XRView) : IO (Option XRWebGLDepthInformation) :=
-  self.val.callMethod "getDepthInformation" (Support.args #[toJS view]) (Option XRWebGLDepthInformation)
+@[macro_inline] def XRWebGLBinding.getDepthInformation (self : XRWebGLBinding) (view : XRView) : IO (Option XRWebGLDepthInformation) := Internal.api "Lasm.JS.Web.XRWebGLBinding.getDepthInformation" do
+  self.val.callMethod "getDepthInformation" (Internal.args #[toJS view]) (Option XRWebGLDepthInformation)
 
 end Lasm.JS.Web

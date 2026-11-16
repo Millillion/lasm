@@ -6,25 +6,33 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssColor5
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSColorProfileRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSColorProfileRule`). -/
-def CSSColorProfileRule.cast? (v : Value) : IO (Option CSSColorProfileRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSColorProfileRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSColorProfileRule.cast? (v : Value) : IO (Option CSSColorProfileRule) := Internal.api "Lasm.JS.Web.CSSColorProfileRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSColorProfileRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSColorProfileRule.name (self : CSSColorProfileRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSColorProfileRule.name (self : CSSColorProfileRule) : IO String := Internal.api "Lasm.JS.Web.CSSColorProfileRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CSSOMString src` -/
-def CSSColorProfileRule.src (self : CSSColorProfileRule) : IO String := self.val.get "src" String
+@[macro_inline] def CSSColorProfileRule.src (self : CSSColorProfileRule) : IO String := Internal.api "Lasm.JS.Web.CSSColorProfileRule.src" do
+  self.val.get "src" String
 
 /-- `readonly attribute CSSOMString renderingIntent` -/
-def CSSColorProfileRule.renderingIntent (self : CSSColorProfileRule) : IO String := self.val.get "renderingIntent" String
+@[macro_inline] def CSSColorProfileRule.renderingIntent (self : CSSColorProfileRule) : IO String := Internal.api "Lasm.JS.Web.CSSColorProfileRule.renderingIntent" do
+  self.val.get "renderingIntent" String
 
 /-- `readonly attribute CSSOMString components` -/
-def CSSColorProfileRule.components (self : CSSColorProfileRule) : IO String := self.val.get "components" String
+@[macro_inline] def CSSColorProfileRule.components (self : CSSColorProfileRule) : IO String := Internal.api "Lasm.JS.Web.CSSColorProfileRule.components" do
+  self.val.get "components" String
 
 end Lasm.JS.Web

@@ -6,32 +6,19 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WebcodecsHevcCodecRegistration
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum HevcBitstreamFormat` (HEVC (H.265) WebCodecs Registration (https://w3c.github.io/webcodecs/hevc_codec_registration.html)): "annexb", "hevc". -/
-inductive HevcBitstreamFormat where
-  /-- "annexb" -/
-  | annexb
-  /-- "hevc" -/
-  | hevc
-  deriving BEq, Repr, Inhabited
-instance : ToJS HevcBitstreamFormat := ⟨fun
-  | .annexb => .string "annexb"
-  | .hevc => .string "hevc"⟩
-instance : FromJS HevcBitstreamFormat where
-  fromJS
-    | .string "annexb" => .ok .annexb
-    | .string "hevc" => .ok .hevc
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.HevcBitstreamFormat"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary HevcEncoderConfig` (HEVC (H.265) WebCodecs Registration (https://w3c.github.io/webcodecs/hevc_codec_registration.html)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HevcEncoderConfig where
   /-- `HevcBitstreamFormat format = "hevc"` -/
   format : Option HevcBitstreamFormat := none
-instance : ToJS HevcEncoderConfig := ⟨fun d => Support.fields #[("format", Support.optional d.format)]⟩
+instance : ToJS HevcEncoderConfig := ⟨fun d => Internal.fields #[("format", Internal.optional d.format)]⟩
 instance : FromJS HevcEncoderConfig where
   fromJS d := do return {
     format := ← Lasm.JS.readField (Option HevcBitstreamFormat) d "format" }
@@ -41,6 +28,6 @@ instance : FromJS HevcEncoderConfig where
 structure VideoEncoderEncodeOptionsForHevc where
   /-- `unsigned short? quantizer` -/
   quantizer : Option Nat := none
-instance : ToJS VideoEncoderEncodeOptionsForHevc := ⟨fun d => Support.fields #[("quantizer", Support.optional d.quantizer)]⟩
+instance : ToJS VideoEncoderEncodeOptionsForHevc := ⟨fun d => Internal.fields #[("quantizer", Internal.optional d.quantizer)]⟩
 
 end Lasm.JS.Web

@@ -22,8 +22,9 @@ set in the same step as the text.
 -/
 import Lasm.UI
 import Lasm.JS.Json
-import Lasm.JS.Web.WebSocket
-import Lasm.JS.Web.Messaging
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Websockets
 import Tandem
 open Lean Lasm.UI Lasm.JS Tandem
 

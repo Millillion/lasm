@@ -6,9 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Types.WEBGLMultiDraw
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(Int32Array or sequence<GLint>)`: one constructor per member type. -/
 inductive Int32ArrayOrSequenceOfGLint where
@@ -35,19 +39,19 @@ instance : Coe ByteArray Int32ArrayOrSequenceOfGLsizei := ⟨.int32Array⟩
 instance : Coe (Array Int) Int32ArrayOrSequenceOfGLsizei := ⟨.sequence⟩
 
 /-- `undefined multiDrawArraysWEBGL(GLenum mode, (Int32Array or sequence<GLint>) firstsList, unsigned long long firstsOffset, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw.multiDrawArraysWEBGL (self : WEBGL_multi_draw) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawArraysWEBGL" (Support.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw.multiDrawArraysWEBGL (self : WEBGL_multi_draw) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw.multiDrawArraysWEBGL" do
+  self.val.callMethod "multiDrawArraysWEBGL" (Internal.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS drawcount]) Unit
 
 /-- `undefined multiDrawElementsWEBGL(GLenum mode, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, GLenum type, (Int32Array or sequence<GLsizei>) offsetsList, unsigned long long offsetsOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw.multiDrawElementsWEBGL (self : WEBGL_multi_draw) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawElementsWEBGL" (Support.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw.multiDrawElementsWEBGL (self : WEBGL_multi_draw) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw.multiDrawElementsWEBGL" do
+  self.val.callMethod "multiDrawElementsWEBGL" (Internal.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS drawcount]) Unit
 
 /-- `undefined multiDrawArraysInstancedWEBGL(GLenum mode, (Int32Array or sequence<GLint>) firstsList, unsigned long long firstsOffset, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, (Int32Array or sequence<GLsizei>) instanceCountsList, unsigned long long instanceCountsOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw.multiDrawArraysInstancedWEBGL (self : WEBGL_multi_draw) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawArraysInstancedWEBGL" (Support.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw.multiDrawArraysInstancedWEBGL (self : WEBGL_multi_draw) (mode : Nat) (firstsList : Int32ArrayOrSequenceOfGLint) (firstsOffset : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw.multiDrawArraysInstancedWEBGL" do
+  self.val.callMethod "multiDrawArraysInstancedWEBGL" (Internal.args #[toJS mode, toJS firstsList, toJS firstsOffset, toJS countsList, toJS countsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS drawcount]) Unit
 
 /-- `undefined multiDrawElementsInstancedWEBGL(GLenum mode, (Int32Array or sequence<GLsizei>) countsList, unsigned long long countsOffset, GLenum type, (Int32Array or sequence<GLsizei>) offsetsList, unsigned long long offsetsOffset, (Int32Array or sequence<GLsizei>) instanceCountsList, unsigned long long instanceCountsOffset, GLsizei drawcount)` -/
-def WEBGL_multi_draw.multiDrawElementsInstancedWEBGL (self : WEBGL_multi_draw) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (drawcount : Int) : IO Unit :=
-  self.val.callMethod "multiDrawElementsInstancedWEBGL" (Support.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS drawcount]) Unit
+@[macro_inline] def WEBGL_multi_draw.multiDrawElementsInstancedWEBGL (self : WEBGL_multi_draw) (mode : Nat) (countsList : Int32ArrayOrSequenceOfGLsizei) (countsOffset : Nat) (type : Nat) (offsetsList : Int32ArrayOrSequenceOfGLsizei) (offsetsOffset : Nat) (instanceCountsList : Int32ArrayOrSequenceOfGLsizei) (instanceCountsOffset : Nat) (drawcount : Int) : IO Unit := Internal.api "Lasm.JS.Web.WEBGL_multi_draw.multiDrawElementsInstancedWEBGL" do
+  self.val.callMethod "multiDrawElementsInstancedWEBGL" (Internal.args #[toJS mode, toJS countsList, toJS countsOffset, toJS type, toJS offsetsList, toJS offsetsOffset, toJS instanceCountsList, toJS instanceCountsOffset, toJS drawcount]) Unit
 
 end Lasm.JS.Web

@@ -6,12 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Permissions
+import Lasm.JS.Web.Types.OrientationEvent
 import Lasm.JS.Web.Html
-import Lasm.JS.Web.FileSystemAccess
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary DeviceMotionEventAccelerationInit` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DeviceMotionEventAccelerationInit where
@@ -21,9 +26,9 @@ structure DeviceMotionEventAccelerationInit where
   y : Option Float := none
   /-- `double? z = null` -/
   z : Option Float := none
-instance : ToJS DeviceMotionEventAccelerationInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("z", Support.optional d.z)]⟩
+instance : ToJS DeviceMotionEventAccelerationInit := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y),
+    ("z", Internal.optional d.z)]⟩
 
 /-- `dictionary DeviceMotionEventRotationRateInit` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DeviceMotionEventRotationRateInit where
@@ -33,9 +38,9 @@ structure DeviceMotionEventRotationRateInit where
   beta : Option Float := none
   /-- `double? gamma = null` -/
   gamma : Option Float := none
-instance : ToJS DeviceMotionEventRotationRateInit := ⟨fun d => Support.fields #[("alpha", Support.optional d.alpha),
-    ("beta", Support.optional d.beta),
-    ("gamma", Support.optional d.gamma)]⟩
+instance : ToJS DeviceMotionEventRotationRateInit := ⟨fun d => Internal.fields #[("alpha", Internal.optional d.alpha),
+    ("beta", Internal.optional d.beta),
+    ("gamma", Internal.optional d.gamma)]⟩
 
 /-- `dictionary DeviceMotionEventInit : EventInit` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DeviceMotionEventInit where
@@ -53,13 +58,13 @@ structure DeviceMotionEventInit where
   rotationRate : Option DeviceMotionEventRotationRateInit := none
   /-- `double interval = 0` -/
   interval : Option Float := none
-instance : ToJS DeviceMotionEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("acceleration", Support.optional d.acceleration),
-    ("accelerationIncludingGravity", Support.optional d.accelerationIncludingGravity),
-    ("rotationRate", Support.optional d.rotationRate),
-    ("interval", Support.optional d.interval)]⟩
+instance : ToJS DeviceMotionEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("acceleration", Internal.optional d.acceleration),
+    ("accelerationIncludingGravity", Internal.optional d.accelerationIncludingGravity),
+    ("rotationRate", Internal.optional d.rotationRate),
+    ("interval", Internal.optional d.interval)]⟩
 
 /-- `dictionary DeviceOrientationEventInit : EventInit` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DeviceOrientationEventInit where
@@ -77,99 +82,140 @@ structure DeviceOrientationEventInit where
   gamma : Option Float := none
   /-- `boolean absolute = false` -/
   absolute : Option Bool := none
-instance : ToJS DeviceOrientationEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("alpha", Support.optional d.alpha),
-    ("beta", Support.optional d.beta),
-    ("gamma", Support.optional d.gamma),
-    ("absolute", Support.optional d.absolute)]⟩
+instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("alpha", Internal.optional d.alpha),
+    ("beta", Internal.optional d.beta),
+    ("gamma", Internal.optional d.gamma),
+    ("absolute", Internal.optional d.absolute)]⟩
 
 /-- `v instanceof DeviceMotionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceMotionEvent`). -/
-def DeviceMotionEvent.cast? (v : Value) : IO (Option DeviceMotionEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DeviceMotionEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def DeviceMotionEvent.cast? (v : Value) : IO (Option DeviceMotionEvent) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["DeviceMotionEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional DeviceMotionEventInit eventInitDict)` -/
-def DeviceMotionEvent.new (type : String) (eventInitDict : Option DeviceMotionEventInit := none) : IO DeviceMotionEvent :=
+@[macro_inline] def DeviceMotionEvent.new (type : String) (eventInitDict : Option DeviceMotionEventInit := none) : IO DeviceMotionEvent := Internal.api "Lasm.JS.Web.DeviceMotionEvent.new" do
   Lasm.JS.Binding.invoke DeviceMotionEvent { name := "Lasm.JS.Web.DeviceMotionEvent.new", module := "globalThis", path := "DeviceMotionEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DeviceMotionEventAcceleration? acceleration` -/
-def DeviceMotionEvent.acceleration (self : DeviceMotionEvent) : IO (Option DeviceMotionEventAcceleration) := self.val.get "acceleration" (Option DeviceMotionEventAcceleration)
+@[macro_inline] def DeviceMotionEvent.acceleration (self : DeviceMotionEvent) : IO (Option DeviceMotionEventAcceleration) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.acceleration" do
+  self.val.get "acceleration" (Option DeviceMotionEventAcceleration)
 
 /-- `readonly attribute DeviceMotionEventAcceleration? accelerationIncludingGravity` -/
-def DeviceMotionEvent.accelerationIncludingGravity (self : DeviceMotionEvent) : IO (Option DeviceMotionEventAcceleration) := self.val.get "accelerationIncludingGravity" (Option DeviceMotionEventAcceleration)
+@[macro_inline] def DeviceMotionEvent.accelerationIncludingGravity (self : DeviceMotionEvent) : IO (Option DeviceMotionEventAcceleration) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.accelerationIncludingGravity" do
+  self.val.get "accelerationIncludingGravity" (Option DeviceMotionEventAcceleration)
 
 /-- `readonly attribute DeviceMotionEventRotationRate? rotationRate` -/
-def DeviceMotionEvent.rotationRate (self : DeviceMotionEvent) : IO (Option DeviceMotionEventRotationRate) := self.val.get "rotationRate" (Option DeviceMotionEventRotationRate)
+@[macro_inline] def DeviceMotionEvent.rotationRate (self : DeviceMotionEvent) : IO (Option DeviceMotionEventRotationRate) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.rotationRate" do
+  self.val.get "rotationRate" (Option DeviceMotionEventRotationRate)
 
 /-- `readonly attribute double interval` -/
-def DeviceMotionEvent.interval (self : DeviceMotionEvent) : IO Float := self.val.get "interval" Float
+@[macro_inline] def DeviceMotionEvent.interval (self : DeviceMotionEvent) : IO Float := Internal.api "Lasm.JS.Web.DeviceMotionEvent.interval" do
+  self.val.get "interval" Float
 
 /-- `static Promise<PermissionState> requestPermission()` -/
-def DeviceMotionEvent.requestPermission : Async PermissionState :=
+@[macro_inline] def DeviceMotionEvent.requestPermission : Async PermissionState := Internal.api "Lasm.JS.Web.DeviceMotionEvent.requestPermission" do
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceMotionEvent.requestPermission", module := "globalThis", path := "DeviceMotionEvent.requestPermission", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 /-- `v instanceof DeviceMotionEventAcceleration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceMotionEventAcceleration`). -/
-def DeviceMotionEventAcceleration.cast? (v : Value) : IO (Option DeviceMotionEventAcceleration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DeviceMotionEventAcceleration"] Value) v) then some { val := v } else none
+@[macro_inline] def DeviceMotionEventAcceleration.cast? (v : Value) : IO (Option DeviceMotionEventAcceleration) := Internal.api "Lasm.JS.Web.DeviceMotionEventAcceleration.cast?" do
+  Internal.cast (Internal.getGlobal ["DeviceMotionEventAcceleration"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double? x` -/
-def DeviceMotionEventAcceleration.x (self : DeviceMotionEventAcceleration) : IO (Option Float) := self.val.get "x" (Option Float)
+@[macro_inline] def DeviceMotionEventAcceleration.x (self : DeviceMotionEventAcceleration) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventAcceleration.x" do
+  self.val.get "x" (Option Float)
 
 /-- `readonly attribute double? y` -/
-def DeviceMotionEventAcceleration.y (self : DeviceMotionEventAcceleration) : IO (Option Float) := self.val.get "y" (Option Float)
+@[macro_inline] def DeviceMotionEventAcceleration.y (self : DeviceMotionEventAcceleration) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventAcceleration.y" do
+  self.val.get "y" (Option Float)
 
 /-- `readonly attribute double? z` -/
-def DeviceMotionEventAcceleration.z (self : DeviceMotionEventAcceleration) : IO (Option Float) := self.val.get "z" (Option Float)
+@[macro_inline] def DeviceMotionEventAcceleration.z (self : DeviceMotionEventAcceleration) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventAcceleration.z" do
+  self.val.get "z" (Option Float)
 
 /-- `v instanceof DeviceMotionEventRotationRate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceMotionEventRotationRate`). -/
-def DeviceMotionEventRotationRate.cast? (v : Value) : IO (Option DeviceMotionEventRotationRate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DeviceMotionEventRotationRate"] Value) v) then some { val := v } else none
+@[macro_inline] def DeviceMotionEventRotationRate.cast? (v : Value) : IO (Option DeviceMotionEventRotationRate) := Internal.api "Lasm.JS.Web.DeviceMotionEventRotationRate.cast?" do
+  Internal.cast (Internal.getGlobal ["DeviceMotionEventRotationRate"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute double? alpha` -/
-def DeviceMotionEventRotationRate.alpha (self : DeviceMotionEventRotationRate) : IO (Option Float) := self.val.get "alpha" (Option Float)
+@[macro_inline] def DeviceMotionEventRotationRate.alpha (self : DeviceMotionEventRotationRate) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventRotationRate.alpha" do
+  self.val.get "alpha" (Option Float)
 
 /-- `readonly attribute double? beta` -/
-def DeviceMotionEventRotationRate.beta (self : DeviceMotionEventRotationRate) : IO (Option Float) := self.val.get "beta" (Option Float)
+@[macro_inline] def DeviceMotionEventRotationRate.beta (self : DeviceMotionEventRotationRate) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventRotationRate.beta" do
+  self.val.get "beta" (Option Float)
 
 /-- `readonly attribute double? gamma` -/
-def DeviceMotionEventRotationRate.gamma (self : DeviceMotionEventRotationRate) : IO (Option Float) := self.val.get "gamma" (Option Float)
+@[macro_inline] def DeviceMotionEventRotationRate.gamma (self : DeviceMotionEventRotationRate) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceMotionEventRotationRate.gamma" do
+  self.val.get "gamma" (Option Float)
 
 /-- `v instanceof DeviceOrientationEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceOrientationEvent`). -/
-def DeviceOrientationEvent.cast? (v : Value) : IO (Option DeviceOrientationEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DeviceOrientationEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def DeviceOrientationEvent.cast? (v : Value) : IO (Option DeviceOrientationEvent) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["DeviceOrientationEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional DeviceOrientationEventInit eventInitDict)` -/
-def DeviceOrientationEvent.new (type : String) (eventInitDict : Option DeviceOrientationEventInit := none) : IO DeviceOrientationEvent :=
+@[macro_inline] def DeviceOrientationEvent.new (type : String) (eventInitDict : Option DeviceOrientationEventInit := none) : IO DeviceOrientationEvent := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.new" do
   Lasm.JS.Binding.invoke DeviceOrientationEvent { name := "Lasm.JS.Web.DeviceOrientationEvent.new", module := "globalThis", path := "DeviceOrientationEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute double? alpha` -/
-def DeviceOrientationEvent.alpha (self : DeviceOrientationEvent) : IO (Option Float) := self.val.get "alpha" (Option Float)
+@[macro_inline] def DeviceOrientationEvent.alpha (self : DeviceOrientationEvent) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.alpha" do
+  self.val.get "alpha" (Option Float)
 
 /-- `readonly attribute double? beta` -/
-def DeviceOrientationEvent.beta (self : DeviceOrientationEvent) : IO (Option Float) := self.val.get "beta" (Option Float)
+@[macro_inline] def DeviceOrientationEvent.beta (self : DeviceOrientationEvent) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.beta" do
+  self.val.get "beta" (Option Float)
 
 /-- `readonly attribute double? gamma` -/
-def DeviceOrientationEvent.gamma (self : DeviceOrientationEvent) : IO (Option Float) := self.val.get "gamma" (Option Float)
+@[macro_inline] def DeviceOrientationEvent.gamma (self : DeviceOrientationEvent) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.gamma" do
+  self.val.get "gamma" (Option Float)
 
 /-- `readonly attribute boolean absolute` -/
-def DeviceOrientationEvent.absolute (self : DeviceOrientationEvent) : IO Bool := self.val.get "absolute" Bool
+@[macro_inline] def DeviceOrientationEvent.absolute (self : DeviceOrientationEvent) : IO Bool := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.absolute" do
+  self.val.get "absolute" Bool
 
 /-- `static Promise<PermissionState> requestPermission(optional boolean absolute)` -/
-def DeviceOrientationEvent.requestPermission (absolute : Option Bool := none) : Async PermissionState :=
+@[macro_inline] def DeviceOrientationEvent.requestPermission (absolute : Option Bool := none) : Async PermissionState := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.requestPermission" do
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceOrientationEvent.requestPermission", module := "globalThis", path := "DeviceOrientationEvent.requestPermission", construct := false, arity := 1 }
-    (Support.args #[Support.optional absolute])
+    (Internal.args #[Internal.optional absolute])
+
+/-- `attribute EventHandler ondeviceorientation` -/
+@[macro_inline] def Window.ondeviceorientation (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondeviceorientation" do
+  self.val.get "ondeviceorientation" (Option EventHandlerNonNull)
+
+/-- Sets `ondeviceorientation`: `attribute EventHandler ondeviceorientation` -/
+@[macro_inline] def Window.setOndeviceorientation (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndeviceorientation" do
+  self.val.set "ondeviceorientation" (toJS value)
+
+/-- `attribute EventHandler ondeviceorientationabsolute` -/
+@[macro_inline] def Window.ondeviceorientationabsolute (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondeviceorientationabsolute" do
+  self.val.get "ondeviceorientationabsolute" (Option EventHandlerNonNull)
+
+/-- Sets `ondeviceorientationabsolute`: `attribute EventHandler ondeviceorientationabsolute` -/
+@[macro_inline] def Window.setOndeviceorientationabsolute (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndeviceorientationabsolute" do
+  self.val.set "ondeviceorientationabsolute" (toJS value)
+
+/-- `attribute EventHandler ondevicemotion` -/
+@[macro_inline] def Window.ondevicemotion (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondevicemotion" do
+  self.val.get "ondevicemotion" (Option EventHandlerNonNull)
+
+/-- Sets `ondevicemotion`: `attribute EventHandler ondevicemotion` -/
+@[macro_inline] def Window.setOndevicemotion (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndevicemotion" do
+  self.val.set "ondevicemotion" (toJS value)
 
 /-- `attribute EventHandler ondeviceorientation` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)) -/
-def ondeviceorientation : IO (Option EventHandlerNonNull) := Support.getGlobal ["ondeviceorientation"] (Option EventHandlerNonNull)
+@[macro_inline] def ondeviceorientation : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondeviceorientation" do
+  Internal.getGlobal ["ondeviceorientation"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ondeviceorientationabsolute` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)) -/
-def ondeviceorientationabsolute : IO (Option EventHandlerNonNull) := Support.getGlobal ["ondeviceorientationabsolute"] (Option EventHandlerNonNull)
+@[macro_inline] def ondeviceorientationabsolute : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondeviceorientationabsolute" do
+  Internal.getGlobal ["ondeviceorientationabsolute"] (Option EventHandlerNonNull)
 
 /-- `attribute EventHandler ondevicemotion` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)) -/
-def ondevicemotion : IO (Option EventHandlerNonNull) := Support.getGlobal ["ondevicemotion"] (Option EventHandlerNonNull)
+@[macro_inline] def ondevicemotion : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondevicemotion" do
+  Internal.getGlobal ["ondevicemotion"] (Option EventHandlerNonNull)
 
 end Lasm.JS.Web

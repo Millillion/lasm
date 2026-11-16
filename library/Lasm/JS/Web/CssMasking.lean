@@ -6,56 +6,60 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.CssMasking
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof SVGClipPathElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGClipPathElement`). -/
-def SVGClipPathElement.cast? (v : Value) : IO (Option SVGClipPathElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGClipPathElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGClipPathElement.cast? (v : Value) : IO (Option SVGClipPathElement) := Internal.api "Lasm.JS.Web.SVGClipPathElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGClipPathElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedEnumeration clipPathUnits` -/
-def SVGClipPathElement.clipPathUnits (self : SVGClipPathElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGClipPathElement.clipPathUnits (self : SVGClipPathElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGClipPathElement.clipPathUnits" do
   let r ← self.val.get "clipPathUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedTransformList transform` -/
-def SVGClipPathElement.transform (self : SVGClipPathElement) : IO SVGAnimatedTransformList := do
+@[macro_inline] def SVGClipPathElement.transform (self : SVGClipPathElement) : IO SVGAnimatedTransformList := Internal.api "Lasm.JS.Web.SVGClipPathElement.transform" do
   let r ← self.val.get "transform" Value
   pure { val := r }
 
 /-- `v instanceof SVGMaskElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SVGMaskElement`). -/
-def SVGMaskElement.cast? (v : Value) : IO (Option SVGMaskElement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SVGMaskElement"] Value) v) then some { val := v } else none
+@[macro_inline] def SVGMaskElement.cast? (v : Value) : IO (Option SVGMaskElement) := Internal.api "Lasm.JS.Web.SVGMaskElement.cast?" do
+  Internal.cast (Internal.getGlobal ["SVGMaskElement"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute SVGAnimatedEnumeration maskUnits` -/
-def SVGMaskElement.maskUnits (self : SVGMaskElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGMaskElement.maskUnits (self : SVGMaskElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGMaskElement.maskUnits" do
   let r ← self.val.get "maskUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedEnumeration maskContentUnits` -/
-def SVGMaskElement.maskContentUnits (self : SVGMaskElement) : IO SVGAnimatedEnumeration := do
+@[macro_inline] def SVGMaskElement.maskContentUnits (self : SVGMaskElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGMaskElement.maskContentUnits" do
   let r ← self.val.get "maskContentUnits" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength x` -/
-def SVGMaskElement.x (self : SVGMaskElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMaskElement.x (self : SVGMaskElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMaskElement.x" do
   let r ← self.val.get "x" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength y` -/
-def SVGMaskElement.y (self : SVGMaskElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMaskElement.y (self : SVGMaskElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMaskElement.y" do
   let r ← self.val.get "y" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength width` -/
-def SVGMaskElement.width (self : SVGMaskElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMaskElement.width (self : SVGMaskElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMaskElement.width" do
   let r ← self.val.get "width" Value
   pure { val := r }
 
 /-- `readonly attribute SVGAnimatedLength height` -/
-def SVGMaskElement.height (self : SVGMaskElement) : IO SVGAnimatedLength := do
+@[macro_inline] def SVGMaskElement.height (self : SVGMaskElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGMaskElement.height" do
   let r ← self.val.get "height" Value
   pure { val := r }
 

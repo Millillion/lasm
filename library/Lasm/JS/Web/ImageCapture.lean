@@ -6,52 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.ImageCapture
+import Lasm.JS.Web.Types.MediacaptureStreams
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum FillLightMode` (MediaStream Image Capture (https://w3c.github.io/mediacapture-image/)): "auto", "off", "flash". -/
-inductive FillLightMode where
-  /-- "auto" -/
-  | auto
-  /-- "off" -/
-  | off
-  /-- "flash" -/
-  | flash
-  deriving BEq, Repr, Inhabited
-instance : ToJS FillLightMode := ⟨fun
-  | .auto => .string "auto"
-  | .off => .string "off"
-  | .flash => .string "flash"⟩
-instance : FromJS FillLightMode where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "off" => .ok .off
-    | .string "flash" => .ok .flash
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.FillLightMode"
-
-/-- `enum RedEyeReduction` (MediaStream Image Capture (https://w3c.github.io/mediacapture-image/)): "never", "always", "controllable". -/
-inductive RedEyeReduction where
-  /-- "never" -/
-  | never
-  /-- "always" -/
-  | always
-  /-- "controllable" -/
-  | controllable
-  deriving BEq, Repr, Inhabited
-instance : ToJS RedEyeReduction := ⟨fun
-  | .never => .string "never"
-  | .always => .string "always"
-  | .controllable => .string "controllable"⟩
-instance : FromJS RedEyeReduction where
-  fromJS
-    | .string "never" => .ok .never
-    | .string "always" => .ok .always
-    | .string "controllable" => .ok .controllable
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RedEyeReduction"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary PhotoSettings` (MediaStream Image Capture (https://w3c.github.io/mediacapture-image/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PhotoSettings where
@@ -63,10 +27,10 @@ structure PhotoSettings where
   imageWidth : Option Float := none
   /-- `boolean redEyeReduction` -/
   redEyeReduction : Option Bool := none
-instance : ToJS PhotoSettings := ⟨fun d => Support.fields #[("fillLightMode", Support.optional d.fillLightMode),
-    ("imageHeight", Support.optional d.imageHeight),
-    ("imageWidth", Support.optional d.imageWidth),
-    ("redEyeReduction", Support.optional d.redEyeReduction)]⟩
+instance : ToJS PhotoSettings := ⟨fun d => Internal.fields #[("fillLightMode", Internal.optional d.fillLightMode),
+    ("imageHeight", Internal.optional d.imageHeight),
+    ("imageWidth", Internal.optional d.imageWidth),
+    ("redEyeReduction", Internal.optional d.redEyeReduction)]⟩
 instance : FromJS PhotoSettings where
   fromJS d := do return {
     fillLightMode := ← Lasm.JS.readField (Option FillLightMode) d "fillLightMode",
@@ -83,6 +47,9 @@ structure MediaSettingsRange where
   min : Option Float := none
   /-- `double step` -/
   step : Option Float := none
+instance : ToJS MediaSettingsRange := ⟨fun d => Internal.fields #[("max", Internal.optional d.max),
+    ("min", Internal.optional d.min),
+    ("step", Internal.optional d.step)]⟩
 instance : FromJS MediaSettingsRange where
   fromJS d := do return {
     max := ← Lasm.JS.readField (Option Float) d "max",
@@ -100,6 +67,10 @@ structure PhotoCapabilities where
   imageWidth : Option MediaSettingsRange := none
   /-- `sequence<FillLightMode> fillLightMode` -/
   fillLightMode : Option (Array FillLightMode) := none
+instance : ToJS PhotoCapabilities := ⟨fun d => Internal.fields #[("redEyeReduction", Internal.optional d.redEyeReduction),
+    ("imageHeight", Internal.optional d.imageHeight),
+    ("imageWidth", Internal.optional d.imageWidth),
+    ("fillLightMode", Internal.optional d.fillLightMode)]⟩
 instance : FromJS PhotoCapabilities where
   fromJS d := do return {
     redEyeReduction := ← Lasm.JS.readField (Option RedEyeReduction) d "redEyeReduction",
@@ -114,8 +85,8 @@ structure Point2D where
   x : Option Float := none
   /-- `double y = 0.0` -/
   y : Option Float := none
-instance : ToJS Point2D := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y)]⟩
+instance : ToJS Point2D := ⟨fun d => Internal.fields #[("x", Internal.optional d.x),
+    ("y", Internal.optional d.y)]⟩
 instance : FromJS Point2D where
   fromJS d := do return {
     x := ← Lasm.JS.readField (Option Float) d "x",
@@ -128,8 +99,8 @@ structure ConstrainPoint2DParameters where
   exact : Option (Array Point2D) := none
   /-- `sequence<Point2D> ideal` -/
   ideal : Option (Array Point2D) := none
-instance : ToJS ConstrainPoint2DParameters := ⟨fun d => Support.fields #[("exact", Support.optional d.exact),
-    ("ideal", Support.optional d.ideal)]⟩
+instance : ToJS ConstrainPoint2DParameters := ⟨fun d => Internal.fields #[("exact", Internal.optional d.exact),
+    ("ideal", Internal.optional d.ideal)]⟩
 instance : FromJS ConstrainPoint2DParameters where
   fromJS d := do return {
     exact := ← Lasm.JS.readField (Option (Array Point2D)) d "exact",
@@ -155,35 +126,35 @@ instance : FromJS ConstrainPoint2D where
   typeName := "Lasm.JS.Web.ConstrainPoint2D"
 
 /-- `v instanceof ImageCapture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageCapture`). -/
-def ImageCapture.cast? (v : Value) : IO (Option ImageCapture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ImageCapture"] Value) v) then some { val := v } else none
+@[macro_inline] def ImageCapture.cast? (v : Value) : IO (Option ImageCapture) := Internal.api "Lasm.JS.Web.ImageCapture.cast?" do
+  Internal.cast (Internal.getGlobal ["ImageCapture"] Value) (fun x => { val := x }) v
 
 /-- `constructor(MediaStreamTrack videoTrack)` -/
-def ImageCapture.new (videoTrack : MediaStreamTrack) : IO ImageCapture :=
+@[macro_inline] def ImageCapture.new (videoTrack : MediaStreamTrack) : IO ImageCapture := Internal.api "Lasm.JS.Web.ImageCapture.new" do
   Lasm.JS.Binding.invoke ImageCapture { name := "Lasm.JS.Web.ImageCapture.new", module := "globalThis", path := "ImageCapture", construct := true, arity := 1 }
-    (Support.args #[toJS videoTrack]) (await := false)
+    (Internal.args #[toJS videoTrack]) (await := false)
 
 /-- `readonly attribute MediaStreamTrack track` -/
-def ImageCapture.track (self : ImageCapture) : IO MediaStreamTrack := do
+@[macro_inline] def ImageCapture.track (self : ImageCapture) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.ImageCapture.track" do
   let r ← self.val.get "track" Value
   pure { val := r }
 
 /-- `Promise<Blob> takePhoto(optional PhotoSettings photoSettings)` -/
-def ImageCapture.takePhoto (self : ImageCapture) (photoSettings : Option PhotoSettings := none) : Async Blob := do
-  let r ← self.val.callMethodAwait "takePhoto" (Support.args #[Support.optional photoSettings]) Value
+@[macro_inline] def ImageCapture.takePhoto (self : ImageCapture) (photoSettings : Option PhotoSettings := none) : Async Blob := Internal.api "Lasm.JS.Web.ImageCapture.takePhoto" do
+  let r ← self.val.callMethodAwait "takePhoto" (Internal.args #[Internal.optional photoSettings]) Value
   pure { val := r }
 
 /-- `Promise<PhotoCapabilities> getPhotoCapabilities()` -/
-def ImageCapture.getPhotoCapabilities (self : ImageCapture) : Async PhotoCapabilities :=
-  self.val.callMethodAwait "getPhotoCapabilities" (Support.args #[]) PhotoCapabilities
+@[macro_inline] def ImageCapture.getPhotoCapabilities (self : ImageCapture) : Async PhotoCapabilities := Internal.api "Lasm.JS.Web.ImageCapture.getPhotoCapabilities" do
+  self.val.callMethodAwait "getPhotoCapabilities" (Internal.args #[]) PhotoCapabilities
 
 /-- `Promise<PhotoSettings> getPhotoSettings()` -/
-def ImageCapture.getPhotoSettings (self : ImageCapture) : Async PhotoSettings :=
-  self.val.callMethodAwait "getPhotoSettings" (Support.args #[]) PhotoSettings
+@[macro_inline] def ImageCapture.getPhotoSettings (self : ImageCapture) : Async PhotoSettings := Internal.api "Lasm.JS.Web.ImageCapture.getPhotoSettings" do
+  self.val.callMethodAwait "getPhotoSettings" (Internal.args #[]) PhotoSettings
 
 /-- `Promise<ImageBitmap> grabFrame()` -/
-def ImageCapture.grabFrame (self : ImageCapture) : Async ImageBitmap := do
-  let r ← self.val.callMethodAwait "grabFrame" (Support.args #[]) Value
+@[macro_inline] def ImageCapture.grabFrame (self : ImageCapture) : Async ImageBitmap := Internal.api "Lasm.JS.Web.ImageCapture.grabFrame" do
+  let r ← self.val.callMethodAwait "grabFrame" (Internal.args #[]) Value
   pure { val := r }
 
 end Lasm.JS.Web

@@ -6,34 +6,45 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.HrTime
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof Performance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Performance`). -/
-def Performance.cast? (v : Value) : IO (Option Performance) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Performance"] Value) v) then some { val := v } else none
+@[macro_inline] def Performance.cast? (v : Value) : IO (Option Performance) := Internal.api "Lasm.JS.Web.Performance.cast?" do
+  Internal.cast (Internal.getGlobal ["Performance"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMHighResTimeStamp timeOrigin` -/
-def Performance.timeOrigin (self : Performance) : IO Float := self.val.get "timeOrigin" Float
+@[macro_inline] def Performance.timeOrigin (self : Performance) : IO Float := Internal.api "Lasm.JS.Web.Performance.timeOrigin" do
+  self.val.get "timeOrigin" Float
 
 /-- `DOMHighResTimeStamp now()` -/
-def Performance.now (self : Performance) : IO Float :=
-  self.val.callMethod "now" (Support.args #[]) Float
+@[macro_inline] def Performance.now (self : Performance) : IO Float := Internal.api "Lasm.JS.Web.Performance.now" do
+  self.val.callMethod "now" (Internal.args #[]) Float
 
 /-- `object toJSON()` -/
-def Performance.toJSON (self : Performance) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def Performance.toJSON (self : Performance) : IO Data := Internal.api "Lasm.JS.Web.Performance.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `readonly attribute Performance performance` -/
-def WorkerGlobalScope.performance (self : WorkerGlobalScope) : IO Performance := do
+@[macro_inline] def Window.performance (self : Window) : IO Performance := Internal.api "Lasm.JS.Web.Window.performance" do
+  let r ← self.val.get "performance" Value
+  pure { val := r }
+
+/-- `readonly attribute Performance performance` -/
+@[macro_inline] def WorkerGlobalScope.performance (self : WorkerGlobalScope) : IO Performance := Internal.api "Lasm.JS.Web.WorkerGlobalScope.performance" do
   let r ← self.val.get "performance" Value
   pure { val := r }
 
 /-- `readonly attribute Performance performance` (High Resolution Time (https://w3c.github.io/hr-time/)) -/
-def performance : IO Performance := do
-  let r ← Support.getGlobal ["performance"] Value
+@[macro_inline] def performance : IO Performance := Internal.api "Lasm.JS.Web.performance" do
+  let r ← Internal.getGlobal ["performance"] Value
   pure { val := r }
 
 end Lasm.JS.Web

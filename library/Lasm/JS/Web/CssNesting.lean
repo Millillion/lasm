@@ -6,17 +6,21 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.CssNesting
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof CSSNestedDeclarations`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSNestedDeclarations`). -/
-def CSSNestedDeclarations.cast? (v : Value) : IO (Option CSSNestedDeclarations) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSNestedDeclarations"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSNestedDeclarations.cast? (v : Value) : IO (Option CSSNestedDeclarations) := Internal.api "Lasm.JS.Web.CSSNestedDeclarations.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSNestedDeclarations"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def CSSNestedDeclarations.style (self : CSSNestedDeclarations) : IO CSSStyleProperties := do
+@[macro_inline] def CSSNestedDeclarations.style (self : CSSNestedDeclarations) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.CSSNestedDeclarations.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 

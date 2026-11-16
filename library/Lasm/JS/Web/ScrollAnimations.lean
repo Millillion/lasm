@@ -6,35 +6,16 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.CssTypedOm
+import Lasm.JS.Web.Types.WebAnimationsAndWebAnimations2
+import Lasm.JS.Web.Types.ScrollAnimations
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum ScrollAxis` (Scroll-driven Animations Module Level 1 (https://drafts.csswg.org/scroll-animations-1/)): "block", "inline", "x", "y". -/
-inductive ScrollAxis where
-  /-- "block" -/
-  | block
-  /-- "inline" -/
-  | inline
-  /-- "x" -/
-  | x
-  /-- "y" -/
-  | y
-  deriving BEq, Repr, Inhabited
-instance : ToJS ScrollAxis := ⟨fun
-  | .block => .string "block"
-  | .inline => .string "inline"
-  | .x => .string "x"
-  | .y => .string "y"⟩
-instance : FromJS ScrollAxis where
-  fromJS
-    | .string "block" => .ok .block
-    | .string "inline" => .ok .inline
-    | .string "x" => .ok .x
-    | .string "y" => .ok .y
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ScrollAxis"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ScrollTimelineOptions` (Scroll-driven Animations Module Level 1 (https://drafts.csswg.org/scroll-animations-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ScrollTimelineOptions where
@@ -42,8 +23,8 @@ structure ScrollTimelineOptions where
   source : Option Element := none
   /-- `ScrollAxis axis = "block"` -/
   axis : Option ScrollAxis := none
-instance : ToJS ScrollTimelineOptions := ⟨fun d => Support.fields #[("source", Support.optional d.source),
-    ("axis", Support.optional d.axis)]⟩
+instance : ToJS ScrollTimelineOptions := ⟨fun d => Internal.fields #[("source", Internal.optional d.source),
+    ("axis", Internal.optional d.axis)]⟩
 
 /-- `(CSSNumericValue or CSSKeywordValue)`: one constructor per member type. -/
 inductive CSSNumericValueOrCSSKeywordValue where
@@ -77,46 +58,48 @@ structure ViewTimelineOptions where
   axis : Option ScrollAxis := none
   /-- `(DOMString or sequence<(CSSNumericValue or CSSKeywordValue)>) inset = "auto"` -/
   inset : Option DOMStringOrSequenceOfCSSNumericValueOrCSSKeywordValue := none
-instance : ToJS ViewTimelineOptions := ⟨fun d => Support.fields #[("subject", toJS d.subject),
-    ("axis", Support.optional d.axis),
-    ("inset", Support.optional d.inset)]⟩
+instance : ToJS ViewTimelineOptions := ⟨fun d => Internal.fields #[("subject", toJS d.subject),
+    ("axis", Internal.optional d.axis),
+    ("inset", Internal.optional d.inset)]⟩
 
 /-- `v instanceof ScrollTimeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ScrollTimeline`). -/
-def ScrollTimeline.cast? (v : Value) : IO (Option ScrollTimeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ScrollTimeline"] Value) v) then some { val := v } else none
+@[macro_inline] def ScrollTimeline.cast? (v : Value) : IO (Option ScrollTimeline) := Internal.api "Lasm.JS.Web.ScrollTimeline.cast?" do
+  Internal.cast (Internal.getGlobal ["ScrollTimeline"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional ScrollTimelineOptions options)` -/
-def ScrollTimeline.new (options : Option ScrollTimelineOptions := none) : IO ScrollTimeline :=
+@[macro_inline] def ScrollTimeline.new (options : Option ScrollTimelineOptions := none) : IO ScrollTimeline := Internal.api "Lasm.JS.Web.ScrollTimeline.new" do
   Lasm.JS.Binding.invoke ScrollTimeline { name := "Lasm.JS.Web.ScrollTimeline.new", module := "globalThis", path := "ScrollTimeline", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute Element? source` -/
-def ScrollTimeline.source (self : ScrollTimeline) : IO (Option Element) := self.val.get "source" (Option Element)
+@[macro_inline] def ScrollTimeline.source (self : ScrollTimeline) : IO (Option Element) := Internal.api "Lasm.JS.Web.ScrollTimeline.source" do
+  self.val.get "source" (Option Element)
 
 /-- `readonly attribute ScrollAxis axis` -/
-def ScrollTimeline.axis (self : ScrollTimeline) : IO ScrollAxis := self.val.get "axis" ScrollAxis
+@[macro_inline] def ScrollTimeline.axis (self : ScrollTimeline) : IO ScrollAxis := Internal.api "Lasm.JS.Web.ScrollTimeline.axis" do
+  self.val.get "axis" ScrollAxis
 
 /-- `v instanceof ViewTimeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ViewTimeline`). -/
-def ViewTimeline.cast? (v : Value) : IO (Option ViewTimeline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ViewTimeline"] Value) v) then some { val := v } else none
+@[macro_inline] def ViewTimeline.cast? (v : Value) : IO (Option ViewTimeline) := Internal.api "Lasm.JS.Web.ViewTimeline.cast?" do
+  Internal.cast (Internal.getGlobal ["ViewTimeline"] Value) (fun x => { val := x }) v
 
 /-- `constructor(ViewTimelineOptions options)` -/
-def ViewTimeline.new (options : ViewTimelineOptions) : IO ViewTimeline :=
+@[macro_inline] def ViewTimeline.new (options : ViewTimelineOptions) : IO ViewTimeline := Internal.api "Lasm.JS.Web.ViewTimeline.new" do
   Lasm.JS.Binding.invoke ViewTimeline { name := "Lasm.JS.Web.ViewTimeline.new", module := "globalThis", path := "ViewTimeline", construct := true, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `readonly attribute Element subject` -/
-def ViewTimeline.subject (self : ViewTimeline) : IO Element := do
+@[macro_inline] def ViewTimeline.subject (self : ViewTimeline) : IO Element := Internal.api "Lasm.JS.Web.ViewTimeline.subject" do
   let r ← self.val.get "subject" Value
   pure { val := r }
 
 /-- `readonly attribute CSSNumericValue startOffset` -/
-def ViewTimeline.startOffset (self : ViewTimeline) : IO CSSNumericValue := do
+@[macro_inline] def ViewTimeline.startOffset (self : ViewTimeline) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.ViewTimeline.startOffset" do
   let r ← self.val.get "startOffset" Value
   pure { val := r }
 
 /-- `readonly attribute CSSNumericValue endOffset` -/
-def ViewTimeline.endOffset (self : ViewTimeline) : IO CSSNumericValue := do
+@[macro_inline] def ViewTimeline.endOffset (self : ViewTimeline) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.ViewTimeline.endOffset" do
   let r ← self.val.get "endOffset" Value
   pure { val := r }
 

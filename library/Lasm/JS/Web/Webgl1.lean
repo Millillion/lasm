@@ -6,32 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Webgl1
+import Lasm.JS.Web.Types.Webcodecs
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum WebGLPowerPreference` (WebGL Specification (https://registry.khronos.org/webgl/specs/latest/1.0/)): "default", "low-power", "high-performance". -/
-inductive WebGLPowerPreference where
-  /-- "default" -/
-  | default
-  /-- "low-power" -/
-  | lowPower
-  /-- "high-performance" -/
-  | highPerformance
-  deriving BEq, Repr, Inhabited
-instance : ToJS WebGLPowerPreference := ⟨fun
-  | .default => .string "default"
-  | .lowPower => .string "low-power"
-  | .highPerformance => .string "high-performance"⟩
-instance : FromJS WebGLPowerPreference where
-  fromJS
-    | .string "default" => .ok .default
-    | .string "low-power" => .ok .lowPower
-    | .string "high-performance" => .ok .highPerformance
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.WebGLPowerPreference"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary WebGLContextEventInit : EventInit` (WebGL Specification (https://registry.khronos.org/webgl/specs/latest/1.0/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebGLContextEventInit where
@@ -43,10 +28,10 @@ structure WebGLContextEventInit where
   composed : Option Bool := none
   /-- `DOMString statusMessage = ""` -/
   statusMessage : Option String := none
-instance : ToJS WebGLContextEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("statusMessage", Support.optional d.statusMessage)]⟩
+instance : ToJS WebGLContextEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("statusMessage", Internal.optional d.statusMessage)]⟩
 
 /-- `dictionary WebGLContextAttributes` (WebGL Specification (https://registry.khronos.org/webgl/specs/latest/1.0/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebGLContextAttributes where
@@ -70,6 +55,16 @@ structure WebGLContextAttributes where
   desynchronized : Option Bool := none
   /-- `boolean xrCompatible = false` -/
   xrCompatible : Option Bool := none
+instance : ToJS WebGLContextAttributes := ⟨fun d => Internal.fields #[("alpha", Internal.optional d.alpha),
+    ("depth", Internal.optional d.depth),
+    ("stencil", Internal.optional d.stencil),
+    ("antialias", Internal.optional d.antialias),
+    ("premultipliedAlpha", Internal.optional d.premultipliedAlpha),
+    ("preserveDrawingBuffer", Internal.optional d.preserveDrawingBuffer),
+    ("powerPreference", Internal.optional d.powerPreference),
+    ("failIfMajorPerformanceCaveat", Internal.optional d.failIfMajorPerformanceCaveat),
+    ("desynchronized", Internal.optional d.desynchronized),
+    ("xrCompatible", Internal.optional d.xrCompatible)]⟩
 instance : FromJS WebGLContextAttributes where
   fromJS d := do return {
     alpha := ← Lasm.JS.readField (Option Bool) d "alpha",
@@ -141,44 +136,49 @@ instance : Coe ByteArray Int32List := ⟨.int32Array⟩
 instance : Coe (Array Int) Int32List := ⟨.sequence⟩
 
 /-- `v instanceof WebGLActiveInfo`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLActiveInfo`). -/
-def WebGLActiveInfo.cast? (v : Value) : IO (Option WebGLActiveInfo) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLActiveInfo"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLActiveInfo.cast? (v : Value) : IO (Option WebGLActiveInfo) := Internal.api "Lasm.JS.Web.WebGLActiveInfo.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLActiveInfo"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GLint size` -/
-def WebGLActiveInfo.size (self : WebGLActiveInfo) : IO Int := self.val.get "size" Int
+@[macro_inline] def WebGLActiveInfo.size (self : WebGLActiveInfo) : IO Int := Internal.api "Lasm.JS.Web.WebGLActiveInfo.size" do
+  self.val.get "size" Int
 
 /-- `readonly attribute GLenum type` -/
-def WebGLActiveInfo.type (self : WebGLActiveInfo) : IO Nat := self.val.get "type" Nat
+@[macro_inline] def WebGLActiveInfo.type (self : WebGLActiveInfo) : IO Nat := Internal.api "Lasm.JS.Web.WebGLActiveInfo.type" do
+  self.val.get "type" Nat
 
 /-- `readonly attribute DOMString name` -/
-def WebGLActiveInfo.name (self : WebGLActiveInfo) : IO String := self.val.get "name" String
+@[macro_inline] def WebGLActiveInfo.name (self : WebGLActiveInfo) : IO String := Internal.api "Lasm.JS.Web.WebGLActiveInfo.name" do
+  self.val.get "name" String
 
 /-- `v instanceof WebGLContextEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLContextEvent`). -/
-def WebGLContextEvent.cast? (v : Value) : IO (Option WebGLContextEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLContextEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLContextEvent.cast? (v : Value) : IO (Option WebGLContextEvent) := Internal.api "Lasm.JS.Web.WebGLContextEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLContextEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional WebGLContextEventInit eventInit)` -/
-def WebGLContextEvent.new (type : String) (eventInit : Option WebGLContextEventInit := none) : IO WebGLContextEvent :=
+@[macro_inline] def WebGLContextEvent.new (type : String) (eventInit : Option WebGLContextEventInit := none) : IO WebGLContextEvent := Internal.api "Lasm.JS.Web.WebGLContextEvent.new" do
   Lasm.JS.Binding.invoke WebGLContextEvent { name := "Lasm.JS.Web.WebGLContextEvent.new", module := "globalThis", path := "WebGLContextEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInit]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInit]) (await := false)
 
 /-- `readonly attribute DOMString statusMessage` -/
-def WebGLContextEvent.statusMessage (self : WebGLContextEvent) : IO String := self.val.get "statusMessage" String
+@[macro_inline] def WebGLContextEvent.statusMessage (self : WebGLContextEvent) : IO String := Internal.api "Lasm.JS.Web.WebGLContextEvent.statusMessage" do
+  self.val.get "statusMessage" String
 
 /-- `v instanceof WebGLObject`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLObject`). -/
-def WebGLObject.cast? (v : Value) : IO (Option WebGLObject) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLObject"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLObject.cast? (v : Value) : IO (Option WebGLObject) := Internal.api "Lasm.JS.Web.WebGLObject.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLObject"] Value) (fun x => { val := x }) v
 
 /-- `attribute USVString label` -/
-def WebGLObject.label (self : WebGLObject) : IO String := self.val.get "label" String
+@[macro_inline] def WebGLObject.label (self : WebGLObject) : IO String := Internal.api "Lasm.JS.Web.WebGLObject.label" do
+  self.val.get "label" String
 
 /-- Sets `label`: `attribute USVString label` -/
-def WebGLObject.setLabel (self : WebGLObject) (value : String) : IO Unit :=
+@[macro_inline] def WebGLObject.setLabel (self : WebGLObject) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.WebGLObject.setLabel" do
   self.val.set "label" (toJS value)
 
 /-- `v instanceof WebGLRenderingContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLRenderingContext`). -/
-def WebGLRenderingContext.cast? (v : Value) : IO (Option WebGLRenderingContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLRenderingContext"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLRenderingContext.cast? (v : Value) : IO (Option WebGLRenderingContext) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLRenderingContext"] Value) (fun x => { val := x }) v
 
 /-- `const GLenum DEPTH_BUFFER_BIT = 0x00000100` -/
 def WebGLRenderingContext.DEPTH_BUFFER_BIT : Nat := 0x00000100
@@ -1072,635 +1072,644 @@ def WebGLRenderingContext.UNPACK_COLORSPACE_CONVERSION_WEBGL : Nat := 0x9243
 def WebGLRenderingContext.BROWSER_DEFAULT_WEBGL : Nat := 0x9244
 
 /-- `readonly attribute (HTMLCanvasElement or OffscreenCanvas) canvas` -/
-def WebGLRenderingContext.canvas (self : WebGLRenderingContext) : IO Value := self.val.get "canvas" Value
+@[macro_inline] def WebGLRenderingContext.canvas (self : WebGLRenderingContext) : IO Value := Internal.api "Lasm.JS.Web.WebGLRenderingContext.canvas" do
+  self.val.get "canvas" Value
 
 /-- `readonly attribute GLsizei drawingBufferWidth` -/
-def WebGLRenderingContext.drawingBufferWidth (self : WebGLRenderingContext) : IO Int := self.val.get "drawingBufferWidth" Int
+@[macro_inline] def WebGLRenderingContext.drawingBufferWidth (self : WebGLRenderingContext) : IO Int := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferWidth" do
+  self.val.get "drawingBufferWidth" Int
 
 /-- `readonly attribute GLsizei drawingBufferHeight` -/
-def WebGLRenderingContext.drawingBufferHeight (self : WebGLRenderingContext) : IO Int := self.val.get "drawingBufferHeight" Int
+@[macro_inline] def WebGLRenderingContext.drawingBufferHeight (self : WebGLRenderingContext) : IO Int := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferHeight" do
+  self.val.get "drawingBufferHeight" Int
 
 /-- `readonly attribute GLenum drawingBufferFormat` -/
-def WebGLRenderingContext.drawingBufferFormat (self : WebGLRenderingContext) : IO Nat := self.val.get "drawingBufferFormat" Nat
+@[macro_inline] def WebGLRenderingContext.drawingBufferFormat (self : WebGLRenderingContext) : IO Nat := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferFormat" do
+  self.val.get "drawingBufferFormat" Nat
 
 /-- `attribute PredefinedColorSpace drawingBufferColorSpace` -/
-def WebGLRenderingContext.drawingBufferColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := self.val.get "drawingBufferColorSpace" PredefinedColorSpace
+@[macro_inline] def WebGLRenderingContext.drawingBufferColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferColorSpace" do
+  self.val.get "drawingBufferColorSpace" PredefinedColorSpace
 
 /-- Sets `drawingBufferColorSpace`: `attribute PredefinedColorSpace drawingBufferColorSpace` -/
-def WebGLRenderingContext.setDrawingBufferColorSpace (self : WebGLRenderingContext) (value : PredefinedColorSpace) : IO Unit :=
+@[macro_inline] def WebGLRenderingContext.setDrawingBufferColorSpace (self : WebGLRenderingContext) (value : PredefinedColorSpace) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.setDrawingBufferColorSpace" do
   self.val.set "drawingBufferColorSpace" (toJS value)
 
 /-- `attribute PredefinedColorSpace unpackColorSpace` -/
-def WebGLRenderingContext.unpackColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := self.val.get "unpackColorSpace" PredefinedColorSpace
+@[macro_inline] def WebGLRenderingContext.unpackColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGLRenderingContext.unpackColorSpace" do
+  self.val.get "unpackColorSpace" PredefinedColorSpace
 
 /-- Sets `unpackColorSpace`: `attribute PredefinedColorSpace unpackColorSpace` -/
-def WebGLRenderingContext.setUnpackColorSpace (self : WebGLRenderingContext) (value : PredefinedColorSpace) : IO Unit :=
+@[macro_inline] def WebGLRenderingContext.setUnpackColorSpace (self : WebGLRenderingContext) (value : PredefinedColorSpace) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.setUnpackColorSpace" do
   self.val.set "unpackColorSpace" (toJS value)
 
 /-- `WebGLContextAttributes? getContextAttributes()` -/
-def WebGLRenderingContext.getContextAttributes (self : WebGLRenderingContext) : IO (Option WebGLContextAttributes) :=
-  self.val.callMethod "getContextAttributes" (Support.args #[]) (Option WebGLContextAttributes)
+@[macro_inline] def WebGLRenderingContext.getContextAttributes (self : WebGLRenderingContext) : IO (Option WebGLContextAttributes) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getContextAttributes" do
+  self.val.callMethod "getContextAttributes" (Internal.args #[]) (Option WebGLContextAttributes)
 
 /-- `boolean isContextLost()` -/
-def WebGLRenderingContext.isContextLost (self : WebGLRenderingContext) : IO Bool :=
-  self.val.callMethod "isContextLost" (Support.args #[]) Bool
+@[macro_inline] def WebGLRenderingContext.isContextLost (self : WebGLRenderingContext) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isContextLost" do
+  self.val.callMethod "isContextLost" (Internal.args #[]) Bool
 
 /-- `sequence<DOMString>? getSupportedExtensions()` -/
-def WebGLRenderingContext.getSupportedExtensions (self : WebGLRenderingContext) : IO (Option (Array String)) :=
-  self.val.callMethod "getSupportedExtensions" (Support.args #[]) (Option (Array String))
+@[macro_inline] def WebGLRenderingContext.getSupportedExtensions (self : WebGLRenderingContext) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getSupportedExtensions" do
+  self.val.callMethod "getSupportedExtensions" (Internal.args #[]) (Option (Array String))
 
 /-- `object? getExtension(DOMString name)` -/
-def WebGLRenderingContext.getExtension (self : WebGLRenderingContext) (name : String) : IO (Option Data) :=
-  self.val.callMethod "getExtension" (Support.args #[toJS name]) (Option Data)
+@[macro_inline] def WebGLRenderingContext.getExtension (self : WebGLRenderingContext) (name : String) : IO (Option Data) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getExtension" do
+  self.val.callMethod "getExtension" (Internal.args #[toJS name]) (Option Data)
 
 /-- `undefined drawingBufferStorage(GLenum sizedFormat, unsigned long width, unsigned long height)` -/
-def WebGLRenderingContext.drawingBufferStorage (self : WebGLRenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO Unit :=
-  self.val.callMethod "drawingBufferStorage" (Support.args #[toJS sizedFormat, toJS width, toJS height]) Unit
+@[macro_inline] def WebGLRenderingContext.drawingBufferStorage (self : WebGLRenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferStorage" do
+  self.val.callMethod "drawingBufferStorage" (Internal.args #[toJS sizedFormat, toJS width, toJS height]) Unit
 
 /-- `undefined activeTexture(GLenum texture)` -/
-def WebGLRenderingContext.activeTexture (self : WebGLRenderingContext) (texture : Nat) : IO Unit :=
-  self.val.callMethod "activeTexture" (Support.args #[toJS texture]) Unit
+@[macro_inline] def WebGLRenderingContext.activeTexture (self : WebGLRenderingContext) (texture : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.activeTexture" do
+  self.val.callMethod "activeTexture" (Internal.args #[toJS texture]) Unit
 
 /-- `undefined attachShader(WebGLProgram program, WebGLShader shader)` -/
-def WebGLRenderingContext.attachShader (self : WebGLRenderingContext) (program : WebGLProgram) (shader : WebGLShader) : IO Unit :=
-  self.val.callMethod "attachShader" (Support.args #[toJS program, toJS shader]) Unit
+@[macro_inline] def WebGLRenderingContext.attachShader (self : WebGLRenderingContext) (program : WebGLProgram) (shader : WebGLShader) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.attachShader" do
+  self.val.callMethod "attachShader" (Internal.args #[toJS program, toJS shader]) Unit
 
 /-- `undefined bindAttribLocation(WebGLProgram program, GLuint index, DOMString name)` -/
-def WebGLRenderingContext.bindAttribLocation (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) (name : String) : IO Unit :=
-  self.val.callMethod "bindAttribLocation" (Support.args #[toJS program, toJS index, toJS name]) Unit
+@[macro_inline] def WebGLRenderingContext.bindAttribLocation (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bindAttribLocation" do
+  self.val.callMethod "bindAttribLocation" (Internal.args #[toJS program, toJS index, toJS name]) Unit
 
 /-- `undefined bindBuffer(GLenum target, WebGLBuffer? buffer)` -/
-def WebGLRenderingContext.bindBuffer (self : WebGLRenderingContext) (target : Nat) (buffer : Option WebGLBuffer) : IO Unit :=
-  self.val.callMethod "bindBuffer" (Support.args #[toJS target, toJS buffer]) Unit
+@[macro_inline] def WebGLRenderingContext.bindBuffer (self : WebGLRenderingContext) (target : Nat) (buffer : Option WebGLBuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bindBuffer" do
+  self.val.callMethod "bindBuffer" (Internal.args #[toJS target, toJS buffer]) Unit
 
 /-- `undefined bindFramebuffer(GLenum target, WebGLFramebuffer? framebuffer)` -/
-def WebGLRenderingContext.bindFramebuffer (self : WebGLRenderingContext) (target : Nat) (framebuffer : Option WebGLFramebuffer) : IO Unit :=
-  self.val.callMethod "bindFramebuffer" (Support.args #[toJS target, toJS framebuffer]) Unit
+@[macro_inline] def WebGLRenderingContext.bindFramebuffer (self : WebGLRenderingContext) (target : Nat) (framebuffer : Option WebGLFramebuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bindFramebuffer" do
+  self.val.callMethod "bindFramebuffer" (Internal.args #[toJS target, toJS framebuffer]) Unit
 
 /-- `undefined bindRenderbuffer(GLenum target, WebGLRenderbuffer? renderbuffer)` -/
-def WebGLRenderingContext.bindRenderbuffer (self : WebGLRenderingContext) (target : Nat) (renderbuffer : Option WebGLRenderbuffer) : IO Unit :=
-  self.val.callMethod "bindRenderbuffer" (Support.args #[toJS target, toJS renderbuffer]) Unit
+@[macro_inline] def WebGLRenderingContext.bindRenderbuffer (self : WebGLRenderingContext) (target : Nat) (renderbuffer : Option WebGLRenderbuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bindRenderbuffer" do
+  self.val.callMethod "bindRenderbuffer" (Internal.args #[toJS target, toJS renderbuffer]) Unit
 
 /-- `undefined bindTexture(GLenum target, WebGLTexture? texture)` -/
-def WebGLRenderingContext.bindTexture (self : WebGLRenderingContext) (target : Nat) (texture : Option WebGLTexture) : IO Unit :=
-  self.val.callMethod "bindTexture" (Support.args #[toJS target, toJS texture]) Unit
+@[macro_inline] def WebGLRenderingContext.bindTexture (self : WebGLRenderingContext) (target : Nat) (texture : Option WebGLTexture) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bindTexture" do
+  self.val.callMethod "bindTexture" (Internal.args #[toJS target, toJS texture]) Unit
 
 /-- `undefined blendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)` -/
-def WebGLRenderingContext.blendColor (self : WebGLRenderingContext) (red : Float) (green : Float) (blue : Float) (alpha : Float) : IO Unit :=
-  self.val.callMethod "blendColor" (Support.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
+@[macro_inline] def WebGLRenderingContext.blendColor (self : WebGLRenderingContext) (red : Float) (green : Float) (blue : Float) (alpha : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.blendColor" do
+  self.val.callMethod "blendColor" (Internal.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
 
 /-- `undefined blendEquation(GLenum mode)` -/
-def WebGLRenderingContext.blendEquation (self : WebGLRenderingContext) (mode : Nat) : IO Unit :=
-  self.val.callMethod "blendEquation" (Support.args #[toJS mode]) Unit
+@[macro_inline] def WebGLRenderingContext.blendEquation (self : WebGLRenderingContext) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.blendEquation" do
+  self.val.callMethod "blendEquation" (Internal.args #[toJS mode]) Unit
 
 /-- `undefined blendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)` -/
-def WebGLRenderingContext.blendEquationSeparate (self : WebGLRenderingContext) (modeRGB : Nat) (modeAlpha : Nat) : IO Unit :=
-  self.val.callMethod "blendEquationSeparate" (Support.args #[toJS modeRGB, toJS modeAlpha]) Unit
+@[macro_inline] def WebGLRenderingContext.blendEquationSeparate (self : WebGLRenderingContext) (modeRGB : Nat) (modeAlpha : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.blendEquationSeparate" do
+  self.val.callMethod "blendEquationSeparate" (Internal.args #[toJS modeRGB, toJS modeAlpha]) Unit
 
 /-- `undefined blendFunc(GLenum sfactor, GLenum dfactor)` -/
-def WebGLRenderingContext.blendFunc (self : WebGLRenderingContext) (sfactor : Nat) (dfactor : Nat) : IO Unit :=
-  self.val.callMethod "blendFunc" (Support.args #[toJS sfactor, toJS dfactor]) Unit
+@[macro_inline] def WebGLRenderingContext.blendFunc (self : WebGLRenderingContext) (sfactor : Nat) (dfactor : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.blendFunc" do
+  self.val.callMethod "blendFunc" (Internal.args #[toJS sfactor, toJS dfactor]) Unit
 
 /-- `undefined blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)` -/
-def WebGLRenderingContext.blendFuncSeparate (self : WebGLRenderingContext) (srcRGB : Nat) (dstRGB : Nat) (srcAlpha : Nat) (dstAlpha : Nat) : IO Unit :=
-  self.val.callMethod "blendFuncSeparate" (Support.args #[toJS srcRGB, toJS dstRGB, toJS srcAlpha, toJS dstAlpha]) Unit
+@[macro_inline] def WebGLRenderingContext.blendFuncSeparate (self : WebGLRenderingContext) (srcRGB : Nat) (dstRGB : Nat) (srcAlpha : Nat) (dstAlpha : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.blendFuncSeparate" do
+  self.val.callMethod "blendFuncSeparate" (Internal.args #[toJS srcRGB, toJS dstRGB, toJS srcAlpha, toJS dstAlpha]) Unit
 
 /-- `GLenum checkFramebufferStatus(GLenum target)` -/
-def WebGLRenderingContext.checkFramebufferStatus (self : WebGLRenderingContext) (target : Nat) : IO Nat :=
-  self.val.callMethod "checkFramebufferStatus" (Support.args #[toJS target]) Nat
+@[macro_inline] def WebGLRenderingContext.checkFramebufferStatus (self : WebGLRenderingContext) (target : Nat) : IO Nat := Internal.api "Lasm.JS.Web.WebGLRenderingContext.checkFramebufferStatus" do
+  self.val.callMethod "checkFramebufferStatus" (Internal.args #[toJS target]) Nat
 
 /-- `undefined clear(GLbitfield mask)` -/
-def WebGLRenderingContext.clear (self : WebGLRenderingContext) (mask : Nat) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[toJS mask]) Unit
+@[macro_inline] def WebGLRenderingContext.clear (self : WebGLRenderingContext) (mask : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.clear" do
+  self.val.callMethod "clear" (Internal.args #[toJS mask]) Unit
 
 /-- `undefined clearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)` -/
-def WebGLRenderingContext.clearColor (self : WebGLRenderingContext) (red : Float) (green : Float) (blue : Float) (alpha : Float) : IO Unit :=
-  self.val.callMethod "clearColor" (Support.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
+@[macro_inline] def WebGLRenderingContext.clearColor (self : WebGLRenderingContext) (red : Float) (green : Float) (blue : Float) (alpha : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.clearColor" do
+  self.val.callMethod "clearColor" (Internal.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
 
 /-- `undefined clearDepth(GLclampf depth)` -/
-def WebGLRenderingContext.clearDepth (self : WebGLRenderingContext) (depth : Float) : IO Unit :=
-  self.val.callMethod "clearDepth" (Support.args #[toJS depth]) Unit
+@[macro_inline] def WebGLRenderingContext.clearDepth (self : WebGLRenderingContext) (depth : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.clearDepth" do
+  self.val.callMethod "clearDepth" (Internal.args #[toJS depth]) Unit
 
 /-- `undefined clearStencil(GLint s)` -/
-def WebGLRenderingContext.clearStencil (self : WebGLRenderingContext) (s : Int) : IO Unit :=
-  self.val.callMethod "clearStencil" (Support.args #[toJS s]) Unit
+@[macro_inline] def WebGLRenderingContext.clearStencil (self : WebGLRenderingContext) (s : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.clearStencil" do
+  self.val.callMethod "clearStencil" (Internal.args #[toJS s]) Unit
 
 /-- `undefined colorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)` -/
-def WebGLRenderingContext.colorMask (self : WebGLRenderingContext) (red : Bool) (green : Bool) (blue : Bool) (alpha : Bool) : IO Unit :=
-  self.val.callMethod "colorMask" (Support.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
+@[macro_inline] def WebGLRenderingContext.colorMask (self : WebGLRenderingContext) (red : Bool) (green : Bool) (blue : Bool) (alpha : Bool) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.colorMask" do
+  self.val.callMethod "colorMask" (Internal.args #[toJS red, toJS green, toJS blue, toJS alpha]) Unit
 
 /-- `undefined compileShader(WebGLShader shader)` -/
-def WebGLRenderingContext.compileShader (self : WebGLRenderingContext) (shader : WebGLShader) : IO Unit :=
-  self.val.callMethod "compileShader" (Support.args #[toJS shader]) Unit
+@[macro_inline] def WebGLRenderingContext.compileShader (self : WebGLRenderingContext) (shader : WebGLShader) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.compileShader" do
+  self.val.callMethod "compileShader" (Internal.args #[toJS shader]) Unit
 
 /-- `undefined copyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)` -/
-def WebGLRenderingContext.copyTexImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Nat) (x : Int) (y : Int) (width : Int) (height : Int) (border : Int) : IO Unit :=
-  self.val.callMethod "copyTexImage2D" (Support.args #[toJS target, toJS level, toJS internalformat, toJS x, toJS y, toJS width, toJS height, toJS border]) Unit
+@[macro_inline] def WebGLRenderingContext.copyTexImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Nat) (x : Int) (y : Int) (width : Int) (height : Int) (border : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.copyTexImage2D" do
+  self.val.callMethod "copyTexImage2D" (Internal.args #[toJS target, toJS level, toJS internalformat, toJS x, toJS y, toJS width, toJS height, toJS border]) Unit
 
 /-- `undefined copyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)` -/
-def WebGLRenderingContext.copyTexSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit :=
-  self.val.callMethod "copyTexSubImage2D" (Support.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS x, toJS y, toJS width, toJS height]) Unit
+@[macro_inline] def WebGLRenderingContext.copyTexSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.copyTexSubImage2D" do
+  self.val.callMethod "copyTexSubImage2D" (Internal.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS x, toJS y, toJS width, toJS height]) Unit
 
 /-- `WebGLBuffer createBuffer()` -/
-def WebGLRenderingContext.createBuffer (self : WebGLRenderingContext) : IO WebGLBuffer := do
-  let r ← self.val.callMethod "createBuffer" (Support.args #[]) Value
+@[macro_inline] def WebGLRenderingContext.createBuffer (self : WebGLRenderingContext) : IO WebGLBuffer := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createBuffer" do
+  let r ← self.val.callMethod "createBuffer" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `WebGLFramebuffer createFramebuffer()` -/
-def WebGLRenderingContext.createFramebuffer (self : WebGLRenderingContext) : IO WebGLFramebuffer := do
-  let r ← self.val.callMethod "createFramebuffer" (Support.args #[]) Value
+@[macro_inline] def WebGLRenderingContext.createFramebuffer (self : WebGLRenderingContext) : IO WebGLFramebuffer := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createFramebuffer" do
+  let r ← self.val.callMethod "createFramebuffer" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `WebGLProgram createProgram()` -/
-def WebGLRenderingContext.createProgram (self : WebGLRenderingContext) : IO WebGLProgram := do
-  let r ← self.val.callMethod "createProgram" (Support.args #[]) Value
+@[macro_inline] def WebGLRenderingContext.createProgram (self : WebGLRenderingContext) : IO WebGLProgram := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createProgram" do
+  let r ← self.val.callMethod "createProgram" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `WebGLRenderbuffer createRenderbuffer()` -/
-def WebGLRenderingContext.createRenderbuffer (self : WebGLRenderingContext) : IO WebGLRenderbuffer := do
-  let r ← self.val.callMethod "createRenderbuffer" (Support.args #[]) Value
+@[macro_inline] def WebGLRenderingContext.createRenderbuffer (self : WebGLRenderingContext) : IO WebGLRenderbuffer := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createRenderbuffer" do
+  let r ← self.val.callMethod "createRenderbuffer" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `WebGLShader? createShader(GLenum type)` -/
-def WebGLRenderingContext.createShader (self : WebGLRenderingContext) (type : Nat) : IO (Option WebGLShader) :=
-  self.val.callMethod "createShader" (Support.args #[toJS type]) (Option WebGLShader)
+@[macro_inline] def WebGLRenderingContext.createShader (self : WebGLRenderingContext) (type : Nat) : IO (Option WebGLShader) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createShader" do
+  self.val.callMethod "createShader" (Internal.args #[toJS type]) (Option WebGLShader)
 
 /-- `WebGLTexture createTexture()` -/
-def WebGLRenderingContext.createTexture (self : WebGLRenderingContext) : IO WebGLTexture := do
-  let r ← self.val.callMethod "createTexture" (Support.args #[]) Value
+@[macro_inline] def WebGLRenderingContext.createTexture (self : WebGLRenderingContext) : IO WebGLTexture := Internal.api "Lasm.JS.Web.WebGLRenderingContext.createTexture" do
+  let r ← self.val.callMethod "createTexture" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `undefined cullFace(GLenum mode)` -/
-def WebGLRenderingContext.cullFace (self : WebGLRenderingContext) (mode : Nat) : IO Unit :=
-  self.val.callMethod "cullFace" (Support.args #[toJS mode]) Unit
+@[macro_inline] def WebGLRenderingContext.cullFace (self : WebGLRenderingContext) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.cullFace" do
+  self.val.callMethod "cullFace" (Internal.args #[toJS mode]) Unit
 
 /-- `undefined deleteBuffer(WebGLBuffer? buffer)` -/
-def WebGLRenderingContext.deleteBuffer (self : WebGLRenderingContext) (buffer : Option WebGLBuffer) : IO Unit :=
-  self.val.callMethod "deleteBuffer" (Support.args #[toJS buffer]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteBuffer (self : WebGLRenderingContext) (buffer : Option WebGLBuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteBuffer" do
+  self.val.callMethod "deleteBuffer" (Internal.args #[toJS buffer]) Unit
 
 /-- `undefined deleteFramebuffer(WebGLFramebuffer? framebuffer)` -/
-def WebGLRenderingContext.deleteFramebuffer (self : WebGLRenderingContext) (framebuffer : Option WebGLFramebuffer) : IO Unit :=
-  self.val.callMethod "deleteFramebuffer" (Support.args #[toJS framebuffer]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteFramebuffer (self : WebGLRenderingContext) (framebuffer : Option WebGLFramebuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteFramebuffer" do
+  self.val.callMethod "deleteFramebuffer" (Internal.args #[toJS framebuffer]) Unit
 
 /-- `undefined deleteProgram(WebGLProgram? program)` -/
-def WebGLRenderingContext.deleteProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Unit :=
-  self.val.callMethod "deleteProgram" (Support.args #[toJS program]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteProgram" do
+  self.val.callMethod "deleteProgram" (Internal.args #[toJS program]) Unit
 
 /-- `undefined deleteRenderbuffer(WebGLRenderbuffer? renderbuffer)` -/
-def WebGLRenderingContext.deleteRenderbuffer (self : WebGLRenderingContext) (renderbuffer : Option WebGLRenderbuffer) : IO Unit :=
-  self.val.callMethod "deleteRenderbuffer" (Support.args #[toJS renderbuffer]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteRenderbuffer (self : WebGLRenderingContext) (renderbuffer : Option WebGLRenderbuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteRenderbuffer" do
+  self.val.callMethod "deleteRenderbuffer" (Internal.args #[toJS renderbuffer]) Unit
 
 /-- `undefined deleteShader(WebGLShader? shader)` -/
-def WebGLRenderingContext.deleteShader (self : WebGLRenderingContext) (shader : Option WebGLShader) : IO Unit :=
-  self.val.callMethod "deleteShader" (Support.args #[toJS shader]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteShader (self : WebGLRenderingContext) (shader : Option WebGLShader) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteShader" do
+  self.val.callMethod "deleteShader" (Internal.args #[toJS shader]) Unit
 
 /-- `undefined deleteTexture(WebGLTexture? texture)` -/
-def WebGLRenderingContext.deleteTexture (self : WebGLRenderingContext) (texture : Option WebGLTexture) : IO Unit :=
-  self.val.callMethod "deleteTexture" (Support.args #[toJS texture]) Unit
+@[macro_inline] def WebGLRenderingContext.deleteTexture (self : WebGLRenderingContext) (texture : Option WebGLTexture) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.deleteTexture" do
+  self.val.callMethod "deleteTexture" (Internal.args #[toJS texture]) Unit
 
 /-- `undefined depthFunc(GLenum func)` -/
-def WebGLRenderingContext.depthFunc (self : WebGLRenderingContext) (func : Nat) : IO Unit :=
-  self.val.callMethod "depthFunc" (Support.args #[toJS func]) Unit
+@[macro_inline] def WebGLRenderingContext.depthFunc (self : WebGLRenderingContext) (func : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.depthFunc" do
+  self.val.callMethod "depthFunc" (Internal.args #[toJS func]) Unit
 
 /-- `undefined depthMask(GLboolean flag)` -/
-def WebGLRenderingContext.depthMask (self : WebGLRenderingContext) (flag : Bool) : IO Unit :=
-  self.val.callMethod "depthMask" (Support.args #[toJS flag]) Unit
+@[macro_inline] def WebGLRenderingContext.depthMask (self : WebGLRenderingContext) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.depthMask" do
+  self.val.callMethod "depthMask" (Internal.args #[toJS flag]) Unit
 
 /-- `undefined depthRange(GLclampf zNear, GLclampf zFar)` -/
-def WebGLRenderingContext.depthRange (self : WebGLRenderingContext) (zNear : Float) (zFar : Float) : IO Unit :=
-  self.val.callMethod "depthRange" (Support.args #[toJS zNear, toJS zFar]) Unit
+@[macro_inline] def WebGLRenderingContext.depthRange (self : WebGLRenderingContext) (zNear : Float) (zFar : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.depthRange" do
+  self.val.callMethod "depthRange" (Internal.args #[toJS zNear, toJS zFar]) Unit
 
 /-- `undefined detachShader(WebGLProgram program, WebGLShader shader)` -/
-def WebGLRenderingContext.detachShader (self : WebGLRenderingContext) (program : WebGLProgram) (shader : WebGLShader) : IO Unit :=
-  self.val.callMethod "detachShader" (Support.args #[toJS program, toJS shader]) Unit
+@[macro_inline] def WebGLRenderingContext.detachShader (self : WebGLRenderingContext) (program : WebGLProgram) (shader : WebGLShader) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.detachShader" do
+  self.val.callMethod "detachShader" (Internal.args #[toJS program, toJS shader]) Unit
 
 /-- `undefined disable(GLenum cap)` -/
-def WebGLRenderingContext.disable (self : WebGLRenderingContext) (cap : Nat) : IO Unit :=
-  self.val.callMethod "disable" (Support.args #[toJS cap]) Unit
+@[macro_inline] def WebGLRenderingContext.disable (self : WebGLRenderingContext) (cap : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.disable" do
+  self.val.callMethod "disable" (Internal.args #[toJS cap]) Unit
 
 /-- `undefined disableVertexAttribArray(GLuint index)` -/
-def WebGLRenderingContext.disableVertexAttribArray (self : WebGLRenderingContext) (index : Nat) : IO Unit :=
-  self.val.callMethod "disableVertexAttribArray" (Support.args #[toJS index]) Unit
+@[macro_inline] def WebGLRenderingContext.disableVertexAttribArray (self : WebGLRenderingContext) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.disableVertexAttribArray" do
+  self.val.callMethod "disableVertexAttribArray" (Internal.args #[toJS index]) Unit
 
 /-- `undefined drawArrays(GLenum mode, GLint first, GLsizei count)` -/
-def WebGLRenderingContext.drawArrays (self : WebGLRenderingContext) (mode : Nat) (first : Int) (count : Int) : IO Unit :=
-  self.val.callMethod "drawArrays" (Support.args #[toJS mode, toJS first, toJS count]) Unit
+@[macro_inline] def WebGLRenderingContext.drawArrays (self : WebGLRenderingContext) (mode : Nat) (first : Int) (count : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawArrays" do
+  self.val.callMethod "drawArrays" (Internal.args #[toJS mode, toJS first, toJS count]) Unit
 
 /-- `undefined drawElements(GLenum mode, GLsizei count, GLenum type, GLintptr offset)` -/
-def WebGLRenderingContext.drawElements (self : WebGLRenderingContext) (mode : Nat) (count : Int) (type : Nat) (offset : Int) : IO Unit :=
-  self.val.callMethod "drawElements" (Support.args #[toJS mode, toJS count, toJS type, toJS offset]) Unit
+@[macro_inline] def WebGLRenderingContext.drawElements (self : WebGLRenderingContext) (mode : Nat) (count : Int) (type : Nat) (offset : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawElements" do
+  self.val.callMethod "drawElements" (Internal.args #[toJS mode, toJS count, toJS type, toJS offset]) Unit
 
 /-- `undefined enable(GLenum cap)` -/
-def WebGLRenderingContext.enable (self : WebGLRenderingContext) (cap : Nat) : IO Unit :=
-  self.val.callMethod "enable" (Support.args #[toJS cap]) Unit
+@[macro_inline] def WebGLRenderingContext.enable (self : WebGLRenderingContext) (cap : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.enable" do
+  self.val.callMethod "enable" (Internal.args #[toJS cap]) Unit
 
 /-- `undefined enableVertexAttribArray(GLuint index)` -/
-def WebGLRenderingContext.enableVertexAttribArray (self : WebGLRenderingContext) (index : Nat) : IO Unit :=
-  self.val.callMethod "enableVertexAttribArray" (Support.args #[toJS index]) Unit
+@[macro_inline] def WebGLRenderingContext.enableVertexAttribArray (self : WebGLRenderingContext) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.enableVertexAttribArray" do
+  self.val.callMethod "enableVertexAttribArray" (Internal.args #[toJS index]) Unit
 
 /-- `undefined finish()` -/
-def WebGLRenderingContext.finish (self : WebGLRenderingContext) : IO Unit :=
-  self.val.callMethod "finish" (Support.args #[]) Unit
+@[macro_inline] def WebGLRenderingContext.finish (self : WebGLRenderingContext) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.finish" do
+  self.val.callMethod "finish" (Internal.args #[]) Unit
 
 /-- `undefined flush()` -/
-def WebGLRenderingContext.flush (self : WebGLRenderingContext) : IO Unit :=
-  self.val.callMethod "flush" (Support.args #[]) Unit
+@[macro_inline] def WebGLRenderingContext.flush (self : WebGLRenderingContext) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.flush" do
+  self.val.callMethod "flush" (Internal.args #[]) Unit
 
 /-- `undefined framebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, WebGLRenderbuffer? renderbuffer)` -/
-def WebGLRenderingContext.framebufferRenderbuffer (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (renderbuffertarget : Nat) (renderbuffer : Option WebGLRenderbuffer) : IO Unit :=
-  self.val.callMethod "framebufferRenderbuffer" (Support.args #[toJS target, toJS attachment, toJS renderbuffertarget, toJS renderbuffer]) Unit
+@[macro_inline] def WebGLRenderingContext.framebufferRenderbuffer (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (renderbuffertarget : Nat) (renderbuffer : Option WebGLRenderbuffer) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.framebufferRenderbuffer" do
+  self.val.callMethod "framebufferRenderbuffer" (Internal.args #[toJS target, toJS attachment, toJS renderbuffertarget, toJS renderbuffer]) Unit
 
 /-- `undefined framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, WebGLTexture? texture, GLint level)` -/
-def WebGLRenderingContext.framebufferTexture2D (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (textarget : Nat) (texture : Option WebGLTexture) (level : Int) : IO Unit :=
-  self.val.callMethod "framebufferTexture2D" (Support.args #[toJS target, toJS attachment, toJS textarget, toJS texture, toJS level]) Unit
+@[macro_inline] def WebGLRenderingContext.framebufferTexture2D (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (textarget : Nat) (texture : Option WebGLTexture) (level : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.framebufferTexture2D" do
+  self.val.callMethod "framebufferTexture2D" (Internal.args #[toJS target, toJS attachment, toJS textarget, toJS texture, toJS level]) Unit
 
 /-- `undefined frontFace(GLenum mode)` -/
-def WebGLRenderingContext.frontFace (self : WebGLRenderingContext) (mode : Nat) : IO Unit :=
-  self.val.callMethod "frontFace" (Support.args #[toJS mode]) Unit
+@[macro_inline] def WebGLRenderingContext.frontFace (self : WebGLRenderingContext) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.frontFace" do
+  self.val.callMethod "frontFace" (Internal.args #[toJS mode]) Unit
 
 /-- `undefined generateMipmap(GLenum target)` -/
-def WebGLRenderingContext.generateMipmap (self : WebGLRenderingContext) (target : Nat) : IO Unit :=
-  self.val.callMethod "generateMipmap" (Support.args #[toJS target]) Unit
+@[macro_inline] def WebGLRenderingContext.generateMipmap (self : WebGLRenderingContext) (target : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.generateMipmap" do
+  self.val.callMethod "generateMipmap" (Internal.args #[toJS target]) Unit
 
 /-- `WebGLActiveInfo? getActiveAttrib(WebGLProgram program, GLuint index)` -/
-def WebGLRenderingContext.getActiveAttrib (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) : IO (Option WebGLActiveInfo) :=
-  self.val.callMethod "getActiveAttrib" (Support.args #[toJS program, toJS index]) (Option WebGLActiveInfo)
+@[macro_inline] def WebGLRenderingContext.getActiveAttrib (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) : IO (Option WebGLActiveInfo) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getActiveAttrib" do
+  self.val.callMethod "getActiveAttrib" (Internal.args #[toJS program, toJS index]) (Option WebGLActiveInfo)
 
 /-- `WebGLActiveInfo? getActiveUniform(WebGLProgram program, GLuint index)` -/
-def WebGLRenderingContext.getActiveUniform (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) : IO (Option WebGLActiveInfo) :=
-  self.val.callMethod "getActiveUniform" (Support.args #[toJS program, toJS index]) (Option WebGLActiveInfo)
+@[macro_inline] def WebGLRenderingContext.getActiveUniform (self : WebGLRenderingContext) (program : WebGLProgram) (index : Nat) : IO (Option WebGLActiveInfo) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getActiveUniform" do
+  self.val.callMethod "getActiveUniform" (Internal.args #[toJS program, toJS index]) (Option WebGLActiveInfo)
 
 /-- `sequence<WebGLShader>? getAttachedShaders(WebGLProgram program)` -/
-def WebGLRenderingContext.getAttachedShaders (self : WebGLRenderingContext) (program : WebGLProgram) : IO (Option (Array WebGLShader)) :=
-  self.val.callMethod "getAttachedShaders" (Support.args #[toJS program]) (Option (Array WebGLShader))
+@[macro_inline] def WebGLRenderingContext.getAttachedShaders (self : WebGLRenderingContext) (program : WebGLProgram) : IO (Option (Array WebGLShader)) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getAttachedShaders" do
+  self.val.callMethod "getAttachedShaders" (Internal.args #[toJS program]) (Option (Array WebGLShader))
 
 /-- `GLint getAttribLocation(WebGLProgram program, DOMString name)` -/
-def WebGLRenderingContext.getAttribLocation (self : WebGLRenderingContext) (program : WebGLProgram) (name : String) : IO Int :=
-  self.val.callMethod "getAttribLocation" (Support.args #[toJS program, toJS name]) Int
+@[macro_inline] def WebGLRenderingContext.getAttribLocation (self : WebGLRenderingContext) (program : WebGLProgram) (name : String) : IO Int := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getAttribLocation" do
+  self.val.callMethod "getAttribLocation" (Internal.args #[toJS program, toJS name]) Int
 
 /-- `any getBufferParameter(GLenum target, GLenum pname)` -/
-def WebGLRenderingContext.getBufferParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getBufferParameter" (Support.args #[toJS target, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getBufferParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getBufferParameter" do
+  self.val.callMethod "getBufferParameter" (Internal.args #[toJS target, toJS pname]) Data
 
 /-- `any getParameter(GLenum pname)` -/
-def WebGLRenderingContext.getParameter (self : WebGLRenderingContext) (pname : Nat) : IO Data :=
-  self.val.callMethod "getParameter" (Support.args #[toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getParameter (self : WebGLRenderingContext) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getParameter" do
+  self.val.callMethod "getParameter" (Internal.args #[toJS pname]) Data
 
 /-- `GLenum getError()` -/
-def WebGLRenderingContext.getError (self : WebGLRenderingContext) : IO Nat :=
-  self.val.callMethod "getError" (Support.args #[]) Nat
+@[macro_inline] def WebGLRenderingContext.getError (self : WebGLRenderingContext) : IO Nat := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getError" do
+  self.val.callMethod "getError" (Internal.args #[]) Nat
 
 /-- `any getFramebufferAttachmentParameter(GLenum target, GLenum attachment, GLenum pname)` -/
-def WebGLRenderingContext.getFramebufferAttachmentParameter (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getFramebufferAttachmentParameter" (Support.args #[toJS target, toJS attachment, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getFramebufferAttachmentParameter (self : WebGLRenderingContext) (target : Nat) (attachment : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getFramebufferAttachmentParameter" do
+  self.val.callMethod "getFramebufferAttachmentParameter" (Internal.args #[toJS target, toJS attachment, toJS pname]) Data
 
 /-- `any getProgramParameter(WebGLProgram program, GLenum pname)` -/
-def WebGLRenderingContext.getProgramParameter (self : WebGLRenderingContext) (program : WebGLProgram) (pname : Nat) : IO Data :=
-  self.val.callMethod "getProgramParameter" (Support.args #[toJS program, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getProgramParameter (self : WebGLRenderingContext) (program : WebGLProgram) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getProgramParameter" do
+  self.val.callMethod "getProgramParameter" (Internal.args #[toJS program, toJS pname]) Data
 
 /-- `DOMString? getProgramInfoLog(WebGLProgram program)` -/
-def WebGLRenderingContext.getProgramInfoLog (self : WebGLRenderingContext) (program : WebGLProgram) : IO (Option String) :=
-  self.val.callMethod "getProgramInfoLog" (Support.args #[toJS program]) (Option String)
+@[macro_inline] def WebGLRenderingContext.getProgramInfoLog (self : WebGLRenderingContext) (program : WebGLProgram) : IO (Option String) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getProgramInfoLog" do
+  self.val.callMethod "getProgramInfoLog" (Internal.args #[toJS program]) (Option String)
 
 /-- `any getRenderbufferParameter(GLenum target, GLenum pname)` -/
-def WebGLRenderingContext.getRenderbufferParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getRenderbufferParameter" (Support.args #[toJS target, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getRenderbufferParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getRenderbufferParameter" do
+  self.val.callMethod "getRenderbufferParameter" (Internal.args #[toJS target, toJS pname]) Data
 
 /-- `any getShaderParameter(WebGLShader shader, GLenum pname)` -/
-def WebGLRenderingContext.getShaderParameter (self : WebGLRenderingContext) (shader : WebGLShader) (pname : Nat) : IO Data :=
-  self.val.callMethod "getShaderParameter" (Support.args #[toJS shader, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getShaderParameter (self : WebGLRenderingContext) (shader : WebGLShader) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getShaderParameter" do
+  self.val.callMethod "getShaderParameter" (Internal.args #[toJS shader, toJS pname]) Data
 
 /-- `WebGLShaderPrecisionFormat? getShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype)` -/
-def WebGLRenderingContext.getShaderPrecisionFormat (self : WebGLRenderingContext) (shadertype : Nat) (precisiontype : Nat) : IO (Option WebGLShaderPrecisionFormat) :=
-  self.val.callMethod "getShaderPrecisionFormat" (Support.args #[toJS shadertype, toJS precisiontype]) (Option WebGLShaderPrecisionFormat)
+@[macro_inline] def WebGLRenderingContext.getShaderPrecisionFormat (self : WebGLRenderingContext) (shadertype : Nat) (precisiontype : Nat) : IO (Option WebGLShaderPrecisionFormat) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getShaderPrecisionFormat" do
+  self.val.callMethod "getShaderPrecisionFormat" (Internal.args #[toJS shadertype, toJS precisiontype]) (Option WebGLShaderPrecisionFormat)
 
 /-- `DOMString? getShaderInfoLog(WebGLShader shader)` -/
-def WebGLRenderingContext.getShaderInfoLog (self : WebGLRenderingContext) (shader : WebGLShader) : IO (Option String) :=
-  self.val.callMethod "getShaderInfoLog" (Support.args #[toJS shader]) (Option String)
+@[macro_inline] def WebGLRenderingContext.getShaderInfoLog (self : WebGLRenderingContext) (shader : WebGLShader) : IO (Option String) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getShaderInfoLog" do
+  self.val.callMethod "getShaderInfoLog" (Internal.args #[toJS shader]) (Option String)
 
 /-- `DOMString? getShaderSource(WebGLShader shader)` -/
-def WebGLRenderingContext.getShaderSource (self : WebGLRenderingContext) (shader : WebGLShader) : IO (Option String) :=
-  self.val.callMethod "getShaderSource" (Support.args #[toJS shader]) (Option String)
+@[macro_inline] def WebGLRenderingContext.getShaderSource (self : WebGLRenderingContext) (shader : WebGLShader) : IO (Option String) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getShaderSource" do
+  self.val.callMethod "getShaderSource" (Internal.args #[toJS shader]) (Option String)
 
 /-- `any getTexParameter(GLenum target, GLenum pname)` -/
-def WebGLRenderingContext.getTexParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getTexParameter" (Support.args #[toJS target, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getTexParameter (self : WebGLRenderingContext) (target : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getTexParameter" do
+  self.val.callMethod "getTexParameter" (Internal.args #[toJS target, toJS pname]) Data
 
 /-- `any getUniform(WebGLProgram program, WebGLUniformLocation location)` -/
-def WebGLRenderingContext.getUniform (self : WebGLRenderingContext) (program : WebGLProgram) (location : WebGLUniformLocation) : IO Data :=
-  self.val.callMethod "getUniform" (Support.args #[toJS program, toJS location]) Data
+@[macro_inline] def WebGLRenderingContext.getUniform (self : WebGLRenderingContext) (program : WebGLProgram) (location : WebGLUniformLocation) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getUniform" do
+  self.val.callMethod "getUniform" (Internal.args #[toJS program, toJS location]) Data
 
 /-- `WebGLUniformLocation? getUniformLocation(WebGLProgram program, DOMString name)` -/
-def WebGLRenderingContext.getUniformLocation (self : WebGLRenderingContext) (program : WebGLProgram) (name : String) : IO (Option WebGLUniformLocation) :=
-  self.val.callMethod "getUniformLocation" (Support.args #[toJS program, toJS name]) (Option WebGLUniformLocation)
+@[macro_inline] def WebGLRenderingContext.getUniformLocation (self : WebGLRenderingContext) (program : WebGLProgram) (name : String) : IO (Option WebGLUniformLocation) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getUniformLocation" do
+  self.val.callMethod "getUniformLocation" (Internal.args #[toJS program, toJS name]) (Option WebGLUniformLocation)
 
 /-- `any getVertexAttrib(GLuint index, GLenum pname)` -/
-def WebGLRenderingContext.getVertexAttrib (self : WebGLRenderingContext) (index : Nat) (pname : Nat) : IO Data :=
-  self.val.callMethod "getVertexAttrib" (Support.args #[toJS index, toJS pname]) Data
+@[macro_inline] def WebGLRenderingContext.getVertexAttrib (self : WebGLRenderingContext) (index : Nat) (pname : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getVertexAttrib" do
+  self.val.callMethod "getVertexAttrib" (Internal.args #[toJS index, toJS pname]) Data
 
 /-- `GLintptr getVertexAttribOffset(GLuint index, GLenum pname)` -/
-def WebGLRenderingContext.getVertexAttribOffset (self : WebGLRenderingContext) (index : Nat) (pname : Nat) : IO Int :=
-  self.val.callMethod "getVertexAttribOffset" (Support.args #[toJS index, toJS pname]) Int
+@[macro_inline] def WebGLRenderingContext.getVertexAttribOffset (self : WebGLRenderingContext) (index : Nat) (pname : Nat) : IO Int := Internal.api "Lasm.JS.Web.WebGLRenderingContext.getVertexAttribOffset" do
+  self.val.callMethod "getVertexAttribOffset" (Internal.args #[toJS index, toJS pname]) Int
 
 /-- `undefined hint(GLenum target, GLenum mode)` -/
-def WebGLRenderingContext.hint (self : WebGLRenderingContext) (target : Nat) (mode : Nat) : IO Unit :=
-  self.val.callMethod "hint" (Support.args #[toJS target, toJS mode]) Unit
+@[macro_inline] def WebGLRenderingContext.hint (self : WebGLRenderingContext) (target : Nat) (mode : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.hint" do
+  self.val.callMethod "hint" (Internal.args #[toJS target, toJS mode]) Unit
 
 /-- `GLboolean isBuffer(WebGLBuffer? buffer)` -/
-def WebGLRenderingContext.isBuffer (self : WebGLRenderingContext) (buffer : Option WebGLBuffer) : IO Bool :=
-  self.val.callMethod "isBuffer" (Support.args #[toJS buffer]) Bool
+@[macro_inline] def WebGLRenderingContext.isBuffer (self : WebGLRenderingContext) (buffer : Option WebGLBuffer) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isBuffer" do
+  self.val.callMethod "isBuffer" (Internal.args #[toJS buffer]) Bool
 
 /-- `GLboolean isEnabled(GLenum cap)` -/
-def WebGLRenderingContext.isEnabled (self : WebGLRenderingContext) (cap : Nat) : IO Bool :=
-  self.val.callMethod "isEnabled" (Support.args #[toJS cap]) Bool
+@[macro_inline] def WebGLRenderingContext.isEnabled (self : WebGLRenderingContext) (cap : Nat) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isEnabled" do
+  self.val.callMethod "isEnabled" (Internal.args #[toJS cap]) Bool
 
 /-- `GLboolean isFramebuffer(WebGLFramebuffer? framebuffer)` -/
-def WebGLRenderingContext.isFramebuffer (self : WebGLRenderingContext) (framebuffer : Option WebGLFramebuffer) : IO Bool :=
-  self.val.callMethod "isFramebuffer" (Support.args #[toJS framebuffer]) Bool
+@[macro_inline] def WebGLRenderingContext.isFramebuffer (self : WebGLRenderingContext) (framebuffer : Option WebGLFramebuffer) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isFramebuffer" do
+  self.val.callMethod "isFramebuffer" (Internal.args #[toJS framebuffer]) Bool
 
 /-- `GLboolean isProgram(WebGLProgram? program)` -/
-def WebGLRenderingContext.isProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Bool :=
-  self.val.callMethod "isProgram" (Support.args #[toJS program]) Bool
+@[macro_inline] def WebGLRenderingContext.isProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isProgram" do
+  self.val.callMethod "isProgram" (Internal.args #[toJS program]) Bool
 
 /-- `GLboolean isRenderbuffer(WebGLRenderbuffer? renderbuffer)` -/
-def WebGLRenderingContext.isRenderbuffer (self : WebGLRenderingContext) (renderbuffer : Option WebGLRenderbuffer) : IO Bool :=
-  self.val.callMethod "isRenderbuffer" (Support.args #[toJS renderbuffer]) Bool
+@[macro_inline] def WebGLRenderingContext.isRenderbuffer (self : WebGLRenderingContext) (renderbuffer : Option WebGLRenderbuffer) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isRenderbuffer" do
+  self.val.callMethod "isRenderbuffer" (Internal.args #[toJS renderbuffer]) Bool
 
 /-- `GLboolean isShader(WebGLShader? shader)` -/
-def WebGLRenderingContext.isShader (self : WebGLRenderingContext) (shader : Option WebGLShader) : IO Bool :=
-  self.val.callMethod "isShader" (Support.args #[toJS shader]) Bool
+@[macro_inline] def WebGLRenderingContext.isShader (self : WebGLRenderingContext) (shader : Option WebGLShader) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isShader" do
+  self.val.callMethod "isShader" (Internal.args #[toJS shader]) Bool
 
 /-- `GLboolean isTexture(WebGLTexture? texture)` -/
-def WebGLRenderingContext.isTexture (self : WebGLRenderingContext) (texture : Option WebGLTexture) : IO Bool :=
-  self.val.callMethod "isTexture" (Support.args #[toJS texture]) Bool
+@[macro_inline] def WebGLRenderingContext.isTexture (self : WebGLRenderingContext) (texture : Option WebGLTexture) : IO Bool := Internal.api "Lasm.JS.Web.WebGLRenderingContext.isTexture" do
+  self.val.callMethod "isTexture" (Internal.args #[toJS texture]) Bool
 
 /-- `undefined lineWidth(GLfloat width)` -/
-def WebGLRenderingContext.lineWidth (self : WebGLRenderingContext) (width : Float) : IO Unit :=
-  self.val.callMethod "lineWidth" (Support.args #[toJS width]) Unit
+@[macro_inline] def WebGLRenderingContext.lineWidth (self : WebGLRenderingContext) (width : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.lineWidth" do
+  self.val.callMethod "lineWidth" (Internal.args #[toJS width]) Unit
 
 /-- `undefined linkProgram(WebGLProgram program)` -/
-def WebGLRenderingContext.linkProgram (self : WebGLRenderingContext) (program : WebGLProgram) : IO Unit :=
-  self.val.callMethod "linkProgram" (Support.args #[toJS program]) Unit
+@[macro_inline] def WebGLRenderingContext.linkProgram (self : WebGLRenderingContext) (program : WebGLProgram) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.linkProgram" do
+  self.val.callMethod "linkProgram" (Internal.args #[toJS program]) Unit
 
 /-- `undefined pixelStorei(GLenum pname, GLint param)` -/
-def WebGLRenderingContext.pixelStorei (self : WebGLRenderingContext) (pname : Nat) (param : Int) : IO Unit :=
-  self.val.callMethod "pixelStorei" (Support.args #[toJS pname, toJS param]) Unit
+@[macro_inline] def WebGLRenderingContext.pixelStorei (self : WebGLRenderingContext) (pname : Nat) (param : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.pixelStorei" do
+  self.val.callMethod "pixelStorei" (Internal.args #[toJS pname, toJS param]) Unit
 
 /-- `undefined polygonOffset(GLfloat factor, GLfloat units)` -/
-def WebGLRenderingContext.polygonOffset (self : WebGLRenderingContext) (factor : Float) (units : Float) : IO Unit :=
-  self.val.callMethod "polygonOffset" (Support.args #[toJS factor, toJS units]) Unit
+@[macro_inline] def WebGLRenderingContext.polygonOffset (self : WebGLRenderingContext) (factor : Float) (units : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.polygonOffset" do
+  self.val.callMethod "polygonOffset" (Internal.args #[toJS factor, toJS units]) Unit
 
 /-- `undefined renderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)` -/
-def WebGLRenderingContext.renderbufferStorage (self : WebGLRenderingContext) (target : Nat) (internalformat : Nat) (width : Int) (height : Int) : IO Unit :=
-  self.val.callMethod "renderbufferStorage" (Support.args #[toJS target, toJS internalformat, toJS width, toJS height]) Unit
+@[macro_inline] def WebGLRenderingContext.renderbufferStorage (self : WebGLRenderingContext) (target : Nat) (internalformat : Nat) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.renderbufferStorage" do
+  self.val.callMethod "renderbufferStorage" (Internal.args #[toJS target, toJS internalformat, toJS width, toJS height]) Unit
 
 /-- `undefined sampleCoverage(GLclampf value, GLboolean invert)` -/
-def WebGLRenderingContext.sampleCoverage (self : WebGLRenderingContext) (value : Float) (invert : Bool) : IO Unit :=
-  self.val.callMethod "sampleCoverage" (Support.args #[toJS value, toJS invert]) Unit
+@[macro_inline] def WebGLRenderingContext.sampleCoverage (self : WebGLRenderingContext) (value : Float) (invert : Bool) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.sampleCoverage" do
+  self.val.callMethod "sampleCoverage" (Internal.args #[toJS value, toJS invert]) Unit
 
 /-- `undefined scissor(GLint x, GLint y, GLsizei width, GLsizei height)` -/
-def WebGLRenderingContext.scissor (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit :=
-  self.val.callMethod "scissor" (Support.args #[toJS x, toJS y, toJS width, toJS height]) Unit
+@[macro_inline] def WebGLRenderingContext.scissor (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.scissor" do
+  self.val.callMethod "scissor" (Internal.args #[toJS x, toJS y, toJS width, toJS height]) Unit
 
 /-- `undefined shaderSource(WebGLShader shader, DOMString source)` -/
-def WebGLRenderingContext.shaderSource (self : WebGLRenderingContext) (shader : WebGLShader) (source : String) : IO Unit :=
-  self.val.callMethod "shaderSource" (Support.args #[toJS shader, toJS source]) Unit
+@[macro_inline] def WebGLRenderingContext.shaderSource (self : WebGLRenderingContext) (shader : WebGLShader) (source : String) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.shaderSource" do
+  self.val.callMethod "shaderSource" (Internal.args #[toJS shader, toJS source]) Unit
 
 /-- `undefined stencilFunc(GLenum func, GLint ref, GLuint mask)` -/
-def WebGLRenderingContext.stencilFunc (self : WebGLRenderingContext) (func : Nat) (ref : Int) (mask : Nat) : IO Unit :=
-  self.val.callMethod "stencilFunc" (Support.args #[toJS func, toJS ref, toJS mask]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilFunc (self : WebGLRenderingContext) (func : Nat) (ref : Int) (mask : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilFunc" do
+  self.val.callMethod "stencilFunc" (Internal.args #[toJS func, toJS ref, toJS mask]) Unit
 
 /-- `undefined stencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)` -/
-def WebGLRenderingContext.stencilFuncSeparate (self : WebGLRenderingContext) (face : Nat) (func : Nat) (ref : Int) (mask : Nat) : IO Unit :=
-  self.val.callMethod "stencilFuncSeparate" (Support.args #[toJS face, toJS func, toJS ref, toJS mask]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilFuncSeparate (self : WebGLRenderingContext) (face : Nat) (func : Nat) (ref : Int) (mask : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilFuncSeparate" do
+  self.val.callMethod "stencilFuncSeparate" (Internal.args #[toJS face, toJS func, toJS ref, toJS mask]) Unit
 
 /-- `undefined stencilMask(GLuint mask)` -/
-def WebGLRenderingContext.stencilMask (self : WebGLRenderingContext) (mask : Nat) : IO Unit :=
-  self.val.callMethod "stencilMask" (Support.args #[toJS mask]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilMask (self : WebGLRenderingContext) (mask : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilMask" do
+  self.val.callMethod "stencilMask" (Internal.args #[toJS mask]) Unit
 
 /-- `undefined stencilMaskSeparate(GLenum face, GLuint mask)` -/
-def WebGLRenderingContext.stencilMaskSeparate (self : WebGLRenderingContext) (face : Nat) (mask : Nat) : IO Unit :=
-  self.val.callMethod "stencilMaskSeparate" (Support.args #[toJS face, toJS mask]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilMaskSeparate (self : WebGLRenderingContext) (face : Nat) (mask : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilMaskSeparate" do
+  self.val.callMethod "stencilMaskSeparate" (Internal.args #[toJS face, toJS mask]) Unit
 
 /-- `undefined stencilOp(GLenum fail, GLenum zfail, GLenum zpass)` -/
-def WebGLRenderingContext.stencilOp (self : WebGLRenderingContext) (fail : Nat) (zfail : Nat) (zpass : Nat) : IO Unit :=
-  self.val.callMethod "stencilOp" (Support.args #[toJS fail, toJS zfail, toJS zpass]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilOp (self : WebGLRenderingContext) (fail : Nat) (zfail : Nat) (zpass : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilOp" do
+  self.val.callMethod "stencilOp" (Internal.args #[toJS fail, toJS zfail, toJS zpass]) Unit
 
 /-- `undefined stencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)` -/
-def WebGLRenderingContext.stencilOpSeparate (self : WebGLRenderingContext) (face : Nat) (fail : Nat) (zfail : Nat) (zpass : Nat) : IO Unit :=
-  self.val.callMethod "stencilOpSeparate" (Support.args #[toJS face, toJS fail, toJS zfail, toJS zpass]) Unit
+@[macro_inline] def WebGLRenderingContext.stencilOpSeparate (self : WebGLRenderingContext) (face : Nat) (fail : Nat) (zfail : Nat) (zpass : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.stencilOpSeparate" do
+  self.val.callMethod "stencilOpSeparate" (Internal.args #[toJS face, toJS fail, toJS zfail, toJS zpass]) Unit
 
 /-- `undefined texParameterf(GLenum target, GLenum pname, GLfloat param)` -/
-def WebGLRenderingContext.texParameterf (self : WebGLRenderingContext) (target : Nat) (pname : Nat) (param : Float) : IO Unit :=
-  self.val.callMethod "texParameterf" (Support.args #[toJS target, toJS pname, toJS param]) Unit
+@[macro_inline] def WebGLRenderingContext.texParameterf (self : WebGLRenderingContext) (target : Nat) (pname : Nat) (param : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texParameterf" do
+  self.val.callMethod "texParameterf" (Internal.args #[toJS target, toJS pname, toJS param]) Unit
 
 /-- `undefined texParameteri(GLenum target, GLenum pname, GLint param)` -/
-def WebGLRenderingContext.texParameteri (self : WebGLRenderingContext) (target : Nat) (pname : Nat) (param : Int) : IO Unit :=
-  self.val.callMethod "texParameteri" (Support.args #[toJS target, toJS pname, toJS param]) Unit
+@[macro_inline] def WebGLRenderingContext.texParameteri (self : WebGLRenderingContext) (target : Nat) (pname : Nat) (param : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texParameteri" do
+  self.val.callMethod "texParameteri" (Internal.args #[toJS target, toJS pname, toJS param]) Unit
 
 /-- `undefined uniform1f(WebGLUniformLocation? location, GLfloat x)` -/
-def WebGLRenderingContext.uniform1f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) : IO Unit :=
-  self.val.callMethod "uniform1f" (Support.args #[toJS location, toJS x]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform1f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform1f" do
+  self.val.callMethod "uniform1f" (Internal.args #[toJS location, toJS x]) Unit
 
 /-- `undefined uniform2f(WebGLUniformLocation? location, GLfloat x, GLfloat y)` -/
-def WebGLRenderingContext.uniform2f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "uniform2f" (Support.args #[toJS location, toJS x, toJS y]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform2f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform2f" do
+  self.val.callMethod "uniform2f" (Internal.args #[toJS location, toJS x, toJS y]) Unit
 
 /-- `undefined uniform3f(WebGLUniformLocation? location, GLfloat x, GLfloat y, GLfloat z)` -/
-def WebGLRenderingContext.uniform3f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) (z : Float) : IO Unit :=
-  self.val.callMethod "uniform3f" (Support.args #[toJS location, toJS x, toJS y, toJS z]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform3f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) (z : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform3f" do
+  self.val.callMethod "uniform3f" (Internal.args #[toJS location, toJS x, toJS y, toJS z]) Unit
 
 /-- `undefined uniform4f(WebGLUniformLocation? location, GLfloat x, GLfloat y, GLfloat z, GLfloat w)` -/
-def WebGLRenderingContext.uniform4f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) (z : Float) (w : Float) : IO Unit :=
-  self.val.callMethod "uniform4f" (Support.args #[toJS location, toJS x, toJS y, toJS z, toJS w]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform4f (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Float) (y : Float) (z : Float) (w : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform4f" do
+  self.val.callMethod "uniform4f" (Internal.args #[toJS location, toJS x, toJS y, toJS z, toJS w]) Unit
 
 /-- `undefined uniform1i(WebGLUniformLocation? location, GLint x)` -/
-def WebGLRenderingContext.uniform1i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) : IO Unit :=
-  self.val.callMethod "uniform1i" (Support.args #[toJS location, toJS x]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform1i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform1i" do
+  self.val.callMethod "uniform1i" (Internal.args #[toJS location, toJS x]) Unit
 
 /-- `undefined uniform2i(WebGLUniformLocation? location, GLint x, GLint y)` -/
-def WebGLRenderingContext.uniform2i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) : IO Unit :=
-  self.val.callMethod "uniform2i" (Support.args #[toJS location, toJS x, toJS y]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform2i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform2i" do
+  self.val.callMethod "uniform2i" (Internal.args #[toJS location, toJS x, toJS y]) Unit
 
 /-- `undefined uniform3i(WebGLUniformLocation? location, GLint x, GLint y, GLint z)` -/
-def WebGLRenderingContext.uniform3i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) (z : Int) : IO Unit :=
-  self.val.callMethod "uniform3i" (Support.args #[toJS location, toJS x, toJS y, toJS z]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform3i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) (z : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform3i" do
+  self.val.callMethod "uniform3i" (Internal.args #[toJS location, toJS x, toJS y, toJS z]) Unit
 
 /-- `undefined uniform4i(WebGLUniformLocation? location, GLint x, GLint y, GLint z, GLint w)` -/
-def WebGLRenderingContext.uniform4i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) (z : Int) (w : Int) : IO Unit :=
-  self.val.callMethod "uniform4i" (Support.args #[toJS location, toJS x, toJS y, toJS z, toJS w]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform4i (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (x : Int) (y : Int) (z : Int) (w : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform4i" do
+  self.val.callMethod "uniform4i" (Internal.args #[toJS location, toJS x, toJS y, toJS z, toJS w]) Unit
 
 /-- `undefined useProgram(WebGLProgram? program)` -/
-def WebGLRenderingContext.useProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Unit :=
-  self.val.callMethod "useProgram" (Support.args #[toJS program]) Unit
+@[macro_inline] def WebGLRenderingContext.useProgram (self : WebGLRenderingContext) (program : Option WebGLProgram) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.useProgram" do
+  self.val.callMethod "useProgram" (Internal.args #[toJS program]) Unit
 
 /-- `undefined validateProgram(WebGLProgram program)` -/
-def WebGLRenderingContext.validateProgram (self : WebGLRenderingContext) (program : WebGLProgram) : IO Unit :=
-  self.val.callMethod "validateProgram" (Support.args #[toJS program]) Unit
+@[macro_inline] def WebGLRenderingContext.validateProgram (self : WebGLRenderingContext) (program : WebGLProgram) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.validateProgram" do
+  self.val.callMethod "validateProgram" (Internal.args #[toJS program]) Unit
 
 /-- `undefined vertexAttrib1f(GLuint index, GLfloat x)` -/
-def WebGLRenderingContext.vertexAttrib1f (self : WebGLRenderingContext) (index : Nat) (x : Float) : IO Unit :=
-  self.val.callMethod "vertexAttrib1f" (Support.args #[toJS index, toJS x]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib1f (self : WebGLRenderingContext) (index : Nat) (x : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib1f" do
+  self.val.callMethod "vertexAttrib1f" (Internal.args #[toJS index, toJS x]) Unit
 
 /-- `undefined vertexAttrib2f(GLuint index, GLfloat x, GLfloat y)` -/
-def WebGLRenderingContext.vertexAttrib2f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) : IO Unit :=
-  self.val.callMethod "vertexAttrib2f" (Support.args #[toJS index, toJS x, toJS y]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib2f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib2f" do
+  self.val.callMethod "vertexAttrib2f" (Internal.args #[toJS index, toJS x, toJS y]) Unit
 
 /-- `undefined vertexAttrib3f(GLuint index, GLfloat x, GLfloat y, GLfloat z)` -/
-def WebGLRenderingContext.vertexAttrib3f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) (z : Float) : IO Unit :=
-  self.val.callMethod "vertexAttrib3f" (Support.args #[toJS index, toJS x, toJS y, toJS z]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib3f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) (z : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib3f" do
+  self.val.callMethod "vertexAttrib3f" (Internal.args #[toJS index, toJS x, toJS y, toJS z]) Unit
 
 /-- `undefined vertexAttrib4f(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w)` -/
-def WebGLRenderingContext.vertexAttrib4f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) (z : Float) (w : Float) : IO Unit :=
-  self.val.callMethod "vertexAttrib4f" (Support.args #[toJS index, toJS x, toJS y, toJS z, toJS w]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib4f (self : WebGLRenderingContext) (index : Nat) (x : Float) (y : Float) (z : Float) (w : Float) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib4f" do
+  self.val.callMethod "vertexAttrib4f" (Internal.args #[toJS index, toJS x, toJS y, toJS z, toJS w]) Unit
 
 /-- `undefined vertexAttrib1fv(GLuint index, Float32List values)` -/
-def WebGLRenderingContext.vertexAttrib1fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit :=
-  self.val.callMethod "vertexAttrib1fv" (Support.args #[toJS index, toJS values]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib1fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib1fv" do
+  self.val.callMethod "vertexAttrib1fv" (Internal.args #[toJS index, toJS values]) Unit
 
 /-- `undefined vertexAttrib2fv(GLuint index, Float32List values)` -/
-def WebGLRenderingContext.vertexAttrib2fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit :=
-  self.val.callMethod "vertexAttrib2fv" (Support.args #[toJS index, toJS values]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib2fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib2fv" do
+  self.val.callMethod "vertexAttrib2fv" (Internal.args #[toJS index, toJS values]) Unit
 
 /-- `undefined vertexAttrib3fv(GLuint index, Float32List values)` -/
-def WebGLRenderingContext.vertexAttrib3fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit :=
-  self.val.callMethod "vertexAttrib3fv" (Support.args #[toJS index, toJS values]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib3fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib3fv" do
+  self.val.callMethod "vertexAttrib3fv" (Internal.args #[toJS index, toJS values]) Unit
 
 /-- `undefined vertexAttrib4fv(GLuint index, Float32List values)` -/
-def WebGLRenderingContext.vertexAttrib4fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit :=
-  self.val.callMethod "vertexAttrib4fv" (Support.args #[toJS index, toJS values]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttrib4fv (self : WebGLRenderingContext) (index : Nat) (values : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttrib4fv" do
+  self.val.callMethod "vertexAttrib4fv" (Internal.args #[toJS index, toJS values]) Unit
 
 /-- `undefined vertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLintptr offset)` -/
-def WebGLRenderingContext.vertexAttribPointer (self : WebGLRenderingContext) (index : Nat) (size : Int) (type : Nat) (normalized : Bool) (stride : Int) (offset : Int) : IO Unit :=
-  self.val.callMethod "vertexAttribPointer" (Support.args #[toJS index, toJS size, toJS type, toJS normalized, toJS stride, toJS offset]) Unit
+@[macro_inline] def WebGLRenderingContext.vertexAttribPointer (self : WebGLRenderingContext) (index : Nat) (size : Int) (type : Nat) (normalized : Bool) (stride : Int) (offset : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.vertexAttribPointer" do
+  self.val.callMethod "vertexAttribPointer" (Internal.args #[toJS index, toJS size, toJS type, toJS normalized, toJS stride, toJS offset]) Unit
 
 /-- `undefined viewport(GLint x, GLint y, GLsizei width, GLsizei height)` -/
-def WebGLRenderingContext.viewport (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit :=
-  self.val.callMethod "viewport" (Support.args #[toJS x, toJS y, toJS width, toJS height]) Unit
+@[macro_inline] def WebGLRenderingContext.viewport (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.viewport" do
+  self.val.callMethod "viewport" (Internal.args #[toJS x, toJS y, toJS width, toJS height]) Unit
 
 /-- `undefined bufferData(GLenum target, GLsizeiptr size, GLenum usage)` -/
-def WebGLRenderingContext.bufferData (self : WebGLRenderingContext) (target : Nat) (size : Int) (usage : Nat) : IO Unit :=
-  self.val.callMethod "bufferData" (Support.args #[toJS target, toJS size, toJS usage]) Unit
+@[macro_inline] def WebGLRenderingContext.bufferData (self : WebGLRenderingContext) (target : Nat) (size : Int) (usage : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bufferData" do
+  self.val.callMethod "bufferData" (Internal.args #[toJS target, toJS size, toJS usage]) Unit
 
 /-- `undefined bufferData(GLenum target, AllowSharedBufferSource? data, GLenum usage)` -/
-def WebGLRenderingContext.bufferDataWithData (self : WebGLRenderingContext) (target : Nat) (data : Option ByteArray) (usage : Nat) : IO Unit :=
-  self.val.callMethod "bufferData" (Support.args #[toJS target, toJS data, toJS usage]) Unit
+@[macro_inline] def WebGLRenderingContext.bufferDataWithData (self : WebGLRenderingContext) (target : Nat) (data : Option ByteArray) (usage : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bufferDataWithData" do
+  self.val.callMethod "bufferData" (Internal.args #[toJS target, toJS data, toJS usage]) Unit
 
 /-- `undefined bufferSubData(GLenum target, GLintptr offset, AllowSharedBufferSource data)` -/
-def WebGLRenderingContext.bufferSubData (self : WebGLRenderingContext) (target : Nat) (offset : Int) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "bufferSubData" (Support.args #[toJS target, toJS offset, toJS data]) Unit
+@[macro_inline] def WebGLRenderingContext.bufferSubData (self : WebGLRenderingContext) (target : Nat) (offset : Int) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.bufferSubData" do
+  self.val.callMethod "bufferSubData" (Internal.args #[toJS target, toJS offset, toJS data]) Unit
 
 /-- `undefined compressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, ArrayBufferView data)` -/
-def WebGLRenderingContext.compressedTexImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Nat) (width : Int) (height : Int) (border : Int) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "compressedTexImage2D" (Support.args #[toJS target, toJS level, toJS internalformat, toJS width, toJS height, toJS border, toJS data]) Unit
+@[macro_inline] def WebGLRenderingContext.compressedTexImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Nat) (width : Int) (height : Int) (border : Int) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.compressedTexImage2D" do
+  self.val.callMethod "compressedTexImage2D" (Internal.args #[toJS target, toJS level, toJS internalformat, toJS width, toJS height, toJS border, toJS data]) Unit
 
 /-- `undefined compressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, ArrayBufferView data)` -/
-def WebGLRenderingContext.compressedTexSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (width : Int) (height : Int) (format : Nat) (data : ByteArray) : IO Unit :=
-  self.val.callMethod "compressedTexSubImage2D" (Support.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS width, toJS height, toJS format, toJS data]) Unit
+@[macro_inline] def WebGLRenderingContext.compressedTexSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (width : Int) (height : Int) (format : Nat) (data : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.compressedTexSubImage2D" do
+  self.val.callMethod "compressedTexSubImage2D" (Internal.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS width, toJS height, toJS format, toJS data]) Unit
 
 /-- `undefined readPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, ArrayBufferView? pixels)` -/
-def WebGLRenderingContext.readPixels (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit :=
-  self.val.callMethod "readPixels" (Support.args #[toJS x, toJS y, toJS width, toJS height, toJS format, toJS type, toJS pixels]) Unit
+@[macro_inline] def WebGLRenderingContext.readPixels (self : WebGLRenderingContext) (x : Int) (y : Int) (width : Int) (height : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.readPixels" do
+  self.val.callMethod "readPixels" (Internal.args #[toJS x, toJS y, toJS width, toJS height, toJS format, toJS type, toJS pixels]) Unit
 
 /-- `undefined texImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, ArrayBufferView? pixels)` -/
-def WebGLRenderingContext.texImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Int) (width : Int) (height : Int) (border : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit :=
-  self.val.callMethod "texImage2D" (Support.args #[toJS target, toJS level, toJS internalformat, toJS width, toJS height, toJS border, toJS format, toJS type, toJS pixels]) Unit
+@[macro_inline] def WebGLRenderingContext.texImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Int) (width : Int) (height : Int) (border : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texImage2D" do
+  self.val.callMethod "texImage2D" (Internal.args #[toJS target, toJS level, toJS internalformat, toJS width, toJS height, toJS border, toJS format, toJS type, toJS pixels]) Unit
 
 /-- `undefined texImage2D(GLenum target, GLint level, GLint internalformat, GLenum format, GLenum type, TexImageSource source)` -/
-def WebGLRenderingContext.texImage2DWithFormat (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Int) (format : Nat) (type : Nat) (source : TexImageSource) : IO Unit :=
-  self.val.callMethod "texImage2D" (Support.args #[toJS target, toJS level, toJS internalformat, toJS format, toJS type, toJS source]) Unit
+@[macro_inline] def WebGLRenderingContext.texImage2DWithFormat (self : WebGLRenderingContext) (target : Nat) (level : Int) (internalformat : Int) (format : Nat) (type : Nat) (source : TexImageSource) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texImage2DWithFormat" do
+  self.val.callMethod "texImage2D" (Internal.args #[toJS target, toJS level, toJS internalformat, toJS format, toJS type, toJS source]) Unit
 
 /-- `undefined texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, ArrayBufferView? pixels)` -/
-def WebGLRenderingContext.texSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (width : Int) (height : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit :=
-  self.val.callMethod "texSubImage2D" (Support.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS width, toJS height, toJS format, toJS type, toJS pixels]) Unit
+@[macro_inline] def WebGLRenderingContext.texSubImage2D (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (width : Int) (height : Int) (format : Nat) (type : Nat) (pixels : Option ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texSubImage2D" do
+  self.val.callMethod "texSubImage2D" (Internal.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS width, toJS height, toJS format, toJS type, toJS pixels]) Unit
 
 /-- `undefined texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLenum format, GLenum type, TexImageSource source)` -/
-def WebGLRenderingContext.texSubImage2DWithFormat (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (format : Nat) (type : Nat) (source : TexImageSource) : IO Unit :=
-  self.val.callMethod "texSubImage2D" (Support.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS format, toJS type, toJS source]) Unit
+@[macro_inline] def WebGLRenderingContext.texSubImage2DWithFormat (self : WebGLRenderingContext) (target : Nat) (level : Int) (xoffset : Int) (yoffset : Int) (format : Nat) (type : Nat) (source : TexImageSource) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.texSubImage2DWithFormat" do
+  self.val.callMethod "texSubImage2D" (Internal.args #[toJS target, toJS level, toJS xoffset, toJS yoffset, toJS format, toJS type, toJS source]) Unit
 
 /-- `undefined uniform1fv(WebGLUniformLocation? location, Float32List v)` -/
-def WebGLRenderingContext.uniform1fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit :=
-  self.val.callMethod "uniform1fv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform1fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform1fv" do
+  self.val.callMethod "uniform1fv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform2fv(WebGLUniformLocation? location, Float32List v)` -/
-def WebGLRenderingContext.uniform2fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit :=
-  self.val.callMethod "uniform2fv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform2fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform2fv" do
+  self.val.callMethod "uniform2fv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform3fv(WebGLUniformLocation? location, Float32List v)` -/
-def WebGLRenderingContext.uniform3fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit :=
-  self.val.callMethod "uniform3fv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform3fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform3fv" do
+  self.val.callMethod "uniform3fv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform4fv(WebGLUniformLocation? location, Float32List v)` -/
-def WebGLRenderingContext.uniform4fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit :=
-  self.val.callMethod "uniform4fv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform4fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform4fv" do
+  self.val.callMethod "uniform4fv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform1iv(WebGLUniformLocation? location, Int32List v)` -/
-def WebGLRenderingContext.uniform1iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit :=
-  self.val.callMethod "uniform1iv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform1iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform1iv" do
+  self.val.callMethod "uniform1iv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform2iv(WebGLUniformLocation? location, Int32List v)` -/
-def WebGLRenderingContext.uniform2iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit :=
-  self.val.callMethod "uniform2iv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform2iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform2iv" do
+  self.val.callMethod "uniform2iv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform3iv(WebGLUniformLocation? location, Int32List v)` -/
-def WebGLRenderingContext.uniform3iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit :=
-  self.val.callMethod "uniform3iv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform3iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform3iv" do
+  self.val.callMethod "uniform3iv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniform4iv(WebGLUniformLocation? location, Int32List v)` -/
-def WebGLRenderingContext.uniform4iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit :=
-  self.val.callMethod "uniform4iv" (Support.args #[toJS location, toJS v]) Unit
+@[macro_inline] def WebGLRenderingContext.uniform4iv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (v : Int32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniform4iv" do
+  self.val.callMethod "uniform4iv" (Internal.args #[toJS location, toJS v]) Unit
 
 /-- `undefined uniformMatrix2fv(WebGLUniformLocation? location, GLboolean transpose, Float32List value)` -/
-def WebGLRenderingContext.uniformMatrix2fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit :=
-  self.val.callMethod "uniformMatrix2fv" (Support.args #[toJS location, toJS transpose, toJS value]) Unit
+@[macro_inline] def WebGLRenderingContext.uniformMatrix2fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniformMatrix2fv" do
+  self.val.callMethod "uniformMatrix2fv" (Internal.args #[toJS location, toJS transpose, toJS value]) Unit
 
 /-- `undefined uniformMatrix3fv(WebGLUniformLocation? location, GLboolean transpose, Float32List value)` -/
-def WebGLRenderingContext.uniformMatrix3fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit :=
-  self.val.callMethod "uniformMatrix3fv" (Support.args #[toJS location, toJS transpose, toJS value]) Unit
+@[macro_inline] def WebGLRenderingContext.uniformMatrix3fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniformMatrix3fv" do
+  self.val.callMethod "uniformMatrix3fv" (Internal.args #[toJS location, toJS transpose, toJS value]) Unit
 
 /-- `undefined uniformMatrix4fv(WebGLUniformLocation? location, GLboolean transpose, Float32List value)` -/
-def WebGLRenderingContext.uniformMatrix4fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit :=
-  self.val.callMethod "uniformMatrix4fv" (Support.args #[toJS location, toJS transpose, toJS value]) Unit
+@[macro_inline] def WebGLRenderingContext.uniformMatrix4fv (self : WebGLRenderingContext) (location : Option WebGLUniformLocation) (transpose : Bool) (value : Float32List) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.uniformMatrix4fv" do
+  self.val.callMethod "uniformMatrix4fv" (Internal.args #[toJS location, toJS transpose, toJS value]) Unit
 
 /-- `v instanceof WebGLShaderPrecisionFormat`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLShaderPrecisionFormat`). -/
-def WebGLShaderPrecisionFormat.cast? (v : Value) : IO (Option WebGLShaderPrecisionFormat) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLShaderPrecisionFormat"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLShaderPrecisionFormat.cast? (v : Value) : IO (Option WebGLShaderPrecisionFormat) := Internal.api "Lasm.JS.Web.WebGLShaderPrecisionFormat.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLShaderPrecisionFormat"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute GLint rangeMin` -/
-def WebGLShaderPrecisionFormat.rangeMin (self : WebGLShaderPrecisionFormat) : IO Int := self.val.get "rangeMin" Int
+@[macro_inline] def WebGLShaderPrecisionFormat.rangeMin (self : WebGLShaderPrecisionFormat) : IO Int := Internal.api "Lasm.JS.Web.WebGLShaderPrecisionFormat.rangeMin" do
+  self.val.get "rangeMin" Int
 
 /-- `readonly attribute GLint rangeMax` -/
-def WebGLShaderPrecisionFormat.rangeMax (self : WebGLShaderPrecisionFormat) : IO Int := self.val.get "rangeMax" Int
+@[macro_inline] def WebGLShaderPrecisionFormat.rangeMax (self : WebGLShaderPrecisionFormat) : IO Int := Internal.api "Lasm.JS.Web.WebGLShaderPrecisionFormat.rangeMax" do
+  self.val.get "rangeMax" Int
 
 /-- `readonly attribute GLint precision` -/
-def WebGLShaderPrecisionFormat.precision (self : WebGLShaderPrecisionFormat) : IO Int := self.val.get "precision" Int
+@[macro_inline] def WebGLShaderPrecisionFormat.precision (self : WebGLShaderPrecisionFormat) : IO Int := Internal.api "Lasm.JS.Web.WebGLShaderPrecisionFormat.precision" do
+  self.val.get "precision" Int
 
 /-- `v instanceof WebGLUniformLocation`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLUniformLocation`). -/
-def WebGLUniformLocation.cast? (v : Value) : IO (Option WebGLUniformLocation) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLUniformLocation"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLUniformLocation.cast? (v : Value) : IO (Option WebGLUniformLocation) := Internal.api "Lasm.JS.Web.WebGLUniformLocation.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLUniformLocation"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLBuffer`). -/
-def WebGLBuffer.cast? (v : Value) : IO (Option WebGLBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLBuffer.cast? (v : Value) : IO (Option WebGLBuffer) := Internal.api "Lasm.JS.Web.WebGLBuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLBuffer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLFramebuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLFramebuffer`). -/
-def WebGLFramebuffer.cast? (v : Value) : IO (Option WebGLFramebuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLFramebuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLFramebuffer.cast? (v : Value) : IO (Option WebGLFramebuffer) := Internal.api "Lasm.JS.Web.WebGLFramebuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLFramebuffer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLProgram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLProgram`). -/
-def WebGLProgram.cast? (v : Value) : IO (Option WebGLProgram) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLProgram"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLProgram.cast? (v : Value) : IO (Option WebGLProgram) := Internal.api "Lasm.JS.Web.WebGLProgram.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLProgram"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLRenderbuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLRenderbuffer`). -/
-def WebGLRenderbuffer.cast? (v : Value) : IO (Option WebGLRenderbuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLRenderbuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLRenderbuffer.cast? (v : Value) : IO (Option WebGLRenderbuffer) := Internal.api "Lasm.JS.Web.WebGLRenderbuffer.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLRenderbuffer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLShader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLShader`). -/
-def WebGLShader.cast? (v : Value) : IO (Option WebGLShader) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLShader"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLShader.cast? (v : Value) : IO (Option WebGLShader) := Internal.api "Lasm.JS.Web.WebGLShader.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLShader"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof WebGLTexture`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebGLTexture`). -/
-def WebGLTexture.cast? (v : Value) : IO (Option WebGLTexture) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebGLTexture"] Value) v) then some { val := v } else none
+@[macro_inline] def WebGLTexture.cast? (v : Value) : IO (Option WebGLTexture) := Internal.api "Lasm.JS.Web.WebGLTexture.cast?" do
+  Internal.cast (Internal.getGlobal ["WebGLTexture"] Value) (fun x => { val := x }) v
 
 end Lasm.JS.Web

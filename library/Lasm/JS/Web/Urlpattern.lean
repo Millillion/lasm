@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Urlpattern
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary URLPatternInit` (URL Pattern Standard (https://urlpattern.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure URLPatternInit where
@@ -31,15 +34,15 @@ structure URLPatternInit where
   hash : Option String := none
   /-- `USVString baseURL` -/
   baseURL : Option String := none
-instance : ToJS URLPatternInit := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),
-    ("username", Support.optional d.username),
-    ("password", Support.optional d.password),
-    ("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("pathname", Support.optional d.pathname),
-    ("search", Support.optional d.search),
-    ("hash", Support.optional d.hash),
-    ("baseURL", Support.optional d.baseURL)]⟩
+instance : ToJS URLPatternInit := ⟨fun d => Internal.fields #[("protocol", Internal.optional d.protocol),
+    ("username", Internal.optional d.username),
+    ("password", Internal.optional d.password),
+    ("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("pathname", Internal.optional d.pathname),
+    ("search", Internal.optional d.search),
+    ("hash", Internal.optional d.hash),
+    ("baseURL", Internal.optional d.baseURL)]⟩
 instance : FromJS URLPatternInit where
   fromJS d := do return {
     protocol := ← Lasm.JS.readField (Option String) d "protocol",
@@ -75,7 +78,7 @@ instance : FromJS URLPatternInput where
 structure URLPatternOptions where
   /-- `boolean ignoreCase = false` -/
   ignoreCase : Option Bool := none
-instance : ToJS URLPatternOptions := ⟨fun d => Support.fields #[("ignoreCase", Support.optional d.ignoreCase)]⟩
+instance : ToJS URLPatternOptions := ⟨fun d => Internal.fields #[("ignoreCase", Internal.optional d.ignoreCase)]⟩
 
 /-- `dictionary URLPatternComponentResult` (URL Pattern Standard (https://urlpattern.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure URLPatternComponentResult where
@@ -83,6 +86,8 @@ structure URLPatternComponentResult where
   input : Option String := none
   /-- `record<USVString, (USVString or undefined)> groups` -/
   groups : Option (Record (Option String)) := none
+instance : ToJS URLPatternComponentResult := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("groups", Internal.optional d.groups)]⟩
 instance : FromJS URLPatternComponentResult where
   fromJS d := do return {
     input := ← Lasm.JS.readField (Option String) d "input",
@@ -109,6 +114,15 @@ structure URLPatternResult where
   search : Option URLPatternComponentResult := none
   /-- `URLPatternComponentResult hash` -/
   hash : Option URLPatternComponentResult := none
+instance : ToJS URLPatternResult := ⟨fun d => Internal.fields #[("inputs", Internal.optional d.inputs),
+    ("protocol", Internal.optional d.protocol),
+    ("username", Internal.optional d.username),
+    ("password", Internal.optional d.password),
+    ("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("pathname", Internal.optional d.pathname),
+    ("search", Internal.optional d.search),
+    ("hash", Internal.optional d.hash)]⟩
 instance : FromJS URLPatternResult where
   fromJS d := do return {
     inputs := ← Lasm.JS.readField (Option (Array URLPatternInput)) d "inputs",
@@ -139,53 +153,62 @@ instance : Coe URLPatternInit URLPatternCompatible := ⟨.urlPatternInit⟩
 instance : Coe URLPattern URLPatternCompatible := ⟨.urlPattern⟩
 
 /-- `v instanceof URLPattern`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLPattern`). -/
-def URLPattern.cast? (v : Value) : IO (Option URLPattern) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLPattern"] Value) v) then some { val := v } else none
+@[macro_inline] def URLPattern.cast? (v : Value) : IO (Option URLPattern) := Internal.api "Lasm.JS.Web.URLPattern.cast?" do
+  Internal.cast (Internal.getGlobal ["URLPattern"] Value) (fun x => { val := x }) v
 
 /-- `constructor(URLPatternInput input, USVString baseURL, optional URLPatternOptions options)` -/
-def URLPattern.new (input : URLPatternInput) (baseURL : String) (options : Option URLPatternOptions := none) : IO URLPattern :=
+@[macro_inline] def URLPattern.new (input : URLPatternInput) (baseURL : String) (options : Option URLPatternOptions := none) : IO URLPattern := Internal.api "Lasm.JS.Web.URLPattern.new" do
   Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.new", module := "globalThis", path := "URLPattern", construct := true, arity := 3 }
-    (Support.args #[toJS input, toJS baseURL, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, toJS baseURL, Internal.optional options]) (await := false)
 
 /-- `constructor(optional URLPatternInput input, optional URLPatternOptions options)` -/
-def URLPattern.newWithOptions (input : Option URLPatternInput := none) (options : Option URLPatternOptions := none) : IO URLPattern :=
+@[macro_inline] def URLPattern.newWithOptions (input : Option URLPatternInput := none) (options : Option URLPatternOptions := none) : IO URLPattern := Internal.api "Lasm.JS.Web.URLPattern.newWithOptions" do
   Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.newWithOptions", module := "globalThis", path := "URLPattern", construct := true, arity := 2 }
-    (Support.args #[Support.optional input, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional input, Internal.optional options]) (await := false)
 
 /-- `readonly attribute USVString protocol` -/
-def URLPattern.protocol (self : URLPattern) : IO String := self.val.get "protocol" String
+@[macro_inline] def URLPattern.protocol (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.protocol" do
+  self.val.get "protocol" String
 
 /-- `readonly attribute USVString username` -/
-def URLPattern.username (self : URLPattern) : IO String := self.val.get "username" String
+@[macro_inline] def URLPattern.username (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.username" do
+  self.val.get "username" String
 
 /-- `readonly attribute USVString password` -/
-def URLPattern.password (self : URLPattern) : IO String := self.val.get "password" String
+@[macro_inline] def URLPattern.password (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.password" do
+  self.val.get "password" String
 
 /-- `readonly attribute USVString hostname` -/
-def URLPattern.hostname (self : URLPattern) : IO String := self.val.get "hostname" String
+@[macro_inline] def URLPattern.hostname (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.hostname" do
+  self.val.get "hostname" String
 
 /-- `readonly attribute USVString port` -/
-def URLPattern.port (self : URLPattern) : IO String := self.val.get "port" String
+@[macro_inline] def URLPattern.port (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.port" do
+  self.val.get "port" String
 
 /-- `readonly attribute USVString pathname` -/
-def URLPattern.pathname (self : URLPattern) : IO String := self.val.get "pathname" String
+@[macro_inline] def URLPattern.pathname (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.pathname" do
+  self.val.get "pathname" String
 
 /-- `readonly attribute USVString search` -/
-def URLPattern.search (self : URLPattern) : IO String := self.val.get "search" String
+@[macro_inline] def URLPattern.search (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.search" do
+  self.val.get "search" String
 
 /-- `readonly attribute USVString hash` -/
-def URLPattern.hash (self : URLPattern) : IO String := self.val.get "hash" String
+@[macro_inline] def URLPattern.hash (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.hash" do
+  self.val.get "hash" String
 
 /-- `readonly attribute boolean hasRegExpGroups` -/
-def URLPattern.hasRegExpGroups (self : URLPattern) : IO Bool := self.val.get "hasRegExpGroups" Bool
+@[macro_inline] def URLPattern.hasRegExpGroups (self : URLPattern) : IO Bool := Internal.api "Lasm.JS.Web.URLPattern.hasRegExpGroups" do
+  self.val.get "hasRegExpGroups" Bool
 
 /-- `boolean test(optional URLPatternInput input, optional USVString baseURL)` -/
-def URLPattern.test (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO Bool :=
-  self.val.callMethod "test" (Support.args #[Support.optional input, Support.optional baseURL]) Bool
+@[macro_inline] def URLPattern.test (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.URLPattern.test" do
+  self.val.callMethod "test" (Internal.args #[Internal.optional input, Internal.optional baseURL]) Bool
 
 /-- `URLPatternResult? exec(optional URLPatternInput input, optional USVString baseURL)` -/
-def URLPattern.exec (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO (Option URLPatternResult) := do
-  let r ← self.val.callMethod "exec" (Support.args #[Support.optional input, Support.optional baseURL]) Value
-  Support.cloneAs (Option URLPatternResult) r
+@[macro_inline] def URLPattern.exec (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO (Option URLPatternResult) := Internal.api "Lasm.JS.Web.URLPattern.exec" do
+  let r ← self.val.callMethod "exec" (Internal.args #[Internal.optional input, Internal.optional baseURL]) Value
+  Internal.cloneAs (Option URLPatternResult) r
 
 end Lasm.JS.Web

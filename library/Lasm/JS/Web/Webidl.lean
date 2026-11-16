@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Webidl
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary QuotaExceededErrorOptions` (Web IDL Standard (https://webidl.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QuotaExceededErrorOptions where
@@ -17,8 +20,8 @@ structure QuotaExceededErrorOptions where
   quota : Option Float := none
   /-- `double requested` -/
   requested : Option Float := none
-instance : ToJS QuotaExceededErrorOptions := ⟨fun d => Support.fields #[("quota", Support.optional d.quota),
-    ("requested", Support.optional d.requested)]⟩
+instance : ToJS QuotaExceededErrorOptions := ⟨fun d => Internal.fields #[("quota", Internal.optional d.quota),
+    ("requested", Internal.optional d.requested)]⟩
 
 /-- `callback Function = any (any... arguments)` (Web IDL Standard (https://webidl.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure JSFunction where
@@ -49,13 +52,13 @@ def VoidFunction.ofSyncFn (f : IO Unit) : IO VoidFunction := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `v instanceof DOMException`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMException`). -/
-def DOMException.cast? (v : Value) : IO (Option DOMException) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMException"] Value) v) then some { val := v } else none
+@[macro_inline] def DOMException.cast? (v : Value) : IO (Option DOMException) := Internal.api "Lasm.JS.Web.DOMException.cast?" do
+  Internal.cast (Internal.getGlobal ["DOMException"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message, optional DOMString name)` -/
-def DOMException.new (message : Option String := none) (name : Option String := none) : IO DOMException :=
+@[macro_inline] def DOMException.new (message : Option String := none) (name : Option String := none) : IO DOMException := Internal.api "Lasm.JS.Web.DOMException.new" do
   Lasm.JS.Binding.invoke DOMException { name := "Lasm.JS.Web.DOMException.new", module := "globalThis", path := "DOMException", construct := true, arity := 2 }
-    (Support.args #[Support.optional message, Support.optional name]) (await := false)
+    (Internal.args #[Internal.optional message, Internal.optional name]) (await := false)
 
 /-- `const unsigned short INDEX_SIZE_ERR = 1` -/
 def DOMException.INDEX_SIZE_ERR : Nat := 1
@@ -133,27 +136,32 @@ def DOMException.INVALID_NODE_TYPE_ERR : Nat := 24
 def DOMException.DATA_CLONE_ERR : Nat := 25
 
 /-- `readonly attribute DOMString name` -/
-def DOMException.name (self : DOMException) : IO String := self.val.get "name" String
+@[macro_inline] def DOMException.name (self : DOMException) : IO String := Internal.api "Lasm.JS.Web.DOMException.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute DOMString message` -/
-def DOMException.message (self : DOMException) : IO String := self.val.get "message" String
+@[macro_inline] def DOMException.message (self : DOMException) : IO String := Internal.api "Lasm.JS.Web.DOMException.message" do
+  self.val.get "message" String
 
 /-- `readonly attribute unsigned short code` -/
-def DOMException.code (self : DOMException) : IO Nat := self.val.get "code" Nat
+@[macro_inline] def DOMException.code (self : DOMException) : IO Nat := Internal.api "Lasm.JS.Web.DOMException.code" do
+  self.val.get "code" Nat
 
 /-- `v instanceof QuotaExceededError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `QuotaExceededError`). -/
-def QuotaExceededError.cast? (v : Value) : IO (Option QuotaExceededError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["QuotaExceededError"] Value) v) then some { val := v } else none
+@[macro_inline] def QuotaExceededError.cast? (v : Value) : IO (Option QuotaExceededError) := Internal.api "Lasm.JS.Web.QuotaExceededError.cast?" do
+  Internal.cast (Internal.getGlobal ["QuotaExceededError"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional DOMString message, optional QuotaExceededErrorOptions options)` -/
-def QuotaExceededError.new (message : Option String := none) (options : Option QuotaExceededErrorOptions := none) : IO QuotaExceededError :=
+@[macro_inline] def QuotaExceededError.new (message : Option String := none) (options : Option QuotaExceededErrorOptions := none) : IO QuotaExceededError := Internal.api "Lasm.JS.Web.QuotaExceededError.new" do
   Lasm.JS.Binding.invoke QuotaExceededError { name := "Lasm.JS.Web.QuotaExceededError.new", module := "globalThis", path := "QuotaExceededError", construct := true, arity := 2 }
-    (Support.args #[Support.optional message, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
 
 /-- `readonly attribute double? quota` -/
-def QuotaExceededError.quota (self : QuotaExceededError) : IO (Option Float) := self.val.get "quota" (Option Float)
+@[macro_inline] def QuotaExceededError.quota (self : QuotaExceededError) : IO (Option Float) := Internal.api "Lasm.JS.Web.QuotaExceededError.quota" do
+  self.val.get "quota" (Option Float)
 
 /-- `readonly attribute double? requested` -/
-def QuotaExceededError.requested (self : QuotaExceededError) : IO (Option Float) := self.val.get "requested" (Option Float)
+@[macro_inline] def QuotaExceededError.requested (self : QuotaExceededError) : IO (Option Float) := Internal.api "Lasm.JS.Web.QuotaExceededError.requested" do
+  self.val.get "requested" (Option Float)
 
 end Lasm.JS.Web

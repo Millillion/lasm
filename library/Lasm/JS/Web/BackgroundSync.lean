@@ -6,11 +6,15 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.ServiceWorkers
+import Lasm.JS.Web.Types.BackgroundSync
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary SyncEventInit : ExtendableEventInit` (Web Background Synchronization (https://wicg.github.io/background-sync/spec/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SyncEventInit where
@@ -24,48 +28,51 @@ structure SyncEventInit where
   tag : String
   /-- `boolean lastChance = false` -/
   lastChance : Option Bool := none
-instance : ToJS SyncEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
+instance : ToJS SyncEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
     ("tag", toJS d.tag),
-    ("lastChance", Support.optional d.lastChance)]⟩
+    ("lastChance", Internal.optional d.lastChance)]⟩
 
 /-- `v instanceof SyncEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncEvent`). -/
-def SyncEvent.cast? (v : Value) : IO (Option SyncEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SyncEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def SyncEvent.cast? (v : Value) : IO (Option SyncEvent) := Internal.api "Lasm.JS.Web.SyncEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["SyncEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, SyncEventInit init)` -/
-def SyncEvent.new (type : String) (init : SyncEventInit) : IO SyncEvent :=
+@[macro_inline] def SyncEvent.new (type : String) (init : SyncEventInit) : IO SyncEvent := Internal.api "Lasm.JS.Web.SyncEvent.new" do
   Lasm.JS.Binding.invoke SyncEvent { name := "Lasm.JS.Web.SyncEvent.new", module := "globalThis", path := "SyncEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, toJS init]) (await := false)
+    (Internal.args #[toJS type, toJS init]) (await := false)
 
 /-- `readonly attribute DOMString tag` -/
-def SyncEvent.tag (self : SyncEvent) : IO String := self.val.get "tag" String
+@[macro_inline] def SyncEvent.tag (self : SyncEvent) : IO String := Internal.api "Lasm.JS.Web.SyncEvent.tag" do
+  self.val.get "tag" String
 
 /-- `readonly attribute boolean lastChance` -/
-def SyncEvent.lastChance (self : SyncEvent) : IO Bool := self.val.get "lastChance" Bool
+@[macro_inline] def SyncEvent.lastChance (self : SyncEvent) : IO Bool := Internal.api "Lasm.JS.Web.SyncEvent.lastChance" do
+  self.val.get "lastChance" Bool
 
 /-- `v instanceof SyncManager`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncManager`). -/
-def SyncManager.cast? (v : Value) : IO (Option SyncManager) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SyncManager"] Value) v) then some { val := v } else none
+@[macro_inline] def SyncManager.cast? (v : Value) : IO (Option SyncManager) := Internal.api "Lasm.JS.Web.SyncManager.cast?" do
+  Internal.cast (Internal.getGlobal ["SyncManager"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> register(DOMString tag)` -/
-def SyncManager.register (self : SyncManager) (tag : String) : Async Unit :=
-  self.val.callMethodAwait "register" (Support.args #[toJS tag]) Unit
+@[macro_inline] def SyncManager.register (self : SyncManager) (tag : String) : Async Unit := Internal.api "Lasm.JS.Web.SyncManager.register" do
+  self.val.callMethodAwait "register" (Internal.args #[toJS tag]) Unit
 
 /-- `Promise<sequence<DOMString>> getTags()` -/
-def SyncManager.getTags (self : SyncManager) : Async (Array String) :=
-  self.val.callMethodAwait "getTags" (Support.args #[]) (Array String)
+@[macro_inline] def SyncManager.getTags (self : SyncManager) : Async (Array String) := Internal.api "Lasm.JS.Web.SyncManager.getTags" do
+  self.val.callMethodAwait "getTags" (Internal.args #[]) (Array String)
 
 /-- `attribute EventHandler onsync` -/
-def ServiceWorkerGlobalScope.onsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := self.val.get "onsync" (Option EventHandlerNonNull)
+@[macro_inline] def ServiceWorkerGlobalScope.onsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onsync" do
+  self.val.get "onsync" (Option EventHandlerNonNull)
 
 /-- Sets `onsync`: `attribute EventHandler onsync` -/
-def ServiceWorkerGlobalScope.setOnsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def ServiceWorkerGlobalScope.setOnsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnsync" do
   self.val.set "onsync" (toJS value)
 
 /-- `readonly attribute SyncManager sync` -/
-def ServiceWorkerRegistration.sync (self : ServiceWorkerRegistration) : IO SyncManager := do
+@[macro_inline] def ServiceWorkerRegistration.sync (self : ServiceWorkerRegistration) : IO SyncManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.sync" do
   let r ← self.val.get "sync" Value
   pure { val := r }
 

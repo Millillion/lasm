@@ -6,21 +6,32 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Geometry
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.CssViewport
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof Viewport`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Viewport`). -/
-def Viewport.cast? (v : Value) : IO (Option Viewport) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Viewport"] Value) v) then some { val := v } else none
+@[macro_inline] def Viewport.cast? (v : Value) : IO (Option Viewport) := Internal.api "Lasm.JS.Web.Viewport.cast?" do
+  Internal.cast (Internal.getGlobal ["Viewport"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute FrozenArray<DOMRect>? segments` -/
-def Viewport.segments (self : Viewport) : IO (Option (Array DOMRect)) := self.val.get "segments" (Option (Array DOMRect))
+@[macro_inline] def Viewport.segments (self : Viewport) : IO (Option (Array DOMRect)) := Internal.api "Lasm.JS.Web.Viewport.segments" do
+  self.val.get "segments" (Option (Array DOMRect))
+
+/-- `readonly attribute Viewport viewport` -/
+@[macro_inline] def Window.viewport (self : Window) : IO Viewport := Internal.api "Lasm.JS.Web.Window.viewport" do
+  let r ← self.val.get "viewport" Value
+  pure { val := r }
 
 /-- `readonly attribute Viewport viewport` (CSS Viewport Module Level 1 (https://drafts.csswg.org/css-viewport/)) -/
-def viewport : IO Viewport := do
-  let r ← Support.getGlobal ["viewport"] Value
+@[macro_inline] def viewport : IO Viewport := Internal.api "Lasm.JS.Web.viewport" do
+  let r ← Internal.getGlobal ["viewport"] Value
   pure { val := r }
 
 end Lasm.JS.Web

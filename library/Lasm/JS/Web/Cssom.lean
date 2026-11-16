@@ -6,10 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.Cssom
+import Lasm.JS.Web.Types.SVG
+import Lasm.JS.Web.Types.MathmlCore
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `(MediaList or DOMString)`: one constructor per member type. -/
 inductive MediaListOrDOMString where
@@ -31,13 +38,13 @@ structure CSSStyleSheetInit where
   media : Option MediaListOrDOMString := none
   /-- `boolean disabled = false` -/
   disabled : Option Bool := none
-instance : ToJS CSSStyleSheetInit := ⟨fun d => Support.fields #[("baseURL", Support.optional d.baseURL),
-    ("media", Support.optional d.media),
-    ("disabled", Support.optional d.disabled)]⟩
+instance : ToJS CSSStyleSheetInit := ⟨fun d => Internal.fields #[("baseURL", Internal.optional d.baseURL),
+    ("media", Internal.optional d.media),
+    ("disabled", Internal.optional d.disabled)]⟩
 
 /-- `v instanceof CSSRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSRule`). -/
-def CSSRule.cast? (v : Value) : IO (Option CSSRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSRule.cast? (v : Value) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSRule"] Value) (fun x => { val := x }) v
 
 /-- `const unsigned short STYLE_RULE = 1` -/
 def CSSRule.STYLE_RULE : Nat := 1
@@ -64,445 +71,495 @@ def CSSRule.MARGIN_RULE : Nat := 9
 def CSSRule.NAMESPACE_RULE : Nat := 10
 
 /-- `attribute CSSOMString cssText` -/
-def CSSRule.cssText (self : CSSRule) : IO String := self.val.get "cssText" String
+@[macro_inline] def CSSRule.cssText (self : CSSRule) : IO String := Internal.api "Lasm.JS.Web.CSSRule.cssText" do
+  self.val.get "cssText" String
 
 /-- Sets `cssText`: `attribute CSSOMString cssText` -/
-def CSSRule.setCssText (self : CSSRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSRule.setCssText (self : CSSRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSRule.setCssText" do
   self.val.set "cssText" (toJS value)
 
 /-- `readonly attribute CSSRule? parentRule` -/
-def CSSRule.parentRule (self : CSSRule) : IO (Option CSSRule) := self.val.get "parentRule" (Option CSSRule)
+@[macro_inline] def CSSRule.parentRule (self : CSSRule) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSRule.parentRule" do
+  self.val.get "parentRule" (Option CSSRule)
 
 /-- `readonly attribute CSSStyleSheet? parentStyleSheet` -/
-def CSSRule.parentStyleSheet (self : CSSRule) : IO (Option CSSStyleSheet) := self.val.get "parentStyleSheet" (Option CSSStyleSheet)
+@[macro_inline] def CSSRule.parentStyleSheet (self : CSSRule) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.CSSRule.parentStyleSheet" do
+  self.val.get "parentStyleSheet" (Option CSSStyleSheet)
 
 /-- `readonly attribute unsigned short type` -/
-def CSSRule.type (self : CSSRule) : IO Nat := self.val.get "type" Nat
+@[macro_inline] def CSSRule.type (self : CSSRule) : IO Nat := Internal.api "Lasm.JS.Web.CSSRule.type" do
+  self.val.get "type" Nat
 
 /-- `v instanceof CSSRuleList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSRuleList`). -/
-def CSSRuleList.cast? (v : Value) : IO (Option CSSRuleList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSRuleList"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSRuleList.cast? (v : Value) : IO (Option CSSRuleList) := Internal.api "Lasm.JS.Web.CSSRuleList.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSRuleList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def CSSRuleList.length (self : CSSRuleList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def CSSRuleList.length (self : CSSRuleList) : IO Nat := Internal.api "Lasm.JS.Web.CSSRuleList.length" do
+  self.val.get "length" Nat
 
 /-- `getter CSSRule? item(unsigned long index)` -/
-def CSSRuleList.item (self : CSSRuleList) (index : Nat) : IO (Option CSSRule) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option CSSRule)
+@[macro_inline] def CSSRuleList.item (self : CSSRuleList) (index : Nat) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSRuleList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option CSSRule)
 
 /-- `v instanceof CSSStyleDeclaration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleDeclaration`). -/
-def CSSStyleDeclaration.cast? (v : Value) : IO (Option CSSStyleDeclaration) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleDeclaration"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSStyleDeclaration.cast? (v : Value) : IO (Option CSSStyleDeclaration) := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSStyleDeclaration"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString cssText` -/
-def CSSStyleDeclaration.cssText (self : CSSStyleDeclaration) : IO String := self.val.get "cssText" String
+@[macro_inline] def CSSStyleDeclaration.cssText (self : CSSStyleDeclaration) : IO String := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.cssText" do
+  self.val.get "cssText" String
 
 /-- Sets `cssText`: `attribute CSSOMString cssText` -/
-def CSSStyleDeclaration.setCssText (self : CSSStyleDeclaration) (value : String) : IO Unit :=
+@[macro_inline] def CSSStyleDeclaration.setCssText (self : CSSStyleDeclaration) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.setCssText" do
   self.val.set "cssText" (toJS value)
 
 /-- `readonly attribute unsigned long length` -/
-def CSSStyleDeclaration.length (self : CSSStyleDeclaration) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def CSSStyleDeclaration.length (self : CSSStyleDeclaration) : IO Nat := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.length" do
+  self.val.get "length" Nat
 
 /-- `readonly attribute CSSRule? parentRule` -/
-def CSSStyleDeclaration.parentRule (self : CSSStyleDeclaration) : IO (Option CSSRule) := self.val.get "parentRule" (Option CSSRule)
+@[macro_inline] def CSSStyleDeclaration.parentRule (self : CSSStyleDeclaration) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.parentRule" do
+  self.val.get "parentRule" (Option CSSRule)
 
 /-- `getter CSSOMString item(unsigned long index)` -/
-def CSSStyleDeclaration.item (self : CSSStyleDeclaration) (index : Nat) : IO String :=
-  self.val.callMethod "item" (Support.args #[toJS index]) String
+@[macro_inline] def CSSStyleDeclaration.item (self : CSSStyleDeclaration) (index : Nat) : IO String := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) String
 
 /-- `CSSOMString getPropertyValue(CSSOMString property)` -/
-def CSSStyleDeclaration.getPropertyValue (self : CSSStyleDeclaration) (property : String) : IO String :=
-  self.val.callMethod "getPropertyValue" (Support.args #[toJS property]) String
+@[macro_inline] def CSSStyleDeclaration.getPropertyValue (self : CSSStyleDeclaration) (property : String) : IO String := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.getPropertyValue" do
+  self.val.callMethod "getPropertyValue" (Internal.args #[toJS property]) String
 
 /-- `CSSOMString getPropertyPriority(CSSOMString property)` -/
-def CSSStyleDeclaration.getPropertyPriority (self : CSSStyleDeclaration) (property : String) : IO String :=
-  self.val.callMethod "getPropertyPriority" (Support.args #[toJS property]) String
+@[macro_inline] def CSSStyleDeclaration.getPropertyPriority (self : CSSStyleDeclaration) (property : String) : IO String := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.getPropertyPriority" do
+  self.val.callMethod "getPropertyPriority" (Internal.args #[toJS property]) String
 
 /-- `undefined setProperty(CSSOMString property, CSSOMString value, optional CSSOMString priority)` -/
-def CSSStyleDeclaration.setProperty (self : CSSStyleDeclaration) (property : String) (value : String) (priority : Option String := none) : IO Unit :=
-  self.val.callMethod "setProperty" (Support.args #[toJS property, toJS value, Support.optional priority]) Unit
+@[macro_inline] def CSSStyleDeclaration.setProperty (self : CSSStyleDeclaration) (property : String) (value : String) (priority : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.setProperty" do
+  self.val.callMethod "setProperty" (Internal.args #[toJS property, toJS value, Internal.optional priority]) Unit
 
 /-- `CSSOMString removeProperty(CSSOMString property)` -/
-def CSSStyleDeclaration.removeProperty (self : CSSStyleDeclaration) (property : String) : IO String :=
-  self.val.callMethod "removeProperty" (Support.args #[toJS property]) String
+@[macro_inline] def CSSStyleDeclaration.removeProperty (self : CSSStyleDeclaration) (property : String) : IO String := Internal.api "Lasm.JS.Web.CSSStyleDeclaration.removeProperty" do
+  self.val.callMethod "removeProperty" (Internal.args #[toJS property]) String
 
 /-- `v instanceof MediaList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaList`). -/
-def MediaList.cast? (v : Value) : IO (Option MediaList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaList"] Value) v) then some { val := v } else none
+@[macro_inline] def MediaList.cast? (v : Value) : IO (Option MediaList) := Internal.api "Lasm.JS.Web.MediaList.cast?" do
+  Internal.cast (Internal.getGlobal ["MediaList"] Value) (fun x => { val := x }) v
 
 /-- `stringifier attribute CSSOMString mediaText` -/
-def MediaList.mediaText (self : MediaList) : IO String := self.val.get "mediaText" String
+@[macro_inline] def MediaList.mediaText (self : MediaList) : IO String := Internal.api "Lasm.JS.Web.MediaList.mediaText" do
+  self.val.get "mediaText" String
 
 /-- Sets `mediaText`: `stringifier attribute CSSOMString mediaText` -/
-def MediaList.setMediaText (self : MediaList) (value : String) : IO Unit :=
+@[macro_inline] def MediaList.setMediaText (self : MediaList) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaList.setMediaText" do
   self.val.set "mediaText" (toJS value)
 
 /-- The stringifier (`mediaText`). -/
-def MediaList.toString (self : MediaList) : IO String := self.val.callMethod "toString" #[] String
+@[macro_inline] def MediaList.toString (self : MediaList) : IO String := Internal.api "Lasm.JS.Web.MediaList.toString" do
+  self.val.callMethod "toString" #[] String
 
 /-- `readonly attribute unsigned long length` -/
-def MediaList.length (self : MediaList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def MediaList.length (self : MediaList) : IO Nat := Internal.api "Lasm.JS.Web.MediaList.length" do
+  self.val.get "length" Nat
 
 /-- `getter CSSOMString? item(unsigned long index)` -/
-def MediaList.item (self : MediaList) (index : Nat) : IO (Option String) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option String)
+@[macro_inline] def MediaList.item (self : MediaList) (index : Nat) : IO (Option String) := Internal.api "Lasm.JS.Web.MediaList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option String)
 
 /-- `undefined appendMedium(CSSOMString medium)` -/
-def MediaList.appendMedium (self : MediaList) (medium : String) : IO Unit :=
-  self.val.callMethod "appendMedium" (Support.args #[toJS medium]) Unit
+@[macro_inline] def MediaList.appendMedium (self : MediaList) (medium : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaList.appendMedium" do
+  self.val.callMethod "appendMedium" (Internal.args #[toJS medium]) Unit
 
 /-- `undefined deleteMedium(CSSOMString medium)` -/
-def MediaList.deleteMedium (self : MediaList) (medium : String) : IO Unit :=
-  self.val.callMethod "deleteMedium" (Support.args #[toJS medium]) Unit
+@[macro_inline] def MediaList.deleteMedium (self : MediaList) (medium : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaList.deleteMedium" do
+  self.val.callMethod "deleteMedium" (Internal.args #[toJS medium]) Unit
 
 /-- `v instanceof StyleSheet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StyleSheet`). -/
-def StyleSheet.cast? (v : Value) : IO (Option StyleSheet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StyleSheet"] Value) v) then some { val := v } else none
+@[macro_inline] def StyleSheet.cast? (v : Value) : IO (Option StyleSheet) := Internal.api "Lasm.JS.Web.StyleSheet.cast?" do
+  Internal.cast (Internal.getGlobal ["StyleSheet"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString type` -/
-def StyleSheet.type (self : StyleSheet) : IO String := self.val.get "type" String
+@[macro_inline] def StyleSheet.type (self : StyleSheet) : IO String := Internal.api "Lasm.JS.Web.StyleSheet.type" do
+  self.val.get "type" String
 
 /-- `readonly attribute USVString? href` -/
-def StyleSheet.href (self : StyleSheet) : IO (Option String) := self.val.get "href" (Option String)
+@[macro_inline] def StyleSheet.href (self : StyleSheet) : IO (Option String) := Internal.api "Lasm.JS.Web.StyleSheet.href" do
+  self.val.get "href" (Option String)
 
 /-- `readonly attribute (Element or ProcessingInstruction)? ownerNode` -/
-def StyleSheet.ownerNode (self : StyleSheet) : IO (Option Value) := do
+@[macro_inline] def StyleSheet.ownerNode (self : StyleSheet) : IO (Option Value) := Internal.api "Lasm.JS.Web.StyleSheet.ownerNode" do
   let r ← self.val.get "ownerNode" Data
-  Support.optionalValue r
+  Internal.optionalValue r
 
 /-- `readonly attribute CSSStyleSheet? parentStyleSheet` -/
-def StyleSheet.parentStyleSheet (self : StyleSheet) : IO (Option CSSStyleSheet) := self.val.get "parentStyleSheet" (Option CSSStyleSheet)
+@[macro_inline] def StyleSheet.parentStyleSheet (self : StyleSheet) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.StyleSheet.parentStyleSheet" do
+  self.val.get "parentStyleSheet" (Option CSSStyleSheet)
 
 /-- `readonly attribute DOMString? title` -/
-def StyleSheet.title (self : StyleSheet) : IO (Option String) := self.val.get "title" (Option String)
+@[macro_inline] def StyleSheet.title (self : StyleSheet) : IO (Option String) := Internal.api "Lasm.JS.Web.StyleSheet.title" do
+  self.val.get "title" (Option String)
 
 /-- `readonly attribute MediaList media` -/
-def StyleSheet.media (self : StyleSheet) : IO MediaList := do
+@[macro_inline] def StyleSheet.media (self : StyleSheet) : IO MediaList := Internal.api "Lasm.JS.Web.StyleSheet.media" do
   let r ← self.val.get "media" Value
   pure { val := r }
 
 /-- `attribute boolean disabled` -/
-def StyleSheet.disabled (self : StyleSheet) : IO Bool := self.val.get "disabled" Bool
+@[macro_inline] def StyleSheet.disabled (self : StyleSheet) : IO Bool := Internal.api "Lasm.JS.Web.StyleSheet.disabled" do
+  self.val.get "disabled" Bool
 
 /-- Sets `disabled`: `attribute boolean disabled` -/
-def StyleSheet.setDisabled (self : StyleSheet) (value : Bool) : IO Unit :=
+@[macro_inline] def StyleSheet.setDisabled (self : StyleSheet) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.StyleSheet.setDisabled" do
   self.val.set "disabled" (toJS value)
 
 /-- `v instanceof StyleSheetList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StyleSheetList`). -/
-def StyleSheetList.cast? (v : Value) : IO (Option StyleSheetList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StyleSheetList"] Value) v) then some { val := v } else none
+@[macro_inline] def StyleSheetList.cast? (v : Value) : IO (Option StyleSheetList) := Internal.api "Lasm.JS.Web.StyleSheetList.cast?" do
+  Internal.cast (Internal.getGlobal ["StyleSheetList"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute unsigned long length` -/
-def StyleSheetList.length (self : StyleSheetList) : IO Nat := self.val.get "length" Nat
+@[macro_inline] def StyleSheetList.length (self : StyleSheetList) : IO Nat := Internal.api "Lasm.JS.Web.StyleSheetList.length" do
+  self.val.get "length" Nat
 
 /-- `getter CSSStyleSheet? item(unsigned long index)` -/
-def StyleSheetList.item (self : StyleSheetList) (index : Nat) : IO (Option CSSStyleSheet) :=
-  self.val.callMethod "item" (Support.args #[toJS index]) (Option CSSStyleSheet)
+@[macro_inline] def StyleSheetList.item (self : StyleSheetList) (index : Nat) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.StyleSheetList.item" do
+  self.val.callMethod "item" (Internal.args #[toJS index]) (Option CSSStyleSheet)
 
 /-- `v instanceof CSSGroupingRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSGroupingRule`). -/
-def CSSGroupingRule.cast? (v : Value) : IO (Option CSSGroupingRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSGroupingRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSGroupingRule.cast? (v : Value) : IO (Option CSSGroupingRule) := Internal.api "Lasm.JS.Web.CSSGroupingRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSGroupingRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSRuleList cssRules` -/
-def CSSGroupingRule.cssRules (self : CSSGroupingRule) : IO CSSRuleList := do
+@[macro_inline] def CSSGroupingRule.cssRules (self : CSSGroupingRule) : IO CSSRuleList := Internal.api "Lasm.JS.Web.CSSGroupingRule.cssRules" do
   let r ← self.val.get "cssRules" Value
   pure { val := r }
 
 /-- `unsigned long insertRule(CSSOMString rule, optional unsigned long index)` -/
-def CSSGroupingRule.insertRule (self : CSSGroupingRule) (rule : String) (index : Option Nat := none) : IO Nat :=
-  self.val.callMethod "insertRule" (Support.args #[toJS rule, Support.optional index]) Nat
+@[macro_inline] def CSSGroupingRule.insertRule (self : CSSGroupingRule) (rule : String) (index : Option Nat := none) : IO Nat := Internal.api "Lasm.JS.Web.CSSGroupingRule.insertRule" do
+  self.val.callMethod "insertRule" (Internal.args #[toJS rule, Internal.optional index]) Nat
 
 /-- `undefined deleteRule(unsigned long index)` -/
-def CSSGroupingRule.deleteRule (self : CSSGroupingRule) (index : Nat) : IO Unit :=
-  self.val.callMethod "deleteRule" (Support.args #[toJS index]) Unit
+@[macro_inline] def CSSGroupingRule.deleteRule (self : CSSGroupingRule) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.CSSGroupingRule.deleteRule" do
+  self.val.callMethod "deleteRule" (Internal.args #[toJS index]) Unit
 
 /-- `v instanceof CSSImportRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSImportRule`). -/
-def CSSImportRule.cast? (v : Value) : IO (Option CSSImportRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSImportRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSImportRule.cast? (v : Value) : IO (Option CSSImportRule) := Internal.api "Lasm.JS.Web.CSSImportRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSImportRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute USVString href` -/
-def CSSImportRule.href (self : CSSImportRule) : IO String := self.val.get "href" String
+@[macro_inline] def CSSImportRule.href (self : CSSImportRule) : IO String := Internal.api "Lasm.JS.Web.CSSImportRule.href" do
+  self.val.get "href" String
 
 /-- `readonly attribute MediaList media` -/
-def CSSImportRule.media (self : CSSImportRule) : IO MediaList := do
+@[macro_inline] def CSSImportRule.media (self : CSSImportRule) : IO MediaList := Internal.api "Lasm.JS.Web.CSSImportRule.media" do
   let r ← self.val.get "media" Value
   pure { val := r }
 
 /-- `readonly attribute CSSStyleSheet? styleSheet` -/
-def CSSImportRule.styleSheet (self : CSSImportRule) : IO (Option CSSStyleSheet) := self.val.get "styleSheet" (Option CSSStyleSheet)
+@[macro_inline] def CSSImportRule.styleSheet (self : CSSImportRule) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.CSSImportRule.styleSheet" do
+  self.val.get "styleSheet" (Option CSSStyleSheet)
 
 /-- `readonly attribute CSSOMString? layerName` -/
-def CSSImportRule.layerName (self : CSSImportRule) : IO (Option String) := self.val.get "layerName" (Option String)
+@[macro_inline] def CSSImportRule.layerName (self : CSSImportRule) : IO (Option String) := Internal.api "Lasm.JS.Web.CSSImportRule.layerName" do
+  self.val.get "layerName" (Option String)
 
 /-- `readonly attribute CSSOMString? supportsText` -/
-def CSSImportRule.supportsText (self : CSSImportRule) : IO (Option String) := self.val.get "supportsText" (Option String)
+@[macro_inline] def CSSImportRule.supportsText (self : CSSImportRule) : IO (Option String) := Internal.api "Lasm.JS.Web.CSSImportRule.supportsText" do
+  self.val.get "supportsText" (Option String)
 
 /-- `v instanceof CSSMarginRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSMarginRule`). -/
-def CSSMarginRule.cast? (v : Value) : IO (Option CSSMarginRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSMarginRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSMarginRule.cast? (v : Value) : IO (Option CSSMarginRule) := Internal.api "Lasm.JS.Web.CSSMarginRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSMarginRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString name` -/
-def CSSMarginRule.name (self : CSSMarginRule) : IO String := self.val.get "name" String
+@[macro_inline] def CSSMarginRule.name (self : CSSMarginRule) : IO String := Internal.api "Lasm.JS.Web.CSSMarginRule.name" do
+  self.val.get "name" String
 
 /-- `readonly attribute CSSStyleDeclaration style` -/
-def CSSMarginRule.style (self : CSSMarginRule) : IO CSSStyleDeclaration := do
+@[macro_inline] def CSSMarginRule.style (self : CSSMarginRule) : IO CSSStyleDeclaration := Internal.api "Lasm.JS.Web.CSSMarginRule.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `v instanceof CSSNamespaceRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSNamespaceRule`). -/
-def CSSNamespaceRule.cast? (v : Value) : IO (Option CSSNamespaceRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSNamespaceRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSNamespaceRule.cast? (v : Value) : IO (Option CSSNamespaceRule) := Internal.api "Lasm.JS.Web.CSSNamespaceRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSNamespaceRule"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute CSSOMString namespaceURI` -/
-def CSSNamespaceRule.namespaceURI (self : CSSNamespaceRule) : IO String := self.val.get "namespaceURI" String
+@[macro_inline] def CSSNamespaceRule.namespaceURI (self : CSSNamespaceRule) : IO String := Internal.api "Lasm.JS.Web.CSSNamespaceRule.namespaceURI" do
+  self.val.get "namespaceURI" String
 
 /-- `readonly attribute CSSOMString prefix` -/
-def CSSNamespaceRule.«prefix» (self : CSSNamespaceRule) : IO String := self.val.get "prefix" String
+@[macro_inline] def CSSNamespaceRule.«prefix» (self : CSSNamespaceRule) : IO String := Internal.api "Lasm.JS.Web.CSSNamespaceRule.prefix" do
+  self.val.get "prefix" String
 
 /-- `v instanceof CSSPageDescriptors`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPageDescriptors`). -/
-def CSSPageDescriptors.cast? (v : Value) : IO (Option CSSPageDescriptors) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSPageDescriptors"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSPageDescriptors.cast? (v : Value) : IO (Option CSSPageDescriptors) := Internal.api "Lasm.JS.Web.CSSPageDescriptors.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSPageDescriptors"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString margin` -/
-def CSSPageDescriptors.margin (self : CSSPageDescriptors) : IO String := self.val.get "margin" String
+@[macro_inline] def CSSPageDescriptors.margin (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.margin" do
+  self.val.get "margin" String
 
 /-- Sets `margin`: `attribute CSSOMString margin` -/
-def CSSPageDescriptors.setMargin (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMargin (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMargin" do
   self.val.set "margin" (toJS value)
 
 /-- `attribute CSSOMString marginTop` -/
-def CSSPageDescriptors.marginTop (self : CSSPageDescriptors) : IO String := self.val.get "marginTop" String
+@[macro_inline] def CSSPageDescriptors.marginTop (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.marginTop" do
+  self.val.get "marginTop" String
 
 /-- Sets `marginTop`: `attribute CSSOMString marginTop` -/
-def CSSPageDescriptors.setMarginTop (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMarginTop (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMarginTop" do
   self.val.set "marginTop" (toJS value)
 
 /-- `attribute CSSOMString marginRight` -/
-def CSSPageDescriptors.marginRight (self : CSSPageDescriptors) : IO String := self.val.get "marginRight" String
+@[macro_inline] def CSSPageDescriptors.marginRight (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.marginRight" do
+  self.val.get "marginRight" String
 
 /-- Sets `marginRight`: `attribute CSSOMString marginRight` -/
-def CSSPageDescriptors.setMarginRight (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMarginRight (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMarginRight" do
   self.val.set "marginRight" (toJS value)
 
 /-- `attribute CSSOMString marginBottom` -/
-def CSSPageDescriptors.marginBottom (self : CSSPageDescriptors) : IO String := self.val.get "marginBottom" String
+@[macro_inline] def CSSPageDescriptors.marginBottom (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.marginBottom" do
+  self.val.get "marginBottom" String
 
 /-- Sets `marginBottom`: `attribute CSSOMString marginBottom` -/
-def CSSPageDescriptors.setMarginBottom (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMarginBottom (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMarginBottom" do
   self.val.set "marginBottom" (toJS value)
 
 /-- `attribute CSSOMString marginLeft` -/
-def CSSPageDescriptors.marginLeft (self : CSSPageDescriptors) : IO String := self.val.get "marginLeft" String
+@[macro_inline] def CSSPageDescriptors.marginLeft (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.marginLeft" do
+  self.val.get "marginLeft" String
 
 /-- Sets `marginLeft`: `attribute CSSOMString marginLeft` -/
-def CSSPageDescriptors.setMarginLeft (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMarginLeft (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMarginLeft" do
   self.val.set "marginLeft" (toJS value)
 
 /-- `attribute CSSOMString margin-top` -/
-def CSSPageDescriptors.«margin-top» (self : CSSPageDescriptors) : IO String := self.val.get "margin-top" String
+@[macro_inline] def CSSPageDescriptors.«margin-top» (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.margin-top" do
+  self.val.get "margin-top" String
 
 /-- Sets `margin-top`: `attribute CSSOMString margin-top` -/
-def CSSPageDescriptors.«setMargin-top» (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.«setMargin-top» (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMargin-top" do
   self.val.set "margin-top" (toJS value)
 
 /-- `attribute CSSOMString margin-right` -/
-def CSSPageDescriptors.«margin-right» (self : CSSPageDescriptors) : IO String := self.val.get "margin-right" String
+@[macro_inline] def CSSPageDescriptors.«margin-right» (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.margin-right" do
+  self.val.get "margin-right" String
 
 /-- Sets `margin-right`: `attribute CSSOMString margin-right` -/
-def CSSPageDescriptors.«setMargin-right» (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.«setMargin-right» (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMargin-right" do
   self.val.set "margin-right" (toJS value)
 
 /-- `attribute CSSOMString margin-bottom` -/
-def CSSPageDescriptors.«margin-bottom» (self : CSSPageDescriptors) : IO String := self.val.get "margin-bottom" String
+@[macro_inline] def CSSPageDescriptors.«margin-bottom» (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.margin-bottom" do
+  self.val.get "margin-bottom" String
 
 /-- Sets `margin-bottom`: `attribute CSSOMString margin-bottom` -/
-def CSSPageDescriptors.«setMargin-bottom» (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.«setMargin-bottom» (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMargin-bottom" do
   self.val.set "margin-bottom" (toJS value)
 
 /-- `attribute CSSOMString margin-left` -/
-def CSSPageDescriptors.«margin-left» (self : CSSPageDescriptors) : IO String := self.val.get "margin-left" String
+@[macro_inline] def CSSPageDescriptors.«margin-left» (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.margin-left" do
+  self.val.get "margin-left" String
 
 /-- Sets `margin-left`: `attribute CSSOMString margin-left` -/
-def CSSPageDescriptors.«setMargin-left» (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.«setMargin-left» (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMargin-left" do
   self.val.set "margin-left" (toJS value)
 
 /-- `attribute CSSOMString size` -/
-def CSSPageDescriptors.size (self : CSSPageDescriptors) : IO String := self.val.get "size" String
+@[macro_inline] def CSSPageDescriptors.size (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.size" do
+  self.val.get "size" String
 
 /-- Sets `size`: `attribute CSSOMString size` -/
-def CSSPageDescriptors.setSize (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setSize (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setSize" do
   self.val.set "size" (toJS value)
 
 /-- `attribute CSSOMString pageOrientation` -/
-def CSSPageDescriptors.pageOrientation (self : CSSPageDescriptors) : IO String := self.val.get "pageOrientation" String
+@[macro_inline] def CSSPageDescriptors.pageOrientation (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.pageOrientation" do
+  self.val.get "pageOrientation" String
 
 /-- Sets `pageOrientation`: `attribute CSSOMString pageOrientation` -/
-def CSSPageDescriptors.setPageOrientation (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setPageOrientation (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setPageOrientation" do
   self.val.set "pageOrientation" (toJS value)
 
 /-- `attribute CSSOMString page-orientation` -/
-def CSSPageDescriptors.«page-orientation» (self : CSSPageDescriptors) : IO String := self.val.get "page-orientation" String
+@[macro_inline] def CSSPageDescriptors.«page-orientation» (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.page-orientation" do
+  self.val.get "page-orientation" String
 
 /-- Sets `page-orientation`: `attribute CSSOMString page-orientation` -/
-def CSSPageDescriptors.«setPage-orientation» (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.«setPage-orientation» (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setPage-orientation" do
   self.val.set "page-orientation" (toJS value)
 
 /-- `attribute CSSOMString marks` -/
-def CSSPageDescriptors.marks (self : CSSPageDescriptors) : IO String := self.val.get "marks" String
+@[macro_inline] def CSSPageDescriptors.marks (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.marks" do
+  self.val.get "marks" String
 
 /-- Sets `marks`: `attribute CSSOMString marks` -/
-def CSSPageDescriptors.setMarks (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setMarks (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setMarks" do
   self.val.set "marks" (toJS value)
 
 /-- `attribute CSSOMString bleed` -/
-def CSSPageDescriptors.bleed (self : CSSPageDescriptors) : IO String := self.val.get "bleed" String
+@[macro_inline] def CSSPageDescriptors.bleed (self : CSSPageDescriptors) : IO String := Internal.api "Lasm.JS.Web.CSSPageDescriptors.bleed" do
+  self.val.get "bleed" String
 
 /-- Sets `bleed`: `attribute CSSOMString bleed` -/
-def CSSPageDescriptors.setBleed (self : CSSPageDescriptors) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageDescriptors.setBleed (self : CSSPageDescriptors) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageDescriptors.setBleed" do
   self.val.set "bleed" (toJS value)
 
 /-- `v instanceof CSSStyleProperties`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleProperties`). -/
-def CSSStyleProperties.cast? (v : Value) : IO (Option CSSStyleProperties) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleProperties"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSStyleProperties.cast? (v : Value) : IO (Option CSSStyleProperties) := Internal.api "Lasm.JS.Web.CSSStyleProperties.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSStyleProperties"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString cssFloat` -/
-def CSSStyleProperties.cssFloat (self : CSSStyleProperties) : IO String := self.val.get "cssFloat" String
+@[macro_inline] def CSSStyleProperties.cssFloat (self : CSSStyleProperties) : IO String := Internal.api "Lasm.JS.Web.CSSStyleProperties.cssFloat" do
+  self.val.get "cssFloat" String
 
 /-- Sets `cssFloat`: `attribute CSSOMString cssFloat` -/
-def CSSStyleProperties.setCssFloat (self : CSSStyleProperties) (value : String) : IO Unit :=
+@[macro_inline] def CSSStyleProperties.setCssFloat (self : CSSStyleProperties) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleProperties.setCssFloat" do
   self.val.set "cssFloat" (toJS value)
 
 /-- `v instanceof CSSStyleSheet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleSheet`). -/
-def CSSStyleSheet.cast? (v : Value) : IO (Option CSSStyleSheet) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleSheet"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSStyleSheet.cast? (v : Value) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.CSSStyleSheet.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSStyleSheet"] Value) (fun x => { val := x }) v
 
 /-- `constructor(optional CSSStyleSheetInit options)` -/
-def CSSStyleSheet.new (options : Option CSSStyleSheetInit := none) : IO CSSStyleSheet :=
+@[macro_inline] def CSSStyleSheet.new (options : Option CSSStyleSheetInit := none) : IO CSSStyleSheet := Internal.api "Lasm.JS.Web.CSSStyleSheet.new" do
   Lasm.JS.Binding.invoke CSSStyleSheet { name := "Lasm.JS.Web.CSSStyleSheet.new", module := "globalThis", path := "CSSStyleSheet", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly attribute CSSRule? ownerRule` -/
-def CSSStyleSheet.ownerRule (self : CSSStyleSheet) : IO (Option CSSRule) := self.val.get "ownerRule" (Option CSSRule)
+@[macro_inline] def CSSStyleSheet.ownerRule (self : CSSStyleSheet) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSStyleSheet.ownerRule" do
+  self.val.get "ownerRule" (Option CSSRule)
 
 /-- `readonly attribute CSSRuleList cssRules` -/
-def CSSStyleSheet.cssRules (self : CSSStyleSheet) : IO CSSRuleList := do
+@[macro_inline] def CSSStyleSheet.cssRules (self : CSSStyleSheet) : IO CSSRuleList := Internal.api "Lasm.JS.Web.CSSStyleSheet.cssRules" do
   let r ← self.val.get "cssRules" Value
   pure { val := r }
 
 /-- `readonly attribute CSSRuleList rules` -/
-def CSSStyleSheet.rules (self : CSSStyleSheet) : IO CSSRuleList := do
+@[macro_inline] def CSSStyleSheet.rules (self : CSSStyleSheet) : IO CSSRuleList := Internal.api "Lasm.JS.Web.CSSStyleSheet.rules" do
   let r ← self.val.get "rules" Value
   pure { val := r }
 
 /-- `unsigned long insertRule(CSSOMString rule, optional unsigned long index)` -/
-def CSSStyleSheet.insertRule (self : CSSStyleSheet) (rule : String) (index : Option Nat := none) : IO Nat :=
-  self.val.callMethod "insertRule" (Support.args #[toJS rule, Support.optional index]) Nat
+@[macro_inline] def CSSStyleSheet.insertRule (self : CSSStyleSheet) (rule : String) (index : Option Nat := none) : IO Nat := Internal.api "Lasm.JS.Web.CSSStyleSheet.insertRule" do
+  self.val.callMethod "insertRule" (Internal.args #[toJS rule, Internal.optional index]) Nat
 
 /-- `undefined deleteRule(unsigned long index)` -/
-def CSSStyleSheet.deleteRule (self : CSSStyleSheet) (index : Nat) : IO Unit :=
-  self.val.callMethod "deleteRule" (Support.args #[toJS index]) Unit
+@[macro_inline] def CSSStyleSheet.deleteRule (self : CSSStyleSheet) (index : Nat) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleSheet.deleteRule" do
+  self.val.callMethod "deleteRule" (Internal.args #[toJS index]) Unit
 
 /-- `Promise<CSSStyleSheet> replace(USVString text)` -/
-def CSSStyleSheet.replace (self : CSSStyleSheet) (text : String) : Async CSSStyleSheet := do
-  let r ← self.val.callMethodAwait "replace" (Support.args #[toJS text]) Value
+@[macro_inline] def CSSStyleSheet.replace (self : CSSStyleSheet) (text : String) : Async CSSStyleSheet := Internal.api "Lasm.JS.Web.CSSStyleSheet.replace" do
+  let r ← self.val.callMethodAwait "replace" (Internal.args #[toJS text]) Value
   pure { val := r }
 
 /-- `undefined replaceSync(USVString text)` -/
-def CSSStyleSheet.replaceSync (self : CSSStyleSheet) (text : String) : IO Unit :=
-  self.val.callMethod "replaceSync" (Support.args #[toJS text]) Unit
+@[macro_inline] def CSSStyleSheet.replaceSync (self : CSSStyleSheet) (text : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleSheet.replaceSync" do
+  self.val.callMethod "replaceSync" (Internal.args #[toJS text]) Unit
 
 /-- `long addRule(optional DOMString selector, optional DOMString style, optional unsigned long index)` -/
-def CSSStyleSheet.addRule (self : CSSStyleSheet) (selector : Option String := none) (style : Option String := none) (index : Option Nat := none) : IO Int :=
-  self.val.callMethod "addRule" (Support.args #[Support.optional selector, Support.optional style, Support.optional index]) Int
+@[macro_inline] def CSSStyleSheet.addRule (self : CSSStyleSheet) (selector : Option String := none) (style : Option String := none) (index : Option Nat := none) : IO Int := Internal.api "Lasm.JS.Web.CSSStyleSheet.addRule" do
+  self.val.callMethod "addRule" (Internal.args #[Internal.optional selector, Internal.optional style, Internal.optional index]) Int
 
 /-- `undefined removeRule(optional unsigned long index)` -/
-def CSSStyleSheet.removeRule (self : CSSStyleSheet) (index : Option Nat := none) : IO Unit :=
-  self.val.callMethod "removeRule" (Support.args #[Support.optional index]) Unit
+@[macro_inline] def CSSStyleSheet.removeRule (self : CSSStyleSheet) (index : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleSheet.removeRule" do
+  self.val.callMethod "removeRule" (Internal.args #[Internal.optional index]) Unit
 
 /-- `v instanceof CSSPageRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPageRule`). -/
-def CSSPageRule.cast? (v : Value) : IO (Option CSSPageRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSPageRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSPageRule.cast? (v : Value) : IO (Option CSSPageRule) := Internal.api "Lasm.JS.Web.CSSPageRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSPageRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString selectorText` -/
-def CSSPageRule.selectorText (self : CSSPageRule) : IO String := self.val.get "selectorText" String
+@[macro_inline] def CSSPageRule.selectorText (self : CSSPageRule) : IO String := Internal.api "Lasm.JS.Web.CSSPageRule.selectorText" do
+  self.val.get "selectorText" String
 
 /-- Sets `selectorText`: `attribute CSSOMString selectorText` -/
-def CSSPageRule.setSelectorText (self : CSSPageRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSPageRule.setSelectorText (self : CSSPageRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSPageRule.setSelectorText" do
   self.val.set "selectorText" (toJS value)
 
 /-- `readonly attribute CSSPageDescriptors style` -/
-def CSSPageRule.style (self : CSSPageRule) : IO CSSPageDescriptors := do
+@[macro_inline] def CSSPageRule.style (self : CSSPageRule) : IO CSSPageDescriptors := Internal.api "Lasm.JS.Web.CSSPageRule.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `v instanceof CSSStyleRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleRule`). -/
-def CSSStyleRule.cast? (v : Value) : IO (Option CSSStyleRule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleRule"] Value) v) then some { val := v } else none
+@[macro_inline] def CSSStyleRule.cast? (v : Value) : IO (Option CSSStyleRule) := Internal.api "Lasm.JS.Web.CSSStyleRule.cast?" do
+  Internal.cast (Internal.getGlobal ["CSSStyleRule"] Value) (fun x => { val := x }) v
 
 /-- `attribute CSSOMString selectorText` -/
-def CSSStyleRule.selectorText (self : CSSStyleRule) : IO String := self.val.get "selectorText" String
+@[macro_inline] def CSSStyleRule.selectorText (self : CSSStyleRule) : IO String := Internal.api "Lasm.JS.Web.CSSStyleRule.selectorText" do
+  self.val.get "selectorText" String
 
 /-- Sets `selectorText`: `attribute CSSOMString selectorText` -/
-def CSSStyleRule.setSelectorText (self : CSSStyleRule) (value : String) : IO Unit :=
+@[macro_inline] def CSSStyleRule.setSelectorText (self : CSSStyleRule) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CSSStyleRule.setSelectorText" do
   self.val.set "selectorText" (toJS value)
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def CSSStyleRule.style (self : CSSStyleRule) : IO CSSStyleProperties := do
+@[macro_inline] def CSSStyleRule.style (self : CSSStyleRule) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.CSSStyleRule.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `readonly attribute StyleSheetList styleSheets` -/
-def Document.styleSheets (self : Document) : IO StyleSheetList := do
+@[macro_inline] def Document.styleSheets (self : Document) : IO StyleSheetList := Internal.api "Lasm.JS.Web.Document.styleSheets" do
   let r ← self.val.get "styleSheets" Value
   pure { val := r }
 
 /-- `attribute ObservableArray<CSSStyleSheet> adoptedStyleSheets` -/
-def Document.adoptedStyleSheets (self : Document) : IO (Array CSSStyleSheet) := self.val.get "adoptedStyleSheets" (Array CSSStyleSheet)
+@[macro_inline] def Document.adoptedStyleSheets (self : Document) : IO (Array CSSStyleSheet) := Internal.api "Lasm.JS.Web.Document.adoptedStyleSheets" do
+  self.val.get "adoptedStyleSheets" (Array CSSStyleSheet)
 
 /-- Sets `adoptedStyleSheets`: `attribute ObservableArray<CSSStyleSheet> adoptedStyleSheets` -/
-def Document.setAdoptedStyleSheets (self : Document) (value : Array CSSStyleSheet) : IO Unit :=
+@[macro_inline] def Document.setAdoptedStyleSheets (self : Document) (value : Array CSSStyleSheet) : IO Unit := Internal.api "Lasm.JS.Web.Document.setAdoptedStyleSheets" do
   self.val.set "adoptedStyleSheets" (toJS value)
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def HTMLElement.style (self : HTMLElement) : IO CSSStyleProperties := do
+@[macro_inline] def HTMLElement.style (self : HTMLElement) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.HTMLElement.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def MathMLElement.style (self : MathMLElement) : IO CSSStyleProperties := do
+@[macro_inline] def MathMLElement.style (self : MathMLElement) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.MathMLElement.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `readonly attribute CSSStyleSheet? sheet` -/
-def ProcessingInstruction.sheet (self : ProcessingInstruction) : IO (Option CSSStyleSheet) := self.val.get "sheet" (Option CSSStyleSheet)
+@[macro_inline] def ProcessingInstruction.sheet (self : ProcessingInstruction) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.ProcessingInstruction.sheet" do
+  self.val.get "sheet" (Option CSSStyleSheet)
 
 /-- `readonly attribute CSSStyleProperties style` -/
-def SVGElement.style (self : SVGElement) : IO CSSStyleProperties := do
+@[macro_inline] def SVGElement.style (self : SVGElement) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.SVGElement.style" do
   let r ← self.val.get "style" Value
   pure { val := r }
 
 /-- `readonly attribute StyleSheetList styleSheets` -/
-def ShadowRoot.styleSheets (self : ShadowRoot) : IO StyleSheetList := do
+@[macro_inline] def ShadowRoot.styleSheets (self : ShadowRoot) : IO StyleSheetList := Internal.api "Lasm.JS.Web.ShadowRoot.styleSheets" do
   let r ← self.val.get "styleSheets" Value
   pure { val := r }
 
 /-- `attribute ObservableArray<CSSStyleSheet> adoptedStyleSheets` -/
-def ShadowRoot.adoptedStyleSheets (self : ShadowRoot) : IO (Array CSSStyleSheet) := self.val.get "adoptedStyleSheets" (Array CSSStyleSheet)
+@[macro_inline] def ShadowRoot.adoptedStyleSheets (self : ShadowRoot) : IO (Array CSSStyleSheet) := Internal.api "Lasm.JS.Web.ShadowRoot.adoptedStyleSheets" do
+  self.val.get "adoptedStyleSheets" (Array CSSStyleSheet)
 
 /-- Sets `adoptedStyleSheets`: `attribute ObservableArray<CSSStyleSheet> adoptedStyleSheets` -/
-def ShadowRoot.setAdoptedStyleSheets (self : ShadowRoot) (value : Array CSSStyleSheet) : IO Unit :=
+@[macro_inline] def ShadowRoot.setAdoptedStyleSheets (self : ShadowRoot) (value : Array CSSStyleSheet) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.setAdoptedStyleSheets" do
   self.val.set "adoptedStyleSheets" (toJS value)
 
+/-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` -/
+@[macro_inline] def Window.getComputedStyle (self : Window) (elt : Element) (pseudoElt : Option String := none) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.Window.getComputedStyle" do
+  let r ← self.val.callMethod "getComputedStyle" (Internal.args #[toJS elt, Internal.optional pseudoElt]) Value
+  pure { val := r }
+
 /-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` (CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)) -/
-def getComputedStyle (elt : Element) (pseudoElt : Option String := none) : IO CSSStyleProperties := do
+@[macro_inline] def getComputedStyle (elt : Element) (pseudoElt : Option String := none) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.getComputedStyle" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.getComputedStyle", module := "globalThis", path := "getComputedStyle", construct := false, arity := 2 }
-    (Support.args #[toJS elt, Support.optional pseudoElt]) (await := false)
+    (Internal.args #[toJS elt, Internal.optional pseudoElt]) (await := false)
   pure { val := r }
 
 /-- `CSSOMString escape(CSSOMString ident)` (CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)) -/
-def CSS.escape (ident : String) : IO String :=
+@[macro_inline] def CSS.escape (ident : String) : IO String := Internal.api "Lasm.JS.Web.CSS.escape" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.CSS.escape", module := "globalThis", path := "CSS.escape", construct := false, arity := 1 }
-    (Support.args #[toJS ident]) (await := false)
+    (Internal.args #[toJS ident]) (await := false)
 
 end Lasm.JS.Web

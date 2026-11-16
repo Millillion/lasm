@@ -6,11 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.MediacaptureStreams
+import Lasm.JS.Web.Types.Webrtc
+import Lasm.JS.Web.Types.WebrtcIdentity
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary RTCIdentityProviderOptions` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIdentityProviderOptions where
@@ -20,9 +26,9 @@ structure RTCIdentityProviderOptions where
   usernameHint : Option String := none
   /-- `DOMString peerIdentity` -/
   peerIdentity : Option String := none
-instance : ToJS RTCIdentityProviderOptions := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),
-    ("usernameHint", Support.optional d.usernameHint),
-    ("peerIdentity", Support.optional d.peerIdentity)]⟩
+instance : ToJS RTCIdentityProviderOptions := ⟨fun d => Internal.fields #[("protocol", Internal.optional d.protocol),
+    ("usernameHint", Internal.optional d.usernameHint),
+    ("peerIdentity", Internal.optional d.peerIdentity)]⟩
 instance : FromJS RTCIdentityProviderOptions where
   fromJS d := do return {
     protocol := ← Lasm.JS.readField (Option String) d "protocol",
@@ -36,6 +42,8 @@ structure RTCIdentityProviderDetails where
   domain : String
   /-- `DOMString protocol = "default"` -/
   protocol : Option String := none
+instance : ToJS RTCIdentityProviderDetails := ⟨fun d => Internal.fields #[("domain", toJS d.domain),
+    ("protocol", Internal.optional d.protocol)]⟩
 
 /-- `dictionary RTCIdentityAssertionResult` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIdentityAssertionResult where
@@ -43,6 +51,8 @@ structure RTCIdentityAssertionResult where
   idp : RTCIdentityProviderDetails
   /-- `required DOMString assertion` -/
   assertion : String
+instance : ToJS RTCIdentityAssertionResult := ⟨fun d => Internal.fields #[("idp", toJS d.idp),
+    ("assertion", toJS d.assertion)]⟩
 
 /-- `callback GenerateAssertionCallback = Promise<RTCIdentityAssertionResult> (DOMString contents, DOMString origin, optional RTCIdentityProviderOptions options)` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure GenerateAssertionCallback where
@@ -53,10 +63,10 @@ instance : ToJS GenerateAssertionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS GenerateAssertionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.GenerateAssertionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def GenerateAssertionCallback.ofFn (f : String → String → (Option RTCIdentityProviderOptions) → Async RTCIdentityAssertionResult) : IO GenerateAssertionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg (Option RTCIdentityProviderOptions) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg (Option RTCIdentityProviderOptions) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def GenerateAssertionCallback.ofSyncFn (f : String → String → (Option RTCIdentityProviderOptions) → IO RTCIdentityAssertionResult) : IO GenerateAssertionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg (Option RTCIdentityProviderOptions) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg (Option RTCIdentityProviderOptions) args 2)) }
 
 /-- `dictionary RTCIdentityValidationResult` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIdentityValidationResult where
@@ -64,6 +74,8 @@ structure RTCIdentityValidationResult where
   identity : String
   /-- `required DOMString contents` -/
   contents : String
+instance : ToJS RTCIdentityValidationResult := ⟨fun d => Internal.fields #[("identity", toJS d.identity),
+    ("contents", toJS d.contents)]⟩
 
 /-- `callback ValidateAssertionCallback = Promise<RTCIdentityValidationResult> (DOMString assertion, DOMString origin)` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ValidateAssertionCallback where
@@ -74,10 +86,10 @@ instance : ToJS ValidateAssertionCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ValidateAssertionCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ValidateAssertionCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ValidateAssertionCallback.ofFn (f : String → String → Async RTCIdentityValidationResult) : IO ValidateAssertionCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ValidateAssertionCallback.ofSyncFn (f : String → String → IO RTCIdentityValidationResult) : IO ValidateAssertionCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1)) }
 
 /-- `dictionary RTCIdentityProvider` (Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RTCIdentityProvider where
@@ -85,80 +97,87 @@ structure RTCIdentityProvider where
   generateAssertion : GenerateAssertionCallback
   /-- `required ValidateAssertionCallback validateAssertion` -/
   validateAssertion : ValidateAssertionCallback
-instance : ToJS RTCIdentityProvider := ⟨fun d => Support.fields #[("generateAssertion", toJS d.generateAssertion),
+instance : ToJS RTCIdentityProvider := ⟨fun d => Internal.fields #[("generateAssertion", toJS d.generateAssertion),
     ("validateAssertion", toJS d.validateAssertion)]⟩
 
 /-- `v instanceof RTCIdentityAssertion`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIdentityAssertion`). -/
-def RTCIdentityAssertion.cast? (v : Value) : IO (Option RTCIdentityAssertion) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIdentityAssertion"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIdentityAssertion.cast? (v : Value) : IO (Option RTCIdentityAssertion) := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIdentityAssertion"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString idp, DOMString name)` -/
-def RTCIdentityAssertion.new (idp : String) (name : String) : IO RTCIdentityAssertion :=
+@[macro_inline] def RTCIdentityAssertion.new (idp : String) (name : String) : IO RTCIdentityAssertion := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.new" do
   Lasm.JS.Binding.invoke RTCIdentityAssertion { name := "Lasm.JS.Web.RTCIdentityAssertion.new", module := "globalThis", path := "RTCIdentityAssertion", construct := true, arity := 2 }
-    (Support.args #[toJS idp, toJS name]) (await := false)
+    (Internal.args #[toJS idp, toJS name]) (await := false)
 
 /-- `attribute DOMString idp` -/
-def RTCIdentityAssertion.idp (self : RTCIdentityAssertion) : IO String := self.val.get "idp" String
+@[macro_inline] def RTCIdentityAssertion.idp (self : RTCIdentityAssertion) : IO String := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.idp" do
+  self.val.get "idp" String
 
 /-- Sets `idp`: `attribute DOMString idp` -/
-def RTCIdentityAssertion.setIdp (self : RTCIdentityAssertion) (value : String) : IO Unit :=
+@[macro_inline] def RTCIdentityAssertion.setIdp (self : RTCIdentityAssertion) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.setIdp" do
   self.val.set "idp" (toJS value)
 
 /-- `attribute DOMString name` -/
-def RTCIdentityAssertion.name (self : RTCIdentityAssertion) : IO String := self.val.get "name" String
+@[macro_inline] def RTCIdentityAssertion.name (self : RTCIdentityAssertion) : IO String := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.name" do
+  self.val.get "name" String
 
 /-- Sets `name`: `attribute DOMString name` -/
-def RTCIdentityAssertion.setName (self : RTCIdentityAssertion) (value : String) : IO Unit :=
+@[macro_inline] def RTCIdentityAssertion.setName (self : RTCIdentityAssertion) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.setName" do
   self.val.set "name" (toJS value)
 
 /-- `v instanceof RTCIdentityProviderGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIdentityProviderGlobalScope`). -/
-def RTCIdentityProviderGlobalScope.cast? (v : Value) : IO (Option RTCIdentityProviderGlobalScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIdentityProviderGlobalScope"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIdentityProviderGlobalScope.cast? (v : Value) : IO (Option RTCIdentityProviderGlobalScope) := Internal.api "Lasm.JS.Web.RTCIdentityProviderGlobalScope.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIdentityProviderGlobalScope"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute RTCIdentityProviderRegistrar rtcIdentityProvider` -/
-def RTCIdentityProviderGlobalScope.rtcIdentityProvider (self : RTCIdentityProviderGlobalScope) : IO RTCIdentityProviderRegistrar := do
+@[macro_inline] def RTCIdentityProviderGlobalScope.rtcIdentityProvider (self : RTCIdentityProviderGlobalScope) : IO RTCIdentityProviderRegistrar := Internal.api "Lasm.JS.Web.RTCIdentityProviderGlobalScope.rtcIdentityProvider" do
   let r ← self.val.get "rtcIdentityProvider" Value
   pure { val := r }
 
 /-- `v instanceof RTCIdentityProviderRegistrar`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCIdentityProviderRegistrar`). -/
-def RTCIdentityProviderRegistrar.cast? (v : Value) : IO (Option RTCIdentityProviderRegistrar) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RTCIdentityProviderRegistrar"] Value) v) then some { val := v } else none
+@[macro_inline] def RTCIdentityProviderRegistrar.cast? (v : Value) : IO (Option RTCIdentityProviderRegistrar) := Internal.api "Lasm.JS.Web.RTCIdentityProviderRegistrar.cast?" do
+  Internal.cast (Internal.getGlobal ["RTCIdentityProviderRegistrar"] Value) (fun x => { val := x }) v
 
 /-- `undefined register(RTCIdentityProvider idp)` -/
-def RTCIdentityProviderRegistrar.register (self : RTCIdentityProviderRegistrar) (idp : RTCIdentityProvider) : IO Unit :=
-  self.val.callMethod "register" (Support.args #[toJS idp]) Unit
+@[macro_inline] def RTCIdentityProviderRegistrar.register (self : RTCIdentityProviderRegistrar) (idp : RTCIdentityProvider) : IO Unit := Internal.api "Lasm.JS.Web.RTCIdentityProviderRegistrar.register" do
+  self.val.callMethod "register" (Internal.args #[toJS idp]) Unit
 
 /-- `readonly attribute boolean isolated` -/
-def MediaStreamTrack.isolated (self : MediaStreamTrack) : IO Bool := self.val.get "isolated" Bool
+@[macro_inline] def MediaStreamTrack.isolated (self : MediaStreamTrack) : IO Bool := Internal.api "Lasm.JS.Web.MediaStreamTrack.isolated" do
+  self.val.get "isolated" Bool
 
 /-- `attribute EventHandler onisolationchange` -/
-def MediaStreamTrack.onisolationchange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := self.val.get "onisolationchange" (Option EventHandlerNonNull)
+@[macro_inline] def MediaStreamTrack.onisolationchange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onisolationchange" do
+  self.val.get "onisolationchange" (Option EventHandlerNonNull)
 
 /-- Sets `onisolationchange`: `attribute EventHandler onisolationchange` -/
-def MediaStreamTrack.setOnisolationchange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def MediaStreamTrack.setOnisolationchange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnisolationchange" do
   self.val.set "onisolationchange" (toJS value)
 
 /-- `readonly attribute long? httpRequestStatusCode` -/
-def RTCError.httpRequestStatusCode (self : RTCError) : IO (Option Int) := self.val.get "httpRequestStatusCode" (Option Int)
+@[macro_inline] def RTCError.httpRequestStatusCode (self : RTCError) : IO (Option Int) := Internal.api "Lasm.JS.Web.RTCError.httpRequestStatusCode" do
+  self.val.get "httpRequestStatusCode" (Option Int)
 
 /-- `readonly attribute Promise<RTCIdentityAssertion> peerIdentity` -/
-def RTCPeerConnection.peerIdentity (self : RTCPeerConnection) : Async RTCIdentityAssertion := do
+@[macro_inline] def RTCPeerConnection.peerIdentity (self : RTCPeerConnection) : Async RTCIdentityAssertion := Internal.api "Lasm.JS.Web.RTCPeerConnection.peerIdentity" do
   let p ← self.val.get "peerIdentity" Value
   let r ← p.await Value
   pure { val := r }
 
 /-- `readonly attribute DOMString? idpLoginUrl` -/
-def RTCPeerConnection.idpLoginUrl (self : RTCPeerConnection) : IO (Option String) := self.val.get "idpLoginUrl" (Option String)
+@[macro_inline] def RTCPeerConnection.idpLoginUrl (self : RTCPeerConnection) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.idpLoginUrl" do
+  self.val.get "idpLoginUrl" (Option String)
 
 /-- `readonly attribute DOMString? idpErrorInfo` -/
-def RTCPeerConnection.idpErrorInfo (self : RTCPeerConnection) : IO (Option String) := self.val.get "idpErrorInfo" (Option String)
+@[macro_inline] def RTCPeerConnection.idpErrorInfo (self : RTCPeerConnection) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.idpErrorInfo" do
+  self.val.get "idpErrorInfo" (Option String)
 
 /-- `undefined setIdentityProvider(DOMString provider, optional RTCIdentityProviderOptions options)` -/
-def RTCPeerConnection.setIdentityProvider (self : RTCPeerConnection) (provider : String) (options : Option RTCIdentityProviderOptions := none) : IO Unit :=
-  self.val.callMethod "setIdentityProvider" (Support.args #[toJS provider, Support.optional options]) Unit
+@[macro_inline] def RTCPeerConnection.setIdentityProvider (self : RTCPeerConnection) (provider : String) (options : Option RTCIdentityProviderOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setIdentityProvider" do
+  self.val.callMethod "setIdentityProvider" (Internal.args #[toJS provider, Internal.optional options]) Unit
 
 /-- `Promise<DOMString> getIdentityAssertion()` -/
-def RTCPeerConnection.getIdentityAssertion (self : RTCPeerConnection) : Async String :=
-  self.val.callMethodAwait "getIdentityAssertion" (Support.args #[]) String
+@[macro_inline] def RTCPeerConnection.getIdentityAssertion (self : RTCPeerConnection) : Async String := Internal.api "Lasm.JS.Web.RTCPeerConnection.getIdentityAssertion" do
+  self.val.callMethodAwait "getIdentityAssertion" (Internal.args #[]) String
 
 end Lasm.JS.Web

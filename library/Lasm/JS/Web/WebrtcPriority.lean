@@ -6,13 +6,17 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
-import Lasm.JS.Web.Webrtc
+import Lasm.JS.Web.Types.Webrtc
+import Lasm.JS.Web.Types.WebrtcPriority
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `readonly attribute RTCPriorityType priority` -/
-def RTCDataChannel.priority (self : RTCDataChannel) : IO RTCPriorityType := self.val.get "priority" RTCPriorityType
+@[macro_inline] def RTCDataChannel.priority (self : RTCDataChannel) : IO RTCPriorityType := Internal.api "Lasm.JS.Web.RTCDataChannel.priority" do
+  self.val.get "priority" RTCPriorityType
 
 end Lasm.JS.Web

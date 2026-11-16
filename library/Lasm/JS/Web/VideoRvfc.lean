@@ -6,10 +6,13 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary VideoFrameCallbackMetadata` (HTMLVideoElement.requestVideoFrameCallback() (https://wicg.github.io/video-rvfc/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VideoFrameCallbackMetadata where
@@ -33,6 +36,16 @@ structure VideoFrameCallbackMetadata where
   receiveTime : Option Float := none
   /-- `unsigned long rtpTimestamp` -/
   rtpTimestamp : Option Nat := none
+instance : ToJS VideoFrameCallbackMetadata := ⟨fun d => Internal.fields #[("presentationTime", toJS d.presentationTime),
+    ("expectedDisplayTime", toJS d.expectedDisplayTime),
+    ("width", toJS d.width),
+    ("height", toJS d.height),
+    ("mediaTime", toJS d.mediaTime),
+    ("presentedFrames", toJS d.presentedFrames),
+    ("processingDuration", Internal.optional d.processingDuration),
+    ("captureTime", Internal.optional d.captureTime),
+    ("receiveTime", Internal.optional d.receiveTime),
+    ("rtpTimestamp", Internal.optional d.rtpTimestamp)]⟩
 instance : FromJS VideoFrameCallbackMetadata where
   fromJS d := do return {
     presentationTime := ← Lasm.JS.readField Float d "presentationTime",
@@ -56,17 +69,17 @@ instance : ToJS VideoFrameRequestCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS VideoFrameRequestCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.VideoFrameRequestCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def VideoFrameRequestCallback.ofFn (f : Float → VideoFrameCallbackMetadata → Async Unit) : IO VideoFrameRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg VideoFrameCallbackMetadata args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg VideoFrameCallbackMetadata args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def VideoFrameRequestCallback.ofSyncFn (f : Float → VideoFrameCallbackMetadata → IO Unit) : IO VideoFrameRequestCallback := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg VideoFrameCallbackMetadata args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg VideoFrameCallbackMetadata args 1)) }
 
 /-- `unsigned long requestVideoFrameCallback(VideoFrameRequestCallback callback)` -/
-def HTMLVideoElement.requestVideoFrameCallback (self : HTMLVideoElement) (callback : VideoFrameRequestCallback) : IO Nat :=
-  self.val.callMethod "requestVideoFrameCallback" (Support.args #[toJS callback]) Nat
+@[macro_inline] def HTMLVideoElement.requestVideoFrameCallback (self : HTMLVideoElement) (callback : VideoFrameRequestCallback) : IO Nat := Internal.api "Lasm.JS.Web.HTMLVideoElement.requestVideoFrameCallback" do
+  self.val.callMethod "requestVideoFrameCallback" (Internal.args #[toJS callback]) Nat
 
 /-- `undefined cancelVideoFrameCallback(unsigned long handle)` -/
-def HTMLVideoElement.cancelVideoFrameCallback (self : HTMLVideoElement) (handle : Nat) : IO Unit :=
-  self.val.callMethod "cancelVideoFrameCallback" (Support.args #[toJS handle]) Unit
+@[macro_inline] def HTMLVideoElement.cancelVideoFrameCallback (self : HTMLVideoElement) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.HTMLVideoElement.cancelVideoFrameCallback" do
+  self.val.callMethod "cancelVideoFrameCallback" (Internal.args #[toJS handle]) Unit
 
 end Lasm.JS.Web

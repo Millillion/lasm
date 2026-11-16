@@ -6,37 +6,22 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.ClipboardApis
+import Lasm.JS.Web.Types.FileAPI
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum PresentationStyle` (Clipboard API and events (https://w3c.github.io/clipboard-apis/)): "unspecified", "inline", "attachment". -/
-inductive PresentationStyle where
-  /-- "unspecified" -/
-  | unspecified
-  /-- "inline" -/
-  | inline
-  /-- "attachment" -/
-  | attachment
-  deriving BEq, Repr, Inhabited
-instance : ToJS PresentationStyle := ⟨fun
-  | .unspecified => .string "unspecified"
-  | .inline => .string "inline"
-  | .attachment => .string "attachment"⟩
-instance : FromJS PresentationStyle where
-  fromJS
-    | .string "unspecified" => .ok .unspecified
-    | .string "inline" => .ok .inline
-    | .string "attachment" => .ok .attachment
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.PresentationStyle"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary ClipboardUnsanitizedFormats` (Clipboard API and events (https://w3c.github.io/clipboard-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ClipboardUnsanitizedFormats where
   /-- `sequence<DOMString> unsanitized` -/
   unsanitized : Option (Array String) := none
-instance : ToJS ClipboardUnsanitizedFormats := ⟨fun d => Support.fields #[("unsanitized", Support.optional d.unsanitized)]⟩
+instance : ToJS ClipboardUnsanitizedFormats := ⟨fun d => Internal.fields #[("unsanitized", Internal.optional d.unsanitized)]⟩
 
 /-- `dictionary ClipboardChangeEventInit : EventInit` (Clipboard API and events (https://w3c.github.io/clipboard-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ClipboardChangeEventInit where
@@ -50,11 +35,11 @@ structure ClipboardChangeEventInit where
   types : Option (Array String) := none
   /-- `bigint changeId = 0` -/
   changeId : Option Int := none
-instance : ToJS ClipboardChangeEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("types", Support.optional d.types),
-    ("changeId", Support.optional d.changeId)]⟩
+instance : ToJS ClipboardChangeEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("types", Internal.optional d.types),
+    ("changeId", Internal.optional d.changeId)]⟩
 
 /-- `dictionary ClipboardEventInit : EventInit` (Clipboard API and events (https://w3c.github.io/clipboard-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ClipboardEventInit where
@@ -66,10 +51,10 @@ structure ClipboardEventInit where
   composed : Option Bool := none
   /-- `DataTransfer? clipboardData = null` -/
   clipboardData : Option DataTransfer := none
-instance : ToJS ClipboardEventInit := ⟨fun d => Support.fields #[("bubbles", Support.optional d.bubbles),
-    ("cancelable", Support.optional d.cancelable),
-    ("composed", Support.optional d.composed),
-    ("clipboardData", Support.optional d.clipboardData)]⟩
+instance : ToJS ClipboardEventInit := ⟨fun d => Internal.fields #[("bubbles", Internal.optional d.bubbles),
+    ("cancelable", Internal.optional d.cancelable),
+    ("composed", Internal.optional d.composed),
+    ("clipboardData", Internal.optional d.clipboardData)]⟩
 
 /-- `(DOMString or Blob)`: one constructor per member type. -/
 inductive DOMStringOrBlob where
@@ -82,82 +67,96 @@ inductive DOMStringOrBlob where
 structure ClipboardItemOptions where
   /-- `PresentationStyle presentationStyle = "unspecified"` -/
   presentationStyle : Option PresentationStyle := none
-instance : ToJS ClipboardItemOptions := ⟨fun d => Support.fields #[("presentationStyle", Support.optional d.presentationStyle)]⟩
+instance : ToJS ClipboardItemOptions := ⟨fun d => Internal.fields #[("presentationStyle", Internal.optional d.presentationStyle)]⟩
+
+/-- `dictionary ClipboardPermissionDescriptor : PermissionDescriptor` (Clipboard API and events (https://w3c.github.io/clipboard-apis/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ClipboardPermissionDescriptor where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `boolean allowWithoutGesture = false` -/
+  allowWithoutGesture : Option Bool := none
+instance : ToJS ClipboardPermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("allowWithoutGesture", Internal.optional d.allowWithoutGesture)]⟩
 
 /-- `v instanceof Clipboard`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Clipboard`). -/
-def Clipboard.cast? (v : Value) : IO (Option Clipboard) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Clipboard"] Value) v) then some { val := v } else none
+@[macro_inline] def Clipboard.cast? (v : Value) : IO (Option Clipboard) := Internal.api "Lasm.JS.Web.Clipboard.cast?" do
+  Internal.cast (Internal.getGlobal ["Clipboard"] Value) (fun x => { val := x }) v
 
 /-- `Promise<ClipboardItems> read(optional ClipboardUnsanitizedFormats formats)` -/
-def Clipboard.read (self : Clipboard) (formats : Option ClipboardUnsanitizedFormats := none) : Async (Array ClipboardItem) :=
-  self.val.callMethodAwait "read" (Support.args #[Support.optional formats]) (Array ClipboardItem)
+@[macro_inline] def Clipboard.read (self : Clipboard) (formats : Option ClipboardUnsanitizedFormats := none) : Async (Array ClipboardItem) := Internal.api "Lasm.JS.Web.Clipboard.read" do
+  self.val.callMethodAwait "read" (Internal.args #[Internal.optional formats]) (Array ClipboardItem)
 
 /-- `Promise<DOMString> readText()` -/
-def Clipboard.readText (self : Clipboard) : Async String :=
-  self.val.callMethodAwait "readText" (Support.args #[]) String
+@[macro_inline] def Clipboard.readText (self : Clipboard) : Async String := Internal.api "Lasm.JS.Web.Clipboard.readText" do
+  self.val.callMethodAwait "readText" (Internal.args #[]) String
 
 /-- `Promise<undefined> write(ClipboardItems data)` -/
-def Clipboard.write (self : Clipboard) (data : Array ClipboardItem) : Async Unit :=
-  self.val.callMethodAwait "write" (Support.args #[toJS data]) Unit
+@[macro_inline] def Clipboard.write (self : Clipboard) (data : Array ClipboardItem) : Async Unit := Internal.api "Lasm.JS.Web.Clipboard.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS data]) Unit
 
 /-- `Promise<undefined> writeText(DOMString data)` -/
-def Clipboard.writeText (self : Clipboard) (data : String) : Async Unit :=
-  self.val.callMethodAwait "writeText" (Support.args #[toJS data]) Unit
+@[macro_inline] def Clipboard.writeText (self : Clipboard) (data : String) : Async Unit := Internal.api "Lasm.JS.Web.Clipboard.writeText" do
+  self.val.callMethodAwait "writeText" (Internal.args #[toJS data]) Unit
 
 /-- `v instanceof ClipboardChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClipboardChangeEvent`). -/
-def ClipboardChangeEvent.cast? (v : Value) : IO (Option ClipboardChangeEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ClipboardChangeEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ClipboardChangeEvent.cast? (v : Value) : IO (Option ClipboardChangeEvent) := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ClipboardChangeEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ClipboardChangeEventInit eventInitDict)` -/
-def ClipboardChangeEvent.new (type : String) (eventInitDict : Option ClipboardChangeEventInit := none) : IO ClipboardChangeEvent :=
+@[macro_inline] def ClipboardChangeEvent.new (type : String) (eventInitDict : Option ClipboardChangeEventInit := none) : IO ClipboardChangeEvent := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.new" do
   Lasm.JS.Binding.invoke ClipboardChangeEvent { name := "Lasm.JS.Web.ClipboardChangeEvent.new", module := "globalThis", path := "ClipboardChangeEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute FrozenArray<DOMString> types` -/
-def ClipboardChangeEvent.types (self : ClipboardChangeEvent) : IO (Array String) := self.val.get "types" (Array String)
+@[macro_inline] def ClipboardChangeEvent.types (self : ClipboardChangeEvent) : IO (Array String) := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.types" do
+  self.val.get "types" (Array String)
 
 /-- `readonly attribute bigint changeId` -/
-def ClipboardChangeEvent.changeId (self : ClipboardChangeEvent) : IO Int := self.val.get "changeId" Int
+@[macro_inline] def ClipboardChangeEvent.changeId (self : ClipboardChangeEvent) : IO Int := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.changeId" do
+  self.val.get "changeId" Int
 
 /-- `v instanceof ClipboardEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClipboardEvent`). -/
-def ClipboardEvent.cast? (v : Value) : IO (Option ClipboardEvent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ClipboardEvent"] Value) v) then some { val := v } else none
+@[macro_inline] def ClipboardEvent.cast? (v : Value) : IO (Option ClipboardEvent) := Internal.api "Lasm.JS.Web.ClipboardEvent.cast?" do
+  Internal.cast (Internal.getGlobal ["ClipboardEvent"] Value) (fun x => { val := x }) v
 
 /-- `constructor(DOMString type, optional ClipboardEventInit eventInitDict)` -/
-def ClipboardEvent.new (type : String) (eventInitDict : Option ClipboardEventInit := none) : IO ClipboardEvent :=
+@[macro_inline] def ClipboardEvent.new (type : String) (eventInitDict : Option ClipboardEventInit := none) : IO ClipboardEvent := Internal.api "Lasm.JS.Web.ClipboardEvent.new" do
   Lasm.JS.Binding.invoke ClipboardEvent { name := "Lasm.JS.Web.ClipboardEvent.new", module := "globalThis", path := "ClipboardEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional eventInitDict]) (await := false)
+    (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
 /-- `readonly attribute DataTransfer? clipboardData` -/
-def ClipboardEvent.clipboardData (self : ClipboardEvent) : IO (Option DataTransfer) := self.val.get "clipboardData" (Option DataTransfer)
+@[macro_inline] def ClipboardEvent.clipboardData (self : ClipboardEvent) : IO (Option DataTransfer) := Internal.api "Lasm.JS.Web.ClipboardEvent.clipboardData" do
+  self.val.get "clipboardData" (Option DataTransfer)
 
 /-- `v instanceof ClipboardItem`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClipboardItem`). -/
-def ClipboardItem.cast? (v : Value) : IO (Option ClipboardItem) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ClipboardItem"] Value) v) then some { val := v } else none
+@[macro_inline] def ClipboardItem.cast? (v : Value) : IO (Option ClipboardItem) := Internal.api "Lasm.JS.Web.ClipboardItem.cast?" do
+  Internal.cast (Internal.getGlobal ["ClipboardItem"] Value) (fun x => { val := x }) v
 
 /-- `constructor(record<DOMString, ClipboardItemData> items, optional ClipboardItemOptions options)` -/
-def ClipboardItem.new (items : Record Value) (options : Option ClipboardItemOptions := none) : IO ClipboardItem :=
+@[macro_inline] def ClipboardItem.new (items : Record Value) (options : Option ClipboardItemOptions := none) : IO ClipboardItem := Internal.api "Lasm.JS.Web.ClipboardItem.new" do
   Lasm.JS.Binding.invoke ClipboardItem { name := "Lasm.JS.Web.ClipboardItem.new", module := "globalThis", path := "ClipboardItem", construct := true, arity := 2 }
-    (Support.args #[toJS items, Support.optional options]) (await := false)
+    (Internal.args #[toJS items, Internal.optional options]) (await := false)
 
 /-- `readonly attribute PresentationStyle presentationStyle` -/
-def ClipboardItem.presentationStyle (self : ClipboardItem) : IO PresentationStyle := self.val.get "presentationStyle" PresentationStyle
+@[macro_inline] def ClipboardItem.presentationStyle (self : ClipboardItem) : IO PresentationStyle := Internal.api "Lasm.JS.Web.ClipboardItem.presentationStyle" do
+  self.val.get "presentationStyle" PresentationStyle
 
 /-- `readonly attribute FrozenArray<DOMString> types` -/
-def ClipboardItem.types (self : ClipboardItem) : IO (Array String) := self.val.get "types" (Array String)
+@[macro_inline] def ClipboardItem.types (self : ClipboardItem) : IO (Array String) := Internal.api "Lasm.JS.Web.ClipboardItem.types" do
+  self.val.get "types" (Array String)
 
 /-- `Promise<Blob> getType(DOMString type)` -/
-def ClipboardItem.getType (self : ClipboardItem) (type : String) : Async Blob := do
-  let r ← self.val.callMethodAwait "getType" (Support.args #[toJS type]) Value
+@[macro_inline] def ClipboardItem.getType (self : ClipboardItem) (type : String) : Async Blob := Internal.api "Lasm.JS.Web.ClipboardItem.getType" do
+  let r ← self.val.callMethodAwait "getType" (Internal.args #[toJS type]) Value
   pure { val := r }
 
 /-- `static boolean supports(DOMString type)` -/
-def ClipboardItem.supports (type : String) : IO Bool :=
+@[macro_inline] def ClipboardItem.supports (type : String) : IO Bool := Internal.api "Lasm.JS.Web.ClipboardItem.supports" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.ClipboardItem.supports", module := "globalThis", path := "ClipboardItem.supports", construct := false, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
 
 /-- `readonly attribute Clipboard clipboard` -/
-def Navigator.clipboard (self : Navigator) : IO Clipboard := do
+@[macro_inline] def Navigator.clipboard (self : Navigator) : IO Clipboard := Internal.api "Lasm.JS.Web.Navigator.clipboard" do
   let r ← self.val.get "clipboard" Value
   pure { val := r }
 

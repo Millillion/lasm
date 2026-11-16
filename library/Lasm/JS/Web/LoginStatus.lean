@@ -6,38 +6,25 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.Html
+import Lasm.JS.Web.Types.LoginStatus
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum LoginStatus` (Login Status API (https://w3c-fedid.github.io/login-status/)): "logged-in", "logged-out". -/
-inductive LoginStatus where
-  /-- "logged-in" -/
-  | loggedIn
-  /-- "logged-out" -/
-  | loggedOut
-  deriving BEq, Repr, Inhabited
-instance : ToJS LoginStatus := ⟨fun
-  | .loggedIn => .string "logged-in"
-  | .loggedOut => .string "logged-out"⟩
-instance : FromJS LoginStatus where
-  fromJS
-    | .string "logged-in" => .ok .loggedIn
-    | .string "logged-out" => .ok .loggedOut
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.LoginStatus"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof NavigatorLogin`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NavigatorLogin`). -/
-def NavigatorLogin.cast? (v : Value) : IO (Option NavigatorLogin) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NavigatorLogin"] Value) v) then some { val := v } else none
+@[macro_inline] def NavigatorLogin.cast? (v : Value) : IO (Option NavigatorLogin) := Internal.api "Lasm.JS.Web.NavigatorLogin.cast?" do
+  Internal.cast (Internal.getGlobal ["NavigatorLogin"] Value) (fun x => { val := x }) v
 
 /-- `Promise<undefined> setStatus(LoginStatus status)` -/
-def NavigatorLogin.setStatus (self : NavigatorLogin) (status : LoginStatus) : Async Unit :=
-  self.val.callMethodAwait "setStatus" (Support.args #[toJS status]) Unit
+@[macro_inline] def NavigatorLogin.setStatus (self : NavigatorLogin) (status : LoginStatus) : Async Unit := Internal.api "Lasm.JS.Web.NavigatorLogin.setStatus" do
+  self.val.callMethodAwait "setStatus" (Internal.args #[toJS status]) Unit
 
 /-- `readonly attribute NavigatorLogin login` -/
-def Navigator.login (self : Navigator) : IO NavigatorLogin := do
+@[macro_inline] def Navigator.login (self : Navigator) : IO NavigatorLogin := Internal.api "Lasm.JS.Web.Navigator.login" do
   let r ← self.val.get "login" Value
   pure { val := r }
 

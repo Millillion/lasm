@@ -6,134 +6,151 @@ The doc comments quote the WebIDL of the specifications they name: WHATWG standa
 and W3C specifications (W3C Software and Document License), with attribution to each.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Types
+import Lasm.JS.Web.Types.PerformanceTimeline
+import Lasm.JS.Web.Types.HrTime
+import Lasm.JS.Web.Types.ResourceTiming
 import Lasm.JS.Web.Html
 
 namespace Lasm.JS.Web
 open Lasm.JS
-
-/-- `enum RenderBlockingStatusType` (Resource Timing (https://w3c.github.io/resource-timing/)): "blocking", "non-blocking". -/
-inductive RenderBlockingStatusType where
-  /-- "blocking" -/
-  | blocking
-  /-- "non-blocking" -/
-  | nonBlocking
-  deriving BEq, Repr, Inhabited
-instance : ToJS RenderBlockingStatusType := ⟨fun
-  | .blocking => .string "blocking"
-  | .nonBlocking => .string "non-blocking"⟩
-instance : FromJS RenderBlockingStatusType where
-  fromJS
-    | .string "blocking" => .ok .blocking
-    | .string "non-blocking" => .ok .nonBlocking
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.RenderBlockingStatusType"
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `v instanceof PerformanceResourceTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceResourceTiming`). -/
-def PerformanceResourceTiming.cast? (v : Value) : IO (Option PerformanceResourceTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PerformanceResourceTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceResourceTiming.cast? (v : Value) : IO (Option PerformanceResourceTiming) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.cast?" do
+  Internal.cast (Internal.getGlobal ["PerformanceResourceTiming"] Value) (fun x => { val := x }) v
 
 /-- `readonly attribute DOMString initiatorType` -/
-def PerformanceResourceTiming.initiatorType (self : PerformanceResourceTiming) : IO String := self.val.get "initiatorType" String
+@[macro_inline] def PerformanceResourceTiming.initiatorType (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.initiatorType" do
+  self.val.get "initiatorType" String
 
 /-- `readonly attribute DOMString deliveryType` -/
-def PerformanceResourceTiming.deliveryType (self : PerformanceResourceTiming) : IO String := self.val.get "deliveryType" String
+@[macro_inline] def PerformanceResourceTiming.deliveryType (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.deliveryType" do
+  self.val.get "deliveryType" String
 
 /-- `readonly attribute ByteString nextHopProtocol` -/
-def PerformanceResourceTiming.nextHopProtocol (self : PerformanceResourceTiming) : IO String := self.val.get "nextHopProtocol" String
+@[macro_inline] def PerformanceResourceTiming.nextHopProtocol (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.nextHopProtocol" do
+  self.val.get "nextHopProtocol" String
 
 /-- `readonly attribute DOMHighResTimeStamp workerStart` -/
-def PerformanceResourceTiming.workerStart (self : PerformanceResourceTiming) : IO Float := self.val.get "workerStart" Float
+@[macro_inline] def PerformanceResourceTiming.workerStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerStart" do
+  self.val.get "workerStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp redirectStart` -/
-def PerformanceResourceTiming.redirectStart (self : PerformanceResourceTiming) : IO Float := self.val.get "redirectStart" Float
+@[macro_inline] def PerformanceResourceTiming.redirectStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.redirectStart" do
+  self.val.get "redirectStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp redirectEnd` -/
-def PerformanceResourceTiming.redirectEnd (self : PerformanceResourceTiming) : IO Float := self.val.get "redirectEnd" Float
+@[macro_inline] def PerformanceResourceTiming.redirectEnd (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.redirectEnd" do
+  self.val.get "redirectEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp fetchStart` -/
-def PerformanceResourceTiming.fetchStart (self : PerformanceResourceTiming) : IO Float := self.val.get "fetchStart" Float
+@[macro_inline] def PerformanceResourceTiming.fetchStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.fetchStart" do
+  self.val.get "fetchStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domainLookupStart` -/
-def PerformanceResourceTiming.domainLookupStart (self : PerformanceResourceTiming) : IO Float := self.val.get "domainLookupStart" Float
+@[macro_inline] def PerformanceResourceTiming.domainLookupStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.domainLookupStart" do
+  self.val.get "domainLookupStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp domainLookupEnd` -/
-def PerformanceResourceTiming.domainLookupEnd (self : PerformanceResourceTiming) : IO Float := self.val.get "domainLookupEnd" Float
+@[macro_inline] def PerformanceResourceTiming.domainLookupEnd (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.domainLookupEnd" do
+  self.val.get "domainLookupEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp connectStart` -/
-def PerformanceResourceTiming.connectStart (self : PerformanceResourceTiming) : IO Float := self.val.get "connectStart" Float
+@[macro_inline] def PerformanceResourceTiming.connectStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.connectStart" do
+  self.val.get "connectStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp connectEnd` -/
-def PerformanceResourceTiming.connectEnd (self : PerformanceResourceTiming) : IO Float := self.val.get "connectEnd" Float
+@[macro_inline] def PerformanceResourceTiming.connectEnd (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.connectEnd" do
+  self.val.get "connectEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp secureConnectionStart` -/
-def PerformanceResourceTiming.secureConnectionStart (self : PerformanceResourceTiming) : IO Float := self.val.get "secureConnectionStart" Float
+@[macro_inline] def PerformanceResourceTiming.secureConnectionStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.secureConnectionStart" do
+  self.val.get "secureConnectionStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp requestStart` -/
-def PerformanceResourceTiming.requestStart (self : PerformanceResourceTiming) : IO Float := self.val.get "requestStart" Float
+@[macro_inline] def PerformanceResourceTiming.requestStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.requestStart" do
+  self.val.get "requestStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp finalResponseHeadersStart` -/
-def PerformanceResourceTiming.finalResponseHeadersStart (self : PerformanceResourceTiming) : IO Float := self.val.get "finalResponseHeadersStart" Float
+@[macro_inline] def PerformanceResourceTiming.finalResponseHeadersStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.finalResponseHeadersStart" do
+  self.val.get "finalResponseHeadersStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp firstInterimResponseStart` -/
-def PerformanceResourceTiming.firstInterimResponseStart (self : PerformanceResourceTiming) : IO Float := self.val.get "firstInterimResponseStart" Float
+@[macro_inline] def PerformanceResourceTiming.firstInterimResponseStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.firstInterimResponseStart" do
+  self.val.get "firstInterimResponseStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp responseStart` -/
-def PerformanceResourceTiming.responseStart (self : PerformanceResourceTiming) : IO Float := self.val.get "responseStart" Float
+@[macro_inline] def PerformanceResourceTiming.responseStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseStart" do
+  self.val.get "responseStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp responseEnd` -/
-def PerformanceResourceTiming.responseEnd (self : PerformanceResourceTiming) : IO Float := self.val.get "responseEnd" Float
+@[macro_inline] def PerformanceResourceTiming.responseEnd (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseEnd" do
+  self.val.get "responseEnd" Float
 
 /-- `readonly attribute DOMHighResTimeStamp workerRouterEvaluationStart` -/
-def PerformanceResourceTiming.workerRouterEvaluationStart (self : PerformanceResourceTiming) : IO Float := self.val.get "workerRouterEvaluationStart" Float
+@[macro_inline] def PerformanceResourceTiming.workerRouterEvaluationStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerRouterEvaluationStart" do
+  self.val.get "workerRouterEvaluationStart" Float
 
 /-- `readonly attribute DOMHighResTimeStamp workerCacheLookupStart` -/
-def PerformanceResourceTiming.workerCacheLookupStart (self : PerformanceResourceTiming) : IO Float := self.val.get "workerCacheLookupStart" Float
+@[macro_inline] def PerformanceResourceTiming.workerCacheLookupStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerCacheLookupStart" do
+  self.val.get "workerCacheLookupStart" Float
 
 /-- `readonly attribute DOMString workerMatchedRouterSource` -/
-def PerformanceResourceTiming.workerMatchedRouterSource (self : PerformanceResourceTiming) : IO String := self.val.get "workerMatchedRouterSource" String
+@[macro_inline] def PerformanceResourceTiming.workerMatchedRouterSource (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerMatchedRouterSource" do
+  self.val.get "workerMatchedRouterSource" String
 
 /-- `readonly attribute DOMString workerFinalRouterSource` -/
-def PerformanceResourceTiming.workerFinalRouterSource (self : PerformanceResourceTiming) : IO String := self.val.get "workerFinalRouterSource" String
+@[macro_inline] def PerformanceResourceTiming.workerFinalRouterSource (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerFinalRouterSource" do
+  self.val.get "workerFinalRouterSource" String
 
 /-- `readonly attribute unsigned long long transferSize` -/
-def PerformanceResourceTiming.transferSize (self : PerformanceResourceTiming) : IO Nat := self.val.get "transferSize" Nat
+@[macro_inline] def PerformanceResourceTiming.transferSize (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.transferSize" do
+  self.val.get "transferSize" Nat
 
 /-- `readonly attribute unsigned long long encodedBodySize` -/
-def PerformanceResourceTiming.encodedBodySize (self : PerformanceResourceTiming) : IO Nat := self.val.get "encodedBodySize" Nat
+@[macro_inline] def PerformanceResourceTiming.encodedBodySize (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.encodedBodySize" do
+  self.val.get "encodedBodySize" Nat
 
 /-- `readonly attribute unsigned long long decodedBodySize` -/
-def PerformanceResourceTiming.decodedBodySize (self : PerformanceResourceTiming) : IO Nat := self.val.get "decodedBodySize" Nat
+@[macro_inline] def PerformanceResourceTiming.decodedBodySize (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.decodedBodySize" do
+  self.val.get "decodedBodySize" Nat
 
 /-- `readonly attribute unsigned short responseStatus` -/
-def PerformanceResourceTiming.responseStatus (self : PerformanceResourceTiming) : IO Nat := self.val.get "responseStatus" Nat
+@[macro_inline] def PerformanceResourceTiming.responseStatus (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseStatus" do
+  self.val.get "responseStatus" Nat
 
 /-- `readonly attribute RenderBlockingStatusType renderBlockingStatus` -/
-def PerformanceResourceTiming.renderBlockingStatus (self : PerformanceResourceTiming) : IO RenderBlockingStatusType := self.val.get "renderBlockingStatus" RenderBlockingStatusType
+@[macro_inline] def PerformanceResourceTiming.renderBlockingStatus (self : PerformanceResourceTiming) : IO RenderBlockingStatusType := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.renderBlockingStatus" do
+  self.val.get "renderBlockingStatus" RenderBlockingStatusType
 
 /-- `readonly attribute DOMString contentType` -/
-def PerformanceResourceTiming.contentType (self : PerformanceResourceTiming) : IO String := self.val.get "contentType" String
+@[macro_inline] def PerformanceResourceTiming.contentType (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentType" do
+  self.val.get "contentType" String
 
 /-- `readonly attribute DOMString contentEncoding` -/
-def PerformanceResourceTiming.contentEncoding (self : PerformanceResourceTiming) : IO String := self.val.get "contentEncoding" String
+@[macro_inline] def PerformanceResourceTiming.contentEncoding (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentEncoding" do
+  self.val.get "contentEncoding" String
 
 /-- `object toJSON()` -/
-def PerformanceResourceTiming.toJSON (self : PerformanceResourceTiming) : IO Data :=
-  self.val.callMethod "toJSON" (Support.args #[]) Data
+@[macro_inline] def PerformanceResourceTiming.toJSON (self : PerformanceResourceTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Data
 
 /-- `attribute EventHandler onresourcetimingbufferfull` -/
-def Performance.onresourcetimingbufferfull (self : Performance) : IO (Option EventHandlerNonNull) := self.val.get "onresourcetimingbufferfull" (Option EventHandlerNonNull)
+@[macro_inline] def Performance.onresourcetimingbufferfull (self : Performance) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Performance.onresourcetimingbufferfull" do
+  self.val.get "onresourcetimingbufferfull" (Option EventHandlerNonNull)
 
 /-- Sets `onresourcetimingbufferfull`: `attribute EventHandler onresourcetimingbufferfull` -/
-def Performance.setOnresourcetimingbufferfull (self : Performance) (value : Option EventHandlerNonNull) : IO Unit :=
+@[macro_inline] def Performance.setOnresourcetimingbufferfull (self : Performance) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Performance.setOnresourcetimingbufferfull" do
   self.val.set "onresourcetimingbufferfull" (toJS value)
 
 /-- `undefined clearResourceTimings()` -/
-def Performance.clearResourceTimings (self : Performance) : IO Unit :=
-  self.val.callMethod "clearResourceTimings" (Support.args #[]) Unit
+@[macro_inline] def Performance.clearResourceTimings (self : Performance) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearResourceTimings" do
+  self.val.callMethod "clearResourceTimings" (Internal.args #[]) Unit
 
 /-- `undefined setResourceTimingBufferSize(unsigned long maxSize)` -/
-def Performance.setResourceTimingBufferSize (self : Performance) (maxSize : Nat) : IO Unit :=
-  self.val.callMethod "setResourceTimingBufferSize" (Support.args #[toJS maxSize]) Unit
+@[macro_inline] def Performance.setResourceTimingBufferSize (self : Performance) (maxSize : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Performance.setResourceTimingBufferSize" do
+  self.val.callMethod "setResourceTimingBufferSize" (Internal.args #[toJS maxSize]) Unit
 
 end Lasm.JS.Web
