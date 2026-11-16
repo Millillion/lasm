@@ -329,7 +329,7 @@ def subprocessChecks (r : Checks) (live : Live) : Async Unit := do
     let o ← (← Deno.Command.new (.domString "sh") (some { args := some #["-c", "printf %s \"$LASM_X\"; pwd"], env := some ⟨#[("LASM_X", "x1")]⟩, cwd := some (.domString "/") })).output
     expect r "env and cwd" (String.fromUTF8! o.stdout == "x1/\n") (String.fromUTF8! o.stdout)
     -- spawn with piped stdin: cat echoes what is written
-    let child ← (← Deno.Command.new (.domString "cat") (some { stdin := some .piped, stdout := some .piped })).spawn
+    let child ← (← Deno.Command.new (.domString "cat") (some { stdin := some .piped, stdout := some .piped, stderr := some .piped })).spawn
     see live "ChildProcess" child.val
     let (b, _) := g.bytes 3000
     writeAll (← child.stdin) b
