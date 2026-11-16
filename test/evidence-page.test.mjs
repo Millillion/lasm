@@ -150,7 +150,7 @@ test('the exit bar: each of the eight items from the repository and CI, met only
     mutation: { run: run(1), modules: [job('module (a)', 'failure', { module: 'a' })] }, coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 70, files: 140 })] },
     campaigns: { nights: 3, endedOn: '2026-11-06', why: 'dst-nightly.yml failure' },
     apps: [{ app: 'conduit', claims: [{ row: 'Node', ok: true }, { row: 'Bun', ok: false, unmet: ['x'] }] }] });
-  assert.deepEqual(worse, ['not met', 'not met', 'not met', 'not met', 'not met', 'not met', 'not met', 'not met']);
+  assert.deepEqual(worse, ['not met', 'not met', 'not met', 'observed', 'not met', 'not met', 'not met', 'not met']);
   // 3: a 0 % file nobody names fails it; a log without the 0 % line only partly meets it.
   const coverage = extra => ({ ...ci, coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140, ...extra })] } });
   assert.equal(exitBar(repo, coverage({ zeroFiles: 3, zeroNamed: 2, zeroUnnamed: ['src/x.mjs'] }))[2].status, 'not met');

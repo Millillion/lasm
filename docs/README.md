@@ -73,8 +73,10 @@ For contributors; not needed to use Lasm. Some pages describe earlier phases
 (for example "Node only" or Lean 4.32/4.34) and are kept as records; pages that
 are only history are in [history/](history/).
 
-- Decisions and plans: [DECISIONS.md](DECISIONS.md) (choices made during launch
-  week, with how to undo each), [PLAN.md](PLAN.md)
+- Decisions and plans: [the roadmap](../ROADMAP.md) (stages, 2026-11-16),
+  [API_DECISIONS.md](API_DECISIONS.md) (every API decision, for sign-off before
+  1.0), [DECISIONS.md](DECISIONS.md) (choices made during launch week, with how
+  to undo each), [PLAN.md](PLAN.md)
 - Releasing: [RELEASING.md](RELEASING.md), [0.1.0 gate](release/0.1.0-gate.md),
   [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md), [CI_STORAGE.md](CI_STORAGE.md)
 - Architecture: [JS interop threading](JS_INTEROP.md),

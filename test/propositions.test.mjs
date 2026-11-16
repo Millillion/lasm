@@ -17,9 +17,9 @@ test('lint: every cited proposition exists with the statement cited, every candi
   // Exit bar 7 (docs/TESTING_STRATEGY.md §7), held once reached: every
   // JavaScript property names its proposition, and every fuzz oracle but the
   // WASI C host's CGI target (src/wasi/lasm_fetch_wasi.c, which goes with
-  // Lasm.Fetch) and the tar target, whose oracle is Python's tarfile (an
-  // independent implementation) until the reader has a Lean model
-  // (verification/models.json: src/tar.mjs pending).
+  // Lasm.Fetch) and the tar target, whose oracle is Python's tarfile: a fuzz
+  // target checked against an outside reference implementation is exempt by
+  // rule (Jordan, 2026-11-16; docs/TESTING_STRATEGY.md §7, item 7).
   assert.deepEqual(s.properties.unnamed, [], 'every forAll property names a proposition');
   assert.deepEqual(s.oracles.unnamed.filter(id => id !== 'wasi-cgi' && id !== 'tar'), [], 'every fuzz oracle names a proposition');
 });
