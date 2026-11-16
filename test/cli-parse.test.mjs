@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   parseLasmArguments, buildTargets, edgeBuildTargets, wasiBuildTargets, fixedLayoutTargets, suspendModes,
-  targetHint, cliUsage, commandNames, editDistance, closest,
+  targetHint, targetHintAmong, cliUsage, commandNames, editDistance, closest,
 } from '../src/cli-arguments.mjs';
 import { packageTargets, parsePackageArguments } from '../src/package.mjs';
 import { parseInitArguments } from '../src/init.mjs';
@@ -34,6 +34,23 @@ test('the target lists', () => {
   assert.ok(cliUsage.startsWith('Usage: lasm <Main.lean> [--release] [-- arguments…]\n'));
   assert.ok(cliUsage.endsWith('Application arguments must follow --.'));
   for (const command of ['dev', 'build', 'init', 'package', 'editor', 'cache repair']) assert.ok(cliUsage.includes(`lasm ${command}`), command);
+  // The target lists come from the tables (0.7-16).
+  assert.ok(cliUsage.includes('\n       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]\n'));
+  assert.ok(cliUsage.includes('\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--output PATH] [--allow-dev]\n'));
+});
+
+test('targetHintAmong: an alias among the candidates, else the closest candidate (0.7-23)', () => {
+  const dev = ['node', 'bun', 'deno', 'workers', 'browser'];
+  assert.equal(targetHintAmong('cloudflare', dev), ' (did you mean --target workers?)');
+  assert.equal(targetHintAmong('CloudFlare', dev), ' (did you mean --target workers?)');
+  // An alias of a target outside the candidates is no hint, and not the closest either.
+  assert.equal(targetHintAmong('aws', dev), '');
+  assert.equal(targetHintAmong('vite', ['node', 'vite-x']), ' (did you mean --target vite-x?)');
+  assert.equal(targetHintAmong('brwser', dev), ' (did you mean --target browser?)');
+  assert.equal(targetHintAmong('worker', ['lambda', 'workers'], '--deploy'), ' (did you mean --deploy workers?)');
+  assert.equal(targetHintAmong('Hono', ['plain', 'hono'], '--template'), ' (did you mean --template hono?)');
+  assert.equal(targetHintAmong('zzzzzzzz', dev), '');
+  assert.equal(targetHintAmong('constructor', dev), '');
 });
 
 test('version: one token only', () => {
