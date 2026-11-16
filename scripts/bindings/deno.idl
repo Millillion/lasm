@@ -20,31 +20,35 @@
 //   - Deno.readDirSync(path: string | URL): returns a synchronous iterator object (not an array) of the entries readDir gives
 //   - FsWatcher.return: the iterator protocol's return(): close() ends the watcher
 //   - FsWatcher.[Symbol.asyncIterator]: the async iterator: lowered as `async iterable` (values and an iterator)
-//   - Deno.spawn(command: string | URL, options?: CommandOptions): @experimental in its declaration
-//   - Deno.spawn(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): @experimental in its declaration
-//   - Deno.spawnAndWait(command: string | URL, options?: CommandOptions): @experimental in its declaration
-//   - Deno.spawnAndWait(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): @experimental in its declaration
-//   - Deno.spawnAndWaitSync(command: string | URL, options?: CommandOptions): @experimental in its declaration
-//   - Deno.spawnAndWaitSync(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): @experimental in its declaration
+//   - ChildProcess.[Symbol.asyncDispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - UpgradeWebSocketOptions.socket: a node:net Socket (Deno's Node compatibility), for upgrading a Node HTTP request: Lasm.JS.Node's domain
 //   - Deno.resolveDns(query: string, recordType: RecordType, options?: ResolveDnsOptions): the per-record-type overloads (resolveDns, resolveDnsCaa, …) give every record type with its typed result
-//   - Deno.serve(options: ServeVsockOptions, handler: ServeHandler<Deno.VsockAddr>): @experimental in its declaration
 //   - Deno.serve(options: ServeUnixOptions & ServeInit<Deno.UnixAddr>): the same operation as serveWithUnixOptions with the handler inside the options: one Lean function per operation
-//   - Deno.serve(options: ServeVsockOptions & ServeInit<Deno.VsockAddr>): @experimental in its declaration
+//   - Deno.serve(options: ServeVsockOptions & ServeInit<Deno.VsockAddr>): the same operation as serveWithVsockOptions with the handler inside the options: one Lean function per operation
 //   - Deno.serve(options: (ServeTcpOptions | ServeTcpOptions & TlsCertifiedKeyPem) & ServeInit<Deno.NetAddr>): the same operation as serveWithOptions and serveWithTlsOptions with the handler inside the options: one Lean function per operation
 //   - Deno.dlopen(filename: string | URL, symbols: S): native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI
 //   - HttpClient.[Symbol.dispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
-//   - Deno.listen(options: VsockListenOptions & {transport: "vsock"}): @experimental in its declaration
 //   - Conn.read: reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile)
 //   - Conn.write: writes part of a buffer and returns how much; use the `writable` stream, or writeFile
 //   - Listener.[Symbol.asyncIterator]: the async iterator: lowered as `async iterable` (values and an iterator)
-//   - Deno.connect(options: VsockConnectOptions): @experimental in its declaration
-//   - Deno.connectQuic(options: ConnectQuicOptions<ZRTT>): UNSTABLE in its declaration
-//   - Deno.upgradeWebTransport(conn: QuicConn): UNSTABLE in its declaration
+//   - QuicListener.[Symbol.asyncIterator]: the async iterator: lowered as `async iterable` (values and an iterator)
+//   - Deno.bundle(options: Deno.bundle.Options): Deno.bundle builds JavaScript bundles with Deno's bundler; Lasm builds the program
+//   - DatagramConn.[Symbol.asyncIterator]: the async iterator: lowered as `async iterable` (values and an iterator)
 //   - Kv.commitVersionstamp: returns a Symbol placeholder for a versionstamp in a key, which Lean cannot hold as a key part (a KvKeyPart has no Symbol alternative here)
 //   - Kv.[Symbol.dispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - KvListIterator.next: the iterator protocol's next(): KvListIterator is an `async iterable` (values, iterator)
 //   - KvListIterator.[Symbol.asyncIterator]: the async iterator: lowered as `async iterable` (values and an iterator)
+//   - Deno.jupyter.display(obj: unknown, options?: DisplayOptions): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.md(strings: TemplateStringsArray, ...values: unknown[]): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.html(strings: TemplateStringsArray, ...values: unknown[]): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.svg(strings: TemplateStringsArray, ...values: unknown[]): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.image(path: string): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.image(data: Uint8Array): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.format(obj: unknown): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.jupyter.broadcast(msgType: string, content: Record<string, unknown>, extra?: {metadata?: Record<string, unknown>; buffers?: Uint8Array[];}): Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
+//   - Deno.lint.runPlugin(plugin: Plugin, fileName: string, source: string): Deno.lint's plugin API, for lint rules that `deno lint` runs on JavaScript source
+//   - Deno.webgpu.deviceStartCapture(device: GPUDevice): a native window surface for WebGPU (UnsafeWindowSurface), which a program run by Lasm has no window for
+//   - Deno.webgpu.deviceStopCapture(device: GPUDevice): a native window surface for WebGPU (UnsafeWindowSurface), which a program run by Lasm has no window for
 //   - Deno.errors: the error classes (Deno.errors.NotFound, …), for instanceof checks: a JavaScript error reaches Lean as an IO.Error whose message starts with the class name
 //   - Deno.test: Deno.test and Deno.bench register tests for `deno test` and `deno bench`, which do not run Lasm's output (a Lasm program runs with deno run)
 //   - stdin.read: reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile)
@@ -53,7 +57,6 @@
 //   - stdout.writeSync: writes part of a buffer and returns how much; use the `writable` stream, or writeFile
 //   - stderr.write: writes part of a buffer and returns how much; use the `writable` stream, or writeFile
 //   - stderr.writeSync: writes part of a buffer and returns how much; use the `writable` stream, or writeFile
-//   - ChildProcess.[Symbol.asyncDispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - PermissionStatus.addEventListener: typed with keyof PermissionStatusEventMap; the EventTarget parent's addEventListener (Lasm.JS.Web) is the same call
 //   - PermissionStatus.removeEventListener: as addEventListener
 //   - Deno.brand: native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI
@@ -62,7 +65,8 @@
 //   - Deno.UnsafeFnPointer: native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI
 //   - Deno.UnsafeCallback: native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI
 //   - Deno.telemetry: OpenTelemetry provider objects (typed any) for an OpenTelemetry JavaScript API package bound with @[js]; Lean code passes them on, as Lasm.JS.global gives them
-//   - Deno.QuicEndpoint: UNSTABLE in its declaration
+//   - Deno.UnsafeWindowSurface: a native window surface for WebGPU (UnsafeWindowSurface), which a program run by Lasm has no window for
+//   - Deno.jupyter.$display: Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output
 
 
 // object Deno.MemoryUsage
@@ -176,9 +180,6 @@ dictionary Deno_FileInfo {
   required boolean? isSocket;
 };
 
-[LasmHost="Deno", LasmLeanModule="Runtime", LasmName="DoubleOrObject"]
-typedef (double or object) Deno_DoubleOrObject;
-
 // object Deno.SetRawOptions
 [LasmHost="Deno", LasmLeanModule="Io", LasmFile="lib.deno.ns.d.ts", LasmName="SetRawOptions", LasmPath="Deno.SetRawOptions"]
 dictionary Deno_SetRawOptions {
@@ -214,9 +215,9 @@ interface Deno_FsFile {
   // syncDataSync(): void
   [LasmHost="Deno", LasmSignature="syncDataSync(): void"] undefined syncDataSync();
   // utime(atime: number | Date, mtime: number | Date): Promise<void>
-  [LasmHost="Deno", LasmSignature="utime(atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmSignature="utime(atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(any atime, any mtime);
   // utimeSync(atime: number | Date, mtime: number | Date): void
-  [LasmHost="Deno", LasmSignature="utimeSync(atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmSignature="utimeSync(atime: number | Date, mtime: number | Date): void"] undefined utimeSync(any atime, any mtime);
   // isTerminal(): boolean
   [LasmHost="Deno", LasmSignature="isTerminal(): boolean"] boolean isTerminal();
   // setRaw(mode: boolean, options?: SetRawOptions): void
@@ -387,6 +388,103 @@ callback Deno_AddSignalListenerHandler = undefined ();
 [LasmHost="Deno", LasmLeanModule="Runtime", LasmName="RemoveSignalListenerHandler", LasmSignature="() => void"]
 callback Deno_RemoveSignalListenerHandler = undefined ();
 
+// interface Deno.SubprocessReadableStream
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="SubprocessReadableStream", LasmPath="Deno.SubprocessReadableStream"]
+interface Deno_SubprocessReadableStream : ReadableStream {
+  // arrayBuffer(): Promise<ArrayBuffer>
+  [LasmHost="Deno", LasmSignature="arrayBuffer(): Promise<ArrayBuffer>"] Promise<ArrayBuffer> arrayBuffer();
+  // bytes(): Promise<Uint8Array<ArrayBuffer>>
+  [LasmHost="Deno", LasmSignature="bytes(): Promise<Uint8Array<ArrayBuffer>>"] Promise<Uint8Array> bytes();
+  // json(): Promise<any>
+  [LasmHost="Deno", LasmSignature="json(): Promise<any>"] Promise<any> json();
+  // text(): Promise<string>
+  [LasmHost="Deno", LasmSignature="text(): Promise<string>"] Promise<DOMString> text();
+};
+
+// object Deno.CommandStatus
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandStatus", LasmPath="Deno.CommandStatus"]
+dictionary Deno_CommandStatus {
+  // success: boolean
+  required boolean success;
+  // code: number
+  required double code;
+  // signal: Signal | null
+  required Deno_Signal? signal;
+};
+
+// object Deno.CommandOutput
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandOutput", LasmPath="Deno.CommandOutput"]
+dictionary Deno_CommandOutput : Deno_CommandStatus {
+  // readonly stdout: Uint8Array<ArrayBuffer>
+  required Uint8Array stdout;
+  // readonly stderr: Uint8Array<ArrayBuffer>
+  required Uint8Array stderr;
+};
+
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="SignalOrDouble"]
+typedef (Deno_Signal or double) Deno_SignalOrDouble;
+
+// class Deno.ChildProcess
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="ChildProcess", LasmPath="Deno.ChildProcess"]
+interface Deno_ChildProcess {
+  // get stdin(): WritableStream<Uint8Array<ArrayBufferLike>>
+  [LasmHost="Deno", LasmSignature="get stdin(): WritableStream<Uint8Array<ArrayBufferLike>>"] readonly attribute WritableStream stdin;
+  // get stdout(): SubprocessReadableStream
+  [LasmHost="Deno", LasmSignature="get stdout(): SubprocessReadableStream"] readonly attribute Deno_SubprocessReadableStream stdout;
+  // get stderr(): SubprocessReadableStream
+  [LasmHost="Deno", LasmSignature="get stderr(): SubprocessReadableStream"] readonly attribute Deno_SubprocessReadableStream stderr;
+  // readonly pid: number
+  [LasmHost="Deno", LasmSignature="readonly pid: number"] readonly attribute double pid;
+  // readonly status: Promise<CommandStatus>
+  [LasmHost="Deno", LasmSignature="readonly status: Promise<CommandStatus>"] readonly attribute Promise<Deno_CommandStatus> status;
+  // output(): Promise<CommandOutput>
+  [LasmHost="Deno", LasmSignature="output(): Promise<CommandOutput>"] Promise<Deno_CommandOutput> output();
+  // kill(signo?: Signal | number): void
+  [LasmHost="Deno", LasmSignature="kill(signo?: Signal | number): void"] undefined kill(optional Deno_SignalOrDouble signo);
+  // ref(): void
+  [LasmHost="Deno", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Deno", LasmSignature="unref(): void"] undefined unref();
+};
+
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStdin"]
+enum Deno_CommandOptionsStdin { "piped", "inherit", "null" };
+
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStdout"]
+enum Deno_CommandOptionsStdout { "piped", "inherit", "null" };
+
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStderr"]
+enum Deno_CommandOptionsStderr { "piped", "inherit", "null" };
+
+// object Deno.CommandOptions
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandOptions", LasmPath="Deno.CommandOptions"]
+dictionary Deno_CommandOptions {
+  // args?: string[]
+  sequence<DOMString> args;
+  // cwd?: string | URL
+  Deno_DOMStringOrURL cwd;
+  // clearEnv?: boolean
+  boolean clearEnv;
+  // env?: Record<string, string>
+  record<DOMString, DOMString> env;
+  // uid?: number
+  double uid;
+  // gid?: number
+  double gid;
+  // signal?: AbortSignal
+  AbortSignal signal;
+  // stdin?: "piped" | "inherit" | "null"
+  Deno_CommandOptionsStdin stdin;
+  // stdout?: "piped" | "inherit" | "null"
+  Deno_CommandOptionsStdout stdout;
+  // stderr?: "piped" | "inherit" | "null"
+  Deno_CommandOptionsStderr stderr;
+  // windowsRawArguments?: boolean
+  boolean windowsRawArguments;
+  // detached?: boolean
+  boolean detached;
+};
+
 // object Deno.InspectOptions
 [LasmHost="Deno", LasmLeanModule="Io", LasmFile="lib.deno.ns.d.ts", LasmName="InspectOptions", LasmPath="Deno.InspectOptions"]
 dictionary Deno_InspectOptions {
@@ -445,9 +543,6 @@ dictionary Deno_UpgradeWebSocketOptions {
   // head?: Uint8Array
   Uint8Array head;
 };
-
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="SignalOrDouble"]
-typedef (Deno_Signal or double) Deno_SignalOrDouble;
 
 [LasmHost="Deno", LasmLeanModule="Net", LasmName="ResolveDnsRecordType"]
 enum Deno_ResolveDnsRecordType { "A", "AAAA", "ANAME", "CNAME", "NS", "PTR" };
@@ -672,6 +767,83 @@ interface Deno_ServeHandlerInfoUnixAddr {
 [LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeHandlerUnixAddr", LasmSignature="type ServeHandler<Addr extends Deno.Addr = Deno.Addr> = (request: Request, info: ServeHandlerInfo<Addr>) => Response | Promise<Response>"]
 callback Deno_ServeHandlerUnixAddr = Promise<Response> (Request request, Deno_ServeHandlerInfoUnixAddr info);
 
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="VsockAddrTransport"]
+enum Deno_VsockAddrTransport { "vsock" };
+
+// object Deno.VsockAddr
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="VsockAddr", LasmPath="Deno.VsockAddr"]
+dictionary Deno_VsockAddr {
+  // transport: "vsock"
+  required Deno_VsockAddrTransport transport;
+  // cid: number
+  required double cid;
+  // port: number
+  required double port;
+};
+
+// interface Deno.HttpServer (HttpServer<VsockAddr>)
+[LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno.ns.d.ts", LasmName="HttpServerVsockAddr", LasmPath="Deno.HttpServer"]
+interface Deno_HttpServerVsockAddr {
+  // finished: Promise<void>
+  [LasmHost="Deno", LasmSignature="finished: Promise<void>"] readonly attribute Promise<undefined> finished;
+  // addr: Addr
+  [LasmHost="Deno", LasmSignature="addr: Addr"] readonly attribute Deno_VsockAddr addr;
+  // ref(): void
+  [LasmHost="Deno", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Deno", LasmSignature="unref(): void"] undefined unref();
+  // shutdown(): Promise<void>
+  [LasmHost="Deno", LasmSignature="shutdown(): Promise<void>"] Promise<undefined> shutdown();
+};
+
+// (error: unknown) => Response | Promise<Response>
+[LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeOptionsVsockAddrOnError", LasmSignature="(error: unknown) => Response | Promise<Response>"]
+callback Deno_ServeOptionsVsockAddrOnError = Promise<Response> (any error);
+
+// (localAddr: Addr) => void
+[LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeOptionsVsockAddrOnListen", LasmSignature="(localAddr: Addr) => void"]
+callback Deno_ServeOptionsVsockAddrOnListen = undefined (Deno_VsockAddr localAddr);
+
+// object Deno.ServeOptions (ServeOptions<VsockAddr>)
+[LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno.ns.d.ts", LasmName="ServeOptionsVsockAddr", LasmPath="Deno.ServeOptions"]
+dictionary Deno_ServeOptionsVsockAddr {
+  // signal?: AbortSignal
+  AbortSignal signal;
+  // onError?: (error: unknown) => Response | Promise<Response>
+  Deno_ServeOptionsVsockAddrOnError onError;
+  // onListen?: (localAddr: Addr) => void
+  Deno_ServeOptionsVsockAddrOnListen onListen;
+  // automaticCompression?: boolean
+  boolean automaticCompression;
+};
+
+[LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeVsockOptionsTransport"]
+enum Deno_ServeVsockOptionsTransport { "vsock" };
+
+// object Deno.ServeVsockOptions
+[LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno.ns.d.ts", LasmName="ServeVsockOptions", LasmPath="Deno.ServeVsockOptions"]
+dictionary Deno_ServeVsockOptions : Deno_ServeOptionsVsockAddr {
+  // transport?: "vsock"
+  Deno_ServeVsockOptionsTransport transport;
+  // cid: number
+  required double cid;
+  // port: number
+  required double port;
+};
+
+// interface Deno.ServeHandlerInfo (ServeHandlerInfo<VsockAddr>)
+[LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno.ns.d.ts", LasmName="ServeHandlerInfoVsockAddr", LasmPath="Deno.ServeHandlerInfo"]
+interface Deno_ServeHandlerInfoVsockAddr {
+  // remoteAddr: Addr
+  [LasmHost="Deno", LasmSignature="remoteAddr: Addr"] readonly attribute Deno_VsockAddr remoteAddr;
+  // completed: Promise<void>
+  [LasmHost="Deno", LasmSignature="completed: Promise<void>"] readonly attribute Promise<undefined> completed;
+};
+
+// type ServeHandler<Addr extends Deno.Addr = Deno.Addr> = (request: Request, info: ServeHandlerInfo<Addr>) => Response | Promise<Response>
+[LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeHandlerVsockAddr", LasmSignature="type ServeHandler<Addr extends Deno.Addr = Deno.Addr> = (request: Request, info: ServeHandlerInfo<Addr>) => Response | Promise<Response>"]
+callback Deno_ServeHandlerVsockAddr = Promise<Response> (Request request, Deno_ServeHandlerInfoVsockAddr info);
+
 // (error: unknown) => Response | Promise<Response>
 [LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeOptionsOnError", LasmSignature="(error: unknown) => Response | Promise<Response>"]
 callback Deno_ServeOptionsOnError = Promise<Response> (any error);
@@ -858,7 +1030,8 @@ dictionary Deno_ListenOptions {
 // object Deno.TcpListenOptions
 [LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="TcpListenOptions", LasmPath="Deno.TcpListenOptions"]
 dictionary Deno_TcpListenOptions : Deno_ListenOptions {
-
+  // reusePort?: boolean
+  boolean reusePort;
 };
 
 [LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenTcpOptionsTransport"]
@@ -929,6 +1102,68 @@ enum Deno_ListenUnixOptionsTransport { "unix" };
 dictionary Deno_ListenUnixOptions : Deno_UnixListenOptions {
   // transport: "unix"
   required Deno_ListenUnixOptionsTransport transport;
+};
+
+// interface Deno.Conn (Conn<VsockAddr>)
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="ConnVsockAddr", LasmPath="Deno.Conn"]
+interface Deno_ConnVsockAddr {
+  // close(): void
+  [LasmHost="Deno", LasmSignature="close(): void"] undefined close();
+  // readonly localAddr: A
+  [LasmHost="Deno", LasmSignature="readonly localAddr: A"] readonly attribute Deno_VsockAddr localAddr;
+  // readonly remoteAddr: A
+  [LasmHost="Deno", LasmSignature="readonly remoteAddr: A"] readonly attribute Deno_VsockAddr remoteAddr;
+  // closeWrite(): Promise<void>
+  [LasmHost="Deno", LasmSignature="closeWrite(): Promise<void>"] Promise<undefined> closeWrite();
+  // ref(): void
+  [LasmHost="Deno", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Deno", LasmSignature="unref(): void"] undefined unref();
+  // readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>
+  [LasmHost="Deno", LasmSignature="readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>"] readonly attribute ReadableStream readable;
+  // readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>
+  [LasmHost="Deno", LasmSignature="readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>"] readonly attribute WritableStream writable;
+};
+
+// interface Deno.VsockConn
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="VsockConn", LasmPath="Deno.VsockConn"]
+interface Deno_VsockConn : Deno_ConnVsockAddr {
+
+};
+
+// interface Deno.Listener (Listener<VsockConn, VsockAddr>)
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="VsockListener", LasmPath="Deno.Listener"]
+interface Deno_VsockListener {
+  async iterable<Deno_VsockConn>;
+  // accept(): Promise<T>
+  [LasmHost="Deno", LasmSignature="accept(): Promise<T>"] Promise<Deno_VsockConn> accept();
+  // close(): void
+  [LasmHost="Deno", LasmSignature="close(): void"] undefined close();
+  // readonly addr: A
+  [LasmHost="Deno", LasmSignature="readonly addr: A"] readonly attribute Deno_VsockAddr addr;
+  // ref(): void
+  [LasmHost="Deno", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Deno", LasmSignature="unref(): void"] undefined unref();
+};
+
+// object Deno.VsockListenOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="VsockListenOptions", LasmPath="Deno.VsockListenOptions"]
+dictionary Deno_VsockListenOptions {
+  // cid: number
+  required double cid;
+  // port: number
+  required double port;
+};
+
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenVsockOptionsTransport"]
+enum Deno_ListenVsockOptionsTransport { "vsock" };
+
+// options VsockListenOptions & {transport: "vsock"}
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenVsockOptions", LasmPath="Deno.VsockListenOptions & {transport: 'vsock'}"]
+dictionary Deno_ListenVsockOptions : Deno_VsockListenOptions {
+  // transport: "vsock"
+  required Deno_ListenVsockOptionsTransport transport;
 };
 
 // object Deno.TlsHandshakeInfo
@@ -1019,6 +1254,20 @@ dictionary Deno_UnixConnectOptions {
   required DOMString path;
 };
 
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="VsockConnectOptionsTransport"]
+enum Deno_VsockConnectOptionsTransport { "vsock" };
+
+// object Deno.VsockConnectOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="VsockConnectOptions", LasmPath="Deno.VsockConnectOptions"]
+dictionary Deno_VsockConnectOptions {
+  // transport: "vsock"
+  required Deno_VsockConnectOptionsTransport transport;
+  // cid: number
+  required double cid;
+  // port: number
+  required double port;
+};
+
 [LasmHost="Deno", LasmLeanModule="Net", LasmName="ConnectTlsOptionsKeyFormat"]
 enum Deno_ConnectTlsOptionsKeyFormat { "pem" };
 
@@ -1058,6 +1307,313 @@ dictionary Deno_StartTlsOptions {
   sequence<DOMString> alpnProtocols;
   // unsafelyDisableHostnameVerification?: boolean
   boolean unsafelyDisableHostnameVerification;
+};
+
+// object Deno.QuicCloseInfo
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicCloseInfo", LasmPath="Deno.QuicCloseInfo"]
+dictionary Deno_QuicCloseInfo {
+  // closeCode: number
+  required double closeCode;
+  // reason: string
+  required DOMString reason;
+};
+
+// object Deno.QuicSendStreamOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicSendStreamOptions", LasmPath="Deno.QuicSendStreamOptions"]
+dictionary Deno_QuicSendStreamOptions {
+  // sendOrder?: number
+  double sendOrder;
+  // waitUntilAvailable?: boolean
+  boolean waitUntilAvailable;
+};
+
+// interface Deno.QuicReceiveStream
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicReceiveStream", LasmPath="Deno.QuicReceiveStream"]
+interface Deno_QuicReceiveStream : ReadableStream {
+  // readonly id: bigint
+  [LasmHost="Deno", LasmSignature="readonly id: bigint"] readonly attribute bigint id;
+};
+
+// interface Deno.QuicSendStream
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicSendStream", LasmPath="Deno.QuicSendStream"]
+interface Deno_QuicSendStream : WritableStream {
+  // sendOrder: number
+  [LasmHost="Deno", LasmSignature="sendOrder: number"] readonly attribute double sendOrder;
+  // readonly id: bigint
+  [LasmHost="Deno", LasmSignature="readonly id: bigint"] readonly attribute bigint id;
+};
+
+// object Deno.QuicBidirectionalStream
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicBidirectionalStream", LasmPath="Deno.QuicBidirectionalStream"]
+dictionary Deno_QuicBidirectionalStream {
+  // readonly readable: QuicReceiveStream
+  required Deno_QuicReceiveStream readable;
+  // readonly writable: QuicSendStream
+  required Deno_QuicSendStream writable;
+};
+
+// object Deno.QuicEndpointOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicEndpointOptions", LasmPath="Deno.QuicEndpointOptions"]
+dictionary Deno_QuicEndpointOptions {
+  // hostname?: string
+  DOMString hostname;
+  // port?: number
+  double port;
+};
+
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="QuicTransportOptionsCongestionControl"]
+enum Deno_QuicTransportOptionsCongestionControl { "throughput", "low-latency", "default" };
+
+// object Deno.QuicTransportOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicTransportOptions", LasmPath="Deno.QuicTransportOptions"]
+dictionary Deno_QuicTransportOptions {
+  // keepAliveInterval?: number
+  double keepAliveInterval;
+  // maxIdleTimeout?: number
+  double maxIdleTimeout;
+  // maxConcurrentBidirectionalStreams?: number
+  double maxConcurrentBidirectionalStreams;
+  // maxConcurrentUnidirectionalStreams?: number
+  double maxConcurrentUnidirectionalStreams;
+  // congestionControl?: "throughput" | "low-latency" | "default"
+  Deno_QuicTransportOptionsCongestionControl congestionControl;
+};
+
+// object Deno.QuicServerTransportOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicServerTransportOptions", LasmPath="Deno.QuicServerTransportOptions"]
+dictionary Deno_QuicServerTransportOptions : Deno_QuicTransportOptions {
+  // preferredAddressV4?: string
+  DOMString preferredAddressV4;
+  // preferredAddressV6?: string
+  DOMString preferredAddressV6;
+};
+
+// object Deno.QuicListenOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicListenOptions", LasmPath="Deno.QuicListenOptions"]
+dictionary Deno_QuicListenOptions : Deno_QuicServerTransportOptions {
+  // alpnProtocols: string[]
+  required sequence<DOMString> alpnProtocols;
+  // key: string
+  required DOMString key;
+  // cert: string
+  required DOMString cert;
+};
+
+// object Deno.QuicAcceptOptions (QuicAcceptOptions<boolean>)
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicAcceptOptions", LasmPath="Deno.QuicAcceptOptions"]
+dictionary Deno_QuicAcceptOptions : Deno_QuicServerTransportOptions {
+  // alpnProtocols?: string[]
+  sequence<DOMString> alpnProtocols;
+  // zeroRtt?: ZRTT
+  boolean zeroRtt;
+};
+
+// interface Deno.QuicIncoming
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicIncoming", LasmPath="Deno.QuicIncoming"]
+interface Deno_QuicIncoming {
+  // readonly localIp: string
+  [LasmHost="Deno", LasmSignature="readonly localIp: string"] readonly attribute DOMString localIp;
+  // readonly remoteAddr: NetAddr
+  [LasmHost="Deno", LasmSignature="readonly remoteAddr: NetAddr"] readonly attribute Deno_NetAddr remoteAddr;
+  // readonly remoteAddressValidated: boolean
+  [LasmHost="Deno", LasmSignature="readonly remoteAddressValidated: boolean"] readonly attribute boolean remoteAddressValidated;
+  // accept<ZRTT extends boolean>(options?: QuicAcceptOptions<ZRTT>): ZRTT extends true ? QuicConn : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)
+  [LasmHost="Deno", LasmSignature="accept<ZRTT extends boolean>(options?: QuicAcceptOptions<ZRTT>): ZRTT extends true ? QuicConn : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)"] Promise<Deno_QuicConn> accept(optional Deno_QuicAcceptOptions options);
+  // refuse(): void
+  [LasmHost="Deno", LasmSignature="refuse(): void"] undefined refuse();
+  // ignore(): void
+  [LasmHost="Deno", LasmSignature="ignore(): void"] undefined ignore();
+};
+
+// interface Deno.QuicListener
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicListener", LasmPath="Deno.QuicListener"]
+interface Deno_QuicListener {
+  async iterable<Deno_QuicIncoming>;
+  // incoming(): Promise<QuicIncoming>
+  [LasmHost="Deno", LasmSignature="incoming(): Promise<QuicIncoming>"] Promise<Deno_QuicIncoming> incoming();
+  // accept(): Promise<QuicConn>
+  [LasmHost="Deno", LasmSignature="accept(): Promise<QuicConn>"] Promise<Deno_QuicConn> accept();
+  // stop(): void
+  [LasmHost="Deno", LasmSignature="stop(): void"] undefined stop();
+  // readonly endpoint: QuicEndpoint
+  [LasmHost="Deno", LasmSignature="readonly endpoint: QuicEndpoint"] readonly attribute Deno_QuicEndpoint endpoint;
+};
+
+// class Deno.QuicEndpoint
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicEndpoint", LasmPath="Deno.QuicEndpoint"]
+interface Deno_QuicEndpoint {
+  // constructor(options?: QuicEndpointOptions)
+  [LasmHost="Deno", LasmSignature="constructor(options?: QuicEndpointOptions)"] constructor(optional Deno_QuicEndpointOptions options);
+  // readonly addr: NetAddr
+  [LasmHost="Deno", LasmSignature="readonly addr: NetAddr"] readonly attribute Deno_NetAddr addr;
+  // listen(options: QuicListenOptions): QuicListener
+  [LasmHost="Deno", LasmSignature="listen(options: QuicListenOptions): QuicListener"] Deno_QuicListener listen(Deno_QuicListenOptions options);
+  // close(info?: QuicCloseInfo): void
+  [LasmHost="Deno", LasmSignature="close(info?: QuicCloseInfo): void"] undefined close(optional Deno_QuicCloseInfo info);
+};
+
+// interface Deno.QuicConn
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="QuicConn", LasmPath="Deno.QuicConn"]
+interface Deno_QuicConn {
+  // close(info?: QuicCloseInfo): void
+  [LasmHost="Deno", LasmSignature="close(info?: QuicCloseInfo): void"] undefined close(optional Deno_QuicCloseInfo info);
+  // createBidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicBidirectionalStream>
+  [LasmHost="Deno", LasmSignature="createBidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicBidirectionalStream>"] Promise<Deno_QuicBidirectionalStream> createBidirectionalStream(optional Deno_QuicSendStreamOptions options);
+  // createUnidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicSendStream>
+  [LasmHost="Deno", LasmSignature="createUnidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicSendStream>"] Promise<Deno_QuicSendStream> createUnidirectionalStream(optional Deno_QuicSendStreamOptions options);
+  // sendDatagram(data: Uint8Array): Promise<void>
+  [LasmHost="Deno", LasmSignature="sendDatagram(data: Uint8Array): Promise<void>"] Promise<undefined> sendDatagram(Uint8Array data);
+  // readDatagram(): Promise<Uint8Array<ArrayBuffer>>
+  [LasmHost="Deno", LasmSignature="readDatagram(): Promise<Uint8Array<ArrayBuffer>>"] Promise<Uint8Array> readDatagram();
+  // readonly endpoint: QuicEndpoint
+  [LasmHost="Deno", LasmSignature="readonly endpoint: QuicEndpoint"] readonly attribute Deno_QuicEndpoint endpoint;
+  // readonly handshake: Promise<void>
+  [LasmHost="Deno", LasmSignature="readonly handshake: Promise<void>"] readonly attribute Promise<undefined> handshake;
+  // readonly remoteAddr: NetAddr
+  [LasmHost="Deno", LasmSignature="readonly remoteAddr: NetAddr"] readonly attribute Deno_NetAddr remoteAddr;
+  // readonly protocol: string | undefined
+  [LasmHost="Deno", LasmSignature="readonly protocol: string | undefined"] readonly attribute DOMString? protocol;
+  // readonly serverName: string | undefined
+  [LasmHost="Deno", LasmSignature="readonly serverName: string | undefined"] readonly attribute DOMString? serverName;
+  // readonly closed: Promise<QuicCloseInfo>
+  [LasmHost="Deno", LasmSignature="readonly closed: Promise<QuicCloseInfo>"] readonly attribute Promise<Deno_QuicCloseInfo> closed;
+  // readonly incomingBidirectionalStreams: ReadableStream<QuicBidirectionalStream>
+  [LasmHost="Deno", LasmSignature="readonly incomingBidirectionalStreams: ReadableStream<QuicBidirectionalStream>"] readonly attribute ReadableStream incomingBidirectionalStreams;
+  // readonly incomingUnidirectionalStreams: ReadableStream<QuicReceiveStream>
+  [LasmHost="Deno", LasmSignature="readonly incomingUnidirectionalStreams: ReadableStream<QuicReceiveStream>"] readonly attribute ReadableStream incomingUnidirectionalStreams;
+  // readonly maxDatagramSize: number
+  [LasmHost="Deno", LasmSignature="readonly maxDatagramSize: number"] readonly attribute double maxDatagramSize;
+};
+
+// object Deno.ConnectQuicOptions (ConnectQuicOptions<boolean>)
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno_net.d.ts", LasmName="ConnectQuicOptions", LasmPath="Deno.ConnectQuicOptions"]
+dictionary Deno_ConnectQuicOptions : Deno_QuicTransportOptions {
+  // port: number
+  required double port;
+  // hostname: string
+  required DOMString hostname;
+  // serverName?: string | undefined
+  DOMString serverName;
+  // alpnProtocols: string[]
+  required sequence<DOMString> alpnProtocols;
+  // caCerts?: string[]
+  sequence<DOMString> caCerts;
+  // endpoint?: QuicEndpoint
+  Deno_QuicEndpoint endpoint;
+  // zeroRtt?: ZRTT
+  boolean zeroRtt;
+};
+
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="AddrTransport"]
+enum Deno_AddrTransport { "tcp", "udp", "unix", "unixpacket", "vsock" };
+
+// the union NetAddr | UnixAddr | VsockAddr, as one dictionary
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="Addr", LasmPath="Deno.Addr"]
+dictionary Deno_Addr {
+  // transport: "tcp" | "udp" | "unix" | "unixpacket" | "vsock"
+  required Deno_AddrTransport transport;
+  // hostname: string (optional)
+  DOMString hostname;
+  // port: number (optional)
+  double port;
+  // path: string (optional)
+  DOMString path;
+  // cid: number (optional)
+  double cid;
+};
+
+// () => Promise<void>
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="MulticastV4MembershipLeave", LasmSignature="() => Promise<void>"]
+callback Deno_MulticastV4MembershipLeave = Promise<undefined> ();
+
+// (loopback: boolean) => Promise<void>
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="MulticastV4MembershipSetLoopback", LasmSignature="(loopback: boolean) => Promise<void>"]
+callback Deno_MulticastV4MembershipSetLoopback = Promise<undefined> (boolean loopback);
+
+// (ttl: number) => Promise<void>
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="MulticastV4MembershipSetTTL", LasmSignature="(ttl: number) => Promise<void>"]
+callback Deno_MulticastV4MembershipSetTTL = Promise<undefined> (double ttl);
+
+// object Deno.MulticastV4Membership
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno.unstable.d.ts", LasmName="MulticastV4Membership", LasmPath="Deno.MulticastV4Membership"]
+dictionary Deno_MulticastV4Membership {
+  // leave: () => Promise<void>
+  required Deno_MulticastV4MembershipLeave leave;
+  // setLoopback: (loopback: boolean) => Promise<void>
+  required Deno_MulticastV4MembershipSetLoopback setLoopback;
+  // setTTL: (ttl: number) => Promise<void>
+  required Deno_MulticastV4MembershipSetTTL setTTL;
+};
+
+// () => Promise<void>
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="MulticastV6MembershipLeave", LasmSignature="() => Promise<void>"]
+callback Deno_MulticastV6MembershipLeave = Promise<undefined> ();
+
+// (loopback: boolean) => Promise<void>
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="MulticastV6MembershipSetLoopback", LasmSignature="(loopback: boolean) => Promise<void>"]
+callback Deno_MulticastV6MembershipSetLoopback = Promise<undefined> (boolean loopback);
+
+// object Deno.MulticastV6Membership
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno.unstable.d.ts", LasmName="MulticastV6Membership", LasmPath="Deno.MulticastV6Membership"]
+dictionary Deno_MulticastV6Membership {
+  // leave: () => Promise<void>
+  required Deno_MulticastV6MembershipLeave leave;
+  // setLoopback: (loopback: boolean) => Promise<void>
+  required Deno_MulticastV6MembershipSetLoopback setLoopback;
+};
+
+// interface Deno.DatagramConn
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno.unstable.d.ts", LasmName="DatagramConn", LasmPath="Deno.DatagramConn"]
+interface Deno_DatagramConn {
+  async iterable<sequence<any>>;
+  // joinMulticastV4(address: string, networkInterface: string): Promise<MulticastV4Membership>
+  [LasmHost="Deno", LasmSignature="joinMulticastV4(address: string, networkInterface: string): Promise<MulticastV4Membership>"] Promise<Deno_MulticastV4Membership> joinMulticastV4(DOMString address, DOMString networkInterface);
+  // joinMulticastV6(address: string, networkInterface: number): Promise<MulticastV6Membership>
+  [LasmHost="Deno", LasmSignature="joinMulticastV6(address: string, networkInterface: number): Promise<MulticastV6Membership>"] Promise<Deno_MulticastV6Membership> joinMulticastV6(DOMString address, double networkInterface);
+  // receive(p?: Uint8Array): Promise<[Uint8Array<ArrayBuffer>, Addr]>
+  [LasmHost="Deno", LasmSignature="receive(p?: Uint8Array): Promise<[Uint8Array<ArrayBuffer>, Addr]>"] Promise<sequence<any>> receive(optional Uint8Array p);
+  // send(p: Uint8Array, addr: Addr): Promise<number>
+  [LasmHost="Deno", LasmSignature="send(p: Uint8Array, addr: Addr): Promise<number>"] Promise<double> send(Uint8Array p, Deno_Addr addr);
+  // close(): void
+  [LasmHost="Deno", LasmSignature="close(): void"] undefined close();
+  // readonly addr: Addr
+  [LasmHost="Deno", LasmSignature="readonly addr: Addr"] readonly attribute Deno_Addr addr;
+};
+
+// object Deno.UdpListenOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno.unstable.d.ts", LasmName="UdpListenOptions", LasmPath="Deno.UdpListenOptions"]
+dictionary Deno_UdpListenOptions : Deno_ListenOptions {
+  // reuseAddress?: boolean
+  boolean reuseAddress;
+  // loopback?: boolean
+  boolean loopback;
+};
+
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenDatagramUdpOptionsTransport"]
+enum Deno_ListenDatagramUdpOptionsTransport { "udp" };
+
+// options UdpListenOptions & {transport: "udp"}
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenDatagramUdpOptions", LasmPath="Deno.UdpListenOptions & {transport: 'udp'}"]
+dictionary Deno_ListenDatagramUdpOptions : Deno_UdpListenOptions {
+  // transport: "udp"
+  required Deno_ListenDatagramUdpOptionsTransport transport;
+};
+
+// object Deno.UnixListenDatagramOptions
+[LasmHost="Deno", LasmLeanModule="Net", LasmFile="lib.deno.unstable.d.ts", LasmName="UnixListenDatagramOptions", LasmPath="Deno.UnixListenDatagramOptions"]
+dictionary Deno_UnixListenDatagramOptions {
+  // path?: string
+  DOMString path;
+};
+
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenDatagramUnixOptionsTransport"]
+enum Deno_ListenDatagramUnixOptionsTransport { "unixpacket" };
+
+// options UnixListenDatagramOptions & {transport: "unixpacket"}
+[LasmHost="Deno", LasmLeanModule="Net", LasmName="ListenDatagramUnixOptions", LasmPath="Deno.UnixListenDatagramOptions & {transport: 'unixpacket'}"]
+dictionary Deno_ListenDatagramUnixOptions : Deno_UnixListenDatagramOptions {
+  // transport: "unixpacket"
+  required Deno_ListenDatagramUnixOptionsTransport transport;
 };
 
 [LasmHost="Deno", LasmLeanModule="Kv", LasmName="KvKeyPart"]
@@ -1394,100 +1950,6 @@ interface Deno_Stderr {
   [LasmHost="Deno", LasmSignature="isTerminal(): boolean"] boolean isTerminal();
 };
 
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStdin"]
-enum Deno_CommandOptionsStdin { "piped", "inherit", "null" };
-
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStdout"]
-enum Deno_CommandOptionsStdout { "piped", "inherit", "null" };
-
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmName="CommandOptionsStderr"]
-enum Deno_CommandOptionsStderr { "piped", "inherit", "null" };
-
-// object Deno.CommandOptions
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandOptions", LasmPath="Deno.CommandOptions"]
-dictionary Deno_CommandOptions {
-  // args?: string[]
-  sequence<DOMString> args;
-  // cwd?: string | URL
-  Deno_DOMStringOrURL cwd;
-  // clearEnv?: boolean
-  boolean clearEnv;
-  // env?: Record<string, string>
-  record<DOMString, DOMString> env;
-  // uid?: number
-  double uid;
-  // gid?: number
-  double gid;
-  // signal?: AbortSignal
-  AbortSignal signal;
-  // stdin?: "piped" | "inherit" | "null"
-  Deno_CommandOptionsStdin stdin;
-  // stdout?: "piped" | "inherit" | "null"
-  Deno_CommandOptionsStdout stdout;
-  // stderr?: "piped" | "inherit" | "null"
-  Deno_CommandOptionsStderr stderr;
-  // windowsRawArguments?: boolean
-  boolean windowsRawArguments;
-  // detached?: boolean
-  boolean detached;
-};
-
-// object Deno.CommandStatus
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandStatus", LasmPath="Deno.CommandStatus"]
-dictionary Deno_CommandStatus {
-  // success: boolean
-  required boolean success;
-  // code: number
-  required double code;
-  // signal: Signal | null
-  required Deno_Signal? signal;
-};
-
-// object Deno.CommandOutput
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="CommandOutput", LasmPath="Deno.CommandOutput"]
-dictionary Deno_CommandOutput : Deno_CommandStatus {
-  // readonly stdout: Uint8Array<ArrayBuffer>
-  required Uint8Array stdout;
-  // readonly stderr: Uint8Array<ArrayBuffer>
-  required Uint8Array stderr;
-};
-
-// interface Deno.SubprocessReadableStream
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="SubprocessReadableStream", LasmPath="Deno.SubprocessReadableStream"]
-interface Deno_SubprocessReadableStream : ReadableStream {
-  // arrayBuffer(): Promise<ArrayBuffer>
-  [LasmHost="Deno", LasmSignature="arrayBuffer(): Promise<ArrayBuffer>"] Promise<ArrayBuffer> arrayBuffer();
-  // bytes(): Promise<Uint8Array<ArrayBuffer>>
-  [LasmHost="Deno", LasmSignature="bytes(): Promise<Uint8Array<ArrayBuffer>>"] Promise<Uint8Array> bytes();
-  // json(): Promise<any>
-  [LasmHost="Deno", LasmSignature="json(): Promise<any>"] Promise<any> json();
-  // text(): Promise<string>
-  [LasmHost="Deno", LasmSignature="text(): Promise<string>"] Promise<DOMString> text();
-};
-
-// class Deno.ChildProcess
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="ChildProcess", LasmPath="Deno.ChildProcess"]
-interface Deno_ChildProcess {
-  // get stdin(): WritableStream<Uint8Array<ArrayBufferLike>>
-  [LasmHost="Deno", LasmSignature="get stdin(): WritableStream<Uint8Array<ArrayBufferLike>>"] readonly attribute WritableStream stdin;
-  // get stdout(): SubprocessReadableStream
-  [LasmHost="Deno", LasmSignature="get stdout(): SubprocessReadableStream"] readonly attribute Deno_SubprocessReadableStream stdout;
-  // get stderr(): SubprocessReadableStream
-  [LasmHost="Deno", LasmSignature="get stderr(): SubprocessReadableStream"] readonly attribute Deno_SubprocessReadableStream stderr;
-  // readonly pid: number
-  [LasmHost="Deno", LasmSignature="readonly pid: number"] readonly attribute double pid;
-  // readonly status: Promise<CommandStatus>
-  [LasmHost="Deno", LasmSignature="readonly status: Promise<CommandStatus>"] readonly attribute Promise<Deno_CommandStatus> status;
-  // output(): Promise<CommandOutput>
-  [LasmHost="Deno", LasmSignature="output(): Promise<CommandOutput>"] Promise<Deno_CommandOutput> output();
-  // kill(signo?: Signal | number): void
-  [LasmHost="Deno", LasmSignature="kill(signo?: Signal | number): void"] undefined kill(optional Deno_SignalOrDouble signo);
-  // ref(): void
-  [LasmHost="Deno", LasmSignature="ref(): void"] undefined ref();
-  // unref(): void
-  [LasmHost="Deno", LasmSignature="unref(): void"] undefined unref();
-};
-
 // class Deno.Command
 [LasmHost="Deno", LasmLeanModule="Subprocess", LasmFile="lib.deno.ns.d.ts", LasmName="Command", LasmPath="Deno.Command"]
 interface Deno_Command {
@@ -1621,9 +2083,9 @@ namespace Deno_nsRuntime {
   // Deno.removeSignalListener(signal: Signal, handler: () => void): void
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.removeSignalListener(signal: Signal, handler: () => void): void"] undefined removeSignalListener(Deno_Signal signal, Deno_RemoveSignalListenerHandler handler);
   // Deno.refTimer(id: number | NodeJS.Timeout): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.refTimer(id: number | NodeJS.Timeout): void"] undefined refTimer(Deno_DoubleOrObject id);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.refTimer(id: number | NodeJS.Timeout): void"] undefined refTimer(any id);
   // Deno.unrefTimer(id: number | NodeJS.Timeout): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.unrefTimer(id: number | NodeJS.Timeout): void"] undefined unrefTimer(Deno_DoubleOrObject id);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.unrefTimer(id: number | NodeJS.Timeout): void"] undefined unrefTimer(any id);
   // Deno.uid(): number | null
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.uid(): number | null"] double? uid();
   // Deno.gid(): number | null
@@ -1671,16 +2133,28 @@ namespace Deno_nsNet {
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.listen(options: TcpListenOptions & { transport?: 'tcp' }): TcpListener"] Deno_TcpListener listen(Deno_ListenTcpOptions options);
   // Deno.listen(options: UnixListenOptions & { transport: "unix" }): UnixListener
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.listen(options: UnixListenOptions & { transport: 'unix' }): UnixListener", LasmLeanName="listenUnix"] Deno_UnixListener listen(Deno_ListenUnixOptions options);
+  // Deno.listen(options: VsockListenOptions & { transport: "vsock" }): VsockListener
+  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.listen(options: VsockListenOptions & { transport: 'vsock' }): VsockListener", LasmLeanName="listenWithVsockListenOptionsTransportVsock"] Deno_VsockListener listen(Deno_ListenVsockOptions options);
   // Deno.listenTls(options: ListenTlsOptions & TlsCertifiedKeyPem): TlsListener
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.listenTls(options: ListenTlsOptions & TlsCertifiedKeyPem): TlsListener"] Deno_TlsListener listenTls(Deno_ListenTlsCertifiedOptions options);
   // Deno.connect(options: ConnectOptions): Promise<TcpConn>
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.connect(options: ConnectOptions): Promise<TcpConn>"] Promise<Deno_TcpConn> connect(Deno_ConnectOptions options);
   // Deno.connect(options: UnixConnectOptions): Promise<UnixConn>
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.connect(options: UnixConnectOptions): Promise<UnixConn>", LasmLeanName="connectUnix"] Promise<Deno_UnixConn> connect(Deno_UnixConnectOptions options);
+  // Deno.connect(options: VsockConnectOptions): Promise<VsockConn>
+  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.connect(options: VsockConnectOptions): Promise<VsockConn>", LasmLeanName="connectWithVsockConnectOptions"] Promise<Deno_VsockConn> connect(Deno_VsockConnectOptions options);
   // Deno.connectTls(options: ConnectTlsOptions | (ConnectTlsOptions & TlsCertifiedKeyPem)): Promise<TlsConn>
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.connectTls(options: ConnectTlsOptions | (ConnectTlsOptions & TlsCertifiedKeyPem)): Promise<TlsConn>"] Promise<Deno_TlsConn> connectTls(Deno_ConnectTlsOptions options);
   // Deno.startTls(conn: TcpConn, options?: StartTlsOptions): Promise<TlsConn>
   [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.startTls(conn: TcpConn, options?: StartTlsOptions): Promise<TlsConn>"] Promise<Deno_TlsConn> startTls(Deno_TcpConn conn, optional Deno_StartTlsOptions options);
+  // Deno.connectQuic<ZRTT extends boolean>(options: ConnectQuicOptions<ZRTT>): ZRTT extends true ? (QuicConn | Promise<QuicConn>) : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)
+  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.connectQuic<ZRTT extends boolean>(options: ConnectQuicOptions<ZRTT>): ZRTT extends true ? (QuicConn | Promise<QuicConn>) : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)"] Promise<Deno_QuicConn> connectQuic(Deno_ConnectQuicOptions options);
+  // Deno.upgradeWebTransport(conn: QuicConn): Promise<WebTransport & { url: string }> (read as Promise<unknown>: a web WebTransport with its url, which Lasm.JS.Web does not generate: the object as Data)
+  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="Deno.upgradeWebTransport(conn: QuicConn): Promise<WebTransport & { url: string }> (read as Promise<unknown>: a web WebTransport with its url, which Lasm.JS.Web does not generate: the object as Data)"] Promise<any> upgradeWebTransport(Deno_QuicConn conn);
+  // Deno.listenDatagram(options: UdpListenOptions & { transport: "udp" }): DatagramConn
+  [LasmHost="Deno", LasmFile="lib.deno.unstable.d.ts", LasmSignature="Deno.listenDatagram(options: UdpListenOptions & { transport: 'udp' }): DatagramConn"] Deno_DatagramConn listenDatagram(Deno_ListenDatagramUdpOptions options);
+  // Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: "unixpacket" }): DatagramConn
+  [LasmHost="Deno", LasmFile="lib.deno.unstable.d.ts", LasmSignature="Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn", LasmLeanName="listenDatagramUnix"] Deno_DatagramConn listenDatagram(Deno_ListenDatagramUnixOptions options);
 };
 
 // The global Deno: the file system (Deno.readFile, Deno.open, Deno.FsFile, …)
@@ -1775,9 +2249,9 @@ namespace Deno_nsFs {
   // Deno.symlinkSync(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): void
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.symlinkSync(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): void"] undefined symlinkSync(Deno_DOMStringOrURL oldpath, Deno_DOMStringOrURL newpath, optional Deno_SymlinkOptions options);
   // Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DOMStringOrURL path, Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DOMStringOrURL path, any atime, any mtime);
   // Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DOMStringOrURL path, Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DOMStringOrURL path, any atime, any mtime);
   // Deno.umask(mask?: number): number
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.umask(mask?: number): number"] double umask(optional double mask);
 };
@@ -1797,18 +2271,30 @@ namespace Deno_nsIo {
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="const Deno.stderr: { write(p: Uint8Array): Promise<number>; writeSync(p: Uint8Array): number; close(): void; readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>; isTerminal(): boolean; }"] readonly attribute Deno_Stderr stderr;
 };
 
+// The global Deno: subprocesses (Deno.Command, Deno.ChildProcess)
+[LasmHost="Deno", LasmLeanModule="Subprocess", LasmPath="Deno"]
+namespace Deno_nsSubprocess {
+  // Deno.spawn(command: string | URL, options?: CommandOptions): ChildProcess
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawn(command: string | URL, options?: CommandOptions): ChildProcess"] Deno_ChildProcess spawn(Deno_DOMStringOrURL command, optional Deno_CommandOptions options);
+  // Deno.spawn(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): ChildProcess
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawn(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): ChildProcess", LasmLeanName="spawnWithArgs"] Deno_ChildProcess spawn(Deno_DOMStringOrURL command, sequence<DOMString> args, optional Deno_CommandOptions options);
+  // Deno.spawnAndWait(command: string | URL, options?: CommandOptions): Promise<CommandOutput>
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawnAndWait(command: string | URL, options?: CommandOptions): Promise<CommandOutput>"] Promise<Deno_CommandOutput> spawnAndWait(Deno_DOMStringOrURL command, optional Deno_CommandOptions options);
+  // Deno.spawnAndWait(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): Promise<CommandOutput>
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawnAndWait(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): Promise<CommandOutput>", LasmLeanName="spawnAndWaitWithArgs"] Promise<Deno_CommandOutput> spawnAndWait(Deno_DOMStringOrURL command, sequence<DOMString> args, optional Deno_CommandOptions options);
+  // Deno.spawnAndWaitSync(command: string | URL, options?: CommandOptions): CommandOutput
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawnAndWaitSync(command: string | URL, options?: CommandOptions): CommandOutput"] Deno_CommandOutput spawnAndWaitSync(Deno_DOMStringOrURL command, optional Deno_CommandOptions options);
+  // Deno.spawnAndWaitSync(command: string | URL, args: string[], options?: Omit<CommandOptions, "args">): CommandOutput
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.spawnAndWaitSync(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): CommandOutput", LasmLeanName="spawnAndWaitSyncWithArgs"] Deno_CommandOutput spawnAndWaitSync(Deno_DOMStringOrURL command, sequence<DOMString> args, optional Deno_CommandOptions options);
+  // Deno.kill(pid: number, signo?: Signal | number): void
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.kill(pid: number, signo?: Signal | number): void"] undefined kill(double pid, optional Deno_SignalOrDouble signo);
+};
+
 // The global Deno: WebSocket upgrades (Deno.upgradeWebSocket)
 [LasmHost="Deno", LasmLeanModule="WebSockets", LasmPath="Deno"]
 namespace Deno_nsWebSockets {
   // Deno.upgradeWebSocket(request: Request, options?: UpgradeWebSocketOptions): WebSocketUpgrade
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.upgradeWebSocket(request: Request, options?: UpgradeWebSocketOptions): WebSocketUpgrade"] Deno_WebSocketUpgrade upgradeWebSocket(Request request, optional Deno_UpgradeWebSocketOptions options);
-};
-
-// The global Deno: subprocesses (Deno.Command, Deno.ChildProcess)
-[LasmHost="Deno", LasmLeanModule="Subprocess", LasmPath="Deno"]
-namespace Deno_nsSubprocess {
-  // Deno.kill(pid: number, signo?: Signal | number): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.kill(pid: number, signo?: Signal | number): void"] undefined kill(double pid, optional Deno_SignalOrDouble signo);
 };
 
 // The global Deno: HTTP servers (Deno.serve)
@@ -1818,6 +2304,8 @@ namespace Deno_nsServe {
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.serve(handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>"] Deno_HttpServer serve(Deno_ServeHandler handler);
   // Deno.serve(options: ServeUnixOptions, handler: ServeHandler<Deno.UnixAddr>): HttpServer<Deno.UnixAddr>
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.serve(options: ServeUnixOptions, handler: ServeHandler<Deno.UnixAddr>): HttpServer<Deno.UnixAddr>", LasmLeanName="serveWithUnixOptions"] Deno_HttpServerUnixAddr serve(Deno_ServeUnixOptions options, Deno_ServeHandlerUnixAddr handler);
+  // Deno.serve(options: ServeVsockOptions, handler: ServeHandler<Deno.VsockAddr>): HttpServer<Deno.VsockAddr>
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.serve(options: ServeVsockOptions, handler: ServeHandler<Deno.VsockAddr>): HttpServer<Deno.VsockAddr>", LasmLeanName="serveWithVsockOptions"] Deno_HttpServerVsockAddr serve(Deno_ServeVsockOptions options, Deno_ServeHandlerVsockAddr handler);
   // Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>", LasmLeanName="serveWithOptions"] Deno_HttpServer serve(Deno_ServeTcpOptions options, Deno_ServeHandler handler);
   // Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>

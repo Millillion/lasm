@@ -150,7 +150,9 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     assert.equal(s.global, h.global);
     if (h.auto) {
       // The whole namespace (ts-auto.mjs): the functions apps use, and no excluded member.
-      for (const f of ['serve', 'readFile', 'writeTextFile', 'listen', 'connect', 'upgradeWebSocket', 'openKv', 'env', 'args']) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
+      const expected = { Deno: ['serve', 'readFile', 'writeTextFile', 'listen', 'connect', 'upgradeWebSocket', 'openKv', 'env', 'args'],
+        Bun: ['serve', 'file', 'write', 'spawn', 'spawnSync', 'listen', 'connect', 'escapeHTML', 'env', 'password'] }[h.name];
+      for (const f of expected) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
       for (const k of Object.keys(h.exclude).filter(k => /^\w+\.\w+$/.test(k))) {
         const [owner, member] = k.split('.');
         assert.ok(!(s.interfaces[owner] ?? []).includes(member), `${h.global}.${k} is excluded but generated`);
@@ -165,7 +167,9 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     }
   }
   const idl = readFileSync(new URL('../scripts/bindings/deno.idl', import.meta.url), 'utf8');
-  assert.match(idl, /Deno\.serve\(options: ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental in its declaration/);
+  // Experimental declarations that work are generated (VSOCK); excluded ones carry their reason.
+  assert.doesNotMatch(idl, /ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental/);
+  assert.match(idl, /LasmLeanName="serveWithVsockOptions"/);
 });
 
 /** A host of serve-tier2.mjs's shape over one synthetic declaration file. */
@@ -480,7 +484,9 @@ test('serve-api reads rich declarations: classes, constants, getters and generic
   assert.ok(!declarations(richSource, 'cf.d.ts').some(x => x.name === 'Store'), 'classes only when asked');
   assert.deepEqual(genericDefaults('Key extends string = string, T = unknown, U'), { Key: 'string', T: 'unknown', U: 'unknown' });
   assert.equal(typeText(parseType('readonly Entry[]')), 'Entry[]');
-  assert.throws(() => parseType('[string[], ...T[]]'), /tuple types are not lowered/);
+  // Tuples are read (Lasm.JS.Bun's Redis replies; ts-auto.mjs lowers them to arrays), labels and spreads dropped.
+  assert.equal(typeText(parseType('[string[], ...T[]]')), '[string[], T[]]');
+  assert.equal(typeText(parseType('[raw: Socket, tls?: Socket]')), '[Socket, Socket]');
 });
 
 test('serve-api lowers by its rich rules', () => {

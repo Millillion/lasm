@@ -333,17 +333,6 @@ def RemoveSignalListenerHandler.ofSyncFn (f : IO Unit) : IO RemoveSignalListener
     #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
   return { val := fn }
 
-/-- `typedef double or object DoubleOrObject`: one constructor per member type. -/
-inductive DoubleOrObject where
-  /-- `double` -/
-  | double (value : Float)
-  /-- `object` -/
-  | object (value : Data)
-instance : ToJS DoubleOrObject := ⟨fun
-  | .double v => toJS v
-  | .object v => toJS v⟩
-instance : Coe Float DoubleOrObject := ⟨.double⟩
-
 /-- `dictionary Build` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Build where
   /-- `required DOMString target` -/
@@ -492,13 +481,13 @@ def removeSignalListener (signal : Signal) (handler : RemoveSignalListenerHandle
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.removeSignalListener", module := "globalThis", path := "Deno.removeSignalListener", construct := false, arity := 2 }
     (Support.args #[toJS signal, toJS handler]) (await := false)
 
-/-- `Deno.refTimer(id: number | NodeJS.Timeout): void`: `undefined refTimer(DoubleOrObject id)` (Deno 2.9.6 type declarations) -/
-def refTimer (id : DoubleOrObject) : IO Unit :=
+/-- `Deno.refTimer(id: number | NodeJS.Timeout): void`: `undefined refTimer(any id)` (Deno 2.9.6 type declarations) -/
+def refTimer (id : Data) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.refTimer", module := "globalThis", path := "Deno.refTimer", construct := false, arity := 1 }
     (Support.args #[toJS id]) (await := false)
 
-/-- `Deno.unrefTimer(id: number | NodeJS.Timeout): void`: `undefined unrefTimer(DoubleOrObject id)` (Deno 2.9.6 type declarations) -/
-def unrefTimer (id : DoubleOrObject) : IO Unit :=
+/-- `Deno.unrefTimer(id: number | NodeJS.Timeout): void`: `undefined unrefTimer(any id)` (Deno 2.9.6 type declarations) -/
+def unrefTimer (id : Data) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.unrefTimer", module := "globalThis", path := "Deno.unrefTimer", construct := false, arity := 1 }
     (Support.args #[toJS id]) (await := false)
 

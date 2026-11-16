@@ -57,6 +57,7 @@ function typeParams(header) {
     let e = findTop(innerShape, i, inner.length, ',');
     if (e < 0) e = inner.length;
     const p = inner.slice(i, e).trim().replace(/^const\s+/, '');
+    if (!p) { i = e + 1; continue; }
     const m = /^([\w$]+)(?:\s+extends\s+([\s\S]+?))?(?:\s*=\s*([\s\S]+))?$/.exec(p);
     if (!m) fail(`cannot read the type parameter ${p}`);
     params.push({ name: m[1], constraint: m[2] && squash(m[2]), def: m[3] && squash(m[3]) });
@@ -137,12 +138,16 @@ export function lowerAuto(host, files) {
   const unstableFiles = new Set(Object.keys(host.unstable ?? {}));
   // The declarations of the namespace, by name (interfaces merged).
   const byName = new Map(), fns = new Map();
-  for (const d of all) {
+  for (const d0 of all) {
+    // A JavaScript module of the runtime (`declare module "bun:sqlite"`): its declarations, loaded from that module.
+    const root = (host.roots ?? []).find(r => d0.name.startsWith(r + '.'));
+    const d = root ? { ...d0, name: `${G}.${d0.name.slice(root.length + 1)}`, jsModule: root } : d0;
     if (!d.name.startsWith(G + '.')) continue;
     const n = strip(d.name);
+    if (root) used.add(`root:${root}`);
     if (unstableFiles.has(d.file)) {
       const take = host.unstable[d.file];
-      if (!take.names.includes(n.split('.')[0])) continue;
+      if (take.names !== '*' && !take.names.includes(n.split('.')[0])) continue;
       used.add(`unstable:${n.split('.')[0]}`);
       d.unstableTaken = take.reason;
     }
@@ -150,12 +155,15 @@ export function lowerAuto(host, files) {
     if (d.kind === 'interface' && byName.get(n)?.kind === 'interface') { byName.get(n).more.push(d); continue; }
     if (!byName.has(n)) byName.set(n, { ...d, more: [] });
   }
-  for (const [f, t] of Object.entries(host.unstable ?? {})) for (const n of t.names) if (!used.has(`unstable:${n}`)) fail(`${host.name}: unstable ${n} is not declared in ${f}`);
-  const leanOf = n => n.replace(/\./g, '');
-  const idl = lean => `${host.name}_${lean}`;
-  const moduleOfCategory = (doc, where) => {
+  for (const [f, t] of Object.entries(host.unstable ?? {})) for (const n of t.names === '*' ? [] : t.names) if (!used.has(`unstable:${n}`)) fail(`${host.name}: unstable ${n} is not declared in ${f}`);
+  // A nested namespace's declaration: its namespaces capitalised in front (`udp.Socket` → `UdpSocket`, apart from the function `udpSocket`).
+  const leanOf = n => n.includes('.') ? n.split('.').map(capital).join('') : n;
+  /** A name as declared, looked up from a nested namespace outwards (`HostnamePortServeOptions` in `Serve`). */
+  const scoped = (n, scope = '') => { n = strip(n); for (let sc = scope; sc; sc = sc.split('.').slice(0, -1).join('.')) if (byName.has(`${sc}.${n}`)) return `${sc}.${n}`; return n; };
+  const idl = lean => `${host.name}_${lean.replace(/\./g, '_')}`;
+  const moduleOfCategory = (doc, where, file) => {
     const c = categoryOf(doc);
-    if (!c) return null;
+    if (!c) return host.fileModules?.[file?.split('/').at(-1)] ?? null;
     const m = host.categories[c];
     if (m === undefined) fail(`${host.name} ${where}: @category ${c} is not in the tier file's categories`);
     return m;
@@ -168,12 +176,15 @@ export function lowerAuto(host, files) {
   const isExcluded = (key, doc, decl) => {
     if (key in host.exclude) { used.add(key); return host.exclude[key]; }
     const tag = tagOf(doc);
-    if (tag && !(decl?.unstableTaken && tag !== '@deprecated')) return `${tag} in its declaration`;
+    // Experimental and unstable declarations are generated when the host takes them (Jordan, 2026-11-16: decide each
+    // on whether it works); deprecated ones never (their replacement is generated).
+    if (tag && !((decl?.unstableTaken || host.takeExperimental) && tag !== '@deprecated')) return `${tag} in its declaration`;
     return null;
   };
 
   // ---------- types ----------
   const objectRequests = new Map(); // key → idl name
+  const dictFieldNames = new Map(); // dictionary IDL name → { parent, names }
   const enumTexts = new Map();
   const attrs = (more) => `[${Object.entries({ LasmHost: host.name, ...more }).filter(([, v]) => v !== undefined && v !== null).map(([k, v]) => v === true ? k : `${k}=${quoteAttr(v)}`).join(', ')}]`;
   const isNullish = t => t.k === 'name' && (t.name === 'null' || t.name === 'undefined');
@@ -181,7 +192,7 @@ export function lowerAuto(host, files) {
   const isPromise = t => t.k === 'name' && t.name === 'Promise';
   const anyString = t => t.k === 'inter' && t.parts.length === 2 && t.parts[0].k === 'name' && t.parts[0].name === 'string' && t.parts[1].k === 'obj' && !t.parts[1].body.trim();
   const flat = t => t.k === 'union' ? t.alts.flatMap(flat) : [t];
-  const bytes = new Set(['Uint8Array', 'Uint8ClampedArray', 'ArrayBufferView', 'ArrayBufferLike', 'BufferSource', 'Buffer']);
+  const bytes = new Set(['Uint8Array', 'Uint8ClampedArray', 'ArrayBufferView', 'ArrayBufferLike', 'BufferSource', 'Buffer', 'NodeJS.TypedArray', 'SharedArrayBuffer', 'DataView']);
   const sequences = new Set(['Array', 'ReadonlyArray', 'Iterable', 'ArrayLike']);
 
   function addDef(name, mod, text, origin) {
@@ -200,17 +211,55 @@ export function lowerAuto(host, files) {
     : t.k === 'union' ? { ...t, alts: t.alts.map(a => substT(a, s)) } : t.k === 'inter' ? { ...t, parts: t.parts.map(a => substT(a, s)) }
     : t.k === 'array' ? { ...t, inner: substT(t.inner, s) } : t;
   /** The members of an object-like type (an object literal, a dictionary-like interface, an intersection of them), or null. */
-  function objectMembers(t) {
-    if (t.k === 'obj') { const ms = membersOf({ ...blank(t.body), file: '' }, 0, t.body.length); return ms.some(m => m.kind === 'index') ? null : ms; }
-    if (t.k === 'inter') { const parts = t.parts.map(objectMembers); return parts.some(x => !x) ? null : parts.flat(); }
+  /** A method of an options object as a function-typed member (`fetch(req, server): Response` → a callback). */
+  const asProperty = m => m.kind === 'method' ? { ...m, kind: 'property', method: true, type: `(${m.params.map(p => `${p.rest ? '...' : ''}${p.name}${p.optional ? '?' : ''}: ${p.type}`).join(', ')}) => ${m.type}` } : m;
+  /** Alternatives with each intersection's alias and XOR parts expanded and distributed (to a fixed point). */
+  function spreadObjects(alts, scope) {
+    const expand = x => {
+      if (x.k === 'name' && /(^|\.)XOR$/.test(x.name)) return { k: 'union', alts: x.args };
+      const d = x.k === 'name' && byName.get(scoped(x.name, scope));
+      if (d?.kind !== 'type') return x;
+      const { params } = aliasParams(d);
+      const sub = new Map(params.map((p, i) => [p.name, x.args[i] ?? parseType(p.def ?? 'unknown')]));
+      return substT(parseType(aliasBody(d)), sub);
+    };
+    let out = alts;
+    for (let round = 0; round < 6; round++) {
+      const next = out.flatMap(a => {
+        if (a.k === 'union') return a.alts;
+        if (a.k !== 'inter') return [a];
+        const parts = a.parts.map(expand).flatMap(x => x.k === 'inter' ? x.parts : [x]);
+        let combos = [[]];
+        for (const part of parts) combos = combos.flatMap(c => (part.k === 'union' ? part.alts : [part]).map(y => [...c, y]));
+        return combos.map(ps => ({ k: 'inter', parts: ps.flatMap(x => x.k === 'inter' ? x.parts : [x]) }));
+      });
+      if (next.map(typeText).join('|') === out.map(typeText).join('|')) break;
+      out = next;
+    }
+    return out;
+  }
+  function objectMembers(t, scope = '') {
+    if (t.k === 'obj') { const ms = membersOf({ ...blank(t.body), file: '' }, 0, t.body.length).map(asProperty); return ms.some(m => m.kind === 'index' || m.kind === 'call' || (m.method && !m.optional && false)) ? null : ms; }
+    if (t.k === 'inter') { const parts = t.parts.map(x => objectMembers(x, scope)); return parts.some(x => !x) ? null : parts.flat(); }
     if (t.k === 'name') {
-      const d = byName.get(strip(t.name));
+      const d = byName.get(scoped(t.name, scope));
       if (d?.kind !== 'interface') return null;
-      const ps = typeParams(d.header).params;
-      let ms = [d, ...d.more].flatMap(x => membersOf(x.src, x.body[0], x.body[1]));
+      const { params: ps, rest } = typeParams(d.header);
       // A generic interface's members with its arguments (or defaults) written in.
-      if (ps.length) ms = ms.map(m => ({ ...m, type: ps.reduce((ty, p, i) => ty.replace(new RegExp(`\\b${p.name}\\b`, 'g'), `(${t.args[i] ? typeText(t.args[i]) : p.def ?? 'unknown'})`), m.type) }));
-      if (ms.some(m => (m.kind === 'method' && !m.optional) || (m.kind === 'property' && /^Promise\b/.test(m.type)) || m.kind === 'index')) return null;
+      const write = ty => ps.reduce((acc, p, i) => acc.replace(new RegExp(`\\b${p.name}\\b`, 'g'), `(${t.args[i] ? typeText(t.args[i]) : p.def ?? 'unknown'})`), ty);
+      let ms = [d, ...d.more].flatMap(x => membersOf(x.src, x.body[0], x.body[1]));
+      // A method of an options object is a function-typed member (`fetch(req, server): Response` → a callback).
+      ms = ms.map(asProperty);
+      if (ps.length) ms = ms.map(m => ({ ...m, type: write(m.type) }));
+      if (ms.some(m => (m.method && !m.optional) || (m.kind === 'property' && /^Promise\b/.test(m.type)) || m.kind === 'index' || m.kind === 'call')) return null;
+      // The members of its bases (`extends BaseServeOptions<WebSocketData>`), after its own.
+      const sc = strip(d.name).split('.').slice(0, -1).join('.');
+      for (const h of heritageOf(rest)) {
+        if (h.k !== 'name' || ['Disposable', 'AsyncDisposable'].includes(h.name)) continue;
+        const base = objectMembers(parseType(write(typeText(h))), sc);
+        if (!base) return null;
+        for (const b of base) if (!ms.some(m => m.name === b.name)) ms.push(b);
+      }
       return ms;
     }
     return null;
@@ -220,15 +269,17 @@ export function lowerAuto(host, files) {
     const name = idl(lean);
     if (objectRequests.has(`merge:${lean}`)) return name;
     objectRequests.set(`merge:${lean}`, name);
-    const each = alts.map(objectMembers);
+    const each = alts.map(a => objectMembers(a, ctx.scope));
     const names = [...new Set(each.flat().map(m => m.name))];
     const lines = [];
     for (const n of names) {
       const ms = each.map(x => x.find(m => m.name === n));
       const optional = ms.some(m => !m || m.optional);
-      const types = [...new Set(ms.filter(Boolean).map(m => m.type))];
+      let types = [...new Set(ms.filter(Boolean).map(m => m.type))];
+      // A callback member declared differently per alternative (Bun's fetch, with or without WebSockets): the first one.
+      if (types.length > 1 && types.every(x => { try { return parseType(x).k === 'fn'; } catch { return false; } })) types = [types[0]];
       const t = parseType(types.map(x => `(${x})`).join(' | '));
-      const lt = lower(t, { ...ctx, owner: lean, member: n, role: 'field', optional, enumName: null, intKey: null });
+      const lt = lower(t, { ...ctx, owner: lean, member: n, role: 'field', optional, enumName: null, intKey: `${lean}.${n}`, doc: ms.find(Boolean)?.doc ?? '' });
       lines.push(`  // ${n}: ${types.join(' | ')}${optional ? ' (optional)' : ''}`);
       lines.push(`  ${optional ? '' : 'required '}${optional ? lt.replace(/\?$/, '') : lt} ${escape(n)};`);
     }
@@ -256,6 +307,11 @@ export function lowerAuto(host, files) {
     case 'array': return `sequence<${lower(t.inner, { ...ctx, intKey: null })}>`;
     case 'fn': return lowerCallback(t, ctx);
     case 'num': return 'double';
+    // A tuple: an array of its element types (the one type they share, else any).
+    case 'tuple': {
+      const els = [...new Set(t.elems.map(e => lower(e, { ...ctx, intKey: null, role: ctx.role === 'arg' ? 'arg' : 'result' })))];
+      return `sequence<${els.length === 1 ? els[0] : 'any'}>`;
+    }
     case 'obj': {
       // `{ [k: string]: T }`: a record.
       const ms = membersOf({ ...blank(t.body), file: '' }, 0, t.body.length);
@@ -264,6 +320,20 @@ export function lowerAuto(host, files) {
     }
     case 'inter': {
       if (anyString(t)) return 'DOMString';
+      // A part that is a type alias of a union (Bun's FetchOrRoutes): its union, distributed below.
+      if (t.parts.some(x => x.k === 'name' && /(^|\.)XOR$/.test(x.name))) return lower({ k: 'inter', parts: t.parts.map(x => x.k === 'name' && /(^|\.)XOR$/.test(x.name) ? { k: 'union', alts: x.args } : x) }, ctx);
+      if (t.parts.some(x => x.k === 'name' && byName.get(scoped(x.name, ctx.scope))?.kind === 'type')) {
+        const expand = x => {
+          const d = x.k === 'name' && byName.get(scoped(x.name, ctx.scope));
+          if (d?.kind !== 'type') return x;
+          const { params } = aliasParams(d);
+          const sub = new Map(params.map((p, i) => [p.name, x.args[i] ?? parseType(p.def ?? 'unknown')]));
+          return substT(parseType(aliasBody(d)), sub);
+        };
+        return lower({ k: 'inter', parts: t.parts.map(expand).flatMap(x => x.k === 'inter' ? x.parts : [x]) }, ctx);
+      }
+      // Bun's XOR<A, B> parts are unions: distribute.
+      if (t.parts.some(x => x.k === 'name' && /(^|\.)XOR$/.test(x.name))) return lower({ k: 'inter', parts: t.parts.map(x => x.k === 'name' && /(^|\.)XOR$/.test(x.name) ? { k: 'union', alts: x.args } : x) }, ctx);
       const key = t.parts.map(typeText).join(' & ');
       const name = host.intersections?.[key];
       if (!name) fail(`the intersection ${key} is not named in the tier file's intersections`);
@@ -280,6 +350,8 @@ export function lowerAuto(host, files) {
       if (isNullish(a)) { if (!(ctx.optional && a.name === 'undefined')) nullable = true; continue; }
       rest.push(a);
     }
+    // Only null or undefined (`replacer?: undefined | null`): any value is passed through.
+    if (!rest.length) return 'any';
     if (rest.some(isPromise)) {
       let inner = rest.map(a => isPromise(a) ? a.args[0] ?? { k: 'name', name: 'void', args: [] } : a);
       if (ctx.role === 'cbResult' && inner.some(a => !isVoid(a))) inner = inner.filter(a => !isVoid(a));
@@ -288,10 +360,15 @@ export function lowerAuto(host, files) {
       return `Promise<${it}${nullable && !it.endsWith('?') ? '?' : ''}>`;
     }
     if (ctx.role === 'cbResult' && rest.some(isVoid) && rest.some(a => !isVoid(a))) rest = rest.filter(a => !isVoid(a));
-    if (rest.length > 1 && rest.every(a => objectMembers(a))) {
+    // Intersections of aliases of unions (Bun's XOR<…> & XOR<…>): spread into their object alternatives first.
+    rest = spreadObjects(rest, ctx.scope);
+    if (rest.length > 1 && rest.every(a => objectMembers(a, ctx.scope))) {
       const base = mergeObjects(rest, ctx.enumName ?? `${ctx.owner}${capital(ctx.member)}`, ctx);
       return nullable ? `${base}?` : base;
     }
+    // A union of number literals (`-1 | 0 | 1`): a number.
+    if (rest.length && rest.every(a => a.k === 'num')) return nullable ? 'double?' : 'double';
+    if (rest.some(a => a.k === 'num') && rest.every(a => a.k === 'num' || (a.k === 'name' && a.name === 'number'))) return nullable ? 'double?' : 'double';
     const lits = rest.filter(a => a.k === 'lit');
     let base;
     if (lits.length && lits.length === rest.length && lits.every(l => typeof l.value === 'string')) base = enumOf(lits.map(l => l.value), ctx.enumName ?? `${ctx.owner}${capital(ctx.member)}`, ctx);
@@ -301,7 +378,7 @@ export function lowerAuto(host, files) {
       // String literals beside other types: their enum (a member of the union); object types beside
       // others: one dictionary (`<name>Object`).
       let nonLit = rest.filter(a => a.k !== 'lit');
-      const objs = nonLit.filter(a => a.k !== 'name' && objectMembers(a));
+      const objs = nonLit.filter(a => a.k !== 'name' && objectMembers(a, ctx.scope));
       if (objs.length) {
         const lean = `${ctx.enumName ?? `${ctx.owner}${capital(ctx.member)}`}Object`;
         const merged = objs.length > 1 ? mergeObjects(objs, lean, ctx) : objectType({ kind: 'literal', body: objs[0].body, lean }, [], ctx);
@@ -311,7 +388,8 @@ export function lowerAuto(host, files) {
         : rest.map(a => lower(a, { ...ctx, enumName: null }));
       const uniq = [...new Set(members.map(m => m.replace(/\?$/, '')))];
       if (members.some(m => m.endsWith('?'))) nullable = true;
-      if (uniq.includes('any')) base = 'any';
+      // `object` (a Date, a Map, an object of another module) beside other types: the union is any value (Data).
+      if (uniq.includes('any') || uniq.includes('object')) base = 'any';
       else if (uniq.length === 1) base = uniq[0];
       else {
         // A union is a typedef named after its alias or member (`FsFileSeekOffset`), so that it is Deno's own type.
@@ -351,15 +429,27 @@ export function lowerAuto(host, files) {
     }
     case 'Promise': return `Promise<${t.args.length ? lower(t.args[0], { ...ctx, role: 'promised', intKey: null }) : 'undefined'}>`;
     case 'Record': return `record<DOMString, ${lower(t.args[1], { ...ctx, intKey: null })}>`;
+    case 'NodeJS.Dict': case 'Dict': return `record<DOMString, ${lower(t.args[0], { ...ctx, intKey: null })}>`;
+    case 'Required': case 'Partial': case 'Readonly': return lower(t.args[0], ctx);
+    case 'SyntaxError': case 'TypeError': case 'RangeError': return 'object';
     case 'AsyncIterable': case 'AsyncIterableIterator': case 'AsyncGenerator': {
       const el = lower(t.args[0], { ...ctx, role: 'result', intKey: null });
       const lean = `${el.replace(/\?$/, '').replace(new RegExp(`^${host.name}_`), '').replace(/[^A-Za-z0-9]/g, '')}AsyncIterable`;
       return addDef(idl(lean), ctx.mod, `// AsyncIterable<${typeText(t.args[0])}>\n${attrs({ LasmLeanModule: '@', LasmName: lean, LasmPath: `AsyncIterable<${typeText(t.args[0])}>` })}\ninterface ${idl(lean)} {\n  async iterable<${el}>;\n};`, ctx.where);
     }
     }
+    // Bun's XOR<A, B> (exactly one of two option shapes, written with mapped types): the union A | B.
+    if (/(^|\.)XOR$/.test(n)) return lower({ k: 'union', alts: t.args }, ctx);
+    // Pick<T, …> and Omit<T, …>: T (the members outside the pick are optional members a caller leaves out).
+    if (n === 'Pick' || n === 'Omit') return lower(t.args[0], ctx);
+    if (n === 'Map' || n === 'Set' || n === 'WeakMap') return 'object';
     if (sequences.has(n)) return `sequence<${lower(t.args[0], { ...ctx, intKey: null })}>`;
     if (bytes.has(n)) return 'Uint8Array';
     if (n in (host.typeNames ?? {})) { used.add(`type:${n}`); return host.typeNames[n]; }
+    // A namespace alias (`SpawnOptions` = `Spawn`).
+    { const [head, ...tail] = n.split('.'); const al = tail.length && byName.get(head); if (al?.kind === 'nsalias') return lowerName({ ...t, name: [al.target, ...tail].join('.') }, ctx); }
+    // A name inside a nested namespace (`Filter` in `Bun.Image`) is that namespace's first.
+    for (let sc = ctx.scope ?? ''; sc; sc = sc.split('.').slice(0, -1).join('.')) if (byName.has(`${sc}.${n}`)) return lowerName({ ...t, name: `${sc}.${n}` }, { ...ctx, scope: '' });
     const d = byName.get(n);
     if (!d) fail(`the type ${typeText(t)} is neither declared in ${G} nor in the tier file's typeNames`);
     const why = isExcluded(n, d.doc, d);
@@ -373,13 +463,16 @@ export function lowerAuto(host, files) {
       // An instantiation other than the defaults adds its arguments' names (ServeHandlerUnixAddr).
       const isDefault = params.every((p, i) => !args[i] || strip(typeText(args[i])) === strip(typeText(dflt(p))));
       const aliasLean = isDefault ? leanOf(n) : `${leanOf(n)}${args.map(a => capital(strip(typeText(a)).replace(/<.*$/, '').replace(/[^A-Za-z0-9]/g, ''))).join('')}`;
-      const rhs = parseType(aliasBody(d));
+      // A type alias the declarations compute (an indexed type), stated plainly in the tier file's overrides.
+      const ov = host.overrides?.[n];
+      if (ov) used.add(`override:${n}`);
+      const rhs = parseType(ov?.type ?? aliasBody(d));
       // An alias of an instantiation is that instantiation, named by the alias.
       if (rhs.k === 'name' && !params.length && byName.get(strip(rhs.name))?.kind !== 'type' && rhs.args.length) return objectRef(strip(rhs.name), rhs.args, { ...ctx, aliasName: leanOf(n) });
       void t;
       if (rhs.k === 'fn') return lowerCallback(rhs, { ...ctx, subst, callbackName: aliasLean, mod: moduleOfCategory(d.doc, n) ?? ctx.mod, signature: squash(d.text.replace(/^export\s+/, '')) });
       if (rhs.k === 'obj') return objectType({ kind: 'literal', body: rhs.body, lean: aliasLean, doc: d.doc, file: d.file, path: `${G}.${n}` }, [], { ...ctx, mod: moduleOfCategory(d.doc, n) ?? ctx.mod });
-      return lower(rhs, { ...ctx, subst, enumName: aliasLean, owner: aliasLean, member: '', mod: moduleOfCategory(d.doc, n) ?? ctx.mod });
+      return lower(rhs, { ...ctx, subst, enumName: aliasLean, owner: aliasLean, member: '', scope: n.split('.').slice(0, -1).join('.'), mod: moduleOfCategory(d.doc, n) ?? ctx.mod });
     }
     return objectRef(n, t.args.map(a => substT(a, ctx.subst)), ctx);
   }
@@ -431,7 +524,11 @@ export function lowerAuto(host, files) {
       if (b.k === 'obj') ms = membersOf({ ...blank(b.body), file: '' }, 0, b.body.length);
       else if (b.k === 'name' && byName.get(strip(b.name))?.kind === 'interface') { const bd = byName.get(strip(b.name)); ms = [bd, ...bd.more].flatMap(x => membersOf(x.src, x.body[0], x.body[1])); }
       else fail(`intersection ${key}: ${typeText(b)} is not an object type`);
+      const inherited = new Set();
+      for (let p0 = base; p0 && dictFieldNames.has(p0);) { for (const f of dictFieldNames.get(p0).names) inherited.add(f); p0 = dictFieldNames.get(p0).parent; }
       for (const m of ms) {
+        // A member the base declares too (a narrower type: `compact: false`): the base's.
+        if (inherited.has(m.name)) continue;
         lines.push(`  // ${m.text}`);
         lines.push(`  ${m.optional ? '' : 'required '}${lower(parseType(m.type), { ...ctx, owner: lean, member: m.name, role: 'field', optional: m.optional })} ${m.name};`);
       }
@@ -447,7 +544,7 @@ export function lowerAuto(host, files) {
     if (objectRequests.has(reqKey)) return objectRequests.get(reqKey);
     objectRequests.set(reqKey, name);
     const d = o.decl;
-    const mod = (d && moduleOfCategory(d.doc, o.path)) ?? ctx.mod;
+    const mod = (d && moduleOfCategory(d.doc, o.path, d.file)) ?? ctx.mod;
     const subst = o.subst ?? new Map();
     // Members (interfaces merged), and the heritage.
     let members = [], heritage = [], rest = '';
@@ -457,11 +554,14 @@ export function lowerAuto(host, files) {
       rest = typeParams(part.header).rest;
       heritage.push(...heritageOf(rest));
     }
+    // An interface declared twice with the same base (lib.deno_net.d.ts and lib.deno.unstable.d.ts): one base.
+    heritage = [...new Map(heritage.map(h => [typeText(h), h])).values()];
     const lean = o.lean;
     const path = o.path ?? `${G}.${lean}`;
     let parent = null;
     const lines = [];
-    const ctxM = m => ({ where: `${host.name} ${path}.${m.name}`, owner: lean, member: m.name, mod, doc: m.doc, subst, intKey: `${path.slice(G.length + 1)}.${m.name}`, self: name });
+    const scope = d ? strip(d.name).split('.').slice(0, -1).join('.') : (ctx.scope ?? '');
+    const ctxM = m => ({ where: `${host.name} ${path}.${m.name}`, owner: lean, member: m.name, mod, doc: m.doc, subst, intKey: `${path.slice(G.length + 1)}.${m.name}`, self: name, scope });
     for (const h of heritage) {
       const hn = strip(h.name ?? '');
       if (['Disposable', 'AsyncDisposable'].includes(hn)) continue;
@@ -471,9 +571,9 @@ export function lowerAuto(host, files) {
         continue;
       }
       if (hn in (host.typeNames ?? {}) && host.typeNames[hn] !== 'any') { if (parent) fail(`${path}: two parents`); parent = host.typeNames[hn]; used.add(`type:${hn}`); continue; }
-      const hd = byName.get(hn);
+      const hd = byName.get(scoped(hn, scope));
       if (!hd) { exclude(`${path} extends ${typeText(h)}`, 'not declared in the namespace'); continue; }
-      const ref = tryMember(`${path} extends ${hn}`, () => lower(h, { where: path, owner: lean, member: 'parent', mod, subst, role: 'field' }));
+      const ref = tryMember(`${path} extends ${hn}`, () => lower(h, { where: path, owner: lean, member: 'parent', mod, subst, role: 'field', scope: d ? strip(d.name).split('.').slice(0, -1).join('.') : '' }));
       if (!ref) continue;
       if (!parent) parent = ref;
       else fail(`${path}: two lowered parents (${parent}, ${ref})`);
@@ -494,29 +594,33 @@ export function lowerAuto(host, files) {
         exclude(key, 'a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call'); continue;
       }
       if (m.kind === 'index') { exclude(key, 'an index signature'); continue; }
+      if (m.kind === 'call') { exclude(`${key}${m.type.slice(0, 40)}`, 'a call or construct signature (the object is itself a function, called with Lasm.JS\'s Value.call)'); continue; }
       const why = isExcluded(key, m.doc, d);
       if (why) { exclude(key, why); continue; }
       const ov = host.overrides?.[key];
       if (ov) {
         used.add(`override:${key}`);
-        m = { ...m, params: m.params?.map(p => ov.params?.[p.name] ? { ...p, type: ov.params[p.name] } : p), type: ov.type ?? m.type, text: `${m.text} (read as ${ov.type ?? ''}${ov.params ? ` ${JSON.stringify(ov.params)}` : ''}: ${ov.reason})` };
+        // An overridden rest parameter (a conditional rest tuple) is one optional parameter.
+        m = { ...m, params: m.params?.map(p => ov.params?.[p.name] ? { ...p, type: ov.params[p.name], rest: false, optional: p.optional || p.rest } : p), type: ov.type ?? m.type, text: `${m.text} (read as ${ov.type ?? ''}${ov.params ? ` ${JSON.stringify(ov.params)}` : ''}: ${ov.reason})` };
       }
       const gk = `${m.static ? 'static ' : ''}${m.kind === 'ctor' ? 'constructor' : m.name}`;
       if (!groups.has(gk)) groups.set(gk, []);
       groups.get(gk).push(m);
     }
     for (const [gk, group] of groups) {
-      const names = overloadNames(group, `${path.slice(G.length + 1)}`);
+      const names = tryMember(`${path}.${gk}`, () => overloadNames(group, `${path.slice(G.length + 1)}`));
+      if (!names) continue;
       group.forEach((m, i) => {
         const line = tryMember(`${path}.${m.name}`, () => {
           const c = ctxM(m);
           const mSubst = new Map([...subst, ...methodTypeParams(m)]);
+          if (as === 'dictionary' && reservedNames.has(m.name)) { exclude(`${path.slice(G.length + 1)}.${m.name}`, `a dictionary member named ${m.name}, which WebIDL reserves`); return null; }
           if (as === 'dictionary') {
             const t = m.kind === 'method' ? lowerCallback({ k: 'fn', params: m.params, ret: parseType(m.type) }, { ...c, subst: mSubst })
               : lower(parseType(m.type), { ...c, role: 'field', optional: m.optional, subst: mSubst });
             return `  // ${m.text}\n  ${m.optional ? '' : 'required '}${m.optional ? t.replace(/\?$/, '') : t} ${escape(m.name)};`;
           }
-          const a = { LasmSignature: m.text, LasmLeanName: names[i] !== (m.kind === 'ctor' ? 'new' : m.name) ? names[i] : null };
+          const a = { LasmSignature: m.text, LasmLeanName: names[i] !== (m.kind === 'ctor' ? 'new' : m.name) ? names[i] : null, LasmName: reservedNames.has(m.name) && m.kind !== 'ctor' ? m.name : null };
           if (m.kind === 'property') {
             const t = lower(parseType(m.type), { ...c, role: 'attr', optional: false, subst: mSubst });
             // Writable: a class's field that is not readonly, and an interface's function-typed property (an event
@@ -524,7 +628,7 @@ export function lowerAuto(host, files) {
             const ro = d?.kind === 'class' ? !!m.readonly : (!!m.readonly || !/=>/.test(m.type));
             return `  // ${m.text}\n  ${attrs(a)} ${m.static ? 'static ' : ''}${ro ? 'readonly ' : ''}attribute ${m.optional && !t.endsWith('?') && t !== 'any' ? t + '?' : t} ${escape(m.name)};`;
           }
-          const args = argList(m.params, { ...c, subst: mSubst });
+          const args = argList(m.params, { ...c, subst: mSubst, member: names[i] });
           if (m.kind === 'ctor') return `  // ${m.text}\n  ${attrs(a)} constructor(${args});`;
           return `  // ${m.text}\n  ${attrs(a)} ${m.static ? 'static ' : ''}${lower(parseType(m.type), { ...c, role: 'result', subst: mSubst })} ${escape(m.name)}(${args});`;
         });
@@ -532,15 +636,24 @@ export function lowerAuto(host, files) {
       });
       void gk;
     }
-    const head = attrs({ LasmLeanModule: '@', LasmFile: d?.file?.split('/').at(-1), LasmName: lean, LasmPath: path });
+    // A dictionary member its parent already declares (TypeScript re-declares it narrower) is the parent's.
+    if (as === 'dictionary' && parent) {
+      const inherited = new Set();
+      for (let p0 = parent; p0 && dictFieldNames.has(p0);) { for (const f of dictFieldNames.get(p0).names) inherited.add(f); p0 = dictFieldNames.get(p0).parent; }
+      for (let k = lines.length - 1; k >= 0; k--) { const f = / (\S+);$/.exec(lines[k])?.[1]; if (f && inherited.has(f.replace(/^_/, ''))) lines.splice(k, 1); }
+    }
+    if (as === 'dictionary') dictFieldNames.set(name, { parent, names: lines.map(l => / (\S+);$/.exec(l)?.[1]?.replace(/^_/, '')).filter(Boolean) });
+    const head = attrs({ LasmLeanModule: '@', LasmFile: d?.file?.split('/').at(-1), LasmName: lean, LasmModule: d?.jsModule, LasmPath: d?.jsModule ? path.slice(G.length + 1) : path });
     addDef(name, mod, `// ${as === 'interface' ? (d?.kind === 'class' ? 'class' : 'interface') : 'object'} ${path}${o.key && o.key !== `${path.slice(G.length + 1)}<>` && !o.key.endsWith('<>') ? ` (${o.key})` : ''}\n${head}\n${as} ${name}${parent ? ' : ' + parent : ''} {\n${lines.join('\n')}\n};`, path);
     return name;
   }
   const escapeWords = new Set(['any', 'async', 'attribute', 'bigint', 'boolean', 'byte', 'callback', 'const', 'constructor', 'deleter', 'dictionary', 'double', 'enum',
     'float', 'getter', 'includes', 'inherit', 'interface', 'iterable', 'long', 'maplike', 'mixin', 'namespace', 'object', 'octet', 'optional', 'or', 'partial',
     'readonly', 'record', 'required', 'sequence', 'setlike', 'setter', 'short', 'static', 'stringifier', 'symbol', 'typedef', 'undefined', 'unrestricted', 'unsigned',
-    'true', 'false', 'null', 'Infinity', 'NaN', 'toString', 'toJSON', 'prototype']);
-  const escape = n => escapeWords.has(n) ? '_' + n : n;
+    'true', 'false', 'null', 'Infinity', 'NaN']);
+  // Names WebIDL reserves even escaped: written `toString_` with the real name in LasmName (as Lasm.JS.Node does).
+  const reservedNames = new Set(['toString', 'toJSON', 'prototype', 'constructor']);
+  const escape = n => reservedNames.has(n) ? n + '_' : escapeWords.has(n) ? '_' + n : n;
   function methodTypeParams(m) {
     const out = [];
     if (!m.text) return out;
@@ -574,6 +687,13 @@ export function lowerAuto(host, files) {
       if (tdx >= 0) return `${base}With${typeNameOf(ps[tdx].type)}`;
       return `${base}${ps.length}`;
     });
+    // Overloads told apart by keyword arguments (Redis's `"FNX"`, `"WITHSCORES"`): the keywords the first overload lacks.
+    const lits = m => (m.params ?? []).map(p => /^\s*"([^"]*)"\s*$/.exec(p.type)?.[1]).filter(Boolean);
+    names.forEach((n, i) => {
+      if (i === 0 || names.indexOf(n) === i && names.lastIndexOf(n) === i) return;
+      const k = lits(group[i]).filter(l => !lits(group[0]).includes(l)).map(l => capital(l.toLowerCase().replace(/[^a-z0-9]+/g, '')));
+      if (k.length && !(m => m.sigKey && host.names?.[m.sigKey])(group[i])) names[i] = `${base}${k.join('')}`;
+    });
     const dup = names.find((n, i) => names.indexOf(n) !== i);
     if (dup) fail(`${owner}.${base}: two overloads named ${dup}; name them in the tier file's names (${group.map(m => m.sigKey ?? sigKey(owner, base, m.params)).join(' | ')})`);
     return names;
@@ -584,7 +704,10 @@ export function lowerAuto(host, files) {
 
   // ---------- the namespace: functions, constants, classes ----------
   const nsLines = new Map(); // module → lines
-  const pushNs = (mod, line) => { if (!nsLines.has(mod)) nsLines.set(mod, []); nsLines.get(mod).push(line); };
+  /** Lines of the namespace definition of a Lean module, a nested namespace (`dns` of `Bun.dns.lookup`) and a JavaScript module. */
+  const pushNs = (mod, line, sub = '', jsModule = '') => { const k = `${mod}|${sub}|${jsModule}`; if (!nsLines.has(k)) nsLines.set(k, []); nsLines.get(k).push(line); };
+  const lastName = n => n.split('.').at(-1);
+  const subOf = n => n.split('.').slice(0, -1).join('.');
   for (const [n, overloads] of fns) {
     if (n.includes('.')) { const top = n.split('.')[0]; if (top in host.exclude) { used.add(top); exclude(`${G}.${top}`, host.exclude[top]); continue; } }
     const taken = [];
@@ -595,7 +718,14 @@ export function lowerAuto(host, files) {
       const why = (cat && host.excludeCategories?.[cat]) ?? isExcluded(key, o.doc, o) ?? isExcluded(n, '', o);
       if (cat && host.excludeCategories?.[cat]) used.add(`category:${cat}`);
       if (why) { exclude(`${G}.${key}`, why); continue; }
-      const text = squash(o.text.replace(/^export\s+(declare\s+)?/, ''));
+      let text = squash(o.text.replace(/^export\s+(declare\s+)?/, ''));
+      const fov = host.overrides?.[n];
+      if (fov) {
+        used.add(`override:${n}`);
+        sig.params = sig.params.map(p => fov.params?.[p.name] ? { ...p, type: fov.params[p.name] } : p);
+        if (fov.type) sig.type = fov.type;
+        text += ` (read as ${fov.type ?? ''}${fov.params ? ` ${JSON.stringify(fov.params)}` : ''}: ${fov.reason})`;
+      }
       // A parameter whose type is a union of object types: one overload per alternative (the tier file's split names them).
       const split = host.split?.[key];
       if (split) {
@@ -611,19 +741,21 @@ export function lowerAuto(host, files) {
       } else taken.push({ o, sig, name: n, params: sig.params, kind: 'method', text, sigKey: key });
     }
     if (!taken.length) continue;
-    const names = overloadNames(taken, '');
+    const names = tryMember(`${G}.${n}`, () => overloadNames(taken, ''));
+    if (!names) continue;
     taken.forEach((t, i) => {
-      const mod = moduleOfCategory(t.o.doc, n) ?? fail(`${G}.${n} has no @category`);
+      const mod = moduleOfCategory(t.o.doc, n, t.o.file) ?? fail(`${G}.${n} has no @category`);
       const line = tryMember(`${G}.${n}`, () => {
         const g = /function\s+[\w$]+\s*(<[^(]*>)\s*\(/.exec(t.o.text);
         const subst = new Map(g ? typeParams(g[1]).params.map(p => [p.name, parseType(p.def ?? p.constraint ?? 'unknown')]) : []);
-        const c = { where: `${host.name} ${G}.${n}`, owner: '', member: n, mod, doc: t.o.doc, subst, intKey: n };
-        const ret = lower(parseType(t.sig.type), { ...c, role: 'result', owner: capital(names[i]), member: 'Result' });
-        const args = argList(t.params, { ...c, owner: '', member: names[i] });
+        const c = { where: `${host.name} ${G}.${n}`, owner: '', member: n, mod, doc: t.o.doc, subst, intKey: n, scope: subOf(n) };
+        const camel = names[i].split('.').map((x, k) => k ? capital(x) : x).join('');
+        const ret = lower(parseType(t.sig.type), { ...c, role: 'result', owner: capital(camel), member: 'Result' });
+        const args = argList(t.params, { ...c, owner: '', member: camel });
         const a = { LasmFile: t.o.file.split('/').at(-1), LasmSignature: `${G}.${t.text.replace(/^function\s+/, '')}`, LasmLeanName: names[i] !== n ? names[i] : null };
-        return `  // ${G}.${t.text.replace(/^function\s+/, '')}\n  ${attrs(a)} ${ret} ${escape(n)}(${args});`;
+        return `  // ${G}.${t.text.replace(/^function\s+/, '')}\n  ${attrs({ ...a, LasmLeanName: a.LasmLeanName ? lastName(a.LasmLeanName) : null })} ${ret} ${escape(lastName(n))}(${args});`;
       });
-      if (line) pushNs(mod, line);
+      if (line) pushNs(mod, line, subOf(n), t.o.jsModule ?? '');
     });
   }
   for (const [n, d] of byName) {
@@ -633,20 +765,22 @@ export function lowerAuto(host, files) {
       const cat = categoryOf(d.doc);
       const why = (cat && host.excludeCategories?.[cat]) ?? isExcluded(n, d.doc, d);
       if (why) { exclude(`${G}.${n}`, why); continue; }
-      const mod = moduleOfCategory(d.doc, n) ?? fail(`${G}.${n} has no @category`);
+      const mod = moduleOfCategory(d.doc, n, d.file) ?? fail(`${G}.${n} has no @category`);
       const line = tryMember(`${G}.${n}`, () => {
-        const c = { where: `${host.name} ${G}.${n}`, owner: capital(n), member: '', mod, doc: d.doc, intKey: n, role: 'attr' };
-        let t = parseType(d.type);
-        const type = t.k === 'obj' ? objectType({ kind: 'literal', body: t.body, lean: capital(n), doc: d.doc, file: d.file, path: `${G}.${n}` }, [], c) : lower(t, c);
-        return `  // ${G}.${n}: ${d.type}\n  ${attrs({ LasmFile: d.file.split('/').at(-1), LasmSignature: `${d.mutable ? 'var' : 'const'} ${G}.${n}: ${d.type}` })} readonly attribute ${type} ${escape(n)};`;
+        const c = { where: `${host.name} ${G}.${n}`, owner: n.split('.').map(capital).join(''), member: '', mod, doc: d.doc, intKey: n, role: 'attr', scope: subOf(n) };
+        const cov = host.overrides?.[n];
+        if (cov) used.add(`override:${n}`);
+        let t = parseType(cov?.type ?? d.type);
+        const type = t.k === 'obj' ? objectType({ kind: 'literal', body: t.body, lean: n.split('.').map(capital).join(''), doc: d.doc, file: d.file, path: `${G}.${n}` }, [], c) : lower(t, c);
+        return `  // ${G}.${n}: ${d.type}\n  ${attrs({ LasmFile: d.file.split('/').at(-1), LasmSignature: `${d.mutable ? 'var' : 'const'} ${G}.${n}: ${d.type}` })} readonly attribute ${type} ${escape(lastName(n))};`;
       });
-      if (line) pushNs(mod, line);
+      if (line) pushNs(mod, line, subOf(n), d.jsModule ?? '');
     } else if (d.kind === 'class') {
       const cat = categoryOf(d.doc);
       const why = (cat && host.excludeCategories?.[cat]) ?? isExcluded(n, d.doc, d);
       if (cat && host.excludeCategories?.[cat]) used.add(`category:${cat}`);
       if (why) { exclude(`${G}.${n}`, why); continue; }
-      tryMember(`${G}.${n}`, () => objectRef(n, [], { where: `${host.name} ${G}.${n}`, mod: moduleOfCategory(d.doc, n) }));
+      tryMember(`${G}.${n}`, () => objectRef(n, [], { where: `${host.name} ${G}.${n}`, mod: moduleOfCategory(d.doc, n, d.file) }));
     }
   }
   if (problems.length) fail(`${host.name}: ${problems.length} members are neither lowered nor excluded:\n  ${problems.join('\n  ')}`);
@@ -663,8 +797,13 @@ export function lowerAuto(host, files) {
   // A type's module is the earliest (in the tier file's order) of its own category's and its users'.
   const order = host.modules.map(m => m.name);
   const rank = m => { const r = order.indexOf(m); if (r < 0) fail(`${host.name}: module ${m} is not in the tier file's modules`); return r; };
-  const nsName = mod => idl(`ns${mod}`);
-  for (const [mod, lines] of nsLines) addDef(nsName(mod), mod, `// The global ${G}: ${host.modules.find(m => m.name === mod)?.title}\n${attrs({ LasmLeanModule: mod, LasmPath: G })}\nnamespace ${nsName(mod)} {\n${lines.join('\n')}\n};`, `${G} (${mod})`);
+  for (const [k, lines] of nsLines) {
+    const [mod, sub, jsModule] = k.split('|');
+    const name = idl(`ns${mod}${sub.split('.').map(capital).join('')}${jsModule ? jsModule.replace(/[^A-Za-z0-9]/g, '') : ''}`);
+    const path = jsModule ? sub : [G, sub].filter(Boolean).join('.');
+    addDef(name, mod, `// ${jsModule ? `The module ${jsModule}` : `The global ${G}`}${sub ? `.${sub}` : ''}: ${host.modules.find(m => m.name === mod)?.title}\n${attrs({ LasmLeanModule: mod, LasmModule: jsModule || null, LasmPath: path || null, LasmLeanPrefix: sub ? `${sub}.` : null })}\nnamespace ${name} {\n${lines.join('\n')}\n};`, `${G} (${mod})`);
+  }
+  for (const r of host.roots ?? []) if (!used.has(`root:${r}`)) fail(`${host.name}: root ${r} declares nothing`);
   const refs = name => new Set([...defs.get(name).text.matchAll(new RegExp(`\\b${host.name}_[A-Za-z0-9_]+`, 'g'))].map(m => m[0]).filter(r => r !== name && defs.has(r)));
   for (const [, v] of defs) if (!v.mod) v.mod = order[order.length - 1];
   for (let changed = true; changed;) {

@@ -48,6 +48,15 @@ def throws (act : Async α) : Async Bool := do
 
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
+
+/-- Whether `g` has the member at a dotted path (`dns.lookup`). -/
+def hasPath (g : Value) (path : String) : IO Bool := do
+  let parts := path.splitOn "."
+  let mut o := g
+  for p in parts.dropLast do
+    unless ← reflectHas o p do return false
+    o ← o.get p Value
+  reflectHas o (parts.getLastD "")
 /-- Waits `ms` milliseconds with `setTimeout` (holding no Lean thread). -/
 def sleep (ms : Nat) : Async Unit := do
   let p : IO.Promise Unit ← IO.Promise.new
@@ -231,7 +240,7 @@ def fsChecks (r : Checks) (live : Live) : Async Unit := do
     Deno.chmod (.domString p) 0o600
     expect r "chmod" ((← Deno.stat (.domString p)).mode.map (fun m => m.toUInt64.toNat % 0o1000) == some 0o600) s!"{(← Deno.stat (.domString p)).mode}"
     -- utime sets the modification time (seconds since the epoch)
-    Deno.utime (.domString p) (.double 1000000) (.double 2000000)
+    Deno.utime (.domString p) (toJS (1000000 : Float)) (toJS (2000000 : Float))
     expect r "utime" ((← Deno.stat (.domString p)).mtime.isSome) ""
   runSection r "fs.dirs" do
     -- readDir lists exactly the names written (the model: a set of names), and their kinds.
@@ -394,6 +403,10 @@ def netChecks (r : Checks) (live : Live) : Async Unit := do
     -- the loopback interface is listed
     let ifs ← Deno.networkInterfaces
     expect r "networkInterfaces" (ifs.any (·.address == "127.0.0.1")) s!"{ifs.size}"
+    -- a UDP socket listens on the port it reports (Deno.listenDatagram, --unstable-net)
+    let d ← Deno.listenDatagram { transport := .udp, hostname := some "127.0.0.1", port := some 0 }
+    see live "DatagramConn" d.val
+    d.close
   runSection r "websockets" do
     -- A WebSocket server (Deno.serve + Deno.upgradeWebSocket) echoes every message; Lasm.JS.Web's WebSocket is the client.
     let handler ← Deno.ServeHandler.ofFn fun req _ => do
@@ -553,13 +566,16 @@ def availability (r : Checks) (live : Live) : Async Unit := do
   let names (d : Data) : Array String := match d with | .array xs => xs.map str | _ => #[]
   let g ← (← Lasm.JS.global).get "Deno" Value
   for f in names (info.field "functions") do
-    expect r s!"available Deno.{f}" (← reflectHas g f) ""
+    expect r s!"available Deno.{f}" (← hasPath g f) ""
   let .object ifaces := info.field "interfaces" | throw (IO.userError "no interfaces")
   for (iface, members) in ifaces do
     match (← live.get).find? (·.1 == iface) with
     | none =>
       -- Deno.serve's objects are probed live by test/fixtures/js-serve.
-      unless ["HttpServer", "ServeHandlerInfo", "HttpServerUnixAddr", "ServeHandlerInfoUnixAddr"].contains iface do
+      -- VSOCK needs a VSOCK device and QUIC a QUIC peer, which the CI runner has neither of.
+      unless ["HttpServer", "ServeHandlerInfo", "HttpServerUnixAddr", "ServeHandlerInfoUnixAddr", "HttpServerVsockAddr", "ServeHandlerInfoVsockAddr",
+          "ConnVsockAddr", "VsockConn", "VsockListener", "QuicReceiveStream", "QuicSendStream", "QuicIncoming", "QuicListener", "QuicEndpoint",
+          "QuicConn"].contains iface do
         expect r s!"available Deno.{iface}" false "no live object was seen"
     | some (_, v) =>
       for m in names members do

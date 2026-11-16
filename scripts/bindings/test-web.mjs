@@ -35,11 +35,11 @@ const { values } = parseArgs({ options: {
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
-if (!['js-web', 'js-node', 'js-serve', 'js-deno', 'js-cloudflare', 'js-core'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve, js-deno, js-cloudflare or js-core'); process.exit(2); }
+if (!['js-web', 'js-node', 'js-serve', 'js-deno', 'js-bun', 'js-cloudflare', 'js-core'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve, js-deno, js-bun, js-cloudflare or js-core'); process.exit(2); }
 const fixture = join(root, 'test', 'fixtures', values.fixture);
-const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno', 'js-cloudflare': 'Lasm.JS.Cloudflare', 'js-core': 'Lasm.JS core' }[values.fixture];
+const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno', 'js-bun': 'Lasm.JS.Bun', 'js-cloudflare': 'Lasm.JS.Cloudflare', 'js-core': 'Lasm.JS core' }[values.fixture];
 // Deno KV and Deno.cron are behind Deno's own flags on the Deno CLI (Deno Deploy enables them).
-const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron'] : [];
+const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron', '--unstable-net'] : [];
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };
