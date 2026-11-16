@@ -18,6 +18,7 @@ import { untar } from '../scripts/bindings/cloudflare-api.mjs';
 import { lowerAuto } from '../scripts/bindings/ts-auto.mjs';
 import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
+import { lazyModules } from '../src/lazy-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -50,7 +51,7 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
 });
 
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) {
+  for (const tier of ['Web', 'Node', 'Cloudflare']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
     for (const m of generated) {
@@ -58,6 +59,23 @@ test('the generated modules are shipped library modules, in import order', () =>
       for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm))
         assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
     }
+  }
+});
+
+// Lasm.JS.Deno and Lasm.JS.Bun ship as source and compile on first import (docs/api/decisions/0.4.md, 0.4-20):
+// their prebuilt core is empty, since no template imports them (the examples that do compile them on first use).
+const denoBunCore = [];
+test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core; every other one compiles on first import', () => {
+  const lazy = lazyModules(libraryModules);
+  for (const tier of ['Deno', 'Bun']) {
+    const shipped = [`Lasm.JS.${tier}`, ...readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
+      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`)];
+    for (const m of libraryModules.filter(m => m === `Lasm.JS.${tier}` || m.startsWith(`Lasm.JS.${tier}.`)))
+      assert.ok(denoBunCore.includes(m), `${m} is prebuilt (src/lasm-library.mjs libraryModules) but not in the declared core`);
+    for (const m of shipped) assert.ok(denoBunCore.includes(m) || lazy.includes(m), `${m} is neither prebuilt nor compiled on first import`);
+    for (const t of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean')))
+      assert.ok(!/^import Lasm\.JS\.(Deno|Bun)\b/m.test(readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8')),
+        `templates/${t} imports Lasm.JS.Deno or Lasm.JS.Bun: its modules belong in the prebuilt core`);
   }
 });
 

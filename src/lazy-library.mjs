@@ -16,9 +16,9 @@ import { executableName } from './platform.mjs';
 
 const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
 
-/** The generated binding namespaces whose modules may be compiled on first import. */
+/** The generated binding namespaces whose modules (and umbrella module, `Lasm.JS.Deno`) may be compiled on first import. */
 export const lazyNamespaces = ['Lasm.JS.Web.', 'Lasm.JS.Node.', 'Lasm.JS.Deno.', 'Lasm.JS.Bun.', 'Lasm.JS.Cloudflare.'];
-export const isLazyNamespace = module => lazyNamespaces.some(prefix => module.startsWith(prefix));
+export const isLazyNamespace = module => lazyNamespaces.some(prefix => module.startsWith(prefix) || module === prefix.slice(0, -1));
 
 /** A module's source in the shipped library. */
 export const librarySourceFile = (module, root = libraryRoot) => join(root, ...module.split('.')) + '.lean';
@@ -48,7 +48,9 @@ export function lazyModules(eager, root = libraryRoot) {
     }
   };
   for (const prefix of lazyNamespaces) {
-    const parts = prefix.slice(0, -1).split('.');
+    const umbrella = prefix.slice(0, -1), parts = umbrella.split('.');
+    // The umbrella module (library/Lasm/JS/Deno.lean), which imports the namespace's modules.
+    if (existsSync(join(root, ...parts) + '.lean') && !eager.includes(umbrella)) found.push(umbrella);
     walk(join(root, ...parts), prefix);
   }
   return found;
