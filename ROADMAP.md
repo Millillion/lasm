@@ -136,8 +136,13 @@ Tandem, the differential-fuzzing generator covers the remaining features of
 observed and reported only: it never blocks this stage or anything else
 (Jordan, 2026-11-16).
 
-- [ ] **1.1 Platforms (item 1).** Every platform at L2 or higher, and Node,
-  Workers and the browser at L3. The page of 2026-11-16 reads 6 of 13 at L2
+- [ ] **1.1 Platforms (item 1).** **Every** platform at L3 (Jordan, 2026-11-16;
+  it was L2 everywhere and L3 only for Node, Workers and the browser). For each
+  platform that means a flagship app passing its outside oracle, fuzzing and
+  deterministic simulation, all on that platform's own runtime, emulator or
+  base image in CI. Stage 2's backend then has per-platform oracles on every
+  platform. L3 is runtime evidence, not production evidence: no live
+  deployments (no real accounts). The page of 2026-11-16 reads 6 of 13 at L2
   and 0 of 3 at L3, mostly "no main-branch run has this job", which 0.8.0's
   release checks on `main` may already have changed: re-measure first.
 - [ ] **1.2 Propositions (item 7).** Every library candidate in
