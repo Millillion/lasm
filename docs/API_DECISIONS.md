@@ -103,3 +103,212 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+### Milestone 0.4: Deno (Lasm.JS.Deno)
+
+Decided by Claude under Jordan's direction calls of 2026-11-16 ("Deno: full
+support", "Lasm.KV is deleted: apps use the generated platform bindings
+directly", "decide the smaller questions yourself, platform-native").
+Detail and the full mapping: [JS_BINDINGS.md, "Standard bindings for
+Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
+
+#### A2.1 Lasm.JS.Deno is the whole Deno namespace
+
+- **Decision:** `import Lasm.JS.Deno` gives every function, constant and class
+  of the stable `Deno` namespace of Deno 2.9.6, and every type they use,
+  generated from Deno's own declarations (`lib.deno.ns.d.ts`,
+  `lib.deno_net.d.ts`) by `scripts/bindings/ts-auto.mjs`; the selection is an
+  exclude table (`scripts/bindings/deno-tier2.mjs`). Modules follow the
+  declarations' `@category`: `Lasm.JS.Deno.Runtime`, `.Permissions`, `.Io`,
+  `.Fs`, `.Subprocess`, `.Net`, `.Serve`, `.WebSockets`, `.Fetch`, `.Kv`.
+  Names are Deno's (`Deno.readFile`, `Deno.Command.new`, `FsFile.seek`).
+  ```lean
+  import Lasm.JS.Deno
+  open Lasm.JS Lasm.JS.Web
+
+  def run : Async Unit := do
+    let dir ← Deno.makeTempDir none
+    Deno.writeTextFile (.domString s!"{dir}/a.txt") (.domString "hi") none
+    let text ← Deno.readTextFile (.domString s!"{dir}/a.txt") none
+    for e in ← (← Deno.readDir (.domString dir)).values do IO.println e.name
+    let out ← (← Deno.Command.new (.domString "printf") (some { args := some #["%s", text] })).output
+    let l ← Deno.listen { hostname := some "127.0.0.1", port := some 0 }
+    IO.println s!"{out.code} {(← l.addr).port}"
+  ```
+- **Why:** Jordan's call (full Deno support; `--target deno` and
+  `--target deno-deploy` stay fully supported). Generating the namespace
+  (rather than a hand-picked list, as 0.7.0's `Deno.serve` cut) means every
+  new Deno version's additions are decided by the lowering, not missed.
+  Alternatives: a curated list per module (rejected: hand-maintained, misses
+  APIs); a TypeScript compiler dependency for the lowering (rejected: a large
+  dependency for a declaration syntax the reader already handles).
+- **Where:** PR #307; unreleased.
+- **Status:** pending sign-off.
+
+#### A25.1 WebSockets on Deno: generated now
+
+- **Decision:** `Deno.upgradeWebSocket` (`Lasm.JS.Deno.WebSockets`) is
+  generated; its result `WebSocketUpgrade` holds the `Response` to return and
+  the socket (Lasm.JS.Web's `WebSocket`: `{ val := up.socket : WebSocket }`).
+  ```lean
+  let handler ← Deno.ServeHandler.ofFn fun req _ => do
+    let up ← Deno.upgradeWebSocket req none
+    let socket : WebSocket := { val := up.socket }
+    socket.val.set "onmessage" (toJS (← Function.ofSyncFn fun args => do
+      let _ : Value ← socket.val.callMethod "send" #[(← (args[0]!.field "data" |> pure))]; return .undefined))
+    return up.response
+  ```
+- **Why:** the platform-native WebSocket server on Deno; Tandem's server-side
+  WebSocket need. Alternative: wait for a concrete app (rejected: Jordan wants
+  full Deno support now). `socket` is a `Value` because `WebSocket` lives in the
+  browser tier's module, which Lasm.JS.Deno does not import.
+- **Where:** PR #307; unreleased. (Bun's WebSockets: the Bun PR.)
+- **Status:** pending sign-off.
+
+#### 0.4-21 Deno KV and Deno.cron are generated although Deno marks them unstable
+
+- **Decision:** from `lib.deno.unstable.d.ts` only Deno KV (`openKv`, `Kv`,
+  `AtomicOperation`, `KvU64`, `KvListIterator`, the key, entry, selector and
+  mutation types) and `Deno.cron` are lowered; the rest of that file is not.
+  On the Deno CLI they need Deno's own flags (`deno run -A --unstable-kv
+  --unstable-cron deno/main.mjs`); Deno Deploy provides them. Lasm adds no flag
+  to its output: the program's user runs Deno with the flags their program needs.
+  ```lean
+  let kv ← Deno.openKv none
+  discard <| kv.set #["users", "ada"] (toJS "Ada") none
+  let e ← kv.get #["users", "ada"] none            -- e.value : Data, e.versionstamp : Option String
+  let op ← (← kv.atomic).check #[{ key := #["users", "ada"], versionstamp := e.versionstamp }]
+  let r ← (← op.set #["users", "ada"] (toJS "Ada L.") none).commit   -- r.ok : Bool
+  for entry in ← (← kv.list { «prefix» := some #["users"] } none).values do IO.println entry.versionstamp
+  ```
+- **Why:** an override of the rule "experimental or unstable is never lowered"
+  (Jordan, 2026-11-16: full Deno support including KV; `Lasm.KV` is deleted, so
+  apps use Deno KV directly). Alternatives: keep KV behind `Lasm.KV` (rejected
+  by Jordan); generate the whole unstable file (rejected: WebGPU, QUIC and
+  other APIs Deno itself does not commit to); a `deno.json` with
+  `"unstable": ["kv"]` in `deno/` (rejected: Deno reads the configuration from
+  the working directory, not the module's, so it would not apply as run).
+- **Where:** PR #307; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-22 How TypeScript declarations become Lean (ts-auto rules)
+
+- **Decision:** the rules of [JS_BINDINGS.md, "How Deno's declarations become
+  Lean"](JS_BINDINGS.md#how-denos-declarations-become-lean), among them:
+  an interface with a required method or a `Promise` property, a class, or an
+  interface extending one is a handle; plain data is a copied structure; **a
+  union of object types is one structure** whose members are optional where an
+  alternative lacks them (`KvEntryMaybe`, `KvListSelector`,
+  `PermissionDescriptor`, `KvMutation`); other unions are inductives named
+  after their alias, else their members (`DOMStringOrURL`), in Lasm.JS.Deno's
+  own namespace, with `Coe` from each member (`Deno.readFile "a.txt"`); a
+  generic declaration is one type per instantiation (`Conn`, `ConnUnixAddr`;
+  an alias's name where one exists: `TcpListener`); a generic method's
+  parameter is its default (`unknown` → `Data`); interface properties are
+  read-only except function-typed ones (`onchange`); a TypeScript enum is its
+  number; `Date` is `Data`; a `symbol` alternative is dropped; an all-capitals
+  enum value is a lower-case constructor (`Signal.sigterm`, `.aaaa`).
+  ```lean
+  let st ← (← Deno.permissions).query { name := .read, path := some (.domString "/tmp") }  -- one structure for 8 descriptor types
+  Deno.kill (← Deno.pid) (some (.signal .sigterm))
+  let e ← kv.get #["k"] none
+  if e.versionstamp.isNone then IO.println "absent"                                    -- KvEntry | {null…} as one structure
+  ```
+- **Why:** each is what the declaration means for a Lean caller, decided once
+  for every Deno (and later Bun) member. A union of object types as one
+  structure is what Deno returns (an object that always has the members, some
+  null) and what Lean can build and read without a JavaScript discriminant;
+  unions in Deno's own namespace keep Lasm.JS.Deno from importing Lasm.JS.Node.
+  Alternatives: an inductive per union of objects (rejected: a result cannot be
+  told apart by its JavaScript kind, so it would read as `Data`); `Float`-only
+  numbers everywhere (kept for now except ports, pending A11).
+- **Where:** PR #307; unreleased. Shared rules A9–A12 (0.3) apply on top when
+  they land.
+- **Status:** pending sign-off.
+
+#### 0.4-23 The override tables of deno-tier2.mjs
+
+- **Decision:** four reviewed tables complete the mechanical rules:
+  - **names** of overloads: `listenUnix`, `connectUnix`, `serveWithUnixOptions`,
+    `resolveDnsCaa`, `resolveDnsMx`, `resolveDnsNaptr`, `resolveDnsSoa`,
+    `resolveDnsSrv`, `resolveDnsTxt` (the mechanical rule would name them by
+    their parameter types, or twice);
+  - **split**: `Deno.serve(options: ServeTcpOptions | (ServeTcpOptions &
+    TlsCertifiedKeyPem), handler)` is `serveWithOptions` and
+    `serveWithTlsOptions` (as in 0.7.0);
+  - **intersections** named `ServeTcpTlsOptions`, `ListenTcpOptions`,
+    `ListenUnixOptions`, `ListenTlsCertifiedOptions`;
+  - **overrides**: `Kv.getMany` and `Kv.watch` take `Array KvKey` (the
+    declaration maps a tuple of keys to a tuple of entries, a mapped type).
+  ```lean
+  let l ← Deno.listenUnix { path := "/tmp/app.sock", transport := .unix }
+  let mx ← Deno.resolveDnsMx "example.com" .mx none
+  let entries ← kv.getMany #[#["a"], #["b"]] none
+  ```
+- **Why:** A9's "mechanical rule plus a small reviewed table", each entry an
+  API decision. Alternatives: the mechanical names
+  (`connectWithUnixConnectOptions`; rejected as unreadable).
+- **Where:** PR #307; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-24 What Lasm.JS.Deno leaves out
+
+- **Decision:** not generated, each with its reason in `deno-tier2.mjs` and the
+  header of `deno.idl`: FFI (`Deno.dlopen`, `UnsafePointer`: computed types, no
+  FFI on Deno Deploy); `Deno.test` and `Deno.bench` (`deno test` does not run
+  Lasm's output); `Deno.errors` (an error reaches Lean as an `IO.Error` naming
+  the class); `Deno.telemetry` (OpenTelemetry providers typed `any`); in-place
+  buffer `read`/`write` of `FsFile`, `Conn`, `stdin`, `stdout`, `stderr` (Lean
+  bytes are copies: use the streams); `readDirSync` (a synchronous iterator
+  object); `Kv.commitVersionstamp` (a Symbol); `UpgradeWebSocketOptions.socket`
+  (a `node:net` socket); the handler-inside-options `serve` forms; the general
+  `resolveDns(query, RecordType)`; the iterator protocol's own `next`/`return`;
+  `PermissionStatus`'s typed `addEventListener`; Symbol-keyed members; and
+  whatever Deno marks `@experimental`, `UNSTABLE` or `@deprecated` (VSOCK,
+  QUIC, WebTransport, `Deno.spawn`) except 0.4-21.
+- **Why:** only what makes no sense from Lean compiled to Wasm, cannot be
+  expressed, or duplicates a generated member. Alternative: generate FFI as
+  `Value`-typed functions (rejected: unusable without the computed types).
+- **Where:** PR #307; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-25 Async iterables: values, iterator, next
+
+- **Decision:** a declaration that is or returns an `AsyncIterable<T>`
+  (`Deno.readDir`, `Kv.list`, `FsWatcher`, `TcpListener`) has
+  `values : Async (Array T)` (every value, to the end) and
+  `iterator : IO It` with `It.next : Async (Option T)` (one at a time;
+  `none` at the end). An `AsyncIterable<T>` result without its own interface
+  is a generated `<T>AsyncIterable` (`DirEntryAsyncIterable`).
+  ```lean
+  let names := (← (← Deno.readDir (.domString ".")).values).map (·.name)
+  let it ← (← Deno.listen {}).iterator
+  while true do
+    let some conn ← it.next | break
+    handleConn conn
+  ```
+- **Why:** `for await` is the only way to read these APIs; `values` matches
+  Lasm.JS.Web's sync iterables (which collect into an array), and `next` serves
+  the endless ones (a listener, a watcher). Alternatives: leave async iteration
+  unmapped (as Lasm.JS.Web does; rejected: `readDir`, `Kv.list` and listeners
+  would be unusable).
+- **Where:** PR #307; unreleased. Lasm.JS.Web's async iterables are unchanged
+  (0.3's question).
+- **Status:** pending sign-off.
+
+#### 0.4-26 Deno.serve's module: Unix sockets, one rename
+
+- **Decision:** `Deno.serveWithUnixOptions (options : ServeUnixOptions)
+  (handler : ServeHandlerUnixAddr) : IO HttpServerUnixAddr` is new; the TLS
+  key format enum is `ServeTcpTlsOptionsKeyFormat` (was
+  `TlsCertifiedKeyPemKeyFormat`; the intersection's own name); `NetAddr` lives
+  in `Lasm.JS.Deno.Net` (still imported by `Lasm.JS.Deno.Serve`).
+  ```lean
+  let handler ← Deno.ServeHandlerUnixAddr.ofFn fun req _ => handle req
+  let server ← Deno.serveWithUnixOptions { path := "/tmp/http.sock" } handler
+  ```
+- **Why:** Unix sockets were outside 0.7.0's HTTP cut, not unexpressible; the
+  rename follows the mechanical naming. Migration note in
+  docs/release/next-notes.md.
+- **Where:** PR #307; unreleased (breaking: one rename).
+- **Status:** pending sign-off.
