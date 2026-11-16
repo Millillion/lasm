@@ -1,8 +1,3 @@
-# Next release (unreleased)
-
-Changes since 0.8.0, collected until the release's version bump turns this
-file into `<version>-notes.md`.
-
 ## Lasm.WASI.Http
 
 - **Helpers for whole bodies and responses** (A31, docs/API_DECISIONS.md):
