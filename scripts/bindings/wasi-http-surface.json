@@ -1,6 +1,6 @@
 {
   "source": "scripts/wasi/wit/deps (Wasmtime v49.0.4 crates/wasi-http/wit/deps, WASI 0.2.12)",
-  "digest": "81cd616dd5286fb1",
+  "digest": "b7289f85304734bb",
   "interfaces": [
     {
       "wit": "wasi:io/error@0.2.12",

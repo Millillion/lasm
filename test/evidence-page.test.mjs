@@ -128,7 +128,7 @@ test('the exit bar: each of the eight items from the repository and CI, met only
     mutationModules: ['a', 'b'], propositions: { proved: 5, candidates: 2, citations: 4, problems: 0, oracles: { named: 2, total: 2, unnamed: [] }, properties: { named: 1, total: 1, unnamed: [] } } };
   const platform = (id, level) => ({ id, row: id, level, levels: {} });
   const ci = {
-    platforms: [platform('node', 3), platform('workers', 3), platform('browser', 3), platform('lambda', 2)],
+    platforms: [platform('node', 3), platform('workers', 3), platform('browser', 3), platform('lambda', 3)],
     mutation: { run: run(1), modules: [job('module (a)', 'success', { module: 'a', score: 91 }), job('module (b)', 'success', { module: 'b', score: 80 })] },
     coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140, zeroFiles: 2, zeroNamed: 2, zeroUnnamed: [] })] },
     campaigns: { nights: 30, endedOn: null, why: 'no older runs', run: null },
@@ -164,7 +164,7 @@ test('the exit bar: each of the eight items from the repository and CI, met only
   assert.match(exitBar(repo, { ...ci, apps: [{ app: 'porter', claims: [{ row: 'Node', ok: true }, { row: 'Docker', ok: false }] }] })[5].measured, /^1 of 2 claimed platforms of 1 apps .*\(not: porter on Docker\)/);
   assert.equal(exitBar(repo, { ...ci, apps: [] })[5].status, 'not measured');
   const rows = exitBar(repo, { ...ci, platforms: [platform('lambda', -1), platform('node', 2)] });
-  assert.match(rows[0].measured, /^1 of 2 platforms at L2 or higher \(not: lambda\); at L3: 0 of 3/);
+  assert.match(rows[0].measured, /^0 of 2 platforms at L3 \(not: lambda at no level, node at L2\)$/);
   assert.equal(status({ ...repo, featureGenerator: false }, ci)[7], 'not met');
   assert.deepEqual(status(repo, null).slice(0, 4), ['not read', 'not read', 'not read', 'not read']);
   assert.equal(status(repo, { ...ci, coverage: { run: null, jobs: [] } })[2], 'not measured');

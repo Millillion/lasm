@@ -10,7 +10,7 @@
  * bound function (lasm_wasi_http_bound_imports), so every program's module has
  * the same imports and one component template serves all of them
  * (src/wasi/wasi-component.mjs). In every other build each call fails.
- * WIT digest: 81cd616dd5286fb1.
+ * WIT digest: b7289f85304734bb.
  */
 #include <stdint.h>
 #include <stddef.h>
@@ -21,7 +21,7 @@
 #include <lean/lean.h>
 
 /* The wasi-http link drops the Node build's copy of this file (src/wasi/wasi-link.mjs). */
-LEAN_EXPORT const char lasm_wasi_http_bindings[] = "81cd616dd5286fb1";
+LEAN_EXPORT const char lasm_wasi_http_bindings[] = "b7289f85304734bb";
 
 #ifdef LASM_WASI_HTTP
 #define P(x) ((uint32_t)(uintptr_t)(x))
