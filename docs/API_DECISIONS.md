@@ -78,8 +78,8 @@ linked section of the review.
 | A34 | Lasm.Fastly | Fastly calls are namespaced by module (`HttpReq.methodGet req`): keep the witx layout, or also generate dot-notation aliases on the handle types? | [Q34](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
 | A35 | Lasm.UI | Keep UI's own `Http`, `Url` and `Storage` commands as pure data (Claude recommends this), or replace them with `Cmd.io` plus the generated bindings? | [Q35](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
 | A36 | Lasm.UI | Keep the `_` suffix names (`class_`, `main_`, `type_`), or use «guillemets» or another convention? | [Q36](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
-| A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
-| A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
+| A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | dropped with Lasm.RPC in 0.6 ([below](#a37-a38-dropped-with-lasmrpc)), pending sign-off |
+| A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | dropped with Lasm.RPC in 0.6 ([below](#a37-a38-dropped-with-lasmrpc)), pending sign-off |
 | A39 | Lasm.KV | What `Lasm.KV` becomes: keep `open` with `setWorkersEnv` (PR #213), or typed constructors taking the platform binding (recommended)? | [Q39](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
 | A40 | Lasm.KV | Should values stay `String` only, or become `ByteArray` (or generic, through `ToJson`)? | [Q40](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
 | A41 | Lasm.Fetch | Embedded assets after Lasm.Fetch: keep them copied in apps, or a small transport-free library (`Lasm.Embed`, recommended)? | [Q41](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
@@ -217,3 +217,43 @@ implicit background `Async`. **Tests.** `test/fixtures/js-interop` (keys),
 `test/fixtures/js-sync-waits`, `test/lasm-js-framing.test.mjs`.
 
 **Where.** Shipped in 0.5.0 and 0.6.1. **Status:** pending sign-off.
+
+### Lasm.RPC
+
+#### 0.6-1: Lasm.RPC is dropped (Jordan, 2026-11-16)
+
+**Decision.** Lasm.RPC is deleted. A Lean app's server and browser share
+plain Lean types and talk plain REST over each host's own fetch API
+(Lasm.JS.Web's `fetch`, `Request` and `Response`; Lasm.Fastly; Lasm.WASI.Http).
+Validation is a subtype the shared module declares, so a handler that needs a
+valid value demands it in its type:
+
+```lean
+-- Shared.lean
+def ValidTitle := { t : String // checkTitle t = .ok () }
+structure NewTodo where
+  title : String
+  deriving ToJson, FromJson
+
+-- Server: the route parses, validates once, and hands on the subtype.
+def addTodo (t : ValidTitle) : Async Todo := …
+```
+
+**Why.** Every host already has a native way to serve and call HTTP, and
+REST with shared types is what those hosts and their tools expect. RPC's one
+guarantee, the validation proof reaching the handler, is a subtype, which
+needs no library.
+
+**Alternatives.** Keeping Lasm.RPC with a transport-free `dispatch` and
+`Lasm.RPC.webHandler` (PR #303, closed unmerged).
+
+**Where.** Decided 2026-11-16. The library is deleted, and Conduit's and
+Ledger's frontends move off `Endpoint.call`, once Lasm.UI is decided (their
+`call` commands are Lasm.UI commands). **Status:** pending sign-off.
+
+#### A37, A38: dropped with Lasm.RPC
+
+**Decision.** No `dispatch`, `webHandler` or `serve'` naming question
+remains: they are dropped with Lasm.RPC ([0.6-1](#06-1-lasmrpc-is-dropped-jordan-2026-11-16)).
+PR #303, which built `dispatch` and `webHandler`, was closed unmerged.
+**Status:** pending sign-off.
