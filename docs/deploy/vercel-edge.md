@@ -10,15 +10,15 @@ Node runtime over the edge runtime. The design and limits are in
 ```sh
 npx lasm init my-app --template hono --deploy vercel-edge
 cd my-app && npm install
-npm run build:vercel-edge    # lasm build Main.lean --target vercel-edge
+npm run build:vercel-edge    # lasm build Export.lean --target vercel-edge
 npx vercel deploy            # your account; Lasm never runs this
 ```
 
 `--deploy vercel-edge` writes `vercel.json`. Vercel runs
 `npm run build:vercel-edge`, and every path is routed to `/api/lasm`.
 `public/lasm.txt` is there because Vercel refuses an empty output directory.
-The same `Main.lean` serves Node and the edge (`Lasm.JS.onEdge`, as in
-[workers.md](workers.md)).
+The edge function serves the program's default export (`Export.lean`, as in
+[workers.md](workers.md)); `Main.lean` serves Node.
 
 ## What the build writes
 
