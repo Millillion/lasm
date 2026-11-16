@@ -172,7 +172,7 @@ inductive DOMStringOrBigintOrUint8ArrayOrDoubleOrBoolean where
   | boolean (value : Bool)
 instance : ToJS DOMStringOrBigintOrUint8ArrayOrDoubleOrBoolean := ⟨fun
   | .domString v => toJS v
-  | .bigint v => toJS v
+  | .bigint v => (Data.bigint v)
   | .uint8Array v => toJS v
   | .double v => toJS v
   | .boolean v => toJS v⟩
@@ -198,7 +198,7 @@ inductive SQLQueryBindings where
   | record (value : Record (Option DOMStringOrBigintOrUint8ArrayOrDoubleOrBoolean))
 instance : ToJS SQLQueryBindings := ⟨fun
   | .domString v => toJS v
-  | .bigint v => toJS v
+  | .bigint v => (Data.bigint v)
   | .uint8Array v => toJS v
   | .double v => toJS v
   | .boolean v => toJS v
@@ -228,7 +228,7 @@ inductive SQLQueryBindingsOrSequenceOfSQLQueryBindings where
   | sequence (value : Array (Option SQLQueryBindings))
 instance : ToJS SQLQueryBindingsOrSequenceOfSQLQueryBindings := ⟨fun
   | .domString v => toJS v
-  | .bigint v => toJS v
+  | .bigint v => (Data.bigint v)
   | .uint8Array v => toJS v
   | .double v => toJS v
   | .boolean v => toJS v
@@ -256,7 +256,7 @@ inductive SQLFunctionResult where
   | boolean (value : Bool)
 instance : ToJS SQLFunctionResult := ⟨fun
   | .domString v => toJS v
-  | .bigint v => toJS v
+  | .bigint v => (Data.bigint v)
   | .uint8Array v => toJS v
   | .double v => toJS v
   | .boolean v => toJS v⟩
