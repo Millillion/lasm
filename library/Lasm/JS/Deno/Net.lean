@@ -131,109 +131,109 @@ inductive ResolveDnsRecordType where
   /-- "A" -/
   | a
   /-- "AAAA" -/
-  | aAAA
+  | aaaa
   /-- "ANAME" -/
-  | aNAME
+  | aname
   /-- "CNAME" -/
-  | cNAME
+  | cname
   /-- "NS" -/
-  | nS
+  | ns
   /-- "PTR" -/
-  | pTR
+  | ptr
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsRecordType := ⟨fun
   | .a => .string "A"
-  | .aAAA => .string "AAAA"
-  | .aNAME => .string "ANAME"
-  | .cNAME => .string "CNAME"
-  | .nS => .string "NS"
-  | .pTR => .string "PTR"⟩
+  | .aaaa => .string "AAAA"
+  | .aname => .string "ANAME"
+  | .cname => .string "CNAME"
+  | .ns => .string "NS"
+  | .ptr => .string "PTR"⟩
 instance : FromJS ResolveDnsRecordType where
   fromJS
     | .string "A" => .ok .a
-    | .string "AAAA" => .ok .aAAA
-    | .string "ANAME" => .ok .aNAME
-    | .string "CNAME" => .ok .cNAME
-    | .string "NS" => .ok .nS
-    | .string "PTR" => .ok .pTR
+    | .string "AAAA" => .ok .aaaa
+    | .string "ANAME" => .ok .aname
+    | .string "CNAME" => .ok .cname
+    | .string "NS" => .ok .ns
+    | .string "PTR" => .ok .ptr
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsRecordType"
 
 /-- `enum ResolveDnsCaaRecordType` (Deno 2.9.6 type declarations): "CAA". -/
 inductive ResolveDnsCaaRecordType where
   /-- "CAA" -/
-  | cAA
+  | caa
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsCaaRecordType := ⟨fun
-  | .cAA => .string "CAA"⟩
+  | .caa => .string "CAA"⟩
 instance : FromJS ResolveDnsCaaRecordType where
   fromJS
-    | .string "CAA" => .ok .cAA
+    | .string "CAA" => .ok .caa
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsCaaRecordType"
 
 /-- `enum ResolveDnsMxRecordType` (Deno 2.9.6 type declarations): "MX". -/
 inductive ResolveDnsMxRecordType where
   /-- "MX" -/
-  | mX
+  | mx
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsMxRecordType := ⟨fun
-  | .mX => .string "MX"⟩
+  | .mx => .string "MX"⟩
 instance : FromJS ResolveDnsMxRecordType where
   fromJS
-    | .string "MX" => .ok .mX
+    | .string "MX" => .ok .mx
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsMxRecordType"
 
 /-- `enum ResolveDnsNaptrRecordType` (Deno 2.9.6 type declarations): "NAPTR". -/
 inductive ResolveDnsNaptrRecordType where
   /-- "NAPTR" -/
-  | nAPTR
+  | naptr
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsNaptrRecordType := ⟨fun
-  | .nAPTR => .string "NAPTR"⟩
+  | .naptr => .string "NAPTR"⟩
 instance : FromJS ResolveDnsNaptrRecordType where
   fromJS
-    | .string "NAPTR" => .ok .nAPTR
+    | .string "NAPTR" => .ok .naptr
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsNaptrRecordType"
 
 /-- `enum ResolveDnsSoaRecordType` (Deno 2.9.6 type declarations): "SOA". -/
 inductive ResolveDnsSoaRecordType where
   /-- "SOA" -/
-  | sOA
+  | soa
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsSoaRecordType := ⟨fun
-  | .sOA => .string "SOA"⟩
+  | .soa => .string "SOA"⟩
 instance : FromJS ResolveDnsSoaRecordType where
   fromJS
-    | .string "SOA" => .ok .sOA
+    | .string "SOA" => .ok .soa
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsSoaRecordType"
 
 /-- `enum ResolveDnsSrvRecordType` (Deno 2.9.6 type declarations): "SRV". -/
 inductive ResolveDnsSrvRecordType where
   /-- "SRV" -/
-  | sRV
+  | srv
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsSrvRecordType := ⟨fun
-  | .sRV => .string "SRV"⟩
+  | .srv => .string "SRV"⟩
 instance : FromJS ResolveDnsSrvRecordType where
   fromJS
-    | .string "SRV" => .ok .sRV
+    | .string "SRV" => .ok .srv
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsSrvRecordType"
 
 /-- `enum ResolveDnsTxtRecordType` (Deno 2.9.6 type declarations): "TXT". -/
 inductive ResolveDnsTxtRecordType where
   /-- "TXT" -/
-  | tXT
+  | txt
   deriving BEq, Repr, Inhabited
 instance : ToJS ResolveDnsTxtRecordType := ⟨fun
-  | .tXT => .string "TXT"⟩
+  | .txt => .string "TXT"⟩
 instance : FromJS ResolveDnsTxtRecordType where
   fromJS
-    | .string "TXT" => .ok .tXT
+    | .string "TXT" => .ok .txt
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ResolveDnsTxtRecordType"
 
@@ -334,13 +334,13 @@ structure NetAddr where
   transport : NetAddrTransport
   /-- `required DOMString hostname` -/
   hostname : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required unsigned short port` -/
+  port : Nat
 instance : FromJS NetAddr where
   fromJS d := do return {
     transport := ← Lasm.JS.readField NetAddrTransport d "transport",
     hostname := ← Lasm.JS.readField String d "hostname",
-    port := ← Lasm.JS.readField Float d "port" }
+    port := ← Lasm.JS.readField Nat d "port" }
   typeName := "Lasm.JS.Deno.NetAddr"
 
 /-- `dictionary UnixAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/

@@ -175,6 +175,8 @@ function lowerName(name) {
 /** Constructor name of an enum value: "no-cors" → noCors, "" → empty. */
 function enumCtor(value) {
   if (value === '') return 'empty';
+  // An all-capitals value (Deno's "SIGTERM", "AAAA") in lower case: sigterm, aaaa.
+  if (/^[A-Z][A-Z0-9_]*$/.test(value) && /[A-Z]{2}/.test(value)) return value.toLowerCase().replace(/_+(.)?/g, (_, c) => c ? c.toUpperCase() : '');
   let s = value.replace(/[^A-Za-z0-9]+(.)?/g, (_, c) => c ? c.toUpperCase() : '');
   if (/^[0-9]/.test(s)) s = 'v' + s;
   s = s[0].toLowerCase() + s.slice(1);
@@ -723,7 +725,8 @@ function resultOf(idlType) {
   if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
   // A record result is read through Object.entries (Lasm.JS.Node.Support.recordOf): Node's
   // process.env is not a plain object, and Deno's is a Proxy that structuredClone rejects.
-  if (dict.k === 'record' && !needsPost(dict.inner)) return { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
+  // (Lasm.JS.Deno and Lasm.JS.Bun read records as data: Lasm.JS.Node.Support is Node's.)
+  if (dict.k === 'record' && !needsPost(dict.inner) && !emittingHost) return { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
   return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }
 function holdsRecord(t, seen = new Set()) {
@@ -1013,7 +1016,9 @@ function emitDict(module, name) {
     const reads = fields.map(f => {
       const t = resolve(f.idlType);
       const inner = t.k === 'nullable' && !f.required ? t.inner : t;
-      const R = f.required ? retType(t) : retType(inner) === 'Data' ? 'Data' : `Option ${paren(retType(inner))}`;
+      // A member of a type outside the tier (a Value field) is read as that Value.
+      const rt = x => x.k === 'unknown' ? argType(x) : retType(x);
+      const R = f.required ? rt(t) : rt(inner) === 'Data' ? 'Data' : `Option ${paren(rt(inner))}`;
       return `${id(f.name)} := ← Lasm.JS.readField ${paren(R)} d "${f.name}"`;
     });
     decl.push(`instance : FromJS ${T} where\n  fromJS d := ${fields.length ? `do return {\n    ${reads.join(',\n    ')} }` : `match d with | .object _ => .ok {} | _ => .error ""`}\n  typeName := "${nsOf(module)}.${T}"`);
@@ -1059,8 +1064,11 @@ function emitUnion(module, key) {
 
 // Collect per module, in dependency order within the module.
 for (const o of out.values()) Object.assign(o, { types: [], support: [] });
-for (const m of plan) inTier(m.tier, () => { for (const i of m.ifaces) emitInterface(m.key, i); });
+/** Whether the module being emitted is Lasm.JS.Deno's or Lasm.JS.Bun's. */
+let emittingHost = false;
+for (const m of plan) inTier(m.tier, () => { emittingHost = !!m.host; for (const i of m.ifaces) emitInterface(m.key, i); });
 for (const m of plan) inTier(m.tier, () => {
+  emittingHost = !!m.host;
   emitNamespaceOrGlobal(m.key, 'WindowOrWorkerGlobalScope', m.globals.flatMap(globalMember), [], '');
   for (const n of m.namespaces) {
     const jsModule = jsModuleOf(n);

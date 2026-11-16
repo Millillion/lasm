@@ -96,7 +96,12 @@ export const deno = {
     'Kv.watch': { params: { keys: 'KvKey[]' }, type: 'ReadableStream<KvEntryMaybe<unknown>[]>', reason: 'as getMany: a stream of arrays of entries, one per key' },
   },
   instances: {},
-  integers: {},
+  /** `number`s the doc comment describes as a port or count (WebIDL integers; `double` otherwise), each quoting it. */
+  integers: {
+    'ServeTcpOptions.port': { type: 'unsigned short', quote: 'The port to listen on.' },
+    'ServeTcpOptions.tcpBacklog': { type: 'unsigned long', quote: 'Maximum number of pending connections in the listen queue.' },
+    'NetAddr.port': { type: 'unsigned short', quote: 'The port number.' },
+  },
   /** Names the declarations use that are not Deno's: Lasm.JS.Web's (tier 1) interfaces. */
   typeNames: {
     Request: 'Request', Response: 'Response', URL: 'URL', AbortSignal: 'AbortSignal', ReadableStream: 'ReadableStream', WritableStream: 'WritableStream',

@@ -239,14 +239,14 @@ structure ServeTcpOptions where
   automaticCompression : Option Bool := none
   /-- `ServeTcpOptionsTransport transport` -/
   transport : Option ServeTcpOptionsTransport := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `unsigned short port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `boolean reusePort` -/
   reusePort : Option Bool := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `unsigned long tcpBacklog` -/
+  tcpBacklog : Option Nat := none
 instance : ToJS ServeTcpOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("onError", Support.optional d.onError),
     ("onListen", Support.optional d.onListen),
@@ -269,14 +269,14 @@ structure ServeTcpTlsOptions where
   automaticCompression : Option Bool := none
   /-- `ServeTcpOptionsTransport transport` -/
   transport : Option ServeTcpOptionsTransport := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `unsigned short port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `boolean reusePort` -/
   reusePort : Option Bool := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `unsigned long tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `ServeTcpTlsOptionsKeyFormat keyFormat` -/
   keyFormat : Option ServeTcpTlsOptionsKeyFormat := none
   /-- `required DOMString key` -/

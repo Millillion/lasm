@@ -568,7 +568,7 @@ dictionary Deno_NetAddr {
   // hostname: string
   required DOMString hostname;
   // port: number
-  required double port;
+  required unsigned short port;
 };
 
 // interface Deno.HttpServer (HttpServer<NetAddr>)
@@ -702,13 +702,13 @@ dictionary Deno_ServeTcpOptions : Deno_ServeOptions {
   // transport?: "tcp"
   Deno_ServeTcpOptionsTransport transport;
   // port?: number
-  double port;
+  unsigned short port;
   // hostname?: string
   DOMString hostname;
   // reusePort?: boolean
   boolean reusePort;
   // tcpBacklog?: number
-  double tcpBacklog;
+  unsigned long tcpBacklog;
 };
 
 [LasmHost="Deno", LasmLeanModule="Serve", LasmName="ServeTcpTlsOptionsKeyFormat"]

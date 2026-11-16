@@ -29,9 +29,11 @@ const { values } = parseArgs({ options: {
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
-if (!['js-web', 'js-node', 'js-serve'].includes(values.fixture)) { console.error('--fixture is js-web, js-node or js-serve'); process.exit(2); }
+if (!['js-web', 'js-node', 'js-serve', 'js-deno'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve or js-deno'); process.exit(2); }
 const fixture = join(root, 'test', 'fixtures', values.fixture);
-const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun' }[values.fixture];
+const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno' }[values.fixture];
+// Deno KV and Deno.cron are behind Deno's own flags on the Deno CLI (Deno Deploy enables them).
+const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron'] : [];
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };
@@ -90,7 +92,7 @@ const TARGETS = {
   node: { build: [], output: 'dist', run: dir => exec(process.execPath, ['dist/main.mjs'], { cwd: dir }) },
   node24: { build: [], output: 'dist', run: dir => exec(values.node24, ['dist/main.mjs'], { cwd: dir }) },
   bun: { build: ['--target', 'bun'], output: 'bun', run: dir => exec(values.bun, ['bun/main.mjs'], { cwd: dir }) },
-  deno: { build: ['--target', 'deno'], output: 'deno', run: dir => exec(values.deno, ['run', '-A', '--no-lock', 'deno/main.mjs'], { cwd: dir }) },
+  deno: { build: ['--target', 'deno'], output: 'deno', run: dir => exec(values.deno, ['run', '-A', '--no-lock', ...denoFlags, 'deno/main.mjs'], { cwd: dir }) },
   workers: { build: ['--target', 'workers'], output: 'workers', run: dir => serveWorkers(dir) },
   'browser-chromium': { build: ['--target', 'browser', '--suspend', 'jspi'], output: 'dist',
     run: dir => exec(process.execPath, [join(root, 'scripts/differential/browser-runner.mjs'), '--browser', 'chromium',

@@ -24,153 +24,153 @@ instance : FromJS Env := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "",
 /-- `enum Signal` (Deno 2.9.6 type declarations): "SIGABRT", "SIGALRM", "SIGBREAK", "SIGBUS", "SIGCHLD", "SIGCONT", "SIGEMT", "SIGFPE", "SIGHUP", "SIGILL", "SIGINFO", "SIGINT", "SIGIO", "SIGPOLL", "SIGUNUSED", "SIGKILL", "SIGPIPE", "SIGPROF", "SIGPWR", "SIGQUIT", "SIGSEGV", "SIGSTKFLT", "SIGSTOP", "SIGSYS", "SIGTERM", "SIGTRAP", "SIGTSTP", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGUSR1", "SIGUSR2", "SIGVTALRM", "SIGWINCH", "SIGXCPU", "SIGXFSZ". -/
 inductive Signal where
   /-- "SIGABRT" -/
-  | sIGABRT
+  | sigabrt
   /-- "SIGALRM" -/
-  | sIGALRM
+  | sigalrm
   /-- "SIGBREAK" -/
-  | sIGBREAK
+  | sigbreak
   /-- "SIGBUS" -/
-  | sIGBUS
+  | sigbus
   /-- "SIGCHLD" -/
-  | sIGCHLD
+  | sigchld
   /-- "SIGCONT" -/
-  | sIGCONT
+  | sigcont
   /-- "SIGEMT" -/
-  | sIGEMT
+  | sigemt
   /-- "SIGFPE" -/
-  | sIGFPE
+  | sigfpe
   /-- "SIGHUP" -/
-  | sIGHUP
+  | sighup
   /-- "SIGILL" -/
-  | sIGILL
+  | sigill
   /-- "SIGINFO" -/
-  | sIGINFO
+  | siginfo
   /-- "SIGINT" -/
-  | sIGINT
+  | sigint
   /-- "SIGIO" -/
-  | sIGIO
+  | sigio
   /-- "SIGPOLL" -/
-  | sIGPOLL
+  | sigpoll
   /-- "SIGUNUSED" -/
-  | sIGUNUSED
+  | sigunused
   /-- "SIGKILL" -/
-  | sIGKILL
+  | sigkill
   /-- "SIGPIPE" -/
-  | sIGPIPE
+  | sigpipe
   /-- "SIGPROF" -/
-  | sIGPROF
+  | sigprof
   /-- "SIGPWR" -/
-  | sIGPWR
+  | sigpwr
   /-- "SIGQUIT" -/
-  | sIGQUIT
+  | sigquit
   /-- "SIGSEGV" -/
-  | sIGSEGV
+  | sigsegv
   /-- "SIGSTKFLT" -/
-  | sIGSTKFLT
+  | sigstkflt
   /-- "SIGSTOP" -/
-  | sIGSTOP
+  | sigstop
   /-- "SIGSYS" -/
-  | sIGSYS
+  | sigsys
   /-- "SIGTERM" -/
-  | sIGTERM
+  | sigterm
   /-- "SIGTRAP" -/
-  | sIGTRAP
+  | sigtrap
   /-- "SIGTSTP" -/
-  | sIGTSTP
+  | sigtstp
   /-- "SIGTTIN" -/
-  | sIGTTIN
+  | sigttin
   /-- "SIGTTOU" -/
-  | sIGTTOU
+  | sigttou
   /-- "SIGURG" -/
-  | sIGURG
+  | sigurg
   /-- "SIGUSR1" -/
-  | sIGUSR1
+  | sigusr1
   /-- "SIGUSR2" -/
-  | sIGUSR2
+  | sigusr2
   /-- "SIGVTALRM" -/
-  | sIGVTALRM
+  | sigvtalrm
   /-- "SIGWINCH" -/
-  | sIGWINCH
+  | sigwinch
   /-- "SIGXCPU" -/
-  | sIGXCPU
+  | sigxcpu
   /-- "SIGXFSZ" -/
-  | sIGXFSZ
+  | sigxfsz
   deriving BEq, Repr, Inhabited
 instance : ToJS Signal := ⟨fun
-  | .sIGABRT => .string "SIGABRT"
-  | .sIGALRM => .string "SIGALRM"
-  | .sIGBREAK => .string "SIGBREAK"
-  | .sIGBUS => .string "SIGBUS"
-  | .sIGCHLD => .string "SIGCHLD"
-  | .sIGCONT => .string "SIGCONT"
-  | .sIGEMT => .string "SIGEMT"
-  | .sIGFPE => .string "SIGFPE"
-  | .sIGHUP => .string "SIGHUP"
-  | .sIGILL => .string "SIGILL"
-  | .sIGINFO => .string "SIGINFO"
-  | .sIGINT => .string "SIGINT"
-  | .sIGIO => .string "SIGIO"
-  | .sIGPOLL => .string "SIGPOLL"
-  | .sIGUNUSED => .string "SIGUNUSED"
-  | .sIGKILL => .string "SIGKILL"
-  | .sIGPIPE => .string "SIGPIPE"
-  | .sIGPROF => .string "SIGPROF"
-  | .sIGPWR => .string "SIGPWR"
-  | .sIGQUIT => .string "SIGQUIT"
-  | .sIGSEGV => .string "SIGSEGV"
-  | .sIGSTKFLT => .string "SIGSTKFLT"
-  | .sIGSTOP => .string "SIGSTOP"
-  | .sIGSYS => .string "SIGSYS"
-  | .sIGTERM => .string "SIGTERM"
-  | .sIGTRAP => .string "SIGTRAP"
-  | .sIGTSTP => .string "SIGTSTP"
-  | .sIGTTIN => .string "SIGTTIN"
-  | .sIGTTOU => .string "SIGTTOU"
-  | .sIGURG => .string "SIGURG"
-  | .sIGUSR1 => .string "SIGUSR1"
-  | .sIGUSR2 => .string "SIGUSR2"
-  | .sIGVTALRM => .string "SIGVTALRM"
-  | .sIGWINCH => .string "SIGWINCH"
-  | .sIGXCPU => .string "SIGXCPU"
-  | .sIGXFSZ => .string "SIGXFSZ"⟩
+  | .sigabrt => .string "SIGABRT"
+  | .sigalrm => .string "SIGALRM"
+  | .sigbreak => .string "SIGBREAK"
+  | .sigbus => .string "SIGBUS"
+  | .sigchld => .string "SIGCHLD"
+  | .sigcont => .string "SIGCONT"
+  | .sigemt => .string "SIGEMT"
+  | .sigfpe => .string "SIGFPE"
+  | .sighup => .string "SIGHUP"
+  | .sigill => .string "SIGILL"
+  | .siginfo => .string "SIGINFO"
+  | .sigint => .string "SIGINT"
+  | .sigio => .string "SIGIO"
+  | .sigpoll => .string "SIGPOLL"
+  | .sigunused => .string "SIGUNUSED"
+  | .sigkill => .string "SIGKILL"
+  | .sigpipe => .string "SIGPIPE"
+  | .sigprof => .string "SIGPROF"
+  | .sigpwr => .string "SIGPWR"
+  | .sigquit => .string "SIGQUIT"
+  | .sigsegv => .string "SIGSEGV"
+  | .sigstkflt => .string "SIGSTKFLT"
+  | .sigstop => .string "SIGSTOP"
+  | .sigsys => .string "SIGSYS"
+  | .sigterm => .string "SIGTERM"
+  | .sigtrap => .string "SIGTRAP"
+  | .sigtstp => .string "SIGTSTP"
+  | .sigttin => .string "SIGTTIN"
+  | .sigttou => .string "SIGTTOU"
+  | .sigurg => .string "SIGURG"
+  | .sigusr1 => .string "SIGUSR1"
+  | .sigusr2 => .string "SIGUSR2"
+  | .sigvtalrm => .string "SIGVTALRM"
+  | .sigwinch => .string "SIGWINCH"
+  | .sigxcpu => .string "SIGXCPU"
+  | .sigxfsz => .string "SIGXFSZ"⟩
 instance : FromJS Signal where
   fromJS
-    | .string "SIGABRT" => .ok .sIGABRT
-    | .string "SIGALRM" => .ok .sIGALRM
-    | .string "SIGBREAK" => .ok .sIGBREAK
-    | .string "SIGBUS" => .ok .sIGBUS
-    | .string "SIGCHLD" => .ok .sIGCHLD
-    | .string "SIGCONT" => .ok .sIGCONT
-    | .string "SIGEMT" => .ok .sIGEMT
-    | .string "SIGFPE" => .ok .sIGFPE
-    | .string "SIGHUP" => .ok .sIGHUP
-    | .string "SIGILL" => .ok .sIGILL
-    | .string "SIGINFO" => .ok .sIGINFO
-    | .string "SIGINT" => .ok .sIGINT
-    | .string "SIGIO" => .ok .sIGIO
-    | .string "SIGPOLL" => .ok .sIGPOLL
-    | .string "SIGUNUSED" => .ok .sIGUNUSED
-    | .string "SIGKILL" => .ok .sIGKILL
-    | .string "SIGPIPE" => .ok .sIGPIPE
-    | .string "SIGPROF" => .ok .sIGPROF
-    | .string "SIGPWR" => .ok .sIGPWR
-    | .string "SIGQUIT" => .ok .sIGQUIT
-    | .string "SIGSEGV" => .ok .sIGSEGV
-    | .string "SIGSTKFLT" => .ok .sIGSTKFLT
-    | .string "SIGSTOP" => .ok .sIGSTOP
-    | .string "SIGSYS" => .ok .sIGSYS
-    | .string "SIGTERM" => .ok .sIGTERM
-    | .string "SIGTRAP" => .ok .sIGTRAP
-    | .string "SIGTSTP" => .ok .sIGTSTP
-    | .string "SIGTTIN" => .ok .sIGTTIN
-    | .string "SIGTTOU" => .ok .sIGTTOU
-    | .string "SIGURG" => .ok .sIGURG
-    | .string "SIGUSR1" => .ok .sIGUSR1
-    | .string "SIGUSR2" => .ok .sIGUSR2
-    | .string "SIGVTALRM" => .ok .sIGVTALRM
-    | .string "SIGWINCH" => .ok .sIGWINCH
-    | .string "SIGXCPU" => .ok .sIGXCPU
-    | .string "SIGXFSZ" => .ok .sIGXFSZ
+    | .string "SIGABRT" => .ok .sigabrt
+    | .string "SIGALRM" => .ok .sigalrm
+    | .string "SIGBREAK" => .ok .sigbreak
+    | .string "SIGBUS" => .ok .sigbus
+    | .string "SIGCHLD" => .ok .sigchld
+    | .string "SIGCONT" => .ok .sigcont
+    | .string "SIGEMT" => .ok .sigemt
+    | .string "SIGFPE" => .ok .sigfpe
+    | .string "SIGHUP" => .ok .sighup
+    | .string "SIGILL" => .ok .sigill
+    | .string "SIGINFO" => .ok .siginfo
+    | .string "SIGINT" => .ok .sigint
+    | .string "SIGIO" => .ok .sigio
+    | .string "SIGPOLL" => .ok .sigpoll
+    | .string "SIGUNUSED" => .ok .sigunused
+    | .string "SIGKILL" => .ok .sigkill
+    | .string "SIGPIPE" => .ok .sigpipe
+    | .string "SIGPROF" => .ok .sigprof
+    | .string "SIGPWR" => .ok .sigpwr
+    | .string "SIGQUIT" => .ok .sigquit
+    | .string "SIGSEGV" => .ok .sigsegv
+    | .string "SIGSTKFLT" => .ok .sigstkflt
+    | .string "SIGSTOP" => .ok .sigstop
+    | .string "SIGSYS" => .ok .sigsys
+    | .string "SIGTERM" => .ok .sigterm
+    | .string "SIGTRAP" => .ok .sigtrap
+    | .string "SIGTSTP" => .ok .sigtstp
+    | .string "SIGTTIN" => .ok .sigttin
+    | .string "SIGTTOU" => .ok .sigttou
+    | .string "SIGURG" => .ok .sigurg
+    | .string "SIGUSR1" => .ok .sigusr1
+    | .string "SIGUSR2" => .ok .sigusr2
+    | .string "SIGVTALRM" => .ok .sigvtalrm
+    | .string "SIGWINCH" => .ok .sigwinch
+    | .string "SIGXCPU" => .ok .sigxcpu
+    | .string "SIGXFSZ" => .ok .sigxfsz
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.Signal"
 
@@ -400,9 +400,8 @@ def Env.has (self : Env) (key : String) : IO Bool :=
   self.val.callMethod "has" (Support.args #[toJS key]) Bool
 
 /-- `toObject(): { [index: string]: string }`: `record<DOMString, DOMString> toObject()` -/
-def Env.toObject (self : Env) : IO (Record String) := do
-  let r ← self.val.callMethod "toObject" (Support.args #[]) Value
-  Support.recordOf String r
+def Env.toObject (self : Env) : IO (Record String) :=
+  self.val.callMethod "toObject" (Support.args #[]) (Record String)
 
 /-- `const Deno.pid: number`: `readonly attribute double pid` (Deno 2.9.6 type declarations) -/
 def pid : IO Float := Support.getGlobal ["Deno", "pid"] Float

@@ -34,7 +34,7 @@ structure WebSocketUpgrade where
 instance : FromJS WebSocketUpgrade where
   fromJS d := do return {
     response := ← Lasm.JS.readField Response d "response",
-    socket := ← Lasm.JS.readField Data d "socket" }
+    socket := ← Lasm.JS.readField Value d "socket" }
   typeName := "Lasm.JS.Deno.WebSocketUpgrade"
 
 /-- `Deno.upgradeWebSocket(request: Request, options?: UpgradeWebSocketOptions): WebSocketUpgrade`: `WebSocketUpgrade upgradeWebSocket(Request request, optional UpgradeWebSocketOptions options)` (Deno 2.9.6 type declarations) -/
