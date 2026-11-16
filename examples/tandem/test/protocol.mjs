@@ -2,20 +2,27 @@
 // invalid and oversized messages, chunked replies, WebSocket pushes,
 // long-poll, concurrent writers, and persistence across a SIGKILL.
 //
-//   node test/protocol.mjs [--url URL | --command CMD | --platform P] [--name NAME]
+//   node test/protocol.mjs [--url URL | --command CMD | --platform P] [--name NAME] [--equivalence]
+//
+// --equivalence records the HTTP traffic (test-results/traffic-protocol-NAME.json)
+// for test/equivalence.mjs. Tests marked unrecorded are not: the concurrent
+// writers and the long-poll (their order and timing are the scheduler's and
+// the platform's), and those only some targets run (WebSocket, SIGKILL).
 import assert from 'node:assert/strict';
-import { args, parseReply, startTandem, sync } from './server.mjs';
+import { recordFetch, saveTraffic } from '../../../scripts/equivalence/traffic.mjs';
+import { args, parseReply, root, startTandem, sync } from './server.mjs';
 
 const a = args();
 const server = await startTandem(a);
 const base = server.base;
+const recorder = a.equivalence ? recordFetch(base) : undefined;
 const results = [];
 let doc = 0;
 const fresh = () => `p${Date.now() % 100000}-${doc++}`;
 
-async function test(name, fn) {
+async function test(name, fn, { unrecorded = false } = {}) {
   const started = Date.now();
-  try { await fn(); results.push([name, 'ok']); console.log(`ok   ${name} (${Date.now() - started} ms)`); }
+  try { await (unrecorded && recorder ? recorder.unrecorded(fn) : fn()); results.push([name, 'ok']); console.log(`ok   ${name} (${Date.now() - started} ms)`); }
   catch (e) { results.push([name, 'FAIL']); console.log(`FAIL ${name}: ${e.stack ?? e}`); }
 }
 const text = async d => (await fetch(`${base}/doc/${d}/text`)).text();
@@ -120,7 +127,7 @@ await test('concurrent writers: every acknowledged operation stored exactly once
   assert.equal(all.to, total);
   assert.equal(new Set(all.ops).size, total);
   for (const w of writers) for (const op of w) assert.ok(all.ops.includes(op));
-});
+}, { unrecorded: true });
 
 await test('long-poll answers when the log grows, and after the timeout when it does not', async () => {
   const d = fresh();
@@ -134,7 +141,7 @@ await test('long-poll answers when the log grows, and after the timeout when it 
   await sync(base, d, 1, [ins(2, 8, [1, 8], 'b')]);
   const got = parseReply(await waiting);
   assert.deepEqual([got.from, got.to, got.ops.length], [1, 2, 1]);
-});
+}, { unrecorded: true });
 
 if (supportsWs) await test('WebSocket: a sync is answered, and other connections get the new operations', async () => {
   const d = fresh();
@@ -155,7 +162,7 @@ if (supportsWs) await test('WebSocket: a sync is answered, and other connections
   assert.ok(parseReply(B.inbox[1]).error);
   A.ws.close(); B.ws.close();
   assert.equal(await text(d), 'hi');
-});
+}, { unrecorded: true });
 
 if (server.kill) await test('acknowledged operations survive a SIGKILL of the server', async () => {
   const d = fresh();
@@ -164,8 +171,9 @@ if (server.kill) await test('acknowledged operations survive a SIGKILL of the se
   await server.kill();
   await server.restart();
   assert.equal(await text(d), 'durable');
-});
+}, { unrecorded: true });
 
+if (recorder) { recorder.stop(); saveTraffic(root, `protocol-${a.name ?? 'node'}`, recorder.exchanges, { base }); }
 await server.stop();
 const failed = results.filter(([, s]) => s !== 'ok');
 console.log(`\n${results.length - failed.length}/${results.length} protocol tests passed${a.name ? ` (${a.name})` : ''}`);

@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { writeEdgeOutput, edgeTargets, edgeHostFiles, edgeModules, supabaseImportMap, workersConfig, workersEntry, edgeTargetSuspend, edgeProgramKey,
+import { writeEdgeOutput, edgeTargets, edgeHostFiles, edgeModules, supabaseFunctionName, supabaseImportMap, workersConfig, workersEntry, edgeTargetSuspend, edgeProgramKey,
   workersCompatibilityDate } from '../src/edge/edge-build.mjs';
 import { edgeLinkSettings } from '../src/edge/edge-link.mjs';
 import { applicationNotices, leanRuntimeChanges, noticesSectionName } from '../src/notices.mjs';
@@ -257,4 +257,19 @@ test('edge output: Vercel routes, a hand-written entry that only ends like a gen
     assert.throws(() => writeEdgeOutput({ ...f.options, source: join(f.root, 'elsewhere.lean'), target: 'bun', output: f.project }), /must not contain the Lean sources/);
   } finally { rmSync(f.root, { recursive: true, force: true }); }
   assert.match(workersCompatibilityDate, /^\d{4}-\d{2}-\d{2}$/);
+});
+
+// Found by the project-files fuzz target (test/fuzz/targets/project-files.mjs).
+test('a package.json that is not a JSON object is refused with a message naming it', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-edge-package-'));
+  try {
+    for (const text of ['null', '[]', '"app"', '{"name": "app"']) {
+      writeFileSync(join(root, 'package.json'), text);
+      for (const read of [() => edgeModules(root, []), () => supabaseFunctionName(root)])
+        assert.throws(read, error => error.constructor === Error && error.message.includes(join(root, 'package.json')), text);
+    }
+    writeFileSync(join(root, 'package.json'), '{"name": 5, "lasm": null}');
+    assert.deepEqual(edgeModules(root, []), []);
+    assert.equal(supabaseFunctionName(root), 'lasm-5');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

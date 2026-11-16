@@ -170,6 +170,17 @@
       ]
     },
     {
+      "slug": "release-0-8-0",
+      "title": "Lasm 0.8.0",
+      "description": "A minor release: the fetch template moves off Lasm.Fetch except on Node, and Fastly, WASI and wasi-http programs use far less memory.",
+      "date": "2026-11-14",
+      "kind": "release",
+      "path": "docs/release/0.8.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.8.0"
+      ]
+    },
+    {
       "slug": "release-0-7-0",
       "title": "Lasm 0.7.0",
       "description": "A minor release with breaking changes.",

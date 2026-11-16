@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseWasmObject, archiveMembers } from '../src/wasm-objects.mjs';
+import { forAll } from './helpers/property.mjs';
 import { cInitTargets, coreInitTargets, hasExternalEffect, initializerClosure, initializerUnits, initializerWrappers,
   isForeignFunction, readLiveSymbols, unitsReaching } from '../src/application-initialization.mjs';
 
@@ -113,4 +114,27 @@ test('live symbols from a wasm-ld map, including Emscripten data segments', asyn
     assert.deepEqual([...live.code], ['initialize_A']);
     assert.deepEqual([...live.data].sort(), ['__em_lib_deps_x', 'l_a', 'l_c']);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+// Proposition: Lasm.Cli.Spec.closure_reached
+//   ∀ (units : List (String × List String)) (roots : List String),
+//     (initializerClosureOf units roots).Nodup ∧
+//     ∀ x, x ∈ initializerClosureOf units roots ↔ ∃ r ∈ roots, InitReaches units r x
+test('the initializer closure lists each unit the roots reach once, and nothing else', () => {
+  forAll(r => {
+    const names = Array.from({ length: r.int(1, 8) }, (_, i) => `initialize_U${i}`);
+    const units = new Map(names.filter(() => r.next() < 0.85).map(name => [name, { name, calls: r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Outside' : r.pick(names)) }]));
+    return { units, roots: r.array(r.int(0, 4), () => r.pick([...names, 'initialize_Missing'])) };
+  }, ({ units, roots }) => {
+    const closure = initializerClosure(units, roots);
+    assert.equal(new Set(closure).size, closure.length);
+    const reached = new Set(), pending = roots.filter(root => units.has(root));
+    while (pending.length) {
+      const name = pending.pop();
+      if (reached.has(name)) continue;
+      reached.add(name);
+      for (const call of units.get(name).calls) if (units.has(call)) pending.push(call);
+    }
+    assert.deepEqual(new Set(closure), reached);
+  }, { runs: 1000 });
 });

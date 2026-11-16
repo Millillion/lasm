@@ -39,9 +39,9 @@ this review.
   100.8 MiB, with no OOM, throttling or resource abort. No complete toolchain
   downloads, Lean builds or new cloud campaigns were needed.
 
-The [recorded evidence](evidence/toolchain-robustness-2026-09-28.json) contains
+The [recorded evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/toolchain-robustness-2026-09-28.json) contains
 errors, successful retries, resource results and source hashes. The
-[characterization program](evidence/toolchain-robustness-probes-2026-09-28.mjs)
+[characterization program](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/toolchain-robustness-probes-2026-09-28.mjs)
 is preserved for reproduction. New fault probes ran only on Linux; Windows
 locking/antivirus behavior and macOS-specific interruptions remain unmeasured.
 

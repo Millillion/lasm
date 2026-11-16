@@ -32,13 +32,20 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.JsFraming
 import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
+import Lasm.Cli.Model.Mangle
+import Lasm.Cli.Model.StaticServer
+import Lasm.Cli.Model.Reachability
+import Lasm.Cli.Model.Initialization
+import Lasm.Cli.Model.FileMessage
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
+import Lasm.Cli.Model.Python
 import Lasm.Cli.Model.WasiComponent
 import Lasm.Cli.Model.Zip
 
@@ -200,6 +207,33 @@ def unquote (line : String) : Option String :=
   | '"' :: r => if r.getLast? = some '"' then some (String.ofList (unescape r.dropLast)) else none
   | _ => none
 
+/-- `insideDirectory(directory, file, path.posix)` (src/platform.mjs; modelled
+in Model/Platform.lean), with `process.cwd()` the absolute `cwd`. -/
+def insideDirectory (cwd directory file : String) : Bool :=
+  insideDirectoryModel cwd.toList directory.toList file.toList
+
+/-- The segments of `path.posix.resolve(p)` from `cwd`. -/
+def resolvedSegments (cwd p : String) : List (List Char) := resolveSegments cwd.toList p.toList
+
+/-- `initializerClosure(units, roots)` (src/application-initialization.mjs;
+modelled in Model/Initialization.lean), `units` the Map's entries (each
+unit's `calls`). -/
+def initializerClosureOf (units : List (String × List String)) (roots : List String) : List String :=
+  Initialization.initializerClosure units roots
+
+/-- `x` is reached from `root` by initializer calls through units of the
+map: `root` is a unit, and each step calls a unit. -/
+inductive InitReaches (units : List (String × List String)) (root : String) : String → Prop
+  | base : Initialization.hasUnit units root = true → InitReaches units root root
+  | step {y z : String} : InitReaches units root y → z ∈ Initialization.callsOf units y →
+      Initialization.hasUnit units z = true → InitReaches units root z
+
+/-- `applicationLinkRequirements(map, { initializationFreeCppSymbols })`
+(src/application-reachability.mjs; modelled in Model/Reachability.lean):
+what the linker map of the reachability link requires, or the message thrown. -/
+def linkRequirements (initFree : String → Bool) (map : String) : Except String Reachability.Requirements :=
+  Reachability.applicationLinkRequirements (fun s => initFree (String.ofList s)) map.toList
+
 /-! ## The process launcher (src/process-launcher.mjs) -/
 
 -- `encodeProcessConfiguration(options)` (src/process-launcher.mjs) and the
@@ -208,18 +242,13 @@ def unquote (line : String) : Option String :=
 
 /-! ## Builds: names, initializers, builtin modules -/
 
-/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean's C name of a
-dotted name. -/
-opaque mangleName : String → String
+/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean 4.35's C name
+(`Name.mangle n ""`) of a dotted name; modelled in Model/Mangle.lean. -/
+def mangleName (name : String) : String := Mangle.mangleNameModel name
 /-- `demangleName(text)`. -/
-opaque demangleName : String → String
+def demangleName (text : String) : String := Mangle.demangleNameModel text
 /-- `initializerModule(symbol)`: the module a C initializer initializes. -/
-opaque initializerModule : String → Option String
-
-/-- A dotted name whose components each start with an ASCII letter and do not
-end with `_`, where Lean's mangling is unambiguous. -/
-def wellFormedName (n : String) : Bool :=
-  (n.splitOn ".").all fun c => (c.toList.head?.map Char.isAlpha).getD false && !c.endsWith "_"
+def initializerModule (symbol : String) : Option String := Mangle.initializerModuleModel symbol
 
 -- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
 -- `imports` the builtin specifiers (`lasm:…`) each builtin's file imports:
@@ -262,21 +291,39 @@ def initializerName (n : String) : Bool :=
 
 /-! ## `lasm init` names (src/init.mjs) -/
 
-/-- `packageName(directory)`. -/
-opaque packageName : String → String
-/-- `lakeName(name)`. -/
-opaque lakeName : String → String
-/-- `supabaseFunctionNameOf(packageName)`. -/
-opaque supabaseFunctionNameOf : String → String
+/-- Not Lasm's JavaScript: Node's `path.basename(path.resolve(directory))`,
+then JavaScript's `toLowerCase()`. -/
+opaque lowerBasename : String → String
+/-- Not Lasm's JavaScript: `String(value).toLowerCase()` (Unicode's mapping). -/
+opaque jsToLowerCase : String → String
+/-- `packageName(directory)`: modelled in Model/Init.lean. -/
+def packageName (directory : String) : String := packageNameOf (lowerBasename directory)
+/-- `lakeName(name)`: modelled in Model/Init.lean. -/
+def lakeName (name : String) : String := lakeNameOf name
+/-- `supabaseFunctionNameOf(packageName)`: modelled in Model/Init.lean. -/
+def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLowerCase name)
 
 /-! ## Development server (src/dev.mjs, src/browser/static-server.mjs) -/
 
 -- `changedFiles(before, after)` (src/dev.mjs): modelled in Model/Dev.lean.
 
-/-- The static server (`startStaticServer(root)` without a fallback page)
-answering a GET of a request path: the status, and the file (an absolute
-path) whose bytes are the body, if any. -/
-opaque staticServe : String → String → Nat × Option String
+/-- The static server answering a GET (`resolveStaticPath(root, pathname, {
+fallback, accepts, fileExists })`, src/browser/static-server.mjs; modelled
+in Model/StaticServer.lean): the status, and the file whose bytes are the
+body, if any. `fileExists` is the file system (an existing regular file). -/
+def staticServe (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String) :
+    Nat × Option String :=
+  let r := StaticServer.resolveStaticPath (fun f => fileExists (String.ofList f)) root.toList pathname.toList
+    accepts.toList (fallback.map String.toList)
+  (r.status, r.served.map String.ofList)
+
+/-- One segment of a path: not empty, `.` or `..`, and without `/`. -/
+def pathSegment (l : List Char) : Prop := l ≠ [] ∧ l ≠ ['.'] ∧ l ≠ ['.', '.'] ∧ '/' ∉ l
+
+/-- An absolute path as `path.resolve` gives one, other than `/`:
+`/` and segments joined by `/`. -/
+def resolvedDirectory (root : String) : Prop :=
+  ∃ segs : List (List Char), segs ≠ [] ∧ (∀ s ∈ segs, pathSegment s) ∧ root.toList = '/' :: ['/'].intercalate segs
 
 /-! ## The Node host (src/lean-io-errors.mjs, src/node-host.mjs) -/
 
@@ -307,14 +354,12 @@ def backoff (attempt : Nat) : Nat := min 60000 (2000 * 2 ^ (attempt - 1))
 
 /-! ## The link driver's Python semantics (src/link-driver/python.mjs) -/
 
-/-- `pythonJsonString(value)`: `json.dumps` of a string, `ensure_ascii`. -/
-opaque pythonJsonString : String → String
+-- `pythonJsonString(value)` and `comparePythonStrings(a, b)`: modelled in
+-- Model/Python.lean.
 
 /-- `pythonJsonDumps(value, { indent, sortKeys })`, or the message it throws. -/
 opaque pythonJsonDumps : Lean.Json → Option Nat → Bool → Except String String
 
-/-- `comparePythonStrings(a, b)`: negative, zero or positive. -/
-opaque comparePythonStrings : String → String → Int
 
 /-! ## WebAssembly (src/wasi/lower-atomics.mjs, src/wasi/wasi-component.mjs) -/
 
@@ -491,6 +536,170 @@ def parents (path : String) : List String :=
 JavaScript sorts strings (by UTF-16 code units). -/
 def directoriesOf (entries : List ZipEntry) : List String :=
   (entries.flatMap fun e => parents e.name).eraseDups.mergeSort fun a b => !(decide (utf16 b < utf16 a))
+
+/-! ## `lasm dev`'s proxy (src/dev-proxy.mjs) -/
+
+/-- An HTTP request: method, target, headers (names in lowercase), body. -/
+structure HttpRequest where
+  method : String
+  target : String
+  headers : List (String × String)
+  body : ByteArray
+  deriving Inhabited
+
+/-- An HTTP reply: status, headers (names in lowercase), body. -/
+structure HttpReply where
+  status : Nat
+  headers : List (String × String)
+  body : ByteArray
+  deriving Inhabited
+
+/-- A request's header, by its lowercase name. -/
+def HttpRequest.header? (r : HttpRequest) (name : String) : Option String := r.headers.lookup name
+
+/-- A reply's header, by its lowercase name. -/
+def HttpReply.header? (r : HttpReply) (name : String) : Option String := r.headers.lookup name
+
+/-- What the server program does with a request the proxy forwards: answers
+with a whole reply, stops before the reply's body ends (as when it is
+killed for a rebuild), or answers with a malformed head. -/
+inductive Upstream where
+  | answers (reply : HttpReply)
+  | cut
+  | malformed
+
+/-- What the client gets: a whole reply, or a connection that ended early. -/
+inductive ClientResult where
+  | reply (r : HttpReply)
+  | cut
+  deriving Inhabited
+
+/-- `startDevProxy({ upstreamPort })` serving one request whose server
+program does `u`: the requests the program receives, and the client's
+result. -/
+opaque devProxy : HttpRequest → Upstream → List HttpRequest × ClientResult
+
+/-- The Host header the proxy sends: `127.0.0.1:` and the program's port. -/
+opaque devUpstreamHost : String
+
+/-- The live-reload client the proxy injects into pages (`reloadClient`). -/
+opaque reloadClient : ByteArray
+
+/-- Headers about a connection rather than a request, which the client and
+the proxy each set for their own connection (and `content-encoding`, which
+a rewritten page drops). -/
+def connectionHeaders : List String :=
+  ["host", "connection", "keep-alive", "transfer-encoding", "content-length", "te", "trailer", "upgrade",
+    "expect", "proxy-connection", "proxy-authorization", "http2-settings", "content-encoding"]
+
+/-- Headers the tests write: distinct lowercase names, none a connection's. -/
+def PlainHeaders (hs : List (String × String)) : Prop :=
+  (hs.map (·.1)).Nodup ∧ ∀ h ∈ hs, h.1 = h.1.toLower ∧ h.1 ∉ connectionHeaders
+
+/-- Whether the proxy rewrites a reply: `text/html…`, to anything but HEAD. -/
+def isPage (r : HttpRequest) (a : HttpReply) : Bool :=
+  ((a.header? "content-type").getD "").startsWith "text/html" && r.method != "HEAD"
+
+/-- `body` with the reload client and a line feed inserted before the first
+`</body>`, or the reload client appended when there is none. -/
+def withReload (body : ByteArray) : ByteArray :=
+  let b := body.toList
+  let tag := "</body>".toUTF8.toList
+  match (List.range (b.length + 1)).find? fun i => (b.drop i).take tag.length == tag with
+  | some i => ⟨(b.take i ++ reloadClient.toList ++ [10] ++ b.drop i).toArray⟩
+  | none => ⟨(b ++ reloadClient.toList).toArray⟩
+
+/-- The body the client gets for `a`: none to HEAD or for 204 and 304, a
+page's with the reload client, any other byte for byte. -/
+def relayedBody (r : HttpRequest) (a : HttpReply) : ByteArray :=
+  if r.method = "HEAD" ∨ a.status = 204 ∨ a.status = 304 then .empty
+  else if isPage r a then withReload a.body else a.body
+
+/-! ## Project files -/
+
+/-- An import of a Lean header: its module's name, component by component,
+and its `all`, exported and `meta` flags. -/
+structure HeaderImport where
+  module : List String
+  all : Bool
+  exported : Bool
+  isMeta : Bool
+
+/-- Not Lasm's JavaScript: Lean's own header parser (`Lean.Elab.parseImports`
+of Lean 4.35.0): the imports it reads, without the implicit `Init`, or
+`none` when it reports an error. -/
+opaque leanImports : String → Option (List HeaderImport)
+
+/-- `leanHeader(text)` (src/application-sources.mjs). -/
+opaque leanHeader : String → String
+
+/-- `importClosure(project, Main.lean)` (src/dev-proxy.mjs) in a project whose
+`Main.lean` holds `text`, with an empty file for each of `modules`: the
+files it reaches, relative to the project. -/
+opaque importClosureOf : String → List (List String) → List String
+
+/-- A module's file in a project: its components joined by `/`, and `.lean`. -/
+def moduleFile (m : List String) : String := "/".intercalate m ++ ".lean"
+
+/-- A name a file or directory can have on every OS Lasm runs on. -/
+def FileComponent (c : String) : Prop :=
+  c ≠ "" ∧ c ≠ "." ∧ c ≠ ".." ∧ c = c.trimAscii.toString ∧ c.utf8ByteSize < 100 ∧
+    ∀ ch ∈ c.toList, ch.toNat ≥ 32 ∧ ch ∉ ['/', '\\', '<', '>', ':', '"', '|', '?', '*']
+
+/-- No carriage return but before a line feed. -/
+def NoBareCR (text : String) : Prop :=
+  ∀ i, text.toList[i]? = some '\r' → text.toList[i + 1]? = some '\n'
+
+/-- `lakeConfigurationKey(project, undefined, lean)` (src/application-sources.mjs)
+in a project whose lake-manifest.json holds `manifest` and lakefile.lean
+`lakefile`: the key (`none`: no reuse), or the message of what it throws. -/
+opaque lakeConfigurationKeyOf : String → String → Except String (Option String)
+
+/-- `edgeModules(project, [])` (src/edge/edge-build.mjs) in a project whose
+package.json holds the text: the modules, or the message of what it throws. -/
+opaque edgeModulesOf : String → Except String (List String)
+
+/-- `supabaseFunctionName(project)` (src/edge/edge-build.mjs), likewise. -/
+opaque supabaseFunctionNameIn : String → Except String String
+
+/-- `fastlyName(project)` (src/wasi/wasi-build.mjs), likewise. -/
+opaque fastlyNameIn : String → Except String String
+
+/-- `s` occurs in `e`. -/
+def Mentions (e s : String) : Prop := ∃ a b, e = a ++ s ++ b
+
+/-! ## The edge entries' request mapping (src/edge/edge-build.mjs) -/
+
+/-- Not Lasm's JavaScript: the WHATWG URL parser (`new URL`): an absolute
+URL's origin, path, and query and fragment together, or `none` when it is
+not one. -/
+opaque urlParts : String → Option (String × String × String)
+
+/-- `route` of the Supabase entry (`supabaseEntry(modules, name)`) on a
+request whose target is its absolute URL. -/
+opaque supabaseRoute : String → HttpRequest → HttpRequest
+
+/-- `identity` of the Vercel Edge entry (`vercelEdgeEntry(modules)`). -/
+opaque vercelIdentity : HttpRequest → HttpRequest
+
+/-! ## The glue program's host (src/glue/glue.mjs) -/
+
+/-- `encodeFields(fields)`: the request the glue program reads, as text
+(each field as its UTF-8 length in decimal, `:`, and the field). -/
+opaque encodeFields : List String → String
+
+/-- `decodeFields(text)`: the fields of a result the glue program wrote, or
+the message it throws on a malformed one. -/
+opaque decodeFields : String → Except String (List String)
+
+/-- `encodeRequest(lists)`: the request the glue program reads, from lists of
+fields (a table of the distinct fields and their indices, or `encodeFields`
+of them all when a field holds a 0 byte). -/
+opaque encodeRequest : List (List String) → ByteArray
+
+/-- The fields a request carries, read as the glue program reads either of
+its formats (the empty request carries none). -/
+opaque requestFields : ByteArray → List String
 
 /-! ## Node.serve (src/lasm-modules/node-serve.mjs) -/
 

@@ -44,6 +44,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           FORCE: ${{ inputs.force == true || github.ref != 'refs/heads/main' }}
+        shell: bash
         run: |
           # The newest passing run that ran: a scheduled run on a Sunday in New York
           # passed without testing anything (sunday-guard.yml).
@@ -147,12 +148,13 @@ jobs:
           RESULTS: ${{ toJSON(needs) }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ON_MAIN: ${{ github.ref == 'refs/heads/main' }}
+        shell: bash
         run: |
           failed=$(node -e "const n=JSON.parse(process.env.RESULTS);console.log(Object.entries(n).filter(([k,v])=>k!=='gate'&&v.result!=='success').map(([k,v])=>k+' ('+v.result+')').join(', '))")
           { echo '### Nightly tier'; echo; echo "${failed:-all passed} at $GITHUB_SHA"; } >> "$GITHUB_STEP_SUMMARY"
           [ "$ON_MAIN" = true ] || { [ -z "$failed" ]; exit; }
           title='Nightly tier failures on main'
-          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" | sed -n 1p)
           if [ -n "$failed" ]; then
             body="The nightly tier ($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/main/docs/CI.md) failed on $GITHUB_SHA: $failed. Run: $RUN_URL"
             if [ -n "$issue" ]; then gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" --body "$body"; else gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"; fi

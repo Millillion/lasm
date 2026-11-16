@@ -11,7 +11,7 @@ import { hashFile, managedCacheDirectory, sessionTrusted, verificationRecords } 
 import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject, assertDefinesMain } from './application-sources.mjs';
-import { importsLibrary, librarySources } from './lasm-library.mjs';
+import { glueHeaders, importsLibrary, librarySources } from './lasm-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
 import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
@@ -156,7 +156,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     ...(nativeCompilations.length ? { nativeObjects: nativeCompilations.map(item => ({ object: item.object, identity: item.identity,
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
     ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
-    ...(usesJs ? { lasmJs: true } : {}),
+    ...(usesJs ? { lasmJs: true, lasmJsHeaders: await Promise.all(glueHeaders.map(hashFile)) } : {}),
     ...(nodeModules ? { nodeModules: { identity: nodeModules.identity, packages: nodeModules.packages } } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);

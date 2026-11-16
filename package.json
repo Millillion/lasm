@@ -1,6 +1,6 @@
 {
   "name": "@lasm/compiler",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -41,7 +41,6 @@
     "webidl2": "24.5.0"
   },
   "dependencies": {
-    "koffi": "3.3.0",
-    "tar": "7.5.22"
+    "koffi": "3.3.0"
   }
 }
