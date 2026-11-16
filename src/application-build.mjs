@@ -12,7 +12,7 @@ import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject, assertDefinesMain } from './application-sources.mjs';
 import { glueHeaders, importsLibrary, librarySources, libraryModules } from './lasm-library.mjs';
-import { programLibraryImports } from './lazy-library.mjs';
+import { ensureProgramLibrary } from './lazy-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
 import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
@@ -97,9 +97,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
   // Lasm's library modules compiled on first import (src/lazy-library.mjs): those this program's files import.
-  const ensureLibrary = async prefix => (await import('./lazy-library.mjs')).ensureLazyModules(prefix, programLibraryImports(directory), {
-    eager: libraryModules, log: message => (progress ? progress({ stage: message.replace(/^\[lasm\] /, '') }) : log(message)),
-    lock: (path, action) => withApplicationLock(path, action, { onWait: () => progress?.({ stage: 'Waiting for another build compiling Lasm library modules' }) }) });
+  const ensureLibrary = prefix => ensureProgramLibrary(prefix, directory, { eager: libraryModules, log, progress, lock: withApplicationLock });
   await ensureLibrary(lean.prefix);
   let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, afterImports });
   if (generated.needsCCompiler) {

@@ -118,10 +118,10 @@ export async function autoSetupEditor(source, { log = console.error, env = proce
 
 /** Compiles the lazily compiled Lasm library modules the project's files import, so the editor resolves them. */
 async function compileProjectLibrary(project, lean, log = console.error) {
-  const { ensureLazyModules, programLibraryImports } = await import('./lazy-library.mjs');
+  const { ensureProgramLibrary } = await import('./lazy-library.mjs');
   const { libraryModules } = await import('./lasm-library.mjs');
   const { withApplicationLock } = await import('./application-lock.mjs');
-  await ensureLazyModules(lean.prefix, programLibraryImports(project), { eager: libraryModules, log, lock: (path, action) => withApplicationLock(path, action) });
+  await ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, log, lock: withApplicationLock });
 }
 
 /** `lasm editor [directory]`: set up (or refresh) the editor explicitly. */
