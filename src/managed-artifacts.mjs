@@ -210,6 +210,12 @@ async function lazyLibraryEntries(directory) {
   }
   return entries;
 }
+/** The bookkeeping files a lazy compile may leave in a prefix, named exactly (anything else unvouched fails the check):
+ * an interrupted compile's temporary outputs (`<output>.tmp-<pid>` beside a module's .olean, .c, source or stamp),
+ * and the empty lock file of Lasm versions that kept it in the prefix (`lib/lasm/lazy.lock`; now in `.locks/`). */
+const lazyBookkeeping = (name, entry) => entry.type === 'file' && (
+  (name === 'lib/lasm/lazy.lock' && entry.bytes === 0)
+  || /^(?:lib\/lean\/Lasm\/[^]*\.olean|lib\/lasm\/c\/Lasm\/[^]*\.c|src\/lean\/Lasm\/[^]*\.lean|lib\/lasm\/lazy\/[^/]+\.json)\.tmp-\d+$/.test(name));
 /** Directories lazily compiled library modules may add to a prefix. */
 const lazyDirectory = name => /^(lib\/lean\/Lasm|lib\/lasm\/c\/Lasm|src\/lean\/Lasm|lib\/lasm\/lazy)(\/|$)/.test(name) || ['lib/lasm', 'lib/lasm/c', 'src', 'src/lean'].includes(name);
 
@@ -328,7 +334,7 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
     for (const [name, entry] of Object.entries(await lazyLibraryEntries(directory)))
       if (!(name in receipt.files) && isDeepStrictEqual(observed[name], entry)) delete observed[name];
     for (const name of Object.keys(observed))
-      if (!(name in receipt.files) && (observed[name].type === 'directory' && lazyDirectory(name) || /\.tmp-\d+$/.test(name) && name.startsWith('lib/'))) delete observed[name];
+      if (!(name in receipt.files) && (observed[name].type === 'directory' && lazyDirectory(name) || lazyBookkeeping(name, observed[name]))) delete observed[name];
     if (!isDeepStrictEqual(observed, receipt.files)) {
       const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
         .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
