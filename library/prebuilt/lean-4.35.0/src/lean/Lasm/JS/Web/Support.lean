@@ -6,7 +6,7 @@ reading ArrayBuffers and iterables. Hand-written; the mapping is in
 docs/JS_BINDINGS.md ("Standard bindings").
 
 The helpers are in `Lasm.JS.Web.Internal`: internal to the generated bindings, with no stability promise
-(docs/API_DECISIONS.md 0.3-3); programs use Lasm.JS directly. `Record` is public.
+(docs/api/decisions/0.3.md 0.3-3); programs use Lasm.JS directly. `Record` is public.
 -/
 import Lasm.JS.Core
 
@@ -127,7 +127,7 @@ def recordOf (α : Type) [FromJS α] (v : Value) : IO (Record α) := do
 def cast (ctor : IO Value) (mk : Value → α) (v : Value) : IO (Option α) := do
   return if (← isInstance ctor v) then some (mk v) else none
 
-/-- A generated binding's call, named (docs/API_DECISIONS.md 0.3-12): an error names the binding, and
+/-- A generated binding's call, named (docs/api/decisions/0.3.md 0.3-12): an error names the binding, and
 `lasm build --target`'s availability check finds a program's web APIs by these names in its C. -/
 @[inline] def api [Monad m] [MonadExcept IO.Error m] (name : String) (act : m α) : m α :=
   tryCatch act fun e => throw (IO.userError s!"{name}: {e}")

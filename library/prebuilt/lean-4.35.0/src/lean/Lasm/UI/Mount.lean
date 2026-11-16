@@ -81,7 +81,7 @@ def onUnmount (f : IO Unit) : IO Unit := do Raw.onUnmount (← callback fun _ =>
 /-- An `AbortSignal` that aborts when the app is unmounted, as `α`: `signal Lasm.JS.Web.AbortSignal`
 (`import Lasm.JS.Web.Dom`), or a `Value`. Pass it where the platform takes one, and the platform
 removes what it registered: `addEventListener`'s `signal` option, `fetch`'s, and
-`signal.addEventListener "abort"` for a timer or a socket (docs/API_DECISIONS.md A14.1).
+`signal.addEventListener "abort"` for a timer or a socket (docs/api/decisions/0.3.md A14.1).
 It aborts before the `onUnmount` handlers run. Outside a mounted app it never aborts. -/
 def signal (α : Type := Value) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.signal" (.ref (← Raw.signal) "")
 
