@@ -1280,9 +1280,14 @@ end Surface
 const serveSurface = {};
 for (const m of plan.filter(m => m.host)) {
   const h = (serveSurface[m.host.name] ??= { global: m.host.global, functions: [], interfaces: {} });
-  for (const n of m.namespaces) h.functions.push(...new Set(def(n).members.map(x => x.name)));
-  for (const i of m.ifaces) h.interfaces[displayName(i)] = [...new Set(membersOf(i).filter(x => x.name && x.special !== 'static').map(x => x.name))];
-  (h.modules ??= {})[m.name] = { functions: [...new Set(m.namespaces.flatMap(n => def(n).members.map(x => x.name)))], interfaces: m.ifaces.map(displayName) };
+  // A global's members by their path below it (`dns.lookup` of Bun.dns); a runtime module's (`bun:sqlite`) are not the global's.
+  const globalMembers = n => extAttr(def(n), 'LasmModule') ? [] : def(n).members.map(x => {
+    const path = extValue(extAttr(def(n), 'LasmPath')) ?? '';
+    return [...path.split('.').slice(1), memberName(x)].join('.');
+  });
+  for (const n of m.namespaces) h.functions.push(...new Set(globalMembers(n)));
+  for (const i of m.ifaces) h.interfaces[displayName(i)] = [...new Set(membersOf(i).filter(x => x.name && x.special !== 'static').map(memberName))];
+  (h.modules ??= {})[m.name] = { functions: [...new Set(m.namespaces.flatMap(globalMembers))], interfaces: m.ifaces.map(displayName) };
 }
 // What a conformance program probes: js-serve the HTTP servers (Deno's Serve module, Bun's), js-deno all of Lasm.JS.Deno.
 const hostSurfaceOf = (host, modules) => {

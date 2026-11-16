@@ -1898,25 +1898,25 @@ dictionary Bun_ResourceUsageOps {
   required double out;
 };
 
-// object Bun.ResourceUsage
+// interface Bun.ResourceUsage
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="ResourceUsage", LasmPath="Bun.ResourceUsage"]
-dictionary Bun_ResourceUsage {
+interface Bun_ResourceUsage {
   // contextSwitches: { voluntary: number; involuntary: number; }
-  required Bun_ResourceUsageContextSwitches contextSwitches;
+  [LasmHost="Bun", LasmSignature="contextSwitches: { voluntary: number; involuntary: number; }"] readonly attribute Bun_ResourceUsageContextSwitches contextSwitches;
   // cpuTime: { user: bigint; system: bigint; total: bigint; }
-  required Bun_ResourceUsageCpuTime cpuTime;
+  [LasmHost="Bun", LasmSignature="cpuTime: { user: bigint; system: bigint; total: bigint; }"] readonly attribute Bun_ResourceUsageCpuTime cpuTime;
   // maxRSS: number
-  required double maxRSS;
+  [LasmHost="Bun", LasmSignature="maxRSS: number"] readonly attribute double maxRSS;
   // messages: { sent: number; received: number; }
-  required Bun_ResourceUsageMessages messages;
+  [LasmHost="Bun", LasmSignature="messages: { sent: number; received: number; }"] readonly attribute Bun_ResourceUsageMessages messages;
   // ops: { in: number; out: number; }
-  required Bun_ResourceUsageOps ops;
+  [LasmHost="Bun", LasmSignature="ops: { in: number; out: number; }"] readonly attribute Bun_ResourceUsageOps ops;
   // shmSize: number
-  required double shmSize;
+  [LasmHost="Bun", LasmSignature="shmSize: number"] readonly attribute double shmSize;
   // signalCount: number
-  required double signalCount;
+  [LasmHost="Bun", LasmSignature="signalCount: number"] readonly attribute double signalCount;
   // swapCount: number
-  required double swapCount;
+  [LasmHost="Bun", LasmSignature="swapCount: number"] readonly attribute double swapCount;
 };
 
 // interface Bun.Subprocess (Subprocess<"ignore", "pipe", "inherit">)

@@ -59,7 +59,8 @@ export const bun = {
   defaults: { 'Serve.Options.R': 'never', WebSocketData: 'undefined', Data: 'undefined', DataBinaryType: '"buffer"',
     'WebSocketHandler.T': 'undefined', 'Serve.Routes.R': 'never', 'Serve.RoutesWithUpgrade.R': 'never', 'Serve.Routes.WebSocketData': 'undefined', 'Serve.RoutesWithUpgrade.WebSocketData': 'undefined',
     'Subprocess.In': '"ignore"', 'Subprocess.Out': '"pipe"', 'Subprocess.Err': '"inherit"' },
-  as: {},
+  /** Declarations Bun hands over as class instances (getters), not plain objects: handles. */
+  as: { ResourceUsage: 'interface' },
   split: {},
   names: {
     'write(destination: BunFile, input: Response | Request, options?: {createPath?: boolean;})': 'writeResponse',

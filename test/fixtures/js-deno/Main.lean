@@ -48,6 +48,15 @@ def throws (act : Async α) : Async Bool := do
 
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
+
+/-- Whether `g` has the member at a dotted path (`dns.lookup`). -/
+def hasPath (g : Value) (path : String) : IO Bool := do
+  let parts := path.splitOn "."
+  let mut o := g
+  for p in parts.dropLast do
+    unless ← reflectHas o p do return false
+    o ← o.get p Value
+  reflectHas o (parts.getLastD "")
 /-- Waits `ms` milliseconds with `setTimeout` (holding no Lean thread). -/
 def sleep (ms : Nat) : Async Unit := do
   let p : IO.Promise Unit ← IO.Promise.new
@@ -553,7 +562,7 @@ def availability (r : Checks) (live : Live) : Async Unit := do
   let names (d : Data) : Array String := match d with | .array xs => xs.map str | _ => #[]
   let g ← (← Lasm.JS.global).get "Deno" Value
   for f in names (info.field "functions") do
-    expect r s!"available Deno.{f}" (← reflectHas g f) ""
+    expect r s!"available Deno.{f}" (← hasPath g f) ""
   let .object ifaces := info.field "interfaces" | throw (IO.userError "no interfaces")
   for (iface, members) in ifaces do
     match (← live.get).find? (·.1 == iface) with
