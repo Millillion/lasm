@@ -1,5 +1,3 @@
-# Unreleased
-
 ## Standard bindings
 
 - **`Lasm.JS.Node` covers `node:net`, `node:http` and `node:https`.**
@@ -9,7 +7,8 @@
   `http.get`, `http.Server`, `http.IncomingMessage`, `http.ServerResponse`,
   `http.ClientRequest`, `http.Agent`; and the `https` equivalents, generated
   from Node 24.22.2's documentation like the rest of `Lasm.JS.Node`
-  (docs/JS_BINDINGS.md, "Standard bindings for Node").
+  (docs/JS_BINDINGS.md, "Standard bindings for Node"; #220,
+  API decisions A18, 0.4-30 to 0.4-32).
 - **Documented events are typed listeners.** `server.onRequest`,
   `socket.onData`, `req.onceResponse`, `child.onceExit`, `stream.onEnd`, …
   take a listener made from a Lean function of the event's documented

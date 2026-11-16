@@ -527,7 +527,12 @@ and \`wasi:clocks/monotonic-clock\`, one module each, and its export
     let stream := (← body.write).toOption.get!
     discard <| stream.blockingWriteAndFlush "Hello from Lean!".toUTF8
     stream.drop
-    discard <| OutgoingBody.finish body none`), '', ...modules.map(m => `import ${m}`), ''].join('\n'));
+    discard <| OutgoingBody.finish body none
+
+The hand-written helpers (Lasm.WASI.Http.Respond) shorten that to
+\`respond out 200 #[] "Hello from Lean!".toUTF8\`.`), '', ...modules.map(m => `import ${m}`),
+  // Hand-written, not generated: whole-body reads and writes, and respond.
+  'import Lasm.WASI.Http.Respond', ''].join('\n'));
 
 // ---- The C glue ----
 const cParams = f => f.rparams.map((p, i) => rep(p.r) === 'obj' ? `b_lean_obj_arg a${i}` : `${scalarC[rep(p.r)]} a${i}`);
