@@ -19,6 +19,8 @@ lines for generated members a runtime lacks, and `summary <passed> <failed>`.
 import Lasm.JS
 import Lasm.JS.Web
 import Lasm.JS.Node
+import Lasm.JS.Node.Http
+import Lasm.JS.Node.Https
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 

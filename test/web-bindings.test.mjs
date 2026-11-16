@@ -82,11 +82,20 @@ test('Lasm.JS.Node names: a parent projection or instance never repeats an ances
 test('the generated modules are shipped library modules, in import order', () => {
   for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
-    for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
-    for (const m of generated) {
+    // Lasm.JS.Node ships a compiled core set; its other modules are compiled on first import (src/lazy-library.mjs).
+    const eager = tier === 'Node' ? generated.filter(m => libraryModules.includes(m)) : generated;
+    for (const m of [...eager, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
+    for (const m of eager) {
       const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
       for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm))
         assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+    }
+    if (tier === 'Node') {
+      const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+      assert.deepEqual(eager.filter(m => m !== 'Lasm.JS.Node.Support' && m !== 'Lasm.JS.Node.All').sort(),
+        modules.filter(m => m.core).map(m => `Lasm.JS.Node.${m.name}`).sort(), 'the compiled Node modules are node-modules.json\'s core');
+      for (const imported of readFileSync(`${root}library/Lasm/JS/Node.lean`, 'utf8').matchAll(/^import (Lasm\.\S+)$/gm))
+        assert.ok(libraryModules.includes(imported[1]), `Lasm.JS.Node imports ${imported[1]}, which is not compiled`);
     }
   }
 });

@@ -82,6 +82,13 @@ export const modules = [
   { name: 'StreamIter', doc: 'stream_iter', title: 'iterable streams' },
 ];
 
+/**
+ * The Lean modules that ship compiled in library/prebuilt (with the modules they import: node-modules.json `core`),
+ * what the templates, examples and fixtures use; `import Lasm.JS.Node` imports them. Every other module is compiled on
+ * first import (src/lazy-library.mjs; docs/api/decisions/0.4.md 0.4-39).
+ */
+export const core = ['Events', 'Stream', 'Buffer', 'Path', 'Os', 'Process', 'Fs', 'Crypto', 'ChildProcess'];
+
 /** The doc/api files read. */
 export const docs = modules.map(m => m.doc);
 

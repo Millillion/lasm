@@ -758,6 +758,7 @@ released**.
 
 ```lean
 import Lasm.JS.Node
+import Lasm.JS.Node.Zlib     -- outside the compiled core set: compiled on first import
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def run : Async Unit := do
@@ -791,6 +792,18 @@ typed listeners: `server.onRequest`, `socket.onData`, `child.onceExit`
 ### What is covered
 
 One Lean module per documentation file, each with everything that file documents.
+
+**Imports.** `import Lasm.JS.Node` is the core set, which ships compiled: `events`,
+`stream`, `buffer`, `path`, `os`, `process`, `fs`, `crypto`, `child_process`, and the
+modules they use (`async_hooks`, `net`, `readline`). Every other module is its own
+import (`import Lasm.JS.Node.Zlib`, `import Lasm.JS.Node.Http`), compiled into Lasm's
+tool cache the first time a program imports it ([lazy library](HOW_LASM_WORKS.md)), and
+`import Lasm.JS.Node.All` imports every module. Measured on 2026-11-16 (Linux x64, one
+core, `lean -c`), the first import costs 0.3 to 3.7 s per module: `Http2` and `Test`
+3.7 s, `Http` 3.0 s, `Tls` and `Sqlite` 1.4 s, the others 0.3 to 1.2 s; all 33 lazy
+modules together 32.5 s (28.3 MB of `.olean`, 10.3 MB of C). Later builds reuse the
+compiled modules. The compiled core set is 13 modules: 21.3 s, 23.9 MB of `.olean` and
+9.3 MB of C in `library/prebuilt`.
 [`node-modules.json`](../scripts/bindings/node-modules.json) lists them in import
 order and [`node-surface.json`](../scripts/bindings/node-surface.json) every
 generated class, namespace and member.
@@ -1000,9 +1013,11 @@ which gives the bytes written where the docs give the string.
 - **Build time: about 4 to 9 seconds more** for a new project with warm tools:
   Node 13.0 → 16.8 s and 18.2 → 24.6 s, the edge runtime 8.8 → 13.9 s and
   12.9 → 21.7 s (two CI runs).
-- **Package size:** the compiled library (`library/prebuilt`) grows from 61.0
-  to 70.8 MB (7.0 MB of `.olean` files), 2.2 MB compressed. Nothing is
-  compiled on the user's machine.
+- **Package size:** `library/prebuilt` holds only the core set (13 modules:
+  23.9 MB of `.olean` files and 9.3 MB of C, before compression); the other 33
+  modules ship as Lean source (about 1 MB) and are compiled on first import
+  (see [Imports](#what-is-covered-1)). All of Lasm.JS.Node compiled would be
+  52 MB of `.olean` and 20 MB of C (2026-11-16).
 
 ### Pinned version and drift
 

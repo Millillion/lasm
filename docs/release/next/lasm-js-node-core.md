@@ -6,7 +6,14 @@
   the callback and synchronous forms of `node:fs`, and Experimental, Deprecated
   and Legacy members (marked in their doc comments), plus what only Node 26
   documents (marked "Node.js 26 and later"). Example: `examples/node-core`.
+  **Imports:** `import Lasm.JS.Node` is the compiled core set (`fs`,
+  `path`, `os`, `process`, `buffer`, `crypto`, `child_process`, `events`,
+  `stream`, with `async_hooks`, `net` and `readline`). Every other module is its
+  own import (`import Lasm.JS.Node.Http`, `import Lasm.JS.Node.Zlib`), compiled
+  on first use, and `import Lasm.JS.Node.All` imports them all.
   **Migration:**
+  - Programs that use `node:http` or `node:https` through `import Lasm.JS.Node`
+    add `import Lasm.JS.Node.Http` (or `.Https`).
   - `crypto.randomUUID` (and `getRandomValues`, `subtle`) moved to
     `Lasm.JS.Web`: `(← Lasm.JS.Web.crypto).randomUUID`.
   - `Buffer.from s (some "hex")` is `Buffer.fromWithString s (some "hex")`
