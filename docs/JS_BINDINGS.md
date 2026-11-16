@@ -715,7 +715,16 @@ browser tier's imports add about 7 seconds (browser 11.9 → 18.2 → 25.1 s, ed
 the modules it uses pays less. The compiled library grows by 20.1 MB (see
 [Cost](#cost)).
 
-**Where each member exists (measured).** The platform suite's availability
+**Shipped members only.** Since milestone 0.3 (decision 0.3-2), a member of
+these interfaces is generated only when Chromium 153, Firefox 155 and Safari 26.6
+all ship it according to the pinned `@mdn/browser-compat-data`, as for
+[the rest of the browser platform](#the-rest-of-the-browser-platform-lasmjswebplatform).
+The members the paragraph below lists as missing are gone. A member whose type
+is an interface of the rest of the platform keeps that type as `Data` or
+`Value` here (`Document.createRange : IO Data`), so this tier never depends on
+it; the rest of the platform gives the typed form (`Range.new`).
+
+**Where each member exists (measured, before 0.3).** The platform suite's availability
 probe looked up every generated member on 2026-11-10 (`browser.yml` run
 42847975929: Chromium 153, Firefox 155, WebKit 26.6 of Playwright 1.63.0). All
 interfaces and globals exist everywhere except `CSSStyleProperties` in Chromium
