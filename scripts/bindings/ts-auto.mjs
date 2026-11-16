@@ -596,7 +596,8 @@ export function lowerAuto(host, files) {
       const ov = host.overrides?.[key];
       if (ov) {
         used.add(`override:${key}`);
-        m = { ...m, params: m.params?.map(p => ov.params?.[p.name] ? { ...p, type: ov.params[p.name] } : p), type: ov.type ?? m.type, text: `${m.text} (read as ${ov.type ?? ''}${ov.params ? ` ${JSON.stringify(ov.params)}` : ''}: ${ov.reason})` };
+        // An overridden rest parameter (a conditional rest tuple) is one optional parameter.
+        m = { ...m, params: m.params?.map(p => ov.params?.[p.name] ? { ...p, type: ov.params[p.name], rest: false, optional: p.optional || p.rest } : p), type: ov.type ?? m.type, text: `${m.text} (read as ${ov.type ?? ''}${ov.params ? ` ${JSON.stringify(ov.params)}` : ''}: ${ov.reason})` };
       }
       const gk = `${m.static ? 'static ' : ''}${m.kind === 'ctor' ? 'constructor' : m.name}`;
       if (!groups.has(gk)) groups.set(gk, []);

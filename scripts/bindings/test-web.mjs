@@ -29,9 +29,9 @@ const { values } = parseArgs({ options: {
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
-if (!['js-web', 'js-node', 'js-serve', 'js-deno'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve or js-deno'); process.exit(2); }
+if (!['js-web', 'js-node', 'js-serve', 'js-deno', 'js-bun'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve, js-deno or js-bun'); process.exit(2); }
 const fixture = join(root, 'test', 'fixtures', values.fixture);
-const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno' }[values.fixture];
+const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno', 'js-bun': 'Lasm.JS.Bun' }[values.fixture];
 // Deno KV and Deno.cron are behind Deno's own flags on the Deno CLI (Deno Deploy enables them).
 const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron'] : [];
 const lasm = resolve(values.lasm), work = resolve(values.work);

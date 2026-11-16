@@ -57,6 +57,7 @@ export const bun = {
   },
   /** Generic parameters whose instantiation by a function differs from the declaration's default: the one the plain name stands for. */
   defaults: { 'Serve.Options.R': 'never', WebSocketData: 'undefined', Data: 'undefined', DataBinaryType: '"buffer"',
+    'WebSocketHandler.T': 'undefined', 'Serve.Routes.R': 'never', 'Serve.RoutesWithUpgrade.R': 'never', 'Serve.Routes.WebSocketData': 'undefined', 'Serve.RoutesWithUpgrade.WebSocketData': 'undefined',
     'Subprocess.In': '"ignore"', 'Subprocess.Out': '"pipe"', 'Subprocess.Err': '"inherit"' },
   as: {},
   split: {},

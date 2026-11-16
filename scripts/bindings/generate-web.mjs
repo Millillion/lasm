@@ -1300,7 +1300,8 @@ def json : String := r#"${JSON.stringify(json)}"#
 end Surface
 `;
 files.set(join(root, 'test', 'fixtures', 'js-deno', 'Surface.lean'), surfaceLean('all of Lasm.JS.Deno', { Deno: hostSurfaceOf("Deno") }));
-const serveProbe = { Deno: hostSurfaceOf("Deno", ["Serve"]), Bun: hostSurfaceOf("Bun") };
+files.set(join(root, 'test', 'fixtures', 'js-bun', 'Surface.lean'), surfaceLean('all of Lasm.JS.Bun', { Bun: hostSurfaceOf("Bun") }));
+const serveProbe = { Deno: hostSurfaceOf("Deno", ["Serve"]), Bun: hostSurfaceOf("Bun", ["Serve"]) };
 for (const h of Object.values(serveSurface)) delete h.modules;
 files.set(join(root, 'scripts', 'bindings', 'serve-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (${serveTier.hosts.map(h => `${h.name} ${h.version}`).join(', ')} declarations)`, surface: serveSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-serve', 'Surface.lean'), `/-

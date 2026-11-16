@@ -98,7 +98,9 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     assert.equal(s.global, h.global);
     if (h.auto) {
       // The whole namespace (ts-auto.mjs): the functions apps use, and no excluded member.
-      for (const f of ['serve', 'readFile', 'writeTextFile', 'listen', 'connect', 'upgradeWebSocket', 'openKv', 'env', 'args']) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
+      const expected = { Deno: ['serve', 'readFile', 'writeTextFile', 'listen', 'connect', 'upgradeWebSocket', 'openKv', 'env', 'args'],
+        Bun: ['serve', 'file', 'write', 'spawn', 'spawnSync', 'listen', 'connect', 'escapeHTML', 'env', 'password'] }[h.name];
+      for (const f of expected) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
       for (const k of Object.keys(h.exclude).filter(k => /^\w+\.\w+$/.test(k))) {
         const [owner, member] = k.split('.');
         assert.ok(!(s.interfaces[owner] ?? []).includes(member), `${h.global}.${k} is excluded but generated`);

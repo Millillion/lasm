@@ -2055,19 +2055,19 @@ callback Bun_ServeOptionsError = Promise<Response> (Bun_ErrorLike error);
 callback Bun_ServeOptionsFetch = Promise<Response> (Request req, Bun_Server server);
 
 // object Bun.Serve.Routes
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesUndefinedNever", LasmPath="Bun.Serve.Routes"]
-dictionary Bun_ServeRoutesUndefinedNever {
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutes", LasmPath="Bun.Serve.Routes"]
+dictionary Bun_ServeRoutes {
 
 };
 
 // object Bun.Serve.RoutesWithUpgrade
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesWithUpgradeUndefinedNever", LasmPath="Bun.Serve.RoutesWithUpgrade"]
-dictionary Bun_ServeRoutesWithUpgradeUndefinedNever {
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesWithUpgrade", LasmPath="Bun.Serve.RoutesWithUpgrade"]
+dictionary Bun_ServeRoutesWithUpgrade {
 
 };
 
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever"]
-typedef (Bun_ServeRoutesUndefinedNever or Bun_ServeRoutesWithUpgradeUndefinedNever) Bun_ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever;
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesOrServeRoutesWithUpgrade"]
+typedef (Bun_ServeRoutes or Bun_ServeRoutesWithUpgrade) Bun_ServeRoutesOrServeRoutesWithUpgrade;
 
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="Uint8ArrayOrBlob"]
 typedef (Uint8Array or Blob) Bun_Uint8ArrayOrBlob;
@@ -2131,32 +2131,32 @@ interface Bun_ServerWebSocket {
 };
 
 // (ws: ServerWebSocket<T>, message: string | Buffer<ArrayBuffer>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedMessage", LasmSignature="(ws: ServerWebSocket<T>, message: string | Buffer<ArrayBuffer>) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedMessage = Promise<undefined> (Bun_ServerWebSocket ws, Bun_DOMStringOrUint8Array message);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerMessage", LasmSignature="(ws: ServerWebSocket<T>, message: string | Buffer<ArrayBuffer>) => void | Promise<void>"]
+callback Bun_WebSocketHandlerMessage = Promise<undefined> (Bun_ServerWebSocket ws, Bun_DOMStringOrUint8Array message);
 
 // (ws: ServerWebSocket<T>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedOpen", LasmSignature="(ws: ServerWebSocket<T>) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedOpen = Promise<undefined> (Bun_ServerWebSocket ws);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerOpen", LasmSignature="(ws: ServerWebSocket<T>) => void | Promise<void>"]
+callback Bun_WebSocketHandlerOpen = Promise<undefined> (Bun_ServerWebSocket ws);
 
 // (ws: ServerWebSocket<T>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedDrain", LasmSignature="(ws: ServerWebSocket<T>) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedDrain = Promise<undefined> (Bun_ServerWebSocket ws);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerDrain", LasmSignature="(ws: ServerWebSocket<T>) => void | Promise<void>"]
+callback Bun_WebSocketHandlerDrain = Promise<undefined> (Bun_ServerWebSocket ws);
 
 // (ws: ServerWebSocket<T>, code: number, reason: string) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedClose", LasmSignature="(ws: ServerWebSocket<T>, code: number, reason: string) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedClose = Promise<undefined> (Bun_ServerWebSocket ws, double code, DOMString reason);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerClose", LasmSignature="(ws: ServerWebSocket<T>, code: number, reason: string) => void | Promise<void>"]
+callback Bun_WebSocketHandlerClose = Promise<undefined> (Bun_ServerWebSocket ws, double code, DOMString reason);
 
 // (ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedPing", LasmSignature="(ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedPing = Promise<undefined> (Bun_ServerWebSocket ws, Uint8Array data);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerPing", LasmSignature="(ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>"]
+callback Bun_WebSocketHandlerPing = Promise<undefined> (Bun_ServerWebSocket ws, Uint8Array data);
 
 // (ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedPong", LasmSignature="(ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedPong = Promise<undefined> (Bun_ServerWebSocket ws, Uint8Array data);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerPong", LasmSignature="(ws: ServerWebSocket<T>, data: Buffer) => void | Promise<void>"]
+callback Bun_WebSocketHandlerPong = Promise<undefined> (Bun_ServerWebSocket ws, Uint8Array data);
 
 // (error: Error, ws: ServerWebSocket<T>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedError", LasmSignature="(error: Error, ws: ServerWebSocket<T>) => void | Promise<void>"]
-callback Bun_WebSocketHandlerUndefinedError = Promise<undefined> (object error, Bun_ServerWebSocket ws);
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerError", LasmSignature="(error: Error, ws: ServerWebSocket<T>) => void | Promise<void>"]
+callback Bun_WebSocketHandlerError = Promise<undefined> (object error, Bun_ServerWebSocket ws);
 
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketCompressor"]
 enum Bun_WebSocketCompressor { "disable", "shared", "dedicated", "3KB", "4KB", "8KB", "16KB", "32KB", "64KB", "128KB", "256KB" };
@@ -2164,46 +2164,46 @@ enum Bun_WebSocketCompressor { "disable", "shared", "dedicated", "3KB", "4KB", "
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketCompressorOrBoolean"]
 typedef (Bun_WebSocketCompressor or boolean) Bun_WebSocketCompressorOrBoolean;
 
-// object Bun.WebSocketHandlerUndefinedPerMessageDeflateObject
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedPerMessageDeflateObject", LasmPath="Bun.WebSocketHandlerUndefinedPerMessageDeflateObject"]
-dictionary Bun_WebSocketHandlerUndefinedPerMessageDeflateObject {
+// object Bun.WebSocketHandlerPerMessageDeflateObject
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerPerMessageDeflateObject", LasmPath="Bun.WebSocketHandlerPerMessageDeflateObject"]
+dictionary Bun_WebSocketHandlerPerMessageDeflateObject {
   // compress?: WebSocketCompressor | boolean
   Bun_WebSocketCompressorOrBoolean compress;
   // decompress?: WebSocketCompressor | boolean
   Bun_WebSocketCompressorOrBoolean decompress;
 };
 
-// object Bun.WebSocketHandlerUndefinedPerMessageDeflate
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerUndefinedPerMessageDeflate", LasmPath="Bun.WebSocketHandlerUndefinedPerMessageDeflate"]
-dictionary Bun_WebSocketHandlerUndefinedPerMessageDeflate {
+// object Bun.WebSocketHandlerPerMessageDeflate
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="WebSocketHandlerPerMessageDeflate", LasmPath="Bun.WebSocketHandlerPerMessageDeflate"]
+dictionary Bun_WebSocketHandlerPerMessageDeflate {
   // compress?: WebSocketCompressor | boolean
   Bun_WebSocketCompressorOrBoolean compress;
   // decompress?: WebSocketCompressor | boolean
   Bun_WebSocketCompressorOrBoolean decompress;
 };
 
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="BooleanOrWebSocketHandlerUndefinedPerMessageDeflate"]
-typedef (boolean or Bun_WebSocketHandlerUndefinedPerMessageDeflate) Bun_BooleanOrWebSocketHandlerUndefinedPerMessageDeflate;
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="BooleanOrWebSocketHandlerPerMessageDeflate"]
+typedef (boolean or Bun_WebSocketHandlerPerMessageDeflate) Bun_BooleanOrWebSocketHandlerPerMessageDeflate;
 
 // object Bun.WebSocketHandler (WebSocketHandler<undefined>)
-[LasmHost="Bun", LasmLeanModule="Serve", LasmFile="serve.d.ts", LasmName="WebSocketHandlerUndefined", LasmPath="Bun.WebSocketHandler"]
-dictionary Bun_WebSocketHandlerUndefined {
+[LasmHost="Bun", LasmLeanModule="Serve", LasmFile="serve.d.ts", LasmName="WebSocketHandler", LasmPath="Bun.WebSocketHandler"]
+dictionary Bun_WebSocketHandler {
   // data?: T
   undefined data;
   // message?(ws: ServerWebSocket<T>, message: string | Buffer<ArrayBuffer>): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedMessage message;
+  Bun_WebSocketHandlerMessage message;
   // open?(ws: ServerWebSocket<T>): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedOpen open;
+  Bun_WebSocketHandlerOpen open;
   // drain?(ws: ServerWebSocket<T>): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedDrain drain;
+  Bun_WebSocketHandlerDrain drain;
   // close?(ws: ServerWebSocket<T>, code: number, reason: string): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedClose close;
+  Bun_WebSocketHandlerClose close;
   // ping?(ws: ServerWebSocket<T>, data: Buffer): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedPing ping;
+  Bun_WebSocketHandlerPing ping;
   // pong?(ws: ServerWebSocket<T>, data: Buffer): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedPong pong;
+  Bun_WebSocketHandlerPong pong;
   // error?(error: Error, ws: ServerWebSocket<T>): void | Promise<void>
-  Bun_WebSocketHandlerUndefinedError error;
+  Bun_WebSocketHandlerError error;
   // maxPayloadLength?: number
   double maxPayloadLength;
   // backpressureLimit?: number
@@ -2217,7 +2217,7 @@ dictionary Bun_WebSocketHandlerUndefined {
   // sendPings?: boolean
   boolean sendPings;
   // perMessageDeflate?: | boolean | { compress?: WebSocketCompressor | boolean; decompress?: WebSocketCompressor | boolean; }
-  Bun_BooleanOrWebSocketHandlerUndefinedPerMessageDeflate perMessageDeflate;
+  Bun_BooleanOrWebSocketHandlerPerMessageDeflate perMessageDeflate;
 };
 
 // the union HostnamePortServeOptions<undefined> & {fetch?(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response>; routes: Routes<WebSocketData, R>;} | HostnamePortServeOptions<undefined> & {fetch(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response>; routes?: Routes<WebSocketData, R>;} | HostnamePortServeOptions<undefined> & {websocket: WebSocketHandler<WebSocketData>;} & {fetch?(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response | void | undefined>; routes: RoutesWithUpgrade<WebSocketData, R>;} | HostnamePortServeOptions<undefined> & {websocket: WebSocketHandler<WebSocketData>;} & {fetch(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response | void | undefined>; routes?: RoutesWithUpgrade<WebSocketData, R>;} | UnixServeOptions<undefined> & {fetch?(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response>; routes: Routes<WebSocketData, R>;} | UnixServeOptions<undefined> & {fetch(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response>; routes?: Routes<WebSocketData, R>;} | UnixServeOptions<undefined> & {websocket: WebSocketHandler<WebSocketData>;} & {fetch?(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response | void | undefined>; routes: RoutesWithUpgrade<WebSocketData, R>;} | UnixServeOptions<undefined> & {websocket: WebSocketHandler<WebSocketData>;} & {fetch(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>): MaybePromise<Response | void | undefined>; routes?: RoutesWithUpgrade<WebSocketData, R>;}, as one dictionary
@@ -2252,9 +2252,9 @@ dictionary Bun_ServeOptions {
   // fetch: (this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>) => MaybePromise<Response> (optional)
   Bun_ServeOptionsFetch fetch;
   // routes: Routes<WebSocketData, R> | RoutesWithUpgrade<WebSocketData, R> (optional)
-  Bun_ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever routes;
+  Bun_ServeRoutesOrServeRoutesWithUpgrade routes;
   // websocket: WebSocketHandler<WebSocketData> (optional)
-  Bun_WebSocketHandlerUndefined websocket;
+  Bun_WebSocketHandler websocket;
   // unix: string (optional)
   DOMString unix;
 };
@@ -2289,7 +2289,7 @@ interface Bun_Server {
   // fetch(request: Request | string): Response | Promise<Response>
   [LasmHost="Bun", LasmSignature="fetch(request: Request | string): Response | Promise<Response>"] Promise<Response> fetch(Bun_RequestOrDOMString request);
   // upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as  {"options":"{ headers?: HeadersInit; data?: unknown }"}: a conditional rest tuple on the WebSocket data type)
-  [LasmHost="Bun", LasmSignature="upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as {'options':'{ headers?: HeadersInit; data?: unknown }'}: a conditional rest tuple on the WebSocket data type)"] boolean upgrade(Request request, Bun_ServerUpgradeOptions... options);
+  [LasmHost="Bun", LasmSignature="upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as {'options':'{ headers?: HeadersInit; data?: unknown }'}: a conditional rest tuple on the WebSocket data type)"] boolean upgrade(Request request, optional Bun_ServerUpgradeOptions options);
   // publish(topic: string, data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Blob, compress?: boolean): ServerWebSocketSendStatus
   [LasmHost="Bun", LasmSignature="publish(topic: string, data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Blob, compress?: boolean): ServerWebSocketSendStatus"] double publish(DOMString topic, Bun_DOMStringOrUint8ArrayOrArrayBufferOrBlob data, optional boolean compress);
   // subscriberCount(topic: string): number
