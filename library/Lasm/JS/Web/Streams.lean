@@ -443,6 +443,10 @@ instance : ToJS Transformer := ⟨fun d => Support.fields #[("start", Support.op
     ("readableType", d.readableType),
     ("writableType", d.writableType)]⟩
 
+/-- `v instanceof ReadableStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStream`). -/
+def ReadableStream.cast? (v : Value) : IO (Option ReadableStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStream"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional object underlyingSource, optional QueuingStrategy strategy)` -/
 def ReadableStream.new (underlyingSource : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO ReadableStream :=
   Lasm.JS.Binding.invoke ReadableStream { name := "Lasm.JS.Web.ReadableStream.new", module := "globalThis", path := "ReadableStream", construct := true, arity := 2 }
@@ -478,6 +482,10 @@ def ReadableStream.pipeTo (self : ReadableStream) (destination : WritableStream)
 def ReadableStream.tee (self : ReadableStream) : IO (Array ReadableStream) :=
   self.val.callMethod "tee" (Support.args #[]) (Array ReadableStream)
 
+/-- `v instanceof ReadableStreamDefaultReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamDefaultReader`). -/
+def ReadableStreamDefaultReader.cast? (v : Value) : IO (Option ReadableStreamDefaultReader) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamDefaultReader"] Value) v) then some { val := v } else none
+
 /-- `constructor(ReadableStream stream)` -/
 def ReadableStreamDefaultReader.new (stream : ReadableStream) : IO ReadableStreamDefaultReader :=
   Lasm.JS.Binding.invoke ReadableStreamDefaultReader { name := "Lasm.JS.Web.ReadableStreamDefaultReader.new", module := "globalThis", path := "ReadableStreamDefaultReader", construct := true, arity := 1 }
@@ -499,6 +507,10 @@ def ReadableStreamDefaultReader.releaseLock (self : ReadableStreamDefaultReader)
 /-- `Promise<undefined> cancel(optional any reason)` -/
 def ReadableStreamDefaultReader.cancel (self : ReadableStreamDefaultReader) (reason : Data := .undefined) : Async Unit :=
   self.val.callMethodAwait "cancel" (Support.args #[reason]) Unit
+
+/-- `v instanceof ReadableStreamBYOBReader`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamBYOBReader`). -/
+def ReadableStreamBYOBReader.cast? (v : Value) : IO (Option ReadableStreamBYOBReader) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamBYOBReader"] Value) v) then some { val := v } else none
 
 /-- `constructor(ReadableStream stream)` -/
 def ReadableStreamBYOBReader.new (stream : ReadableStream) : IO ReadableStreamBYOBReader :=
@@ -522,6 +534,10 @@ def ReadableStreamBYOBReader.releaseLock (self : ReadableStreamBYOBReader) : IO 
 def ReadableStreamBYOBReader.cancel (self : ReadableStreamBYOBReader) (reason : Data := .undefined) : Async Unit :=
   self.val.callMethodAwait "cancel" (Support.args #[reason]) Unit
 
+/-- `v instanceof ReadableStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamDefaultController`). -/
+def ReadableStreamDefaultController.cast? (v : Value) : IO (Option ReadableStreamDefaultController) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamDefaultController"] Value) v) then some { val := v } else none
+
 /-- `readonly attribute unrestricted double? desiredSize` -/
 def ReadableStreamDefaultController.desiredSize (self : ReadableStreamDefaultController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
 
@@ -536,6 +552,10 @@ def ReadableStreamDefaultController.enqueue (self : ReadableStreamDefaultControl
 /-- `undefined error(optional any e)` -/
 def ReadableStreamDefaultController.error (self : ReadableStreamDefaultController) (e : Data := .undefined) : IO Unit :=
   self.val.callMethod "error" (Support.args #[e]) Unit
+
+/-- `v instanceof ReadableByteStreamController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableByteStreamController`). -/
+def ReadableByteStreamController.cast? (v : Value) : IO (Option ReadableByteStreamController) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableByteStreamController"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute ReadableStreamBYOBRequest? byobRequest` -/
 def ReadableByteStreamController.byobRequest (self : ReadableByteStreamController) : IO (Option ReadableStreamBYOBRequest) := self.val.get "byobRequest" (Option ReadableStreamBYOBRequest)
@@ -555,6 +575,10 @@ def ReadableByteStreamController.enqueue (self : ReadableByteStreamController) (
 def ReadableByteStreamController.error (self : ReadableByteStreamController) (e : Data := .undefined) : IO Unit :=
   self.val.callMethod "error" (Support.args #[e]) Unit
 
+/-- `v instanceof ReadableStreamBYOBRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadableStreamBYOBRequest`). -/
+def ReadableStreamBYOBRequest.cast? (v : Value) : IO (Option ReadableStreamBYOBRequest) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ReadableStreamBYOBRequest"] Value) v) then some { val := v } else none
+
 /-- `readonly attribute Uint8Array? view` -/
 def ReadableStreamBYOBRequest.view (self : ReadableStreamBYOBRequest) : IO (Option ByteArray) := self.val.get "view" (Option ByteArray)
 
@@ -565,6 +589,10 @@ def ReadableStreamBYOBRequest.respond (self : ReadableStreamBYOBRequest) (bytesW
 /-- `undefined respondWithNewView(ArrayBufferView view)` -/
 def ReadableStreamBYOBRequest.respondWithNewView (self : ReadableStreamBYOBRequest) (view : ByteArray) : IO Unit :=
   self.val.callMethod "respondWithNewView" (Support.args #[toJS view]) Unit
+
+/-- `v instanceof WritableStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStream`). -/
+def WritableStream.cast? (v : Value) : IO (Option WritableStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStream"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional object underlyingSink, optional QueuingStrategy strategy)` -/
 def WritableStream.new (underlyingSink : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO WritableStream :=
@@ -586,6 +614,10 @@ def WritableStream.close (self : WritableStream) : Async Unit :=
 def WritableStream.getWriter (self : WritableStream) : IO WritableStreamDefaultWriter := do
   let r ← self.val.callMethod "getWriter" (Support.args #[]) Value
   pure { val := r }
+
+/-- `v instanceof WritableStreamDefaultWriter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStreamDefaultWriter`). -/
+def WritableStreamDefaultWriter.cast? (v : Value) : IO (Option WritableStreamDefaultWriter) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStreamDefaultWriter"] Value) v) then some { val := v } else none
 
 /-- `constructor(WritableStream stream)` -/
 def WritableStreamDefaultWriter.new (stream : WritableStream) : IO WritableStreamDefaultWriter :=
@@ -621,6 +653,10 @@ def WritableStreamDefaultWriter.releaseLock (self : WritableStreamDefaultWriter)
 def WritableStreamDefaultWriter.write (self : WritableStreamDefaultWriter) (chunk : Data := .undefined) : Async Unit :=
   self.val.callMethodAwait "write" (Support.args #[chunk]) Unit
 
+/-- `v instanceof WritableStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WritableStreamDefaultController`). -/
+def WritableStreamDefaultController.cast? (v : Value) : IO (Option WritableStreamDefaultController) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WritableStreamDefaultController"] Value) v) then some { val := v } else none
+
 /-- `readonly attribute AbortSignal signal` -/
 def WritableStreamDefaultController.signal (self : WritableStreamDefaultController) : IO AbortSignal := do
   let r ← self.val.get "signal" Value
@@ -629,6 +665,10 @@ def WritableStreamDefaultController.signal (self : WritableStreamDefaultControll
 /-- `undefined error(optional any e)` -/
 def WritableStreamDefaultController.error (self : WritableStreamDefaultController) (e : Data := .undefined) : IO Unit :=
   self.val.callMethod "error" (Support.args #[e]) Unit
+
+/-- `v instanceof TransformStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TransformStream`). -/
+def TransformStream.cast? (v : Value) : IO (Option TransformStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TransformStream"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional object transformer, optional QueuingStrategy writableStrategy, optional QueuingStrategy readableStrategy)` -/
 def TransformStream.new (transformer : Data := .undefined) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO TransformStream :=
@@ -645,6 +685,10 @@ def TransformStream.writable (self : TransformStream) : IO WritableStream := do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
+/-- `v instanceof TransformStreamDefaultController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TransformStreamDefaultController`). -/
+def TransformStreamDefaultController.cast? (v : Value) : IO (Option TransformStreamDefaultController) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TransformStreamDefaultController"] Value) v) then some { val := v } else none
+
 /-- `readonly attribute unrestricted double? desiredSize` -/
 def TransformStreamDefaultController.desiredSize (self : TransformStreamDefaultController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)
 
@@ -660,6 +704,10 @@ def TransformStreamDefaultController.error (self : TransformStreamDefaultControl
 def TransformStreamDefaultController.terminate (self : TransformStreamDefaultController) : IO Unit :=
   self.val.callMethod "terminate" (Support.args #[]) Unit
 
+/-- `v instanceof ByteLengthQueuingStrategy`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ByteLengthQueuingStrategy`). -/
+def ByteLengthQueuingStrategy.cast? (v : Value) : IO (Option ByteLengthQueuingStrategy) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ByteLengthQueuingStrategy"] Value) v) then some { val := v } else none
+
 /-- `constructor(QueuingStrategyInit init)` -/
 def ByteLengthQueuingStrategy.new (init : QueuingStrategyInit) : IO ByteLengthQueuingStrategy :=
   Lasm.JS.Binding.invoke ByteLengthQueuingStrategy { name := "Lasm.JS.Web.ByteLengthQueuingStrategy.new", module := "globalThis", path := "ByteLengthQueuingStrategy", construct := true, arity := 1 }
@@ -670,6 +718,10 @@ def ByteLengthQueuingStrategy.highWaterMark (self : ByteLengthQueuingStrategy) :
 
 /-- `readonly attribute Function size` -/
 def ByteLengthQueuingStrategy.size (self : ByteLengthQueuingStrategy) : IO JSFunction := self.val.get "size" JSFunction
+
+/-- `v instanceof CountQueuingStrategy`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CountQueuingStrategy`). -/
+def CountQueuingStrategy.cast? (v : Value) : IO (Option CountQueuingStrategy) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CountQueuingStrategy"] Value) v) then some { val := v } else none
 
 /-- `constructor(QueuingStrategyInit init)` -/
 def CountQueuingStrategy.new (init : QueuingStrategyInit) : IO CountQueuingStrategy :=

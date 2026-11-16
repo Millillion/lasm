@@ -480,6 +480,10 @@ instance : FromJS FormDataEntryValue where
     | _ => .error ""
   typeName := "Lasm.JS.Web.FormDataEntryValue"
 
+/-- `v instanceof Headers`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Headers`). -/
+def Headers.cast? (v : Value) : IO (Option Headers) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Headers"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional HeadersInit init)` -/
 def Headers.new (init : Option HeadersInit := none) : IO Headers :=
   Lasm.JS.Binding.invoke Headers { name := "Lasm.JS.Web.Headers.new", module := "globalThis", path := "Headers", construct := true, arity := 1 }
@@ -520,6 +524,10 @@ def Headers.keys (self : Headers) : IO (Array String) :=
 /-- `iterable<ByteString, ByteString>`: `values()`, collected into an array. -/
 def Headers.values (self : Headers) : IO (Array String) :=
   Support.iterate self.val "values" (Array String)
+
+/-- `v instanceof Request`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Request`). -/
+def Request.cast? (v : Value) : IO (Option Request) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Request"] Value) v) then some { val := v } else none
 
 /-- `constructor(RequestInfo input, optional RequestInit init)` -/
 def Request.new (input : RequestInfo) (init : Option RequestInit := none) : IO Request :=
@@ -621,6 +629,10 @@ def Request.textStream (self : Request) : IO ReadableStream := do
   let r ← self.val.callMethod "textStream" (Support.args #[]) Value
   pure { val := r }
 
+/-- `v instanceof Response`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Response`). -/
+def Response.cast? (v : Value) : IO (Option Response) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Response"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional BodyInit? body, optional ResponseInit init)` -/
 def Response.new (body : Option BodyInit := none) (init : Option ResponseInit := none) : IO Response :=
   Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.new", module := "globalThis", path := "Response", construct := true, arity := 2 }
@@ -710,6 +722,10 @@ def Response.textStream (self : Response) : IO ReadableStream := do
   let r ← self.val.callMethod "textStream" (Support.args #[]) Value
   pure { val := r }
 
+/-- `v instanceof FormData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FormData`). -/
+def FormData.cast? (v : Value) : IO (Option FormData) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FormData"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional HTMLFormElement form, optional HTMLElement? submitter)` -/
 def FormData.new (form : Option Value := none) (submitter : Option Value := none) : IO FormData :=
   Lasm.JS.Binding.invoke FormData { name := "Lasm.JS.Web.FormData.new", module := "globalThis", path := "FormData", construct := true, arity := 2 }
@@ -720,7 +736,7 @@ def FormData.append (self : FormData) (name : String) (value : String) : IO Unit
   self.val.callMethod "append" (Support.args #[toJS name, toJS value]) Unit
 
 /-- `undefined append(USVString name, Blob blobValue, optional USVString filename)` -/
-def FormData.appendWithBlobValue (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
+def FormData.appendBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
   self.val.callMethod "append" (Support.args #[toJS name, toJS blobValue, Support.optional filename]) Unit
 
 /-- `undefined delete(USVString name)` -/
@@ -744,7 +760,7 @@ def FormData.set (self : FormData) (name : String) (value : String) : IO Unit :=
   self.val.callMethod "set" (Support.args #[toJS name, toJS value]) Unit
 
 /-- `undefined set(USVString name, Blob blobValue, optional USVString filename)` -/
-def FormData.setWithBlobValue (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
+def FormData.setBlob (self : FormData) (name : String) (blobValue : Blob) (filename : Option String := none) : IO Unit :=
   self.val.callMethod "set" (Support.args #[toJS name, toJS blobValue, Support.optional filename]) Unit
 
 /-- `iterable<USVString, FormDataEntryValue>`: `entries()`, collected into an array. -/
