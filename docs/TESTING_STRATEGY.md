@@ -262,9 +262,11 @@ under the 2026-11-09 direction; DECISIONS.md has one row per decision, dated
 
 ## 7. Exit bar: "rock solid"
 
-Lasm is rock solid, and the reduction (IRREDUCIBLE.md M1–M3) can delete code
-freely, when all of these hold at once. Each item is measured by CI and shown
-on the evidence page.
+Lasm is rock solid when items 1–3 and 5–8 hold at once; that is the
+definition of done of [ROADMAP.md](../ROADMAP.md)'s Stage 1. Item 4 is
+observed and reported only, and never blocks a stage or anything else
+(Jordan, 2026-11-16). Each item is measured by CI and shown on the evidence
+page.
 
 1. **Platforms:** every platform is at evidence level L2 or higher, and Node,
    Workers and the browser are at L3.
@@ -276,16 +278,21 @@ on the evidence page.
 3. **Coverage:** total line coverage of the unit suite is ≥ 75 %. The baseline
    is 67.5 %. Every 0 % file is either covered by an integration workflow named
    in the baseline, or removed.
-4. **Campaigns:** 30 consecutive nightly differential, equivalence, fuzzing
-   and DST campaigns find nothing new. Sundays don't count and don't break the
-   run.
+4. **Campaigns (observed, not required):** the streak of consecutive nightly
+   differential, equivalence, fuzzing and DST campaigns that find nothing new,
+   reported against 30. Sundays don't count and don't break the run. A failure
+   is a bug to fix, but the streak itself is never a gate.
 5. **Flakes:** no flaky test is open, and none was quarantined in the last 14 days.
 6. **Apps:** each example app passes its outside oracle on every platform it
    claims.
 7. **Propositions:** every fuzz oracle and JavaScript property names a
    proposition that exists (the §4 lint is green). Every library candidate in
    library/PROOFS.md is a `Candidates.lean` definition with a `Tested by:`
-   line.
+   line. Rule (Jordan, 2026-11-16): a fuzz target whose oracle is an outside
+   reference implementation (Python's `tarfile` for `tar`) is exempt from
+   naming a proposition; the reference implementation is its specification.
+   The `wasi-cgi` target is exempt for a different reason: it goes with
+   `Lasm.Fetch`, which Stage 0 deletes.
 8. **Differential fuzzing:**
    - The generator covers every feature listed under "Next gap" in §2.
    - The Lasm.JS wire codec and the UI decoder each have a model differential
