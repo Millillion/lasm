@@ -366,6 +366,12 @@ instance : ToJS HeadersInit := ⟨fun
   | .record v => toJS v⟩
 instance : Coe (Array (Array String)) HeadersInit := ⟨.sequence⟩
 instance : Coe (Record String) HeadersInit := ⟨.record⟩
+instance : FromJS HeadersInit where
+  fromJS
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array (Array String))).map .sequence
+    | d@(.object _) => (FromJS.fromJS d : Except String (Record String)).map .record
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.HeadersInit"
 
 /-- `typedef Request or USVString RequestInfo`: one constructor per member type. -/
 inductive RequestInfo where

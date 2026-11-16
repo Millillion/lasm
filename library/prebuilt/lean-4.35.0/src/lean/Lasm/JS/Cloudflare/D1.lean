@@ -12,6 +12,10 @@ import Lasm.JS.Cloudflare.Support
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface D1Database` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure D1Database where
   /-- The JavaScript object. -/
@@ -176,5 +180,9 @@ def D1PreparedStatement.all (self : D1PreparedStatement) : Async D1Result :=
 /-- `raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>`: `Promise<sequence<sequence<any>>> raw(optional D1PreparedStatementRawOptions options)` -/
 def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1PreparedStatementRawOptions := none) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "raw" (Support.args #[Support.optional options]) (Array (Array Data))
+
+/-- `raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>`: `Promise<sequence<any>> raw(any options)` -/
+def D1PreparedStatement.rawWithColumnNames (self : D1PreparedStatement) (options : Data) : Async (Array Data) :=
+  self.val.callMethodAwait "raw" (Support.args #[toJS options]) (Array Data)
 
 end Lasm.JS.Cloudflare
