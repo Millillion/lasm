@@ -197,7 +197,7 @@ def cmd_map_comp : Prop :=
 
 /-- **Mapping commands keeps their effects.** Mapping a command by any `f`
 keeps exactly its effects, in order, each of the same kind with the same
-data (the same request, delay, URL, storage key …): with the messages they
+data (the same delay, the same URL, the same task): with the messages they
 deliver forgotten (`Effect.forget`), the effects before and after are equal.
 Only the messages change. -/
 def cmd_map_effects : Prop :=

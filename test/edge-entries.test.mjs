@@ -283,3 +283,9 @@ test('supabase-edge: the import map and the Deno environment', async () => {
     assert.ok(starts[0].wasmModule instanceof WebAssembly.Module);
   } finally { delete globalThis.Deno; }
 });
+
+test('entries import the project\'s own files from lasm/project-modules/ (A6.1)', async () => {
+  const { workersEntry, vercelEdgeEntry } = await import('../src/edge/edge-build.mjs');
+  assert.match(workersEntry(['./App/ffi/x.mjs', 'pg']), /^import \* as m0 from "\.\/lasm\/project-modules\/App\/ffi\/x\.mjs";\nimport \* as m1 from "pg";$/m);
+  assert.match(vercelEdgeEntry(['./x.mjs']), /^import \* as m0 from "\.\/_lasm\/lasm\/project-modules\/x\.mjs";$/m);
+});

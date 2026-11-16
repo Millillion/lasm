@@ -87,11 +87,6 @@ theorem handler_method : Spec.handler_method := by
 theorem call_invalid : Spec.call_invalid :=
   fun _ _ _ _ _ e req handle base m h => Endpoint.call_invalid e req handle base m h
 
-theorem call_valid : Spec.call_valid := by
-  intro _ _ _ _ _ e req handle base h
-  simp only [Endpoint.call, h, Cmd.ofEffect]
-  refine ⟨_, rfl, ?_, ?_⟩ <;> intro _ <;> rfl
-
 theorem decodeResponse_not_network : Spec.decodeResponse_not_network := by
   intro _ Res _ e status body m
   simp only [Endpoint.decodeResponse]

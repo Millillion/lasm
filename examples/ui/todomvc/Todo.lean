@@ -3,8 +3,11 @@ TodoMVC's state and update, in pure Lean, with proofs. `update` keeps the
 invariant `Inv`: todo ids are distinct and below `nextId`, titles are
 non-empty, and the todo being edited exists. Theorems below also pin down
 what the main actions do (toggle all, clear completed, add, delete).
+
+Its effects are data too (`Effect`): `update` says what to save, Main.lean's
+interpreter does it through the browser's `localStorage`, and the theorems
+here can state what `update` asks for (docs/UI.md, "Effects you can test").
 -/
-import Lasm.UI.Cmd
 
 namespace Todo
 
@@ -363,11 +366,22 @@ theorem toggle_flips (m : Model) (t : Item) (ht : t ∈ m.todos) :
 /-- Storage key (shared with other TodoMVC implementations' conventions). -/
 def storageKey : String := "todos-lasm"
 
+/-- What the app asks the page to do, as data: Main.lean performs it. -/
+inductive Effect where
+  /-- Keep `json` in `localStorage` under `key`. -/
+  | save (key json : String)
+  deriving Repr, BEq
+
 /-- The update: `step`, and saving the todos whenever they change. `save`
 encodes them for storage (the view module passes a JSON encoder). -/
-def update (save : List Item → String) (msg : Msg) (m : Model) : Model × Lasm.UI.Cmd Msg :=
+def update (save : List Item → String) (msg : Msg) (m : Model) : Model × List Effect :=
   let m' := step msg m
-  (m', if m'.todos == m.todos then .none else Lasm.UI.Cmd.storageSet storageKey (save m'.todos))
+  (m', if m'.todos == m.todos then [] else [.save storageKey (save m'.todos)])
+
+/-- The todos are saved exactly when a message changes them, and then once,
+under `storageKey`, as `save` encodes them. -/
+theorem update_saves (save : List Item → String) (msg : Msg) (m : Model) :
+    (update save msg m).2 = (if (step msg m).todos == m.todos then [] else [.save storageKey (save (step msg m).todos)]) := rfl
 
 theorem update_inv (save : List Item → String) (msg : Msg) (m : Model) (h : Inv m) : Inv (update save msg m).1 :=
   step_inv msg m h
