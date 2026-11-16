@@ -6,7 +6,7 @@ calls it on a cache miss, and the Lean server's response goes back to the viewer
 (and into the cache, following its `Cache-Control`).
 
 ```sh
-npx lasm build Main.lean --target lambda-edge   # dist/ (a server on $HOST:$PORT) and lambda-edge.zip
+npx lasm build Main.lean --target lambda-edge   # lambda-edge.zip (a server on $HOST:$PORT)
 aws lambda create-function --region us-east-1 --function-name my-edge-app \
   --runtime nodejs24.x --handler lasm-lambda.handler --architectures x86_64 \
   --zip-file fileb://lambda-edge.zip --memory-size 512 --timeout 30 --role ROLE_ARN

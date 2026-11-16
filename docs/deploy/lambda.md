@@ -7,7 +7,7 @@ Adapter ([further down](#container-image)). For CloudFront, see
 ## Zip package (`nodejs24.x`, x86_64 and arm64)
 
 ```sh
-npx lasm build Main.lean --target lambda   # dist/ (any server on $HOST:$PORT) and lambda.zip
+npx lasm build Main.lean --target lambda   # lambda.zip (any server on $HOST:$PORT)
 aws lambda create-function --function-name my-app --runtime nodejs24.x \
   --handler lasm-lambda.handler --zip-file fileb://lambda.zip \
   --memory-size 512 --timeout 10 --architectures arm64 --role ROLE_ARN

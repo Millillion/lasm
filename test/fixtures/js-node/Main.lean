@@ -291,7 +291,7 @@ def currentProcess (r : Checks) : Async Unit := do
   expect r "uptime" ((← process.uptime) > 0) ""
   expect r "memoryUsage" ((← process.memoryUsage).field "rss" matches .number _) ""
   -- kill pid 0 tests that the process exists (signal 0) without signalling it
-  process.kill pid.toNat.toFloat (some (.double 0))
+  process.kill (pid.toNat : Int) (some (.double 0))
   expect r "kill with signal 0" true ""
   -- title is a string
   discard process.title

@@ -19,6 +19,10 @@ instance : Nonempty Navigator := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Navigator := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Navigator := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Navigator", .data⟩
 
+/-- `v instanceof Navigator`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Navigator`). -/
+def Navigator.cast? (v : Value) : IO (Option Navigator) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Navigator"] Value) v) then some { val := v } else none
+
 /-- `readonly attribute DOMString userAgent` -/
 def Navigator.userAgent (self : Navigator) : IO String := self.val.get "userAgent" String
 
