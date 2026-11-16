@@ -410,7 +410,8 @@ export function exitBar(repo, ci) {
   if (!ci) out.push(row(4, 'Campaigns', 'not read', notRead));
   else {
     const c = ci.campaigns ?? { nights: 0, why: 'not measured' };
-    out.push(row(4, 'Campaigns', c.nights >= 30 ? 'met' : 'not met',
+    // Observed only (Jordan, 2026-11-16): the streak is reported, never required.
+    out.push(row(4, 'Campaigns', c.nights >= 30 ? 'met' : 'observed',
       `${c.nights} of 30 consecutive clean nights of ${CAMPAIGNS.map(w => `\`${w}\``).join(', ')}${c.endedOn ? `; ended on ${c.endedOn}: ${c.why}` : c.why ? ` (${c.why})` : ''}`));
   }
   // 5. Flakes
@@ -529,7 +530,7 @@ export function renderPage(summary) {
   p('### Measured by CI and the repository');
   p(table(['#', 'Item', 'Status', 'Measured'], summary.exitBar.map(x => [String(x.item), x.name, `**${x.status}**`, x.measured])));
   p('### About');
-  p('Lasm is "rock solid", and its code can be reduced freely, when all eight items of the [exit bar](../../docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) hold at once. Each row is computed when the page is generated: from CI runs (platform levels, the nightly mutation run, unit-suite coverage and its 0 % files, the scheduled campaigns, each example app\'s oracle jobs on the platforms it claims) and from the repository (the quarantine list and its git history, the proposition lint\'s inventory, the fuzz targets that run against Lean). "Partly met" means the measured part holds and the rest is not measured yet; "not measured" means nothing measures it yet.');
+  p('Lasm is "rock solid" when items 1–3 and 5–8 of the [exit bar](../../docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) hold at once. Item 4, the streak of clean nightly campaigns, is observed and reported, and never blocks anything. Each row is computed when the page is generated: from CI runs (platform levels, the nightly mutation run, unit-suite coverage and its 0 % files, the scheduled campaigns, each example app\'s oracle jobs on the platforms it claims) and from the repository (the quarantine list and its git history, the proposition lint\'s inventory, the fuzz targets that run against Lean). "Partly met" means the measured part holds and the rest is not measured yet; "not measured" means nothing measures it yet.');
 
   // Platforms
   p('## Platforms: how well tested');
