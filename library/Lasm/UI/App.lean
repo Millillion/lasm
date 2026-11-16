@@ -331,7 +331,7 @@ needs an element the update just added to the view:
     | .startEdit id, m => ({ m with editing := some id }, Cmd.ofEffect (.task fun _ => do
         afterFrame
         if let some el ← (← document).getElementById s!"edit-{id}" then
-          (HTMLElement.mk el.val).focus))
+          ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus))
 
 Only in a running app (`App.run`). -/
 def afterFrame : Std.Async.Async Unit := do
