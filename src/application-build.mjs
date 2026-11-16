@@ -15,6 +15,7 @@ import { glueHeaders, importsLibrary, librarySources, libraryModules } from './l
 import { ensureProgramLibrary } from './lazy-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
+import { copyProjectModules, programNamesProjectFiles, projectCheckPlan, projectModules, withAbsoluteFiles } from './project-modules.mjs';
 import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint, minimumApplicationNode, minimumApplicationGlibc } from './application-output.mjs';
 import { applicationNativeTargets } from './native-bundle.mjs';
@@ -65,7 +66,8 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports,
+  bindingTarget } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -118,6 +120,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // Programs that import Lasm's library (Lasm.JS, Lasm.UI) link the generated
   // C of the modules they use, and the Lasm.JS C glue.
   const usesJs = importsLibrary(generated.sources);
+  const programSources = generated.inputs.map(input => input.source);
   let library;
   if (usesJs) {
     library = librarySources(lean, generated.sources);
@@ -129,11 +132,22 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // from the module files and Node loads the packages while the build compiles
   // and links (separate processes); the result is awaited before any output.
   let bindingCheck = Promise.resolve(undefined);
+  // The project's own JavaScript files (@[js "./ffi/x.mjs" …], src/project-modules.mjs)
+  // are part of the build's identity, so a program that names one waits here for
+  // its bindings; other programs read them while the build compiles and links.
+  let projectFiles = { files: [] };
   if (usesJs) {
     const cache = join(work, 'bindings');
-    bindingCheck = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
-      .then(bindings => checkBindingsAsync(directory, bindings, { cache, identity: nodeModules?.identity ?? 'none' }))
-      .then(results => { for (const warning of requireValidBindings(results)) log(`Lasm.JS binding warning: ${warning}`); return results; });
+    const read = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
+      .then(bindings => withAbsoluteFiles(bindings, directory));
+    const named = programNamesProjectFiles(programSources.map(file => String(readFileSync(file))));
+    if (named) projectFiles = projectModules(await read, directory);
+    bindingCheck = read
+      .then(bindings => {
+        const plan = projectCheckPlan(bindings, projectFiles, { named, npmIdentity: nodeModules?.identity });
+        return checkBindingsAsync(directory, plan.bindings, { cache, identity: plan.identity });
+      })
+      .then(results => { for (const warning of requireValidBindings(results, { target: bindingTarget })) log(`Lasm.JS binding warning: ${warning}`); return results; });
     bindingCheck.catch(() => {});
   }
   progress?.({ stage: 'Checking application inputs and cached build' });
@@ -162,17 +176,18 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
     ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
     ...(usesJs ? { lasmJs: true, lasmJsHeaders: await Promise.all(glueHeaders.map(hashFile)) } : {}),
+    ...(projectFiles.files.length ? { projectModules: projectFiles.files.map(({ name, sha256 }) => ({ name, sha256 })) } : {}),
     ...(nodeModules ? { nodeModules: { identity: nodeModules.identity, packages: nodeModules.packages } } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
-  if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
+  if (insideDirectory(output, source) || insideDirectory(output, work))
     throw new Error('Output directory must not contain application sources or its build cache');
   if (!rebuild && await reusableOutput(cached, signature)) {
     if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
     await bindingCheck;
     progress?.({ stage: 'Reusing verified application build' });
     await deliverOutput(cached, output, signature);
-    return { ...JSON.parse(await readFile(join(cached, 'build-info.json'), 'utf8')), output, cached, signature, cacheHit: true };
+    return { ...JSON.parse(await readFile(join(cached, 'build-info.json'))), output, cached, signature, cacheHit: true };
   }
   // No compiler tool runs on an unchanged application. The tool catalog and
   // link driver are still part of the cache identity. Revalidate the tools only
@@ -202,7 +217,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
   const jsBindings = await bindingCheck;
   progress?.({ stage: 'Packaging the application and runtime support' });
-  if (!linkOnly) { copyApplicationHost(dist); writeApplicationEntrypoint(dist); }
+  if (!linkOnly) { copyApplicationHost(dist); copyProjectModules(join(dist, 'host'), projectFiles); writeApplicationEntrypoint(dist); }
   await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
     applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'))
     + dependencyNotices(dependencyLicenses));

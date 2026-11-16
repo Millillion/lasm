@@ -3,6 +3,8 @@
   ".gitignore",
   "App.lean",
   "Dockerfile",
+  "Export.lean",
+  "Handler.lean",
   "Main.lean",
   "README.md",
   "lakefile.toml",

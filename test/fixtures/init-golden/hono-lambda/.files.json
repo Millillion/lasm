@@ -1,0 +1,14 @@
+[
+  ".dockerignore",
+  ".gitignore",
+  "App.lean",
+  "Dockerfile",
+  "Dockerfile.lambda",
+  "Export.lean",
+  "Main.lean",
+  "README.md",
+  "Routes.lean",
+  "lakefile.toml",
+  "lean-toolchain",
+  "package.json"
+]

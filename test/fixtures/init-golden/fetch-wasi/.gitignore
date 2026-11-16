@@ -5,7 +5,6 @@ bun/
 deno/
 bin/
 pkg/
-wasi/
 wasi-http/
 wasi-http/
 .spin/

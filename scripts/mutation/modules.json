@@ -62,7 +62,7 @@
       "name": "downloads",
       "description": "Managed downloads and installation: the downloader, managed artifacts and their verification, the managed Lean, npm artifacts, cache repair",
       "mutate": ["src/managed-download.mjs", "src/managed-artifacts.mjs", "src/managed-lean.mjs", "src/npm-artifacts.mjs", "src/cache-repair.mjs"],
-      "tests": ["test/managed-download.test.mjs", "test/managed-network.test.mjs", "test/managed-artifacts.test.mjs", "test/managed-artifacts-units.test.mjs", "test/managed-artifacts-decoder.test.mjs", "test/managed-lean-tiers.test.mjs", "test/managed-lean-provision.test.mjs", "test/npm-artifacts.test.mjs", "test/npm-artifacts-units.test.mjs", "test/npm-dist-packages.test.mjs", "test/cache-lifecycle.test.mjs", "test/cache-repair.test.mjs", "test/verification-records.test.mjs", "test/tree-archive.test.mjs", "test/windows-installer-faults.test.mjs", "test/application-runtime.test.mjs", "test/editor.test.mjs"]
+      "tests": ["test/managed-download.test.mjs", "test/managed-network.test.mjs", "test/managed-artifacts.test.mjs", "test/managed-artifacts-units.test.mjs", "test/managed-artifacts-decoder.test.mjs", "test/managed-lean-tiers.test.mjs", "test/managed-lean-provision.test.mjs", "test/npm-artifacts.test.mjs", "test/npm-artifacts-units.test.mjs", "test/npm-dist-packages.test.mjs", "test/cache-lifecycle.test.mjs", "test/cache-repair.test.mjs", "test/verification-records.test.mjs", "test/tree-archive.test.mjs", "test/windows-installer-faults.test.mjs", "test/application-runtime.test.mjs", "test/editor.test.mjs", "test/lazy-library.test.mjs"]
     },
     {
       "name": "tar",
@@ -139,6 +139,12 @@
       "description": "Native files and processes: the file host and its worker pool, messages, worker stdio and cwd, native processes and signals, programs, aborts",
       "mutate": ["src/native-files.mjs", "src/native-file-message.mjs", "src/native-file-worker.mjs", "src/native-file-worker-pool.mjs", "src/native-worker-cwd.cjs", "src/worker-stdio.cjs", "src/native-process.mjs", "src/native-signals.mjs", "src/native-program.mjs", "src/native-abort.cjs"],
       "tests": ["test/native-files.test.mjs", "test/native-directory.test.mjs", "test/native-file-worker-churn.test.mjs", "test/node-file-worker.test.mjs", "test/node-regular-files.test.mjs", "test/stdio-bytes.test.mjs", "test/getline-native-state.test.mjs", "test/native-file-message.test.mjs", "test/worker-cwd-preload.test.mjs", "test/native-process.test.mjs", "test/native-program.test.mjs", "test/node-process-pipes.test.mjs", "test/stdio-backpressure.test.mjs", "test/native-application-bundle.test.mjs", "test/native-file-abi.test.mjs", "test/worker-stdio.test.mjs", "test/native-files-adapter.test.mjs", "test/native-file-worker-protocol.test.mjs", "test/native-process-inprocess.test.mjs", "test/native-adapters-stand-in.test.mjs", "test/worker-host-pieces.test.mjs", "test/native-signals-stand-in.test.mjs", "test/native-file-worker-pool.test.mjs", "test/native-files-stand-in.test.mjs", "test/native-process-stand-in.test.mjs"]
+    },
+    {
+      "name": "project-files",
+      "description": "The project's own JavaScript files (@[js \"./ffi/x.mjs\" …]: resolution, the relative-import closure, refusals, the binding check's plan) and lasm:class (Lasm.JS.Class.define)",
+      "mutate": ["src/project-modules.mjs", "src/lasm-modules/class.mjs"],
+      "tests": ["test/project-modules.test.mjs", "test/lasm-class.test.mjs"]
     }
   ]
 }

@@ -2,8 +2,8 @@ name: Serverless platforms
 # Phase 6: backs every function-platform claim (README "Supported platforms",
 # docs/deploy/) with the platform's own local runtime or emulator. Linux
 # runners only, free runners only, no cloud accounts or deployments, ever.
-# The sample applications are the `lasm init` server templates (hono, express,
-# std-http), built with a candidate, plus any sources changed since main
+# The sample applications are the `lasm init` templates that publish a handler
+# with `exportDefault` (hono, fetch), built with a candidate, plus any sources changed since main
 # (scripts/serverless/overlay-candidate.mjs; none on main), and packaged with
 # `lasm package`. Dispatch it for a candidate (run by hand: Linux runners only).
 #   - AWS Lambda zip (nodejs24.x) and Lambda@Edge zip: AWS's Lambda Node 24

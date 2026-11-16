@@ -7,13 +7,13 @@
     "dev": "lasm dev Main.lean",
     "build": "lasm build Main.lean",
     "start": "node dist/main.mjs",
-    "build:netlify": "lasm build Main.lean --target netlify",
-    "build:azure": "lasm build Main.lean --target azure",
-    "build:lambda-edge": "lasm build Main.lean --target lambda-edge",
+    "build:netlify": "lasm build Export.lean --target netlify",
+    "build:azure": "lasm build Export.lean --target azure",
+    "build:lambda-edge": "lasm build Export.lean --target lambda-edge",
     "dev:bun": "bun x --bun lasm dev Main.lean",
-    "build:bun": "bun x --bun lasm build Main.lean --target bun",
+    "build:bun": "bun x --bun lasm build Export.lean --target bun",
     "start:bun": "bun bun/main.mjs",
-    "build:deno": "lasm build Main.lean --target deno",
+    "build:deno": "lasm build Export.lean --target deno",
     "start:deno": "deno run -A deno/main.mjs"
   },
   "engines": {

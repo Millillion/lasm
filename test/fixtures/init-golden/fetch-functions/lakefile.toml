@@ -1,0 +1,16 @@
+name = "func_app_v2"
+version = "0.1.0"
+defaultTargets = ["app"]
+
+# Pure Lean modules (App.lean).
+[[lean_lib]]
+name = "App"
+
+# The HTTP handler (Handler.lean), shared by Main.lean (Node) and Export.lean.
+[[lean_lib]]
+name = "Handler"
+
+# The program: Main.lean. Lasm builds it with `lasm build Main.lean`.
+[[lean_exe]]
+name = "app"
+root = "Main"
