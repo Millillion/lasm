@@ -567,7 +567,7 @@ export function lowerAuto(host, files) {
         continue;
       }
       if (hn in (host.typeNames ?? {}) && host.typeNames[hn] !== 'any') { if (parent) fail(`${path}: two parents`); parent = host.typeNames[hn]; used.add(`type:${hn}`); continue; }
-      const hd = byName.get(hn);
+      const hd = byName.get(scoped(hn, scope));
       if (!hd) { exclude(`${path} extends ${typeText(h)}`, 'not declared in the namespace'); continue; }
       const ref = tryMember(`${path} extends ${hn}`, () => lower(h, { where: path, owner: lean, member: 'parent', mod, subst, role: 'field', scope: d ? strip(d.name).split('.').slice(0, -1).join('.') : '' }));
       if (!ref) continue;

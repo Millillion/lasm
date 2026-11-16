@@ -103,6 +103,8 @@ export const bun = {
     env: { type: 'Record<string, string>', reason: 'an intersection of Bun\'s, Node\'s and import.meta\'s environment types: the variables as strings' },
     hash: { type: 'Hash', reason: 'a function that is also an object of hash functions: its functions (Hash.wyhash, …); call Bun.hash itself with Value.call' },
     'Password.AlgorithmLabel': { type: '"bcrypt" | "argon2id" | "argon2d" | "argon2i"', reason: 'an indexed type: the algorithms\' names' },
+    'udp.BaseUDPSocket.binaryType': { type: '"arraybuffer" | "buffer" | "uint8array"', reason: 'keyof BinaryTypeList' },
+    'Spawn.BaseOptions.stdio': { type: 'unknown[]', reason: 'a tuple of stdin, stdout and stderr typed by the generic options: each entry as Data' },
     'udp.ConnectedSocketHandler.data': { params: { data: 'Uint8Array' }, reason: 'indexed by the binary type (a Buffer by default)' },
   },
   instances: {},

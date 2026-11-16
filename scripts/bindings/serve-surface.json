@@ -655,6 +655,25 @@
         "UnixSocketListener": [
           "unix"
         ],
+        "UdpBaseUDPSocket": [
+          "hostname",
+          "port",
+          "address",
+          "binaryType",
+          "closed",
+          "ref",
+          "unref",
+          "close",
+          "setBroadcast",
+          "setTTL",
+          "setMulticastTTL",
+          "setMulticastLoopback",
+          "setMulticastInterface",
+          "addMembership",
+          "dropMembership",
+          "addSourceSpecificMembership",
+          "dropSourceSpecificMembership"
+        ],
         "UdpSocket": [
           "sendMany",
           "send",
@@ -680,6 +699,25 @@
           "controlFlags"
         ],
         "Subprocess": [
+          "stdin",
+          "stdout",
+          "stderr",
+          "terminal",
+          "stdio",
+          "readable",
+          "pid",
+          "exited",
+          "exitCode",
+          "signalCode",
+          "killed",
+          "kill",
+          "ref",
+          "unref",
+          "send",
+          "disconnect",
+          "resourceUsage"
+        ],
+        "SubprocessIgnorePipePipe": [
           "stdin",
           "stdout",
           "stderr",

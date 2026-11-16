@@ -21,28 +21,25 @@ instance : ToJS SQLSQLError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLSQLError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLSQLError", .data⟩
 
 /-- `interface Bun.SQL.PostgresError` (Bun 1.4.4 type declarations, sql.d.ts): a handle to the JavaScript object. -/
-structure SQLPostgresError where
-  /-- The JavaScript object. -/
-  val : Value
+structure SQLPostgresError extends SQLSQLError
 instance : Nonempty SQLPostgresError := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SQLPostgresError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLPostgresError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLPostgresError", .data⟩
+instance : Coe SQLPostgresError SQLSQLError := ⟨SQLPostgresError.toSQLSQLError⟩
 
 /-- `interface Bun.SQL.MySQLError` (Bun 1.4.4 type declarations, sql.d.ts): a handle to the JavaScript object. -/
-structure SQLMySQLError where
-  /-- The JavaScript object. -/
-  val : Value
+structure SQLMySQLError extends SQLSQLError
 instance : Nonempty SQLMySQLError := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SQLMySQLError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLMySQLError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLMySQLError", .data⟩
+instance : Coe SQLMySQLError SQLSQLError := ⟨SQLMySQLError.toSQLSQLError⟩
 
 /-- `interface Bun.SQL.SQLiteError` (Bun 1.4.4 type declarations, sql.d.ts): a handle to the JavaScript object. -/
-structure SQLSQLiteError where
-  /-- The JavaScript object. -/
-  val : Value
+structure SQLSQLiteError extends SQLSQLError
 instance : Nonempty SQLSQLiteError := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SQLSQLiteError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLSQLiteError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLSQLiteError", .data⟩
+instance : Coe SQLSQLiteError SQLSQLError := ⟨SQLSQLiteError.toSQLSQLError⟩
 
 /-- `dictionary SQLPostgresErrorNewOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SQLPostgresErrorNewOptions where

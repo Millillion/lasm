@@ -8,6 +8,7 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
+import Lasm.JS.Web.Dom
 import Lasm.JS.Web.Streams
 import Lasm.JS.Web.File
 import Lasm.JS.Web.Url
@@ -122,21 +123,27 @@ instance : ToJS UnixSocketListener := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UnixSocketListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UnixSocketListener", .data⟩
 instance : Coe UnixSocketListener SocketListener := ⟨UnixSocketListener.toSocketListener⟩
 
-/-- `interface Bun.udp.Socket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure UdpSocket where
+/-- `interface Bun.udp.BaseUDPSocket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
+structure UdpBaseUDPSocket where
   /-- The JavaScript object. -/
   val : Value
+instance : Nonempty UdpBaseUDPSocket := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpBaseUDPSocket := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpBaseUDPSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpBaseUDPSocket", .data⟩
+
+/-- `interface Bun.udp.Socket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
+structure UdpSocket extends UdpBaseUDPSocket
 instance : Nonempty UdpSocket := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS UdpSocket := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocket", .data⟩
+instance : Coe UdpSocket UdpBaseUDPSocket := ⟨UdpSocket.toUdpBaseUDPSocket⟩
 
 /-- `interface Bun.udp.ConnectedSocket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure UdpConnectedSocket where
-  /-- The JavaScript object. -/
-  val : Value
+structure UdpConnectedSocket extends UdpBaseUDPSocket
 instance : Nonempty UdpConnectedSocket := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS UdpConnectedSocket := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpConnectedSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocket", .data⟩
+instance : Coe UdpConnectedSocket UdpBaseUDPSocket := ⟨UdpConnectedSocket.toUdpBaseUDPSocket⟩
 
 /-- `interface Bun.Terminal` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
 structure Terminal where
@@ -153,6 +160,14 @@ structure Subprocess where
 instance : Nonempty Subprocess := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Subprocess := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Subprocess := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Subprocess", .data⟩
+
+/-- `interface Bun.Subprocess` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
+structure SubprocessIgnorePipePipe where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SubprocessIgnorePipePipe := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SubprocessIgnorePipePipe := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SubprocessIgnorePipePipe := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SubprocessIgnorePipePipe", .data⟩
 
 /-- `interface Bun.ArrayBufferSink` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
 structure ArrayBufferSink where
@@ -648,6 +663,27 @@ instance : FromJS SocketAddressFamily where
     | .string "IPv6" => .ok .iPv6
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.SocketAddressFamily"
+
+/-- `enum UdpBaseUDPSocketBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
+inductive UdpBaseUDPSocketBinaryType where
+  /-- "arraybuffer" -/
+  | arraybuffer
+  /-- "buffer" -/
+  | buffer
+  /-- "uint8array" -/
+  | uint8array
+  deriving BEq, Repr, Inhabited
+instance : ToJS UdpBaseUDPSocketBinaryType := ⟨fun
+  | .arraybuffer => .string "arraybuffer"
+  | .buffer => .string "buffer"
+  | .uint8array => .string "uint8array"⟩
+instance : FromJS UdpBaseUDPSocketBinaryType where
+  fromJS
+    | .string "arraybuffer" => .ok .arraybuffer
+    | .string "buffer" => .ok .buffer
+    | .string "uint8array" => .ok .uint8array
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.UdpBaseUDPSocketBinaryType"
 
 /-- `enum JavaScriptLoader` (Bun 1.4.4 type declarations): "jsx", "js", "ts", "tsx". -/
 inductive JavaScriptLoader where
@@ -1510,6 +1546,118 @@ instance : FromJS UdpConnectSocketOptionsBinaryType where
     | .string "buffer" => .ok .buffer
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.UdpConnectSocketOptionsBinaryType"
+
+/-- `enum SpawnBaseOptionsIgnorePipeInheritStdin` (Bun 1.4.4 type declarations): "ignore". -/
+inductive SpawnBaseOptionsIgnorePipeInheritStdin where
+  /-- "ignore" -/
+  | ignore
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdin := ⟨fun
+  | .ignore => .string "ignore"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritStdin where
+  fromJS
+    | .string "ignore" => .ok .ignore
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStdin"
+
+/-- `enum SpawnBaseOptionsIgnorePipeInheritStdout` (Bun 1.4.4 type declarations): "pipe". -/
+inductive SpawnBaseOptionsIgnorePipeInheritStdout where
+  /-- "pipe" -/
+  | pipe
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdout := ⟨fun
+  | .pipe => .string "pipe"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritStdout where
+  fromJS
+    | .string "pipe" => .ok .pipe
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStdout"
+
+/-- `enum SpawnBaseOptionsIgnorePipeInheritStderr` (Bun 1.4.4 type declarations): "inherit". -/
+inductive SpawnBaseOptionsIgnorePipeInheritStderr where
+  /-- "inherit" -/
+  | inherit
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStderr := ⟨fun
+  | .inherit => .string "inherit"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritStderr where
+  fromJS
+    | .string "inherit" => .ok .inherit
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStderr"
+
+/-- `enum SpawnBaseOptionsIgnorePipeInheritSerialization` (Bun 1.4.4 type declarations): "json", "advanced". -/
+inductive SpawnBaseOptionsIgnorePipeInheritSerialization where
+  /-- "json" -/
+  | json
+  /-- "advanced" -/
+  | advanced
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritSerialization := ⟨fun
+  | .json => .string "json"
+  | .advanced => .string "advanced"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritSerialization where
+  fromJS
+    | .string "json" => .ok .json
+    | .string "advanced" => .ok .advanced
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritSerialization"
+
+/-- `enum SpawnBaseOptionsIgnorePipePipeStdin` (Bun 1.4.4 type declarations): "ignore". -/
+inductive SpawnBaseOptionsIgnorePipePipeStdin where
+  /-- "ignore" -/
+  | ignore
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStdin := ⟨fun
+  | .ignore => .string "ignore"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeStdin where
+  fromJS
+    | .string "ignore" => .ok .ignore
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStdin"
+
+/-- `enum SpawnBaseOptionsIgnorePipePipeStdout` (Bun 1.4.4 type declarations): "pipe". -/
+inductive SpawnBaseOptionsIgnorePipePipeStdout where
+  /-- "pipe" -/
+  | pipe
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStdout := ⟨fun
+  | .pipe => .string "pipe"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeStdout where
+  fromJS
+    | .string "pipe" => .ok .pipe
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStdout"
+
+/-- `enum SpawnBaseOptionsIgnorePipePipeStderr` (Bun 1.4.4 type declarations): "pipe". -/
+inductive SpawnBaseOptionsIgnorePipePipeStderr where
+  /-- "pipe" -/
+  | pipe
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStderr := ⟨fun
+  | .pipe => .string "pipe"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeStderr where
+  fromJS
+    | .string "pipe" => .ok .pipe
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStderr"
+
+/-- `enum SpawnBaseOptionsIgnorePipePipeSerialization` (Bun 1.4.4 type declarations): "json", "advanced". -/
+inductive SpawnBaseOptionsIgnorePipePipeSerialization where
+  /-- "json" -/
+  | json
+  /-- "advanced" -/
+  | advanced
+  deriving BEq, Repr, Inhabited
+instance : ToJS SpawnBaseOptionsIgnorePipePipeSerialization := ⟨fun
+  | .json => .string "json"
+  | .advanced => .string "advanced"⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeSerialization where
+  fromJS
+    | .string "json" => .ok .json
+    | .string "advanced" => .ok .advanced
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeSerialization"
 
 /-- `enum RandomUUIDv7Encoding` (Bun 1.4.4 type declarations): "hex", "base64", "base64url". -/
 inductive RandomUUIDv7Encoding where
@@ -2605,6 +2753,21 @@ instance : ToJS TLSUpgradeOptionsUnknown := ⟨fun d => Support.fields #[("data"
     ("tls", toJS d.tls),
     ("socket", toJS d.socket)]⟩
 
+/-- `dictionary SocketAddress` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SocketAddress where
+  /-- `required DOMString address` -/
+  address : String
+  /-- `required unsigned short port` -/
+  port : Nat
+  /-- `required SocketAddressFamily family` -/
+  family : SocketAddressFamily
+instance : FromJS SocketAddress where
+  fromJS d := do return {
+    address := ← Lasm.JS.readField String d "address",
+    port := ← Lasm.JS.readField Nat d "port",
+    family := ← Lasm.JS.readField SocketAddressFamily d "family" }
+  typeName := "Lasm.JS.Bun.SocketAddress"
+
 /-- `typedef DOMString or Uint8Array or DOMString or double UdpDataOrDOMStringOrDouble`: one constructor per member type. -/
 inductive UdpDataOrDOMStringOrDouble where
   /-- `DOMString` -/
@@ -2718,21 +2881,6 @@ structure UdpSocketHandler where
 instance : ToJS UdpSocketHandler := ⟨fun d => Support.fields #[("data", Support.optional d.data),
     ("drain", Support.optional d.drain),
     ("error", Support.optional d.error)]⟩
-
-/-- `dictionary SocketAddress` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SocketAddress where
-  /-- `required DOMString address` -/
-  address : String
-  /-- `required unsigned short port` -/
-  port : Nat
-  /-- `required SocketAddressFamily family` -/
-  family : SocketAddressFamily
-instance : FromJS SocketAddress where
-  fromJS d := do return {
-    address := ← Lasm.JS.readField String d "address",
-    port := ← Lasm.JS.readField Nat d "port",
-    family := ← Lasm.JS.readField SocketAddressFamily d "family" }
-  typeName := "Lasm.JS.Bun.SocketAddress"
 
 /-- `callback UdpConnectedSocketHandlerData = Promise<undefined> (UdpConnectedSocket socket, Uint8Array data, double port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UdpConnectedSocketHandlerData where
@@ -4246,6 +4394,81 @@ instance : ToJS UdpConnectSocketOptions := ⟨fun d => Support.fields #[("hostna
     ("socket", Support.optional d.socket),
     ("connect", toJS d.connect)]⟩
 
+/-- `dictionary ErrorLike` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ErrorLike where
+  /-- `DOMString code` -/
+  code : Option String := none
+  /-- `double errno` -/
+  errno : Option Float := none
+  /-- `DOMString syscall` -/
+  syscall : Option String := none
+instance : FromJS ErrorLike where
+  fromJS d := do return {
+    code := ← Lasm.JS.readField (Option String) d "code",
+    errno := ← Lasm.JS.readField (Option Float) d "errno",
+    syscall := ← Lasm.JS.readField (Option String) d "syscall" }
+  typeName := "Lasm.JS.Bun.ErrorLike"
+
+/-- `callback SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Subprocess subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipeInheritOnExit where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritOnExit", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipeInheritOnExit.ofFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipeInheritOnExit.ofSyncFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
+  return { val := fn }
+
+/-- `callback SpawnBaseOptionsIgnorePipeInheritOnDisconnect = Promise<undefined> ()` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipeInheritOnDisconnect where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipeInheritOnDisconnect := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritOnDisconnect := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritOnDisconnect := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritOnDisconnect", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipeInheritOnDisconnect.ofFn (f : Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnDisconnect := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipeInheritOnDisconnect.ofSyncFn (f : IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnDisconnect := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback SpawnBaseOptionsIgnorePipeInheritIpc = undefined (any message, Subprocess subprocess, optional any handle)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipeInheritIpc where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipeInheritIpc := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritIpc := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipeInheritIpc := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritIpc", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipeInheritIpc.ofFn (f : Data → Subprocess → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritIpc := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Subprocess args 1) (← Support.arg Data args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipeInheritIpc.ofSyncFn (f : Data → Subprocess → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritIpc := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Subprocess args 1) (← Support.arg Data args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
 /-- `typedef TerminalOptions or Terminal TerminalOptionsOrTerminal`: one constructor per member type. -/
 inductive TerminalOptionsOrTerminal where
   /-- `TerminalOptions` -/
@@ -4260,33 +4483,279 @@ instance : Coe Terminal TerminalOptionsOrTerminal := ⟨.terminal⟩
 
 /-- `dictionary SpawnCmdOptions : SpawnSpawnOptionsIgnorePipeInherit` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpawnCmdOptions where
+  /-- `DOMString cwd` -/
+  cwd : Option String := none
+  /-- `boolean detached` -/
+  detached : Option Bool := none
+  /-- `double uid` -/
+  uid : Option Float := none
+  /-- `double gid` -/
+  gid : Option Float := none
+  /-- `DOMStringOrDouble cgroup` -/
+  cgroup : Option DOMStringOrDouble := none
+  /-- `record<DOMString, DOMString> env` -/
+  env : Option (Record String) := none
+  /-- `sequence<any> stdio` -/
+  stdio : Option (Array Data) := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStdin stdin` -/
+  stdin : Option SpawnBaseOptionsIgnorePipeInheritStdin := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStdout stdout` -/
+  stdout : Option SpawnBaseOptionsIgnorePipeInheritStdout := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStderr stderr` -/
+  stderr : Option SpawnBaseOptionsIgnorePipeInheritStderr := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritOnExit onExit` -/
+  onExit : Option SpawnBaseOptionsIgnorePipeInheritOnExit := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritOnDisconnect onDisconnect` -/
+  onDisconnect : Option SpawnBaseOptionsIgnorePipeInheritOnDisconnect := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritIpc ipc` -/
+  ipc : Option SpawnBaseOptionsIgnorePipeInheritIpc := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritSerialization serialization` -/
+  serialization : Option SpawnBaseOptionsIgnorePipeInheritSerialization := none
+  /-- `boolean windowsHide` -/
+  windowsHide : Option Bool := none
+  /-- `boolean windowsVerbatimArguments` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `DOMString argv0` -/
+  argv0 : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `DOMStringOrDouble killSignal` -/
+  killSignal : Option DOMStringOrDouble := none
+  /-- `double maxBuffer` -/
+  maxBuffer : Option Float := none
   /-- `boolean lazy` -/
   lazy : Option Bool := none
   /-- `TerminalOptionsOrTerminal terminal` -/
   terminal : Option TerminalOptionsOrTerminal := none
   /-- `required sequence<DOMString> cmd` -/
   cmd : Array String
-instance : ToJS SpawnCmdOptions := ⟨fun d => Support.fields #[("lazy", Support.optional d.lazy),
+instance : ToJS SpawnCmdOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("detached", Support.optional d.detached),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("cgroup", Support.optional d.cgroup),
+    ("env", Support.optional d.env),
+    ("stdio", Support.optional d.stdio),
+    ("stdin", Support.optional d.stdin),
+    ("stdout", Support.optional d.stdout),
+    ("stderr", Support.optional d.stderr),
+    ("onExit", Support.optional d.onExit),
+    ("onDisconnect", Support.optional d.onDisconnect),
+    ("ipc", Support.optional d.ipc),
+    ("serialization", Support.optional d.serialization),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("argv0", Support.optional d.argv0),
+    ("signal", Support.optional d.signal),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("lazy", Support.optional d.lazy),
     ("terminal", Support.optional d.terminal),
     ("cmd", toJS d.cmd)]⟩
 
-/-- `dictionary SpawnSpawnOptionsIgnorePipeInherit` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary SpawnSpawnOptionsIgnorePipeInherit : SpawnBaseOptionsIgnorePipeInherit` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpawnSpawnOptionsIgnorePipeInherit where
+  /-- `DOMString cwd` -/
+  cwd : Option String := none
+  /-- `boolean detached` -/
+  detached : Option Bool := none
+  /-- `double uid` -/
+  uid : Option Float := none
+  /-- `double gid` -/
+  gid : Option Float := none
+  /-- `DOMStringOrDouble cgroup` -/
+  cgroup : Option DOMStringOrDouble := none
+  /-- `record<DOMString, DOMString> env` -/
+  env : Option (Record String) := none
+  /-- `sequence<any> stdio` -/
+  stdio : Option (Array Data) := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStdin stdin` -/
+  stdin : Option SpawnBaseOptionsIgnorePipeInheritStdin := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStdout stdout` -/
+  stdout : Option SpawnBaseOptionsIgnorePipeInheritStdout := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritStderr stderr` -/
+  stderr : Option SpawnBaseOptionsIgnorePipeInheritStderr := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritOnExit onExit` -/
+  onExit : Option SpawnBaseOptionsIgnorePipeInheritOnExit := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritOnDisconnect onDisconnect` -/
+  onDisconnect : Option SpawnBaseOptionsIgnorePipeInheritOnDisconnect := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritIpc ipc` -/
+  ipc : Option SpawnBaseOptionsIgnorePipeInheritIpc := none
+  /-- `SpawnBaseOptionsIgnorePipeInheritSerialization serialization` -/
+  serialization : Option SpawnBaseOptionsIgnorePipeInheritSerialization := none
+  /-- `boolean windowsHide` -/
+  windowsHide : Option Bool := none
+  /-- `boolean windowsVerbatimArguments` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `DOMString argv0` -/
+  argv0 : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `DOMStringOrDouble killSignal` -/
+  killSignal : Option DOMStringOrDouble := none
+  /-- `double maxBuffer` -/
+  maxBuffer : Option Float := none
   /-- `boolean lazy` -/
   lazy : Option Bool := none
   /-- `TerminalOptionsOrTerminal terminal` -/
   terminal : Option TerminalOptionsOrTerminal := none
-instance : ToJS SpawnSpawnOptionsIgnorePipeInherit := ⟨fun d => Support.fields #[("lazy", Support.optional d.lazy),
+instance : ToJS SpawnSpawnOptionsIgnorePipeInherit := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("detached", Support.optional d.detached),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("cgroup", Support.optional d.cgroup),
+    ("env", Support.optional d.env),
+    ("stdio", Support.optional d.stdio),
+    ("stdin", Support.optional d.stdin),
+    ("stdout", Support.optional d.stdout),
+    ("stderr", Support.optional d.stderr),
+    ("onExit", Support.optional d.onExit),
+    ("onDisconnect", Support.optional d.onDisconnect),
+    ("ipc", Support.optional d.ipc),
+    ("serialization", Support.optional d.serialization),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("argv0", Support.optional d.argv0),
+    ("signal", Support.optional d.signal),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("lazy", Support.optional d.lazy),
     ("terminal", Support.optional d.terminal)]⟩
+
+/-- `callback SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (SubprocessIgnorePipePipe subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipePipeOnExit where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipePipeOnExit := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeOnExit", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipePipeOnExit.ofFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipePipeOnExit.ofSyncFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
+  return { val := fn }
+
+/-- `callback SpawnBaseOptionsIgnorePipePipeOnDisconnect = Promise<undefined> ()` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipePipeOnDisconnect where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipePipeOnDisconnect := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipePipeOnDisconnect := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeOnDisconnect := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeOnDisconnect", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipePipeOnDisconnect.ofFn (f : Async Unit) : IO SpawnBaseOptionsIgnorePipePipeOnDisconnect := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipePipeOnDisconnect.ofSyncFn (f : IO Unit) : IO SpawnBaseOptionsIgnorePipePipeOnDisconnect := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback SpawnBaseOptionsIgnorePipePipeIpc = undefined (any message, SubprocessIgnorePipePipe subprocess, optional any handle)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SpawnBaseOptionsIgnorePipePipeIpc where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SpawnBaseOptionsIgnorePipePipeIpc := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SpawnBaseOptionsIgnorePipePipeIpc := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SpawnBaseOptionsIgnorePipePipeIpc := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeIpc", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SpawnBaseOptionsIgnorePipePipeIpc.ofFn (f : Data → SubprocessIgnorePipePipe → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeIpc := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg SubprocessIgnorePipePipe args 1) (← Support.arg Data args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SpawnBaseOptionsIgnorePipePipeIpc.ofSyncFn (f : Data → SubprocessIgnorePipePipe → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeIpc := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg SubprocessIgnorePipePipe args 1) (← Support.arg Data args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
 
 /-- `dictionary SpawnSyncCmdOptions : SpawnSpawnSyncOptionsIgnorePipePipe` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpawnSyncCmdOptions where
+  /-- `DOMString cwd` -/
+  cwd : Option String := none
+  /-- `boolean detached` -/
+  detached : Option Bool := none
+  /-- `double uid` -/
+  uid : Option Float := none
+  /-- `double gid` -/
+  gid : Option Float := none
+  /-- `DOMStringOrDouble cgroup` -/
+  cgroup : Option DOMStringOrDouble := none
+  /-- `record<DOMString, DOMString> env` -/
+  env : Option (Record String) := none
+  /-- `sequence<any> stdio` -/
+  stdio : Option (Array Data) := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStdin stdin` -/
+  stdin : Option SpawnBaseOptionsIgnorePipePipeStdin := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStdout stdout` -/
+  stdout : Option SpawnBaseOptionsIgnorePipePipeStdout := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStderr stderr` -/
+  stderr : Option SpawnBaseOptionsIgnorePipePipeStderr := none
+  /-- `SpawnBaseOptionsIgnorePipePipeOnExit onExit` -/
+  onExit : Option SpawnBaseOptionsIgnorePipePipeOnExit := none
+  /-- `SpawnBaseOptionsIgnorePipePipeOnDisconnect onDisconnect` -/
+  onDisconnect : Option SpawnBaseOptionsIgnorePipePipeOnDisconnect := none
+  /-- `SpawnBaseOptionsIgnorePipePipeIpc ipc` -/
+  ipc : Option SpawnBaseOptionsIgnorePipePipeIpc := none
+  /-- `SpawnBaseOptionsIgnorePipePipeSerialization serialization` -/
+  serialization : Option SpawnBaseOptionsIgnorePipePipeSerialization := none
+  /-- `boolean windowsHide` -/
+  windowsHide : Option Bool := none
+  /-- `boolean windowsVerbatimArguments` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `DOMString argv0` -/
+  argv0 : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `DOMStringOrDouble killSignal` -/
+  killSignal : Option DOMStringOrDouble := none
+  /-- `double maxBuffer` -/
+  maxBuffer : Option Float := none
   /-- `required sequence<DOMString> cmd` -/
   cmd : Array String
-  /-- `undefined onExit` -/
-  onExit : Option Unit := none
-instance : ToJS SpawnSyncCmdOptions := ⟨fun d => Support.fields #[("cmd", toJS d.cmd),
-    ("onExit", Support.optional d.onExit)]⟩
+instance : ToJS SpawnSyncCmdOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("detached", Support.optional d.detached),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("cgroup", Support.optional d.cgroup),
+    ("env", Support.optional d.env),
+    ("stdio", Support.optional d.stdio),
+    ("stdin", Support.optional d.stdin),
+    ("stdout", Support.optional d.stdout),
+    ("stderr", Support.optional d.stderr),
+    ("onExit", Support.optional d.onExit),
+    ("onDisconnect", Support.optional d.onDisconnect),
+    ("ipc", Support.optional d.ipc),
+    ("serialization", Support.optional d.serialization),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("argv0", Support.optional d.argv0),
+    ("signal", Support.optional d.signal),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("cmd", toJS d.cmd)]⟩
 
 /-- `dictionary ReadableSyncSubprocess` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableSyncSubprocess where
@@ -4321,9 +4790,71 @@ instance : FromJS ReadableSyncSubprocess where
     pid := ← Lasm.JS.readField Float d "pid" }
   typeName := "Lasm.JS.Bun.ReadableSyncSubprocess"
 
-/-- `dictionary SpawnSpawnSyncOptionsIgnorePipePipe` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary SpawnSpawnSyncOptionsIgnorePipePipe : SpawnBaseOptionsIgnorePipePipe` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpawnSpawnSyncOptionsIgnorePipePipe where
-instance : ToJS SpawnSpawnSyncOptionsIgnorePipePipe := ⟨fun _ => Support.fields #[]⟩
+  /-- `DOMString cwd` -/
+  cwd : Option String := none
+  /-- `boolean detached` -/
+  detached : Option Bool := none
+  /-- `double uid` -/
+  uid : Option Float := none
+  /-- `double gid` -/
+  gid : Option Float := none
+  /-- `DOMStringOrDouble cgroup` -/
+  cgroup : Option DOMStringOrDouble := none
+  /-- `record<DOMString, DOMString> env` -/
+  env : Option (Record String) := none
+  /-- `sequence<any> stdio` -/
+  stdio : Option (Array Data) := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStdin stdin` -/
+  stdin : Option SpawnBaseOptionsIgnorePipePipeStdin := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStdout stdout` -/
+  stdout : Option SpawnBaseOptionsIgnorePipePipeStdout := none
+  /-- `SpawnBaseOptionsIgnorePipePipeStderr stderr` -/
+  stderr : Option SpawnBaseOptionsIgnorePipePipeStderr := none
+  /-- `SpawnBaseOptionsIgnorePipePipeOnExit onExit` -/
+  onExit : Option SpawnBaseOptionsIgnorePipePipeOnExit := none
+  /-- `SpawnBaseOptionsIgnorePipePipeOnDisconnect onDisconnect` -/
+  onDisconnect : Option SpawnBaseOptionsIgnorePipePipeOnDisconnect := none
+  /-- `SpawnBaseOptionsIgnorePipePipeIpc ipc` -/
+  ipc : Option SpawnBaseOptionsIgnorePipePipeIpc := none
+  /-- `SpawnBaseOptionsIgnorePipePipeSerialization serialization` -/
+  serialization : Option SpawnBaseOptionsIgnorePipePipeSerialization := none
+  /-- `boolean windowsHide` -/
+  windowsHide : Option Bool := none
+  /-- `boolean windowsVerbatimArguments` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `DOMString argv0` -/
+  argv0 : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `DOMStringOrDouble killSignal` -/
+  killSignal : Option DOMStringOrDouble := none
+  /-- `double maxBuffer` -/
+  maxBuffer : Option Float := none
+instance : ToJS SpawnSpawnSyncOptionsIgnorePipePipe := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("detached", Support.optional d.detached),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("cgroup", Support.optional d.cgroup),
+    ("env", Support.optional d.env),
+    ("stdio", Support.optional d.stdio),
+    ("stdin", Support.optional d.stdin),
+    ("stdout", Support.optional d.stdout),
+    ("stderr", Support.optional d.stderr),
+    ("onExit", Support.optional d.onExit),
+    ("onDisconnect", Support.optional d.onDisconnect),
+    ("ipc", Support.optional d.ipc),
+    ("serialization", Support.optional d.serialization),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("argv0", Support.optional d.argv0),
+    ("signal", Support.optional d.signal),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer)]⟩
 
 /-- `typedef RandomUUIDv5NamespaceLiteral or DOMString or Uint8Array RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array`: one constructor per member type. -/
 inductive RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array where
@@ -6147,6 +6678,69 @@ def TCPSocketListener.hostname (self : TCPSocketListener) : IO String := self.va
 /-- `readonly unix: string`: `readonly attribute DOMString unix` -/
 def UnixSocketListener.unix (self : UnixSocketListener) : IO String := self.val.get "unix" String
 
+/-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
+def UdpBaseUDPSocket.hostname (self : UdpBaseUDPSocket) : IO String := self.val.get "hostname" String
+
+/-- `readonly port: number`: `readonly attribute double port` -/
+def UdpBaseUDPSocket.port (self : UdpBaseUDPSocket) : IO Float := self.val.get "port" Float
+
+/-- `readonly address: SocketAddress`: `readonly attribute SocketAddress address` -/
+def UdpBaseUDPSocket.address (self : UdpBaseUDPSocket) : IO SocketAddress := self.val.get "address" SocketAddress
+
+/-- `readonly binaryType: BinaryType (read as 'arraybuffer' | 'buffer' | 'uint8array': keyof BinaryTypeList)`: `readonly attribute UdpBaseUDPSocketBinaryType binaryType` -/
+def UdpBaseUDPSocket.binaryType (self : UdpBaseUDPSocket) : IO UdpBaseUDPSocketBinaryType := self.val.get "binaryType" UdpBaseUDPSocketBinaryType
+
+/-- `readonly closed: boolean`: `readonly attribute boolean closed` -/
+def UdpBaseUDPSocket.closed (self : UdpBaseUDPSocket) : IO Bool := self.val.get "closed" Bool
+
+/-- `ref(): void`: `undefined ref()` -/
+def UdpBaseUDPSocket.ref (self : UdpBaseUDPSocket) : IO Unit :=
+  self.val.callMethod "ref" (Support.args #[]) Unit
+
+/-- `unref(): void`: `undefined unref()` -/
+def UdpBaseUDPSocket.unref (self : UdpBaseUDPSocket) : IO Unit :=
+  self.val.callMethod "unref" (Support.args #[]) Unit
+
+/-- `close(): void`: `undefined close()` -/
+def UdpBaseUDPSocket.close (self : UdpBaseUDPSocket) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `setBroadcast(enabled: boolean): boolean`: `boolean setBroadcast(boolean enabled)` -/
+def UdpBaseUDPSocket.setBroadcast (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool :=
+  self.val.callMethod "setBroadcast" (Support.args #[toJS enabled]) Bool
+
+/-- `setTTL(ttl: number): number`: `double setTTL(double ttl)` -/
+def UdpBaseUDPSocket.setTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float :=
+  self.val.callMethod "setTTL" (Support.args #[toJS ttl]) Float
+
+/-- `setMulticastTTL(ttl: number): number`: `double setMulticastTTL(double ttl)` -/
+def UdpBaseUDPSocket.setMulticastTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float :=
+  self.val.callMethod "setMulticastTTL" (Support.args #[toJS ttl]) Float
+
+/-- `setMulticastLoopback(enabled: boolean): boolean`: `boolean setMulticastLoopback(boolean enabled)` -/
+def UdpBaseUDPSocket.setMulticastLoopback (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool :=
+  self.val.callMethod "setMulticastLoopback" (Support.args #[toJS enabled]) Bool
+
+/-- `setMulticastInterface(interfaceAddress: string): boolean`: `boolean setMulticastInterface(DOMString interfaceAddress)` -/
+def UdpBaseUDPSocket.setMulticastInterface (self : UdpBaseUDPSocket) (interfaceAddress : String) : IO Bool :=
+  self.val.callMethod "setMulticastInterface" (Support.args #[toJS interfaceAddress]) Bool
+
+/-- `addMembership(multicastAddress: string, interfaceAddress?: string): boolean`: `boolean addMembership(DOMString multicastAddress, optional DOMString interfaceAddress)` -/
+def UdpBaseUDPSocket.addMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
+  self.val.callMethod "addMembership" (Support.args #[toJS multicastAddress, Support.optional interfaceAddress]) Bool
+
+/-- `dropMembership(multicastAddress: string, interfaceAddress?: string): boolean`: `boolean dropMembership(DOMString multicastAddress, optional DOMString interfaceAddress)` -/
+def UdpBaseUDPSocket.dropMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
+  self.val.callMethod "dropMembership" (Support.args #[toJS multicastAddress, Support.optional interfaceAddress]) Bool
+
+/-- `addSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean`: `boolean addSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress)` -/
+def UdpBaseUDPSocket.addSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
+  self.val.callMethod "addSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional interfaceAddress]) Bool
+
+/-- `dropSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean`: `boolean dropSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress)` -/
+def UdpBaseUDPSocket.dropSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
+  self.val.callMethod "dropSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional interfaceAddress]) Bool
+
 /-- `sendMany(packets: readonly (Data | string | number)[]): number`: `double sendMany(sequence<UdpDataOrDOMStringOrDouble> packets)` -/
 def UdpSocket.sendMany (self : UdpSocket) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float :=
   self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
@@ -6291,6 +6885,65 @@ def Subprocess.disconnect (self : Subprocess) : IO Unit :=
 
 /-- `resourceUsage(): ResourceUsage | undefined`: `ResourceUsage? resourceUsage()` -/
 def Subprocess.resourceUsage (self : Subprocess) : IO (Option ResourceUsage) :=
+  self.val.callMethod "resourceUsage" (Support.args #[]) (Option ResourceUsage)
+
+/-- `readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))`: `readonly attribute FileSinkOrDouble? stdin` -/
+def SubprocessIgnorePipePipe.stdin (self : SubprocessIgnorePipePipe) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)
+
+/-- `readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stdout` -/
+def SubprocessIgnorePipePipe.stdout (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "stdout" (Option ReadableStreamOrDouble)
+
+/-- `readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stderr` -/
+def SubprocessIgnorePipePipe.stderr (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "stderr" (Option ReadableStreamOrDouble)
+
+/-- `readonly terminal: Terminal | undefined`: `readonly attribute Terminal? terminal` -/
+def SubprocessIgnorePipePipe.terminal (self : SubprocessIgnorePipePipe) : IO (Option Terminal) := self.val.get "terminal" (Option Terminal)
+
+/-- `readonly stdio: [null, null, null, ...(number | null)[]]`: `readonly attribute sequence<any> stdio` -/
+def SubprocessIgnorePipePipe.stdio (self : SubprocessIgnorePipePipe) : IO (Array Data) := self.val.get "stdio" (Array Data)
+
+/-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
+def SubprocessIgnorePipePipe.readable (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
+
+/-- `readonly pid: number`: `readonly attribute double pid` -/
+def SubprocessIgnorePipePipe.pid (self : SubprocessIgnorePipePipe) : IO Float := self.val.get "pid" Float
+
+/-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
+def SubprocessIgnorePipePipe.exited (self : SubprocessIgnorePipePipe) : Async Float := do
+  let p ← self.val.get "exited" Value
+  p.await Float
+
+/-- `readonly exitCode: number | null`: `readonly attribute double? exitCode` -/
+def SubprocessIgnorePipePipe.exitCode (self : SubprocessIgnorePipePipe) : IO (Option Float) := self.val.get "exitCode" (Option Float)
+
+/-- `readonly signalCode: NodeJS.Signals | number | null`: `readonly attribute DOMStringOrDouble? signalCode` -/
+def SubprocessIgnorePipePipe.signalCode (self : SubprocessIgnorePipePipe) : IO (Option DOMStringOrDouble) := self.val.get "signalCode" (Option DOMStringOrDouble)
+
+/-- `readonly killed: boolean`: `readonly attribute boolean killed` -/
+def SubprocessIgnorePipePipe.killed (self : SubprocessIgnorePipePipe) : IO Bool := self.val.get "killed" Bool
+
+/-- `kill(exitCode?: number | NodeJS.Signals): void`: `undefined kill(optional DoubleOrDOMString exitCode)` -/
+def SubprocessIgnorePipePipe.kill (self : SubprocessIgnorePipePipe) (exitCode : Option DoubleOrDOMString := none) : IO Unit :=
+  self.val.callMethod "kill" (Support.args #[Support.optional exitCode]) Unit
+
+/-- `ref(): void`: `undefined ref()` -/
+def SubprocessIgnorePipePipe.ref (self : SubprocessIgnorePipePipe) : IO Unit :=
+  self.val.callMethod "ref" (Support.args #[]) Unit
+
+/-- `unref(): void`: `undefined unref()` -/
+def SubprocessIgnorePipePipe.unref (self : SubprocessIgnorePipePipe) : IO Unit :=
+  self.val.callMethod "unref" (Support.args #[]) Unit
+
+/-- `send(message: any): void`: `undefined send(any message)` -/
+def SubprocessIgnorePipePipe.send (self : SubprocessIgnorePipePipe) (message : Data) : IO Unit :=
+  self.val.callMethod "send" (Support.args #[toJS message]) Unit
+
+/-- `disconnect(): void`: `undefined disconnect()` -/
+def SubprocessIgnorePipePipe.disconnect (self : SubprocessIgnorePipePipe) : IO Unit :=
+  self.val.callMethod "disconnect" (Support.args #[]) Unit
+
+/-- `resourceUsage(): ResourceUsage | undefined`: `ResourceUsage? resourceUsage()` -/
+def SubprocessIgnorePipePipe.resourceUsage (self : SubprocessIgnorePipePipe) : IO (Option ResourceUsage) :=
   self.val.callMethod "resourceUsage" (Support.args #[]) (Option ResourceUsage)
 
 /-- `start(options?: { asUint8Array?: boolean; highWaterMark?: number; stream?: boolean; }): void`: `undefined start(optional ArrayBufferSinkStartOptions options)` -/

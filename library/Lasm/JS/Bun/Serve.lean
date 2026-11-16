@@ -207,21 +207,6 @@ instance : ToJS ServeDevelopmentUnion := ⟨fun
 instance : Coe Bool ServeDevelopmentUnion := ⟨.boolean⟩
 instance : Coe ServeDevelopment ServeDevelopmentUnion := ⟨.serveDevelopment⟩
 
-/-- `dictionary ErrorLike` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ErrorLike where
-  /-- `DOMString code` -/
-  code : Option String := none
-  /-- `double errno` -/
-  errno : Option Float := none
-  /-- `DOMString syscall` -/
-  syscall : Option String := none
-instance : FromJS ErrorLike where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField (Option String) d "code",
-    errno := ← Lasm.JS.readField (Option Float) d "errno",
-    syscall := ← Lasm.JS.readField (Option String) d "syscall" }
-  typeName := "Lasm.JS.Bun.ErrorLike"
-
 /-- `callback ServeOptionsError = Promise<Response> (ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeOptionsError where
   /-- The JavaScript function. -/

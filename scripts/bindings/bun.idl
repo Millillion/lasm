@@ -20,11 +20,7 @@
 //   - Bun.unsafe.arrayBufferToString(buffer: Uint16Array): reads a UTF-16 Uint16Array in place; the Uint8Array overload takes bytes
 //   - Bun.shrink(): @deprecated in its declaration
 //   - Socket.[Symbol.dispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
-//   - Bun.udp.Socket extends BaseUDPSocket: not declared in the namespace
-//   - Bun.udp.ConnectedSocket extends BaseUDPSocket: not declared in the namespace
 //   - Terminal.[Symbol.asyncDispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
-//   - Bun.Spawn.SpawnOptions extends BaseOptions<In, Out, Err>: not declared in the namespace
-//   - Bun.Spawn.SpawnSyncOptions extends BaseOptions<In, Out, Err>: not declared in the namespace
 //   - Bun.ErrorLike extends Error: not declared in the namespace
 //   - Serve.Routes.[Path in R]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - Serve.RoutesWithUpgrade.[Path in R]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
@@ -57,9 +53,6 @@
 //   - RedisClient.hmset: @deprecated in its declaration
 //   - RedisClient.substr: @deprecated in its declaration
 //   - Bun.SQL.SQLError extends Error: not declared in the namespace
-//   - Bun.SQL.PostgresError extends SQLError: not declared in the namespace
-//   - Bun.SQL.MySQLError extends SQLError: not declared in the namespace
-//   - Bun.SQL.SQLiteError extends SQLError: not declared in the namespace
 //   - SQL.NameTransform.()(name: string): string: a call or construct signature (the object is itself a function, called with Lasm.JS's Value.call)
 //   - Bun.sql: the default SQL client is a tagged template literal (sql`select …`), as $; Bun.SQL's methods (unsafe, …) run queries
 //   - Bun.postgres: @deprecated in its declaration
@@ -1616,6 +1609,62 @@ interface Bun_UnixSocketListener : Bun_SocketListener {
   [LasmHost="Bun", LasmSignature="readonly unix: string"] readonly attribute DOMString unix;
 };
 
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketAddressFamily"]
+enum Bun_SocketAddressFamily { "IPv4", "IPv6" };
+
+// object Bun.SocketAddress
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketAddress", LasmPath="Bun.SocketAddress"]
+dictionary Bun_SocketAddress {
+  // address: string
+  required DOMString address;
+  // port: number
+  required unsigned short port;
+  // family: "IPv4" | "IPv6"
+  required Bun_SocketAddressFamily family;
+};
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpBaseUDPSocketBinaryType"]
+enum Bun_UdpBaseUDPSocketBinaryType { "arraybuffer", "buffer", "uint8array" };
+
+// interface Bun.udp.BaseUDPSocket
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpBaseUDPSocket", LasmPath="Bun.udp.BaseUDPSocket"]
+interface Bun_UdpBaseUDPSocket {
+  // readonly hostname: string
+  [LasmHost="Bun", LasmSignature="readonly hostname: string"] readonly attribute DOMString hostname;
+  // readonly port: number
+  [LasmHost="Bun", LasmSignature="readonly port: number"] readonly attribute double port;
+  // readonly address: SocketAddress
+  [LasmHost="Bun", LasmSignature="readonly address: SocketAddress"] readonly attribute Bun_SocketAddress address;
+  // readonly binaryType: BinaryType (read as "arraybuffer" | "buffer" | "uint8array": keyof BinaryTypeList)
+  [LasmHost="Bun", LasmSignature="readonly binaryType: BinaryType (read as 'arraybuffer' | 'buffer' | 'uint8array': keyof BinaryTypeList)"] readonly attribute Bun_UdpBaseUDPSocketBinaryType binaryType;
+  // readonly closed: boolean
+  [LasmHost="Bun", LasmSignature="readonly closed: boolean"] readonly attribute boolean closed;
+  // ref(): void
+  [LasmHost="Bun", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Bun", LasmSignature="unref(): void"] undefined unref();
+  // close(): void
+  [LasmHost="Bun", LasmSignature="close(): void"] undefined close();
+  // setBroadcast(enabled: boolean): boolean
+  [LasmHost="Bun", LasmSignature="setBroadcast(enabled: boolean): boolean"] boolean setBroadcast(boolean enabled);
+  // setTTL(ttl: number): number
+  [LasmHost="Bun", LasmSignature="setTTL(ttl: number): number"] double setTTL(double ttl);
+  // setMulticastTTL(ttl: number): number
+  [LasmHost="Bun", LasmSignature="setMulticastTTL(ttl: number): number"] double setMulticastTTL(double ttl);
+  // setMulticastLoopback(enabled: boolean): boolean
+  [LasmHost="Bun", LasmSignature="setMulticastLoopback(enabled: boolean): boolean"] boolean setMulticastLoopback(boolean enabled);
+  // setMulticastInterface(interfaceAddress: string): boolean
+  [LasmHost="Bun", LasmSignature="setMulticastInterface(interfaceAddress: string): boolean"] boolean setMulticastInterface(DOMString interfaceAddress);
+  // addMembership(multicastAddress: string, interfaceAddress?: string): boolean
+  [LasmHost="Bun", LasmSignature="addMembership(multicastAddress: string, interfaceAddress?: string): boolean"] boolean addMembership(DOMString multicastAddress, optional DOMString interfaceAddress);
+  // dropMembership(multicastAddress: string, interfaceAddress?: string): boolean
+  [LasmHost="Bun", LasmSignature="dropMembership(multicastAddress: string, interfaceAddress?: string): boolean"] boolean dropMembership(DOMString multicastAddress, optional DOMString interfaceAddress);
+  // addSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean
+  [LasmHost="Bun", LasmSignature="addSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean"] boolean addSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress);
+  // dropSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean
+  [LasmHost="Bun", LasmSignature="dropSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean"] boolean dropSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress);
+};
+
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpData"]
 typedef (DOMString or Uint8Array) Bun_UdpData;
 
@@ -1656,7 +1705,7 @@ dictionary Bun_UdpSocketHandler {
 
 // interface Bun.udp.Socket (udp.Socket<"buffer">)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpSocket", LasmPath="Bun.udp.Socket"]
-interface Bun_UdpSocket {
+interface Bun_UdpSocket : Bun_UdpBaseUDPSocket {
   // sendMany(packets: readonly (Data | string | number)[]): number
   [LasmHost="Bun", LasmSignature="sendMany(packets: readonly (Data | string | number)[]): number"] double sendMany(sequence<Bun_UdpDataOrDOMStringOrDouble> packets);
   // send(data: Data, port: number, address: string): boolean
@@ -1679,20 +1728,6 @@ dictionary Bun_UdpSocketOptions {
   Bun_UdpSocketOptionsBinaryType binaryType;
   // socket?: SocketHandler<DataBinaryType>
   Bun_UdpSocketHandler socket;
-};
-
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketAddressFamily"]
-enum Bun_SocketAddressFamily { "IPv4", "IPv6" };
-
-// object Bun.SocketAddress
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketAddress", LasmPath="Bun.SocketAddress"]
-dictionary Bun_SocketAddress {
-  // address: string
-  required DOMString address;
-  // port: number
-  required unsigned short port;
-  // family: "IPv4" | "IPv6"
-  required Bun_SocketAddressFamily family;
 };
 
 // (socket: ConnectedSocket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>
@@ -1720,7 +1755,7 @@ dictionary Bun_UdpConnectedSocketHandler {
 
 // interface Bun.udp.ConnectedSocket (udp.ConnectedSocket<"buffer">)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpConnectedSocket", LasmPath="Bun.udp.ConnectedSocket"]
-interface Bun_UdpConnectedSocket {
+interface Bun_UdpConnectedSocket : Bun_UdpBaseUDPSocket {
   // readonly remoteAddress: SocketAddress
   [LasmHost="Bun", LasmSignature="readonly remoteAddress: SocketAddress"] readonly attribute Bun_SocketAddress remoteAddress;
   // sendMany(packets: readonly Data[]): number
@@ -1923,12 +1958,94 @@ interface Bun_Subprocess {
   [LasmHost="Bun", LasmSignature="resourceUsage(): ResourceUsage | undefined"] Bun_ResourceUsage? resourceUsage();
 };
 
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritStdin"]
+enum Bun_SpawnBaseOptionsIgnorePipeInheritStdin { "ignore" };
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritStdout"]
+enum Bun_SpawnBaseOptionsIgnorePipeInheritStdout { "pipe" };
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritStderr"]
+enum Bun_SpawnBaseOptionsIgnorePipeInheritStderr { "inherit" };
+
+// object Bun.ErrorLike
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="ErrorLike", LasmPath="Bun.ErrorLike"]
+dictionary Bun_ErrorLike {
+  // code?: string
+  DOMString code;
+  // errno?: number
+  double errno;
+  // syscall?: string
+  DOMString syscall;
+};
+
+// (subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritOnExit", LasmSignature="(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>"]
+callback Bun_SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Bun_Subprocess subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional Bun_ErrorLike error);
+
+// () => void | Promise<void>
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritOnDisconnect", LasmSignature="() => void | Promise<void>"]
+callback Bun_SpawnBaseOptionsIgnorePipeInheritOnDisconnect = Promise<undefined> ();
+
+// (message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown) => void
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritIpc", LasmSignature="(message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown) => void"]
+callback Bun_SpawnBaseOptionsIgnorePipeInheritIpc = undefined (any message, Bun_Subprocess subprocess, optional any handle);
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritSerialization"]
+enum Bun_SpawnBaseOptionsIgnorePipeInheritSerialization { "json", "advanced" };
+
+// object Bun.Spawn.BaseOptions (Spawn.BaseOptions<"ignore", "pipe", "inherit">)
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SpawnBaseOptionsIgnorePipeInherit", LasmPath="Bun.Spawn.BaseOptions"]
+dictionary Bun_SpawnBaseOptionsIgnorePipeInherit {
+  // cwd?: string
+  DOMString cwd;
+  // detached?: boolean
+  boolean detached;
+  // uid?: number
+  double uid;
+  // gid?: number
+  double gid;
+  // cgroup?: string | number
+  Bun_DOMStringOrDouble cgroup;
+  // env?: Record<string, string | undefined>
+  record<DOMString, DOMString> env;
+  // stdio?: [In, Out, Err, ...(Readable | "socket-fd")[]] (read as unknown[]: a tuple of stdin, stdout and stderr typed by the generic options: each entry as Data)
+  sequence<any> stdio;
+  // stdin?: In
+  Bun_SpawnBaseOptionsIgnorePipeInheritStdin stdin;
+  // stdout?: Out
+  Bun_SpawnBaseOptionsIgnorePipeInheritStdout stdout;
+  // stderr?: Err
+  Bun_SpawnBaseOptionsIgnorePipeInheritStderr stderr;
+  // onExit?(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike): void | Promise<void>
+  Bun_SpawnBaseOptionsIgnorePipeInheritOnExit onExit;
+  // onDisconnect?(): void | Promise<void>
+  Bun_SpawnBaseOptionsIgnorePipeInheritOnDisconnect onDisconnect;
+  // ipc?(message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown): void
+  Bun_SpawnBaseOptionsIgnorePipeInheritIpc ipc;
+  // serialization?: "json" | "advanced"
+  Bun_SpawnBaseOptionsIgnorePipeInheritSerialization serialization;
+  // windowsHide?: boolean
+  boolean windowsHide;
+  // windowsVerbatimArguments?: boolean
+  boolean windowsVerbatimArguments;
+  // argv0?: string
+  DOMString argv0;
+  // signal?: AbortSignal
+  AbortSignal signal;
+  // timeout?: number
+  double timeout;
+  // killSignal?: string | number
+  Bun_DOMStringOrDouble killSignal;
+  // maxBuffer?: number
+  double maxBuffer;
+};
+
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="TerminalOptionsOrTerminal"]
 typedef (Bun_TerminalOptions or Bun_Terminal) Bun_TerminalOptionsOrTerminal;
 
 // object Bun.Spawn.SpawnOptions (Spawn.SpawnOptions<"ignore", "pipe", "inherit">)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SpawnSpawnOptionsIgnorePipeInherit", LasmPath="Bun.Spawn.SpawnOptions"]
-dictionary Bun_SpawnSpawnOptionsIgnorePipeInherit {
+dictionary Bun_SpawnSpawnOptionsIgnorePipeInherit : Bun_SpawnBaseOptionsIgnorePipeInherit {
   // lazy?: boolean
   boolean lazy;
   // terminal?: TerminalOptions | Terminal
@@ -1965,9 +2082,119 @@ dictionary Bun_ReadableSyncSubprocess {
   required double pid;
 };
 
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeStdin"]
+enum Bun_SpawnBaseOptionsIgnorePipePipeStdin { "ignore" };
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeStdout"]
+enum Bun_SpawnBaseOptionsIgnorePipePipeStdout { "pipe" };
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeStderr"]
+enum Bun_SpawnBaseOptionsIgnorePipePipeStderr { "pipe" };
+
+// interface Bun.Subprocess (Subprocess<"ignore", "pipe", "pipe">)
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SubprocessIgnorePipePipe", LasmPath="Bun.Subprocess"]
+interface Bun_SubprocessIgnorePipePipe {
+  // readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when "pipe"))
+  [LasmHost="Bun", LasmSignature="readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))"] readonly attribute Bun_FileSinkOrDouble? stdin;
+  // readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when "pipe"))
+  [LasmHost="Bun", LasmSignature="readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when 'pipe'))"] readonly attribute Bun_ReadableStreamOrDouble? stdout;
+  // readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when "pipe"))
+  [LasmHost="Bun", LasmSignature="readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when 'pipe'))"] readonly attribute Bun_ReadableStreamOrDouble? stderr;
+  // readonly terminal: Terminal | undefined
+  [LasmHost="Bun", LasmSignature="readonly terminal: Terminal | undefined"] readonly attribute Bun_Terminal? terminal;
+  // readonly stdio: [null, null, null, ...(number | null)[]]
+  [LasmHost="Bun", LasmSignature="readonly stdio: [null, null, null, ...(number | null)[]]"] readonly attribute sequence<any> stdio;
+  // readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)
+  [LasmHost="Bun", LasmSignature="readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)"] readonly attribute Bun_ReadableStreamOrDouble? readable;
+  // readonly pid: number
+  [LasmHost="Bun", LasmSignature="readonly pid: number"] readonly attribute double pid;
+  // readonly exited: Promise<number>
+  [LasmHost="Bun", LasmSignature="readonly exited: Promise<number>"] readonly attribute Promise<double> exited;
+  // readonly exitCode: number | null
+  [LasmHost="Bun", LasmSignature="readonly exitCode: number | null"] readonly attribute double? exitCode;
+  // readonly signalCode: NodeJS.Signals | number | null
+  [LasmHost="Bun", LasmSignature="readonly signalCode: NodeJS.Signals | number | null"] readonly attribute Bun_DOMStringOrDouble? signalCode;
+  // readonly killed: boolean
+  [LasmHost="Bun", LasmSignature="readonly killed: boolean"] readonly attribute boolean killed;
+  // kill(exitCode?: number | NodeJS.Signals): void
+  [LasmHost="Bun", LasmSignature="kill(exitCode?: number | NodeJS.Signals): void"] undefined kill(optional Bun_DoubleOrDOMString exitCode);
+  // ref(): void
+  [LasmHost="Bun", LasmSignature="ref(): void"] undefined ref();
+  // unref(): void
+  [LasmHost="Bun", LasmSignature="unref(): void"] undefined unref();
+  // send(message: any): void
+  [LasmHost="Bun", LasmSignature="send(message: any): void"] undefined send(any message);
+  // disconnect(): void
+  [LasmHost="Bun", LasmSignature="disconnect(): void"] undefined disconnect();
+  // resourceUsage(): ResourceUsage | undefined
+  [LasmHost="Bun", LasmSignature="resourceUsage(): ResourceUsage | undefined"] Bun_ResourceUsage? resourceUsage();
+};
+
+// (subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeOnExit", LasmSignature="(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>"]
+callback Bun_SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (Bun_SubprocessIgnorePipePipe subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional Bun_ErrorLike error);
+
+// () => void | Promise<void>
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeOnDisconnect", LasmSignature="() => void | Promise<void>"]
+callback Bun_SpawnBaseOptionsIgnorePipePipeOnDisconnect = Promise<undefined> ();
+
+// (message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown) => void
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeIpc", LasmSignature="(message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown) => void"]
+callback Bun_SpawnBaseOptionsIgnorePipePipeIpc = undefined (any message, Bun_SubprocessIgnorePipePipe subprocess, optional any handle);
+
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeSerialization"]
+enum Bun_SpawnBaseOptionsIgnorePipePipeSerialization { "json", "advanced" };
+
+// object Bun.Spawn.BaseOptions (Spawn.BaseOptions<"ignore", "pipe", "pipe">)
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SpawnBaseOptionsIgnorePipePipe", LasmPath="Bun.Spawn.BaseOptions"]
+dictionary Bun_SpawnBaseOptionsIgnorePipePipe {
+  // cwd?: string
+  DOMString cwd;
+  // detached?: boolean
+  boolean detached;
+  // uid?: number
+  double uid;
+  // gid?: number
+  double gid;
+  // cgroup?: string | number
+  Bun_DOMStringOrDouble cgroup;
+  // env?: Record<string, string | undefined>
+  record<DOMString, DOMString> env;
+  // stdio?: [In, Out, Err, ...(Readable | "socket-fd")[]] (read as unknown[]: a tuple of stdin, stdout and stderr typed by the generic options: each entry as Data)
+  sequence<any> stdio;
+  // stdin?: In
+  Bun_SpawnBaseOptionsIgnorePipePipeStdin stdin;
+  // stdout?: Out
+  Bun_SpawnBaseOptionsIgnorePipePipeStdout stdout;
+  // stderr?: Err
+  Bun_SpawnBaseOptionsIgnorePipePipeStderr stderr;
+  // onExit?(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike): void | Promise<void>
+  Bun_SpawnBaseOptionsIgnorePipePipeOnExit onExit;
+  // onDisconnect?(): void | Promise<void>
+  Bun_SpawnBaseOptionsIgnorePipePipeOnDisconnect onDisconnect;
+  // ipc?(message: any, subprocess: Subprocess<In, Out, Err>, handle?: unknown): void
+  Bun_SpawnBaseOptionsIgnorePipePipeIpc ipc;
+  // serialization?: "json" | "advanced"
+  Bun_SpawnBaseOptionsIgnorePipePipeSerialization serialization;
+  // windowsHide?: boolean
+  boolean windowsHide;
+  // windowsVerbatimArguments?: boolean
+  boolean windowsVerbatimArguments;
+  // argv0?: string
+  DOMString argv0;
+  // signal?: AbortSignal
+  AbortSignal signal;
+  // timeout?: number
+  double timeout;
+  // killSignal?: string | number
+  Bun_DOMStringOrDouble killSignal;
+  // maxBuffer?: number
+  double maxBuffer;
+};
+
 // object Bun.Spawn.SpawnSyncOptions (Spawn.SpawnSyncOptions<"ignore", "pipe", "pipe">)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SpawnSpawnSyncOptionsIgnorePipePipe", LasmPath="Bun.Spawn.SpawnSyncOptions"]
-dictionary Bun_SpawnSpawnSyncOptionsIgnorePipePipe {
+dictionary Bun_SpawnSpawnSyncOptionsIgnorePipePipe : Bun_SpawnBaseOptionsIgnorePipePipe {
 
 };
 
@@ -1976,8 +2203,6 @@ dictionary Bun_SpawnSpawnSyncOptionsIgnorePipePipe {
 dictionary Bun_SpawnSyncCmdOptions : Bun_SpawnSpawnSyncOptionsIgnorePipePipe {
   // cmd: string[]
   required sequence<DOMString> cmd;
-  // onExit?: never
-  undefined onExit;
 };
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="RandomUUIDv7Encoding"]
@@ -2034,17 +2259,6 @@ dictionary Bun_ServeDevelopment {
 
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeDevelopmentUnion"]
 typedef (boolean or Bun_ServeDevelopment) Bun_ServeDevelopmentUnion;
-
-// object Bun.ErrorLike
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="ErrorLike", LasmPath="Bun.ErrorLike"]
-dictionary Bun_ErrorLike {
-  // code?: string
-  DOMString code;
-  // errno?: number
-  double errno;
-  // syscall?: string
-  DOMString syscall;
-};
 
 // (this: Server<(undefined)>, error: ErrorLike) => Response | Promise<Response> | void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeOptionsError", LasmSignature="(this: Server<(undefined)>, error: ErrorLike) => Response | Promise<Response> | void | Promise<void>"]
@@ -4716,7 +4930,7 @@ dictionary Bun_SQLPostgresErrorNewOptions {
 
 // class Bun.SQL.PostgresError
 [LasmHost="Bun", LasmLeanModule="Sql", LasmFile="sql.d.ts", LasmName="SQLPostgresError", LasmPath="Bun.SQL.PostgresError"]
-interface Bun_SQLPostgresError {
+interface Bun_SQLPostgresError : Bun_SQLSQLError {
   // public readonly code: string
   [LasmHost="Bun", LasmSignature="public readonly code: string"] readonly attribute DOMString code;
   // public readonly errno?: string | undefined
@@ -4768,7 +4982,7 @@ dictionary Bun_SQLMySQLErrorNewOptions {
 
 // class Bun.SQL.MySQLError
 [LasmHost="Bun", LasmLeanModule="Sql", LasmFile="sql.d.ts", LasmName="SQLMySQLError", LasmPath="Bun.SQL.MySQLError"]
-interface Bun_SQLMySQLError {
+interface Bun_SQLMySQLError : Bun_SQLSQLError {
   // public readonly code: string
   [LasmHost="Bun", LasmSignature="public readonly code: string"] readonly attribute DOMString code;
   // public readonly errno?: number | undefined
@@ -4792,7 +5006,7 @@ dictionary Bun_SQLSQLiteErrorNewOptions {
 
 // class Bun.SQL.SQLiteError
 [LasmHost="Bun", LasmLeanModule="Sql", LasmFile="sql.d.ts", LasmName="SQLSQLiteError", LasmPath="Bun.SQL.SQLiteError"]
-interface Bun_SQLSQLiteError {
+interface Bun_SQLSQLiteError : Bun_SQLSQLError {
   // public readonly code: string
   [LasmHost="Bun", LasmSignature="public readonly code: string"] readonly attribute DOMString code;
   // public readonly errno: number
