@@ -78,8 +78,8 @@ linked section of the review.
 | A34 | Lasm.Fastly | Fastly calls are namespaced by module (`HttpReq.methodGet req`): keep the witx layout, or also generate dot-notation aliases on the handle types? | [Q34](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
 | A35 | Lasm.UI | Keep UI's own `Http`, `Url` and `Storage` commands as pure data (Claude recommends this), or replace them with `Cmd.io` plus the generated bindings? | [Q35](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
 | A36 | Lasm.UI | Keep the `_` suffix names (`class_`, `main_`, `type_`), or use «guillemets» or another convention? | [Q36](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
-| A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
-| A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
+| A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | decided in 0.6 ([below](#a37-dispatch-answers-endpoints-on-any-server-webhandler-on-the-javascript-runtimes)), pending sign-off |
+| A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | decided in 0.6 ([below](#a38-serve-keeps-its-name)), pending sign-off |
 | A39 | Lasm.KV | What `Lasm.KV` becomes: keep `open` with `setWorkersEnv` (PR #213), or typed constructors taking the platform binding (recommended)? | [Q39](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
 | A40 | Lasm.KV | Should values stay `String` only, or become `ByteArray` (or generic, through `ToJson`)? | [Q40](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
 | A41 | Lasm.Fetch | Embedded assets after Lasm.Fetch: keep them copied in apps, or a small transport-free library (`Lasm.Embed`, recommended)? | [Q41](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
@@ -103,3 +103,88 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.6: the `Lasm.*` libraries
+
+Decisions of ROADMAP.md's milestone 0.6, each with its shape, code, why, the
+alternatives, and where it shipped. New entries are numbered `0.6-1`, `0.6-2`,
+…; decisions on an existing question keep its id.
+
+### Lasm.RPC
+
+#### A37: `dispatch` answers endpoints on any server; `webHandler` on the JavaScript runtimes
+
+**Decision.** The server side of Lasm.RPC no longer needs a server library.
+`Lasm.RPC.dispatch` (in `Lasm.RPC.Server`) answers an HTTP request from its
+method, URL path and body text, and leaves every other path to the program.
+`Lasm.RPC.webHandler` (in a new module, `Lasm.RPC.Web`) does the same for a
+Lasm.JS.Web `Request`, the web platform's own type, which `Deno.serve`,
+`Bun.serve`, `Node.serve` and the edge platforms' default export hand over.
+Lasm.Fastly and Lasm.WASI.Http programs call `dispatch` directly. `handler`
+(a Lasm.Fetch handler) remains only until Lasm.Fetch is deleted (0.2), with
+its proofs.
+
+```lean
+structure Answer where
+  status : UInt16
+  headers : Array (String × String)
+  body : String
+def endpointName? (path : String) : Option String          -- "/rpc/addTodo?x" ↦ some "addTodo"
+def dispatch (routes : List Route) (method path body : String) : Option (Async Answer)
+def webHandler (routes : List Route) (request : Lasm.JS.Web.Request) : Async (Option Lasm.JS.Web.Response)
+
+-- Node, Bun, Deno and the edge platforms:
+def fetch (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
+  if let some response ← Lasm.RPC.webHandler routes request then return response
+  site request
+-- Fastly, wasi-http:
+match Lasm.RPC.dispatch routes method path body with
+| some answer => respond (← answer)
+| none => site …
+```
+
+**Why.** Platform-native: each server hands over its own request, and the
+program answers with its own response type; RPC decides only what
+`/rpc/<name>` answers. `dispatch` takes the URL path as the platform gives it
+(`new URL(request.url).pathname`, wasi-http's `path-with-query`), so no app
+needs a path parser for it, and it returns `none` instead of taking a
+fallback handler, so it composes with any router. `webHandler` reads the body
+only for a `POST` to an endpoint. It lives in its own module so that a
+Fastly or WASI server importing `Lasm.RPC` does not load Lasm.JS.Web.
+
+The four dispatch propositions are proved (`dispatch_other`,
+`dispatch_route`, `dispatch_unknown`, `dispatch_method`; library/PROOFS.md).
+
+**Alternatives.** PR #213's `dispatch` on decoded path segments: every caller
+first splits and decodes the path (endpoint names never need decoding).
+Adapters for every server kind in RPC (Fastly, wasi-http): they would each be
+the program's own request/response conversion, which the apps already have;
+added if a second app needs the same one. Leaving the JavaScript adapter to
+apps: it is the same ten lines in every JavaScript app.
+
+**Tests.** `test/fixtures/js-serve` serves the endpoints with `webHandler` on
+Node, Bun and Deno and checks 200, 400, 404 and 405 over HTTP
+(web-bindings.yml). Docs: docs/RPC.md, "Server".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A38: `serve'` keeps its name
+
+**Decision.** `Endpoint.serve'` stays the name of the form whose handler does
+not take the validation proof.
+
+```lean
+addTodo.serve fun req ok => …      -- ok : addTodo.validate req = .ok ()
+listTodos.serve' fun _ => …        -- no proof needed
+```
+
+**Why.** A prime for "the same thing, a little different" is Lean's own
+convention (`foldl'`, `simp'`, `Nat.lt_irrefl'`), and the two forms differ
+only in the proof argument. `serve` remains the main name because handing the
+handler its proof is what Lasm.RPC is for.
+
+**Alternatives.** `serveNoProof` or `serveSimple`: longer names for a
+difference Lean programmers read from the prime already; a breaking rename
+with no gain in clarity.
+
+**Where.** Unchanged since Lasm.RPC shipped. **Status:** pending sign-off.
