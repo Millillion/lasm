@@ -448,6 +448,15 @@
       "kind": "runtime",
       "reason": "the app instance of Lasm.UI.Mount; tested in browsers (ui.yml)"
     },
+    "src/lasm-modules/class.mjs": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core)"
+    },
+    "src/lasm-modules/node-serve.mjs": {
+      "status": "pending",
+      "reason": "Node.serve's node:http server and its req/res ↔ Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module"
+    },
     "src/lasm-modules/ui-dom.mjs": {
       "status": "modelled",
       "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, diff_conforms, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
@@ -950,6 +959,10 @@
       ],
       "reason": "the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs)"
     },
+    "src/project-modules.mjs": {
+      "status": "pending",
+      "reason": "the project's JavaScript files (A6.1): pure over the binding records and the files, resolving each against its Lean file, the relative-import closure and the refusals; model it as BuiltinModules.lean models the builtin closure (tested in test/project-modules.test.mjs)"
+    },
     "src/sdk-repairs.mjs": {
       "status": "exempt",
       "kind": "io",
@@ -958,12 +971,32 @@
     "src/serverless/lasm-azure.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "the Azure Functions entry: forwards to lasm-server.mjs, whose mapping is modelled"
+      "reason": "the Azure Functions entry: forwards to lasm-function.mjs, whose mapping is modelled"
+    },
+    "src/serverless/lasm-function.mjs": {
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "library/Lasm/Serverless/Proofs/Model.lean",
+          "functions": [
+            "requestTarget",
+            "plainHost",
+            "joinCookies",
+            "outgoingHeaders",
+            "isTextual",
+            "webReply",
+            "parseSetCookie",
+            "azureReply"
+          ],
+          "differential": "test/fuzz/targets/serverless-http.mjs"
+        }
+      ],
+      "reason": "the HTTP mapping is modelled; the rest starts the program once and calls its handler in-process"
     },
     "src/serverless/lasm-gcf.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "the Google Cloud Functions entry: forwards to lasm-server.mjs, whose mapping is modelled"
+      "reason": "the Google Cloud Functions entry: forwards to lasm-function.mjs, whose mapping is modelled"
     },
     "src/serverless/lasm-lambda.mjs": {
       "status": "modelled",
@@ -986,32 +1019,17 @@
     "src/serverless/lasm-netlify.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "the Netlify entry: forwards to lasm-server.mjs, whose mapping is modelled"
+      "reason": "the Netlify entry: forwards to lasm-function.mjs, whose mapping is modelled"
     },
-    "src/serverless/lasm-server.mjs": {
-      "status": "modelled",
-      "models": [
-        {
-          "lean": "library/Lasm/Serverless/Proofs/Model.lean",
-          "functions": [
-            "requestTarget",
-            "plainHost",
-            "joinCookies",
-            "outgoingHeaders",
-            "isTextual",
-            "webReply",
-            "parseSetCookie",
-            "azureReply"
-          ],
-          "differential": "test/fuzz/targets/serverless-http.mjs"
-        }
-      ],
-      "reason": "the HTTP mapping is modelled; the rest starts the program and forwards over loopback"
+    "src/serverless/lasm-node-serve.mjs": {
+      "status": "exempt",
+      "kind": "io",
+      "reason": "re-exports src/lasm-modules/node-serve.mjs, the name the function shims import it by in the repository (`lasm package` copies node-serve.mjs itself under this name)"
     },
     "src/serverless/lasm-vercel.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "the Vercel entry: forwards to lasm-server.mjs, whose mapping is modelled"
+      "reason": "the Vercel entry: forwards to lasm-function.mjs, whose mapping is modelled"
     },
     "src/serverless/zip.mjs": {
       "status": "modelled",

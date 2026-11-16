@@ -11,7 +11,7 @@ Cloudflare account. The design, limits and measurements are in
 ```sh
 npx lasm init my-app --template hono --deploy workers
 cd my-app && npm install
-npm run build:workers        # lasm build Main.lean --target workers → workers/
+npm run build:workers        # lasm build Export.lean --target workers → workers/
 npx wrangler dev             # serves workers/worker.mjs locally
 npx wrangler deploy          # your account; Lasm never runs this
 ```
@@ -24,14 +24,16 @@ npx wrangler deploy          # your account; Lasm never runs this
 - `"lasm": { "edge": { "exclude": ["@hono/node-server"] } }` in
   `package.json`.
 
-The same `Main.lean` serves Node (`npm run dev`) and Workers. It builds the Hono
-app, then branches on `Lasm.JS.onEdge`:
+The Hono app is built in `Routes.lean`. `Main.lean` serves it on Node
+(`npm run dev`, with `@hono/node-server`), and `Export.lean`, which Workers
+run, publishes it as the program's default export:
 
 ```lean
-  if ← onEdge then
-    exportDefault app   -- the Worker's fetch handler
-    return
-  -- Node: serve with @hono/node-server …
+import Routes
+import Lasm.JS
+open Lasm.JS
+
+def main : IO Unit := do exportDefault (← Routes.app)
 ```
 
 ## What `lasm build --target workers` writes

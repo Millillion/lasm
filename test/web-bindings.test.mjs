@@ -15,8 +15,10 @@ import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
 import * as cloudflareTier from '../scripts/bindings/cloudflare-tier3.mjs';
 import { declarations, genericDefaults, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
 import { untar } from '../scripts/bindings/cloudflare-api.mjs';
+import { lowerAuto } from '../scripts/bindings/ts-auto.mjs';
 import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
+import { lazyModules } from '../src/lazy-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -48,6 +50,7 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
   }
 });
 
+
 // Lasm.JS.Cloudflare (API_DECISIONS 0.5-16): no umbrella; Support, Kv, D1 and Workers ship compiled, in import
 // order and closed under imports; every other module is compiled on first import (src/lazy-library.mjs).
 test('Lasm.JS.Cloudflare: a compiled core closed under imports, the rest compiled on first import', async () => {
@@ -67,8 +70,40 @@ test('Lasm.JS.Cloudflare: a compiled core closed under imports, the rest compile
   for (const m of generated) assert.ok(core.includes(m) || lazy.includes(m), `${m} is neither compiled nor compiled on first import`);
 });
 
+test('Lasm.JS.Node events: each documented event is a typed listener with on<Event> and once<Event>', () => {
+  const idl = readFileSync(new URL('../scripts/bindings/node.idl', import.meta.url), 'utf8');
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-surface.json', import.meta.url), 'utf8'));
+  // The server's request event, the socket's data event and the client's response event, with the docs' argument types.
+  assert.match(idl, /callback Node_http_Server_RequestListener = undefined \(Node_http_IncomingMessage request, Node_http_ServerResponse response\);/);
+  assert.match(idl, /callback Node_net_Socket_DataListener = undefined \(\(Uint8Array or DOMString\) value\);/);
+  assert.match(idl, /callback Node_http_ClientRequest_ResponseListener = undefined \(Node_http_IncomingMessage response\);/);
+  // A listener parameter the docs add to an event is that event's listener type.
+  assert.match(idl, /createServer\(optional Node_http_CreateServerOptions options, optional Node_http_Server_RequestListener requestListener\);/);
+  assert.match(idl, /createServer\(optional Node_net_CreateServerOptions options, optional Node_net_Server_ConnectionListener connectionListener\);/);
+  // Events whose arguments the docs give in prose are stated (eventProse): a child's exit code is null after a signal.
+  assert.match(idl, /callback Node_ChildProcess_ExitListener = undefined \(long long\? code, DOMString\? signal\);/);
+  const http = readFileSync(new URL('../library/Lasm/JS/Node/Http.lean', import.meta.url), 'utf8');
+  assert.match(http, /def http\.Server\.onRequest \(self : http\.Server\) \(listener : http\.Server\.RequestListener\) : IO http\.Server := do\n  let r ← self\.val\.callMethod "on" \(Support\.args #\[toJS "request", toJS listener\]\) Value/);
+  assert.match(http, /def http\.Server\.onceRequest [^\n]*\n  let r ← self\.val\.callMethod "once" /);
+  // Events are not members of the object: the availability probe does not look for onRequest.
+  const server = surface.find(e => e.lean === 'http.Server');
+  assert.ok(server.events.includes('request') && !server.prototype.includes('onRequest'));
+  // Documented overloads under one heading are each generated (server.listen(options), (path), ([port[, host]])).
+  assert.match(idl, /Node_net_Server listen\(Node_net_Server_ListenOptions options\);/);
+  assert.match(idl, /Node_net_Server listen\(optional double port, optional DOMString host, optional double backlog\);/);
+});
+
+test('Lasm.JS.Node names: a parent projection or instance never repeats an ancestor\'s', () => {
+  const https = readFileSync(new URL('../library/Lasm/JS/Node/Https.lean', import.meta.url), 'utf8');
+  assert.match(https, /structure https\.Server extends toHttpServer : http\.Server/);
+  for (const f of readdirSync(new URL('../library/Lasm/JS/Node/', import.meta.url))) {
+    const source = readFileSync(new URL(`../library/Lasm/JS/Node/${f}`, import.meta.url), 'utf8');
+    for (const [line] of source.matchAll(/^instance : \S+ .*$/gm)) assert.ok(!/ [A-Za-z]\w*\.[A-Za-z]/.test(line.split(':=')[0].split(' where')[0]), `${f}: unnamed instance on a namespaced type: ${line}`);
+  }
+});
+
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
+  for (const tier of ['Web', 'Node']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
     for (const m of generated) {
@@ -76,6 +111,23 @@ test('the generated modules are shipped library modules, in import order', () =>
       for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm))
         assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
     }
+  }
+});
+
+// Lasm.JS.Deno and Lasm.JS.Bun ship as source and compile on first import (docs/api/decisions/0.4.md, 0.4-20):
+// their prebuilt core is empty, since no template imports them (the examples that do compile them on first use).
+const denoBunCore = [];
+test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core; every other one compiles on first import', () => {
+  const lazy = lazyModules(libraryModules);
+  for (const tier of ['Deno', 'Bun']) {
+    const shipped = [`Lasm.JS.${tier}`, ...readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
+      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`)];
+    for (const m of libraryModules.filter(m => m === `Lasm.JS.${tier}` || m.startsWith(`Lasm.JS.${tier}.`)))
+      assert.ok(denoBunCore.includes(m), `${m} is prebuilt (src/lasm-library.mjs libraryModules) but not in the declared core`);
+    for (const m of shipped) assert.ok(denoBunCore.includes(m) || lazy.includes(m), `${m} is neither prebuilt nor compiled on first import`);
+    for (const t of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean')))
+      assert.ok(!/^import Lasm\.JS\.(Deno|Bun)\b/m.test(readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8')),
+        `templates/${t} imports Lasm.JS.Deno or Lasm.JS.Bun: its modules belong in the prebuilt core`);
   }
 });
 
@@ -116,6 +168,17 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     const s = surface[h.name];
     assert.ok(s, `${h.name} is missing from the generated surface`);
     assert.equal(s.global, h.global);
+    if (h.auto) {
+      // The whole namespace (ts-auto.mjs): the functions apps use, and no excluded member.
+      const expected = { Deno: ['serve', 'readFile', 'writeTextFile', 'listen', 'connect', 'upgradeWebSocket', 'openKv', 'env', 'args'],
+        Bun: ['serve', 'file', 'write', 'spawn', 'spawnSync', 'listen', 'connect', 'escapeHTML', 'env', 'password'] }[h.name];
+      for (const f of expected) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
+      for (const k of Object.keys(h.exclude).filter(k => /^\w+\.\w+$/.test(k))) {
+        const [owner, member] = k.split('.');
+        assert.ok(!(s.interfaces[owner] ?? []).includes(member), `${h.global}.${k} is excluded but generated`);
+      }
+      continue;
+    }
     for (const f of Object.keys(h.functions)) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
     for (const d of h.declarations.filter(d => d.as === 'interface')) {
       const members = s.interfaces[d.lean ?? d.name.split('.').at(-1)];
@@ -124,7 +187,9 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     }
   }
   const idl = readFileSync(new URL('../scripts/bindings/deno.idl', import.meta.url), 'utf8');
-  assert.match(idl, /Deno\.serve\(options: ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental in its declaration/);
+  // Experimental declarations that work are generated (VSOCK); excluded ones carry their reason.
+  assert.doesNotMatch(idl, /ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental/);
+  assert.match(idl, /LasmLeanName="serveWithVsockOptions"/);
 });
 
 /** A host of serve-tier2.mjs's shape over one synthetic declaration file. */
@@ -251,6 +316,82 @@ test('serve-api fails on what its selection does not decide', () => {
   assert.throws(() => lower(h5), /@experimental, but serve-tier2.mjs selects it/);
 });
 
+// ts-auto.mjs: a whole namespace (Lasm.JS.Deno's rules), on a synthetic declaration file.
+const autoSource = `
+declare namespace Rt {
+  /** @category Files */
+  export function readFile(path: string | URL): Promise<Uint8Array<ArrayBuffer>>;
+  /** @category Files */
+  export function readDir(path: string): AsyncIterable<DirEntry>;
+  /** @category Files */
+  export interface DirEntry { name: string; isFile: boolean; }
+  /** @category Net */
+  export type Addr = NetAddr | UnixAddr;
+  /** @category Net */
+  export interface NetAddr { transport: "tcp"; port: number; }
+  /** @category Net */
+  export interface UnixAddr { transport: "unix"; path: string; }
+  /** @category Net */
+  export interface Conn<A extends Addr = Addr> { readonly localAddr: A; close(): void; }
+  /** @category Net */
+  export interface UnixConn extends Conn<UnixAddr> {}
+  /** @category Net */
+  export function connect(options: { port: number }): Promise<Conn>;
+  /** @category Net */
+  export function connect(options: { path: string; transport: "unix" }): Promise<UnixConn>;
+  /** @category Net */
+  export type Entry = { key: string; value: unknown; stamp: string } | { key: string; value: null; stamp: null } | { key: string; value: null };
+  /** @category Net */
+  export function get(key: string): Entry;
+  /** @category Files @experimental */
+  export function future(): void;
+  /** @category Files */
+  export class File { constructor(path: string); write(data: Uint8Array): Promise<number>; readonly size: number; [Symbol.dispose](): void; }
+  /** @category Files */
+  export const pid: number;
+}`;
+const autoHost = (extra = {}) => ({
+  name: 'Rt', global: 'Rt', files: ['rt.d.ts'], auto: true,
+  modules: [{ name: 'Files', title: 'files' }, { name: 'Net', title: 'net' }],
+  categories: { Files: 'Files', Net: 'Net' }, exclude: {}, defaults: { Addr: 'NetAddr' },
+  names: { 'connect(options: {path: string; transport: "unix"})': 'connectUnix' }, typeNames: { URL: 'URL' },
+  ...extra,
+});
+const auto = (h = autoHost()) => lowerAuto(h, [{ file: 'rt.d.ts', text: autoSource }]);
+
+test('ts-auto lowers every function, constant and class, and the types they reach', () => {
+  const { idl, excluded } = auto();
+  // a plain-data interface is a dictionary (copied); one with a required method an interface (a handle)
+  assert.match(idl, /dictionary Rt_DirEntry \{/);
+  assert.match(idl, /interface Rt_Conn \{/);
+  // the declared default that is a union of object types is the tier file's (NetAddr); another instantiation adds its argument
+  assert.match(idl, /readonly attribute Rt_NetAddr localAddr;/);
+  assert.match(idl, /interface Rt_UnixConn : Rt_ConnUnixAddr \{/);
+  // AsyncIterable<T> is a generated async iterable interface
+  assert.match(idl, /interface Rt_DirEntryAsyncIterable \{\n {2}async iterable<Rt_DirEntry>;/);
+  // a union of object types is one dictionary; a member missing from an alternative is optional
+  assert.match(idl, /dictionary Rt_Entry \{[^}]*required DOMString key;[^}]*any value;[^}]*\n {2}DOMString stamp;/s);
+  // overloads: the tier file's name
+  assert.match(idl, /LasmLeanName="connectUnix"/);
+  // an anonymous union is a typedef named after its members
+  assert.match(idl, /typedef \(DOMString or URL\) Rt_DOMStringOrURL;/);
+  // a class: constructor, methods, readonly attributes; Symbol-keyed members excluded with the reason
+  assert.match(idl, /interface Rt_File \{[^}]*constructor\(DOMString path\);/s);
+  assert.ok(excluded.some(([w, r]) => w === 'File.[Symbol.dispose]' && /Symbol-keyed/.test(r)));
+  // @experimental is never lowered
+  assert.ok(excluded.some(([w, r]) => w === 'Rt.future()' && /@experimental/.test(r)));
+  assert.doesNotMatch(idl, /future/);
+  // constants are attributes of the namespace, in their category's module
+  assert.match(idl, /LasmLeanModule="Files", LasmPath="Rt"\]\nnamespace Rt_nsFiles \{[^}]*readonly attribute double pid;/s);
+});
+
+test('ts-auto fails on what it cannot lower, and on stale tier entries', () => {
+  // without the names entry, the mechanical name: With and the parameter type that differs
+  assert.match(auto(autoHost({ names: {} })).idl, /LasmLeanName="connectWithPathStringTransportUnix"/);
+  assert.throws(() => auto(autoHost({ exclude: { 'Nothing.here': 'stale' } })), /exclude Nothing\.here matches nothing/);
+  assert.throws(() => lowerAuto(autoHost(), [{ file: 'rt.d.ts', text: autoSource.replace('export const pid: number;', 'export const pid: keyof Foo;') }]), /keyof (types are not lowered|Foo is not lowered)/);
+});
+
 // Lasm.JS.Cloudflare (scripts/bindings/cloudflare-api.mjs lowers @cloudflare/workers-types with
 // serve-api.mjs's rich rules; its --check needs the network and runs in web-bindings.yml).
 const idl0 = () => readFileSync(new URL('../scripts/bindings/cloudflare.idl', import.meta.url), 'utf8');
@@ -368,7 +509,9 @@ test('serve-api reads rich declarations: classes, constants, getters and generic
   assert.ok(!declarations(richSource, 'cf.d.ts').some(x => x.name === 'Store'), 'classes only when asked');
   assert.deepEqual(genericDefaults('Key extends string = string, T = unknown, U'), { Key: 'string', T: 'unknown', U: 'unknown' });
   assert.equal(typeText(parseType('readonly Entry[]')), 'Entry[]');
-  assert.deepEqual(parseType('[string[], ...T[]]'), { k: 'tuple', items: [{ k: 'array', inner: { k: 'name', name: 'string', args: [] } }, { k: 'array', inner: { k: 'name', name: 'T', args: [] } }] });
+  // Tuples are read (Lasm.JS.Bun's Redis replies; ts-auto.mjs lowers them to arrays), labels and spreads dropped.
+  assert.equal(typeText(parseType('[string[], ...T[]]')), '[string[], T[]]');
+  assert.equal(typeText(parseType('[raw: Socket, tls?: Socket]')), '[Socket, Socket]');
 });
 
 test('serve-api lowers by its rich rules', () => {

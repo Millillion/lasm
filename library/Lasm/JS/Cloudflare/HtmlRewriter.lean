@@ -121,7 +121,7 @@ instance : ToJS TextRasterize := ⟨fun d => Support.fields #[("content", toJS d
 
 /-- `constructor()`: `constructor()` -/
 def HTMLRewriter.new : IO HTMLRewriter :=
-  Lasm.JS.Binding.invoke HTMLRewriter { name := "Lasm.JS.Cloudflare.HTMLRewriter.new", module := "globalThis", path := "Cloudflare_HTMLRewriter", construct := true, arity := 0 }
+  Lasm.JS.Binding.invoke HTMLRewriter { name := "Lasm.JS.Cloudflare.HTMLRewriter.new", module := "globalThis", path := "HTMLRewriter", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
 /-- `on(selector: string, handlers: HTMLRewriterElementContentHandlers): HTMLRewriter`: `HTMLRewriter on(DOMString selector, HTMLRewriterElementContentHandlers handlers)` -/

@@ -503,9 +503,9 @@ instance : FromJS IncomingRequestCfPropertiesGeographicInformationIsEUCountry wh
 /-- `enum CertVerificationStatus` (@cloudflare/workers-types 5.20261019.1 type declarations): "SUCCESS", "NONE", "FAILED:self signed certificate", "FAILED:unable to verify the first certificate", "FAILED:certificate is not yet valid", "FAILED:certificate has expired", "FAILED". -/
 inductive CertVerificationStatus where
   /-- "SUCCESS" -/
-  | sUCCESS
+  | success
   /-- "NONE" -/
-  | nONE
+  | none
   /-- "FAILED:self signed certificate" -/
   | fAILEDSelfSignedCertificate
   /-- "FAILED:unable to verify the first certificate" -/
@@ -515,25 +515,25 @@ inductive CertVerificationStatus where
   /-- "FAILED:certificate has expired" -/
   | fAILEDCertificateHasExpired
   /-- "FAILED" -/
-  | fAILED
+  | failed
   deriving BEq, Repr, Inhabited
 instance : ToJS CertVerificationStatus := ⟨fun
-  | .sUCCESS => .string "SUCCESS"
-  | .nONE => .string "NONE"
+  | .success => .string "SUCCESS"
+  | .none => .string "NONE"
   | .fAILEDSelfSignedCertificate => .string "FAILED:self signed certificate"
   | .fAILEDUnableToVerifyTheFirstCertificate => .string "FAILED:unable to verify the first certificate"
   | .fAILEDCertificateIsNotYetValid => .string "FAILED:certificate is not yet valid"
   | .fAILEDCertificateHasExpired => .string "FAILED:certificate has expired"
-  | .fAILED => .string "FAILED"⟩
+  | .failed => .string "FAILED"⟩
 instance : FromJS CertVerificationStatus where
   fromJS
-    | .string "SUCCESS" => .ok .sUCCESS
-    | .string "NONE" => .ok .nONE
+    | .string "SUCCESS" => .ok .success
+    | .string "NONE" => .ok .none
     | .string "FAILED:self signed certificate" => .ok .fAILEDSelfSignedCertificate
     | .string "FAILED:unable to verify the first certificate" => .ok .fAILEDUnableToVerifyTheFirstCertificate
     | .string "FAILED:certificate is not yet valid" => .ok .fAILEDCertificateIsNotYetValid
     | .string "FAILED:certificate has expired" => .ok .fAILEDCertificateHasExpired
-    | .string "FAILED" => .ok .fAILED
+    | .string "FAILED" => .ok .failed
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.CertVerificationStatus"
 
@@ -570,13 +570,13 @@ instance : FromJS IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertPresent
 /-- `enum IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified` (@cloudflare/workers-types 5.20261019.1 type declarations): "NONE". -/
 inductive IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified where
   /-- "NONE" -/
-  | nONE
+  | none
   deriving BEq, Repr, Inhabited
 instance : ToJS IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified := ⟨fun
-  | .nONE => .string "NONE"⟩
+  | .none => .string "NONE"⟩
 instance : FromJS IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified where
   fromJS
-    | .string "NONE" => .ok .nONE
+    | .string "NONE" => .ok .none
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified"
 
@@ -596,1008 +596,1008 @@ instance : FromJS IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerD
 /-- `enum IncomingRequestCfPropertiesGeographicInformationCountry` (@cloudflare/workers-types 5.20261019.1 type declarations): "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW", "T1". -/
 inductive IncomingRequestCfPropertiesGeographicInformationCountry where
   /-- "AD" -/
-  | aD
+  | ad
   /-- "AE" -/
-  | aE
+  | ae
   /-- "AF" -/
-  | aF
+  | af
   /-- "AG" -/
-  | aG
+  | ag
   /-- "AI" -/
-  | aI
+  | ai
   /-- "AL" -/
-  | aL
+  | al
   /-- "AM" -/
-  | aM
+  | am
   /-- "AO" -/
-  | aO
+  | ao
   /-- "AQ" -/
-  | aQ
+  | aq
   /-- "AR" -/
-  | aR
+  | ar
   /-- "AS" -/
-  | aS
+  | as
   /-- "AT" -/
-  | aT
+  | «at»
   /-- "AU" -/
-  | aU
+  | au
   /-- "AW" -/
-  | aW
+  | aw
   /-- "AX" -/
-  | aX
+  | ax
   /-- "AZ" -/
-  | aZ
+  | az
   /-- "BA" -/
-  | bA
+  | ba
   /-- "BB" -/
-  | bB
+  | bb
   /-- "BD" -/
-  | bD
+  | bd
   /-- "BE" -/
-  | bE
+  | be
   /-- "BF" -/
-  | bF
+  | bf
   /-- "BG" -/
-  | bG
+  | bg
   /-- "BH" -/
-  | bH
+  | bh
   /-- "BI" -/
-  | bI
+  | bi
   /-- "BJ" -/
-  | bJ
+  | bj
   /-- "BL" -/
-  | bL
+  | bl
   /-- "BM" -/
-  | bM
+  | bm
   /-- "BN" -/
-  | bN
+  | bn
   /-- "BO" -/
-  | bO
+  | bo
   /-- "BQ" -/
-  | bQ
+  | bq
   /-- "BR" -/
-  | bR
+  | br
   /-- "BS" -/
-  | bS
+  | bs
   /-- "BT" -/
-  | bT
+  | bt
   /-- "BV" -/
-  | bV
+  | bv
   /-- "BW" -/
-  | bW
+  | bw
   /-- "BY" -/
-  | bY
+  | «by»
   /-- "BZ" -/
-  | bZ
+  | bz
   /-- "CA" -/
-  | cA
+  | ca
   /-- "CC" -/
-  | cC
+  | cc
   /-- "CD" -/
-  | cD
+  | cd
   /-- "CF" -/
-  | cF
+  | cf
   /-- "CG" -/
-  | cG
+  | cg
   /-- "CH" -/
-  | cH
+  | ch
   /-- "CI" -/
-  | cI
+  | ci
   /-- "CK" -/
-  | cK
+  | ck
   /-- "CL" -/
-  | cL
+  | cl
   /-- "CM" -/
-  | cM
+  | cm
   /-- "CN" -/
-  | cN
+  | cn
   /-- "CO" -/
-  | cO
+  | co
   /-- "CR" -/
-  | cR
+  | cr
   /-- "CU" -/
-  | cU
+  | cu
   /-- "CV" -/
-  | cV
+  | cv
   /-- "CW" -/
-  | cW
+  | cw
   /-- "CX" -/
-  | cX
+  | cx
   /-- "CY" -/
-  | cY
+  | cy
   /-- "CZ" -/
-  | cZ
+  | cz
   /-- "DE" -/
-  | dE
+  | de
   /-- "DJ" -/
-  | dJ
+  | dj
   /-- "DK" -/
-  | dK
+  | dk
   /-- "DM" -/
-  | dM
+  | dm
   /-- "DO" -/
-  | dO
+  | «do»
   /-- "DZ" -/
-  | dZ
+  | dz
   /-- "EC" -/
-  | eC
+  | ec
   /-- "EE" -/
-  | eE
+  | ee
   /-- "EG" -/
-  | eG
+  | eg
   /-- "EH" -/
-  | eH
+  | eh
   /-- "ER" -/
-  | eR
+  | er
   /-- "ES" -/
-  | eS
+  | es
   /-- "ET" -/
-  | eT
+  | et
   /-- "FI" -/
-  | fI
+  | fi
   /-- "FJ" -/
-  | fJ
+  | fj
   /-- "FK" -/
-  | fK
+  | fk
   /-- "FM" -/
-  | fM
+  | fm
   /-- "FO" -/
-  | fO
+  | fo
   /-- "FR" -/
-  | fR
+  | fr
   /-- "GA" -/
-  | gA
+  | ga
   /-- "GB" -/
-  | gB
+  | gb
   /-- "GD" -/
-  | gD
+  | gd
   /-- "GE" -/
-  | gE
+  | ge
   /-- "GF" -/
-  | gF
+  | gf
   /-- "GG" -/
-  | gG
+  | gg
   /-- "GH" -/
-  | gH
+  | gh
   /-- "GI" -/
-  | gI
+  | gi
   /-- "GL" -/
-  | gL
+  | gl
   /-- "GM" -/
-  | gM
+  | gm
   /-- "GN" -/
-  | gN
+  | gn
   /-- "GP" -/
-  | gP
+  | gp
   /-- "GQ" -/
-  | gQ
+  | gq
   /-- "GR" -/
-  | gR
+  | gr
   /-- "GS" -/
-  | gS
+  | gs
   /-- "GT" -/
-  | gT
+  | gt
   /-- "GU" -/
-  | gU
+  | gu
   /-- "GW" -/
-  | gW
+  | gw
   /-- "GY" -/
-  | gY
+  | gy
   /-- "HK" -/
-  | hK
+  | hk
   /-- "HM" -/
-  | hM
+  | hm
   /-- "HN" -/
-  | hN
+  | hn
   /-- "HR" -/
-  | hR
+  | hr
   /-- "HT" -/
-  | hT
+  | ht
   /-- "HU" -/
-  | hU
+  | hu
   /-- "ID" -/
-  | iD
+  | id
   /-- "IE" -/
-  | iE
+  | ie
   /-- "IL" -/
-  | iL
+  | il
   /-- "IM" -/
-  | iM
+  | im
   /-- "IN" -/
-  | iN
+  | «in»
   /-- "IO" -/
-  | iO
+  | io
   /-- "IQ" -/
-  | iQ
+  | iq
   /-- "IR" -/
-  | iR
+  | ir
   /-- "IS" -/
-  | iS
+  | is
   /-- "IT" -/
-  | iT
+  | it
   /-- "JE" -/
-  | jE
+  | je
   /-- "JM" -/
-  | jM
+  | jm
   /-- "JO" -/
-  | jO
+  | jo
   /-- "JP" -/
-  | jP
+  | jp
   /-- "KE" -/
-  | kE
+  | ke
   /-- "KG" -/
-  | kG
+  | kg
   /-- "KH" -/
-  | kH
+  | kh
   /-- "KI" -/
-  | kI
+  | ki
   /-- "KM" -/
-  | kM
+  | km
   /-- "KN" -/
-  | kN
+  | kn
   /-- "KP" -/
-  | kP
+  | kp
   /-- "KR" -/
-  | kR
+  | kr
   /-- "KW" -/
-  | kW
+  | kw
   /-- "KY" -/
-  | kY
+  | ky
   /-- "KZ" -/
-  | kZ
+  | kz
   /-- "LA" -/
-  | lA
+  | la
   /-- "LB" -/
-  | lB
+  | lb
   /-- "LC" -/
-  | lC
+  | lc
   /-- "LI" -/
-  | lI
+  | li
   /-- "LK" -/
-  | lK
+  | lk
   /-- "LR" -/
-  | lR
+  | lr
   /-- "LS" -/
-  | lS
+  | ls
   /-- "LT" -/
-  | lT
+  | lt
   /-- "LU" -/
-  | lU
+  | lu
   /-- "LV" -/
-  | lV
+  | lv
   /-- "LY" -/
-  | lY
+  | ly
   /-- "MA" -/
-  | mA
+  | ma
   /-- "MC" -/
-  | mC
+  | mc
   /-- "MD" -/
-  | mD
+  | md
   /-- "ME" -/
-  | mE
+  | me
   /-- "MF" -/
-  | mF
+  | mf
   /-- "MG" -/
-  | mG
+  | mg
   /-- "MH" -/
-  | mH
+  | mh
   /-- "MK" -/
-  | mK
+  | mk
   /-- "ML" -/
-  | mL
+  | ml
   /-- "MM" -/
-  | mM
+  | mm
   /-- "MN" -/
-  | mN
+  | mn
   /-- "MO" -/
-  | mO
+  | mo
   /-- "MP" -/
-  | mP
+  | mp
   /-- "MQ" -/
-  | mQ
+  | mq
   /-- "MR" -/
-  | mR
+  | mr
   /-- "MS" -/
-  | mS
+  | ms
   /-- "MT" -/
-  | mT
+  | mt
   /-- "MU" -/
-  | mU
+  | mu
   /-- "MV" -/
-  | mV
+  | mv
   /-- "MW" -/
-  | mW
+  | mw
   /-- "MX" -/
-  | mX
+  | mx
   /-- "MY" -/
-  | mY
+  | my
   /-- "MZ" -/
-  | mZ
+  | mz
   /-- "NA" -/
-  | nA
+  | na
   /-- "NC" -/
-  | nC
+  | nc
   /-- "NE" -/
-  | nE
+  | ne
   /-- "NF" -/
-  | nF
+  | nf
   /-- "NG" -/
-  | nG
+  | ng
   /-- "NI" -/
-  | nI
+  | ni
   /-- "NL" -/
-  | nL
+  | nl
   /-- "NO" -/
-  | nO
+  | no
   /-- "NP" -/
-  | nP
+  | np
   /-- "NR" -/
-  | nR
+  | nr
   /-- "NU" -/
-  | nU
+  | nu
   /-- "NZ" -/
-  | nZ
+  | nz
   /-- "OM" -/
-  | oM
+  | om
   /-- "PA" -/
-  | pA
+  | pa
   /-- "PE" -/
-  | pE
+  | pe
   /-- "PF" -/
-  | pF
+  | pf
   /-- "PG" -/
-  | pG
+  | pg
   /-- "PH" -/
-  | pH
+  | ph
   /-- "PK" -/
-  | pK
+  | pk
   /-- "PL" -/
-  | pL
+  | pl
   /-- "PM" -/
-  | pM
+  | pm
   /-- "PN" -/
-  | pN
+  | pn
   /-- "PR" -/
-  | pR
+  | pr
   /-- "PS" -/
-  | pS
+  | ps
   /-- "PT" -/
-  | pT
+  | pt
   /-- "PW" -/
-  | pW
+  | pw
   /-- "PY" -/
-  | pY
+  | py
   /-- "QA" -/
-  | qA
+  | qa
   /-- "RE" -/
-  | rE
+  | re
   /-- "RO" -/
-  | rO
+  | ro
   /-- "RS" -/
-  | rS
+  | rs
   /-- "RU" -/
-  | rU
+  | ru
   /-- "RW" -/
-  | rW
+  | rw
   /-- "SA" -/
-  | sA
+  | sa
   /-- "SB" -/
-  | sB
+  | sb
   /-- "SC" -/
-  | sC
+  | sc
   /-- "SD" -/
-  | sD
+  | sd
   /-- "SE" -/
-  | sE
+  | se
   /-- "SG" -/
-  | sG
+  | sg
   /-- "SH" -/
-  | sH
+  | sh
   /-- "SI" -/
-  | sI
+  | si
   /-- "SJ" -/
-  | sJ
+  | sj
   /-- "SK" -/
-  | sK
+  | sk
   /-- "SL" -/
-  | sL
+  | sl
   /-- "SM" -/
-  | sM
+  | sm
   /-- "SN" -/
-  | sN
+  | sn
   /-- "SO" -/
-  | sO
+  | so
   /-- "SR" -/
-  | sR
+  | sr
   /-- "SS" -/
-  | sS
+  | ss
   /-- "ST" -/
-  | sT
+  | st
   /-- "SV" -/
-  | sV
+  | sv
   /-- "SX" -/
-  | sX
+  | sx
   /-- "SY" -/
-  | sY
+  | sy
   /-- "SZ" -/
-  | sZ
+  | sz
   /-- "TC" -/
-  | tC
+  | tc
   /-- "TD" -/
-  | tD
+  | td
   /-- "TF" -/
-  | tF
+  | tf
   /-- "TG" -/
-  | tG
+  | tg
   /-- "TH" -/
-  | tH
+  | th
   /-- "TJ" -/
-  | tJ
+  | tj
   /-- "TK" -/
-  | tK
+  | tk
   /-- "TL" -/
-  | tL
+  | tl
   /-- "TM" -/
-  | tM
+  | tm
   /-- "TN" -/
-  | tN
+  | tn
   /-- "TO" -/
-  | tO
+  | to
   /-- "TR" -/
-  | tR
+  | tr
   /-- "TT" -/
-  | tT
+  | tt
   /-- "TV" -/
-  | tV
+  | tv
   /-- "TW" -/
-  | tW
+  | tw
   /-- "TZ" -/
-  | tZ
+  | tz
   /-- "UA" -/
-  | uA
+  | ua
   /-- "UG" -/
-  | uG
+  | ug
   /-- "UM" -/
-  | uM
+  | um
   /-- "US" -/
-  | uS
+  | us
   /-- "UY" -/
-  | uY
+  | uy
   /-- "UZ" -/
-  | uZ
+  | uz
   /-- "VA" -/
-  | vA
+  | va
   /-- "VC" -/
-  | vC
+  | vc
   /-- "VE" -/
-  | vE
+  | ve
   /-- "VG" -/
-  | vG
+  | vg
   /-- "VI" -/
-  | vI
+  | vi
   /-- "VN" -/
-  | vN
+  | vn
   /-- "VU" -/
-  | vU
+  | vu
   /-- "WF" -/
-  | wF
+  | wf
   /-- "WS" -/
-  | wS
+  | ws
   /-- "YE" -/
-  | yE
+  | ye
   /-- "YT" -/
-  | yT
+  | yt
   /-- "ZA" -/
-  | zA
+  | za
   /-- "ZM" -/
-  | zM
+  | zm
   /-- "ZW" -/
-  | zW
+  | zw
   /-- "T1" -/
   | t1
   deriving BEq, Repr, Inhabited
 instance : ToJS IncomingRequestCfPropertiesGeographicInformationCountry := ⟨fun
-  | .aD => .string "AD"
-  | .aE => .string "AE"
-  | .aF => .string "AF"
-  | .aG => .string "AG"
-  | .aI => .string "AI"
-  | .aL => .string "AL"
-  | .aM => .string "AM"
-  | .aO => .string "AO"
-  | .aQ => .string "AQ"
-  | .aR => .string "AR"
-  | .aS => .string "AS"
-  | .aT => .string "AT"
-  | .aU => .string "AU"
-  | .aW => .string "AW"
-  | .aX => .string "AX"
-  | .aZ => .string "AZ"
-  | .bA => .string "BA"
-  | .bB => .string "BB"
-  | .bD => .string "BD"
-  | .bE => .string "BE"
-  | .bF => .string "BF"
-  | .bG => .string "BG"
-  | .bH => .string "BH"
-  | .bI => .string "BI"
-  | .bJ => .string "BJ"
-  | .bL => .string "BL"
-  | .bM => .string "BM"
-  | .bN => .string "BN"
-  | .bO => .string "BO"
-  | .bQ => .string "BQ"
-  | .bR => .string "BR"
-  | .bS => .string "BS"
-  | .bT => .string "BT"
-  | .bV => .string "BV"
-  | .bW => .string "BW"
-  | .bY => .string "BY"
-  | .bZ => .string "BZ"
-  | .cA => .string "CA"
-  | .cC => .string "CC"
-  | .cD => .string "CD"
-  | .cF => .string "CF"
-  | .cG => .string "CG"
-  | .cH => .string "CH"
-  | .cI => .string "CI"
-  | .cK => .string "CK"
-  | .cL => .string "CL"
-  | .cM => .string "CM"
-  | .cN => .string "CN"
-  | .cO => .string "CO"
-  | .cR => .string "CR"
-  | .cU => .string "CU"
-  | .cV => .string "CV"
-  | .cW => .string "CW"
-  | .cX => .string "CX"
-  | .cY => .string "CY"
-  | .cZ => .string "CZ"
-  | .dE => .string "DE"
-  | .dJ => .string "DJ"
-  | .dK => .string "DK"
-  | .dM => .string "DM"
-  | .dO => .string "DO"
-  | .dZ => .string "DZ"
-  | .eC => .string "EC"
-  | .eE => .string "EE"
-  | .eG => .string "EG"
-  | .eH => .string "EH"
-  | .eR => .string "ER"
-  | .eS => .string "ES"
-  | .eT => .string "ET"
-  | .fI => .string "FI"
-  | .fJ => .string "FJ"
-  | .fK => .string "FK"
-  | .fM => .string "FM"
-  | .fO => .string "FO"
-  | .fR => .string "FR"
-  | .gA => .string "GA"
-  | .gB => .string "GB"
-  | .gD => .string "GD"
-  | .gE => .string "GE"
-  | .gF => .string "GF"
-  | .gG => .string "GG"
-  | .gH => .string "GH"
-  | .gI => .string "GI"
-  | .gL => .string "GL"
-  | .gM => .string "GM"
-  | .gN => .string "GN"
-  | .gP => .string "GP"
-  | .gQ => .string "GQ"
-  | .gR => .string "GR"
-  | .gS => .string "GS"
-  | .gT => .string "GT"
-  | .gU => .string "GU"
-  | .gW => .string "GW"
-  | .gY => .string "GY"
-  | .hK => .string "HK"
-  | .hM => .string "HM"
-  | .hN => .string "HN"
-  | .hR => .string "HR"
-  | .hT => .string "HT"
-  | .hU => .string "HU"
-  | .iD => .string "ID"
-  | .iE => .string "IE"
-  | .iL => .string "IL"
-  | .iM => .string "IM"
-  | .iN => .string "IN"
-  | .iO => .string "IO"
-  | .iQ => .string "IQ"
-  | .iR => .string "IR"
-  | .iS => .string "IS"
-  | .iT => .string "IT"
-  | .jE => .string "JE"
-  | .jM => .string "JM"
-  | .jO => .string "JO"
-  | .jP => .string "JP"
-  | .kE => .string "KE"
-  | .kG => .string "KG"
-  | .kH => .string "KH"
-  | .kI => .string "KI"
-  | .kM => .string "KM"
-  | .kN => .string "KN"
-  | .kP => .string "KP"
-  | .kR => .string "KR"
-  | .kW => .string "KW"
-  | .kY => .string "KY"
-  | .kZ => .string "KZ"
-  | .lA => .string "LA"
-  | .lB => .string "LB"
-  | .lC => .string "LC"
-  | .lI => .string "LI"
-  | .lK => .string "LK"
-  | .lR => .string "LR"
-  | .lS => .string "LS"
-  | .lT => .string "LT"
-  | .lU => .string "LU"
-  | .lV => .string "LV"
-  | .lY => .string "LY"
-  | .mA => .string "MA"
-  | .mC => .string "MC"
-  | .mD => .string "MD"
-  | .mE => .string "ME"
-  | .mF => .string "MF"
-  | .mG => .string "MG"
-  | .mH => .string "MH"
-  | .mK => .string "MK"
-  | .mL => .string "ML"
-  | .mM => .string "MM"
-  | .mN => .string "MN"
-  | .mO => .string "MO"
-  | .mP => .string "MP"
-  | .mQ => .string "MQ"
-  | .mR => .string "MR"
-  | .mS => .string "MS"
-  | .mT => .string "MT"
-  | .mU => .string "MU"
-  | .mV => .string "MV"
-  | .mW => .string "MW"
-  | .mX => .string "MX"
-  | .mY => .string "MY"
-  | .mZ => .string "MZ"
-  | .nA => .string "NA"
-  | .nC => .string "NC"
-  | .nE => .string "NE"
-  | .nF => .string "NF"
-  | .nG => .string "NG"
-  | .nI => .string "NI"
-  | .nL => .string "NL"
-  | .nO => .string "NO"
-  | .nP => .string "NP"
-  | .nR => .string "NR"
-  | .nU => .string "NU"
-  | .nZ => .string "NZ"
-  | .oM => .string "OM"
-  | .pA => .string "PA"
-  | .pE => .string "PE"
-  | .pF => .string "PF"
-  | .pG => .string "PG"
-  | .pH => .string "PH"
-  | .pK => .string "PK"
-  | .pL => .string "PL"
-  | .pM => .string "PM"
-  | .pN => .string "PN"
-  | .pR => .string "PR"
-  | .pS => .string "PS"
-  | .pT => .string "PT"
-  | .pW => .string "PW"
-  | .pY => .string "PY"
-  | .qA => .string "QA"
-  | .rE => .string "RE"
-  | .rO => .string "RO"
-  | .rS => .string "RS"
-  | .rU => .string "RU"
-  | .rW => .string "RW"
-  | .sA => .string "SA"
-  | .sB => .string "SB"
-  | .sC => .string "SC"
-  | .sD => .string "SD"
-  | .sE => .string "SE"
-  | .sG => .string "SG"
-  | .sH => .string "SH"
-  | .sI => .string "SI"
-  | .sJ => .string "SJ"
-  | .sK => .string "SK"
-  | .sL => .string "SL"
-  | .sM => .string "SM"
-  | .sN => .string "SN"
-  | .sO => .string "SO"
-  | .sR => .string "SR"
-  | .sS => .string "SS"
-  | .sT => .string "ST"
-  | .sV => .string "SV"
-  | .sX => .string "SX"
-  | .sY => .string "SY"
-  | .sZ => .string "SZ"
-  | .tC => .string "TC"
-  | .tD => .string "TD"
-  | .tF => .string "TF"
-  | .tG => .string "TG"
-  | .tH => .string "TH"
-  | .tJ => .string "TJ"
-  | .tK => .string "TK"
-  | .tL => .string "TL"
-  | .tM => .string "TM"
-  | .tN => .string "TN"
-  | .tO => .string "TO"
-  | .tR => .string "TR"
-  | .tT => .string "TT"
-  | .tV => .string "TV"
-  | .tW => .string "TW"
-  | .tZ => .string "TZ"
-  | .uA => .string "UA"
-  | .uG => .string "UG"
-  | .uM => .string "UM"
-  | .uS => .string "US"
-  | .uY => .string "UY"
-  | .uZ => .string "UZ"
-  | .vA => .string "VA"
-  | .vC => .string "VC"
-  | .vE => .string "VE"
-  | .vG => .string "VG"
-  | .vI => .string "VI"
-  | .vN => .string "VN"
-  | .vU => .string "VU"
-  | .wF => .string "WF"
-  | .wS => .string "WS"
-  | .yE => .string "YE"
-  | .yT => .string "YT"
-  | .zA => .string "ZA"
-  | .zM => .string "ZM"
-  | .zW => .string "ZW"
+  | .ad => .string "AD"
+  | .ae => .string "AE"
+  | .af => .string "AF"
+  | .ag => .string "AG"
+  | .ai => .string "AI"
+  | .al => .string "AL"
+  | .am => .string "AM"
+  | .ao => .string "AO"
+  | .aq => .string "AQ"
+  | .ar => .string "AR"
+  | .as => .string "AS"
+  | .«at» => .string "AT"
+  | .au => .string "AU"
+  | .aw => .string "AW"
+  | .ax => .string "AX"
+  | .az => .string "AZ"
+  | .ba => .string "BA"
+  | .bb => .string "BB"
+  | .bd => .string "BD"
+  | .be => .string "BE"
+  | .bf => .string "BF"
+  | .bg => .string "BG"
+  | .bh => .string "BH"
+  | .bi => .string "BI"
+  | .bj => .string "BJ"
+  | .bl => .string "BL"
+  | .bm => .string "BM"
+  | .bn => .string "BN"
+  | .bo => .string "BO"
+  | .bq => .string "BQ"
+  | .br => .string "BR"
+  | .bs => .string "BS"
+  | .bt => .string "BT"
+  | .bv => .string "BV"
+  | .bw => .string "BW"
+  | .«by» => .string "BY"
+  | .bz => .string "BZ"
+  | .ca => .string "CA"
+  | .cc => .string "CC"
+  | .cd => .string "CD"
+  | .cf => .string "CF"
+  | .cg => .string "CG"
+  | .ch => .string "CH"
+  | .ci => .string "CI"
+  | .ck => .string "CK"
+  | .cl => .string "CL"
+  | .cm => .string "CM"
+  | .cn => .string "CN"
+  | .co => .string "CO"
+  | .cr => .string "CR"
+  | .cu => .string "CU"
+  | .cv => .string "CV"
+  | .cw => .string "CW"
+  | .cx => .string "CX"
+  | .cy => .string "CY"
+  | .cz => .string "CZ"
+  | .de => .string "DE"
+  | .dj => .string "DJ"
+  | .dk => .string "DK"
+  | .dm => .string "DM"
+  | .«do» => .string "DO"
+  | .dz => .string "DZ"
+  | .ec => .string "EC"
+  | .ee => .string "EE"
+  | .eg => .string "EG"
+  | .eh => .string "EH"
+  | .er => .string "ER"
+  | .es => .string "ES"
+  | .et => .string "ET"
+  | .fi => .string "FI"
+  | .fj => .string "FJ"
+  | .fk => .string "FK"
+  | .fm => .string "FM"
+  | .fo => .string "FO"
+  | .fr => .string "FR"
+  | .ga => .string "GA"
+  | .gb => .string "GB"
+  | .gd => .string "GD"
+  | .ge => .string "GE"
+  | .gf => .string "GF"
+  | .gg => .string "GG"
+  | .gh => .string "GH"
+  | .gi => .string "GI"
+  | .gl => .string "GL"
+  | .gm => .string "GM"
+  | .gn => .string "GN"
+  | .gp => .string "GP"
+  | .gq => .string "GQ"
+  | .gr => .string "GR"
+  | .gs => .string "GS"
+  | .gt => .string "GT"
+  | .gu => .string "GU"
+  | .gw => .string "GW"
+  | .gy => .string "GY"
+  | .hk => .string "HK"
+  | .hm => .string "HM"
+  | .hn => .string "HN"
+  | .hr => .string "HR"
+  | .ht => .string "HT"
+  | .hu => .string "HU"
+  | .id => .string "ID"
+  | .ie => .string "IE"
+  | .il => .string "IL"
+  | .im => .string "IM"
+  | .«in» => .string "IN"
+  | .io => .string "IO"
+  | .iq => .string "IQ"
+  | .ir => .string "IR"
+  | .is => .string "IS"
+  | .it => .string "IT"
+  | .je => .string "JE"
+  | .jm => .string "JM"
+  | .jo => .string "JO"
+  | .jp => .string "JP"
+  | .ke => .string "KE"
+  | .kg => .string "KG"
+  | .kh => .string "KH"
+  | .ki => .string "KI"
+  | .km => .string "KM"
+  | .kn => .string "KN"
+  | .kp => .string "KP"
+  | .kr => .string "KR"
+  | .kw => .string "KW"
+  | .ky => .string "KY"
+  | .kz => .string "KZ"
+  | .la => .string "LA"
+  | .lb => .string "LB"
+  | .lc => .string "LC"
+  | .li => .string "LI"
+  | .lk => .string "LK"
+  | .lr => .string "LR"
+  | .ls => .string "LS"
+  | .lt => .string "LT"
+  | .lu => .string "LU"
+  | .lv => .string "LV"
+  | .ly => .string "LY"
+  | .ma => .string "MA"
+  | .mc => .string "MC"
+  | .md => .string "MD"
+  | .me => .string "ME"
+  | .mf => .string "MF"
+  | .mg => .string "MG"
+  | .mh => .string "MH"
+  | .mk => .string "MK"
+  | .ml => .string "ML"
+  | .mm => .string "MM"
+  | .mn => .string "MN"
+  | .mo => .string "MO"
+  | .mp => .string "MP"
+  | .mq => .string "MQ"
+  | .mr => .string "MR"
+  | .ms => .string "MS"
+  | .mt => .string "MT"
+  | .mu => .string "MU"
+  | .mv => .string "MV"
+  | .mw => .string "MW"
+  | .mx => .string "MX"
+  | .my => .string "MY"
+  | .mz => .string "MZ"
+  | .na => .string "NA"
+  | .nc => .string "NC"
+  | .ne => .string "NE"
+  | .nf => .string "NF"
+  | .ng => .string "NG"
+  | .ni => .string "NI"
+  | .nl => .string "NL"
+  | .no => .string "NO"
+  | .np => .string "NP"
+  | .nr => .string "NR"
+  | .nu => .string "NU"
+  | .nz => .string "NZ"
+  | .om => .string "OM"
+  | .pa => .string "PA"
+  | .pe => .string "PE"
+  | .pf => .string "PF"
+  | .pg => .string "PG"
+  | .ph => .string "PH"
+  | .pk => .string "PK"
+  | .pl => .string "PL"
+  | .pm => .string "PM"
+  | .pn => .string "PN"
+  | .pr => .string "PR"
+  | .ps => .string "PS"
+  | .pt => .string "PT"
+  | .pw => .string "PW"
+  | .py => .string "PY"
+  | .qa => .string "QA"
+  | .re => .string "RE"
+  | .ro => .string "RO"
+  | .rs => .string "RS"
+  | .ru => .string "RU"
+  | .rw => .string "RW"
+  | .sa => .string "SA"
+  | .sb => .string "SB"
+  | .sc => .string "SC"
+  | .sd => .string "SD"
+  | .se => .string "SE"
+  | .sg => .string "SG"
+  | .sh => .string "SH"
+  | .si => .string "SI"
+  | .sj => .string "SJ"
+  | .sk => .string "SK"
+  | .sl => .string "SL"
+  | .sm => .string "SM"
+  | .sn => .string "SN"
+  | .so => .string "SO"
+  | .sr => .string "SR"
+  | .ss => .string "SS"
+  | .st => .string "ST"
+  | .sv => .string "SV"
+  | .sx => .string "SX"
+  | .sy => .string "SY"
+  | .sz => .string "SZ"
+  | .tc => .string "TC"
+  | .td => .string "TD"
+  | .tf => .string "TF"
+  | .tg => .string "TG"
+  | .th => .string "TH"
+  | .tj => .string "TJ"
+  | .tk => .string "TK"
+  | .tl => .string "TL"
+  | .tm => .string "TM"
+  | .tn => .string "TN"
+  | .to => .string "TO"
+  | .tr => .string "TR"
+  | .tt => .string "TT"
+  | .tv => .string "TV"
+  | .tw => .string "TW"
+  | .tz => .string "TZ"
+  | .ua => .string "UA"
+  | .ug => .string "UG"
+  | .um => .string "UM"
+  | .us => .string "US"
+  | .uy => .string "UY"
+  | .uz => .string "UZ"
+  | .va => .string "VA"
+  | .vc => .string "VC"
+  | .ve => .string "VE"
+  | .vg => .string "VG"
+  | .vi => .string "VI"
+  | .vn => .string "VN"
+  | .vu => .string "VU"
+  | .wf => .string "WF"
+  | .ws => .string "WS"
+  | .ye => .string "YE"
+  | .yt => .string "YT"
+  | .za => .string "ZA"
+  | .zm => .string "ZM"
+  | .zw => .string "ZW"
   | .t1 => .string "T1"⟩
 instance : FromJS IncomingRequestCfPropertiesGeographicInformationCountry where
   fromJS
-    | .string "AD" => .ok .aD
-    | .string "AE" => .ok .aE
-    | .string "AF" => .ok .aF
-    | .string "AG" => .ok .aG
-    | .string "AI" => .ok .aI
-    | .string "AL" => .ok .aL
-    | .string "AM" => .ok .aM
-    | .string "AO" => .ok .aO
-    | .string "AQ" => .ok .aQ
-    | .string "AR" => .ok .aR
-    | .string "AS" => .ok .aS
-    | .string "AT" => .ok .aT
-    | .string "AU" => .ok .aU
-    | .string "AW" => .ok .aW
-    | .string "AX" => .ok .aX
-    | .string "AZ" => .ok .aZ
-    | .string "BA" => .ok .bA
-    | .string "BB" => .ok .bB
-    | .string "BD" => .ok .bD
-    | .string "BE" => .ok .bE
-    | .string "BF" => .ok .bF
-    | .string "BG" => .ok .bG
-    | .string "BH" => .ok .bH
-    | .string "BI" => .ok .bI
-    | .string "BJ" => .ok .bJ
-    | .string "BL" => .ok .bL
-    | .string "BM" => .ok .bM
-    | .string "BN" => .ok .bN
-    | .string "BO" => .ok .bO
-    | .string "BQ" => .ok .bQ
-    | .string "BR" => .ok .bR
-    | .string "BS" => .ok .bS
-    | .string "BT" => .ok .bT
-    | .string "BV" => .ok .bV
-    | .string "BW" => .ok .bW
-    | .string "BY" => .ok .bY
-    | .string "BZ" => .ok .bZ
-    | .string "CA" => .ok .cA
-    | .string "CC" => .ok .cC
-    | .string "CD" => .ok .cD
-    | .string "CF" => .ok .cF
-    | .string "CG" => .ok .cG
-    | .string "CH" => .ok .cH
-    | .string "CI" => .ok .cI
-    | .string "CK" => .ok .cK
-    | .string "CL" => .ok .cL
-    | .string "CM" => .ok .cM
-    | .string "CN" => .ok .cN
-    | .string "CO" => .ok .cO
-    | .string "CR" => .ok .cR
-    | .string "CU" => .ok .cU
-    | .string "CV" => .ok .cV
-    | .string "CW" => .ok .cW
-    | .string "CX" => .ok .cX
-    | .string "CY" => .ok .cY
-    | .string "CZ" => .ok .cZ
-    | .string "DE" => .ok .dE
-    | .string "DJ" => .ok .dJ
-    | .string "DK" => .ok .dK
-    | .string "DM" => .ok .dM
-    | .string "DO" => .ok .dO
-    | .string "DZ" => .ok .dZ
-    | .string "EC" => .ok .eC
-    | .string "EE" => .ok .eE
-    | .string "EG" => .ok .eG
-    | .string "EH" => .ok .eH
-    | .string "ER" => .ok .eR
-    | .string "ES" => .ok .eS
-    | .string "ET" => .ok .eT
-    | .string "FI" => .ok .fI
-    | .string "FJ" => .ok .fJ
-    | .string "FK" => .ok .fK
-    | .string "FM" => .ok .fM
-    | .string "FO" => .ok .fO
-    | .string "FR" => .ok .fR
-    | .string "GA" => .ok .gA
-    | .string "GB" => .ok .gB
-    | .string "GD" => .ok .gD
-    | .string "GE" => .ok .gE
-    | .string "GF" => .ok .gF
-    | .string "GG" => .ok .gG
-    | .string "GH" => .ok .gH
-    | .string "GI" => .ok .gI
-    | .string "GL" => .ok .gL
-    | .string "GM" => .ok .gM
-    | .string "GN" => .ok .gN
-    | .string "GP" => .ok .gP
-    | .string "GQ" => .ok .gQ
-    | .string "GR" => .ok .gR
-    | .string "GS" => .ok .gS
-    | .string "GT" => .ok .gT
-    | .string "GU" => .ok .gU
-    | .string "GW" => .ok .gW
-    | .string "GY" => .ok .gY
-    | .string "HK" => .ok .hK
-    | .string "HM" => .ok .hM
-    | .string "HN" => .ok .hN
-    | .string "HR" => .ok .hR
-    | .string "HT" => .ok .hT
-    | .string "HU" => .ok .hU
-    | .string "ID" => .ok .iD
-    | .string "IE" => .ok .iE
-    | .string "IL" => .ok .iL
-    | .string "IM" => .ok .iM
-    | .string "IN" => .ok .iN
-    | .string "IO" => .ok .iO
-    | .string "IQ" => .ok .iQ
-    | .string "IR" => .ok .iR
-    | .string "IS" => .ok .iS
-    | .string "IT" => .ok .iT
-    | .string "JE" => .ok .jE
-    | .string "JM" => .ok .jM
-    | .string "JO" => .ok .jO
-    | .string "JP" => .ok .jP
-    | .string "KE" => .ok .kE
-    | .string "KG" => .ok .kG
-    | .string "KH" => .ok .kH
-    | .string "KI" => .ok .kI
-    | .string "KM" => .ok .kM
-    | .string "KN" => .ok .kN
-    | .string "KP" => .ok .kP
-    | .string "KR" => .ok .kR
-    | .string "KW" => .ok .kW
-    | .string "KY" => .ok .kY
-    | .string "KZ" => .ok .kZ
-    | .string "LA" => .ok .lA
-    | .string "LB" => .ok .lB
-    | .string "LC" => .ok .lC
-    | .string "LI" => .ok .lI
-    | .string "LK" => .ok .lK
-    | .string "LR" => .ok .lR
-    | .string "LS" => .ok .lS
-    | .string "LT" => .ok .lT
-    | .string "LU" => .ok .lU
-    | .string "LV" => .ok .lV
-    | .string "LY" => .ok .lY
-    | .string "MA" => .ok .mA
-    | .string "MC" => .ok .mC
-    | .string "MD" => .ok .mD
-    | .string "ME" => .ok .mE
-    | .string "MF" => .ok .mF
-    | .string "MG" => .ok .mG
-    | .string "MH" => .ok .mH
-    | .string "MK" => .ok .mK
-    | .string "ML" => .ok .mL
-    | .string "MM" => .ok .mM
-    | .string "MN" => .ok .mN
-    | .string "MO" => .ok .mO
-    | .string "MP" => .ok .mP
-    | .string "MQ" => .ok .mQ
-    | .string "MR" => .ok .mR
-    | .string "MS" => .ok .mS
-    | .string "MT" => .ok .mT
-    | .string "MU" => .ok .mU
-    | .string "MV" => .ok .mV
-    | .string "MW" => .ok .mW
-    | .string "MX" => .ok .mX
-    | .string "MY" => .ok .mY
-    | .string "MZ" => .ok .mZ
-    | .string "NA" => .ok .nA
-    | .string "NC" => .ok .nC
-    | .string "NE" => .ok .nE
-    | .string "NF" => .ok .nF
-    | .string "NG" => .ok .nG
-    | .string "NI" => .ok .nI
-    | .string "NL" => .ok .nL
-    | .string "NO" => .ok .nO
-    | .string "NP" => .ok .nP
-    | .string "NR" => .ok .nR
-    | .string "NU" => .ok .nU
-    | .string "NZ" => .ok .nZ
-    | .string "OM" => .ok .oM
-    | .string "PA" => .ok .pA
-    | .string "PE" => .ok .pE
-    | .string "PF" => .ok .pF
-    | .string "PG" => .ok .pG
-    | .string "PH" => .ok .pH
-    | .string "PK" => .ok .pK
-    | .string "PL" => .ok .pL
-    | .string "PM" => .ok .pM
-    | .string "PN" => .ok .pN
-    | .string "PR" => .ok .pR
-    | .string "PS" => .ok .pS
-    | .string "PT" => .ok .pT
-    | .string "PW" => .ok .pW
-    | .string "PY" => .ok .pY
-    | .string "QA" => .ok .qA
-    | .string "RE" => .ok .rE
-    | .string "RO" => .ok .rO
-    | .string "RS" => .ok .rS
-    | .string "RU" => .ok .rU
-    | .string "RW" => .ok .rW
-    | .string "SA" => .ok .sA
-    | .string "SB" => .ok .sB
-    | .string "SC" => .ok .sC
-    | .string "SD" => .ok .sD
-    | .string "SE" => .ok .sE
-    | .string "SG" => .ok .sG
-    | .string "SH" => .ok .sH
-    | .string "SI" => .ok .sI
-    | .string "SJ" => .ok .sJ
-    | .string "SK" => .ok .sK
-    | .string "SL" => .ok .sL
-    | .string "SM" => .ok .sM
-    | .string "SN" => .ok .sN
-    | .string "SO" => .ok .sO
-    | .string "SR" => .ok .sR
-    | .string "SS" => .ok .sS
-    | .string "ST" => .ok .sT
-    | .string "SV" => .ok .sV
-    | .string "SX" => .ok .sX
-    | .string "SY" => .ok .sY
-    | .string "SZ" => .ok .sZ
-    | .string "TC" => .ok .tC
-    | .string "TD" => .ok .tD
-    | .string "TF" => .ok .tF
-    | .string "TG" => .ok .tG
-    | .string "TH" => .ok .tH
-    | .string "TJ" => .ok .tJ
-    | .string "TK" => .ok .tK
-    | .string "TL" => .ok .tL
-    | .string "TM" => .ok .tM
-    | .string "TN" => .ok .tN
-    | .string "TO" => .ok .tO
-    | .string "TR" => .ok .tR
-    | .string "TT" => .ok .tT
-    | .string "TV" => .ok .tV
-    | .string "TW" => .ok .tW
-    | .string "TZ" => .ok .tZ
-    | .string "UA" => .ok .uA
-    | .string "UG" => .ok .uG
-    | .string "UM" => .ok .uM
-    | .string "US" => .ok .uS
-    | .string "UY" => .ok .uY
-    | .string "UZ" => .ok .uZ
-    | .string "VA" => .ok .vA
-    | .string "VC" => .ok .vC
-    | .string "VE" => .ok .vE
-    | .string "VG" => .ok .vG
-    | .string "VI" => .ok .vI
-    | .string "VN" => .ok .vN
-    | .string "VU" => .ok .vU
-    | .string "WF" => .ok .wF
-    | .string "WS" => .ok .wS
-    | .string "YE" => .ok .yE
-    | .string "YT" => .ok .yT
-    | .string "ZA" => .ok .zA
-    | .string "ZM" => .ok .zM
-    | .string "ZW" => .ok .zW
+    | .string "AD" => .ok .ad
+    | .string "AE" => .ok .ae
+    | .string "AF" => .ok .af
+    | .string "AG" => .ok .ag
+    | .string "AI" => .ok .ai
+    | .string "AL" => .ok .al
+    | .string "AM" => .ok .am
+    | .string "AO" => .ok .ao
+    | .string "AQ" => .ok .aq
+    | .string "AR" => .ok .ar
+    | .string "AS" => .ok .as
+    | .string "AT" => .ok .«at»
+    | .string "AU" => .ok .au
+    | .string "AW" => .ok .aw
+    | .string "AX" => .ok .ax
+    | .string "AZ" => .ok .az
+    | .string "BA" => .ok .ba
+    | .string "BB" => .ok .bb
+    | .string "BD" => .ok .bd
+    | .string "BE" => .ok .be
+    | .string "BF" => .ok .bf
+    | .string "BG" => .ok .bg
+    | .string "BH" => .ok .bh
+    | .string "BI" => .ok .bi
+    | .string "BJ" => .ok .bj
+    | .string "BL" => .ok .bl
+    | .string "BM" => .ok .bm
+    | .string "BN" => .ok .bn
+    | .string "BO" => .ok .bo
+    | .string "BQ" => .ok .bq
+    | .string "BR" => .ok .br
+    | .string "BS" => .ok .bs
+    | .string "BT" => .ok .bt
+    | .string "BV" => .ok .bv
+    | .string "BW" => .ok .bw
+    | .string "BY" => .ok .«by»
+    | .string "BZ" => .ok .bz
+    | .string "CA" => .ok .ca
+    | .string "CC" => .ok .cc
+    | .string "CD" => .ok .cd
+    | .string "CF" => .ok .cf
+    | .string "CG" => .ok .cg
+    | .string "CH" => .ok .ch
+    | .string "CI" => .ok .ci
+    | .string "CK" => .ok .ck
+    | .string "CL" => .ok .cl
+    | .string "CM" => .ok .cm
+    | .string "CN" => .ok .cn
+    | .string "CO" => .ok .co
+    | .string "CR" => .ok .cr
+    | .string "CU" => .ok .cu
+    | .string "CV" => .ok .cv
+    | .string "CW" => .ok .cw
+    | .string "CX" => .ok .cx
+    | .string "CY" => .ok .cy
+    | .string "CZ" => .ok .cz
+    | .string "DE" => .ok .de
+    | .string "DJ" => .ok .dj
+    | .string "DK" => .ok .dk
+    | .string "DM" => .ok .dm
+    | .string "DO" => .ok .«do»
+    | .string "DZ" => .ok .dz
+    | .string "EC" => .ok .ec
+    | .string "EE" => .ok .ee
+    | .string "EG" => .ok .eg
+    | .string "EH" => .ok .eh
+    | .string "ER" => .ok .er
+    | .string "ES" => .ok .es
+    | .string "ET" => .ok .et
+    | .string "FI" => .ok .fi
+    | .string "FJ" => .ok .fj
+    | .string "FK" => .ok .fk
+    | .string "FM" => .ok .fm
+    | .string "FO" => .ok .fo
+    | .string "FR" => .ok .fr
+    | .string "GA" => .ok .ga
+    | .string "GB" => .ok .gb
+    | .string "GD" => .ok .gd
+    | .string "GE" => .ok .ge
+    | .string "GF" => .ok .gf
+    | .string "GG" => .ok .gg
+    | .string "GH" => .ok .gh
+    | .string "GI" => .ok .gi
+    | .string "GL" => .ok .gl
+    | .string "GM" => .ok .gm
+    | .string "GN" => .ok .gn
+    | .string "GP" => .ok .gp
+    | .string "GQ" => .ok .gq
+    | .string "GR" => .ok .gr
+    | .string "GS" => .ok .gs
+    | .string "GT" => .ok .gt
+    | .string "GU" => .ok .gu
+    | .string "GW" => .ok .gw
+    | .string "GY" => .ok .gy
+    | .string "HK" => .ok .hk
+    | .string "HM" => .ok .hm
+    | .string "HN" => .ok .hn
+    | .string "HR" => .ok .hr
+    | .string "HT" => .ok .ht
+    | .string "HU" => .ok .hu
+    | .string "ID" => .ok .id
+    | .string "IE" => .ok .ie
+    | .string "IL" => .ok .il
+    | .string "IM" => .ok .im
+    | .string "IN" => .ok .«in»
+    | .string "IO" => .ok .io
+    | .string "IQ" => .ok .iq
+    | .string "IR" => .ok .ir
+    | .string "IS" => .ok .is
+    | .string "IT" => .ok .it
+    | .string "JE" => .ok .je
+    | .string "JM" => .ok .jm
+    | .string "JO" => .ok .jo
+    | .string "JP" => .ok .jp
+    | .string "KE" => .ok .ke
+    | .string "KG" => .ok .kg
+    | .string "KH" => .ok .kh
+    | .string "KI" => .ok .ki
+    | .string "KM" => .ok .km
+    | .string "KN" => .ok .kn
+    | .string "KP" => .ok .kp
+    | .string "KR" => .ok .kr
+    | .string "KW" => .ok .kw
+    | .string "KY" => .ok .ky
+    | .string "KZ" => .ok .kz
+    | .string "LA" => .ok .la
+    | .string "LB" => .ok .lb
+    | .string "LC" => .ok .lc
+    | .string "LI" => .ok .li
+    | .string "LK" => .ok .lk
+    | .string "LR" => .ok .lr
+    | .string "LS" => .ok .ls
+    | .string "LT" => .ok .lt
+    | .string "LU" => .ok .lu
+    | .string "LV" => .ok .lv
+    | .string "LY" => .ok .ly
+    | .string "MA" => .ok .ma
+    | .string "MC" => .ok .mc
+    | .string "MD" => .ok .md
+    | .string "ME" => .ok .me
+    | .string "MF" => .ok .mf
+    | .string "MG" => .ok .mg
+    | .string "MH" => .ok .mh
+    | .string "MK" => .ok .mk
+    | .string "ML" => .ok .ml
+    | .string "MM" => .ok .mm
+    | .string "MN" => .ok .mn
+    | .string "MO" => .ok .mo
+    | .string "MP" => .ok .mp
+    | .string "MQ" => .ok .mq
+    | .string "MR" => .ok .mr
+    | .string "MS" => .ok .ms
+    | .string "MT" => .ok .mt
+    | .string "MU" => .ok .mu
+    | .string "MV" => .ok .mv
+    | .string "MW" => .ok .mw
+    | .string "MX" => .ok .mx
+    | .string "MY" => .ok .my
+    | .string "MZ" => .ok .mz
+    | .string "NA" => .ok .na
+    | .string "NC" => .ok .nc
+    | .string "NE" => .ok .ne
+    | .string "NF" => .ok .nf
+    | .string "NG" => .ok .ng
+    | .string "NI" => .ok .ni
+    | .string "NL" => .ok .nl
+    | .string "NO" => .ok .no
+    | .string "NP" => .ok .np
+    | .string "NR" => .ok .nr
+    | .string "NU" => .ok .nu
+    | .string "NZ" => .ok .nz
+    | .string "OM" => .ok .om
+    | .string "PA" => .ok .pa
+    | .string "PE" => .ok .pe
+    | .string "PF" => .ok .pf
+    | .string "PG" => .ok .pg
+    | .string "PH" => .ok .ph
+    | .string "PK" => .ok .pk
+    | .string "PL" => .ok .pl
+    | .string "PM" => .ok .pm
+    | .string "PN" => .ok .pn
+    | .string "PR" => .ok .pr
+    | .string "PS" => .ok .ps
+    | .string "PT" => .ok .pt
+    | .string "PW" => .ok .pw
+    | .string "PY" => .ok .py
+    | .string "QA" => .ok .qa
+    | .string "RE" => .ok .re
+    | .string "RO" => .ok .ro
+    | .string "RS" => .ok .rs
+    | .string "RU" => .ok .ru
+    | .string "RW" => .ok .rw
+    | .string "SA" => .ok .sa
+    | .string "SB" => .ok .sb
+    | .string "SC" => .ok .sc
+    | .string "SD" => .ok .sd
+    | .string "SE" => .ok .se
+    | .string "SG" => .ok .sg
+    | .string "SH" => .ok .sh
+    | .string "SI" => .ok .si
+    | .string "SJ" => .ok .sj
+    | .string "SK" => .ok .sk
+    | .string "SL" => .ok .sl
+    | .string "SM" => .ok .sm
+    | .string "SN" => .ok .sn
+    | .string "SO" => .ok .so
+    | .string "SR" => .ok .sr
+    | .string "SS" => .ok .ss
+    | .string "ST" => .ok .st
+    | .string "SV" => .ok .sv
+    | .string "SX" => .ok .sx
+    | .string "SY" => .ok .sy
+    | .string "SZ" => .ok .sz
+    | .string "TC" => .ok .tc
+    | .string "TD" => .ok .td
+    | .string "TF" => .ok .tf
+    | .string "TG" => .ok .tg
+    | .string "TH" => .ok .th
+    | .string "TJ" => .ok .tj
+    | .string "TK" => .ok .tk
+    | .string "TL" => .ok .tl
+    | .string "TM" => .ok .tm
+    | .string "TN" => .ok .tn
+    | .string "TO" => .ok .to
+    | .string "TR" => .ok .tr
+    | .string "TT" => .ok .tt
+    | .string "TV" => .ok .tv
+    | .string "TW" => .ok .tw
+    | .string "TZ" => .ok .tz
+    | .string "UA" => .ok .ua
+    | .string "UG" => .ok .ug
+    | .string "UM" => .ok .um
+    | .string "US" => .ok .us
+    | .string "UY" => .ok .uy
+    | .string "UZ" => .ok .uz
+    | .string "VA" => .ok .va
+    | .string "VC" => .ok .vc
+    | .string "VE" => .ok .ve
+    | .string "VG" => .ok .vg
+    | .string "VI" => .ok .vi
+    | .string "VN" => .ok .vn
+    | .string "VU" => .ok .vu
+    | .string "WF" => .ok .wf
+    | .string "WS" => .ok .ws
+    | .string "YE" => .ok .ye
+    | .string "YT" => .ok .yt
+    | .string "ZA" => .ok .za
+    | .string "ZM" => .ok .zm
+    | .string "ZW" => .ok .zw
     | .string "T1" => .ok .t1
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesGeographicInformationCountry"
@@ -1605,37 +1605,37 @@ instance : FromJS IncomingRequestCfPropertiesGeographicInformationCountry where
 /-- `enum ContinentCode` (@cloudflare/workers-types 5.20261019.1 type declarations): "AF", "AN", "AS", "EU", "NA", "OC", "SA". -/
 inductive ContinentCode where
   /-- "AF" -/
-  | aF
+  | af
   /-- "AN" -/
-  | aN
+  | an
   /-- "AS" -/
-  | aS
+  | as
   /-- "EU" -/
-  | eU
+  | eu
   /-- "NA" -/
-  | nA
+  | na
   /-- "OC" -/
-  | oC
+  | oc
   /-- "SA" -/
-  | sA
+  | sa
   deriving BEq, Repr, Inhabited
 instance : ToJS ContinentCode := ⟨fun
-  | .aF => .string "AF"
-  | .aN => .string "AN"
-  | .aS => .string "AS"
-  | .eU => .string "EU"
-  | .nA => .string "NA"
-  | .oC => .string "OC"
-  | .sA => .string "SA"⟩
+  | .af => .string "AF"
+  | .an => .string "AN"
+  | .as => .string "AS"
+  | .eu => .string "EU"
+  | .na => .string "NA"
+  | .oc => .string "OC"
+  | .sa => .string "SA"⟩
 instance : FromJS ContinentCode where
   fromJS
-    | .string "AF" => .ok .aF
-    | .string "AN" => .ok .aN
-    | .string "AS" => .ok .aS
-    | .string "EU" => .ok .eU
-    | .string "NA" => .ok .nA
-    | .string "OC" => .ok .oC
-    | .string "SA" => .ok .sA
+    | .string "AF" => .ok .af
+    | .string "AN" => .ok .an
+    | .string "AS" => .ok .as
+    | .string "EU" => .ok .eu
+    | .string "NA" => .ok .na
+    | .string "OC" => .ok .oc
+    | .string "SA" => .ok .sa
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.ContinentCode"
 

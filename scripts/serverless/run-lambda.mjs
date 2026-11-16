@@ -16,6 +16,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { echoed, rootMessage } from './http-contract.mjs';
 import { eventKinds, makeEvent, readReply } from './lambda-events.mjs';
 
 const args = process.argv.slice(2);
@@ -87,10 +88,10 @@ async function contract(fn, kind, framework) {
       checks.push({ kind, name, ok: true });
     } catch (error) { checks.push({ kind, name, ok: false, error: error.message.slice(0, 1000) }); }
   };
-  await check('GET /', { path: '/' }, 200, { message: `Hello from Lean on ${framework}!` });
+  await check('GET /', { path: '/' }, 200, { message: rootMessage(framework) });
   await check('GET /hello/Ada?x=1', { path: '/hello/Ada', query: [['x', '1']] }, 200, { message: 'Hello, Ada, from Lean!' });
   await check('POST /echo (JSON body)', { method: 'POST', path: '/echo', headers: { 'content-type': 'application/json' }, body: '{"n":[1,2],"s":"λ"}' },
-    200, { echo: { n: [1, 2], s: 'λ' } });
+    200, echoed(framework, { n: [1, 2], s: 'λ' }));
   await check('GET /health', { path: '/health' }, 200, { ok: true });
   await check('GET /missing is 404', { path: '/missing' }, 404);
   return checks;

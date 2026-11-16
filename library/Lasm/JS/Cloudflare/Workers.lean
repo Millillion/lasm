@@ -609,16 +609,16 @@ def ScheduledEvent.timeStamp (self : ScheduledEvent) : IO Float := self.val.get 
 def ScheduledEvent.isTrusted (self : ScheduledEvent) : IO Bool := self.val.get "isTrusted" Bool
 
 /-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
-def ScheduledEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "NONE"] Float
+def ScheduledEvent.NONE : IO Float := Support.getGlobal ["ScheduledEvent", "NONE"] Float
 
 /-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
-def ScheduledEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "CAPTURING_PHASE"] Float
+def ScheduledEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["ScheduledEvent", "CAPTURING_PHASE"] Float
 
 /-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
-def ScheduledEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "AT_TARGET"] Float
+def ScheduledEvent.AT_TARGET : IO Float := Support.getGlobal ["ScheduledEvent", "AT_TARGET"] Float
 
 /-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
-def ScheduledEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "BUBBLING_PHASE"] Float
+def ScheduledEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["ScheduledEvent", "BUBBLING_PHASE"] Float
 
 /-- `readonly scheduledTime: number`: `readonly attribute double scheduledTime` -/
 def ScheduledEvent.scheduledTime (self : ScheduledEvent) : IO Float := self.val.get "scheduledTime" Float

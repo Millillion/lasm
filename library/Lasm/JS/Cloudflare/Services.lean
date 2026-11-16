@@ -225,61 +225,61 @@ instance : FromJS UnderlyingByteSourceType where
 /-- `enum ArtifactsErrorCode` (@cloudflare/workers-types 5.20261019.1 type declarations): "ALREADY_EXISTS", "NOT_FOUND", "CREATE_IN_PROGRESS", "IMPORT_IN_PROGRESS", "FORK_IN_PROGRESS", "INVALID_INPUT", "INVALID_REPO_NAME", "INVALID_TTL", "INVALID_URL", "REMOTE_AUTH_REQUIRED", "UPSTREAM_UNAVAILABLE", "MEMORY_LIMIT", "INTERNAL_ERROR". -/
 inductive ArtifactsErrorCode where
   /-- "ALREADY_EXISTS" -/
-  | aLREADYEXISTS
+  | alreadyExists
   /-- "NOT_FOUND" -/
-  | nOTFOUND
+  | notFound
   /-- "CREATE_IN_PROGRESS" -/
-  | cREATEINPROGRESS
+  | createInProgress
   /-- "IMPORT_IN_PROGRESS" -/
-  | iMPORTINPROGRESS
+  | importInProgress
   /-- "FORK_IN_PROGRESS" -/
-  | fORKINPROGRESS
+  | forkInProgress
   /-- "INVALID_INPUT" -/
-  | iNVALIDINPUT
+  | invalidInput
   /-- "INVALID_REPO_NAME" -/
-  | iNVALIDREPONAME
+  | invalidRepoName
   /-- "INVALID_TTL" -/
-  | iNVALIDTTL
+  | invalidTtl
   /-- "INVALID_URL" -/
-  | iNVALIDURL
+  | invalidUrl
   /-- "REMOTE_AUTH_REQUIRED" -/
-  | rEMOTEAUTHREQUIRED
+  | remoteAuthRequired
   /-- "UPSTREAM_UNAVAILABLE" -/
-  | uPSTREAMUNAVAILABLE
+  | upstreamUnavailable
   /-- "MEMORY_LIMIT" -/
-  | mEMORYLIMIT
+  | memoryLimit
   /-- "INTERNAL_ERROR" -/
-  | iNTERNALERROR
+  | internalError
   deriving BEq, Repr, Inhabited
 instance : ToJS ArtifactsErrorCode := ⟨fun
-  | .aLREADYEXISTS => .string "ALREADY_EXISTS"
-  | .nOTFOUND => .string "NOT_FOUND"
-  | .cREATEINPROGRESS => .string "CREATE_IN_PROGRESS"
-  | .iMPORTINPROGRESS => .string "IMPORT_IN_PROGRESS"
-  | .fORKINPROGRESS => .string "FORK_IN_PROGRESS"
-  | .iNVALIDINPUT => .string "INVALID_INPUT"
-  | .iNVALIDREPONAME => .string "INVALID_REPO_NAME"
-  | .iNVALIDTTL => .string "INVALID_TTL"
-  | .iNVALIDURL => .string "INVALID_URL"
-  | .rEMOTEAUTHREQUIRED => .string "REMOTE_AUTH_REQUIRED"
-  | .uPSTREAMUNAVAILABLE => .string "UPSTREAM_UNAVAILABLE"
-  | .mEMORYLIMIT => .string "MEMORY_LIMIT"
-  | .iNTERNALERROR => .string "INTERNAL_ERROR"⟩
+  | .alreadyExists => .string "ALREADY_EXISTS"
+  | .notFound => .string "NOT_FOUND"
+  | .createInProgress => .string "CREATE_IN_PROGRESS"
+  | .importInProgress => .string "IMPORT_IN_PROGRESS"
+  | .forkInProgress => .string "FORK_IN_PROGRESS"
+  | .invalidInput => .string "INVALID_INPUT"
+  | .invalidRepoName => .string "INVALID_REPO_NAME"
+  | .invalidTtl => .string "INVALID_TTL"
+  | .invalidUrl => .string "INVALID_URL"
+  | .remoteAuthRequired => .string "REMOTE_AUTH_REQUIRED"
+  | .upstreamUnavailable => .string "UPSTREAM_UNAVAILABLE"
+  | .memoryLimit => .string "MEMORY_LIMIT"
+  | .internalError => .string "INTERNAL_ERROR"⟩
 instance : FromJS ArtifactsErrorCode where
   fromJS
-    | .string "ALREADY_EXISTS" => .ok .aLREADYEXISTS
-    | .string "NOT_FOUND" => .ok .nOTFOUND
-    | .string "CREATE_IN_PROGRESS" => .ok .cREATEINPROGRESS
-    | .string "IMPORT_IN_PROGRESS" => .ok .iMPORTINPROGRESS
-    | .string "FORK_IN_PROGRESS" => .ok .fORKINPROGRESS
-    | .string "INVALID_INPUT" => .ok .iNVALIDINPUT
-    | .string "INVALID_REPO_NAME" => .ok .iNVALIDREPONAME
-    | .string "INVALID_TTL" => .ok .iNVALIDTTL
-    | .string "INVALID_URL" => .ok .iNVALIDURL
-    | .string "REMOTE_AUTH_REQUIRED" => .ok .rEMOTEAUTHREQUIRED
-    | .string "UPSTREAM_UNAVAILABLE" => .ok .uPSTREAMUNAVAILABLE
-    | .string "MEMORY_LIMIT" => .ok .mEMORYLIMIT
-    | .string "INTERNAL_ERROR" => .ok .iNTERNALERROR
+    | .string "ALREADY_EXISTS" => .ok .alreadyExists
+    | .string "NOT_FOUND" => .ok .notFound
+    | .string "CREATE_IN_PROGRESS" => .ok .createInProgress
+    | .string "IMPORT_IN_PROGRESS" => .ok .importInProgress
+    | .string "FORK_IN_PROGRESS" => .ok .forkInProgress
+    | .string "INVALID_INPUT" => .ok .invalidInput
+    | .string "INVALID_REPO_NAME" => .ok .invalidRepoName
+    | .string "INVALID_TTL" => .ok .invalidTtl
+    | .string "INVALID_URL" => .ok .invalidUrl
+    | .string "REMOTE_AUTH_REQUIRED" => .ok .remoteAuthRequired
+    | .string "UPSTREAM_UNAVAILABLE" => .ok .upstreamUnavailable
+    | .string "MEMORY_LIMIT" => .ok .memoryLimit
+    | .string "INTERNAL_ERROR" => .ok .internalError
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.ArtifactsErrorCode"
 
@@ -1265,7 +1265,7 @@ def Console.warn (self : Console) (data : Array Data := #[]) : IO Unit :=
 
 /-- `constructor(algorithm: string | SubtleCryptoHashAlgorithm, options?: DigestStreamOptions)`: `constructor(DOMStringOrSubtleCryptoHashAlgorithm algorithm, optional DigestStreamOptions options)` -/
 def DigestStream.new (algorithm : DOMStringOrSubtleCryptoHashAlgorithm) (options : Option DigestStreamOptions := none) : IO DigestStream :=
-  Lasm.JS.Binding.invoke DigestStream { name := "Lasm.JS.Cloudflare.DigestStream.new", module := "globalThis", path := "Cloudflare_DigestStream", construct := true, arity := 2 }
+  Lasm.JS.Binding.invoke DigestStream { name := "Lasm.JS.Cloudflare.DigestStream.new", module := "globalThis", path := "DigestStream", construct := true, arity := 2 }
     (Support.args #[toJS algorithm, Support.optional options]) (await := false)
 
 /-- `get locked(): boolean`: `readonly attribute boolean locked` -/
@@ -1295,7 +1295,7 @@ def DigestStream.getWriter (self : DigestStream) : IO WritableStreamDefaultWrite
 
 /-- `constructor(queuingStrategy?: IdentityTransformStreamQueuingStrategy)`: `constructor(optional IdentityTransformStreamQueuingStrategy queuingStrategy)` -/
 def IdentityTransformStream.new (queuingStrategy : Option IdentityTransformStreamQueuingStrategy := none) : IO IdentityTransformStream :=
-  Lasm.JS.Binding.invoke IdentityTransformStream { name := "Lasm.JS.Cloudflare.IdentityTransformStream.new", module := "globalThis", path := "Cloudflare_IdentityTransformStream", construct := true, arity := 1 }
+  Lasm.JS.Binding.invoke IdentityTransformStream { name := "Lasm.JS.Cloudflare.IdentityTransformStream.new", module := "globalThis", path := "IdentityTransformStream", construct := true, arity := 1 }
     (Support.args #[Support.optional queuingStrategy]) (await := false)
 
 /-- `get readable(): ReadableStream<O>`: `readonly attribute ReadableStream readable` -/
@@ -1310,7 +1310,7 @@ def IdentityTransformStream.writable (self : IdentityTransformStream) : IO Writa
 
 /-- `constructor(expectedLength: number | bigint, queuingStrategy?: IdentityTransformStreamQueuingStrategy)`: `constructor(DoubleOrBigint expectedLength, optional IdentityTransformStreamQueuingStrategy queuingStrategy)` -/
 def FixedLengthStream.new (expectedLength : DoubleOrBigint) (queuingStrategy : Option IdentityTransformStreamQueuingStrategy := none) : IO FixedLengthStream :=
-  Lasm.JS.Binding.invoke FixedLengthStream { name := "Lasm.JS.Cloudflare.FixedLengthStream.new", module := "globalThis", path := "Cloudflare_FixedLengthStream", construct := true, arity := 2 }
+  Lasm.JS.Binding.invoke FixedLengthStream { name := "Lasm.JS.Cloudflare.FixedLengthStream.new", module := "globalThis", path := "FixedLengthStream", construct := true, arity := 2 }
     (Support.args #[toJS expectedLength, Support.optional queuingStrategy]) (await := false)
 
 /-- `createToken(scope?: 'write' | 'read', ttl?: number): Promise<ArtifactsCreateTokenResult>`: `Promise<ArtifactsCreateTokenResult> createToken(optional ArtifactsRepoCreateToken scope, optional double ttl)` -/

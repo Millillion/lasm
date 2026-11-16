@@ -227,7 +227,7 @@ def MessageBatch.ackAll (self : MessageBatch) : IO Unit :=
 
 /-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
 def QueueEvent.new (type : String) (init : Option EventInit := none) : IO QueueEvent :=
-  Lasm.JS.Binding.invoke QueueEvent { name := "Lasm.JS.Cloudflare.QueueEvent.new", module := "globalThis", path := "Cloudflare_QueueEvent", construct := true, arity := 2 }
+  Lasm.JS.Binding.invoke QueueEvent { name := "Lasm.JS.Cloudflare.QueueEvent.new", module := "globalThis", path := "QueueEvent", construct := true, arity := 2 }
     (Support.args #[toJS type, Support.optional init]) (await := false)
 
 /-- `get type(): string`: `readonly attribute DOMString type` -/
@@ -261,16 +261,16 @@ def QueueEvent.timeStamp (self : QueueEvent) : IO Float := self.val.get "timeSta
 def QueueEvent.isTrusted (self : QueueEvent) : IO Bool := self.val.get "isTrusted" Bool
 
 /-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
-def QueueEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "NONE"] Float
+def QueueEvent.NONE : IO Float := Support.getGlobal ["QueueEvent", "NONE"] Float
 
 /-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
-def QueueEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "CAPTURING_PHASE"] Float
+def QueueEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["QueueEvent", "CAPTURING_PHASE"] Float
 
 /-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
-def QueueEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "AT_TARGET"] Float
+def QueueEvent.AT_TARGET : IO Float := Support.getGlobal ["QueueEvent", "AT_TARGET"] Float
 
 /-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
-def QueueEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "BUBBLING_PHASE"] Float
+def QueueEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["QueueEvent", "BUBBLING_PHASE"] Float
 
 /-- `readonly messages: readonly Message<Body>[]`: `readonly attribute sequence<Message> messages` -/
 def QueueEvent.messages (self : QueueEvent) : IO (Array Message) := self.val.get "messages" (Array Message)

@@ -280,16 +280,16 @@ def EmailEvent.timeStamp (self : EmailEvent) : IO Float := self.val.get "timeSta
 def EmailEvent.isTrusted (self : EmailEvent) : IO Bool := self.val.get "isTrusted" Bool
 
 /-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
-def EmailEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_EmailEvent", "NONE"] Float
+def EmailEvent.NONE : IO Float := Support.getGlobal ["EmailEvent", "NONE"] Float
 
 /-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
-def EmailEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_EmailEvent", "CAPTURING_PHASE"] Float
+def EmailEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["EmailEvent", "CAPTURING_PHASE"] Float
 
 /-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
-def EmailEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_EmailEvent", "AT_TARGET"] Float
+def EmailEvent.AT_TARGET : IO Float := Support.getGlobal ["EmailEvent", "AT_TARGET"] Float
 
 /-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
-def EmailEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_EmailEvent", "BUBBLING_PHASE"] Float
+def EmailEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["EmailEvent", "BUBBLING_PHASE"] Float
 
 /-- `readonly message: ForwardableEmailMessage`: `readonly attribute ForwardableEmailMessage message` -/
 def EmailEvent.message (self : EmailEvent) : IO ForwardableEmailMessage := do

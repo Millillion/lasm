@@ -116,9 +116,41 @@ decisions themselves are logged with their reasoning in
   - **Numbers follow the docs**: `{number}` is `Float` (`crypto.randomBytes 32`,
     `FileHandle.fd`), `{integer}` is `Int`; `os.uptime` is corrected to `Float`
     because Node returns fractions.
-  - **Not generated**: `node:http`/`node:net` (Node serving goes through an
-    npm adapter, per your 2026-11-10 direction), and async iteration (`glob`,
-    `watch`, `opendir`).
+  - **Not generated**: async iteration (`glob`, `watch`, `opendir`).
+    `node:http`, `node:https` and `node:net` are generated since 2026-11-11
+    (your confirmation that Lasm.JS.Node should be complete; how Lean servers
+    run on Node is decided separately). Their shape choices:
+    - **Events are typed listeners**: each stable documented event becomes a
+      callback type of its documented arguments named after it
+      (`http.Server.RequestListener : http.IncomingMessage →
+      http.ServerResponse → Async Unit`) and `onRequest` / `onceRequest`
+      methods. The alternative was the untyped `EventEmitter.on "request"
+      (JSFunction)` only (still there), or promises for one-shot events
+      (`events.once`, still there, untyped).
+    - **Listener parameters take the event's type**: `http.createServer`'s
+      `requestListener`, `net.createServer`'s `connectionListener`, `connect`'s
+      `connectListener` (the docs say each is added to that event).
+      `http.request`'s optional `callback` is left out by the existing rule
+      (optional trailing callbacks): `req.onceResponse` does the same.
+    - **Methods returning `{this}` return the object** (`res.writeHead`,
+      `res.«end»`, `sock.write`'s siblings), as `emitter.on` already did, so
+      calls in `do` blocks need `discard <|`. Alternative: `Unit` for every
+      `{this}` result (no chaining in Lean anyway).
+    - **Overload names**: `server.listen options`, `listenWithPath`,
+      `listenWithPort`; `net.connect options`, `connectWithPath`,
+      `connectWithPort`; `http.request options`, `requestWithUrl`.
+    - **Parents for Lean's single inheritance**: `net.Socket` extends
+      `stream.Duplex` extends `stream.Readable` (so `stream.Readable.toWeb sock`
+      works; its writable side is `write`/`end`); `http.OutgoingMessage`
+      extends `EventEmitter` (the docs say legacy `Stream`, which is not a
+      `stream.Writable`); `https.Server` extends `http.Server` (the docs say
+      `tls.Server`, outside the cut, and "See http.Server"), so it has the
+      request events; that parent's projection is `toHttpServer`.
+    - **Numbers stay the docs' `{number}`**: status codes and ports are
+      `Float` (`res.writeHead 404`, `listenWithPort (some 0)`), `{integer}`
+      (`socket.localPort`) is `Int`.
+    - **Header objects are `Data`** (`req.headers`, `writeHead`'s headers):
+      the docs type them `{Object}`.
 
 - [ ] **`Lasm.JS.Deno` and `Lasm.JS.Bun` (tier 2, second part; 2026-11-10) are
   generated from the runtimes' own TypeScript declarations** (Deno 2.9.6's
@@ -157,9 +189,15 @@ decisions themselves are logged with their reasoning in
   - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
     without the `server` argument, so a generated handler rejects there
     (`known.json`).
-  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
-    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
-    CI. A user-facing helper (or a template change) is yours to decide.
+  - **Node**: superseded 2026-11-11 by `Node.serve` (Lasm provides it; see
+    "Node.serve and function-platform handlers" below). `@hono/node-server`
+    through `@[js]` still works and stays exercised in CI.
+
+### Node.serve and function-platform handlers (decided by Jordan 2026-11-11)
+- [ ] **The shapes are recorded for sign-off** in
+  [API_DECISIONS.md, milestone 0.2](api/decisions/0.2.md#milestone-02-decisions-in-detail)
+  (A7, A19–A23, 0.2-1), with the code, the reasons and the alternatives.
+  [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve) is the guide.
 
 - [ ] **`Lasm.JS.Cloudflare` (tier 3; 2026-11-11) is generated from
   `@cloudflare/workers-types` 5.20261019.1** (the declarations of the workerd

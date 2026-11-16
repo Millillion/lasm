@@ -171,6 +171,13 @@ instance : ToJS R2BucketGetOptions := ⟨fun d => Support.fields #[("onlyIf", to
     ("range", Support.optional d.range),
     ("ssecKey", Support.optional d.ssecKey)]⟩
 
+/-- `typedef R2ObjectBody or R2Object R2ObjectBodyOrR2Object`: one constructor per member type. -/
+inductive R2ObjectBodyOrR2Object where
+  /-- `R2ObjectBody` -/
+  | r2ObjectBody (value : R2ObjectBody)
+  /-- `R2Object` -/
+  | r2Object (value : R2Object)
+
 /-- `typedef ReadableStream or DOMString or Blob or BufferSource ReadableStreamOrDOMStringOrBlobOrBufferSource`: one constructor per member type. -/
 inductive ReadableStreamOrDOMStringOrBlobOrBufferSource where
   /-- `ReadableStream` -/

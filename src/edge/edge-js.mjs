@@ -320,6 +320,11 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       const builtin = globalThis.process.getBuiltinModule(specifier);
       if (builtin !== undefined) return builtin;
     }
+    // Bun's own modules (`bun:sqlite`, Lasm.JS.Bun) on Bun, which provides require in ES modules.
+    if (specifier.startsWith('bun:') && typeof globalThis.Bun === 'object') {
+      const builtin = globalThis.process?.getBuiltinModule?.(specifier) ?? (typeof require === 'function' ? require(specifier) : undefined);
+      if (builtin !== undefined) return builtin;
+    }
     throw failure(`JavaScript module ${JSON.stringify(specifier)} is not in this edge build. Edge builds import modules statically: use it in a binding (@[js "${specifier}" …]) or list it in the build's modules.`);
   }
   function dispatch(op, id, arg, request) {
@@ -379,7 +384,10 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       }
       case 209: return events.length ? takeEvents() : empty;
       case 210: {
-        const f = Number(arg) === 2 ? syncFunction(id) : asyncFunction(id);
+        // The low byte of arg is the kind (1 asynchronous, 2 synchronous), the rest the function's `length`.
+        const flags = Number(arg), length = Math.floor(flags / 256);
+        const f = (flags & 255) === 2 ? syncFunction(id) : asyncFunction(id);
+        Object.defineProperty(f, 'length', { value: length });
         stats.functionsCreated++;
         return encode(f, 'reference');
       }

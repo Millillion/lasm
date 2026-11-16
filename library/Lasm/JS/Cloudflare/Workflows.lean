@@ -996,7 +996,7 @@ def WorkflowEntrypoint.run (self : WorkflowEntrypoint) (event : WorkflowEntrypoi
 
 /-- `public constructor(message: string, name?: string)`: `constructor(DOMString message, optional DOMString name)` -/
 def NonRetryableError.new (message : String) (name : Option String := none) : IO NonRetryableError :=
-  Lasm.JS.Binding.invoke NonRetryableError { name := "Lasm.JS.Cloudflare.NonRetryableError.new", module := "globalThis", path := "Cloudflare_NonRetryableError", construct := true, arity := 2 }
+  Lasm.JS.Binding.invoke NonRetryableError { name := "Lasm.JS.Cloudflare.NonRetryableError.new", module := "globalThis", path := "cloudflare:workflows.NonRetryableError", construct := true, arity := 2 }
     (Support.args #[toJS message, Support.optional name]) (await := false)
 
 /-- `public get(id: string): Promise<WorkflowInstance>`: `Promise<WorkflowInstance> get(DOMString id)` -/

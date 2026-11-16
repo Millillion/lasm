@@ -3,7 +3,7 @@ import { join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hashFile, verifyTreeOnce } from './managed-artifacts.mjs';
 
-export const applicationRuntimeCatalog = JSON.parse(await readFile(new URL('./application-runtimes.json', import.meta.url), 'utf8'));
+export const applicationRuntimeCatalog = JSON.parse(await readFile(new URL('./application-runtimes.json', import.meta.url)));
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
 
 /** The catalog authenticates the manifest; the manifest authenticates every byte. */
@@ -15,7 +15,7 @@ export async function verifyApplicationRuntime(directory, expected, { stamps } =
   const manifestFile = join(directory, 'target.json');
   if (!(await lstat(manifestFile)).isFile() || await hashFile(manifestFile) !== expected.manifestSha256)
     throw new Error('Application runtime manifest does not match its release catalog');
-  const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+  const manifest = JSON.parse(await readFile(manifestFile));
   if (manifest.schema !== 1 || manifest.name !== expected.name || manifest.memoryLayout !== 'wasm64'
       || manifest.threading !== 'pthreads' || manifest.allocator !== 'mimalloc'
       || manifest.applicationSymbolHook !== 'lasm_lookup_application_symbol')

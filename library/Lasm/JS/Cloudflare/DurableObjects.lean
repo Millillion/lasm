@@ -1084,7 +1084,7 @@ def DurableObject.webSocketError (self : DurableObject) (ws : Value) (error : Da
 
 /-- `constructor(request: string, response: string)`: `constructor(DOMString request, DOMString response)` -/
 def WebSocketRequestResponsePair.new (request : String) (response : String) : IO WebSocketRequestResponsePair :=
-  Lasm.JS.Binding.invoke WebSocketRequestResponsePair { name := "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.new", module := "globalThis", path := "Cloudflare_WebSocketRequestResponsePair", construct := true, arity := 2 }
+  Lasm.JS.Binding.invoke WebSocketRequestResponsePair { name := "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.new", module := "globalThis", path := "WebSocketRequestResponsePair", construct := true, arity := 2 }
     (Support.args #[toJS request, toJS response]) (await := false)
 
 /-- `get request(): string`: `readonly attribute DOMString request` -/

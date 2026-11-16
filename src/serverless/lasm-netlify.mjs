@@ -1,13 +1,14 @@
-// Netlify Function (v2, Node.js) for a Lasm HTTP server: every path is
-// forwarded to the Lean server as a WHATWG Request.
-import { fetchLean, startLeanServer } from './lasm-server.mjs';
+// Netlify Function (v2, Node.js) for a Lasm program: the platform's Request
+// goes to the fetch handler the program publishes (Lasm.JS.exportDefault),
+// called directly, with Netlify's context after it.
+import { fetchLean, loadHandler } from './lasm-function.mjs';
 
-// Start the Lean server while the function loads; requests wait for it.
-startLeanServer().catch(() => { /* reported by the first request */ });
+// Start the Lean program while the function loads; requests wait for its handler.
+loadHandler().catch(() => { /* reported by the first request */ });
 
-export default async request => {
-  try { return await fetchLean(request); }
-  catch (error) { console.error(error); return new Response('Lean server unavailable\n', { status: 502 }); }
+export default async (request, context) => {
+  try { return await fetchLean(request, context); }
+  catch (error) { console.error(error); return new Response('Lean program unavailable\n', { status: 502 }); }
 };
 
 // All paths; static files in the publish directory are served first.

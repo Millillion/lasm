@@ -781,17 +781,17 @@ instance : FromJS AiSearchItemInfoStatus where
 /-- `enum AiSearchItemInfoNext_action` (@cloudflare/workers-types 5.20261019.1 type declarations): "INDEX", "DELETE". -/
 inductive AiSearchItemInfoNext_action where
   /-- "INDEX" -/
-  | iNDEX
+  | index
   /-- "DELETE" -/
-  | dELETE
+  | delete
   deriving BEq, Repr, Inhabited
 instance : ToJS AiSearchItemInfoNext_action := ⟨fun
-  | .iNDEX => .string "INDEX"
-  | .dELETE => .string "DELETE"⟩
+  | .index => .string "INDEX"
+  | .delete => .string "DELETE"⟩
 instance : FromJS AiSearchItemInfoNext_action where
   fromJS
-    | .string "INDEX" => .ok .iNDEX
-    | .string "DELETE" => .ok .dELETE
+    | .string "INDEX" => .ok .index
+    | .string "DELETE" => .ok .delete
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.AiSearchItemInfoNext_action"
 
@@ -4821,6 +4821,15 @@ instance : FromJS AiSearchInternalError where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Cloudflare.AiSearchInternalError"
 
+/-- `typedef sequence<AiTextGenerationToolInput> or sequence<AiTextGenerationToolLegacyInput> or AiSearchInternalError SequenceOfAiTextGenerationToolInputOrSequenceOfAiTextGenerationToolLegacyInputOrAiTextGenerationInputTools`: one constructor per member type. -/
+inductive SequenceOfAiTextGenerationToolInputOrSequenceOfAiTextGenerationToolLegacyInputOrAiTextGenerationInputTools where
+  /-- `sequence<AiTextGenerationToolInput>` -/
+  | sequence (value : Array AiTextGenerationToolInput)
+  /-- `sequence<AiTextGenerationToolLegacyInput>` -/
+  | sequence2 (value : Array AiTextGenerationToolLegacyInput)
+  /-- `AiSearchInternalError` -/
+  | aiSearchInternalError (value : AiSearchInternalError)
+
 /-- `dictionary AiTextGenerationFunctionsInput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiTextGenerationFunctionsInput where
   /-- `required DOMString name` -/
@@ -5077,6 +5086,13 @@ instance : FromJS Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse where
     request_id := ← Lasm.JS.readField (Option String) d "request_id" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse"
 
+/-- `typedef Ai_Cf_Baai_Bge_M3_Output_Embedding or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Base_Ai_Cf_Baai_Bge_Base_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse`: one constructor per member type. -/
+inductive Base_Ai_Cf_Baai_Bge_Base_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse where
+  /-- `Ai_Cf_Baai_Bge_M3_Output_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Output_Embedding (value : Ai_Cf_Baai_Bge_M3_Output_Embedding)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
+
 /-- `typedef DOMString or AiAutomaticSpeechRecognitionInput DOMStringOrBase_Ai_Cf_Openai_WhisperInputs`: one constructor per member type. -/
 inductive DOMStringOrBase_Ai_Cf_Openai_WhisperInputs where
   /-- `DOMString` -/
@@ -5155,6 +5171,27 @@ instance : FromJS Ai_Cf_Meta_M2M100_1_2B_Input where
     target_lang := ← Lasm.JS.readField (Option String) d "target_lang",
     requests := ← Lasm.JS.readField (Option (Array Ai_Cf_Meta_M2M100_1_2B_InputRequests)) d "requests" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_M2M100_1_2B_Input"
+
+/-- `typedef AiTranslationOutput or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Base_Ai_Cf_Meta_M2M100_1_2BPostProcessedOutputsOrAi_Cf_Meta_M2M100_1_2B_AsyncResponse`: one constructor per member type. -/
+inductive Base_Ai_Cf_Meta_M2M100_1_2BPostProcessedOutputsOrAi_Cf_Meta_M2M100_1_2B_AsyncResponse where
+  /-- `AiTranslationOutput` -/
+  | aiTranslationOutput (value : AiTranslationOutput)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
+
+/-- `typedef Ai_Cf_Baai_Bge_M3_Output_Embedding or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Base_Ai_Cf_Baai_Bge_Small_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse`: one constructor per member type. -/
+inductive Base_Ai_Cf_Baai_Bge_Small_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse where
+  /-- `Ai_Cf_Baai_Bge_M3_Output_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Output_Embedding (value : Ai_Cf_Baai_Bge_M3_Output_Embedding)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
+
+/-- `typedef Ai_Cf_Baai_Bge_M3_Output_Embedding or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Base_Ai_Cf_Baai_Bge_Large_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse`: one constructor per member type. -/
+inductive Base_Ai_Cf_Baai_Bge_Large_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse where
+  /-- `Ai_Cf_Baai_Bge_M3_Output_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Output_Embedding (value : Ai_Cf_Baai_Bge_M3_Output_Embedding)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
 
 /-- `typedef sequence<double> or DOMString SequenceOfDoubleOrDOMString`: one constructor per member type. -/
 inductive SequenceOfDoubleOrDOMString where
@@ -5403,10 +5440,26 @@ instance : FromJS Ai_Cf_Baai_Bge_M3_Input_Embedding where
     truncate_inputs := ← Lasm.JS.readField (Option Bool) d "truncate_inputs" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Baai_Bge_M3_Input_Embedding"
 
+/-- `typedef Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts or Ai_Cf_Baai_Bge_M3_Input_Embedding Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1OrAi_Cf_Baai_Bge_M3_Input_Embedding_1`: one constructor per member type. -/
+inductive Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1OrAi_Cf_Baai_Bge_M3_Input_Embedding_1 where
+  /-- `Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts` -/
+  | ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts (value : Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts)
+  /-- `Ai_Cf_Baai_Bge_M3_Input_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Input_Embedding (value : Ai_Cf_Baai_Bge_M3_Input_Embedding)
+
 /-- `dictionary Base_Ai_Cf_Baai_Bge_M3Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Baai_Bge_M3Inputs where
   /-- `required sequence<Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1OrAi_Cf_Baai_Bge_M3_Input_Embedding_1> requests` -/
   requests : Array Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1OrAi_Cf_Baai_Bge_M3_Input_Embedding_1
+
+/-- `typedef Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts or Ai_Cf_Baai_Bge_M3_Input_Embedding or Base_Ai_Cf_Baai_Bge_M3Inputs Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsOrAi_Cf_Baai_Bge_M3_Input_EmbeddingOrBase_Ai_Cf_Baai_Bge_M3Inputs`: one constructor per member type. -/
+inductive Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsOrAi_Cf_Baai_Bge_M3_Input_EmbeddingOrBase_Ai_Cf_Baai_Bge_M3Inputs where
+  /-- `Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts` -/
+  | ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts (value : Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts)
+  /-- `Ai_Cf_Baai_Bge_M3_Input_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Input_Embedding (value : Ai_Cf_Baai_Bge_M3_Input_Embedding)
+  /-- `Base_Ai_Cf_Baai_Bge_M3Inputs` -/
+  | base_Ai_Cf_Baai_Bge_M3Inputs (value : Base_Ai_Cf_Baai_Bge_M3Inputs)
 
 /-- `dictionary Ai_Cf_Baai_Bge_M3_Output_QueryResponse` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Baai_Bge_M3_Output_QueryResponse where
@@ -5443,6 +5496,17 @@ instance : FromJS Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts where
     shape := ← Lasm.JS.readField (Option (Array Float)) d "shape",
     pooling := ← Lasm.JS.readField (Option Ai_Cf_Baai_Bge_Base_En_V1_5_InputPooling) d "pooling" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts"
+
+/-- `typedef Ai_Cf_Baai_Bge_M3_Output_Query or Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts or Ai_Cf_Baai_Bge_M3_Output_Embedding or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Ai_Cf_Baai_Bge_M3_Output_QueryOrAi_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsOrAi_Cf_Baai_Bge_M3_Output_EmbeddingOrAi_Cf_Baai_Bge_M3_AsyncResponse`: one constructor per member type. -/
+inductive Ai_Cf_Baai_Bge_M3_Output_QueryOrAi_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsOrAi_Cf_Baai_Bge_M3_Output_EmbeddingOrAi_Cf_Baai_Bge_M3_AsyncResponse where
+  /-- `Ai_Cf_Baai_Bge_M3_Output_Query` -/
+  | ai_Cf_Baai_Bge_M3_Output_Query (value : Ai_Cf_Baai_Bge_M3_Output_Query)
+  /-- `Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts` -/
+  | ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts (value : Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts)
+  /-- `Ai_Cf_Baai_Bge_M3_Output_Embedding` -/
+  | ai_Cf_Baai_Bge_M3_Output_Embedding (value : Ai_Cf_Baai_Bge_M3_Output_Embedding)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
 
 /-- `dictionary Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input where
@@ -5609,6 +5673,13 @@ instance : FromJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages where
     frequency_penalty := ← Lasm.JS.readField (Option Float) d "frequency_penalty",
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages"
+
+/-- `typedef Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt or Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptOrAi_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages`: one constructor per member type. -/
+inductive Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptOrAi_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages where
+  /-- `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt` -/
+  | ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt (value : Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt)
+  /-- `Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages` -/
+  | ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages (value : Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages)
 
 /-- `dictionary Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputTool_calls` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputTool_calls where
@@ -5824,6 +5895,15 @@ instance : FromJS Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch where
     requests := ← Lasm.JS.readField (Option (Array Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_BatchRequests)) d "requests" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch"
 
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages or Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch`: one constructor per member type. -/
+inductive Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages)
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch)
+
 /-- `dictionary Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsUsage` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsUsage where
   /-- `double prompt_tokens` -/
@@ -5853,6 +5933,15 @@ instance : FromJS Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output where
     usage := ← Lasm.JS.readField (Option Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsUsage) d "usage",
     tool_calls := ← Lasm.JS.readField (Option (Array Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputTool_calls)) d "tool_calls" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output"
+
+/-- `typedef Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output or DOMString or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsOrDOMStringOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse`: one constructor per member type. -/
+inductive Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsOrDOMStringOrAi_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_AsyncResponse where
+  /-- `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output` -/
+  | ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output (value : Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output)
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
 
 /-- `dictionary Ai_Cf_Meta_Llama_Guard_3_8B_InputMessages` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_Guard_3_8B_InputMessages where
@@ -6002,6 +6091,13 @@ instance : FromJS Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages"
 
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptOrAi_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages`: one constructor per member type. -/
+inductive Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptOrAi_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages` -/
+  | ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages (value : Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages)
+
 /-- `dictionary Ai_Cf_Qwen_Qwq_32B_Prompt` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Qwen_Qwq_32B_Prompt where
   /-- `required DOMString prompt` -/
@@ -6123,6 +6219,13 @@ instance : FromJS Ai_Cf_Qwen_Qwq_32B_Messages where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Qwen_Qwq_32B_Messages"
 
+/-- `typedef Ai_Cf_Qwen_Qwq_32B_Prompt or Ai_Cf_Qwen_Qwq_32B_Messages Ai_Cf_Qwen_Qwq_32B_PromptOrAi_Cf_Qwen_Qwq_32B_Messages`: one constructor per member type. -/
+inductive Ai_Cf_Qwen_Qwq_32B_PromptOrAi_Cf_Qwen_Qwq_32B_Messages where
+  /-- `Ai_Cf_Qwen_Qwq_32B_Prompt` -/
+  | ai_Cf_Qwen_Qwq_32B_Prompt (value : Ai_Cf_Qwen_Qwq_32B_Prompt)
+  /-- `Ai_Cf_Qwen_Qwq_32B_Messages` -/
+  | ai_Cf_Qwen_Qwq_32B_Messages (value : Ai_Cf_Qwen_Qwq_32B_Messages)
+
 /-- `typedef DOMString or sequence<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent> or Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent DOMStringOrSequenceOfAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentOrAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContent`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContentOrAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesMessagesContent where
   /-- `DOMString` -/
@@ -6202,6 +6305,13 @@ instance : FromJS Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages"
 
+/-- `typedef Ai_Cf_Qwen_Qwq_32B_Prompt or Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptOrAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages`: one constructor per member type. -/
+inductive Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptOrAi_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages where
+  /-- `Ai_Cf_Qwen_Qwq_32B_Prompt` -/
+  | ai_Cf_Qwen_Qwq_32B_Prompt (value : Ai_Cf_Qwen_Qwq_32B_Prompt)
+  /-- `Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages` -/
+  | ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages (value : Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages)
+
 /-- `typedef DOMString or sequence<Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesMessagesContent> DOMStringOrSequenceOfAi_Cf_Google_Gemma_3_12B_It_MessagesMessagesContent`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfAi_Cf_Google_Gemma_3_12B_It_MessagesMessagesContent where
   /-- `DOMString` -/
@@ -6274,6 +6384,13 @@ instance : FromJS Ai_Cf_Google_Gemma_3_12B_It_Messages where
     frequency_penalty := ← Lasm.JS.readField (Option Float) d "frequency_penalty",
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Google_Gemma_3_12B_It_Messages"
+
+/-- `typedef Ai_Cf_Qwen_Qwq_32B_Prompt or Ai_Cf_Google_Gemma_3_12B_It_Messages Ai_Cf_Google_Gemma_3_12B_It_PromptOrAi_Cf_Google_Gemma_3_12B_It_Messages`: one constructor per member type. -/
+inductive Ai_Cf_Google_Gemma_3_12B_It_PromptOrAi_Cf_Google_Gemma_3_12B_It_Messages where
+  /-- `Ai_Cf_Qwen_Qwq_32B_Prompt` -/
+  | ai_Cf_Qwen_Qwq_32B_Prompt (value : Ai_Cf_Qwen_Qwq_32B_Prompt)
+  /-- `Ai_Cf_Google_Gemma_3_12B_It_Messages` -/
+  | ai_Cf_Google_Gemma_3_12B_It_Messages (value : Ai_Cf_Google_Gemma_3_12B_It_Messages)
 
 /-- `dictionary Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt where
@@ -6484,10 +6601,26 @@ instance : FromJS Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner"
 
+/-- `typedef Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt or Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner`: one constructor per member type. -/
+inductive Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner where
+  /-- `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt` -/
+  | ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt (value : Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt)
+  /-- `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner` -/
+  | ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner (value : Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner)
+
 /-- `dictionary Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch where
   /-- `required sequence<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner> requests` -/
   requests : Array Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner
+
+/-- `typedef Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt or Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages or Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch`: one constructor per member type. -/
+inductive Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesOrAi_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch where
+  /-- `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt` -/
+  | ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt (value : Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt)
+  /-- `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages` -/
+  | ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages (value : Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages)
+  /-- `Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch` -/
+  | ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch (value : Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch)
 
 /-- `dictionary Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputTool_callsFunction` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputTool_callsFunction where
@@ -6677,10 +6810,26 @@ instance : FromJS Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1"
 
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1OrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1`: one constructor per member type. -/
+inductive Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1OrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1)
+
 /-- `dictionary Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch where
   /-- `required sequence<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1OrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1> requests` -/
   requests : Array Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1OrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1
+
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch`: one constructor per member type. -/
+inductive Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages)
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch)
 
 /-- `dictionary AiTextGenerationToolOutput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiTextGenerationToolOutput where
@@ -6810,6 +6959,17 @@ instance : FromJS Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response where
     choices := ← Lasm.JS.readField (Option (Array Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseChoices)) d "choices",
     usage := ← Lasm.JS.readField (Option Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_FastPostProcessedOutputsUsage) d "usage" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response"
+
+/-- `typedef Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response or DOMString or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseOrDOMStringOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse`: one constructor per member type. -/
+inductive Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_ResponseOrDOMStringOrAi_Cf_Qwen_Qwen3_30B_A3B_Fp8_AsyncResponse where
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response)
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response)
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
 
 /-- `dictionary Ai_Cf_Deepgram_Nova_3_InputAudio` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Deepgram_Nova_3_InputAudio where
@@ -7372,10 +7532,37 @@ instance : FromJS Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 where
     presence_penalty := ← Lasm.JS.readField (Option Float) d "presence_penalty" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1"
 
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1OrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1`: one constructor per member type. -/
+inductive Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1OrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1` -/
+  | ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 (value : Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1)
+
 /-- `dictionary Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch where
   /-- `required sequence<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1OrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1> requests` -/
   requests : Array Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1OrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1
+
+/-- `typedef Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt or Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages or Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch`: one constructor per member type. -/
+inductive Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch where
+  /-- `Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt` -/
+  | ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt (value : Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt)
+  /-- `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages` -/
+  | ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages (value : Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages)
+  /-- `Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch` -/
+  | ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch (value : Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch)
+
+/-- `typedef Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response or Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response or DOMString or Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseOrDOMStringOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse`: one constructor per member type. -/
+inductive Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseOrDOMStringOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse where
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response)
+  /-- `Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response` -/
+  | ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response (value : Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response)
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse` -/
+  | ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse (value : Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse)
 
 /-- `dictionary AiIMultimodalEmbeddingsOutput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiIMultimodalEmbeddingsOutput where
@@ -7747,6 +7934,13 @@ instance : FromJS ChatCompletionMessageCustomToolCall where
     custom := ← Lasm.JS.readField ChatCompletionMessageCustomToolCallCustom d "custom" }
   typeName := "Lasm.JS.Cloudflare.ChatCompletionMessageCustomToolCall"
 
+/-- `typedef AiTextGenerationToolOutput or ChatCompletionMessageCustomToolCall ChatCompletionMessageFunctionToolCallOrChatCompletionMessageCustomToolCall`: one constructor per member type. -/
+inductive ChatCompletionMessageFunctionToolCallOrChatCompletionMessageCustomToolCall where
+  /-- `AiTextGenerationToolOutput` -/
+  | aiTextGenerationToolOutput (value : AiTextGenerationToolOutput)
+  /-- `ChatCompletionMessageCustomToolCall` -/
+  | chatCompletionMessageCustomToolCall (value : ChatCompletionMessageCustomToolCall)
+
 /-- `dictionary AssistantMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AssistantMessage where
   /-- `required AssistantMessageRole role` -/
@@ -7806,6 +8000,21 @@ instance : FromJS FunctionMessage where
     content := ← Lasm.JS.readField String d "content",
     name := ← Lasm.JS.readField String d "name" }
   typeName := "Lasm.JS.Cloudflare.FunctionMessage"
+
+/-- `typedef DeveloperMessage or SystemMessage or UserMessage or AssistantMessage or ToolMessage or FunctionMessage DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage`: one constructor per member type. -/
+inductive DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage where
+  /-- `DeveloperMessage` -/
+  | developerMessage (value : DeveloperMessage)
+  /-- `SystemMessage` -/
+  | systemMessage (value : SystemMessage)
+  /-- `UserMessage` -/
+  | userMessage (value : UserMessage)
+  /-- `AssistantMessage` -/
+  | assistantMessage (value : AssistantMessage)
+  /-- `ToolMessage` -/
+  | toolMessage (value : ToolMessage)
+  /-- `FunctionMessage` -/
+  | functionMessage (value : FunctionMessage)
 
 /-- `typedef DOMString or ResponseConversationParam DOMStringOrAudioParamsVoice`: one constructor per member type. -/
 inductive DOMStringOrAudioParamsVoice where
@@ -8022,6 +8231,21 @@ instance : FromJS ChatCompletionToolChoiceAllowedTools where
     type := ← Lasm.JS.readField ChatCompletionToolChoiceAllowedToolsType d "type",
     allowed_tools := ← Lasm.JS.readField ChatCompletionToolChoiceAllowedToolsAllowed_tools d "allowed_tools" }
   typeName := "Lasm.JS.Cloudflare.ChatCompletionToolChoiceAllowedTools"
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption6OrChatCompletionToolChoiceOption7OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption6OrChatCompletionToolChoiceOption7OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary FunctionDefinition` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FunctionDefinition where
@@ -8464,6 +8688,21 @@ instance : FromJS ChatTemplateKwargs where
     clear_thinking := ← Lasm.JS.readField (Option Bool) d "clear_thinking" }
   typeName := "Lasm.JS.Cloudflare.ChatTemplateKwargs"
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption4OrChatCompletionToolChoiceOption5OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption4OrChatCompletionToolChoiceOption5OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary ChatCompletionsMessagesInput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionsMessagesInput where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -8531,6 +8770,21 @@ structure ChatCompletionsMessagesInput where
   /-- `sequence<FunctionDefinition> functions` -/
   functions : Option (Array FunctionDefinition) := none
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption8OrChatCompletionToolChoiceOption9OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption8OrChatCompletionToolChoiceOption9OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary Base_Ai_Cf_Moonshotai_Kimi_K2_6Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Moonshotai_Kimi_K2_6Inputs where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -8597,6 +8851,21 @@ structure Base_Ai_Cf_Moonshotai_Kimi_K2_6Inputs where
   reasoning_effort : Option Base_Ai_Cf_Moonshotai_Kimi_K2_6InputsReasoning_effort := none
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption10OrChatCompletionToolChoiceOption11OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption10OrChatCompletionToolChoiceOption11OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary Ai_Cf_Nvidia_Nemotron_3_120B_A12B_InputChat_template_kwargs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Nvidia_Nemotron_3_120B_A12B_InputChat_template_kwargs where
@@ -8677,6 +8946,21 @@ structure Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input where
   chat_template_kwargs : Option Ai_Cf_Nvidia_Nemotron_3_120B_A12B_InputChat_template_kwargs := none
   /-- `boolean? store` -/
   store : Option Bool := none
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption12OrChatCompletionToolChoiceOption13OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption12OrChatCompletionToolChoiceOption13OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary Ai_Cf_Google_Gemma_4_26B_A4B_It_Input` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Google_Gemma_4_26B_A4B_It_Input where
@@ -8788,6 +9072,21 @@ instance : FromJS Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output where
     duration := ← Lasm.JS.readField (Option Float) d "duration" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output"
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption14OrChatCompletionToolChoiceOption15OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption14OrChatCompletionToolChoiceOption15OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary Base_Ai_Cf_Moonshotai_Kimi_K2_7_CodeInputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Moonshotai_Kimi_K2_7_CodeInputs where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -8852,6 +9151,21 @@ structure Base_Ai_Cf_Moonshotai_Kimi_K2_7_CodeInputs where
   functions : Option (Array FunctionDefinition) := none
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption16OrChatCompletionToolChoiceOption17OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption16OrChatCompletionToolChoiceOption17OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary Base_Ai_Cf_Zai_Org_Glm_5_2Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Zai_Org_Glm_5_2Inputs where
@@ -9049,6 +9363,21 @@ instance : FromJS Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output where
     reasoning := ← Lasm.JS.readField (Option Ai_Cf_Moondream_Moondream3_1_9B_A2B_OutputReasoning) d "reasoning" }
   typeName := "Lasm.JS.Cloudflare.Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output"
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption18OrChatCompletionToolChoiceOption19OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption18OrChatCompletionToolChoiceOption19OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Flash_0731Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Flash_0731Inputs where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -9115,6 +9444,21 @@ structure Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Flash_0731Inputs where
   reasoning_effort : Option Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Flash_0731InputsReasoning_effort := none
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption20OrChatCompletionToolChoiceOption21OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption20OrChatCompletionToolChoiceOption21OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Pro_0813Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Pro_0813Inputs where
@@ -9183,6 +9527,21 @@ structure Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Pro_0813Inputs where
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption22OrChatCompletionToolChoiceOption23OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption22OrChatCompletionToolChoiceOption23OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary Base_Ai_Cf_Qwen_Qwen3_8_27BInputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Qwen_Qwen3_8_27BInputs where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -9250,6 +9609,21 @@ structure Base_Ai_Cf_Qwen_Qwen3_8_27BInputs where
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
 
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption24OrChatCompletionToolChoiceOption25OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption24OrChatCompletionToolChoiceOption25OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
+
 /-- `dictionary Base_Ai_Cf_Zai_Org_Glm_5_3Inputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Zai_Org_Glm_5_3Inputs where
   /-- `required sequence<DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages` -/
@@ -9316,6 +9690,21 @@ structure Base_Ai_Cf_Zai_Org_Glm_5_3Inputs where
   reasoning_effort : Option Base_Ai_Cf_Zai_Org_Glm_5_3InputsReasoning_effort := none
   /-- `Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs chat_template_kwargs` -/
   chat_template_kwargs : Option Base_Ai_Cf_Zai_Org_Glm_4_7_FlashInputsChat_template_kwargs := none
+
+/-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption26OrChatCompletionToolChoiceOption27OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
+inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption26OrChatCompletionToolChoiceOption27OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
+  /-- `ChatCompletionToolChoiceOption` -/
+  | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
+  /-- `ChatCompletionToolChoiceOption2` -/
+  | chatCompletionToolChoiceOption2 (value : ChatCompletionToolChoiceOption2)
+  /-- `ChatCompletionToolChoiceOption3` -/
+  | chatCompletionToolChoiceOption3 (value : ChatCompletionToolChoiceOption3)
+  /-- `ChatCompletionToolChoiceFunction` -/
+  | chatCompletionToolChoiceFunction (value : ChatCompletionToolChoiceFunction)
+  /-- `ChatCompletionToolChoiceCustom` -/
+  | chatCompletionToolChoiceCustom (value : ChatCompletionToolChoiceCustom)
+  /-- `ChatCompletionToolChoiceAllowedTools` -/
+  | chatCompletionToolChoiceAllowedTools (value : ChatCompletionToolChoiceAllowedTools)
 
 /-- `dictionary Base_Ai_Cf_Zai_Org_Glm_5_3_FlashInputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Base_Ai_Cf_Zai_Org_Glm_5_3_FlashInputs where
@@ -10677,6 +11066,15 @@ instance : FromJS ResponsesOutputTool_choiceOrToolChoiceFunction where
     | d@(.object _) => (FromJS.fromJS d : Except String ToolChoiceFunction).map .toolChoiceFunction
     | _ => .error ""
   typeName := "Lasm.JS.Cloudflare.ResponsesOutputTool_choiceOrToolChoiceFunction"
+
+/-- `typedef DOMString or ResponseInputText or ResponseInputImage DOMStringOrResponseInputTextOrResponseInputImage`: one constructor per member type. -/
+inductive DOMStringOrResponseInputTextOrResponseInputImage where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `ResponseInputText` -/
+  | responseInputText (value : ResponseInputText)
+  /-- `ResponseInputImage` -/
+  | responseInputImage (value : ResponseInputImage)
 
 /-- `dictionary ResponsePrompt` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponsePrompt where

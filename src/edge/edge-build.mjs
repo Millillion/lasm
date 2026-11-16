@@ -13,6 +13,7 @@ import { managedCacheDirectory } from '../managed-artifacts.mjs';
 import { readStoreEntry, writeStoreEntry } from '../application-link.mjs';
 import { testUnoptimized } from '../test-switches.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule } from './builtin-modules.mjs';
+import { copyProjectModules, isProjectModule, projectModuleName, projectModules } from '../project-modules.mjs';
 import { supabaseFunctionNameOf } from '../init.mjs';
 import { noticeBanner, noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
 import { copyNodeModules, planNodeModules, readPackageJson } from '../application-npm.mjs';
@@ -150,7 +151,9 @@ const respond = (handler, request, ...rest) => typeof handler === 'function' ? h
 `;
 // Builtin modules (lasm:<name>) are files of the output: base is the entry's
 // path to the program directory (lasm/).
-const moduleSource = (name, base) => isBuiltinModule(name) ? `${base}modules/${name.slice(builtinPrefix.length)}.mjs` : name;
+// The project's own files (./…, src/project-modules.mjs) are under project-modules/.
+const moduleSource = (name, base) => isBuiltinModule(name) ? `${base}modules/${name.slice(builtinPrefix.length)}.mjs`
+  : isProjectModule(name) ? `${base}project-modules/${projectModuleName(name)}` : name;
 const moduleImports = (modules, base = './lasm/') => modules.map((name, i) => `import * as m${i} from ${JSON.stringify(moduleSource(name, base))};`).join('\n');
 const moduleMap = modules => `const modules = { ${modules.map((name, i) => `${JSON.stringify(name)}: m${i}`).join(', ')} };`;
 
@@ -519,6 +522,8 @@ export function writeEdgeOutput({ target, source, projectDirectory, result, edge
   const builtins = builtinModuleClosure(modules);
   if (builtins.length) mkdirSync(join(programDirectory, 'modules'));
   for (const name of builtins) copyFileSync(builtinModuleFile(name), join(programDirectory, 'modules', name.slice(builtinPrefix.length) + '.mjs'));
+  // The project's own files the bindings name, with those they import.
+  copyProjectModules(programDirectory, projectModules(result.jsBindings ?? [], projectDirectory));
   // The entry module is written after the owned directory is in place.
   let written;
   writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), notices);

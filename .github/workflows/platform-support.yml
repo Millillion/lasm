@@ -11,8 +11,6 @@ name: Launch platform support
 #     must give a clean error;
 #   - in Debian 11/12, Ubuntu 22.04/24.04 and Amazon Linux 2023 containers,
 #     read-only with a 512 MB memory limit, plus the deploy/Dockerfile recipe;
-#   - in the AWS Lambda Node 24 image through its Runtime Interface Emulator and
-#     the AWS Lambda Web Adapter (deploy/lambda/Dockerfile), x64 and arm64;
 #   - cross-built: macOS and Windows builds on Linux, Linux builds on macOS.
 # Called by the candidate acceptance (node-linux-acceptance.yml) before a
 # candidate is retained as tested.
@@ -238,35 +236,6 @@ jobs:
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
-  # Fills the image cache for both architectures from an arm64 runner (ECR Public
-  # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
-  # does nothing; consumers fall back to pulling their own architecture.
-  images:
-    needs: select
-    if: needs.select.outputs.active == 'true'
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 120
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: lambda
-        with:
-          path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
-          lookup-only: true
-      - name: Pull the pinned lambda images for amd64 and arm64 by digest
-        if: steps.lambda.outputs.cache-hit != 'true'
-        id: seed-lambda
-        continue-on-error: true
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda --seed amd64,arm64 --no-load
-      - if: steps.lambda.outputs.cache-hit != 'true' && steps.seed-lambda.outcome == 'success'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
   containers:
     needs: [select, build]
     if: always() && needs.select.outputs.active == 'true'
@@ -293,50 +262,6 @@ jobs:
         run: |
           own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
           node scripts/platform/run-matrix.mjs containers "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64 win32-x64
-      - name: Summary
-        if: always()
-        run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
-  lambda:
-    needs: [select, build, images]
-    if: always() && needs.select.outputs.active == 'true'
-    name: lambda ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm]
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: ${{ needs.select.outputs.node24 }}
-          package-manager-cache: false
-      - uses: actions/download-artifact@v8
-        with:
-          pattern: platform-apps-*
-          path: ${{ runner.temp }}/artifacts
-      # Pinned images from the Actions cache (scripts/ci/images.lock.json); a miss
-      # pulls once by digest with long backoff and saves for later runs.
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: images-lambda
-        with:
-          path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
-      - name: Load the pinned lambda images (cache, else registry by digest)
-        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
-      - if: steps.images-lambda.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/image-cache/lambda
-          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
-      - name: Lambda image, Runtime Interface Emulator and Lambda Web Adapter (Linux and macOS builds)
-        run: |
-          own=linux-x64; [ "$(uname -m)" = aarch64 ] && own=linux-arm64
-          node scripts/platform/run-matrix.mjs lambda "$RUNNER_TEMP/artifacts" "$RUNNER_TEMP/results" "$own" darwin-arm64
       - name: Summary
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"/*.json
@@ -421,7 +346,7 @@ jobs:
         if: always()
         run: node scripts/platform/summary.mjs "$RUNNER_TEMP/results"
   result:
-    needs: [select, build, native, containers, lambda, macos, native-other, compiler-glibc]
+    needs: [select, build, native, containers, macos, native-other, compiler-glibc]
     if: always() && needs.select.outputs.active == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5

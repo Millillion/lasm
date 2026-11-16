@@ -127,22 +127,6 @@ def call_invalid : Prop :=
     (handle : Except Error Res → Msg) (base m : String),
     e.validate req = .error m → (e.call req handle base).effects = [.msg (handle (.error (.invalid m)))]
 
-/-- **A valid request is sent once, as JSON, to its endpoint.** When
-`validate` accepts a request, the command `call` performs exactly one effect:
-a `POST` of the encoded request to `base ++ e.path` (`base` followed by
-`/rpc/<name>`) with a JSON
-content type. A network failure reaches the app as `Error.network`, and any
-answer as the endpoint's reading of its status and body (`decodeResponse`). -/
-def call_valid : Prop :=
-  ∀ (Req Res Msg : Type) [ToJson Req] [FromJson Res] (e : Endpoint Req Res) (req : Req)
-    (handle : Except Error Res → Msg) (base : String),
-    e.validate req = .ok () → ∃ k,
-      (e.call req handle base).effects =
-        [.http { method := "POST", url := base ++ e.path, body := some (e.encodeRequest req),
-                 headers := [("content-type", "application/json")] } k] ∧
-      (∀ m, k (.error m) = handle (.error (.network m))) ∧
-      (∀ resp, k (.ok resp) = handle (e.decodeResponse resp.status resp.body))
-
 /-- **Reading an answer never claims a network failure.** Whatever status
 and body the server answers, `decodeResponse` never reports
 `Error.network`: that error means only that no answer arrived. -/

@@ -1530,16 +1530,16 @@ def TailEvent.timeStamp (self : TailEvent) : IO Float := self.val.get "timeStamp
 def TailEvent.isTrusted (self : TailEvent) : IO Bool := self.val.get "isTrusted" Bool
 
 /-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
-def TailEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_TailEvent", "NONE"] Float
+def TailEvent.NONE : IO Float := Support.getGlobal ["TailEvent", "NONE"] Float
 
 /-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
-def TailEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_TailEvent", "CAPTURING_PHASE"] Float
+def TailEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["TailEvent", "CAPTURING_PHASE"] Float
 
 /-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
-def TailEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_TailEvent", "AT_TARGET"] Float
+def TailEvent.AT_TARGET : IO Float := Support.getGlobal ["TailEvent", "AT_TARGET"] Float
 
 /-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
-def TailEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_TailEvent", "BUBBLING_PHASE"] Float
+def TailEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["TailEvent", "BUBBLING_PHASE"] Float
 
 /-- `readonly events: TraceItem[]`: `readonly attribute sequence<TraceItem> events` -/
 def TailEvent.events (self : TailEvent) : IO (Array Data) := self.val.get "events" (Array Data)

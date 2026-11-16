@@ -9,6 +9,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } fro
 import net from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { echoed } from './http-contract.mjs';
 import { makeEvent } from './lambda-events.mjs';
 
 const [appsArg, resultArg, sam] = process.argv.slice(2);
@@ -87,7 +88,7 @@ Resources:
     });
     await check('start-api POST /echo', async () => {
       const r = await fetch(base + '/echo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"s":"λ"}' });
-      assert.deepEqual(await r.json(), { echo: { s: 'λ' } });
+      assert.deepEqual(await r.json(), echoed(app.framework, { s: 'λ' }));
     });
     await check('start-api GET /missing is 404', async () => assert.equal((await fetch(base + '/missing')).status, 404));
   } finally { api.kill('SIGINT'); await new Promise(done => setTimeout(done, 3000)); api.kill('SIGKILL'); }

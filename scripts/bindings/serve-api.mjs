@@ -40,6 +40,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as tier from './serve-tier2.mjs';
+import { lowerAuto } from './ts-auto.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const lockFile = join(root, 'scripts', 'bindings', 'serve-api.lock.json');
@@ -107,7 +108,7 @@ export function blank(text) {
 
 const opens = { '(': ')', '[': ']', '{': '}' };
 /** The index of the bracket closing the one at `at` (in a `shape`). */
-function matchClose(shape, at) {
+export function matchClose(shape, at) {
   let depth = 0;
   for (let i = at; i < shape.length; i++) {
     const c = shape[i];
@@ -117,7 +118,7 @@ function matchClose(shape, at) {
   fail(`unbalanced ${shape[at]} at ${at}`);
 }
 /** The index of the first `ch` at bracket depth 0 (angle brackets included, `=>` excepted) from `from`, or -1. */
-function findTop(shape, from, to, chars, angles = true) {
+export function findTop(shape, from, to, chars, angles = true) {
   let depth = 0;
   for (let i = from; i < to; i++) {
     const c = shape[i];
@@ -127,15 +128,15 @@ function findTop(shape, from, to, chars, angles = true) {
   }
   return -1;
 }
-const docBefore = (src, pos) => {
+export const docBefore = (src, pos) => {
   let best = null;
   for (const d of src.docs) if (d.end <= pos && src.code.slice(d.end, pos).trim() === '') best = d;
   return best ? best.text : '';
 };
-const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
+export const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
 
 /** Every interface, type alias and function of a file, by qualified name (`Deno.HttpServer`, `Bun.Serve.Options`). */
-export function declarations(text, file, { classes = false } = {}) {
+export function declarations(text, file, { classes = false, auto = false } = {}) {
   const src = { ...blank(text), file };
   const out = [];
   const head = /^(?:export\s+)?(?:declare\s+)?/;
@@ -176,6 +177,26 @@ export function declarations(text, file, { classes = false } = {}) {
           doc: docBefore(src, i) });
         i = close + 1; continue;
       }
+      // ts-auto.mjs (Lasm.JS.Deno, Lasm.JS.Bun): classes, enums and constants as they are declared.
+      if (auto && (m = /^(?:abstract\s+)?(class|enum)\s+([\w$]+)/.exec(body))) {
+        const open = findTop(src.shape, i + lead + m[0].length, end, '{');
+        const close = open < 0 ? end - 1 : matchClose(src.shape, open);
+        if (open >= 0) out.push({ kind: m[1], name: qual(m[2]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
+          doc: docBefore(src, i) });
+        i = close + 1; continue;
+      }
+      // `export import SpawnOptions = Spawn;`: another name of a namespace.
+      if (auto && (m = /^import\s+([\w$]+)\s*=\s*([\w$.]+)\s*;/.exec(body))) {
+        out.push({ kind: 'nsalias', name: qual(m[1]), target: m[2], src, doc: '' });
+        i = i + lead + m[0].length; continue;
+      }
+      if (auto && (m = /^(const|let|var)\s+([\w$]+)\s*:/.exec(body))) {
+        const stop = findTop(src.shape, i, end, ';', false);
+        const e = stop < 0 ? end : stop;
+        out.push({ kind: 'const', name: qual(m[2]), mutable: m[1] !== 'const', type: squash(src.code.slice(i + lead + m[0].length, e)), src,
+          at: i + lead + m[0].length, doc: docBefore(src, i) });
+        i = e + 1; continue;
+      }
       if ((m = /^(?:abstract\s+)?(?:class|enum)\s/.exec(body))) {
         const open = findTop(src.shape, i, end, '{', false);
         i = open < 0 ? end : matchClose(src.shape, open) + 1; continue;
@@ -207,7 +228,9 @@ export function membersOf(src, from, to) {
   }
   return out;
 }
-function parseMember(text, shape) {
+export function parseMember(text, shape) {
+  // A call or construct signature (`(name: string): string`, `<T>(…): R`, `new (…): T`): the object is a function.
+  if (/^(new\s*)?[(<]/.test(text)) return { name: '()', kind: 'call', optional: false, readonly: false, type: squash(text) };
   let s = 0;
   const ws = () => { while (/\s/.test(text[s])) s++; };
   let readonly = false;
@@ -281,8 +304,9 @@ export function splitParams(text, shape) {
   return out;
 }
 /** The overloads of a function declaration's text: [{ params, type }]. */
-function functionSignature(text) {
-  const { shape } = blank(text);
+export function functionSignature(text) {
+  const { code, shape } = blank(text);
+  text = code; // doc comments inside the parameter list are blanked
   const m = /function\s+[\w$]+\s*/.exec(shape);
   let at = m.index + m[0].length, generics = '';
   if (shape[at] === '<') { const close = findTop(shape, at + 1, shape.length, '>'); generics = text.slice(at + 1, close); at = close + 1; }
@@ -349,8 +373,10 @@ const paramKey = params => params.map(p => `${p.rest ? '...' : ''}${p.name}${p.o
 
 // ---------- types ----------
 
-const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|\d+(?:\.\d+)?|[|&()<>[\]{},:?;=-])/y;
+const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|-?\d+(?:\.\d+)?|[|&()<>[\]{},:?;=-])/y;
 function tokenize(text) {
+  // A type of another module (`import("node:tls").PeerCertificate`, `typeof import("util").inspect.custom`): an object.
+  text = text.replace(/(?:typeof\s+)?import\(\s*"[^"]*"\s*\)(?:\.[\w$]+)*/g, 'object');
   const out = [];
   tokenRe.lastIndex = 0;
   let m;
@@ -413,30 +439,32 @@ export function parseType(text) {
       p = close + 1;
       return { k: 'obj', body };
     }
+
     if (/^["'`]/.test(t)) { next(); if (t[0] === '`') return { k: 'template', text: t }; return { k: 'lit', value: JSON.parse(t[0] === "'" ? `"${t.slice(1, -1)}"` : t) }; }
-    if (/^\d/.test(t)) { next(); return { k: 'num', value: +t }; }
+    if (/^-?\d/.test(t)) { next(); return { k: 'num', value: +t }; }
     if (t === '-' && /^\d/.test(toks[p + 1]?.t ?? '')) { next(); return { k: 'num', value: -next() }; }
     if (t === 'typeof') { next(); return { k: 'typeof', name: next() }; }
     if (t === 'keyof') { next(); return { k: 'keyof', inner: postfix() }; }
     if (t === 'unique') { next(); return primary(); }
     // `infer V` inside a conditional type: a name (the conditional is lowered as any).
     if (t === 'infer') { next(); return { k: 'name', name: next(), args: [] }; }
-    // `readonly T[]`: an array (Lean's arrays are values).
-    if (t === 'readonly') { next(); return postfix(); }
-    // A tuple type (`[number, number]`; a labeled element `[name: string]`).
+    // A tuple `[a: A, b: B]`: its element types (labels dropped).
     if (t === '[') {
-      next(); const items = [];
+      next();
+      const elems = [];
       while (peek() !== ']') {
         if (peek() === '...') next();
-        if (/^[A-Za-z_$]/.test(peek()) && toks[p + 1]?.t === ':') p += 2;
-        else if (/^[A-Za-z_$]/.test(peek()) && toks[p + 1]?.t === '?' && toks[p + 2]?.t === ':') p += 3;
-        items.push(union());
+        if (toks[p + 1]?.t === ':' || (toks[p + 1]?.t === '?' && toks[p + 2]?.t === ':')) { next(); if (peek() === '?') next(); next(); }
+        if (peek() === '...') next();
+        elems.push(union());
         if (peek() === '?') next();
         if (peek() === ',') next();
       }
       expect(']');
-      return { k: 'tuple', items };
+      return { k: 'tuple', elems };
     }
+    // `readonly T[]`: the array (Lean arrays are values).
+    if (t === 'readonly' && toks[p + 1] && /^[A-Za-z_$(]/.test(toks[p + 1].t)) { next(); return postfix(); }
     next();
     const n = { k: 'name', name: t, args: [] };
     if (peek() === '<') {
@@ -461,7 +489,8 @@ export const typeText = t => {
   case 'array': return `${typeText(t.inner)}[]`;
   case 'fn': return `(${t.params.map(x => `${x.name}${x.optional ? '?' : ''}: ${x.type}`).join(', ')}) => ${typeText(t.ret)}`;
   case 'obj': return `{${squash(t.body)}}`;
-  case 'tuple': return `[${t.items.map(typeText).join(', ')}]`;
+
+  case 'tuple': return `[${t.elems.map(typeText).join(', ')}]`;
   case 'template': return t.text;
   case 'typeof': return `typeof ${t.name}`;
   case 'keyof': return `keyof ${typeText(t.inner)}`;
@@ -550,7 +579,7 @@ export function lowerHost(host, files) {
     // value, read as any (Data).
     case 'typeof': case 'cond': if (rich) return 'any'; break;
     case 'tuple': if (rich) {
-      const items = [...new Set(t.items.map(x => lower(x, { ...ctx, intKey: null })))];
+      const items = [...new Set(t.elems.map(x => lower(x, { ...ctx, intKey: null })))];
       return `sequence<${items.length === 1 ? items[0] : 'any'}>`;
     } break;
     case 'index': if (rich) return lowerIndex(t, ctx); break;
@@ -574,8 +603,12 @@ export function lowerHost(host, files) {
       if (!name) fail(`${ctx.where}: the intersection ${key} is not named in serve-tier2.mjs intersections`);
       return idlName(name);
     }
-    default: fail(`${ctx.where}: the type ${typeText(t)} is not lowered`);
+    default: break;
     }
+    // Without the rich rules, the type operators are not lowered (Deno's and Bun's tiers).
+    const op = { keyof: 'keyof', typeof: 'typeof', cond: 'conditional', template: 'template literal', index: 'indexed access', tuple: 'tuple' }[t.k];
+    if (op) fail(`${ctx.where}: ${op} types are not lowered: ${typeText(t)}`);
+    fail(`${ctx.where}: the type ${typeText(t)} is not lowered`);
   }
   function lowerUnion(alts, ctx) {
     // An alternative spliced from a namespace's alias is read in that namespace.
@@ -1279,15 +1312,15 @@ export async function lowerAll() {
   for (const host of tier.hosts) {
     const files = [];
     for (const file of host.files) files.push({ file, text: await loadFile(host, file) });
-    const { idl, excluded } = lowerHost(host, files);
+    const { idl, excluded } = host.auto ? lowerAuto(host, files) : lowerHost(host, files);
     const header = `// GENERATED by scripts/bindings/serve-api.mjs from the ${host.name} ${host.version} TypeScript declarations
 // (${host.files.map(f => `https://github.com/${host.repo}/blob/${host.tag}/${f}`).join(',\n//  ')};
-// ${host.license}), for what serve-tier2.mjs selects; do not edit. Comments quote each
+// ${host.license}), for what ${host.auto ? `${host.name.toLowerCase()}-tier2.mjs excludes (ts-auto.mjs's rules)` : 'serve-tier2.mjs selects'}; do not edit. Comments quote each
 // member's declaration. generate-web.mjs turns this into Lasm.JS.${host.name}.
 //
-// Not lowered (serve-tier2.mjs; the declarations' own @experimental and UNSTABLE tags):
+// Not lowered (${host.auto ? `${host.name.toLowerCase()}-tier2.mjs` : 'serve-tier2.mjs'}; the declarations' own @experimental and UNSTABLE tags):
 ${excluded.map(([w, r]) => `//   - ${w}: ${r}`).join('\n')}
-${Object.entries(host.notSelected).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
+${Object.entries(host.notSelected ?? {}).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
 `;
     results.push({ file: join(root, 'scripts', 'bindings', `${host.name.toLowerCase()}.idl`), text: `${header}\n${idl}\n` });
   }
