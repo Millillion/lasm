@@ -9,6 +9,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
+import { compiledLazyModules, importsOfSource, lazyModules } from './lazy-library.mjs';
 
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
@@ -18,7 +19,21 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
   'HttpDownstream', 'HttpResp', 'Dictionary', 'Geo', 'DeviceDetection', 'Erl', 'ObjectStore', 'ImageOptimizer', 'KvStore', 'SecretStore',
   'Backend', 'AsyncIo', 'Purge', 'ComputeRuntime', 'Acl'].map(name => `Lasm.Fastly.${name}`).concat('Lasm.Fastly');
 // Lasm.JS.Web's generated modules, one per web spec, in import order, then the umbrella module (generate-web.mjs).
-const webModules = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
+// Lasm.JS.Web's modules compiled with the prefix (and prebuilt): those the templates and the example apps import,
+// with what they import (test/web-bindings.test.mjs checks the templates and examples need no other). Every other
+// module of the whole platform ships as source and is compiled on first import (src/lazy-library.mjs, 0.3-6).
+export const eagerWebRoots = ['Lasm.JS.Web.Dom', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Websockets'];
+const webModules = (() => {
+  const all = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
+  const need = new Set();
+  const visit = module => {
+    if (need.has(module) || !all.includes(module)) return;
+    need.add(module);
+    for (const imported of importsOfSource(readFileSync(join(root, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
+  };
+  eagerWebRoots.forEach(visit);
+  return all.filter(module => need.has(module));
+})();
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http'].map(name => `Lasm.WASI.${name}`);
@@ -149,24 +164,25 @@ const libraryC = (lean, module) => join(lean.prefix, 'lib', 'lasm', 'c', ...modu
 
 /** The library modules a program links: those whose initializer the program's
  * generated C calls, and the library modules those import, in import order. */
-export function linkedLibraryModules(sources, { read = file => readFileSync(file, 'latin1'), libraryText } = {}) {
+export function linkedLibraryModules(sources, { read = file => readFileSync(file, 'latin1'), libraryText, modules: known = libraryModules } = {}) {
   const texts = sources.map(read);
   const linked = new Set();
   for (let changed = true; changed;) {
     changed = false;
-    for (const module of libraryModules) {
+    for (const module of known) {
       if (linked.has(module)) continue;
       const call = initializerCall(module);
       if (texts.some(text => text.includes(call)) || [...linked].some(other => libraryText(other).includes(call))) { linked.add(module); changed = true; }
     }
   }
-  return libraryModules.filter(module => linked.has(module));
+  return known.filter(module => linked.has(module));
 }
 
 /** Whether any generated C initializes a module of Lasm's library (its Lean code imports it). */
 export function importsLibrary(sources) {
   const texts = sources.map(file => readFileSync(file, 'latin1'));
-  return libraryModules.some(module => texts.some(text => text.includes(initializerCall(module))));
+  // The modules compiled on first import (src/lazy-library.mjs) count too: a program may import only those.
+  return [...libraryModules, ...lazyModules(libraryModules)].some(module => texts.some(text => text.includes(initializerCall(module))));
 }
 
 /** The generated C (from the prefix) of the library modules the program links,
@@ -177,7 +193,8 @@ export function librarySources(lean, programSources) {
   if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
   const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
-  const modules = linkedLibraryModules(programSources, { libraryText });
+  // The prefix's library: the modules compiled with it, then those compiled on first import.
+  const modules = linkedLibraryModules(programSources, { libraryText, modules: [...libraryModules, ...compiledLazyModules(lean.prefix, libraryModules)] });
   const sources = [], inputs = [];
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });

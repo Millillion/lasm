@@ -474,6 +474,10 @@
       "kind": "io",
       "reason": "starts a built program"
     },
+    "src/lazy-library.mjs": {
+      "status": "pending",
+      "reason": "library modules compiled on first import: import resolution, dependency order, identity stamps and the parallel schedule are pure; model them (the compiles themselves are I/O)"
+    },
     "src/lean-io-errors.mjs": {
       "status": "modelled",
       "models": [
@@ -1121,6 +1125,10 @@
     "src/wasm-objects.mjs": {
       "status": "pending",
       "reason": "a reader of relocatable Wasm objects: pure"
+    },
+    "src/web-availability.mjs": {
+      "status": "pending",
+      "reason": "lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup"
     },
     "src/windows-tool-paths.mjs": {
       "status": "exempt",

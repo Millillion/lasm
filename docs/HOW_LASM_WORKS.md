@@ -77,6 +77,30 @@ prefix, so `import Lasm.JS` resolves like a standard library module
 ([src/lasm-library.mjs](../src/lasm-library.mjs); prebuilt in
 [library/prebuilt/](../library/prebuilt)).
 
+**Generated binding modules are compiled on first import.** This covers
+`Lasm.JS.Web.*`, `Lasm.JS.Node.*`, `Lasm.JS.Deno.*`, `Lasm.JS.Bun.*` and
+`Lasm.JS.Cloudflare.*`. A small core set of them ships compiled, in
+`libraryModules`. Every other module of these namespaces ships as Lean source
+only. Before Lean elaborates a program, the build reads the `import Lasm.*`
+lines of the program's files, and `lasm editor` reads those of the project's.
+It then compiles each module they need that the prefix lacks, with the modules
+that module imports (read from the sources themselves), into the prefix
+([src/lazy-library.mjs](../src/lazy-library.mjs)).
+- **Progress:** `[lasm] Compiling Lasm.JS.Web.IndexedDB (first use)…`, then the
+  total time.
+- **Parallel:** modules that do not depend on each other compile at once, up
+  to half the cores and one per 3 GB of memory.
+- **Atomic:** each output is written to a temporary file and renamed into
+  place, so an interrupted compile leaves nothing half-written.
+- **Recompiled only when needed:** a stamp records the hash of the module's
+  source and of its dependencies, so a new Lasm version recompiles only what
+  changed.
+- **Verified:** the stamp also records each output's hash. The tool cache's
+  integrity check accepts the outputs against it, and refuses them if they
+  changed.
+
+Decision 0.3-6.
+
 **From source to C.** [src/application-sources.mjs](../src/application-sources.mjs)
 (`applicationSources`) handles two kinds of input:
 

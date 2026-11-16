@@ -12,6 +12,8 @@ import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
 import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
 import { declarations, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
+import { lazyModules } from '../src/lazy-library.mjs';
+import { join } from 'node:path';
 import { referencedWebApis, targetRuntime, webAvailabilityErrors } from '../src/web-availability.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -43,13 +45,23 @@ test('every generated module is a shipped library module, in import order, and L
     for (const m of generated) for (const imported of importsOf(m))
       assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
   }
+  const order = JSON.parse(readFileSync(new URL('modules.json', webDir), 'utf8')).modules;
   for (const m of webModules) {
-    assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
+    // Compiled with the prefix (the core the templates use), or on first import (src/lazy-library.mjs).
+    assert.ok(libraryModules.includes(m) || lazyModules(libraryModules).includes(m), `${m} is neither compiled with the prefix nor on first import`);
     for (const imported of importsOf(m)) {
-      assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+      assert.ok(imported === 'Lasm.JS.Web.Support' || order.indexOf(imported) < order.indexOf(m), `${m} imports ${imported}, which comes later`);
       assert.ok(/^Lasm\.JS\.Web(\.|$)/.test(imported), `${m} imports ${imported}, outside Lasm.JS.Web`);
+      // A module compiled with the prefix never needs one compiled on first import.
+      if (libraryModules.includes(m)) assert.ok(libraryModules.includes(imported), `${m} (prebuilt) imports ${imported} (compiled on first import)`);
     }
   }
+  // The templates and the example apps need only prebuilt web modules.
+  const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => ['node_modules', '.lake', 'dist'].includes(e.name) ? []
+    : e.isDirectory() ? walk(join(dir, e.name)) : e.name.endsWith('.lean') ? [join(dir, e.name)] : []);
+  for (const file of [...walk(`${root}templates`), ...walk(`${root}examples`)])
+    for (const [, m] of readFileSync(file, 'utf8').matchAll(/^import (Lasm\.JS\.Web\.\S+)$/gm))
+      assert.ok(libraryModules.includes(m), `${file.slice(root.length)} imports ${m}, which is not prebuilt (src/lasm-library.mjs eagerWebRoots)`);
 });
 
 test('handle types are per spec (Lasm.JS.Web.Types.<Spec>), importing only their parents\' types', () => {
