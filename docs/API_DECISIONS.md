@@ -222,15 +222,22 @@ names its classes `http.Server` and `net.Server`, so `Node.Server` and
 which separates hand-written from generated code but reads unlike
 `Bun.serve`.
 
-### A23: `Lasm.Serverless`'s proofs are rewritten, not dropped (#222)
+### A23: `Lasm.Serverless` is deleted; its useful proofs move to the test suite (Jordan, 2026-11-16)
 
-**Decision:** the shims stay (each platform's event still has to become a
-`Request`), so their model and the 20 propositions stay, restated for the
-direct call: the model mirrors `lasm-function.mjs` (formerly
-`lasm-server.mjs`) and `lasm-lambda.mjs` function for function, and the
-serverless-http fuzz oracle still runs it on every input. Only the loopback
-part (forwarding to a server on a port) is gone. **Alternative:** drop the
-proofs with the loopback shims.
+**Decision (Jordan's):** once each function platform's generated file calls
+the `exportDefault` handler directly (this PR), `Lasm.Serverless` is deleted
+from the library. It has no runtime API: it is a Lean model of the shims
+(`lasm-function.mjs`, formerly `lasm-server.mjs`, and `lasm-lambda.mjs`) and
+20 propositions about them. The model and the propositions that still
+describe the generated platform files (each event becomes one `Request`;
+one plain Host; one Cookie field; the reply's status, fields and body reach
+each platform's response) move into the test suite, beside the other models
+of the CLI's JavaScript (`verification/`), where the serverless-http fuzz
+oracle keeps running the model on every input. Propositions about the
+loopback forwarding (the target `http.request` sends) are dropped with it.
+This PR only restates the model for the direct call; the move is milestone
+0.2's own follow-up PR (entry 0.2-2). **Alternatives:** keep the proofs in
+the library (they describe CLI code, not a library API); drop them all.
 
 ### 0.2-1: function platforms run only programs that publish a handler (#222)
 
@@ -245,3 +252,9 @@ own server (Express, Fastify, `Std.Http`, `Node.serve`) runs on Lambda only
 as a container image behind the AWS Lambda Web Adapter (`--deploy lambda`),
 which is that platform's own way to run a server. **Alternative:** keep the
 loopback adapter (`lasm-server.mjs`), which Jordan rejected on 2026-11-11.
+
+### 0.2-2: `Lasm.Serverless` leaves the library (proposed, follow-up PR)
+
+The library namespace `Lasm.Serverless` (proofs only, no runtime API) is
+deleted; see A23. Status: decided by Jordan (2026-11-16); implementation
+pending.
