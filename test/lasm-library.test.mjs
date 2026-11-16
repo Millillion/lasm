@@ -122,6 +122,14 @@ test('the library sources a program links come from the prefix, with the glue, a
     { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
     { module: 'lasm_async.c', source: asyncGlueSource }]);
   assert.deepEqual(result.oleans, [join(prefix, 'lib', 'lean', 'Lasm', 'JS', 'Core.olean'), join(prefix, 'lib', 'lean', 'Lasm', 'JS.olean')]);
+  // A module the program's sources already compile (Lake built it from Lasm's Lake package, 0.3-7) is not linked again;
+  // what it imports still is.
+  const lakeC = join(prefix, 'IndexedDB.c');
+  put(lakeC, call('Lasm.JS'));
+  put(program, call('Lasm.JS.Web.IndexedDB'));
+  put(c('Lasm.JS.Web.IndexedDB'), call('Lasm.JS'));
+  put(join(prefix, 'lib', 'lasm', 'lazy', 'Lasm.JS.Web.IndexedDB.json'), '{}');
+  assert.deepEqual(librarySources(lean, [program, lakeC], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] }).modules, ['Lasm.JS.Core', 'Lasm.JS']);
   rmSync(c('Lasm.RPC'));
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });

@@ -14,7 +14,7 @@ import { dirname, join, relative, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
 
-const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
+export const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
 
 /** The generated binding namespaces whose modules may be compiled on first import. */
 export const lazyNamespaces = ['Lasm.JS.Web.', 'Lasm.JS.Node.', 'Lasm.JS.Deno.', 'Lasm.JS.Bun.', 'Lasm.JS.Cloudflare.'];

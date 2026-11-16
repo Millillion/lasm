@@ -401,8 +401,10 @@ you import, never the names you write.
 templates and examples use: DOM, HTML, Fetch, URL, WebSockets and what they
 import). Every other module ships as source, and the first build that imports
 it compiles it once into Lasm's cache: `[lasm] Compiling
-Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). For that reason there
-is no umbrella `import Lasm.JS.Web`: it would compile every spec (0.3-18).
+Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). In a Lake project,
+Lake builds it, in the editor too ([GETTING_STARTED.md](GETTING_STARTED.md#editor),
+decision 0.3-7). For that reason there is no umbrella `import Lasm.JS.Web`: it
+would compile every spec (0.3-18).
 
 ```lean
 import Lasm.JS.Web.Fetch

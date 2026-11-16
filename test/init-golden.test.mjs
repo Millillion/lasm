@@ -22,11 +22,13 @@ import { forAll } from './helpers/property.mjs';
 registerHooks({
   resolve(specifier, context, next) {
     if (specifier === './editor.mjs' && context.parentURL?.endsWith('/src/init.mjs'))
-      return { url: 'data:text/javascript,' + encodeURIComponent('export const autoSetupEditor = (...a) => { globalThis.initEditorCalls.push(a); };'), shortCircuit: true };
+      return { url: 'data:text/javascript,' + encodeURIComponent('export const autoSetupEditor = (...a) => { globalThis.initEditorCalls.push(a); };\n'
+        + 'export const linkProjectLibrary = (...a) => { globalThis.initLinkCalls.push(a); };'), shortCircuit: true };
     return next(specifier, context);
   },
 });
 globalThis.initEditorCalls = [];
+globalThis.initLinkCalls = [];
 
 const repository = fileURLToPath(new URL('..', import.meta.url));
 const goldenRoot = join(repository, 'test/fixtures/init-golden');
@@ -269,6 +271,8 @@ test('runInit prints what it created and the next commands', async t => {
   assert.equal(await runInit({ directory: 'my-app', template: 'plain', deploy: [] }), 0);
   // The editor is set up only from what is already cached (no download during lasm init).
   assert.deepEqual(globalThis.initEditorCalls, [[join(process.cwd(), 'my-app', 'Main.lean'), { cachedOnly: true }]]);
+  // With the editor setup off (here, or on CI), Lasm's Lake package is still linked from what is cached (0.3-7).
+  assert.deepEqual(globalThis.initLinkCalls, [[join(process.cwd(), 'my-app'), { cachedOnly: true }]]);
   assert.equal(output[0], `Created my-app (template plain):\n  ${initProjectFiles('plain').join(', ')}\n\nNext:\n  cd my-app\n${nextSteps('plain')}`);
   assert.equal(await runInit({ directory: 'Dir With Space', template: 'hono', deploy: [] }), 0);
   assert.match(output[1], /^Created dir-with-space in Dir With Space \(template hono\):\n/);
