@@ -194,6 +194,25 @@ async function extract(artifact, archive, directory, python, hashes) {
   }
 }
 
+/** The entries the stamps of lazily compiled library modules vouch for (lib/lasm/lazy/<module>.json), stamps included. */
+async function lazyLibraryEntries(directory) {
+  const stamps = join(directory, 'lib', 'lasm', 'lazy'), entries = {};
+  let names = [];
+  try { names = await readdir(stamps); } catch { return entries; }
+  for (const name of names.filter(n => n.endsWith('.json'))) {
+    try {
+      const stamp = JSON.parse(await readFile(join(stamps, name), 'utf8'));
+      Object.assign(entries, stamp.files);
+      const bytes = await readFile(join(stamps, name));
+      entries[`lib/lasm/lazy/${name}`] = { type: 'file', bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'),
+        ...(process.platform === 'win32' ? {} : { executable: !!((await lstat(join(stamps, name))).mode & 0o111) }) };
+    } catch { /* An unreadable stamp vouches for nothing: its files then fail the check. */ }
+  }
+  return entries;
+}
+/** Directories lazily compiled library modules may add to a prefix. */
+const lazyDirectory = name => /^(lib\/lean\/Lasm|lib\/lasm\/c\/Lasm|src\/lean\/Lasm|lib\/lasm\/lazy)(\/|$)/.test(name) || ['lib/lasm', 'lib/lasm/c', 'src', 'src/lean'].includes(name);
+
 async function inventory(directory, { known, extracted } = {}) {
   directory = await realpath(directory);
   const files = new Map();
@@ -304,6 +323,12 @@ export async function verifyArtifactDirectory(directory, identity, { stamps } = 
     throw new Error('Managed artifact receipt does not match the requested toolchain');
   await verifyTreeOnce(stamps, artifactRecordKey(identity, directory), directory, async () => {
     const observed = await inventory(directory);
+    // Lasm library modules compiled into a prefix on first import (src/lazy-library.mjs) are not in its receipt:
+    // each is checked against the hashes its stamp recorded when it was written.
+    for (const [name, entry] of Object.entries(await lazyLibraryEntries(directory)))
+      if (!(name in receipt.files) && isDeepStrictEqual(observed[name], entry)) delete observed[name];
+    for (const name of Object.keys(observed))
+      if (!(name in receipt.files) && (observed[name].type === 'directory' && lazyDirectory(name) || /\.tmp-\d+$/.test(name) && name.startsWith('lib/'))) delete observed[name];
     if (!isDeepStrictEqual(observed, receipt.files)) {
       const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
         .filter(name => !isDeepStrictEqual(observed[name], receipt.files[name]));
