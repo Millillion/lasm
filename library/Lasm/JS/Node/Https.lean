@@ -114,6 +114,10 @@ def https.Server.closeAllConnections (self : https.Server) : IO Unit :=
 def https.Server.closeIdleConnections (self : https.Server) : IO Unit :=
   self.val.callMethod "closeIdleConnections" (Support.args #[]) Unit
 
+/-- `server.listen()`: `undefined listen()` -/
+def https.Server.listen (self : https.Server) : IO Unit :=
+  self.val.callMethod "listen" (Support.args #[]) Unit
+
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.11.2): `https.Server setTimeout(optional double msecs)` -/
 def https.Server.setTimeout (self : https.Server) (msecs : Option Float := none) : IO https.Server := do
   let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
@@ -137,9 +141,9 @@ def https.get (options : ObjectOrDOMStringOrURL) : IO http.ClientRequest := do
   pure { val := r }
 
 /-- `https.get(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((DOMString or URL) url, optional (object or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.getWithUrl (url : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := do
+def https.getWithUrl (url_ : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.getWithUrl", module := "node:https", path := "get", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional options]) (await := false)
+    (Support.args #[toJS url_, Support.optional options]) (await := false)
   pure { val := r }
 
 /-- `https.request(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
@@ -149,9 +153,9 @@ def https.request (options : https.RequestOptionsOrDOMStringOrURL) : IO http.Cli
   pure { val := r }
 
 /-- `https.request(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((DOMString or URL) url, optional (https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.requestWithUrl (url : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := do
+def https.requestWithUrl (url_ : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.requestWithUrl", module := "node:https", path := "request", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional options]) (await := false)
+    (Support.args #[toJS url_, Support.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

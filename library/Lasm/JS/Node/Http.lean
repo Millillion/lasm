@@ -15,8 +15,8 @@ import Lasm.JS.Web.WebSocket
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
-import Lasm.JS.Node.Fs
 import Lasm.JS.Node.Net
+import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
@@ -43,6 +43,13 @@ instance instToJSHttpClientRequest : ToJS http.ClientRequest := ⟨fun x => .ref
 instance instFromJSHttpClientRequest : FromJS http.ClientRequest := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ClientRequest", .data⟩
 instance instCoeHttpClientRequestHttpOutgoingMessage : Coe http.ClientRequest http.OutgoingMessage := ⟨http.ClientRequest.toOutgoingMessage⟩
 
+/-- `class http.Server extends net.Server` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
+structure http.Server extends net.Server
+instance instNonemptyHttpServer : Nonempty http.Server := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServer : ToJS http.Server := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServer : FromJS http.Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.Server", .data⟩
+instance instCoeHttpServerNetServer : Coe http.Server net.Server := ⟨http.Server.toServer⟩
+
 /-- `class http.ServerResponse extends http.OutgoingMessage` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
 structure http.ServerResponse extends http.OutgoingMessage
 instance instNonemptyHttpServerResponse : Nonempty http.ServerResponse := ⟨{ val := Classical.ofNonempty }⟩
@@ -56,13 +63,6 @@ instance instNonemptyHttpIncomingMessage : Nonempty http.IncomingMessage := ⟨{
 instance instToJSHttpIncomingMessage : ToJS http.IncomingMessage := ⟨fun x => .ref x.val ""⟩
 instance instFromJSHttpIncomingMessage : FromJS http.IncomingMessage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage", .data⟩
 instance instCoeHttpIncomingMessageStreamReadable : Coe http.IncomingMessage stream.Readable := ⟨http.IncomingMessage.toReadable⟩
-
-/-- `class http.Server extends net.Server` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
-structure http.Server extends net.Server
-instance instNonemptyHttpServer : Nonempty http.Server := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServer : ToJS http.Server := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServer : FromJS http.Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.Server", .data⟩
-instance instCoeHttpServerNetServer : Coe http.Server net.Server := ⟨http.Server.toServer⟩
 
 /-- `dictionary http.Agent.NewOptionsProxyEnv` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http.Agent.NewOptionsProxyEnv where
@@ -211,6 +211,20 @@ instance : ToJS HeadersOrObject := ⟨fun
   | .headers v => toJS v
   | .object v => toJS v⟩
 instance : Coe Headers HeadersOrObject := ⟨.headers⟩
+
+/-- `callback http.ClientRequest.AbortListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ClientRequest.AbortListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpClientRequestAbortListener : Nonempty http.ClientRequest.AbortListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpClientRequestAbortListener : ToJS http.ClientRequest.AbortListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpClientRequestAbortListener : FromJS http.ClientRequest.AbortListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ClientRequest.AbortListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ClientRequest.AbortListener.ofFn (f : Async Unit) : IO http.ClientRequest.AbortListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ClientRequest.AbortListener.ofSyncFn (f : IO Unit) : IO http.ClientRequest.AbortListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `callback http.ClientRequest.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure http.ClientRequest.CloseListener where
@@ -365,59 +379,6 @@ def http.ClientRequest.UpgradeListener.ofFn (f : http.IncomingMessage → stream
 def http.ClientRequest.UpgradeListener.ofSyncFn (f : http.IncomingMessage → stream.Duplex → ByteArray → IO Unit) : IO http.ClientRequest.UpgradeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http.IncomingMessage args 0) (← Support.arg stream.Duplex args 1) (← Support.arg ByteArray args 2)) }
 
-/-- `callback http.ServerResponse.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.ServerResponse.CloseListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpServerResponseCloseListener : Nonempty http.ServerResponse.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServerResponseCloseListener : ToJS http.ServerResponse.CloseListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServerResponseCloseListener : FromJS http.ServerResponse.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.CloseListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.ServerResponse.CloseListener.ofFn (f : Async Unit) : IO http.ServerResponse.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.ServerResponse.CloseListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
-/-- `callback http.ServerResponse.FinishListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.ServerResponse.FinishListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpServerResponseFinishListener : Nonempty http.ServerResponse.FinishListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServerResponseFinishListener : ToJS http.ServerResponse.FinishListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServerResponseFinishListener : FromJS http.ServerResponse.FinishListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.FinishListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.ServerResponse.FinishListener.ofFn (f : Async Unit) : IO http.ServerResponse.FinishListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.ServerResponse.FinishListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.FinishListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
-/-- `(object or sequence<any>)`: one constructor per member type. -/
-inductive ObjectOrSequenceOfAny where
-  /-- `object` -/
-  | object (value : Data)
-  /-- `sequence<any>` -/
-  | sequence (value : Array Data)
-instance : ToJS ObjectOrSequenceOfAny := ⟨fun
-  | .object v => toJS v
-  | .sequence v => toJS v⟩
-instance : Coe (Array Data) ObjectOrSequenceOfAny := ⟨.sequence⟩
-
-/-- `callback http.IncomingMessage.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.IncomingMessage.CloseListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpIncomingMessageCloseListener : Nonempty http.IncomingMessage.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpIncomingMessageCloseListener : ToJS http.IncomingMessage.CloseListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpIncomingMessageCloseListener : FromJS http.IncomingMessage.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.CloseListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.IncomingMessage.CloseListener.ofFn (f : Async Unit) : IO http.IncomingMessage.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.IncomingMessage.CloseListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
 /-- `callback http.Server.CheckContinueListener = undefined (http.IncomingMessage request, http.ServerResponse response)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure http.Server.CheckContinueListener where
   /-- The JavaScript function. -/
@@ -543,6 +504,73 @@ def http.Server.UpgradeListener.ofFn (f : http.IncomingMessage → stream.Duplex
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def http.Server.UpgradeListener.ofSyncFn (f : http.IncomingMessage → stream.Duplex → ByteArray → IO Unit) : IO http.Server.UpgradeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http.IncomingMessage args 0) (← Support.arg stream.Duplex args 1) (← Support.arg ByteArray args 2)) }
+
+/-- `callback http.ServerResponse.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ServerResponse.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpServerResponseCloseListener : Nonempty http.ServerResponse.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServerResponseCloseListener : ToJS http.ServerResponse.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServerResponseCloseListener : FromJS http.ServerResponse.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ServerResponse.CloseListener.ofFn (f : Async Unit) : IO http.ServerResponse.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ServerResponse.CloseListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback http.ServerResponse.FinishListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ServerResponse.FinishListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpServerResponseFinishListener : Nonempty http.ServerResponse.FinishListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServerResponseFinishListener : ToJS http.ServerResponse.FinishListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServerResponseFinishListener : FromJS http.ServerResponse.FinishListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.FinishListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ServerResponse.FinishListener.ofFn (f : Async Unit) : IO http.ServerResponse.FinishListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ServerResponse.FinishListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.FinishListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `(object or sequence<any>)`: one constructor per member type. -/
+inductive ObjectOrSequenceOfAny where
+  /-- `object` -/
+  | object (value : Data)
+  /-- `sequence<any>` -/
+  | sequence (value : Array Data)
+instance : ToJS ObjectOrSequenceOfAny := ⟨fun
+  | .object v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe (Array Data) ObjectOrSequenceOfAny := ⟨.sequence⟩
+
+/-- `callback http.IncomingMessage.AbortedListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.IncomingMessage.AbortedListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpIncomingMessageAbortedListener : Nonempty http.IncomingMessage.AbortedListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpIncomingMessageAbortedListener : ToJS http.IncomingMessage.AbortedListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpIncomingMessageAbortedListener : FromJS http.IncomingMessage.AbortedListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.AbortedListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.IncomingMessage.AbortedListener.ofFn (f : Async Unit) : IO http.IncomingMessage.AbortedListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.IncomingMessage.AbortedListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.AbortedListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback http.IncomingMessage.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.IncomingMessage.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpIncomingMessageCloseListener : Nonempty http.IncomingMessage.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpIncomingMessageCloseListener : ToJS http.IncomingMessage.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpIncomingMessageCloseListener : FromJS http.IncomingMessage.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.IncomingMessage.CloseListener.ofFn (f : Async Unit) : IO http.IncomingMessage.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.IncomingMessage.CloseListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `dictionary http.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http.CreateServerOptions where
@@ -738,6 +766,9 @@ def http.Agent.destroy (self : http.Agent) : IO Unit :=
 def http.Agent.getName (self : http.Agent) (options : Option http.Agent.GetNameOptions := none) : IO String :=
   self.val.callMethod "getName" (Support.args #[Support.optional options]) String
 
+/-- `outgoingMessage.connection` (added in Node.js v0.3.0): `readonly attribute any connection` -/
+def http.OutgoingMessage.connection (self : http.OutgoingMessage) : IO Data := self.val.get "connection" Data
+
 /-- `outgoingMessage.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
 def http.OutgoingMessage.headersSent (self : http.OutgoingMessage) : IO Bool := self.val.get "headersSent" Bool
 
@@ -837,6 +868,10 @@ def http.OutgoingMessage.getHeaders (self : http.OutgoingMessage) : IO Data :=
 def http.OutgoingMessage.hasHeader (self : http.OutgoingMessage) (name : String) : IO Bool :=
   self.val.callMethod "hasHeader" (Support.args #[toJS name]) Bool
 
+/-- `outgoingMessage.pipe()` (added in Node.js v9.0.0): `undefined pipe()` -/
+def http.OutgoingMessage.pipe (self : http.OutgoingMessage) : IO Unit :=
+  self.val.callMethod "pipe" (Support.args #[]) Unit
+
 /-- `outgoingMessage.removeHeader(name)` (added in Node.js v0.4.0): `undefined removeHeader(DOMString name)` -/
 def http.OutgoingMessage.removeHeader (self : http.OutgoingMessage) (name : String) : IO Unit :=
   self.val.callMethod "removeHeader" (Support.args #[toJS name]) Unit
@@ -863,6 +898,17 @@ def http.OutgoingMessage.uncork (self : http.OutgoingMessage) : IO Unit :=
 /-- `outgoingMessage.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
 def http.OutgoingMessage.write (self : http.OutgoingMessage) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+
+/-- `request.aborted` (added in Node.js v0.11.14): `readonly attribute boolean aborted` -/
+def http.ClientRequest.aborted (self : http.ClientRequest) : IO Bool := self.val.get "aborted" Bool
+
+/-- `request.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+def http.ClientRequest.connection (self : http.ClientRequest) : IO stream.Duplex := do
+  let r ← self.val.get "connection" Value
+  pure { val := r }
+
+/-- `request.finished` (added in Node.js v0.0.1): `readonly attribute boolean finished` -/
+def http.ClientRequest.finished (self : http.ClientRequest) : IO Bool := self.val.get "finished" Bool
 
 /-- `request.maxHeadersCount`: `readonly attribute double maxHeadersCount` -/
 def http.ClientRequest.maxHeadersCount (self : http.ClientRequest) : IO Float := self.val.get "maxHeadersCount" Float
@@ -892,6 +938,16 @@ def http.ClientRequest.writableEnded (self : http.ClientRequest) : IO Bool := se
 
 /-- `request.writableFinished` (added in Node.js v12.7.0): `readonly attribute boolean writableFinished` -/
 def http.ClientRequest.writableFinished (self : http.ClientRequest) : IO Bool := self.val.get "writableFinished" Bool
+
+/-- `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onAbort(http.ClientRequest.AbortListener listener)`: calls `on("abort", listener)` -/
+def http.ClientRequest.onAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "abort", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onceAbort(http.ClientRequest.AbortListener listener)`: calls `once("abort", listener)` -/
+def http.ClientRequest.onceAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "abort", toJS listener]) Value
+  pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.5.4): `http.ClientRequest onClose(http.ClientRequest.CloseListener listener)`: calls `on("close", listener)` -/
 def http.ClientRequest.onClose (self : http.ClientRequest) (listener : http.ClientRequest.CloseListener) : IO http.ClientRequest := do
@@ -983,6 +1039,10 @@ def http.ClientRequest.onceUpgrade (self : http.ClientRequest) (listener : http.
   let r ← self.val.callMethod "once" (Support.args #[toJS "upgrade", toJS listener]) Value
   pure { val := r }
 
+/-- `request.abort()` (added in Node.js v0.3.8): `undefined abort()` -/
+def http.ClientRequest.abort (self : http.ClientRequest) : IO Unit :=
+  self.val.callMethod "abort" (Support.args #[]) Unit
+
 /-- `request.cork()` (added in Node.js v13.2.0, v12.16.0): `undefined cork()` -/
 def http.ClientRequest.cork (self : http.ClientRequest) : IO Unit :=
   self.val.callMethod "cork" (Support.args #[]) Unit
@@ -1049,6 +1109,149 @@ def http.ClientRequest.uncork (self : http.ClientRequest) : IO Unit :=
 /-- `request.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
 def http.ClientRequest.write (self : http.ClientRequest) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+
+/-- `server.headersTimeout` (added in Node.js v11.3.0, v10.14.0): `readonly attribute double headersTimeout` -/
+def http.Server.headersTimeout (self : http.Server) : IO Float := self.val.get "headersTimeout" Float
+
+/-- `server.listening` (added in Node.js v5.7.0): `readonly attribute boolean listening` -/
+def http.Server.listening (self : http.Server) : IO Bool := self.val.get "listening" Bool
+
+/-- `server.maxHeadersCount` (added in Node.js v0.7.0): `readonly attribute double maxHeadersCount` -/
+def http.Server.maxHeadersCount (self : http.Server) : IO Float := self.val.get "maxHeadersCount" Float
+
+/-- `server.requestTimeout` (added in Node.js v14.11.0): `readonly attribute double requestTimeout` -/
+def http.Server.requestTimeout (self : http.Server) : IO Float := self.val.get "requestTimeout" Float
+
+/-- `server.maxRequestsPerSocket` (added in Node.js v16.10.0): `readonly attribute double maxRequestsPerSocket` -/
+def http.Server.maxRequestsPerSocket (self : http.Server) : IO Float := self.val.get "maxRequestsPerSocket" Float
+
+/-- `server.timeout` (added in Node.js v0.9.12): `readonly attribute double timeout` -/
+def http.Server.timeout (self : http.Server) : IO Float := self.val.get "timeout" Float
+
+/-- `server.keepAliveTimeout` (added in Node.js v8.0.0): `readonly attribute double keepAliveTimeout` -/
+def http.Server.keepAliveTimeout (self : http.Server) : IO Float := self.val.get "keepAliveTimeout" Float
+
+/-- `server.keepAliveTimeoutBuffer` (added in Node.js v24.6.0): `readonly attribute double keepAliveTimeoutBuffer` -/
+def http.Server.keepAliveTimeoutBuffer (self : http.Server) : IO Float := self.val.get "keepAliveTimeoutBuffer" Float
+
+/-- `Event: 'checkContinue'` (added in Node.js v0.3.0): `http.Server onCheckContinue(http.Server.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
+def http.Server.onCheckContinue (self : http.Server) (listener : http.Server.CheckContinueListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "checkContinue", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'checkContinue'` (added in Node.js v0.3.0): `http.Server onceCheckContinue(http.Server.CheckContinueListener listener)`: calls `once("checkContinue", listener)` -/
+def http.Server.onceCheckContinue (self : http.Server) (listener : http.Server.CheckContinueListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "checkContinue", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'checkExpectation'` (added in Node.js v5.5.0): `http.Server onCheckExpectation(http.Server.CheckExpectationListener listener)`: calls `on("checkExpectation", listener)` -/
+def http.Server.onCheckExpectation (self : http.Server) (listener : http.Server.CheckExpectationListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "checkExpectation", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'checkExpectation'` (added in Node.js v5.5.0): `http.Server onceCheckExpectation(http.Server.CheckExpectationListener listener)`: calls `once("checkExpectation", listener)` -/
+def http.Server.onceCheckExpectation (self : http.Server) (listener : http.Server.CheckExpectationListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "checkExpectation", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'clientError'` (added in Node.js v0.1.94): `http.Server onClientError(http.Server.ClientErrorListener listener)`: calls `on("clientError", listener)` -/
+def http.Server.onClientError (self : http.Server) (listener : http.Server.ClientErrorListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "clientError", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'clientError'` (added in Node.js v0.1.94): `http.Server onceClientError(http.Server.ClientErrorListener listener)`: calls `once("clientError", listener)` -/
+def http.Server.onceClientError (self : http.Server) (listener : http.Server.ClientErrorListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "clientError", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.1.4): `http.Server onClose(http.Server.CloseListener listener)`: calls `on("close", listener)` -/
+def http.Server.onClose (self : http.Server) (listener : http.Server.CloseListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.1.4): `http.Server onceClose(http.Server.CloseListener listener)`: calls `once("close", listener)` -/
+def http.Server.onceClose (self : http.Server) (listener : http.Server.CloseListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'connect'` (added in Node.js v0.7.0): `http.Server onConnect(http.Server.ConnectListener listener)`: calls `on("connect", listener)` -/
+def http.Server.onConnect (self : http.Server) (listener : http.Server.ConnectListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "connect", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'connect'` (added in Node.js v0.7.0): `http.Server onceConnect(http.Server.ConnectListener listener)`: calls `once("connect", listener)` -/
+def http.Server.onceConnect (self : http.Server) (listener : http.Server.ConnectListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "connect", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'connection'` (added in Node.js v0.1.0): `http.Server onConnection(http.Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
+def http.Server.onConnection (self : http.Server) (listener : http.Server.ConnectionListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'connection'` (added in Node.js v0.1.0): `http.Server onceConnection(http.Server.ConnectionListener listener)`: calls `once("connection", listener)` -/
+def http.Server.onceConnection (self : http.Server) (listener : http.Server.ConnectionListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'dropRequest'` (added in Node.js v18.7.0, v16.17.0): `http.Server onDropRequest(http.Server.DropRequestListener listener)`: calls `on("dropRequest", listener)` -/
+def http.Server.onDropRequest (self : http.Server) (listener : http.Server.DropRequestListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "dropRequest", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'dropRequest'` (added in Node.js v18.7.0, v16.17.0): `http.Server onceDropRequest(http.Server.DropRequestListener listener)`: calls `once("dropRequest", listener)` -/
+def http.Server.onceDropRequest (self : http.Server) (listener : http.Server.DropRequestListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "dropRequest", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'request'` (added in Node.js v0.1.0): `http.Server onRequest(http.Server.RequestListener listener)`: calls `on("request", listener)` -/
+def http.Server.onRequest (self : http.Server) (listener : http.Server.RequestListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "request", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'request'` (added in Node.js v0.1.0): `http.Server onceRequest(http.Server.RequestListener listener)`: calls `once("request", listener)` -/
+def http.Server.onceRequest (self : http.Server) (listener : http.Server.RequestListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "request", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'upgrade'` (added in Node.js v0.1.94): `http.Server onUpgrade(http.Server.UpgradeListener listener)`: calls `on("upgrade", listener)` -/
+def http.Server.onUpgrade (self : http.Server) (listener : http.Server.UpgradeListener) : IO http.Server := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "upgrade", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'upgrade'` (added in Node.js v0.1.94): `http.Server onceUpgrade(http.Server.UpgradeListener listener)`: calls `once("upgrade", listener)` -/
+def http.Server.onceUpgrade (self : http.Server) (listener : http.Server.UpgradeListener) : IO http.Server := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "upgrade", toJS listener]) Value
+  pure { val := r }
+
+/-- `server.close([callback])` (added in Node.js v0.1.90): `undefined close()` -/
+def http.Server.close (self : http.Server) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `server.closeAllConnections()` (added in Node.js v18.2.0): `undefined closeAllConnections()` -/
+def http.Server.closeAllConnections (self : http.Server) : IO Unit :=
+  self.val.callMethod "closeAllConnections" (Support.args #[]) Unit
+
+/-- `server.closeIdleConnections()` (added in Node.js v18.2.0): `undefined closeIdleConnections()` -/
+def http.Server.closeIdleConnections (self : http.Server) : IO Unit :=
+  self.val.callMethod "closeIdleConnections" (Support.args #[]) Unit
+
+/-- `server.listen()`: `undefined listen()` -/
+def http.Server.listen (self : http.Server) : IO Unit :=
+  self.val.callMethod "listen" (Support.args #[]) Unit
+
+/-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.9.12): `http.Server setTimeout(optional double msecs)` -/
+def http.Server.setTimeout (self : http.Server) (msecs : Option Float := none) : IO http.Server := do
+  let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
+  pure { val := r }
+
+/-- `response.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+def http.ServerResponse.connection (self : http.ServerResponse) : IO stream.Duplex := do
+  let r ← self.val.get "connection" Value
+  pure { val := r }
+
+/-- `response.finished` (added in Node.js v0.0.2): `readonly attribute boolean finished` -/
+def http.ServerResponse.finished (self : http.ServerResponse) : IO Bool := self.val.get "finished" Bool
 
 /-- `response.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
 def http.ServerResponse.headersSent (self : http.ServerResponse) : IO Bool := self.val.get "headersSent" Bool
@@ -1177,8 +1380,14 @@ def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCod
 def http.ServerResponse.writeProcessing (self : http.ServerResponse) : IO Unit :=
   self.val.callMethod "writeProcessing" (Support.args #[]) Unit
 
+/-- `message.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
+def http.IncomingMessage.aborted (self : http.IncomingMessage) : IO Bool := self.val.get "aborted" Bool
+
 /-- `message.complete` (added in Node.js v0.3.0): `readonly attribute boolean complete` -/
 def http.IncomingMessage.complete (self : http.IncomingMessage) : IO Bool := self.val.get "complete" Bool
+
+/-- `message.connection` (added in Node.js v0.1.90): `readonly attribute any connection` -/
+def http.IncomingMessage.connection (self : http.IncomingMessage) : IO Data := self.val.get "connection" Data
 
 /-- `message.headers` (added in Node.js v0.1.5): `readonly attribute object headers` -/
 def http.IncomingMessage.headers (self : http.IncomingMessage) : IO Data := self.val.get "headers" Data
@@ -1223,6 +1432,16 @@ def http.IncomingMessage.trailersDistinct (self : http.IncomingMessage) : IO Dat
 /-- `message.url` (added in Node.js v0.1.90): `readonly attribute DOMString url` -/
 def http.IncomingMessage.url (self : http.IncomingMessage) : IO String := self.val.get "url" String
 
+/-- `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onAborted(http.IncomingMessage.AbortedListener listener)`: calls `on("aborted", listener)` -/
+def http.IncomingMessage.onAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "aborted", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onceAborted(http.IncomingMessage.AbortedListener listener)`: calls `once("aborted", listener)` -/
+def http.IncomingMessage.onceAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "aborted", toJS listener]) Value
+  pure { val := r }
+
 /-- `Event: 'close'` (added in Node.js v0.4.2): `http.IncomingMessage onClose(http.IncomingMessage.CloseListener listener)`: calls `on("close", listener)` -/
 def http.IncomingMessage.onClose (self : http.IncomingMessage) (listener : http.IncomingMessage.CloseListener) : IO http.IncomingMessage := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
@@ -1241,137 +1460,6 @@ def http.IncomingMessage.destroy (self : http.IncomingMessage) (error : Data := 
 /-- `message.setTimeout(msecs[, callback])` (added in Node.js v0.5.9): `http.IncomingMessage setTimeout(double msecs)` -/
 def http.IncomingMessage.setTimeout (self : http.IncomingMessage) (msecs : Float) : IO http.IncomingMessage := do
   let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs]) Value
-  pure { val := r }
-
-/-- `server.headersTimeout` (added in Node.js v11.3.0, v10.14.0): `readonly attribute double headersTimeout` -/
-def http.Server.headersTimeout (self : http.Server) : IO Float := self.val.get "headersTimeout" Float
-
-/-- `server.listening` (added in Node.js v5.7.0): `readonly attribute boolean listening` -/
-def http.Server.listening (self : http.Server) : IO Bool := self.val.get "listening" Bool
-
-/-- `server.maxHeadersCount` (added in Node.js v0.7.0): `readonly attribute double maxHeadersCount` -/
-def http.Server.maxHeadersCount (self : http.Server) : IO Float := self.val.get "maxHeadersCount" Float
-
-/-- `server.requestTimeout` (added in Node.js v14.11.0): `readonly attribute double requestTimeout` -/
-def http.Server.requestTimeout (self : http.Server) : IO Float := self.val.get "requestTimeout" Float
-
-/-- `server.maxRequestsPerSocket` (added in Node.js v16.10.0): `readonly attribute double maxRequestsPerSocket` -/
-def http.Server.maxRequestsPerSocket (self : http.Server) : IO Float := self.val.get "maxRequestsPerSocket" Float
-
-/-- `server.timeout` (added in Node.js v0.9.12): `readonly attribute double timeout` -/
-def http.Server.timeout (self : http.Server) : IO Float := self.val.get "timeout" Float
-
-/-- `server.keepAliveTimeout` (added in Node.js v8.0.0): `readonly attribute double keepAliveTimeout` -/
-def http.Server.keepAliveTimeout (self : http.Server) : IO Float := self.val.get "keepAliveTimeout" Float
-
-/-- `server.keepAliveTimeoutBuffer` (added in Node.js v24.6.0): `readonly attribute double keepAliveTimeoutBuffer` -/
-def http.Server.keepAliveTimeoutBuffer (self : http.Server) : IO Float := self.val.get "keepAliveTimeoutBuffer" Float
-
-/-- `Event: 'checkContinue'` (added in Node.js v0.3.0): `http.Server onCheckContinue(http.Server.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
-def http.Server.onCheckContinue (self : http.Server) (listener : http.Server.CheckContinueListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "checkContinue", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'checkContinue'` (added in Node.js v0.3.0): `http.Server onceCheckContinue(http.Server.CheckContinueListener listener)`: calls `once("checkContinue", listener)` -/
-def http.Server.onceCheckContinue (self : http.Server) (listener : http.Server.CheckContinueListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "checkContinue", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'checkExpectation'` (added in Node.js v5.5.0): `http.Server onCheckExpectation(http.Server.CheckExpectationListener listener)`: calls `on("checkExpectation", listener)` -/
-def http.Server.onCheckExpectation (self : http.Server) (listener : http.Server.CheckExpectationListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "checkExpectation", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'checkExpectation'` (added in Node.js v5.5.0): `http.Server onceCheckExpectation(http.Server.CheckExpectationListener listener)`: calls `once("checkExpectation", listener)` -/
-def http.Server.onceCheckExpectation (self : http.Server) (listener : http.Server.CheckExpectationListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "checkExpectation", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'clientError'` (added in Node.js v0.1.94): `http.Server onClientError(http.Server.ClientErrorListener listener)`: calls `on("clientError", listener)` -/
-def http.Server.onClientError (self : http.Server) (listener : http.Server.ClientErrorListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "clientError", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'clientError'` (added in Node.js v0.1.94): `http.Server onceClientError(http.Server.ClientErrorListener listener)`: calls `once("clientError", listener)` -/
-def http.Server.onceClientError (self : http.Server) (listener : http.Server.ClientErrorListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "clientError", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'close'` (added in Node.js v0.1.4): `http.Server onClose(http.Server.CloseListener listener)`: calls `on("close", listener)` -/
-def http.Server.onClose (self : http.Server) (listener : http.Server.CloseListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'close'` (added in Node.js v0.1.4): `http.Server onceClose(http.Server.CloseListener listener)`: calls `once("close", listener)` -/
-def http.Server.onceClose (self : http.Server) (listener : http.Server.CloseListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'connect'` (added in Node.js v0.7.0): `http.Server onConnect(http.Server.ConnectListener listener)`: calls `on("connect", listener)` -/
-def http.Server.onConnect (self : http.Server) (listener : http.Server.ConnectListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connect", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'connect'` (added in Node.js v0.7.0): `http.Server onceConnect(http.Server.ConnectListener listener)`: calls `once("connect", listener)` -/
-def http.Server.onceConnect (self : http.Server) (listener : http.Server.ConnectListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connect", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'connection'` (added in Node.js v0.1.0): `http.Server onConnection(http.Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
-def http.Server.onConnection (self : http.Server) (listener : http.Server.ConnectionListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'connection'` (added in Node.js v0.1.0): `http.Server onceConnection(http.Server.ConnectionListener listener)`: calls `once("connection", listener)` -/
-def http.Server.onceConnection (self : http.Server) (listener : http.Server.ConnectionListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'dropRequest'` (added in Node.js v18.7.0, v16.17.0): `http.Server onDropRequest(http.Server.DropRequestListener listener)`: calls `on("dropRequest", listener)` -/
-def http.Server.onDropRequest (self : http.Server) (listener : http.Server.DropRequestListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "dropRequest", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'dropRequest'` (added in Node.js v18.7.0, v16.17.0): `http.Server onceDropRequest(http.Server.DropRequestListener listener)`: calls `once("dropRequest", listener)` -/
-def http.Server.onceDropRequest (self : http.Server) (listener : http.Server.DropRequestListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "dropRequest", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'request'` (added in Node.js v0.1.0): `http.Server onRequest(http.Server.RequestListener listener)`: calls `on("request", listener)` -/
-def http.Server.onRequest (self : http.Server) (listener : http.Server.RequestListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "request", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'request'` (added in Node.js v0.1.0): `http.Server onceRequest(http.Server.RequestListener listener)`: calls `once("request", listener)` -/
-def http.Server.onceRequest (self : http.Server) (listener : http.Server.RequestListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "request", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'upgrade'` (added in Node.js v0.1.94): `http.Server onUpgrade(http.Server.UpgradeListener listener)`: calls `on("upgrade", listener)` -/
-def http.Server.onUpgrade (self : http.Server) (listener : http.Server.UpgradeListener) : IO http.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "upgrade", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'upgrade'` (added in Node.js v0.1.94): `http.Server onceUpgrade(http.Server.UpgradeListener listener)`: calls `once("upgrade", listener)` -/
-def http.Server.onceUpgrade (self : http.Server) (listener : http.Server.UpgradeListener) : IO http.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "upgrade", toJS listener]) Value
-  pure { val := r }
-
-/-- `server.close([callback])` (added in Node.js v0.1.90): `undefined close()` -/
-def http.Server.close (self : http.Server) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
-
-/-- `server.closeAllConnections()` (added in Node.js v18.2.0): `undefined closeAllConnections()` -/
-def http.Server.closeAllConnections (self : http.Server) : IO Unit :=
-  self.val.callMethod "closeAllConnections" (Support.args #[]) Unit
-
-/-- `server.closeIdleConnections()` (added in Node.js v18.2.0): `undefined closeIdleConnections()` -/
-def http.Server.closeIdleConnections (self : http.Server) : IO Unit :=
-  self.val.callMethod "closeIdleConnections" (Support.args #[]) Unit
-
-/-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.9.12): `http.Server setTimeout(optional double msecs)` -/
-def http.Server.setTimeout (self : http.Server) (msecs : Option Float := none) : IO http.Server := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
   pure { val := r }
 
 /-- `http.METHODS` (added in Node.js v0.11.8): `readonly attribute sequence<DOMString> METHODS` (Node.js 24.22.2 documentation, http.md) -/
@@ -1401,9 +1489,9 @@ def http.get (options : Data) : IO http.ClientRequest := do
   pure { val := r }
 
 /-- `http.get(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((DOMString or URL) url, optional object options)` (Node.js 24.22.2 documentation, http.md) -/
-def http.getWithUrl (url : DOMStringOrURL) (options : Data := .undefined) : IO http.ClientRequest := do
+def http.getWithUrl (url_ : DOMStringOrURL) (options : Data := .undefined) : IO http.ClientRequest := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http.getWithUrl", module := "node:http", path := "get", construct := false, arity := 2 }
-    (Support.args #[toJS url, options]) (await := false)
+    (Support.args #[toJS url_, options]) (await := false)
   pure { val := r }
 
 /-- `http.request(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest request(http.RequestOptions options)` (Node.js 24.22.2 documentation, http.md) -/
@@ -1413,9 +1501,9 @@ def http.request (options : http.RequestOptions) : IO http.ClientRequest := do
   pure { val := r }
 
 /-- `http.request(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((DOMString or URL) url, optional http.RequestOptions options)` (Node.js 24.22.2 documentation, http.md) -/
-def http.requestWithUrl (url : DOMStringOrURL) (options : Option http.RequestOptions := none) : IO http.ClientRequest := do
+def http.requestWithUrl (url_ : DOMStringOrURL) (options : Option http.RequestOptions := none) : IO http.ClientRequest := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http.requestWithUrl", module := "node:http", path := "request", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional options]) (await := false)
+    (Support.args #[toJS url_, Support.optional options]) (await := false)
   pure { val := r }
 
 /-- `http.validateHeaderName(name[, label])` (added in Node.js v14.3.0): `undefined validateHeaderName(DOMString name, optional DOMString label)` (Node.js 24.22.2 documentation, http.md) -/

@@ -236,7 +236,9 @@ const inTier = (t, f) => { const saved = ctxTier; ctxTier = t; try { return f();
 // exposed to workers, only tier 1's interfaces visible); its members are its node.idl
 // definitions marked with its LasmLeanModule.
 const nodeDefs = [...defs.values()].filter(d => extAttr(d, 'LasmLeanModule') && !extAttr(d, 'LasmHost'));
-const nodeModules = nodeTier.modules.map(m => {
+// In node-api.mjs's import order (node-modules.json: each module after those whose types it uses).
+const nodeModuleOrder = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'node-modules.json'), 'utf8')).modules;
+const nodeModules = nodeModuleOrder.map(m => {
   const mine = nodeDefs.filter(d => extValue(extAttr(d, 'LasmLeanModule')) === m.name);
   return { name: m.name, title: m.title, specs: `Node.js ${nodeTier.version} documentation, ${m.doc}.md`, tier: 1, ns: NODE_NS, key: `${NODE_NS}.${m.name}`,
     interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name) };
