@@ -548,8 +548,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunPDFOptionsGotoOptionsW
 
 /-- `dictionary BrowserRunPDFOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -590,8 +590,8 @@ structure BrowserRunBaseOptionsWaitForSelector where
   hidden : Option Bool := none
   /-- `boolean visible` -/
   visible : Option Bool := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance : ToJS BrowserRunBaseOptionsWaitForSelector := ⟨fun d => Support.fields #[("selector", toJS d.selector),
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
@@ -644,8 +644,8 @@ structure BrowserRunPDFOptionsPdfOptions where
   tagged : Option Bool := none
   /-- `boolean outline` -/
   outline : Option Bool := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance : ToJS BrowserRunPDFOptionsPdfOptions := ⟨fun d => Support.fields #[("scale", Support.optional d.scale),
     ("displayHeaderFooter", Support.optional d.displayHeaderFooter),
     ("headerTemplate", Support.optional d.headerTemplate),
@@ -761,8 +761,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunQuickActionOptionsGoto
 
 /-- `dictionary BrowserRunQuickActionOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunQuickActionOptionsGotoOptionsWaitUntilOrBrowserRunQuickActionOptionsGotoOptionsWaitUntil2OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil3OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunQuickActionOptionsGotoOptionsWaitUntilOrBrowserRunQuickActionOptionsGotoOptionsWaitUntil2OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil3OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -887,8 +887,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunLinksOptionsGotoOption
 
 /-- `dictionary BrowserRunLinksOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -1001,8 +1001,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunScrapeOptionsGotoOptio
 
 /-- `dictionary BrowserRunScrapeOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -1118,8 +1118,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunSnapshotOptionsGotoOpt
 
 /-- `dictionary BrowserRunSnapshotOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -1277,8 +1277,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunScreenshotOptionsGotoO
 
 /-- `dictionary BrowserRunScreenshotOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -1424,8 +1424,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunAccessibilityTreeOptio
 
 /-- `dictionary BrowserRunAccessibilityTreeOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntilOrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntilOrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -1770,8 +1770,8 @@ instance : FromJS BrowserRunLiveView where
 
 /-- `dictionary BrowserRunListSessionsOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunListSessionsOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double offset` -/
   offset : Option Float := none
 instance : ToJS BrowserRunListSessionsOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
@@ -2111,8 +2111,8 @@ instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunBaseOptionsGotoOptions
 
 /-- `dictionary BrowserRunBaseOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `BrowserRunBaseOptionsGotoOptionsWaitUntilOrBrowserRunBaseOptionsGotoOptionsWaitUntil2OrBrowserRunBaseOptionsGotoOptionsWaitUntil3OrBrowserRunBaseOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
   waitUntil : Option BrowserRunBaseOptionsGotoOptionsWaitUntilOrBrowserRunBaseOptionsGotoOptionsWaitUntil2OrBrowserRunBaseOptionsGotoOptionsWaitUntil3OrBrowserRunBaseOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
   /-- `DOMString referer` -/
@@ -2200,8 +2200,8 @@ instance : ToJS BrowserRunJsonBaseOptions := ⟨fun d => Support.fields #[("cust
 structure BrowserRunRedirectHop where
   /-- `required DOMString url` -/
   url : String
-  /-- `required double status` -/
-  status : Float
+  /-- `required double /* integer: Nat */ status` -/
+  status : Nat
   /-- `required record<DOMString, DOMString> headers` -/
   headers : Record String
 instance : ToJS BrowserRunRedirectHop := ⟨fun d => Support.fields #[("url", toJS d.url),
@@ -2210,8 +2210,8 @@ instance : ToJS BrowserRunRedirectHop := ⟨fun d => Support.fields #[("url", to
 
 /-- `dictionary BrowserRunResponseMeta` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunResponseMeta where
-  /-- `required double status` -/
-  status : Float
+  /-- `required double /* integer: Nat */ status` -/
+  status : Nat
   /-- `required DOMString title` -/
   title : String
   /-- `record<DOMString, DOMString> headers` -/

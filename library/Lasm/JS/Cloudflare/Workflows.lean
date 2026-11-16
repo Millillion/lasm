@@ -351,23 +351,23 @@ instance : FromJS WorkflowInstanceEventType where
 structure WorkflowDynamicDelayContextCtxStep where
   /-- `required DOMString name` -/
   name : String
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
 instance : FromJS WorkflowDynamicDelayContextCtxStep where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
-    count := ← Lasm.JS.readField Float d "count" }
+    count := ← Lasm.JS.readField Nat d "count" }
   typeName := "Lasm.JS.Cloudflare.WorkflowDynamicDelayContextCtxStep"
 
 /-- `dictionary WorkflowDynamicDelayContextCtxConfigRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowDynamicDelayContextCtxConfigRetries where
-  /-- `required double limit` -/
-  limit : Float
+  /-- `required double /* integer: Nat */ limit` -/
+  limit : Nat
   /-- `WorkflowBackoff backoff` -/
   backoff : Option WorkflowBackoff := none
 instance : FromJS WorkflowDynamicDelayContextCtxConfigRetries where
   fromJS d := do return {
-    limit := ← Lasm.JS.readField Float d "limit",
+    limit := ← Lasm.JS.readField Nat d "limit",
     backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
   typeName := "Lasm.JS.Cloudflare.WorkflowDynamicDelayContextCtxConfigRetries"
 
@@ -509,8 +509,8 @@ instance : Coe WorkflowDelayFunction DOMStringOrDoubleOrWorkflowDelayFunction :=
 
 /-- `dictionary WorkflowStepConfigRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigRetries where
-  /-- `required double limit` -/
-  limit : Float
+  /-- `required double /* integer: Nat */ limit` -/
+  limit : Nat
   /-- `required DOMStringOrDoubleOrWorkflowDelayFunction delay` -/
   delay : DOMStringOrDoubleOrWorkflowDelayFunction
   /-- `WorkflowBackoff backoff` -/
@@ -571,8 +571,8 @@ def WorkflowStepDoCallback3.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO 
 
 /-- `dictionary WorkflowStepConfigWithDelayFunctionRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithDelayFunctionRetries where
-  /-- `required double limit` -/
-  limit : Float
+  /-- `required double /* integer: Nat */ limit` -/
+  limit : Nat
   /-- `required WorkflowDelayFunction delay` -/
   delay : WorkflowDelayFunction
   /-- `WorkflowBackoff backoff` -/
@@ -615,8 +615,8 @@ def WorkflowStepDoCallback4.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO 
 
 /-- `dictionary WorkflowStepConfigWithStaticDelayRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithStaticDelayRetries where
-  /-- `required double limit` -/
-  limit : Float
+  /-- `required double /* integer: Nat */ limit` -/
+  limit : Nat
   /-- `required DOMStringOrDouble delay` -/
   delay : DOMStringOrDouble
   /-- `WorkflowBackoff backoff` -/
@@ -851,8 +851,8 @@ instance : ToJS WorkflowInstanceTerminateOptions := ⟨fun d => Support.fields #
 structure WorkflowInstanceRestartOptionsFrom where
   /-- `required DOMString name` -/
   name : String
-  /-- `double count` -/
-  count : Option Float := none
+  /-- `double /* integer: Nat */ count` -/
+  count : Option Nat := none
   /-- `WorkflowInstanceRestartOptionsFromType type` -/
   type : Option WorkflowInstanceRestartOptionsFromType := none
 instance : ToJS WorkflowInstanceRestartOptionsFrom := ⟨fun d => Support.fields #[("name", toJS d.name),
@@ -921,8 +921,8 @@ instance : ToJS WorkflowError := ⟨fun d => Support.fields #[("code", Support.o
 
 /-- `dictionary WorkflowCreateBatchOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowCreateBatchOptions where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `any params` -/
   params : Data := .undefined
   /-- `WorkflowCreateBatchOptionsRetention retention` -/

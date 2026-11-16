@@ -27,14 +27,14 @@ instance : FromJS KVNamespace := ⟨fun | .ref v _ => .ok { val := v } | _ => .e
 
 /-- `dictionary KVNamespaceGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceGetOptions where
-  /-- `double cacheTtl` -/
-  cacheTtl : Option Float := none
+  /-- `double /* integer: Nat */ cacheTtl` -/
+  cacheTtl : Option Nat := none
 instance : ToJS KVNamespaceGetOptions := ⟨fun d => Support.fields #[("cacheTtl", Support.optional d.cacheTtl)]⟩
 
 /-- `dictionary KVNamespaceListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceListOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString? prefix` -/
   «prefix» : Option String := none
   /-- `DOMString? cursor` -/
@@ -47,14 +47,14 @@ instance : ToJS KVNamespaceListOptions := ⟨fun d => Support.fields #[("limit",
 structure KVNamespaceListKey where
   /-- `required DOMString name` -/
   name : String
-  /-- `double expiration` -/
-  expiration : Option Float := none
+  /-- `double /* integer: Nat */ expiration` -/
+  expiration : Option Nat := none
   /-- `any metadata` -/
   metadata : Data := .undefined
 instance : FromJS KVNamespaceListKey where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
-    expiration := ← Lasm.JS.readField (Option Float) d "expiration",
+    expiration := ← Lasm.JS.readField (Option Nat) d "expiration",
     metadata := ← Lasm.JS.readField Data d "metadata" }
   typeName := "Lasm.JS.Cloudflare.KVNamespaceListKey"
 
@@ -94,10 +94,10 @@ instance : Coe ByteArray DOMStringOrReadableStreamOrBufferSource := ⟨.bufferSo
 
 /-- `dictionary KVNamespacePutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespacePutOptions where
-  /-- `double expiration` -/
-  expiration : Option Float := none
-  /-- `double expirationTtl` -/
-  expirationTtl : Option Float := none
+  /-- `double /* integer: Nat */ expiration` -/
+  expiration : Option Nat := none
+  /-- `double /* integer: Nat */ expirationTtl` -/
+  expirationTtl : Option Nat := none
   /-- `any metadata` -/
   metadata : Data := .undefined
 instance : ToJS KVNamespacePutOptions := ⟨fun d => Support.fields #[("expiration", Support.optional d.expiration),

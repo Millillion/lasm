@@ -2002,8 +2002,8 @@ structure RequestInitCfProperties where
   cacheKey : Option String := none
   /-- `sequence<DOMString> cacheTags` -/
   cacheTags : Option (Array String) := none
-  /-- `double cacheTtl` -/
-  cacheTtl : Option Float := none
+  /-- `double /* integer: Nat */ cacheTtl` -/
+  cacheTtl : Option Nat := none
   /-- `record<DOMString, double> cacheTtlByStatus` -/
   cacheTtlByStatus : Option (Record Float) := none
   /-- `RequestInitCfPropertiesOriginRangeRequests originRangeRequests` -/

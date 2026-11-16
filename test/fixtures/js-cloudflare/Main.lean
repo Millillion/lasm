@@ -231,7 +231,7 @@ def kv (r : Checks) (live : Live) (env : Env) : Async Unit := do
   let res ← ns.list (some { «prefix» := some "ttl" })
   let now := (← dateNow) / 1000
   match res.keys.find? (·.name == "ttl") |>.bind (·.expiration) with
-  | some e => expect r "kv expirationTtl" (e > now + 3500 && e < now + 3700) s!"{e} vs {now}"
+  | some e => expect r "kv expirationTtl" (e.toFloat > now + 3500 && e.toFloat < now + 3700) s!"{e} vs {now}"
   | none => expect r "kv expirationTtl" false "no expiration listed"
 
 /-! D1 -/
@@ -302,7 +302,7 @@ def r2 (r : Checks) (live : Live) (env : Env) : Async Unit := do
       httpMetadata := some (.r2HTTPMetadata { contentType := some "application/x-lasm" }),
       customMetadata := some ⟨#[("index", toString i)]⟩ })
     if i == 0 then live.modify (·.push ("R2Object", put.val))
-    expect r s!"r2 put [{i}]" ((← put.key) == key && (← put.size) == n.toFloat && (← put.httpEtag) == s!"\"{← put.etag}\"") s!"{← put.size}"
+    expect r s!"r2 put [{i}]" ((← put.key) == key && (← put.size) == n && (← put.httpEtag) == s!"\"{← put.etag}\"") s!"{← put.size}"
     match ← bucket.get key with
     | some body =>
       if i == 0 then live.modify (·.push ("R2ObjectBody", body.val))
@@ -313,7 +313,7 @@ def r2 (r : Checks) (live : Live) (env : Env) : Async Unit := do
     | some h =>
       let httpMeta ← h.httpMetadata
       let custom ← h.customMetadata
-      expect r s!"r2 head [{i}]" ((← h.size) == n.toFloat && (httpMeta.bind (·.contentType)) == some "application/x-lasm"
+      expect r s!"r2 head [{i}]" ((← h.size) == n && (httpMeta.bind (·.contentType)) == some "application/x-lasm"
         && (custom.map (·.entries)) == some #[("index", toString i)]) s!"{← h.size} {httpMeta.bind (·.contentType)} {custom.map (·.entries)}"
       -- R2's MD5 checksum of a single-part object is the MD5 of its bytes
       let checksums ← h.checksums
@@ -330,7 +330,7 @@ def r2 (r : Checks) (live : Live) (env : Env) : Async Unit := do
     let (o, g') := g.below 4000; g := g'
     let (l, g') := g.below 96; g := g'
     let len := l + 1
-    match ← bucket.get "ranges" (some { range := some (.r2Range { offset := some o.toFloat, length := some len.toFloat }) }) with
+    match ← bucket.get "ranges" (some { range := some (.r2Range { offset := some o.toFloat, length := some len }) }) with
     | some body =>
       let bytes ← body.bytes
       expect r s!"r2 range [{i}]" (bytesEq bytes (b.extract o (o + len))) s!"{bytes.size} bytes at {o} (asked {len})"
@@ -395,7 +395,7 @@ def r2 (r : Checks) (live : Live) (env : Env) : Async Unit := do
   expect r "r2 resumeMultipartUpload" ((← resumed.uploadId) == (← upload.uploadId) && (← resumed.key) == "multi") ""
   let part2 ← resumed.uploadPart 2 (.bufferSource p2)
   let done ← upload.complete #[part1, part2]
-  expect r "r2 multipart size" ((← done.size) == (p1.size + p2.size).toFloat) s!"{← done.size}"
+  expect r "r2 multipart size" ((← done.size) == (p1.size + p2.size)) s!"{← done.size}"
   match ← bucket.get "multi" with
   | some body => expect r "r2 multipart bytes" (bytesEq (← body.bytes) (p1 ++ p2)) ""
   | none => expect r "r2 multipart bytes" false "none"
@@ -536,7 +536,7 @@ def sockets (r : Checks) (live : Live) (env : Env) : Async Unit := do
   let mut g : Rng := ⟨61⟩
   for i in [0:3] do
     let (b, g') := g.bytes (1000 + 7000 * i); g := g'
-    let socket ← if i % 2 == 0 then connect (.socketAddress { hostname := "127.0.0.1", port := p.toFloat })
+    let socket ← if i % 2 == 0 then connect (.socketAddress { hostname := "127.0.0.1", port := p })
       else connect (.domString s!"127.0.0.1:{p}")
     if i == 0 then live.modify (·.push ("Socket", socket.val))
     let _info ← socket.opened

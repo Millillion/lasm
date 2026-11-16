@@ -68,8 +68,8 @@ def Hyperdrive.host (self : Hyperdrive) : IO String := self.val.get "host" Strin
 /-- `readonly ip: string`: `readonly attribute DOMString ip` -/
 def Hyperdrive.ip (self : Hyperdrive) : IO String := self.val.get "ip" String
 
-/-- `readonly port: number`: `readonly attribute double port` -/
-def Hyperdrive.port (self : Hyperdrive) : IO Float := self.val.get "port" Float
+/-- `readonly port: number`: `readonly attribute double /* integer: Nat */ port` -/
+def Hyperdrive.port (self : Hyperdrive) : IO Nat := self.val.get "port" Nat
 
 /-- `readonly user: string`: `readonly attribute DOMString user` -/
 def Hyperdrive.user (self : Hyperdrive) : IO String := self.val.get "user" String

@@ -102,8 +102,8 @@ instance : ToJS TextOptionsFont := ⟨fun d => Support.fields #[("url", toJS d.u
 structure TextOptions where
   /-- `required TextOptionsFont font` -/
   font : TextOptionsFont
-  /-- `double size` -/
-  size : Option Float := none
+  /-- `double /* integer: Nat */ size` -/
+  size : Option Nat := none
   /-- `DOMString color` -/
   color : Option String := none
 instance : ToJS TextOptions := ⟨fun d => Support.fields #[("font", toJS d.font),

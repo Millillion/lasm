@@ -656,8 +656,8 @@ instance : ToJS ImageListFilter := ⟨fun d => Support.fields #[("metadata", Sup
 
 /-- `dictionary ImageListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageListOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString cursor` -/
   cursor : Option String := none
   /-- `ImageListOptionsSortOrder sortOrder` -/

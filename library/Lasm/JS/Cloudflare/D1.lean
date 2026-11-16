@@ -108,13 +108,13 @@ instance : FromJS D1Result where
 
 /-- `dictionary D1ExecResult` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure D1ExecResult where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required double duration` -/
   duration : Float
 instance : FromJS D1ExecResult where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     duration := ← Lasm.JS.readField Float d "duration" }
   typeName := "Lasm.JS.Cloudflare.D1ExecResult"
 
@@ -182,7 +182,7 @@ def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1Pre
   self.val.callMethodAwait "raw" (Support.args #[Support.optional options]) (Array (Array Data))
 
 /-- `raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>`: `Promise<sequence<any>> raw(any options)` -/
-def D1PreparedStatement.raw1 (self : D1PreparedStatement) (options : Data) : Async (Array Data) :=
+def D1PreparedStatement.rawWithColumnNames (self : D1PreparedStatement) (options : Data) : Async (Array Data) :=
   self.val.callMethodAwait "raw" (Support.args #[toJS options]) (Array Data)
 
 end Lasm.JS.Cloudflare

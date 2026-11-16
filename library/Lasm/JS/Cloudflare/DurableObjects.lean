@@ -302,8 +302,8 @@ structure DurableObjectListOptions where
   «prefix» : Option String := none
   /-- `boolean reverse` -/
   reverse : Option Bool := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `boolean allowConcurrency` -/
   allowConcurrency : Option Bool := none
   /-- `boolean noCache` -/
@@ -572,8 +572,8 @@ structure SyncKvListOptions where
   «prefix» : Option String := none
   /-- `boolean reverse` -/
   reverse : Option Bool := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
 instance : ToJS SyncKvListOptions := ⟨fun d => Support.fields #[("start", Support.optional d.start),
     ("startAfter", Support.optional d.startAfter),
     ("end", Support.optional d.«end»),

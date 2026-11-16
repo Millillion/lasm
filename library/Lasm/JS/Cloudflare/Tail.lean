@@ -459,12 +459,12 @@ instance : FromJS ReturnType where
 
 /-- `dictionary TraceItemFetchEventInfoResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TraceItemFetchEventInfoResponse where
-  /-- `required double status` -/
-  status : Float
+  /-- `required double /* integer: Nat */ status` -/
+  status : Nat
 instance : ToJS TraceItemFetchEventInfoResponse := ⟨fun d => Support.fields #[("status", toJS d.status)]⟩
 instance : FromJS TraceItemFetchEventInfoResponse where
   fromJS d := do return {
-    status := ← Lasm.JS.readField Float d "status" }
+    status := ← Lasm.JS.readField Nat d "status" }
   typeName := "Lasm.JS.Cloudflare.TraceItemFetchEventInfoResponse"
 
 /-- `dictionary TraceItemFetchEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -998,8 +998,8 @@ instance : ToJS CustomEventInfo := ⟨fun d => Support.fields #[("type", toJS d.
 structure FetchResponseInfo where
   /-- `required FetchEventInfoType type` -/
   type : FetchEventInfoType
-  /-- `required double statusCode` -/
-  statusCode : Float
+  /-- `required double /* integer: Nat */ statusCode` -/
+  statusCode : Nat
 instance : ToJS FetchResponseInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("statusCode", toJS d.statusCode)]⟩
 
@@ -1277,8 +1277,8 @@ instance : ToJS Exception := ⟨fun d => Support.fields #[("type", toJS d.type),
 structure DroppedEventsDiagnostic where
   /-- `required DroppedEventsDiagnosticDiagnosticsType diagnosticsType` -/
   diagnosticsType : DroppedEventsDiagnosticDiagnosticsType
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
 instance : ToJS DroppedEventsDiagnostic := ⟨fun d => Support.fields #[("diagnosticsType", toJS d.diagnosticsType),
     ("count", toJS d.count)]⟩
 

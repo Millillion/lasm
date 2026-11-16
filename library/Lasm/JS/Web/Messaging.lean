@@ -139,6 +139,10 @@ instance : ToJS PromiseRejectionEventInit := ⟨fun d => Support.fields #[("bubb
     ("promise", toJS d.promise),
     ("reason", d.reason)]⟩
 
+/-- `v instanceof MessageChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MessageChannel`). -/
+def MessageChannel.cast? (v : Value) : IO (Option MessageChannel) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MessageChannel"] Value) v) then some { val := v } else none
+
 /-- `constructor()` -/
 def MessageChannel.new : IO MessageChannel :=
   Lasm.JS.Binding.invoke MessageChannel { name := "Lasm.JS.Web.MessageChannel.new", module := "globalThis", path := "MessageChannel", construct := true, arity := 0 }
@@ -153,6 +157,10 @@ def MessageChannel.port1 (self : MessageChannel) : IO MessagePort := do
 def MessageChannel.port2 (self : MessageChannel) : IO MessagePort := do
   let r ← self.val.get "port2" Value
   pure { val := r }
+
+/-- `v instanceof MessagePort`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MessagePort`). -/
+def MessagePort.cast? (v : Value) : IO (Option MessagePort) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MessagePort"] Value) v) then some { val := v } else none
 
 /-- `attribute EventHandler onmessage` -/
 def MessagePort.onmessage (self : MessagePort) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)
@@ -184,6 +192,10 @@ def MessagePort.start (self : MessagePort) : IO Unit :=
 def MessagePort.close (self : MessagePort) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
+/-- `v instanceof MessageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MessageEvent`). -/
+def MessageEvent.cast? (v : Value) : IO (Option MessageEvent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MessageEvent"] Value) v) then some { val := v } else none
+
 /-- `constructor(DOMString type, optional MessageEventInit eventInitDict)` -/
 def MessageEvent.new (type : String) (eventInitDict : Option MessageEventInit := none) : IO MessageEvent :=
   Lasm.JS.Binding.invoke MessageEvent { name := "Lasm.JS.Web.MessageEvent.new", module := "globalThis", path := "MessageEvent", construct := true, arity := 2 }
@@ -208,6 +220,10 @@ def MessageEvent.ports (self : MessageEvent) : IO (Array MessagePort) := self.va
 def MessageEvent.initMessageEvent (self : MessageEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (data : Data := .undefined) (origin : Option String := none) (lastEventId : Option String := none) (source : Option MessageEventSource := none) (ports : Option (Array MessagePort) := none) : IO Unit :=
   self.val.callMethod "initMessageEvent" (Support.args #[toJS type, Support.optional bubbles, Support.optional cancelable, data, Support.optional origin, Support.optional lastEventId, Support.optional source, Support.optional ports]) Unit
 
+/-- `v instanceof ErrorEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ErrorEvent`). -/
+def ErrorEvent.cast? (v : Value) : IO (Option ErrorEvent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ErrorEvent"] Value) v) then some { val := v } else none
+
 /-- `constructor(DOMString type, optional ErrorEventInit eventInitDict)` -/
 def ErrorEvent.new (type : String) (eventInitDict : Option ErrorEventInit := none) : IO ErrorEvent :=
   Lasm.JS.Binding.invoke ErrorEvent { name := "Lasm.JS.Web.ErrorEvent.new", module := "globalThis", path := "ErrorEvent", construct := true, arity := 2 }
@@ -227,6 +243,10 @@ def ErrorEvent.colno (self : ErrorEvent) : IO Nat := self.val.get "colno" Nat
 
 /-- `readonly attribute any error` -/
 def ErrorEvent.error (self : ErrorEvent) : IO Data := self.val.get "error" Data
+
+/-- `v instanceof PromiseRejectionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PromiseRejectionEvent`). -/
+def PromiseRejectionEvent.cast? (v : Value) : IO (Option PromiseRejectionEvent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PromiseRejectionEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, PromiseRejectionEventInit eventInitDict)` -/
 def PromiseRejectionEvent.new (type : String) (eventInitDict : PromiseRejectionEventInit) : IO PromiseRejectionEvent :=

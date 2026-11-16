@@ -256,12 +256,12 @@ instance : FromJS VectorizeMatch where
 structure VectorizeMatches where
   /-- `required sequence<VectorizeMatch> matches` -/
   «matches» : Array VectorizeMatch
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
 instance : FromJS VectorizeMatches where
   fromJS d := do return {
     «matches» := ← Lasm.JS.readField (Array VectorizeMatch) d "matches",
-    count := ← Lasm.JS.readField Float d "count" }
+    count := ← Lasm.JS.readField Nat d "count" }
   typeName := "Lasm.JS.Cloudflare.VectorizeMatches"
 
 /-- `dictionary VectorizeVector` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -290,12 +290,12 @@ instance : FromJS VectorizeVector where
 structure VectorizeVectorMutation where
   /-- `required sequence<DOMString> ids` -/
   ids : Array String
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
 instance : FromJS VectorizeVectorMutation where
   fromJS d := do return {
     ids := ← Lasm.JS.readField (Array String) d "ids",
-    count := ← Lasm.JS.readField Float d "count" }
+    count := ← Lasm.JS.readField Nat d "count" }
   typeName := "Lasm.JS.Cloudflare.VectorizeVectorMutation"
 
 /-- `dictionary VectorizeIndexInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/

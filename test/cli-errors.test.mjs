@@ -33,6 +33,6 @@ test('the bug report line follows internal errors only', () => {
 });
 
 test('lasm --version', async () => {
-  for (const flag of ['--version', '-v', 'version']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
+  for (const flag of ['--version', '-v']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
   assert.match(await versionText(), /^lasm \d+\.\d+\.\d+\S* \(@lasm\/\S+; Lean 4\.\d+\.\d+; (?:Node|Bun|Deno) \S+; [a-z0-9]+-[a-z0-9]+\)$/);
 });

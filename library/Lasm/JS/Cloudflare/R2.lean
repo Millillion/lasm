@@ -109,8 +109,8 @@ instance : Coe Headers R2ConditionalOrHeaders := ⟨.headers⟩
 structure R2Range where
   /-- `double offset` -/
   offset : Option Float := none
-  /-- `double length` -/
-  length : Option Float := none
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
   /-- `double suffix` -/
   suffix : Option Float := none
 instance : ToJS R2Range := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
@@ -119,7 +119,7 @@ instance : ToJS R2Range := ⟨fun d => Support.fields #[("offset", Support.optio
 instance : FromJS R2Range where
   fromJS d := do return {
     offset := ← Lasm.JS.readField (Option Float) d "offset",
-    length := ← Lasm.JS.readField (Option Float) d "length",
+    length := ← Lasm.JS.readField (Option Nat) d "length",
     suffix := ← Lasm.JS.readField (Option Float) d "suffix" }
   typeName := "Lasm.JS.Cloudflare.R2Range"
 
@@ -346,8 +346,8 @@ instance : FromJS DOMStringOrSequenceOfDOMString where
 
 /-- `dictionary R2ListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2ListOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString prefix` -/
   «prefix» : Option String := none
   /-- `DOMString cursor` -/
@@ -433,7 +433,7 @@ def R2Bucket.get (self : R2Bucket) (key : String) (options : Option R2GetOptions
   self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option R2ObjectBody)
 
 /-- `get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>`: `Promise<R2ObjectBodyOrR2Object?> get(DOMString key, R2BucketGetOptions options)` -/
-def R2Bucket.get2 (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := do
+def R2Bucket.getWithOnlyIf (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := do
   let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS options]) Data
   Support.optionalValue r
 
@@ -443,7 +443,7 @@ def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStream
   pure { val := r }
 
 /-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>`: `Promise<R2Object?> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2BucketPutOptions options)` -/
-def R2Bucket.put3 (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) :=
+def R2Bucket.putWithOnlyIf (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) :=
   self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) (Option R2Object)
 
 /-- `createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>`: `Promise<R2MultipartUpload> createMultipartUpload(DOMString key, optional R2MultipartOptions options)` -/
@@ -470,8 +470,8 @@ def R2Object.key (self : R2Object) : IO String := self.val.get "key" String
 /-- `readonly version: string`: `readonly attribute DOMString version` -/
 def R2Object.version (self : R2Object) : IO String := self.val.get "version" String
 
-/-- `readonly size: number`: `readonly attribute double size` -/
-def R2Object.size (self : R2Object) : IO Float := self.val.get "size" Float
+/-- `readonly size: number`: `readonly attribute double /* integer: Nat */ size` -/
+def R2Object.size (self : R2Object) : IO Nat := self.val.get "size" Nat
 
 /-- `readonly etag: string`: `readonly attribute DOMString etag` -/
 def R2Object.etag (self : R2Object) : IO String := self.val.get "etag" String

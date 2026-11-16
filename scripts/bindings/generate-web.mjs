@@ -22,6 +22,7 @@ import * as nodeTier from './node-tier2.mjs';
 import * as serveTier from './serve-tier2.mjs';
 import * as cloudflareTier from './cloudflare-tier3.mjs';
 import * as browser from './web-browser.mjs';
+import * as overrides from './overrides.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(import.meta.url);
@@ -44,11 +45,15 @@ const NODE_NS = 'Lasm.JS.Node';
 const nodeIdlFile = join(root, 'scripts', 'bindings', 'node.idl');
 
 const fail = message => { throw new Error(`generate-web: ${message}`); };
+
 // The runtimes generated from TypeScript declarations: Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs),
 // Lasm.JS.Cloudflare (cloudflare-tier3.mjs).
 const hosts = [...serveTier.hosts, ...cloudflareTier.hosts];
 /** What a host's declarations are, for doc comments: `Deno 2.9.6`, `@cloudflare/workers-types 5.20261019.1`. */
 const hostSource = h => `${h.npm ?? h.name} ${h.version}`;
+// The reviewed override table (scripts/bindings/overrides.json; docs/BINDING_RULES.md), for the
+// namespaces this generator writes.
+const ov = overrides.forNamespaces([NS, NODE_NS, ...hosts.map(h => `Lasm.JS.${h.name}`)]);
 
 // ---------- reading the IDL ----------
 
@@ -131,6 +136,25 @@ for (const { spec, d } of asts) {
   }
 }
 const def = name => defs.get(name);
+
+// Rule A11 (docs/BINDING_RULES.md): a `number` of a source that does not type integers (Node's
+// docs, TypeScript declarations, lowered to WebIDL `double`) is an integer when its name is in
+// the integer table (overrides.json `integers`): `unsigned long long` (Nat) or `long long` (Int).
+// WebIDL from webref types its integers itself and is left as it is.
+const webrefSpecs = new Set([...fullSpecs, ...typeSpecs, 'synthetic']);
+const narrow = (t, owner, name) => {
+  if (!t || t.union || t.generic || !['double', 'unrestricted double'].includes(t.idlType)) return;
+  const type = ov.integer(owner, name);
+  if (type) Object.assign(t, { narrowedFrom: `${t.idlType} /* integer: ${type} */`, idlType: type === 'Nat' ? 'unsigned long long' : 'long long' });
+};
+for (const d of defs.values()) {
+  if (d.type === 'callback' && d.spec && !webrefSpecs.has(d.spec)) for (const a of d.arguments ?? []) narrow(a.idlType, d.name, a.name);
+  for (const m of d.members) {
+    if (webrefSpecs.has(m.spec)) continue;
+    if (m.type === 'attribute' || m.type === 'field') narrow(m.idlType, d.name, m.name);
+    if (m.type === 'operation' || m.type === 'constructor') for (const a of m.arguments) narrow(a.idlType, d.name, a.name);
+  }
+}
 
 // ---------- names ----------
 
@@ -341,7 +365,7 @@ function idlText(t) {
   let s;
   if (t.union) s = '(' + t.idlType.map(idlText).join(' or ') + ')';
   else if (t.generic) s = `${t.generic}<${t.idlType.map(idlText).join(', ')}>`;
-  else s = idlText(t.idlType);
+  else s = t.narrowedFrom ?? idlText(t.idlType);
   return s + (t.nullable ? '?' : '');
 }
 
@@ -862,10 +886,17 @@ function emitInterface(module, name) {
     // An instance where its parent is expected (an HTMLElement for a Node argument).
     if (parent) decls.push(`instance : Coe ${T} ${parent} := ⟨${T}.to${parent.split('.').at(-1)}⟩`);
     o.types.push(decls.join('\n'));
+    // Rule A12: a checked downcast through the interface object's prototype (`instanceof`), for
+    // every interface JavaScript code can name: not [LegacyNoInterfaceObject] ones, not Deno's and
+    // Bun's declared-only interfaces, not Node classes their module does not export.
+    const ctor = hostOf(d) || extAttr(d, 'LegacyNoInterfaceObject') ? null
+      : isNode ? (extValue(extAttr(d, 'LasmPath')) ? `Support.getExport "${jsModule}" [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value` : null)
+      : `Support.getGlobal [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value`;
+    if (ctor) o.decls.push(`/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) := do\n  return if (← Lasm.JS.Web.Support.isInstance (${ctor}) v) then some { val := v } else none`);
   }
 
   const members = membersOf(name);
-  const taken = new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn']);
+  const taken = new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn', 'cast?']);
   const take = (n, what) => { if (taken.has(n)) fail(`${T}.${n} (${what}) is generated twice`); taken.add(n); return n; };
   const staticNames = new Set(members.filter(m => m.special === 'static').map(memberName));
   const instanceNames = new Set(members.filter(m => m.special !== 'static' && m.name).map(memberName));
@@ -875,7 +906,7 @@ function emitInterface(module, name) {
   // Constructors.
   // [HTMLConstructor] constructors construct only custom elements (subclasses); for the element itself they throw.
   const ctors = members.filter(m => m.type === 'constructor' && !extAttr(m, 'HTMLConstructor'));
-  overloadNames(ctors.map(c => ({ ...c, name: constructorName }))).forEach((n, i) => {
+  overloadNames(ctors.map(c => ({ ...c, name: constructorName }))).map(n => ov.name(`${ns}.${T}.${n}`)).forEach((n, i) => {
     const c = ctors[i];
     for (const a of c.arguments) requireType(module, resolve(a.idlType));
     const al = argumentList(c.arguments, module);
@@ -934,7 +965,7 @@ function emitInterface(module, name) {
     (fixed ? [fixed] : overloadNames(group)).forEach((n0, i) => {
       const op = group[i];
       const isStatic = op.special === 'static';
-      const n = isStatic && instanceNames.has(op.name) ? 'static' + capital(n0) : n0;
+      const n = ov.name(`${ns}.${T}.${isStatic && instanceNames.has(op.name) ? 'static' + capital(n0) : n0}`);
       for (const a of op.arguments) requireType(module, resolve(a.idlType));
       requireType(module, resolve(op.idlType));
       const al = argumentList(op.arguments, module);
@@ -998,7 +1029,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
     groups.get(m.name).push(m);
   }
   for (const group of groups.values()) {
-    overloadNames(group).forEach((n, i) => {
+    overloadNames(group).map(n => ov.name(`${ns}.${leanPrefix}${n}`)).forEach((n, i) => {
       const op = group[i];
       for (const a of op.arguments) requireType(module, resolve(a.idlType));
       requireType(module, resolve(op.idlType));
@@ -1061,8 +1092,12 @@ function emitCallback(module, name) {
     `instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`,
     `instance : ToJS ${T} := ⟨fun x => .ref x.val ""⟩`,
     `instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${nsOf(module)}.${T}", .data⟩`,
+
     `/-- A JavaScript function that runs \`f\` asynchronously (\`Lasm.JS.Function.ofFn\`): it returns a promise at once and \`f\` runs as a Lean task, holding no Lean thread while it awaits. -/\ndef ${T}.ofFn${typeBinders(...resolved)} (f : ${fnType('Async')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`,
     `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn${typeBinders(...resolved)} (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
+  // Rule A10: reviewed aliases of the mechanical name (overrides.json `aliases`).
+  for (const a of ov.aliasesOf(`${nsOf(module)}.${T}`))
+    lines.push(`/-- \`${a.alias.split('.').at(-1)}\`: \`${T}\` (an alias, docs/API_DECISIONS.md ${a.decision}: ${docText(a.why)}). -/\nabbrev ${a.alias.slice(nsOf(module).length + 1)} := ${T}`);
   return lines.join('\n');
 }
 function emitDict(module, name) {
@@ -1372,6 +1407,7 @@ def json : String := r#"${JSON.stringify(serveSurface)}"#
 end Surface
 `);
 
+
 // Lasm.JS.Cloudflare's surface: the globals and module exports, and the members of each
 // interface, for the availability probe of test/fixtures/js-cloudflare (on live objects: the
 // bindings of env, a handler's context, a stub).
@@ -1395,6 +1431,8 @@ def json : String := r#"${JSON.stringify(cloudflareSurface)}"#
 
 end Surface
 `);
+const unusedOverrides = ov.unused();
+if (unusedOverrides.length) fail(`scripts/bindings/overrides.json entries match no generated declaration: ${unusedOverrides.join(', ')}`);
 
 let stale = [];
 for (const [file, text] of files) {

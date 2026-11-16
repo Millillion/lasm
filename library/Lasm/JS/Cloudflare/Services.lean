@@ -573,8 +573,8 @@ instance : ToJS ArtifactsRepoReadFileArgs := ⟨fun d => Support.fields #[("ref"
 structure ArtifactsRepoLogOpts where
   /-- `DOMString ref` -/
   ref : Option String := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double offset` -/
   offset : Option Float := none
 instance : ToJS ArtifactsRepoLogOpts := ⟨fun d => Support.fields #[("ref", Support.optional d.ref),
@@ -670,8 +670,8 @@ instance : ToJS ArtifactsImportParams := ⟨fun d => Support.fields #[("source",
 
 /-- `dictionary ArtifactsListOpts` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ArtifactsListOpts where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString cursor` -/
   cursor : Option String := none
 instance : ToJS ArtifactsListOpts := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
@@ -787,11 +787,11 @@ instance : FromJS HelloWorldBindingGet where
 
 /-- `dictionary NodeStyleServerAddress` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NodeStyleServerAddress where
-  /-- `double? port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */? port` -/
+  port : Option Nat := none
 instance : FromJS NodeStyleServerAddress where
   fromJS d := do return {
-    port := ← Lasm.JS.readField (Option Float) d "port" }
+    port := ← Lasm.JS.readField (Option Nat) d "port" }
   typeName := "Lasm.JS.Cloudflare.NodeStyleServerAddress"
 
 /-- `dictionary PipelineBatchMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/

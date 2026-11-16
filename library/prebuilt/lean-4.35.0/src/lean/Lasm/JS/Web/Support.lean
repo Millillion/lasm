@@ -111,5 +111,14 @@ def getGlobal (path : List String) (α : Type) [FromJS α] : IO α := do
     | k :: ks => do go (← o.get k Value) ks
   go (← global) path
 
+/-- `v instanceof C`, for the constructor `ctor` reads (`C.prototype.isPrototypeOf(v)`, which is
+`instanceof` for the platform's classes): `false` when `ctor` fails or is not a constructor (a
+runtime without `C`). The generated `I.cast?` (docs/BINDING_RULES.md, rule A12). -/
+def isInstance (ctor : IO Value) (v : Value) : IO Bool := do
+  try
+    let proto ← (← ctor).get "prototype" Value
+    proto.callMethod "isPrototypeOf" #[.ref v ""] Bool
+  catch _ => return false
+
 end Support
 end Lasm.JS.Web

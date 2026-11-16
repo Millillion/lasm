@@ -223,8 +223,8 @@ instance : Coe ContainerStartResources ContainerStartOptionsInstanceOrContainerS
 structure ContainerDirectorySnapshot where
   /-- `required DOMString id` -/
   id : String
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `required DOMString dir` -/
   dir : String
   /-- `DOMString name` -/
@@ -476,14 +476,14 @@ instance : ToJS ContainerSnapshotOptions := ⟨fun d => Support.fields #[("name"
 structure ContainerSnapshot where
   /-- `required DOMString id` -/
   id : String
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `DOMString name` -/
   name : Option String := none
 instance : FromJS ContainerSnapshot where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     name := ← Lasm.JS.readField (Option String) d "name" }
   typeName := "Lasm.JS.Cloudflare.ContainerSnapshot"
 
@@ -617,8 +617,8 @@ def ExecProcess.stdout (self : ExecProcess) : IO (Option ReadableStream) := self
 /-- `readonly stderr: ReadableStream | null`: `readonly attribute ReadableStream? stderr` -/
 def ExecProcess.stderr (self : ExecProcess) : IO (Option ReadableStream) := self.val.get "stderr" (Option ReadableStream)
 
-/-- `readonly pid: number`: `readonly attribute double pid` -/
-def ExecProcess.pid (self : ExecProcess) : IO Float := self.val.get "pid" Float
+/-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
+def ExecProcess.pid (self : ExecProcess) : IO Int := self.val.get "pid" Int
 
 /-- `readonly isPty: boolean`: `readonly attribute boolean isPty` -/
 def ExecProcess.isPty (self : ExecProcess) : IO Bool := self.val.get "isPty" Bool
@@ -664,8 +664,8 @@ def Container.destroy (self : Container) (error : Data := .undefined) : Async Un
 def Container.signal (self : Container) (signo : Float) : IO Unit :=
   self.val.callMethod "signal" (Support.args #[toJS signo]) Unit
 
-/-- `getTcpPort(port: number): Fetcher`: `ContainerGetTcpPort getTcpPort(double port)` -/
-def Container.getTcpPort (self : Container) (port : Float) : IO ContainerGetTcpPort :=
+/-- `getTcpPort(port: number): Fetcher`: `ContainerGetTcpPort getTcpPort(double /* integer: Nat */ port)` -/
+def Container.getTcpPort (self : Container) (port : Nat) : IO ContainerGetTcpPort :=
   self.val.callMethod "getTcpPort" (Support.args #[toJS port]) ContainerGetTcpPort
 
 /-- `setInactivityTimeout(durationMs: number | bigint): Promise<void>`: `Promise<undefined> setInactivityTimeout(DoubleOrBigint durationMs)` -/

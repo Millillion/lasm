@@ -222,8 +222,8 @@ instance : FromJS StreamVideoInput where
 structure StreamWatermark where
   /-- `required DOMString id` -/
   id : String
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `required double height` -/
   height : Float
   /-- `required double width` -/
@@ -245,7 +245,7 @@ structure StreamWatermark where
 instance : FromJS StreamWatermark where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     height := ← Lasm.JS.readField Float d "height",
     width := ← Lasm.JS.readField Float d "width",
     created := ← Lasm.JS.readField String d "created",
@@ -299,8 +299,8 @@ structure StreamVideo where
   modified : String
   /-- `required DOMString? scheduledDeletion` -/
   scheduledDeletion : Option String
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `DOMString preview` -/
   preview : Option String := none
   /-- `required sequence<DOMString> allowedOrigins` -/
@@ -344,7 +344,7 @@ instance : FromJS StreamVideo where
     created := ← Lasm.JS.readField String d "created",
     modified := ← Lasm.JS.readField String d "modified",
     scheduledDeletion := ← Lasm.JS.readField (Option String) d "scheduledDeletion",
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     preview := ← Lasm.JS.readField (Option String) d "preview",
     allowedOrigins := ← Lasm.JS.readField (Array String) d "allowedOrigins",
     requireSignedURLs := ← Lasm.JS.readField (Option Bool) d "requireSignedURLs",
@@ -487,8 +487,8 @@ instance : FromJS StreamDownloadGetResponse where
 
 /-- `dictionary StreamVideosListParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StreamVideosListParams where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString before` -/
   before : Option String := none
   /-- `StreamPaginationComparison beforeComp` -/
@@ -531,8 +531,8 @@ instance : ToJS StreamOptions := ⟨fun d => Support.fields #[("include_obfuscat
 structure StreamError where
   /-- `required double code` -/
   code : Float
-  /-- `required double statusCode` -/
-  statusCode : Float
+  /-- `required double /* integer: Nat */ statusCode` -/
+  statusCode : Nat
   /-- `required DOMString message` -/
   message : String
   /-- `DOMString stack` -/
@@ -546,8 +546,8 @@ instance : ToJS StreamError := ⟨fun d => Support.fields #[("code", toJS d.code
 structure InternalError where
   /-- `required double code` -/
   code : Float
-  /-- `required double statusCode` -/
-  statusCode : Float
+  /-- `required double /* integer: Nat */ statusCode` -/
+  statusCode : Nat
   /-- `required DOMString message` -/
   message : String
   /-- `DOMString stack` -/

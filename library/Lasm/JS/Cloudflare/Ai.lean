@@ -3270,23 +3270,23 @@ instance : FromJS AgentMemoryScoredCandidate where
 
 /-- `dictionary AgentMemoryRecallResult` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AgentMemoryRecallResult where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required DOMString answer` -/
   answer : String
   /-- `required sequence<AgentMemoryScoredCandidate> candidates` -/
   candidates : Array AgentMemoryScoredCandidate
 instance : FromJS AgentMemoryRecallResult where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     answer := ← Lasm.JS.readField String d "answer",
     candidates := ← Lasm.JS.readField (Array AgentMemoryScoredCandidate) d "candidates" }
   typeName := "Lasm.JS.Cloudflare.AgentMemoryRecallResult"
 
 /-- `dictionary AgentMemoryListMemoriesOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AgentMemoryListMemoriesOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString cursor` -/
   cursor : Option String := none
   /-- `DOMString sessionId` -/
@@ -3387,20 +3387,20 @@ structure AiSearchItemContentResult where
   contentType : String
   /-- `required DOMString filename` -/
   filename : String
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
 instance : FromJS AiSearchItemContentResult where
   fromJS d := do return {
     body := ← Lasm.JS.readField ReadableStream d "body",
     contentType := ← Lasm.JS.readField String d "contentType",
     filename := ← Lasm.JS.readField String d "filename",
-    size := ← Lasm.JS.readField Float d "size" }
+    size := ← Lasm.JS.readField Nat d "size" }
   typeName := "Lasm.JS.Cloudflare.AiSearchItemContentResult"
 
 /-- `dictionary AiSearchItemLogsParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchItemLogsParams where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString cursor` -/
   cursor : Option String := none
 instance : ToJS AiSearchItemLogsParams := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
@@ -3435,8 +3435,8 @@ instance : FromJS AiSearchItemLog where
 
 /-- `dictionary AiSearchItemLogsResponseResult_info` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchItemLogsResponseResult_info where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required double per_page` -/
   per_page : Float
   /-- `required DOMString? cursor` -/
@@ -3445,7 +3445,7 @@ structure AiSearchItemLogsResponseResult_info where
   truncated : Bool
 instance : FromJS AiSearchItemLogsResponseResult_info where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     per_page := ← Lasm.JS.readField Float d "per_page",
     cursor := ← Lasm.JS.readField (Option String) d "cursor",
     truncated := ← Lasm.JS.readField Bool d "truncated" }
@@ -3465,8 +3465,8 @@ instance : FromJS AiSearchItemLogsResponse where
 
 /-- `dictionary AiSearchItemChunksParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchItemChunksParams where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double offset` -/
   offset : Option Float := none
 instance : ToJS AiSearchItemChunksParams := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
@@ -3510,19 +3510,19 @@ instance : FromJS AiSearchItemChunk where
 
 /-- `dictionary AiSearchItemChunksResponseResult_info` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchItemChunksResponseResult_info where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required double total` -/
   total : Float
-  /-- `required double limit` -/
-  limit : Float
+  /-- `required double /* integer: Nat */ limit` -/
+  limit : Nat
   /-- `required double offset` -/
   offset : Float
 instance : FromJS AiSearchItemChunksResponseResult_info where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     total := ← Lasm.JS.readField Float d "total",
-    limit := ← Lasm.JS.readField Float d "limit",
+    limit := ← Lasm.JS.readField Nat d "limit",
     offset := ← Lasm.JS.readField Float d "offset" }
   typeName := "Lasm.JS.Cloudflare.AiSearchItemChunksResponseResult_info"
 
@@ -3570,8 +3570,8 @@ instance : ToJS AiSearchListItemsParams := ⟨fun d => Support.fields #[("page",
 
 /-- `dictionary AiSearchListResponseResult_info` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchListResponseResult_info where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required double page` -/
   page : Float
   /-- `required double per_page` -/
@@ -3580,7 +3580,7 @@ structure AiSearchListResponseResult_info where
   total_count : Float
 instance : FromJS AiSearchListResponseResult_info where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     page := ← Lasm.JS.readField Float d "page",
     per_page := ← Lasm.JS.readField Float d "per_page",
     total_count := ← Lasm.JS.readField Float d "total_count" }
@@ -9390,8 +9390,8 @@ structure AiWebSearchRequest where
   gatewayId : String
   /-- `required DOMString query` -/
   query : String
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString provider` -/
   provider : Option String := none
   /-- `DOMString byokAlias` -/
@@ -9454,8 +9454,8 @@ structure GatewayOptions where
   id : String
   /-- `DOMString cacheKey` -/
   cacheKey : Option String := none
-  /-- `double cacheTtl` -/
-  cacheTtl : Option Float := none
+  /-- `double /* integer: Nat */ cacheTtl` -/
+  cacheTtl : Option Nat := none
   /-- `boolean skipCache` -/
   skipCache : Option Bool := none
   /-- `record<DOMString, DoubleOrDOMStringOrBooleanOrBigint?> metadata` -/
@@ -9713,8 +9713,8 @@ structure AiGatewayLog where
   metadata : Option (Record (Option DoubleOrDOMStringOrBooleanOrBigint)) := none
   /-- `double step` -/
   step : Option Float := none
-  /-- `double cost` -/
-  cost : Option Float := none
+  /-- `double /* integer: Nat */ cost` -/
+  cost : Option Nat := none
   /-- `boolean custom_cost` -/
   custom_cost : Option Bool := none
   /-- `required double request_size` -/
@@ -9749,7 +9749,7 @@ instance : FromJS AiGatewayLog where
     tokens_out := ← Lasm.JS.readField (Option Float) d "tokens_out",
     metadata := ← Lasm.JS.readField (Option (Record (Option DoubleOrDOMStringOrBooleanOrBigint))) d "metadata",
     step := ← Lasm.JS.readField (Option Float) d "step",
-    cost := ← Lasm.JS.readField (Option Float) d "cost",
+    cost := ← Lasm.JS.readField (Option Nat) d "cost",
     custom_cost := ← Lasm.JS.readField (Option Bool) d "custom_cost",
     request_size := ← Lasm.JS.readField Float d "request_size",
     request_head := ← Lasm.JS.readField (Option String) d "request_head",
@@ -9815,8 +9815,8 @@ instance : ToJS AiGatewayRunOptions := ⟨fun d => Support.fields #[("gateway", 
 structure WebSearchSearchOptions where
   /-- `required DOMString query` -/
   query : String
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
 instance : ToJS WebSearchSearchOptions := ⟨fun d => Support.fields #[("query", toJS d.query),
     ("limit", Support.optional d.limit)]⟩
 
