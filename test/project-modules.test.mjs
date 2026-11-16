@@ -42,8 +42,13 @@ test('relative imports: static, re-exports, side effects and literal dynamic imp
     "export const x = './not-an-import.mjs';",
     "// import { y } from './commented.mjs'",
     "/* import './block.mjs'; */",
+    "import { i } from'./i.mjs';",
+    "import'./j.mjs';",
+    "const k = import( './k.mjs' );",
+    "/* c */import './l.mjs';",
+    "    // import './indented-comment.mjs';",
   ].join('\n');
-  assert.deepEqual(relativeImportsOf(text), ['./a.mjs', '../b.mjs', './c/d.mjs', './e.mjs', './f.mjs', './g.mjs', './h.mjs']);
+  assert.deepEqual(relativeImportsOf(text), ['./a.mjs', '../b.mjs', './c/d.mjs', './e.mjs', './f.mjs', './g.mjs', './h.mjs', './i.mjs', './j.mjs', './k.mjs', './l.mjs']);
 });
 
 test('a binding resolves against its Lean file; the files it imports come along, once each', t => {
@@ -97,4 +102,16 @@ test('the check plan: project bindings get their paths, the identity adds the fi
   assert.deepEqual(projectCheckPlan([bindings[1]], { files: [] }, { named: false }), { bindings: [bindings[1]], identity: 'none' });
   assert.throws(() => projectCheckPlan(bindings, { files: [] }, { named: false }),
     { message: 'A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]' });
+});
+
+test('cycles, hidden names, bindings without a project file, and paths that leave the root through the middle', t => {
+  const directory = project(t, {
+    'Main.lean': '', 'a.mjs': "import { b } from './b.mjs';\nexport const a = 1;\n", 'b.mjs': "import { a } from './a.mjs';\nimport './.hidden.mjs';\nexport const b = 2;\n",
+    '.hidden.mjs': '', 'c.mjs.js': '' });
+  const lean = join(directory, 'Main.lean');
+  assert.deepEqual(projectModules([binding('./a.mjs', './a.mjs', lean)], directory).files.map(f => f.specifier), ['./.hidden.mjs', './a.mjs', './b.mjs']);
+  // A binding record without `relative` (not one @[js] wrote for a project file) is not resolved.
+  assert.deepEqual(projectModules([{ name: 'X', module: './nowhere.mjs' }], directory), { files: [] });
+  assert.throws(() => projectModules([binding('./x/../../a.mjs', './x/../../a.mjs', lean)], directory), /outside the Lean source root/);
+  assert.throws(() => projectModules([binding('./c.mjs.js', './c.mjs.js', lean)], directory), /must be an ES module file ending in \.mjs/);
 });

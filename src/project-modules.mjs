@@ -42,21 +42,20 @@ export function relativeImportsOf(text) {
 export function projectModules(bindings, directory) {
   const bySpecifier = new Map();
   const add = (specifier, path, what) => {
-    if (!specifier.startsWith('./') || posix.normalize(specifier).startsWith('..'))
+    if (posix.normalize(specifier).startsWith('..'))
       throw new Error(`${what}: ${path} is outside the Lean source root; keep project JavaScript files beside or below the Lean files`);
     if (!/\.mjs$/.test(specifier)) throw new Error(`${what}: ${path} must be an ES module file ending in .mjs`);
     if (!existsSync(path) || !statSync(path).isFile()) throw new Error(`${what}: ${path} does not exist`);
     const known = bySpecifier.get(specifier);
-    if (known && known !== path) throw new Error(`${what}: ${specifier} names two files, ${known} and ${path}`);
-    if (known) return false;
-    bySpecifier.set(specifier, path);
-    return true;
+    if (known === undefined) { bySpecifier.set(specifier, path); return true; }
+    if (known !== path) throw new Error(`${what}: ${specifier} names two files, ${known} and ${path}`);
+    return false;
   };
   const visit = (specifier, path, what) => {
     if (!add(specifier, path, what)) return;
     for (const imported of relativeImportsOf(readFileSync(path, 'utf8'))) {
-      const child = posix.normalize(posix.join(posix.dirname(specifier), imported));
-      visit(child.startsWith('.') ? child : './' + child, resolve(dirname(path), imported), `${specifier} imports ${imported}`);
+      // Kept as ./… (projectModuleName drops it); a path above the root stays ./../… and is refused.
+      visit('./' + posix.normalize(posix.join(posix.dirname(specifier), imported)), resolve(dirname(path), imported), `${specifier} imports ${imported}`);
     }
   };
   for (const b of bindings) {
@@ -66,7 +65,7 @@ export function projectModules(bindings, directory) {
   }
   const files = [...bySpecifier].map(([specifier, path]) => ({ specifier, name: projectModuleName(specifier), path,
     sha256: createHash('sha256').update(readFileSync(path)).digest('hex') }));
-  return { files: files.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0) };
+  return { files: files.sort((a, b) => a.name.localeCompare(b.name, 'en')) };
 }
 
 /** Copies the project modules to `directory`/project-modules/, keeping their
@@ -82,7 +81,7 @@ export function copyProjectModules(directory, { files }) {
 /** The bindings with each project file's Lean `file` made absolute (from the
  * project `directory`, where Lean ran), so later steps resolve it from anywhere. */
 export const withAbsoluteFiles = (bindings, directory) =>
-  bindings.map(b => typeof b.relative === 'string' && typeof b.file === 'string' && !isAbsolute(b.file) ? { ...b, file: resolve(directory, b.file) } : b);
+  bindings.map(b => typeof b.relative === 'string' && !isAbsolute(b.file) ? { ...b, file: resolve(directory, b.file) } : b);
 
 /** Whether any of the program's Lean source texts declares a project file
  * binding: such a build waits for its bindings before it links, since the

@@ -123,6 +123,12 @@
       "mutants": 1804,
       "threshold": 88
     },
+    "project-files": {
+      "initial": 100,
+      "score": 100,
+      "mutants": 190,
+      "threshold": 100
+    },
     "serverless": {
       "initial": 40.5,
       "score": 88.5,
