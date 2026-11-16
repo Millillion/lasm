@@ -157,9 +157,15 @@ decisions themselves are logged with their reasoning in
   - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
     without the `server` argument, so a generated handler rejects there
     (`known.json`).
-  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
-    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
-    CI. A user-facing helper (or a template change) is yours to decide.
+  - **Node**: superseded 2026-11-11 by `Node.serve` (Lasm provides it; see
+    "Node.serve and function-platform handlers" below). `@hono/node-server`
+    through `@[js]` still works and stays exercised in CI.
+
+### Node.serve and function-platform handlers (decided by Jordan 2026-11-11)
+- [ ] **The shapes are recorded for sign-off** in
+  [API_DECISIONS.md, milestone 0.2](api/decisions/0.2.md#milestone-02-decisions-in-detail)
+  (A7, A19–A23, 0.2-1), with the code, the reasons and the alternatives.
+  [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve) is the guide.
 
 - [ ] **`Lasm.JS.Cloudflare` (tier 3; 2026-11-11) is generated from
   `@cloudflare/workers-types` 5.20261019.1** (the declarations of the workerd
