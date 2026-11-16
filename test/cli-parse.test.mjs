@@ -86,10 +86,8 @@ test('the run and build results, field by field', () => {
     { command: 'build', rebuild: false, verbose: false, args: [], input: 'Main.lean', profile: 'dev', target: 'browser', suspend: 'jspi', bundler: true });
   assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--dev', '--allow-dev']),
     { command: 'build', rebuild: false, verbose: false, args: [], input: 'Main.lean', profile: 'dev', target: 'lambda', allowDev: true });
-  // A binding configuration: no profile, the node target.
-  assert.deepEqual(parseLasmArguments(['build', 'bindings.json']),
-    { command: 'build', rebuild: false, verbose: false, args: [], input: 'bindings.json', target: 'node', output: 'dist' });
-  assert.deepEqual(parseLasmArguments(['build', 'bindings.json', '--target', 'node']).target, 'node');
+  // The retired binding configurations are not sources (0.7-15).
+  fails(['build', 'bindings.json'], 'Expected a Lean source file (Main.lean), not bindings.json');
 });
 
 test('help anywhere before --, but -- ends Lasm options', () => {
@@ -108,7 +106,6 @@ test('--dev and --release', () => {
   assert.equal(parseLasmArguments(['Main.lean', '--release', '--release']).profile, 'release');
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--release']).profile, 'release');
   for (const pair of [['--dev', '--release'], ['--release', '--dev']]) fails(['Main.lean', ...pair], 'Choose one of --dev and --release');
-  for (const flag of ['--dev', '--release']) fails(['build', 'bindings.json', flag], '--dev and --release apply to Lean applications');
 });
 
 test('--target', () => {
@@ -126,7 +123,6 @@ test('--target', () => {
   fails(['build', 'Main.lean', '--target', 'CloudFlare'], `Unknown build target "CloudFlare" (did you mean --target workers?). Choose one of: ${targetList}`);
   fails(['build', 'Main.lean', '--target', 'Node'], `Unknown build target "Node" (did you mean --target node?). Choose one of: ${targetList}`);
   fails(['build', 'Main.lean', '--target', 'workrs'], `Unknown build target "workrs" (did you mean --target workers?). Choose one of: ${targetList}`);
-  fails(['build', 'bindings.json', '--target', 'workers'], '--target applies to Lean applications, not binding configurations');
 });
 
 test('option names match whole tokens only', () => {
@@ -198,9 +194,9 @@ test('sources and commands', () => {
   fails([], cliUsage);
   fails(['build'], cliUsage);
   fails(['--rebuild'], cliUsage);
-  fails(['run', 'config.json'], 'Expected a Lean source file, or a binding configuration for lasm build');
-  fails(['Main.txt'], 'Expected a Lean source file, or a binding configuration for lasm build');
-  fails(['build', 'Main.txt'], 'Expected a Lean source file, or a binding configuration for lasm build');
+  fails(['run', 'config.json'], 'Expected a Lean source file (Main.lean), not config.json');
+  fails(['Main.txt'], 'Expected a Lean source file (Main.lean), not Main.txt');
+  fails(['build', 'Main.txt'], 'Expected a Lean source file (Main.lean), not Main.txt');
   fails(['Main.lean', '--node-version', '26'], 'Unknown Lasm option: --node-version. Application arguments must follow --.');
   fails(['Main.lean', '-x'], 'Unknown Lasm option: -x. Application arguments must follow --.');
   const commands = commandNames.join(', ');
@@ -209,9 +205,9 @@ test('sources and commands', () => {
   fails(['frobnicate'], `Unknown command "frobnicate". Commands: ${commands}; or run a program with lasm Main.lean.`);
   // A path is a source, never a command: the check is only for bare words.
   for (const input of ['./biuld', 'dir/biuld', 'dir\\biuld', 'biuld.txt'])
-    fails([input], 'Expected a Lean source file, or a binding configuration for lasm build');
+    fails([input], `Expected a Lean source file (Main.lean), not ${input}`);
   // `lasm build` takes any bare word as its source; only run guesses commands.
-  fails(['build', 'biuld'], 'Expected a Lean source file, or a binding configuration for lasm build');
+  fails(['build', 'biuld'], 'Expected a Lean source file (Main.lean), not biuld');
 });
 
 test('a bare word that names a Lean file beside it suggests the file', t => {

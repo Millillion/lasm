@@ -59,7 +59,7 @@ test('package arguments: forms, values, repetition, unknown options and targets'
 });
 
 test('the usage lists every target with its output and summary', () => {
-  assert.match(packageUsage, /^Usage: lasm package \[dist\] --target lambda\|lambda-edge\|vercel\|netlify\|azure\|gcf \[--output PATH\] \[--allow-dev\]\n/);
+  assert.match(packageUsage, /^Usage: lasm package \[dist\] --target lambda\|lambda-edge\|vercel\|netlify\|azure\|gcf\|browser \[--output PATH\] \[--allow-dev\]\n/);
   for (const [name, spec] of Object.entries(packageTargets))
     assert.ok(packageUsage.includes(`  ${name.padEnd(12)} ${spec.output.padEnd(23)} ${spec.summary}`), name);
   assert.ok(packageUsage.includes(`  ${'browser'.padEnd(12)} ${'(in place)'.padEnd(23)} a browser build`));

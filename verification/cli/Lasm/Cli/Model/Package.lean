@@ -35,7 +35,7 @@ def packageTable : List PackageTarget := [
 
 def packageTargets : List String := packageTable.map (·.name)
 
-def packageUsage : String := "Usage: lasm package [dist] --target " ++ "|".intercalate packageTargets ++ " [--output PATH] [--allow-dev]
+def packageUsage : String := "Usage: lasm package [dist] --target " ++ "|".intercalate packageTargets ++ "|browser [--output PATH] [--allow-dev]
 
 Packages a built Lasm HTTP server (lasm build output, default dist/) for a
 function platform. The server must listen on $HOST and $PORT (every lasm init
