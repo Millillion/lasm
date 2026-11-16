@@ -558,25 +558,28 @@ test('an event raised while a patch is applied waits for the next frame (no re-e
   assert.equal(frames, 2);
 });
 
-test('renders: timings, history entries made with the frame, focus and blur after it, nothing after unmount', async () => {
+test('renders: timings, history entries made with the frame, afterFrame callbacks after it, nothing after unmount', async () => {
   const { root, window, document } = page();
   const ui = createUi({ root });
   let frames = 0;
   const patches = [frame().insert(0, 0, f => f.el(1, 'input', f => (f.attr('id', 'name'), 1))).u8];
   ui.module.connect({ frame: () => { frames++; return patches.shift() ?? new Uint8Array(0); }, url: () => false });
   const before = performance.now();
-  ui.module.focus('name', false);
+  // Lasm.UI.afterFrame: the callback runs once the frame that adds the element is applied.
+  const seen = [];
+  ui.module.afterFrame(() => seen.push(document.getElementById('name')?.tagName));
+  assert.deepEqual(seen, []);
   await nextFrame(window); await nextFrame(window);
-  assert.equal(document.activeElement, root.firstChild);
+  assert.deepEqual(seen, ['INPUT']);
   const { last } = ui.stats();
   assert.equal(last.frames, 1);
   assert.ok(last.bytes > 0);
   assert.ok(last.leanMs >= 0 && last.leanMs <= performance.now() - before, `leanMs ${last.leanMs}`);
   assert.ok(last.applyMs >= 0 && last.applyMs <= performance.now() - before, `applyMs ${last.applyMs}`);
-  ui.module.focus('name', true);
-  ui.module.focus('missing', false);
+  ui.module.afterFrame(() => seen.push('second'));
+  ui.module.afterFrame(() => seen.push('third'));
   await nextFrame(window); await nextFrame(window);
-  assert.notEqual(document.activeElement, root.firstChild);
+  assert.deepEqual(seen, ['INPUT', 'second', 'third']);
   // Cmd.replaceUrl replaces the entry; Cmd.pushUrl adds one; relative URLs resolve against the last queued one.
   const length = window.history.length;
   ui.module.navigate('/a/b', true);
@@ -602,16 +605,9 @@ test('navigate before connect queues the history entry for the first frame', asy
   assert.deepEqual(urls, []);
 });
 
-test('commands: timeout and http results go back to Lean, and render only when Lean says so', async () => {
+test('commands: timeout results go back to Lean, and render only when Lean says so', async () => {
   const { root, window } = page();
-  const requests = [];
-  const fetch = async (url, init) => {
-    requests.push([url, init]);
-    if (url === '/fail') throw new Error('offline');
-    if (url === '/odd') throw 'plain';
-    return new window.Response('body text', { status: 201, statusText: 'Created', headers: { 'x-a': '1' } });
-  };
-  const ui = createUi({ root, window: windowWith(window, { fetch }) });
+  const ui = createUi({ root, window });
   let frames = 0;
   ui.module.connect({ frame: () => { frames++; return new Uint8Array(0); } });
   const results = [];
@@ -623,63 +619,24 @@ test('commands: timeout and http results go back to Lean, and render only when L
   ui.module.timeout(1, () => { results.push('quiet'); return false; });
   await tick(20); await nextFrame(window); await nextFrame(window);
   assert.equal(frames, 1);
-  const done = new Promise(resolve => {
-    ui.module.http('POST', '/ok', [['content-type', 'text/plain']], 'hi', 'include', (...r) => { results.push(r); resolve(); return true; });
-  });
-  await done;
-  assert.deepEqual(requests[0], ['/ok', { method: 'POST', headers: [['content-type', 'text/plain']], body: 'hi', credentials: 'include' }]);
-  const [ok, status, statusText, headers, body] = results.at(-1);
-  assert.deepEqual([ok, status, statusText, body], [true, 201, 'Created', 'body text']);
-  assert.ok(headers.some(([k, v]) => k === 'x-a' && v === '1'), JSON.stringify(headers));
-  await nextFrame(window); await nextFrame(window);
-  assert.equal(frames, 2);
-  for (const [url, message] of [['/fail', 'offline'], ['/odd', 'plain']]) {
-    await new Promise(resolve => ui.module.http('GET', url, [], null, 'same-origin', (...r) => { results.push(r); resolve(); return false; }));
-    assert.deepEqual(results.at(-1), [false, message]);
-    assert.equal(requests.at(-1)[1].body, undefined);
-  }
   // After unmount, late results are dropped.
   ui.module.timeout(1, () => { results.push('late'); return true; });
   let late = false;
-  ui.module.http('GET', '/ok', [], null, 'omit', () => { late = true; return true; });
+  ui.module.afterFrame(() => { late = true; });
   ui.unmount();
-  await tick(20);
+  await tick(20); await nextFrame(window); await nextFrame(window);
   assert.equal(results.includes('late'), false);
   assert.equal(late, false);
 });
 
-test('commands: now, title, go, load, error, storage (local and session, and unavailable)', () => {
-  const { root, window, document } = page();
-  const calls = [];
-  const throwing = { get localStorage() { throw new Error('denied'); }, get sessionStorage() { throw new Error('denied'); } };
-  const ui = createUi({ root, window: windowWith(window, {
-    history: { go: n => calls.push(['go', n]), pushState() {}, replaceState() {} },
-    location: { href: 'https://app.test/', origin: 'https://app.test', assign: url => calls.push(['assign', url]) } }) });
-  const t = Date.now();
-  assert.ok(Math.abs(ui.module.now() - t) < 1000);
-  ui.module.title('New title');
-  assert.equal(document.title, 'New title');
-  ui.module.go(-2);
-  ui.module.load('https://elsewhere.test/');
-  assert.deepEqual(calls, [['go', -2], ['assign', 'https://elsewhere.test/']]);
+test('commands: error', () => {
+  const { root } = page();
+  const ui = createUi({ root });
   const logged = [];
   const original = console.error;
   console.error = (...a) => logged.push(a.join(' '));
   try { ui.module.error('bad thing'); } finally { console.error = original; }
   assert.deepEqual(logged, ['[lasm:ui] bad thing']);
-  const real = createUi({ root, window });
-  real.module.storageSet('session', 'k', 's');
-  real.module.storageSet('local', 'k', 'l');
-  assert.equal(window.sessionStorage.getItem('k'), 's');
-  assert.equal(window.localStorage.getItem('k'), 'l');
-  assert.equal(real.module.storageGet('session', 'k'), 's');
-  real.module.storageRemove('session', 'k');
-  assert.equal(window.sessionStorage.getItem('k'), null);
-  assert.equal(window.localStorage.getItem('k'), 'l');
-  const denied = createUi({ root, window: windowWith(window, throwing) });
-  denied.module.storageSet('local', 'k', 'v');
-  denied.module.storageRemove('session', 'k');
-  assert.equal(denied.module.storageGet('local', 'k'), null);
 });
 
 test('options: the URL defaults to http://localhost/ without a location; flags and hydrate pass through', () => {
@@ -950,8 +907,7 @@ test('lasmInstance: one per mount; dispose unmounts it; the root exposes stats',
 });
 
 test('outside the browser every export throws an error that names it', () => {
-  const names = ['options', 'connect', 'apply', 'schedule', 'error', 'sub', 'unsub', 'timeout', 'http', 'now', 'navigate',
-    'go', 'load', 'storageSet', 'storageRemove', 'storageGet', 'focus', 'title'];
+  const names = ['options', 'connect', 'apply', 'schedule', 'error', 'sub', 'unsub', 'timeout', 'navigate', 'afterFrame'];
   const standIn = lasmInstance({});
   for (const name of names) {
     assert.throws(() => uiDom[name](), new RegExp(`^Error: lasm:ui-dom ${name}: Lasm.UI apps run in the browser`), name);
