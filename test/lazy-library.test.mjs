@@ -46,6 +46,8 @@ test('imports, namespaces and dependency order come from the sources', () => {
   assert.deepEqual(importsOfSource('import A\npublic import B C\n-- import D\n/- import E -/\nmeta import F -- x\n'), ['A', 'B', 'C', 'F']);
   assert.ok(isLazyNamespace('Lasm.JS.Node.Http'));
   assert.ok(!isLazyNamespace('Lasm.UI.Html'));
+  assert.ok(isLazyNamespace('Lasm.JS.Deno'), 'an umbrella module');
+  assert.ok(!isLazyNamespace('Lasm.JS.Denox'));
   const { root, eager, dir } = fixture();
   try {
     assert.deepEqual(lazyModules(eager, root), ['Lasm.JS.Web.A', 'Lasm.JS.Web.B', 'Lasm.JS.Web.C']);
@@ -132,5 +134,20 @@ test('ensureProgramLibrary: the imports of the directory\'s files, messages as p
     const locks = [];
     assert.deepEqual((await ensureProgramLibrary(tree, join(dir, 'p1'), { eager, lock: async (...a) => { locks.push(a); return a[1](); } })).compiled, []);
     assert.deepEqual(locks, []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('an umbrella module with no prebuilt core is compiled on first import, after its namespace\'s modules', async () => {
+  const { root, tree, eager, dir } = fixture();
+  try {
+    put(join(root, 'Lasm/JS/Bun/Serve.lean'), 'import Lasm.JS.Web.Core\n');
+    put(join(root, 'Lasm/JS/Bun/Sqlite.lean'), 'import Lasm.JS\n');
+    put(join(root, 'Lasm/JS/Bun.lean'), 'import Lasm.JS.Bun.Serve\nimport Lasm.JS.Bun.Sqlite\n');
+    assert.deepEqual(lazyModules(eager, root).filter(m => m.startsWith('Lasm.JS.Bun')), ['Lasm.JS.Bun', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun.Sqlite']);
+    assert.ok(!lazyModules([...eager, 'Lasm.JS.Bun'], root).includes('Lasm.JS.Bun'), 'a prebuilt umbrella is not lazy');
+    const fake = fakeCompile();
+    assert.deepEqual((await ensureLazyModules(tree, ['Lasm.JS.Bun'], { eager, root, log: () => {}, compile: fake.compile })).compiled,
+      ['Lasm.JS.Bun.Serve', 'Lasm.JS.Bun.Sqlite', 'Lasm.JS.Bun']);
+    assert.equal(readFileSync(join(tree, 'lib/lean/Lasm/JS/Bun.olean'), 'utf8'), 'olean of Lasm.JS.Bun');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

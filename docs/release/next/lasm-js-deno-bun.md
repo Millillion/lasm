@@ -14,6 +14,9 @@
   each with its reason, are in `scripts/bindings/deno-tier2.mjs` (FFI, `Deno.test`,
   experimental APIs, in-place buffer reads). docs/JS_BINDINGS.md, "Standard bindings
   for Deno"; docs/API_DECISIONS.md 0.4-5, 0.4-7, 0.4-9, 0.4-10 to 0.4-15.
+- **`Lasm.JS.Deno` and `Lasm.JS.Bun` are not prebuilt.** Their modules ship as source
+  and compile on the first build that imports them (docs/api/decisions/0.4.md, 0.4-20),
+  so the package does not grow with them.
 - **Deno KV needs Deno's `--unstable-kv` flag on the Deno CLI** (`deno run -A
   --unstable-kv deno/main.mjs`); Deno Deploy provides KV without it.
 - **`Deno.serveWithUnixOptions`** serves on a Unix domain socket.

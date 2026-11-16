@@ -1167,8 +1167,10 @@ each of the three servers.
 - **Build time: no measurable change** for a new project with warm tools
   (Node 21.1 s for the baseline, 18.2 and 19.8 s; the edge runtime 17.9 s, 16.4
   and 16.7 s).
-- **Package size:** the compiled library (`library/prebuilt`) grows by 2.6 MB
-  (1.9 MB of `.olean` files), 0.6 MB compressed.
+- **Package size: sources only.** Neither namespace is prebuilt
+  (docs/api/decisions/0.4.md, 0.4-20): their modules ship as Lean source and
+  compile into Lasm's managed Lean prefix the first time a program imports them,
+  then are reused.
 
 ### Pinned versions and drift
 
@@ -1193,6 +1195,8 @@ from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 every function, constant and class, and every type they use. Status: **current
 source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
 0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
+Its modules ship as source and compile on the first build that imports them
+(0.4-20); import only the modules you use (`import Lasm.JS.Deno.Kv`) to compile less.
 
 ```lean
 import Lasm.JS.Deno
