@@ -42,13 +42,13 @@ def Tracing.enable (self : Tracing) : IO Unit :=
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.createTracing(options)` (added in Node.js v10.0.0): `Tracing createTracing(trace_events.CreateTracingOptions options)` (Node.js 24.22.2 documentation, tracing.md) -/
 def trace_events.createTracing (options : trace_events.CreateTracingOptions) : IO Tracing := do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.trace_events.createTracing", module := "node:trace_events", path := "createTracing", construct := false, arity := 1 }
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.trace_events.createTracing", module := "node:trace_events", path := "trace_events.createTracing", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.getEnabledCategories()` (added in Node.js v10.0.0): `DOMString getEnabledCategories()` (Node.js 24.22.2 documentation, tracing.md) -/
 def trace_events.getEnabledCategories : IO String :=
-  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.trace_events.getEnabledCategories", module := "node:trace_events", path := "getEnabledCategories", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.trace_events.getEnabledCategories", module := "node:trace_events", path := "trace_events.getEnabledCategories", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 end Lasm.JS.Node

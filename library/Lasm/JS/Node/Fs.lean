@@ -3299,11 +3299,11 @@ def fs.openAsBlobSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.
 
 /-- `fs.realpath.native(path[, options], callback)` (added in Node.js v9.2.0): `Promise<(DOMString or Uint8Array)> native((DOMString or Uint8Array or URL) path, optional (DOMString or fs.realpath.NativeOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.realpath.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpath.DOMStringOrNativeOptions := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "native" (Support.args #[toJS path_, Support.optional options])
+  Support.promisified DOMStringOrUint8Array "node:fs" "realpath.native" (Support.args #[toJS path_, Support.optional options])
 
 /-- `fs.realpathSync.native(path[, options])` (added in Node.js v9.2.0): `(DOMString or Uint8Array) native((DOMString or Uint8Array or URL) path, optional (DOMString or fs.realpathSync.NativeOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.realpathSync.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpathSync.DOMStringOrNativeOptions := none) : IO DOMStringOrUint8Array :=
-  Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.realpathSync.native", module := "node:fs", path := "native", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.realpathSync.native", module := "node:fs", path := "realpathSync.native", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options]) (await := false)
 
 end Lasm.JS.Node

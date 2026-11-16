@@ -111,12 +111,12 @@ def timersPromises.setInterval (delay : Data := .undefined) (value : Data := .un
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.wait(delay[, options])` (added in Node.js v17.3.0, v16.14.0): `Promise<any> wait(double delay, optional timersPromises.scheduler.WaitOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
 def timersPromises.scheduler.wait (delay : Float) (options : Option timersPromises.scheduler.WaitOptions := none) : Async Data :=
-  Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.wait", module := "node:timers", path := "wait", construct := false, arity := 2 }
+  Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.wait", module := "node:timers", path := "timersPromises.scheduler.wait", construct := false, arity := 2 }
     (Support.args #[toJS delay, Support.optional options])
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.yield()` (added in Node.js v17.3.0, v16.14.0): `Promise<any> yield()` (Node.js 24.22.2 documentation, timers.md) -/
 def timersPromises.scheduler.yield : Async Data :=
-  Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.yield", module := "node:timers", path := "yield", construct := false, arity := 0 }
+  Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.yield", module := "node:timers", path := "timersPromises.scheduler.yield", construct := false, arity := 0 }
     (Support.args #[])
 
 end Lasm.JS.Node

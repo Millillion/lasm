@@ -145,7 +145,14 @@ for (const target of targets) {
     Object.assign(result, judge(target, r.stdout));
     if (r.timedOut) throw new Error('timed out');
     if (!result.summary) throw new Error(`no summary (exit ${r.code}):\n${(r.stdout + r.stderr).slice(-4000)}`);
-    result.pass = result.unexpected.length === 0 && result.stale.length === 0;
+    // Lasm.JS.Node on Node itself: every generated member exists, but what the docs mark Experimental and, on Node 24,
+    // what only Node 26's docs document (node-surface.json mayLack). On Bun and Deno a lacking member is reported only.
+    if (values.fixture === 'js-node' && (target === 'node' || target === 'node24')) {
+      const { mayLack } = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'node-surface.json'), 'utf8'));
+      const allowedMissing = new Set(mayLack[target] ?? []);
+      result.unexpectedMissing = result.missing.filter(m => !allowedMissing.has(m));
+    }
+    result.pass = result.unexpected.length === 0 && result.stale.length === 0 && !(result.unexpectedMissing?.length);
   } catch (error) {
     result.pass = false;
     result.error = String(error?.message ?? error);
@@ -156,6 +163,7 @@ for (const target of targets) {
     + `${result.buildMs !== undefined ? `, build ${(result.buildMs / 1000).toFixed(1)} s` : ''}${result.outputBytes ? `, output ${(result.outputBytes / 1048576).toFixed(2)} MiB` : ''}`);
   for (const f of result.unexpected ?? []) console.log(`  unexpected: ${f.name}: ${f.detail}`);
   for (const p of result.stale ?? []) console.log(`  listed in known.json but passed: ${p}`);
+  for (const m of result.unexpectedMissing ?? []) console.log(`  generated but missing on Node: ${m}`);
   if (result.error) console.log(`  ${result.error.split('\n').join('\n  ')}`);
 }
 // --sizes: what importing the tier costs, against the same program on Lasm.JS

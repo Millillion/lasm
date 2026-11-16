@@ -104,13 +104,7 @@ instance instToJSMockTrackerMethodOptions : ToJS MockTracker.MethodOptions := �
 structure MockTracker.ModuleOptionsExports where
   /-- `any If` -/
   If : Data := .undefined
-  /-- `any If` -/
-  If : Data := .undefined
-  /-- `any If` -/
-  If : Data := .undefined
-instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Support.fields #[("If", d.If),
-    ("If", d.If),
-    ("If", d.If)]⟩
+instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Support.fields #[("If", d.If)]⟩
 
 /-- `dictionary MockTracker.ModuleOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.ModuleOptions where
@@ -1372,17 +1366,17 @@ def SuiteContext.log (self : SuiteContext) (message : String) (data : Data := .u
 
 /-- `suite.skip([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def suite.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.skip", module := "node:test", path := "skip", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.skip", module := "node:test", path := "suite.skip", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `suite.todo([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def suite.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.todo", module := "node:test", path := "todo", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.todo", module := "node:test", path := "suite.todo", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `suite.only([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def suite.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.only", module := "node:test", path := "only", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.only", module := "node:test", path := "suite.only", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `test.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
@@ -1402,42 +1396,42 @@ def test.only (name : Data := .undefined) (options : Data := .undefined) (fn : D
 
 /-- `describe.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def describe.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.skip", module := "node:test", path := "skip", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.skip", module := "node:test", path := "describe.skip", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `describe.todo([name][, options][, fn])`: `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def describe.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.todo", module := "node:test", path := "todo", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.todo", module := "node:test", path := "describe.todo", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `describe.only([name][, options][, fn])` (added in Node.js v19.8.0, v18.15.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def describe.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.only", module := "node:test", path := "only", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.only", module := "node:test", path := "describe.only", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `it.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def it.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.skip", module := "node:test", path := "skip", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.skip", module := "node:test", path := "it.skip", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `it.todo([name][, options][, fn])`: `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def it.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.todo", module := "node:test", path := "todo", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.todo", module := "node:test", path := "it.todo", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `it.only([name][, options][, fn])` (added in Node.js v19.8.0, v18.15.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
 def it.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.only", module := "node:test", path := "only", construct := false, arity := 3 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.only", module := "node:test", path := "it.only", construct := false, arity := 3 }
     (Support.args #[name, options, fn]) (await := false)
 
 /-- `snapshot.setDefaultSnapshotSerializers(serializers)` (added in Node.js v22.3.0): `undefined setDefaultSnapshotSerializers(sequence<any> serializers)` (Node.js 24.22.2 documentation, test.md) -/
 def snapshot.setDefaultSnapshotSerializers (serializers : Array Data) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setDefaultSnapshotSerializers", module := "node:test", path := "setDefaultSnapshotSerializers", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setDefaultSnapshotSerializers", module := "node:test", path := "snapshot.setDefaultSnapshotSerializers", construct := false, arity := 1 }
     (Support.args #[toJS serializers]) (await := false)
 
 /-- `snapshot.setResolveSnapshotPath(fn)` (added in Node.js v22.3.0): `undefined setResolveSnapshotPath(Function fn)` (Node.js 24.22.2 documentation, test.md) -/
 def snapshot.setResolveSnapshotPath (fn : JSFunction) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setResolveSnapshotPath", module := "node:test", path := "setResolveSnapshotPath", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setResolveSnapshotPath", module := "node:test", path := "snapshot.setResolveSnapshotPath", construct := false, arity := 1 }
     (Support.args #[toJS fn]) (await := false)
 
 end Lasm.JS.Node

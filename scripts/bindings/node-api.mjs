@@ -1,11 +1,13 @@
 // Lowers Node's API documentation (doc/api/<module>.json of the pinned Node.js
 // version) to WebIDL: scripts/bindings/node.idl, which generate-web.mjs turns into
 // Lasm.JS.Node with the mapping rules of Lasm.JS.Web (docs/JS_BINDINGS.md,
-// "Lasm.JS.Node"). The selection and what the docs say only in prose are in
-// node-tier2.mjs; the docs' files are fetched from nodejs.org and checked against
-// node-api.lock.json, and cached in .work/node-api/.
+// "Lasm.JS.Node"). Every class and module-level namespace of each documentation
+// file in node-tier2.mjs is lowered; what the docs say only in prose is in
+// node-tier2.mjs. The Node 24 docs are the base and what only the Node 26 docs
+// document is added (LasmSince). The docs' files are fetched from nodejs.org and
+// checked against node-api.lock.json, and cached in .work/node-api/.
 //
-//   node scripts/bindings/node-api.mjs                # write node.idl and node-api-26.json
+//   node scripts/bindings/node-api.mjs                # write node.idl, node-api-26.json, node-modules.json, node-coverage.json
 //   node scripts/bindings/node-api.mjs --check        # exit 1 if either differs
 //   node scripts/bindings/node-api.mjs --update-lock  # record the docs' hashes (after a version bump)
 //
@@ -201,6 +203,7 @@ function makeDictionary(ns, base, options, where, overrides, path) {
   const members = [];
   for (const o of options) {
     if (!/^[A-Za-z_$][\w$]*$/.test(o.name)) continue; // `fs.constants.COPYFILE_EXCL` and the like: values, not members
+    if (options.indexOf(options.find(x => x.name === o.name)) !== options.indexOf(o)) continue; // documented twice (prose list items): once
     const at = `${path}.${o.name}`;
     const type = overrides[at] ? proseType(overrides[at]) : lowerType(docType(o), { where: `${where} ${at}`, options: o.options,
       makeDict: opts => makeDictionary(ns, lean + capital(o.name), opts, where, overrides, at) });
@@ -242,6 +245,8 @@ function lowerContainer(doc, all, mod, c, out) {
       if (k === 'properties') {
         name = /^`([^`]+)`/.exec(node.textRaw)?.[1] ?? (/^Type:/.test(node.textRaw) ? node.name : null); if (!name) continue;
         if (prefix && name.startsWith(prefix) && !name.slice(prefix.length).includes('.')) name = name.slice(prefix.length);
+        // A static property documented beside the instance's (`Buffer.poolSize`).
+        else if (c.path && name.startsWith(c.path + '.') && !name.slice(c.path.length + 1).includes('.')) { name = name.slice(c.path.length + 1); classStatic = true; }
       }
       else if (!sig) continue;
       else {
@@ -347,6 +352,13 @@ function lowerContainer(doc, all, mod, c, out) {
     const stab = m.stability !== 2 ? `LasmStability="${m.stability}"` : null;
     const ex = [`${c.prefix}${m.name}`, m.sig ? `${m.sig.name}(${m.node.textRaw.match(/\(([^)]*)\)/)[1]})` : null, m.sig?.name].find(k => k && k in tier.exclude);
     if (ex) { out.excluded.push(`${ex}: ${tier.exclude[ex]}`); excludedUsed.add(ex); continue; }
+    // Buffer's instance members on Lean bytes (a copy, docs/JS_BINDINGS.md): its properties describe the view of memory
+    // (`buf.byteOffset`, `buf.buffer`; `buf.length` is ByteArray.size), and a method that writes into the buffer in
+    // place without returning it (`buf.writeUInt32BE`, `buf.write`) would write into a copy that is then dropped.
+    if (c.kind === 'bytes' && !m.isStatic && (m.kind === 'properties' || (/^<p>Writes /.test(m.node.desc ?? '') && !/\{Buffer\}|\{this\}/.test(m.node.signatures?.[0]?.return?.type ? `{${m.node.signatures[0].return.type}}` : '')))) {
+      out.excluded.push(`${c.prefix}${m.name}: ${m.kind === 'properties' ? 'a property of the Buffer object; Lean bytes are a copy (ByteArray)' : 'writes into the buffer in place; Lean bytes are a copy, so the write would be lost'}`);
+      continue;
+    }
     if (stab) out.skipped.push(`${c.prefix}${m.name}: stability ${m.stability} (generated, marked)`);
     const docName = m.kind === 'properties' ? `${(c.prefix ?? '').replace(/\.$/, '')}.${m.name}`.replace(/^\./, '') : m.sig.name;
     const proseKey = [`${docName}(${m.sig ? m.node.textRaw.match(/\(([^)]*)\)/)[1] : ''})`, docName].find(k => tier.prose[k]);

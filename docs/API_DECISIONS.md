@@ -207,3 +207,106 @@ Entries of [ROADMAP.md](../ROADMAP.md)'s milestone 0.4. Full rules and examples:
 - **Why:** Lean's automatic instance names collided across namespaced types
   (`fs.Stats`, `net.Server`). **Alternative:** none that keeps both types.
 - **Where:** #220 (unreleased). **Status:** pending sign-off.
+
+### 0.4-4: Lasm.JS.Node is every Node core module, generated as the docs give it
+
+- **Decision (Jordan's direction, 2026-11-16: the generated sources as they are):**
+  `Lasm.JS.Node` is generated from all 45 documentation files of Node's own
+  modules (the table in [JS_BINDINGS.md](JS_BINDINGS.md#what-is-covered-1)), one
+  Lean module per file, with no hand-picked subset: `node-api.mjs` finds the
+  containers itself (every `Class:` section; every module-level owner of
+  documented members, `fs`, `fsPromises`, `dnsPromises`, …). The promises,
+  callback and synchronous forms of `node:fs` are all generated.
+
+  ```lean
+  let gz ← zlib.gzipSync (.domString "hi")
+  let back ← zlib.gunzip (.uint8Array gz)          -- Async ByteArray
+  let entries ← fs.readdirSync (.domString ".")
+  let h ← crypto.createHash "sha256"
+  ```
+- **Why:** one rule for the whole source; nothing to review per member; users
+  get the API Node documents. **Alternatives:** the hand-picked "server
+  essentials" of 0.7.0 (retired); `@types/node` (A17).
+- **Where:** this milestone's Node PR (unreleased). **Status:** pending sign-off.
+
+### 0.4-5: stability marks and Node 26 members
+
+- **Decision:** members marked Deprecated, Experimental or Legacy are generated
+  and say so in their doc comment (`**Experimental** in the Node.js 24.22.2
+  docs`). The bindings follow the Node 24.22.2 docs (the oldest supported Node);
+  what only the Node 26.13.0 docs document is added with `**Node.js 26 and
+  later**` in its doc comment (`buffer.isLatin1`, `Buffer.stringLength`). The
+  conformance run fails on Node when a generated member is missing, except
+  Experimental ones and, on Node 24, the Node 26 additions.
+- **Why:** the source as it is; a user on Node 26 can use Node 26's API, and
+  the marks say where it is not portable. **Alternatives:** stable members only
+  (0.7.0's rule); Lean `@[deprecated]` attributes (warnings on every use of a
+  deprecated Node API, noisy for members Node keeps working); one binding set
+  per Node version.
+- **Where:** this milestone's Node PR. **Status:** pending sign-off.
+
+### 0.4-6: web standards stay in Lasm.JS.Web
+
+- **Decision:** a Node class whose name is a web standard interface (`URL`,
+  `EventTarget`, `Blob`, `MessagePort`, `TextEncoder`, `PerformanceObserver`,
+  …), the `console` namespace, and the members of Node objects that a web
+  interface defines (`crypto.randomUUID`, `crypto.getRandomValues`,
+  `crypto.subtle`; `performance.now`, `mark`, `measure`, …) are not generated in
+  `Lasm.JS.Node`; Node types that name them use `Lasm.JS.Web`'s types.
+  Exceptions, Node's own classes that share a web name, are listed
+  (`cluster.Worker`, `worker_threads.Worker`, `vm.Module`). **Breaking:**
+  `Lasm.JS.Node.crypto.randomUUID` is gone; use `(← Lasm.JS.Web.crypto).randomUUID`.
+- **Why:** host namespaces hold only each host's non-web APIs (Jordan,
+  2026-11-16); one type per web API across every target. **Alternative:**
+  generate Node's own documentation of them too (two types for one object).
+- **Where:** this milestone's Node PR. **Status:** pending sign-off.
+
+### 0.4-7: callbacks, overload names and prose types
+
+- **Decision:** a required trailing `callback(err, value)` is `Async value`
+  through `util.promisify` (as in 0.7.0); a required callback with more values or
+  undocumented arguments is a `JSFunction` argument, as documented; an optional
+  trailing callback is left out (its synchronous form). Overloads take the
+  shared overload naming (`Buffer.fromWithString`, `Buffer.fromWithArrayBuffer`;
+  **breaking:** `Buffer.from` of a string is now `Buffer.fromWithString`, since
+  `Buffer.from` has four documented forms). A type the docs give only in prose
+  is `any` (`Data`) unless `node-tier2.mjs` `prose` states it with a quoted
+  sentence (zlib's convenience methods: `Async ByteArray` and `IO ByteArray`).
+  Two classes of one name in different modules are named with their module.
+- **Why:** mechanical rules, no per-member choices; a prose statement is the
+  docs' own words. **Alternatives:** `util.promisify` for every callback (it
+  drops all values but the first, or needs `util.promisify.custom`); failing the
+  lowering on prose types (0.7.0, which forced a subset).
+- **Where:** this milestone's Node PR. **Status:** pending sign-off; the shared
+  rules (A9–A12, docs/BINDING_RULES.md) supersede these names once they land.
+
+### 0.4-8: the node-core example and the Node conformance gate
+
+- **Decision:** `examples/node-core` (a file report: `fsPromises`, `crypto`,
+  `zlib`, `path`, `os`, `process` only) is built and run by `web-bindings.yml`
+  on Node 26 and Node 24, and `test/fixtures/js-node` probes every generated
+  member on Node 26, Node 24, Bun and Deno.
+- **Why:** every API ships with an example exercised in CI (Jordan's rule).
+- **Where:** this milestone's Node PR. **Status:** pending sign-off.
+
+### 0.4-9: what Lasm.JS.Node does not generate, and why
+
+- **Decision:** only what cannot work from Lean compiled to Wasm, or is not a
+  named member:
+  - `Buffer`'s instance properties (`buf.length`, `buf.buffer`,
+    `buf.byteOffset`, `buf.parent`, `buf.poolSize`) and its methods that write
+    into the buffer in place without returning it (`buf.write`,
+    `buf.writeUInt32BE` and the other `write…` methods): a `Buffer` is a Lean
+    `ByteArray`, a copy, so the property describes memory Lean does not hold
+    and the write would be lost.
+  - Members with computed keys (`buf[index]`, `[Symbol.asyncDispose]()`):
+    not named members (`Value.get` with the key reaches them).
+  - `inspector.Session`'s `'<inspector-protocol-method>'` event: a placeholder
+    for every protocol event.
+  - `options.detached`, `options.stdio` in `child_process.md`: spawn's options,
+    documented under their own headings (members of `SpawnOptions`).
+- **Why:** Jordan, 2026-11-16: exclusions only where something cannot work
+  from Wasm, each recorded with its reason. **Alternative:** generating the
+  Buffer members against a copy (they would silently do nothing).
+- **Where:** this milestone's Node PR; the list is generated into
+  `scripts/bindings/node-coverage.json`. **Status:** pending sign-off.

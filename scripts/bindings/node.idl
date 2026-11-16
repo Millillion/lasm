@@ -458,52 +458,6 @@ interface Node_Buffer {
   [LasmBytesThis, LasmName="toString", LasmSignature="buf.toString([encoding[, start[, end]]])", LasmAdded="v0.1.90"] DOMString toString_(optional DOMString encoding, optional long long start, optional long long end);
   // `buf.values()` [buffer.md]
   [LasmBytesThis, LasmSignature="buf.values()", LasmAdded="v1.1.0"] object values();
-  // `buf.write(string[, offset[, length]][, encoding])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.write(string[, offset[, length]][, encoding])", LasmAdded="v0.1.90"] long long write(DOMString string, optional long long offset, optional long long length, optional DOMString encoding);
-  // `buf.writeBigInt64BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeBigInt64BE(value[, offset])", LasmAdded="v12.0.0, v10.20.0"] long long writeBigInt64BE(bigint value, optional long long offset);
-  // `buf.writeBigInt64LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeBigInt64LE(value[, offset])", LasmAdded="v12.0.0, v10.20.0"] long long writeBigInt64LE(bigint value, optional long long offset);
-  // `buf.writeBigUInt64BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeBigUInt64BE(value[, offset])", LasmAdded="v12.0.0, v10.20.0"] long long writeBigUInt64BE(bigint value, optional long long offset);
-  // `buf.writeBigUInt64LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeBigUInt64LE(value[, offset])", LasmAdded="v12.0.0, v10.20.0"] long long writeBigUInt64LE(bigint value, optional long long offset);
-  // `buf.writeDoubleBE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeDoubleBE(value[, offset])", LasmAdded="v0.11.15"] long long writeDoubleBE(double value, optional long long offset);
-  // `buf.writeDoubleLE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeDoubleLE(value[, offset])", LasmAdded="v0.11.15"] long long writeDoubleLE(double value, optional long long offset);
-  // `buf.writeFloatBE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeFloatBE(value[, offset])", LasmAdded="v0.11.15"] long long writeFloatBE(double value, optional long long offset);
-  // `buf.writeFloatLE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeFloatLE(value[, offset])", LasmAdded="v0.11.15"] long long writeFloatLE(double value, optional long long offset);
-  // `buf.writeInt8(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeInt8(value[, offset])", LasmAdded="v0.5.0"] long long writeInt8(long long value, optional long long offset);
-  // `buf.writeInt16BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeInt16BE(value[, offset])", LasmAdded="v0.5.5"] long long writeInt16BE(long long value, optional long long offset);
-  // `buf.writeInt16LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeInt16LE(value[, offset])", LasmAdded="v0.5.5"] long long writeInt16LE(long long value, optional long long offset);
-  // `buf.writeInt32BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeInt32BE(value[, offset])", LasmAdded="v0.5.5"] long long writeInt32BE(long long value, optional long long offset);
-  // `buf.writeInt32LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeInt32LE(value[, offset])", LasmAdded="v0.5.5"] long long writeInt32LE(long long value, optional long long offset);
-  // `buf.writeIntBE(value, offset, byteLength)` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeIntBE(value, offset, byteLength)", LasmAdded="v0.11.15"] long long writeIntBE(long long value, long long offset, long long byteLength);
-  // `buf.writeIntLE(value, offset, byteLength)` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeIntLE(value, offset, byteLength)", LasmAdded="v0.11.15"] long long writeIntLE(long long value, long long offset, long long byteLength);
-  // `buf.writeUInt8(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUInt8(value[, offset])", LasmAdded="v0.5.0"] long long writeUInt8(long long value, optional long long offset);
-  // `buf.writeUInt16BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUInt16BE(value[, offset])", LasmAdded="v0.5.5"] long long writeUInt16BE(long long value, optional long long offset);
-  // `buf.writeUInt16LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUInt16LE(value[, offset])", LasmAdded="v0.5.5"] long long writeUInt16LE(long long value, optional long long offset);
-  // `buf.writeUInt32BE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUInt32BE(value[, offset])", LasmAdded="v0.5.5"] long long writeUInt32BE(long long value, optional long long offset);
-  // `buf.writeUInt32LE(value[, offset])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUInt32LE(value[, offset])", LasmAdded="v0.5.5"] long long writeUInt32LE(long long value, optional long long offset);
-  // `buf.writeUIntBE(value, offset, byteLength)` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUIntBE(value, offset, byteLength)", LasmAdded="v0.5.5"] long long writeUIntBE(long long value, long long offset, long long byteLength);
-  // `buf.writeUIntLE(value, offset, byteLength)` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.writeUIntLE(value, offset, byteLength)", LasmAdded="v0.5.5"] long long writeUIntLE(long long value, long long offset, long long byteLength);
   // Static method: `Buffer.alloc(size[, fill[, encoding]])` [buffer.md]
   [LasmSignature="Buffer.alloc(size[, fill[, encoding]])", LasmAdded="v5.10.0"] static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding);
   // Static method: `Buffer.allocUnsafe(size)` [buffer.md]
@@ -532,24 +486,12 @@ interface Node_Buffer {
   [LasmSignature="Buffer.isBuffer(obj)", LasmAdded="v0.1.101"] static boolean isBuffer(object obj);
   // Static method: `Buffer.isEncoding(encoding)` [buffer.md]
   [LasmSignature="Buffer.isEncoding(encoding)", LasmAdded="v0.9.1"] static boolean isEncoding(DOMString encoding);
-  // `poolSize` Type: {integer} **Default:** `65536` [buffer.md]
-  [LasmSignature="buf.poolSize", LasmAdded="v0.11.3"] readonly attribute long long poolSize;
-  // `buffer` Type: {ArrayBuffer} The underlying `ArrayBuffer` object based on which this `Buffer` object is created. [buffer.md]
-  [LasmSignature="buf.buffer"] readonly attribute ArrayBuffer buffer;
-  // `byteOffset` Type: {integer} The `byteOffset` of the `Buffer`'s underlying `ArrayBuffer` object. [buffer.md]
-  [LasmSignature="buf.byteOffset"] readonly attribute long long byteOffset;
-  // `length` Type: {integer} [buffer.md]
-  [LasmSignature="buf.length", LasmAdded="v0.1.90"] readonly attribute long long length;
-  // `buf.parent` [buffer.md]
-  [LasmSignature="buf.parent", LasmStability="0"] readonly attribute any parent;
   // Static method: `Buffer.allocUnsafe(size[, alignment])` [buffer.md]
   [LasmSince="26.13.0", LasmSignature="Buffer.allocUnsafe(size[, alignment])", LasmAdded="v5.10.0"] static Uint8Array allocUnsafe(long long size, optional long long alignment);
   // Static method: `Buffer.allocUnsafeSlow(size[, alignment])` [buffer.md]
   [LasmSince="26.13.0", LasmSignature="Buffer.allocUnsafeSlow(size[, alignment])", LasmAdded="v5.12.0"] static Uint8Array allocUnsafeSlow(long long size, optional long long alignment);
   // Static method: `Buffer.stringLength(input[, encoding])` [buffer.md]
   [LasmSince="26.13.0", LasmSignature="Buffer.stringLength(input[, encoding])", LasmAdded="v26.11.0"] static long long stringLength(Uint8Array input, optional DOMString encoding);
-  // `index` {integer} [buffer.md]
-  [LasmSince="26.13.0", LasmSignature="buf.index"] readonly attribute long long index;
 };
 
 // buffer (buffer.md) (buffer.md), node:buffer
@@ -3964,72 +3906,6 @@ namespace zlib {
   [LasmSignature="zlib.createZstdCompress([options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined createZstdCompress(optional object options);
   // `zlib.createZstdDecompress([options])` [zlib.md]
   [LasmSignature="zlib.createZstdDecompress([options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined createZstdDecompress(optional object options);
-  // `zlib.brotliCompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.brotliCompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] undefined brotliCompress((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.brotliCompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.brotliCompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] undefined brotliCompress((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.brotliCompressSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.brotliCompressSync(buffer[, options])", LasmAdded="v11.7.0, v10.16.0"] undefined brotliCompressSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.brotliDecompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.brotliDecompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] undefined brotliDecompress((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.brotliDecompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.brotliDecompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] undefined brotliDecompress((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.brotliDecompressSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.brotliDecompressSync(buffer[, options])", LasmAdded="v11.7.0, v10.16.0"] undefined brotliDecompressSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.deflate(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.deflate(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined deflate((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.deflate(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.deflate(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined deflate((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.deflateSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.deflateSync(buffer[, options])", LasmAdded="v0.11.12"] undefined deflateSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.deflateRaw(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.deflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined deflateRaw((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.deflateRaw(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.deflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined deflateRaw((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.deflateRawSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.deflateRawSync(buffer[, options])", LasmAdded="v0.11.12"] undefined deflateRawSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.gunzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.gunzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined gunzip((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.gunzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.gunzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined gunzip((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.gunzipSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.gunzipSync(buffer[, options])", LasmAdded="v0.11.12"] undefined gunzipSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.gzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.gzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined gzip((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.gzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.gzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined gzip((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.gzipSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.gzipSync(buffer[, options])", LasmAdded="v0.11.12"] undefined gzipSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.inflate(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.inflate(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined inflate((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.inflate(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.inflate(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined inflate((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.inflateSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.inflateSync(buffer[, options])", LasmAdded="v0.11.12"] undefined inflateSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.inflateRaw(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.inflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined inflateRaw((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.inflateRaw(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.inflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined inflateRaw((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.inflateRawSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.inflateRawSync(buffer[, options])", LasmAdded="v0.11.12"] undefined inflateRawSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.unzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.unzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined unzip((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.unzip(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.unzip(buffer[, options], callback)", LasmAdded="v0.6.0"] undefined unzip((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.unzipSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.unzipSync(buffer[, options])", LasmAdded="v0.11.12"] undefined unzipSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.zstdCompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.zstdCompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdCompress((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.zstdCompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.zstdCompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdCompress((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.zstdCompressSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.zstdCompressSync(buffer[, options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdCompressSync((Uint8Array or DOMString) buffer, optional object options);
-  // `zlib.zstdDecompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.zstdDecompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdDecompress((Uint8Array or DOMString) buffer, Function _callback);
-  // `zlib.zstdDecompress(buffer[, options], callback)` [zlib.md]
-  [LasmSignature="zlib.zstdDecompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdDecompress((Uint8Array or DOMString) buffer, object options, Function _callback);
-  // `zlib.zstdDecompressSync(buffer[, options])` [zlib.md]
-  [LasmSignature="zlib.zstdDecompressSync(buffer[, options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] undefined zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options);
   // `zlib.constants` [zlib.md]
   [LasmSignature="zlib.constants", LasmAdded="v7.0.0"] readonly attribute any constants;
   // `zlib.createZipArchive(entries[, options])` [zlib.md]
@@ -4042,6 +3918,50 @@ namespace zlib {
   [LasmSince="26.13.0", LasmSignature="zlib.getMaxZipContentSize()", LasmAdded="v26.8.0", LasmStability="1"] double getMaxZipContentSize();
   // `zlib.setMaxZipContentSize(size)` [zlib.md]
   [LasmSince="26.13.0", LasmSignature="zlib.setMaxZipContentSize(size)", LasmAdded="v26.8.0", LasmStability="1"] undefined setMaxZipContentSize(double size);
+  // `zlib.brotliCompress(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.brotliCompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] Promise<Uint8Array> brotliCompress((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.brotliCompressSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.brotliCompressSync(buffer[, options])", LasmAdded="v11.7.0, v10.16.0"] Uint8Array brotliCompressSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.brotliDecompress(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.brotliDecompress(buffer[, options], callback)", LasmAdded="v11.7.0, v10.16.0"] Promise<Uint8Array> brotliDecompress((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.brotliDecompressSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.brotliDecompressSync(buffer[, options])", LasmAdded="v11.7.0, v10.16.0"] Uint8Array brotliDecompressSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.deflate(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.deflate(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> deflate((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.deflateSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.deflateSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array deflateSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.deflateRaw(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.deflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> deflateRaw((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.deflateRawSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.deflateRawSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array deflateRawSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.gunzip(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.gunzip(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> gunzip((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.gunzipSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.gunzipSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array gunzipSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.gzip(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.gzip(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> gzip((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.gzipSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.gzipSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array gzipSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.inflate(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.inflate(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> inflate((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.inflateSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.inflateSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array inflateSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.inflateRaw(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.inflateRaw(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> inflateRaw((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.inflateRawSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.inflateRawSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array inflateRawSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.unzip(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.unzip(buffer[, options], callback)", LasmAdded="v0.6.0"] Promise<Uint8Array> unzip((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.unzipSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.unzipSync(buffer[, options])", LasmAdded="v0.11.12"] Uint8Array unzipSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.zstdCompress(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.zstdCompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] Promise<Uint8Array> zstdCompress((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.zstdCompressSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.zstdCompressSync(buffer[, options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] Uint8Array zstdCompressSync((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.zstdDecompress(buffer[, options], callback)` [zlib.md]
+  [LasmSince="26.13.0", LasmPromisify, LasmSignature="zlib.zstdDecompress(buffer[, options], callback)", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] Promise<Uint8Array> zstdDecompress((Uint8Array or DOMString) buffer, optional object options);
+  // `zlib.zstdDecompressSync(buffer[, options])` [zlib.md]
+  [LasmSince="26.13.0", LasmSignature="zlib.zstdDecompressSync(buffer[, options])", LasmAdded="v23.8.0, v22.15.0", LasmStability="1"] Uint8Array zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options);
 };
 
 // Class: `util.MIMEType` (util.md), node:util
@@ -8486,8 +8406,6 @@ dictionary Node_MockTracker_MethodOptions {
 
 [LasmNamespace="MockTracker", LasmName="ModuleOptionsExports"]
 dictionary Node_MockTracker_ModuleOptionsExports {
-  any If;
-  any If;
   any If;
 };
 

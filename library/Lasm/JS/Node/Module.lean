@@ -165,6 +165,6 @@ def module.setSourceMapsSupport (enabled : Bool) (options : Option module.SetSou
     (Support.args #[toJS enabled, Support.optional options]) (await := false)
 
 /-- `module.constants.compileCacheStatus` (added in Node.js v22.8.0): `readonly attribute any compileCacheStatus` (Node.js 24.22.2 documentation, module.md) -/
-def module.constants.compileCacheStatus : IO Data := Support.getExport "node:module" ["compileCacheStatus"] Data
+def module.constants.compileCacheStatus : IO Data := Support.getExport "node:module" ["constants", "compileCacheStatus"] Data
 
 end Lasm.JS.Node

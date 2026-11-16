@@ -303,13 +303,13 @@ def buffers (r : Checks) : Async Unit := do
   let mut g : Rng := ⟨0xb0ff⟩
   for i in [0:300] do
     let (b, g1) := g.bytes 64; let (c, g2) := g1.bytes 64; g := g2
-    -- Buffer.toString b "hex" = hex b ∧ Buffer.from (hex b) "hex" = b
-    expect r s!"hex {i}" ((← Buffer.toString b (some "hex")) == hex b && bytesEq (← Buffer.from (hex b) (some "hex")) b) (hex b)
+    -- Buffer.toString b "hex" = hex b ∧ Buffer.fromWithString (hex b) "hex" = b
+    expect r s!"hex {i}" ((← Buffer.toString b (some "hex")) == hex b && bytesEq (← Buffer.fromWithString (hex b) (some "hex")) b) (hex b)
     -- base64 (RFC 4648 §4) and base64url (§5, unpadded) both ways
-    expect r s!"base64 {i}" ((← Buffer.toString b (some "base64")) == base64 b && bytesEq (← Buffer.from (base64 b) (some "base64")) b) (hex b)
-    expect r s!"base64url {i}" ((← Buffer.toString b (some "base64url")) == base64 b true && bytesEq (← Buffer.from (base64 b true) (some "base64url")) b) (hex b)
+    expect r s!"base64 {i}" ((← Buffer.toString b (some "base64")) == base64 b && bytesEq (← Buffer.fromWithString (base64 b) (some "base64")) b) (hex b)
+    expect r s!"base64url {i}" ((← Buffer.toString b (some "base64url")) == base64 b true && bytesEq (← Buffer.fromWithString (base64 b true) (some "base64url")) b) (hex b)
     -- latin1: one character per byte, both ways
-    expect r s!"latin1 {i}" ((← Buffer.toString b (some "latin1")) == latin1 b && bytesEq (← Buffer.from (latin1 b) (some "latin1")) b) (hex b)
+    expect r s!"latin1 {i}" ((← Buffer.toString b (some "latin1")) == latin1 b && bytesEq (← Buffer.fromWithString (latin1 b) (some "latin1")) b) (hex b)
     -- isUtf8 b = ByteArray.validateUTF8 b ∧ isAscii b = ∀ x ∈ b, x < 128
     expect r s!"isUtf8 {i}" ((← buffer.isUtf8 b) == ByteArray.validateUTF8 b) (hex b)
     expect r s!"isAscii {i}" ((← buffer.isAscii b) == b.toList.all (· < 128)) (hex b)
@@ -322,8 +322,8 @@ def buffers (r : Checks) : Async Unit := do
     expect r s!"toString slice {i}" ((← Buffer.toString b (some "hex") (some k) (some b.size)) == hex (b.extract k b.size)) ""
   for i in [0:200] do
     let (s, g1) := g.string 40; g := g1
-    -- Buffer.from s "utf8" = String.toUTF8 s ∧ byteLength s = utf8ByteSize s ∧ toString (toUTF8 s) = s
-    expect r s!"utf8 {i}" (bytesEq (← Buffer.from s (some "utf8")) s.toUTF8 && (← Buffer.byteLength (.domString s)) == s.utf8ByteSize
+    -- Buffer.fromWithString s "utf8" = String.toUTF8 s ∧ byteLength s = utf8ByteSize s ∧ toString (toUTF8 s) = s
+    expect r s!"utf8 {i}" (bytesEq (← Buffer.fromWithString s (some "utf8")) s.toUTF8 && (← Buffer.byteLength (.domString s)) == s.utf8ByteSize
       && (← Buffer.toString s.toUTF8) == s) (repr s).pretty
     -- transcode utf8 → utf16le → utf8 is the identity, and utf16le has 2 bytes per UTF-16 code unit
     let u16 ← buffer.transcode s.toUTF8 "utf8" "utf16le"
@@ -400,7 +400,7 @@ def cryptography (r : Checks) : Async Unit := do
     let y ← crypto.randomInt 3
     inRange := inRange && -5 ≤ x && x < 7 && 0 ≤ y && y < 3
   expect r "randomInt" inRange ""
-  let u ← crypto.randomUUID
+  let u ← (← Lasm.JS.Web.crypto).randomUUID
   let cs := u.toList
   expect r "randomUUID" (cs.length == 36 && cs[14]! == '4' && ['8', '9', 'a', 'b'].contains cs[19]! && cs[8]! == '-' && cs[13]! == '-') u
   -- getHashes lists sha256
@@ -769,8 +769,18 @@ def availability (r : Checks) : Async Unit := do
     match loaded, info.field "path" with
     | none, _ => missing := missing.push module
     | some m, .string "" =>
-      for n in names "namespace" do
-        unless ← reflectHas m n do missing := missing.push s!"{module} {n}"
+      -- A namespace that is an export of the module (`performance` of node:perf_hooks, `realpath` of node:fs).
+      let exportPath := match info.field "export" with | .string e => some e | _ => none
+      let mut target := m
+      let mut ok := true
+      for part in (exportPath.map (·.splitOn ".")).getD [] do
+        if ok then
+          if ← reflectHas target part then target ← target.get part Value
+          else ok := false
+      unless ok do missing := missing.push s!"{module} {exportPath.getD ""}"
+      if ok then
+        for n in names "namespace" do
+          unless ← reflectHas target n do missing := missing.push s!"{module} {match exportPath with | some e => e ++ "." | none => ""}{n}"
     | some m, .string p =>
       if ← reflectHas m p then
         let c ← m.get p Value

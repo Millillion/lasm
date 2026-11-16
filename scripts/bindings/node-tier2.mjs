@@ -1,22 +1,22 @@
-// Tier 2 of the standard bindings, first part: Lasm.JS.Node, the server-essential
-// Node.js modules that Lasm.JS.Web (tier 1) does not cover. The source is Node's
-// own API documentation in its machine-readable form (doc/api/<module>.json, as
-// published at https://nodejs.org/dist/v<version>/docs/api/; MIT, the Node.js
-// license), pinned below with SHA-256 hashes in node-api.lock.json.
-// scripts/bindings/node-api.mjs lowers the members selected here to WebIDL
-// (scripts/bindings/node.idl), which scripts/bindings/generate-web.mjs turns into
-// library/Lasm/JS/Node/*.lean with the same mapping rules as Lasm.JS.Web
-// (docs/JS_BINDINGS.md, "Lasm.JS.Node"). DECISIONS.md says why these docs and not
-// @types/node.
+// Lasm.JS.Node: every Node.js core module, generated from Node's own API
+// documentation in its machine-readable form (doc/api/<module>.json, as published
+// at https://nodejs.org/dist/v<version>/docs/api/; MIT, the Node.js license),
+// pinned below with SHA-256 hashes in node-api.lock.json, as it is (Jordan,
+// 2026-11-16). scripts/bindings/node-api.mjs lowers each documentation file listed
+// in `modules` to WebIDL (scripts/bindings/node.idl), finding its classes and
+// namespaces itself, and scripts/bindings/generate-web.mjs turns that into
+// library/Lasm/JS/Node/*.lean with the mapping rules of Lasm.JS.Web
+// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; API_DECISIONS.md A17, 0.4-4 to 0.4-9).
 //
-// Selection. Each `containers` entry names a section of a module's docs by its
-// heading (`Promises API`, `Class: \`FileHandle\``) and takes every member of it
-// whose stability is 2 (Stable), minus `exclude` (each with the reason), or only
-// the members in `only`. Members marked Experimental (1), Deprecated (0) or Legacy
-// (3) are never taken. A member's types are the docs' own (`{string|Buffer|URL}`);
-// where the docs give a result only in prose (`Fulfills with the contents of the
-// file.`), `prose` states it in WebIDL and quotes the sentence it encodes: the
-// lowering fails if that sentence is no longer in the member's documentation.
+// This file holds only what the docs do not say in their structure: the JavaScript
+// module of a name (`jsModules`), what a class's heading or prose says about it
+// (`classes`), objects described without a `Class:` heading (`instances`), Node
+// classes that share a web standard's name (`notWeb`), the docs' type names
+// (`typeNames`), types stated in prose with the sentence quoted (`prose`,
+// `proseIdl`, `eventProse`: the lowering fails if the sentence is gone),
+// corrections of the docs against Node, and the members that cannot work from Wasm
+// (`exclude`, each with its reason). Every member is generated whatever its
+// stability; node-coverage.json lists everything not taken exactly as documented.
 
 /** The Node.js version whose docs the bindings reflect (the oldest supported Node,
  * Node 24 LTS), and the newer LTS the lowering compares it with (node-api-26.json). */
@@ -275,3 +275,9 @@ export const eventProse = {
   'net.Socket#lookup': { args: [{ type: 'any', name: 'err' }, { type: 'DOMString', name: 'address' }, { type: 'double?', name: 'family' }, { type: 'DOMString', name: 'host' }],
     quote: 'Emitted after resolving the host name but before connecting.' },
 };
+
+/** zlib's convenience methods: the docs give their results once for all, in the section's prose. */
+for (const n of ['brotliCompress', 'brotliDecompress', 'deflate', 'deflateRaw', 'gunzip', 'gzip', 'inflate', 'inflateRaw', 'unzip', 'zstdCompress', 'zstdDecompress']) {
+  prose[`zlib.${n}`] = { promisify: true, returns: 'Promise<bytes>', quote: 'will call the supplied callback with callback(error, result).' };
+  prose[`zlib.${n}Sync`] = { returns: 'bytes', quote: 'Every method has a *Sync counterpart, which accept the same arguments, but without a callback.' };
+}

@@ -73,26 +73,6 @@ instance : FromJS LongLongOrDOMString where
     | _ => .error ""
   typeName := "Lasm.JS.Node.LongLongOrDOMString"
 
-/-- `buf.poolSize` (added in Node.js v0.11.3): `readonly attribute long long poolSize` -/
-def Buffer.poolSize (self : Buffer) : IO Int := self.val.get "poolSize" Int
-
-/-- `buf.buffer`: `readonly attribute ArrayBuffer buffer` -/
-def Buffer.buffer (self : Buffer) : IO ByteArray := do
-  let r ← self.val.get "buffer" Value
-  Support.arrayBufferBytes r
-
-/-- `buf.byteOffset`: `readonly attribute long long byteOffset` -/
-def Buffer.byteOffset (self : Buffer) : IO Int := self.val.get "byteOffset" Int
-
-/-- `buf.length` (added in Node.js v0.1.90): `readonly attribute long long length` -/
-def Buffer.length (self : Buffer) : IO Int := self.val.get "length" Int
-
-/-- **Deprecated** in the Node.js 24.22.2 docs. `buf.parent`: `readonly attribute any parent` -/
-def Buffer.parent (self : Buffer) : IO Data := self.val.get "parent" Data
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `buf.index`: `readonly attribute long long index` -/
-def Buffer.index (self : Buffer) : IO Int := self.val.get "index" Int
-
 /-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
 def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Support.args #[toJS target, Support.optional targetStart, Support.optional targetEnd, Support.optional sourceStart, Support.optional sourceEnd]) Int
@@ -248,98 +228,6 @@ def Buffer.toString (self : ByteArray) (encoding : Option String := none) (start
 /-- `buf.values()` (added in Node.js v1.1.0): `object values()` -/
 def Buffer.values (self : ByteArray) : IO Data :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.values" self (Support.args #[]) Data
-
-/-- `buf.write(string[, offset[, length]][, encoding])` (added in Node.js v0.1.90): `long long write(DOMString string, optional long long offset, optional long long length, optional DOMString encoding)` -/
-def Buffer.write (self : ByteArray) (string : String) (offset : Option Int := none) (length : Option Int := none) (encoding : Option String := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.write" self (Support.args #[toJS string, Support.optional offset, Support.optional length, Support.optional encoding]) Int
-
-/-- `buf.writeBigInt64BE(value[, offset])` (added in Node.js v12.0.0, v10.20.0): `long long writeBigInt64BE(bigint value, optional long long offset)` -/
-def Buffer.writeBigInt64BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeBigInt64BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeBigInt64LE(value[, offset])` (added in Node.js v12.0.0, v10.20.0): `long long writeBigInt64LE(bigint value, optional long long offset)` -/
-def Buffer.writeBigInt64LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeBigInt64LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeBigUInt64BE(value[, offset])` (added in Node.js v12.0.0, v10.20.0): `long long writeBigUInt64BE(bigint value, optional long long offset)` -/
-def Buffer.writeBigUInt64BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeBigUInt64BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeBigUInt64LE(value[, offset])` (added in Node.js v12.0.0, v10.20.0): `long long writeBigUInt64LE(bigint value, optional long long offset)` -/
-def Buffer.writeBigUInt64LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeBigUInt64LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeDoubleBE(value[, offset])` (added in Node.js v0.11.15): `long long writeDoubleBE(double value, optional long long offset)` -/
-def Buffer.writeDoubleBE (self : ByteArray) (value : Float) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeDoubleBE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeDoubleLE(value[, offset])` (added in Node.js v0.11.15): `long long writeDoubleLE(double value, optional long long offset)` -/
-def Buffer.writeDoubleLE (self : ByteArray) (value : Float) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeDoubleLE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeFloatBE(value[, offset])` (added in Node.js v0.11.15): `long long writeFloatBE(double value, optional long long offset)` -/
-def Buffer.writeFloatBE (self : ByteArray) (value : Float) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeFloatBE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeFloatLE(value[, offset])` (added in Node.js v0.11.15): `long long writeFloatLE(double value, optional long long offset)` -/
-def Buffer.writeFloatLE (self : ByteArray) (value : Float) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeFloatLE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeInt8(value[, offset])` (added in Node.js v0.5.0): `long long writeInt8(long long value, optional long long offset)` -/
-def Buffer.writeInt8 (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeInt8" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeInt16BE(value[, offset])` (added in Node.js v0.5.5): `long long writeInt16BE(long long value, optional long long offset)` -/
-def Buffer.writeInt16BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeInt16BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeInt16LE(value[, offset])` (added in Node.js v0.5.5): `long long writeInt16LE(long long value, optional long long offset)` -/
-def Buffer.writeInt16LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeInt16LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeInt32BE(value[, offset])` (added in Node.js v0.5.5): `long long writeInt32BE(long long value, optional long long offset)` -/
-def Buffer.writeInt32BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeInt32BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeInt32LE(value[, offset])` (added in Node.js v0.5.5): `long long writeInt32LE(long long value, optional long long offset)` -/
-def Buffer.writeInt32LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeInt32LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeIntBE(value, offset, byteLength)` (added in Node.js v0.11.15): `long long writeIntBE(long long value, long long offset, long long byteLength)` -/
-def Buffer.writeIntBE (self : ByteArray) (value : Int) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeIntBE" self (Support.args #[toJS value, toJS offset, toJS byteLength]) Int
-
-/-- `buf.writeIntLE(value, offset, byteLength)` (added in Node.js v0.11.15): `long long writeIntLE(long long value, long long offset, long long byteLength)` -/
-def Buffer.writeIntLE (self : ByteArray) (value : Int) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeIntLE" self (Support.args #[toJS value, toJS offset, toJS byteLength]) Int
-
-/-- `buf.writeUInt8(value[, offset])` (added in Node.js v0.5.0): `long long writeUInt8(long long value, optional long long offset)` -/
-def Buffer.writeUInt8 (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUInt8" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeUInt16BE(value[, offset])` (added in Node.js v0.5.5): `long long writeUInt16BE(long long value, optional long long offset)` -/
-def Buffer.writeUInt16BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUInt16BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeUInt16LE(value[, offset])` (added in Node.js v0.5.5): `long long writeUInt16LE(long long value, optional long long offset)` -/
-def Buffer.writeUInt16LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUInt16LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeUInt32BE(value[, offset])` (added in Node.js v0.5.5): `long long writeUInt32BE(long long value, optional long long offset)` -/
-def Buffer.writeUInt32BE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUInt32BE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeUInt32LE(value[, offset])` (added in Node.js v0.5.5): `long long writeUInt32LE(long long value, optional long long offset)` -/
-def Buffer.writeUInt32LE (self : ByteArray) (value : Int) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUInt32LE" self (Support.args #[toJS value, Support.optional offset]) Int
-
-/-- `buf.writeUIntBE(value, offset, byteLength)` (added in Node.js v0.5.5): `long long writeUIntBE(long long value, long long offset, long long byteLength)` -/
-def Buffer.writeUIntBE (self : ByteArray) (value : Int) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUIntBE" self (Support.args #[toJS value, toJS offset, toJS byteLength]) Int
-
-/-- `buf.writeUIntLE(value, offset, byteLength)` (added in Node.js v0.5.5): `long long writeUIntLE(long long value, long long offset, long long byteLength)` -/
-def Buffer.writeUIntLE (self : ByteArray) (value : Int) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.writeUIntLE" self (Support.args #[toJS value, toJS offset, toJS byteLength]) Int
 
 /-- `Buffer.alloc(size[, fill[, encoding]])` (added in Node.js v5.10.0): `static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding)` -/
 def Buffer.alloc (size : Int) (fill : Option DOMStringOrUint8ArrayOrLongLong := none) (encoding : Option String := none) : IO ByteArray :=

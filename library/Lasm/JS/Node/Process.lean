@@ -463,469 +463,469 @@ def process.addUncaughtExceptionCaptureCallback (fn : JSFunction) : IO Unit :=
     (Support.args #[toJS fn]) (await := false)
 
 /-- `process.finalization.allowedNodeEnvironmentFlags` (added in Node.js v10.10.0): `readonly attribute object allowedNodeEnvironmentFlags` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["allowedNodeEnvironmentFlags"] Data
+def process.finalization.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["finalization", "allowedNodeEnvironmentFlags"] Data
 
 /-- `process.finalization.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.arch : IO String := Support.getExport "node:process" ["arch"] String
+def process.finalization.arch : IO String := Support.getExport "node:process" ["finalization", "arch"] String
 
 /-- `process.finalization.argv` (added in Node.js v0.1.27): `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.argv : IO (Array String) := Support.getExport "node:process" ["argv"] (Array String)
+def process.finalization.argv : IO (Array String) := Support.getExport "node:process" ["finalization", "argv"] (Array String)
 
 /-- `process.finalization.argv0` (added in Node.js v6.4.0): `readonly attribute DOMString argv0` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.argv0 : IO String := Support.getExport "node:process" ["argv0"] String
+def process.finalization.argv0 : IO String := Support.getExport "node:process" ["finalization", "argv0"] String
 
 /-- `process.finalization.channel` (added in Node.js v7.1.0): `readonly attribute object channel` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.channel : IO Data := Support.getExport "node:process" ["channel"] Data
+def process.finalization.channel : IO Data := Support.getExport "node:process" ["finalization", "channel"] Data
 
 /-- `process.finalization.config` (added in Node.js v0.7.7): `readonly attribute object config` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.config : IO Data := Support.getExport "node:process" ["config"] Data
+def process.finalization.config : IO Data := Support.getExport "node:process" ["finalization", "config"] Data
 
 /-- `process.finalization.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.connected : IO Bool := Support.getExport "node:process" ["connected"] Bool
+def process.finalization.connected : IO Bool := Support.getExport "node:process" ["finalization", "connected"] Bool
 
 /-- `process.finalization.debugPort` (added in Node.js v0.7.2): `readonly attribute double debugPort` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.debugPort : IO Float := Support.getExport "node:process" ["debugPort"] Float
+def process.finalization.debugPort : IO Float := Support.getExport "node:process" ["finalization", "debugPort"] Float
 
 /-- `process.finalization.env` (added in Node.js v0.1.27): `readonly attribute object env` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.env : IO Data := Support.getExport "node:process" ["env"] Data
+def process.finalization.env : IO Data := Support.getExport "node:process" ["finalization", "env"] Data
 
 /-- `process.finalization.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
+def process.finalization.execArgv : IO (Array String) := Support.getExport "node:process" ["finalization", "execArgv"] (Array String)
 
 /-- `process.finalization.execPath` (added in Node.js v0.1.100): `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.execPath : IO String := Support.getExport "node:process" ["execPath"] String
+def process.finalization.execPath : IO String := Support.getExport "node:process" ["finalization", "execPath"] String
 
 /-- `process.finalization.exitCode` (added in Node.js v0.11.8): `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
+def process.finalization.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["finalization", "exitCode"] (Option LongLongOrDOMString)
 
 /-- `process.finalization.cached_builtins` (added in Node.js v12.0.0): `readonly attribute boolean cached_builtins` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.cached_builtins : IO Bool := Support.getExport "node:process" ["cached_builtins"] Bool
+def process.finalization.cached_builtins : IO Bool := Support.getExport "node:process" ["finalization", "cached_builtins"] Bool
 
 /-- `process.finalization.debug` (added in Node.js v0.5.5): `readonly attribute boolean debug` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.debug : IO Bool := Support.getExport "node:process" ["debug"] Bool
+def process.finalization.debug : IO Bool := Support.getExport "node:process" ["finalization", "debug"] Bool
 
 /-- `process.finalization.inspector` (added in Node.js v11.10.0): `readonly attribute boolean inspector` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.inspector : IO Bool := Support.getExport "node:process" ["inspector"] Bool
+def process.finalization.inspector : IO Bool := Support.getExport "node:process" ["finalization", "inspector"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.ipv6` (added in Node.js v0.5.3): `readonly attribute boolean ipv6` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.ipv6 : IO Bool := Support.getExport "node:process" ["ipv6"] Bool
+def process.finalization.ipv6 : IO Bool := Support.getExport "node:process" ["finalization", "ipv6"] Bool
 
 /-- `process.finalization.require_module` (added in Node.js v23.0.0, v22.10.0, v20.19.0): `readonly attribute boolean require_module` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.require_module : IO Bool := Support.getExport "node:process" ["require_module"] Bool
+def process.finalization.require_module : IO Bool := Support.getExport "node:process" ["finalization", "require_module"] Bool
 
 /-- `process.finalization.tls` (added in Node.js v0.5.3): `readonly attribute boolean tls` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.tls : IO Bool := Support.getExport "node:process" ["tls"] Bool
+def process.finalization.tls : IO Bool := Support.getExport "node:process" ["finalization", "tls"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.tls_alpn` (added in Node.js v4.8.0): `readonly attribute boolean tls_alpn` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.tls_alpn : IO Bool := Support.getExport "node:process" ["tls_alpn"] Bool
+def process.finalization.tls_alpn : IO Bool := Support.getExport "node:process" ["finalization", "tls_alpn"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.tls_ocsp` (added in Node.js v0.11.13): `readonly attribute boolean tls_ocsp` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.tls_ocsp : IO Bool := Support.getExport "node:process" ["tls_ocsp"] Bool
+def process.finalization.tls_ocsp : IO Bool := Support.getExport "node:process" ["finalization", "tls_ocsp"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.tls_sni` (added in Node.js v0.5.3): `readonly attribute boolean tls_sni` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.tls_sni : IO Bool := Support.getExport "node:process" ["tls_sni"] Bool
+def process.finalization.tls_sni : IO Bool := Support.getExport "node:process" ["finalization", "tls_sni"] Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.typescript` (added in Node.js v23.0.0, v22.10.0): `readonly attribute (boolean or DOMString) typescript` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["typescript"] BooleanOrDOMString
+def process.finalization.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["finalization", "typescript"] BooleanOrDOMString
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.uv` (added in Node.js v0.5.3): `readonly attribute boolean uv` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.uv : IO Bool := Support.getExport "node:process" ["uv"] Bool
+def process.finalization.uv : IO Bool := Support.getExport "node:process" ["finalization", "uv"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.finalization.mainModule` (added in Node.js v0.1.17): `readonly attribute object mainModule` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.mainModule : IO Data := Support.getExport "node:process" ["mainModule"] Data
+def process.finalization.mainModule : IO Data := Support.getExport "node:process" ["finalization", "mainModule"] Data
 
 /-- `process.finalization.noDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean noDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.noDeprecation : IO Bool := Support.getExport "node:process" ["noDeprecation"] Bool
+def process.finalization.noDeprecation : IO Bool := Support.getExport "node:process" ["finalization", "noDeprecation"] Bool
 
 /-- `process.finalization.permission` (added in Node.js v20.0.0): `readonly attribute object permission` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.permission : IO Data := Support.getExport "node:process" ["permission"] Data
+def process.finalization.permission : IO Data := Support.getExport "node:process" ["finalization", "permission"] Data
 
 /-- `process.finalization.pid` (added in Node.js v0.1.15): `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.pid : IO Int := Support.getExport "node:process" ["pid"] Int
+def process.finalization.pid : IO Int := Support.getExport "node:process" ["finalization", "pid"] Int
 
 /-- `process.finalization.platform` (added in Node.js v0.1.16): `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.platform : IO String := Support.getExport "node:process" ["platform"] String
+def process.finalization.platform : IO String := Support.getExport "node:process" ["finalization", "platform"] String
 
 /-- `process.finalization.ppid` (added in Node.js v9.2.0, v8.10.0, v6.13.0): `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.ppid : IO Int := Support.getExport "node:process" ["ppid"] Int
+def process.finalization.ppid : IO Int := Support.getExport "node:process" ["finalization", "ppid"] Int
 
 /-- `process.finalization.release` (added in Node.js v3.0.0): `readonly attribute object release` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.release : IO Data := Support.getExport "node:process" ["release"] Data
+def process.finalization.release : IO Data := Support.getExport "node:process" ["finalization", "release"] Data
 
 /-- `process.finalization.report` (added in Node.js v11.8.0): `readonly attribute object report` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.report : IO Data := Support.getExport "node:process" ["report"] Data
+def process.finalization.report : IO Data := Support.getExport "node:process" ["finalization", "report"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.sourceMapsEnabled` (added in Node.js v20.7.0, v18.19.0): `readonly attribute boolean sourceMapsEnabled` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["sourceMapsEnabled"] Bool
+def process.finalization.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["finalization", "sourceMapsEnabled"] Bool
 
 /-- `process.finalization.stderr`: `readonly attribute EventEmitter stderr` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.stderr : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stderr"] Value
+  let r ← Support.getExport "node:process" ["finalization", "stderr"] Value
   pure { val := r }
 
 /-- `process.finalization.stdin`: `readonly attribute EventEmitter stdin` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.stdin : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdin"] Value
+  let r ← Support.getExport "node:process" ["finalization", "stdin"] Value
   pure { val := r }
 
 /-- `process.finalization.stdout`: `readonly attribute EventEmitter stdout` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.stdout : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdout"] Value
+  let r ← Support.getExport "node:process" ["finalization", "stdout"] Value
   pure { val := r }
 
 /-- `process.finalization.throwDeprecation` (added in Node.js v0.9.12): `readonly attribute boolean throwDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.throwDeprecation : IO Bool := Support.getExport "node:process" ["throwDeprecation"] Bool
+def process.finalization.throwDeprecation : IO Bool := Support.getExport "node:process" ["finalization", "throwDeprecation"] Bool
 
 /-- `process.finalization.title` (added in Node.js v0.1.104): `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.title : IO String := Support.getExport "node:process" ["title"] String
+def process.finalization.title : IO String := Support.getExport "node:process" ["finalization", "title"] String
 
 /-- `process.finalization.traceDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean traceDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.traceDeprecation : IO Bool := Support.getExport "node:process" ["traceDeprecation"] Bool
+def process.finalization.traceDeprecation : IO Bool := Support.getExport "node:process" ["finalization", "traceDeprecation"] Bool
 
 /-- `process.finalization.traceProcessWarnings` (added in Node.js v6.10.0): `readonly attribute boolean traceProcessWarnings` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["traceProcessWarnings"] Bool
+def process.finalization.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["finalization", "traceProcessWarnings"] Bool
 
 /-- `process.finalization.version` (added in Node.js v0.1.3): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.version : IO String := Support.getExport "node:process" ["version"] String
+def process.finalization.version : IO String := Support.getExport "node:process" ["finalization", "version"] String
 
 /-- `process.finalization.versions` (added in Node.js v0.2.0): `readonly attribute object versions` (Node.js 24.22.2 documentation, process.md) -/
-def process.finalization.versions : IO Data := Support.getExport "node:process" ["versions"] Data
+def process.finalization.versions : IO Data := Support.getExport "node:process" ["finalization", "versions"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.register(ref, callback)` (added in Node.js v22.5.0): `undefined register((object or Function) ref, Function callback)` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.register (ref : ObjectOrJSFunction) (callback : JSFunction) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.register", module := "node:process", path := "register", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.register", module := "node:process", path := "finalization.register", construct := false, arity := 2 }
     (Support.args #[toJS ref, toJS callback]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.registerBeforeExit(ref, callback)` (added in Node.js v22.5.0): `undefined registerBeforeExit((object or Function) ref, Function callback)` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.registerBeforeExit (ref : ObjectOrJSFunction) (callback : JSFunction) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.registerBeforeExit", module := "node:process", path := "registerBeforeExit", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.registerBeforeExit", module := "node:process", path := "finalization.registerBeforeExit", construct := false, arity := 2 }
     (Support.args #[toJS ref, toJS callback]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.unregister(ref)` (added in Node.js v22.5.0): `undefined unregister((object or Function) ref)` (Node.js 24.22.2 documentation, process.md) -/
 def process.finalization.unregister (ref : ObjectOrJSFunction) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.unregister", module := "node:process", path := "unregister", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.unregister", module := "node:process", path := "finalization.unregister", construct := false, arity := 1 }
     (Support.args #[toJS ref]) (await := false)
 
 /-- `process.hrtime.allowedNodeEnvironmentFlags` (added in Node.js v10.10.0): `readonly attribute object allowedNodeEnvironmentFlags` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["allowedNodeEnvironmentFlags"] Data
+def process.hrtime.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["hrtime", "allowedNodeEnvironmentFlags"] Data
 
 /-- `process.hrtime.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.arch : IO String := Support.getExport "node:process" ["arch"] String
+def process.hrtime.arch : IO String := Support.getExport "node:process" ["hrtime", "arch"] String
 
 /-- `process.hrtime.argv` (added in Node.js v0.1.27): `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.argv : IO (Array String) := Support.getExport "node:process" ["argv"] (Array String)
+def process.hrtime.argv : IO (Array String) := Support.getExport "node:process" ["hrtime", "argv"] (Array String)
 
 /-- `process.hrtime.argv0` (added in Node.js v6.4.0): `readonly attribute DOMString argv0` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.argv0 : IO String := Support.getExport "node:process" ["argv0"] String
+def process.hrtime.argv0 : IO String := Support.getExport "node:process" ["hrtime", "argv0"] String
 
 /-- `process.hrtime.channel` (added in Node.js v7.1.0): `readonly attribute object channel` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.channel : IO Data := Support.getExport "node:process" ["channel"] Data
+def process.hrtime.channel : IO Data := Support.getExport "node:process" ["hrtime", "channel"] Data
 
 /-- `process.hrtime.config` (added in Node.js v0.7.7): `readonly attribute object config` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.config : IO Data := Support.getExport "node:process" ["config"] Data
+def process.hrtime.config : IO Data := Support.getExport "node:process" ["hrtime", "config"] Data
 
 /-- `process.hrtime.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.connected : IO Bool := Support.getExport "node:process" ["connected"] Bool
+def process.hrtime.connected : IO Bool := Support.getExport "node:process" ["hrtime", "connected"] Bool
 
 /-- `process.hrtime.debugPort` (added in Node.js v0.7.2): `readonly attribute double debugPort` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.debugPort : IO Float := Support.getExport "node:process" ["debugPort"] Float
+def process.hrtime.debugPort : IO Float := Support.getExport "node:process" ["hrtime", "debugPort"] Float
 
 /-- `process.hrtime.env` (added in Node.js v0.1.27): `readonly attribute object env` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.env : IO Data := Support.getExport "node:process" ["env"] Data
+def process.hrtime.env : IO Data := Support.getExport "node:process" ["hrtime", "env"] Data
 
 /-- `process.hrtime.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
+def process.hrtime.execArgv : IO (Array String) := Support.getExport "node:process" ["hrtime", "execArgv"] (Array String)
 
 /-- `process.hrtime.execPath` (added in Node.js v0.1.100): `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.execPath : IO String := Support.getExport "node:process" ["execPath"] String
+def process.hrtime.execPath : IO String := Support.getExport "node:process" ["hrtime", "execPath"] String
 
 /-- `process.hrtime.exitCode` (added in Node.js v0.11.8): `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
+def process.hrtime.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["hrtime", "exitCode"] (Option LongLongOrDOMString)
 
 /-- `process.hrtime.cached_builtins` (added in Node.js v12.0.0): `readonly attribute boolean cached_builtins` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.cached_builtins : IO Bool := Support.getExport "node:process" ["cached_builtins"] Bool
+def process.hrtime.cached_builtins : IO Bool := Support.getExport "node:process" ["hrtime", "cached_builtins"] Bool
 
 /-- `process.hrtime.debug` (added in Node.js v0.5.5): `readonly attribute boolean debug` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.debug : IO Bool := Support.getExport "node:process" ["debug"] Bool
+def process.hrtime.debug : IO Bool := Support.getExport "node:process" ["hrtime", "debug"] Bool
 
 /-- `process.hrtime.inspector` (added in Node.js v11.10.0): `readonly attribute boolean inspector` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.inspector : IO Bool := Support.getExport "node:process" ["inspector"] Bool
+def process.hrtime.inspector : IO Bool := Support.getExport "node:process" ["hrtime", "inspector"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.ipv6` (added in Node.js v0.5.3): `readonly attribute boolean ipv6` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.ipv6 : IO Bool := Support.getExport "node:process" ["ipv6"] Bool
+def process.hrtime.ipv6 : IO Bool := Support.getExport "node:process" ["hrtime", "ipv6"] Bool
 
 /-- `process.hrtime.require_module` (added in Node.js v23.0.0, v22.10.0, v20.19.0): `readonly attribute boolean require_module` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.require_module : IO Bool := Support.getExport "node:process" ["require_module"] Bool
+def process.hrtime.require_module : IO Bool := Support.getExport "node:process" ["hrtime", "require_module"] Bool
 
 /-- `process.hrtime.tls` (added in Node.js v0.5.3): `readonly attribute boolean tls` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.tls : IO Bool := Support.getExport "node:process" ["tls"] Bool
+def process.hrtime.tls : IO Bool := Support.getExport "node:process" ["hrtime", "tls"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.tls_alpn` (added in Node.js v4.8.0): `readonly attribute boolean tls_alpn` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.tls_alpn : IO Bool := Support.getExport "node:process" ["tls_alpn"] Bool
+def process.hrtime.tls_alpn : IO Bool := Support.getExport "node:process" ["hrtime", "tls_alpn"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.tls_ocsp` (added in Node.js v0.11.13): `readonly attribute boolean tls_ocsp` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.tls_ocsp : IO Bool := Support.getExport "node:process" ["tls_ocsp"] Bool
+def process.hrtime.tls_ocsp : IO Bool := Support.getExport "node:process" ["hrtime", "tls_ocsp"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.tls_sni` (added in Node.js v0.5.3): `readonly attribute boolean tls_sni` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.tls_sni : IO Bool := Support.getExport "node:process" ["tls_sni"] Bool
+def process.hrtime.tls_sni : IO Bool := Support.getExport "node:process" ["hrtime", "tls_sni"] Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.hrtime.typescript` (added in Node.js v23.0.0, v22.10.0): `readonly attribute (boolean or DOMString) typescript` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["typescript"] BooleanOrDOMString
+def process.hrtime.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["hrtime", "typescript"] BooleanOrDOMString
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.uv` (added in Node.js v0.5.3): `readonly attribute boolean uv` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.uv : IO Bool := Support.getExport "node:process" ["uv"] Bool
+def process.hrtime.uv : IO Bool := Support.getExport "node:process" ["hrtime", "uv"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.hrtime.mainModule` (added in Node.js v0.1.17): `readonly attribute object mainModule` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.mainModule : IO Data := Support.getExport "node:process" ["mainModule"] Data
+def process.hrtime.mainModule : IO Data := Support.getExport "node:process" ["hrtime", "mainModule"] Data
 
 /-- `process.hrtime.noDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean noDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.noDeprecation : IO Bool := Support.getExport "node:process" ["noDeprecation"] Bool
+def process.hrtime.noDeprecation : IO Bool := Support.getExport "node:process" ["hrtime", "noDeprecation"] Bool
 
 /-- `process.hrtime.permission` (added in Node.js v20.0.0): `readonly attribute object permission` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.permission : IO Data := Support.getExport "node:process" ["permission"] Data
+def process.hrtime.permission : IO Data := Support.getExport "node:process" ["hrtime", "permission"] Data
 
 /-- `process.hrtime.pid` (added in Node.js v0.1.15): `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.pid : IO Int := Support.getExport "node:process" ["pid"] Int
+def process.hrtime.pid : IO Int := Support.getExport "node:process" ["hrtime", "pid"] Int
 
 /-- `process.hrtime.platform` (added in Node.js v0.1.16): `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.platform : IO String := Support.getExport "node:process" ["platform"] String
+def process.hrtime.platform : IO String := Support.getExport "node:process" ["hrtime", "platform"] String
 
 /-- `process.hrtime.ppid` (added in Node.js v9.2.0, v8.10.0, v6.13.0): `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.ppid : IO Int := Support.getExport "node:process" ["ppid"] Int
+def process.hrtime.ppid : IO Int := Support.getExport "node:process" ["hrtime", "ppid"] Int
 
 /-- `process.hrtime.release` (added in Node.js v3.0.0): `readonly attribute object release` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.release : IO Data := Support.getExport "node:process" ["release"] Data
+def process.hrtime.release : IO Data := Support.getExport "node:process" ["hrtime", "release"] Data
 
 /-- `process.hrtime.report` (added in Node.js v11.8.0): `readonly attribute object report` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.report : IO Data := Support.getExport "node:process" ["report"] Data
+def process.hrtime.report : IO Data := Support.getExport "node:process" ["hrtime", "report"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.hrtime.sourceMapsEnabled` (added in Node.js v20.7.0, v18.19.0): `readonly attribute boolean sourceMapsEnabled` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["sourceMapsEnabled"] Bool
+def process.hrtime.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["hrtime", "sourceMapsEnabled"] Bool
 
 /-- `process.hrtime.stderr`: `readonly attribute EventEmitter stderr` (Node.js 24.22.2 documentation, process.md) -/
 def process.hrtime.stderr : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stderr"] Value
+  let r ← Support.getExport "node:process" ["hrtime", "stderr"] Value
   pure { val := r }
 
 /-- `process.hrtime.stdin`: `readonly attribute EventEmitter stdin` (Node.js 24.22.2 documentation, process.md) -/
 def process.hrtime.stdin : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdin"] Value
+  let r ← Support.getExport "node:process" ["hrtime", "stdin"] Value
   pure { val := r }
 
 /-- `process.hrtime.stdout`: `readonly attribute EventEmitter stdout` (Node.js 24.22.2 documentation, process.md) -/
 def process.hrtime.stdout : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdout"] Value
+  let r ← Support.getExport "node:process" ["hrtime", "stdout"] Value
   pure { val := r }
 
 /-- `process.hrtime.throwDeprecation` (added in Node.js v0.9.12): `readonly attribute boolean throwDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.throwDeprecation : IO Bool := Support.getExport "node:process" ["throwDeprecation"] Bool
+def process.hrtime.throwDeprecation : IO Bool := Support.getExport "node:process" ["hrtime", "throwDeprecation"] Bool
 
 /-- `process.hrtime.title` (added in Node.js v0.1.104): `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.title : IO String := Support.getExport "node:process" ["title"] String
+def process.hrtime.title : IO String := Support.getExport "node:process" ["hrtime", "title"] String
 
 /-- `process.hrtime.traceDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean traceDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.traceDeprecation : IO Bool := Support.getExport "node:process" ["traceDeprecation"] Bool
+def process.hrtime.traceDeprecation : IO Bool := Support.getExport "node:process" ["hrtime", "traceDeprecation"] Bool
 
 /-- `process.hrtime.traceProcessWarnings` (added in Node.js v6.10.0): `readonly attribute boolean traceProcessWarnings` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["traceProcessWarnings"] Bool
+def process.hrtime.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["hrtime", "traceProcessWarnings"] Bool
 
 /-- `process.hrtime.version` (added in Node.js v0.1.3): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.version : IO String := Support.getExport "node:process" ["version"] String
+def process.hrtime.version : IO String := Support.getExport "node:process" ["hrtime", "version"] String
 
 /-- `process.hrtime.versions` (added in Node.js v0.2.0): `readonly attribute object versions` (Node.js 24.22.2 documentation, process.md) -/
-def process.hrtime.versions : IO Data := Support.getExport "node:process" ["versions"] Data
+def process.hrtime.versions : IO Data := Support.getExport "node:process" ["hrtime", "versions"] Data
 
 /-- `process.hrtime.bigint()` (added in Node.js v10.7.0): `bigint bigint()` (Node.js 24.22.2 documentation, process.md) -/
 def process.hrtime.bigint : IO Int :=
-  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.hrtime.bigint", module := "node:process", path := "bigint", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.hrtime.bigint", module := "node:process", path := "hrtime.bigint", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 /-- `process.memoryUsage.allowedNodeEnvironmentFlags` (added in Node.js v10.10.0): `readonly attribute object allowedNodeEnvironmentFlags` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["allowedNodeEnvironmentFlags"] Data
+def process.memoryUsage.allowedNodeEnvironmentFlags : IO Data := Support.getExport "node:process" ["memoryUsage", "allowedNodeEnvironmentFlags"] Data
 
 /-- `process.memoryUsage.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.arch : IO String := Support.getExport "node:process" ["arch"] String
+def process.memoryUsage.arch : IO String := Support.getExport "node:process" ["memoryUsage", "arch"] String
 
 /-- `process.memoryUsage.argv` (added in Node.js v0.1.27): `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.argv : IO (Array String) := Support.getExport "node:process" ["argv"] (Array String)
+def process.memoryUsage.argv : IO (Array String) := Support.getExport "node:process" ["memoryUsage", "argv"] (Array String)
 
 /-- `process.memoryUsage.argv0` (added in Node.js v6.4.0): `readonly attribute DOMString argv0` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.argv0 : IO String := Support.getExport "node:process" ["argv0"] String
+def process.memoryUsage.argv0 : IO String := Support.getExport "node:process" ["memoryUsage", "argv0"] String
 
 /-- `process.memoryUsage.channel` (added in Node.js v7.1.0): `readonly attribute object channel` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.channel : IO Data := Support.getExport "node:process" ["channel"] Data
+def process.memoryUsage.channel : IO Data := Support.getExport "node:process" ["memoryUsage", "channel"] Data
 
 /-- `process.memoryUsage.config` (added in Node.js v0.7.7): `readonly attribute object config` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.config : IO Data := Support.getExport "node:process" ["config"] Data
+def process.memoryUsage.config : IO Data := Support.getExport "node:process" ["memoryUsage", "config"] Data
 
 /-- `process.memoryUsage.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.connected : IO Bool := Support.getExport "node:process" ["connected"] Bool
+def process.memoryUsage.connected : IO Bool := Support.getExport "node:process" ["memoryUsage", "connected"] Bool
 
 /-- `process.memoryUsage.debugPort` (added in Node.js v0.7.2): `readonly attribute double debugPort` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.debugPort : IO Float := Support.getExport "node:process" ["debugPort"] Float
+def process.memoryUsage.debugPort : IO Float := Support.getExport "node:process" ["memoryUsage", "debugPort"] Float
 
 /-- `process.memoryUsage.env` (added in Node.js v0.1.27): `readonly attribute object env` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.env : IO Data := Support.getExport "node:process" ["env"] Data
+def process.memoryUsage.env : IO Data := Support.getExport "node:process" ["memoryUsage", "env"] Data
 
 /-- `process.memoryUsage.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
+def process.memoryUsage.execArgv : IO (Array String) := Support.getExport "node:process" ["memoryUsage", "execArgv"] (Array String)
 
 /-- `process.memoryUsage.execPath` (added in Node.js v0.1.100): `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.execPath : IO String := Support.getExport "node:process" ["execPath"] String
+def process.memoryUsage.execPath : IO String := Support.getExport "node:process" ["memoryUsage", "execPath"] String
 
 /-- `process.memoryUsage.exitCode` (added in Node.js v0.11.8): `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
+def process.memoryUsage.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["memoryUsage", "exitCode"] (Option LongLongOrDOMString)
 
 /-- `process.memoryUsage.cached_builtins` (added in Node.js v12.0.0): `readonly attribute boolean cached_builtins` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.cached_builtins : IO Bool := Support.getExport "node:process" ["cached_builtins"] Bool
+def process.memoryUsage.cached_builtins : IO Bool := Support.getExport "node:process" ["memoryUsage", "cached_builtins"] Bool
 
 /-- `process.memoryUsage.debug` (added in Node.js v0.5.5): `readonly attribute boolean debug` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.debug : IO Bool := Support.getExport "node:process" ["debug"] Bool
+def process.memoryUsage.debug : IO Bool := Support.getExport "node:process" ["memoryUsage", "debug"] Bool
 
 /-- `process.memoryUsage.inspector` (added in Node.js v11.10.0): `readonly attribute boolean inspector` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.inspector : IO Bool := Support.getExport "node:process" ["inspector"] Bool
+def process.memoryUsage.inspector : IO Bool := Support.getExport "node:process" ["memoryUsage", "inspector"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.ipv6` (added in Node.js v0.5.3): `readonly attribute boolean ipv6` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.ipv6 : IO Bool := Support.getExport "node:process" ["ipv6"] Bool
+def process.memoryUsage.ipv6 : IO Bool := Support.getExport "node:process" ["memoryUsage", "ipv6"] Bool
 
 /-- `process.memoryUsage.require_module` (added in Node.js v23.0.0, v22.10.0, v20.19.0): `readonly attribute boolean require_module` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.require_module : IO Bool := Support.getExport "node:process" ["require_module"] Bool
+def process.memoryUsage.require_module : IO Bool := Support.getExport "node:process" ["memoryUsage", "require_module"] Bool
 
 /-- `process.memoryUsage.tls` (added in Node.js v0.5.3): `readonly attribute boolean tls` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.tls : IO Bool := Support.getExport "node:process" ["tls"] Bool
+def process.memoryUsage.tls : IO Bool := Support.getExport "node:process" ["memoryUsage", "tls"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.tls_alpn` (added in Node.js v4.8.0): `readonly attribute boolean tls_alpn` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.tls_alpn : IO Bool := Support.getExport "node:process" ["tls_alpn"] Bool
+def process.memoryUsage.tls_alpn : IO Bool := Support.getExport "node:process" ["memoryUsage", "tls_alpn"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.tls_ocsp` (added in Node.js v0.11.13): `readonly attribute boolean tls_ocsp` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.tls_ocsp : IO Bool := Support.getExport "node:process" ["tls_ocsp"] Bool
+def process.memoryUsage.tls_ocsp : IO Bool := Support.getExport "node:process" ["memoryUsage", "tls_ocsp"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.tls_sni` (added in Node.js v0.5.3): `readonly attribute boolean tls_sni` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.tls_sni : IO Bool := Support.getExport "node:process" ["tls_sni"] Bool
+def process.memoryUsage.tls_sni : IO Bool := Support.getExport "node:process" ["memoryUsage", "tls_sni"] Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.memoryUsage.typescript` (added in Node.js v23.0.0, v22.10.0): `readonly attribute (boolean or DOMString) typescript` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["typescript"] BooleanOrDOMString
+def process.memoryUsage.typescript : IO BooleanOrDOMString := Support.getExport "node:process" ["memoryUsage", "typescript"] BooleanOrDOMString
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.uv` (added in Node.js v0.5.3): `readonly attribute boolean uv` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.uv : IO Bool := Support.getExport "node:process" ["uv"] Bool
+def process.memoryUsage.uv : IO Bool := Support.getExport "node:process" ["memoryUsage", "uv"] Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `process.memoryUsage.mainModule` (added in Node.js v0.1.17): `readonly attribute object mainModule` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.mainModule : IO Data := Support.getExport "node:process" ["mainModule"] Data
+def process.memoryUsage.mainModule : IO Data := Support.getExport "node:process" ["memoryUsage", "mainModule"] Data
 
 /-- `process.memoryUsage.noDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean noDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.noDeprecation : IO Bool := Support.getExport "node:process" ["noDeprecation"] Bool
+def process.memoryUsage.noDeprecation : IO Bool := Support.getExport "node:process" ["memoryUsage", "noDeprecation"] Bool
 
 /-- `process.memoryUsage.permission` (added in Node.js v20.0.0): `readonly attribute object permission` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.permission : IO Data := Support.getExport "node:process" ["permission"] Data
+def process.memoryUsage.permission : IO Data := Support.getExport "node:process" ["memoryUsage", "permission"] Data
 
 /-- `process.memoryUsage.pid` (added in Node.js v0.1.15): `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.pid : IO Int := Support.getExport "node:process" ["pid"] Int
+def process.memoryUsage.pid : IO Int := Support.getExport "node:process" ["memoryUsage", "pid"] Int
 
 /-- `process.memoryUsage.platform` (added in Node.js v0.1.16): `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.platform : IO String := Support.getExport "node:process" ["platform"] String
+def process.memoryUsage.platform : IO String := Support.getExport "node:process" ["memoryUsage", "platform"] String
 
 /-- `process.memoryUsage.ppid` (added in Node.js v9.2.0, v8.10.0, v6.13.0): `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.ppid : IO Int := Support.getExport "node:process" ["ppid"] Int
+def process.memoryUsage.ppid : IO Int := Support.getExport "node:process" ["memoryUsage", "ppid"] Int
 
 /-- `process.memoryUsage.release` (added in Node.js v3.0.0): `readonly attribute object release` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.release : IO Data := Support.getExport "node:process" ["release"] Data
+def process.memoryUsage.release : IO Data := Support.getExport "node:process" ["memoryUsage", "release"] Data
 
 /-- `process.memoryUsage.report` (added in Node.js v11.8.0): `readonly attribute object report` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.report : IO Data := Support.getExport "node:process" ["report"] Data
+def process.memoryUsage.report : IO Data := Support.getExport "node:process" ["memoryUsage", "report"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.memoryUsage.sourceMapsEnabled` (added in Node.js v20.7.0, v18.19.0): `readonly attribute boolean sourceMapsEnabled` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["sourceMapsEnabled"] Bool
+def process.memoryUsage.sourceMapsEnabled : IO Bool := Support.getExport "node:process" ["memoryUsage", "sourceMapsEnabled"] Bool
 
 /-- `process.memoryUsage.stderr`: `readonly attribute EventEmitter stderr` (Node.js 24.22.2 documentation, process.md) -/
 def process.memoryUsage.stderr : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stderr"] Value
+  let r ← Support.getExport "node:process" ["memoryUsage", "stderr"] Value
   pure { val := r }
 
 /-- `process.memoryUsage.stdin`: `readonly attribute EventEmitter stdin` (Node.js 24.22.2 documentation, process.md) -/
 def process.memoryUsage.stdin : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdin"] Value
+  let r ← Support.getExport "node:process" ["memoryUsage", "stdin"] Value
   pure { val := r }
 
 /-- `process.memoryUsage.stdout`: `readonly attribute EventEmitter stdout` (Node.js 24.22.2 documentation, process.md) -/
 def process.memoryUsage.stdout : IO EventEmitter := do
-  let r ← Support.getExport "node:process" ["stdout"] Value
+  let r ← Support.getExport "node:process" ["memoryUsage", "stdout"] Value
   pure { val := r }
 
 /-- `process.memoryUsage.throwDeprecation` (added in Node.js v0.9.12): `readonly attribute boolean throwDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.throwDeprecation : IO Bool := Support.getExport "node:process" ["throwDeprecation"] Bool
+def process.memoryUsage.throwDeprecation : IO Bool := Support.getExport "node:process" ["memoryUsage", "throwDeprecation"] Bool
 
 /-- `process.memoryUsage.title` (added in Node.js v0.1.104): `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.title : IO String := Support.getExport "node:process" ["title"] String
+def process.memoryUsage.title : IO String := Support.getExport "node:process" ["memoryUsage", "title"] String
 
 /-- `process.memoryUsage.traceDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean traceDeprecation` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.traceDeprecation : IO Bool := Support.getExport "node:process" ["traceDeprecation"] Bool
+def process.memoryUsage.traceDeprecation : IO Bool := Support.getExport "node:process" ["memoryUsage", "traceDeprecation"] Bool
 
 /-- `process.memoryUsage.traceProcessWarnings` (added in Node.js v6.10.0): `readonly attribute boolean traceProcessWarnings` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["traceProcessWarnings"] Bool
+def process.memoryUsage.traceProcessWarnings : IO Bool := Support.getExport "node:process" ["memoryUsage", "traceProcessWarnings"] Bool
 
 /-- `process.memoryUsage.version` (added in Node.js v0.1.3): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.version : IO String := Support.getExport "node:process" ["version"] String
+def process.memoryUsage.version : IO String := Support.getExport "node:process" ["memoryUsage", "version"] String
 
 /-- `process.memoryUsage.versions` (added in Node.js v0.2.0): `readonly attribute object versions` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage.versions : IO Data := Support.getExport "node:process" ["versions"] Data
+def process.memoryUsage.versions : IO Data := Support.getExport "node:process" ["memoryUsage", "versions"] Data
 
 /-- `process.memoryUsage.rss()` (added in Node.js v15.6.0, v14.18.0): `long long rss()` (Node.js 24.22.2 documentation, process.md) -/
 def process.memoryUsage.rss : IO Int :=
-  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.memoryUsage.rss", module := "node:process", path := "rss", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.memoryUsage.rss", module := "node:process", path := "memoryUsage.rss", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 /-- `process.channel.ref()` (added in Node.js v7.1.0): `undefined ref()` (Node.js 24.22.2 documentation, process.md) -/
 def process.channel.ref : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.ref", module := "node:process", path := "ref", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.ref", module := "node:process", path := "channel.ref", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 /-- `process.channel.unref()` (added in Node.js v7.1.0): `undefined unref()` (Node.js 24.22.2 documentation, process.md) -/
 def process.channel.unref : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.unref", module := "node:process", path := "unref", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.unref", module := "node:process", path := "channel.unref", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 /-- `process.permission.has(scope[, reference])` (added in Node.js v20.0.0): `boolean has(DOMString scope, optional DOMString reference)` (Node.js 24.22.2 documentation, process.md) -/
 def process.permission.has (scope : String) (reference : Option String := none) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.process.permission.has", module := "node:process", path := "has", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.process.permission.has", module := "node:process", path := "permission.has", construct := false, arity := 2 }
     (Support.args #[toJS scope, Support.optional reference]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `process.permission.drop(scope[, reference])` (added in Node.js v24.20.0): `undefined drop(DOMString scope, optional DOMString reference)` (Node.js 24.22.2 documentation, process.md) -/
 def process.permission.drop (scope : String) (reference : Option String := none) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.permission.drop", module := "node:process", path := "drop", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.permission.drop", module := "node:process", path := "permission.drop", construct := false, arity := 2 }
     (Support.args #[toJS scope, Support.optional reference]) (await := false)
 
 /-- `process.report.compact` (added in Node.js v13.12.0, v12.17.0): `readonly attribute boolean compact` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.compact : IO Bool := Support.getExport "node:process" ["compact"] Bool
+def process.report.compact : IO Bool := Support.getExport "node:process" ["report", "compact"] Bool
 
 /-- `process.report.directory` (added in Node.js v11.12.0): `readonly attribute DOMString directory` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.directory : IO String := Support.getExport "node:process" ["directory"] String
+def process.report.directory : IO String := Support.getExport "node:process" ["report", "directory"] String
 
 /-- `process.report.filename` (added in Node.js v11.12.0): `readonly attribute DOMString filename` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.filename : IO String := Support.getExport "node:process" ["filename"] String
+def process.report.filename : IO String := Support.getExport "node:process" ["report", "filename"] String
 
 /-- `process.report.reportOnFatalError` (added in Node.js v11.12.0): `readonly attribute boolean reportOnFatalError` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.reportOnFatalError : IO Bool := Support.getExport "node:process" ["reportOnFatalError"] Bool
+def process.report.reportOnFatalError : IO Bool := Support.getExport "node:process" ["report", "reportOnFatalError"] Bool
 
 /-- `process.report.reportOnSignal` (added in Node.js v11.12.0): `readonly attribute boolean reportOnSignal` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.reportOnSignal : IO Bool := Support.getExport "node:process" ["reportOnSignal"] Bool
+def process.report.reportOnSignal : IO Bool := Support.getExport "node:process" ["report", "reportOnSignal"] Bool
 
 /-- `process.report.reportOnUncaughtException` (added in Node.js v11.12.0): `readonly attribute boolean reportOnUncaughtException` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.reportOnUncaughtException : IO Bool := Support.getExport "node:process" ["reportOnUncaughtException"] Bool
+def process.report.reportOnUncaughtException : IO Bool := Support.getExport "node:process" ["report", "reportOnUncaughtException"] Bool
 
 /-- `process.report.excludeEnv` (added in Node.js v23.3.0, v22.13.0): `readonly attribute boolean excludeEnv` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.excludeEnv : IO Bool := Support.getExport "node:process" ["excludeEnv"] Bool
+def process.report.excludeEnv : IO Bool := Support.getExport "node:process" ["report", "excludeEnv"] Bool
 
 /-- `process.report.signal` (added in Node.js v11.12.0): `readonly attribute DOMString signal` (Node.js 24.22.2 documentation, process.md) -/
-def process.report.signal : IO String := Support.getExport "node:process" ["signal"] String
+def process.report.signal : IO String := Support.getExport "node:process" ["report", "signal"] String
 
 /-- `process.report.getReport([err])` (added in Node.js v11.8.0): `object getReport(optional any err)` (Node.js 24.22.2 documentation, process.md) -/
 def process.report.getReport (err : Data := .undefined) : IO Data :=
-  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.report.getReport", module := "node:process", path := "getReport", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.report.getReport", module := "node:process", path := "report.getReport", construct := false, arity := 1 }
     (Support.args #[err]) (await := false)
 
 /-- `process.report.writeReport([filename][, err])` (added in Node.js v11.8.0): `DOMString writeReport(optional DOMString filename, optional any err)` (Node.js 24.22.2 documentation, process.md) -/
 def process.report.writeReport (filename : Option String := none) (err : Data := .undefined) : IO String :=
-  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.process.report.writeReport", module := "node:process", path := "writeReport", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.process.report.writeReport", module := "node:process", path := "report.writeReport", construct := false, arity := 2 }
     (Support.args #[Support.optional filename, err]) (await := false)
 
 end Lasm.JS.Node

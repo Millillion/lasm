@@ -412,9 +412,9 @@ def vm.runInThisContext (code : String) (options : Option vm.RunInThisContextOpt
     (Support.args #[toJS code, Support.optional options]) (await := false)
 
 /-- `vm.constants.DONT_CONTEXTIFY`: `readonly attribute any DONT_CONTEXTIFY` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.constants.DONT_CONTEXTIFY : IO Data := Support.getExport "node:vm" ["DONT_CONTEXTIFY"] Data
+def vm.constants.DONT_CONTEXTIFY : IO Data := Support.getExport "node:vm" ["constants", "DONT_CONTEXTIFY"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` (added in Node.js v21.7.0, v20.12.0): `readonly attribute any USE_MAIN_CONTEXT_DEFAULT_LOADER` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER : IO Data := Support.getExport "node:vm" ["USE_MAIN_CONTEXT_DEFAULT_LOADER"] Data
+def vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER : IO Data := Support.getExport "node:vm" ["constants", "USE_MAIN_CONTEXT_DEFAULT_LOADER"] Data
 
 end Lasm.JS.Node

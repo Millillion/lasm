@@ -424,224 +424,224 @@ def util.isPartialDeepStrictEqual (val1 : Data) (val2 : Data) : IO Bool :=
     (Support.args #[toJS val1, toJS val2]) (await := false)
 
 /-- `util.inspect.custom` (added in Node.js v6.6.0): `readonly attribute symbol custom` (Node.js 24.22.2 documentation, util.md) -/
-def util.inspect.custom : IO Value := Support.getExport "node:util" ["custom"] Value
+def util.inspect.custom : IO Value := Support.getExport "node:util" ["inspect", "custom"] Value
 
 /-- `util.inspect.defaultOptions` (added in Node.js v6.4.0): `readonly attribute any defaultOptions` (Node.js 24.22.2 documentation, util.md) -/
-def util.inspect.defaultOptions : IO Data := Support.getExport "node:util" ["defaultOptions"] Data
+def util.inspect.defaultOptions : IO Data := Support.getExport "node:util" ["inspect", "defaultOptions"] Data
 
 /-- `util.types.isAnyArrayBuffer(value)` (added in Node.js v10.0.0): `boolean isAnyArrayBuffer(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isAnyArrayBuffer (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isAnyArrayBuffer", module := "node:util", path := "isAnyArrayBuffer", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isAnyArrayBuffer", module := "node:util", path := "types.isAnyArrayBuffer", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isArrayBufferView(value)` (added in Node.js v10.0.0): `boolean isArrayBufferView(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isArrayBufferView (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArrayBufferView", module := "node:util", path := "isArrayBufferView", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArrayBufferView", module := "node:util", path := "types.isArrayBufferView", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isArgumentsObject(value)` (added in Node.js v10.0.0): `boolean isArgumentsObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isArgumentsObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArgumentsObject", module := "node:util", path := "isArgumentsObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArgumentsObject", module := "node:util", path := "types.isArgumentsObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isArrayBuffer(value)` (added in Node.js v10.0.0): `boolean isArrayBuffer(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isArrayBuffer (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArrayBuffer", module := "node:util", path := "isArrayBuffer", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isArrayBuffer", module := "node:util", path := "types.isArrayBuffer", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isAsyncFunction(value)` (added in Node.js v10.0.0): `boolean isAsyncFunction(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isAsyncFunction (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isAsyncFunction", module := "node:util", path := "isAsyncFunction", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isAsyncFunction", module := "node:util", path := "types.isAsyncFunction", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isBigInt64Array(value)` (added in Node.js v10.0.0): `boolean isBigInt64Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isBigInt64Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigInt64Array", module := "node:util", path := "isBigInt64Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigInt64Array", module := "node:util", path := "types.isBigInt64Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isBigIntObject(value)` (added in Node.js v10.4.0): `boolean isBigIntObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isBigIntObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigIntObject", module := "node:util", path := "isBigIntObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigIntObject", module := "node:util", path := "types.isBigIntObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isBigUint64Array(value)` (added in Node.js v10.0.0): `boolean isBigUint64Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isBigUint64Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigUint64Array", module := "node:util", path := "isBigUint64Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBigUint64Array", module := "node:util", path := "types.isBigUint64Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isBooleanObject(value)` (added in Node.js v10.0.0): `boolean isBooleanObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isBooleanObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBooleanObject", module := "node:util", path := "isBooleanObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBooleanObject", module := "node:util", path := "types.isBooleanObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isBoxedPrimitive(value)` (added in Node.js v10.11.0): `boolean isBoxedPrimitive(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isBoxedPrimitive (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBoxedPrimitive", module := "node:util", path := "isBoxedPrimitive", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isBoxedPrimitive", module := "node:util", path := "types.isBoxedPrimitive", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isCryptoKey(value)` (added in Node.js v16.2.0): `boolean isCryptoKey(object value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isCryptoKey (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isCryptoKey", module := "node:util", path := "isCryptoKey", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isCryptoKey", module := "node:util", path := "types.isCryptoKey", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isDataView(value)` (added in Node.js v10.0.0): `boolean isDataView(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isDataView (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isDataView", module := "node:util", path := "isDataView", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isDataView", module := "node:util", path := "types.isDataView", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isDate(value)` (added in Node.js v10.0.0): `boolean isDate(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isDate (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isDate", module := "node:util", path := "isDate", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isDate", module := "node:util", path := "types.isDate", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isExternal(value)` (added in Node.js v10.0.0): `boolean isExternal(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isExternal (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isExternal", module := "node:util", path := "isExternal", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isExternal", module := "node:util", path := "types.isExternal", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isFloat16Array(value)` (added in Node.js v24.0.0): `boolean isFloat16Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isFloat16Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat16Array", module := "node:util", path := "isFloat16Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat16Array", module := "node:util", path := "types.isFloat16Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isFloat32Array(value)` (added in Node.js v10.0.0): `boolean isFloat32Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isFloat32Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat32Array", module := "node:util", path := "isFloat32Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat32Array", module := "node:util", path := "types.isFloat32Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isFloat64Array(value)` (added in Node.js v10.0.0): `boolean isFloat64Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isFloat64Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat64Array", module := "node:util", path := "isFloat64Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isFloat64Array", module := "node:util", path := "types.isFloat64Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isGeneratorFunction(value)` (added in Node.js v10.0.0): `boolean isGeneratorFunction(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isGeneratorFunction (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isGeneratorFunction", module := "node:util", path := "isGeneratorFunction", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isGeneratorFunction", module := "node:util", path := "types.isGeneratorFunction", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isGeneratorObject(value)` (added in Node.js v10.0.0): `boolean isGeneratorObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isGeneratorObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isGeneratorObject", module := "node:util", path := "isGeneratorObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isGeneratorObject", module := "node:util", path := "types.isGeneratorObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isInt8Array(value)` (added in Node.js v10.0.0): `boolean isInt8Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isInt8Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt8Array", module := "node:util", path := "isInt8Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt8Array", module := "node:util", path := "types.isInt8Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isInt16Array(value)` (added in Node.js v10.0.0): `boolean isInt16Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isInt16Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt16Array", module := "node:util", path := "isInt16Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt16Array", module := "node:util", path := "types.isInt16Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isInt32Array(value)` (added in Node.js v10.0.0): `boolean isInt32Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isInt32Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt32Array", module := "node:util", path := "isInt32Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isInt32Array", module := "node:util", path := "types.isInt32Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isKeyObject(value)` (added in Node.js v16.2.0): `boolean isKeyObject(object value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isKeyObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isKeyObject", module := "node:util", path := "isKeyObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isKeyObject", module := "node:util", path := "types.isKeyObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isMap(value)` (added in Node.js v10.0.0): `boolean isMap(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isMap (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isMap", module := "node:util", path := "isMap", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isMap", module := "node:util", path := "types.isMap", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isMapIterator(value)` (added in Node.js v10.0.0): `boolean isMapIterator(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isMapIterator (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isMapIterator", module := "node:util", path := "isMapIterator", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isMapIterator", module := "node:util", path := "types.isMapIterator", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isModuleNamespaceObject(value)` (added in Node.js v10.0.0): `boolean isModuleNamespaceObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isModuleNamespaceObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isModuleNamespaceObject", module := "node:util", path := "isModuleNamespaceObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isModuleNamespaceObject", module := "node:util", path := "types.isModuleNamespaceObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `util.types.isNativeError(value)` (added in Node.js v10.0.0): `boolean isNativeError(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isNativeError (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isNativeError", module := "node:util", path := "isNativeError", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isNativeError", module := "node:util", path := "types.isNativeError", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isNumberObject(value)` (added in Node.js v10.0.0): `boolean isNumberObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isNumberObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isNumberObject", module := "node:util", path := "isNumberObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isNumberObject", module := "node:util", path := "types.isNumberObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isPromise(value)` (added in Node.js v10.0.0): `boolean isPromise(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isPromise (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isPromise", module := "node:util", path := "isPromise", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isPromise", module := "node:util", path := "types.isPromise", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isProxy(value)` (added in Node.js v10.0.0): `boolean isProxy(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isProxy (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isProxy", module := "node:util", path := "isProxy", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isProxy", module := "node:util", path := "types.isProxy", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isRegExp(value)` (added in Node.js v10.0.0): `boolean isRegExp(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isRegExp (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isRegExp", module := "node:util", path := "isRegExp", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isRegExp", module := "node:util", path := "types.isRegExp", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isSet(value)` (added in Node.js v10.0.0): `boolean isSet(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isSet (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSet", module := "node:util", path := "isSet", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSet", module := "node:util", path := "types.isSet", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isSetIterator(value)` (added in Node.js v10.0.0): `boolean isSetIterator(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isSetIterator (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSetIterator", module := "node:util", path := "isSetIterator", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSetIterator", module := "node:util", path := "types.isSetIterator", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isSharedArrayBuffer(value)` (added in Node.js v10.0.0): `boolean isSharedArrayBuffer(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isSharedArrayBuffer (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSharedArrayBuffer", module := "node:util", path := "isSharedArrayBuffer", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSharedArrayBuffer", module := "node:util", path := "types.isSharedArrayBuffer", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isStringObject(value)` (added in Node.js v10.0.0): `boolean isStringObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isStringObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isStringObject", module := "node:util", path := "isStringObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isStringObject", module := "node:util", path := "types.isStringObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isSymbolObject(value)` (added in Node.js v10.0.0): `boolean isSymbolObject(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isSymbolObject (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSymbolObject", module := "node:util", path := "isSymbolObject", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isSymbolObject", module := "node:util", path := "types.isSymbolObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isTypedArray(value)` (added in Node.js v10.0.0): `boolean isTypedArray(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isTypedArray (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isTypedArray", module := "node:util", path := "isTypedArray", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isTypedArray", module := "node:util", path := "types.isTypedArray", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isUint8Array(value)` (added in Node.js v10.0.0): `boolean isUint8Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isUint8Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint8Array", module := "node:util", path := "isUint8Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint8Array", module := "node:util", path := "types.isUint8Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isUint8ClampedArray(value)` (added in Node.js v10.0.0): `boolean isUint8ClampedArray(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isUint8ClampedArray (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint8ClampedArray", module := "node:util", path := "isUint8ClampedArray", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint8ClampedArray", module := "node:util", path := "types.isUint8ClampedArray", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isUint16Array(value)` (added in Node.js v10.0.0): `boolean isUint16Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isUint16Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint16Array", module := "node:util", path := "isUint16Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint16Array", module := "node:util", path := "types.isUint16Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isUint32Array(value)` (added in Node.js v10.0.0): `boolean isUint32Array(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isUint32Array (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint32Array", module := "node:util", path := "isUint32Array", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isUint32Array", module := "node:util", path := "types.isUint32Array", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isWeakMap(value)` (added in Node.js v10.0.0): `boolean isWeakMap(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isWeakMap (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isWeakMap", module := "node:util", path := "isWeakMap", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isWeakMap", module := "node:util", path := "types.isWeakMap", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 /-- `util.types.isWeakSet(value)` (added in Node.js v10.0.0): `boolean isWeakSet(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isWeakSet (value : Data) : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isWeakSet", module := "node:util", path := "isWeakSet", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isWeakSet", module := "node:util", path := "types.isWeakSet", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
 end Lasm.JS.Node

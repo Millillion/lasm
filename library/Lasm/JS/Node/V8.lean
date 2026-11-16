@@ -374,47 +374,47 @@ def v8.setHeapProfileNearHeapLimit (limit : Int) : IO Unit :=
 
 /-- `promiseHooks.onInit(init)` (added in Node.js v17.1.0, v16.14.0): `Function onInit(Function init)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.onInit (init : JSFunction) : IO JSFunction :=
-  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onInit", module := "node:v8", path := "onInit", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onInit", module := "node:v8", path := "promiseHooks.onInit", construct := false, arity := 1 }
     (Support.args #[toJS init]) (await := false)
 
 /-- `promiseHooks.onSettled(settled)` (added in Node.js v17.1.0, v16.14.0): `Function onSettled(Function settled)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.onSettled (settled : JSFunction) : IO JSFunction :=
-  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onSettled", module := "node:v8", path := "onSettled", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onSettled", module := "node:v8", path := "promiseHooks.onSettled", construct := false, arity := 1 }
     (Support.args #[toJS settled]) (await := false)
 
 /-- `promiseHooks.onBefore(before)` (added in Node.js v17.1.0, v16.14.0): `Function onBefore(Function before)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.onBefore (before : JSFunction) : IO JSFunction :=
-  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onBefore", module := "node:v8", path := "onBefore", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onBefore", module := "node:v8", path := "promiseHooks.onBefore", construct := false, arity := 1 }
     (Support.args #[toJS before]) (await := false)
 
 /-- `promiseHooks.onAfter(after)` (added in Node.js v17.1.0, v16.14.0): `Function onAfter(Function after)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.onAfter (after : JSFunction) : IO JSFunction :=
-  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onAfter", module := "node:v8", path := "onAfter", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onAfter", module := "node:v8", path := "promiseHooks.onAfter", construct := false, arity := 1 }
     (Support.args #[toJS after]) (await := false)
 
 /-- `promiseHooks.createHook(callbacks)` (added in Node.js v17.1.0, v16.14.0): `Function createHook(promiseHooks.CreateHookCallbacks callbacks)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.createHook (callbacks : promiseHooks.CreateHookCallbacks) : IO JSFunction :=
-  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.createHook", module := "node:v8", path := "createHook", construct := false, arity := 1 }
+  Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.createHook", module := "node:v8", path := "promiseHooks.createHook", construct := false, arity := 1 }
     (Support.args #[toJS callbacks]) (await := false)
 
 /-- `v8.startupSnapshot.addSerializeCallback(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined addSerializeCallback(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.startupSnapshot.addSerializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addSerializeCallback", module := "node:v8", path := "addSerializeCallback", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addSerializeCallback", module := "node:v8", path := "startupSnapshot.addSerializeCallback", construct := false, arity := 2 }
     (Support.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.addDeserializeCallback(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined addDeserializeCallback(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.startupSnapshot.addDeserializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addDeserializeCallback", module := "node:v8", path := "addDeserializeCallback", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addDeserializeCallback", module := "node:v8", path := "startupSnapshot.addDeserializeCallback", construct := false, arity := 2 }
     (Support.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.setDeserializeMainFunction(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined setDeserializeMainFunction(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.startupSnapshot.setDeserializeMainFunction (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.setDeserializeMainFunction", module := "node:v8", path := "setDeserializeMainFunction", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.setDeserializeMainFunction", module := "node:v8", path := "startupSnapshot.setDeserializeMainFunction", construct := false, arity := 2 }
     (Support.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.isBuildingSnapshot()` (added in Node.js v18.6.0, v16.17.0): `boolean isBuildingSnapshot()` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.startupSnapshot.isBuildingSnapshot : IO Bool :=
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.v8.startupSnapshot.isBuildingSnapshot", module := "node:v8", path := "isBuildingSnapshot", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.v8.startupSnapshot.isBuildingSnapshot", module := "node:v8", path := "startupSnapshot.isBuildingSnapshot", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
 end Lasm.JS.Node

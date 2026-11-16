@@ -409,22 +409,22 @@ def perf_hooks.timerify (fn : JSFunction) (options : Option perf_hooks.TimerifyO
 
 /-- `performance.nodeTiming` (added in Node.js v8.5.0): `readonly attribute PerformanceNodeTiming nodeTiming` (Node.js 24.22.2 documentation, perf_hooks.md) -/
 def performance.nodeTiming : IO PerformanceNodeTiming := do
-  let r ← Support.getExport "node:perf_hooks" ["nodeTiming"] Value
+  let r ← Support.getExport "node:perf_hooks" ["performance", "nodeTiming"] Value
   pure { val := r }
 
 /-- `performance.eventLoopUtilization([utilization1[, utilization2]])` (added in Node.js v14.10.0, v12.19.0): `object eventLoopUtilization(optional object utilization1, optional object utilization2)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
 def performance.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data :=
-  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.performance.eventLoopUtilization", module := "node:perf_hooks", path := "eventLoopUtilization", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.performance.eventLoopUtilization", module := "node:perf_hooks", path := "performance.eventLoopUtilization", construct := false, arity := 2 }
     (Support.args #[utilization1, utilization2]) (await := false)
 
 /-- `performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])` (added in Node.js v18.2.0, v16.17.0): `undefined markResourceTiming(object timingInfo, DOMString requestedUrl, DOMString initiatorType, object global, DOMString cacheMode, object bodyInfo, double responseStatus, optional DOMString deliveryType)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
 def performance.markResourceTiming (timingInfo : Data) (requestedUrl : String) (initiatorType : String) (global : Data) (cacheMode : String) (bodyInfo : Data) (responseStatus : Float) (deliveryType : Option String := none) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.markResourceTiming", module := "node:perf_hooks", path := "markResourceTiming", construct := false, arity := 8 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.markResourceTiming", module := "node:perf_hooks", path := "performance.markResourceTiming", construct := false, arity := 8 }
     (Support.args #[toJS timingInfo, toJS requestedUrl, toJS initiatorType, toJS global, toJS cacheMode, toJS bodyInfo, toJS responseStatus, Support.optional deliveryType]) (await := false)
 
 /-- `performance.timerify(fn[, options])` (added in Node.js v8.5.0): `undefined timerify(Function fn, optional performance.TimerifyOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
 def performance.timerify (fn : JSFunction) (options : Option performance.TimerifyOptions := none) : IO Unit :=
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.timerify", module := "node:perf_hooks", path := "timerify", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.timerify", module := "node:perf_hooks", path := "performance.timerify", construct := false, arity := 2 }
     (Support.args #[toJS fn, Support.optional options]) (await := false)
 
 end Lasm.JS.Node

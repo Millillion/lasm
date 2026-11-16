@@ -1068,7 +1068,8 @@ for (const m of plan) inTier(m.tier, () => {
     // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`).
     if (hostOf(def(n))) emitNamespaceOrGlobal(m.key, n, def(n).members, [extValue(extAttr(def(n), 'LasmPath'))], '');
     else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
-    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
+    // A Node namespace that is an export of its module (`performance` of node:perf_hooks, `fs.realpath`): its LasmPath.
+    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), extValue(extAttr(def(n), 'LasmPath'))?.split('.') ?? [], `${leanTypeName(n)}.`, jsModule);
   }
   emitNamespaceOrGlobal(m.key, 'Window', m.windowGlobals.flatMap(windowMember), [], '');
 });
@@ -1235,7 +1236,7 @@ end Surface
 // (classes without an export, FileHandle, are probed on an instance by the test).
 const nodeSurface = [];
 for (const m of plan.filter(m => m.ns === NODE_NS)) {
-  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', leanModule: m.name,
+  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', ...(extAttr(def(n), 'LasmPath') ? { export: extValue(extAttr(def(n), 'LasmPath')) } : {}), leanModule: m.name,
     namespace: [...new Set(def(n).members.map(memberName))] });
   for (const i of m.ifaces) {
     const members = membersOf(i);
@@ -1247,7 +1248,29 @@ for (const m of plan.filter(m => m.ns === NODE_NS)) {
       instance: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'attribute').map(memberName))] });
   }
 }
-files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, surface: nodeSurface }, null, 2) + '\n');
+// What Node itself may lack, in the availability probe's words (`<module> <path>.<member>`): on Node 24, what only Node 26's
+// docs document (LasmSince); on either, Experimental members (stability 1, which can sit behind a flag).
+const nodeMayLack = { node24: [], node: [] };
+for (const m of plan.filter(m => m.ns === NODE_NS)) {
+  const note = (d, x, probe) => {
+    if (extAttr(x, 'LasmSince') || extAttr(d, 'LasmSince')) nodeMayLack.node24.push(probe);
+    if (/^1/.test(extValue(extAttr(x, 'LasmStability')) ?? extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(probe); nodeMayLack.node24.push(probe); }
+  };
+  for (const n of m.namespaces) {
+    const d = def(n);
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(jsModuleOf(n));
+    const ex = extValue(extAttr(d, 'LasmPath'));
+    for (const x of d.members) note(d, x, `${jsModuleOf(n)} ${ex ? ex + '.' : ''}${memberName(x)}`);
+  }
+  for (const i of m.ifaces) {
+    const d = def(i), p = extValue(extAttr(d, 'LasmPath'));
+    if (!p) continue;
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`);
+    for (const x of membersOf(i)) if (!extAttr(x, 'LasmEvent')) note(d, x, `${jsModuleOf(i)} ${p}.${x.special === 'static' ? '' : x.type === 'operation' ? 'prototype.' : ''}${memberName(x)}`);
+  }
+}
+for (const k of Object.keys(nodeMayLack)) nodeMayLack[k] = [...new Set(nodeMayLack[k])].sort();
+files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, mayLack: nodeMayLack, surface: nodeSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-node', 'Surface.lean'), `/-
 ${nodeGeneratedBy}
 The generated surface (scripts/bindings/node-surface.json), for the availability probe of Main.lean.
