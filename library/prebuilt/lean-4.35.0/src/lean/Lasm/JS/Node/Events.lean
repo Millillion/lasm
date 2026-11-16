@@ -73,6 +73,10 @@ structure events.OnceOptions where
   signal : Option AbortSignal := none
 instance instToJSEventsOnceOptions : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
 
+/-- `v instanceof EventEmitter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitter`). -/
+def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v) then some { val := v } else none
+
 /-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onNewListener(EventEmitter.NewListenerListener listener)`: calls `on("newListener", listener)` -/
 def EventEmitter.onNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "newListener", toJS listener]) Value
@@ -92,10 +96,6 @@ def EventEmitter.onRemoveListener (self : EventEmitter) (listener : EventEmitter
 def EventEmitter.onceRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "removeListener", toJS listener]) Value
   pure { val := r }
-
-/-- `v instanceof EventEmitter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitter`). -/
-def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v) then some { val := v } else none
 
 /-- `emitter.emit(eventName[, ...args])` (added in Node.js v0.1.26): `boolean emit((DOMString or symbol) eventName, any... args)` -/
 def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool :=
