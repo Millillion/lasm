@@ -654,6 +654,19 @@ def ofSyncFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO V
 
 end Function
 
+namespace Async
+
+/-- A JavaScript promise of `act`'s result, for APIs that take a promise of work still
+running: Workers' `ctx.waitUntil (← Async.toPromise (kv.put "k" v))`. `act` starts at
+once as a Lean task (as a call of a `Function.ofFn` function does) and holds no Lean
+thread while it awaits; the promise resolves with `toJS` of its result, or rejects
+with an `Error` if it throws. -/
+def toPromise [ToJS α] (act : Async α) : IO Value := do
+  let f ← Function.ofFn fun _ => do return toJS (← act)
+  f.call #[]
+
+end Async
+
 /-! Typed bindings: `@[js "module" "export"] opaque f : A → B → Async C` (macro in
 Lasm.JS.Meta) defines `f` with `Bindable.bind`; the glue comes from the type. -/
 
@@ -722,8 +735,10 @@ def onEdge : IO Bool := do
 /-- Publishes `v` as the program's default export. In an edge build
 (`lasm build --target workers`) the Worker's requests go to it: a Hono app (or
 any object with a `fetch` method), or a function `(request, env, ctx) => Response`.
+On Workers, the object's `scheduled` and `queue` methods also receive the cron
+triggers and queue batches (`Lasm.JS.Cloudflare.ExportedHandler` is such an object).
 On Node it only records the value (`globalThis.__lasmDefaultExport`). -/
-def exportDefault (v : Value) : IO Unit := do
+def exportDefault [ToJS α] (v : α) : IO Unit := do
   (← global).set "__lasmDefaultExport" v
 
 /-- Blocks the calling thread forever, for servers whose work happens in
