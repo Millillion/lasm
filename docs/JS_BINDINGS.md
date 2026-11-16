@@ -104,6 +104,7 @@ is converted with `FromJS`.
 | The default export | the package | `"default"` | `@[js "some-esm" "default"] opaque f : String → IO Data` |
 | A class (with `new`) | the package | `"new ClassName"` | `@[js "pg" "new Pool"] opaque newPool : Data → IO Value` |
 | A global function | `"globalThis"` | its name | `@[js "globalThis" "fetch"] opaque fetch : String → Data → IO Value` |
+| Your own JavaScript file | its path, from this Lean file | its name | `@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit` |
 
 Result types:
 
@@ -120,6 +121,38 @@ Result types:
 Arguments can be any type with `ToJS`, including `Data` and `Value`. Pass a JavaScript
 function (callback) as a `Value` created with `Function.ofFn` (see below).
 
+### Your own JavaScript files
+
+When the JavaScript you need is not an existing function (an expression such
+as `x instanceof Foo`, two calls made in one host call, a comparator), write
+it in an ES module file of your project and bind it with a path relative to
+the Lean file:
+
+```js
+// ffi/stream.mjs, next to Server.lean
+export function writeAndEnd(res, body) { res.writeHead(200); res.end(body); }
+```
+
+```lean
+-- Server.lean
+@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit
+```
+
+- The path starts with `./` or `../` and names an ES module ending in `.mjs`,
+  beside or below the Lean files' source root (the directory of a standalone
+  program's main file, or the Lake library's source directory).
+- `lasm build` ships the file, and every file it imports by a relative path
+  (`import { x } from './lib.mjs'`), with the program on every target: under
+  `host/project-modules/` for Node, `lasm/project-modules/` for the edge
+  targets, Bun and Deno, and `project-modules/` beside the browser loader. A
+  file it imports from npm (`import pg from 'pg'`) is resolved from the
+  project's `node_modules` on Node and the edge targets, and needs Vite
+  (`@lasm/cli/vite`) in the browser, as npm bindings do.
+- The same file named from two Lean files is one module instance.
+- The binding check loads the file as it loads npm modules, so a missing file
+  or export stops the build. Nothing is evaluated from strings at run time, so
+  project files work under Cloudflare Workers and a strict Content-Security-Policy.
+
 **Binding check.** `lasm build` loads each bound module from the project's
 `node_modules` and checks that the export exists and is a function. A broken
 binding stops the build:
@@ -132,6 +165,11 @@ Lasm.JS binding check failed:
 The check also warns when the Lean binding passes more arguments than the function
 declares. Passing fewer is normal: JavaScript functions often have optional
 trailing parameters.
+
+The check runs on Node. A global that Node lacks (`@[js "globalThis" "Deno.serve"]`,
+`@[js "globalThis" "document.title"]`) fails a Node build, and only warns when the
+build's target is another runtime (`--target deno`, `bun`, `workers`, `browser`,
+…), which brings its own globals.
 
 ## Values and dynamic calls
 
@@ -296,11 +334,22 @@ in `IO` took 8.7 s ([INTEROP_SOAK.md](INTEROP_SOAK.md#concurrent-waiting-handler
 ## Callbacks: Lean functions called by JavaScript
 
 ```lean
-Function.ofFn  (f : Array Data → Async Data) : IO Value      -- JavaScript gets a function returning a Promise
-Function.ofFnReply (f : Array Data → Async Function.Reply) : IO Value -- the reply may be a method call the host makes
-Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms
-Function.ofSyncFn (f : Array Data → IO Data) : IO Value      -- synchronous
-Function.ofSyncFn2 (f : α → β → IO γ)
+Function.ofFn  (f : Array Data → Async Data) (length := 0) : IO Value      -- JavaScript gets a function returning a Promise
+Function.ofFnReply (f : Array Data → Async Function.Reply) (length := 0) : IO Value -- the reply may be a method call the host makes
+Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms (length 1 and 2)
+Function.ofSyncFn (f : Array Data → IO Data) (length := 0) : IO Value      -- synchronous
+Function.ofSyncFn2 (f : α → β → IO γ)                                       -- length 2
+```
+
+`length` is the JavaScript function's `length`, the number of parameters it
+declares. Most callers ignore it; some read it. `Deno.serve` calls a handler
+of length 0 without its request, and Express treats a handler of length 4 as
+an error handler:
+
+```lean
+let onError ← Function.ofFn (length := 4) fun args => do   -- (err, req, res, next)
+  discard <| (← decodeAs Value "res" args[2]!).callMethod "status" #[toJS 500]
+  return .undefined
 ```
 
 - **Asynchronous (`ofFn`), the default for handlers.** Each call is queued to the
@@ -365,6 +414,45 @@ let _ ← app.callMethod "use" #[toJS handler]
 
 A server's `main` must not return while JavaScript serves requests: end it with
 `Lasm.JS.waitForever`.
+
+## JavaScript classes: `Lasm.JS.Class.define`
+
+Some APIs take a class, not a function: `customElements.define`, subclasses
+of `Error`, `EventTarget` or Node's streams, frameworks that call `new` on
+what you pass. `Lasm.JS.Class.define` (`import Lasm.JS.Class`) makes a real
+`class Name extends Base` from Lean, without `eval`, so it works on every
+JavaScript target:
+
+```lean
+import Lasm.JS.Class
+open Lasm.JS
+
+def errorClass : IO Value := do (← global).get "Error"   -- the class itself; a binding would call it
+
+def notFound : IO Value := do
+  Class.define {
+    name := "NotFound"
+    extends? := some (← errorClass)                    -- super(...args) runs first
+    constructor := some fun self _ => self.set "status" (404 : Nat)
+    methods := #[("describe", .sync fun self _ => do
+      return toJS s!"{← self.get "message" String} ({← self.get "status" Nat})")]
+    getters := #[("retryable", fun _ => return .bool false)] }
+-- In JavaScript: const e = new NotFound("no such page"); e instanceof Error; e.describe()
+```
+
+- Each constructor, method and getter is a Lean function of the instance
+  (`self`, JavaScript's `this`) and the call's arguments.
+- `.sync` methods and getters follow `Function.ofSyncFn`'s rules (JavaScript
+  waits for them, and they cannot wait for JavaScript); `.async` methods
+  return a promise and follow `Function.ofFn`'s. Choose per method: a DOM
+  lifecycle callback or a method whose result is used at once is `.sync`.
+- `statics` sets properties of the class itself (`observedAttributes`).
+- Each call of a method is a JavaScript → Lean call (about 20 µs on Node).
+  Per-instance state lives on the instance (`self.set`), or in Lean keyed by
+  a field.
+- Classes a platform finds by export name (Cloudflare Durable Objects,
+  Workers RPC entrypoints) must exist when the module loads, before Lean
+  runs: `define` cannot make those.
 
 ## Errors
 
@@ -776,6 +864,8 @@ Names are Node's own, as its docs write them: `fsPromises.readFile`,
 types (`FileHandle`, `fs.Stats`, `fs.Dirent`, `Hash`, `Hmac`, `ChildProcess`,
 `EventEmitter`, `stream.Readable`, `stream.Writable`), and options objects are
 structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
+Documented events are typed listeners: `server.onRequest`, `socket.onData`,
+`child.onceExit` ([Events](#events-typed-listeners)).
 
 ### What is covered
 
@@ -789,19 +879,21 @@ structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
 | `Lasm.JS.Node.Crypto` | `crypto.createHash`, `createHmac`, `hash`, `randomBytes`, `randomInt`, `randomUUID`, `timingSafeEqual`, `getHashes`, and `scrypt`, `pbkdf2`, `hkdf` as `Async` (through `util.promisify`); `Hash`, `Hmac` | `node:crypto` |
 | `Lasm.JS.Node.ChildProcess` | `child_process.spawn`, `child_process.execFile` (as `Async`, its documented promisified form: `{stdout, stderr}`), `ChildProcess` (`pid`, `exitCode`, `signalCode`, `killed`, `kill`, `stdin`, `stdout`, `stderr`) | `node:child_process` |
 | `Lasm.JS.Node.Events` | `EventEmitter` (`on`, `once`, `off`, `emit`, `listenerCount`, `eventNames`, `removeAllListeners`), `events.once` (`Async`) | `node:events` |
-| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`: a child's `stdout` becomes a web `ReadableStream` (read with Lasm.JS.Web) | `node:stream` |
+| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`, `stream.Duplex.toWeb`, `fromWeb`: a child's `stdout` or a request body becomes a web `ReadableStream` (read with Lasm.JS.Web); `readable.pause`, `resume`, `isPaused`, `setEncoding`, `destroy`, `writable.write`, `end`, `destroy`; the streams' events (`'data'`, `'end'`, `'error'`, `'drain'`, `'finish'`, …) | `node:stream` |
+| `Lasm.JS.Node.Net` | every stable member of `net` (`net.createServer`, `connect` and `createConnection` in their options, path and port forms, `isIP`, the autoselection defaults), `net.Server` (`listen` with options, a path or a port; `address`, `close`, `getConnections` as `Async`, `ref`, `unref`, events `'connection'`, `'listening'`, `'close'`, `'error'`, `'drop'`), `net.Socket` (constructor, `connect`, `write`, `end`, `destroy`, `setEncoding`, `setKeepAlive`, `setNoDelay`, `setTimeout`, addresses and counters, twelve events), `net.BlockList`, `net.SocketAddress`, `net.BoundSocket` | `node:net` |
+| `Lasm.JS.Node.Http` | every stable member of `http` (`http.createServer`, `request` and `get` with options or a URL, `METHODS`, `STATUS_CODES`, `globalAgent`, `validateHeaderName`, …), `http.Server`, `http.IncomingMessage`, `http.ServerResponse`, `http.ClientRequest`, `http.OutgoingMessage`, `http.Agent`, with their stable events | `node:http` |
+| `Lasm.JS.Node.Https` | `https.createServer`, `request`, `get`, `globalAgent`, `https.Server` (with `http.Server`'s members and events), `https.Agent` | `node:https` |
 
 Not generated, with the reason (each listed in
 [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
 
-- **`node:http`, `node:net`: not generated.** A server is a request listener
-  called for each request with an `IncomingMessage` (a Node `Readable`) and a
-  `ServerResponse` (a `Writable`) whose methods are called many times per
-  request, and the docs type the listener's arguments, the events and their
-  arguments in prose. Servers on JavaScript targets are Lasm.JS.Web
-  `Request → Async Response` handlers; on Node they are served through an npm
-  adapter bound with `@[js]` (`@hono/node-server`), and outbound HTTP is
-  Lasm.JS.Web's `fetch` on every target.
+- `net.Server`'s `listen(handle)` form (a libuv handle or file descriptor
+  object; the options, path and port forms are generated); `http.Server`'s and
+  `https.Server`'s own `listen()` entries, which the docs give as identical to
+  `net.Server`'s (inherited); `outgoingMessage.pipe()` (documented to throw);
+  the `[Symbol.asyncDispose]` methods (`await using`: `close`); `http`'s
+  `WebSocket` class (the global, `Lasm.JS.Web.WebSocket`); the `tls` module
+  (`https.createServer` takes TLS options as `Data`).
 - `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
   `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
   `createReadStream`, `createWriteStream` (Node stream classes: use
@@ -834,6 +926,11 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | `[min, ]max` (an optional parameter before a required one) | two overloads | `crypto.randomInt max`, `crypto.randomIntWithMin min max` |
 | `buf.toString([encoding])` (a Buffer method) | an operation on bytes | `Buffer.toString (bytes) (encoding := none)`, called with the bytes as `this` |
 | a `Buffer` result | `Uint8Array` | `ByteArray` |
+| `Event: 'request'` with `request {http.IncomingMessage}`, `response {http.ServerResponse}` | `callback http.Server.RequestListener = undefined (…)` and `onRequest`, `onceRequest` | `server.onRequest (← http.Server.RequestListener.ofFn fun req res => …)` ([Events](#events-typed-listeners)) |
+| a listener parameter the docs add to an event (`requestListener`, `connectListener`) | that event's callback | `http.createServer none (some listener)` |
+| `new net.Socket([options])` (a heading only in the JSON) | `constructor(…)`, checked against the documented parameters | `net.Socket.new (options := none)` |
+| overloads documented under one heading (`server.listen()`: `listen(options)`, `listen(path)`, `listen([port[, host]])`) | one operation each | `listen options`, `listenWithPath`, `listenWithPort (some 0) (some "127.0.0.1")` |
+| `Returns: {this}` | the class | `IO net.Socket` (the object itself) |
 
 Where the docs give a type only in prose, [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)
 states it in WebIDL and quotes the sentence (the lowering fails if the sentence
@@ -851,6 +948,49 @@ still names the namespace), and a union of a namespaced type lives in that
 namespace (`fsPromises.ReadFileOptionsOrDOMString`). A `record` result (`process.env`) is read through `Object.entries`, one more host call: Node's `process.env` is not a plain object and Deno's is a Proxy. Overloads that would get
 one name each add all their argument names (`FileHandle.readWithOptions`,
 `FileHandle.readWithBufferOptions`).
+
+### Events: typed listeners
+
+Every stable event a selected class documents (`Event: 'request'`, with its
+arguments' types) becomes a callback type named after it in the class's
+namespace, `http.Server.RequestListener`, made from a Lean function with
+`ofFn` (asynchronous) or `ofSyncFn`, and two methods, `onRequest` and
+`onceRequest`, which call `emitter.on('request', listener)` and
+`emitter.once(…)` and return the emitter, as those do. Subclasses have their
+parents' events through the structure's `extends` (`http.IncomingMessage` has
+`stream.Readable`'s `onData`, `onEnd`, `onError`). An argument the docs list
+without a name (`net.Server`'s `'connection'`: `{net.Socket}`) is `value`;
+arguments the docs give only in prose are stated in `node-tier2.mjs`
+(`eventProse`, with a quoted sentence: `net.Socket`'s `'lookup'`,
+`net.Server`'s `'drop'`; `ChildProcess`'s `'exit'` and `'close'` give `code`
+and `signal` as `Option`s, since the docs say each is `null` in one case). The
+untyped `EventEmitter.on (name) (JSFunction)` stays for anything else.
+
+```lean
+import Lasm.JS.Node
+open Lasm.JS Lasm.JS.Web Lasm.JS.Node
+
+def main : IO Unit := do
+  -- a TCP echo server: every socket writes back what it reads
+  let onConnection ← net.Server.ConnectionListener.ofSyncFn fun sock => do
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => do
+      discard <| sock.write (match d with | .uint8Array b => .uint8Array b | .domString s => .domString s))
+    discard <| sock.onEnd (← net.Socket.EndListener.ofSyncFn (do discard <| sock.«end»))
+  let server ← net.createServer none (some onConnection)
+  discard <| server.listenWithPort (some 7000) (some "127.0.0.1")
+  waitForever
+```
+
+- **Order.** An asynchronous listener (`ofFn`) runs as a Lean task, so two
+  calls of it may run concurrently: use `ofSyncFn` where the order of events
+  matters (a socket's `'data'` chunks), as above.
+- **Errors.** A listener made with `ofFn` that throws rejects its promise,
+  which Node reports as an unhandled rejection (by default the process exits).
+  An `'error'` event with no listener throws, as in JavaScript.
+- **`end` is a Lean keyword**: the methods are written `sock.«end»`,
+  `res.«end» (some body)`.
+- Event names are not members of the object, so the availability probe does
+  not look for them; `node-surface.json` lists them per class (`events`).
 
 ### Where it runs
 
@@ -903,8 +1043,24 @@ property checks: Lean as the oracle of hex, base64 (RFC 4648), Latin-1, UTF-8
 encoding and validation (`ByteArray.validateUTF8` for `buffer.isUtf8`), byte
 order (`Buffer.compare`) and path operations over generated inputs; published
 vectors (FIPS 180, RFC 1321, RFC 4231, RFC 6070, RFC 7914, RFC 5869); files in a
-fresh temporary directory; child processes, events and stream conversion.
+fresh temporary directory; child processes, events and stream conversion;
+and on 127.0.0.1: an HTTP echo server (`http.createServer`) requested with
+`http.request` over generated bodies (up to 200 kB), methods, paths and headers,
+ten concurrent requests, `http.get`, a 404 from `writeHead`; a web `Request`
+built from an `IncomingMessage` and a `Response` written to a `ServerResponse`
+(requested with `fetch`); and a TCP echo server (`net.createServer`,
+`net.connect`) round-tripping generated chunks (up to six of 64 kB), with
+addresses, `getConnections`, `setEncoding`, `net.isIP` and `BlockList`.
 `web-bindings.yml` runs it on Node 26 and 24, Bun and Deno.
+Measured (web-bindings run 43214713325, `node-conformance`): 5,571 checks
+pass on Node 26.13.0, Node 24.22.2 and Bun 1.4.4; on Deno 2.9.6, 5,570 pass
+and one fails as a known runtime gap (`FileHandle.write string`: Deno's
+`filehandle.write(string)` gives the bytes, not the string;
+`test/fixtures/js-node/known.json`). Generated members the runtimes do not
+have (reported, not failures): `net.BlockList`'s `addAddresses`, `addCIDR`,
+`addCIDRs`, `clear`, `removeAddress`, `removeCIDR`, `removeRange`,
+`removeSubnet` and `net.BoundSocket` on Bun and Deno;
+`net.Socket.getTypeOfService` and `setTypeOfService` on Deno.
 
 ## Servers on JavaScript runtimes: `Lasm.JS.Deno`, `Lasm.JS.Bun` and Node
 
@@ -1006,7 +1162,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
 | a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |
 | a `this` parameter | left out | — |
-| a callback's parameters | its arity is the JavaScript function's `length` (Lasm.JS's own functions have length 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
+| a callback's parameters | its arity is the JavaScript function's `length` (`Function.ofFn`'s default is 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
 | `Response \| Promise<Response>`, `MaybePromise<Response>` | `Promise<Response>` | the handler is `Async`; it returns a promise |
 | `void` beside a value in a callback's result (Bun's `error`) | left out | return a `Response` |
 | `string`, `boolean`, `number`, `void`, `unknown` | `DOMString`, `boolean`, `double`, `undefined`, `any` | `String`, `Bool`, `Float`, `Unit`, `Data` |
@@ -1021,8 +1177,8 @@ fails on one that is neither, so a new version's additions get a decision.
 
 The generated functions look the runtime's global up when called, so a program
 that imports `Lasm.JS.Deno.Serve` still builds (and runs its other code) on Node. A
-hand-written `@[js "globalThis" "Deno.serve"]` binding would not: `lasm build`
-checks every `@[js]` export on Node, where `Deno` does not exist.
+hand-written `@[js "globalThis" "Deno.serve"]` binding builds for `--target deno`
+(the binding check, which runs on Node, only warns there) but not for Node.
 
 The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
@@ -1736,11 +1892,6 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   (`LEAN_NUM_THREADS` raises it at about 9 MB per worker). Waiting in `Async`
   (handlers, `Async` bindings) holds no thread. CPU-bound Lean work in handlers
   still runs on those workers.
-- **Function length.** A JavaScript function made by `Function.ofFn` reports
-  `length` 0. APIs that inspect it do not recognize it: Express treats only
-  four-parameter middleware as an error handler, so write Express error handlers
-  in JavaScript or catch errors inside the Lean handler. An uncaught Lean error
-  rejects the handler's promise, which Express 5 and Hono answer with 500.
 - **Diagnostics.** `Lasm.JS.stats` returns a JSON string with the live counts:
   `values` (JavaScript values Lean holds), `pendingCalls` (JavaScript calls of
   Lean functions awaiting their reply), `functionsLive` (Lean functions that

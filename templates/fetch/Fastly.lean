@@ -1,5 +1,5 @@
 /-
-The routes of Main.lean on Fastly Compute, on Fastly's own host calls
+The routes of Handler.lean on Fastly Compute, on Fastly's own host calls
 (Lasm.Fastly): `npm run build:fastly` writes bin/main.wasm and the package
 Fastly deploys; `fastly compute serve` runs it locally (Viceroy), one instance
 per request.

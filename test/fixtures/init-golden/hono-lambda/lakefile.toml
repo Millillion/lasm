@@ -1,0 +1,16 @@
+name = "app_2nd_server"
+version = "0.1.0"
+defaultTargets = ["app"]
+
+# Pure Lean modules (App.lean).
+[[lean_lib]]
+name = "App"
+
+# The Hono app (Routes.lean), shared by Main.lean (Node) and Export.lean.
+[[lean_lib]]
+name = "Routes"
+
+# The program: Main.lean. Lasm builds it with `lasm build Main.lean`.
+[[lean_exe]]
+name = "app"
+root = "Main"

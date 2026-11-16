@@ -20,6 +20,7 @@ export const inventoryFiles = [
   'src/browser/browser-dev.mjs', 'src/browser/static-server.mjs', 'src/browser/browser-build.mjs', 'src/edge/edge-build.mjs',
   'src/cache-repair.mjs', 'src/editor.mjs', 'src/output-directory.mjs', 'src/application-sources.mjs', 'src/application-build.mjs',
   'src/application-lock.mjs', 'src/application-files.mjs', 'src/managed-lean.mjs', 'src/npm-artifacts.mjs', 'src/managed-download.mjs',
+  'src/project-modules.mjs',
 ];
 
 /** Reads a string or template literal starting at `at` (the quote); returns its fixed pieces and the end. */

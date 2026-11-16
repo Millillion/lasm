@@ -46,7 +46,7 @@ programs that start subprocesses use that helper.
 | Windows x64 | the Windows build on `windows-2025` with Node 24.0.0 and 24.22.3; five-platform installed acceptance on Node 26.13.1 | `node dist/main.mjs` |
 | Docker / Kubernetes | `node:24.22.3-bookworm-slim`, `node:26.13.1-bookworm-slim`, `node:24.20.0-bullseye-slim` (glibc 2.31), `ubuntu:22.04` and `ubuntu:24.04` with the official Node tarballs, all read-only with a 512 MB limit; `deploy/Dockerfile` built and reached over HTTP | [docker-kubernetes.md](deploy/docker-kubernetes.md), [`deploy/Dockerfile`](../deploy/Dockerfile) |
 | Google Cloud Run (gen2), Fly.io, Railway, Render, Heroku (container stack) | the same container images (these platforms run your image on Linux x64; Cloud Run gen1's gVisor is untested) | [cloud-run.md](deploy/cloud-run.md), [fly.md](deploy/fly.md), [railway.md](deploy/railway.md), [render.md](deploy/render.md), [heroku.md](deploy/heroku.md) |
-| AWS Lambda (container image, x86_64 and arm64) | `public.ecr.aws/lambda/nodejs:24` with the AWS Lambda Web Adapter 1.1.0, invoked through the image's Runtime Interface Emulator with API Gateway (HTTP API) events, read-only with 512 MB; `amazonlinux:2023` (glibc 2.34) with the Node 24 tarball | [lambda.md](deploy/lambda.md), [`deploy/lambda/Dockerfile`](../deploy/lambda/Dockerfile) |
+| AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` running the handler the program publishes (`CMD ["lasm-lambda.handler"]`, no server inside): the hono template's `Dockerfile.lambda` in the templates workflow, invoked through the image's Runtime Interface Emulator with API Gateway (HTTP API) events, read-only with 512 MB; the same files as the .zip package (below); `amazonlinux:2023` (glibc 2.34) with the Node 24 tarball | [lambda.md](deploy/lambda.md#container-image) |
 
 ## Function platforms, Alpine and gVisor (Phase 6)
 
@@ -123,15 +123,13 @@ listing records, 404s and 2 seconds of 16 concurrent clients
 | build | Linux x64, Windows x64 and macOS x64 (compiler on Node 24.22.3), Linux arm64 (compiler on Node 24.0.0), macOS arm64 (compiler on Node 26.13.1) | native runners |
 | native | each runner's own Linux build plus the macOS and Windows builds | Node 24.0.0, 24.22.3, 26.13.1 on x64 and arm64; Node 22.23.4 must refuse every build |
 | containers | own Linux build in every image; macOS and Windows builds in Debian 12 and the recipe | Docker on x64 and arm64: `--read-only --tmpfs /tmp --memory=512m --memory-swap=512m`, default seccomp ([`images.json`](../scripts/platform/images.json)) |
-| lambda | Linux and macOS builds | Lambda Node 24 image + Lambda Web Adapter through the Runtime Interface Emulator, x64 and arm64 |
 | macOS | the macOS arm64 build; the Linux x64 build must refuse macOS clearly | `macos-15`, Node 24.22.3 |
 | native-other | the Windows x64 and macOS x64 builds, with the same checks as native | `windows-2025` (the image's PostgreSQL service) and `macos-15-intel` (embedded-postgres), Node 24.0.0 and 24.22.3 |
 | compiler-glibc | the compiler itself builds all three applications | `amazonlinux:2023` (glibc 2.34) with the official Node 24 |
 
 Run it locally (Docker; no accounts): build the three applications with
 `node scripts/platform/build-apps.mjs CANDIDATE.tgz WORK APPS`, then
-`node scripts/platform/run-containers.mjs APPS result.json` and
-`node scripts/platform/run-lambda.mjs APPS result.json`.
+`node scripts/platform/run-containers.mjs APPS result.json`.
 
 ## The compiler's own requirements
 

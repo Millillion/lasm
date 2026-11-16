@@ -384,7 +384,10 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       }
       case 209: return events.length ? takeEvents() : empty;
       case 210: {
-        const f = Number(arg) === 2 ? syncFunction(id) : asyncFunction(id);
+        // The low byte of arg is the kind (1 asynchronous, 2 synchronous), the rest the function's `length`.
+        const flags = Number(arg), length = Math.floor(flags / 256);
+        const f = (flags & 255) === 2 ? syncFunction(id) : asyncFunction(id);
+        Object.defineProperty(f, 'length', { value: length });
         stats.functionsCreated++;
         return encode(f, 'reference');
       }

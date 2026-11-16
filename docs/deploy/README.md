@@ -58,7 +58,7 @@ test and deploy.
 | Railway | [railway.md](railway.md) | Builds the Dockerfile; sets `PORT`. |
 | Render | [render.md](render.md) | Docker runtime; a plan with at least 512 MB. |
 | Heroku | [heroku.md](heroku.md) | Container stack (`heroku.yml`). |
-| AWS Lambda | [lambda.md](lambda.md) | `.zip` for `nodejs24.x` (`lasm build --target lambda`) or a container image behind the AWS Lambda Web Adapter; x86_64 and arm64. |
+| AWS Lambda | [lambda.md](lambda.md) | `.zip` for `nodejs24.x` (`lasm build --target lambda`) or a container image on Lambda's Node 24 image with the same handler (no server inside); x86_64 and arm64. |
 | Lambda@Edge | [lambda-edge.md](lambda-edge.md) | CloudFront origin-request trigger, x86_64, `lasm build --target lambda-edge`. |
 | Vercel Functions | [vercel.md](vercel.md) | `lasm build --target vercel` (Build Output API) or `lasm init --deploy vercel`. |
 | Netlify Functions | [netlify.md](netlify.md) | `lasm init --deploy netlify` (`netlify.toml` with `included_files`); 60 s synchronous limit. |
