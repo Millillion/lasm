@@ -65,7 +65,8 @@ export async function buildApplication(file, options = {}) {
 }
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports } = {}) {
+  cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports,
+  bindingTarget } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -145,7 +146,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
         return checkBindingsAsync(directory, bindings.map(b => paths.has(b.module) ? { ...b, projectFile: paths.get(b.module) } : b), { cache,
           identity: (nodeModules?.identity ?? 'none') + (projectFiles.files.length ? ' ' + projectFiles.files.map(f => f.sha256).join(',') : '') });
       })
-      .then(results => { for (const warning of requireValidBindings(results)) log(`Lasm.JS binding warning: ${warning}`); return results; });
+      .then(results => { for (const warning of requireValidBindings(results, { target: bindingTarget })) log(`Lasm.JS binding warning: ${warning}`); return results; });
     bindingCheck.catch(() => {});
   }
   progress?.({ stage: 'Checking application inputs and cached build' });

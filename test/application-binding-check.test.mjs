@@ -93,6 +93,8 @@ const cases = [
   [{ name: 'Ok.nested', module: 'fns', path: 'nested.deep.f', arity: 1 }, {}],
   [{ name: 'Ok.module', module: 'callable', arity: 1 }, {}],
   [{ name: 'Ok.global', module: 'globalThis', path: 'setTimeout', arity: 2 }, {}],
+  [{ name: 'Err.global', module: 'globalThis', path: 'Deno.serve', arity: 1 }, { error: 'globalThis export "Deno.serve" is missing', missingGlobal: true }],
+  [{ name: 'Err.globalValue', module: 'globalThis', path: 'NaN', arity: 0 }, { error: 'globalThis export "NaN" is a number, not a function' }],
   [{ name: 'Ok.class', module: 'fns', path: 'Klass', arity: 0, construct: true }, {}],
   [{ name: 'Ok.variadic', module: 'fns', path: 'none', arity: 3 }, {}],
   [{ name: 'Ok.builtin', module: 'lasm:ui-dom', path: 'createUi', arity: 1 }, {}],
@@ -125,6 +127,15 @@ test('the check\'s verdict: errors fail the build with each binding named, warni
   const results = [{ name: 'A', warning: 'w1' }, { name: 'B' }, { name: 'C', warning: 'w2' }];
   assert.deepEqual(requireValidBindings(results), ['A: w1', 'C: w2']);
   assert.deepEqual(requireValidBindings([]), []);
+  // A global the checking runtime lacks fails on Node and only warns for another target (A5).
+  const missing = { name: 'G', module: 'globalThis', error: 'globalThis export "Deno.serve" is missing', missingGlobal: true };
+  const other = { name: 'H', module: 'globalThis', error: 'globalThis export "NaN" is a number, not a function' };
+  assert.throws(() => requireValidBindings([missing]), /G: globalThis export "Deno.serve" is missing/);
+  assert.throws(() => requireValidBindings([missing], { target: 'node' }), /G: globalThis export "Deno.serve" is missing/);
+  assert.deepEqual(requireValidBindings([missing, { name: 'B' }], { target: 'deno' }),
+    ['G: globalThis export "Deno.serve" is missing where Lasm checks bindings; it must exist on deno']);
+  assert.throws(() => requireValidBindings([missing, other], { target: 'browser' }), error => error.message.includes('H: globalThis export "NaN" is a number')
+    && !error.message.includes('G:'));
   assert.throws(() => requireValidBindings([...results, { name: 'D', error: 'e1' }, { name: 'E', error: 'e2' }]), error =>
     error.code === 'ERR_LASM_JS_BINDING' && error.message === 'Lasm.JS binding check failed:\n  D: e1\n  E: e2\n'
       + 'Fix the @[js "module" "export"] declarations or install the packages; see https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md');

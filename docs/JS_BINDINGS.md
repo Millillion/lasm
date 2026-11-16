@@ -166,6 +166,11 @@ The check also warns when the Lean binding passes more arguments than the functi
 declares. Passing fewer is normal: JavaScript functions often have optional
 trailing parameters.
 
+The check runs on Node. A global that Node lacks (`@[js "globalThis" "Deno.serve"]`,
+`@[js "globalThis" "document.title"]`) fails a Node build, and only warns when the
+build's target is another runtime (`--target deno`, `bun`, `workers`, `browser`,
+…), which brings its own globals.
+
 ## Values and dynamic calls
 
 `Value` is a JavaScript value (any object, function, promise, class instance) held
@@ -329,11 +334,22 @@ in `IO` took 8.7 s ([INTEROP_SOAK.md](INTEROP_SOAK.md#concurrent-waiting-handler
 ## Callbacks: Lean functions called by JavaScript
 
 ```lean
-Function.ofFn  (f : Array Data → Async Data) : IO Value      -- JavaScript gets a function returning a Promise
-Function.ofFnReply (f : Array Data → Async Function.Reply) : IO Value -- the reply may be a method call the host makes
-Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms
-Function.ofSyncFn (f : Array Data → IO Data) : IO Value      -- synchronous
-Function.ofSyncFn2 (f : α → β → IO γ)
+Function.ofFn  (f : Array Data → Async Data) (length := 0) : IO Value      -- JavaScript gets a function returning a Promise
+Function.ofFnReply (f : Array Data → Async Function.Reply) (length := 0) : IO Value -- the reply may be a method call the host makes
+Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms (length 1 and 2)
+Function.ofSyncFn (f : Array Data → IO Data) (length := 0) : IO Value      -- synchronous
+Function.ofSyncFn2 (f : α → β → IO γ)                                       -- length 2
+```
+
+`length` is the JavaScript function's `length`, the number of parameters it
+declares. Most callers ignore it; some read it. `Deno.serve` calls a handler
+of length 0 without its request, and Express treats a handler of length 4 as
+an error handler:
+
+```lean
+let onError ← Function.ofFn (length := 4) fun args => do   -- (err, req, res, next)
+  discard <| (← decodeAs Value "res" args[2]!).callMethod "status" #[toJS 500]
+  return .undefined
 ```
 
 - **Asynchronous (`ofFn`), the default for handlers.** Each call is queued to the
@@ -1070,7 +1086,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
 | a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |
 | a `this` parameter | left out | — |
-| a callback's parameters | its arity is the JavaScript function's `length` (Lasm.JS's own functions have length 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
+| a callback's parameters | its arity is the JavaScript function's `length` (`Function.ofFn`'s default is 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
 | `Response \| Promise<Response>`, `MaybePromise<Response>` | `Promise<Response>` | the handler is `Async`; it returns a promise |
 | `void` beside a value in a callback's result (Bun's `error`) | left out | return a `Response` |
 | `string`, `boolean`, `number`, `void`, `unknown` | `DOMString`, `boolean`, `double`, `undefined`, `any` | `String`, `Bool`, `Float`, `Unit`, `Data` |
@@ -1085,8 +1101,8 @@ fails on one that is neither, so a new version's additions get a decision.
 
 The generated functions look the runtime's global up when called, so a program
 that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
-hand-written `@[js "globalThis" "Deno.serve"]` binding would not: `lasm build`
-checks every `@[js]` export on Node, where `Deno` does not exist.
+hand-written `@[js "globalThis" "Deno.serve"]` binding builds for `--target deno`
+(the binding check, which runs on Node, only warns there) but not for Node.
 
 The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
@@ -1275,11 +1291,6 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   (`LEAN_NUM_THREADS` raises it at about 9 MB per worker). Waiting in `Async`
   (handlers, `Async` bindings) holds no thread. CPU-bound Lean work in handlers
   still runs on those workers.
-- **Function length.** A JavaScript function made by `Function.ofFn` reports
-  `length` 0. APIs that inspect it do not recognize it: Express treats only
-  four-parameter middleware as an error handler, so write Express error handlers
-  in JavaScript or catch errors inside the Lean handler. An uncaught Lean error
-  rejects the handler's promise, which Express 5 and Hono answer with 500.
 - **Diagnostics.** `Lasm.JS.stats` returns a JSON string with the live counts:
   `values` (JavaScript values Lean holds), `pendingCalls` (JavaScript calls of
   Lean functions awaiting their reply), `functionsLive` (Lean functions that

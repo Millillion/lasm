@@ -80,7 +80,8 @@ const results = bindings.map(b => {
     if (value === null || value === undefined) { value = undefined; break; }
     value = value[key];
   }
-  if (typeof value !== 'function') return { ...b, error: where + ' is ' + (value === undefined ? 'missing' : 'a ' + typeof value + ', not a function') };
+  if (typeof value !== 'function') return { ...b, error: where + ' is ' + (value === undefined ? 'missing' : 'a ' + typeof value + ', not a function'),
+    ...(value === undefined && b.module === 'globalThis' ? { missingGlobal: true } : {}) };
   if (b.construct && !value.prototype) return { ...b, error: where + ' cannot be called with new' };
   const length = value.length;
   if (b.arity > length && length > 0) return { ...b, warning: 'the Lean binding passes ' + b.arity + ' arguments; ' + where + ' declares ' + length + ' parameters' };
@@ -123,8 +124,14 @@ export function checkBindingsAsync(project, bindings, { cache, identity } = {}) 
   });
 }
 
-/** Throws when a binding is broken; returns the warnings. */
-export function requireValidBindings(results) {
+/** Throws when a binding is broken; returns the warnings. A global the checking
+ * runtime lacks (`@[js "globalThis" "Deno.serve"]`, `document.title`) is a warning
+ * when the build's `target` is another runtime (an edge platform, Bun, Deno, the
+ * browser), which provides its own globals; on Node it stays an error. */
+export function requireValidBindings(results, { target } = {}) {
+  if (target && target !== 'node') results = results.map(({ missingGlobal, error, ...r }) => missingGlobal
+    ? { ...r, warning: `${error} where Lasm checks bindings; it must exist on ${target}` }
+    : error === undefined ? r : { ...r, error });
   const errors = results.filter(r => r.error);
   if (errors.length) throw Object.assign(new Error('Lasm.JS binding check failed:\n'
     + errors.map(r => `  ${r.name}: ${r.error}`).join('\n')

@@ -156,6 +156,13 @@ test('require, typed bindings, construction, methods and errors', async () => {
   assert.equal(js.decode(js.dispatch(214, 0, 0n, wire(['clone', 'globalThis', 'structuredClone', [{ a: [1] }]]))).a[0], 1);
 });
 
+test('op 210: the length above the kind byte sets the function\'s length (Function.ofFn1, ofFn2)', () => {
+  const js = createNodeJs();
+  assert.equal(js.decode(js.dispatch(210, 7, 1n, Buffer.alloc(0))).length, 0);
+  assert.equal(js.decode(js.dispatch(210, 7, 1n + 2n * 256n, Buffer.alloc(0))).length, 2);
+  assert.equal(js.decode(js.dispatch(210, 7, 1n + 3n * 256n, Buffer.alloc(0))).length, 3);
+});
+
 test('asynchronous Lean functions are queued to the interop thread', async () => {
   const js = createNodeJs();
   const f = js.decode(js.dispatch(210, 7, 1n, Buffer.alloc(0)));

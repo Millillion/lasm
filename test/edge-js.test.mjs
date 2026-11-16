@@ -385,6 +385,16 @@ test('synchronous Lean functions call the export directly; a failure status thro
   assert.equal(e.js.snapshot().functionsCreated, 2);
 });
 
+test('op 210: the length above the kind byte sets the function\'s length (Function.ofFn1, ofFn2)', () => {
+  const e = edge({ syncCall: () => cat(Uint8Array.of(0), wire(null)) });
+  const length = arg => e.value(203, unwire(e.call(210, 1, arg)).ref, 0, wire('length'));
+  assert.equal(length(1), 0);
+  assert.equal(length(2), 0);
+  assert.equal(length(1 + 2 * 256), 2);
+  assert.equal(length(2 + 1 * 256), 1);
+  assert.equal(length(1 + 4 * 256), 4);
+});
+
 test('statistics: op 213 and the snapshot', () => {
   const e = edge({ modules: { lib: {} } });
   e.call(201, 0, 1, enc.encode('lib'));
