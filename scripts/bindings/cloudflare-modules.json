@@ -48,6 +48,10 @@
   "title": "ExportedHandler, every handler of a Worker together (fetch, scheduled, queue, email, tail, trace, tailStream, connect, test)"
  },
  {
+  "name": "Stream",
+  "title": "Cloudflare Stream (StreamBinding)"
+ },
+ {
   "name": "HtmlRewriter",
   "title": "HTMLRewriter, a streaming HTML parser"
  },
@@ -56,12 +60,16 @@
   "title": "Images and Media transformations (ImagesBinding, MediaBinding)"
  },
  {
+  "name": "Services",
+  "title": "the other bindings: rate limiting, Secrets Store, Artifacts, Flagship, Pipelines, Markdown conversion"
+ },
+ {
   "name": "Vectorize",
   "title": "Vectorize, vector indexes (VectorizeIndex)"
  },
  {
   "name": "Ai",
-  "title": "Workers AI, AI Gateway, AI Search and AutoRAG, Agent memory (Ai, AiGateway, AiSearchNamespace); Cloudflare Stream (StreamBinding); the other bindings: rate limiting, Secrets Store, Artifacts, Flagship, Pipelines, Markdown conversion"
+  "title": "Workers AI, AI Gateway, AI Search and AutoRAG, Agent memory (Ai, AiGateway, AiSearchNamespace)"
  },
  {
   "name": "Hyperdrive",

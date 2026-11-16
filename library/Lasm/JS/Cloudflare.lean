@@ -23,8 +23,10 @@ import Lasm.JS.Cloudflare.DurableObjects
 import Lasm.JS.Cloudflare.Tail
 import Lasm.JS.Cloudflare.Email
 import Lasm.JS.Cloudflare.Handlers
+import Lasm.JS.Cloudflare.Stream
 import Lasm.JS.Cloudflare.HtmlRewriter
 import Lasm.JS.Cloudflare.Images
+import Lasm.JS.Cloudflare.Services
 import Lasm.JS.Cloudflare.Vectorize
 import Lasm.JS.Cloudflare.Hyperdrive
 import Lasm.JS.Cloudflare.Workflows

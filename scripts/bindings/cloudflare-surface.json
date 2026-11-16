@@ -428,6 +428,42 @@
         "waitUntil",
         "message"
       ],
+      "StreamBinding": [
+        "video",
+        "upload",
+        "createDirectUpload",
+        "videos",
+        "watermarks"
+      ],
+      "StreamVideoHandle": [
+        "id",
+        "details",
+        "update",
+        "delete",
+        "generateToken",
+        "downloads",
+        "captions"
+      ],
+      "StreamScopedCaptions": [
+        "upload",
+        "generate",
+        "list",
+        "delete"
+      ],
+      "StreamScopedDownloads": [
+        "generate",
+        "get",
+        "delete"
+      ],
+      "StreamVideos": [
+        "list"
+      ],
+      "StreamWatermarks": [
+        "generate",
+        "list",
+        "get",
+        "delete"
+      ],
       "HTMLRewriter": [
         null,
         "on",
@@ -498,23 +534,6 @@
         "response",
         "contentType"
       ],
-      "VectorizeIndex": [
-        "describe",
-        "query",
-        "insert",
-        "upsert",
-        "deleteByIds",
-        "getByIds"
-      ],
-      "Vectorize": [
-        "describe",
-        "query",
-        "queryById",
-        "insert",
-        "upsert",
-        "deleteByIds",
-        "getByIds"
-      ],
       "Console": [
         "assert",
         "clear",
@@ -553,6 +572,74 @@
       ],
       "FixedLengthStream": [
         null
+      ],
+      "ArtifactsRepo": [
+        "createToken",
+        "listTokens",
+        "revokeToken",
+        "info",
+        "readBlob",
+        "readTree",
+        "readCommit",
+        "readFile",
+        "log",
+        "fork"
+      ],
+      "Artifacts": [
+        "create",
+        "get",
+        "import",
+        "list",
+        "delete"
+      ],
+      "Flagship": [
+        "getValue",
+        "getDetails",
+        "getBooleanValue",
+        "getStringValue",
+        "getNumberValue",
+        "getObjectValue",
+        "getBooleanDetails",
+        "getStringDetails",
+        "getNumberDetails",
+        "getObjectDetails"
+      ],
+      "HelloWorldBinding": [
+        "get",
+        "set"
+      ],
+      "NodeStyleServer": [
+        "listen",
+        "address"
+      ],
+      "PipelineTransformationEntrypoint": [
+        "run"
+      ],
+      "Pipeline": [
+        "send"
+      ],
+      "RateLimit": [
+        "limit"
+      ],
+      "SecretsStoreSecret": [
+        "get"
+      ],
+      "VectorizeIndex": [
+        "describe",
+        "query",
+        "insert",
+        "upsert",
+        "deleteByIds",
+        "getByIds"
+      ],
+      "Vectorize": [
+        "describe",
+        "query",
+        "queryById",
+        "insert",
+        "upsert",
+        "deleteByIds",
+        "getByIds"
       ],
       "AgentMemoryProfile": [
         "get",
@@ -884,94 +971,7 @@
         "run",
         "getUrl"
       ],
-      "ArtifactsRepo": [
-        "createToken",
-        "listTokens",
-        "revokeToken",
-        "info",
-        "readBlob",
-        "readTree",
-        "readCommit",
-        "readFile",
-        "log",
-        "fork"
-      ],
-      "Artifacts": [
-        "create",
-        "get",
-        "import",
-        "list",
-        "delete"
-      ],
       "AutoRAG": [],
-      "Flagship": [
-        "getValue",
-        "getDetails",
-        "getBooleanValue",
-        "getStringValue",
-        "getNumberValue",
-        "getObjectValue",
-        "getBooleanDetails",
-        "getStringDetails",
-        "getNumberDetails",
-        "getObjectDetails"
-      ],
-      "HelloWorldBinding": [
-        "get",
-        "set"
-      ],
-      "NodeStyleServer": [
-        "listen",
-        "address"
-      ],
-      "PipelineTransformationEntrypoint": [
-        "run"
-      ],
-      "Pipeline": [
-        "send"
-      ],
-      "RateLimit": [
-        "limit"
-      ],
-      "SecretsStoreSecret": [
-        "get"
-      ],
-      "StreamBinding": [
-        "video",
-        "upload",
-        "createDirectUpload",
-        "videos",
-        "watermarks"
-      ],
-      "StreamVideoHandle": [
-        "id",
-        "details",
-        "update",
-        "delete",
-        "generateToken",
-        "downloads",
-        "captions"
-      ],
-      "StreamScopedCaptions": [
-        "upload",
-        "generate",
-        "list",
-        "delete"
-      ],
-      "StreamScopedDownloads": [
-        "generate",
-        "get",
-        "delete"
-      ],
-      "StreamVideos": [
-        "list"
-      ],
-      "StreamWatermarks": [
-        "generate",
-        "list",
-        "get",
-        "delete"
-      ],
       "ToMarkdownService": [
         "transform",
         "supported"

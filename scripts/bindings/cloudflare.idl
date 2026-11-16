@@ -1215,7 +1215,7 @@ dictionary Cloudflare_ExportedHandler {
 };
 
 // interface Console
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Console", LasmPath="Console"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="Console", LasmPath="Console"]
 interface Cloudflare_Console {
   // assert(condition?: boolean, ...data: any[]): void
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="assert(condition?: boolean, ...data: any[]): void"] undefined assert(optional boolean condition, any... data);
@@ -1374,21 +1374,21 @@ dictionary Cloudflare_AnalyticsEngineDataPoint {
 };
 
 // options EventTargetHandlerObject
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="EventTargetHandlerObject", LasmPath="EventTargetHandlerObject"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="EventTargetHandlerObject", LasmPath="EventTargetHandlerObject"]
 dictionary Cloudflare_EventTargetHandlerObject {
   // handleEvent: (event: Event) => any | undefined
   required Cloudflare_EventTargetHandlerObjectHandleEvent handleEvent;
 };
 
 // options SubtleCryptoHashAlgorithm
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="SubtleCryptoHashAlgorithm", LasmPath="SubtleCryptoHashAlgorithm"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="SubtleCryptoHashAlgorithm", LasmPath="SubtleCryptoHashAlgorithm"]
 dictionary Cloudflare_SubtleCryptoHashAlgorithm {
   // name: string
   required DOMString name;
 };
 
 // interface DigestStream
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="DigestStream", LasmPath="DigestStream"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="DigestStream", LasmPath="DigestStream"]
 interface Cloudflare_DigestStream {
   // get locked(): boolean
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get locked(): boolean"] readonly attribute boolean locked;
@@ -1407,7 +1407,7 @@ interface Cloudflare_DigestStream {
 };
 
 // options DigestStreamOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="DigestStreamOptions", LasmPath="DigestStreamOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="DigestStreamOptions", LasmPath="DigestStreamOptions"]
 dictionary Cloudflare_DigestStreamOptions {
   // toWellFormed?: boolean
   boolean toWellFormed;
@@ -1593,7 +1593,7 @@ interface Cloudflare_ScheduledEvent {
 };
 
 // options UnderlyingByteSource
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="UnderlyingByteSource", LasmPath="UnderlyingByteSource"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="UnderlyingByteSource", LasmPath="UnderlyingByteSource"]
 dictionary Cloudflare_UnderlyingByteSource {
   // type: "bytes"
   required Cloudflare_UnderlyingByteSourceType type;
@@ -1608,21 +1608,21 @@ dictionary Cloudflare_UnderlyingByteSource {
 };
 
 // options ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions", LasmPath="ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions", LasmPath="ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions"]
 dictionary Cloudflare_ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions {
   // min?: number
   double min;
 };
 
 // interface FixedLengthStream
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="FixedLengthStream", LasmPath="FixedLengthStream"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="FixedLengthStream", LasmPath="FixedLengthStream"]
 interface Cloudflare_FixedLengthStream : Cloudflare_IdentityTransformStream {
   // constructor(expectedLength: number | bigint, queuingStrategy?: IdentityTransformStreamQueuingStrategy)
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(expectedLength: number | bigint, queuingStrategy?: IdentityTransformStreamQueuingStrategy)"] constructor(Cloudflare_DoubleOrBigint expectedLength, optional Cloudflare_IdentityTransformStreamQueuingStrategy queuingStrategy);
 };
 
 // interface IdentityTransformStream
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="IdentityTransformStream", LasmPath="IdentityTransformStream"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="IdentityTransformStream", LasmPath="IdentityTransformStream"]
 interface Cloudflare_IdentityTransformStream {
   // get readable(): ReadableStream<O>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get readable(): ReadableStream<O>"] readonly attribute ReadableStream readable;
@@ -1633,7 +1633,7 @@ interface Cloudflare_IdentityTransformStream {
 };
 
 // options IdentityTransformStreamQueuingStrategy
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="IdentityTransformStreamQueuingStrategy", LasmPath="IdentityTransformStreamQueuingStrategy"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="IdentityTransformStreamQueuingStrategy", LasmPath="IdentityTransformStreamQueuingStrategy"]
 dictionary Cloudflare_IdentityTransformStreamQueuingStrategy {
   // highWaterMark?: number | bigint
   Cloudflare_DoubleOrBigint highWaterMark;
@@ -2275,7 +2275,7 @@ dictionary Cloudflare_workerdResourceLimits {
 };
 
 // options UvMetricsInfo
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="UvMetricsInfo", LasmPath="UvMetricsInfo"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="UvMetricsInfo", LasmPath="UvMetricsInfo"]
 dictionary Cloudflare_UvMetricsInfo {
   // loopCount: number
   required double loopCount;
@@ -3737,7 +3737,7 @@ dictionary Cloudflare_ChatCompletionToolChoiceFunction {
   // type: "function"
   required Cloudflare_AiTextGenerationToolOutputType type;
   // function: { name: string; }
-  required Cloudflare_SubtleCryptoHashAlgorithm function;
+  required Cloudflare_ChatCompletionToolChoiceFunctionFunction function;
 };
 
 // options ChatCompletionToolChoiceCustom
@@ -3746,7 +3746,7 @@ dictionary Cloudflare_ChatCompletionToolChoiceCustom {
   // type: "custom"
   required Cloudflare_ChatCompletionCustomToolType type;
   // custom: { name: string; }
-  required Cloudflare_SubtleCryptoHashAlgorithm custom;
+  required Cloudflare_ChatCompletionToolChoiceFunctionFunction custom;
 };
 
 // options ChatCompletionToolChoiceAllowedTools
@@ -4885,7 +4885,7 @@ dictionary Cloudflare_ToolChoiceFunction {
 };
 
 // options StreamOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamOptions", LasmPath="StreamOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamOptions", LasmPath="StreamOptions"]
 dictionary Cloudflare_StreamOptions {
   // include_obfuscation?: boolean
   boolean include_obfuscation;
@@ -7098,7 +7098,7 @@ interface Cloudflare_AnalyticsSQLBinding {
 };
 
 // options ArtifactsRepoInfo
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsRepoInfo", LasmPath="ArtifactsRepoInfo"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsRepoInfo", LasmPath="ArtifactsRepoInfo"]
 dictionary Cloudflare_ArtifactsRepoInfo {
   // id: string
   required DOMString id;
@@ -7123,7 +7123,7 @@ dictionary Cloudflare_ArtifactsRepoInfo {
 };
 
 // options ArtifactsCreateRepoResult
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsCreateRepoResult", LasmPath="ArtifactsCreateRepoResult"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsCreateRepoResult", LasmPath="ArtifactsCreateRepoResult"]
 dictionary Cloudflare_ArtifactsCreateRepoResult {
   // id: string
   required DOMString id;
@@ -7140,7 +7140,7 @@ dictionary Cloudflare_ArtifactsCreateRepoResult {
 };
 
 // options ArtifactsRepoListResult
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsRepoListResult", LasmPath="ArtifactsRepoListResult"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsRepoListResult", LasmPath="ArtifactsRepoListResult"]
 dictionary Cloudflare_ArtifactsRepoListResult {
   // repos: Omit<ArtifactsRepoInfo, "remote">[]
   required sequence<Cloudflare_ArtifactsRepoListResultRepos> repos;
@@ -7151,7 +7151,7 @@ dictionary Cloudflare_ArtifactsRepoListResult {
 };
 
 // options ArtifactsCreateTokenResult
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsCreateTokenResult", LasmPath="ArtifactsCreateTokenResult"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsCreateTokenResult", LasmPath="ArtifactsCreateTokenResult"]
 dictionary Cloudflare_ArtifactsCreateTokenResult {
   // id: string
   required DOMString id;
@@ -7164,7 +7164,7 @@ dictionary Cloudflare_ArtifactsCreateTokenResult {
 };
 
 // options ArtifactsTokenInfo
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsTokenInfo", LasmPath="ArtifactsTokenInfo"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsTokenInfo", LasmPath="ArtifactsTokenInfo"]
 dictionary Cloudflare_ArtifactsTokenInfo {
   // id: string
   required DOMString id;
@@ -7179,7 +7179,7 @@ dictionary Cloudflare_ArtifactsTokenInfo {
 };
 
 // options ArtifactsTokenListResult
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsTokenListResult", LasmPath="ArtifactsTokenListResult"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsTokenListResult", LasmPath="ArtifactsTokenListResult"]
 dictionary Cloudflare_ArtifactsTokenListResult {
   // tokens: ArtifactsTokenInfo[]
   required sequence<Cloudflare_ArtifactsTokenInfo> tokens;
@@ -7188,7 +7188,7 @@ dictionary Cloudflare_ArtifactsTokenListResult {
 };
 
 // options ArtifactsTreeEntry
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsTreeEntry", LasmPath="ArtifactsTreeEntry"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsTreeEntry", LasmPath="ArtifactsTreeEntry"]
 dictionary Cloudflare_ArtifactsTreeEntry {
   // name: string
   required DOMString name;
@@ -7201,7 +7201,7 @@ dictionary Cloudflare_ArtifactsTreeEntry {
 };
 
 // options ArtifactsCommitMetadata
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsCommitMetadata", LasmPath="ArtifactsCommitMetadata"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsCommitMetadata", LasmPath="ArtifactsCommitMetadata"]
 dictionary Cloudflare_ArtifactsCommitMetadata {
   // hash: string
   required DOMString hash;
@@ -7222,7 +7222,7 @@ dictionary Cloudflare_ArtifactsCommitMetadata {
 };
 
 // interface ArtifactsRepo
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsRepo", LasmPath="ArtifactsRepo"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsRepo", LasmPath="ArtifactsRepo"]
 interface Cloudflare_ArtifactsRepo : Cloudflare_TestController {
   // createToken(scope?: "write" | "read", ttl?: number): Promise<ArtifactsCreateTokenResult>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="createToken(scope?: 'write' | 'read', ttl?: number): Promise<ArtifactsCreateTokenResult>"] Promise<Cloudflare_ArtifactsCreateTokenResult> createToken(optional Cloudflare_ArtifactsRepoCreateToken scope, optional double ttl);
@@ -7247,7 +7247,7 @@ interface Cloudflare_ArtifactsRepo : Cloudflare_TestController {
 };
 
 // options ArtifactsError
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ArtifactsError", LasmPath="ArtifactsError"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ArtifactsError", LasmPath="ArtifactsError"]
 dictionary Cloudflare_ArtifactsError {
   // readonly name: "ArtifactsError"
   required any name;
@@ -7258,7 +7258,7 @@ dictionary Cloudflare_ArtifactsError {
 };
 
 // interface Artifacts
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Artifacts", LasmPath="Artifacts"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="Artifacts", LasmPath="Artifacts"]
 interface Cloudflare_Artifacts {
   // create(name: string, opts?: { readOnly?: boolean; description?: string; setDefaultBranch?: string; }): Promise<ArtifactsCreateRepoResult>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="create(name: string, opts?: { readOnly?: boolean; description?: string; setDefaultBranch?: string; }): Promise<ArtifactsCreateRepoResult>"] Promise<Cloudflare_ArtifactsCreateRepoResult> create(DOMString name, optional Cloudflare_ArtifactsCreateOpts opts);
@@ -7267,7 +7267,7 @@ interface Cloudflare_Artifacts {
   // import(params: { source: { url: string; branch?: string; depth?: number; }; target: { name: string; opts?: { description?: string; readOnly?: boolean; }; }; }): Promise<ArtifactsCreateRepoResult>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="import(params: { source: { url: string; branch?: string; depth?: number; }; target: { name: string; opts?: { description?: string; readOnly?: boolean; }; }; }): Promise<ArtifactsCreateRepoResult>"] Promise<Cloudflare_ArtifactsCreateRepoResult> import(Cloudflare_ArtifactsImportParams params);
   // list(opts?: { limit?: number; cursor?: string; }): Promise<ArtifactsRepoListResult>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="list(opts?: { limit?: number; cursor?: string; }): Promise<ArtifactsRepoListResult>"] Promise<Cloudflare_ArtifactsRepoListResult> list(optional Cloudflare_AiSearchItemLogsParams opts);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="list(opts?: { limit?: number; cursor?: string; }): Promise<ArtifactsRepoListResult>"] Promise<Cloudflare_ArtifactsRepoListResult> list(optional Cloudflare_ArtifactsListOpts opts);
   // delete(name: string): Promise<boolean>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="delete(name: string): Promise<boolean>"] Promise<boolean> delete(DOMString name);
 };
@@ -7285,7 +7285,7 @@ typedef Cloudflare_AiSearchInternalError Cloudflare_AutoRAGUnauthorizedError;
 typedef Cloudflare_AiSearchInternalError Cloudflare_AutoRAGNameNotSetError;
 
 // options ComparisonFilter
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ComparisonFilter", LasmPath="ComparisonFilter"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ComparisonFilter", LasmPath="ComparisonFilter"]
 dictionary Cloudflare_ComparisonFilter {
   // key: string
   required DOMString key;
@@ -7296,10 +7296,10 @@ dictionary Cloudflare_ComparisonFilter {
 };
 
 // options CompoundFilter
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="CompoundFilter", LasmPath="CompoundFilter"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="CompoundFilter", LasmPath="CompoundFilter"]
 dictionary Cloudflare_CompoundFilter {
   // type: "and" | "or"
-  required Cloudflare_AiSearchOptionsRetrievalKeyword_match_mode type;
+  required Cloudflare_CompoundFilterType type;
   // filters: ComparisonFilter[]
   required sequence<Cloudflare_ComparisonFilter> filters;
 };
@@ -8893,7 +8893,7 @@ interface Cloudflare_EmailEvent {
 };
 
 // options FlagshipEvaluationDetails
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="FlagshipEvaluationDetails", LasmPath="FlagshipEvaluationDetails"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="FlagshipEvaluationDetails", LasmPath="FlagshipEvaluationDetails"]
 dictionary Cloudflare_FlagshipEvaluationDetails {
   // flagKey: string
   required DOMString flagKey;
@@ -8909,11 +8909,14 @@ dictionary Cloudflare_FlagshipEvaluationDetails {
   DOMString errorMessage;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="FlagshipEvaluationError", LasmPath="FlagshipEvaluationError", LasmAlias]
-typedef Cloudflare_AiSearchInternalError Cloudflare_FlagshipEvaluationError;
+// options FlagshipEvaluationError
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="FlagshipEvaluationError", LasmPath="FlagshipEvaluationError"]
+dictionary Cloudflare_FlagshipEvaluationError {
+
+};
 
 // interface Flagship
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Flagship", LasmPath="Flagship"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="Flagship", LasmPath="Flagship"]
 interface Cloudflare_Flagship {
   // getValue<T extends boolean | string | number | Record<string, unknown> | unknown[]>(flagKey: string, defaultValue: T, context?: FlagshipEvaluationContext): Promise<FlagshipWidenedValue<T>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getValue<T extends boolean | string | number | Record<string, unknown> | unknown[]>(flagKey: string, defaultValue: T, context?: FlagshipEvaluationContext): Promise<FlagshipWidenedValue<T>>"] Promise<any> getValue(DOMString flagKey, any defaultValue, optional record<DOMString, Cloudflare_DOMStringOrDoubleOrBooleanOrSequenceOfAnyOrRecordOfAny?> context);
@@ -8938,7 +8941,7 @@ interface Cloudflare_Flagship {
 };
 
 // interface HelloWorldBinding
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="HelloWorldBinding", LasmPath="HelloWorldBinding"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="HelloWorldBinding", LasmPath="HelloWorldBinding"]
 interface Cloudflare_HelloWorldBinding {
   // get(): Promise<{ value: string; ms?: number; }>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(): Promise<{ value: string; ms?: number; }>"] Promise<Cloudflare_HelloWorldBindingGet> get();
@@ -9394,7 +9397,7 @@ dictionary Cloudflare_MediaTransformationOutputOptions {
 };
 
 // interface cloudflare:node.NodeStyleServer
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="NodeStyleServer", LasmPath="cloudflare:node.NodeStyleServer"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="NodeStyleServer", LasmPath="cloudflare:node.NodeStyleServer"]
 interface Cloudflare_NodeStyleServer {
   // listen(...args: unknown[]): this
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="listen(...args: unknown[]): this"] Cloudflare_NodeStyleServer listen(any... args);
@@ -9403,14 +9406,14 @@ interface Cloudflare_NodeStyleServer {
 };
 
 // interface cloudflare:pipelines.PipelineTransformationEntrypoint
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="PipelineTransformationEntrypoint", LasmPath="cloudflare:pipelines.PipelineTransformationEntrypoint"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="PipelineTransformationEntrypoint", LasmPath="cloudflare:pipelines.PipelineTransformationEntrypoint"]
 interface Cloudflare_PipelineTransformationEntrypoint {
   // public run(records: I[], metadata: PipelineBatchMetadata): Promise<O[]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="public run(records: I[], metadata: PipelineBatchMetadata): Promise<O[]>"] Promise<sequence<record<DOMString, any>>> run(sequence<record<DOMString, any>> records, Cloudflare_PipelineBatchMetadata metadata);
 };
 
 // options cloudflare:pipelines.PipelineBatchMetadata
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="PipelineBatchMetadata", LasmPath="cloudflare:pipelines.PipelineBatchMetadata"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="PipelineBatchMetadata", LasmPath="cloudflare:pipelines.PipelineBatchMetadata"]
 dictionary Cloudflare_PipelineBatchMetadata {
   // pipelineId: string
   required DOMString pipelineId;
@@ -9419,14 +9422,14 @@ dictionary Cloudflare_PipelineBatchMetadata {
 };
 
 // interface cloudflare:pipelines.Pipeline
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Pipeline", LasmPath="cloudflare:pipelines.Pipeline"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="Pipeline", LasmPath="cloudflare:pipelines.Pipeline"]
 interface Cloudflare_Pipeline {
   // send(records: T[]): Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="send(records: T[]): Promise<void>"] Promise<undefined> send(sequence<record<DOMString, any>> records);
 };
 
 // options PubSubMessage
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="PubSubMessage", LasmPath="PubSubMessage"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="PubSubMessage", LasmPath="PubSubMessage"]
 dictionary Cloudflare_PubSubMessage {
   // readonly mid: number
   required double mid;
@@ -9449,7 +9452,7 @@ dictionary Cloudflare_PubSubMessage {
 };
 
 // options JsonWebKeyWithKid
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="JsonWebKeyWithKid", LasmPath="JsonWebKeyWithKid"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="JsonWebKeyWithKid", LasmPath="JsonWebKeyWithKid"]
 dictionary Cloudflare_JsonWebKeyWithKid {
   // kty: string
   required DOMString kty;
@@ -9496,21 +9499,21 @@ dictionary Cloudflare_JsonWebKeyWithKid {
 };
 
 // options RateLimitOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="RateLimitOptions", LasmPath="RateLimitOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="RateLimitOptions", LasmPath="RateLimitOptions"]
 dictionary Cloudflare_RateLimitOptions {
   // key: string
   required DOMString key;
 };
 
 // options RateLimitOutcome
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="RateLimitOutcome", LasmPath="RateLimitOutcome"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="RateLimitOutcome", LasmPath="RateLimitOutcome"]
 dictionary Cloudflare_RateLimitOutcome {
   // success: boolean
   required boolean success;
 };
 
 // interface RateLimit
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="RateLimit", LasmPath="RateLimit"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="RateLimit", LasmPath="RateLimit"]
 interface Cloudflare_RateLimit {
   // limit(options: RateLimitOptions): Promise<RateLimitOutcome>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="limit(options: RateLimitOptions): Promise<RateLimitOutcome>"] Promise<Cloudflare_RateLimitOutcome> limit(Cloudflare_RateLimitOptions options);
@@ -9662,14 +9665,14 @@ interface Cloudflare_WorkflowEntrypoint {
 };
 
 // interface SecretsStoreSecret
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="SecretsStoreSecret", LasmPath="SecretsStoreSecret"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="SecretsStoreSecret", LasmPath="SecretsStoreSecret"]
 interface Cloudflare_SecretsStoreSecret {
   // get(): Promise<string>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(): Promise<string>"] Promise<DOMString> get();
 };
 
 // interface StreamBinding
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamBinding", LasmPath="StreamBinding"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamBinding", LasmPath="StreamBinding"]
 interface Cloudflare_StreamBinding {
   // video(id: string): StreamVideoHandle
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="video(id: string): StreamVideoHandle"] Cloudflare_StreamVideoHandle video(DOMString id);
@@ -9684,7 +9687,7 @@ interface Cloudflare_StreamBinding {
 };
 
 // interface StreamVideoHandle
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideoHandle", LasmPath="StreamVideoHandle"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideoHandle", LasmPath="StreamVideoHandle"]
 interface Cloudflare_StreamVideoHandle {
   // id: string
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="id: string"] readonly attribute DOMString id;
@@ -9703,7 +9706,7 @@ interface Cloudflare_StreamVideoHandle {
 };
 
 // options StreamVideo
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideo", LasmPath="StreamVideo"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideo", LasmPath="StreamVideo"]
 dictionary Cloudflare_StreamVideo {
   // id: string
   required DOMString id;
@@ -9762,7 +9765,7 @@ dictionary Cloudflare_StreamVideo {
 };
 
 // options StreamVideoStatus
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideoStatus", LasmPath="StreamVideoStatus"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideoStatus", LasmPath="StreamVideoStatus"]
 dictionary Cloudflare_StreamVideoStatus {
   // state: string
   required DOMString state;
@@ -9777,7 +9780,7 @@ dictionary Cloudflare_StreamVideoStatus {
 };
 
 // options StreamVideoInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideoInput", LasmPath="StreamVideoInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideoInput", LasmPath="StreamVideoInput"]
 dictionary Cloudflare_StreamVideoInput {
   // width: number
   required double width;
@@ -9786,7 +9789,7 @@ dictionary Cloudflare_StreamVideoInput {
 };
 
 // options StreamPublicDetails
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamPublicDetails", LasmPath="StreamPublicDetails"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamPublicDetails", LasmPath="StreamPublicDetails"]
 dictionary Cloudflare_StreamPublicDetails {
   // title: string | null
   required DOMString? title;
@@ -9799,7 +9802,7 @@ dictionary Cloudflare_StreamPublicDetails {
 };
 
 // options StreamDirectUpload
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamDirectUpload", LasmPath="StreamDirectUpload"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamDirectUpload", LasmPath="StreamDirectUpload"]
 dictionary Cloudflare_StreamDirectUpload {
   // uploadURL: string
   required DOMString uploadURL;
@@ -9812,7 +9815,7 @@ dictionary Cloudflare_StreamDirectUpload {
 };
 
 // options StreamDirectUploadCreateParams
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamDirectUploadCreateParams", LasmPath="StreamDirectUploadCreateParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamDirectUploadCreateParams", LasmPath="StreamDirectUploadCreateParams"]
 dictionary Cloudflare_StreamDirectUploadCreateParams {
   // maxDurationSeconds: number
   required double maxDurationSeconds;
@@ -9831,14 +9834,18 @@ dictionary Cloudflare_StreamDirectUploadCreateParams {
   // scheduledDeletion?: string | null
   DOMString? scheduledDeletion;
   // watermark?: StreamDirectUploadWatermark
-  Cloudflare_ResponseConversationParam watermark;
+  Cloudflare_StreamDirectUploadWatermark watermark;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamDirectUploadWatermark", LasmPath="StreamDirectUploadWatermark", LasmAlias]
-typedef Cloudflare_ResponseConversationParam Cloudflare_StreamDirectUploadWatermark;
+// options StreamDirectUploadWatermark
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamDirectUploadWatermark", LasmPath="StreamDirectUploadWatermark"]
+dictionary Cloudflare_StreamDirectUploadWatermark {
+  // id: string
+  required DOMString id;
+};
 
 // options StreamUrlUploadParams
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamUrlUploadParams", LasmPath="StreamUrlUploadParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamUrlUploadParams", LasmPath="StreamUrlUploadParams"]
 dictionary Cloudflare_StreamUrlUploadParams {
   // allowedOrigins?: Array<string>
   sequence<DOMString> allowedOrigins;
@@ -9857,7 +9864,7 @@ dictionary Cloudflare_StreamUrlUploadParams {
 };
 
 // interface StreamScopedCaptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamScopedCaptions", LasmPath="StreamScopedCaptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamScopedCaptions", LasmPath="StreamScopedCaptions"]
 interface Cloudflare_StreamScopedCaptions {
   // upload(language: string, input: ReadableStream): Promise<StreamCaption>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="upload(language: string, input: ReadableStream): Promise<StreamCaption>"] Promise<Cloudflare_StreamCaption> upload(DOMString language, ReadableStream input);
@@ -9870,7 +9877,7 @@ interface Cloudflare_StreamScopedCaptions {
 };
 
 // interface StreamScopedDownloads
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamScopedDownloads", LasmPath="StreamScopedDownloads"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamScopedDownloads", LasmPath="StreamScopedDownloads"]
 interface Cloudflare_StreamScopedDownloads {
   // generate(downloadType?: StreamDownloadType): Promise<StreamDownloadGetResponse>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="generate(downloadType?: StreamDownloadType): Promise<StreamDownloadGetResponse>"] Promise<Cloudflare_StreamDownloadGetResponse> generate(optional Cloudflare_StreamDownloadType downloadType);
@@ -9881,14 +9888,14 @@ interface Cloudflare_StreamScopedDownloads {
 };
 
 // interface StreamVideos
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideos", LasmPath="StreamVideos"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideos", LasmPath="StreamVideos"]
 interface Cloudflare_StreamVideos {
   // list(params?: StreamVideosListParams): Promise<StreamVideo[]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="list(params?: StreamVideosListParams): Promise<StreamVideo[]>"] Promise<sequence<Cloudflare_StreamVideo>> list(optional Cloudflare_StreamVideosListParams params);
 };
 
 // interface StreamWatermarks
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamWatermarks", LasmPath="StreamWatermarks"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamWatermarks", LasmPath="StreamWatermarks"]
 interface Cloudflare_StreamWatermarks {
   // generate(input: ReadableStream, params: StreamWatermarkCreateParams): Promise<StreamWatermark>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="generate(input: ReadableStream, params: StreamWatermarkCreateParams): Promise<StreamWatermark>"] Promise<Cloudflare_StreamWatermark> generate(ReadableStream input, Cloudflare_StreamWatermarkCreateParams params);
@@ -9903,7 +9910,7 @@ interface Cloudflare_StreamWatermarks {
 };
 
 // options StreamUpdateVideoParams
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamUpdateVideoParams", LasmPath="StreamUpdateVideoParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamUpdateVideoParams", LasmPath="StreamUpdateVideoParams"]
 dictionary Cloudflare_StreamUpdateVideoParams {
   // allowedOrigins?: Array<string>
   sequence<DOMString> allowedOrigins;
@@ -9922,7 +9929,7 @@ dictionary Cloudflare_StreamUpdateVideoParams {
 };
 
 // options StreamCaption
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamCaption", LasmPath="StreamCaption"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamCaption", LasmPath="StreamCaption"]
 dictionary Cloudflare_StreamCaption {
   // generated?: boolean
   boolean generated;
@@ -9935,7 +9942,7 @@ dictionary Cloudflare_StreamCaption {
 };
 
 // options StreamDownload
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamDownload", LasmPath="StreamDownload"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamDownload", LasmPath="StreamDownload"]
 dictionary Cloudflare_StreamDownload {
   // percentComplete: number
   required double percentComplete;
@@ -9946,7 +9953,7 @@ dictionary Cloudflare_StreamDownload {
 };
 
 // options StreamDownloadGetResponse
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamDownloadGetResponse", LasmPath="StreamDownloadGetResponse"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamDownloadGetResponse", LasmPath="StreamDownloadGetResponse"]
 dictionary Cloudflare_StreamDownloadGetResponse {
   // audio?: StreamDownload
   Cloudflare_StreamDownload audio;
@@ -9955,7 +9962,7 @@ dictionary Cloudflare_StreamDownloadGetResponse {
 };
 
 // options StreamWatermark
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamWatermark", LasmPath="StreamWatermark"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamWatermark", LasmPath="StreamWatermark"]
 dictionary Cloudflare_StreamWatermark {
   // id: string
   required DOMString id;
@@ -9982,7 +9989,7 @@ dictionary Cloudflare_StreamWatermark {
 };
 
 // options StreamWatermarkCreateParams
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamWatermarkCreateParams", LasmPath="StreamWatermarkCreateParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamWatermarkCreateParams", LasmPath="StreamWatermarkCreateParams"]
 dictionary Cloudflare_StreamWatermarkCreateParams {
   // name?: string
   DOMString name;
@@ -9997,7 +10004,7 @@ dictionary Cloudflare_StreamWatermarkCreateParams {
 };
 
 // options StreamVideosListParams
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamVideosListParams", LasmPath="StreamVideosListParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamVideosListParams", LasmPath="StreamVideosListParams"]
 dictionary Cloudflare_StreamVideosListParams {
   // limit?: number
   double limit;
@@ -10012,7 +10019,7 @@ dictionary Cloudflare_StreamVideosListParams {
 };
 
 // options StreamError
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="StreamError", LasmPath="StreamError"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="StreamError", LasmPath="StreamError"]
 dictionary Cloudflare_StreamError {
   // readonly code: number
   required double code;
@@ -10025,7 +10032,7 @@ dictionary Cloudflare_StreamError {
 };
 
 // options InternalError
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="InternalError", LasmPath="InternalError"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="InternalError", LasmPath="InternalError"]
 dictionary Cloudflare_InternalError {
   // readonly code: number
   required double code;
@@ -10039,31 +10046,31 @@ dictionary Cloudflare_InternalError {
   required any name;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="BadRequestError", LasmPath="BadRequestError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="BadRequestError", LasmPath="BadRequestError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_BadRequestError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="NotFoundError", LasmPath="NotFoundError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="NotFoundError", LasmPath="NotFoundError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_NotFoundError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ForbiddenError", LasmPath="ForbiddenError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="ForbiddenError", LasmPath="ForbiddenError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_ForbiddenError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="RateLimitedError", LasmPath="RateLimitedError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="RateLimitedError", LasmPath="RateLimitedError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_RateLimitedError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="QuotaReachedError", LasmPath="QuotaReachedError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="QuotaReachedError", LasmPath="QuotaReachedError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_QuotaReachedError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="MaxFileSizeError", LasmPath="MaxFileSizeError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="MaxFileSizeError", LasmPath="MaxFileSizeError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_MaxFileSizeError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="InvalidURLError", LasmPath="InvalidURLError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="InvalidURLError", LasmPath="InvalidURLError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_InvalidURLError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AlreadyUploadedError", LasmPath="AlreadyUploadedError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="AlreadyUploadedError", LasmPath="AlreadyUploadedError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_AlreadyUploadedError;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="TooManyWatermarksError", LasmPath="TooManyWatermarksError", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmFile="index.d.ts", LasmName="TooManyWatermarksError", LasmPath="TooManyWatermarksError", LasmAlias]
 typedef Cloudflare_InternalError Cloudflare_TooManyWatermarksError;
 
 // options MarkdownDocument
@@ -10113,14 +10120,14 @@ dictionary Cloudflare_EmbeddedImageConversionOptions {
 };
 
 // options ConversionOutputOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ConversionOutputOptions", LasmPath="ConversionOutputOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ConversionOutputOptions", LasmPath="ConversionOutputOptions"]
 dictionary Cloudflare_ConversionOutputOptions {
   // format?: OutputFormat
   Cloudflare_OutputFormat format;
 };
 
 // options ConversionOptions
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ConversionOptions", LasmPath="ConversionOptions"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="ConversionOptions", LasmPath="ConversionOptions"]
 dictionary Cloudflare_ConversionOptions {
   // output?: ConversionOutputOptions
   Cloudflare_ConversionOutputOptions output;
@@ -10146,7 +10153,7 @@ dictionary Cloudflare_ConversionRequestOptions {
 };
 
 // options SupportedFileFormat
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="SupportedFileFormat", LasmPath="SupportedFileFormat"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="SupportedFileFormat", LasmPath="SupportedFileFormat"]
 dictionary Cloudflare_SupportedFileFormat {
   // mimeType: string
   required DOMString mimeType;
@@ -10695,7 +10702,7 @@ interface Cloudflare_Vectorize {
 };
 
 // options WorkerVersionMetadata
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="WorkerVersionMetadata", LasmPath="WorkerVersionMetadata"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="WorkerVersionMetadata", LasmPath="WorkerVersionMetadata"]
 dictionary Cloudflare_WorkerVersionMetadata {
   // id: string
   required DOMString id;
@@ -11103,28 +11110,28 @@ dictionary Cloudflare_DurableObjectFacetsGet {
 typedef (Cloudflare_DurableObjectId or DOMString) Cloudflare_DurableObjectIdOrDOMString;
 
 // EventTargetHandlerObject.handleEvent: (event: Event) => any | undefined
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="EventTargetHandlerObjectHandleEvent", LasmSignature="EventTargetHandlerObject.handleEvent: (event: Event) => any | undefined"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="EventTargetHandlerObjectHandleEvent", LasmSignature="EventTargetHandlerObject.handleEvent: (event: Event) => any | undefined"]
 callback Cloudflare_EventTargetHandlerObjectHandleEvent = any (Event event);
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="DOMStringOrSubtleCryptoHashAlgorithm"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="DOMStringOrSubtleCryptoHashAlgorithm"]
 typedef (DOMString or Cloudflare_SubtleCryptoHashAlgorithm) Cloudflare_DOMStringOrSubtleCryptoHashAlgorithm;
 
 [LasmHost="Cloudflare", LasmLeanModule="HtmlRewriter", LasmName="DOMStringOrReadableStreamOrResponse"]
 typedef (DOMString or ReadableStream or Response) Cloudflare_DOMStringOrReadableStreamOrResponse;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="UnderlyingByteSourceType"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="UnderlyingByteSourceType"]
 enum Cloudflare_UnderlyingByteSourceType { "bytes" };
 
 // UnderlyingByteSource.start?: (controller: ReadableByteStreamController) => void | Promise<void>
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="UnderlyingByteSourceStart", LasmSignature="UnderlyingByteSource.start?: (controller: ReadableByteStreamController) => void | Promise<void>"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="UnderlyingByteSourceStart", LasmSignature="UnderlyingByteSource.start?: (controller: ReadableByteStreamController) => void | Promise<void>"]
 callback Cloudflare_UnderlyingByteSourceStart = Promise<undefined> (ReadableByteStreamController controller);
 
 // UnderlyingByteSource.pull?: (controller: ReadableByteStreamController) => void | Promise<void>
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="UnderlyingByteSourcePull", LasmSignature="UnderlyingByteSource.pull?: (controller: ReadableByteStreamController) => void | Promise<void>"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="UnderlyingByteSourcePull", LasmSignature="UnderlyingByteSource.pull?: (controller: ReadableByteStreamController) => void | Promise<void>"]
 callback Cloudflare_UnderlyingByteSourcePull = Promise<undefined> (ReadableByteStreamController controller);
 
 // UnderlyingByteSource.cancel?: (reason: any) => void | Promise<void>
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="UnderlyingByteSourceCancel", LasmSignature="UnderlyingByteSource.cancel?: (reason: any) => void | Promise<void>"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmFile="index.d.ts", LasmName="UnderlyingByteSourceCancel", LasmSignature="UnderlyingByteSource.cancel?: (reason: any) => void | Promise<void>"]
 callback Cloudflare_UnderlyingByteSourceCancel = Promise<undefined> (any reason);
 
 [LasmHost="Cloudflare", LasmLeanModule="Tail", LasmName="TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo"]
@@ -12213,14 +12220,18 @@ dictionary Cloudflare_ChatCompletionMessageCustomToolCallCustom {
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceFunctionType", LasmAlias]
 typedef Cloudflare_AiTextGenerationToolOutputType Cloudflare_ChatCompletionToolChoiceFunctionType;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceFunctionFunction", LasmAlias]
-typedef Cloudflare_SubtleCryptoHashAlgorithm Cloudflare_ChatCompletionToolChoiceFunctionFunction;
+// {name: string;}
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceFunctionFunction"]
+dictionary Cloudflare_ChatCompletionToolChoiceFunctionFunction {
+  // name: string
+  required DOMString name;
+};
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceCustomType", LasmAlias]
 typedef Cloudflare_ChatCompletionCustomToolType Cloudflare_ChatCompletionToolChoiceCustomType;
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceCustomCustom", LasmAlias]
-typedef Cloudflare_SubtleCryptoHashAlgorithm Cloudflare_ChatCompletionToolChoiceCustomCustom;
+typedef Cloudflare_ChatCompletionToolChoiceFunctionFunction Cloudflare_ChatCompletionToolChoiceCustomCustom;
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ChatCompletionToolChoiceAllowedToolsType"]
 enum Cloudflare_ChatCompletionToolChoiceAllowedToolsType { "allowed_tools" };
@@ -15033,7 +15044,7 @@ typedef (DOMString or double or boolean) Cloudflare_DOMStringOrDoubleOrBoolean;
 typedef (sequence<Cloudflare_DOMStringOrDoubleOrBoolean?> or record<DOMString, Cloudflare_DOMStringOrDoubleOrBoolean?>) Cloudflare_SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean;
 
 // {id: string; name: string; description: string | null; defaultBranch: string; createdAt: string; updatedAt: string; lastPushAt: string | null; source: string | null; readOnly: boolean;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsRepoListResultRepos"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsRepoListResultRepos"]
 dictionary Cloudflare_ArtifactsRepoListResultRepos {
   // id: string
   required DOMString id;
@@ -15055,20 +15066,20 @@ dictionary Cloudflare_ArtifactsRepoListResultRepos {
   required boolean readOnly;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsCreateTokenResultScope"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsCreateTokenResultScope"]
 enum Cloudflare_ArtifactsCreateTokenResultScope { "read", "write" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsTokenInfoScope", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsTokenInfoScope", LasmAlias]
 typedef Cloudflare_ArtifactsCreateTokenResultScope Cloudflare_ArtifactsTokenInfoScope;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsTokenInfoState"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsTokenInfoState"]
 enum Cloudflare_ArtifactsTokenInfoState { "active", "expired", "revoked" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsTreeEntryType"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsTreeEntryType"]
 enum Cloudflare_ArtifactsTreeEntryType { "tree", "blob", "symlink", "gitlink", "exec" };
 
 // {name: string; email: string;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsCommitMetadataAuthor"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsCommitMetadataAuthor"]
 dictionary Cloudflare_ArtifactsCommitMetadataAuthor {
   // name: string
   required DOMString name;
@@ -15076,14 +15087,14 @@ dictionary Cloudflare_ArtifactsCommitMetadataAuthor {
   required DOMString email;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsCommitMetadataCommitter", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsCommitMetadataCommitter", LasmAlias]
 typedef Cloudflare_ArtifactsCommitMetadataAuthor Cloudflare_ArtifactsCommitMetadataCommitter;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsRepoCreateToken"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsRepoCreateToken"]
 enum Cloudflare_ArtifactsRepoCreateToken { "write", "read" };
 
 // {ref: string; path: string}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsRepoReadFileArgs"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsRepoReadFileArgs"]
 dictionary Cloudflare_ArtifactsRepoReadFileArgs {
   // ref: string
   required DOMString ref;
@@ -15092,7 +15103,7 @@ dictionary Cloudflare_ArtifactsRepoReadFileArgs {
 };
 
 // {ref?: string; limit?: number; offset?: number;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsRepoLogOpts"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsRepoLogOpts"]
 dictionary Cloudflare_ArtifactsRepoLogOpts {
   // ref?: string
   DOMString ref;
@@ -15103,7 +15114,7 @@ dictionary Cloudflare_ArtifactsRepoLogOpts {
 };
 
 // {description?: string; readOnly?: boolean; defaultBranchOnly?: boolean;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsRepoForkOpts"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsRepoForkOpts"]
 dictionary Cloudflare_ArtifactsRepoForkOpts {
   // description?: string
   DOMString description;
@@ -15113,11 +15124,11 @@ dictionary Cloudflare_ArtifactsRepoForkOpts {
   boolean defaultBranchOnly;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsErrorCode"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsErrorCode"]
 enum Cloudflare_ArtifactsErrorCode { "ALREADY_EXISTS", "NOT_FOUND", "CREATE_IN_PROGRESS", "IMPORT_IN_PROGRESS", "FORK_IN_PROGRESS", "INVALID_INPUT", "INVALID_REPO_NAME", "INVALID_TTL", "INVALID_URL", "REMOTE_AUTH_REQUIRED", "UPSTREAM_UNAVAILABLE", "MEMORY_LIMIT", "INTERNAL_ERROR" };
 
 // {readOnly?: boolean; description?: string; setDefaultBranch?: string;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsCreateOpts"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsCreateOpts"]
 dictionary Cloudflare_ArtifactsCreateOpts {
   // readOnly?: boolean
   boolean readOnly;
@@ -15128,7 +15139,7 @@ dictionary Cloudflare_ArtifactsCreateOpts {
 };
 
 // {url: string; branch?: string; depth?: number;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsImportParamsSource"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsImportParamsSource"]
 dictionary Cloudflare_ArtifactsImportParamsSource {
   // url: string
   required DOMString url;
@@ -15139,7 +15150,7 @@ dictionary Cloudflare_ArtifactsImportParamsSource {
 };
 
 // {description?: string; readOnly?: boolean;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsImportParamsTargetOpts"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsImportParamsTargetOpts"]
 dictionary Cloudflare_ArtifactsImportParamsTargetOpts {
   // description?: string
   DOMString description;
@@ -15148,7 +15159,7 @@ dictionary Cloudflare_ArtifactsImportParamsTargetOpts {
 };
 
 // {name: string; opts?: { description?: string; readOnly?: boolean; };}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsImportParamsTarget"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsImportParamsTarget"]
 dictionary Cloudflare_ArtifactsImportParamsTarget {
   // name: string
   required DOMString name;
@@ -15157,7 +15168,7 @@ dictionary Cloudflare_ArtifactsImportParamsTarget {
 };
 
 // {source: { url: string; branch?: string; depth?: number; }; target: { name: string; opts?: { description?: string; readOnly?: boolean; }; };}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsImportParams"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsImportParams"]
 dictionary Cloudflare_ArtifactsImportParams {
   // source: { url: string; branch?: string; depth?: number; }
   required Cloudflare_ArtifactsImportParamsSource source;
@@ -15165,14 +15176,20 @@ dictionary Cloudflare_ArtifactsImportParams {
   required Cloudflare_ArtifactsImportParamsTarget target;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ArtifactsListOpts", LasmAlias]
-typedef Cloudflare_AiSearchItemLogsParams Cloudflare_ArtifactsListOpts;
+// {limit?: number; cursor?: string;}
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ArtifactsListOpts"]
+dictionary Cloudflare_ArtifactsListOpts {
+  // limit?: number
+  double limit;
+  // cursor?: string
+  DOMString cursor;
+};
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ComparisonFilterType"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ComparisonFilterType"]
 enum Cloudflare_ComparisonFilterType { "eq", "ne", "gt", "gte", "lt", "lte" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="CompoundFilterType", LasmAlias]
-typedef Cloudflare_AiSearchOptionsRetrievalKeyword_match_mode Cloudflare_CompoundFilterType;
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="CompoundFilterType"]
+enum Cloudflare_CompoundFilterType { "and", "or" };
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="CompoundFilterOrComparisonFilter"]
 typedef (Cloudflare_CompoundFilter or Cloudflare_ComparisonFilter) Cloudflare_CompoundFilterOrComparisonFilter;
@@ -16474,11 +16491,11 @@ typedef (DOMString or Cloudflare_EmailAddress or sequence<Cloudflare_DOMStringOr
 [LasmHost="Cloudflare", LasmLeanModule="Email", LasmFile="index.d.ts", LasmName="EmailExportedHandler", LasmSignature="type EmailExportedHandler<Env = unknown, Props = unknown> = (message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>"]
 callback Cloudflare_EmailExportedHandler = Promise<undefined> (Cloudflare_ForwardableEmailMessage message, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="DOMStringOrDoubleOrBooleanOrSequenceOfAnyOrRecordOfAny"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="DOMStringOrDoubleOrBooleanOrSequenceOfAnyOrRecordOfAny"]
 typedef (DOMString or double or boolean or sequence<any> or record<DOMString, any>) Cloudflare_DOMStringOrDoubleOrBooleanOrSequenceOfAnyOrRecordOfAny;
 
 // {value: string; ms?: number;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="HelloWorldBindingGet"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="HelloWorldBindingGet"]
 dictionary Cloudflare_HelloWorldBindingGet {
   // value: string
   required DOMString value;
@@ -16598,7 +16615,7 @@ enum Cloudflare_MediaTransformationOutputOptionsMode { "video", "spritesheet", "
 enum Cloudflare_MediaTransformationOutputOptionsFormat { "jpg", "png", "m4a" };
 
 // {port?: number | null | undefined;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="NodeStyleServerAddress"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="NodeStyleServerAddress"]
 dictionary Cloudflare_NodeStyleServerAddress {
   // port?: number | null | undefined
   double? port;
@@ -16679,7 +16696,7 @@ dictionary Cloudflare_PagesPluginFunction2 {
   required any pluginArgs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="DOMStringOrUint8Array"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="DOMStringOrUint8Array"]
 typedef (DOMString or Uint8Array) Cloudflare_DOMStringOrUint8Array;
 
 // {name: string; count: number;}
@@ -16891,19 +16908,19 @@ dictionary Cloudflare_WorkflowEntrypointRunEvent {
   Cloudflare_WorkflowCronSchedule schedule;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="StreamDownloadType"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmName="StreamDownloadType"]
 enum Cloudflare_StreamDownloadType { "default", "audio" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="StreamCaptionStatus"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmName="StreamCaptionStatus"]
 enum Cloudflare_StreamCaptionStatus { "ready", "inprogress", "error" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="StreamDownloadStatus", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmName="StreamDownloadStatus", LasmAlias]
 typedef Cloudflare_StreamCaptionStatus Cloudflare_StreamDownloadStatus;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="StreamWatermarkPosition"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmName="StreamWatermarkPosition"]
 enum Cloudflare_StreamWatermarkPosition { "upperRight", "upperLeft", "lowerLeft", "lowerRight", "center" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="StreamPaginationComparison"]
+[LasmHost="Cloudflare", LasmLeanModule="Stream", LasmName="StreamPaginationComparison"]
 enum Cloudflare_StreamPaginationComparison { "eq", "gt", "gte", "lt", "lte" };
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionResponseFormat"]
@@ -16915,14 +16932,14 @@ enum Cloudflare_ImageConversionOptionsDescriptionLanguage { "en", "es", "fr", "i
 [LasmHost="Cloudflare", LasmLeanModule="Images", LasmName="EmbeddedImageConversionOptionsDescriptionLanguage", LasmAlias]
 typedef Cloudflare_ImageConversionOptionsDescriptionLanguage Cloudflare_EmbeddedImageConversionOptionsDescriptionLanguage;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="OutputFormat"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="OutputFormat"]
 enum Cloudflare_OutputFormat { "markdown", "text" };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionOptionsHtmlImagesDescriptionLanguage"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ConversionOptionsHtmlImagesDescriptionLanguage"]
 enum Cloudflare_ConversionOptionsHtmlImagesDescriptionLanguage { "en", "es", "fr", "it", "pt", "de" };
 
 // {descriptionLanguage?: "en" | "es" | "fr" | "it" | "pt" | "de"; convert?: boolean; maxConvertedImages?: number; convertOGImage?: boolean;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionOptionsHtmlImages"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ConversionOptionsHtmlImages"]
 dictionary Cloudflare_ConversionOptionsHtmlImages {
   // descriptionLanguage?: "en" | "es" | "fr" | "it" | "pt" | "de"
   Cloudflare_ConversionOptionsHtmlImagesDescriptionLanguage descriptionLanguage;
@@ -16935,7 +16952,7 @@ dictionary Cloudflare_ConversionOptionsHtmlImages {
 };
 
 // {images?: EmbeddedImageConversionOptions & { convertOGImage?: boolean; }; hostname?: string; cssSelector?: string;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionOptionsHtml"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ConversionOptionsHtml"]
 dictionary Cloudflare_ConversionOptionsHtml {
   // images?: EmbeddedImageConversionOptions & { convertOGImage?: boolean; }
   Cloudflare_ConversionOptionsHtmlImages images;
@@ -16946,14 +16963,14 @@ dictionary Cloudflare_ConversionOptionsHtml {
 };
 
 // {images?: EmbeddedImageConversionOptions;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionOptionsDocx"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ConversionOptionsDocx"]
 dictionary Cloudflare_ConversionOptionsDocx {
   // images?: EmbeddedImageConversionOptions
   Cloudflare_EmbeddedImageConversionOptions images;
 };
 
 // {images?: EmbeddedImageConversionOptions; metadata?: boolean;}
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ConversionOptionsPdf"]
+[LasmHost="Cloudflare", LasmLeanModule="Services", LasmName="ConversionOptionsPdf"]
 dictionary Cloudflare_ConversionOptionsPdf {
   // images?: EmbeddedImageConversionOptions
   Cloudflare_EmbeddedImageConversionOptions images;
