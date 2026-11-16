@@ -16,7 +16,7 @@ const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
 export const devTargets = [...runtimeTargets, ...edgeOnlyTargets, 'browser'];
 
-export const devUsage = `Usage: lasm dev [Main.lean] [--target ${devTargets.join('|')}] [--release] [--no-run] [-- arguments…]
+export const devUsage = `Usage: lasm dev [Main.lean] [--target ${devTargets.join('|')}] [--release] [--no-run] [--verbose] [-- arguments…]
        lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173] [--host 127.0.0.1] [--output DIR]
 
 Watches the project's Lean sources and Lake/npm configuration, rebuilds after
@@ -34,7 +34,8 @@ is done) and restarts the program. Arguments after -- are passed to main.
 Several outputs of one project rebuild together: --target node,browser, or
 with their own sources --target node=Server.lean,browser=Client.lean (one
 program runs; the browser output is served with live reload).
---release builds the release profile instead; --no-run only rebuilds.
+--release builds the release profile instead (--dev, the default, the dev
+profile); --no-run only rebuilds; --verbose shows compiler and linker details.
 Type rs and Enter to rebuild and restart; Ctrl+C stops.`;
 
 export function parseDevArguments(tokens) {

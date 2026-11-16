@@ -204,7 +204,7 @@ test('lasm build for Node: the build, its summary line, the editor, and packagin
   globalThis.cliStandIns.package.runPackage = record('runPackage', 9);
   assert.equal(await cli(['build', source, '--target', 'netlify', '--dev', '--allow-dev']), 9);
   assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'netlify', allowDev: true }]]);
-  // --output names the package; the Node build stays in its cache entry (0.7-3).
+  // --output names the package; the Node build stays in its cache entry (0.7-5).
   calls.length = 0;
   assert.equal(await cli(['build', source, '--target', 'lambda', '--output', 'app.zip']), 9);
   assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'lambda', allowDev: undefined, output: 'app.zip' }]]);

@@ -18,7 +18,7 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.deepEqual([all.profile, all.run, all.verbose, all.input, all.args], ['dev', false, true, 'App.lean', ['x', '--help']]);
   assert.equal(parseDevArguments(['--release']).profile, 'release');
   assert.equal(parseDevArguments(['--release', '--release']).profile, 'release');
-  // As lasm build: one profile, each valued option once (0.7-4).
+  // As lasm build: one profile, each valued option once (0.7-23).
   for (const tokens of [['--release', '--dev'], ['--dev', '--release']])
     assert.throws(() => parseDevArguments(tokens), /^Error: Choose one of --dev and --release$/);
   for (const [name, a, b] of [['target', 'node', 'browser'], ['port', '1', '2'], ['host', 'a', 'b'], ['output', 'a', 'b']])
@@ -32,7 +32,7 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.equal(parseDevArguments(['Main.lean', '--target', 'node=Server.lean']).input, 'Main.lean');
   assert.throws(() => parseDevArguments(['--target', 'node=Server.js']), /^Error: --target node=Server\.js: the source must be a \.lean file$/);
   assert.throws(() => parseDevArguments(['--target', 'lambda']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "lambda"$`));
-  // A near miss or another name for a dev target is suggested (0.7-4).
+  // A near miss or another name for a dev target is suggested (0.7-23).
   assert.throws(() => parseDevArguments(['--target', 'worker']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "worker" \\(did you mean --target workers\\?\\)$`));
   assert.throws(() => parseDevArguments(['--target', 'node,brwser']), /not "brwser" \(did you mean --target browser\?\)$/);
   assert.throws(() => parseDevArguments(['--target', 'cloudflare']), /not "cloudflare" \(did you mean --target workers\?\)$/);

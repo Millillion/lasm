@@ -36,7 +36,7 @@ test('build targets: node by default, or a function platform packaged after the 
     { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, profile: 'release', args: [] });
 });
 
-test('--output: the Node build for node, what is deployed for every other target (0.7-3)', () => {
+test('--output: the Node build for node, what is deployed for every other target (0.7-5)', () => {
   // node: the Node build, default dist/ (lasm package reads it).
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', 'node']).output, 'dist');
   // Every other target: no default here; each target's writer uses its own place

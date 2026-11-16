@@ -187,7 +187,7 @@ test('--output, and no positional output (0.7-2)', () => {
     '--output does not apply to --target vercel-edge: the platform fixes its layout (api/lasm.mjs and api/_lasm/)');
   fails(['build', 'Main.lean', '--output', 'out', '--target', 'netlify-edge'],
     '--output does not apply to --target netlify-edge: the platform fixes its layout (netlify/edge-functions/lasm.mjs and netlify/lasm/)');
-  // Every other target keeps --output, and only node gets dist/ by default (0.7-3).
+  // Every other target keeps --output, and only node gets dist/ by default (0.7-5).
   for (const target of buildTargets.filter(target => !fixedLayoutTargets.includes(target))) {
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'o']).output, 'o', target);
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, target === 'node' ? 'dist' : undefined, target);
