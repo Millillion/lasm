@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Lasm.JS.Bun
-// Imports: public import Init public meta import Init public import Lasm.JS.Bun.Serve
+// Imports: public import Init public meta import Init public import Lasm.JS.Bun.Core public import Lasm.JS.Bun.Serve public import Lasm.JS.Bun.Shell public import Lasm.JS.Bun.Sqlite public import Lasm.JS.Bun.Sql public import Lasm.JS.Bun.Redis public import Lasm.JS.Bun.S3
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -15,7 +15,13 @@ extern "C" {
 #endif
 lean_object* initialize_Init(uint8_t builtin);
 lean_object* initialize_Init(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_Core(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Bun_Serve(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_Shell(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_Sqlite(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_Sql(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_Redis(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Bun_S3(uint8_t builtin);
 void lean_initialize_runtime_module();
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_Lasm_JS_Bun(uint8_t builtin) {
@@ -29,7 +35,25 @@ lean_dec_ref(res);
 res = initialize_Init(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_Core(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
 res = initialize_Lasm_JS_Bun_Serve(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_Shell(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_Sqlite(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_Sql(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_Redis(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Bun_S3(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 return lean_io_result_mk_ok(lean_box(0));
