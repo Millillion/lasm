@@ -129,21 +129,21 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // The project's own JavaScript files (@[js "./ffi/x.mjs" …], src/project-modules.mjs)
   // are part of the build's identity, so a program that names one waits here for
   // its bindings; other programs read them while the build compiles and links.
-  let project = { files: [] };
+  let projectFiles = { files: [] };
   if (usesJs) {
     const cache = join(work, 'bindings');
     const read = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
       .then(bindings => withAbsoluteFiles(bindings, directory));
     read.catch(() => {});
     const namesFiles = programSources.some(file => declaresProjectModules(readFileSync(file, 'utf8')));
-    if (namesFiles) project = projectModules(await read, directory);
+    if (namesFiles) projectFiles = projectModules(await read, directory);
     bindingCheck = read
       .then(bindings => {
         if (!namesFiles && bindings.some(b => typeof b.relative === 'string'))
           throw new Error('A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]');
-        const paths = new Map(project.files.map(file => [file.specifier, file.path]));
+        const paths = new Map(projectFiles.files.map(file => [file.specifier, file.path]));
         return checkBindingsAsync(directory, bindings.map(b => paths.has(b.module) ? { ...b, projectFile: paths.get(b.module) } : b), { cache,
-          identity: (nodeModules?.identity ?? 'none') + (project.files.length ? ' ' + project.files.map(f => f.sha256).join(',') : '') });
+          identity: (nodeModules?.identity ?? 'none') + (projectFiles.files.length ? ' ' + projectFiles.files.map(f => f.sha256).join(',') : '') });
       })
       .then(results => { for (const warning of requireValidBindings(results)) log(`Lasm.JS binding warning: ${warning}`); return results; });
     bindingCheck.catch(() => {});
@@ -174,7 +174,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
       sourceSha256: createHash('sha256').update(readFileSync(item.source)).digest('hex'), args: item.extraArgs })) } : {}),
     ...(nativeUnavailable.length ? { nativeUnavailable } : {}),
     ...(usesJs ? { lasmJs: true, lasmJsHeaders: await Promise.all(glueHeaders.map(hashFile)) } : {}),
-    ...(project.files.length ? { projectModules: project.files.map(({ name, sha256 }) => ({ name, sha256 })) } : {}),
+    ...(projectFiles.files.length ? { projectModules: projectFiles.files.map(({ name, sha256 }) => ({ name, sha256 })) } : {}),
     ...(nodeModules ? { nodeModules: { identity: nodeModules.identity, packages: nodeModules.packages } } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
@@ -215,7 +215,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
   const jsBindings = await bindingCheck;
   progress?.({ stage: 'Packaging the application and runtime support' });
-  if (!linkOnly) { copyApplicationHost(dist); copyProjectModules(join(dist, 'host'), project); writeApplicationEntrypoint(dist); }
+  if (!linkOnly) { copyApplicationHost(dist); copyProjectModules(join(dist, 'host'), projectFiles); writeApplicationEntrypoint(dist); }
   await writeFile(join(dist, 'THIRD_PARTY_NOTICES.txt'),
     applicationNotices(runtime.manifest, await readFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'))
     + dependencyNotices(dependencyLicenses));
