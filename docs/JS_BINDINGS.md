@@ -860,7 +860,7 @@ name that no generated class or web standard defines is `any` too.
 with the web classes left to Lasm.JS.Web, the parents dropped and the name clashes.
 
 **Not generated** (each with its reason, `node-coverage.json` `excluded` and
-`computedKeys`; API_DECISIONS.md 0.4-9):
+`computedKeys`; API_DECISIONS.md 0.4-38):
 
 - `Buffer`'s instance properties (`buf.length`, `buf.buffer`, `buf.byteOffset`,
   `buf.parent`, `buf.poolSize`) and the methods that write into the buffer in place

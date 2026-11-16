@@ -23,8 +23,8 @@
   (`instFromJSFsStats`); nothing refers to the automatic ones.
 
 
-- **`Lasm.JS.Node` is every Node core module** (API_DECISIONS.md 0.4-4 to
-  0.4-9): all of Node's documented modules (`zlib`, `dns`, `tls`, `http2`,
+- **`Lasm.JS.Node` is every Node core module** (API_DECISIONS.md 0.4-33 to
+  0.4-38): all of Node's documented modules (`zlib`, `dns`, `tls`, `http2`,
   `worker_threads`, `util`, `v8`, `vm`, `sqlite`, `readline`, `node:test`, …),
   the callback and synchronous forms of `node:fs`, and Experimental, Deprecated
   and Legacy members (marked in their doc comments), plus what only Node 26

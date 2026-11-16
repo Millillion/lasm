@@ -6,7 +6,7 @@
 // in `modules` to WebIDL (scripts/bindings/node.idl), finding its classes and
 // namespaces itself, and scripts/bindings/generate-web.mjs turns that into
 // library/Lasm/JS/Node/*.lean with the mapping rules of Lasm.JS.Web
-// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; API_DECISIONS.md A17, 0.4-4 to 0.4-9).
+// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; API_DECISIONS.md A17, 0.4-33 to 0.4-38).
 //
 // This file holds only what the docs do not say in their structure: the JavaScript
 // module of a name (`jsModules`), what a class's heading or prose says about it
