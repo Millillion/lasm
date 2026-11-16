@@ -4,7 +4,7 @@ A Lasm server runs as one Vercel Function
 on the Node.js 24 runtime that answers every path.
 
 ```sh
-npx lasm build Main.lean --target vercel   # .vercel/output (a server on $HOST:$PORT)
+npx lasm build Main.lean --target vercel   # Main.lean calls exportDefault; writes dist/ and .vercel/output
 vercel deploy --prebuilt                   # Vercel's own CLI uploads exactly that output
 ```
 
@@ -42,10 +42,12 @@ for every path.
   4.5 MB (Vercel's limit). Set the memory to at least 512 MB (Hobby: 2 GB
   default) and the maximum duration as needed.
 - **Architecture:** x86_64 (Vercel's default).
-- **Not supported:** the Edge runtime (no threads or native add-ons; Phase 8).
+- **Vercel Edge Functions** are a separate target: [vercel-edge.md](vercel-edge.md)
+  (`--target vercel-edge`, tested in CI with `vercel build` offline and
+  Vercel's `edge-runtime`).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Vercel
-account): for every server template, the `lasm package` output is checked
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm package` output is checked
 (config, every file, permissions, size); Vercel CLI 65.2.0 `vercel build` runs
 offline in the `lasm init --deploy vercel` project, with a local
 `.vercel/project.json` in place of `vercel link`; the built function then runs

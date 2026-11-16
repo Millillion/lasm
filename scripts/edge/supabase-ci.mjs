@@ -55,7 +55,9 @@ const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOB
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
 const lasmBuild = (project, target) => {
   const started = Date.now();
-  run(process.execPath, [...bounded, process.execPath, join(root, 'bin/lasm.mjs'), 'build', 'Main.lean', '--target', target], { cwd: project });
+  // The Hono template's default export (Export.lean); the pure example's Main.lean.
+  const entry = existsSync(join(project, 'Export.lean')) ? 'Export.lean' : 'Main.lean';
+  run(process.execPath, [...bounded, process.execPath, join(root, 'bin/lasm.mjs'), 'build', entry, '--target', target], { cwd: project });
   return (Date.now() - started) / 1000;
 };
 const size = dir => readdirSync(dir, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? size(join(dir, e.name)) : statSync(join(dir, e.name)).size), 0);

@@ -447,14 +447,13 @@ if (engines.has('deno'))
   await serveAndCheck('deno', toolPath.deno, ['run', '-A', 'deno/main.mjs'], { cwd: fetchApp, port: 3104, env: { PORT: '3104', GREETING: 'hello from the host' } });
 
 // ---- The fetch template's WASI programs ----
-// `lasm init --template fetch --deploy fastly --deploy wasi --deploy wasi-http`
-// writes Fastly.lean (Lasm.Fastly), Cgi.lean (CGI in Lean IO) and WasiHttp.lean
-// (Lasm.WASI.Http); each builds with its package.json script and answers the
-// template's routes.
+// `lasm init --template fetch --deploy fastly --deploy wasi-http` writes
+// Fastly.lean (Lasm.Fastly) and WasiHttp.lean (Lasm.WASI.Http); each builds with
+// its package.json script and answers the template's routes.
 {
   const app = join(work, 'fetch-template');
   rmSync(app, { recursive: true, force: true });
-  execFileSync(process.execPath, [join(root, 'bin/lasm.mjs'), 'init', app, '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'wasi', '--deploy', 'wasi-http'],
+  execFileSync(process.execPath, [join(root, 'bin/lasm.mjs'), 'init', app, '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'wasi-http'],
     { stdio: 'inherit', env: headlessEnvironment() });
   const out = results.fetch['fetch-template'] = { passed: 0 };
   const templateRoutes = [
@@ -474,31 +473,11 @@ if (engines.has('deno'))
   };
   const scripts = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8')).scripts;
   let built = true;
-  for (const target of ['wasi', 'fastly', 'wasi-http']) {
+  for (const target of ['fastly', 'wasi-http']) {
     try { lasm(app, scripts[`build:${target}`].replace(/^lasm /, '').split(' '), `fetch-template-${target}`); }
     catch (error) { built = false; fail(`fetch template: npm run build:${target}`, error); }
   }
   if (built) {
-    // CGI under wasmtime, one run per request (as `cgi` above, on the template's build).
-    if (engines.has('wasmtime')) for (const route of templateRoutes) {
-      try {
-        const url = new URL(route.path, 'http://localhost:8080');
-        const env = { REQUEST_METHOD: route.method ?? 'GET', X_FULL_URL: url.href, PATH_INFO: url.pathname,
-          ...(route.headers?.['content-type'] ? { CONTENT_TYPE: route.headers['content-type'] } : {}),
-          ...(route.body ? { CONTENT_LENGTH: String(Buffer.byteLength(route.body)) } : {}) };
-        const got = run('wasmtime', app, 'wasi/main.wasm', [], { env, input: route.body ? Buffer.from(route.body) : '' });
-        if (got.status !== 0) throw new Error(`exit ${got.status}: ${got.stderr}`);
-        const split = got.stdout.indexOf('\r\n\r\n');
-        const headers = new Headers();
-        let status = 200;
-        for (const line of got.stdout.subarray(0, split).toString().split('\r\n')) {
-          const colon = line.indexOf(':'), name = line.slice(0, colon).trim(), value = line.slice(colon + 1).trim();
-          if (name.toLowerCase() === 'status') status = Number(value.split(' ')[0]); else headers.append(name, value);
-        }
-        check('fetch template cgi', route, { status, headers, body: new Uint8Array(got.stdout.subarray(split + 4)) });
-        out.passed++;
-      } catch (error) { fail(`fetch template cgi ${route.path}`, error); }
-    }
     // Viceroy (Fastly.lean) and wasmtime serve (WasiHttp.lean).
     const servers = [];
     if (engines.has('viceroy')) servers.push(['viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3121', '-C', 'fastly.toml', 'bin/main.wasm'], 3121]);

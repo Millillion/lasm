@@ -9,7 +9,7 @@ account: CI serves the functions in Supabase's own edge runtime image. The desig
 ```sh
 npx lasm init my-app --template hono --deploy supabase-edge
 cd my-app && npm install
-npm run build:supabase-edge     # lasm build Main.lean --target supabase-edge → supabase/functions/my-app/
+npm run build:supabase-edge     # lasm build Export.lean --target supabase-edge → supabase/functions/my-app/
 npx supabase functions deploy my-app --project-ref PROJECT_REF
 curl -H "Authorization: Bearer $SUPABASE_ANON_KEY" https://PROJECT_REF.supabase.co/functions/v1/my-app/hello/Ada
 # {"message":"Hello, Ada, from Lean!"}

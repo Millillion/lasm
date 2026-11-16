@@ -7,7 +7,7 @@ The directory must be new or empty. The default template is plain.
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
   lambda           AWS Lambda .zip for nodejs24.x (npm run build:lambda)
-  lambda-container AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)
+  lambda-container AWS Lambda container image (Dockerfile.lambda: Lambda's Node 24 image calling the default export)
   lambda-edge      Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)
   vercel           Vercel Function (vercel.json; Vercel runs the build)
   netlify          Netlify Function (netlify.toml; Netlify runs the build)
@@ -30,7 +30,7 @@ Templates:
   fastify   Fastify 5 with Lean route handlers (Lasm.JS)
   std-http  an HTTP server in pure Lean (Std.Http)
   web       a browser app in Lean (Lasm.UI): a counter
-  fetch     an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces
+  fetch     an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces
   fullstack a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target
 
 Example: npx @lasm/cli init my-app --template hono
