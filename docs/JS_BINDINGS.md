@@ -1110,8 +1110,9 @@ review the diff of the IDL files.
 
 ## Cloudflare Workers: `Lasm.JS.Cloudflare`
 
-`import Lasm.JS.Cloudflare` gives typed bindings of the runtime APIs of
-Cloudflare Workers, **generated from Cloudflare's own TypeScript declarations**
+`Lasm.JS.Cloudflare.*` (`import Lasm.JS.Cloudflare.Kv`, `.D1`, `.Workers`, …,
+one module per area) gives typed bindings of the runtime APIs of Cloudflare
+Workers, **generated from Cloudflare's own TypeScript declarations**
 (`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
 CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
 3 of the standard bindings). It covers what a Worker's `env` holds and what its
@@ -1127,7 +1128,10 @@ Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
 
 ```lean
 import Lasm.JS              -- deriving FromJS
-import Lasm.JS.Cloudflare
+import Lasm.JS.Cloudflare.Kv
+import Lasm.JS.Cloudflare.D1
+import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.Handlers
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
 /-- The Worker's bindings and variables, as wrangler.toml declares them. -/
@@ -1190,11 +1194,13 @@ in import order:
 | `Lasm.JS.Cloudflare.Stream`, `.Services` | Cloudflare Stream; rate limiting, Secrets Store, Artifacts, Flagship, Pipelines and the other bindings |
 | `Lasm.JS.Cloudflare.Vectorize`, `.Hyperdrive`, `.Images`, `.Workflows`, `.Rpc`, `.BrowserRun`, `.Analytics`, `.HtmlRewriter`, `.Cf` | Vectorize, Hyperdrive, Images and Media, Workflows, service bindings, RPC, Worker loaders and dispatch namespaces, Browser Rendering, Analytics Engine, HTMLRewriter, the `cf` properties of requests |
 
-**Import only what the Worker uses.** A Worker links the modules it imports.
-`import Lasm.JS.Cloudflare` imports every module except
-`Lasm.JS.Cloudflare.Ai`, which is most of the library and is imported by name.
-A Worker that uses KV and D1 imports `Lasm.JS.Cloudflare.Kv`, `.D1` and
-`.Workers`, which import no other Cloudflare module. Its smallest form
+**Import the modules of the areas the Worker uses** (API_DECISIONS 0.5-16:
+there is no umbrella `Lasm.JS.Cloudflare`). A Worker links the modules it
+imports. `Lasm.JS.Cloudflare.Support`, `.Kv`, `.D1` and `.Workers` ship
+compiled; every other module compiles the first time a program imports it
+(docs/HOW_LASM_WORKS.md, "Lasm's library"). Workers AI's catalog takes about
+25 seconds then. A Worker that uses KV and D1 imports `Lasm.JS.Cloudflare.Kv`,
+`.D1` and `.Workers`, which import no other Cloudflare module. Its smallest form
 publishes the fetch function itself (`exportDefault fetch`), because
 `ExportedHandler` names every handler and so imports their modules.
 
@@ -1308,7 +1314,7 @@ takes a promise (`Async.toPromise`).
 ### Where it runs, tests and cost
 
 Only on Workers (`--target workers`): the bindings are looked up on the objects
-the runtime hands over, so a program that imports `Lasm.JS.Cloudflare` builds
+the runtime hands over, so a program that imports `Lasm.JS.Cloudflare.*` builds
 for any target, but the calls work only in a Worker.
 
 [`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare) is one Worker

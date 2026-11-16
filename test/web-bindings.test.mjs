@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
@@ -48,8 +48,27 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
   }
 });
 
+// Lasm.JS.Cloudflare (API_DECISIONS 0.5-16): no umbrella; Support, Kv, D1 and Workers ship compiled, in import
+// order and closed under imports; every other module is compiled on first import (src/lazy-library.mjs).
+test('Lasm.JS.Cloudflare: a compiled core closed under imports, the rest compiled on first import', async () => {
+  const { lazyModules } = await import('../src/lazy-library.mjs');
+  const core = ['Support', 'Kv', 'D1', 'Workers'].map(n => `Lasm.JS.Cloudflare.${n}`);
+  assert.deepEqual(libraryModules.filter(m => m.startsWith('Lasm.JS.Cloudflare')), core);
+  assert.ok(!existsSync(new URL('../library/Lasm/JS/Cloudflare.lean', import.meta.url)), 'no umbrella module');
+  for (const m of core) {
+    const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
+    for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) {
+      assert.ok(libraryModules.includes(imported), `${m} imports ${imported}, which is not compiled with it`);
+      assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+    }
+  }
+  const generated = readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url)).map(f => `Lasm.JS.Cloudflare.${f.replace(/\.lean$/, '')}`);
+  const lazy = lazyModules(libraryModules);
+  for (const m of generated) assert.ok(core.includes(m) || lazy.includes(m), `${m} is neither compiled nor compiled on first import`);
+});
+
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) {
+  for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
     for (const m of generated) {

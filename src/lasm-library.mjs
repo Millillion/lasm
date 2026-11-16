@@ -47,14 +47,9 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',
   // Lasm.JS.Cloudflare (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare"): Workers' runtime APIs,
   // generated from @cloudflare/workers-types (scripts/bindings/cloudflare-api.mjs, generate-web.mjs).
-  'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.R2',
-  'Lasm.JS.Cloudflare.Workers', 'Lasm.JS.Cloudflare.Queues', 'Lasm.JS.Cloudflare.Cache',
-  'Lasm.JS.Cloudflare.Sockets', 'Lasm.JS.Cloudflare.Containers', 'Lasm.JS.Cloudflare.DurableObjects',
-  'Lasm.JS.Cloudflare.Tail', 'Lasm.JS.Cloudflare.Email', 'Lasm.JS.Cloudflare.Handlers', 'Lasm.JS.Cloudflare.Stream',
-  'Lasm.JS.Cloudflare.HtmlRewriter', 'Lasm.JS.Cloudflare.Images', 'Lasm.JS.Cloudflare.Services',
-  'Lasm.JS.Cloudflare.Vectorize', 'Lasm.JS.Cloudflare.Ai', 'Lasm.JS.Cloudflare.Hyperdrive',
-  'Lasm.JS.Cloudflare.Workflows', 'Lasm.JS.Cloudflare.Rpc', 'Lasm.JS.Cloudflare.BrowserRun',
-  'Lasm.JS.Cloudflare.Analytics', 'Lasm.JS.Cloudflare.Cf', 'Lasm.JS.Cloudflare',
+  // Prebuilt: the core a Worker's fetch handler and its KV and D1 bindings need (API_DECISIONS 0.5-16); every
+  // other Lasm.JS.Cloudflare module compiles on first import (src/lazy-library.mjs).
+  'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.Workers',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',

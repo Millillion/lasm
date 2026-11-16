@@ -1,6 +1,6 @@
 ## New: `Lasm.JS.Cloudflare`, Cloudflare Workers' runtime APIs
 
-- **`import Lasm.JS.Cloudflare`** binds the runtime APIs of Cloudflare
+- **`Lasm.JS.Cloudflare.*`** (`import Lasm.JS.Cloudflare.Kv`, `.D1`, `.Workers`, …) binds the runtime APIs of Cloudflare
   Workers, generated from Cloudflare's own TypeScript declarations
   (`@cloudflare/workers-types` 5.20261019.1, pinned by hash): Workers KV
   (`KVNamespace`), D1 (`D1Database`, prepared statements, batches, sessions),
@@ -16,7 +16,9 @@
 
   ```lean
   import Lasm.JS
-  import Lasm.JS.Cloudflare
+  import Lasm.JS.Cloudflare.Kv
+  import Lasm.JS.Cloudflare.Workers
+  import Lasm.JS.Cloudflare.Handlers
   open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
   structure Env where

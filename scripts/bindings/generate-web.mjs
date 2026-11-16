@@ -1293,14 +1293,8 @@ options objects dictionaries (docs/JS_BINDINGS.md, "Lasm.JS.Node").
 ${nodeGeneratedBy}
 -/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
 
-files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
-Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: every
-module of Cloudflare's own APIs except ${cloudflareTier.hosts[0].umbrellaExcludes.map(n => `Lasm.JS.Cloudflare.${n}`).join(', ')},
-which a program imports by name (a Worker links what it imports: import only the modules it uses, such as
-Lasm.JS.Cloudflare.Kv and Lasm.JS.Cloudflare.D1). Lasm.JS.Web's Request, Response and streams are their web types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
-dictionaries, handlers callbacks made from Lean functions (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare").
-${hostGeneratedBy(cloudflareTier.hosts[0])}
--/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.') && !cloudflareTier.hosts[0].umbrellaExcludes.includes(n.slice(19))).map(n => `import ${n}`), ''].join('\n'));
+// Lasm.JS.Cloudflare has no umbrella module (API_DECISIONS 0.5-16): a program imports the modules of
+// the areas it uses (Lasm.JS.Cloudflare.Kv, .D1, .Workers, …), which compile on first import.
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
 Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
 Request and Response as the handler's types. The same mapping as Lasm.JS.Web: the server is a handle type,

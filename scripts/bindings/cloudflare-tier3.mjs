@@ -86,9 +86,6 @@ export const hosts = [
     // Node's. Each goes to the first module whose pattern its name matches (else Services).
     // `declarations` below are only the ones that need more than the mechanical rules.
     selectAll: true,
-    // Modules the umbrella `import Lasm.JS.Cloudflare` leaves out: Workers AI's model catalog is
-    // most of the library; a program imports it by name.
-    umbrellaExcludes: ['Ai'],
     allOverloads: true,
     areas: [
       // A Worker that uses only some bindings imports only their modules: each handler type is its

@@ -6,9 +6,11 @@
   outputs (`Lasm.JS.Cloudflare.Ai`), AI Gateway and AI Search, Vectorize,
   Hyperdrive, Images, Email, Tail Workers and tracing, Containers, Workflows,
   service bindings and RPC, Browser Rendering, Analytics Engine, Stream,
-  HTMLRewriter and the other bindings. Import only the modules a Worker uses: a
-  Worker links what it imports. `import Lasm.JS.Cloudflare` brings everything
-  except `Lasm.JS.Cloudflare.Ai`, which is imported by name. Migration from the
+  HTMLRewriter and the other bindings. There is no umbrella module: a Worker
+  imports the modules of the areas it uses (`Lasm.JS.Cloudflare.Kv`, `.D1`,
+  `.Workers`, …) and links only those. `Support`, `Kv`, `D1` and `Workers` ship
+  compiled; the others compile on first import. Migration: replace
+  `import Lasm.JS.Cloudflare` with the modules the program uses. Migration from the
   first Lasm.JS.Cloudflare (same release): `ExportedHandler` moved to
   `Lasm.JS.Cloudflare.Handlers` and the queue handler to `.Queues` (both are in
   the umbrella import); overloads with the same parameter names now give the

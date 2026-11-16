@@ -24,7 +24,15 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Cloudflare
+import Lasm.JS.Cloudflare.Kv
+import Lasm.JS.Cloudflare.D1
+import Lasm.JS.Cloudflare.R2
+import Lasm.JS.Cloudflare.Queues
+import Lasm.JS.Cloudflare.Cache
+import Lasm.JS.Cloudflare.Sockets
+import Lasm.JS.Cloudflare.DurableObjects
+import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.Handlers
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
