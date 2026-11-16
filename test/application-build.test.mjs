@@ -18,7 +18,7 @@ import { withApplicationLock } from '../src/application-lock.mjs';
 
 const build = new URL('../src/application-build.mjs', import.meta.url).href;
 const stubbed = ['managed-lean.mjs', 'managed-link-toolchain.mjs', 'system-git.mjs', 'application-runtime.mjs', 'application-sources.mjs',
-  'lasm-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
+  'lasm-library.mjs', 'lazy-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
 const stubDirectory = mkdtempSync(join(tmpdir(), 'lasm-build-stubs-'));
 const stubs = globalThis.lasmBuildStubs = {};
 const isClass = value => typeof value === 'function' && /^class\b/.test(Function.prototype.toString.call(value));
@@ -60,6 +60,7 @@ function setup(t, { project = false } = {}) {
     'managed-lean.mjs:provisionLean': record('provisionLean', async (_, options) => ({ ...lean, ...(options.native ? { cCompiler: {} } : {}) })),
     'managed-link-toolchain.mjs:provisionLinkToolchain': record('provisionLinkToolchain', async () => ({ identity: 'toolchain-identity', toolchain: { version: linkToolchainCatalog.version } })),
     'system-git.mjs:checkSystemGit': record('checkSystemGit'),
+    'lazy-library.mjs:ensureProgramLibrary': record('ensureProgramLibrary', async () => ({ compiled: [], ms: 0 })),
     'application-runtime.mjs:applicationRuntime': record('applicationRuntime', async () => ({ directory: runtime, identity: 'runtime-identity',
       manifest: { name: 'rt', emscripten: linkToolchainCatalog.version } })),
     'application-sources.mjs:applicationSources': record('applicationSources', (file, _lean, work, options) => {
@@ -97,7 +98,7 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.match(result.signature, /^[0-9a-f]{64}$/);
   assert.deepEqual(stages, ['Checking Lean 4.35.0 runtime', 'Checking Lean sources and imports', 'Checking application inputs and cached build',
     'Packaging the application and runtime support', 'Verifying and writing application output']);
-  assert.deepEqual(calls.map(call => call[0]).filter(name => name !== 'log'), ['selectLeanVersion', 'applicationRuntime', 'provisionLean', 'applicationSources',
+  assert.deepEqual(calls.map(call => call[0]).filter(name => name !== 'log'), ['selectLeanVersion', 'applicationRuntime', 'provisionLean', 'ensureProgramLibrary', 'applicationSources',
     'provisionLinkToolchain', 'linkApplication', 'copyApplicationHost']);
   const [, runtimeLean, runtimeOptions] = named('applicationRuntime')[0];
   assert.deepEqual(runtimeLean, { version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit });
@@ -326,6 +327,18 @@ test('Lake projects: system Git, dependency licences, the C tier and native obje
   assert.equal(stages[2], 'Packages with C code (sqlite, zlib) need Lean\'s C compiler and headers');
   assert.equal(named('provisionLean').length, 2);
   assert.equal(named('provisionLean')[1][2].native, true);
+  // The Lasm library modules this project imports, compiled on first import, before each pass over the sources.
+  const ensured = named('ensureProgramLibrary');
+  assert.equal(ensured.length, 2);
+  for (const [, prefix, dir, options] of ensured) {
+    assert.equal(prefix, join(root, 'lean'));
+    assert.equal(dir, directory);
+    assert.ok(options.eager.includes('Lasm.JS.Core'));
+    assert.equal(options.progress, ensured[0][3].progress);
+    assert.equal(typeof options.progress, 'function');
+    assert.equal(options.lock, withApplicationLock);
+    assert.equal(typeof options.log, 'function');
+  }
   assert.deepEqual(stubs.secondLean.cCompiler, {});
   assert.equal(stubs.secondOptions.afterImports, undefined);
   assert.equal(stubs.licenceArgs[0], directory);

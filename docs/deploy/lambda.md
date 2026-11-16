@@ -7,14 +7,14 @@ Adapter ([further down](#container-image)). For CloudFront, see
 ## Zip package (`nodejs24.x`, x86_64 and arm64)
 
 ```sh
-npx lasm build Main.lean --target lambda   # dist/ (any server on $HOST:$PORT) and lambda.zip
+npx lasm build Main.lean --target lambda   # lambda.zip (any server on $HOST:$PORT)
 aws lambda create-function --function-name my-app --runtime nodejs24.x \
   --handler lasm-lambda.handler --zip-file fileb://lambda.zip \
   --memory-size 512 --timeout 10 --architectures arm64 --role ROLE_ARN
 aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
 ```
 
-With `lasm init my-app --template hono --deploy lambda-zip` the project has
+With `lasm init my-app --template hono --deploy lambda` the project has
 `npm run build:lambda` for the first step. `npx lasm package --target lambda`
 packages an existing `dist/` without rebuilding.
 
@@ -108,7 +108,7 @@ through the image's built-in Runtime Interface Emulator with API Gateway HTTP AP
 
 ### From a `lasm init` project
 
-`lasm init my-app --template hono --deploy lambda` (any server template) writes
+`lasm init my-app --template hono --deploy lambda-container` (any server template) writes
 this file as `Dockerfile.lambda` next to the ordinary `Dockerfile`; build it with
 `docker build -f Dockerfile.lambda -t my-app .`. The first stage is the template's;
 the second is the tested recipe's. The template CI builds it for every server

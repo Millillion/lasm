@@ -12,7 +12,7 @@ After installing the local compiler tarball into a Node project:
 ```sh
 npx lasm run Main.lean
 npx lasm run Main.lean -- argument1 "argument two"
-npx lasm build Main.lean dist
+npx lasm build Main.lean --output dist
 node dist/main.mjs argument1 "argument two"
 ```
 

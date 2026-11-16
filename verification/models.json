@@ -478,6 +478,10 @@
       "kind": "io",
       "reason": "starts a built program"
     },
+    "src/lazy-library.mjs": {
+      "status": "pending",
+      "reason": "library modules compiled on first import: import resolution, dependency order, identity stamps and the parallel schedule are pure; model them (the compiles themselves are I/O)"
+    },
     "src/lean-io-errors.mjs": {
       "status": "modelled",
       "models": [

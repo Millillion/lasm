@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**175 shipped modules**: 19 modelled, 23 pending, 133 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 23 modules still need a model.
+**176 shipped modules**: 19 modelled, 24 pending, 133 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 24 modules still need a model.
 
 ### Modelled (19)
 
@@ -60,7 +60,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (23)
+### Pending (24)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -76,6 +76,7 @@ How a module moves from pending to modelled:
 | [`src/edge/lasm_js_edge.c`](../src/edge/lasm_js_edge.c) | — | Lasm.JS C glue for the edge profile, as library/c/lasm_js.c: its request and event framing is library/c/lasm_js_framing.h (modelled); the operations are not modelled (IRREDUCIBLE.md M4) |
 | [`src/init.mjs`](../src/init.mjs) | [Init.lean](../verification/cli/Lasm/Cli/Model/Init.lean) (`parseInitArguments`, packageName (after basename, resolve and toLowerCase), `lakeName`, supabaseFunctionNameOf (after toLowerCase); [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm init`: argument parsing is modelled (parse_known_or_refused proved) and so are the generated names (generated_names_valid proved); the template texts (golden-tested, test/init-golden.test.mjs) and writing them remain |
 | [`src/lasm-modules/node-serve.mjs`](../src/lasm-modules/node-serve.mjs) | — | Node.serve's node:http server and its req/res ↔ Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module |
+| [`src/lazy-library.mjs`](../src/lazy-library.mjs) | — | library modules compiled on first import: import resolution, dependency order, identity stamps and the parallel schedule are pure; model them (the compiles themselves are I/O) |
 | [`src/link-driver/glue.mjs`](../src/link-driver/glue.mjs) | — | a port of Emscripten's emscript: a pure text transformation, checked against Emscripten's output (link-toolchain fixtures) |
 | [`src/link-driver/metadata.mjs`](../src/link-driver/metadata.mjs) | — | a port of Emscripten's extract_metadata.py: a pure reader of Wasm |
 | [`src/link-driver/python.mjs`](../src/link-driver/python.mjs) | [Python.lean](../verification/cli/Lasm/Cli/Model/Python.lean) (`pythonJsonString`, `comparePythonStrings`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Python's JSON and string semantics: pythonJsonString and comparePythonStrings are modelled (json_string_printable and python_order_code_points proved; json_string_ascii's JSON reading stays a candidate); pythonJsonDumps, pythonEquals, truthy and the identifier and whitespace helpers remain to model (candidate json_dumps_parse_back) |

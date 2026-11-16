@@ -37,9 +37,9 @@ const update = process.env.LASM_UPDATE_INIT_GOLDEN === '1';
 // Directory names exercise the npm, Lake, Workers, Spin, Fastly and Supabase name rules.
 const configurations = [
   ...Object.keys(templates).map(template => ({ name: template, directory: `${template} app`, template, deploy: [] })),
-  { name: 'express-functions', directory: 'Func App.v2', template: 'express', deploy: ['lambda', 'lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] },
+  { name: 'express-functions', directory: 'Func App.v2', template: 'express', deploy: ['lambda-container', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] },
   { name: 'fastify-gcf', directory: 'fastify_gcf', template: 'fastify', deploy: ['gcf'] },
-  { name: 'std-http-lambda', directory: '2nd-server', template: 'std-http', deploy: ['lambda', 'vercel'] },
+  { name: 'std-http-lambda', directory: '2nd-server', template: 'std-http', deploy: ['lambda-container', 'vercel'] },
   { name: 'hono-edge', directory: '@Edge App!', template: 'hono', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'] },
   { name: 'hono-netlify-azure', directory: 'hono-2', template: 'hono', deploy: ['netlify', 'azure', 'lambda-edge'] },
   { name: 'fetch-wasi', directory: 'Fetch.App', template: 'fetch', deploy: ['fastly', 'wasi', 'wasi-http', 'spin', 'workers'] },
@@ -142,22 +142,27 @@ test('lasm init arguments: every option form and every error message', () => {
   for (const tokens of [['app', '--template'], ['app', '--template='], ['app', '-t', '--deploy'], ['app', '-t', '-x']])
     fails(tokens, '--template requires a value\n\n' + initUsage);
   // A value ending with a dash is a value.
-  fails(['app', '-t', 'hono-'], `Unknown template "hono-". Choose one of: ${Object.keys(templates).join(', ')}`);
+  fails(['app', '-t', 'hono-'], `Unknown template "hono-" (did you mean --template hono?). Choose one of: ${Object.keys(templates).join(', ')}`);
+  // Each option once; near misses suggested (0.7-23).
+  fails(['app', '-t', 'hono', '--template=web'], 'Specify --template only once');
+  fails(['app', '--deploy', 'worker'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
+  fails(['app', '--deploy', 'cloudflare'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
   for (const tokens of [['app', '--deploy'], ['app', '--deploy='], ['app', '--deploy', 'pages'], ['app', '-t', 'hono', '--deploy', 'constructor'], ['app', '--deploy', '__proto__']])
     fails(tokens, `--deploy accepts ${deployList}\n\n` + initUsage);
   for (const option of ['--templates', '-tx', '--deployment', '--rebuild', '-'])
     fails(['app', option], `Unknown lasm init option: ${option}\n\n${initUsage}`);
   fails([], initUsage);
   fails(['a', 'b'], initUsage);
-  for (const template of ['constructor', 'toString', 'Hono'])
+  for (const template of ['constructor', 'toString'])
     fails(['app', '-t', template], `Unknown template "${template}". Choose one of: plain, express, hono, fastify, std-http, web, fetch, fullstack`);
+  fails(['app', '-t', 'Hono'], 'Unknown template "Hono" (did you mean --template hono?). Choose one of: plain, express, hono, fastify, std-http, web, fetch, fullstack');
   for (const template of ['plain', 'web'])
     fails(['app', '-t', template, '--deploy', 'lambda'], `--deploy lambda needs a server template (express, hono, fastify, std-http or fetch), not ${template}`);
   // wasi is a CLI target: plain takes it; the first server-only target is named.
   assert.deepEqual(parseInitArguments(['app', '--deploy', 'wasi']).deploy, ['wasi']);
   fails(['app', '--deploy', 'wasi', '--deploy', 'netlify'], '--deploy netlify needs a server template (express, hono, fastify, std-http or fetch), not plain');
   // Each refusal names the targets the template does support.
-  const functions = 'lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf';
+  const functions = 'lambda, lambda-container, lambda-edge, vercel, netlify, azure, gcf';
   fails(['app', '-t', 'express', '--deploy', 'supabase-edge'], `--deploy supabase-edge supports the hono template, not express. The express template supports --deploy ${functions}`);
   fails(['app', '-t', 'hono', '--deploy', 'fastly'], `--deploy fastly supports the fetch and fullstack templates, not hono. The hono template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge`);
   fails(['app', '-t', 'express', '--deploy', 'workers'], `--deploy workers supports the hono, fetch and fullstack templates, not express. The express template supports --deploy ${functions}`);
@@ -184,7 +189,7 @@ test('every deploy target accepts exactly its templates', () => {
   // Not fullstack on the function platforms (issue #168).
   const server = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
   const accepted = {
-    lambda: server, 'lambda-zip': server, 'lambda-edge': server, vercel: server, netlify: server, azure: server, gcf: server,
+    lambda: server, 'lambda-container': server, 'lambda-edge': server, vercel: server, netlify: server, azure: server, gcf: server,
     workers: ['hono', 'fetch', 'fullstack'], 'vercel-edge': ['hono', 'fetch', 'fullstack'], 'netlify-edge': ['hono', 'fetch', 'fullstack'],
     'deno-deploy': ['hono', 'fetch', 'fullstack'], 'supabase-edge': ['hono'], fastly: ['fetch', 'fullstack'], wasi: ['fetch', 'plain'],
     'wasi-http': ['fetch', 'fullstack'], spin: ['fetch', 'fullstack'],
@@ -199,7 +204,7 @@ test('every deploy target accepts exactly its templates', () => {
 
 test('the init usage lists every template and deploy target with its summary', () => {
   assert.ok(initUsage.startsWith(`Usage: lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy TARGET]…\n\nCreates a Lean project`));
-  for (const [name, target] of Object.entries(deployTargets)) assert.ok(initUsage.includes(`\n  ${name.padEnd(12)} ${target.summary}\n`), name);
+  for (const [name, target] of Object.entries(deployTargets)) assert.ok(initUsage.includes(`\n  ${name.padEnd(16)} ${target.summary}\n`), name);
   for (const [name, template] of Object.entries(templates)) assert.ok(initUsage.includes(`\n  ${name.padEnd(9)} ${template.summary}`), name);
   assert.ok(initUsage.endsWith('\n\nExample: npx @lasm/cli init my-app --template hono'));
 });

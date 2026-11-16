@@ -268,8 +268,9 @@ observed and reported only, and never blocks a stage or anything else
 (Jordan, 2026-11-16). Each item is measured by CI and shown on the evidence
 page.
 
-1. **Platforms:** every platform is at evidence level L2 or higher, and Node,
-   Workers and the browser are at L3.
+1. **Platforms:** every platform is at evidence level L3 (Jordan, 2026-11-16;
+   it was L2 or higher, with L3 for Node, Workers and the browser only). L3 is
+   runtime evidence in CI, not production evidence.
 2. **Mutation:** every module in `scripts/mutation/` is at or above 80 %, with
    the ratchet never lowered, and every JavaScript file under `src/` is in a
    module (the CLI argument and init modules, `src/serverless/` and the WASI

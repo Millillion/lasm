@@ -1,8 +1,6 @@
-# Unreleased
-
 ## Breaking: function platforms call the program's fetch handler directly
 
-- **`lasm package` and `lasm build --target netlify|vercel|lambda|lambda-zip|lambda-edge|azure|gcf`
+- **`lasm package` and `lasm build --target netlify|vercel|lambda|lambda-edge|azure|gcf`
   no longer run an HTTP server.** The program publishes a fetch handler with
   `Lasm.JS.exportDefault`, as on Cloudflare Workers. The platform file that
   Lasm generates exports the handler the platform expects and calls it in the
