@@ -1,5 +1,5 @@
 {
-  "$comment": "The reviewed override table of the generated bindings (docs/BINDING_RULES.md). Every binding generator reads it through scripts/bindings/overrides.mjs. Each entry names its decision in docs/API_DECISIONS.md; a `names` or `aliases` entry that no longer matches a generated declaration fails the generator's --check.",
+  "$comment": "The reviewed override table of the generated bindings (docs/BINDING_RULES.md). Every binding generator reads it through scripts/bindings/overrides.mjs. Each entry names its decision in docs/api/decisions/; a `names` or `aliases` entry that no longer matches a generated declaration fails the generator's --check.",
   "names": [
     { "binding": "Lasm.JS.Web.FormData.appendWithBlobValue", "name": "appendBlob", "decision": "A9.1",
       "why": "FormData.append(name, blobValue, filename): the mechanical name repeats the IDL argument name" },
