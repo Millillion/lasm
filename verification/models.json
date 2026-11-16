@@ -448,6 +448,11 @@
       "kind": "runtime",
       "reason": "the app instance of Lasm.UI.Mount; tested in browsers (ui.yml)"
     },
+    "src/lasm-modules/class.mjs": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core)"
+    },
     "src/lasm-modules/ui-dom.mjs": {
       "status": "modelled",
       "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, diff_conforms, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
@@ -945,6 +950,10 @@
         }
       ],
       "reason": "the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs)"
+    },
+    "src/project-modules.mjs": {
+      "status": "pending",
+      "reason": "the project's JavaScript files (A6.1): pure over the binding records and the files, resolving each against its Lean file, the relative-import closure and the refusals; model it as BuiltinModules.lean models the builtin closure (tested in test/project-modules.test.mjs)"
     },
     "src/sdk-repairs.mjs": {
       "status": "exempt",
