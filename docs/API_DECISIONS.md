@@ -233,3 +233,22 @@ one consistent, minimal CLI that does what each platform expects.
   the source is a maintainer diagnostic or test switch, not an interface.
 - **Why:** one prefix and the platforms' own variable names; nothing to
   rename. **Where:** as 0.7-5. **Status:** pending sign-off.
+
+### 0.7-7 Project configuration: `package.json` `"lasm"` (configuration)
+
+- **Decision: kept; revisit with the `@lasm/ui` package split.** A project is a
+  Lake project (`lakefile.toml`, `lean-toolchain`) with a `package.json`. Lasm's
+  one key there is `"lasm": { "edge": { "modules": [...], "exclude": [...] } }`:
+  the JavaScript modules the single-threaded (edge and browser) program imports
+  statically for `Lasm.JS.require`, and the Node-only modules to leave out.
+
+  ```json
+  { "lasm": { "edge": { "exclude": ["@hono/node-server"] } } }
+  ```
+- **Why:** it is npm's place for tool configuration, and nothing else needs
+  configuring. The name `edge` also covers browser builds, so it is slightly
+  off. The `@lasm/ui` package split (milestone 0.6) will change how projects
+  depend on first-party libraries, so the shape is revisited then.
+  Alternatives: rename now to `lasm.modules`/`lasm.exclude` (churn before the
+  split decides the shape).
+- **Where:** as 0.7-5. **Status:** pending sign-off.
