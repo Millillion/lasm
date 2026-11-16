@@ -15,6 +15,7 @@ import Lasm.JS
 import Lasm.JS.Web.Browser
 import Lasm.UI.Mount
 import Bindings
+import PlatformChecks
 open Lasm.JS Lasm.JS.Web
 open Lasm.UI
 
@@ -612,6 +613,8 @@ def main : IO Unit := do
   appChecks checks
   -- The browser tier's property checks (Bindings.lean).
   Bindings.run (fun name ok detail => record checks name ok detail) root.val
+  -- The rest of the browser platform's property checks (PlatformChecks.lean).
+  PlatformChecks.run (fun name ok detail => record checks name ok detail) root
   let results ← Mount.port "results"
   background do
     timerChecks checks
