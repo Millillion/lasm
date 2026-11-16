@@ -199,6 +199,8 @@ const jsModuleOf = name => { const d = def(name); return (d && extValue(extAttr(
 const jsPath = name => {
   const d = def(name);
   if (d && extAttr(d, 'LasmModule')) return extValue(extAttr(d, 'LasmPath')) ?? fail(`${name} has no LasmPath`);
+  // Lasm.JS.Deno and Lasm.JS.Bun: the class's path from globalThis (`Deno.FsFile`).
+  if (d && extAttr(d, 'LasmHost') && d.type === 'interface') return extValue(extAttr(d, 'LasmPath'));
   const ns = d && namespaceOf(d); return ns ? `${ns}.${name}` : name;
 };
 /** A member's name: LasmName where WebIDL reserves it (`toString_`), else its own. */
@@ -415,13 +417,15 @@ function makeUnion(types, typedefName, outerNullable = false) {
     const browserOnly = ctxTier >= 2 && resolved.some(namesBrowserInterface);
     const key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
     if (!unions.has(key)) {
-      let name = typedefName ? (tier.renames[typedefName] ?? typedefName) : flat.alts.map(typeKeyName).join('Or');
+      let name = typedefName ? (tier.renames[typedefName] ?? displayName(typedefName)) : flat.alts.map(typeKeyName).join("Or");
       // A union of a Lasm.JS.Node dictionary or class in a namespace lives in that namespace
       // (`fsPromises.ReadFileOptionsOrDOMString` beside `FileHandle.ReadFileOptionsOrDOMString`).
       const home = flat.alts.map(t => !t.union && !t.generic && def(t.idlType) && extValue(extAttr(def(t.idlType), 'LasmNamespace'))).find(Boolean);
       if (home) name = `${home}.${name}`;
-      if ([...unions.values()].some(o => o.name === name)) fail(`two unions are named ${name} (one in each tier)`);
-      const u = { key, name, alts: [], typedef: typedefName };
+      // Lasm.JS.Deno's and Lasm.JS.Bun's unions are their typedefs, in their own namespace (which shadows Lasm.JS.Web's names).
+      const host = typedefName && def(typedefName) ? extValue(extAttr(def(typedefName), 'LasmHost')) : undefined;
+      if ([...unions.values()].some(o => o.name === name && o.host === host)) fail(`two unions are named ${name} (one in each tier)`);
+      const u = { key, name, alts: [], typedef: typedefName, host };
       unions.set(key, u);
       const used = new Set();
       flat.alts.forEach((t, i) => {
@@ -610,7 +614,7 @@ function visitMember(m, module) {
     const r = resolve(m.idlType);
     visit(promiseRet(r) ? r.inner : r, 'from', module);
     if (!m.readonly) visit(r, 'to', module);
-  } else if (m.type === 'iterable' && !m.async) {
+  } else if (m.type === 'iterable' && (!m.async || /^(deno|bun)-/.test(m.spec ?? ''))) {
     for (const t of m.idlType) visit(resolve(t), 'from', module);
   }
 }
@@ -741,6 +745,9 @@ function overloadNames(group) {
   if (group.length === 1) return [group[0].name];
   const first = group[0].arguments;
   const names = group.map((m, i) => {
+    // Lasm.JS.Deno and Lasm.JS.Bun name their overloads in the lowering (ts-auto.mjs).
+    const given = extValue(extAttr(m, 'LasmLeanName'));
+    if (given) return given;
     if (i === 0) return m.name;
     const idx = m.arguments.findIndex((a, j) => first[j]?.name !== a.name);
     return idx >= 0 ? `${m.name}With${capital(m.arguments[idx].name)}` : `${m.name}${m.arguments.length}`;
@@ -873,8 +880,22 @@ function emitInterface(module, name) {
     fns.push(`/-- \`${idl}\`: \`keys()\`, collected into an array. -/\ndef ${T}.${id(take('keys', 'iterable'))} (self : ${T}) : IO (Array ${K}) :=\n  Support.iterate self.val "keys" (Array ${K})`);
     fns.push(`/-- \`${idl}\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
   }
+  // Lasm.JS.Deno and Lasm.JS.Bun: an async iterable (`for await`): its iterator, read one value at a time, and
+  // `values`, every value read to the end.
+  for (const it of members.filter(m => m.type === 'iterable' && m.async && hostOf(d))) {
+    const v = resolve(it.idlType[0]);
+    requireType(module, v);
+    const res = resultOf(it.idlType[0]);
+    const V = paren(res.lean);
+    const I = `${T}.Iterator`;
+    const read = res.post ? `do\n      let r ← r.get "value" ${res.req}\n      ${applyPost(res.post, 'r').replace(/^pure /, 'return some <| ')}` : `return some (← r.get "value" ${res.req})`;
+    fns.push(`/-- An iterator of \`async iterable<${docText(idlText(it.idlType[0]))}>\` (the object's \`[Symbol.asyncIterator]()\`). -/\nstructure ${I} where\n  /-- The JavaScript iterator. -/\n  val : Value`);
+    fns.push(`/-- \`async iterable<${docText(idlText(it.idlType[0]))}>\`: a new iterator (\`[Symbol.asyncIterator]()\`). -/\ndef ${T}.${id(take('iterator', 'async iterable'))} (self : ${T}) : IO ${I} := do\n  let symbol ← (← (← Lasm.JS.global).get "Symbol" Value).get "asyncIterator" Value\n  let f ← self.val.get symbol Value\n  return { val := (← f.call #[] Value (this := .ref self.val "")) }`);
+    fns.push(`/-- The next value, \`none\` at the end (\`await it.next()\`). -/\ndef ${I}.next (it : ${I}) : Async (Option ${V}) := do\n  let r ← it.val.callMethodAwait "next" #[] Value\n  if (← r.get "done" Bool) then return none\n  else ${read.replace(/\n {6}/g, '\n    ')}`);
+    fns.push(`/-- Every value of \`async iterable<${docText(idlText(it.idlType[0]))}>\`, read to the end (\`for await\`). -/\npartial def ${T}.${id(take('values', 'async iterable'))} (self : ${T}) : Async (Array ${V}) := do\n  let it ← self.iterator\n  let rec loop (acc : Array ${V}) : Async (Array ${V}) := do\n    match ← it.next with\n    | some v => loop (acc.push v)\n    | none => return acc\n  loop #[]`);
+  }
   // Value iterables (NodeList, DOMTokenList): `values()`, collected into an array.
-  for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 1)) {
+  for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 1 && !m.async)) {
     const v = resolve(it.idlType[0]);
     requireType(module, v);
     if (needsPost(v)) fail(`${T}: iterable needing decoding`);
@@ -1234,17 +1255,39 @@ const serveSurface = {};
 for (const m of plan.filter(m => m.host)) {
   const h = (serveSurface[m.host.name] ??= { global: m.host.global, functions: [], interfaces: {} });
   for (const n of m.namespaces) h.functions.push(...new Set(def(n).members.map(x => x.name)));
-  for (const i of m.ifaces) h.interfaces[displayName(i)] = [...new Set(membersOf(i).map(x => x.name))];
+  for (const i of m.ifaces) h.interfaces[displayName(i)] = [...new Set(membersOf(i).filter(x => x.name && x.special !== 'static').map(x => x.name))];
+  (h.modules ??= {})[m.name] = { functions: [...new Set(m.namespaces.flatMap(n => def(n).members.map(x => x.name)))], interfaces: m.ifaces.map(displayName) };
 }
+// What a conformance program probes: js-serve the HTTP servers (Deno's Serve module, Bun's), js-deno all of Lasm.JS.Deno.
+const hostSurfaceOf = (host, modules) => {
+  const h = serveSurface[host];
+  if (!modules) return { global: h.global, functions: h.functions, interfaces: h.interfaces };
+  const ms = modules.map(n => h.modules[n]).filter(Boolean);
+  return { global: h.global, functions: ms.flatMap(x => x.functions), interfaces: Object.fromEntries(ms.flatMap(x => x.interfaces).map(i => [i, h.interfaces[i]])) };
+};
+const surfaceLean = (what, json) => `/-
+GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/deno.idl and bun.idl; do not edit.
+The generated surface (${what}), for the availability probe of Main.lean.
+-/
+namespace Surface
+
+/-- \`{runtime: {global, functions, interfaces: {name: [member]}}}\`. -/
+def json : String := r#"${JSON.stringify(json)}"#
+
+end Surface
+`;
+files.set(join(root, 'test', 'fixtures', 'js-deno', 'Surface.lean'), surfaceLean('all of Lasm.JS.Deno', { Deno: hostSurfaceOf("Deno") }));
+const serveProbe = { Deno: hostSurfaceOf("Deno", ["Serve"]), Bun: hostSurfaceOf("Bun") };
+for (const h of Object.values(serveSurface)) delete h.modules;
 files.set(join(root, 'scripts', 'bindings', 'serve-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (${serveTier.hosts.map(h => `${h.name} ${h.version}`).join(', ')} declarations)`, surface: serveSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-serve', 'Surface.lean'), `/-
 GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/deno.idl and bun.idl; do not edit.
-The generated surface (scripts/bindings/serve-surface.json), for the availability probe of Main.lean.
+The generated surface (Deno's HTTP server module and Bun's, of scripts/bindings/serve-surface.json), for the availability probe of Main.lean.
 -/
 namespace Surface
 
 /-- \`{runtime: {global, functions, interfaces: {name: [member]}}}\` for Lasm.JS.Deno and Lasm.JS.Bun. -/
-def json : String := r#"${JSON.stringify(serveSurface)}"#
+def json : String := r#"${JSON.stringify(serveProbe)}"#
 
 end Surface
 `);
