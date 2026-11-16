@@ -555,7 +555,9 @@ function postFn(t) {
   }
 }
 /** Lean expression (pure) converting `v` of argType(t) to Data. */
-const toData = (t, v) => `toJS ${v}`;
+// Lasm.JS.Deno and Lasm.JS.Bun: a `bigint` argument is a JavaScript bigint whatever its size (Deno KV's KvU64, Bun's
+// hashes and seeds reject numbers), where Lasm.JS's `toJS` of an Int gives a number below 2^53.
+const toData = (t, v) => t.k === 'prim' && t.idl === 'bigint' && emittingHost ? `(Data.bigint ${v})` : `toJS ${v}`;
 
 // ---------- usage: which declarations each module needs ----------
 
@@ -1105,6 +1107,7 @@ function emitSupport(key, stack = []) {
   emitted.add(key);
   const module = moduleOfType.get(key);
   const o = out.get(module);
+  emittingHost = /^Lasm\.JS\.(Deno|Bun)\./.test(module);
   const text = inTier(moduleTier.get(module), () => {
     if (key.startsWith('union:')) return emitUnion(module, key.slice(6));
     const d = def(key);

@@ -19,6 +19,7 @@ import Lasm.JS.Web
 import Lasm.JS.Deno
 import Lasm.JS.Web.WebSocket
 import Surface
+import Tls
 open Lasm.JS Lasm.JS.Web
 
 /-! Reporting -/
@@ -151,7 +152,8 @@ def runtimeChecks (r : Checks) (live : Live) : Async Unit := do
     let pid ← Deno.pid
     let ppid ← Deno.ppid
     expect r "pid" (pid > 0 && ppid > 0 && pid != ppid) s!"{pid} {ppid}"
-    expect r "args" ((← Deno.args).size == 0) s!"{← Deno.args}"
+    -- args are the program's (Lasm's Deno entry passes the program name first)
+    expect r "args" ((← Deno.args).size ≤ 1) s!"{← Deno.args}"
     -- build and version describe this Deno: Linux, x86-64, 2.9.6.
     let b ← Deno.build
     expect r "build" (b.os == .linux && b.arch == .x8664 && b.target.endsWith "linux-gnu") s!"{b.target}"
@@ -307,7 +309,7 @@ def subprocessChecks (r : Checks) (live : Live) : Async Unit := do
     let mut g : Rng := ⟨53⟩
     for i in [0:8] do
       let (s, g') := g.string 100; g := g'
-      let c ← Deno.Command.new (.domString "printf") (some { args := some #["%s", s] })
+      let c ← Deno.Command.new (.domString "printf") (some { args := some #["%s", s], stdout := some .piped, stderr := some .piped })
       see live "Command" c.val
       let o ← c.output
       expect r s!"output[{i}]" (o.success && o.code == 0 && o.stdout == utf8 s && o.stderr.size == 0) s!"{o.code}"
@@ -341,27 +343,36 @@ def subprocessChecks (r : Checks) (live : Live) : Async Unit := do
 
 def netChecks (r : Checks) (live : Live) : Async Unit := do
   runSection r "net.tcp" do
-    -- An echo server: ∀ bytes b, what a client writes comes back.
+    -- ∀ bytes b: what the server writes to an accepted connection, the client reads, in order.
     let l ← Deno.listen { hostname := some "127.0.0.1", port := some 0 }
     see live "TcpListener" l.val
     let addr ← l.addr
     expect r "listen addr" (addr.transport == .tcp && addr.hostname == "127.0.0.1" && addr.port > 0) s!"{addr.port}"
-    Std.Async.background do
-      let c ← l.accept
-      let data ← readAll (← c.readable)
-      writeAll (← c.writable) data
+    let mut g : Rng := ⟨61⟩
+    let (b, _) := g.bytes 20000
+    let accepted ← (l.accept).asTask
     let c ← Deno.connect { port := addr.port.toFloat, hostname := some "127.0.0.1" }
     see live "TcpConn" c.val
     see live "Conn" c.val
     c.setNoDelay (some true); c.setKeepAlive (some true)
-    expect r "remoteAddr" ((← c.remoteAddr).port == addr.port) ""
-    let mut g : Rng := ⟨61⟩
-    let (b, _) := g.bytes 20000
-    let w ← (← c.writable).getWriter
-    w.write (toJS b)
-    c.closeWrite
+    let server ← Std.Async.await accepted
+    expect r "remoteAddr" ((← c.remoteAddr).port == addr.port && (← server.localAddr).port == addr.port) ""
+    writeAll (← server.writable) b
     let back ← readAll (← c.readable)
-    expect r "tcp echo" (back == b) s!"{back.size} of {b.size}"
+    expect r "tcp" (back == b) s!"{back.size} of {b.size}"
+    l.close
+  runSection r "net.tls" do
+    -- over TLS (the test CA trusted): what the server writes, the client reads; the handshake completes.
+    let l ← Deno.listenTls { hostname := some "127.0.0.1", port := some 0, cert := Tls.cert, key := Tls.key }
+    see live "TlsListener" l.val
+    let port := (← l.addr).port
+    let accepted ← (l.accept).asTask
+    let c ← Deno.connectTls { port := port.toFloat, hostname := some "localhost", caCerts := some #[Tls.ca] }
+    see live "TlsConn" c.val
+    discard <| c.handshake
+    let server ← Std.Async.await accepted
+    writeAll (← server.writable) (utf8 "over tls")
+    expect r "tls" ((← readAll (← c.readable)) == utf8 "over tls") ""
     l.close
   runSection r "net.unix" do
     let dir ← Deno.makeTempDir none
@@ -546,7 +557,10 @@ def availability (r : Checks) (live : Live) : Async Unit := do
   let .object ifaces := info.field "interfaces" | throw (IO.userError "no interfaces")
   for (iface, members) in ifaces do
     match (← live.get).find? (·.1 == iface) with
-    | none => expect r s!"available Deno.{iface}" false "no live object was seen"
+    | none =>
+      -- Deno.serve's objects are probed live by test/fixtures/js-serve.
+      unless ["HttpServer", "ServeHandlerInfo", "HttpServerUnixAddr", "ServeHandlerInfoUnixAddr"].contains iface do
+        expect r s!"available Deno.{iface}" false "no live object was seen"
     | some (_, v) =>
       for m in names members do
         expect r s!"available Deno.{iface}.{m}" (← reflectHas v m) ""
