@@ -82,6 +82,9 @@
         "utimeSync",
         "utime",
         "umask",
+        "spawn",
+        "spawnAndWait",
+        "spawnAndWaitSync",
         "kill",
         "networkInterfaces",
         "resolveDns",
@@ -90,6 +93,9 @@
         "connect",
         "connectTls",
         "startTls",
+        "connectQuic",
+        "upgradeWebTransport",
+        "listenDatagram",
         "serve",
         "upgradeWebSocket",
         "createHttpClient",
@@ -223,6 +229,24 @@
           "ref",
           "unref"
         ],
+        "ConnVsockAddr": [
+          "close",
+          "localAddr",
+          "remoteAddr",
+          "closeWrite",
+          "ref",
+          "unref",
+          "readable",
+          "writable"
+        ],
+        "VsockConn": [],
+        "VsockListener": [
+          "accept",
+          "close",
+          "addr",
+          "ref",
+          "unref"
+        ],
         "TlsConn": [
           "handshake"
         ],
@@ -232,6 +256,56 @@
           "addr",
           "ref",
           "unref"
+        ],
+        "QuicReceiveStream": [
+          "id"
+        ],
+        "QuicSendStream": [
+          "sendOrder",
+          "id"
+        ],
+        "QuicIncoming": [
+          "localIp",
+          "remoteAddr",
+          "remoteAddressValidated",
+          "accept",
+          "refuse",
+          "ignore"
+        ],
+        "QuicListener": [
+          "incoming",
+          "accept",
+          "stop",
+          "endpoint"
+        ],
+        "QuicEndpoint": [
+          "addr",
+          "listen",
+          "close"
+        ],
+        "QuicConn": [
+          "close",
+          "createBidirectionalStream",
+          "createUnidirectionalStream",
+          "sendDatagram",
+          "readDatagram",
+          "endpoint",
+          "handshake",
+          "remoteAddr",
+          "protocol",
+          "serverName",
+          "closed",
+          "incomingBidirectionalStreams",
+          "incomingUnidirectionalStreams",
+          "maxDatagramSize"
+        ],
+        "DatagramConn": [
+          "joinMulticastV4",
+          "joinMulticastV6",
+          "receive",
+          "send",
+          "close",
+          "addr"
         ],
         "HttpServer": [
           "finished",
@@ -252,6 +326,17 @@
           "shutdown"
         ],
         "ServeHandlerInfoUnixAddr": [
+          "remoteAddr",
+          "completed"
+        ],
+        "HttpServerVsockAddr": [
+          "finished",
+          "addr",
+          "ref",
+          "unref",
+          "shutdown"
+        ],
+        "ServeHandlerInfoVsockAddr": [
           "remoteAddr",
           "completed"
         ],

@@ -147,7 +147,7 @@ export function lowerAuto(host, files) {
     if (root) used.add(`root:${root}`);
     if (unstableFiles.has(d.file)) {
       const take = host.unstable[d.file];
-      if (!take.names.includes(n.split('.')[0])) continue;
+      if (take.names !== '*' && !take.names.includes(n.split('.')[0])) continue;
       used.add(`unstable:${n.split('.')[0]}`);
       d.unstableTaken = take.reason;
     }
@@ -155,7 +155,7 @@ export function lowerAuto(host, files) {
     if (d.kind === 'interface' && byName.get(n)?.kind === 'interface') { byName.get(n).more.push(d); continue; }
     if (!byName.has(n)) byName.set(n, { ...d, more: [] });
   }
-  for (const [f, t] of Object.entries(host.unstable ?? {})) for (const n of t.names) if (!used.has(`unstable:${n}`)) fail(`${host.name}: unstable ${n} is not declared in ${f}`);
+  for (const [f, t] of Object.entries(host.unstable ?? {})) for (const n of t.names === '*' ? [] : t.names) if (!used.has(`unstable:${n}`)) fail(`${host.name}: unstable ${n} is not declared in ${f}`);
   // A nested namespace's declaration: its namespaces capitalised in front (`udp.Socket` → `UdpSocket`, apart from the function `udpSocket`).
   const leanOf = n => n.includes('.') ? n.split('.').map(capital).join('') : n;
   /** A name as declared, looked up from a nested namespace outwards (`HostnamePortServeOptions` in `Serve`). */
@@ -176,7 +176,9 @@ export function lowerAuto(host, files) {
   const isExcluded = (key, doc, decl) => {
     if (key in host.exclude) { used.add(key); return host.exclude[key]; }
     const tag = tagOf(doc);
-    if (tag && !(decl?.unstableTaken && tag !== '@deprecated')) return `${tag} in its declaration`;
+    // Experimental and unstable declarations are generated when the host takes them (Jordan, 2026-11-16: decide each
+    // on whether it works); deprecated ones never (their replacement is generated).
+    if (tag && !((decl?.unstableTaken || host.takeExperimental) && tag !== '@deprecated')) return `${tag} in its declaration`;
     return null;
   };
 
@@ -552,6 +554,8 @@ export function lowerAuto(host, files) {
       rest = typeParams(part.header).rest;
       heritage.push(...heritageOf(rest));
     }
+    // An interface declared twice with the same base (lib.deno_net.d.ts and lib.deno.unstable.d.ts): one base.
+    heritage = [...new Map(heritage.map(h => [typeText(h), h])).values()];
     const lean = o.lean;
     const path = o.path ?? `${G}.${lean}`;
     let parent = null;

@@ -16,6 +16,8 @@ export const deno = {
   license: 'MIT, Copyright 2018-2026 the Deno authors',
   global: 'Deno',
   auto: true,
+  /** @experimental and UNSTABLE declarations are generated too, each decided on whether it works from Wasm (Jordan, 2026-11-16). */
+  takeExperimental: true,
   title: 'the Deno namespace',
   /** Lean modules (Lasm.JS.Deno.<name>), in import order; a declaration's @category picks its module. */
   modules: [
@@ -33,18 +35,22 @@ export const deno = {
   categories: {
     Runtime: 'Runtime', Permissions: 'Permissions', 'I/O': 'Io', 'File System': 'Fs', Subprocess: 'Subprocess', Network: 'Net',
     'HTTP Server': 'Serve', WebSockets: 'WebSockets', Fetch: 'Fetch', Cloud: 'Kv', Performance: 'Runtime', Platform: 'Runtime',
-    FFI: 'Runtime', Testing: 'Runtime', GPU: 'Runtime', Jupyter: 'Runtime', Telemetry: 'Runtime',
+    FFI: 'Runtime', Testing: 'Runtime', GPU: 'Runtime', Jupyter: 'Runtime', Telemetry: 'Runtime', Bundler: 'Runtime', Linter: 'Runtime',
+    Errors: 'Runtime', Intl: 'Runtime', Workers: 'Runtime',
   },
   /** Declarations of the unstable file that are lowered, with why. */
   unstable: {
     'cli/tsc/dts/lib.deno.unstable.d.ts': {
-      names: ['openKv', 'Kv', 'KvKey', 'KvKeyPart', 'KvConsistencyLevel', 'KvListSelector', 'KvMutation', 'KvListIterator', 'KvEntry', 'KvEntryMaybe',
-        'KvListOptions', 'KvCommitResult', 'KvCommitError', 'AtomicCheck', 'AtomicOperation', 'KvU64', 'cron', 'CronSchedule', 'CronScheduleExpression'],
+      names: '*',
       reason: 'Deno KV and Deno.cron (Jordan, 2026-11-16: full Deno support, KV included; Deno Deploy provides both, the Deno CLI with --unstable-kv and --unstable-cron)',
     },
   },
   /** Whole categories not lowered. */
   excludeCategories: {
+    Bundler: 'Deno.bundle builds JavaScript bundles with Deno\'s bundler; Lasm builds the program',
+    Linter: 'Deno.lint\'s plugin API, for lint rules that `deno lint` runs on JavaScript source',
+    GPU: 'a native window surface for WebGPU (UnsafeWindowSurface), which a program run by Lasm has no window for',
+    Jupyter: 'Deno.jupyter works only inside Deno\'s Jupyter kernel, which does not run Lasm\'s output',
     FFI: 'native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI',
     Testing: 'Deno.test and Deno.bench register tests for `deno test` and `deno bench`, which do not run Lasm\'s output (a Lasm program runs with deno run)',
   },
@@ -54,6 +60,7 @@ export const deno = {
     'FsFile.read': inPlace, 'FsFile.readSync': inPlace, 'FsFile.write': inPlaceWrite, 'FsFile.writeSync': inPlaceWrite,
     'Conn.read': inPlace, 'Conn.write': inPlaceWrite,
     'stdin.read': inPlace, 'stdin.readSync': inPlace, 'stdout.write': inPlaceWrite, 'stdout.writeSync': inPlaceWrite, 'stderr.write': inPlaceWrite, 'stderr.writeSync': inPlaceWrite,
+    'serve(options: ServeVsockOptions & ServeInit<Deno.VsockAddr>)': 'the same operation as serveWithVsockOptions with the handler inside the options: one Lean function per operation',
     'serve(options: ServeUnixOptions & ServeInit<Deno.UnixAddr>)': 'the same operation as serveWithUnixOptions with the handler inside the options: one Lean function per operation',
     'serve(options: (ServeTcpOptions | ServeTcpOptions & TlsCertifiedKeyPem) & ServeInit<Deno.NetAddr>)': 'the same operation as serveWithOptions and serveWithTlsOptions with the handler inside the options: one Lean function per operation',
     readDirSync: 'returns a synchronous iterator object (not an array) of the entries readDir gives',
@@ -83,15 +90,22 @@ export const deno = {
     'resolveDns(query: string, recordType: "SRV", options?: ResolveDnsOptions)': 'resolveDnsSrv',
     'resolveDns(query: string, recordType: "TXT", options?: ResolveDnsOptions)': 'resolveDnsTxt',
     'serve(options: ServeUnixOptions, handler: ServeHandler<Deno.UnixAddr>)': 'serveWithUnixOptions',
+    'serve(options: ServeVsockOptions, handler: ServeHandler<Deno.VsockAddr>)': 'serveWithVsockOptions',
   },
   intersections: {
     'ServeTcpOptions & TlsCertifiedKeyPem': 'ServeTcpTlsOptions',
     'TcpListenOptions & {transport?: "tcp"}': 'ListenTcpOptions',
     'UnixListenOptions & {transport: "unix"}': 'ListenUnixOptions',
     'ListenTlsOptions & TlsCertifiedKeyPem': 'ListenTlsCertifiedOptions',
+    'VsockListenOptions & {transport: "vsock"}': 'ListenVsockOptions',
+    'UdpListenOptions & {transport: "udp"}': 'ListenDatagramUdpOptions',
+    'UnixListenDatagramOptions & {transport: "unixpacket"}': 'ListenDatagramUnixOptions',
   },
   /** Member types the declarations state with computed types (mapped tuples), stated plainly, with why. */
   overrides: {
+    connectQuic: { type: 'Promise<QuicConn>', reason: 'conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way' },
+    'QuicIncoming.accept': { type: 'Promise<QuicConn>', reason: 'conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way' },
+    upgradeWebTransport: { type: 'Promise<unknown>', reason: 'a web WebTransport with its url, which Lasm.JS.Web does not generate: the object as Data' },
     'Kv.getMany': { params: { keys: 'KvKey[]' }, type: 'Promise<KvEntryMaybe<unknown>[]>', reason: 'the declared type maps a tuple of keys to a tuple of entries (a mapped type); an array of keys gives an array of entries in order' },
     'Kv.watch': { params: { keys: 'KvKey[]' }, type: 'ReadableStream<KvEntryMaybe<unknown>[]>', reason: 'as getMany: a stream of arrays of entries, one per key' },
   },

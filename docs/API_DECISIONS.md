@@ -254,7 +254,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
 - **Where:** PR #307; unreleased.
 - **Status:** pending sign-off.
 
-#### 0.4-13 What Lasm.JS.Deno leaves out
+#### 0.4-13 What Lasm.JS.Deno leaves out (superseded by 0.4-38 onwards: one entry per exclusion)
 
 - **Decision:** not generated, each with its reason in `deno-tier2.mjs` and the
   header of `deno.idl`: FFI (`Deno.dlopen`, `UnsafePointer`: computed types, no
@@ -521,5 +521,236 @@ Bun"](JS_BINDINGS.md#standard-bindings-for-bun-lasmjsbun).
 - **Decision:** a call or construct signature of an object type (`Bun.cron(…)`, `SQL.NameTransform`) and a Symbol-keyed member (`[Symbol.dispose]`, `[Symbol.iterator]`) are not generated; the object's other members are.
 - **Why:** Lean calls such an object with Lasm.JS's `Value.call`; `using` and `for … of` have no Lean counterpart (the iterators' contents are read with `all`, `toJSON` or `values`).
 - **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-38 Lasm.JS.Deno generates Deno's experimental and unstable APIs that work
+
+- **Decision:** declarations Deno marks @experimental or UNSTABLE are generated (Deno.spawn, spawnAndWait, spawnAndWaitSync; VSOCK serve, listen and connect; QUIC: QuicEndpoint, connectQuic, upgradeWebTransport; datagrams: listenDatagram; the rest of lib.deno.unstable.d.ts with Deno KV and cron), except the categories and members below; @deprecated ones are not (their replacements are). The Deno CLI runs them with Deno's own --unstable-* flags. Supersedes the "experimental never" rule of 0.4-10 and the grouped list of 0.4-13.
+- **Why:** Jordan, 2026-11-16: generate everything the declarations contain, exclude only what cannot work from Wasm, each exclusion its own entry.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-39 Lasm.JS.Deno leaves out the @category Bundler declarations
+
+- **Decision:** not generated.
+- **Why:** Deno.bundle builds JavaScript bundles with Deno's bundler; Lasm builds the program.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-40 Lasm.JS.Deno leaves out the @category Linter declarations
+
+- **Decision:** not generated.
+- **Why:** Deno.lint's plugin API, for lint rules that `deno lint` runs on JavaScript source.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-41 Lasm.JS.Deno leaves out the @category GPU declarations
+
+- **Decision:** not generated.
+- **Why:** a native window surface for WebGPU (UnsafeWindowSurface), which a program run by Lasm has no window for.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-42 Lasm.JS.Deno leaves out the @category Jupyter declarations
+
+- **Decision:** not generated.
+- **Why:** Deno.jupyter works only inside Deno's Jupyter kernel, which does not run Lasm's output.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-43 Lasm.JS.Deno leaves out the @category FFI declarations
+
+- **Decision:** not generated.
+- **Why:** native libraries through pointers (Deno.dlopen, UnsafePointer): their signatures are computed TypeScript types (conditional and mapped), and Deno Deploy has no FFI.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-44 Lasm.JS.Deno leaves out the @category Testing declarations
+
+- **Decision:** not generated.
+- **Why:** Deno.test and Deno.bench register tests for `deno test` and `deno bench`, which do not run Lasm's output (a Lasm program runs with deno run).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-45 Lasm.JS.Deno leaves out `errors`
+
+- **Decision:** not generated.
+- **Why:** the error classes (Deno.errors.NotFound, …), for instanceof checks: a JavaScript error reaches Lean as an IO.Error whose message starts with the class name.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-46 Lasm.JS.Deno leaves out `telemetry`
+
+- **Decision:** not generated.
+- **Why:** OpenTelemetry provider objects (typed any) for an OpenTelemetry JavaScript API package bound with @[js]; Lean code passes them on, as Lasm.JS.global gives them.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-47 Lasm.JS.Deno leaves out `FsFile.read`
+
+- **Decision:** not generated.
+- **Why:** reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-48 Lasm.JS.Deno leaves out `FsFile.readSync`
+
+- **Decision:** not generated.
+- **Why:** reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-49 Lasm.JS.Deno leaves out `FsFile.write`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-50 Lasm.JS.Deno leaves out `FsFile.writeSync`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-51 Lasm.JS.Deno leaves out `Conn.read`
+
+- **Decision:** not generated.
+- **Why:** reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-52 Lasm.JS.Deno leaves out `Conn.write`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-53 Lasm.JS.Deno leaves out `stdin.read`
+
+- **Decision:** not generated.
+- **Why:** reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-54 Lasm.JS.Deno leaves out `stdin.readSync`
+
+- **Decision:** not generated.
+- **Why:** reads into the caller's buffer in place; Lean bytes are copies (read the `readable` stream, or readFile).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-55 Lasm.JS.Deno leaves out `stdout.write`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-56 Lasm.JS.Deno leaves out `stdout.writeSync`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-57 Lasm.JS.Deno leaves out `stderr.write`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-58 Lasm.JS.Deno leaves out `stderr.writeSync`
+
+- **Decision:** not generated.
+- **Why:** writes part of a buffer and returns how much; use the `writable` stream, or writeFile.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-59 Lasm.JS.Deno leaves out `serve(options: ServeVsockOptions & ServeInit<Deno.VsockAddr>)`
+
+- **Decision:** not generated.
+- **Why:** the same operation as serveWithVsockOptions with the handler inside the options: one Lean function per operation.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-60 Lasm.JS.Deno leaves out `serve(options: ServeUnixOptions & ServeInit<Deno.UnixAddr>)`
+
+- **Decision:** not generated.
+- **Why:** the same operation as serveWithUnixOptions with the handler inside the options: one Lean function per operation.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-61 Lasm.JS.Deno leaves out `serve(options: (ServeTcpOptions | ServeTcpOptions & TlsCertifiedKeyPem) & ServeInit<Deno.NetAddr>)`
+
+- **Decision:** not generated.
+- **Why:** the same operation as serveWithOptions and serveWithTlsOptions with the handler inside the options: one Lean function per operation.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-62 Lasm.JS.Deno leaves out `readDirSync`
+
+- **Decision:** not generated.
+- **Why:** returns a synchronous iterator object (not an array) of the entries readDir gives.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-63 Lasm.JS.Deno leaves out `FsWatcher.return`
+
+- **Decision:** not generated.
+- **Why:** the iterator protocol's return(): close() ends the watcher.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-64 Lasm.JS.Deno leaves out `UpgradeWebSocketOptions.socket`
+
+- **Decision:** not generated.
+- **Why:** a node:net Socket (Deno's Node compatibility), for upgrading a Node HTTP request: Lasm.JS.Node's domain.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-65 Lasm.JS.Deno leaves out `resolveDns(query: string, recordType: RecordType, options?: ResolveDnsOptions)`
+
+- **Decision:** not generated.
+- **Why:** the per-record-type overloads (resolveDns, resolveDnsCaa, …) give every record type with its typed result.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-66 Lasm.JS.Deno leaves out `Kv.commitVersionstamp`
+
+- **Decision:** not generated.
+- **Why:** returns a Symbol placeholder for a versionstamp in a key, which Lean cannot hold as a key part (a KvKeyPart has no Symbol alternative here).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-67 Lasm.JS.Deno leaves out `PermissionStatus.addEventListener`
+
+- **Decision:** not generated.
+- **Why:** typed with keyof PermissionStatusEventMap; the EventTarget parent's addEventListener (Lasm.JS.Web) is the same call.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-68 Lasm.JS.Deno leaves out `PermissionStatus.removeEventListener`
+
+- **Decision:** not generated.
+- **Why:** as addEventListener.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-69 Lasm.JS.Deno leaves out `KvListIterator.next`
+
+- **Decision:** not generated.
+- **Why:** the iterator protocol's next(): KvListIterator is an `async iterable` (values, iterator).
+- **Where:** the Bun PR (Deno follow-up); unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-70 Lasm.JS.Deno leaves out Symbol-keyed members and the iterator protocol's own methods
+
+- **Decision:** `[Symbol.dispose]`, `[Symbol.asyncDispose]` and `[Symbol.asyncIterator]` are not generated as members (the last is the async iterable of 0.4-14).
+- **Why:** `using` has no Lean counterpart; `close`, `shutdown` and the async iterables cover them.
+- **Where:** the Bun PR (Deno follow-up); unreleased.
 - **Status:** pending sign-off.
 

@@ -229,7 +229,7 @@ def fsChecks (r : Checks) (live : Live) : Async Unit := do
     Deno.chmod (.domString p) 0o600
     expect r "chmod" ((← Deno.stat (.domString p)).mode.map (fun m => m.toUInt64.toNat % 0o1000) == some 0o600) s!"{(← Deno.stat (.domString p)).mode}"
     -- utime sets the modification time (seconds since the epoch)
-    Deno.utime (.domString p) (.double 1000000) (.double 2000000)
+    Deno.utime (.domString p) (toJS (1000000 : Float)) (toJS (2000000 : Float))
     expect r "utime" ((← Deno.stat (.domString p)).mtime.isSome) ""
   runSection r "fs.dirs" do
     -- readDir lists exactly the names written (the model: a set of names), and their kinds.

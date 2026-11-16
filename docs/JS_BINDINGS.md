@@ -1155,7 +1155,7 @@ deno/main.mjs`); Deno Deploy provides both without flags.
 | `Lasm.JS.Deno.Fetch` | `createHttpClient` (`HttpClient`: pass it as `fetch`'s `client`) |
 | `Lasm.JS.Deno.Kv` | Deno KV: `openKv`, `Kv` (`get`, `getMany`, `set`, `delete`, `list`, `atomic`, `enqueue`, `listenQueue`, `watch`, `close`), `AtomicOperation` (`check`, `mutate`, `set`, `delete`, `sum`, `min`, `max`, `enqueue`, `commit`), `KvU64`, `KvListIterator`; `cron` |
 
-91 functions and constants, 29 classes and handle types (134 members) and 134
+97 functions and constants, 41 classes and handle types (190 members) and 171
 supporting types. Each module is generated from the declarations with that
 `@category` (a type used by an earlier module lives there).
 
@@ -1163,10 +1163,13 @@ Not generated, with the reason (each in
 [`deno-tier2.mjs`](../scripts/bindings/deno-tier2.mjs) and listed at the top of
 [`deno.idl`](../scripts/bindings/deno.idl)):
 
-- **Marked `@experimental`, `UNSTABLE` or `@deprecated`**: VSOCK, QUIC and
-  WebTransport, `Deno.spawn` and its forms, the unstable file's other APIs. Deno
-  KV and `Deno.cron` are the exception: they are generated although their
-  declarations are unstable (Jordan, 2026-11-16; API_DECISIONS 0.4-10).
+- **Marked `@deprecated`** (their replacements are generated). Declarations
+  Deno marks `@experimental` or `UNSTABLE` are generated (VSOCK, QUIC,
+  `Deno.listenDatagram`, `Deno.spawn`, Deno KV, `Deno.cron`; Jordan, 2026-11-16,
+  API_DECISIONS 0.4-38); the Deno CLI runs them with its `--unstable-*` flags.
+- **Bundler, Linter, GPU, Jupyter**: `Deno.bundle`, `Deno.lint`'s plugin API, a
+  WebGPU window surface and `Deno.jupyter` work only in Deno's own tools or with a
+  window.
 - **FFI** (`Deno.dlopen`, `UnsafePointer`, …): signatures computed by
   TypeScript's type system, and Deno Deploy has no FFI. **`Deno.test` and
   `Deno.bench`**: they register tests for `deno test`, which does not run Lasm's

@@ -60,6 +60,29 @@ instance : Nonempty UnixListener := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS UnixListener := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UnixListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.UnixListener", .data⟩
 
+/-- `interface Deno.Conn` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure ConnVsockAddr where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty ConnVsockAddr := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ConnVsockAddr := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ConnVsockAddr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ConnVsockAddr", .data⟩
+
+/-- `interface Deno.VsockConn` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure VsockConn extends ConnVsockAddr
+instance : Nonempty VsockConn := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS VsockConn := ⟨fun x => .ref x.val ""⟩
+instance : FromJS VsockConn := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.VsockConn", .data⟩
+instance : Coe VsockConn ConnVsockAddr := ⟨VsockConn.toConnVsockAddr⟩
+
+/-- `interface Deno.Listener` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure VsockListener where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty VsockListener := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS VsockListener := ⟨fun x => .ref x.val ""⟩
+instance : FromJS VsockListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.VsockListener", .data⟩
+
 /-- `interface Deno.TlsConn` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
 structure TlsConn extends Conn
 instance : Nonempty TlsConn := ⟨{ val := Classical.ofNonempty }⟩
@@ -74,6 +97,60 @@ structure TlsListener where
 instance : Nonempty TlsListener := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS TlsListener := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TlsListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.TlsListener", .data⟩
+
+/-- `interface Deno.QuicReceiveStream` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicReceiveStream extends ReadableStream
+instance : Nonempty QuicReceiveStream := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicReceiveStream := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicReceiveStream := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicReceiveStream", .data⟩
+instance : Coe QuicReceiveStream ReadableStream := ⟨QuicReceiveStream.toReadableStream⟩
+
+/-- `interface Deno.QuicSendStream` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicSendStream extends WritableStream
+instance : Nonempty QuicSendStream := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicSendStream := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicSendStream := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicSendStream", .data⟩
+instance : Coe QuicSendStream WritableStream := ⟨QuicSendStream.toWritableStream⟩
+
+/-- `interface Deno.QuicIncoming` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicIncoming where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QuicIncoming := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicIncoming := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicIncoming := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicIncoming", .data⟩
+
+/-- `interface Deno.QuicListener` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicListener where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QuicListener := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicListener := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicListener", .data⟩
+
+/-- `interface Deno.QuicEndpoint` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicEndpoint where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QuicEndpoint := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicEndpoint := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicEndpoint := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicEndpoint", .data⟩
+
+/-- `interface Deno.QuicConn` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
+structure QuicConn where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QuicConn := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QuicConn := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QuicConn := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.QuicConn", .data⟩
+
+/-- `interface Deno.DatagramConn` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts): a handle to the JavaScript object. -/
+structure DatagramConn where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty DatagramConn := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DatagramConn := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DatagramConn := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.DatagramConn", .data⟩
 
 /-- `enum NetAddrTransport` (Deno 2.9.6 type declarations): "tcp", "udp". -/
 inductive NetAddrTransport where
@@ -108,6 +185,69 @@ instance : FromJS UnixAddrTransport where
     | .string "unixpacket" => .ok .unixpacket
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.UnixAddrTransport"
+
+/-- `enum VsockAddrTransport` (Deno 2.9.6 type declarations): "vsock". -/
+inductive VsockAddrTransport where
+  /-- "vsock" -/
+  | vsock
+  deriving BEq, Repr, Inhabited
+instance : ToJS VsockAddrTransport := ⟨fun
+  | .vsock => .string "vsock"⟩
+instance : FromJS VsockAddrTransport where
+  fromJS
+    | .string "vsock" => .ok .vsock
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.VsockAddrTransport"
+
+/-- `enum QuicTransportOptionsCongestionControl` (Deno 2.9.6 type declarations): "throughput", "low-latency", "default". -/
+inductive QuicTransportOptionsCongestionControl where
+  /-- "throughput" -/
+  | throughput
+  /-- "low-latency" -/
+  | lowLatency
+  /-- "default" -/
+  | default
+  deriving BEq, Repr, Inhabited
+instance : ToJS QuicTransportOptionsCongestionControl := ⟨fun
+  | .throughput => .string "throughput"
+  | .lowLatency => .string "low-latency"
+  | .default => .string "default"⟩
+instance : FromJS QuicTransportOptionsCongestionControl where
+  fromJS
+    | .string "throughput" => .ok .throughput
+    | .string "low-latency" => .ok .lowLatency
+    | .string "default" => .ok .default
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.QuicTransportOptionsCongestionControl"
+
+/-- `enum AddrTransport` (Deno 2.9.6 type declarations): "tcp", "udp", "unix", "unixpacket", "vsock". -/
+inductive AddrTransport where
+  /-- "tcp" -/
+  | tcp
+  /-- "udp" -/
+  | udp
+  /-- "unix" -/
+  | unix
+  /-- "unixpacket" -/
+  | unixpacket
+  /-- "vsock" -/
+  | vsock
+  deriving BEq, Repr, Inhabited
+instance : ToJS AddrTransport := ⟨fun
+  | .tcp => .string "tcp"
+  | .udp => .string "udp"
+  | .unix => .string "unix"
+  | .unixpacket => .string "unixpacket"
+  | .vsock => .string "vsock"⟩
+instance : FromJS AddrTransport where
+  fromJS
+    | .string "tcp" => .ok .tcp
+    | .string "udp" => .ok .udp
+    | .string "unix" => .ok .unix
+    | .string "unixpacket" => .ok .unixpacket
+    | .string "vsock" => .ok .vsock
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.AddrTransport"
 
 /-- `enum NetworkInterfaceInfoFamily` (Deno 2.9.6 type declarations): "IPv4", "IPv6". -/
 inductive NetworkInterfaceInfoFamily where
@@ -263,6 +403,19 @@ instance : FromJS ListenUnixOptionsTransport where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ListenUnixOptionsTransport"
 
+/-- `enum ListenVsockOptionsTransport` (Deno 2.9.6 type declarations): "vsock". -/
+inductive ListenVsockOptionsTransport where
+  /-- "vsock" -/
+  | vsock
+  deriving BEq, Repr, Inhabited
+instance : ToJS ListenVsockOptionsTransport := ⟨fun
+  | .vsock => .string "vsock"⟩
+instance : FromJS ListenVsockOptionsTransport where
+  fromJS
+    | .string "vsock" => .ok .vsock
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.ListenVsockOptionsTransport"
+
 /-- `enum ListenTlsOptionsTransport` (Deno 2.9.6 type declarations): "tcp". -/
 inductive ListenTlsOptionsTransport where
   /-- "tcp" -/
@@ -315,6 +468,19 @@ instance : FromJS UnixConnectOptionsTransport where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.UnixConnectOptionsTransport"
 
+/-- `enum VsockConnectOptionsTransport` (Deno 2.9.6 type declarations): "vsock". -/
+inductive VsockConnectOptionsTransport where
+  /-- "vsock" -/
+  | vsock
+  deriving BEq, Repr, Inhabited
+instance : ToJS VsockConnectOptionsTransport := ⟨fun
+  | .vsock => .string "vsock"⟩
+instance : FromJS VsockConnectOptionsTransport where
+  fromJS
+    | .string "vsock" => .ok .vsock
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.VsockConnectOptionsTransport"
+
 /-- `enum ConnectTlsOptionsKeyFormat` (Deno 2.9.6 type declarations): "pem". -/
 inductive ConnectTlsOptionsKeyFormat where
   /-- "pem" -/
@@ -327,6 +493,32 @@ instance : FromJS ConnectTlsOptionsKeyFormat where
     | .string "pem" => .ok .pem
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.ConnectTlsOptionsKeyFormat"
+
+/-- `enum ListenDatagramUdpOptionsTransport` (Deno 2.9.6 type declarations): "udp". -/
+inductive ListenDatagramUdpOptionsTransport where
+  /-- "udp" -/
+  | udp
+  deriving BEq, Repr, Inhabited
+instance : ToJS ListenDatagramUdpOptionsTransport := ⟨fun
+  | .udp => .string "udp"⟩
+instance : FromJS ListenDatagramUdpOptionsTransport where
+  fromJS
+    | .string "udp" => .ok .udp
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.ListenDatagramUdpOptionsTransport"
+
+/-- `enum ListenDatagramUnixOptionsTransport` (Deno 2.9.6 type declarations): "unixpacket". -/
+inductive ListenDatagramUnixOptionsTransport where
+  /-- "unixpacket" -/
+  | unixpacket
+  deriving BEq, Repr, Inhabited
+instance : ToJS ListenDatagramUnixOptionsTransport := ⟨fun
+  | .unixpacket => .string "unixpacket"⟩
+instance : FromJS ListenDatagramUnixOptionsTransport where
+  fromJS
+    | .string "unixpacket" => .ok .unixpacket
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Deno.ListenDatagramUnixOptionsTransport"
 
 /-- `dictionary NetAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NetAddr where
@@ -355,6 +547,21 @@ instance : FromJS UnixAddr where
     path := ← Lasm.JS.readField String d "path" }
   typeName := "Lasm.JS.Deno.UnixAddr"
 
+/-- `dictionary VsockAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure VsockAddr where
+  /-- `required VsockAddrTransport transport` -/
+  transport : VsockAddrTransport
+  /-- `required double cid` -/
+  cid : Float
+  /-- `required double port` -/
+  port : Float
+instance : FromJS VsockAddr where
+  fromJS d := do return {
+    transport := ← Lasm.JS.readField VsockAddrTransport d "transport",
+    cid := ← Lasm.JS.readField Float d "cid",
+    port := ← Lasm.JS.readField Float d "port" }
+  typeName := "Lasm.JS.Deno.VsockAddr"
+
 /-- `dictionary TlsHandshakeInfo` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TlsHandshakeInfo where
   /-- `required DOMString? alpnProtocol` -/
@@ -363,6 +570,266 @@ instance : FromJS TlsHandshakeInfo where
   fromJS d := do return {
     alpnProtocol := ← Lasm.JS.readField (Option String) d "alpnProtocol" }
   typeName := "Lasm.JS.Deno.TlsHandshakeInfo"
+
+/-- `dictionary QuicAcceptOptions : QuicServerTransportOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicAcceptOptions where
+  /-- `double keepAliveInterval` -/
+  keepAliveInterval : Option Float := none
+  /-- `double maxIdleTimeout` -/
+  maxIdleTimeout : Option Float := none
+  /-- `double maxConcurrentBidirectionalStreams` -/
+  maxConcurrentBidirectionalStreams : Option Float := none
+  /-- `double maxConcurrentUnidirectionalStreams` -/
+  maxConcurrentUnidirectionalStreams : Option Float := none
+  /-- `QuicTransportOptionsCongestionControl congestionControl` -/
+  congestionControl : Option QuicTransportOptionsCongestionControl := none
+  /-- `DOMString preferredAddressV4` -/
+  preferredAddressV4 : Option String := none
+  /-- `DOMString preferredAddressV6` -/
+  preferredAddressV6 : Option String := none
+  /-- `sequence<DOMString> alpnProtocols` -/
+  alpnProtocols : Option (Array String) := none
+  /-- `boolean zeroRtt` -/
+  zeroRtt : Option Bool := none
+instance : ToJS QuicAcceptOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Support.optional d.congestionControl),
+    ("preferredAddressV4", Support.optional d.preferredAddressV4),
+    ("preferredAddressV6", Support.optional d.preferredAddressV6),
+    ("alpnProtocols", Support.optional d.alpnProtocols),
+    ("zeroRtt", Support.optional d.zeroRtt)]⟩
+
+/-- `dictionary QuicEndpointOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicEndpointOptions where
+  /-- `DOMString hostname` -/
+  hostname : Option String := none
+  /-- `double port` -/
+  port : Option Float := none
+instance : ToJS QuicEndpointOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
+    ("port", Support.optional d.port)]⟩
+
+/-- `dictionary QuicListenOptions : QuicServerTransportOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicListenOptions where
+  /-- `double keepAliveInterval` -/
+  keepAliveInterval : Option Float := none
+  /-- `double maxIdleTimeout` -/
+  maxIdleTimeout : Option Float := none
+  /-- `double maxConcurrentBidirectionalStreams` -/
+  maxConcurrentBidirectionalStreams : Option Float := none
+  /-- `double maxConcurrentUnidirectionalStreams` -/
+  maxConcurrentUnidirectionalStreams : Option Float := none
+  /-- `QuicTransportOptionsCongestionControl congestionControl` -/
+  congestionControl : Option QuicTransportOptionsCongestionControl := none
+  /-- `DOMString preferredAddressV4` -/
+  preferredAddressV4 : Option String := none
+  /-- `DOMString preferredAddressV6` -/
+  preferredAddressV6 : Option String := none
+  /-- `required sequence<DOMString> alpnProtocols` -/
+  alpnProtocols : Array String
+  /-- `required DOMString key` -/
+  key : String
+  /-- `required DOMString cert` -/
+  cert : String
+instance : ToJS QuicListenOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Support.optional d.congestionControl),
+    ("preferredAddressV4", Support.optional d.preferredAddressV4),
+    ("preferredAddressV6", Support.optional d.preferredAddressV6),
+    ("alpnProtocols", toJS d.alpnProtocols),
+    ("key", toJS d.key),
+    ("cert", toJS d.cert)]⟩
+
+/-- `dictionary QuicCloseInfo` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicCloseInfo where
+  /-- `required double closeCode` -/
+  closeCode : Float
+  /-- `required DOMString reason` -/
+  reason : String
+instance : ToJS QuicCloseInfo := ⟨fun d => Support.fields #[("closeCode", toJS d.closeCode),
+    ("reason", toJS d.reason)]⟩
+instance : FromJS QuicCloseInfo where
+  fromJS d := do return {
+    closeCode := ← Lasm.JS.readField Float d "closeCode",
+    reason := ← Lasm.JS.readField String d "reason" }
+  typeName := "Lasm.JS.Deno.QuicCloseInfo"
+
+/-- `dictionary QuicSendStreamOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicSendStreamOptions where
+  /-- `double sendOrder` -/
+  sendOrder : Option Float := none
+  /-- `boolean waitUntilAvailable` -/
+  waitUntilAvailable : Option Bool := none
+instance : ToJS QuicSendStreamOptions := ⟨fun d => Support.fields #[("sendOrder", Support.optional d.sendOrder),
+    ("waitUntilAvailable", Support.optional d.waitUntilAvailable)]⟩
+
+/-- `dictionary QuicBidirectionalStream` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QuicBidirectionalStream where
+  /-- `required QuicReceiveStream readable` -/
+  readable : QuicReceiveStream
+  /-- `required QuicSendStream writable` -/
+  writable : QuicSendStream
+instance : FromJS QuicBidirectionalStream where
+  fromJS d := do return {
+    readable := ← Lasm.JS.readField QuicReceiveStream d "readable",
+    writable := ← Lasm.JS.readField QuicSendStream d "writable" }
+  typeName := "Lasm.JS.Deno.QuicBidirectionalStream"
+
+/-- `callback MulticastV4MembershipLeave = Promise<undefined> ()` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MulticastV4MembershipLeave where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty MulticastV4MembershipLeave := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MulticastV4MembershipLeave := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MulticastV4MembershipLeave := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV4MembershipLeave", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def MulticastV4MembershipLeave.ofFn (f : Async Unit) : IO MulticastV4MembershipLeave := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def MulticastV4MembershipLeave.ofSyncFn (f : IO Unit) : IO MulticastV4MembershipLeave := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback MulticastV4MembershipSetLoopback = Promise<undefined> (boolean loopback)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MulticastV4MembershipSetLoopback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty MulticastV4MembershipSetLoopback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MulticastV4MembershipSetLoopback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MulticastV4MembershipSetLoopback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV4MembershipSetLoopback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def MulticastV4MembershipSetLoopback.ofFn (f : Bool → Async Unit) : IO MulticastV4MembershipSetLoopback := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def MulticastV4MembershipSetLoopback.ofSyncFn (f : Bool → IO Unit) : IO MulticastV4MembershipSetLoopback := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback MulticastV4MembershipSetTTL = Promise<undefined> (double ttl)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MulticastV4MembershipSetTTL where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty MulticastV4MembershipSetTTL := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MulticastV4MembershipSetTTL := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MulticastV4MembershipSetTTL := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV4MembershipSetTTL", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def MulticastV4MembershipSetTTL.ofFn (f : Float → Async Unit) : IO MulticastV4MembershipSetTTL := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def MulticastV4MembershipSetTTL.ofSyncFn (f : Float → IO Unit) : IO MulticastV4MembershipSetTTL := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `dictionary MulticastV4Membership` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MulticastV4Membership where
+  /-- `required MulticastV4MembershipLeave leave` -/
+  leave : MulticastV4MembershipLeave
+  /-- `required MulticastV4MembershipSetLoopback setLoopback` -/
+  setLoopback : MulticastV4MembershipSetLoopback
+  /-- `required MulticastV4MembershipSetTTL setTTL` -/
+  setTTL : MulticastV4MembershipSetTTL
+instance : FromJS MulticastV4Membership where
+  fromJS d := do return {
+    leave := ← Lasm.JS.readField MulticastV4MembershipLeave d "leave",
+    setLoopback := ← Lasm.JS.readField MulticastV4MembershipSetLoopback d "setLoopback",
+    setTTL := ← Lasm.JS.readField MulticastV4MembershipSetTTL d "setTTL" }
+  typeName := "Lasm.JS.Deno.MulticastV4Membership"
+
+/-- `callback MulticastV6MembershipLeave = Promise<undefined> ()` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MulticastV6MembershipLeave where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty MulticastV6MembershipLeave := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MulticastV6MembershipLeave := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MulticastV6MembershipLeave := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV6MembershipLeave", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def MulticastV6MembershipLeave.ofFn (f : Async Unit) : IO MulticastV6MembershipLeave := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def MulticastV6MembershipLeave.ofSyncFn (f : IO Unit) : IO MulticastV6MembershipLeave := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback MulticastV6MembershipSetLoopback = Promise<undefined> (boolean loopback)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MulticastV6MembershipSetLoopback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty MulticastV6MembershipSetLoopback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MulticastV6MembershipSetLoopback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MulticastV6MembershipSetLoopback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV6MembershipSetLoopback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def MulticastV6MembershipSetLoopback.ofFn (f : Bool → Async Unit) : IO MulticastV6MembershipSetLoopback := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def MulticastV6MembershipSetLoopback.ofSyncFn (f : Bool → IO Unit) : IO MulticastV6MembershipSetLoopback := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `dictionary MulticastV6Membership` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MulticastV6Membership where
+  /-- `required MulticastV6MembershipLeave leave` -/
+  leave : MulticastV6MembershipLeave
+  /-- `required MulticastV6MembershipSetLoopback setLoopback` -/
+  setLoopback : MulticastV6MembershipSetLoopback
+instance : FromJS MulticastV6Membership where
+  fromJS d := do return {
+    leave := ← Lasm.JS.readField MulticastV6MembershipLeave d "leave",
+    setLoopback := ← Lasm.JS.readField MulticastV6MembershipSetLoopback d "setLoopback" }
+  typeName := "Lasm.JS.Deno.MulticastV6Membership"
+
+/-- `dictionary Addr` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Addr where
+  /-- `required AddrTransport transport` -/
+  transport : AddrTransport
+  /-- `DOMString hostname` -/
+  hostname : Option String := none
+  /-- `double port` -/
+  port : Option Float := none
+  /-- `DOMString path` -/
+  path : Option String := none
+  /-- `double cid` -/
+  cid : Option Float := none
+instance : ToJS Addr := ⟨fun d => Support.fields #[("transport", toJS d.transport),
+    ("hostname", Support.optional d.hostname),
+    ("port", Support.optional d.port),
+    ("path", Support.optional d.path),
+    ("cid", Support.optional d.cid)]⟩
+instance : FromJS Addr where
+  fromJS d := do return {
+    transport := ← Lasm.JS.readField AddrTransport d "transport",
+    hostname := ← Lasm.JS.readField (Option String) d "hostname",
+    port := ← Lasm.JS.readField (Option Float) d "port",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    cid := ← Lasm.JS.readField (Option Float) d "cid" }
+  typeName := "Lasm.JS.Deno.Addr"
 
 /-- `dictionary NetworkInterfaceInfo` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure NetworkInterfaceInfo where
@@ -513,11 +980,14 @@ structure ListenTcpOptions where
   hostname : Option String := none
   /-- `double tcpBacklog` -/
   tcpBacklog : Option Float := none
+  /-- `boolean reusePort` -/
+  reusePort : Option Bool := none
   /-- `ListenTcpOptionsTransport transport` -/
   transport : Option ListenTcpOptionsTransport := none
 instance : ToJS ListenTcpOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
     ("hostname", Support.optional d.hostname),
     ("tcpBacklog", Support.optional d.tcpBacklog),
+    ("reusePort", Support.optional d.reusePort),
     ("transport", Support.optional d.transport)]⟩
 
 /-- `dictionary ListenUnixOptions : UnixListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -529,6 +999,18 @@ structure ListenUnixOptions where
 instance : ToJS ListenUnixOptions := ⟨fun d => Support.fields #[("path", toJS d.path),
     ("transport", toJS d.transport)]⟩
 
+/-- `dictionary ListenVsockOptions : VsockListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ListenVsockOptions where
+  /-- `required double cid` -/
+  cid : Float
+  /-- `required double port` -/
+  port : Float
+  /-- `required ListenVsockOptionsTransport transport` -/
+  transport : ListenVsockOptionsTransport
+instance : ToJS ListenVsockOptions := ⟨fun d => Support.fields #[("cid", toJS d.cid),
+    ("port", toJS d.port),
+    ("transport", toJS d.transport)]⟩
+
 /-- `dictionary ListenTlsCertifiedOptions : ListenTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenTlsCertifiedOptions where
   /-- `double port` -/
@@ -537,6 +1019,8 @@ structure ListenTlsCertifiedOptions where
   hostname : Option String := none
   /-- `double tcpBacklog` -/
   tcpBacklog : Option Float := none
+  /-- `boolean reusePort` -/
+  reusePort : Option Bool := none
   /-- `ListenTlsOptionsTransport transport` -/
   transport : Option ListenTlsOptionsTransport := none
   /-- `sequence<DOMString> alpnProtocols` -/
@@ -550,6 +1034,7 @@ structure ListenTlsCertifiedOptions where
 instance : ToJS ListenTlsCertifiedOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
     ("hostname", Support.optional d.hostname),
     ("tcpBacklog", Support.optional d.tcpBacklog),
+    ("reusePort", Support.optional d.reusePort),
     ("transport", Support.optional d.transport),
     ("alpnProtocols", Support.optional d.alpnProtocols),
     ("keyFormat", Support.optional d.keyFormat),
@@ -585,6 +1070,18 @@ structure UnixConnectOptions where
   path : String
 instance : ToJS UnixConnectOptions := ⟨fun d => Support.fields #[("transport", toJS d.transport),
     ("path", toJS d.path)]⟩
+
+/-- `dictionary VsockConnectOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure VsockConnectOptions where
+  /-- `required VsockConnectOptionsTransport transport` -/
+  transport : VsockConnectOptionsTransport
+  /-- `required double cid` -/
+  cid : Float
+  /-- `required double port` -/
+  port : Float
+instance : ToJS VsockConnectOptions := ⟨fun d => Support.fields #[("transport", toJS d.transport),
+    ("cid", toJS d.cid),
+    ("port", toJS d.port)]⟩
 
 /-- `dictionary ConnectTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectTlsOptions where
@@ -633,6 +1130,75 @@ instance : ToJS StartTlsOptions := ⟨fun d => Support.fields #[("hostname", Sup
     ("caCerts", Support.optional d.caCerts),
     ("alpnProtocols", Support.optional d.alpnProtocols),
     ("unsafelyDisableHostnameVerification", Support.optional d.unsafelyDisableHostnameVerification)]⟩
+
+/-- `dictionary ConnectQuicOptions : QuicTransportOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ConnectQuicOptions where
+  /-- `double keepAliveInterval` -/
+  keepAliveInterval : Option Float := none
+  /-- `double maxIdleTimeout` -/
+  maxIdleTimeout : Option Float := none
+  /-- `double maxConcurrentBidirectionalStreams` -/
+  maxConcurrentBidirectionalStreams : Option Float := none
+  /-- `double maxConcurrentUnidirectionalStreams` -/
+  maxConcurrentUnidirectionalStreams : Option Float := none
+  /-- `QuicTransportOptionsCongestionControl congestionControl` -/
+  congestionControl : Option QuicTransportOptionsCongestionControl := none
+  /-- `required double port` -/
+  port : Float
+  /-- `required DOMString hostname` -/
+  hostname : String
+  /-- `DOMString serverName` -/
+  serverName : Option String := none
+  /-- `required sequence<DOMString> alpnProtocols` -/
+  alpnProtocols : Array String
+  /-- `sequence<DOMString> caCerts` -/
+  caCerts : Option (Array String) := none
+  /-- `QuicEndpoint endpoint` -/
+  endpoint : Option QuicEndpoint := none
+  /-- `boolean zeroRtt` -/
+  zeroRtt : Option Bool := none
+instance : ToJS ConnectQuicOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Support.optional d.congestionControl),
+    ("port", toJS d.port),
+    ("hostname", toJS d.hostname),
+    ("serverName", Support.optional d.serverName),
+    ("alpnProtocols", toJS d.alpnProtocols),
+    ("caCerts", Support.optional d.caCerts),
+    ("endpoint", Support.optional d.endpoint),
+    ("zeroRtt", Support.optional d.zeroRtt)]⟩
+
+/-- `dictionary ListenDatagramUdpOptions : UdpListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ListenDatagramUdpOptions where
+  /-- `double port` -/
+  port : Option Float := none
+  /-- `DOMString hostname` -/
+  hostname : Option String := none
+  /-- `double tcpBacklog` -/
+  tcpBacklog : Option Float := none
+  /-- `boolean reuseAddress` -/
+  reuseAddress : Option Bool := none
+  /-- `boolean loopback` -/
+  loopback : Option Bool := none
+  /-- `required ListenDatagramUdpOptionsTransport transport` -/
+  transport : ListenDatagramUdpOptionsTransport
+instance : ToJS ListenDatagramUdpOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
+    ("hostname", Support.optional d.hostname),
+    ("tcpBacklog", Support.optional d.tcpBacklog),
+    ("reuseAddress", Support.optional d.reuseAddress),
+    ("loopback", Support.optional d.loopback),
+    ("transport", toJS d.transport)]⟩
+
+/-- `dictionary ListenDatagramUnixOptions : UnixListenDatagramOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ListenDatagramUnixOptions where
+  /-- `DOMString path` -/
+  path : Option String := none
+  /-- `required ListenDatagramUnixOptionsTransport transport` -/
+  transport : ListenDatagramUnixOptionsTransport
+instance : ToJS ListenDatagramUnixOptions := ⟨fun d => Support.fields #[("path", Support.optional d.path),
+    ("transport", toJS d.transport)]⟩
 
 /-- `readonly localAddr: A`: `readonly attribute NetAddr localAddr` -/
 def Conn.localAddr (self : Conn) : IO NetAddr := self.val.get "localAddr" NetAddr
@@ -802,6 +1368,86 @@ partial def UnixListener.values (self : UnixListener) : Async (Array UnixConn) :
     | none => return acc
   loop #[]
 
+/-- `readonly localAddr: A`: `readonly attribute VsockAddr localAddr` -/
+def ConnVsockAddr.localAddr (self : ConnVsockAddr) : IO VsockAddr := self.val.get "localAddr" VsockAddr
+
+/-- `readonly remoteAddr: A`: `readonly attribute VsockAddr remoteAddr` -/
+def ConnVsockAddr.remoteAddr (self : ConnVsockAddr) : IO VsockAddr := self.val.get "remoteAddr" VsockAddr
+
+/-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
+def ConnVsockAddr.readable (self : ConnVsockAddr) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
+
+/-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
+def ConnVsockAddr.writable (self : ConnVsockAddr) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
+
+/-- `close(): void`: `undefined close()` -/
+def ConnVsockAddr.close (self : ConnVsockAddr) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `closeWrite(): Promise<void>`: `Promise<undefined> closeWrite()` -/
+def ConnVsockAddr.closeWrite (self : ConnVsockAddr) : Async Unit :=
+  self.val.callMethodAwait "closeWrite" (Support.args #[]) Unit
+
+/-- `ref(): void`: `undefined ref()` -/
+def ConnVsockAddr.ref (self : ConnVsockAddr) : IO Unit :=
+  self.val.callMethod "ref" (Support.args #[]) Unit
+
+/-- `unref(): void`: `undefined unref()` -/
+def ConnVsockAddr.unref (self : ConnVsockAddr) : IO Unit :=
+  self.val.callMethod "unref" (Support.args #[]) Unit
+
+/-- `readonly addr: A`: `readonly attribute VsockAddr addr` -/
+def VsockListener.addr (self : VsockListener) : IO VsockAddr := self.val.get "addr" VsockAddr
+
+/-- `accept(): Promise<T>`: `Promise<VsockConn> accept()` -/
+def VsockListener.accept (self : VsockListener) : Async VsockConn := do
+  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+  pure { val := r }
+
+/-- `close(): void`: `undefined close()` -/
+def VsockListener.close (self : VsockListener) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `ref(): void`: `undefined ref()` -/
+def VsockListener.ref (self : VsockListener) : IO Unit :=
+  self.val.callMethod "ref" (Support.args #[]) Unit
+
+/-- `unref(): void`: `undefined unref()` -/
+def VsockListener.unref (self : VsockListener) : IO Unit :=
+  self.val.callMethod "unref" (Support.args #[]) Unit
+
+/-- An iterator of `async iterable<VsockConn>` (the object's `[Symbol.asyncIterator]()`). -/
+structure VsockListener.Iterator where
+  /-- The JavaScript iterator. -/
+  val : Value
+
+/-- `async iterable<VsockConn>`: a new iterator (`[Symbol.asyncIterator]()`). -/
+def VsockListener.iterator (self : VsockListener) : IO VsockListener.Iterator := do
+  let symbol ← (← (← Lasm.JS.global).get "Symbol" Value).get "asyncIterator" Value
+  let f ← self.val.get symbol Value
+  return { val := (← f.call #[] Value (this := .ref self.val "")) }
+
+/-- The next value, `none` at the end (`await it.next()`). -/
+def VsockListener.Iterator.next (it : VsockListener.Iterator) : Async (Option VsockConn) := do
+  let r ← it.val.callMethodAwait "next" #[] Value
+  if (← r.get "done" Bool) then return none
+  else do
+    let r ← r.get "value" Value
+    return some <| { val := r }
+
+/-- Every value of `async iterable<VsockConn>`, read to the end (`for await`). -/
+partial def VsockListener.values (self : VsockListener) : Async (Array VsockConn) := do
+  let it ← self.iterator
+  let rec loop (acc : Array VsockConn) : Async (Array VsockConn) := do
+    match ← it.next with
+    | some v => loop (acc.push v)
+    | none => return acc
+  loop #[]
+
 /-- `handshake(): Promise<TlsHandshakeInfo>`: `Promise<TlsHandshakeInfo> handshake()` -/
 def TlsConn.handshake (self : TlsConn) : Async TlsHandshakeInfo :=
   self.val.callMethodAwait "handshake" (Support.args #[]) TlsHandshakeInfo
@@ -849,6 +1495,208 @@ def TlsListener.Iterator.next (it : TlsListener.Iterator) : Async (Option TlsCon
 partial def TlsListener.values (self : TlsListener) : Async (Array TlsConn) := do
   let it ← self.iterator
   let rec loop (acc : Array TlsConn) : Async (Array TlsConn) := do
+    match ← it.next with
+    | some v => loop (acc.push v)
+    | none => return acc
+  loop #[]
+
+/-- `readonly id: bigint`: `readonly attribute bigint id` -/
+def QuicReceiveStream.id (self : QuicReceiveStream) : IO Int := self.val.get "id" Int
+
+/-- `sendOrder: number`: `readonly attribute double sendOrder` -/
+def QuicSendStream.sendOrder (self : QuicSendStream) : IO Float := self.val.get "sendOrder" Float
+
+/-- `readonly id: bigint`: `readonly attribute bigint id` -/
+def QuicSendStream.id (self : QuicSendStream) : IO Int := self.val.get "id" Int
+
+/-- `readonly localIp: string`: `readonly attribute DOMString localIp` -/
+def QuicIncoming.localIp (self : QuicIncoming) : IO String := self.val.get "localIp" String
+
+/-- `readonly remoteAddr: NetAddr`: `readonly attribute NetAddr remoteAddr` -/
+def QuicIncoming.remoteAddr (self : QuicIncoming) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+
+/-- `readonly remoteAddressValidated: boolean`: `readonly attribute boolean remoteAddressValidated` -/
+def QuicIncoming.remoteAddressValidated (self : QuicIncoming) : IO Bool := self.val.get "remoteAddressValidated" Bool
+
+/-- `accept<ZRTT extends boolean>(options?: QuicAcceptOptions<ZRTT>): ZRTT extends true ? QuicConn : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)`: `Promise<QuicConn> accept(optional QuicAcceptOptions options)` -/
+def QuicIncoming.accept (self : QuicIncoming) (options : Option QuicAcceptOptions := none) : Async QuicConn := do
+  let r ← self.val.callMethodAwait "accept" (Support.args #[Support.optional options]) Value
+  pure { val := r }
+
+/-- `refuse(): void`: `undefined refuse()` -/
+def QuicIncoming.refuse (self : QuicIncoming) : IO Unit :=
+  self.val.callMethod "refuse" (Support.args #[]) Unit
+
+/-- `ignore(): void`: `undefined ignore()` -/
+def QuicIncoming.ignore (self : QuicIncoming) : IO Unit :=
+  self.val.callMethod "ignore" (Support.args #[]) Unit
+
+/-- `readonly endpoint: QuicEndpoint`: `readonly attribute QuicEndpoint endpoint` -/
+def QuicListener.endpoint (self : QuicListener) : IO QuicEndpoint := do
+  let r ← self.val.get "endpoint" Value
+  pure { val := r }
+
+/-- `incoming(): Promise<QuicIncoming>`: `Promise<QuicIncoming> incoming()` -/
+def QuicListener.incoming (self : QuicListener) : Async QuicIncoming := do
+  let r ← self.val.callMethodAwait "incoming" (Support.args #[]) Value
+  pure { val := r }
+
+/-- `accept(): Promise<QuicConn>`: `Promise<QuicConn> accept()` -/
+def QuicListener.accept (self : QuicListener) : Async QuicConn := do
+  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+  pure { val := r }
+
+/-- `stop(): void`: `undefined stop()` -/
+def QuicListener.stop (self : QuicListener) : IO Unit :=
+  self.val.callMethod "stop" (Support.args #[]) Unit
+
+/-- An iterator of `async iterable<QuicIncoming>` (the object's `[Symbol.asyncIterator]()`). -/
+structure QuicListener.Iterator where
+  /-- The JavaScript iterator. -/
+  val : Value
+
+/-- `async iterable<QuicIncoming>`: a new iterator (`[Symbol.asyncIterator]()`). -/
+def QuicListener.iterator (self : QuicListener) : IO QuicListener.Iterator := do
+  let symbol ← (← (← Lasm.JS.global).get "Symbol" Value).get "asyncIterator" Value
+  let f ← self.val.get symbol Value
+  return { val := (← f.call #[] Value (this := .ref self.val "")) }
+
+/-- The next value, `none` at the end (`await it.next()`). -/
+def QuicListener.Iterator.next (it : QuicListener.Iterator) : Async (Option QuicIncoming) := do
+  let r ← it.val.callMethodAwait "next" #[] Value
+  if (← r.get "done" Bool) then return none
+  else do
+    let r ← r.get "value" Value
+    return some <| { val := r }
+
+/-- Every value of `async iterable<QuicIncoming>`, read to the end (`for await`). -/
+partial def QuicListener.values (self : QuicListener) : Async (Array QuicIncoming) := do
+  let it ← self.iterator
+  let rec loop (acc : Array QuicIncoming) : Async (Array QuicIncoming) := do
+    match ← it.next with
+    | some v => loop (acc.push v)
+    | none => return acc
+  loop #[]
+
+/-- `constructor(options?: QuicEndpointOptions)`: `constructor(optional QuicEndpointOptions options)` -/
+def QuicEndpoint.new (options : Option QuicEndpointOptions := none) : IO QuicEndpoint :=
+  Lasm.JS.Binding.invoke QuicEndpoint { name := "Lasm.JS.Deno.QuicEndpoint.new", module := "globalThis", path := "Deno.QuicEndpoint", construct := true, arity := 1 }
+    (Support.args #[Support.optional options]) (await := false)
+
+/-- `readonly addr: NetAddr`: `readonly attribute NetAddr addr` -/
+def QuicEndpoint.addr (self : QuicEndpoint) : IO NetAddr := self.val.get "addr" NetAddr
+
+/-- `listen(options: QuicListenOptions): QuicListener`: `QuicListener listen(QuicListenOptions options)` -/
+def QuicEndpoint.listen (self : QuicEndpoint) (options : QuicListenOptions) : IO QuicListener := do
+  let r ← self.val.callMethod "listen" (Support.args #[toJS options]) Value
+  pure { val := r }
+
+/-- `close(info?: QuicCloseInfo): void`: `undefined close(optional QuicCloseInfo info)` -/
+def QuicEndpoint.close (self : QuicEndpoint) (info : Option QuicCloseInfo := none) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[Support.optional info]) Unit
+
+/-- `readonly endpoint: QuicEndpoint`: `readonly attribute QuicEndpoint endpoint` -/
+def QuicConn.endpoint (self : QuicConn) : IO QuicEndpoint := do
+  let r ← self.val.get "endpoint" Value
+  pure { val := r }
+
+/-- `readonly handshake: Promise<void>`: `readonly attribute Promise<undefined> handshake` -/
+def QuicConn.handshake (self : QuicConn) : Async Unit := do
+  let p ← self.val.get "handshake" Value
+  p.await Unit
+
+/-- `readonly remoteAddr: NetAddr`: `readonly attribute NetAddr remoteAddr` -/
+def QuicConn.remoteAddr (self : QuicConn) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+
+/-- `readonly protocol: string | undefined`: `readonly attribute DOMString? protocol` -/
+def QuicConn.protocol (self : QuicConn) : IO (Option String) := self.val.get "protocol" (Option String)
+
+/-- `readonly serverName: string | undefined`: `readonly attribute DOMString? serverName` -/
+def QuicConn.serverName (self : QuicConn) : IO (Option String) := self.val.get "serverName" (Option String)
+
+/-- `readonly closed: Promise<QuicCloseInfo>`: `readonly attribute Promise<QuicCloseInfo> closed` -/
+def QuicConn.closed (self : QuicConn) : Async QuicCloseInfo := do
+  let p ← self.val.get "closed" Value
+  p.await QuicCloseInfo
+
+/-- `readonly incomingBidirectionalStreams: ReadableStream<QuicBidirectionalStream>`: `readonly attribute ReadableStream incomingBidirectionalStreams` -/
+def QuicConn.incomingBidirectionalStreams (self : QuicConn) : IO ReadableStream := do
+  let r ← self.val.get "incomingBidirectionalStreams" Value
+  pure { val := r }
+
+/-- `readonly incomingUnidirectionalStreams: ReadableStream<QuicReceiveStream>`: `readonly attribute ReadableStream incomingUnidirectionalStreams` -/
+def QuicConn.incomingUnidirectionalStreams (self : QuicConn) : IO ReadableStream := do
+  let r ← self.val.get "incomingUnidirectionalStreams" Value
+  pure { val := r }
+
+/-- `readonly maxDatagramSize: number`: `readonly attribute double maxDatagramSize` -/
+def QuicConn.maxDatagramSize (self : QuicConn) : IO Float := self.val.get "maxDatagramSize" Float
+
+/-- `close(info?: QuicCloseInfo): void`: `undefined close(optional QuicCloseInfo info)` -/
+def QuicConn.close (self : QuicConn) (info : Option QuicCloseInfo := none) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[Support.optional info]) Unit
+
+/-- `createBidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicBidirectionalStream>`: `Promise<QuicBidirectionalStream> createBidirectionalStream(optional QuicSendStreamOptions options)` -/
+def QuicConn.createBidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicBidirectionalStream :=
+  self.val.callMethodAwait "createBidirectionalStream" (Support.args #[Support.optional options]) QuicBidirectionalStream
+
+/-- `createUnidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicSendStream>`: `Promise<QuicSendStream> createUnidirectionalStream(optional QuicSendStreamOptions options)` -/
+def QuicConn.createUnidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicSendStream := do
+  let r ← self.val.callMethodAwait "createUnidirectionalStream" (Support.args #[Support.optional options]) Value
+  pure { val := r }
+
+/-- `sendDatagram(data: Uint8Array): Promise<void>`: `Promise<undefined> sendDatagram(Uint8Array data)` -/
+def QuicConn.sendDatagram (self : QuicConn) (data : ByteArray) : Async Unit :=
+  self.val.callMethodAwait "sendDatagram" (Support.args #[toJS data]) Unit
+
+/-- `readDatagram(): Promise<Uint8Array<ArrayBuffer>>`: `Promise<Uint8Array> readDatagram()` -/
+def QuicConn.readDatagram (self : QuicConn) : Async ByteArray :=
+  self.val.callMethodAwait "readDatagram" (Support.args #[]) ByteArray
+
+/-- `readonly addr: Addr`: `readonly attribute Addr addr` -/
+def DatagramConn.addr (self : DatagramConn) : IO Addr := self.val.get "addr" Addr
+
+/-- `joinMulticastV4(address: string, networkInterface: string): Promise<MulticastV4Membership>`: `Promise<MulticastV4Membership> joinMulticastV4(DOMString address, DOMString networkInterface)` -/
+def DatagramConn.joinMulticastV4 (self : DatagramConn) (address : String) (networkInterface : String) : Async MulticastV4Membership :=
+  self.val.callMethodAwait "joinMulticastV4" (Support.args #[toJS address, toJS networkInterface]) MulticastV4Membership
+
+/-- `joinMulticastV6(address: string, networkInterface: number): Promise<MulticastV6Membership>`: `Promise<MulticastV6Membership> joinMulticastV6(DOMString address, double networkInterface)` -/
+def DatagramConn.joinMulticastV6 (self : DatagramConn) (address : String) (networkInterface : Float) : Async MulticastV6Membership :=
+  self.val.callMethodAwait "joinMulticastV6" (Support.args #[toJS address, toJS networkInterface]) MulticastV6Membership
+
+/-- `receive(p?: Uint8Array): Promise<[Uint8Array<ArrayBuffer>, Addr]>`: `Promise<sequence<any>> receive(optional Uint8Array p)` -/
+def DatagramConn.receive (self : DatagramConn) (p : Option ByteArray := none) : Async (Array Data) :=
+  self.val.callMethodAwait "receive" (Support.args #[Support.optional p]) (Array Data)
+
+/-- `send(p: Uint8Array, addr: Addr): Promise<number>`: `Promise<double> send(Uint8Array p, Addr addr)` -/
+def DatagramConn.send (self : DatagramConn) (p : ByteArray) (addr : Addr) : Async Float :=
+  self.val.callMethodAwait "send" (Support.args #[toJS p, toJS addr]) Float
+
+/-- `close(): void`: `undefined close()` -/
+def DatagramConn.close (self : DatagramConn) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- An iterator of `async iterable<sequence<any>>` (the object's `[Symbol.asyncIterator]()`). -/
+structure DatagramConn.Iterator where
+  /-- The JavaScript iterator. -/
+  val : Value
+
+/-- `async iterable<sequence<any>>`: a new iterator (`[Symbol.asyncIterator]()`). -/
+def DatagramConn.iterator (self : DatagramConn) : IO DatagramConn.Iterator := do
+  let symbol ← (← (← Lasm.JS.global).get "Symbol" Value).get "asyncIterator" Value
+  let f ← self.val.get symbol Value
+  return { val := (← f.call #[] Value (this := .ref self.val "")) }
+
+/-- The next value, `none` at the end (`await it.next()`). -/
+def DatagramConn.Iterator.next (it : DatagramConn.Iterator) : Async (Option (Array Data)) := do
+  let r ← it.val.callMethodAwait "next" #[] Value
+  if (← r.get "done" Bool) then return none
+  else return some (← r.get "value" (Array Data))
+
+/-- Every value of `async iterable<sequence<any>>`, read to the end (`for await`). -/
+partial def DatagramConn.values (self : DatagramConn) : Async (Array (Array Data)) := do
+  let it ← self.iterator
+  let rec loop (acc : Array (Array Data)) : Async (Array (Array Data)) := do
     match ← it.next with
     | some v => loop (acc.push v)
     | none => return acc
@@ -906,6 +1754,12 @@ def listenUnix (options : ListenUnixOptions) : IO UnixListener := do
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
+/-- `Deno.listen(options: VsockListenOptions & { transport: 'vsock' }): VsockListener`: `VsockListener listen(ListenVsockOptions options)` (Deno 2.9.6 type declarations) -/
+def listenWithVsockListenOptionsTransportVsock (options : ListenVsockOptions) : IO VsockListener := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenWithVsockListenOptionsTransportVsock", module := "globalThis", path := "Deno.listen", construct := false, arity := 1 }
+    (Support.args #[toJS options]) (await := false)
+  pure { val := r }
+
 /-- `Deno.listenTls(options: ListenTlsOptions & TlsCertifiedKeyPem): TlsListener`: `TlsListener listenTls(ListenTlsCertifiedOptions options)` (Deno 2.9.6 type declarations) -/
 def listenTls (options : ListenTlsCertifiedOptions) : IO TlsListener := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenTls", module := "globalThis", path := "Deno.listenTls", construct := false, arity := 1 }
@@ -924,6 +1778,12 @@ def connectUnix (options : UnixConnectOptions) : Async UnixConn := do
     (Support.args #[toJS options])
   pure { val := r }
 
+/-- `Deno.connect(options: VsockConnectOptions): Promise<VsockConn>`: `Promise<VsockConn> connect(VsockConnectOptions options)` (Deno 2.9.6 type declarations) -/
+def connectWithVsockConnectOptions (options : VsockConnectOptions) : Async VsockConn := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectWithVsockConnectOptions", module := "globalThis", path := "Deno.connect", construct := false, arity := 1 }
+    (Support.args #[toJS options])
+  pure { val := r }
+
 /-- `Deno.connectTls(options: ConnectTlsOptions | (ConnectTlsOptions & TlsCertifiedKeyPem)): Promise<TlsConn>`: `Promise<TlsConn> connectTls(ConnectTlsOptions options)` (Deno 2.9.6 type declarations) -/
 def connectTls (options : ConnectTlsOptions) : Async TlsConn := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectTls", module := "globalThis", path := "Deno.connectTls", construct := false, arity := 1 }
@@ -934,6 +1794,29 @@ def connectTls (options : ConnectTlsOptions) : Async TlsConn := do
 def startTls (conn : TcpConn) (options : Option StartTlsOptions := none) : Async TlsConn := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.startTls", module := "globalThis", path := "Deno.startTls", construct := false, arity := 2 }
     (Support.args #[toJS conn, Support.optional options])
+  pure { val := r }
+
+/-- `Deno.connectQuic<ZRTT extends boolean>(options: ConnectQuicOptions<ZRTT>): ZRTT extends true ? (QuicConn | Promise<QuicConn>) : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)`: `Promise<QuicConn> connectQuic(ConnectQuicOptions options)` (Deno 2.9.6 type declarations) -/
+def connectQuic (options : ConnectQuicOptions) : Async QuicConn := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectQuic", module := "globalThis", path := "Deno.connectQuic", construct := false, arity := 1 }
+    (Support.args #[toJS options])
+  pure { val := r }
+
+/-- `Deno.upgradeWebTransport(conn: QuicConn): Promise<WebTransport & { url: string }> (read as Promise<unknown>: a web WebTransport with its url, which Lasm.JS.Web does not generate: the object as Data)`: `Promise<any> upgradeWebTransport(QuicConn conn)` (Deno 2.9.6 type declarations) -/
+def upgradeWebTransport (conn : QuicConn) : Async Data :=
+  Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Deno.upgradeWebTransport", module := "globalThis", path := "Deno.upgradeWebTransport", construct := false, arity := 1 }
+    (Support.args #[toJS conn])
+
+/-- `Deno.listenDatagram(options: UdpListenOptions & { transport: 'udp' }): DatagramConn`: `DatagramConn listenDatagram(ListenDatagramUdpOptions options)` (Deno 2.9.6 type declarations) -/
+def listenDatagram (options : ListenDatagramUdpOptions) : IO DatagramConn := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagram", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
+    (Support.args #[toJS options]) (await := false)
+  pure { val := r }
+
+/-- `Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn`: `DatagramConn listenDatagram(ListenDatagramUnixOptions options)` (Deno 2.9.6 type declarations) -/
+def listenDatagramWithUnixListenDatagramOptionsTransportUnixpacket (options : ListenDatagramUnixOptions) : IO DatagramConn := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagramWithUnixListenDatagramOptionsTransportUnixpacket", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
+    (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Deno

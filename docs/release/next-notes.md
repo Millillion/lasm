@@ -19,6 +19,10 @@
 - **Deno KV needs Deno's `--unstable-kv` flag on the Deno CLI** (`deno run -A
   --unstable-kv deno/main.mjs`); Deno Deploy provides KV without it.
 - **`Deno.serveWithUnixOptions`** serves on a Unix domain socket.
+- Deno's experimental and unstable APIs that work from Wasm are generated too:
+  `Deno.spawn`, VSOCK (`serveWithVsockOptions`, `listen`, `connect`), QUIC
+  (`Deno.connectQuic`, `QuicEndpoint`), `Deno.listenDatagram`. Run them with Deno's
+  `--unstable-*` flags.
 - Async iterables (`Deno.readDir`, `Kv.list`, a listener's connections, `FsWatcher`)
   have `values` (every value, read to the end) and `iterator` with `next` (one at a
   time).
@@ -52,3 +56,6 @@
   still coerces (`{ fetch, port := … }` compiles unchanged). `ServeOptions` gains
   `routes`, `websocket`, `unix`, `tls`, `development` and the `http1`/`http2`/`http3`
   flags.
+- `Deno.utime`, `utimeSync` and `FsFile.utime` take `Data` for the times (a number of
+  seconds or a `Date`): `toJS (1000000 : Float)`. A union with an object member
+  (`number | Date`) is now `Data`.
