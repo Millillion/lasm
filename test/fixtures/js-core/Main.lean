@@ -94,10 +94,25 @@ def classes (r : Checks) : IO Unit := runSection r "classes" do
   let n ← inst.get "count" Nat
   expect r "new from Lean" (n == 2) s!"{n}"
 
-def main : IO Unit := do
+def checks : IO String := do
   let r : Checks ← IO.mkRef {}
   projectFiles r
   classes r
   let s ← r.get
-  for line in s.lines do IO.println line
-  IO.println s!"summary {s.passed} {s.failed}"
+  return "\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n"
+
+/-- Cloudflare Workers (`navigator.userAgent`), where a program runs its checks in a request. -/
+def onWorkers : IO Bool := do
+  if !(← onEdge) then return false
+  let nav ← (← global).get "navigator"
+  return (← nav.get "userAgent" (Option String)) == some "Cloudflare-Workers"
+
+def main : IO Unit := do
+  if ← onWorkers then
+    -- On Workers, the checks run in the first request and answer its body.
+    let handler ← Function.ofFn fun _ => do
+      let text ← checks
+      return toJS (← (← global).get "Response" >>= (·.new #[toJS text]))
+    exportDefault handler
+    return
+  IO.print (← checks)
