@@ -1,6 +1,6 @@
 # node-core: a file tool on the generated Node bindings
 
-`import Lasm.JS.Node` and nothing else: for each file of a directory, its size, its
+Only the generated Node bindings (`import Lasm.JS.Node.Fs`, `.Path`, `.Os`, `.Process`, `.Crypto`, `.Zlib`): for each file of a directory, its size, its
 SHA-256 (`crypto.createHash`), its gzip size (`zlib.gzipSync`) and a gunzip round trip
 (`zlib.gunzip`, awaited in `Async`), listed with `fsPromises.readdir`.
 

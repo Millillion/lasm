@@ -40,11 +40,11 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.JS.Web.Geometry', 'Lasm.JS.Web.Css', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.UiEvents', 'Lasm.JS.Web.Canvas', 'Lasm.JS.Web.WebSocket',
   'Lasm.JS.Web.Browser',
   // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's core set, compiled (scripts/bindings/node-modules.json
-  // `core`, in import order). Every other Lasm.JS.Node.* module, Lasm.JS.Node.All included, ships as source and is
-  // compiled on first import (src/lazy-library.mjs).
+  // `core`, in import order). Every other Lasm.JS.Node.* module ships as source and is compiled on first import
+  // (src/lazy-library.mjs). No umbrella module: programs import each module they use (0.4-39).
   'Lasm.JS.Node.Support', 'Lasm.JS.Node.AsyncHooks', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream',
   'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path', 'Lasm.JS.Node.Os', 'Lasm.JS.Node.Net', 'Lasm.JS.Node.Process',
-  'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node',
+  'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess',
   // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun"): Deno.serve and Bun.serve,
   // generated from the runtimes' TypeScript declarations (scripts/bindings/serve-api.mjs, generate-web.mjs).
   'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',

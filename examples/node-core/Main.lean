@@ -7,7 +7,11 @@ directory of sample files first (node:fs/promises, node:os, node:path) and remov
 
   npx @lasm/cli Main.lean -- [directory]
 -/
-import Lasm.JS.Node
+import Lasm.JS.Node.Fs
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Os
+import Lasm.JS.Node.Process
+import Lasm.JS.Node.Crypto
 import Lasm.JS.Node.Zlib  -- not in the compiled core set: compiled on first import
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 

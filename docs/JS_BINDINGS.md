@@ -747,7 +747,8 @@ members each engine lacks.
 
 ## Standard bindings for Node: `Lasm.JS.Node`
 
-`import Lasm.JS.Node` gives typed bindings of **every Node core module**, generated
+`Lasm.JS.Node` gives typed bindings of **every Node core module**, one Lean module each
+(`import Lasm.JS.Node.Fs`, `import Lasm.JS.Node.Http`), generated
 from Node's own documentation as it is (Jordan, 2026-11-16): the 45 documentation
 files of Node's modules at **Node.js 24.22.2** (Node 24 LTS, the oldest Node Lasm
 supports), plus what only the **Node.js 26.13.0** docs document, marked "Node.js 26
@@ -757,7 +758,12 @@ and later". Web standard APIs that Node also provides (`URL`, `EventTarget`, `Bl
 released**.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Fs
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Os
+import Lasm.JS.Node.Crypto
+import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.ChildProcess
 import Lasm.JS.Node.Zlib     -- outside the compiled core set: compiled on first import
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
@@ -793,12 +799,12 @@ typed listeners: `server.onRequest`, `socket.onData`, `child.onceExit`
 
 One Lean module per documentation file, each with everything that file documents.
 
-**Imports.** `import Lasm.JS.Node` is the core set, which ships compiled: `events`,
-`stream`, `buffer`, `path`, `os`, `process`, `fs`, `crypto`, `child_process`, and the
-modules they use (`async_hooks`, `net`, `readline`). Every other module is its own
-import (`import Lasm.JS.Node.Zlib`, `import Lasm.JS.Node.Http`), compiled into Lasm's
-tool cache the first time a program imports it ([lazy library](HOW_LASM_WORKS.md)), and
-`import Lasm.JS.Node.All` imports every module. Measured on 2026-11-16 (Linux x64, one
+**Imports.** A program imports each module it uses (`import Lasm.JS.Node.Fs`,
+`import Lasm.JS.Node.Http`); there is no umbrella module, as for every generated host
+(0.4-39). The core set ships compiled: `Events`, `Stream`, `Buffer`, `Path`, `Os`,
+`Process`, `Fs`, `Crypto`, `ChildProcess`, and the modules they use (`AsyncHooks`,
+`Net`, `Readline`). Every other module is compiled into Lasm's tool cache the first time
+a program imports it ([lazy library](HOW_LASM_WORKS.md)). Measured on 2026-11-16 (Linux x64, one
 core, `lean -c`), the first import costs 0.3 to 3.7 s per module: `Http2` and `Test`
 3.7 s, `Http` 3.0 s, `Tls` and `Sqlite` 1.4 s, the others 0.3 to 1.2 s; all 33 lazy
 modules together 32.5 s (28.3 MB of `.olean`, 10.3 MB of C). Later builds reuse the
@@ -964,7 +970,7 @@ and `signal` as `Option`s, since the docs say each is `null` in one case). The
 untyped `EventEmitter.on (name) (JSFunction)` stays for anything else.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Net
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def main : IO Unit := do

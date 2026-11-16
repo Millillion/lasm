@@ -2,7 +2,7 @@
 //   - Lasm.JS.Web (library/Lasm/JS/Web/*.lean, library/Lasm/JS/Web.lean): the
 //     WinterTC Minimum Common Web API, from the WebIDL of the pinned @webref/idl
 //     (parsed by webidl2); the interface list is scripts/bindings/web-tier1.mjs;
-//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, library/Lasm/JS/Node.lean): the
+//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, no umbrella module): the
 //     Node.js modules of scripts/bindings/node-tier2.mjs, from Node's API docs
 //     lowered to WebIDL by scripts/bindings/node-api.mjs (scripts/bindings/node.idl).
 // One mapping from WebIDL to Lean serves both; Lasm.JS.Node uses Lasm.JS.Web's
@@ -1199,23 +1199,7 @@ location, history and storage, user-interface events, canvas 2D and WebSocket
 (docs/JS_BINDINGS.md, "The browser tier").
 ${generatedBy}
 -/`, `import ${NS}`, ...plan.filter(m => m.ns === NS && m.tier === 2).map(m => `import ${m.key}`), ''].join('\n'));
-// `import Lasm.JS.Node` is the core set that ships compiled (node-modules.json `core`: node-tier2.mjs's core and the
-// modules they import); `import Lasm.JS.Node.All` is every module, the others compiled on first import
-// (src/lazy-library.mjs).
-const nodeCore = new Set(nodeModuleOrder.filter(m => m.core).map(m => `${NODE_NS}.${m.name}`));
-files.set(join(root, 'library', 'Lasm', 'JS', 'Node.lean'), [`/-
-${NODE_NS}: Node's core modules that ship compiled (${nodeModuleOrder.filter(m => m.core).map(m => `node:${m.doc}`).join(', ')}),
-as documented for Node.js ${nodeTier.version}, for Node and for what Bun and Deno implement of them. Every other
-Node module is its own import (\`import Lasm.JS.Node.Zlib\`), compiled on first use, and \`import Lasm.JS.Node.All\`
-imports them all. The same mapping as Lasm.JS.Web: classes are handle types, Promise results are \`Async\`,
-options objects dictionaries (docs/JS_BINDINGS.md, "Lasm.JS.Node").
-${nodeGeneratedBy}
--/`, ...order.filter(n => nodeCore.has(n)).map(n => `import ${n}`), ''].join('\n'));
-files.set(join(root, 'library', 'Lasm', 'JS', 'Node', 'All.lean'), [`/-
-${NODE_NS}.All: every Node core module, as documented for Node.js ${nodeTier.version} (docs/JS_BINDINGS.md,
-"Lasm.JS.Node"). The modules outside the compiled core set are compiled on first import.
-${nodeGeneratedBy}
--/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
+// No umbrella module (docs/api/decisions/0.4.md 0.4-39): programs import each Lasm.JS.Node module they use.
 
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
 Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
