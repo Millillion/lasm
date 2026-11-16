@@ -291,7 +291,6 @@
         "delete"
       ],
       "TailEvent": [
-        null,
         "type",
         "eventPhase",
         "composed",
@@ -365,7 +364,6 @@
         "getIdentity"
       ],
       "ScheduledEvent": [
-        null,
         "type",
         "eventPhase",
         "composed",
@@ -401,7 +399,6 @@
         "send"
       ],
       "EmailEvent": [
-        null,
         "type",
         "eventPhase",
         "composed",
@@ -424,7 +421,6 @@
         "message"
       ],
       "CloudflareWorkersModuleDurableObject": [
-        null,
         "alarm",
         "fetch",
         "connect",
@@ -542,18 +538,18 @@
         "warn"
       ],
       "DigestStream": [
-        null,
         "locked",
         "abort",
         "close",
         "getWriter",
+        null,
         "digest",
         "bytesWritten"
       ],
       "IdentityTransformStream": [
-        null,
         "readable",
-        "writable"
+        "writable",
+        null
       ],
       "FixedLengthStream": [
         null
@@ -929,7 +925,6 @@
         "address"
       ],
       "PipelineTransformationEntrypoint": [
-        null,
         "run"
       ],
       "Pipeline": [
@@ -1011,7 +1006,6 @@
         "waitForEvent"
       ],
       "WorkflowEntrypoint": [
-        null,
         "run"
       ],
       "NonRetryableError": [
@@ -1050,7 +1044,6 @@
       ],
       "RpcTarget": [],
       "WorkerEntrypoint": [
-        null,
         "email",
         "fetch",
         "connect",

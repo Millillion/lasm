@@ -3782,7 +3782,7 @@ instance : FromJS BrowserRunConnectionGuardrails where
     mode := ← Lasm.JS.readField BrowserRunConnectionGuardrailsMode d "mode" }
   typeName := "Lasm.JS.Cloudflare.BrowserRunConnectionGuardrails"
 
-/-- `dictionary BrowserRunLiveViewOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary BrowserRunLiveViewOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLiveViewOptions where
   /-- `BrowserRunLiveViewMode mode` -/
   mode : Option BrowserRunLiveViewMode := none
@@ -3792,25 +3792,31 @@ structure BrowserRunLiveViewOptions where
   expiresInMs : Option Float := none
   /-- `BrowserRunConnectionGuardrails guardrails` -/
   guardrails : Option BrowserRunConnectionGuardrails := none
-  /-- `required BrowserRunLiveViewMode mode` -/
-  mode : BrowserRunLiveViewMode
-  /-- `BrowserRunConnectionGuardrails guardrails` -/
-  guardrails : Option BrowserRunConnectionGuardrails := none
 instance : ToJS BrowserRunLiveViewOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
     ("targetId", Support.optional d.targetId),
     ("expiresInMs", Support.optional d.expiresInMs),
-    ("guardrails", Support.optional d.guardrails),
-    ("mode", toJS d.mode),
     ("guardrails", Support.optional d.guardrails)]⟩
 instance : FromJS BrowserRunLiveViewOptions where
   fromJS d := do return {
     mode := ← Lasm.JS.readField (Option BrowserRunLiveViewMode) d "mode",
     targetId := ← Lasm.JS.readField (Option String) d "targetId",
     expiresInMs := ← Lasm.JS.readField (Option Float) d "expiresInMs",
-    guardrails := ← Lasm.JS.readField (Option BrowserRunConnectionGuardrails) d "guardrails",
-    mode := ← Lasm.JS.readField BrowserRunLiveViewMode d "mode",
     guardrails := ← Lasm.JS.readField (Option BrowserRunConnectionGuardrails) d "guardrails" }
   typeName := "Lasm.JS.Cloudflare.BrowserRunLiveViewOptions"
+
+/-- `dictionary BrowserRunLiveViewOptions2` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunLiveViewOptions2 where
+  /-- `required BrowserRunLiveViewMode mode` -/
+  mode : BrowserRunLiveViewMode
+  /-- `BrowserRunConnectionGuardrails guardrails` -/
+  guardrails : Option BrowserRunConnectionGuardrails := none
+instance : ToJS BrowserRunLiveViewOptions2 := ⟨fun d => Support.fields #[("mode", toJS d.mode),
+    ("guardrails", Support.optional d.guardrails)]⟩
+instance : FromJS BrowserRunLiveViewOptions2 where
+  fromJS d := do return {
+    mode := ← Lasm.JS.readField BrowserRunLiveViewMode d "mode",
+    guardrails := ← Lasm.JS.readField (Option BrowserRunConnectionGuardrails) d "guardrails" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLiveViewOptions2"
 
 /-- `dictionary BrowserRunLiveView` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLiveView where
@@ -3820,8 +3826,8 @@ structure BrowserRunLiveView where
   devtoolsFrontendUrl : String
   /-- `required DOMString id` -/
   id : String
-  /-- `required BrowserRunLiveViewOptions options` -/
-  options : BrowserRunLiveViewOptions
+  /-- `required BrowserRunLiveViewOptions2 options` -/
+  options : BrowserRunLiveViewOptions2
 instance : ToJS BrowserRunLiveView := ⟨fun d => Support.fields #[("webSocketDebuggerUrl", toJS d.webSocketDebuggerUrl),
     ("devtoolsFrontendUrl", toJS d.devtoolsFrontendUrl),
     ("id", toJS d.id),
@@ -3831,7 +3837,7 @@ instance : FromJS BrowserRunLiveView where
     webSocketDebuggerUrl := ← Lasm.JS.readField String d "webSocketDebuggerUrl",
     devtoolsFrontendUrl := ← Lasm.JS.readField String d "devtoolsFrontendUrl",
     id := ← Lasm.JS.readField String d "id",
-    options := ← Lasm.JS.readField BrowserRunLiveViewOptions d "options" }
+    options := ← Lasm.JS.readField BrowserRunLiveViewOptions2 d "options" }
   typeName := "Lasm.JS.Cloudflare.BrowserRunLiveView"
 
 /-- `dictionary BrowserRunListSessionsOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/

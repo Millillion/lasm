@@ -15,10 +15,12 @@
 //   - ScheduledEvent.srcElement: @deprecated in its declaration
 //   - ScheduledEvent.cancelBubble(null): @deprecated in its declaration
 //   - ScheduledEvent.cancelBubble(null): @deprecated in its declaration
+//   - ScheduledEvent.constructor: an abstract class: a program defines a subclass (A28)
 //   - TailEvent.returnValue: @deprecated in its declaration
 //   - TailEvent.srcElement: @deprecated in its declaration
 //   - TailEvent.cancelBubble(null): @deprecated in its declaration
 //   - TailEvent.cancelBubble(null): @deprecated in its declaration
+//   - TailEvent.constructor: an abstract class: a program defines a subclass (A28)
 //   - SqlStorageCursor.[Symbol.iterator]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
 //   - AiSearchOptions[key: string]: an index signature: the named members are generated; other keys are read and written through Data
 //   - AiSearchChatCompletionsRequest[key: string]: an index signature: the named members are generated; other keys are read and written through Data
@@ -161,7 +163,9 @@
 //   - EmailEvent.srcElement: @deprecated in its declaration
 //   - EmailEvent.cancelBubble(null): @deprecated in its declaration
 //   - EmailEvent.cancelBubble(null): @deprecated in its declaration
+//   - EmailEvent.constructor: an abstract class: a program defines a subclass (A28)
 //   - Flagship.get: @deprecated in its declaration
+//   - cloudflare:pipelines.PipelineTransformationEntrypoint.constructor: an abstract class: a program defines a subclass (A28)
 //   - Rpc.RpcTargetBranded.[__RPC_TARGET_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
 //   - Rpc.WorkerEntrypointBranded.[__WORKER_ENTRYPOINT_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
 //   - Rpc.DurableObjectBranded.[__DURABLE_OBJECT_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
@@ -169,8 +173,11 @@
 //   - Rpc.StubBase.[__RPC_STUB_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
 //   - CloudflareWorkersModule.RpcTarget.[Rpc.__RPC_TARGET_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
 //   - CloudflareWorkersModule.WorkerEntrypoint.[Rpc.__WORKER_ENTRYPOINT_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
+//   - CloudflareWorkersModule.WorkerEntrypoint.constructor: an abstract class: a program defines a subclass (A28)
 //   - CloudflareWorkersModule.DurableObject.[Rpc.__DURABLE_OBJECT_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
+//   - CloudflareWorkersModule.DurableObject.constructor: an abstract class: a program defines a subclass (A28)
 //   - CloudflareWorkersModule.WorkflowEntrypoint.[Rpc.__WORKFLOW_ENTRYPOINT_BRAND]: a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it
+//   - CloudflareWorkersModule.WorkflowEntrypoint.constructor: an abstract class: a program defines a subclass (A28)
 //   - VectorizeVectorMetadataFilter[field: string]: an index signature: the named members are generated; other keys are read and written through Data
 //   - Workflow.createBatch(batch: WorkflowInstanceCreateOptions<PARAMS>[]): @deprecated in its declaration
 //   - Cloudflare.Env (not selected): the bindings object, declared by the program (typeParameters: a Lean type parameter with FromJS)
@@ -1423,8 +1430,6 @@ dictionary Cloudflare_SubtleCryptoHashAlgorithm {
 // interface DigestStream
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="DigestStream", LasmPath="DigestStream"]
 interface Cloudflare_DigestStream {
-  // constructor(underlyingSink?: UnderlyingSink, queuingStrategy?: QueuingStrategy)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(underlyingSink?: UnderlyingSink, queuingStrategy?: QueuingStrategy)"] constructor(optional UnderlyingSink underlyingSink, optional QueuingStrategy queuingStrategy);
   // get locked(): boolean
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get locked(): boolean"] readonly attribute boolean locked;
   // abort(reason?: any): Promise<void>
@@ -1581,8 +1586,6 @@ interface Cloudflare_QueueEvent {
 // interface ScheduledEvent
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ScheduledEvent", LasmPath="ScheduledEvent"]
 interface Cloudflare_ScheduledEvent {
-  // constructor(type: string, init?: EventInit)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(type: string, init?: EventInit)"] constructor(DOMString type, optional EventInit init);
   // get type(): string
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get type(): string"] readonly attribute DOMString type;
   // get eventPhase(): number
@@ -1661,8 +1664,6 @@ interface Cloudflare_FixedLengthStream : Cloudflare_IdentityTransformStream {
 // interface IdentityTransformStream
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="IdentityTransformStream", LasmPath="IdentityTransformStream"]
 interface Cloudflare_IdentityTransformStream {
-  // constructor(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>)"] constructor(optional Transformer transformer, optional QueuingStrategy writableStrategy, optional QueuingStrategy readableStrategy);
   // get readable(): ReadableStream<O>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get readable(): ReadableStream<O>"] readonly attribute ReadableStream readable;
   // get writable(): WritableStream<I>
@@ -1703,8 +1704,6 @@ dictionary Cloudflare_ScriptVersion {
 // interface TailEvent
 [LasmHost="Cloudflare", LasmLeanModule="Tail", LasmFile="index.d.ts", LasmName="TailEvent", LasmPath="TailEvent"]
 interface Cloudflare_TailEvent {
-  // constructor(type: string, init?: EventInit)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(type: string, init?: EventInit)"] constructor(DOMString type, optional EventInit init);
   // get type(): string
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get type(): string"] readonly attribute DOMString type;
   // get eventPhase(): number
@@ -8656,7 +8655,7 @@ dictionary Cloudflare_BrowserRunLiveView {
   // id: string
   required DOMString id;
   // options: { mode: BrowserRunLiveViewMode; guardrails?: BrowserRunConnectionGuardrails; }
-  required Cloudflare_BrowserRunLiveViewOptions options;
+  required Cloudflare_BrowserRunLiveViewOptions2 options;
 };
 
 // options BrowserRunListSessionsOptions
@@ -9461,8 +9460,6 @@ interface Cloudflare_SendEmail {
 // interface EmailEvent
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="EmailEvent", LasmPath="EmailEvent"]
 interface Cloudflare_EmailEvent {
-  // constructor(type: string, init?: EventInit)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(type: string, init?: EventInit)"] constructor(DOMString type, optional EventInit init);
   // get type(): string
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get type(): string"] readonly attribute DOMString type;
   // get eventPhase(): number
@@ -10025,8 +10022,6 @@ interface Cloudflare_NodeStyleServer {
 // interface cloudflare:pipelines.PipelineTransformationEntrypoint
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="PipelineTransformationEntrypoint", LasmPath="cloudflare:pipelines.PipelineTransformationEntrypoint"]
 interface Cloudflare_PipelineTransformationEntrypoint {
-  // constructor(ctx: ExecutionContext, env: Env)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(ctx: ExecutionContext, env: Env)"] constructor(Cloudflare_ExecutionContext ctx, Cloudflare_Env env);
   // public run(records: I[], metadata: PipelineBatchMetadata): Promise<O[]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="public run(records: I[], metadata: PipelineBatchMetadata): Promise<O[]>"] Promise<sequence<record<DOMString, any>>> run(sequence<record<DOMString, any>> records, Cloudflare_PipelineBatchMetadata metadata);
 };
@@ -10178,8 +10173,6 @@ interface Cloudflare_RpcTarget {
 // interface CloudflareWorkersModule.WorkerEntrypoint
 [LasmHost="Cloudflare", LasmLeanModule="Rpc", LasmFile="index.d.ts", LasmName="WorkerEntrypoint", LasmPath="CloudflareWorkersModule.WorkerEntrypoint"]
 interface Cloudflare_WorkerEntrypoint {
-  // constructor(ctx: ExecutionContext, env: Env)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(ctx: ExecutionContext, env: Env)"] constructor(Cloudflare_ExecutionContext ctx, Cloudflare_Env env);
   // email?(message: ForwardableEmailMessage): void | Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="email?(message: ForwardableEmailMessage): void | Promise<void>"] Promise<undefined> email(Cloudflare_ForwardableEmailMessage message);
   // fetch?(request: Request): Response | Promise<Response>
@@ -10193,7 +10186,7 @@ interface Cloudflare_WorkerEntrypoint {
   // tail?(events: TraceItem[]): void | Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="tail?(events: TraceItem[]): void | Promise<void>"] Promise<undefined> tail(sequence<Cloudflare_TraceItem> events);
   // tailStream?(event: TailStream.TailEvent<TailStream.Onset>): | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="tailStream?(event: TailStream.TailEvent<TailStream.Onset>): | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>"] Promise<Cloudflare_TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject?> tailStream(Cloudflare_TailStreamTailEvent event);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="tailStream?(event: TailStream.TailEvent<TailStream.Onset>): | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>"] Promise<Cloudflare_TailEventHandlerOrTailEventHandlerObject?> tailStream(Cloudflare_TailStreamTailEvent event);
   // test?(controller: TestController): void | Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="test?(controller: TestController): void | Promise<void>"] Promise<undefined> test(Cloudflare_TestController controller);
   // trace?(traces: TraceItem[]): void | Promise<void>
@@ -10203,8 +10196,6 @@ interface Cloudflare_WorkerEntrypoint {
 // interface CloudflareWorkersModule.DurableObject
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="CloudflareWorkersModuleDurableObject", LasmPath="CloudflareWorkersModule.DurableObject"]
 interface Cloudflare_CloudflareWorkersModuleDurableObject {
-  // constructor(ctx: DurableObjectState, env: Env)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(ctx: DurableObjectState, env: Env)"] constructor(Cloudflare_DurableObjectState ctx, Cloudflare_Env env);
   // alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>"] Promise<undefined> alarm(optional Cloudflare_AlarmInvocationInfo alarmInfo);
   // fetch?(request: Request): Response | Promise<Response>
@@ -10292,8 +10283,6 @@ interface Cloudflare_WorkflowStep {
 // interface CloudflareWorkersModule.WorkflowEntrypoint
 [LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowEntrypoint", LasmPath="CloudflareWorkersModule.WorkflowEntrypoint"]
 interface Cloudflare_WorkflowEntrypoint {
-  // constructor(ctx: ExecutionContext, env: Env)
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="constructor(ctx: ExecutionContext, env: Env)"] constructor(Cloudflare_ExecutionContext ctx, Cloudflare_Env env);
   // run(event: Readonly<WorkflowEvent<T>>, step: WorkflowStep): Promise<unknown>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run(event: Readonly<WorkflowEvent<T>>, step: WorkflowStep): Promise<unknown>"] Promise<any> run(Cloudflare_WorkflowEntrypointRunEvent event, Cloudflare_WorkflowStep step);
 };
@@ -11821,12 +11810,9 @@ callback Cloudflare_ExportedHandlerTraceHandler = Promise<undefined> (sequence<C
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="TailEventHandlerOrTailEventHandlerObject"]
 typedef (Cloudflare_TailEventHandler or Cloudflare_TailEventHandlerObject) Cloudflare_TailEventHandlerOrTailEventHandlerObject;
 
-[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject"]
-typedef (Cloudflare_TailEventHandler or Cloudflare_TailEventHandlerObject or Cloudflare_TailEventHandlerOrTailEventHandlerObject?) Cloudflare_TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject;
-
 // type ExportedHandlerTailStreamHandler<Env = unknown, Props = unknown> = (event: TailStream.TailEvent<TailStream.Onset>, env: Env, ctx: ExecutionContext<Props>) => | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ExportedHandlerTailStreamHandler", LasmSignature="type ExportedHandlerTailStreamHandler<Env = unknown, Props = unknown> = (event: TailStream.TailEvent<TailStream.Onset>, env: Env, ctx: ExecutionContext<Props>) => | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>"]
-callback Cloudflare_ExportedHandlerTailStreamHandler = Promise<Cloudflare_TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject?> (Cloudflare_TailStreamTailEvent event, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);
+callback Cloudflare_ExportedHandlerTailStreamHandler = Promise<Cloudflare_TailEventHandlerOrTailEventHandlerObject?> (Cloudflare_TailStreamTailEvent event, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);
 
 // type ExportedHandlerTestHandler<Env = unknown, Props = unknown> = (controller: TestController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ExportedHandlerTestHandler", LasmSignature="type ExportedHandlerTestHandler<Env = unknown, Props = unknown> = (controller: TestController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>"]
@@ -18684,8 +18670,8 @@ enum Cloudflare_BrowserRunConnectionGuardrailsMode { "readonly" };
 enum Cloudflare_BrowserRunLiveViewMode { "devtools", "tab", "full" };
 
 // {mode: BrowserRunLiveViewMode; guardrails?: BrowserRunConnectionGuardrails;}
-[LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunLiveViewOptions"]
-dictionary Cloudflare_BrowserRunLiveViewOptions {
+[LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunLiveViewOptions2"]
+dictionary Cloudflare_BrowserRunLiveViewOptions2 {
   // mode: BrowserRunLiveViewMode
   required Cloudflare_BrowserRunLiveViewMode mode;
   // guardrails?: BrowserRunConnectionGuardrails
@@ -19423,17 +19409,38 @@ callback Cloudflare_PagesFunction = undefined (Promise<any> promise);
 typedef (Request or DOMString) Cloudflare_RequestOrDOMString;
 
 // {fetch: typeof fetch;}
-[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesFunctionEnvASSETS"]
-dictionary Cloudflare_PagesFunctionEnvASSETS {
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesFunction2EnvASSETS"]
+dictionary Cloudflare_PagesFunction2EnvASSETS {
   // fetch: typeof fetch
   required any fetch;
 };
 
 // {ASSETS: { fetch: typeof fetch; };}
-[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesFunctionEnv"]
-dictionary Cloudflare_PagesFunctionEnv {
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesFunction2Env"]
+dictionary Cloudflare_PagesFunction2Env {
   // ASSETS: { fetch: typeof fetch; }
-  required Cloudflare_PagesFunctionEnvASSETS ASSETS;
+  required Cloudflare_PagesFunction2EnvASSETS ASSETS;
+};
+
+// {request: Request<unknown, IncomingRequestCfProperties<unknown>>; functionPath: string; waitUntil: (promise: Promise<any>) => void; passThroughOnException: () => void; next: (input?: Request | string, init?: RequestInit) => Promise<Response>; env: Env & { ASSETS: { fetch: typeof fetch; }; }; params: Params<P>; data: Data;}
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesFunction2"]
+dictionary Cloudflare_PagesFunction2 {
+  // request: Request<unknown, IncomingRequestCfProperties<unknown>>
+  required Request request;
+  // functionPath: string
+  required DOMString functionPath;
+  // waitUntil: (promise: Promise<any>) => void
+  required Cloudflare_PagesFunction waitUntil;
+  // passThroughOnException: () => void
+  required Cloudflare_PagesFunction passThroughOnException;
+  // next: (input?: Request | string, init?: RequestInit) => Promise<Response>
+  required Cloudflare_PagesFunction next;
+  // env: Env & { ASSETS: { fetch: typeof fetch; }; }
+  required Cloudflare_PagesFunction2Env env;
+  // params: Params<P>
+  required any params;
+  // data: Data
+  required any data;
 };
 
 // type PagesPluginFunction<Env = unknown, Params extends string = any, Data extends Record<string, unknown> = Record<string, unknown>, PluginArgs = unknown> = (context: EventPluginContext<Env, Params, Data, PluginArgs>) => Response | Promise<Response>
@@ -19441,17 +19448,40 @@ dictionary Cloudflare_PagesFunctionEnv {
 callback Cloudflare_PagesPluginFunction = undefined (Promise<any> promise);
 
 // {fetch: typeof fetch;}
-[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesPluginFunctionEnvASSETS"]
-dictionary Cloudflare_PagesPluginFunctionEnvASSETS {
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesPluginFunction2EnvASSETS"]
+dictionary Cloudflare_PagesPluginFunction2EnvASSETS {
   // fetch: typeof fetch
   required any fetch;
 };
 
 // {ASSETS: { fetch: typeof fetch; };}
-[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesPluginFunctionEnv"]
-dictionary Cloudflare_PagesPluginFunctionEnv {
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesPluginFunction2Env"]
+dictionary Cloudflare_PagesPluginFunction2Env {
   // ASSETS: { fetch: typeof fetch; }
-  required Cloudflare_PagesPluginFunctionEnvASSETS ASSETS;
+  required Cloudflare_PagesPluginFunction2EnvASSETS ASSETS;
+};
+
+// {request: Request<unknown, IncomingRequestCfProperties<unknown>>; functionPath: string; waitUntil: (promise: Promise<any>) => void; passThroughOnException: () => void; next: (input?: Request | string, init?: RequestInit) => Promise<Response>; env: Env & { ASSETS: { fetch: typeof fetch; }; }; params: Params<P>; data: Data; pluginArgs: PluginArgs;}
+[LasmHost="Cloudflare", LasmLeanModule="Workers", LasmName="PagesPluginFunction2"]
+dictionary Cloudflare_PagesPluginFunction2 {
+  // request: Request<unknown, IncomingRequestCfProperties<unknown>>
+  required Request request;
+  // functionPath: string
+  required DOMString functionPath;
+  // waitUntil: (promise: Promise<any>) => void
+  required Cloudflare_PagesPluginFunction waitUntil;
+  // passThroughOnException: () => void
+  required Cloudflare_PagesPluginFunction passThroughOnException;
+  // next: (input?: Request | string, init?: RequestInit) => Promise<Response>
+  required Cloudflare_PagesPluginFunction next;
+  // env: Env & { ASSETS: { fetch: typeof fetch; }; }
+  required Cloudflare_PagesPluginFunction2Env env;
+  // params: Params<P>
+  required any params;
+  // data: Data
+  required any data;
+  // pluginArgs: PluginArgs
+  required any pluginArgs;
 };
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="DOMStringOrUint8Array"]
@@ -19544,8 +19574,8 @@ dictionary Cloudflare_WorkflowStepConfigWithDelayFunctionRetries {
 };
 
 // {name: string; count: number;}
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandlerCtxStep"]
-dictionary Cloudflare_WorkflowRollbackHandlerCtxStep {
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler2CtxStep"]
+dictionary Cloudflare_WorkflowRollbackHandler2CtxStep {
   // name: string
   required DOMString name;
   // count: number
@@ -19553,8 +19583,8 @@ dictionary Cloudflare_WorkflowRollbackHandlerCtxStep {
 };
 
 // {limit: number; backoff?: WorkflowBackoff;}
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandlerCtxConfigRetries"]
-dictionary Cloudflare_WorkflowRollbackHandlerCtxConfigRetries {
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler2CtxConfigRetries"]
+dictionary Cloudflare_WorkflowRollbackHandler2CtxConfigRetries {
   // limit: number
   required double limit;
   // backoff?: WorkflowBackoff
@@ -19562,10 +19592,10 @@ dictionary Cloudflare_WorkflowRollbackHandlerCtxConfigRetries {
 };
 
 // {retries?: { limit: number; backoff?: WorkflowBackoff; } & (Delay extends WorkflowDelayFunction ? {} : { delay: WorkflowDelayDuration | number; }); timeout?: WorkflowTimeoutDuration | number; sensitive?: WorkflowStepSensitivity;}
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandlerCtxConfig"]
-dictionary Cloudflare_WorkflowRollbackHandlerCtxConfig {
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler2CtxConfig"]
+dictionary Cloudflare_WorkflowRollbackHandler2CtxConfig {
   // retries?: { limit: number; backoff?: WorkflowBackoff; } & (Delay extends WorkflowDelayFunction ? {} : { delay: WorkflowDelayDuration | number; })
-  Cloudflare_WorkflowRollbackHandlerCtxConfigRetries retries;
+  Cloudflare_WorkflowRollbackHandler2CtxConfigRetries retries;
   // timeout?: WorkflowTimeoutDuration | number
   Cloudflare_DOMStringOrDouble timeout;
   // sensitive?: WorkflowStepSensitivity
@@ -19573,21 +19603,21 @@ dictionary Cloudflare_WorkflowRollbackHandlerCtxConfig {
 };
 
 // {step: { name: string; count: number; }; attempt: number; config: { retries?: { limit: number; backoff?: WorkflowBackoff; } & (Delay extends WorkflowDelayFunction ? {} : { delay: WorkflowDelayDuration | number; }); timeout?: WorkflowTimeoutDuration | number; sensitive?: WorkflowStepSensitivity; };}
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandlerCtx"]
-dictionary Cloudflare_WorkflowRollbackHandlerCtx {
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler2Ctx"]
+dictionary Cloudflare_WorkflowRollbackHandler2Ctx {
   // step: { name: string; count: number; }
-  required Cloudflare_WorkflowRollbackHandlerCtxStep step;
+  required Cloudflare_WorkflowRollbackHandler2CtxStep step;
   // attempt: number
   required double attempt;
   // config: { retries?: { limit: number; backoff?: WorkflowBackoff; } & (Delay extends WorkflowDelayFunction ? {} : { delay: WorkflowDelayDuration | number; }); timeout?: WorkflowTimeoutDuration | number; sensitive?: WorkflowStepSensitivity; }
-  required Cloudflare_WorkflowRollbackHandlerCtxConfig config;
+  required Cloudflare_WorkflowRollbackHandler2CtxConfig config;
 };
 
 // {ctx: WorkflowStepContext<Delay>; error: Error; output: T | undefined; stepName: string;}
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler"]
-dictionary Cloudflare_WorkflowRollbackHandler {
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowRollbackHandler2"]
+dictionary Cloudflare_WorkflowRollbackHandler2 {
   // ctx: WorkflowStepContext<Delay>
-  required Cloudflare_WorkflowRollbackHandlerCtx ctx;
+  required Cloudflare_WorkflowRollbackHandler2Ctx ctx;
   // error: Error
   required any error;
   // output: T | undefined
@@ -19595,6 +19625,10 @@ dictionary Cloudflare_WorkflowRollbackHandler {
   // stepName: string
   required DOMString stepName;
 };
+
+// type WorkflowRollbackHandler<T = unknown, Delay = WorkflowDelayDuration | number> = (ctx: WorkflowRollbackContext<T, Delay>) => Promise<void>
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowRollbackHandler", LasmSignature="type WorkflowRollbackHandler<T = unknown, Delay = WorkflowDelayDuration | number> = (ctx: WorkflowRollbackContext<T, Delay>) => Promise<void>"]
+callback Cloudflare_WorkflowRollbackHandler = Promise<undefined> (Cloudflare_WorkflowRollbackHandler2 ctx);
 
 // {name: string; count: number;}
 [LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmName="WorkflowStepDoCallbackStep"]

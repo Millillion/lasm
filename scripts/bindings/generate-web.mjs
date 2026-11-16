@@ -495,12 +495,15 @@ const needsPost = t => t.k === 'arraybuffer' || otherView(t) || (t.k === 'nullab
 function unionRead(u) {
   const shapes = u.alts.map(a => shape(a.t));
   const distinct = new Set(shapes).size === shapes.length && !shapes.includes('any')
-    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t));
+    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t) && !readsAsData(a.t));
   if (distinct) return u.alts.some(a => needsPost(a.t)) ? 'decode' : 'fromjs';
   // Only interfaces (generated or not: HTMLCanvasElement.getContext's contexts): a reference.
   if (u.alts.every(a => a.t.k === 'iface' || a.t.k === 'unknown' && (def(a.t.idl)?.type === 'interface' || otherInterfaces.has(a.t.idl)))) return 'value';
   return 'data';
 }
+/** A union's alternative written as a typed value but read as data (an array of a union of
+ * interfaces: written `Array X`, read `Array Data`): the union is then not read back typed. */
+const readsAsData = t => t.k === 'seq' && !needsPost(t) && retType(t).includes('Data') && !argType(t).includes('Data');
 /** Whether a type has a FromJS reading (possibly through an IO decoder). */
 function readable(t) {
   switch (t.k) {
@@ -612,7 +615,8 @@ function visit(t, mode, module) {
       // A callback handle is made from a Lean function: its arguments are read, its result written.
       const c = callbackSignature(t.name);
       for (const a of c.args) visit(resolve(a.idlType), 'from', owner);
-      visit(c.ret, 'to', owner);
+      // An asynchronous callback's Lean function returns the promised value: written.
+      visit(c.ret.k === 'promise' ? c.ret.inner : c.ret, 'to', owner);
       needTo.add(key); needFrom.add(key);
     }
   });
@@ -822,6 +826,11 @@ const constructorName = 'new';
 
 function emitInterface(module, name) {
   const d = def(name);
+  // Every type a member names is imported (a host's class members: constructors, statics).
+  if (hostOf(d)) for (const mem of membersOf(name)) {
+    for (const a of mem.arguments ?? []) requireType(module, resolve(a.idlType));
+    if (mem.idlType && !Array.isArray(mem.idlType)) requireType(module, resolve(mem.idlType));
+  }
   const o = out.get(module);
   const T = leanTypeName(name);
   const ns = nsOf(module), jsModule = jsModuleOf(name);

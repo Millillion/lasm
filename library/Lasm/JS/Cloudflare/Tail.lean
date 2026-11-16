@@ -1781,11 +1781,6 @@ instance : FromJS SpanRecordExceptionException where
     stack := ← Lasm.JS.readField (Option String) d "stack" }
   typeName := "Lasm.JS.Cloudflare.SpanRecordExceptionException"
 
-/-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
-def TailEvent.new (type : String) (init : Option EventInit := none) : IO TailEvent :=
-  Lasm.JS.Binding.invoke TailEvent { name := "Lasm.JS.Cloudflare.TailEvent.new", module := "globalThis", path := "Cloudflare_TailEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional init]) (await := false)
-
 /-- `get type(): string`: `readonly attribute DOMString type` -/
 def TailEvent.type (self : TailEvent) : IO String := self.val.get "type" String
 

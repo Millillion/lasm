@@ -16,7 +16,6 @@ import Lasm.JS.Web.Crypto
 import Lasm.JS.Cloudflare.R2
 import Lasm.JS.Cloudflare.Sockets
 import Lasm.JS.Cloudflare.Containers
-import Lasm.JS.Cloudflare.Workers
 import Lasm.JS.Cloudflare.Images
 import Lasm.JS.Cloudflare.Vectorize
 
@@ -20724,12 +20723,6 @@ instance : ToJS DOMStringOrSequenceOfResponseInputTextOrResponseInputImage := �
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfResponseInputTextOrResponseInputImage := ⟨.domString⟩
 instance : Coe (Array ResponseInputTextOrResponseInputImage) DOMStringOrSequenceOfResponseInputTextOrResponseInputImage := ⟨.sequence⟩
-instance : FromJS DOMStringOrSequenceOfResponseInputTextOrResponseInputImage where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array Data)).map .sequence
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrSequenceOfResponseInputTextOrResponseInputImage"
 
 /-- `dictionary EasyInputMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EasyInputMessage where
@@ -20742,12 +20735,6 @@ structure EasyInputMessage where
 instance : ToJS EasyInputMessage := ⟨fun d => Support.fields #[("content", toJS d.content),
     ("role", toJS d.role),
     ("type", Support.optional d.type)]⟩
-instance : FromJS EasyInputMessage where
-  fromJS d := do return {
-    content := ← Lasm.JS.readField DOMStringOrSequenceOfResponseInputTextOrResponseInputImage d "content",
-    role := ← Lasm.JS.readField EasyInputMessageRole d "role",
-    type := ← Lasm.JS.readField (Option EasyInputMessageType) d "type" }
-  typeName := "Lasm.JS.Cloudflare.EasyInputMessage"
 
 /-- `dictionary ResponseInputItemMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseInputItemMessage where
@@ -20943,12 +20930,6 @@ instance : ToJS DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImag
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImageContent := ⟨.domString⟩
 instance : Coe (Array ResponseInputTextContentOrResponseInputImageContent) DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImageContent := ⟨.sequence⟩
-instance : FromJS DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImageContent where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array Data)).map .sequence
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImageContent"
 
 /-- `dictionary ResponseInputItemFunctionCallOutput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseInputItemFunctionCallOutput where
@@ -20967,14 +20948,6 @@ instance : ToJS ResponseInputItemFunctionCallOutput := ⟨fun d => Support.field
     ("type", toJS d.type),
     ("id", Support.optional d.id),
     ("status", Support.optional d.status)]⟩
-instance : FromJS ResponseInputItemFunctionCallOutput where
-  fromJS d := do return {
-    call_id := ← Lasm.JS.readField String d "call_id",
-    output := ← Lasm.JS.readField DOMStringOrSequenceOfResponseInputTextContentOrResponseInputImageContent d "output",
-    type := ← Lasm.JS.readField ResponseInputItemFunctionCallOutputType d "type",
-    id := ← Lasm.JS.readField (Option String) d "id",
-    status := ← Lasm.JS.readField (Option ResponseInputItemFunctionCallOutputStatus) d "status" }
-  typeName := "Lasm.JS.Cloudflare.ResponseInputItemFunctionCallOutput"
 
 /-- `dictionary ResponseReasoningSummaryItem` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseReasoningSummaryItem where
@@ -21073,12 +21046,6 @@ instance : ToJS DOMStringOrSequenceOfEasyInputMessageOrResponseInputItemMessageO
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfEasyInputMessageOrResponseInputItemMessageOrResponseOutputMessageOrResponseFunctionToolCallOrResponseInputItemFunctionCallOutputOrResponseReasoningItem := ⟨.domString⟩
 instance : Coe (Array EasyInputMessageOrResponseInputItemMessageOrResponseOutputMessageOrResponseFunctionToolCallOrResponseInputItemFunctionCallOutputOrResponseReasoningItem) DOMStringOrSequenceOfEasyInputMessageOrResponseInputItemMessageOrResponseOutputMessageOrResponseFunctionToolCallOrResponseInputItemFunctionCallOutputOrResponseReasoningItem := ⟨.sequence⟩
-instance : FromJS DOMStringOrSequenceOfEasyInputMessageOrResponseInputItemMessageOrResponseOutputMessageOrResponseFunctionToolCallOrResponseInputItemFunctionCallOutputOrResponseReasoningItem where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array Data)).map .sequence
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrSequenceOfEasyInputMessageOrResponseInputItemMessageOrResponseOutputMessageOrResponseFunctionToolCallOrResponseInputItemFunctionCallOutputOrResponseReasoningItem"
 
 /-- `dictionary Reasoning` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Reasoning where
@@ -21522,13 +21489,6 @@ instance : ToJS ResponseCustomToolCallOutput := ⟨fun d => Support.fields #[("c
     ("output", toJS d.output),
     ("type", toJS d.type),
     ("id", Support.optional d.id)]⟩
-instance : FromJS ResponseCustomToolCallOutput where
-  fromJS d := do return {
-    call_id := ← Lasm.JS.readField String d "call_id",
-    output := ← Lasm.JS.readField DOMStringOrSequenceOfResponseInputTextOrResponseInputImage d "output",
-    type := ← Lasm.JS.readField ResponseCustomToolCallOutputType d "type",
-    id := ← Lasm.JS.readField (Option String) d "id" }
-  typeName := "Lasm.JS.Cloudflare.ResponseCustomToolCallOutput"
 
 /-- `dictionary ResponseErrorEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseErrorEvent where
@@ -21677,14 +21637,6 @@ instance : ToJS ResponseFunctionToolCallOutputItem := ⟨fun d => Support.fields
     ("output", toJS d.output),
     ("type", toJS d.type),
     ("status", Support.optional d.status)]⟩
-instance : FromJS ResponseFunctionToolCallOutputItem where
-  fromJS d := do return {
-    id := ← Lasm.JS.readField String d "id",
-    call_id := ← Lasm.JS.readField String d "call_id",
-    output := ← Lasm.JS.readField DOMStringOrSequenceOfResponseInputTextOrResponseInputImage d "output",
-    type := ← Lasm.JS.readField ResponseFunctionToolCallOutputItemType d "type",
-    status := ← Lasm.JS.readField (Option ResponseFunctionToolCallOutputItemStatus) d "status" }
-  typeName := "Lasm.JS.Cloudflare.ResponseFunctionToolCallOutputItem"
 
 /-- `dictionary ResponseIncompleteEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseIncompleteEvent where
@@ -24164,14 +24116,9 @@ def Console.trace (self : Console) (data : Array Data := #[]) : IO Unit :=
 def Console.warn (self : Console) (data : Array Data := #[]) : IO Unit :=
   self.val.callMethod "warn" (Support.argsWith #[] (data.map toJS)) Unit
 
-/-- `constructor(underlyingSink?: UnderlyingSink, queuingStrategy?: QueuingStrategy)`: `constructor(optional UnderlyingSink underlyingSink, optional QueuingStrategy queuingStrategy)` -/
-def DigestStream.new (underlyingSink : Option UnderlyingSink := none) (queuingStrategy : Option QueuingStrategy := none) : IO DigestStream :=
-  Lasm.JS.Binding.invoke DigestStream { name := "Lasm.JS.Cloudflare.DigestStream.new", module := "globalThis", path := "Cloudflare_DigestStream", construct := true, arity := 2 }
-    (Support.args #[Support.optional underlyingSink, Support.optional queuingStrategy]) (await := false)
-
 /-- `constructor(algorithm: string | SubtleCryptoHashAlgorithm, options?: DigestStreamOptions)`: `constructor(DOMStringOrSubtleCryptoHashAlgorithm algorithm, optional DigestStreamOptions options)` -/
-def DigestStream.newWithAlgorithm (algorithm : DOMStringOrSubtleCryptoHashAlgorithm) (options : Option DigestStreamOptions := none) : IO DigestStream :=
-  Lasm.JS.Binding.invoke DigestStream { name := "Lasm.JS.Cloudflare.DigestStream.newWithAlgorithm", module := "globalThis", path := "Cloudflare_DigestStream", construct := true, arity := 2 }
+def DigestStream.new (algorithm : DOMStringOrSubtleCryptoHashAlgorithm) (options : Option DigestStreamOptions := none) : IO DigestStream :=
+  Lasm.JS.Binding.invoke DigestStream { name := "Lasm.JS.Cloudflare.DigestStream.new", module := "globalThis", path := "Cloudflare_DigestStream", construct := true, arity := 2 }
     (Support.args #[toJS algorithm, Support.optional options]) (await := false)
 
 /-- `get locked(): boolean`: `readonly attribute boolean locked` -/
@@ -24199,14 +24146,9 @@ def DigestStream.getWriter (self : DigestStream) : IO WritableStreamDefaultWrite
   let r ← self.val.callMethod "getWriter" (Support.args #[]) Value
   pure { val := r }
 
-/-- `constructor(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>)`: `constructor(optional Transformer transformer, optional QueuingStrategy writableStrategy, optional QueuingStrategy readableStrategy)` -/
-def IdentityTransformStream.new (transformer : Option Transformer := none) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO IdentityTransformStream :=
-  Lasm.JS.Binding.invoke IdentityTransformStream { name := "Lasm.JS.Cloudflare.IdentityTransformStream.new", module := "globalThis", path := "Cloudflare_IdentityTransformStream", construct := true, arity := 3 }
-    (Support.args #[Support.optional transformer, Support.optional writableStrategy, Support.optional readableStrategy]) (await := false)
-
 /-- `constructor(queuingStrategy?: IdentityTransformStreamQueuingStrategy)`: `constructor(optional IdentityTransformStreamQueuingStrategy queuingStrategy)` -/
-def IdentityTransformStream.newWithQueuingStrategy (queuingStrategy : Option IdentityTransformStreamQueuingStrategy := none) : IO IdentityTransformStream :=
-  Lasm.JS.Binding.invoke IdentityTransformStream { name := "Lasm.JS.Cloudflare.IdentityTransformStream.newWithQueuingStrategy", module := "globalThis", path := "Cloudflare_IdentityTransformStream", construct := true, arity := 1 }
+def IdentityTransformStream.new (queuingStrategy : Option IdentityTransformStreamQueuingStrategy := none) : IO IdentityTransformStream :=
+  Lasm.JS.Binding.invoke IdentityTransformStream { name := "Lasm.JS.Cloudflare.IdentityTransformStream.new", module := "globalThis", path := "Cloudflare_IdentityTransformStream", construct := true, arity := 1 }
     (Support.args #[Support.optional queuingStrategy]) (await := false)
 
 /-- `get readable(): ReadableStream<O>`: `readonly attribute ReadableStream readable` -/
@@ -24993,11 +24935,6 @@ def NodeStyleServer.listen (self : NodeStyleServer) (args : Array Data := #[]) :
 /-- `address(): { port?: number | null | undefined; } | null`: `NodeStyleServerAddress? address()` -/
 def NodeStyleServer.address (self : NodeStyleServer) : IO (Option NodeStyleServerAddress) :=
   self.val.callMethod "address" (Support.args #[]) (Option NodeStyleServerAddress)
-
-/-- `constructor(ctx: ExecutionContext, env: Env)`: `constructor(ExecutionContext ctx, Env env)` -/
-def PipelineTransformationEntrypoint.new (ctx : ExecutionContext) (env : Env) : IO PipelineTransformationEntrypoint :=
-  Lasm.JS.Binding.invoke PipelineTransformationEntrypoint { name := "Lasm.JS.Cloudflare.PipelineTransformationEntrypoint.new", module := "globalThis", path := "Cloudflare_PipelineTransformationEntrypoint", construct := true, arity := 2 }
-    (Support.args #[toJS ctx, toJS env]) (await := false)
 
 /-- `public run(records: I[], metadata: PipelineBatchMetadata): Promise<O[]>`: `Promise<sequence<record<DOMString, any>>> run(sequence<record<DOMString, any>> records, PipelineBatchMetadata metadata)` -/
 def PipelineTransformationEntrypoint.run (self : PipelineTransformationEntrypoint) (records : Array (Record Data)) (metadata : PipelineBatchMetadata) : Async (Array (Record Data)) :=

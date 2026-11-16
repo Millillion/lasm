@@ -535,11 +535,6 @@ def StubBase.dup (self : StubBase) : IO StubBase := do
   let r ← self.val.callMethod "dup" (Support.args #[]) Value
   pure { val := r }
 
-/-- `constructor(ctx: ExecutionContext, env: Env)`: `constructor(ExecutionContext ctx, Env env)` -/
-def WorkerEntrypoint.new (ctx : ExecutionContext) (env : Env) : IO WorkerEntrypoint :=
-  Lasm.JS.Binding.invoke WorkerEntrypoint { name := "Lasm.JS.Cloudflare.WorkerEntrypoint.new", module := "globalThis", path := "Cloudflare_WorkerEntrypoint", construct := true, arity := 2 }
-    (Support.args #[toJS ctx, toJS env]) (await := false)
-
 /-- `email?(message: ForwardableEmailMessage): void | Promise<void>`: `Promise<undefined> email(ForwardableEmailMessage message)` -/
 def WorkerEntrypoint.email (self : WorkerEntrypoint) (message : ForwardableEmailMessage) : Async Unit :=
   self.val.callMethodAwait "email" (Support.args #[toJS message]) Unit
@@ -565,9 +560,9 @@ def WorkerEntrypoint.scheduled (self : WorkerEntrypoint) (controller : Scheduled
 def WorkerEntrypoint.tail (self : WorkerEntrypoint) (events : Array TraceItem) : Async Unit :=
   self.val.callMethodAwait "tail" (Support.args #[toJS events]) Unit
 
-/-- `tailStream?(event: TailStream.TailEvent<TailStream.Onset>): | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>`: `Promise<TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject?> tailStream(TailStreamTailEvent event)` -/
-def WorkerEntrypoint.tailStream (self : WorkerEntrypoint) (event : TailStreamTailEvent) : Async (Option Data) :=
-  self.val.callMethodAwait "tailStream" (Support.args #[toJS event]) (Option Data)
+/-- `tailStream?(event: TailStream.TailEvent<TailStream.Onset>): | TailStream.TailEventHandlerType | undefined | Promise<TailStream.TailEventHandlerType | undefined>`: `Promise<TailEventHandlerOrTailEventHandlerObject?> tailStream(TailStreamTailEvent event)` -/
+def WorkerEntrypoint.tailStream (self : WorkerEntrypoint) (event : TailStreamTailEvent) : Async (Option TailEventHandlerOrTailEventHandlerObject) :=
+  self.val.callMethodAwait "tailStream" (Support.args #[toJS event]) (Option TailEventHandlerOrTailEventHandlerObject)
 
 /-- `test?(controller: TestController): void | Promise<void>`: `Promise<undefined> test(TestController controller)` -/
 def WorkerEntrypoint.test (self : WorkerEntrypoint) (controller : TestController) : Async Unit :=

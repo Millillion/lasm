@@ -489,7 +489,25 @@ def ExportedHandlerTraceHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array D
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 
-/-- `callback ExportedHandlerTailStreamHandler = Promise<TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject?> (TailStreamTailEvent event, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `typedef TailEventHandler or TailEventHandlerObject TailEventHandlerOrTailEventHandlerObject`: one constructor per member type. -/
+inductive TailEventHandlerOrTailEventHandlerObject where
+  /-- `TailEventHandler` -/
+  | tailEventHandler (value : TailEventHandler)
+  /-- `TailEventHandlerObject` -/
+  | tailEventHandlerObject (value : TailEventHandlerObject)
+instance : ToJS TailEventHandlerOrTailEventHandlerObject := ⟨fun
+  | .tailEventHandler v => toJS v
+  | .tailEventHandlerObject v => toJS v⟩
+instance : Coe TailEventHandler TailEventHandlerOrTailEventHandlerObject := ⟨.tailEventHandler⟩
+instance : Coe TailEventHandlerObject TailEventHandlerOrTailEventHandlerObject := ⟨.tailEventHandlerObject⟩
+instance : FromJS TailEventHandlerOrTailEventHandlerObject where
+  fromJS
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String TailEventHandler).map .tailEventHandler
+    | d@(.object _) => (FromJS.fromJS d : Except String TailEventHandlerObject).map .tailEventHandlerObject
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.TailEventHandlerOrTailEventHandlerObject"
+
+/-- `callback ExportedHandlerTailStreamHandler = Promise<TailEventHandlerOrTailEventHandlerObject?> (TailStreamTailEvent event, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerTailStreamHandler where
   /-- The JavaScript function. -/
   val : Value
@@ -497,13 +515,13 @@ instance : Nonempty ExportedHandlerTailStreamHandler := ⟨{ val := Classical.of
 instance : ToJS ExportedHandlerTailStreamHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerTailStreamHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTailStreamHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerTailStreamHandler.ofFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → Async (Option TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
+def ExportedHandlerTailStreamHandler.ofFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → Async (Option TailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TailStreamTailEvent args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerTailStreamHandler.ofSyncFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → IO (Option TailEventHandlerOrTailEventHandlerObjectOrTailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
+def ExportedHandlerTailStreamHandler.ofSyncFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → IO (Option TailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TailStreamTailEvent args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
@@ -668,25 +686,63 @@ def PagesFunction.ofSyncFn (f : Value → IO Unit) : IO PagesFunction := do
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary PagesFunctionEnvASSETS` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure PagesFunctionEnvASSETS where
+/-- `dictionary PagesFunction2EnvASSETS` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesFunction2EnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
-instance : ToJS PagesFunctionEnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
-instance : FromJS PagesFunctionEnvASSETS where
+instance : ToJS PagesFunction2EnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
+instance : FromJS PagesFunction2EnvASSETS where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField Data d "fetch" }
-  typeName := "Lasm.JS.Cloudflare.PagesFunctionEnvASSETS"
+  typeName := "Lasm.JS.Cloudflare.PagesFunction2EnvASSETS"
 
-/-- `dictionary PagesFunctionEnv` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure PagesFunctionEnv where
-  /-- `required PagesFunctionEnvASSETS ASSETS` -/
-  ASSETS : PagesFunctionEnvASSETS
-instance : ToJS PagesFunctionEnv := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
-instance : FromJS PagesFunctionEnv where
+/-- `dictionary PagesFunction2Env` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesFunction2Env where
+  /-- `required PagesFunction2EnvASSETS ASSETS` -/
+  ASSETS : PagesFunction2EnvASSETS
+instance : ToJS PagesFunction2Env := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
+instance : FromJS PagesFunction2Env where
   fromJS d := do return {
-    ASSETS := ← Lasm.JS.readField PagesFunctionEnvASSETS d "ASSETS" }
-  typeName := "Lasm.JS.Cloudflare.PagesFunctionEnv"
+    ASSETS := ← Lasm.JS.readField PagesFunction2EnvASSETS d "ASSETS" }
+  typeName := "Lasm.JS.Cloudflare.PagesFunction2Env"
+
+/-- `dictionary PagesFunction2` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesFunction2 where
+  /-- `required Request request` -/
+  request : Request
+  /-- `required DOMString functionPath` -/
+  functionPath : String
+  /-- `required PagesFunction waitUntil` -/
+  waitUntil : PagesFunction
+  /-- `required PagesFunction passThroughOnException` -/
+  passThroughOnException : PagesFunction
+  /-- `required PagesFunction next` -/
+  next : PagesFunction
+  /-- `required PagesFunction2Env env` -/
+  env : PagesFunction2Env
+  /-- `required any params` -/
+  params : Data
+  /-- `required any data` -/
+  data : Data
+instance : ToJS PagesFunction2 := ⟨fun d => Support.fields #[("request", toJS d.request),
+    ("functionPath", toJS d.functionPath),
+    ("waitUntil", toJS d.waitUntil),
+    ("passThroughOnException", toJS d.passThroughOnException),
+    ("next", toJS d.next),
+    ("env", toJS d.env),
+    ("params", toJS d.params),
+    ("data", toJS d.data)]⟩
+instance : FromJS PagesFunction2 where
+  fromJS d := do return {
+    request := ← Lasm.JS.readField Request d "request",
+    functionPath := ← Lasm.JS.readField String d "functionPath",
+    waitUntil := ← Lasm.JS.readField PagesFunction d "waitUntil",
+    passThroughOnException := ← Lasm.JS.readField PagesFunction d "passThroughOnException",
+    next := ← Lasm.JS.readField PagesFunction d "next",
+    env := ← Lasm.JS.readField PagesFunction2Env d "env",
+    params := ← Lasm.JS.readField Data d "params",
+    data := ← Lasm.JS.readField Data d "data" }
+  typeName := "Lasm.JS.Cloudflare.PagesFunction2"
 
 /-- `callback PagesPluginFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesPluginFunction where
@@ -708,25 +764,67 @@ def PagesPluginFunction.ofSyncFn (f : Value → IO Unit) : IO PagesPluginFunctio
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary PagesPluginFunctionEnvASSETS` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure PagesPluginFunctionEnvASSETS where
+/-- `dictionary PagesPluginFunction2EnvASSETS` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesPluginFunction2EnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
-instance : ToJS PagesPluginFunctionEnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
-instance : FromJS PagesPluginFunctionEnvASSETS where
+instance : ToJS PagesPluginFunction2EnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
+instance : FromJS PagesPluginFunction2EnvASSETS where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField Data d "fetch" }
-  typeName := "Lasm.JS.Cloudflare.PagesPluginFunctionEnvASSETS"
+  typeName := "Lasm.JS.Cloudflare.PagesPluginFunction2EnvASSETS"
 
-/-- `dictionary PagesPluginFunctionEnv` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure PagesPluginFunctionEnv where
-  /-- `required PagesPluginFunctionEnvASSETS ASSETS` -/
-  ASSETS : PagesPluginFunctionEnvASSETS
-instance : ToJS PagesPluginFunctionEnv := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
-instance : FromJS PagesPluginFunctionEnv where
+/-- `dictionary PagesPluginFunction2Env` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesPluginFunction2Env where
+  /-- `required PagesPluginFunction2EnvASSETS ASSETS` -/
+  ASSETS : PagesPluginFunction2EnvASSETS
+instance : ToJS PagesPluginFunction2Env := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
+instance : FromJS PagesPluginFunction2Env where
   fromJS d := do return {
-    ASSETS := ← Lasm.JS.readField PagesPluginFunctionEnvASSETS d "ASSETS" }
-  typeName := "Lasm.JS.Cloudflare.PagesPluginFunctionEnv"
+    ASSETS := ← Lasm.JS.readField PagesPluginFunction2EnvASSETS d "ASSETS" }
+  typeName := "Lasm.JS.Cloudflare.PagesPluginFunction2Env"
+
+/-- `dictionary PagesPluginFunction2` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PagesPluginFunction2 where
+  /-- `required Request request` -/
+  request : Request
+  /-- `required DOMString functionPath` -/
+  functionPath : String
+  /-- `required PagesPluginFunction waitUntil` -/
+  waitUntil : PagesPluginFunction
+  /-- `required PagesPluginFunction passThroughOnException` -/
+  passThroughOnException : PagesPluginFunction
+  /-- `required PagesPluginFunction next` -/
+  next : PagesPluginFunction
+  /-- `required PagesPluginFunction2Env env` -/
+  env : PagesPluginFunction2Env
+  /-- `required any params` -/
+  params : Data
+  /-- `required any data` -/
+  data : Data
+  /-- `required any pluginArgs` -/
+  pluginArgs : Data
+instance : ToJS PagesPluginFunction2 := ⟨fun d => Support.fields #[("request", toJS d.request),
+    ("functionPath", toJS d.functionPath),
+    ("waitUntil", toJS d.waitUntil),
+    ("passThroughOnException", toJS d.passThroughOnException),
+    ("next", toJS d.next),
+    ("env", toJS d.env),
+    ("params", toJS d.params),
+    ("data", toJS d.data),
+    ("pluginArgs", toJS d.pluginArgs)]⟩
+instance : FromJS PagesPluginFunction2 where
+  fromJS d := do return {
+    request := ← Lasm.JS.readField Request d "request",
+    functionPath := ← Lasm.JS.readField String d "functionPath",
+    waitUntil := ← Lasm.JS.readField PagesPluginFunction d "waitUntil",
+    passThroughOnException := ← Lasm.JS.readField PagesPluginFunction d "passThroughOnException",
+    next := ← Lasm.JS.readField PagesPluginFunction d "next",
+    env := ← Lasm.JS.readField PagesPluginFunction2Env d "env",
+    params := ← Lasm.JS.readField Data d "params",
+    data := ← Lasm.JS.readField Data d "data",
+    pluginArgs := ← Lasm.JS.readField Data d "pluginArgs" }
+  typeName := "Lasm.JS.Cloudflare.PagesPluginFunction2"
 
 /-- `readonly exports: Cloudflare.Exports`: `readonly attribute any exports` -/
 def ExecutionContext.exports (self : ExecutionContext) : IO Data := self.val.get "exports" Data
@@ -782,11 +880,6 @@ def CloudflareAccessContext.aud (self : CloudflareAccessContext) : IO String := 
 def CloudflareAccessContext.getIdentity (self : CloudflareAccessContext) : Async (Option CloudflareAccessIdentity) := do
   let r ← self.val.callMethodAwait "getIdentity" (Support.args #[]) Value
   Support.cloneAs (Option CloudflareAccessIdentity) r
-
-/-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
-def ScheduledEvent.new (type : String) (init : Option EventInit := none) : IO ScheduledEvent :=
-  Lasm.JS.Binding.invoke ScheduledEvent { name := "Lasm.JS.Cloudflare.ScheduledEvent.new", module := "globalThis", path := "Cloudflare_ScheduledEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional init]) (await := false)
 
 /-- `get type(): string`: `readonly attribute DOMString type` -/
 def ScheduledEvent.type (self : ScheduledEvent) : IO String := self.val.get "type" String
@@ -897,11 +990,6 @@ def SendEmail.send (self : SendEmail) (message : EmailMessage) : Async EmailSend
 def SendEmail.sendWithBuilder (self : SendEmail) (builder : EmailMessageBuilder) : Async EmailSendResult :=
   self.val.callMethodAwait "send" (Support.args #[toJS builder]) EmailSendResult
 
-/-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
-def EmailEvent.new (type : String) (init : Option EventInit := none) : IO EmailEvent :=
-  Lasm.JS.Binding.invoke EmailEvent { name := "Lasm.JS.Cloudflare.EmailEvent.new", module := "globalThis", path := "Cloudflare_EmailEvent", construct := true, arity := 2 }
-    (Support.args #[toJS type, Support.optional init]) (await := false)
-
 /-- `get type(): string`: `readonly attribute DOMString type` -/
 def EmailEvent.type (self : EmailEvent) : IO String := self.val.get "type" String
 
@@ -968,11 +1056,6 @@ def EmailEvent.composedPath (self : EmailEvent) : IO (Array EventTarget) :=
 /-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
 def EmailEvent.waitUntil (self : EmailEvent) (promise : Value) : IO Unit :=
   self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
-
-/-- `constructor(ctx: DurableObjectState, env: Env)`: `constructor(DurableObjectState ctx, Env env)` -/
-def CloudflareWorkersModuleDurableObject.new (ctx : DurableObjectState) (env : Env) : IO CloudflareWorkersModuleDurableObject :=
-  Lasm.JS.Binding.invoke CloudflareWorkersModuleDurableObject { name := "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.new", module := "globalThis", path := "Cloudflare_CloudflareWorkersModuleDurableObject", construct := true, arity := 2 }
-    (Support.args #[toJS ctx, toJS env]) (await := false)
 
 /-- `alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>`: `Promise<undefined> alarm(optional AlarmInvocationInfo alarmInfo)` -/
 def CloudflareWorkersModuleDurableObject.alarm (self : CloudflareWorkersModuleDurableObject) (alarmInfo : Option AlarmInvocationInfo := none) : Async Unit :=

@@ -169,10 +169,10 @@ export function declarations(text, file, { classes = false } = {}) {
       }
       // A class (workers-types' `declare abstract class D1Database`) is read as an interface
       // when the host asks for classes (its constructor and static members are not lowered).
-      if (classes && (m = /^(?:abstract\s+)?class\s+([\w$]+)/.exec(body))) {
+      if (classes && (m = /^(abstract\s+)?class\s+([\w$]+)/.exec(body))) {
         const open = findTop(src.shape, i + lead + m[0].length, end, '{');
         const close = matchClose(src.shape, open);
-        out.push({ kind: 'interface', class: true, name: qual(m[1]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
+        out.push({ kind: 'interface', class: true, abstract: !!m[1], name: qual(m[2]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
           doc: docBefore(src, i) });
         i = close + 1; continue;
       }
@@ -592,7 +592,9 @@ export function lowerHost(host, files) {
     const note = [];
     // T | Promise<T>: a promise (Lean's handler is asynchronous).
     if (rest.some(isPromise)) {
-      let inner = rest.map(a => isPromise(a) ? a.args[0] : a);
+      let inner = rest.flatMap(a => isPromise(a) ? (rich ? flat(a.args[0]) : [a.args[0]]) : [a]);
+      // rich: `X | undefined | Promise<X | undefined>`: a promise of X or nothing.
+      if (rich && inner.some(isNullish)) { nullable = true; inner = inner.filter(a => !isNullish(a)); }
       if (ctx.role === 'cbResult' && inner.some(a => !isVoid(a))) {
         if (inner.some(isVoid)) note.push('void alternatives dropped');
         inner = inner.filter(a => !isVoid(a));
@@ -865,13 +867,18 @@ export function lowerHost(host, files) {
     const name = idlName(lean);
     // rich: the same object type at the same place is one dictionary; one inside itself (a
     // recursive type: Workflows' step callbacks) is any where it recurs.
+    // A generated name that a declaration already has (BrowserRunLiveView's `options` beside the
+    // declared BrowserRunLiveViewOptions): numbered.
+    if (rich && !t.renamed && (selected.has(lean) || [...selected.values()].some(x => leanOf(x) === lean)))
+      return lowerObject({ ...t, renamed: true }, { ...ctx, param: `${ctx.param ?? ''}${nextSuffix(lean)}` });
     const key = `${ctx.owner}|${ctx.member}|${typeText(t)}`;
     if (rich && objectNames.has(key)) return objectNames.get(key);
     if (rich && ctx.objects?.includes(typeText(t))) return 'any';
     if (rich) ctx = { ...ctx, objects: [...(ctx.objects ?? []), typeText(t)] };
     const src = { ...blank(t.body), file: ctx.decl ? ctx.decl.src.file : '' };
     const lines = [];
-    const ms = t.members ?? membersOf(src, 0, t.body.length);
+    // A member named twice (an intersection's parts) is the last one's.
+    const ms = [...new Map((t.members ?? membersOf(src, 0, t.body.length)).map(m => [m.name, m])).values()];
     // An index signature (`{ [k: string]: V }`), and a mapped type (`{ [Op in K]?: V }`), alone: a record.
     if (ms.length === 1 && (ms[0].kind === 'index' || /^\[\s*[\w$]+\s+in\s/.test(ms[0].name)))
       return `record<DOMString, ${lower(parseType(ms[0].type), { ...ctx, intKey: null, alias: null })}>`;
@@ -1114,7 +1121,7 @@ export function lowerHost(host, files) {
             // rich: a base declared here but not selected (a type alias of an object type) gives its
             // members; a base of the web platform or JavaScript (Error, ExtendableEvent, Record) is
             // not repeated: its members are Lasm.JS.Web's.
-            else if (rich && host.allOverloads && byName.get(hn)?.kind) ms = [...objectMembers(h, { where: s.name, generics: {} }), ...ms];
+            else if (rich && host.allOverloads && byName.get(hn)?.kind) { const own = new Set(ms.map(x => x.name)); ms = [...objectMembers(h, { where: s.name, generics: {}, decl: d }).filter(x => !own.has(x.name)), ...ms]; }
             else if (rich && host.allOverloads) continue;
             else if (!(hn in host.notSelected)) fail(`${s.name} extends ${hn}, which is neither selected nor in ${host.tierFile ?? 'serve-tier2.mjs'} notSelected`);
           }
@@ -1149,6 +1156,8 @@ export function lowerHost(host, files) {
         if (s.as === 'interface') {
           const flags = new Set();
           const stat = m.static ? 'static ' : '';
+          // An abstract class (WorkerEntrypoint, DurableObject of cloudflare:workers) is not constructed.
+          if (m.kind === 'constructor' && m.d.abstract) { excluded.push([`${s.name}.constructor`, 'an abstract class: a program defines a subclass (A28)']); continue; }
           if (m.kind === 'constructor') {
             const args = m.params.map(p => `${p.optional ? 'optional ' : ''}${lower(parseType(p.type), { ...ctx, role: 'arg', intKey: null, optional: p.optional, where: `${ctx.where} (${p.name})`, param: p.name })}${p.rest ? '...' : ''} ${p.name}`);
             lines.push(`  // ${m.text}`);
