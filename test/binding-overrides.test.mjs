@@ -3,7 +3,7 @@
 // generator fail on an entry matching nothing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { forNamespaces, load, validate } from '../scripts/bindings/overrides.mjs';
 
@@ -14,10 +14,11 @@ test('the committed table is well formed', () => {
   assert.deepEqual(validate(table), []);
 });
 
-test('every entry names a decision recorded in docs/API_DECISIONS.md', () => {
-  const decisions = readFileSync(root + 'docs/API_DECISIONS.md', 'utf8');
+test('every entry names a decision recorded in docs/api/decisions/', () => {
+  const dir = root + 'docs/api/decisions/';
+  const decisions = readdirSync(dir).filter(f => f.endsWith('.md')).map(f => readFileSync(dir + f, 'utf8')).join('\n');
   for (const e of [...table.names, ...table.aliases, ...table.integers])
-    assert.ok(new RegExp(`\\| ${e.decision.replace(/\./g, '\\.')} \\|`).test(decisions), `${e.decision} is not an entry of docs/API_DECISIONS.md`);
+    assert.ok(new RegExp(`\\| ${e.decision.replace(/\./g, '\\.')} \\|`).test(decisions), `${e.decision} is not an entry of docs/api/decisions/`);
 });
 
 test('no entry targets the WIT generators, which apply none yet', () => {

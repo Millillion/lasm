@@ -1,7 +1,7 @@
 # Rules for generated bindings
 
 Status: decided 2026-11-16 (Jordan: mechanical rules plus a small reviewed
-override table). Entries A9–A12 of [API_DECISIONS.md](API_DECISIONS.md),
+override table). Entries A9–A12 of [docs/api/decisions/0.3.md](api/decisions/0.3.md),
 pending sign-off.
 
 Every generated binding follows these four rules:
@@ -25,7 +25,7 @@ The rest of each mapping is in [JS_BINDINGS.md](JS_BINDINGS.md):
 ## The override table
 
 `overrides.json` has three lists. Each entry carries:
-- `decision`: its entry in API_DECISIONS.md (`A9.1`, `0.3-2`). **No entry
+- `decision`: its entry in the API decisions (docs/api/decisions/) (`A9.1`, `0.3-2`). **No entry
   goes in without one.**
 - `why`: one line.
 
@@ -39,7 +39,7 @@ The rest of each mapping is in [JS_BINDINGS.md](JS_BINDINGS.md):
 declaration makes the generator fail, so `--check` fails in CI (the
 `generated` job of `web-bindings.yml`). An entry can therefore never outlive
 the declaration it renames. `test/binding-overrides.test.mjs` checks the
-table's shape, and checks that every `decision` exists in API_DECISIONS.md.
+table's shape, and checks that every `decision` exists in docs/api/decisions/.
 
 The WIT and witx sources type their integers, and have no overloads and no
 callbacks, so no entry applies to `Lasm.Fastly` or `Lasm.WASI` today. The
@@ -47,7 +47,7 @@ test rejects one listed for them until their generator applies it.
 
 **Adding an entry.** In the same PR:
 1. Add the entry to `overrides.json`.
-2. Add its API_DECISIONS.md entry, as a sub-ID of the rule (`A9.n`, `A10.n`,
+2. Add its entry in docs/api/decisions/0.3.md, as a sub-ID of the rule (`A9.n`, `A10.n`,
    `A11.n`) or a milestone ID (`0.4-n`).
 3. Regenerate the bindings.
 4. Update the callers.

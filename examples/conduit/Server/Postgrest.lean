@@ -12,7 +12,7 @@ security, which allows nothing to anyone else).
 import Server.Web
 import Lasm.KV
 import Lean.Data.Json
-import Lasm.RPC.Core
+import Conduit.SafeJson
 open Lean Std.Async
 
 namespace Conduit.Server.Postgrest
@@ -45,7 +45,7 @@ def «open» (send : Web.Request → Async Web.Response) (url : String) (key : O
     kind := "postgrest"
     get := fun k => do
       let r ← call "GET" s!"{url}?select=value&key=eq.{encode k}" #[("accept", "application/json")]
-      match (Lasm.RPC.parseJson ((r.text?).getD "")).toOption with
+      match (Conduit.parseJson ((r.text?).getD "")).toOption with
       | some (.arr rows) => return rows[0]?.bind fun row => (row.getObjValAs? String "value").toOption
       | _ => return none
     put := fun k v => do
