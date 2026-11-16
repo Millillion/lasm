@@ -85,7 +85,9 @@ the final APIs; no hand-written binding remains where a generated one exists.
   [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) and the API items
   of REVIEW.md. Also inventories the API proposals in
   [Jordan's checklist](#jordans-checklist) (Ledger's, Folio's, Porter's and
-  Tandem's).
+  Tandem's). Listed on 2026-11-16 (74 entries, `0.1-1` to `0.7-22`, beside
+  A1–A56); `scripts/api/inventory.mjs` fails the unit job when a public
+  surface is missing. Awaiting Jordan's sign-off.
 - [ ] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
   `Lasm.JS.Node.Serve`, shaped like `Bun.serve`); function platforms call
   `exportDefault`, and the generated platform file calls the handler directly
