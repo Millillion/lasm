@@ -10,5 +10,6 @@ name = "Shared"
 [[lean_lib]]
 name = "View"
 
-# Server.lean and Client.lean are the two programs: lasm builds them
+# Server.lean (Node), Export.lean (the edge, Bun, Deno), Fastly.lean,
+# WasiHttp.lean and Client.lean (the browser) are the programs: lasm builds them
 # (npm run build). They are not Lake targets.
