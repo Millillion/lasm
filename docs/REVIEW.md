@@ -441,7 +441,7 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   - synchronous callbacks are limited: no async waits inside them, and the #90 depth limit;
   - each call costs about 25–35 µs.
 
-  This is to be scoped together before work starts (ROADMAP.md, top of "Now").
+  This is to be scoped together before work starts (ROADMAP.md, milestone 0.6).
   - [ ] **Symbol keys (PR #170): `get`/`set` take any `[ToJS κ]` key.**
     Before: `get (o : Value) (key : String) …` and `set [ToJS α] (o : Value) (key : String) (x : α)`.
     After: `get [ToJS κ] (o : Value) (key : κ) …` and `set [ToJS κ] [ToJS α] (o : Value) (key : κ) (x : α)`.
@@ -487,8 +487,10 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
 - [ ] 7. Glue code is reduced first, then specified by a Lean model and proved,
   and moved into Lean only where the logic is pure and a Lean program already
   runs beside it.
-- [ ] 8. The order of work is: strategy → gaps closed → reduction →
-  transferable property tests → rewrite assessment.
+- [x] 8. The order of work is: strategy → gaps closed → reduction →
+  transferable property tests → rewrite assessment. **Superseded 2026-11-16**
+  by ROADMAP.md's stages: API surface → robustness → backend → shrink →
+  Lean all the way → performance → 1.0.
 - [ ] 9. No new testing libraries (no Plausible, fast-check, Jazzer.js or TLA+).
 - [ ] The property-testing convention ([§4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)):
   - Proved propositions go in `Spec.lean`.
@@ -507,7 +509,11 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
     [verification/cli](../verification/cli/README.md), stated about `opaque`
     stand-ins for the JavaScript functions until each has a Lean model; two
     more library candidates (Lasm.Serverless, Lasm.UI) bring the library to 12.
-- [ ] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
+- [x] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
+  - **Answered 2026-11-16:** items 1–3 and 5–8 are Stage 1's definition of done;
+    item 4 (the campaign streak) is observed only and never blocks; and a fuzz
+    target checked against an outside reference implementation (`tar` against
+    Python's `tarfile`) is exempt from naming a proposition, as a rule.
   - How items 3, 5 and 6 are measured (2026-11-11, DECISIONS.md): a 0 % file
     fails the unit suite unless the coverage baseline names the workflows that
     run it (the baseline is now 98.05 %); the 14-day quarantine window comes
@@ -517,7 +523,8 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
 - [ ] The reduction and verification path ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md)):
   - Lean is recommended over Rust for the rewrite.
   - Translation validation for wasm-ld and Binaryen.
-  - A direct Lean IR → Wasm backend as research (M7).
+  - A direct Lean IR → Wasm backend as research (M7). **Answered 2026-11-16:**
+    it is Stage 2, before shrinking ([proposals/WASM_BACKEND.md](proposals/WASM_BACKEND.md)).
 
 ### APIs and libraries
 - [ ] **PR #124 is closed.** Its three drafts were `Lasm.Web.Crypto` (typed
@@ -551,7 +558,8 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   1.8–2.3 s, the EPYC 9V74 ones in 1.2–1.6 s, so 2 s failed on the slow class
   (blocking 0.6.0). The check now takes the median of seven warm edits and
   records the CPU. README still says "about 2 s". [BROWSER.md](BROWSER.md#budgets-measured-in-ci-recorded-per-release).
-- [ ] **`library-prebuilt.yml` stays,** and `library/prebuilt` (40 MB) stays
+- [x] **Answered 2026-11-16: generate it in CI** (the design below; ROADMAP.md 3.3).
+  **`library-prebuilt.yml` stays,** and `library/prebuilt` (40 MB) stays
   committed. A committed copy makes the npm tarball reproducible from the
   commit alone. Generating it in CI is IRREDUCIBLE.md removal 15, deferred.
   - **Proposal (2026-11-13, M3; not implemented while this is open): generate it
@@ -587,6 +595,19 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   Sunday (US Eastern), for lasm and the website.
   - Scheduled workflows carry a runtime guard (`TZ=America/New_York date +%u`), and a test checks every cron.
   - Claude does not push, dispatch or merge on Sunday.
+
+### Answered at the regroup (2026-11-16)
+- [x] **#293's edge memory trade-off:** accepted as merged (baseline 4.0 MiB;
+  four Folio worst-case peaks up 1.2–6.7 MiB).
+- [x] **Lean 4.36's two StackOverflow cases:** compare Lasm's advice text,
+  not Lean's exact output.
+- [x] **Porter's Azure-only Set-Cookie normalization** in target equivalence:
+  accepted.
+- [x] **The 108 scripts bdbadc40 deleted** that only READMEs named by bare
+  file name: they stay deleted; their stale mentions are to be removed.
+- [x] **API sign-off before 1.0:** API PRs may merge; every decision goes into
+  [API_DECISIONS.md](API_DECISIONS.md) for Jordan's sign-off. The API
+  questions of §2 below are inventoried there by ROADMAP.md milestone 0.1.
 
 ## 2. Jordan's review queue: APIs, libraries, examples, CLI
 
