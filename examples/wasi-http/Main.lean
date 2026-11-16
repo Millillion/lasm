@@ -25,24 +25,15 @@ def ok! [Repr ε] (what : String) (x : IO (Except ε α)) : IO α := do
   | .ok a => pure a
   | .error e => throw (IO.userError s!"{what}: {repr e}")
 
-/-- A stream's bytes, read to its end (`closed`). -/
-partial def readAll (s : InputStream) (acc : ByteArray := .empty) : IO ByteArray := do
-  match ← s.blockingRead 65536 with
-  | .ok chunk => readAll s (acc ++ chunk)
-  | .error .closed => return acc
-  | .error e => throw (IO.userError s!"reading a body: {repr e}")
+/-- Writes all of `bytes` (`OutputStream.writeAll`, Lasm.WASI.Http's helper:
+at most 4096 bytes per `blocking-write-and-flush`). -/
+def writeAll (s : OutputStream) (bytes : ByteArray) : IO Unit :=
+  ok! "writing a body" (s.writeAll bytes)
 
-/-- Writes all of `bytes`: `blocking-write-and-flush` takes at most 4096 bytes a call. -/
-partial def writeAll (s : OutputStream) (bytes : ByteArray) : IO Unit := do
-  if bytes.isEmpty then return
-  let n := min bytes.size 4096
-  ok! "writing a body" (s.blockingWriteAndFlush (bytes.extract 0 n))
-  writeAll s (bytes.extract n bytes.size)
-
-/-- An incoming body's bytes; the body is finished (its trailers dropped). -/
+/-- An incoming response's body bytes; the body is finished (its trailers dropped). -/
 def bodyBytes (body : IncomingBody) : IO ByteArray := do
   let s ← ok! "incoming-body.stream" body.stream
-  let bytes ← readAll s
+  let bytes ← ok! "reading a body" s.readAll
   s.drop
   (← IncomingBody.finish body).drop
   return bytes
@@ -107,8 +98,7 @@ def parseQuery (q : String) : List (String × String) :=
 def Request.param? (r : Request) (name : String) : Option String := (r.query.find? (·.1 == name)).map (·.2)
 def Request.header? (r : Request) (name : String) : IO (Option String) := do
   return (← r.headers.get name)[0]? >>= String.fromUTF8?
-def Request.body (r : Request) : IO ByteArray := do
-  bodyBytes (← ok! "incoming-request.consume" r.handle.consume)
+def Request.body (r : Request) : IO ByteArray := r.handle.readBody
 
 /-- A response's headers (`fields.append`, so a name may repeat). -/
 def fieldsOf (headers : Array (String × String)) : IO Fields := do
@@ -129,11 +119,9 @@ def finish (body : OutgoingBody) (s : OutputStream) : IO Unit := do
   s.drop
   ok! "outgoing-body.finish" (OutgoingBody.finish body none)
 
-/-- Sends a whole reply. -/
-def send (out : ResponseOutparam) (r : Reply) (head : Bool) : IO Unit := do
-  let (body, s) ← start out r.status r.headers
-  unless head do writeAll s r.body
-  finish body s
+/-- Sends a whole reply (`respond`, Lasm.WASI.Http's helper). -/
+def send (out : ResponseOutparam) (r : Reply) (head : Bool) : IO Unit :=
+  respond out r.status r.headers (if head then .empty else r.body)
 
 /-! ## Outgoing requests -/
 

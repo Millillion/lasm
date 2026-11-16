@@ -71,11 +71,11 @@ linked section of the review.
 | A27 | Lasm.JS.Cloudflare | `waitUntil` and `blockConcurrencyWhile` need `Async` → JS promise: add `Lasm.JS.Async.toPromise : Async α → IO Value` (new core API), or leave it to programs? | [Q27](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
 | A28 | Lasm.JS.Cloudflare | Durable Objects. Keep the JavaScript class shim until `Lasm.JS.Class.define` (Q6) exists, or block Durable Objects support on it? | [Q28](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
 | A29 | Lasm.JS.Cloudflare | Should Claude merge the branch as it is (with Q9, Q10 and Q11 applied later)? | [Q29](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
-| A30 | Lasm.WASI.Http | Please confirm the WASI mapping rules above. | [Q30](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | pending sign-off |
-| A31 | Lasm.WASI.Http | A wasi-http server is ~60 low-level lines per app: keep it per app, or add one thin helper such as `Lasm.WASI.Http.respond`? | [Q31](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | pending sign-off |
-| A32 | Lasm.Fastly | Should errors stay `EIO FastlyStatus α`? | [Q32](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
-| A33 | Lasm.Fastly | Should Claude bind `send_v2`/`v3` with `EIO (FastlyStatus × SendErrorDetail) α`, or leave them unbound (v1 covers sending)? | [Q33](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
-| A34 | Lasm.Fastly | Fastly calls are namespaced by module (`HttpReq.methodGet req`): keep the witx layout, or also generate dot-notation aliases on the handle types? | [Q34](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
+| A30 | Lasm.WASI.Http | Please confirm the WASI mapping rules above. | [Q30](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | decided in 0.6 ([below](#a30-the-wasi-mapping-rules-confirmed)), pending sign-off |
+| A31 | Lasm.WASI.Http | A wasi-http server is ~60 low-level lines per app: keep it per app, or add one thin helper such as `Lasm.WASI.Http.respond`? | [Q31](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | decided in 0.6 ([below](#a31-hand-written-helpers-for-whole-bodies-and-respond)), pending sign-off |
+| A32 | Lasm.Fastly | Should errors stay `EIO FastlyStatus α`? | [Q32](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | decided in 0.6 ([below](#a32-fastly-errors-stay-eio-fastlystatus-α)), pending sign-off |
+| A33 | Lasm.Fastly | Should Claude bind `send_v2`/`v3` with `EIO (FastlyStatus × SendErrorDetail) α`, or leave them unbound (v1 covers sending)? | [Q33](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | decided in 0.6 ([below](#a33-send_v2send_v3-stay-unbound-for-now)), pending sign-off |
+| A34 | Lasm.Fastly | Fastly calls are namespaced by module (`HttpReq.methodGet req`): keep the witx layout, or also generate dot-notation aliases on the handle types? | [Q34](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | decided in 0.6 ([below](#a34-fastly-keeps-the-witx-layout-without-dot-notation-aliases)), pending sign-off |
 | A35 | Lasm.UI | Keep UI's own `Http`, `Url` and `Storage` commands as pure data (Claude recommends this), or replace them with `Cmd.io` plus the generated bindings? | [Q35](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
 | A36 | Lasm.UI | Keep the `_` suffix names (`class_`, `main_`, `type_`), or use «guillemets» or another convention? | [Q36](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
 | A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
@@ -103,3 +103,139 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.6: the `Lasm.*` libraries
+
+Decisions of ROADMAP.md's milestone 0.6, each with its shape, code, why, the
+alternatives, and where it shipped. New entries are numbered `0.6-1`, `0.6-2`,
+…; decisions on an existing question keep its id.
+
+### Lasm.WASI.Http and Lasm.Fastly (host bindings)
+
+#### A30: the WASI mapping rules confirmed
+
+**Decision.** Lasm.WASI.Http keeps the mapping of 0.7.0 (#202), the one
+wit-bindgen gives every language with typed results:
+
+- `result<T, E>` is `Except E T` inside `IO`; an `IO.Error` means only "not a
+  wasi-http host".
+- A resource is `structure R where handle : UInt32`, dropped explicitly with
+  `R.drop`; ownership is the WIT's (`own` moves, `borrow` lends).
+- Names follow heck, as wit-bindgen does; methods take `self`, so dot
+  notation works (`request.method`, `Fields.fromList`).
+- The export is `IncomingHandler.serve (handler : IncomingRequest → ResponseOutparam → IO Unit)`,
+  one instance per request.
+
+```lean
+def main : IO Unit := IncomingHandler.serve fun request out => do
+  match ← request.consume with          -- IO (Except Unit IncomingBody)
+  | .ok body => …
+  | .error () => …
+```
+
+**Why.** These are the WIT's own semantics: its errors are values a program
+handles, and resources have explicit lifetimes the host tracks. Rust's, C's
+and Go's wit-bindgen output read the same way.
+
+**Alternatives.** Throwing the WIT errors as `IO.Error` (loses their type);
+freeing resources through Lean's reference counting (a handle's drop order
+matters to the host: a stream before its body); renaming toward Lasm.JS.Web's
+names (wasi:http is not the fetch API).
+
+**Where.** 0.7.0 (#202), unchanged. Full rules: docs/WASI_FASTLY_BINDINGS.md,
+"Mapping rules". **Status:** pending sign-off.
+
+#### A31: hand-written helpers for whole bodies, and `respond`
+
+**Decision.** A small hand-written module, `Lasm.WASI.Http.Respond`, imported
+by `Lasm.WASI.Http`:
+
+```lean
+InputStream.readAll (s : InputStream) : IO (Except StreamError ByteArray)
+OutputStream.writeAll (s : OutputStream) (bytes : ByteArray) : IO (Except StreamError Unit)
+IncomingRequest.readBody (request : IncomingRequest) : IO ByteArray
+respond (out : ResponseOutparam) (status : UInt16) (headers : Array (String × String)) (body : ByteArray) : IO Unit
+
+def main : IO Unit := IncomingHandler.serve fun request out => do
+  let body ← request.readBody
+  respond out 200 #[("content-type", "text/plain")] s!"{body.size} bytes\n".toUTF8
+```
+
+**Why.** Every wasi:http program wrote these (the `fetch` template, Conduit
+and examples/wasi-http each had a copy): `blocking-write-and-flush`
+takes at most 4,096 bytes per call, and a body is a resource whose stream is
+dropped before it is finished. The two stream helpers keep the WIT's error
+values, as the calls they repeat do; `readBody` and `respond` make several
+calls and throw an `IO.Error` naming the one that failed. `respond` checks
+every header before the response is set, so a refused header sends nothing.
+Streaming, trailers and outgoing requests stay on the generated calls.
+
+**Alternatives.** Keeping it per app (Q31): the same 60 lines everywhere. A
+whole `Request`/`Response` layer over wasi:http: that is what Lasm.Fetch was,
+and Stage 0 removes it.
+
+**Tests.** examples/wasi-http uses all four, under `wasmtime serve` in
+wasi.yml. Docs: docs/WASI_FASTLY_BINDINGS.md, "Helpers".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A32: Fastly errors stay `EIO FastlyStatus α`
+
+**Decision.** Every Lasm.Fastly call stays an `EIO FastlyStatus α` action,
+lifting into `IO` with the message `Fastly host call failed: <status>`;
+`found?` maps `$none` to `Option.none`.
+
+```lean
+let agent ← found? (HttpReq.headerValueGet req "user-agent")    -- Option String
+match ← (ConfigStore.get settings "color").toBaseIO with
+| .ok color => …
+| .error .none => …                                               -- a typed status
+```
+
+**Why.** The witx's every function returns `(expected T (error $fastly_status))`.
+`EIO ε` is Lean's own typed-error `IO`: a program that does not care writes
+plain `IO`, one that does matches the status. **Alternatives.** `IO α` with
+the status only in the message (untyped); `IO (Except FastlyStatus α)`
+everywhere (every call site unwraps).
+
+**Where.** 0.7.0 (#194), unchanged. **Status:** pending sign-off.
+
+#### A33: `send_v2`/`send_v3` stay unbound for now
+
+**Decision.** The five functions that report a `$send_error_detail`
+(`send_v2`, `send_v3`, `pending_req_poll_v2`, `pending_req_wait_v2`,
+`pending_req_select_v2`) stay unbound; `HttpReq.send` and the v1
+`pending_req_*` cover sending, and fail with the status alone.
+
+**Why.** Binding them needs a second error type, `EIO (FastlyStatus × SendErrorDetail) α`,
+and a generator rule for output records, for a detail (DNS, TLS or connection
+error) that no Lasm app reads yet. They are listed with the reason in
+scripts/bindings/fastly-surface.json. The trigger to bind them is the first
+program that must tell a DNS failure from a refused connection.
+
+**Alternatives.** Bind them now with the pair error type (Q33): a second
+error type in one API before anyone needs it.
+
+**Where.** 0.7.0 (#194), unchanged. **Status:** pending sign-off.
+
+#### A34: Fastly keeps the witx layout, without dot-notation aliases
+
+**Decision.** Fastly calls stay in one namespace per witx module, with the
+witx's names: `HttpReq.methodGet req`, `KvStore.lookupWaitV2`. No aliases on
+the handle types.
+
+```lean
+let method ← HttpReq.methodGet req
+HttpResp.statusSet resp 200
+```
+
+**Why.** In witx a handle is a bare `(handle)` type, not a resource with
+methods; the functions belong to modules (`fastly_http_req.method_get`). The
+Lean names are those, one to one, so the ABI's documentation reads directly.
+WASI's dot notation (A30) comes from WIT resources, which witx does not have.
+Aliases would give every call two names.
+
+**Alternatives.** Generated aliases (`req.methodGet`): a second spelling of
+244 functions; renaming to methods on handles: departs from the ABI.
+
+**Where.** 0.7.0 (#194), unchanged. **Status:** pending sign-off.
