@@ -211,3 +211,23 @@ section on every JavaScript target (a class extending `Error`, used from
 JavaScript and from Lean). Docs: docs/JS_BINDINGS.md, "JavaScript classes".
 
 **Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A27.1: `Async.toPromise`, reviewed for the Lasm.JS core
+
+**Decision.** The 0.5 stream's `Lasm.JS.Async.toPromise [ToJS α] (act : Async α) : IO Value`
+(PR #216, A27) fits the core as it is: a JavaScript promise of a Lean
+computation that starts at once, for APIs that take a promise of work still
+running (Workers' `ctx.waitUntil`).
+
+```lean
+ctx.waitUntil (← Async.toPromise (kv.put "k" v))
+```
+
+**Review notes.** It is `Function.ofFn` plus one call, so it costs two host
+calls and a function JavaScript releases once the promise settles, with
+`ofFn`'s semantics (no Lean thread held while it waits, a Lean error rejects
+with an `Error`). It is written `Async.toPromise act`, not `act.toPromise`:
+dot notation on `Async` would need a definition in Std's namespace. No change
+requested.
+
+**Where.** PR #216 (0.5 stream). **Status:** pending sign-off.
