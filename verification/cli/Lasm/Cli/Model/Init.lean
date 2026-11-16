@@ -38,11 +38,12 @@ structure DeployTarget where
   cli : Bool := false
   conflicts : List String := []
 
-def functionTemplates : List String := ["express", "hono", "fastify", "std-http", "fetch"]
+/-- The templates that publish a handler (`Export.lean`): the function platforms and the Lambda image call it. -/
+def functionTemplates : List String := ["hono", "fetch"]
 
 def deployTable : List DeployTarget := [
   { name := "lambda", summary := "AWS Lambda .zip for nodejs24.x (npm run build:lambda)", templates := functionTemplates },
-  { name := "lambda-container", summary := "AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)", templates := functionTemplates },
+  { name := "lambda-container", summary := "AWS Lambda container image (Dockerfile.lambda: Lambda's Node 24 image calling the default export)", templates := functionTemplates },
   { name := "lambda-edge", summary := "Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)", templates := functionTemplates },
   { name := "vercel", summary := "Vercel Function (vercel.json; Vercel runs the build)", templates := functionTemplates },
   { name := "netlify", summary := "Netlify Function (netlify.toml; Netlify runs the build)", templates := functionTemplates },
@@ -54,7 +55,7 @@ def deployTable : List DeployTarget := [
   { name := "deno-deploy", summary := "Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)", templates := ["hono", "fetch", "fullstack"] },
   { name := "supabase-edge", summary := "Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)", templates := ["hono"] },
   { name := "fastly", summary := "Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)", templates := ["fetch", "fullstack"] },
-  { name := "wasi", summary := "a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)", templates := ["fetch", "plain"], cli := true },
+  { name := "wasi", summary := "a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)", templates := ["plain"], cli := true },
   { name := "wasi-http", summary := "a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)", templates := ["fetch", "fullstack"] },
   { name := "spin", summary := "Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)", templates := ["fetch", "fullstack"] }]
 
@@ -71,7 +72,7 @@ def templateTable : List Template := [
   ⟨"fastify", "Fastify 5 with Lean route handlers (Lasm.JS)", true⟩,
   ⟨"std-http", "an HTTP server in pure Lean (Std.Http)", true⟩,
   ⟨"web", "a browser app in Lean (Lasm.UI): a counter", false⟩,
-  ⟨"fetch", "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces", true⟩,
+  ⟨"fetch", "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces", true⟩,
   ⟨"fullstack", "a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target", true⟩]
 
 def deployTargets : List String := deployTable.map (·.name)
@@ -143,14 +144,19 @@ def templateList (names : List String) : String :=
   if names.length = 1 then "the " ++ names.headD "" ++ " template"
   else "the " ++ ", ".intercalate names.dropLast ++ " and " ++ names.getLastD "" ++ " templates"
 
+/-- The end of a refusal: the targets the template supports, or that it has none. -/
+def supportedText (template : String) (supported : List String) : String :=
+  if supported = [] then "The " ++ template ++ " template has no --deploy targets: it runs wherever its Dockerfile runs"
+  else "The " ++ template ++ " template supports --deploy " ++ ", ".intercalate supported
+
 /-- The `for (const target of result.deploy)` loop. -/
 def deployChecks (template : String) (deploy : List String) : List DeployTarget → Except String Unit
   | [] => .ok ()
   | t :: rest =>
     if template ∉ t.templates then
       let supported := (deployTable.filter fun d => template ∈ d.templates).map (·.name)
-      .error ("--deploy " ++ t.name ++ " supports " ++ templateList t.templates ++ ", not " ++ template ++ ". The " ++ template ++
-        " template supports --deploy " ++ ", ".intercalate supported)
+      .error ("--deploy " ++ t.name ++ " supports " ++ templateList t.templates ++ ", not " ++ template ++ ". " ++
+        supportedText template supported)
     else match t.conflicts.find? (· ∈ deploy) with
       | some other => .error ("--deploy " ++ t.name ++ " and --deploy " ++ other ++ " both configure the same platform; choose one")
       | none => deployChecks template deploy rest
