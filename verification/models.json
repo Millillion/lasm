@@ -448,6 +448,11 @@
       "kind": "runtime",
       "reason": "the app instance of Lasm.UI.Mount; tested in browsers (ui.yml)"
     },
+    "src/lasm-modules/class.mjs": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core)"
+    },
     "src/lasm-modules/node-serve.mjs": {
       "status": "pending",
       "reason": "Node.serve's node:http server and its req/res ↔ Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module"
@@ -953,6 +958,10 @@
         }
       ],
       "reason": "the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs)"
+    },
+    "src/project-modules.mjs": {
+      "status": "pending",
+      "reason": "the project's JavaScript files (A6.1): pure over the binding records and the files, resolving each against its Lean file, the relative-import closure and the refusals; model it as BuiltinModules.lean models the builtin closure (tested in test/project-modules.test.mjs)"
     },
     "src/sdk-repairs.mjs": {
       "status": "exempt",

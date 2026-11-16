@@ -397,7 +397,11 @@ test('adapter helpers: event requests, replies, the forwarded scheme, cleaned Ne
 test('a program that publishes no handler fails clearly, and one whose handler throws answers 500', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-nohandler-'));
   const app = fakeApplication(join(directory, 'dist'));
-  writeFileSync(join(app, 'main.mjs'), 'console.log("done"); process.exitCode = 0;');
+  // As Emscripten's runtime does when main returns: Module.onExit (program.cjs's exports).
+  writeFileSync(join(app, 'main.mjs'), `import { createRequire } from 'node:module';
+const runtime = createRequire(import.meta.url)('./program.cjs');
+console.log("done"); process.exitCode = 0;
+setTimeout(() => runtime.onExit?.(0), 10);`);
   packageApplication({ input: app, target: 'netlify', output: join(directory, 'fn') });
   const run = spawnSync(process.execPath, ['--input-type=module', '-e', `
     const { loadHandler } = await import('./fn/lasm-function.mjs');

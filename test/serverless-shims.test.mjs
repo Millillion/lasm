@@ -110,8 +110,22 @@ test('loadHandler: a program that ends, never publishes, throws or publishes som
   await assert.rejects(stopped.loadHandler({ main: program('stops.mjs', 'process.exitCode = 3;') }),
     { message: /^The Lean program ended \(exit code 3\) without publishing a fetch handler\. On a function platform, main calls Lasm\.JS\.exportDefault/ });
   process.exitCode = undefined;
+  // A program that ends with 0: Emscripten's runtime calls Module.onExit (a
+  // stand-in program.cjs here), since process.exitCode is 0 from start-up on.
+  writeFileSync(join(directory, 'program.cjs'), 'module.exports = {};');
   const ended = await fresh();
-  await assert.rejects(ended.loadHandler({ main: program('ends.mjs', 'process.exitCode = 0;') }), { message: /ended \(exit code 0\)/ });
+  await assert.rejects(ended.loadHandler({ main: program('ends.mjs', `import { createRequire } from 'node:module';
+const runtime = createRequire(import.meta.url)('./program.cjs');
+process.exitCode = 0;
+setTimeout(() => runtime.onExit(0), 20);`) }), { message: /ended \(exit code 0\)/ });
+  process.exitCode = 0;
+  // The runtime's start sets process.exitCode to 0 (callMain's implicit exit)
+  // before main publishes the handler: that is not an end.
+  process.exitCode = undefined;
+  const late = await fresh();
+  const handler = await late.loadHandler({ main: program('late.mjs', `process.exitCode = 0;
+setTimeout(() => globalThis.__lasmFunctionHost(() => new Response('late')), 30);`) });
+  assert.equal(await (await handler(new Request('http://h/'))).text(), 'late');
   process.exitCode = 0;
   const quiet = await fresh();
   const started = performance.now();

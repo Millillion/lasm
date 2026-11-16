@@ -24,6 +24,13 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, L
 #     (Deno.serve, Bun.serve, Lasm's Node.serve and @hono/node-server on Node) serve a Lean handler that
 #     the program requests over HTTP; then Serve.lean is served by each and
 #     requested from outside the process (scripts/bindings/test-serve.mjs);
+#   - deno-conformance: all of Lasm.JS.Deno (scripts/bindings/deno-tier2.mjs): the same
+#     candidate builds test/fixtures/js-deno for Deno (files, subprocesses, TCP and
+#     Unix sockets, WebSockets, Deno KV against a sorted-map model, and every
+#     generated member on a live object), and the examples/deno-kv app;
+#   - bun-conformance: all of Lasm.JS.Bun (scripts/bindings/bun-tier2.mjs): test/fixtures/js-bun
+#     on Bun (utilities against Lean models and published vectors, files, processes,
+#     bun:sqlite rows, a WebSocket echo through Bun.serve, a TCP echo), and examples/bun-sqlite;
 #   - cloudflare-conformance: Lasm.JS.Cloudflare, generated from
 #     @cloudflare/workers-types (scripts/bindings/cloudflare.idl is
 #     cloudflare-api.mjs's lowering of it, its SHA-256 hash pinned): the same
@@ -31,6 +38,8 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, L
 #     serves it with local emulation only (workerd; Miniflare's KV, D1, R2,
 #     Durable Objects and Queues; a cron trigger; a TCP echo server of the
 #     runner). No Cloudflare account is used.
+#   - conformance also builds test/fixtures/js-core, Lasm.JS's own features (the
+#     project's JavaScript files, @[js "./ffi/x.mjs" …]), for every target.
 on:
   pull_request:
     branches: [main]
@@ -44,13 +53,22 @@ on:
       - 'test/fixtures/js-node-size/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
+      - 'test/fixtures/js-deno/**'
+      - 'examples/deno-kv/**'
+      - 'test/fixtures/js-bun/**'
+      - 'examples/bun-sqlite/**'
       - 'test/fixtures/js-cloudflare/**'
       - 'test/fixtures/js-cloudflare-size/**'
+      - 'test/fixtures/js-core/**'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
       - 'docs/API_DECISIONS.md'
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
+      - 'src/project-modules.mjs'
+      - 'src/browser/**'
+      - 'src/application-build.mjs'
+      - 'src/application-binding-check.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - 'package.json'
@@ -67,10 +85,19 @@ on:
       - 'test/fixtures/js-node-size/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
+      - 'test/fixtures/js-deno/**'
+      - 'examples/deno-kv/**'
+      - 'test/fixtures/js-bun/**'
+      - 'examples/bun-sqlite/**'
       - 'test/fixtures/js-cloudflare/**'
       - 'test/fixtures/js-cloudflare-size/**'
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
+      - 'test/fixtures/js-core/**'
+      - 'src/project-modules.mjs'
+      - 'src/browser/**'
+      - 'src/application-build.mjs'
+      - 'src/application-binding-check.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - '.github/workflows/web-bindings.yml'
@@ -197,6 +224,14 @@ jobs:
             --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
             --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
             --report "$RUNNER_TEMP/js-web/report.json" --sizes
+      - name: Build and run Lasm.JS's core conformance program (project files) on every target
+        if: success() || failure()
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-core --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-core" \
+            --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
+            --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
+            --report "$RUNNER_TEMP/js-core/report.json"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -256,6 +291,102 @@ jobs:
           path: |
             ${{ runner.temp }}/js-node/*.txt
             ${{ runner.temp }}/js-node/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  deno-conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Deno
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          npm install --prefix "$T" --no-audit --no-fund "deno@$DENO_VERSION"
+          "$T/node_modules/.bin/deno" --version
+      - name: Build and run the Lasm.JS.Deno conformance program (files, processes, sockets, WebSockets, KV, availability)
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-deno --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-deno" \
+            --targets deno --deno "$T/node_modules/.bin/deno" --report "$RUNNER_TEMP/js-deno/report.json"
+      - name: Build and run the Deno KV example (examples/deno-kv)
+        if: success() || failure()
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node examples/deno-kv/test/run.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --deno "$T/node_modules/.bin/deno" --work "$RUNNER_TEMP/deno-kv"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: deno-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-deno/*.txt
+            ${{ runner.temp }}/js-deno/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  bun-conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Bun
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          curl -fsSL --retry 3 -o "$T/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip"
+          echo "$BUN_SHA256  $T/bun.zip" | sha256sum -c
+          unzip -q "$T/bun.zip" -d "$T"
+          "$T/bun-linux-x64/bun" --version
+      - name: Build and run the Lasm.JS.Bun conformance program (utilities, files, processes, bun:sqlite, WebSockets, TCP, availability)
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-bun --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-bun" \
+            --targets bun --bun "$T/bun-linux-x64/bun" --report "$RUNNER_TEMP/js-bun/report.json"
+      - name: Build and run the bun:sqlite example (examples/bun-sqlite)
+        if: success() || failure()
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node examples/bun-sqlite/test/run.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --bun "$T/bun-linux-x64/bun" --work "$RUNNER_TEMP/bun-sqlite"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bun-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-bun/*.txt
+            ${{ runner.temp }}/js-bun/report.json
           retention-days: 14
           if-no-files-found: ignore
   serve-conformance:

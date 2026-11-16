@@ -14,6 +14,7 @@
 // Response or an object with such a `fetch` method (a Hono app).
 import { isUtf8 } from 'node:buffer';
 import { STATUS_CODES } from 'node:http';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { isMainThread } from 'node:worker_threads';
 import { respond, toRequest, writeResponse } from './lasm-node-serve.mjs';
@@ -57,10 +58,21 @@ export function loadHandler({ main = new URL('./main.mjs', import.meta.url), tim
       // that worker threads refuse; the Lean runtime's worker wrapper
       // (scripts/full-lean/emscripten-pre.js) drops them itself.
       try { await import(main.href); } finally { process.argv = argv; }
+      // The runtime ended: Emscripten calls Module.onExit then (main returned,
+      // or exit). The exit code alone cannot tell, because with main on its own
+      // thread (PROXY_TO_PTHREAD) the runtime sets process.exitCode to 0 at
+      // start-up already (callMain's implicit exitJS), and a program that ends
+      // with 0 leaves it unchanged.
+      let runtimeEnded = false, endCode;
+      try {
+        const runtime = createRequire(main)('./program.cjs');
+        const previous = runtime.onExit;
+        runtime.onExit = code => { runtimeEnded = true; endCode = code; previous?.(code); };
+      } catch { /* no Emscripten runtime beside main.mjs */ }
       const ended = new Promise((_, reject) => {
         const poll = () => {
-          if (exited || process.exitCode !== exitCode)
-            return reject(new Error(`The Lean program ended (exit code ${process.exitCode ?? 0}) without publishing a fetch handler. `
+          if (exited || runtimeEnded || (process.exitCode !== exitCode && process.exitCode !== 0))
+            return reject(new Error(`The Lean program ended (exit code ${endCode ?? process.exitCode ?? 0}) without publishing a fetch handler. `
               + 'On a function platform, main calls Lasm.JS.exportDefault with its handler (Request → Async Response); see the log above.'));
           if (performance.now() - started > timeoutMs)
             return reject(new Error(`The Lean program did not publish a fetch handler (Lasm.JS.exportDefault) within ${timeoutMs} ms.`));
