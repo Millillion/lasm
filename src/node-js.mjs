@@ -29,7 +29,7 @@
 //   214 typed binding [Lean name, module, export path, arguments]; flags as 205
 //   207 resolve the Lean promise at arg when a value settles (interop thread event)
 //   208 replies of Lean callbacks (status 0 value, 1 error, 2 method call)   209 interop thread long poll (events)
-//   210 a JavaScript function calling Lean function `handle` (arg 1 async, 2 sync)
+//   210 a JavaScript function calling Lean function `handle` (arg: 1 async, 2 sync, plus its length × 256)
 //   211 register the synchronous-callback channel   213 statistics
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -574,7 +574,10 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         return new Promise(resolve => { waiter = () => resolve(takeEvents()); });
       case 210: {
         // A JavaScript function calling Lean function `id`; arg 1 asynchronous, 2 synchronous.
-        const f = Number(arg) === 2 ? syncFunction(id) : asyncFunction(id);
+        // The low byte of arg is the kind (1 asynchronous, 2 synchronous), the rest the function's `length`.
+        const flags = Number(arg), length = Math.floor(flags / 256);
+        const f = (flags & 255) === 2 ? syncFunction(id) : asyncFunction(id);
+        if (length > 0) Object.defineProperty(f, 'length', { value: length });
         stats.functionsCreated++;
         return encode(f, 'reference');
       }

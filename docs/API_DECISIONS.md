@@ -45,11 +45,11 @@ linked section of the review.
 | A1 | Deno | What happens to `--target deno-deploy`? | [Q1](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
 | A2 | Deno | What happens to `Lasm.JS.Deno` and `--target deno`? | [Q2](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
 | A3 | Deno | Should Netlify Edge and Supabase Edge, which depend on the Deno runtime, be marked as at-risk targets? | [Q3](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
-| A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
-| A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
+| A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | decided in 0.6 ([below](#a4-functionoffn-sets-the-javascript-functions-length)), pending sign-off |
+| A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | decided in 0.6 ([below](#a5-the-binding-check-warns-about-globals-the-builds-target-provides)), pending sign-off |
 | A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A7 | Lasm.JS core | Should `exportDefault` take `[ToJS α]` (branch)? | [Q7](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
-| A8 | Lasm.JS core | Confirm the core shapes in REVIEW.md §1: Symbol and number keys (#170); no fire-and-forget `Async` in `ofSyncFn`; waits inside synchronous callbacks stay a clear error. | [Q8](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
+| A8 | Lasm.JS core | Confirm the core shapes in REVIEW.md §1: Symbol and number keys (#170); no fire-and-forget `Async` in `ofSyncFn`; waits inside synchronous callbacks stay a clear error. | [Q8](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | decided in 0.6 ([below](#a8-a47-a48-a49-a50-the-core-shapes-confirmed)), pending sign-off |
 | A9 | Generated-binding mapping rules | Overload naming. Should Claude keep the mechanical rule, or add a small override table for names that read badly? | [Q9](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
 | A10 | Generated-binding mapping rules | Callback type names. Should Claude keep the mechanical names, or add hand-picked aliases (`Bun.FetchHandler`, `Cloudflare.FetchHandler`)? | [Q10](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
 | A11 | Generated-binding mapping rules | How generated bindings type numbers: each source's typing, a cross-tier table of integer members mapped to `Nat` (recommended), or `Float` everywhere but WebIDL integers. | [Q11](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
@@ -93,13 +93,127 @@ linked section of the review.
 
 | Id | Area | Decision to sign off | Detail | Status |
 | --- | --- | --- | --- | --- |
-| A47 | Lasm.JS core | Symbol and number keys: `get`/`set` take any `[ToJS κ]` key (#170, 0.6.1). | [REVIEW.md §1](REVIEW.md#high-priority-work-to-define-with-jordan) | pending sign-off |
-| A48 | Lasm.JS core | Waits inside synchronous callbacks stay a clear error, by design (#122, 0.5.0). | [REVIEW.md §1](REVIEW.md#high-priority-work-to-define-with-jordan) | pending sign-off |
-| A49 | Lasm.JS core | No fire-and-forget `Async` in `ofSyncFn`. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
-| A50 | Lasm.JS core | `Lasm.JS.Wire.encode` returns `Except String ByteArray` (#154, 0.6.1, breaking). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
+| A47 | Lasm.JS core | Symbol and number keys: `get`/`set` take any `[ToJS κ]` key (#170, 0.6.1). | [REVIEW.md §1](REVIEW.md#high-priority-work-to-define-with-jordan) | decided in 0.6 ([below](#a8-a47-a48-a49-a50-the-core-shapes-confirmed)), pending sign-off |
+| A48 | Lasm.JS core | Waits inside synchronous callbacks stay a clear error, by design (#122, 0.5.0). | [REVIEW.md §1](REVIEW.md#high-priority-work-to-define-with-jordan) | decided in 0.6 ([below](#a8-a47-a48-a49-a50-the-core-shapes-confirmed)), pending sign-off |
+| A49 | Lasm.JS core | No fire-and-forget `Async` in `ofSyncFn`. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | decided in 0.6 ([below](#a8-a47-a48-a49-a50-the-core-shapes-confirmed)), pending sign-off |
+| A50 | Lasm.JS core | `Lasm.JS.Wire.encode` returns `Except String ByteArray` (#154, 0.6.1, breaking). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | decided in 0.6 ([below](#a8-a47-a48-a49-a50-the-core-shapes-confirmed)), pending sign-off |
 | A51 | Bindings | `Lasm.Web` deleted for the generated `Lasm.JS.Web.Browser`, with `Lasm.UI.Mount` (#193, #197, 0.7.0, breaking). | [REVIEW.md §1](REVIEW.md#the-browser-tier-replaced-lasmweb-2026-11-10-jordans-decision-claudes-choices-to-review) | pending sign-off |
 | A52 | Bindings | `Lasm.Fastly` generated from Fastly's witx; the hand-written store calls removed (#194, 0.7.0, breaking). | [REVIEW.md §1](REVIEW.md#host-bindings-lasmfastly-generated-lasmwasi-next-decided-by-jordan-2026-11-10) | pending sign-off |
 | A53 | Templates | `lasm init --template fetch` uses `Lasm.Fetch` only on Node; Fastly, wasi:http/Spin and WASI get their own entry modules (#218, 0.8.0). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.6: the `Lasm.*` libraries
+
+Decisions of ROADMAP.md's milestone 0.6, each with its shape, code, why, the
+alternatives, and where it shipped. New entries are numbered `0.6-1`, `0.6-2`,
+…; decisions on an existing question keep its id.
+
+### Lasm.JS core
+
+#### A4: `Function.ofFn` sets the JavaScript function's `length`
+
+**Decision.** Every function maker takes `(length : Nat := 0)`; `ofFn1` sets 1,
+`ofFn2` and `ofSyncFn2` set 2. The host sets it with
+`Object.defineProperty(f, "length", …)` when it creates the function (op 210's
+argument carries it above the kind byte), so it costs no extra host call.
+
+```lean
+Function.ofFn (f : Array Data → Async Data) (length : Nat := 0) : IO Value
+Function.ofFnReply (f : Array Data → Async Function.Reply) (length : Nat := 0) : IO Value
+Function.ofSyncFn (f : Array Data → IO Data) (length : Nat := 0) : IO Value
+Function.ofFn1 (f : α → Async β) : IO Value                    -- length 1
+Function.ofFn2 (f : α → β → Async γ) : IO Value                -- length 2
+Function.ofSyncFn2 (f : α → β → IO γ) : IO Value               -- length 2
+
+-- An Express error handler: Express recognises it by its four parameters.
+let onError ← Function.ofFn (length := 4) fun args => do …
+```
+
+**Why.** JavaScript callers read `length`: `Deno.serve` calls a handler of
+length 0 without its request, and Express treats only a four-parameter
+function as an error handler. A JavaScript function declares its parameters,
+so the native shape is a function whose `length` is its arity. The default
+stays 0 (a variadic function, which `(...args)` also reports), so existing
+programs behave the same, except that `ofFn1`/`ofFn2`/`ofSyncFn2` handlers
+now report their arity.
+
+**Alternatives.** Leave it at 0 and document it (Q4 b): every API that reads
+`length` stays unusable from Lean. Infer the length from `f`: `f` takes an
+`Array Data`, so there is nothing to infer from. A separate
+`Function.withLength` call: one more host call per function, and easy to
+forget.
+
+**Tests.** `test/node-js.test.mjs` and `test/edge-js.test.mjs` (op 210);
+`test/fixtures/js-interop` (`lengths: 0 1 2 3`, installed acceptance on
+Linux, macOS and Windows). Docs: docs/JS_BINDINGS.md, "Callbacks".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A5: the binding check warns about globals the build's target provides
+
+**Decision.** `lasm build`'s binding check still runs on Node. A
+`@[js "globalThis" "…"]` export that Node lacks fails a Node build as before,
+and is a warning when the build's target is another runtime (`--target deno`,
+`bun`, `workers`, `deno-deploy`, `vercel-edge`, `netlify-edge`,
+`supabase-edge`, `browser`):
+
+```lean
+@[js "globalThis" "Deno.serve"] opaque denoServe : Value → IO Value   -- builds for --target deno
+```
+
+```
+[lasm] Lasm.JS binding warning: Main.denoServe: globalThis export "Deno.serve" is missing where Lasm checks bindings; it must exist on deno
+```
+
+**Why.** A global belongs to the runtime the program targets: Deno's `Deno`,
+the browser's `document`. Checking it against Node is checking the wrong
+runtime. Other errors (an export that is not a function, a module that is not
+installed) stay errors on every target. Option (b) of Q5.
+
+**Alternatives.** (a) Warn on every target: hides a real mistake on Node.
+(c) Leave it: hand-written bindings of Deno, Bun, Workers or browser globals
+cannot build, which pushes programs to dynamic `global.get` chains. Running
+the check on the target runtime: Lasm does not install Deno or a browser to
+build.
+
+**Tests.** `test/application-binding-check.test.mjs`,
+`test/cli-dispatch.test.mjs`. Docs: docs/JS_BINDINGS.md, "Binding check".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A8, A47, A48, A49, A50: the core shapes confirmed
+
+**Decision.** Kept as they are (A8 is the three below, A47–A49):
+
+- **A47.** `get`/`set` take any `[ToJS κ]` key: `o.get "rows"`,
+  `o.get (2 : Nat)`, `o.get symbolValue`, as JavaScript's `o[key]` (#170,
+  0.6.1).
+- **A48.** A wait inside a synchronous callback (`ofSyncFn`) that needs the
+  JavaScript event loop fails at once with an error naming the wait (#122,
+  0.5.0). JavaScript's caller is blocked on the callback, so the promise
+  could never settle; serving other host calls meanwhile would run unrelated
+  JavaScript in the middle of the caller.
+- **A49.** `ofSyncFn` has no fire-and-forget `Async`: starting background
+  work is explicit (`Value.toTask`, a Lean task), so a synchronous callback
+  never silently drops a computation.
+- **A50.** `Lasm.JS.Wire.encode : Data → Except String ByteArray` (#154,
+  0.6.1): a value whose length does not fit the wire's u32 is an error, not a
+  wrapped length.
+
+```lean
+let tag ← (← global).get "Symbol" >>= (·.callMethod "for" #[toJS "lasm.tag"])
+box.set tag "tagged"                                 -- A47
+let f ← Function.ofSyncFn fun _ => do
+  let p ← lib.callMethod "later" #[]
+  p.await String                                     -- A48: fails at once, catchable
+```
+
+**Why.** Each is what JavaScript itself does (any property key; run to
+completion) or makes a failure explicit instead of silent. **Alternatives**
+are in REVIEW.md §1: String-only keys, waits that hang or deadlock, an
+implicit background `Async`. **Tests.** `test/fixtures/js-interop` (keys),
+`test/fixtures/js-sync-waits`, `test/lasm-js-framing.test.mjs`.
+
+**Where.** Shipped in 0.5.0 and 0.6.1. **Status:** pending sign-off.
