@@ -104,6 +104,7 @@ is converted with `FromJS`.
 | The default export | the package | `"default"` | `@[js "some-esm" "default"] opaque f : String → IO Data` |
 | A class (with `new`) | the package | `"new ClassName"` | `@[js "pg" "new Pool"] opaque newPool : Data → IO Value` |
 | A global function | `"globalThis"` | its name | `@[js "globalThis" "fetch"] opaque fetch : String → Data → IO Value` |
+| Your own JavaScript file | its path, from this Lean file | its name | `@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit` |
 
 Result types:
 
@@ -120,6 +121,38 @@ Result types:
 Arguments can be any type with `ToJS`, including `Data` and `Value`. Pass a JavaScript
 function (callback) as a `Value` created with `Function.ofFn` (see below).
 
+### Your own JavaScript files
+
+When the JavaScript you need is not an existing function (an expression such
+as `x instanceof Foo`, two calls made in one host call, a comparator), write
+it in an ES module file of your project and bind it with a path relative to
+the Lean file:
+
+```js
+// ffi/stream.mjs, next to Server.lean
+export function writeAndEnd(res, body) { res.writeHead(200); res.end(body); }
+```
+
+```lean
+-- Server.lean
+@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit
+```
+
+- The path starts with `./` or `../` and names an ES module ending in `.mjs`,
+  beside or below the Lean files' source root (the directory of a standalone
+  program's main file, or the Lake library's source directory).
+- `lasm build` ships the file, and every file it imports by a relative path
+  (`import { x } from './lib.mjs'`), with the program on every target: under
+  `host/project-modules/` for Node, `lasm/project-modules/` for the edge
+  targets, Bun and Deno, and `project-modules/` beside the browser loader. A
+  file it imports from npm (`import pg from 'pg'`) is resolved from the
+  project's `node_modules` on Node and the edge targets, and needs Vite
+  (`@lasm/cli/vite`) in the browser, as npm bindings do.
+- The same file named from two Lean files is one module instance.
+- The binding check loads the file as it loads npm modules, so a missing file
+  or export stops the build. Nothing is evaluated from strings at run time, so
+  project files work under Cloudflare Workers and a strict Content-Security-Policy.
+
 **Binding check.** `lasm build` loads each bound module from the project's
 `node_modules` and checks that the export exists and is a function. A broken
 binding stops the build:
@@ -132,6 +165,11 @@ Lasm.JS binding check failed:
 The check also warns when the Lean binding passes more arguments than the function
 declares. Passing fewer is normal: JavaScript functions often have optional
 trailing parameters.
+
+The check runs on Node. A global that Node lacks (`@[js "globalThis" "Deno.serve"]`,
+`@[js "globalThis" "document.title"]`) fails a Node build, and only warns when the
+build's target is another runtime (`--target deno`, `bun`, `workers`, `browser`,
+…), which brings its own globals.
 
 ## Values and dynamic calls
 
@@ -296,11 +334,22 @@ in `IO` took 8.7 s ([INTEROP_SOAK.md](INTEROP_SOAK.md#concurrent-waiting-handler
 ## Callbacks: Lean functions called by JavaScript
 
 ```lean
-Function.ofFn  (f : Array Data → Async Data) : IO Value      -- JavaScript gets a function returning a Promise
-Function.ofFnReply (f : Array Data → Async Function.Reply) : IO Value -- the reply may be a method call the host makes
-Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms
-Function.ofSyncFn (f : Array Data → IO Data) : IO Value      -- synchronous
-Function.ofSyncFn2 (f : α → β → IO γ)
+Function.ofFn  (f : Array Data → Async Data) (length := 0) : IO Value      -- JavaScript gets a function returning a Promise
+Function.ofFnReply (f : Array Data → Async Function.Reply) (length := 0) : IO Value -- the reply may be a method call the host makes
+Function.ofFn1 (f : α → Async β) / Function.ofFn2 (f : α → β → Async γ)   -- typed forms (length 1 and 2)
+Function.ofSyncFn (f : Array Data → IO Data) (length := 0) : IO Value      -- synchronous
+Function.ofSyncFn2 (f : α → β → IO γ)                                       -- length 2
+```
+
+`length` is the JavaScript function's `length`, the number of parameters it
+declares. Most callers ignore it; some read it. `Deno.serve` calls a handler
+of length 0 without its request, and Express treats a handler of length 4 as
+an error handler:
+
+```lean
+let onError ← Function.ofFn (length := 4) fun args => do   -- (err, req, res, next)
+  discard <| (← decodeAs Value "res" args[2]!).callMethod "status" #[toJS 500]
+  return .undefined
 ```
 
 - **Asynchronous (`ofFn`), the default for handlers.** Each call is queued to the
@@ -365,6 +414,45 @@ let _ ← app.callMethod "use" #[toJS handler]
 
 A server's `main` must not return while JavaScript serves requests: end it with
 `Lasm.JS.waitForever`.
+
+## JavaScript classes: `Lasm.JS.Class.define`
+
+Some APIs take a class, not a function: `customElements.define`, subclasses
+of `Error`, `EventTarget` or Node's streams, frameworks that call `new` on
+what you pass. `Lasm.JS.Class.define` (`import Lasm.JS.Class`) makes a real
+`class Name extends Base` from Lean, without `eval`, so it works on every
+JavaScript target:
+
+```lean
+import Lasm.JS.Class
+open Lasm.JS
+
+def errorClass : IO Value := do (← global).get "Error"   -- the class itself; a binding would call it
+
+def notFound : IO Value := do
+  Class.define {
+    name := "NotFound"
+    extends? := some (← errorClass)                    -- super(...args) runs first
+    constructor := some fun self _ => self.set "status" (404 : Nat)
+    methods := #[("describe", .sync fun self _ => do
+      return toJS s!"{← self.get "message" String} ({← self.get "status" Nat})")]
+    getters := #[("retryable", fun _ => return .bool false)] }
+-- In JavaScript: const e = new NotFound("no such page"); e instanceof Error; e.describe()
+```
+
+- Each constructor, method and getter is a Lean function of the instance
+  (`self`, JavaScript's `this`) and the call's arguments.
+- `.sync` methods and getters follow `Function.ofSyncFn`'s rules (JavaScript
+  waits for them, and they cannot wait for JavaScript); `.async` methods
+  return a promise and follow `Function.ofFn`'s. Choose per method: a DOM
+  lifecycle callback or a method whose result is used at once is `.sync`.
+- `statics` sets properties of the class itself (`observedAttributes`).
+- Each call of a method is a JavaScript → Lean call (about 20 µs on Node).
+  Per-instance state lives on the instance (`self.set`), or in Lean keyed by
+  a field.
+- Classes a platform finds by export name (Cloudflare Durable Objects,
+  Workers RPC entrypoints) must exist when the module loads, before Lean
+  runs: `define` cannot make those.
 
 ## Errors
 
@@ -1072,7 +1160,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
 | a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |
 | a `this` parameter | left out | — |
-| a callback's parameters | its arity is the JavaScript function's `length` (Lasm.JS's own functions have length 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
+| a callback's parameters | its arity is the JavaScript function's `length` (`Function.ofFn`'s default is 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
 | `Response \| Promise<Response>`, `MaybePromise<Response>` | `Promise<Response>` | the handler is `Async`; it returns a promise |
 | `void` beside a value in a callback's result (Bun's `error`) | left out | return a `Response` |
 | `string`, `boolean`, `number`, `void`, `unknown` | `DOMString`, `boolean`, `double`, `undefined`, `any` | `String`, `Bool`, `Float`, `Unit`, `Data` |
@@ -1087,8 +1175,8 @@ fails on one that is neither, so a new version's additions get a decision.
 
 The generated functions look the runtime's global up when called, so a program
 that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
-hand-written `@[js "globalThis" "Deno.serve"]` binding would not: `lasm build`
-checks every `@[js]` export on Node, where `Deno` does not exist.
+hand-written `@[js "globalThis" "Deno.serve"]` binding builds for `--target deno`
+(the binding check, which runs on Node, only warns there) but not for Node.
 
 The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
@@ -1577,11 +1665,6 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   (`LEAN_NUM_THREADS` raises it at about 9 MB per worker). Waiting in `Async`
   (handlers, `Async` bindings) holds no thread. CPU-bound Lean work in handlers
   still runs on those workers.
-- **Function length.** A JavaScript function made by `Function.ofFn` reports
-  `length` 0. APIs that inspect it do not recognize it: Express treats only
-  four-parameter middleware as an error handler, so write Express error handlers
-  in JavaScript or catch errors inside the Lean handler. An uncaught Lean error
-  rejects the handler's promise, which Express 5 and Hono answer with 500.
 - **Diagnostics.** `Lasm.JS.stats` returns a JSON string with the live counts:
   `values` (JavaScript values Lean holds), `pendingCalls` (JavaScript calls of
   Lean functions awaiting their reply), `functionsLive` (Lean functions that

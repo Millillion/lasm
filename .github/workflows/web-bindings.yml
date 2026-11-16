@@ -31,6 +31,8 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, L
 #     serves it with local emulation only (workerd; Miniflare's KV, D1, R2,
 #     Durable Objects and Queues; a cron trigger; a TCP echo server of the
 #     runner). No Cloudflare account is used.
+#   - conformance also builds test/fixtures/js-core, Lasm.JS's own features (the
+#     project's JavaScript files, @[js "./ffi/x.mjs" …]), for every target.
 on:
   pull_request:
     branches: [main]
@@ -46,11 +48,16 @@ on:
       - 'test/fixtures/js-serve-size/**'
       - 'test/fixtures/js-cloudflare/**'
       - 'test/fixtures/js-cloudflare-size/**'
+      - 'test/fixtures/js-core/**'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
       - 'docs/API_DECISIONS.md'
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
+      - 'src/project-modules.mjs'
+      - 'src/browser/**'
+      - 'src/application-build.mjs'
+      - 'src/application-binding-check.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - 'package.json'
@@ -71,6 +78,11 @@ on:
       - 'test/fixtures/js-cloudflare-size/**'
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
+      - 'test/fixtures/js-core/**'
+      - 'src/project-modules.mjs'
+      - 'src/browser/**'
+      - 'src/application-build.mjs'
+      - 'src/application-binding-check.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - '.github/workflows/web-bindings.yml'
@@ -197,6 +209,14 @@ jobs:
             --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
             --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
             --report "$RUNNER_TEMP/js-web/report.json" --sizes
+      - name: Build and run Lasm.JS's core conformance program (project files) on every target
+        if: success() || failure()
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-core --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-core" \
+            --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
+            --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
+            --report "$RUNNER_TEMP/js-core/report.json"
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

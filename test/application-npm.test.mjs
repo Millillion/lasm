@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, symlinkSync, statSync, renameSync } from 'node:fs';
 import { join, sep } from 'node:path';
 import { tmpdir } from 'node:os';
-import { planNodeModules, copyNodeModules, copyNodeModulesAsync } from '../src/application-npm.mjs';
+import { planNodeModules, copyNodeModules, copyNodeModulesAsync, readPackageJson } from '../src/application-npm.mjs';
+import { createHash } from 'node:crypto';
 
 function pkg(root, path, manifest, files = { 'index.js': 'module.exports = 1;' }) {
   const directory = join(root, path);
@@ -139,4 +140,31 @@ test('a linked package\'s own dependencies must be the project\'s too; nested no
   writeFileSync(join(second, 'package.json'), JSON.stringify({ dependencies: { a: '1' } }));
   pkg(second, 'node_modules/a', { name: 'a', version: '1.0.0' }, { 'index.js': '', 'lib/node_modules/vendored.js': 'kept' });
   assert.ok(planNodeModules(second).files.some(file => file.path.split(sep).join('/') === 'node_modules/a/lib/node_modules/vendored.js'));
+});
+
+test('readPackageJson: a JSON object, or an error naming the file', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-npm-'));
+  const file = join(root, 'package.json');
+  writeFileSync(file, '{"name":"x"}');
+  assert.deepEqual(readPackageJson(file), { name: 'x' });
+  for (const text of ['[]', 'null', '"text"', '1', 'true'])  {
+    writeFileSync(file, text);
+    assert.throws(() => readPackageJson(file), { message: `Cannot read ${file}: it must hold a JSON object` }, text);
+  }
+});
+
+test('the closure\'s identity: every file\'s deployed path and bytes, packages and files in name order', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-npm-'));
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ dependencies: { zeta: '1', alpha: '1' } }));
+  // Files created out of order, so the identity cannot rely on the directory's own order.
+  pkg(root, 'node_modules/zeta', { name: 'zeta', version: '1.0.0' }, { 'z.js': 'z', 'b/inner.js': 'bi', 'a.js': 'a' });
+  pkg(root, 'node_modules/alpha', { name: 'alpha', version: '2.0.0' }, { 'y.js': 'y', 'c.js': 'c' });
+  const plan = planNodeModules(root);
+  const hash = createHash('sha256').update('lasm-node-modules-1\0');
+  const order = [['node_modules/alpha/c.js', 'c'], ['node_modules/alpha/package.json', JSON.stringify({ name: 'alpha', version: '2.0.0' })],
+    ['node_modules/alpha/y.js', 'y'], ['node_modules/zeta/a.js', 'a'], ['node_modules/zeta/b/inner.js', 'bi'],
+    ['node_modules/zeta/package.json', JSON.stringify({ name: 'zeta', version: '1.0.0' })], ['node_modules/zeta/z.js', 'z']];
+  for (const [path, text] of order) hash.update(path).update('\0').update(text).update('\0');
+  assert.equal(plan.identity, hash.digest('hex'));
+  assert.deepEqual(plan.files.map(f => f.path.split(sep).join('/')), order.map(([path]) => path));
 });
