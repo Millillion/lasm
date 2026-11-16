@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.Url
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Bun.Server` (Bun 1.4.4 type declarations, serve.d.ts): a handle to the JavaScript object. -/
 structure Server where
@@ -23,37 +26,39 @@ instance : ToJS Server := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Server", .data⟩
 
 /-- `enum SocketAddressFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketAddressFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketAddressFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketAddressFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketAddressFamily.iPv4 : SocketAddressFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketAddressFamily.iPv6 : SocketAddressFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketAddressFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketAddressFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketAddressFamily"
 
 /-- `enum ServerProtocol` (Bun 1.4.4 type declarations): "http", "https". -/
-inductive ServerProtocol where
-  /-- "http" -/
-  | http
-  /-- "https" -/
-  | https
+structure ServerProtocol where
+  /-- A value from its string, unchecked: the generated values (`.http`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ServerProtocol := ⟨fun
-  | .http => .string "http"
-  | .https => .string "https"⟩
+/-- "http" -/
+@[match_pattern] abbrev ServerProtocol.http : ServerProtocol := .unsafeOfString "http"
+/-- "https" -/
+@[match_pattern] abbrev ServerProtocol.https : ServerProtocol := .unsafeOfString "https"
+instance : ToJS ServerProtocol := ⟨fun x => .string x.val⟩
 instance : FromJS ServerProtocol where
   fromJS
-    | .string "http" => .ok .http
-    | .string "https" => .ok .https
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ServerProtocol"
 
 /-- `callback ServeOptionsError = Promise<Response> (any error)` (Bun 1.4.4 type declarations, serve.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -65,13 +70,13 @@ instance : ToJS ServeOptionsError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsError.ofFn (f : Data → Async Response) : IO ServeOptionsError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -97,13 +102,13 @@ instance : ToJS ServeOptionsFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsFetch.ofFn (f : Request → Server → Async Response) : IO ServeOptionsFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg Server args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsFetch.ofSyncFn (f : Request → Server → IO Response) : IO ServeOptionsFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg Server args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -128,14 +133,14 @@ structure ServeOptions where
   idleTimeout : Option Nat := none
   /-- `required ServeOptionsFetch fetch` -/
   fetch : ServeOptionsFetch
-instance : ToJS ServeOptions := ⟨fun d => Support.fields #[("maxRequestBodySize", Support.optional d.maxRequestBodySize),
-    ("error", Support.optional d.error),
-    ("id", Support.optional d.id),
-    ("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("reusePort", Support.optional d.reusePort),
-    ("ipv6Only", Support.optional d.ipv6Only),
-    ("idleTimeout", Support.optional d.idleTimeout),
+instance : ToJS ServeOptions := ⟨fun d => Internal.fields #[("maxRequestBodySize", Internal.optional d.maxRequestBodySize),
+    ("error", Internal.optional d.error),
+    ("id", Internal.optional d.id),
+    ("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("reusePort", Internal.optional d.reusePort),
+    ("ipv6Only", Internal.optional d.ipv6Only),
+    ("idleTimeout", Internal.optional d.idleTimeout),
     ("fetch", toJS d.fetch)]⟩
 
 /-- `(Request or DOMString)`: one constructor per member type. -/
@@ -166,66 +171,72 @@ instance : FromJS SocketAddress where
   typeName := "Lasm.JS.Bun.SocketAddress"
 
 /-- `readonly pendingRequests: number`: `readonly attribute unsigned long pendingRequests` -/
-def Server.pendingRequests (self : Server) : IO Nat := self.val.get "pendingRequests" Nat
+@[macro_inline] def Server.pendingRequests (self : Server) : IO Nat := Internal.api "Lasm.JS.Bun.Server.pendingRequests" do
+  self.val.get "pendingRequests" Nat
 
 /-- `readonly url: URL`: `readonly attribute URL url` -/
-def Server.url (self : Server) : IO URL := do
+@[macro_inline] def Server.url (self : Server) : IO URL := Internal.api "Lasm.JS.Bun.Server.url" do
   let r ← self.val.get "url" Value
   pure { val := r }
 
 /-- `readonly port: number | undefined`: `readonly attribute unsigned short? port` -/
-def Server.port (self : Server) : IO (Option Nat) := self.val.get "port" (Option Nat)
+@[macro_inline] def Server.port (self : Server) : IO (Option Nat) := Internal.api "Lasm.JS.Bun.Server.port" do
+  self.val.get "port" (Option Nat)
 
 /-- `readonly hostname: string | undefined`: `readonly attribute DOMString? hostname` -/
-def Server.hostname (self : Server) : IO (Option String) := self.val.get "hostname" (Option String)
+@[macro_inline] def Server.hostname (self : Server) : IO (Option String) := Internal.api "Lasm.JS.Bun.Server.hostname" do
+  self.val.get "hostname" (Option String)
 
 /-- `readonly protocol: 'http' | 'https' | null`: `readonly attribute ServerProtocol? protocol` -/
-def Server.protocol (self : Server) : IO (Option ServerProtocol) := self.val.get "protocol" (Option ServerProtocol)
+@[macro_inline] def Server.protocol (self : Server) : IO (Option ServerProtocol) := Internal.api "Lasm.JS.Bun.Server.protocol" do
+  self.val.get "protocol" (Option ServerProtocol)
 
 /-- `readonly development: boolean`: `readonly attribute boolean development` -/
-def Server.development (self : Server) : IO Bool := self.val.get "development" Bool
+@[macro_inline] def Server.development (self : Server) : IO Bool := Internal.api "Lasm.JS.Bun.Server.development" do
+  self.val.get "development" Bool
 
 /-- `readonly id: string`: `readonly attribute DOMString id` -/
-def Server.id (self : Server) : IO String := self.val.get "id" String
+@[macro_inline] def Server.id (self : Server) : IO String := Internal.api "Lasm.JS.Bun.Server.id" do
+  self.val.get "id" String
 
 /-- `stop(closeActiveConnections?: boolean): Promise<void>`: `Promise<undefined> stop(optional boolean closeActiveConnections)` -/
-def Server.stop (self : Server) (closeActiveConnections : Option Bool := none) : Async Unit :=
-  self.val.callMethodAwait "stop" (Support.args #[Support.optional closeActiveConnections]) Unit
+@[macro_inline] def Server.stop (self : Server) (closeActiveConnections : Option Bool := none) : Async Unit := Internal.api "Lasm.JS.Bun.Server.stop" do
+  self.val.callMethodAwait "stop" (Internal.args #[Internal.optional closeActiveConnections]) Unit
 
 /-- `closeIdleConnections(): number`: `unsigned long closeIdleConnections()` -/
-def Server.closeIdleConnections (self : Server) : IO Nat :=
-  self.val.callMethod "closeIdleConnections" (Support.args #[]) Nat
+@[macro_inline] def Server.closeIdleConnections (self : Server) : IO Nat := Internal.api "Lasm.JS.Bun.Server.closeIdleConnections" do
+  self.val.callMethod "closeIdleConnections" (Internal.args #[]) Nat
 
 /-- `reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `Server reload(ServeOptions options)` -/
-def Server.reload (self : Server) (options : ServeOptions) : IO Server := do
-  let r ← self.val.callMethod "reload" (Support.args #[toJS options]) Value
+@[macro_inline] def Server.reload (self : Server) (options : ServeOptions) : IO Server := Internal.api "Lasm.JS.Bun.Server.reload" do
+  let r ← self.val.callMethod "reload" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `fetch(request: Request | string): Response | Promise<Response>`: `Promise<Response> fetch((Request or DOMString) request)` -/
-def Server.fetch (self : Server) (request : RequestOrDOMString) : Async Response := do
-  let r ← self.val.callMethodAwait "fetch" (Support.args #[toJS request]) Value
+@[macro_inline] def Server.fetch (self : Server) (request : RequestOrDOMString) : Async Response := Internal.api "Lasm.JS.Bun.Server.fetch" do
+  let r ← self.val.callMethodAwait "fetch" (Internal.args #[toJS request]) Value
   pure { val := r }
 
 /-- `requestIP(request: Request): SocketAddress | null`: `SocketAddress? requestIP(Request request)` -/
-def Server.requestIP (self : Server) (request : Request) : IO (Option SocketAddress) :=
-  self.val.callMethod "requestIP" (Support.args #[toJS request]) (Option SocketAddress)
+@[macro_inline] def Server.requestIP (self : Server) (request : Request) : IO (Option SocketAddress) := Internal.api "Lasm.JS.Bun.Server.requestIP" do
+  self.val.callMethod "requestIP" (Internal.args #[toJS request]) (Option SocketAddress)
 
 /-- `timeout(request: Request, seconds: number): void`: `undefined timeout(Request request, unsigned long seconds)` -/
-def Server.timeout (self : Server) (request : Request) (seconds : Nat) : IO Unit :=
-  self.val.callMethod "timeout" (Support.args #[toJS request, toJS seconds]) Unit
+@[macro_inline] def Server.timeout (self : Server) (request : Request) (seconds : Nat) : IO Unit := Internal.api "Lasm.JS.Bun.Server.timeout" do
+  self.val.callMethod "timeout" (Internal.args #[toJS request, toJS seconds]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def Server.ref (self : Server) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Server.ref (self : Server) : IO Unit := Internal.api "Lasm.JS.Bun.Server.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def Server.unref (self : Server) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Server.unref (self : Server) : IO Unit := Internal.api "Lasm.JS.Bun.Server.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `Bun.serve(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `Server serve(ServeOptions options)` (Bun 1.4.4 type declarations) -/
-def serve (options : ServeOptions) : IO Server := do
+@[macro_inline] def serve (options : ServeOptions) : IO Server := Internal.api "Lasm.JS.Bun.serve" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.serve", module := "globalThis", path := "Bun.serve", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Bun

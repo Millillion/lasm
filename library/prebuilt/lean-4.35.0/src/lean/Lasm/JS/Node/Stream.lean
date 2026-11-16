@@ -8,11 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class stream.Readable` of `node:stream` (Node.js 24.22.2 documentation, stream.md): a handle to the JavaScript object. -/
 structure stream.Readable where
@@ -40,10 +44,10 @@ structure stream.Readable.FromWebOptions where
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS stream.Readable.FromWebOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("objectMode", Support.optional d.objectMode),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS stream.Readable.FromWebOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("objectMode", Internal.optional d.objectMode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.ToWebOptionsStrategy` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptionsStrategy where
@@ -51,8 +55,8 @@ structure stream.Readable.ToWebOptionsStrategy where
   highWaterMark : Option Nat := none
   /-- `Function size` -/
   size : Option JSFunction := none
-instance : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
-    ("size", Support.optional d.size)]⟩
+instance : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark),
+    ("size", Internal.optional d.size)]⟩
 
 /-- `dictionary stream.Readable.ToWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptions where
@@ -60,8 +64,8 @@ structure stream.Readable.ToWebOptions where
   strategy : Option stream.Readable.ToWebOptionsStrategy := none
   /-- `DOMString type` -/
   type : Option String := none
-instance : ToJS stream.Readable.ToWebOptions := ⟨fun d => Support.fields #[("strategy", Support.optional d.strategy),
-    ("type", Support.optional d.type)]⟩
+instance : ToJS stream.Readable.ToWebOptions := ⟨fun d => Internal.fields #[("strategy", Internal.optional d.strategy),
+    ("type", Internal.optional d.type)]⟩
 
 /-- `dictionary stream.Writable.FromWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Writable.FromWebOptions where
@@ -73,41 +77,41 @@ structure stream.Writable.FromWebOptions where
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS stream.Writable.FromWebOptions := ⟨fun d => Support.fields #[("decodeStrings", Support.optional d.decodeStrings),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("objectMode", Support.optional d.objectMode),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS stream.Writable.FromWebOptions := ⟨fun d => Internal.fields #[("decodeStrings", Internal.optional d.decodeStrings),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("objectMode", Internal.optional d.objectMode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
-def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.stream.Readable.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Readable"] Value) (fun x => { val := x }) v
 
 /-- `stream.Readable.fromWeb(readableStream[, options])` (added in Node.js v17.0.0): `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
-def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := do
+@[macro_inline] def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.fromWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.fromWeb", module := "node:stream", path := "Readable.fromWeb", construct := false, arity := 2 }
-    (Support.args #[toJS readableStream, Support.optional options]) (await := false)
+    (Internal.args #[toJS readableStream, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `stream.Readable.toWeb(streamReadable[, options])` (added in Node.js v17.0.0): `static ReadableStream toWeb(stream.Readable streamReadable, optional stream.Readable.ToWebOptions options)` -/
-def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option stream.Readable.ToWebOptions := none) : IO ReadableStream := do
+@[macro_inline] def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option stream.Readable.ToWebOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Node.stream.Readable.toWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.toWeb", module := "node:stream", path := "Readable.toWeb", construct := false, arity := 2 }
-    (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
+    (Internal.args #[toJS streamReadable, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
-def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := Internal.api "Lasm.JS.Node.stream.Writable.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Writable"] Value) (fun x => { val := x }) v
 
 /-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
-def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := do
+@[macro_inline] def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.fromWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.fromWeb", module := "node:stream", path := "Writable.fromWeb", construct := false, arity := 2 }
-    (Support.args #[toJS writableStream, Support.optional options]) (await := false)
+    (Internal.args #[toJS writableStream, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `stream.Writable.toWeb(streamWritable)` (added in Node.js v17.0.0): `static WritableStream toWeb(stream.Writable streamWritable)` -/
-def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream := do
+@[macro_inline] def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream := Internal.api "Lasm.JS.Node.stream.Writable.toWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.toWeb", module := "node:stream", path := "Writable.toWeb", construct := false, arity := 1 }
-    (Support.args #[toJS streamWritable]) (await := false)
+    (Internal.args #[toJS streamWritable]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

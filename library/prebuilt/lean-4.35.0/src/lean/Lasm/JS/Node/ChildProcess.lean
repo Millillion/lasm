@@ -8,7 +8,8 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.MediacaptureStreams
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
@@ -16,6 +17,9 @@ import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class ChildProcess extends EventEmitter` of `node:child_process` (Node.js 24.22.2 documentation, child_process.md): a handle to the JavaScript object. -/
 structure ChildProcess extends EventEmitter
@@ -35,18 +39,6 @@ instance : ToJS DoubleOrDOMString := ⟨fun
   | .domString v => toJS v⟩
 instance : Coe Float DoubleOrDOMString := ⟨.double⟩
 instance : Coe String DoubleOrDOMString := ⟨.domString⟩
-
-/-- `(boolean or DOMString)`: one constructor per member type. -/
-inductive BooleanOrDOMString where
-  /-- `boolean` -/
-  | boolean (value : Bool)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS BooleanOrDOMString := ⟨fun
-  | .boolean v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe Bool BooleanOrDOMString := ⟨.boolean⟩
-instance : Coe String BooleanOrDOMString := ⟨.domString⟩
 
 /-- `dictionary child_process.ExecFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileOptions where
@@ -74,18 +66,18 @@ structure child_process.ExecFileOptions where
   shell : Option BooleanOrDOMString := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS child_process.ExecFileOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("env", Support.optional d.env),
-    ("encoding", Support.optional d.encoding),
-    ("timeout", Support.optional d.timeout),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("killSignal", Support.optional d.killSignal),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("shell", Support.optional d.shell),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS child_process.ExecFileOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("env", Internal.optional d.env),
+    ("encoding", Internal.optional d.encoding),
+    ("timeout", Internal.optional d.timeout),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("killSignal", Internal.optional d.killSignal),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("shell", Internal.optional d.shell),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary child_process.ExecFileResult` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileResult where
@@ -141,58 +133,65 @@ structure child_process.SpawnOptions where
   timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-instance : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("env", Support.optional d.env),
-    ("argv0", Support.optional d.argv0),
-    ("stdio", Support.optional d.stdio),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("serialization", Support.optional d.serialization),
-    ("shell", Support.optional d.shell),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal)]⟩
+instance : ToJS child_process.SpawnOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("env", Internal.optional d.env),
+    ("argv0", Internal.optional d.argv0),
+    ("stdio", Internal.optional d.stdio),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("serialization", Internal.optional d.serialization),
+    ("shell", Internal.optional d.shell),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal)]⟩
 
 /-- `v instanceof ChildProcess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildProcess`). -/
-def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v) then some { val := v } else none
+@[macro_inline] def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := Internal.api "Lasm.JS.Node.ChildProcess.cast?" do
+  Internal.cast (Support.getExport "node:child_process" ["ChildProcess"] Value) (fun x => { val := x }) v
 
 /-- `subprocess.exitCode`: `readonly attribute long long? exitCode` -/
-def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := self.val.get "exitCode" (Option Int)
+@[macro_inline] def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := Internal.api "Lasm.JS.Node.ChildProcess.exitCode" do
+  self.val.get "exitCode" (Option Int)
 
 /-- `subprocess.killed` (added in Node.js v0.5.10): `readonly attribute boolean killed` -/
-def ChildProcess.killed (self : ChildProcess) : IO Bool := self.val.get "killed" Bool
+@[macro_inline] def ChildProcess.killed (self : ChildProcess) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.killed" do
+  self.val.get "killed" Bool
 
 /-- `subprocess.pid` (added in Node.js v0.1.90): `readonly attribute long long? pid` -/
-def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := self.val.get "pid" (Option Int)
+@[macro_inline] def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := Internal.api "Lasm.JS.Node.ChildProcess.pid" do
+  self.val.get "pid" (Option Int)
 
 /-- `subprocess.signalCode`: `readonly attribute DOMString? signalCode` -/
-def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := self.val.get "signalCode" (Option String)
+@[macro_inline] def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := Internal.api "Lasm.JS.Node.ChildProcess.signalCode" do
+  self.val.get "signalCode" (Option String)
 
 /-- `subprocess.stderr` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stderr` -/
-def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stderr" (Option stream.Readable)
+@[macro_inline] def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.ChildProcess.stderr" do
+  self.val.get "stderr" (Option stream.Readable)
 
 /-- `subprocess.stdin` (added in Node.js v0.1.90): `readonly attribute stream.Writable? stdin` -/
-def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := self.val.get "stdin" (Option stream.Writable)
+@[macro_inline] def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := Internal.api "Lasm.JS.Node.ChildProcess.stdin" do
+  self.val.get "stdin" (Option stream.Writable)
 
 /-- `subprocess.stdout` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stdout` -/
-def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stdout" (Option stream.Readable)
+@[macro_inline] def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.ChildProcess.stdout" do
+  self.val.get "stdout" (Option stream.Readable)
 
 /-- `subprocess.kill([signal])` (added in Node.js v0.1.90): `boolean kill(optional (double or DOMString) signal)` -/
-def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool :=
-  self.val.callMethod "kill" (Support.args #[Support.optional signal]) Bool
+@[macro_inline] def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional signal]) Bool
 
 /-- `child_process.execFile(file[, args][, options][, callback])` (added in Node.js v0.1.91): `Promise<child_process.ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult :=
-  Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Support.args #[toJS file, Support.optional args, Support.optional options])
+@[macro_inline] def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult := Internal.api "Lasm.JS.Node.child_process.execFile" do
+  Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Internal.args #[toJS file, Internal.optional args, Internal.optional options])
 
 /-- `child_process.spawn(command[, args][, options])` (added in Node.js v0.1.90): `ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := do
+@[macro_inline] def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Node.child_process.spawn" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.spawn", module := "node:child_process", path := "spawn", construct := false, arity := 3 }
-    (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional args, Internal.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node
