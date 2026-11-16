@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { pathToFileURL } from 'node:url';
 
-export const usage = 'Usage: npm create @lasm@latest <directory> -- [--template plain|express|hono|std-http] [--deploy lambda]';
+export const usage = 'Usage: npm create @lasm@latest <directory> -- [--template NAME] [--deploy TARGET]…\nnpx @lasm/cli init --help lists the templates and deploy targets.';
 
 /** Whether `lasm init` gets a directory (or --help) from these arguments, as lasm init parses them. */
 export function hasDirectory(args) {
@@ -34,7 +34,7 @@ export function locateCli(from = import.meta.url) {
 
 async function templateNames(cli) {
   try { return Object.keys((await import(pathToFileURL(join(cli.directory, 'src/init.mjs')).href)).templates); }
-  catch { return ['plain', 'express', 'hono', 'std-http']; }
+  catch { return ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack']; }
 }
 
 /** Ask for the directory (and the template unless one was given) on an interactive terminal. */
