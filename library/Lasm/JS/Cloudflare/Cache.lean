@@ -51,6 +51,10 @@ structure CacheQueryOptions where
   /-- `boolean ignoreMethod` -/
   ignoreMethod : Option Bool := none
 instance : ToJS CacheQueryOptions := ⟨fun d => Support.fields #[("ignoreMethod", Support.optional d.ignoreMethod)]⟩
+instance : FromJS CacheQueryOptions where
+  fromJS d := do return {
+    ignoreMethod := ← Lasm.JS.readField (Option Bool) d "ignoreMethod" }
+  typeName := "Lasm.JS.Cloudflare.CacheQueryOptions"
 
 /-- `readonly default: Cache`: `readonly attribute Cache default` -/
 def CacheStorage.default (self : CacheStorage) : IO Cache := do

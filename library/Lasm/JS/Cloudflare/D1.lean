@@ -40,6 +40,7 @@ instance : FromJS D1PreparedStatement := ⟨fun | .ref v _ => .ok { val := v } |
 structure D1MetaTimings where
   /-- `required double sql_duration_ms` -/
   sql_duration_ms : Float
+instance : ToJS D1MetaTimings := ⟨fun d => Support.fields #[("sql_duration_ms", toJS d.sql_duration_ms)]⟩
 instance : FromJS D1MetaTimings where
   fromJS d := do return {
     sql_duration_ms := ← Lasm.JS.readField Float d "sql_duration_ms" }
@@ -71,6 +72,18 @@ structure D1Meta where
   timings : Option D1MetaTimings := none
   /-- `double total_attempts` -/
   total_attempts : Option Float := none
+instance : ToJS D1Meta := ⟨fun d => Support.fields #[("duration", toJS d.duration),
+    ("size_after", toJS d.size_after),
+    ("rows_read", toJS d.rows_read),
+    ("rows_written", toJS d.rows_written),
+    ("last_row_id", toJS d.last_row_id),
+    ("changed_db", toJS d.changed_db),
+    ("changes", toJS d.changes),
+    ("served_by_region", Support.optional d.served_by_region),
+    ("served_by_colo", Support.optional d.served_by_colo),
+    ("served_by_primary", Support.optional d.served_by_primary),
+    ("timings", Support.optional d.timings),
+    ("total_attempts", Support.optional d.total_attempts)]⟩
 instance : FromJS D1Meta where
   fromJS d := do return {
     duration := ← Lasm.JS.readField Float d "duration",
@@ -95,6 +108,9 @@ structure D1Result where
   «meta» : D1Meta
   /-- `required sequence<any> results` -/
   results : Array Data
+instance : ToJS D1Result := ⟨fun d => Support.fields #[("success", toJS d.success),
+    ("meta", toJS d.«meta»),
+    ("results", toJS d.results)]⟩
 instance : FromJS D1Result where
   fromJS d := do return {
     success := ← Lasm.JS.readField Bool d "success",
@@ -108,6 +124,8 @@ structure D1ExecResult where
   count : Float
   /-- `required double duration` -/
   duration : Float
+instance : ToJS D1ExecResult := ⟨fun d => Support.fields #[("count", toJS d.count),
+    ("duration", toJS d.duration)]⟩
 instance : FromJS D1ExecResult where
   fromJS d := do return {
     count := ← Lasm.JS.readField Float d "count",
@@ -119,6 +137,10 @@ structure D1PreparedStatementRawOptions where
   /-- `required boolean columnNames` -/
   columnNames : Bool
 instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Support.fields #[("columnNames", toJS d.columnNames)]⟩
+instance : FromJS D1PreparedStatementRawOptions where
+  fromJS d := do return {
+    columnNames := ← Lasm.JS.readField Bool d "columnNames" }
+  typeName := "Lasm.JS.Cloudflare.D1PreparedStatementRawOptions"
 
 /-- `prepare(query: string): D1PreparedStatement`: `D1PreparedStatement prepare(DOMString query)` -/
 def D1Database.prepare (self : D1Database) (query : String) : IO D1PreparedStatement := do

@@ -65,6 +65,12 @@ structure Doctype where
 instance : ToJS Doctype := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("publicId", toJS d.publicId),
     ("systemId", toJS d.systemId)]⟩
+instance : FromJS Doctype where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField (Option String) d "name",
+    publicId := ← Lasm.JS.readField (Option String) d "publicId",
+    systemId := ← Lasm.JS.readField (Option String) d "systemId" }
+  typeName := "Lasm.JS.Cloudflare.Doctype"
 
 /-- `typedef DOMString or ReadableStream or Response DOMStringOrReadableStreamOrResponse`: one constructor per member type. -/
 inductive DOMStringOrReadableStreamOrResponse where
@@ -87,12 +93,20 @@ structure ContentOptions where
   /-- `boolean html` -/
   html : Option Bool := none
 instance : ToJS ContentOptions := ⟨fun d => Support.fields #[("html", Support.optional d.html)]⟩
+instance : FromJS ContentOptions where
+  fromJS d := do return {
+    html := ← Lasm.JS.readField (Option Bool) d "html" }
+  typeName := "Lasm.JS.Cloudflare.ContentOptions"
 
 /-- `dictionary TextOptionsFont` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextOptionsFont where
   /-- `required DOMString url` -/
   url : String
 instance : ToJS TextOptionsFont := ⟨fun d => Support.fields #[("url", toJS d.url)]⟩
+instance : FromJS TextOptionsFont where
+  fromJS d := do return {
+    url := ← Lasm.JS.readField String d "url" }
+  typeName := "Lasm.JS.Cloudflare.TextOptionsFont"
 
 /-- `dictionary TextOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextOptions where
@@ -105,6 +119,12 @@ structure TextOptions where
 instance : ToJS TextOptions := ⟨fun d => Support.fields #[("font", toJS d.font),
     ("size", Support.optional d.size),
     ("color", Support.optional d.color)]⟩
+instance : FromJS TextOptions where
+  fromJS d := do return {
+    font := ← Lasm.JS.readField TextOptionsFont d "font",
+    size := ← Lasm.JS.readField (Option Float) d "size",
+    color := ← Lasm.JS.readField (Option String) d "color" }
+  typeName := "Lasm.JS.Cloudflare.TextOptions"
 
 /-- `dictionary TextRasterize` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextRasterize where
@@ -114,6 +134,11 @@ structure TextRasterize where
   options : TextOptions
 instance : ToJS TextRasterize := ⟨fun d => Support.fields #[("content", toJS d.content),
     ("options", toJS d.options)]⟩
+instance : FromJS TextRasterize where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField String d "content",
+    options := ← Lasm.JS.readField TextOptions d "options" }
+  typeName := "Lasm.JS.Cloudflare.TextRasterize"
 
 /-- `constructor()`: `constructor()` -/
 def HTMLRewriter.new : IO HTMLRewriter :=

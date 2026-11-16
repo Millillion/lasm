@@ -156,6 +156,7 @@
 //   - RequestInitCfPropertiesVaryHeaders[header: string]: an index signature: the named members are generated; other keys are read and written through Data
 //   - RequestInitCfPropertiesImage."origin-auth": its key is not an identifier: read it through Data (Lasm.JS.Value.get)
 //   - IncomingRequestCfPropertiesBotManagement.clientTrustScore: @deprecated in its declaration
+//   - IncomingRequestCfPropertiesBotManagementEnterprise.clientTrustScore: @deprecated in its declaration
 //   - EmailEvent.returnValue: @deprecated in its declaration
 //   - EmailEvent.srcElement: @deprecated in its declaration
 //   - EmailEvent.cancelBubble(null): @deprecated in its declaration
@@ -1993,9 +1994,9 @@ interface Cloudflare_SqlStorage {
   // get databaseSize(): number
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get databaseSize(): number"] readonly attribute double databaseSize;
   // Cursor: typeof SqlStorageCursor
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Cursor: typeof SqlStorageCursor"] readonly attribute any Cursor;
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Cursor: typeof SqlStorageCursor", LasmLeanName="CursorClass"] readonly attribute any Cursor;
   // Statement: typeof SqlStorageStatement
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Statement: typeof SqlStorageStatement"] readonly attribute any Statement;
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Statement: typeof SqlStorageStatement", LasmLeanName="StatementClass"] readonly attribute any Statement;
 };
 
 // interface SqlStorageStatement
@@ -2189,14 +2190,26 @@ dictionary Cloudflare_ContainerStartResources {
 
 // options LoopbackDurableObjectNamespace
 [LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespace", LasmPath="LoopbackDurableObjectNamespace"]
-dictionary Cloudflare_LoopbackDurableObjectNamespace : Cloudflare_DurableObjectNamespace {
-
+dictionary Cloudflare_LoopbackDurableObjectNamespace {
+  // newUniqueId(options?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId
+  required Cloudflare_LoopbackDurableObjectNamespaceNewUniqueId newUniqueId;
+  // idFromName(name: string): DurableObjectId
+  required Cloudflare_LoopbackDurableObjectNamespaceIdFromName idFromName;
+  // idFromString(id: string): DurableObjectId
+  required Cloudflare_LoopbackDurableObjectNamespaceIdFromString idFromString;
+  // get(id: DurableObjectId, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>
+  required Cloudflare_LoopbackDurableObjectNamespaceGet get;
+  // getByName(name: string, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>
+  required Cloudflare_LoopbackDurableObjectNamespaceGetByName getByName;
+  // jurisdiction(jurisdiction: DurableObjectJurisdiction): DurableObjectNamespace<T>
+  required Cloudflare_LoopbackDurableObjectNamespaceJurisdiction jurisdiction;
 };
 
 // options LoopbackColoLocalActorNamespace
 [LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackColoLocalActorNamespace", LasmPath="LoopbackColoLocalActorNamespace"]
-dictionary Cloudflare_LoopbackColoLocalActorNamespace : Cloudflare_ColoLocalActorNamespace {
-
+dictionary Cloudflare_LoopbackColoLocalActorNamespace {
+  // get(actorId: string): Fetcher
+  required Cloudflare_LoopbackColoLocalActorNamespaceGet2 get;
 };
 
 // interface SyncKvStorage
@@ -2332,7 +2345,7 @@ interface Cloudflare_Tracing {
   // getActiveSpan(): Span | undefined
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getActiveSpan(): Span | undefined"] Cloudflare_Span? getActiveSpan();
   // Span: typeof Span
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Span: typeof Span"] readonly attribute any Span;
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="Span: typeof Span", LasmLeanName="SpanClass"] readonly attribute any Span;
 };
 
 // interface Span
@@ -4590,7 +4603,17 @@ dictionary Cloudflare_ResponseFunctionToolCall {
 
 // options ResponseFunctionToolCallItem
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ResponseFunctionToolCallItem", LasmPath="ResponseFunctionToolCallItem"]
-dictionary Cloudflare_ResponseFunctionToolCallItem : Cloudflare_ResponseFunctionToolCall {
+dictionary Cloudflare_ResponseFunctionToolCallItem {
+  // arguments: string
+  required DOMString arguments;
+  // call_id: string
+  required DOMString call_id;
+  // name: string
+  required DOMString name;
+  // type: "function_call"
+  required Cloudflare_ResponseFunctionToolCallItemType type;
+  // status?: "in_progress" | "completed" | "incomplete"
+  Cloudflare_ResponseFunctionToolCallItemStatus status;
   // id: string
   required DOMString id;
 };
@@ -7505,22 +7528,6 @@ dictionary Cloudflare_GatewayOptions {
 dictionary Cloudflare_UniversalGatewayOptions {
   // id?: string
   DOMString id;
-  // cacheKey?: string
-  DOMString cacheKey;
-  // cacheTtl?: number
-  double cacheTtl;
-  // skipCache?: boolean
-  boolean skipCache;
-  // metadata?: Record<string, number | string | boolean | null | bigint>
-  record<DOMString, Cloudflare_DoubleOrDOMStringOrBooleanOrBigint?> metadata;
-  // collectLog?: boolean
-  boolean collectLog;
-  // eventId?: string
-  DOMString eventId;
-  // requestTimeoutMs?: number
-  double requestTimeoutMs;
-  // retries?: GatewayRetries
-  Cloudflare_GatewayRetries retries;
 };
 
 // options AiGatewayPatchLog
@@ -8920,14 +8927,18 @@ dictionary Cloudflare_RequestInitCfPropertiesVaryHeader {
 
 // options RequestInitCfPropertiesVaryAcceptHeader
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmFile="index.d.ts", LasmName="RequestInitCfPropertiesVaryAcceptHeader", LasmPath="RequestInitCfPropertiesVaryAcceptHeader"]
-dictionary Cloudflare_RequestInitCfPropertiesVaryAcceptHeader : Cloudflare_RequestInitCfPropertiesVaryHeader {
+dictionary Cloudflare_RequestInitCfPropertiesVaryAcceptHeader {
+  // action: RequestInitCfPropertiesVaryAction
+  required Cloudflare_RequestInitCfPropertiesVaryAction action;
   // media_types?: string[]
   sequence<DOMString> media_types;
 };
 
 // options RequestInitCfPropertiesVaryAcceptLanguageHeader
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmFile="index.d.ts", LasmName="RequestInitCfPropertiesVaryAcceptLanguageHeader", LasmPath="RequestInitCfPropertiesVaryAcceptLanguageHeader"]
-dictionary Cloudflare_RequestInitCfPropertiesVaryAcceptLanguageHeader : Cloudflare_RequestInitCfPropertiesVaryHeader {
+dictionary Cloudflare_RequestInitCfPropertiesVaryAcceptLanguageHeader {
+  // action: RequestInitCfPropertiesVaryAction
+  required Cloudflare_RequestInitCfPropertiesVaryAction action;
   // languages?: string[]
   sequence<DOMString> languages;
 };
@@ -8995,7 +9006,45 @@ dictionary Cloudflare_BasicImageTransformationsGravityCoordinates {
 
 // options RequestInitCfPropertiesImageDraw
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmFile="index.d.ts", LasmName="RequestInitCfPropertiesImageDraw", LasmPath="RequestInitCfPropertiesImageDraw"]
-dictionary Cloudflare_RequestInitCfPropertiesImageDraw : Cloudflare_BasicImageTransformations {
+dictionary Cloudflare_RequestInitCfPropertiesImageDraw {
+  // width?: number
+  double width;
+  // height?: number
+  double height;
+  // gravity?: | "face" | "left" | "right" | "top" | "bottom" | "center" | "auto" | "entropy" | BasicImageTransformationsGravityCoordinates
+  Cloudflare_RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates gravity;
+  // zoom?: number
+  double zoom;
+  // fit?: | "scale-down" | "scale-up" | "contain" | "cover" | "crop" | "pad" | "squeeze"
+  Cloudflare_RequestInitCfPropertiesImageDrawFit fit;
+  // trim?: | "border" | { top?: number; bottom?: number; left?: number; right?: number; width?: number; height?: number; border?: | boolean | { color?: string; tolerance?: number; keep?: number; }; }
+  any trim;
+  // background?: string
+  DOMString background;
+  // flip?: "h" | "v" | "hv"
+  Cloudflare_RequestInitCfPropertiesImageDrawFlip flip;
+  // rotate?: 0 | 90 | 180 | 270 | 360
+  double rotate;
+  // sharpen?: number
+  double sharpen;
+  // blur?: number
+  double blur;
+  // contrast?: number
+  double contrast;
+  // brightness?: number
+  double brightness;
+  // gamma?: number
+  double gamma;
+  // saturation?: number
+  double saturation;
+  // dpr?: number
+  double dpr;
+  // border?: | { color: string; width: number; } | { color: string; top: number; right: number; bottom: number; left: number; }
+  any border;
+  // segment?: "foreground"
+  Cloudflare_RequestInitCfPropertiesImageDrawSegment segment;
+  // upscale?: "interpolate" | "generate"
+  Cloudflare_RequestInitCfPropertiesImageDrawUpscale upscale;
   // url: string
   required DOMString url;
   // opacity?: number
@@ -9016,7 +9065,45 @@ dictionary Cloudflare_RequestInitCfPropertiesImageDraw : Cloudflare_BasicImageTr
 
 // options RequestInitCfPropertiesImage
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmFile="index.d.ts", LasmName="RequestInitCfPropertiesImage", LasmPath="RequestInitCfPropertiesImage"]
-dictionary Cloudflare_RequestInitCfPropertiesImage : Cloudflare_BasicImageTransformations {
+dictionary Cloudflare_RequestInitCfPropertiesImage {
+  // width?: number
+  double width;
+  // height?: number
+  double height;
+  // gravity?: | "face" | "left" | "right" | "top" | "bottom" | "center" | "auto" | "entropy" | BasicImageTransformationsGravityCoordinates
+  Cloudflare_RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates gravity;
+  // zoom?: number
+  double zoom;
+  // fit?: | "scale-down" | "scale-up" | "contain" | "cover" | "crop" | "pad" | "squeeze"
+  Cloudflare_RequestInitCfPropertiesImageFit fit;
+  // trim?: | "border" | { top?: number; bottom?: number; left?: number; right?: number; width?: number; height?: number; border?: | boolean | { color?: string; tolerance?: number; keep?: number; }; }
+  any trim;
+  // background?: string
+  DOMString background;
+  // flip?: "h" | "v" | "hv"
+  Cloudflare_RequestInitCfPropertiesImageFlip flip;
+  // rotate?: 0 | 90 | 180 | 270 | 360
+  double rotate;
+  // sharpen?: number
+  double sharpen;
+  // blur?: number
+  double blur;
+  // contrast?: number
+  double contrast;
+  // brightness?: number
+  double brightness;
+  // gamma?: number
+  double gamma;
+  // saturation?: number
+  double saturation;
+  // dpr?: number
+  double dpr;
+  // border?: | { color: string; width: number; } | { color: string; top: number; right: number; bottom: number; left: number; }
+  any border;
+  // segment?: "foreground"
+  Cloudflare_RequestInitCfPropertiesImageSegment segment;
+  // upscale?: "interpolate" | "generate"
+  Cloudflare_RequestInitCfPropertiesImageUpscale upscale;
   // quality?: number | "low" | "medium-low" | "medium-high" | "high"
   Cloudflare_DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 quality;
   // format?: | "avif" | "webp" | "json" | "jpeg" | "png" | "baseline-jpeg" | "png-force" | "svg"
@@ -9100,7 +9187,7 @@ dictionary Cloudflare_IncomingRequestCfPropertiesBotManagement {
 
 // options IncomingRequestCfPropertiesBotManagementEnterprise
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmFile="index.d.ts", LasmName="IncomingRequestCfPropertiesBotManagementEnterprise", LasmPath="IncomingRequestCfPropertiesBotManagementEnterprise"]
-dictionary Cloudflare_IncomingRequestCfPropertiesBotManagementEnterprise : Cloudflare_IncomingRequestCfPropertiesBotManagement {
+dictionary Cloudflare_IncomingRequestCfPropertiesBotManagementEnterprise {
   // botManagement: IncomingRequestCfPropertiesBotManagementBase & { ja3Hash: string; }
   required Cloudflare_IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement botManagement;
 };
@@ -10580,70 +10667,150 @@ dictionary Cloudflare_StreamError {
 
 // options InternalError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="InternalError", LasmPath="InternalError"]
-dictionary Cloudflare_InternalError : Cloudflare_StreamError {
+dictionary Cloudflare_InternalError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "InternalError"
   required any name;
 };
 
 // options BadRequestError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="BadRequestError", LasmPath="BadRequestError"]
-dictionary Cloudflare_BadRequestError : Cloudflare_StreamError {
+dictionary Cloudflare_BadRequestError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "BadRequestError"
   required any name;
 };
 
 // options NotFoundError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="NotFoundError", LasmPath="NotFoundError"]
-dictionary Cloudflare_NotFoundError : Cloudflare_StreamError {
+dictionary Cloudflare_NotFoundError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "NotFoundError"
   required any name;
 };
 
 // options ForbiddenError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ForbiddenError", LasmPath="ForbiddenError"]
-dictionary Cloudflare_ForbiddenError : Cloudflare_StreamError {
+dictionary Cloudflare_ForbiddenError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "ForbiddenError"
   required any name;
 };
 
 // options RateLimitedError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="RateLimitedError", LasmPath="RateLimitedError"]
-dictionary Cloudflare_RateLimitedError : Cloudflare_StreamError {
+dictionary Cloudflare_RateLimitedError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "RateLimitedError"
   required any name;
 };
 
 // options QuotaReachedError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="QuotaReachedError", LasmPath="QuotaReachedError"]
-dictionary Cloudflare_QuotaReachedError : Cloudflare_StreamError {
+dictionary Cloudflare_QuotaReachedError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "QuotaReachedError"
   required any name;
 };
 
 // options MaxFileSizeError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="MaxFileSizeError", LasmPath="MaxFileSizeError"]
-dictionary Cloudflare_MaxFileSizeError : Cloudflare_StreamError {
+dictionary Cloudflare_MaxFileSizeError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "MaxFileSizeError"
   required any name;
 };
 
 // options InvalidURLError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="InvalidURLError", LasmPath="InvalidURLError"]
-dictionary Cloudflare_InvalidURLError : Cloudflare_StreamError {
+dictionary Cloudflare_InvalidURLError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "InvalidURLError"
   required any name;
 };
 
 // options AlreadyUploadedError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AlreadyUploadedError", LasmPath="AlreadyUploadedError"]
-dictionary Cloudflare_AlreadyUploadedError : Cloudflare_StreamError {
+dictionary Cloudflare_AlreadyUploadedError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "AlreadyUploadedError"
   required any name;
 };
 
 // options TooManyWatermarksError
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="TooManyWatermarksError", LasmPath="TooManyWatermarksError"]
-dictionary Cloudflare_TooManyWatermarksError : Cloudflare_StreamError {
+dictionary Cloudflare_TooManyWatermarksError {
+  // readonly code: number
+  required double code;
+  // readonly statusCode: number
+  required double statusCode;
+  // readonly message: string
+  required DOMString message;
+  // readonly stack?: string
+  DOMString stack;
   // name: "TooManyWatermarksError"
   required any name;
 };
@@ -11873,6 +12040,51 @@ dictionary Cloudflare_ContainerInterceptOutboundHttpsBinding {
   // connect(address: SocketAddress | string, options?: SocketOptions): Socket
   required Cloudflare_ContainerInterceptOutboundHttpsBindingConnect connect;
 };
+
+// LoopbackDurableObjectNamespace.newUniqueId(options?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceNewUniqueId", LasmSignature="LoopbackDurableObjectNamespace.newUniqueId(options?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId"]
+callback Cloudflare_LoopbackDurableObjectNamespaceNewUniqueId = Cloudflare_DurableObjectId (optional Cloudflare_DurableObjectNamespaceNewUniqueIdOptions options);
+
+// LoopbackDurableObjectNamespace.idFromName(name: string): DurableObjectId
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceIdFromName", LasmSignature="LoopbackDurableObjectNamespace.idFromName(name: string): DurableObjectId"]
+callback Cloudflare_LoopbackDurableObjectNamespaceIdFromName = Cloudflare_DurableObjectId (DOMString name);
+
+// LoopbackDurableObjectNamespace.idFromString(id: string): DurableObjectId
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceIdFromString", LasmSignature="LoopbackDurableObjectNamespace.idFromString(id: string): DurableObjectId"]
+callback Cloudflare_LoopbackDurableObjectNamespaceIdFromString = Cloudflare_DurableObjectId (DOMString id);
+
+// LoopbackDurableObjectNamespace.get(id: DurableObjectId, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceGet", LasmSignature="LoopbackDurableObjectNamespace.get(id: DurableObjectId, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>"]
+callback Cloudflare_LoopbackDurableObjectNamespaceGet = Cloudflare_DurableObjectStub (Cloudflare_DurableObjectId id, optional Cloudflare_DurableObjectNamespaceGetDurableObjectOptions options);
+
+// LoopbackDurableObjectNamespace.getByName(name: string, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceGetByName", LasmSignature="LoopbackDurableObjectNamespace.getByName(name: string, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>"]
+callback Cloudflare_LoopbackDurableObjectNamespaceGetByName = Cloudflare_DurableObjectStub (DOMString name, optional Cloudflare_DurableObjectNamespaceGetDurableObjectOptions options);
+
+// LoopbackDurableObjectNamespace.jurisdiction(jurisdiction: DurableObjectJurisdiction): DurableObjectNamespace<T>
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackDurableObjectNamespaceJurisdiction", LasmSignature="LoopbackDurableObjectNamespace.jurisdiction(jurisdiction: DurableObjectJurisdiction): DurableObjectNamespace<T>"]
+callback Cloudflare_LoopbackDurableObjectNamespaceJurisdiction = Cloudflare_DurableObjectNamespace (Cloudflare_DurableObjectJurisdiction jurisdiction);
+
+// LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackColoLocalActorNamespaceGetFetch", LasmSignature="LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher"]
+callback Cloudflare_LoopbackColoLocalActorNamespaceGetFetch = Promise<Response> (Cloudflare_RequestInfoOrURL input, optional RequestInit init);
+
+// LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackColoLocalActorNamespaceGetConnect", LasmSignature="LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher"]
+callback Cloudflare_LoopbackColoLocalActorNamespaceGetConnect = Cloudflare_Socket (Cloudflare_SocketAddressOrDOMString address, optional Cloudflare_SocketOptions options);
+
+// {fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>; connect(address: SocketAddress | string, options?: SocketOptions): Socket;}
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmName="LoopbackColoLocalActorNamespaceGet"]
+dictionary Cloudflare_LoopbackColoLocalActorNamespaceGet {
+  // fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+  required Cloudflare_LoopbackColoLocalActorNamespaceGetFetch fetch;
+  // connect(address: SocketAddress | string, options?: SocketOptions): Socket
+  required Cloudflare_LoopbackColoLocalActorNamespaceGetConnect connect;
+};
+
+// LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher
+[LasmHost="Cloudflare", LasmLeanModule="DurableObjects", LasmFile="index.d.ts", LasmName="LoopbackColoLocalActorNamespaceGet2", LasmSignature="LoopbackColoLocalActorNamespace.get(actorId: string): Fetcher"]
+callback Cloudflare_LoopbackColoLocalActorNamespaceGet2 = Cloudflare_LoopbackColoLocalActorNamespaceGet (DOMString actorId);
 
 // WorkerStub.getEntrypoint<T extends Rpc.WorkerEntrypointBranded | undefined>(name?: string, options?: WorkerStubEntrypointOptions): Fetcher<T>
 [LasmHost="Cloudflare", LasmLeanModule="Rpc", LasmFile="index.d.ts", LasmName="WorkerStubGetEntrypointFetch", LasmSignature="WorkerStub.getEntrypoint<T extends Rpc.WorkerEntrypointBranded | undefined>(name?: string, options?: WorkerStubEntrypointOptions): Fetcher<T>"]
@@ -13505,6 +13717,12 @@ enum Cloudflare_ResponseFunctionToolCallType { "function_call" };
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ResponseFunctionToolCallStatus"]
 enum Cloudflare_ResponseFunctionToolCallStatus { "in_progress", "completed", "incomplete" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ResponseFunctionToolCallItemType"]
+enum Cloudflare_ResponseFunctionToolCallItemType { "function_call" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ResponseFunctionToolCallItemStatus"]
+enum Cloudflare_ResponseFunctionToolCallItemStatus { "in_progress", "completed", "incomplete" };
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="ResponseFunctionToolCallOutputItemType"]
 enum Cloudflare_ResponseFunctionToolCallOutputItemType { "function_call_output" };
@@ -18793,6 +19011,71 @@ enum Cloudflare_BasicImageTransformationsUpscale { "interpolate", "generate" };
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="BasicImageTransformationsGravityCoordinatesMode"]
 enum Cloudflare_BasicImageTransformationsGravityCoordinatesMode { "remainder", "box-center" };
 
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity { "face" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity2"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity2 { "left" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity3"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity3 { "right" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity4"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity4 { "top" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity5"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity5 { "bottom" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity6"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity6 { "center" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity7"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity7 { "auto" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravity8"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawGravity8 { "entropy" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates"]
+typedef (Cloudflare_RequestInitCfPropertiesImageDrawGravity or Cloudflare_RequestInitCfPropertiesImageDrawGravity2 or Cloudflare_RequestInitCfPropertiesImageDrawGravity3 or Cloudflare_RequestInitCfPropertiesImageDrawGravity4 or Cloudflare_RequestInitCfPropertiesImageDrawGravity5 or Cloudflare_RequestInitCfPropertiesImageDrawGravity6 or Cloudflare_RequestInitCfPropertiesImageDrawGravity7 or Cloudflare_RequestInitCfPropertiesImageDrawGravity8 or Cloudflare_BasicImageTransformationsGravityCoordinates) Cloudflare_RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates;
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawFit"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawFit { "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawTrim"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawTrim { "border" };
+
+// {color?: string; tolerance?: number; keep?: number;}
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawTrimBorder"]
+dictionary Cloudflare_RequestInitCfPropertiesImageDrawTrimBorder {
+  // color?: string
+  DOMString color;
+  // tolerance?: number
+  double tolerance;
+  // keep?: number
+  double keep;
+};
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="BooleanOrRequestInitCfPropertiesImageDrawTrimBorder"]
+typedef (boolean or Cloudflare_RequestInitCfPropertiesImageDrawTrimBorder) Cloudflare_BooleanOrRequestInitCfPropertiesImageDrawTrimBorder;
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawFlip"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawFlip { "h", "v", "hv" };
+
+// {color: string; width: number;}
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawBorder"]
+dictionary Cloudflare_RequestInitCfPropertiesImageDrawBorder {
+  // color: string
+  required DOMString color;
+  // width: number
+  required double width;
+};
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawSegment"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawSegment { "foreground" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawUpscale"]
+enum Cloudflare_RequestInitCfPropertiesImageDrawUpscale { "interpolate", "generate" };
+
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawRepeat"]
 enum Cloudflare_RequestInitCfPropertiesImageDrawRepeat { "x" };
 
@@ -18804,6 +19087,71 @@ typedef (boolean or Cloudflare_RequestInitCfPropertiesImageDrawRepeat or Cloudfl
 
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageDrawComposite"]
 enum Cloudflare_RequestInitCfPropertiesImageDrawComposite { "over", "in", "atop", "out", "xor", "lighter" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity { "face" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity2"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity2 { "left" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity3"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity3 { "right" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity4"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity4 { "top" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity5"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity5 { "bottom" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity6"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity6 { "center" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity7"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity7 { "auto" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravity8"]
+enum Cloudflare_RequestInitCfPropertiesImageGravity8 { "entropy" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates"]
+typedef (Cloudflare_RequestInitCfPropertiesImageGravity or Cloudflare_RequestInitCfPropertiesImageGravity2 or Cloudflare_RequestInitCfPropertiesImageGravity3 or Cloudflare_RequestInitCfPropertiesImageGravity4 or Cloudflare_RequestInitCfPropertiesImageGravity5 or Cloudflare_RequestInitCfPropertiesImageGravity6 or Cloudflare_RequestInitCfPropertiesImageGravity7 or Cloudflare_RequestInitCfPropertiesImageGravity8 or Cloudflare_BasicImageTransformationsGravityCoordinates) Cloudflare_RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates;
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageFit"]
+enum Cloudflare_RequestInitCfPropertiesImageFit { "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageTrim"]
+enum Cloudflare_RequestInitCfPropertiesImageTrim { "border" };
+
+// {color?: string; tolerance?: number; keep?: number;}
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageTrimBorder"]
+dictionary Cloudflare_RequestInitCfPropertiesImageTrimBorder {
+  // color?: string
+  DOMString color;
+  // tolerance?: number
+  double tolerance;
+  // keep?: number
+  double keep;
+};
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="BooleanOrRequestInitCfPropertiesImageTrimBorder"]
+typedef (boolean or Cloudflare_RequestInitCfPropertiesImageTrimBorder) Cloudflare_BooleanOrRequestInitCfPropertiesImageTrimBorder;
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageFlip"]
+enum Cloudflare_RequestInitCfPropertiesImageFlip { "h", "v", "hv" };
+
+// {color: string; width: number;}
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageBorder"]
+dictionary Cloudflare_RequestInitCfPropertiesImageBorder {
+  // color: string
+  required DOMString color;
+  // width: number
+  required double width;
+};
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageSegment"]
+enum Cloudflare_RequestInitCfPropertiesImageSegment { "foreground" };
+
+[LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageUpscale"]
+enum Cloudflare_RequestInitCfPropertiesImageUpscale { "interpolate", "generate" };
 
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesImageQuality"]
 enum Cloudflare_RequestInitCfPropertiesImageQuality { "low" };

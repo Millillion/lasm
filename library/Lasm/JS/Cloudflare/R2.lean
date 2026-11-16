@@ -88,6 +88,14 @@ instance : ToJS R2Conditional := ⟨fun d => Support.fields #[("etagMatches", Su
     ("uploadedBefore", d.uploadedBefore),
     ("uploadedAfter", d.uploadedAfter),
     ("secondsGranularity", Support.optional d.secondsGranularity)]⟩
+instance : FromJS R2Conditional where
+  fromJS d := do return {
+    etagMatches := ← Lasm.JS.readField (Option String) d "etagMatches",
+    etagDoesNotMatch := ← Lasm.JS.readField (Option String) d "etagDoesNotMatch",
+    uploadedBefore := ← Lasm.JS.readField Data d "uploadedBefore",
+    uploadedAfter := ← Lasm.JS.readField Data d "uploadedAfter",
+    secondsGranularity := ← Lasm.JS.readField (Option Bool) d "secondsGranularity" }
+  typeName := "Lasm.JS.Cloudflare.R2Conditional"
 
 /-- `typedef R2Conditional or Headers R2ConditionalOrHeaders`: one constructor per member type. -/
 inductive R2ConditionalOrHeaders where
@@ -100,6 +108,12 @@ instance : ToJS R2ConditionalOrHeaders := ⟨fun
   | .headers v => toJS v⟩
 instance : Coe R2Conditional R2ConditionalOrHeaders := ⟨.r2Conditional⟩
 instance : Coe Headers R2ConditionalOrHeaders := ⟨.headers⟩
+instance : FromJS R2ConditionalOrHeaders where
+  fromJS
+    | d@(.object _) => (FromJS.fromJS d : Except String R2Conditional).map .r2Conditional
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Headers).map .headers
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.R2ConditionalOrHeaders"
 
 /-- `dictionary R2Range` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2Range where
@@ -130,6 +144,12 @@ instance : ToJS R2RangeOrHeaders := ⟨fun
   | .headers v => toJS v⟩
 instance : Coe R2Range R2RangeOrHeaders := ⟨.r2Range⟩
 instance : Coe Headers R2RangeOrHeaders := ⟨.headers⟩
+instance : FromJS R2RangeOrHeaders where
+  fromJS
+    | d@(.object _) => (FromJS.fromJS d : Except String R2Range).map .r2Range
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Headers).map .headers
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.R2RangeOrHeaders"
 
 /-- `typedef ArrayBuffer or DOMString ArrayBufferOrDOMString`: one constructor per member type. -/
 inductive ArrayBufferOrDOMString where
@@ -142,6 +162,12 @@ instance : ToJS ArrayBufferOrDOMString := ⟨fun
   | .domString v => toJS v⟩
 instance : Coe ByteArray ArrayBufferOrDOMString := ⟨.arrayBuffer⟩
 instance : Coe String ArrayBufferOrDOMString := ⟨.domString⟩
+/-- Reads a `ArrayBufferOrDOMString` (one member is an ArrayBuffer, copied with one more host call). -/
+def ArrayBufferOrDOMString.decode (d : Data) : IO ArrayBufferOrDOMString :=
+  match d with
+  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrDOMString" d))
+  | .string _ => do return .domString (← Lasm.JS.decodeAs String "ArrayBufferOrDOMString" d)
+  | _ => throw (IO.userError s!"Lasm.JS.Cloudflare: expected a ArrayBufferOrDOMString, received JavaScript {d.describe}")
 
 /-- `dictionary R2BucketGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2BucketGetOptions where
@@ -228,6 +254,12 @@ instance : ToJS R2HTTPMetadataOrHeaders := ⟨fun
   | .headers v => toJS v⟩
 instance : Coe R2HTTPMetadata R2HTTPMetadataOrHeaders := ⟨.r2HTTPMetadata⟩
 instance : Coe Headers R2HTTPMetadataOrHeaders := ⟨.headers⟩
+instance : FromJS R2HTTPMetadataOrHeaders where
+  fromJS
+    | d@(.object _) => (FromJS.fromJS d : Except String R2HTTPMetadata).map .r2HTTPMetadata
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Headers).map .headers
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.R2HTTPMetadataOrHeaders"
 
 /-- `typedef DOMString or BufferSource DOMStringOrBufferSource`: one constructor per member type. -/
 inductive DOMStringOrBufferSource where
@@ -240,6 +272,12 @@ instance : ToJS DOMStringOrBufferSource := ⟨fun
   | .bufferSource v => toJS v⟩
 instance : Coe String DOMStringOrBufferSource := ⟨.domString⟩
 instance : Coe ByteArray DOMStringOrBufferSource := ⟨.bufferSource⟩
+/-- Reads a `DOMStringOrBufferSource` (one member is an ArrayBuffer, copied with one more host call). -/
+def DOMStringOrBufferSource.decode (d : Data) : IO DOMStringOrBufferSource :=
+  match d with
+  | .string _ => do return .domString (← Lasm.JS.decodeAs String "DOMStringOrBufferSource" d)
+  | .bytes _ => do return .bufferSource (← Support.viewBytes (← Lasm.JS.decodeAs Data "DOMStringOrBufferSource" d))
+  | _ => throw (IO.userError s!"Lasm.JS.Cloudflare: expected a DOMStringOrBufferSource, received JavaScript {d.describe}")
 
 /-- `dictionary R2BucketPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2BucketPutOptions where
@@ -360,6 +398,15 @@ instance : ToJS R2ListOptions := ⟨fun d => Support.fields #[("limit", Support.
     ("delimiter", Support.optional d.delimiter),
     ("startAfter", Support.optional d.startAfter),
     ("include", Support.optional d.«include»)]⟩
+instance : FromJS R2ListOptions where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField (Option Float) d "limit",
+    «prefix» := ← Lasm.JS.readField (Option String) d "prefix",
+    cursor := ← Lasm.JS.readField (Option String) d "cursor",
+    delimiter := ← Lasm.JS.readField (Option String) d "delimiter",
+    startAfter := ← Lasm.JS.readField (Option String) d "startAfter",
+    «include» := ← Lasm.JS.readField (Option (Array R2ListOptionsInclude)) d "include" }
+  typeName := "Lasm.JS.Cloudflare.R2ListOptions"
 
 /-- `dictionary R2Objects` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2Objects where
@@ -371,6 +418,10 @@ structure R2Objects where
   truncated : Bool
   /-- `DOMString cursor` -/
   cursor : Option String := none
+instance : ToJS R2Objects := ⟨fun d => Support.fields #[("objects", toJS d.objects),
+    ("delimitedPrefixes", toJS d.delimitedPrefixes),
+    ("truncated", toJS d.truncated),
+    ("cursor", Support.optional d.cursor)]⟩
 instance : FromJS R2Objects where
   fromJS d := do return {
     objects := ← Lasm.JS.readField (Array R2Object) d "objects",
@@ -391,6 +442,11 @@ structure R2StringChecksums where
   sha384 : Option String := none
   /-- `DOMString sha512` -/
   sha512 : Option String := none
+instance : ToJS R2StringChecksums := ⟨fun d => Support.fields #[("md5", Support.optional d.md5),
+    ("sha1", Support.optional d.sha1),
+    ("sha256", Support.optional d.sha256),
+    ("sha384", Support.optional d.sha384),
+    ("sha512", Support.optional d.sha512)]⟩
 instance : FromJS R2StringChecksums where
   fromJS d := do return {
     md5 := ← Lasm.JS.readField (Option String) d "md5",

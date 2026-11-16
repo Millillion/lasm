@@ -48,6 +48,8 @@ structure SocketInfo where
   remoteAddress : Option String := none
   /-- `DOMString localAddress` -/
   localAddress : Option String := none
+instance : ToJS SocketInfo := ⟨fun d => Support.fields #[("remoteAddress", Support.optional d.remoteAddress),
+    ("localAddress", Support.optional d.localAddress)]⟩
 instance : FromJS SocketInfo where
   fromJS d := do return {
     remoteAddress := ← Lasm.JS.readField (Option String) d "remoteAddress",
@@ -59,6 +61,10 @@ structure TlsOptions where
   /-- `DOMString expectedServerHostname` -/
   expectedServerHostname : Option String := none
 instance : ToJS TlsOptions := ⟨fun d => Support.fields #[("expectedServerHostname", Support.optional d.expectedServerHostname)]⟩
+instance : FromJS TlsOptions where
+  fromJS d := do return {
+    expectedServerHostname := ← Lasm.JS.readField (Option String) d "expectedServerHostname" }
+  typeName := "Lasm.JS.Cloudflare.TlsOptions"
 
 /-- `dictionary SocketAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketAddress where

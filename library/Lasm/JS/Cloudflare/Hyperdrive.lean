@@ -54,6 +54,14 @@ instance : ToJS HyperdriveDynamicConfig := ⟨fun d => Support.fields #[("dynami
     ("targetRegion", toJS d.targetRegion),
     ("cachingEnabled", Support.optional d.cachingEnabled),
     ("maxConnections", Support.optional d.maxConnections)]⟩
+instance : FromJS HyperdriveDynamicConfig where
+  fromJS d := do return {
+    dynamicHyperdriveConnectionString := ← Lasm.JS.readField String d "dynamicHyperdriveConnectionString",
+    connectionString := ← Lasm.JS.readField String d "connectionString",
+    targetRegion := ← Lasm.JS.readField String d "targetRegion",
+    cachingEnabled := ← Lasm.JS.readField (Option Bool) d "cachingEnabled",
+    maxConnections := ← Lasm.JS.readField (Option Float) d "maxConnections" }
+  typeName := "Lasm.JS.Cloudflare.HyperdriveDynamicConfig"
 
 /-- `readonly connectionString: string`: `readonly attribute DOMString connectionString` -/
 def Hyperdrive.connectionString (self : Hyperdrive) : IO String := self.val.get "connectionString" String

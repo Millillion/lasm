@@ -302,6 +302,8 @@ structure WorkflowStepDoCallbackStep where
   name : String
   /-- `required double count` -/
   count : Float
+instance : ToJS WorkflowStepDoCallbackStep := ⟨fun d => Support.fields #[("name", toJS d.name),
+    ("count", toJS d.count)]⟩
 instance : FromJS WorkflowStepDoCallbackStep where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -314,6 +316,8 @@ structure WorkflowStepDoCallbackConfigRetries where
   limit : Float
   /-- `WorkflowBackoff backoff` -/
   backoff : Option WorkflowBackoff := none
+instance : ToJS WorkflowStepDoCallbackConfigRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
+    ("backoff", Support.optional d.backoff)]⟩
 instance : FromJS WorkflowStepDoCallbackConfigRetries where
   fromJS d := do return {
     limit := ← Lasm.JS.readField Float d "limit",
@@ -328,6 +332,9 @@ structure WorkflowStepDoCallbackConfig where
   timeout : Option DOMStringOrDouble := none
   /-- `WorkflowStepSensitivity sensitive` -/
   sensitive : Option WorkflowStepSensitivity := none
+instance : ToJS WorkflowStepDoCallbackConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
+    ("timeout", Support.optional d.timeout),
+    ("sensitive", Support.optional d.sensitive)]⟩
 instance : FromJS WorkflowStepDoCallbackConfig where
   fromJS d := do return {
     retries := ← Lasm.JS.readField (Option WorkflowStepDoCallbackConfigRetries) d "retries",
@@ -343,6 +350,9 @@ structure WorkflowStepDoCallback where
   attempt : Float
   /-- `required WorkflowStepDoCallbackConfig config` -/
   config : WorkflowStepDoCallbackConfig
+instance : ToJS WorkflowStepDoCallback := ⟨fun d => Support.fields #[("step", toJS d.step),
+    ("attempt", toJS d.attempt),
+    ("config", toJS d.config)]⟩
 instance : FromJS WorkflowStepDoCallback where
   fromJS d := do return {
     step := ← Lasm.JS.readField WorkflowStepDoCallbackStep d "step",
@@ -378,6 +388,11 @@ structure WorkflowRollbackHandlerCtxStep where
   count : Float
 instance : ToJS WorkflowRollbackHandlerCtxStep := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("count", toJS d.count)]⟩
+instance : FromJS WorkflowRollbackHandlerCtxStep where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    count := ← Lasm.JS.readField Float d "count" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowRollbackHandlerCtxStep"
 
 /-- `dictionary WorkflowRollbackHandlerCtxConfigRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowRollbackHandlerCtxConfigRetries where
@@ -387,6 +402,11 @@ structure WorkflowRollbackHandlerCtxConfigRetries where
   backoff : Option WorkflowBackoff := none
 instance : ToJS WorkflowRollbackHandlerCtxConfigRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
     ("backoff", Support.optional d.backoff)]⟩
+instance : FromJS WorkflowRollbackHandlerCtxConfigRetries where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField Float d "limit",
+    backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowRollbackHandlerCtxConfigRetries"
 
 /-- `dictionary WorkflowRollbackHandlerCtxConfig` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowRollbackHandlerCtxConfig where
@@ -399,6 +419,12 @@ structure WorkflowRollbackHandlerCtxConfig where
 instance : ToJS WorkflowRollbackHandlerCtxConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
     ("timeout", Support.optional d.timeout),
     ("sensitive", Support.optional d.sensitive)]⟩
+instance : FromJS WorkflowRollbackHandlerCtxConfig where
+  fromJS d := do return {
+    retries := ← Lasm.JS.readField (Option WorkflowRollbackHandlerCtxConfigRetries) d "retries",
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout",
+    sensitive := ← Lasm.JS.readField (Option WorkflowStepSensitivity) d "sensitive" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowRollbackHandlerCtxConfig"
 
 /-- `dictionary WorkflowRollbackHandlerCtx` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowRollbackHandlerCtx where
@@ -411,6 +437,12 @@ structure WorkflowRollbackHandlerCtx where
 instance : ToJS WorkflowRollbackHandlerCtx := ⟨fun d => Support.fields #[("step", toJS d.step),
     ("attempt", toJS d.attempt),
     ("config", toJS d.config)]⟩
+instance : FromJS WorkflowRollbackHandlerCtx where
+  fromJS d := do return {
+    step := ← Lasm.JS.readField WorkflowRollbackHandlerCtxStep d "step",
+    attempt := ← Lasm.JS.readField Float d "attempt",
+    config := ← Lasm.JS.readField WorkflowRollbackHandlerCtxConfig d "config" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowRollbackHandlerCtx"
 
 /-- `dictionary WorkflowRollbackHandler` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowRollbackHandler where
@@ -426,6 +458,13 @@ instance : ToJS WorkflowRollbackHandler := ⟨fun d => Support.fields #[("ctx", 
     ("error", toJS d.error),
     ("output", toJS d.output),
     ("stepName", toJS d.stepName)]⟩
+instance : FromJS WorkflowRollbackHandler where
+  fromJS d := do return {
+    ctx := ← Lasm.JS.readField WorkflowRollbackHandlerCtx d "ctx",
+    error := ← Lasm.JS.readField Data d "error",
+    output := ← Lasm.JS.readField Data d "output",
+    stepName := ← Lasm.JS.readField String d "stepName" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowRollbackHandler"
 
 /-- `dictionary WorkflowDynamicDelayContextCtxStep` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowDynamicDelayContextCtxStep where
@@ -433,6 +472,8 @@ structure WorkflowDynamicDelayContextCtxStep where
   name : String
   /-- `required double count` -/
   count : Float
+instance : ToJS WorkflowDynamicDelayContextCtxStep := ⟨fun d => Support.fields #[("name", toJS d.name),
+    ("count", toJS d.count)]⟩
 instance : FromJS WorkflowDynamicDelayContextCtxStep where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -445,6 +486,8 @@ structure WorkflowDynamicDelayContextCtxConfigRetries where
   limit : Float
   /-- `WorkflowBackoff backoff` -/
   backoff : Option WorkflowBackoff := none
+instance : ToJS WorkflowDynamicDelayContextCtxConfigRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
+    ("backoff", Support.optional d.backoff)]⟩
 instance : FromJS WorkflowDynamicDelayContextCtxConfigRetries where
   fromJS d := do return {
     limit := ← Lasm.JS.readField Float d "limit",
@@ -459,6 +502,9 @@ structure WorkflowDynamicDelayContextCtxConfig where
   timeout : Option DOMStringOrDouble := none
   /-- `WorkflowStepSensitivity sensitive` -/
   sensitive : Option WorkflowStepSensitivity := none
+instance : ToJS WorkflowDynamicDelayContextCtxConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
+    ("timeout", Support.optional d.timeout),
+    ("sensitive", Support.optional d.sensitive)]⟩
 instance : FromJS WorkflowDynamicDelayContextCtxConfig where
   fromJS d := do return {
     retries := ← Lasm.JS.readField (Option WorkflowDynamicDelayContextCtxConfigRetries) d "retries",
@@ -474,6 +520,9 @@ structure WorkflowDynamicDelayContextCtx where
   attempt : Float
   /-- `required WorkflowDynamicDelayContextCtxConfig config` -/
   config : WorkflowDynamicDelayContextCtxConfig
+instance : ToJS WorkflowDynamicDelayContextCtx := ⟨fun d => Support.fields #[("step", toJS d.step),
+    ("attempt", toJS d.attempt),
+    ("config", toJS d.config)]⟩
 instance : FromJS WorkflowDynamicDelayContextCtx where
   fromJS d := do return {
     step := ← Lasm.JS.readField WorkflowDynamicDelayContextCtxStep d "step",
@@ -487,6 +536,8 @@ structure WorkflowDynamicDelayContext where
   ctx : WorkflowDynamicDelayContextCtx
   /-- `required any error` -/
   error : Data
+instance : ToJS WorkflowDynamicDelayContext := ⟨fun d => Support.fields #[("ctx", toJS d.ctx),
+    ("error", toJS d.error)]⟩
 instance : FromJS WorkflowDynamicDelayContext where
   fromJS d := do return {
     ctx := ← Lasm.JS.readField WorkflowDynamicDelayContextCtx d "ctx",
@@ -528,6 +579,13 @@ instance : ToJS DOMStringOrDoubleOrWorkflowDelayFunction := ⟨fun
 instance : Coe String DOMStringOrDoubleOrWorkflowDelayFunction := ⟨.domString⟩
 instance : Coe Float DOMStringOrDoubleOrWorkflowDelayFunction := ⟨.double⟩
 instance : Coe WorkflowDelayFunction DOMStringOrDoubleOrWorkflowDelayFunction := ⟨.workflowDelayFunction⟩
+instance : FromJS DOMStringOrDoubleOrWorkflowDelayFunction where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String WorkflowDelayFunction).map .workflowDelayFunction
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrDoubleOrWorkflowDelayFunction"
 
 /-- `dictionary WorkflowStepDoRollbackOptionsRollbackConfigRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepDoRollbackOptionsRollbackConfigRetries where
@@ -540,6 +598,12 @@ structure WorkflowStepDoRollbackOptionsRollbackConfigRetries where
 instance : ToJS WorkflowStepDoRollbackOptionsRollbackConfigRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
     ("delay", toJS d.delay),
     ("backoff", Support.optional d.backoff)]⟩
+instance : FromJS WorkflowStepDoRollbackOptionsRollbackConfigRetries where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField Float d "limit",
+    delay := ← Lasm.JS.readField DOMStringOrDoubleOrWorkflowDelayFunction d "delay",
+    backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepDoRollbackOptionsRollbackConfigRetries"
 
 /-- `dictionary WorkflowStepDoRollbackOptionsRollbackConfig` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepDoRollbackOptionsRollbackConfig where
@@ -549,6 +613,11 @@ structure WorkflowStepDoRollbackOptionsRollbackConfig where
   timeout : Option DOMStringOrDouble := none
 instance : ToJS WorkflowStepDoRollbackOptionsRollbackConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS WorkflowStepDoRollbackOptionsRollbackConfig where
+  fromJS d := do return {
+    retries := ← Lasm.JS.readField (Option WorkflowStepDoRollbackOptionsRollbackConfigRetries) d "retries",
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepDoRollbackOptionsRollbackConfig"
 
 /-- `dictionary WorkflowStepDoRollbackOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepDoRollbackOptions where
@@ -558,6 +627,11 @@ structure WorkflowStepDoRollbackOptions where
   rollbackConfig : Option WorkflowStepDoRollbackOptionsRollbackConfig := none
 instance : ToJS WorkflowStepDoRollbackOptions := ⟨fun d => Support.fields #[("rollback", toJS d.rollback),
     ("rollbackConfig", Support.optional d.rollbackConfig)]⟩
+instance : FromJS WorkflowStepDoRollbackOptions where
+  fromJS d := do return {
+    rollback := ← Lasm.JS.readField WorkflowRollbackHandler d "rollback",
+    rollbackConfig := ← Lasm.JS.readField (Option WorkflowStepDoRollbackOptionsRollbackConfig) d "rollbackConfig" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepDoRollbackOptions"
 
 /-- `dictionary WorkflowStepConfigWithDelayFunctionRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithDelayFunctionRetries where
@@ -570,6 +644,12 @@ structure WorkflowStepConfigWithDelayFunctionRetries where
 instance : ToJS WorkflowStepConfigWithDelayFunctionRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
     ("delay", toJS d.delay),
     ("backoff", Support.optional d.backoff)]⟩
+instance : FromJS WorkflowStepConfigWithDelayFunctionRetries where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField Float d "limit",
+    delay := ← Lasm.JS.readField WorkflowDelayFunction d "delay",
+    backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfigWithDelayFunctionRetries"
 
 /-- `dictionary WorkflowStepConfigWithDelayFunction` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithDelayFunction where
@@ -582,6 +662,12 @@ structure WorkflowStepConfigWithDelayFunction where
 instance : ToJS WorkflowStepConfigWithDelayFunction := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
     ("sensitive", Support.optional d.sensitive),
     ("retries", toJS d.retries)]⟩
+instance : FromJS WorkflowStepConfigWithDelayFunction where
+  fromJS d := do return {
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout",
+    sensitive := ← Lasm.JS.readField (Option WorkflowStepSensitivity) d "sensitive",
+    retries := ← Lasm.JS.readField WorkflowStepConfigWithDelayFunctionRetries d "retries" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfigWithDelayFunction"
 
 /-- `callback WorkflowStepDoCallback3 = Promise<any> (WorkflowStepDoCallback ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkflowStepDoCallback3 where
@@ -614,6 +700,12 @@ structure WorkflowStepConfigWithStaticDelayRetries where
 instance : ToJS WorkflowStepConfigWithStaticDelayRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
     ("delay", toJS d.delay),
     ("backoff", Support.optional d.backoff)]⟩
+instance : FromJS WorkflowStepConfigWithStaticDelayRetries where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField Float d "limit",
+    delay := ← Lasm.JS.readField DOMStringOrDouble d "delay",
+    backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfigWithStaticDelayRetries"
 
 /-- `dictionary WorkflowStepConfigWithStaticDelay` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithStaticDelay where
@@ -626,6 +718,12 @@ structure WorkflowStepConfigWithStaticDelay where
 instance : ToJS WorkflowStepConfigWithStaticDelay := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
     ("sensitive", Support.optional d.sensitive),
     ("retries", Support.optional d.retries)]⟩
+instance : FromJS WorkflowStepConfigWithStaticDelay where
+  fromJS d := do return {
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout",
+    sensitive := ← Lasm.JS.readField (Option WorkflowStepSensitivity) d "sensitive",
+    retries := ← Lasm.JS.readField (Option WorkflowStepConfigWithStaticDelayRetries) d "retries" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfigWithStaticDelay"
 
 /-- `callback WorkflowStepDoCallback4 = Promise<any> (WorkflowStepDoCallback ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkflowStepDoCallback4 where
@@ -658,6 +756,12 @@ structure WorkflowStepConfigRetries where
 instance : ToJS WorkflowStepConfigRetries := ⟨fun d => Support.fields #[("limit", toJS d.limit),
     ("delay", toJS d.delay),
     ("backoff", Support.optional d.backoff)]⟩
+instance : FromJS WorkflowStepConfigRetries where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField Float d "limit",
+    delay := ← Lasm.JS.readField DOMStringOrDoubleOrWorkflowDelayFunction d "delay",
+    backoff := ← Lasm.JS.readField (Option WorkflowBackoff) d "backoff" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfigRetries"
 
 /-- `dictionary WorkflowStepConfig` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfig where
@@ -670,6 +774,12 @@ structure WorkflowStepConfig where
 instance : ToJS WorkflowStepConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
     ("timeout", Support.optional d.timeout),
     ("sensitive", Support.optional d.sensitive)]⟩
+instance : FromJS WorkflowStepConfig where
+  fromJS d := do return {
+    retries := ← Lasm.JS.readField (Option WorkflowStepConfigRetries) d "retries",
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout",
+    sensitive := ← Lasm.JS.readField (Option WorkflowStepSensitivity) d "sensitive" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepConfig"
 
 /-- `callback WorkflowStepDoCallback5 = Promise<any> (WorkflowStepDoCallback ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkflowStepDoCallback5 where
@@ -739,6 +849,11 @@ structure WorkflowStepWaitForEventOptions where
   timeout : Option DOMStringOrDouble := none
 instance : ToJS WorkflowStepWaitForEventOptions := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS WorkflowStepWaitForEventOptions where
+  fromJS d := do return {
+    type := ← Lasm.JS.readField String d "type",
+    timeout := ← Lasm.JS.readField (Option DOMStringOrDouble) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowStepWaitForEventOptions"
 
 /-- `dictionary WorkflowStepWaitForEvent` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepWaitForEvent where
@@ -750,6 +865,10 @@ structure WorkflowStepWaitForEvent where
   type : String
   /-- `WorkflowStepSensitivity sensitive` -/
   sensitive : Option WorkflowStepSensitivity := none
+instance : ToJS WorkflowStepWaitForEvent := ⟨fun d => Support.fields #[("payload", toJS d.payload),
+    ("timestamp", toJS d.timestamp),
+    ("type", toJS d.type),
+    ("sensitive", Support.optional d.sensitive)]⟩
 instance : FromJS WorkflowStepWaitForEvent where
   fromJS d := do return {
     payload := ← Lasm.JS.readField Data d "payload",
@@ -766,6 +885,11 @@ structure WorkflowCronSchedule where
   scheduledTime : Float
 instance : ToJS WorkflowCronSchedule := ⟨fun d => Support.fields #[("cron", toJS d.cron),
     ("scheduledTime", toJS d.scheduledTime)]⟩
+instance : FromJS WorkflowCronSchedule where
+  fromJS d := do return {
+    cron := ← Lasm.JS.readField String d "cron",
+    scheduledTime := ← Lasm.JS.readField Float d "scheduledTime" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowCronSchedule"
 
 /-- `dictionary WorkflowEntrypointRunEvent` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowEntrypointRunEvent where
@@ -784,6 +908,14 @@ instance : ToJS WorkflowEntrypointRunEvent := ⟨fun d => Support.fields #[("pay
     ("instanceId", toJS d.instanceId),
     ("workflowName", toJS d.workflowName),
     ("schedule", Support.optional d.schedule)]⟩
+instance : FromJS WorkflowEntrypointRunEvent where
+  fromJS d := do return {
+    payload := ← Lasm.JS.readField Data d "payload",
+    timestamp := ← Lasm.JS.readField Data d "timestamp",
+    instanceId := ← Lasm.JS.readField String d "instanceId",
+    workflowName := ← Lasm.JS.readField String d "workflowName",
+    schedule := ← Lasm.JS.readField (Option WorkflowCronSchedule) d "schedule" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowEntrypointRunEvent"
 
 /-- `dictionary WorkflowInstanceCreateOptionsRetention` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceCreateOptionsRetention where
@@ -793,6 +925,11 @@ structure WorkflowInstanceCreateOptionsRetention where
   errorRetention : Option DOMStringOrDouble := none
 instance : ToJS WorkflowInstanceCreateOptionsRetention := ⟨fun d => Support.fields #[("successRetention", Support.optional d.successRetention),
     ("errorRetention", Support.optional d.errorRetention)]⟩
+instance : FromJS WorkflowInstanceCreateOptionsRetention where
+  fromJS d := do return {
+    successRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "successRetention",
+    errorRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "errorRetention" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceCreateOptionsRetention"
 
 /-- `dictionary WorkflowInstanceCreateOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceCreateOptions where
@@ -808,6 +945,13 @@ instance : ToJS WorkflowInstanceCreateOptions := ⟨fun d => Support.fields #[("
     ("params", d.params),
     ("retention", Support.optional d.retention),
     ("locationHint", Support.optional d.locationHint)]⟩
+instance : FromJS WorkflowInstanceCreateOptions where
+  fromJS d := do return {
+    id := ← Lasm.JS.readField (Option String) d "id",
+    params := ← Lasm.JS.readField Data d "params",
+    retention := ← Lasm.JS.readField (Option WorkflowInstanceCreateOptionsRetention) d "retention",
+    locationHint := ← Lasm.JS.readField (Option WorkflowInstanceLocationHint) d "locationHint" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceCreateOptions"
 
 /-- `dictionary WorkflowBatchCreateResultErrors` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowBatchCreateResultErrors where
@@ -819,6 +963,10 @@ structure WorkflowBatchCreateResultErrors where
   code : Float
   /-- `required DOMString message` -/
   message : String
+instance : ToJS WorkflowBatchCreateResultErrors := ⟨fun d => Support.fields #[("index", toJS d.index),
+    ("id", Support.optional d.id),
+    ("code", toJS d.code),
+    ("message", toJS d.message)]⟩
 instance : FromJS WorkflowBatchCreateResultErrors where
   fromJS d := do return {
     index := ← Lasm.JS.readField Float d "index",
@@ -833,6 +981,8 @@ structure WorkflowBatchCreateResult where
   created : Array WorkflowInstance
   /-- `required sequence<WorkflowBatchCreateResultErrors> errors` -/
   errors : Array WorkflowBatchCreateResultErrors
+instance : ToJS WorkflowBatchCreateResult := ⟨fun d => Support.fields #[("created", toJS d.created),
+    ("errors", toJS d.errors)]⟩
 instance : FromJS WorkflowBatchCreateResult where
   fromJS d := do return {
     created := ← Lasm.JS.readField (Array WorkflowInstance) d "created",
@@ -843,6 +993,7 @@ instance : FromJS WorkflowBatchCreateResult where
 structure WorkflowBatchDeleteResultDeleted where
   /-- `required DOMString id` -/
   id : String
+instance : ToJS WorkflowBatchDeleteResultDeleted := ⟨fun d => Support.fields #[("id", toJS d.id)]⟩
 instance : FromJS WorkflowBatchDeleteResultDeleted where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id" }
@@ -856,6 +1007,9 @@ structure WorkflowBatchDeleteResultErrors where
   code : Float
   /-- `required DOMString message` -/
   message : String
+instance : ToJS WorkflowBatchDeleteResultErrors := ⟨fun d => Support.fields #[("id", toJS d.id),
+    ("code", toJS d.code),
+    ("message", toJS d.message)]⟩
 instance : FromJS WorkflowBatchDeleteResultErrors where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -869,6 +1023,8 @@ structure WorkflowBatchDeleteResult where
   deleted : Array WorkflowBatchDeleteResultDeleted
   /-- `required sequence<WorkflowBatchDeleteResultErrors> errors` -/
   errors : Array WorkflowBatchDeleteResultErrors
+instance : ToJS WorkflowBatchDeleteResult := ⟨fun d => Support.fields #[("deleted", toJS d.deleted),
+    ("errors", toJS d.errors)]⟩
 instance : FromJS WorkflowBatchDeleteResult where
   fromJS d := do return {
     deleted := ← Lasm.JS.readField (Array WorkflowBatchDeleteResultDeleted) d "deleted",
@@ -880,6 +1036,10 @@ structure WorkflowInstanceTerminateOptions where
   /-- `boolean rollback` -/
   rollback : Option Bool := none
 instance : ToJS WorkflowInstanceTerminateOptions := ⟨fun d => Support.fields #[("rollback", Support.optional d.rollback)]⟩
+instance : FromJS WorkflowInstanceTerminateOptions where
+  fromJS d := do return {
+    rollback := ← Lasm.JS.readField (Option Bool) d "rollback" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceTerminateOptions"
 
 /-- `dictionary WorkflowInstanceRestartOptionsFrom` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceRestartOptionsFrom where
@@ -892,12 +1052,22 @@ structure WorkflowInstanceRestartOptionsFrom where
 instance : ToJS WorkflowInstanceRestartOptionsFrom := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("count", Support.optional d.count),
     ("type", Support.optional d.type)]⟩
+instance : FromJS WorkflowInstanceRestartOptionsFrom where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    count := ← Lasm.JS.readField (Option Float) d "count",
+    type := ← Lasm.JS.readField (Option WorkflowInstanceRestartOptionsFromType) d "type" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceRestartOptionsFrom"
 
 /-- `dictionary WorkflowInstanceRestartOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceRestartOptions where
   /-- `WorkflowInstanceRestartOptionsFrom from` -/
   «from» : Option WorkflowInstanceRestartOptionsFrom := none
 instance : ToJS WorkflowInstanceRestartOptions := ⟨fun d => Support.fields #[("from", Support.optional d.«from»)]⟩
+instance : FromJS WorkflowInstanceRestartOptions where
+  fromJS d := do return {
+    «from» := ← Lasm.JS.readField (Option WorkflowInstanceRestartOptionsFrom) d "from" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceRestartOptions"
 
 /-- `dictionary WorkflowInstanceSendEventOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceSendEventOptions where
@@ -907,6 +1077,11 @@ structure WorkflowInstanceSendEventOptions where
   payload : Data
 instance : ToJS WorkflowInstanceSendEventOptions := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("payload", toJS d.payload)]⟩
+instance : FromJS WorkflowInstanceSendEventOptions where
+  fromJS d := do return {
+    type := ← Lasm.JS.readField String d "type",
+    payload := ← Lasm.JS.readField Data d "payload" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceSendEventOptions"
 
 /-- `dictionary WorkflowInstanceSubscribeOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceSubscribeOptions where
@@ -916,6 +1091,11 @@ structure WorkflowInstanceSubscribeOptions where
   filter : Option (Array WorkflowInstanceEventType) := none
 instance : ToJS WorkflowInstanceSubscribeOptions := ⟨fun d => Support.fields #[("cursor", Support.optional d.cursor),
     ("filter", Support.optional d.filter)]⟩
+instance : FromJS WorkflowInstanceSubscribeOptions where
+  fromJS d := do return {
+    cursor := ← Lasm.JS.readField (Option Float) d "cursor",
+    filter := ← Lasm.JS.readField (Option (Array WorkflowInstanceEventType)) d "filter" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowInstanceSubscribeOptions"
 
 /-- `dictionary WorkflowError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowError where
@@ -925,6 +1105,11 @@ structure WorkflowError where
   message : String
 instance : ToJS WorkflowError := ⟨fun d => Support.fields #[("code", Support.optional d.code),
     ("message", toJS d.message)]⟩
+instance : FromJS WorkflowError where
+  fromJS d := do return {
+    code := ← Lasm.JS.readField (Option Float) d "code",
+    message := ← Lasm.JS.readField String d "message" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowError"
 
 /-- `dictionary WorkflowCreateBatchOptionsRetention` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowCreateBatchOptionsRetention where
@@ -934,6 +1119,11 @@ structure WorkflowCreateBatchOptionsRetention where
   errorRetention : Option DOMStringOrDouble := none
 instance : ToJS WorkflowCreateBatchOptionsRetention := ⟨fun d => Support.fields #[("successRetention", Support.optional d.successRetention),
     ("errorRetention", Support.optional d.errorRetention)]⟩
+instance : FromJS WorkflowCreateBatchOptionsRetention where
+  fromJS d := do return {
+    successRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "successRetention",
+    errorRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "errorRetention" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowCreateBatchOptionsRetention"
 
 /-- `dictionary WorkflowCreateBatchOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowCreateBatchOptions where
@@ -949,6 +1139,13 @@ instance : ToJS WorkflowCreateBatchOptions := ⟨fun d => Support.fields #[("cou
     ("params", d.params),
     ("retention", Support.optional d.retention),
     ("locationHint", Support.optional d.locationHint)]⟩
+instance : FromJS WorkflowCreateBatchOptions where
+  fromJS d := do return {
+    count := ← Lasm.JS.readField Float d "count",
+    params := ← Lasm.JS.readField Data d "params",
+    retention := ← Lasm.JS.readField (Option WorkflowCreateBatchOptionsRetention) d "retention",
+    locationHint := ← Lasm.JS.readField (Option WorkflowInstanceLocationHint) d "locationHint" }
+  typeName := "Lasm.JS.Cloudflare.WorkflowCreateBatchOptions"
 
 /-- `sleep: (name: string, duration: WorkflowSleepDuration) => Promise<void>`: `readonly attribute WorkflowStepSleep sleep` -/
 def WorkflowStep.sleep (self : WorkflowStep) : IO WorkflowStepSleep := self.val.get "sleep" WorkflowStepSleep

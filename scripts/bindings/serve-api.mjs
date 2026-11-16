@@ -613,6 +613,8 @@ export function lowerHost(host, files) {
         let lowered = [...new Set(rest.map(a => lowerAlt(a, ctx)))];
         // `unknown` (and what is read as any: Date) absorbs the other alternatives.
         if (lowered.includes('any')) return 'any';
+        // Enumerations beside `string` (`"user" | "assistant" | string`, spliced from aliases): a string.
+        if (lowered.includes('DOMString') && lowered.every(x => x === 'DOMString' || /^enum /m.test((extra.get(x) ?? '').split('\n').at(-1)))) return nullable ? 'DOMString?' : 'DOMString';
         if (lowered.includes('ArrayBuffer') && lowered.includes('ArrayBufferView')) lowered = [...lowered.filter(x => x !== 'ArrayBuffer' && x !== 'ArrayBufferView'), 'BufferSource'];
         const base = lowered.length === 1 ? lowered[0] : unionTypedef(lowered, ctx);
         return nullable ? `${base}?` : base;
@@ -800,6 +802,8 @@ export function lowerHost(host, files) {
       if (d) ctx = { ...ctx, decl: d.name.includes('.') ? d : ctx.decl };
       if (d?.kind === 'interface') return [...heritage(d).flatMap(h => objectMembers(h, ctx)), ...membersOf(d.src, d.body[0], d.body[1])];
       if (d?.kind === 'type') return objectMembers(parseType(aliasBody(d)), { ...ctx, generics: { ...ctx.generics, ...declGenerics(d) } });
+      // A type of the web platform or JavaScript (Error, ExtendableEvent): its members are Lasm.JS.Web's.
+      if (!d && host.allOverloads) return [];
       if (['unknown', 'object', 'any', 'NonNullable'].includes(t.name)) return t.name === 'NonNullable' ? objectMembers(t.args[0], ctx) : [];
       if (['Readonly', 'Awaited'].includes(t.name)) return objectMembers(t.args[0], ctx);
       if (t.name === 'Exclude' || t.name === 'Extract') {
@@ -1103,7 +1107,10 @@ export function lowerHost(host, files) {
           if (!s.compose) for (const h of heritage(d)) {
             const hn = typeText(h).replace(/<.*$/, '').replace(new RegExp(`^${host.global}\\.`), '');
             const ref = refName(hn, h.args ?? [], `${s.name} extends`);
-            if (ref) { if (parent) fail(`${s.name}: two selected bases`); parent = ref; }
+            // The full surface: a dictionary takes its base's members (a member it redeclares
+            // replaces the base's), rather than inheriting.
+            if (ref && host.allOverloads && s.as === 'dictionary') { const own = new Set(ms.map(x => x.name)); ms = [...objectMembers(h, { where: s.name, generics: {}, decl: d }).filter(x => !own.has(x.name)), ...ms]; }
+            else if (ref) { if (parent) fail(`${s.name}: two selected bases`); parent = ref; }
             // rich: a base declared here but not selected (a type alias of an object type) gives its
             // members; a base of the web platform or JavaScript (Error, ExtendableEvent, Record) is
             // not repeated: its members are Lasm.JS.Web's.
@@ -1134,8 +1141,11 @@ export function lowerHost(host, files) {
         const intKey = `${s.name}.${m.name}`;
         // WebIDL reserves a few identifiers (`toString`): such a member is written `toString_`, named by LasmName.
         const reserved = rich && ['toString', 'constructor', 'toJSON', 'prototype'].includes(m.name);
+        // A member holding a class (`Span: typeof Span`) is named `SpanClass`: its name is the
+        // class's type's in Lean.
+        const classRef = rich && m.kind === 'property' && /^typeof\s/.test(m.type ?? '');
         const idlMember = reserved ? `${m.name}_` : idlId(m.name);
-        const more = reserved ? { LasmName: m.name } : {};
+        const more = reserved ? { LasmName: m.name } : classRef ? { LasmLeanName: `${m.name}Class` } : {};
         if (s.as === 'interface') {
           const flags = new Set();
           const stat = m.static ? 'static ' : '';

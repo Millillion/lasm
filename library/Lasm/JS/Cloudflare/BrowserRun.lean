@@ -1383,6 +1383,13 @@ instance : ToJS BrowserRunScreenshotOptionsAddScriptTag := ⟨fun d => Support.f
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunScreenshotOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunScreenshotOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptionsAddStyleTag where
@@ -1392,6 +1399,11 @@ structure BrowserRunScreenshotOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunScreenshotOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunScreenshotOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunScreenshotOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptionsAuthenticate where
@@ -1401,6 +1413,11 @@ structure BrowserRunScreenshotOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunScreenshotOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunScreenshotOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsAuthenticate"
 
 /-- `dictionary BrowserRunScreenshotOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptionsCookies where
@@ -1446,6 +1463,23 @@ instance : ToJS BrowserRunScreenshotOptionsCookies := ⟨fun d => Support.fields
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunScreenshotOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunScreenshotOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunScreenshotOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunScreenshotOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsCookies"
 
 /-- `typedef BrowserRunScreenshotOptionsGotoOptionsWaitUntil or BrowserRunScreenshotOptionsGotoOptionsWaitUntil2 or BrowserRunScreenshotOptionsGotoOptionsWaitUntil3 or BrowserRunScreenshotOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -1506,6 +1540,15 @@ instance : ToJS BrowserRunScreenshotOptionsViewport := ⟨fun d => Support.field
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunScreenshotOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsViewport"
 
 /-- `dictionary BrowserRunScreenshotOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptionsWaitForSelector where
@@ -1521,6 +1564,13 @@ instance : ToJS BrowserRunScreenshotOptionsWaitForSelector := ⟨fun d => Suppor
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunScreenshotOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScreenshotOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunPuppeteerScreenshotOptionsClip` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPuppeteerScreenshotOptionsClip where
@@ -1539,6 +1589,14 @@ instance : ToJS BrowserRunPuppeteerScreenshotOptionsClip := ⟨fun d => Support.
     ("width", toJS d.width),
     ("height", toJS d.height),
     ("scale", Support.optional d.scale)]⟩
+instance : FromJS BrowserRunPuppeteerScreenshotOptionsClip where
+  fromJS d := do return {
+    x := ← Lasm.JS.readField Float d "x",
+    y := ← Lasm.JS.readField Float d "y",
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    scale := ← Lasm.JS.readField (Option Float) d "scale" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptionsClip"
 
 /-- `dictionary BrowserRunPuppeteerScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPuppeteerScreenshotOptions where
@@ -1569,6 +1627,18 @@ instance : ToJS BrowserRunPuppeteerScreenshotOptions := ⟨fun d => Support.fiel
     ("optimizeForSpeed", Support.optional d.optimizeForSpeed),
     ("captureBeyondViewport", Support.optional d.captureBeyondViewport),
     ("fromSurface", Support.optional d.fromSurface)]⟩
+instance : FromJS BrowserRunPuppeteerScreenshotOptions where
+  fromJS d := do return {
+    type := ← Lasm.JS.readField (Option BrowserRunPuppeteerScreenshotOptionsType) d "type",
+    encoding := ← Lasm.JS.readField (Option BrowserRunPuppeteerScreenshotOptionsEncoding) d "encoding",
+    quality := ← Lasm.JS.readField (Option Float) d "quality",
+    fullPage := ← Lasm.JS.readField (Option Bool) d "fullPage",
+    clip := ← Lasm.JS.readField (Option BrowserRunPuppeteerScreenshotOptionsClip) d "clip",
+    omitBackground := ← Lasm.JS.readField (Option Bool) d "omitBackground",
+    optimizeForSpeed := ← Lasm.JS.readField (Option Bool) d "optimizeForSpeed",
+    captureBeyondViewport := ← Lasm.JS.readField (Option Bool) d "captureBeyondViewport",
+    fromSurface := ← Lasm.JS.readField (Option Bool) d "fromSurface" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptions"
 
 /-- `dictionary BrowserRunScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScreenshotOptions where
@@ -1662,6 +1732,13 @@ instance : ToJS BrowserRunPDFOptionsAddScriptTag := ⟨fun d => Support.fields #
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunPDFOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunPDFOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsAddStyleTag where
@@ -1671,6 +1748,11 @@ structure BrowserRunPDFOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunPDFOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunPDFOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunPDFOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsAuthenticate where
@@ -1680,6 +1762,11 @@ structure BrowserRunPDFOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunPDFOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunPDFOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsAuthenticate"
 
 /-- `dictionary BrowserRunPDFOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsCookies where
@@ -1725,6 +1812,23 @@ instance : ToJS BrowserRunPDFOptionsCookies := ⟨fun d => Support.fields #[("na
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunPDFOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunPDFOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunPDFOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunPDFOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsCookies"
 
 /-- `typedef BrowserRunPDFOptionsGotoOptionsWaitUntil or BrowserRunPDFOptionsGotoOptionsWaitUntil2 or BrowserRunPDFOptionsGotoOptionsWaitUntil3 or BrowserRunPDFOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -1785,6 +1889,15 @@ instance : ToJS BrowserRunPDFOptionsViewport := ⟨fun d => Support.fields #[("w
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunPDFOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsViewport"
 
 /-- `dictionary BrowserRunPDFOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsWaitForSelector where
@@ -1800,6 +1913,13 @@ instance : ToJS BrowserRunPDFOptionsWaitForSelector := ⟨fun d => Support.field
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunPDFOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunPDFOptionsPdfOptionsMargin` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsPdfOptionsMargin where
@@ -1815,6 +1935,13 @@ instance : ToJS BrowserRunPDFOptionsPdfOptionsMargin := ⟨fun d => Support.fiel
     ("right", Support.optional d.right),
     ("bottom", Support.optional d.bottom),
     ("left", Support.optional d.left)]⟩
+instance : FromJS BrowserRunPDFOptionsPdfOptionsMargin where
+  fromJS d := do return {
+    top := ← Lasm.JS.readField (Option DOMStringOrDouble) d "top",
+    right := ← Lasm.JS.readField (Option DOMStringOrDouble) d "right",
+    bottom := ← Lasm.JS.readField (Option DOMStringOrDouble) d "bottom",
+    left := ← Lasm.JS.readField (Option DOMStringOrDouble) d "left" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsPdfOptionsMargin"
 
 /-- `dictionary BrowserRunPDFOptionsPdfOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsPdfOptions where
@@ -1866,6 +1993,25 @@ instance : ToJS BrowserRunPDFOptionsPdfOptions := ⟨fun d => Support.fields #[(
     ("tagged", Support.optional d.tagged),
     ("outline", Support.optional d.outline),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunPDFOptionsPdfOptions where
+  fromJS d := do return {
+    scale := ← Lasm.JS.readField (Option Float) d "scale",
+    displayHeaderFooter := ← Lasm.JS.readField (Option Bool) d "displayHeaderFooter",
+    headerTemplate := ← Lasm.JS.readField (Option String) d "headerTemplate",
+    footerTemplate := ← Lasm.JS.readField (Option String) d "footerTemplate",
+    printBackground := ← Lasm.JS.readField (Option Bool) d "printBackground",
+    landscape := ← Lasm.JS.readField (Option Bool) d "landscape",
+    pageRanges := ← Lasm.JS.readField (Option String) d "pageRanges",
+    format := ← Lasm.JS.readField (Option BrowserRunPDFOptionsPdfOptionsFormat) d "format",
+    width := ← Lasm.JS.readField (Option DOMStringOrDouble) d "width",
+    height := ← Lasm.JS.readField (Option DOMStringOrDouble) d "height",
+    preferCSSPageSize := ← Lasm.JS.readField (Option Bool) d "preferCSSPageSize",
+    margin := ← Lasm.JS.readField (Option BrowserRunPDFOptionsPdfOptionsMargin) d "margin",
+    omitBackground := ← Lasm.JS.readField (Option Bool) d "omitBackground",
+    tagged := ← Lasm.JS.readField (Option Bool) d "tagged",
+    outline := ← Lasm.JS.readField (Option Bool) d "outline",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPDFOptionsPdfOptions"
 
 /-- `dictionary BrowserRunPDFOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptions where
@@ -1953,6 +2099,13 @@ instance : ToJS BrowserRunQuickActionOptionsAddScriptTag := ⟨fun d => Support.
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunQuickActionOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunQuickActionOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsAddStyleTag where
@@ -1962,6 +2115,11 @@ structure BrowserRunQuickActionOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunQuickActionOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunQuickActionOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunQuickActionOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsAuthenticate where
@@ -1971,6 +2129,11 @@ structure BrowserRunQuickActionOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunQuickActionOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunQuickActionOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsAuthenticate"
 
 /-- `dictionary BrowserRunQuickActionOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsCookies where
@@ -2016,6 +2179,23 @@ instance : ToJS BrowserRunQuickActionOptionsCookies := ⟨fun d => Support.field
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunQuickActionOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunQuickActionOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunQuickActionOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunQuickActionOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsCookies"
 
 /-- `typedef BrowserRunQuickActionOptionsGotoOptionsWaitUntil or BrowserRunQuickActionOptionsGotoOptionsWaitUntil2 or BrowserRunQuickActionOptionsGotoOptionsWaitUntil3 or BrowserRunQuickActionOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunQuickActionOptionsGotoOptionsWaitUntilOrBrowserRunQuickActionOptionsGotoOptionsWaitUntil2OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil3OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunQuickActionOptionsGotoOptionsWaitUntilOrBrowserRunQuickActionOptionsGotoOptionsWaitUntil2OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil3OrBrowserRunQuickActionOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -2076,6 +2256,15 @@ instance : ToJS BrowserRunQuickActionOptionsViewport := ⟨fun d => Support.fiel
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunQuickActionOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsViewport"
 
 /-- `dictionary BrowserRunQuickActionOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsWaitForSelector where
@@ -2091,6 +2280,13 @@ instance : ToJS BrowserRunQuickActionOptionsWaitForSelector := ⟨fun d => Suppo
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunQuickActionOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunQuickActionOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptions where
@@ -2175,6 +2371,13 @@ instance : ToJS BrowserRunScrapeOptionsAddScriptTag := ⟨fun d => Support.field
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunScrapeOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunScrapeOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsAddStyleTag where
@@ -2184,6 +2387,11 @@ structure BrowserRunScrapeOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunScrapeOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunScrapeOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunScrapeOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsAuthenticate where
@@ -2193,6 +2401,11 @@ structure BrowserRunScrapeOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunScrapeOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunScrapeOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsAuthenticate"
 
 /-- `dictionary BrowserRunScrapeOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsCookies where
@@ -2238,6 +2451,23 @@ instance : ToJS BrowserRunScrapeOptionsCookies := ⟨fun d => Support.fields #[(
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunScrapeOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunScrapeOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunScrapeOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunScrapeOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsCookies"
 
 /-- `typedef BrowserRunScrapeOptionsGotoOptionsWaitUntil or BrowserRunScrapeOptionsGotoOptionsWaitUntil2 or BrowserRunScrapeOptionsGotoOptionsWaitUntil3 or BrowserRunScrapeOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -2298,6 +2528,15 @@ instance : ToJS BrowserRunScrapeOptionsViewport := ⟨fun d => Support.fields #[
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunScrapeOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsViewport"
 
 /-- `dictionary BrowserRunScrapeOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsWaitForSelector where
@@ -2313,12 +2552,23 @@ instance : ToJS BrowserRunScrapeOptionsWaitForSelector := ⟨fun d => Support.fi
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunScrapeOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunScrapeOptionsElements` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptionsElements where
   /-- `required DOMString selector` -/
   selector : String
 instance : ToJS BrowserRunScrapeOptionsElements := ⟨fun d => Support.fields #[("selector", toJS d.selector)]⟩
+instance : FromJS BrowserRunScrapeOptionsElements where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeOptionsElements"
 
 /-- `dictionary BrowserRunScrapeOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeOptions where
@@ -2406,6 +2656,13 @@ instance : ToJS BrowserRunLinksOptionsAddScriptTag := ⟨fun d => Support.fields
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunLinksOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunLinksOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptionsAddStyleTag where
@@ -2415,6 +2672,11 @@ structure BrowserRunLinksOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunLinksOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunLinksOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunLinksOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptionsAuthenticate where
@@ -2424,6 +2686,11 @@ structure BrowserRunLinksOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunLinksOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunLinksOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsAuthenticate"
 
 /-- `dictionary BrowserRunLinksOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptionsCookies where
@@ -2469,6 +2736,23 @@ instance : ToJS BrowserRunLinksOptionsCookies := ⟨fun d => Support.fields #[("
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunLinksOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunLinksOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunLinksOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunLinksOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsCookies"
 
 /-- `typedef BrowserRunLinksOptionsGotoOptionsWaitUntil or BrowserRunLinksOptionsGotoOptionsWaitUntil2 or BrowserRunLinksOptionsGotoOptionsWaitUntil3 or BrowserRunLinksOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -2529,6 +2813,15 @@ instance : ToJS BrowserRunLinksOptionsViewport := ⟨fun d => Support.fields #[(
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunLinksOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsViewport"
 
 /-- `dictionary BrowserRunLinksOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptionsWaitForSelector where
@@ -2544,6 +2837,13 @@ instance : ToJS BrowserRunLinksOptionsWaitForSelector := ⟨fun d => Support.fie
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunLinksOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunLinksOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksOptions where
@@ -2634,6 +2934,13 @@ instance : ToJS BrowserRunSnapshotOptionsAddScriptTag := ⟨fun d => Support.fie
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunSnapshotOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunSnapshotOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsAddStyleTag where
@@ -2643,6 +2950,11 @@ structure BrowserRunSnapshotOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunSnapshotOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunSnapshotOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunSnapshotOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsAuthenticate where
@@ -2652,6 +2964,11 @@ structure BrowserRunSnapshotOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunSnapshotOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunSnapshotOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsAuthenticate"
 
 /-- `dictionary BrowserRunSnapshotOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsCookies where
@@ -2697,6 +3014,23 @@ instance : ToJS BrowserRunSnapshotOptionsCookies := ⟨fun d => Support.fields #
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunSnapshotOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunSnapshotOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunSnapshotOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunSnapshotOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsCookies"
 
 /-- `typedef BrowserRunSnapshotOptionsGotoOptionsWaitUntil or BrowserRunSnapshotOptionsGotoOptionsWaitUntil2 or BrowserRunSnapshotOptionsGotoOptionsWaitUntil3 or BrowserRunSnapshotOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -2757,6 +3091,15 @@ instance : ToJS BrowserRunSnapshotOptionsViewport := ⟨fun d => Support.fields 
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunSnapshotOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsViewport"
 
 /-- `dictionary BrowserRunSnapshotOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsWaitForSelector where
@@ -2772,6 +3115,13 @@ instance : ToJS BrowserRunSnapshotOptionsWaitForSelector := ⟨fun d => Support.
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunSnapshotOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunSnapshotOptionsScreenshotOptionsClip` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsScreenshotOptionsClip where
@@ -2790,6 +3140,14 @@ instance : ToJS BrowserRunSnapshotOptionsScreenshotOptionsClip := ⟨fun d => Su
     ("width", toJS d.width),
     ("height", toJS d.height),
     ("scale", Support.optional d.scale)]⟩
+instance : FromJS BrowserRunSnapshotOptionsScreenshotOptionsClip where
+  fromJS d := do return {
+    x := ← Lasm.JS.readField Float d "x",
+    y := ← Lasm.JS.readField Float d "y",
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    scale := ← Lasm.JS.readField (Option Float) d "scale" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsScreenshotOptionsClip"
 
 /-- `dictionary BrowserRunSnapshotOptionsScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsScreenshotOptions where
@@ -2817,6 +3175,17 @@ instance : ToJS BrowserRunSnapshotOptionsScreenshotOptions := ⟨fun d => Suppor
     ("optimizeForSpeed", Support.optional d.optimizeForSpeed),
     ("captureBeyondViewport", Support.optional d.captureBeyondViewport),
     ("fromSurface", Support.optional d.fromSurface)]⟩
+instance : FromJS BrowserRunSnapshotOptionsScreenshotOptions where
+  fromJS d := do return {
+    type := ← Lasm.JS.readField (Option BrowserRunSnapshotOptionsScreenshotOptionsType) d "type",
+    quality := ← Lasm.JS.readField (Option Float) d "quality",
+    fullPage := ← Lasm.JS.readField (Option Bool) d "fullPage",
+    clip := ← Lasm.JS.readField (Option BrowserRunSnapshotOptionsScreenshotOptionsClip) d "clip",
+    omitBackground := ← Lasm.JS.readField (Option Bool) d "omitBackground",
+    optimizeForSpeed := ← Lasm.JS.readField (Option Bool) d "optimizeForSpeed",
+    captureBeyondViewport := ← Lasm.JS.readField (Option Bool) d "captureBeyondViewport",
+    fromSurface := ← Lasm.JS.readField (Option Bool) d "fromSurface" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotOptionsScreenshotOptions"
 
 /-- `dictionary BrowserRunSnapshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptions where
@@ -2907,6 +3276,13 @@ instance : ToJS BrowserRunAccessibilityTreeOptionsAddScriptTag := ⟨fun d => Su
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunAccessibilityTreeOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptionsAddStyleTag where
@@ -2916,6 +3292,11 @@ structure BrowserRunAccessibilityTreeOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunAccessibilityTreeOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunAccessibilityTreeOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptionsAuthenticate where
@@ -2925,6 +3306,11 @@ structure BrowserRunAccessibilityTreeOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunAccessibilityTreeOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsAuthenticate"
 
 /-- `dictionary BrowserRunAccessibilityTreeOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptionsCookies where
@@ -2970,6 +3356,23 @@ instance : ToJS BrowserRunAccessibilityTreeOptionsCookies := ⟨fun d => Support
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunAccessibilityTreeOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunAccessibilityTreeOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunAccessibilityTreeOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsCookies"
 
 /-- `typedef BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil or BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2 or BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3 or BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntilOrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntilOrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -3030,6 +3433,15 @@ instance : ToJS BrowserRunAccessibilityTreeOptionsViewport := ⟨fun d => Suppor
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsViewport"
 
 /-- `dictionary BrowserRunAccessibilityTreeOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptionsWaitForSelector where
@@ -3045,6 +3457,13 @@ instance : ToJS BrowserRunAccessibilityTreeOptionsWaitForSelector := ⟨fun d =>
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunAccessibilityTreeOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunAccessibilityTreeOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeOptions where
@@ -3129,14 +3548,14 @@ instance : Nonempty BrowserRunAcquireOptionsOutboundByHostFetch := ⟨{ val := C
 instance : ToJS BrowserRunAcquireOptionsOutboundByHostFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS BrowserRunAcquireOptionsOutboundByHostFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.BrowserRunAcquireOptionsOutboundByHostFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def BrowserRunAcquireOptionsOutboundByHostFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO BrowserRunAcquireOptionsOutboundByHostFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def BrowserRunAcquireOptionsOutboundByHostFetch.ofFn (f : Data → Data → Async Response) : IO BrowserRunAcquireOptionsOutboundByHostFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def BrowserRunAcquireOptionsOutboundByHostFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO BrowserRunAcquireOptionsOutboundByHostFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def BrowserRunAcquireOptionsOutboundByHostFetch.ofSyncFn (f : Data → Data → IO Response) : IO BrowserRunAcquireOptionsOutboundByHostFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -3169,6 +3588,11 @@ structure BrowserRunAcquireOptionsOutboundByHost where
   connect : BrowserRunAcquireOptionsOutboundByHostConnect
 instance : ToJS BrowserRunAcquireOptionsOutboundByHost := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
+instance : FromJS BrowserRunAcquireOptionsOutboundByHost where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField BrowserRunAcquireOptionsOutboundByHostFetch d "fetch",
+    connect := ← Lasm.JS.readField BrowserRunAcquireOptionsOutboundByHostConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAcquireOptionsOutboundByHost"
 
 /-- `dictionary BrowserRunAcquireGuardrails` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAcquireGuardrails where
@@ -3178,6 +3602,11 @@ structure BrowserRunAcquireGuardrails where
   allowedDomainSets : Option (Array String) := none
 instance : ToJS BrowserRunAcquireGuardrails := ⟨fun d => Support.fields #[("allowedDomains", Support.optional d.allowedDomains),
     ("allowedDomainSets", Support.optional d.allowedDomainSets)]⟩
+instance : FromJS BrowserRunAcquireGuardrails where
+  fromJS d := do return {
+    allowedDomains := ← Lasm.JS.readField (Option (Array String)) d "allowedDomains",
+    allowedDomainSets := ← Lasm.JS.readField (Option (Array String)) d "allowedDomainSets" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAcquireGuardrails"
 
 /-- `dictionary BrowserRunAcquireOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAcquireOptions where
@@ -3202,6 +3631,16 @@ instance : ToJS BrowserRunAcquireOptions := ⟨fun d => Support.fields #[("keepA
     ("guardrails", Support.optional d.guardrails),
     ("targets", Support.optional d.targets),
     ("liveViewUrlExpiresInMs", Support.optional d.liveViewUrlExpiresInMs)]⟩
+instance : FromJS BrowserRunAcquireOptions where
+  fromJS d := do return {
+    keepAlive := ← Lasm.JS.readField (Option Float) d "keepAlive",
+    recording := ← Lasm.JS.readField (Option Bool) d "recording",
+    location := ← Lasm.JS.readField (Option String) d "location",
+    outboundByHost := ← Lasm.JS.readField (Option (Record BrowserRunAcquireOptionsOutboundByHost)) d "outboundByHost",
+    guardrails := ← Lasm.JS.readField (Option BrowserRunAcquireGuardrails) d "guardrails",
+    targets := ← Lasm.JS.readField (Option Bool) d "targets",
+    liveViewUrlExpiresInMs := ← Lasm.JS.readField (Option Float) d "liveViewUrlExpiresInMs" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAcquireOptions"
 
 /-- `dictionary BrowserRunDevToolsTarget` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunDevToolsTarget where
@@ -3219,6 +3658,13 @@ structure BrowserRunDevToolsTarget where
   webSocketDebuggerUrl : Option String := none
   /-- `DOMString devtoolsFrontendUrl` -/
   devtoolsFrontendUrl : Option String := none
+instance : ToJS BrowserRunDevToolsTarget := ⟨fun d => Support.fields #[("id", toJS d.id),
+    ("type", toJS d.type),
+    ("url", toJS d.url),
+    ("title", Support.optional d.title),
+    ("description", Support.optional d.description),
+    ("webSocketDebuggerUrl", Support.optional d.webSocketDebuggerUrl),
+    ("devtoolsFrontendUrl", Support.optional d.devtoolsFrontendUrl)]⟩
 instance : FromJS BrowserRunDevToolsTarget where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -3236,6 +3682,8 @@ structure BrowserRunAcquireResult where
   sessionId : String
   /-- `sequence<BrowserRunDevToolsTarget> targets` -/
   targets : Option (Array BrowserRunDevToolsTarget) := none
+instance : ToJS BrowserRunAcquireResult := ⟨fun d => Support.fields #[("sessionId", toJS d.sessionId),
+    ("targets", Support.optional d.targets)]⟩
 instance : FromJS BrowserRunAcquireResult where
   fromJS d := do return {
     sessionId := ← Lasm.JS.readField String d "sessionId",
@@ -3250,14 +3698,14 @@ instance : Nonempty BrowserRunConnectionWebSocketFetch := ⟨{ val := Classical.
 instance : ToJS BrowserRunConnectionWebSocketFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS BrowserRunConnectionWebSocketFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.BrowserRunConnectionWebSocketFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def BrowserRunConnectionWebSocketFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO BrowserRunConnectionWebSocketFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def BrowserRunConnectionWebSocketFetch.ofFn (f : Data → Data → Async Response) : IO BrowserRunConnectionWebSocketFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def BrowserRunConnectionWebSocketFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO BrowserRunConnectionWebSocketFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def BrowserRunConnectionWebSocketFetch.ofSyncFn (f : Data → Data → IO Response) : IO BrowserRunConnectionWebSocketFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -3288,6 +3736,8 @@ structure BrowserRunConnectionWebSocket where
   fetch : BrowserRunConnectionWebSocketFetch
   /-- `required BrowserRunConnectionWebSocketConnect connect` -/
   connect : BrowserRunConnectionWebSocketConnect
+instance : ToJS BrowserRunConnectionWebSocket := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
+    ("connect", toJS d.connect)]⟩
 instance : FromJS BrowserRunConnectionWebSocket where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField BrowserRunConnectionWebSocketFetch d "fetch",
@@ -3302,6 +3752,9 @@ structure BrowserRunConnection where
   webSocket : BrowserRunConnectionWebSocket
   /-- `sequence<BrowserRunDevToolsTarget> targets` -/
   targets : Option (Array BrowserRunDevToolsTarget) := none
+instance : ToJS BrowserRunConnection := ⟨fun d => Support.fields #[("sessionId", toJS d.sessionId),
+    ("webSocket", toJS d.webSocket),
+    ("targets", Support.optional d.targets)]⟩
 instance : FromJS BrowserRunConnection where
   fromJS d := do return {
     sessionId := ← Lasm.JS.readField String d "sessionId",
@@ -3314,6 +3767,10 @@ structure BrowserRunConnectOptions where
   /-- `DOMString targetId` -/
   targetId : Option String := none
 instance : ToJS BrowserRunConnectOptions := ⟨fun d => Support.fields #[("targetId", Support.optional d.targetId)]⟩
+instance : FromJS BrowserRunConnectOptions where
+  fromJS d := do return {
+    targetId := ← Lasm.JS.readField (Option String) d "targetId" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunConnectOptions"
 
 /-- `dictionary BrowserRunConnectionGuardrails` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunConnectionGuardrails where
@@ -3365,6 +3822,10 @@ structure BrowserRunLiveView where
   id : String
   /-- `required BrowserRunLiveViewOptions options` -/
   options : BrowserRunLiveViewOptions
+instance : ToJS BrowserRunLiveView := ⟨fun d => Support.fields #[("webSocketDebuggerUrl", toJS d.webSocketDebuggerUrl),
+    ("devtoolsFrontendUrl", toJS d.devtoolsFrontendUrl),
+    ("id", toJS d.id),
+    ("options", toJS d.options)]⟩
 instance : FromJS BrowserRunLiveView where
   fromJS d := do return {
     webSocketDebuggerUrl := ← Lasm.JS.readField String d "webSocketDebuggerUrl",
@@ -3381,6 +3842,11 @@ structure BrowserRunListSessionsOptions where
   offset : Option Float := none
 instance : ToJS BrowserRunListSessionsOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
     ("offset", Support.optional d.offset)]⟩
+instance : FromJS BrowserRunListSessionsOptions where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField (Option Float) d "limit",
+    offset := ← Lasm.JS.readField (Option Float) d "offset" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunListSessionsOptions"
 
 /-- `dictionary BrowserRunSession` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSession where
@@ -3406,6 +3872,17 @@ structure BrowserRunSession where
   webSocketDebuggerUrl : Option String := none
   /-- `DOMString devtoolsFrontendUrl` -/
   devtoolsFrontendUrl : Option String := none
+instance : ToJS BrowserRunSession := ⟨fun d => Support.fields #[("sessionId", toJS d.sessionId),
+    ("startTime", Support.optional d.startTime),
+    ("endTime", Support.optional d.endTime),
+    ("closeReason", Support.optional d.closeReason),
+    ("closeReasonText", Support.optional d.closeReasonText),
+    ("connectionId", Support.optional d.connectionId),
+    ("connectionStartTime", Support.optional d.connectionStartTime),
+    ("connectionEndTime", Support.optional d.connectionEndTime),
+    ("lastUpdated", Support.optional d.lastUpdated),
+    ("webSocketDebuggerUrl", Support.optional d.webSocketDebuggerUrl),
+    ("devtoolsFrontendUrl", Support.optional d.devtoolsFrontendUrl)]⟩
 instance : FromJS BrowserRunSession where
   fromJS d := do return {
     sessionId := ← Lasm.JS.readField String d "sessionId",
@@ -3429,11 +3906,17 @@ structure BrowserRunHistoryOptions where
   offset : Option Float := none
 instance : ToJS BrowserRunHistoryOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
     ("offset", Support.optional d.offset)]⟩
+instance : FromJS BrowserRunHistoryOptions where
+  fromJS d := do return {
+    limit := ← Lasm.JS.readField (Option Float) d "limit",
+    offset := ← Lasm.JS.readField (Option Float) d "offset" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunHistoryOptions"
 
 /-- `dictionary BrowserRunLimitsActiveSessions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLimitsActiveSessions where
   /-- `required DOMString id` -/
   id : String
+instance : ToJS BrowserRunLimitsActiveSessions := ⟨fun d => Support.fields #[("id", toJS d.id)]⟩
 instance : FromJS BrowserRunLimitsActiveSessions where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id" }
@@ -3451,6 +3934,11 @@ structure BrowserRunLimits where
   timeUntilNextAllowedBrowserAcquisition : Float
   /-- `double usedBrowserTimeSeconds` -/
   usedBrowserTimeSeconds : Option Float := none
+instance : ToJS BrowserRunLimits := ⟨fun d => Support.fields #[("activeSessions", toJS d.activeSessions),
+    ("maxConcurrentSessions", toJS d.maxConcurrentSessions),
+    ("allowedBrowserAcquisitions", toJS d.allowedBrowserAcquisitions),
+    ("timeUntilNextAllowedBrowserAcquisition", toJS d.timeUntilNextAllowedBrowserAcquisition),
+    ("usedBrowserTimeSeconds", Support.optional d.usedBrowserTimeSeconds)]⟩
 instance : FromJS BrowserRunLimits where
   fromJS d := do return {
     activeSessions := ← Lasm.JS.readField (Array BrowserRunLimitsActiveSessions) d "activeSessions",
@@ -3464,6 +3952,7 @@ instance : FromJS BrowserRunLimits where
 structure BrowserRunCloseSessionResult where
   /-- `required BrowserRunCloseSessionResultStatus status` -/
   status : BrowserRunCloseSessionResultStatus
+instance : ToJS BrowserRunCloseSessionResult := ⟨fun d => Support.fields #[("status", toJS d.status)]⟩
 instance : FromJS BrowserRunCloseSessionResult where
   fromJS d := do return {
     status := ← Lasm.JS.readField BrowserRunCloseSessionResultStatus d "status" }
@@ -3475,6 +3964,13 @@ structure BrowserRunDevToolsVersion where
   Browser : String
   /-- `required DOMString webSocketDebuggerUrl` -/
   webSocketDebuggerUrl : String
+instance : ToJS BrowserRunDevToolsVersion := ⟨fun d => Support.fields #[("Browser", toJS d.Browser),
+    ("webSocketDebuggerUrl", toJS d.webSocketDebuggerUrl)]⟩
+instance : FromJS BrowserRunDevToolsVersion where
+  fromJS d := do return {
+    Browser := ← Lasm.JS.readField String d "Browser",
+    webSocketDebuggerUrl := ← Lasm.JS.readField String d "webSocketDebuggerUrl" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunDevToolsVersion"
 
 /-- `callback BrowserRunDevtoolsGetVersion = Promise<BrowserRunDevToolsVersion> (DOMString sessionId)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure BrowserRunDevtoolsGetVersion where
@@ -3510,6 +4006,21 @@ structure BrowserRunDevToolsProtocolDomain where
   commands : Option (Array (Record Data)) := none
   /-- `sequence<record<DOMString, any>> events` -/
   events : Option (Array (Record Data)) := none
+instance : ToJS BrowserRunDevToolsProtocolDomain := ⟨fun d => Support.fields #[("domain", toJS d.domain),
+    ("experimental", Support.optional d.experimental),
+    ("dependencies", Support.optional d.dependencies),
+    ("types", Support.optional d.types),
+    ("commands", Support.optional d.commands),
+    ("events", Support.optional d.events)]⟩
+instance : FromJS BrowserRunDevToolsProtocolDomain where
+  fromJS d := do return {
+    domain := ← Lasm.JS.readField String d "domain",
+    experimental := ← Lasm.JS.readField (Option Bool) d "experimental",
+    dependencies := ← Lasm.JS.readField (Option (Array String)) d "dependencies",
+    types := ← Lasm.JS.readField (Option (Array (Record Data))) d "types",
+    commands := ← Lasm.JS.readField (Option (Array (Record Data))) d "commands",
+    events := ← Lasm.JS.readField (Option (Array (Record Data))) d "events" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunDevToolsProtocolDomain"
 
 /-- `dictionary BrowserRunDevToolsProtocolVersion` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunDevToolsProtocolVersion where
@@ -3517,6 +4028,13 @@ structure BrowserRunDevToolsProtocolVersion where
   major : String
   /-- `required DOMString minor` -/
   minor : String
+instance : ToJS BrowserRunDevToolsProtocolVersion := ⟨fun d => Support.fields #[("major", toJS d.major),
+    ("minor", toJS d.minor)]⟩
+instance : FromJS BrowserRunDevToolsProtocolVersion where
+  fromJS d := do return {
+    major := ← Lasm.JS.readField String d "major",
+    minor := ← Lasm.JS.readField String d "minor" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunDevToolsProtocolVersion"
 
 /-- `dictionary BrowserRunDevToolsProtocol` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunDevToolsProtocol where
@@ -3524,6 +4042,13 @@ structure BrowserRunDevToolsProtocol where
   domains : Array BrowserRunDevToolsProtocolDomain
   /-- `BrowserRunDevToolsProtocolVersion version` -/
   version : Option BrowserRunDevToolsProtocolVersion := none
+instance : ToJS BrowserRunDevToolsProtocol := ⟨fun d => Support.fields #[("domains", toJS d.domains),
+    ("version", Support.optional d.version)]⟩
+instance : FromJS BrowserRunDevToolsProtocol where
+  fromJS d := do return {
+    domains := ← Lasm.JS.readField (Array BrowserRunDevToolsProtocolDomain) d "domains",
+    version := ← Lasm.JS.readField (Option BrowserRunDevToolsProtocolVersion) d "version" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunDevToolsProtocol"
 
 /-- `callback BrowserRunDevtoolsGetProtocol = Promise<BrowserRunDevToolsProtocol> (DOMString sessionId)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure BrowserRunDevtoolsGetProtocol where
@@ -3549,6 +4074,7 @@ def BrowserRunDevtoolsGetProtocol.ofSyncFn (f : String → IO BrowserRunDevTools
 structure BrowserRunTargetOptions where
   /-- `double liveViewUrlExpiresInMs` -/
   liveViewUrlExpiresInMs : Option Float := none
+instance : ToJS BrowserRunTargetOptions := ⟨fun d => Support.fields #[("liveViewUrlExpiresInMs", Support.optional d.liveViewUrlExpiresInMs)]⟩
 instance : FromJS BrowserRunTargetOptions where
   fromJS d := do return {
     liveViewUrlExpiresInMs := ← Lasm.JS.readField (Option Float) d "liveViewUrlExpiresInMs" }
@@ -3618,6 +4144,11 @@ def BrowserRunDevtoolsNewTarget.ofSyncFn (f : String → (Option String) → (Op
 structure BrowserRunTargetActionResult where
   /-- `required DOMString message` -/
   message : String
+instance : ToJS BrowserRunTargetActionResult := ⟨fun d => Support.fields #[("message", toJS d.message)]⟩
+instance : FromJS BrowserRunTargetActionResult where
+  fromJS d := do return {
+    message := ← Lasm.JS.readField String d "message" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunTargetActionResult"
 
 /-- `callback BrowserRunDevtoolsActivateTarget = Promise<BrowserRunTargetActionResult> (DOMString sessionId, DOMString targetId)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure BrowserRunDevtoolsActivateTarget where
@@ -3675,6 +4206,13 @@ structure BrowserRunDevtools where
   activateTarget : BrowserRunDevtoolsActivateTarget
   /-- `required BrowserRunDevtoolsCloseTarget closeTarget` -/
   closeTarget : BrowserRunDevtoolsCloseTarget
+instance : ToJS BrowserRunDevtools := ⟨fun d => Support.fields #[("getVersion", toJS d.getVersion),
+    ("getProtocol", toJS d.getProtocol),
+    ("listTargets", toJS d.listTargets),
+    ("getTarget", toJS d.getTarget),
+    ("newTarget", toJS d.newTarget),
+    ("activateTarget", toJS d.activateTarget),
+    ("closeTarget", toJS d.closeTarget)]⟩
 instance : FromJS BrowserRunDevtools where
   fromJS d := do return {
     getVersion := ← Lasm.JS.readField BrowserRunDevtoolsGetVersion d "getVersion",
@@ -3700,6 +4238,13 @@ instance : ToJS BrowserRunBaseOptionsAddScriptTag := ⟨fun d => Support.fields 
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
+instance : FromJS BrowserRunBaseOptionsAddScriptTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    type := ← Lasm.JS.readField (Option String) d "type",
+    id := ← Lasm.JS.readField (Option String) d "id" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunBaseOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsAddStyleTag where
@@ -3709,6 +4254,11 @@ structure BrowserRunBaseOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunBaseOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
+instance : FromJS BrowserRunBaseOptionsAddStyleTag where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    url := ← Lasm.JS.readField (Option String) d "url" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunBaseOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsAuthenticate where
@@ -3718,6 +4268,11 @@ structure BrowserRunBaseOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunBaseOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
+instance : FromJS BrowserRunBaseOptionsAuthenticate where
+  fromJS d := do return {
+    username := ← Lasm.JS.readField String d "username",
+    password := ← Lasm.JS.readField String d "password" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAuthenticate"
 
 /-- `dictionary BrowserRunBaseOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsCookies where
@@ -3763,6 +4318,23 @@ instance : ToJS BrowserRunBaseOptionsCookies := ⟨fun d => Support.fields #[("n
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
+instance : FromJS BrowserRunBaseOptionsCookies where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value",
+    url := ← Lasm.JS.readField (Option String) d "url",
+    domain := ← Lasm.JS.readField (Option String) d "domain",
+    path := ← Lasm.JS.readField (Option String) d "path",
+    secure := ← Lasm.JS.readField (Option Bool) d "secure",
+    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
+    sameSite := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesSameSite) d "sameSite",
+    expires := ← Lasm.JS.readField (Option Float) d "expires",
+    priority := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesPriority) d "priority",
+    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
+    sourceScheme := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesSourceScheme) d "sourceScheme",
+    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
+    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsCookies"
 
 /-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunBaseOptionsGotoOptionsWaitUntilOrBrowserRunBaseOptionsGotoOptionsWaitUntil2OrBrowserRunBaseOptionsGotoOptionsWaitUntil3OrBrowserRunBaseOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunBaseOptionsGotoOptionsWaitUntilOrBrowserRunBaseOptionsGotoOptionsWaitUntil2OrBrowserRunBaseOptionsGotoOptionsWaitUntil3OrBrowserRunBaseOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -3823,6 +4395,15 @@ instance : ToJS BrowserRunBaseOptionsViewport := ⟨fun d => Support.fields #[("
     ("isMobile", Support.optional d.isMobile),
     ("isLandscape", Support.optional d.isLandscape),
     ("hasTouch", Support.optional d.hasTouch)]⟩
+instance : FromJS BrowserRunBaseOptionsViewport where
+  fromJS d := do return {
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
+    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
+    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
+    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsViewport"
 
 /-- `dictionary BrowserRunBaseOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsWaitForSelector where
@@ -3838,6 +4419,13 @@ instance : ToJS BrowserRunBaseOptionsWaitForSelector := ⟨fun d => Support.fiel
     ("hidden", Support.optional d.hidden),
     ("visible", Support.optional d.visible),
     ("timeout", Support.optional d.timeout)]⟩
+instance : FromJS BrowserRunBaseOptionsWaitForSelector where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
+    visible := ← Lasm.JS.readField (Option Bool) d "visible",
+    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsWaitForSelector"
 
 /-- `dictionary BrowserRunBaseOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptions where
@@ -3904,6 +4492,10 @@ structure BrowserRunAlternateBackendOptions where
   /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
   browser : Option BrowserRunAlternateBackendOptionsBrowser := none
 instance : ToJS BrowserRunAlternateBackendOptions := ⟨fun d => Support.fields #[("browser", Support.optional d.browser)]⟩
+instance : FromJS BrowserRunAlternateBackendOptions where
+  fromJS d := do return {
+    browser := ← Lasm.JS.readField (Option BrowserRunAlternateBackendOptionsBrowser) d "browser" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAlternateBackendOptions"
 
 /-- `dictionary BrowserRunJsonBaseOptionsCustom_ai` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonBaseOptionsCustom_ai where
@@ -3913,12 +4505,21 @@ structure BrowserRunJsonBaseOptionsCustom_ai where
   authorization : Option String := none
 instance : ToJS BrowserRunJsonBaseOptionsCustom_ai := ⟨fun d => Support.fields #[("model", toJS d.model),
     ("authorization", Support.optional d.authorization)]⟩
+instance : FromJS BrowserRunJsonBaseOptionsCustom_ai where
+  fromJS d := do return {
+    model := ← Lasm.JS.readField String d "model",
+    authorization := ← Lasm.JS.readField (Option String) d "authorization" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonBaseOptionsCustom_ai"
 
 /-- `dictionary BrowserRunJsonBaseOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonBaseOptions where
   /-- `sequence<BrowserRunJsonBaseOptionsCustom_ai> custom_ai` -/
   custom_ai : Option (Array BrowserRunJsonBaseOptionsCustom_ai) := none
 instance : ToJS BrowserRunJsonBaseOptions := ⟨fun d => Support.fields #[("custom_ai", Support.optional d.custom_ai)]⟩
+instance : FromJS BrowserRunJsonBaseOptions where
+  fromJS d := do return {
+    custom_ai := ← Lasm.JS.readField (Option (Array BrowserRunJsonBaseOptionsCustom_ai)) d "custom_ai" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonBaseOptions"
 
 /-- `dictionary BrowserRunRedirectHop` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunRedirectHop where
@@ -3931,6 +4532,12 @@ structure BrowserRunRedirectHop where
 instance : ToJS BrowserRunRedirectHop := ⟨fun d => Support.fields #[("url", toJS d.url),
     ("status", toJS d.status),
     ("headers", toJS d.headers)]⟩
+instance : FromJS BrowserRunRedirectHop where
+  fromJS d := do return {
+    url := ← Lasm.JS.readField String d "url",
+    status := ← Lasm.JS.readField Float d "status",
+    headers := ← Lasm.JS.readField (Record String) d "headers" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunRedirectHop"
 
 /-- `dictionary BrowserRunResponseMeta` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunResponseMeta where
@@ -3949,6 +4556,14 @@ instance : ToJS BrowserRunResponseMeta := ⟨fun d => Support.fields #[("status"
     ("headers", Support.optional d.headers),
     ("finalUrl", Support.optional d.finalUrl),
     ("redirectChain", Support.optional d.redirectChain)]⟩
+instance : FromJS BrowserRunResponseMeta where
+  fromJS d := do return {
+    status := ← Lasm.JS.readField Float d "status",
+    title := ← Lasm.JS.readField String d "title",
+    headers := ← Lasm.JS.readField (Option (Record String)) d "headers",
+    finalUrl := ← Lasm.JS.readField (Option String) d "finalUrl",
+    redirectChain := ← Lasm.JS.readField (Option (Array BrowserRunRedirectHop)) d "redirectChain" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunResponseMeta"
 
 /-- `typedef boolean or BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodeChecked`: one constructor per member type. -/
 inductive BooleanOrBrowserRunSerializedAXNodeChecked where
@@ -3961,6 +4576,12 @@ instance : ToJS BooleanOrBrowserRunSerializedAXNodeChecked := ⟨fun
   | .browserRunSerializedAXNodeChecked v => toJS v⟩
 instance : Coe Bool BooleanOrBrowserRunSerializedAXNodeChecked := ⟨.boolean⟩
 instance : Coe BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodeChecked := ⟨.browserRunSerializedAXNodeChecked⟩
+instance : FromJS BooleanOrBrowserRunSerializedAXNodeChecked where
+  fromJS
+    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
+    | d@(.string _) => (FromJS.fromJS d : Except String BrowserRunSerializedAXNodeChecked).map .browserRunSerializedAXNodeChecked
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.BooleanOrBrowserRunSerializedAXNodeChecked"
 
 /-- `typedef boolean or BrowserRunSerializedAXNodePressed BooleanOrBrowserRunSerializedAXNodePressed`: one constructor per member type. -/
 inductive BooleanOrBrowserRunSerializedAXNodePressed where
@@ -3973,6 +4594,12 @@ instance : ToJS BooleanOrBrowserRunSerializedAXNodePressed := ⟨fun
   | .browserRunSerializedAXNodePressed v => toJS v⟩
 instance : Coe Bool BooleanOrBrowserRunSerializedAXNodePressed := ⟨.boolean⟩
 instance : Coe BrowserRunSerializedAXNodePressed BooleanOrBrowserRunSerializedAXNodePressed := ⟨.browserRunSerializedAXNodePressed⟩
+instance : FromJS BooleanOrBrowserRunSerializedAXNodePressed where
+  fromJS
+    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
+    | d@(.string _) => (FromJS.fromJS d : Except String BrowserRunSerializedAXNodePressed).map .browserRunSerializedAXNodePressed
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.BooleanOrBrowserRunSerializedAXNodePressed"
 
 /-- `dictionary BrowserRunSerializedAXNode` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSerializedAXNode where
@@ -4054,6 +4681,35 @@ instance : ToJS BrowserRunSerializedAXNode := ⟨fun d => Support.fields #[("rol
     ("valuemin", Support.optional d.valuemin),
     ("valuetext", Support.optional d.valuetext),
     ("children", d.children)]⟩
+instance : FromJS BrowserRunSerializedAXNode where
+  fromJS d := do return {
+    role := ← Lasm.JS.readField String d "role",
+    autocomplete := ← Lasm.JS.readField (Option String) d "autocomplete",
+    checked := ← Lasm.JS.readField (Option BooleanOrBrowserRunSerializedAXNodeChecked) d "checked",
+    description := ← Lasm.JS.readField (Option String) d "description",
+    disabled := ← Lasm.JS.readField (Option Bool) d "disabled",
+    expanded := ← Lasm.JS.readField (Option Bool) d "expanded",
+    focused := ← Lasm.JS.readField (Option Bool) d "focused",
+    haspopup := ← Lasm.JS.readField (Option String) d "haspopup",
+    invalid := ← Lasm.JS.readField (Option String) d "invalid",
+    keyshortcuts := ← Lasm.JS.readField (Option String) d "keyshortcuts",
+    level := ← Lasm.JS.readField (Option Float) d "level",
+    modal := ← Lasm.JS.readField (Option Bool) d "modal",
+    multiline := ← Lasm.JS.readField (Option Bool) d "multiline",
+    multiselectable := ← Lasm.JS.readField (Option Bool) d "multiselectable",
+    name := ← Lasm.JS.readField (Option String) d "name",
+    orientation := ← Lasm.JS.readField (Option String) d "orientation",
+    pressed := ← Lasm.JS.readField (Option BooleanOrBrowserRunSerializedAXNodePressed) d "pressed",
+    readonly := ← Lasm.JS.readField (Option Bool) d "readonly",
+    required := ← Lasm.JS.readField (Option Bool) d "required",
+    roledescription := ← Lasm.JS.readField (Option String) d "roledescription",
+    selected := ← Lasm.JS.readField (Option Bool) d "selected",
+    value := ← Lasm.JS.readField (Option DOMStringOrDouble) d "value",
+    valuemax := ← Lasm.JS.readField (Option Float) d "valuemax",
+    valuemin := ← Lasm.JS.readField (Option Float) d "valuemin",
+    valuetext := ← Lasm.JS.readField (Option String) d "valuetext",
+    children := ← Lasm.JS.readField Data d "children" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSerializedAXNode"
 
 /-- `dictionary BrowserRunContentSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunContentSuccessResponse where
@@ -4066,6 +4722,12 @@ structure BrowserRunContentSuccessResponse where
 instance : ToJS BrowserRunContentSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunContentSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField String d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunContentSuccessResponse"
 
 /-- `dictionary BrowserRunLinksSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksSuccessResponse where
@@ -4078,6 +4740,12 @@ structure BrowserRunLinksSuccessResponse where
 instance : ToJS BrowserRunLinksSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunLinksSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField (Array String) d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksSuccessResponse"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResultResultsAttributes` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResultResultsAttributes where
@@ -4087,6 +4755,11 @@ structure BrowserRunScrapeSuccessResponseResultResultsAttributes where
   value : String
 instance : ToJS BrowserRunScrapeSuccessResponseResultResultsAttributes := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("value", toJS d.value)]⟩
+instance : FromJS BrowserRunScrapeSuccessResponseResultResultsAttributes where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    value := ← Lasm.JS.readField String d "value" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResultResultsAttributes"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResultResults` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResultResults where
@@ -4111,6 +4784,16 @@ instance : ToJS BrowserRunScrapeSuccessResponseResultResults := ⟨fun d => Supp
     ("top", toJS d.top),
     ("left", toJS d.left),
     ("attributes", toJS d.attributes)]⟩
+instance : FromJS BrowserRunScrapeSuccessResponseResultResults where
+  fromJS d := do return {
+    html := ← Lasm.JS.readField String d "html",
+    text := ← Lasm.JS.readField String d "text",
+    width := ← Lasm.JS.readField Float d "width",
+    height := ← Lasm.JS.readField Float d "height",
+    top := ← Lasm.JS.readField Float d "top",
+    left := ← Lasm.JS.readField Float d "left",
+    attributes := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResultResultsAttributes) d "attributes" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResultResults"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResult where
@@ -4120,6 +4803,11 @@ structure BrowserRunScrapeSuccessResponseResult where
   results : Array BrowserRunScrapeSuccessResponseResultResults
 instance : ToJS BrowserRunScrapeSuccessResponseResult := ⟨fun d => Support.fields #[("selector", toJS d.selector),
     ("results", toJS d.results)]⟩
+instance : FromJS BrowserRunScrapeSuccessResponseResult where
+  fromJS d := do return {
+    selector := ← Lasm.JS.readField String d "selector",
+    results := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResultResults) d "results" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResult"
 
 /-- `dictionary BrowserRunScrapeSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponse where
@@ -4132,6 +4820,12 @@ structure BrowserRunScrapeSuccessResponse where
 instance : ToJS BrowserRunScrapeSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunScrapeSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResult) d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponse"
 
 /-- `dictionary BrowserRunSnapshotSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotSuccessResponseResult where
@@ -4147,6 +4841,13 @@ instance : ToJS BrowserRunSnapshotSuccessResponseResult := ⟨fun d => Support.f
     ("screenshot", Support.optional d.screenshot),
     ("markdown", Support.optional d.markdown),
     ("accessibilityTree", Support.optional d.accessibilityTree)]⟩
+instance : FromJS BrowserRunSnapshotSuccessResponseResult where
+  fromJS d := do return {
+    content := ← Lasm.JS.readField (Option String) d "content",
+    screenshot := ← Lasm.JS.readField (Option String) d "screenshot",
+    markdown := ← Lasm.JS.readField (Option String) d "markdown",
+    accessibilityTree := ← Lasm.JS.readField (Option BrowserRunSerializedAXNode) d "accessibilityTree" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotSuccessResponseResult"
 
 /-- `dictionary BrowserRunSnapshotSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotSuccessResponse where
@@ -4159,12 +4860,22 @@ structure BrowserRunSnapshotSuccessResponse where
 instance : ToJS BrowserRunSnapshotSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunSnapshotSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField BrowserRunSnapshotSuccessResponseResult d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotSuccessResponse"
 
 /-- `dictionary BrowserRunAccessibilityTreeSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeSuccessResponseResult where
   /-- `required BrowserRunSerializedAXNode? accessibilityTree` -/
   accessibilityTree : Option BrowserRunSerializedAXNode
 instance : ToJS BrowserRunAccessibilityTreeSuccessResponseResult := ⟨fun d => Support.fields #[("accessibilityTree", toJS d.accessibilityTree)]⟩
+instance : FromJS BrowserRunAccessibilityTreeSuccessResponseResult where
+  fromJS d := do return {
+    accessibilityTree := ← Lasm.JS.readField (Option BrowserRunSerializedAXNode) d "accessibilityTree" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeSuccessResponseResult"
 
 /-- `dictionary BrowserRunAccessibilityTreeSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeSuccessResponse where
@@ -4177,6 +4888,12 @@ structure BrowserRunAccessibilityTreeSuccessResponse where
 instance : ToJS BrowserRunAccessibilityTreeSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunAccessibilityTreeSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField BrowserRunAccessibilityTreeSuccessResponseResult d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeSuccessResponse"
 
 /-- `dictionary BrowserRunJsonSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonSuccessResponse where
@@ -4189,6 +4906,12 @@ structure BrowserRunJsonSuccessResponse where
 instance : ToJS BrowserRunJsonSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunJsonSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField (Record Data) d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonSuccessResponse"
 
 /-- `dictionary BrowserRunMarkdownSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunMarkdownSuccessResponse where
@@ -4201,6 +4924,12 @@ structure BrowserRunMarkdownSuccessResponse where
 instance : ToJS BrowserRunMarkdownSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
+instance : FromJS BrowserRunMarkdownSuccessResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    result := ← Lasm.JS.readField String d "result",
+    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunMarkdownSuccessResponse"
 
 /-- `dictionary BrowserRunErrorResponseErrors` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunErrorResponseErrors where
@@ -4216,6 +4945,13 @@ instance : ToJS BrowserRunErrorResponseErrors := ⟨fun d => Support.fields #[("
     ("code", Support.optional d.code),
     ("detail", Support.optional d.detail),
     ("path", Support.optional d.path)]⟩
+instance : FromJS BrowserRunErrorResponseErrors where
+  fromJS d := do return {
+    message := ← Lasm.JS.readField String d "message",
+    code := ← Lasm.JS.readField (Option Float) d "code",
+    detail := ← Lasm.JS.readField (Option String) d "detail",
+    path := ← Lasm.JS.readField (Option String) d "path" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunErrorResponseErrors"
 
 /-- `dictionary BrowserRunErrorResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunErrorResponse where
@@ -4225,6 +4961,11 @@ structure BrowserRunErrorResponse where
   errors : Array BrowserRunErrorResponseErrors
 instance : ToJS BrowserRunErrorResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("errors", toJS d.errors)]⟩
+instance : FromJS BrowserRunErrorResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    errors := ← Lasm.JS.readField (Array BrowserRunErrorResponseErrors) d "errors" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunErrorResponse"
 
 /-- `dictionary BrowserRunJsonErrorResponseErrors` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonErrorResponseErrors where
@@ -4240,6 +4981,13 @@ instance : ToJS BrowserRunJsonErrorResponseErrors := ⟨fun d => Support.fields 
     ("code", Support.optional d.code),
     ("detail", Support.optional d.detail),
     ("path", Support.optional d.path)]⟩
+instance : FromJS BrowserRunJsonErrorResponseErrors where
+  fromJS d := do return {
+    message := ← Lasm.JS.readField String d "message",
+    code := ← Lasm.JS.readField (Option Float) d "code",
+    detail := ← Lasm.JS.readField (Option String) d "detail",
+    path := ← Lasm.JS.readField (Option String) d "path" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonErrorResponseErrors"
 
 /-- `dictionary BrowserRunJsonErrorResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonErrorResponse where
@@ -4252,6 +5000,12 @@ structure BrowserRunJsonErrorResponse where
 instance : ToJS BrowserRunJsonErrorResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("errors", toJS d.errors),
     ("rawAiResponse", Support.optional d.rawAiResponse)]⟩
+instance : FromJS BrowserRunJsonErrorResponse where
+  fromJS d := do return {
+    success := ← Lasm.JS.readField Bool d "success",
+    errors := ← Lasm.JS.readField (Array BrowserRunJsonErrorResponseErrors) d "errors",
+    rawAiResponse := ← Lasm.JS.readField (Option String) d "rawAiResponse" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonErrorResponse"
 
 /-- `dictionary BrowserRunQuickActionOptionsCustom_ai` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptionsCustom_ai where
@@ -4261,6 +5015,11 @@ structure BrowserRunQuickActionOptionsCustom_ai where
   authorization : Option String := none
 instance : ToJS BrowserRunQuickActionOptionsCustom_ai := ⟨fun d => Support.fields #[("model", toJS d.model),
     ("authorization", Support.optional d.authorization)]⟩
+instance : FromJS BrowserRunQuickActionOptionsCustom_ai where
+  fromJS d := do return {
+    model := ← Lasm.JS.readField String d "model",
+    authorization := ← Lasm.JS.readField (Option String) d "authorization" }
+  typeName := "Lasm.JS.Cloudflare.BrowserRunQuickActionOptionsCustom_ai"
 
 /-- `get devtools(): BrowserRunDevtools`: `readonly attribute BrowserRunDevtools devtools` -/
 def BrowserRun.devtools (self : BrowserRun) : IO BrowserRunDevtools := self.val.get "devtools" BrowserRunDevtools

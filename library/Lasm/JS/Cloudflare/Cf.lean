@@ -67,109 +67,109 @@ instance : FromJS RequestInitCfPropertiesGrpcWeb where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesGrpcWeb"
 
-/-- `enum BasicImageTransformationsGravity` (@cloudflare/workers-types 5.20261019.1 type declarations): "face". -/
-inductive BasicImageTransformationsGravity where
+/-- `enum RequestInitCfPropertiesImageGravity` (@cloudflare/workers-types 5.20261019.1 type declarations): "face". -/
+inductive RequestInitCfPropertiesImageGravity where
   /-- "face" -/
   | face
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity := ⟨fun
   | .face => .string "face"⟩
-instance : FromJS BasicImageTransformationsGravity where
+instance : FromJS RequestInitCfPropertiesImageGravity where
   fromJS
     | .string "face" => .ok .face
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity"
 
-/-- `enum BasicImageTransformationsGravity2` (@cloudflare/workers-types 5.20261019.1 type declarations): "left". -/
-inductive BasicImageTransformationsGravity2 where
+/-- `enum RequestInitCfPropertiesImageGravity2` (@cloudflare/workers-types 5.20261019.1 type declarations): "left". -/
+inductive RequestInitCfPropertiesImageGravity2 where
   /-- "left" -/
   | left
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity2 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity2 := ⟨fun
   | .left => .string "left"⟩
-instance : FromJS BasicImageTransformationsGravity2 where
+instance : FromJS RequestInitCfPropertiesImageGravity2 where
   fromJS
     | .string "left" => .ok .left
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity2"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity2"
 
-/-- `enum BasicImageTransformationsGravity3` (@cloudflare/workers-types 5.20261019.1 type declarations): "right". -/
-inductive BasicImageTransformationsGravity3 where
+/-- `enum RequestInitCfPropertiesImageGravity3` (@cloudflare/workers-types 5.20261019.1 type declarations): "right". -/
+inductive RequestInitCfPropertiesImageGravity3 where
   /-- "right" -/
   | right
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity3 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity3 := ⟨fun
   | .right => .string "right"⟩
-instance : FromJS BasicImageTransformationsGravity3 where
+instance : FromJS RequestInitCfPropertiesImageGravity3 where
   fromJS
     | .string "right" => .ok .right
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity3"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity3"
 
-/-- `enum BasicImageTransformationsGravity4` (@cloudflare/workers-types 5.20261019.1 type declarations): "top". -/
-inductive BasicImageTransformationsGravity4 where
+/-- `enum RequestInitCfPropertiesImageGravity4` (@cloudflare/workers-types 5.20261019.1 type declarations): "top". -/
+inductive RequestInitCfPropertiesImageGravity4 where
   /-- "top" -/
   | top
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity4 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity4 := ⟨fun
   | .top => .string "top"⟩
-instance : FromJS BasicImageTransformationsGravity4 where
+instance : FromJS RequestInitCfPropertiesImageGravity4 where
   fromJS
     | .string "top" => .ok .top
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity4"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity4"
 
-/-- `enum BasicImageTransformationsGravity5` (@cloudflare/workers-types 5.20261019.1 type declarations): "bottom". -/
-inductive BasicImageTransformationsGravity5 where
+/-- `enum RequestInitCfPropertiesImageGravity5` (@cloudflare/workers-types 5.20261019.1 type declarations): "bottom". -/
+inductive RequestInitCfPropertiesImageGravity5 where
   /-- "bottom" -/
   | bottom
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity5 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity5 := ⟨fun
   | .bottom => .string "bottom"⟩
-instance : FromJS BasicImageTransformationsGravity5 where
+instance : FromJS RequestInitCfPropertiesImageGravity5 where
   fromJS
     | .string "bottom" => .ok .bottom
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity5"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity5"
 
-/-- `enum BasicImageTransformationsGravity6` (@cloudflare/workers-types 5.20261019.1 type declarations): "center". -/
-inductive BasicImageTransformationsGravity6 where
+/-- `enum RequestInitCfPropertiesImageGravity6` (@cloudflare/workers-types 5.20261019.1 type declarations): "center". -/
+inductive RequestInitCfPropertiesImageGravity6 where
   /-- "center" -/
   | center
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity6 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity6 := ⟨fun
   | .center => .string "center"⟩
-instance : FromJS BasicImageTransformationsGravity6 where
+instance : FromJS RequestInitCfPropertiesImageGravity6 where
   fromJS
     | .string "center" => .ok .center
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity6"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity6"
 
-/-- `enum BasicImageTransformationsGravity7` (@cloudflare/workers-types 5.20261019.1 type declarations): "auto". -/
-inductive BasicImageTransformationsGravity7 where
+/-- `enum RequestInitCfPropertiesImageGravity7` (@cloudflare/workers-types 5.20261019.1 type declarations): "auto". -/
+inductive RequestInitCfPropertiesImageGravity7 where
   /-- "auto" -/
   | auto
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity7 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity7 := ⟨fun
   | .auto => .string "auto"⟩
-instance : FromJS BasicImageTransformationsGravity7 where
+instance : FromJS RequestInitCfPropertiesImageGravity7 where
   fromJS
     | .string "auto" => .ok .auto
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity7"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity7"
 
-/-- `enum BasicImageTransformationsGravity8` (@cloudflare/workers-types 5.20261019.1 type declarations): "entropy". -/
-inductive BasicImageTransformationsGravity8 where
+/-- `enum RequestInitCfPropertiesImageGravity8` (@cloudflare/workers-types 5.20261019.1 type declarations): "entropy". -/
+inductive RequestInitCfPropertiesImageGravity8 where
   /-- "entropy" -/
   | entropy
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsGravity8 := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageGravity8 := ⟨fun
   | .entropy => .string "entropy"⟩
-instance : FromJS BasicImageTransformationsGravity8 where
+instance : FromJS RequestInitCfPropertiesImageGravity8 where
   fromJS
     | .string "entropy" => .ok .entropy
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity8"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageGravity8"
 
 /-- `enum BasicImageTransformationsGravityCoordinatesMode` (@cloudflare/workers-types 5.20261019.1 type declarations): "remainder", "box-center". -/
 inductive BasicImageTransformationsGravityCoordinatesMode where
@@ -188,8 +188,8 @@ instance : FromJS BasicImageTransformationsGravityCoordinatesMode where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravityCoordinatesMode"
 
-/-- `enum BasicImageTransformationsFit` (@cloudflare/workers-types 5.20261019.1 type declarations): "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze". -/
-inductive BasicImageTransformationsFit where
+/-- `enum RequestInitCfPropertiesImageFit` (@cloudflare/workers-types 5.20261019.1 type declarations): "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze". -/
+inductive RequestInitCfPropertiesImageFit where
   /-- "scale-down" -/
   | scaleDown
   /-- "scale-up" -/
@@ -205,7 +205,7 @@ inductive BasicImageTransformationsFit where
   /-- "squeeze" -/
   | squeeze
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsFit := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageFit := ⟨fun
   | .scaleDown => .string "scale-down"
   | .scaleUp => .string "scale-up"
   | .contain => .string "contain"
@@ -213,7 +213,7 @@ instance : ToJS BasicImageTransformationsFit := ⟨fun
   | .crop => .string "crop"
   | .pad => .string "pad"
   | .squeeze => .string "squeeze"⟩
-instance : FromJS BasicImageTransformationsFit where
+instance : FromJS RequestInitCfPropertiesImageFit where
   fromJS
     | .string "scale-down" => .ok .scaleDown
     | .string "scale-up" => .ok .scaleUp
@@ -223,10 +223,10 @@ instance : FromJS BasicImageTransformationsFit where
     | .string "pad" => .ok .pad
     | .string "squeeze" => .ok .squeeze
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsFit"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageFit"
 
-/-- `enum BasicImageTransformationsFlip` (@cloudflare/workers-types 5.20261019.1 type declarations): "h", "v", "hv". -/
-inductive BasicImageTransformationsFlip where
+/-- `enum RequestInitCfPropertiesImageFlip` (@cloudflare/workers-types 5.20261019.1 type declarations): "h", "v", "hv". -/
+inductive RequestInitCfPropertiesImageFlip where
   /-- "h" -/
   | h
   /-- "v" -/
@@ -234,47 +234,47 @@ inductive BasicImageTransformationsFlip where
   /-- "hv" -/
   | hv
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsFlip := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageFlip := ⟨fun
   | .h => .string "h"
   | .v => .string "v"
   | .hv => .string "hv"⟩
-instance : FromJS BasicImageTransformationsFlip where
+instance : FromJS RequestInitCfPropertiesImageFlip where
   fromJS
     | .string "h" => .ok .h
     | .string "v" => .ok .v
     | .string "hv" => .ok .hv
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsFlip"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageFlip"
 
-/-- `enum BasicImageTransformationsSegment` (@cloudflare/workers-types 5.20261019.1 type declarations): "foreground". -/
-inductive BasicImageTransformationsSegment where
+/-- `enum RequestInitCfPropertiesImageSegment` (@cloudflare/workers-types 5.20261019.1 type declarations): "foreground". -/
+inductive RequestInitCfPropertiesImageSegment where
   /-- "foreground" -/
   | foreground
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsSegment := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageSegment := ⟨fun
   | .foreground => .string "foreground"⟩
-instance : FromJS BasicImageTransformationsSegment where
+instance : FromJS RequestInitCfPropertiesImageSegment where
   fromJS
     | .string "foreground" => .ok .foreground
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsSegment"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageSegment"
 
-/-- `enum BasicImageTransformationsUpscale` (@cloudflare/workers-types 5.20261019.1 type declarations): "interpolate", "generate". -/
-inductive BasicImageTransformationsUpscale where
+/-- `enum RequestInitCfPropertiesImageUpscale` (@cloudflare/workers-types 5.20261019.1 type declarations): "interpolate", "generate". -/
+inductive RequestInitCfPropertiesImageUpscale where
   /-- "interpolate" -/
   | interpolate
   /-- "generate" -/
   | generate
   deriving BEq, Repr, Inhabited
-instance : ToJS BasicImageTransformationsUpscale := ⟨fun
+instance : ToJS RequestInitCfPropertiesImageUpscale := ⟨fun
   | .interpolate => .string "interpolate"
   | .generate => .string "generate"⟩
-instance : FromJS BasicImageTransformationsUpscale where
+instance : FromJS RequestInitCfPropertiesImageUpscale where
   fromJS
     | .string "interpolate" => .ok .interpolate
     | .string "generate" => .ok .generate
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsUpscale"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageUpscale"
 
 /-- `enum RequestInitCfPropertiesImageQuality` (@cloudflare/workers-types 5.20261019.1 type declarations): "low". -/
 inductive RequestInitCfPropertiesImageQuality where
@@ -390,6 +390,198 @@ instance : FromJS RequestInitCfPropertiesImageMetadata where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageMetadata"
 
+/-- `enum RequestInitCfPropertiesImageDrawGravity` (@cloudflare/workers-types 5.20261019.1 type declarations): "face". -/
+inductive RequestInitCfPropertiesImageDrawGravity where
+  /-- "face" -/
+  | face
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity := ⟨fun
+  | .face => .string "face"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity where
+  fromJS
+    | .string "face" => .ok .face
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity2` (@cloudflare/workers-types 5.20261019.1 type declarations): "left". -/
+inductive RequestInitCfPropertiesImageDrawGravity2 where
+  /-- "left" -/
+  | left
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity2 := ⟨fun
+  | .left => .string "left"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity2 where
+  fromJS
+    | .string "left" => .ok .left
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity2"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity3` (@cloudflare/workers-types 5.20261019.1 type declarations): "right". -/
+inductive RequestInitCfPropertiesImageDrawGravity3 where
+  /-- "right" -/
+  | right
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity3 := ⟨fun
+  | .right => .string "right"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity3 where
+  fromJS
+    | .string "right" => .ok .right
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity3"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity4` (@cloudflare/workers-types 5.20261019.1 type declarations): "top". -/
+inductive RequestInitCfPropertiesImageDrawGravity4 where
+  /-- "top" -/
+  | top
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity4 := ⟨fun
+  | .top => .string "top"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity4 where
+  fromJS
+    | .string "top" => .ok .top
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity4"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity5` (@cloudflare/workers-types 5.20261019.1 type declarations): "bottom". -/
+inductive RequestInitCfPropertiesImageDrawGravity5 where
+  /-- "bottom" -/
+  | bottom
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity5 := ⟨fun
+  | .bottom => .string "bottom"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity5 where
+  fromJS
+    | .string "bottom" => .ok .bottom
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity5"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity6` (@cloudflare/workers-types 5.20261019.1 type declarations): "center". -/
+inductive RequestInitCfPropertiesImageDrawGravity6 where
+  /-- "center" -/
+  | center
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity6 := ⟨fun
+  | .center => .string "center"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity6 where
+  fromJS
+    | .string "center" => .ok .center
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity6"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity7` (@cloudflare/workers-types 5.20261019.1 type declarations): "auto". -/
+inductive RequestInitCfPropertiesImageDrawGravity7 where
+  /-- "auto" -/
+  | auto
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity7 := ⟨fun
+  | .auto => .string "auto"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity7 where
+  fromJS
+    | .string "auto" => .ok .auto
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity7"
+
+/-- `enum RequestInitCfPropertiesImageDrawGravity8` (@cloudflare/workers-types 5.20261019.1 type declarations): "entropy". -/
+inductive RequestInitCfPropertiesImageDrawGravity8 where
+  /-- "entropy" -/
+  | entropy
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawGravity8 := ⟨fun
+  | .entropy => .string "entropy"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawGravity8 where
+  fromJS
+    | .string "entropy" => .ok .entropy
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawGravity8"
+
+/-- `enum RequestInitCfPropertiesImageDrawFit` (@cloudflare/workers-types 5.20261019.1 type declarations): "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze". -/
+inductive RequestInitCfPropertiesImageDrawFit where
+  /-- "scale-down" -/
+  | scaleDown
+  /-- "scale-up" -/
+  | scaleUp
+  /-- "contain" -/
+  | contain
+  /-- "cover" -/
+  | cover
+  /-- "crop" -/
+  | crop
+  /-- "pad" -/
+  | pad
+  /-- "squeeze" -/
+  | squeeze
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawFit := ⟨fun
+  | .scaleDown => .string "scale-down"
+  | .scaleUp => .string "scale-up"
+  | .contain => .string "contain"
+  | .cover => .string "cover"
+  | .crop => .string "crop"
+  | .pad => .string "pad"
+  | .squeeze => .string "squeeze"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawFit where
+  fromJS
+    | .string "scale-down" => .ok .scaleDown
+    | .string "scale-up" => .ok .scaleUp
+    | .string "contain" => .ok .contain
+    | .string "cover" => .ok .cover
+    | .string "crop" => .ok .crop
+    | .string "pad" => .ok .pad
+    | .string "squeeze" => .ok .squeeze
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawFit"
+
+/-- `enum RequestInitCfPropertiesImageDrawFlip` (@cloudflare/workers-types 5.20261019.1 type declarations): "h", "v", "hv". -/
+inductive RequestInitCfPropertiesImageDrawFlip where
+  /-- "h" -/
+  | h
+  /-- "v" -/
+  | v
+  /-- "hv" -/
+  | hv
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawFlip := ⟨fun
+  | .h => .string "h"
+  | .v => .string "v"
+  | .hv => .string "hv"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawFlip where
+  fromJS
+    | .string "h" => .ok .h
+    | .string "v" => .ok .v
+    | .string "hv" => .ok .hv
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawFlip"
+
+/-- `enum RequestInitCfPropertiesImageDrawSegment` (@cloudflare/workers-types 5.20261019.1 type declarations): "foreground". -/
+inductive RequestInitCfPropertiesImageDrawSegment where
+  /-- "foreground" -/
+  | foreground
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawSegment := ⟨fun
+  | .foreground => .string "foreground"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawSegment where
+  fromJS
+    | .string "foreground" => .ok .foreground
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawSegment"
+
+/-- `enum RequestInitCfPropertiesImageDrawUpscale` (@cloudflare/workers-types 5.20261019.1 type declarations): "interpolate", "generate". -/
+inductive RequestInitCfPropertiesImageDrawUpscale where
+  /-- "interpolate" -/
+  | interpolate
+  /-- "generate" -/
+  | generate
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawUpscale := ⟨fun
+  | .interpolate => .string "interpolate"
+  | .generate => .string "generate"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawUpscale where
+  fromJS
+    | .string "interpolate" => .ok .interpolate
+    | .string "generate" => .ok .generate
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawUpscale"
+
 /-- `enum RequestInitCfPropertiesImageDrawRepeat` (@cloudflare/workers-types 5.20261019.1 type declarations): "x". -/
 inductive RequestInitCfPropertiesImageDrawRepeat where
   /-- "x" -/
@@ -482,6 +674,198 @@ instance : FromJS RequestInitCfPropertiesPolish where
     | .string "off" => .ok .off
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesPolish"
+
+/-- `enum BasicImageTransformationsGravity` (@cloudflare/workers-types 5.20261019.1 type declarations): "face". -/
+inductive BasicImageTransformationsGravity where
+  /-- "face" -/
+  | face
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity := ⟨fun
+  | .face => .string "face"⟩
+instance : FromJS BasicImageTransformationsGravity where
+  fromJS
+    | .string "face" => .ok .face
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity"
+
+/-- `enum BasicImageTransformationsGravity2` (@cloudflare/workers-types 5.20261019.1 type declarations): "left". -/
+inductive BasicImageTransformationsGravity2 where
+  /-- "left" -/
+  | left
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity2 := ⟨fun
+  | .left => .string "left"⟩
+instance : FromJS BasicImageTransformationsGravity2 where
+  fromJS
+    | .string "left" => .ok .left
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity2"
+
+/-- `enum BasicImageTransformationsGravity3` (@cloudflare/workers-types 5.20261019.1 type declarations): "right". -/
+inductive BasicImageTransformationsGravity3 where
+  /-- "right" -/
+  | right
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity3 := ⟨fun
+  | .right => .string "right"⟩
+instance : FromJS BasicImageTransformationsGravity3 where
+  fromJS
+    | .string "right" => .ok .right
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity3"
+
+/-- `enum BasicImageTransformationsGravity4` (@cloudflare/workers-types 5.20261019.1 type declarations): "top". -/
+inductive BasicImageTransformationsGravity4 where
+  /-- "top" -/
+  | top
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity4 := ⟨fun
+  | .top => .string "top"⟩
+instance : FromJS BasicImageTransformationsGravity4 where
+  fromJS
+    | .string "top" => .ok .top
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity4"
+
+/-- `enum BasicImageTransformationsGravity5` (@cloudflare/workers-types 5.20261019.1 type declarations): "bottom". -/
+inductive BasicImageTransformationsGravity5 where
+  /-- "bottom" -/
+  | bottom
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity5 := ⟨fun
+  | .bottom => .string "bottom"⟩
+instance : FromJS BasicImageTransformationsGravity5 where
+  fromJS
+    | .string "bottom" => .ok .bottom
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity5"
+
+/-- `enum BasicImageTransformationsGravity6` (@cloudflare/workers-types 5.20261019.1 type declarations): "center". -/
+inductive BasicImageTransformationsGravity6 where
+  /-- "center" -/
+  | center
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity6 := ⟨fun
+  | .center => .string "center"⟩
+instance : FromJS BasicImageTransformationsGravity6 where
+  fromJS
+    | .string "center" => .ok .center
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity6"
+
+/-- `enum BasicImageTransformationsGravity7` (@cloudflare/workers-types 5.20261019.1 type declarations): "auto". -/
+inductive BasicImageTransformationsGravity7 where
+  /-- "auto" -/
+  | auto
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity7 := ⟨fun
+  | .auto => .string "auto"⟩
+instance : FromJS BasicImageTransformationsGravity7 where
+  fromJS
+    | .string "auto" => .ok .auto
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity7"
+
+/-- `enum BasicImageTransformationsGravity8` (@cloudflare/workers-types 5.20261019.1 type declarations): "entropy". -/
+inductive BasicImageTransformationsGravity8 where
+  /-- "entropy" -/
+  | entropy
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsGravity8 := ⟨fun
+  | .entropy => .string "entropy"⟩
+instance : FromJS BasicImageTransformationsGravity8 where
+  fromJS
+    | .string "entropy" => .ok .entropy
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravity8"
+
+/-- `enum BasicImageTransformationsFit` (@cloudflare/workers-types 5.20261019.1 type declarations): "scale-down", "scale-up", "contain", "cover", "crop", "pad", "squeeze". -/
+inductive BasicImageTransformationsFit where
+  /-- "scale-down" -/
+  | scaleDown
+  /-- "scale-up" -/
+  | scaleUp
+  /-- "contain" -/
+  | contain
+  /-- "cover" -/
+  | cover
+  /-- "crop" -/
+  | crop
+  /-- "pad" -/
+  | pad
+  /-- "squeeze" -/
+  | squeeze
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsFit := ⟨fun
+  | .scaleDown => .string "scale-down"
+  | .scaleUp => .string "scale-up"
+  | .contain => .string "contain"
+  | .cover => .string "cover"
+  | .crop => .string "crop"
+  | .pad => .string "pad"
+  | .squeeze => .string "squeeze"⟩
+instance : FromJS BasicImageTransformationsFit where
+  fromJS
+    | .string "scale-down" => .ok .scaleDown
+    | .string "scale-up" => .ok .scaleUp
+    | .string "contain" => .ok .contain
+    | .string "cover" => .ok .cover
+    | .string "crop" => .ok .crop
+    | .string "pad" => .ok .pad
+    | .string "squeeze" => .ok .squeeze
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsFit"
+
+/-- `enum BasicImageTransformationsFlip` (@cloudflare/workers-types 5.20261019.1 type declarations): "h", "v", "hv". -/
+inductive BasicImageTransformationsFlip where
+  /-- "h" -/
+  | h
+  /-- "v" -/
+  | v
+  /-- "hv" -/
+  | hv
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsFlip := ⟨fun
+  | .h => .string "h"
+  | .v => .string "v"
+  | .hv => .string "hv"⟩
+instance : FromJS BasicImageTransformationsFlip where
+  fromJS
+    | .string "h" => .ok .h
+    | .string "v" => .ok .v
+    | .string "hv" => .ok .hv
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsFlip"
+
+/-- `enum BasicImageTransformationsSegment` (@cloudflare/workers-types 5.20261019.1 type declarations): "foreground". -/
+inductive BasicImageTransformationsSegment where
+  /-- "foreground" -/
+  | foreground
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsSegment := ⟨fun
+  | .foreground => .string "foreground"⟩
+instance : FromJS BasicImageTransformationsSegment where
+  fromJS
+    | .string "foreground" => .ok .foreground
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsSegment"
+
+/-- `enum BasicImageTransformationsUpscale` (@cloudflare/workers-types 5.20261019.1 type declarations): "interpolate", "generate". -/
+inductive BasicImageTransformationsUpscale where
+  /-- "interpolate" -/
+  | interpolate
+  /-- "generate" -/
+  | generate
+  deriving BEq, Repr, Inhabited
+instance : ToJS BasicImageTransformationsUpscale := ⟨fun
+  | .interpolate => .string "interpolate"
+  | .generate => .string "generate"⟩
+instance : FromJS BasicImageTransformationsUpscale where
+  fromJS
+    | .string "interpolate" => .ok .interpolate
+    | .string "generate" => .ok .generate
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsUpscale"
 
 /-- `enum IncomingRequestCfPropertiesTLSClientAuthCertPresented` (@cloudflare/workers-types 5.20261019.1 type declarations): "1". -/
 inductive IncomingRequestCfPropertiesTLSClientAuthCertPresented where
@@ -1869,13 +2253,43 @@ instance : FromJS BasicImageTransformationsTrim where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsTrim"
 
+/-- `enum RequestInitCfPropertiesImageDrawTrim` (@cloudflare/workers-types 5.20261019.1 type declarations): "border". -/
+inductive RequestInitCfPropertiesImageDrawTrim where
+  /-- "border" -/
+  | border
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageDrawTrim := ⟨fun
+  | .border => .string "border"⟩
+instance : FromJS RequestInitCfPropertiesImageDrawTrim where
+  fromJS
+    | .string "border" => .ok .border
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawTrim"
+
+/-- `enum RequestInitCfPropertiesImageTrim` (@cloudflare/workers-types 5.20261019.1 type declarations): "border". -/
+inductive RequestInitCfPropertiesImageTrim where
+  /-- "border" -/
+  | border
+  deriving BEq, Repr, Inhabited
+instance : ToJS RequestInitCfPropertiesImageTrim := ⟨fun
+  | .border => .string "border"⟩
+instance : FromJS RequestInitCfPropertiesImageTrim where
+  fromJS
+    | .string "border" => .ok .border
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageTrim"
+
 /-- `dictionary RequestInitCfPropertiesVaryHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryHeader where
   /-- `required RequestInitCfPropertiesVaryAction action` -/
   action : RequestInitCfPropertiesVaryAction
 instance : ToJS RequestInitCfPropertiesVaryHeader := ⟨fun d => Support.fields #[("action", toJS d.action)]⟩
+instance : FromJS RequestInitCfPropertiesVaryHeader where
+  fromJS d := do return {
+    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryHeader"
 
-/-- `dictionary RequestInitCfPropertiesVaryAcceptHeader : RequestInitCfPropertiesVaryHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary RequestInitCfPropertiesVaryAcceptHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryAcceptHeader where
   /-- `required RequestInitCfPropertiesVaryAction action` -/
   action : RequestInitCfPropertiesVaryAction
@@ -1883,12 +2297,21 @@ structure RequestInitCfPropertiesVaryAcceptHeader where
   media_types : Option (Array String) := none
 instance : ToJS RequestInitCfPropertiesVaryAcceptHeader := ⟨fun d => Support.fields #[("action", toJS d.action),
     ("media_types", Support.optional d.media_types)]⟩
+instance : FromJS RequestInitCfPropertiesVaryAcceptHeader where
+  fromJS d := do return {
+    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action",
+    media_types := ← Lasm.JS.readField (Option (Array String)) d "media_types" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryAcceptHeader"
 
 /-- `dictionary RequestInitCfPropertiesVaryHeaders` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryHeaders where
   /-- `RequestInitCfPropertiesVaryAcceptHeader accept` -/
   accept : Option RequestInitCfPropertiesVaryAcceptHeader := none
 instance : ToJS RequestInitCfPropertiesVaryHeaders := ⟨fun d => Support.fields #[("accept", Support.optional d.accept)]⟩
+instance : FromJS RequestInitCfPropertiesVaryHeaders where
+  fromJS d := do return {
+    accept := ← Lasm.JS.readField (Option RequestInitCfPropertiesVaryAcceptHeader) d "accept" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryHeaders"
 
 /-- `dictionary RequestInitCfPropertiesVary` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVary where
@@ -1898,6 +2321,11 @@ structure RequestInitCfPropertiesVary where
   headers : Option RequestInitCfPropertiesVaryHeaders := none
 instance : ToJS RequestInitCfPropertiesVary := ⟨fun d => Support.fields #[("default", toJS d.default),
     ("headers", Support.optional d.headers)]⟩
+instance : FromJS RequestInitCfPropertiesVary where
+  fromJS d := do return {
+    default := ← Lasm.JS.readField RequestInitCfPropertiesVaryHeader d "default",
+    headers := ← Lasm.JS.readField (Option RequestInitCfPropertiesVaryHeaders) d "headers" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVary"
 
 /-- `dictionary BasicImageTransformationsGravityCoordinates` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsGravityCoordinates where
@@ -1910,46 +2338,52 @@ structure BasicImageTransformationsGravityCoordinates where
 instance : ToJS BasicImageTransformationsGravityCoordinates := ⟨fun d => Support.fields #[("x", Support.optional d.x),
     ("y", Support.optional d.y),
     ("mode", Support.optional d.mode)]⟩
+instance : FromJS BasicImageTransformationsGravityCoordinates where
+  fromJS d := do return {
+    x := ← Lasm.JS.readField (Option Float) d "x",
+    y := ← Lasm.JS.readField (Option Float) d "y",
+    mode := ← Lasm.JS.readField (Option BasicImageTransformationsGravityCoordinatesMode) d "mode" }
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravityCoordinates"
 
-/-- `typedef BasicImageTransformationsGravity or BasicImageTransformationsGravity2 or BasicImageTransformationsGravity3 or BasicImageTransformationsGravity4 or BasicImageTransformationsGravity5 or BasicImageTransformationsGravity6 or BasicImageTransformationsGravity7 or BasicImageTransformationsGravity8 or BasicImageTransformationsGravityCoordinates BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
-inductive BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates where
-  /-- `BasicImageTransformationsGravity` -/
-  | basicImageTransformationsGravity (value : BasicImageTransformationsGravity)
-  /-- `BasicImageTransformationsGravity2` -/
-  | basicImageTransformationsGravity2 (value : BasicImageTransformationsGravity2)
-  /-- `BasicImageTransformationsGravity3` -/
-  | basicImageTransformationsGravity3 (value : BasicImageTransformationsGravity3)
-  /-- `BasicImageTransformationsGravity4` -/
-  | basicImageTransformationsGravity4 (value : BasicImageTransformationsGravity4)
-  /-- `BasicImageTransformationsGravity5` -/
-  | basicImageTransformationsGravity5 (value : BasicImageTransformationsGravity5)
-  /-- `BasicImageTransformationsGravity6` -/
-  | basicImageTransformationsGravity6 (value : BasicImageTransformationsGravity6)
-  /-- `BasicImageTransformationsGravity7` -/
-  | basicImageTransformationsGravity7 (value : BasicImageTransformationsGravity7)
-  /-- `BasicImageTransformationsGravity8` -/
-  | basicImageTransformationsGravity8 (value : BasicImageTransformationsGravity8)
+/-- `typedef RequestInitCfPropertiesImageGravity or RequestInitCfPropertiesImageGravity2 or RequestInitCfPropertiesImageGravity3 or RequestInitCfPropertiesImageGravity4 or RequestInitCfPropertiesImageGravity5 or RequestInitCfPropertiesImageGravity6 or RequestInitCfPropertiesImageGravity7 or RequestInitCfPropertiesImageGravity8 or BasicImageTransformationsGravityCoordinates RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
+inductive RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates where
+  /-- `RequestInitCfPropertiesImageGravity` -/
+  | requestInitCfPropertiesImageGravity (value : RequestInitCfPropertiesImageGravity)
+  /-- `RequestInitCfPropertiesImageGravity2` -/
+  | requestInitCfPropertiesImageGravity2 (value : RequestInitCfPropertiesImageGravity2)
+  /-- `RequestInitCfPropertiesImageGravity3` -/
+  | requestInitCfPropertiesImageGravity3 (value : RequestInitCfPropertiesImageGravity3)
+  /-- `RequestInitCfPropertiesImageGravity4` -/
+  | requestInitCfPropertiesImageGravity4 (value : RequestInitCfPropertiesImageGravity4)
+  /-- `RequestInitCfPropertiesImageGravity5` -/
+  | requestInitCfPropertiesImageGravity5 (value : RequestInitCfPropertiesImageGravity5)
+  /-- `RequestInitCfPropertiesImageGravity6` -/
+  | requestInitCfPropertiesImageGravity6 (value : RequestInitCfPropertiesImageGravity6)
+  /-- `RequestInitCfPropertiesImageGravity7` -/
+  | requestInitCfPropertiesImageGravity7 (value : RequestInitCfPropertiesImageGravity7)
+  /-- `RequestInitCfPropertiesImageGravity8` -/
+  | requestInitCfPropertiesImageGravity8 (value : RequestInitCfPropertiesImageGravity8)
   /-- `BasicImageTransformationsGravityCoordinates` -/
   | basicImageTransformationsGravityCoordinates (value : BasicImageTransformationsGravityCoordinates)
-instance : ToJS BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨fun
-  | .basicImageTransformationsGravity v => toJS v
-  | .basicImageTransformationsGravity2 v => toJS v
-  | .basicImageTransformationsGravity3 v => toJS v
-  | .basicImageTransformationsGravity4 v => toJS v
-  | .basicImageTransformationsGravity5 v => toJS v
-  | .basicImageTransformationsGravity6 v => toJS v
-  | .basicImageTransformationsGravity7 v => toJS v
-  | .basicImageTransformationsGravity8 v => toJS v
+instance : ToJS RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨fun
+  | .requestInitCfPropertiesImageGravity v => toJS v
+  | .requestInitCfPropertiesImageGravity2 v => toJS v
+  | .requestInitCfPropertiesImageGravity3 v => toJS v
+  | .requestInitCfPropertiesImageGravity4 v => toJS v
+  | .requestInitCfPropertiesImageGravity5 v => toJS v
+  | .requestInitCfPropertiesImageGravity6 v => toJS v
+  | .requestInitCfPropertiesImageGravity7 v => toJS v
+  | .requestInitCfPropertiesImageGravity8 v => toJS v
   | .basicImageTransformationsGravityCoordinates v => toJS v⟩
-instance : Coe BasicImageTransformationsGravity BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity⟩
-instance : Coe BasicImageTransformationsGravity2 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity2⟩
-instance : Coe BasicImageTransformationsGravity3 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity3⟩
-instance : Coe BasicImageTransformationsGravity4 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity4⟩
-instance : Coe BasicImageTransformationsGravity5 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity5⟩
-instance : Coe BasicImageTransformationsGravity6 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity6⟩
-instance : Coe BasicImageTransformationsGravity7 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity7⟩
-instance : Coe BasicImageTransformationsGravity8 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity8⟩
-instance : Coe BasicImageTransformationsGravityCoordinates BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravityCoordinates⟩
+instance : Coe RequestInitCfPropertiesImageGravity RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity⟩
+instance : Coe RequestInitCfPropertiesImageGravity2 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity2⟩
+instance : Coe RequestInitCfPropertiesImageGravity3 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity3⟩
+instance : Coe RequestInitCfPropertiesImageGravity4 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity4⟩
+instance : Coe RequestInitCfPropertiesImageGravity5 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity5⟩
+instance : Coe RequestInitCfPropertiesImageGravity6 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity6⟩
+instance : Coe RequestInitCfPropertiesImageGravity7 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity7⟩
+instance : Coe RequestInitCfPropertiesImageGravity8 RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageGravity8⟩
+instance : Coe BasicImageTransformationsGravityCoordinates RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravityCoordinates⟩
 
 /-- `typedef double or RequestInitCfPropertiesImageQuality or RequestInitCfPropertiesImageQuality2 or RequestInitCfPropertiesImageQuality3 or RequestInitCfPropertiesImageQuality4 DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4`: one constructor per member type. -/
 inductive DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 where
@@ -1975,6 +2409,46 @@ instance : Coe RequestInitCfPropertiesImageQuality2 DoubleOrRequestInitCfPropert
 instance : Coe RequestInitCfPropertiesImageQuality3 DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 := ⟨.requestInitCfPropertiesImageQuality3⟩
 instance : Coe RequestInitCfPropertiesImageQuality4 DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 := ⟨.requestInitCfPropertiesImageQuality4⟩
 
+/-- `typedef RequestInitCfPropertiesImageDrawGravity or RequestInitCfPropertiesImageDrawGravity2 or RequestInitCfPropertiesImageDrawGravity3 or RequestInitCfPropertiesImageDrawGravity4 or RequestInitCfPropertiesImageDrawGravity5 or RequestInitCfPropertiesImageDrawGravity6 or RequestInitCfPropertiesImageDrawGravity7 or RequestInitCfPropertiesImageDrawGravity8 or BasicImageTransformationsGravityCoordinates RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
+inductive RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates where
+  /-- `RequestInitCfPropertiesImageDrawGravity` -/
+  | requestInitCfPropertiesImageDrawGravity (value : RequestInitCfPropertiesImageDrawGravity)
+  /-- `RequestInitCfPropertiesImageDrawGravity2` -/
+  | requestInitCfPropertiesImageDrawGravity2 (value : RequestInitCfPropertiesImageDrawGravity2)
+  /-- `RequestInitCfPropertiesImageDrawGravity3` -/
+  | requestInitCfPropertiesImageDrawGravity3 (value : RequestInitCfPropertiesImageDrawGravity3)
+  /-- `RequestInitCfPropertiesImageDrawGravity4` -/
+  | requestInitCfPropertiesImageDrawGravity4 (value : RequestInitCfPropertiesImageDrawGravity4)
+  /-- `RequestInitCfPropertiesImageDrawGravity5` -/
+  | requestInitCfPropertiesImageDrawGravity5 (value : RequestInitCfPropertiesImageDrawGravity5)
+  /-- `RequestInitCfPropertiesImageDrawGravity6` -/
+  | requestInitCfPropertiesImageDrawGravity6 (value : RequestInitCfPropertiesImageDrawGravity6)
+  /-- `RequestInitCfPropertiesImageDrawGravity7` -/
+  | requestInitCfPropertiesImageDrawGravity7 (value : RequestInitCfPropertiesImageDrawGravity7)
+  /-- `RequestInitCfPropertiesImageDrawGravity8` -/
+  | requestInitCfPropertiesImageDrawGravity8 (value : RequestInitCfPropertiesImageDrawGravity8)
+  /-- `BasicImageTransformationsGravityCoordinates` -/
+  | basicImageTransformationsGravityCoordinates (value : BasicImageTransformationsGravityCoordinates)
+instance : ToJS RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨fun
+  | .requestInitCfPropertiesImageDrawGravity v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity2 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity3 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity4 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity5 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity6 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity7 v => toJS v
+  | .requestInitCfPropertiesImageDrawGravity8 v => toJS v
+  | .basicImageTransformationsGravityCoordinates v => toJS v⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity2 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity2⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity3 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity3⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity4 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity4⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity5 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity5⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity6 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity6⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity7 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity7⟩
+instance : Coe RequestInitCfPropertiesImageDrawGravity8 RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.requestInitCfPropertiesImageDrawGravity8⟩
+instance : Coe BasicImageTransformationsGravityCoordinates RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravityCoordinates⟩
+
 /-- `typedef boolean or RequestInitCfPropertiesImageDrawRepeat or RequestInitCfPropertiesImageDrawRepeat2 BooleanOrRequestInitCfPropertiesImageDrawRepeatOrRequestInitCfPropertiesImageDrawRepeat2`: one constructor per member type. -/
 inductive BooleanOrRequestInitCfPropertiesImageDrawRepeatOrRequestInitCfPropertiesImageDrawRepeat2 where
   /-- `boolean` -/
@@ -1991,24 +2465,24 @@ instance : Coe Bool BooleanOrRequestInitCfPropertiesImageDrawRepeatOrRequestInit
 instance : Coe RequestInitCfPropertiesImageDrawRepeat BooleanOrRequestInitCfPropertiesImageDrawRepeatOrRequestInitCfPropertiesImageDrawRepeat2 := ⟨.requestInitCfPropertiesImageDrawRepeat⟩
 instance : Coe RequestInitCfPropertiesImageDrawRepeat2 BooleanOrRequestInitCfPropertiesImageDrawRepeatOrRequestInitCfPropertiesImageDrawRepeat2 := ⟨.requestInitCfPropertiesImageDrawRepeat2⟩
 
-/-- `dictionary RequestInitCfPropertiesImageDraw : BasicImageTransformations` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary RequestInitCfPropertiesImageDraw` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesImageDraw where
   /-- `double width` -/
   width : Option Float := none
   /-- `double height` -/
   height : Option Float := none
-  /-- `BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates gravity` -/
-  gravity : Option BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := none
+  /-- `RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates gravity` -/
+  gravity : Option RequestInitCfPropertiesImageDrawGravityOrRequestInitCfPropertiesImageDrawGravity2OrRequestInitCfPropertiesImageDrawGravity3OrRequestInitCfPropertiesImageDrawGravity4OrRequestInitCfPropertiesImageDrawGravity5OrRequestInitCfPropertiesImageDrawGravity6OrRequestInitCfPropertiesImageDrawGravity7OrRequestInitCfPropertiesImageDrawGravity8OrBasicImageTransformationsGravityCoordinates := none
   /-- `double zoom` -/
   zoom : Option Float := none
-  /-- `BasicImageTransformationsFit fit` -/
-  fit : Option BasicImageTransformationsFit := none
+  /-- `RequestInitCfPropertiesImageDrawFit fit` -/
+  fit : Option RequestInitCfPropertiesImageDrawFit := none
   /-- `any trim` -/
   trim : Data := .undefined
   /-- `DOMString background` -/
   background : Option String := none
-  /-- `BasicImageTransformationsFlip flip` -/
-  flip : Option BasicImageTransformationsFlip := none
+  /-- `RequestInitCfPropertiesImageDrawFlip flip` -/
+  flip : Option RequestInitCfPropertiesImageDrawFlip := none
   /-- `double rotate` -/
   rotate : Option Float := none
   /-- `double sharpen` -/
@@ -2027,10 +2501,10 @@ structure RequestInitCfPropertiesImageDraw where
   dpr : Option Float := none
   /-- `any border` -/
   border : Data := .undefined
-  /-- `BasicImageTransformationsSegment segment` -/
-  segment : Option BasicImageTransformationsSegment := none
-  /-- `BasicImageTransformationsUpscale upscale` -/
-  upscale : Option BasicImageTransformationsUpscale := none
+  /-- `RequestInitCfPropertiesImageDrawSegment segment` -/
+  segment : Option RequestInitCfPropertiesImageDrawSegment := none
+  /-- `RequestInitCfPropertiesImageDrawUpscale upscale` -/
+  upscale : Option RequestInitCfPropertiesImageDrawUpscale := none
   /-- `required DOMString url` -/
   url : String
   /-- `double opacity` -/
@@ -2075,24 +2549,24 @@ instance : ToJS RequestInitCfPropertiesImageDraw := ⟨fun d => Support.fields #
     ("bottom", Support.optional d.bottom),
     ("right", Support.optional d.right)]⟩
 
-/-- `dictionary RequestInitCfPropertiesImage : BasicImageTransformations` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary RequestInitCfPropertiesImage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesImage where
   /-- `double width` -/
   width : Option Float := none
   /-- `double height` -/
   height : Option Float := none
-  /-- `BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates gravity` -/
-  gravity : Option BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := none
+  /-- `RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates gravity` -/
+  gravity : Option RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates := none
   /-- `double zoom` -/
   zoom : Option Float := none
-  /-- `BasicImageTransformationsFit fit` -/
-  fit : Option BasicImageTransformationsFit := none
+  /-- `RequestInitCfPropertiesImageFit fit` -/
+  fit : Option RequestInitCfPropertiesImageFit := none
   /-- `any trim` -/
   trim : Data := .undefined
   /-- `DOMString background` -/
   background : Option String := none
-  /-- `BasicImageTransformationsFlip flip` -/
-  flip : Option BasicImageTransformationsFlip := none
+  /-- `RequestInitCfPropertiesImageFlip flip` -/
+  flip : Option RequestInitCfPropertiesImageFlip := none
   /-- `double rotate` -/
   rotate : Option Float := none
   /-- `double sharpen` -/
@@ -2111,10 +2585,10 @@ structure RequestInitCfPropertiesImage where
   dpr : Option Float := none
   /-- `any border` -/
   border : Data := .undefined
-  /-- `BasicImageTransformationsSegment segment` -/
-  segment : Option BasicImageTransformationsSegment := none
-  /-- `BasicImageTransformationsUpscale upscale` -/
-  upscale : Option BasicImageTransformationsUpscale := none
+  /-- `RequestInitCfPropertiesImageSegment segment` -/
+  segment : Option RequestInitCfPropertiesImageSegment := none
+  /-- `RequestInitCfPropertiesImageUpscale upscale` -/
+  upscale : Option RequestInitCfPropertiesImageUpscale := none
   /-- `DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 quality` -/
   quality : Option DoubleOrRequestInitCfPropertiesImageQualityOrRequestInitCfPropertiesImageQuality2OrRequestInitCfPropertiesImageQuality3OrRequestInitCfPropertiesImageQuality4 := none
   /-- `RequestInitCfPropertiesImageFormat format` -/
@@ -2164,12 +2638,22 @@ structure RequestInitCfPropertiesImageMinify where
 instance : ToJS RequestInitCfPropertiesImageMinify := ⟨fun d => Support.fields #[("javascript", Support.optional d.javascript),
     ("css", Support.optional d.css),
     ("html", Support.optional d.html)]⟩
+instance : FromJS RequestInitCfPropertiesImageMinify where
+  fromJS d := do return {
+    javascript := ← Lasm.JS.readField (Option Bool) d "javascript",
+    css := ← Lasm.JS.readField (Option Bool) d "css",
+    html := ← Lasm.JS.readField (Option Bool) d "html" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageMinify"
 
 /-- `dictionary RequestInitCfPropertiesR2` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesR2 where
   /-- `double bucketColoId` -/
   bucketColoId : Option Float := none
 instance : ToJS RequestInitCfPropertiesR2 := ⟨fun d => Support.fields #[("bucketColoId", Support.optional d.bucketColoId)]⟩
+instance : FromJS RequestInitCfPropertiesR2 where
+  fromJS d := do return {
+    bucketColoId := ← Lasm.JS.readField (Option Float) d "bucketColoId" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesR2"
 
 /-- `dictionary RequestInitCfProperties` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfProperties where
@@ -2243,7 +2727,7 @@ instance : ToJS RequestInitCfProperties := ⟨fun d => Support.fields #[("cacheE
     ("r2", Support.optional d.r2),
     ("resolveOverride", Support.optional d.resolveOverride)]⟩
 
-/-- `dictionary RequestInitCfPropertiesVaryAcceptLanguageHeader : RequestInitCfPropertiesVaryHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary RequestInitCfPropertiesVaryAcceptLanguageHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryAcceptLanguageHeader where
   /-- `required RequestInitCfPropertiesVaryAction action` -/
   action : RequestInitCfPropertiesVaryAction
@@ -2251,6 +2735,51 @@ structure RequestInitCfPropertiesVaryAcceptLanguageHeader where
   languages : Option (Array String) := none
 instance : ToJS RequestInitCfPropertiesVaryAcceptLanguageHeader := ⟨fun d => Support.fields #[("action", toJS d.action),
     ("languages", Support.optional d.languages)]⟩
+instance : FromJS RequestInitCfPropertiesVaryAcceptLanguageHeader where
+  fromJS d := do return {
+    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action",
+    languages := ← Lasm.JS.readField (Option (Array String)) d "languages" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryAcceptLanguageHeader"
+
+/-- `typedef BasicImageTransformationsGravity or BasicImageTransformationsGravity2 or BasicImageTransformationsGravity3 or BasicImageTransformationsGravity4 or BasicImageTransformationsGravity5 or BasicImageTransformationsGravity6 or BasicImageTransformationsGravity7 or BasicImageTransformationsGravity8 or BasicImageTransformationsGravityCoordinates BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
+inductive BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates where
+  /-- `BasicImageTransformationsGravity` -/
+  | basicImageTransformationsGravity (value : BasicImageTransformationsGravity)
+  /-- `BasicImageTransformationsGravity2` -/
+  | basicImageTransformationsGravity2 (value : BasicImageTransformationsGravity2)
+  /-- `BasicImageTransformationsGravity3` -/
+  | basicImageTransformationsGravity3 (value : BasicImageTransformationsGravity3)
+  /-- `BasicImageTransformationsGravity4` -/
+  | basicImageTransformationsGravity4 (value : BasicImageTransformationsGravity4)
+  /-- `BasicImageTransformationsGravity5` -/
+  | basicImageTransformationsGravity5 (value : BasicImageTransformationsGravity5)
+  /-- `BasicImageTransformationsGravity6` -/
+  | basicImageTransformationsGravity6 (value : BasicImageTransformationsGravity6)
+  /-- `BasicImageTransformationsGravity7` -/
+  | basicImageTransformationsGravity7 (value : BasicImageTransformationsGravity7)
+  /-- `BasicImageTransformationsGravity8` -/
+  | basicImageTransformationsGravity8 (value : BasicImageTransformationsGravity8)
+  /-- `BasicImageTransformationsGravityCoordinates` -/
+  | basicImageTransformationsGravityCoordinates (value : BasicImageTransformationsGravityCoordinates)
+instance : ToJS BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨fun
+  | .basicImageTransformationsGravity v => toJS v
+  | .basicImageTransformationsGravity2 v => toJS v
+  | .basicImageTransformationsGravity3 v => toJS v
+  | .basicImageTransformationsGravity4 v => toJS v
+  | .basicImageTransformationsGravity5 v => toJS v
+  | .basicImageTransformationsGravity6 v => toJS v
+  | .basicImageTransformationsGravity7 v => toJS v
+  | .basicImageTransformationsGravity8 v => toJS v
+  | .basicImageTransformationsGravityCoordinates v => toJS v⟩
+instance : Coe BasicImageTransformationsGravity BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity⟩
+instance : Coe BasicImageTransformationsGravity2 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity2⟩
+instance : Coe BasicImageTransformationsGravity3 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity3⟩
+instance : Coe BasicImageTransformationsGravity4 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity4⟩
+instance : Coe BasicImageTransformationsGravity5 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity5⟩
+instance : Coe BasicImageTransformationsGravity6 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity6⟩
+instance : Coe BasicImageTransformationsGravity7 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity7⟩
+instance : Coe BasicImageTransformationsGravity8 BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravity8⟩
+instance : Coe BasicImageTransformationsGravityCoordinates BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates := ⟨.basicImageTransformationsGravityCoordinates⟩
 
 /-- `dictionary BasicImageTransformations` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformations where
@@ -2326,6 +2855,13 @@ instance : ToJS IncomingRequestCfPropertiesExportedAuthenticatorMetadata := ⟨f
     ("serverHandshake", toJS d.serverHandshake),
     ("clientFinished", toJS d.clientFinished),
     ("serverFinished", toJS d.serverFinished)]⟩
+instance : FromJS IncomingRequestCfPropertiesExportedAuthenticatorMetadata where
+  fromJS d := do return {
+    clientHandshake := ← Lasm.JS.readField String d "clientHandshake",
+    serverHandshake := ← Lasm.JS.readField String d "serverHandshake",
+    clientFinished := ← Lasm.JS.readField String d "clientFinished",
+    serverFinished := ← Lasm.JS.readField String d "serverFinished" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesExportedAuthenticatorMetadata"
 
 /-- `dictionary IncomingRequestCfPropertiesBase` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBase where
@@ -2362,6 +2898,20 @@ instance : ToJS IncomingRequestCfPropertiesBase := ⟨fun d => Support.fields #[
     ("tlsVersion", toJS d.tlsVersion),
     ("tlsCipher", toJS d.tlsCipher),
     ("tlsExportedAuthenticator", Support.optional d.tlsExportedAuthenticator)]⟩
+instance : FromJS IncomingRequestCfPropertiesBase where
+  fromJS d := do return {
+    asn := ← Lasm.JS.readField (Option Float) d "asn",
+    asOrganization := ← Lasm.JS.readField (Option String) d "asOrganization",
+    clientAcceptEncoding := ← Lasm.JS.readField (Option String) d "clientAcceptEncoding",
+    clientTcpRtt := ← Lasm.JS.readField (Option Float) d "clientTcpRtt",
+    colo := ← Lasm.JS.readField String d "colo",
+    edgeRequestKeepAliveStatus := ← Lasm.JS.readField Float d "edgeRequestKeepAliveStatus",
+    httpProtocol := ← Lasm.JS.readField String d "httpProtocol",
+    requestPriority := ← Lasm.JS.readField String d "requestPriority",
+    tlsVersion := ← Lasm.JS.readField String d "tlsVersion",
+    tlsCipher := ← Lasm.JS.readField String d "tlsCipher",
+    tlsExportedAuthenticator := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesExportedAuthenticatorMetadata) d "tlsExportedAuthenticator" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBase"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagementBase` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementBase where
@@ -2380,12 +2930,24 @@ instance : ToJS IncomingRequestCfPropertiesBotManagementBase := ⟨fun d => Supp
     ("corporateProxy", toJS d.corporateProxy),
     ("staticResource", toJS d.staticResource),
     ("detectionIds", toJS d.detectionIds)]⟩
+instance : FromJS IncomingRequestCfPropertiesBotManagementBase where
+  fromJS d := do return {
+    score := ← Lasm.JS.readField Float d "score",
+    verifiedBot := ← Lasm.JS.readField Bool d "verifiedBot",
+    corporateProxy := ← Lasm.JS.readField Bool d "corporateProxy",
+    staticResource := ← Lasm.JS.readField Bool d "staticResource",
+    detectionIds := ← Lasm.JS.readField (Array Float) d "detectionIds" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementBase"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagement` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagement where
   /-- `required IncomingRequestCfPropertiesBotManagementBase botManagement` -/
   botManagement : IncomingRequestCfPropertiesBotManagementBase
 instance : ToJS IncomingRequestCfPropertiesBotManagement := ⟨fun d => Support.fields #[("botManagement", toJS d.botManagement)]⟩
+instance : FromJS IncomingRequestCfPropertiesBotManagement where
+  fromJS d := do return {
+    botManagement := ← Lasm.JS.readField IncomingRequestCfPropertiesBotManagementBase d "botManagement" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagement"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement where
@@ -2407,21 +2969,35 @@ instance : ToJS IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement 
     ("staticResource", toJS d.staticResource),
     ("detectionIds", toJS d.detectionIds),
     ("ja3Hash", toJS d.ja3Hash)]⟩
+instance : FromJS IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement where
+  fromJS d := do return {
+    score := ← Lasm.JS.readField Float d "score",
+    verifiedBot := ← Lasm.JS.readField Bool d "verifiedBot",
+    corporateProxy := ← Lasm.JS.readField Bool d "corporateProxy",
+    staticResource := ← Lasm.JS.readField Bool d "staticResource",
+    detectionIds := ← Lasm.JS.readField (Array Float) d "detectionIds",
+    ja3Hash := ← Lasm.JS.readField String d "ja3Hash" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement"
 
-/-- `dictionary IncomingRequestCfPropertiesBotManagementEnterprise : IncomingRequestCfPropertiesBotManagement` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary IncomingRequestCfPropertiesBotManagementEnterprise` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementEnterprise where
-  /-- `required IncomingRequestCfPropertiesBotManagementBase botManagement` -/
-  botManagement : IncomingRequestCfPropertiesBotManagementBase
   /-- `required IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement botManagement` -/
   botManagement : IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement
-instance : ToJS IncomingRequestCfPropertiesBotManagementEnterprise := ⟨fun d => Support.fields #[("botManagement", toJS d.botManagement),
-    ("botManagement", toJS d.botManagement)]⟩
+instance : ToJS IncomingRequestCfPropertiesBotManagementEnterprise := ⟨fun d => Support.fields #[("botManagement", toJS d.botManagement)]⟩
+instance : FromJS IncomingRequestCfPropertiesBotManagementEnterprise where
+  fromJS d := do return {
+    botManagement := ← Lasm.JS.readField IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement d "botManagement" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementEnterprise"
 
 /-- `dictionary IncomingRequestCfPropertiesCloudflareForSaaSEnterprise` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesCloudflareForSaaSEnterprise where
   /-- `any hostMetadata` -/
   hostMetadata : Data := .undefined
 instance : ToJS IncomingRequestCfPropertiesCloudflareForSaaSEnterprise := ⟨fun d => Support.fields #[("hostMetadata", d.hostMetadata)]⟩
+instance : FromJS IncomingRequestCfPropertiesCloudflareForSaaSEnterprise where
+  fromJS d := do return {
+    hostMetadata := ← Lasm.JS.readField Data d "hostMetadata" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesCloudflareForSaaSEnterprise"
 
 /-- `dictionary IncomingRequestCfPropertiesTLSClientAuth` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesTLSClientAuth where
@@ -2488,6 +3064,30 @@ instance : ToJS IncomingRequestCfPropertiesTLSClientAuth := ⟨fun d => Support.
     ("certRFC9440TooLarge", toJS d.certRFC9440TooLarge),
     ("certChainRFC9440", toJS d.certChainRFC9440),
     ("certChainRFC9440TooLarge", toJS d.certChainRFC9440TooLarge)]⟩
+instance : FromJS IncomingRequestCfPropertiesTLSClientAuth where
+  fromJS d := do return {
+    certPresented := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthCertPresented d "certPresented",
+    certVerified := ← Lasm.JS.readField CertVerificationStatus d "certVerified",
+    certRevoked := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthCertRevoked d "certRevoked",
+    certIssuerDN := ← Lasm.JS.readField String d "certIssuerDN",
+    certSubjectDN := ← Lasm.JS.readField String d "certSubjectDN",
+    certIssuerDNRFC2253 := ← Lasm.JS.readField String d "certIssuerDNRFC2253",
+    certSubjectDNRFC2253 := ← Lasm.JS.readField String d "certSubjectDNRFC2253",
+    certIssuerDNLegacy := ← Lasm.JS.readField String d "certIssuerDNLegacy",
+    certSubjectDNLegacy := ← Lasm.JS.readField String d "certSubjectDNLegacy",
+    certSerial := ← Lasm.JS.readField String d "certSerial",
+    certIssuerSerial := ← Lasm.JS.readField String d "certIssuerSerial",
+    certSKI := ← Lasm.JS.readField String d "certSKI",
+    certIssuerSKI := ← Lasm.JS.readField String d "certIssuerSKI",
+    certFingerprintSHA1 := ← Lasm.JS.readField String d "certFingerprintSHA1",
+    certFingerprintSHA256 := ← Lasm.JS.readField String d "certFingerprintSHA256",
+    certNotBefore := ← Lasm.JS.readField String d "certNotBefore",
+    certNotAfter := ← Lasm.JS.readField String d "certNotAfter",
+    certRFC9440 := ← Lasm.JS.readField String d "certRFC9440",
+    certRFC9440TooLarge := ← Lasm.JS.readField Bool d "certRFC9440TooLarge",
+    certChainRFC9440 := ← Lasm.JS.readField String d "certChainRFC9440",
+    certChainRFC9440TooLarge := ← Lasm.JS.readField Bool d "certChainRFC9440TooLarge" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesTLSClientAuth"
 
 /-- `dictionary IncomingRequestCfPropertiesTLSClientAuthPlaceholder` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesTLSClientAuthPlaceholder where
@@ -2554,6 +3154,30 @@ instance : ToJS IncomingRequestCfPropertiesTLSClientAuthPlaceholder := ⟨fun d 
     ("certRFC9440TooLarge", toJS d.certRFC9440TooLarge),
     ("certChainRFC9440", toJS d.certChainRFC9440),
     ("certChainRFC9440TooLarge", toJS d.certChainRFC9440TooLarge)]⟩
+instance : FromJS IncomingRequestCfPropertiesTLSClientAuthPlaceholder where
+  fromJS d := do return {
+    certPresented := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertPresented d "certPresented",
+    certVerified := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified d "certVerified",
+    certRevoked := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertRevoked d "certRevoked",
+    certIssuerDN := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerDN",
+    certSubjectDN := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertSubjectDN d "certSubjectDN",
+    certIssuerDNRFC2253 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDNRFC2253 d "certIssuerDNRFC2253",
+    certSubjectDNRFC2253 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertSubjectDNRFC2253 d "certSubjectDNRFC2253",
+    certIssuerDNLegacy := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDNLegacy d "certIssuerDNLegacy",
+    certSubjectDNLegacy := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertSubjectDNLegacy d "certSubjectDNLegacy",
+    certSerial := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertSerial d "certSerial",
+    certIssuerSerial := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerSerial d "certIssuerSerial",
+    certSKI := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertSKI d "certSKI",
+    certIssuerSKI := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerSKI d "certIssuerSKI",
+    certFingerprintSHA1 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertFingerprintSHA1 d "certFingerprintSHA1",
+    certFingerprintSHA256 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertFingerprintSHA256 d "certFingerprintSHA256",
+    certNotBefore := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertNotBefore d "certNotBefore",
+    certNotAfter := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertNotAfter d "certNotAfter",
+    certRFC9440 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertRFC9440 d "certRFC9440",
+    certRFC9440TooLarge := ← Lasm.JS.readField Bool d "certRFC9440TooLarge",
+    certChainRFC9440 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertChainRFC9440 d "certChainRFC9440",
+    certChainRFC9440TooLarge := ← Lasm.JS.readField Bool d "certChainRFC9440TooLarge" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesTLSClientAuthPlaceholder"
 
 /-- `typedef IncomingRequestCfPropertiesTLSClientAuth or IncomingRequestCfPropertiesTLSClientAuthPlaceholder IncomingRequestCfPropertiesTLSClientAuthOrIncomingRequestCfPropertiesTLSClientAuthPlaceholder`: one constructor per member type. -/
 inductive IncomingRequestCfPropertiesTLSClientAuthOrIncomingRequestCfPropertiesTLSClientAuthPlaceholder where
@@ -2608,6 +3232,20 @@ instance : ToJS IncomingRequestCfPropertiesGeographicInformation := ⟨fun d => 
     ("region", Support.optional d.region),
     ("regionCode", Support.optional d.regionCode),
     ("metroCode", Support.optional d.metroCode)]⟩
+instance : FromJS IncomingRequestCfPropertiesGeographicInformation where
+  fromJS d := do return {
+    country := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesGeographicInformationCountry) d "country",
+    isEUCountry := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesGeographicInformationIsEUCountry) d "isEUCountry",
+    continent := ← Lasm.JS.readField (Option ContinentCode) d "continent",
+    city := ← Lasm.JS.readField (Option String) d "city",
+    postalCode := ← Lasm.JS.readField (Option String) d "postalCode",
+    latitude := ← Lasm.JS.readField (Option String) d "latitude",
+    longitude := ← Lasm.JS.readField (Option String) d "longitude",
+    timezone := ← Lasm.JS.readField (Option String) d "timezone",
+    region := ← Lasm.JS.readField (Option String) d "region",
+    regionCode := ← Lasm.JS.readField (Option String) d "regionCode",
+    metroCode := ← Lasm.JS.readField (Option String) d "metroCode" }
+  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesGeographicInformation"
 
 /-- `dictionary BasicImageTransformationsTrimBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsTrimBorder where
@@ -2620,6 +3258,12 @@ structure BasicImageTransformationsTrimBorder where
 instance : ToJS BasicImageTransformationsTrimBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
     ("tolerance", Support.optional d.tolerance),
     ("keep", Support.optional d.keep)]⟩
+instance : FromJS BasicImageTransformationsTrimBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField (Option String) d "color",
+    tolerance := ← Lasm.JS.readField (Option Float) d "tolerance",
+    keep := ← Lasm.JS.readField (Option Float) d "keep" }
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsTrimBorder"
 
 /-- `dictionary BasicImageTransformationsBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsBorder where
@@ -2629,5 +3273,74 @@ structure BasicImageTransformationsBorder where
   width : Float
 instance : ToJS BasicImageTransformationsBorder := ⟨fun d => Support.fields #[("color", toJS d.color),
     ("width", toJS d.width)]⟩
+instance : FromJS BasicImageTransformationsBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField String d "color",
+    width := ← Lasm.JS.readField Float d "width" }
+  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsBorder"
+
+/-- `dictionary RequestInitCfPropertiesImageDrawTrimBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RequestInitCfPropertiesImageDrawTrimBorder where
+  /-- `DOMString color` -/
+  color : Option String := none
+  /-- `double tolerance` -/
+  tolerance : Option Float := none
+  /-- `double keep` -/
+  keep : Option Float := none
+instance : ToJS RequestInitCfPropertiesImageDrawTrimBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
+    ("tolerance", Support.optional d.tolerance),
+    ("keep", Support.optional d.keep)]⟩
+instance : FromJS RequestInitCfPropertiesImageDrawTrimBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField (Option String) d "color",
+    tolerance := ← Lasm.JS.readField (Option Float) d "tolerance",
+    keep := ← Lasm.JS.readField (Option Float) d "keep" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawTrimBorder"
+
+/-- `dictionary RequestInitCfPropertiesImageDrawBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RequestInitCfPropertiesImageDrawBorder where
+  /-- `required DOMString color` -/
+  color : String
+  /-- `required double width` -/
+  width : Float
+instance : ToJS RequestInitCfPropertiesImageDrawBorder := ⟨fun d => Support.fields #[("color", toJS d.color),
+    ("width", toJS d.width)]⟩
+instance : FromJS RequestInitCfPropertiesImageDrawBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField String d "color",
+    width := ← Lasm.JS.readField Float d "width" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageDrawBorder"
+
+/-- `dictionary RequestInitCfPropertiesImageTrimBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RequestInitCfPropertiesImageTrimBorder where
+  /-- `DOMString color` -/
+  color : Option String := none
+  /-- `double tolerance` -/
+  tolerance : Option Float := none
+  /-- `double keep` -/
+  keep : Option Float := none
+instance : ToJS RequestInitCfPropertiesImageTrimBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
+    ("tolerance", Support.optional d.tolerance),
+    ("keep", Support.optional d.keep)]⟩
+instance : FromJS RequestInitCfPropertiesImageTrimBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField (Option String) d "color",
+    tolerance := ← Lasm.JS.readField (Option Float) d "tolerance",
+    keep := ← Lasm.JS.readField (Option Float) d "keep" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageTrimBorder"
+
+/-- `dictionary RequestInitCfPropertiesImageBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure RequestInitCfPropertiesImageBorder where
+  /-- `required DOMString color` -/
+  color : String
+  /-- `required double width` -/
+  width : Float
+instance : ToJS RequestInitCfPropertiesImageBorder := ⟨fun d => Support.fields #[("color", toJS d.color),
+    ("width", toJS d.width)]⟩
+instance : FromJS RequestInitCfPropertiesImageBorder where
+  fromJS d := do return {
+    color := ← Lasm.JS.readField String d "color",
+    width := ← Lasm.JS.readField Float d "width" }
+  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageBorder"
 
 end Lasm.JS.Cloudflare

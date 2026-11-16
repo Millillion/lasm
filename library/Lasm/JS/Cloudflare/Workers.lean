@@ -120,6 +120,12 @@ structure CachePurgeOptions where
 instance : ToJS CachePurgeOptions := ⟨fun d => Support.fields #[("tags", Support.optional d.tags),
     ("pathPrefixes", Support.optional d.pathPrefixes),
     ("purgeEverything", Support.optional d.purgeEverything)]⟩
+instance : FromJS CachePurgeOptions where
+  fromJS d := do return {
+    tags := ← Lasm.JS.readField (Option (Array String)) d "tags",
+    pathPrefixes := ← Lasm.JS.readField (Option (Array String)) d "pathPrefixes",
+    purgeEverything := ← Lasm.JS.readField (Option Bool) d "purgeEverything" }
+  typeName := "Lasm.JS.Cloudflare.CachePurgeOptions"
 
 /-- `dictionary CachePurgeError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CachePurgeError where
@@ -127,6 +133,8 @@ structure CachePurgeError where
   code : Float
   /-- `required DOMString message` -/
   message : String
+instance : ToJS CachePurgeError := ⟨fun d => Support.fields #[("code", toJS d.code),
+    ("message", toJS d.message)]⟩
 instance : FromJS CachePurgeError where
   fromJS d := do return {
     code := ← Lasm.JS.readField Float d "code",
@@ -139,6 +147,8 @@ structure CachePurgeResult where
   success : Bool
   /-- `required sequence<CachePurgeError> errors` -/
   errors : Array CachePurgeError
+instance : ToJS CachePurgeResult := ⟨fun d => Support.fields #[("success", toJS d.success),
+    ("errors", toJS d.errors)]⟩
 instance : FromJS CachePurgeResult where
   fromJS d := do return {
     success := ← Lasm.JS.readField Bool d "success",
@@ -151,6 +161,8 @@ structure CloudflareAccessIdentityIdp where
   id : String
   /-- `required DOMString type` -/
   type : String
+instance : ToJS CloudflareAccessIdentityIdp := ⟨fun d => Support.fields #[("id", toJS d.id),
+    ("type", toJS d.type)]⟩
 instance : FromJS CloudflareAccessIdentityIdp where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -161,6 +173,7 @@ instance : FromJS CloudflareAccessIdentityIdp where
 structure CloudflareAccessIdentityGeo where
   /-- `required DOMString country` -/
   country : String
+instance : ToJS CloudflareAccessIdentityGeo := ⟨fun d => Support.fields #[("country", toJS d.country)]⟩
 instance : FromJS CloudflareAccessIdentityGeo where
   fromJS d := do return {
     country := ← Lasm.JS.readField String d "country" }
@@ -174,6 +187,9 @@ structure CloudflareAccessIdentityGroups where
   name : String
   /-- `DOMString email` -/
   email : Option String := none
+instance : ToJS CloudflareAccessIdentityGroups := ⟨fun d => Support.fields #[("id", toJS d.id),
+    ("name", toJS d.name),
+    ("email", Support.optional d.email)]⟩
 instance : FromJS CloudflareAccessIdentityGroups where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -209,6 +225,19 @@ structure CloudflareAccessIdentity where
   is_warp : Option Bool := none
   /-- `boolean is_gateway` -/
   is_gateway : Option Bool := none
+instance : ToJS CloudflareAccessIdentity := ⟨fun d => Support.fields #[("email", Support.optional d.email),
+    ("name", Support.optional d.name),
+    ("user_uuid", Support.optional d.user_uuid),
+    ("account_id", Support.optional d.account_id),
+    ("iat", Support.optional d.iat),
+    ("ip", Support.optional d.ip),
+    ("amr", Support.optional d.amr),
+    ("idp", Support.optional d.idp),
+    ("geo", Support.optional d.geo),
+    ("groups", Support.optional d.groups),
+    ("devicePosture", Support.optional d.devicePosture),
+    ("is_warp", Support.optional d.is_warp),
+    ("is_gateway", Support.optional d.is_gateway)]⟩
 instance : FromJS CloudflareAccessIdentity where
   fromJS d := do return {
     email := ← Lasm.JS.readField (Option String) d "email",
@@ -230,6 +259,7 @@ instance : FromJS CloudflareAccessIdentity where
 structure EmailSendResult where
   /-- `required DOMString messageId` -/
   messageId : String
+instance : ToJS EmailSendResult := ⟨fun d => Support.fields #[("messageId", toJS d.messageId)]⟩
 instance : FromJS EmailSendResult where
   fromJS d := do return {
     messageId := ← Lasm.JS.readField String d "messageId" }
@@ -243,6 +273,11 @@ structure EmailMessage where
   to : String
 instance : ToJS EmailMessage := ⟨fun d => Support.fields #[("from", toJS d.«from»),
     ("to", toJS d.to)]⟩
+instance : FromJS EmailMessage where
+  fromJS d := do return {
+    «from» := ← Lasm.JS.readField String d "from",
+    to := ← Lasm.JS.readField String d "to" }
+  typeName := "Lasm.JS.Cloudflare.EmailMessage"
 
 /-- `dictionary EmailAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EmailAddress where
@@ -252,6 +287,11 @@ structure EmailAddress where
   email : String
 instance : ToJS EmailAddress := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("email", toJS d.email)]⟩
+instance : FromJS EmailAddress where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    email := ← Lasm.JS.readField String d "email" }
+  typeName := "Lasm.JS.Cloudflare.EmailAddress"
 
 /-- `typedef DOMString or EmailAddress DOMStringOrEmailAddress`: one constructor per member type. -/
 inductive DOMStringOrEmailAddress where
@@ -264,6 +304,12 @@ instance : ToJS DOMStringOrEmailAddress := ⟨fun
   | .emailAddress v => toJS v⟩
 instance : Coe String DOMStringOrEmailAddress := ⟨.domString⟩
 instance : Coe EmailAddress DOMStringOrEmailAddress := ⟨.emailAddress⟩
+instance : FromJS DOMStringOrEmailAddress where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String EmailAddress).map .emailAddress
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrEmailAddress"
 
 /-- `dictionary EmailAttachment` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EmailAttachment where
@@ -322,6 +368,13 @@ instance : ToJS DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress := �
 instance : Coe String DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress := ⟨.domString⟩
 instance : Coe EmailAddress DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress := ⟨.emailAddress⟩
 instance : Coe (Array DOMStringOrEmailAddress) DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress := ⟨.sequence⟩
+instance : FromJS DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String EmailAddress).map .emailAddress
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array DOMStringOrEmailAddress)).map .sequence
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrEmailAddressOrSequenceOfDOMStringOrEmailAddress"
 
 /-- `dictionary EmailMessageBuilder` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EmailMessageBuilder where
@@ -404,14 +457,14 @@ instance : Nonempty ExportedHandlerTailHandler := ⟨{ val := Classical.ofNonemp
 instance : ToJS ExportedHandlerTailHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerTailHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTailHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerTailHandler.ofFn {Env : Type} [FromJS Env] (f : (Array TraceItem) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTailHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array TraceItem) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerTailHandler.ofFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTailHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerTailHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array TraceItem) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTailHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array TraceItem) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerTailHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTailHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -424,14 +477,14 @@ instance : Nonempty ExportedHandlerTraceHandler := ⟨{ val := Classical.ofNonem
 instance : ToJS ExportedHandlerTraceHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerTraceHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTraceHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerTraceHandler.ofFn {Env : Type} [FromJS Env] (f : (Array TraceItem) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTraceHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array TraceItem) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerTraceHandler.ofFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTraceHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerTraceHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array TraceItem) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTraceHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array TraceItem) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerTraceHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTraceHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -572,12 +625,28 @@ instance : ToJS ExportedHandler := ⟨fun d => Support.fields #[("fetch", Suppor
     ("test", Support.optional d.test),
     ("email", Support.optional d.email),
     ("queue", Support.optional d.queue)]⟩
+instance : FromJS ExportedHandler where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField (Option ExportedHandlerFetchHandler) d "fetch",
+    connect := ← Lasm.JS.readField (Option ExportedHandlerConnectHandler) d "connect",
+    tail := ← Lasm.JS.readField (Option ExportedHandlerTailHandler) d "tail",
+    trace := ← Lasm.JS.readField (Option ExportedHandlerTraceHandler) d "trace",
+    tailStream := ← Lasm.JS.readField (Option ExportedHandlerTailStreamHandler) d "tailStream",
+    scheduled := ← Lasm.JS.readField (Option ExportedHandlerScheduledHandler) d "scheduled",
+    test := ← Lasm.JS.readField (Option ExportedHandlerTestHandler) d "test",
+    email := ← Lasm.JS.readField (Option EmailExportedHandler) d "email",
+    queue := ← Lasm.JS.readField (Option ExportedHandlerQueueHandler) d "queue" }
+  typeName := "Lasm.JS.Cloudflare.ExportedHandler"
 
 /-- `dictionary Cloudflare` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Cloudflare where
   /-- `required record<DOMString, boolean> compatibilityFlags` -/
   compatibilityFlags : Record Bool
 instance : ToJS Cloudflare := ⟨fun d => Support.fields #[("compatibilityFlags", toJS d.compatibilityFlags)]⟩
+instance : FromJS Cloudflare where
+  fromJS d := do return {
+    compatibilityFlags := ← Lasm.JS.readField (Record Bool) d "compatibilityFlags" }
+  typeName := "Lasm.JS.Cloudflare.Cloudflare"
 
 /-- `callback PagesFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesFunction where
@@ -604,12 +673,20 @@ structure PagesFunctionEnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
 instance : ToJS PagesFunctionEnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
+instance : FromJS PagesFunctionEnvASSETS where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField Data d "fetch" }
+  typeName := "Lasm.JS.Cloudflare.PagesFunctionEnvASSETS"
 
 /-- `dictionary PagesFunctionEnv` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesFunctionEnv where
   /-- `required PagesFunctionEnvASSETS ASSETS` -/
   ASSETS : PagesFunctionEnvASSETS
 instance : ToJS PagesFunctionEnv := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
+instance : FromJS PagesFunctionEnv where
+  fromJS d := do return {
+    ASSETS := ← Lasm.JS.readField PagesFunctionEnvASSETS d "ASSETS" }
+  typeName := "Lasm.JS.Cloudflare.PagesFunctionEnv"
 
 /-- `callback PagesPluginFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesPluginFunction where
@@ -636,12 +713,20 @@ structure PagesPluginFunctionEnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
 instance : ToJS PagesPluginFunctionEnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
+instance : FromJS PagesPluginFunctionEnvASSETS where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField Data d "fetch" }
+  typeName := "Lasm.JS.Cloudflare.PagesPluginFunctionEnvASSETS"
 
 /-- `dictionary PagesPluginFunctionEnv` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesPluginFunctionEnv where
   /-- `required PagesPluginFunctionEnvASSETS ASSETS` -/
   ASSETS : PagesPluginFunctionEnvASSETS
 instance : ToJS PagesPluginFunctionEnv := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
+instance : FromJS PagesPluginFunctionEnv where
+  fromJS d := do return {
+    ASSETS := ← Lasm.JS.readField PagesPluginFunctionEnvASSETS d "ASSETS" }
+  typeName := "Lasm.JS.Cloudflare.PagesPluginFunctionEnv"
 
 /-- `readonly exports: Cloudflare.Exports`: `readonly attribute any exports` -/
 def ExecutionContext.exports (self : ExecutionContext) : IO Data := self.val.get "exports" Data

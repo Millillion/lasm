@@ -250,10 +250,19 @@ const nodeModules = nodeTier.modules.map(m => {
 // Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs), generated in tier 1's context too: their
 // members are their IDL's definitions marked with their LasmHost and LasmLeanModule.
 const hostOf = d => extValue(extAttr(d, 'LasmHost'));
+/** Interfaces with each one's base before it (a Lean structure extends one already declared). */
+function parentsFirst(ds) {
+  const left = [...ds], out = [];
+  while (left.length) {
+    const i = left.findIndex(d => !left.some(p => p.name === d.inheritance));
+    out.push(...left.splice(i < 0 ? 0 : i, 1));
+  }
+  return out;
+}
 const hostModules = hosts.flatMap(h => h.modules.map(m => {
   const mine = [...defs.values()].filter(d => hostOf(d) === h.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name);
   return { name: m.name, title: m.title, specs: `${hostSource(h)} type declarations`, tier: 1, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
-    host: h, interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
+    host: h, interfaces: parentsFirst(mine.filter(d => d.type === 'interface')).map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
     // Lasm.JS.Cloudflare: every selected dictionary, callback and enum is generated, also one no member names
     // (ExportedHandler and its handlers, which a program passes to Lasm.JS.exportDefault).
     extraTypes: h.rich ? mine.filter(d => ['dictionary', 'callback', 'enum'].includes(d.type)).map(d => d.name) : undefined };
@@ -505,7 +514,12 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
+  // Readable when every field is, and is read as the type it is written as (a union written
+  // as its inductive but read as Data is not).
+  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => {
+    const t = resolve(f.idlType), inner = t.k === 'nullable' && !f.required ? t.inner : t;
+    return readable(t) && !needsPost(t) && argType(inner) === retType(inner);
+  }));
   dictReadableMemo.set(name, ok);
   return ok;
 }
@@ -650,6 +664,9 @@ for (const m of plan) inTier(m.tier, () => {
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
     if (!d) fail(`extra type ${x} not found`);
+    // Lasm.JS.Cloudflare: each is written and read wherever it is met (a field of a type read
+    // here and written there), so it gets both instances where it can.
+    if (m.host?.rich) { const t = resolveName(x), at = moduleOfType.get(typeKey(t) ?? x) ?? m.key; visit(t, 'to', at); visit(t, 'from', at); continue; }
     if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }
@@ -857,7 +874,8 @@ function emitInterface(module, name) {
     requireType(module, r);
     const res = resultOf(a.idlType, a);
     const isStatic = a.special === 'static';
-    const getName = take(isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name, 'attribute');
+    // LasmLeanName (Lasm.JS.Cloudflare): a Lean name other than the property's (`Tracing.SpanClass`).
+    const getName = take(extValue(extAttr(a, 'LasmLeanName')) ?? (isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name), 'attribute');
     if (isStatic) {
       const path = `[${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}, "${a.name}"]`;
       const call = isNode ? `Support.getExport "${jsModule}" ${path} ${res.async ? 'Value' : res.req}` : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;

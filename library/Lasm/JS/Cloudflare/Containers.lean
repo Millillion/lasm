@@ -170,6 +170,9 @@ structure ExecOutput where
   stderr : ByteArray
   /-- `required double exitCode` -/
   exitCode : Float
+instance : ToJS ExecOutput := ⟨fun d => Support.fields #[("stdout", toJS d.stdout),
+    ("stderr", toJS d.stderr),
+    ("exitCode", toJS d.exitCode)]⟩
 
 /-- `dictionary ContainerStartResources` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerStartResources where
@@ -182,6 +185,12 @@ structure ContainerStartResources where
 instance : ToJS ContainerStartResources := ⟨fun d => Support.fields #[("vcpu", toJS d.vcpu),
     ("memoryMib", toJS d.memoryMib),
     ("diskMb", toJS d.diskMb)]⟩
+instance : FromJS ContainerStartResources where
+  fromJS d := do return {
+    vcpu := ← Lasm.JS.readField Float d "vcpu",
+    memoryMib := ← Lasm.JS.readField Float d "memoryMib",
+    diskMb := ← Lasm.JS.readField Float d "diskMb" }
+  typeName := "Lasm.JS.Cloudflare.ContainerStartResources"
 
 /-- `typedef ContainerStartOptionsInstance or ContainerStartOptionsInstance2 or ContainerStartOptionsInstance3 or ContainerStartOptionsInstance4 or ContainerStartOptionsInstance5 or ContainerStartOptionsInstance6 or ContainerStartResources ContainerStartOptionsInstanceOrContainerStartOptionsInstance2OrContainerStartOptionsInstance3OrContainerStartOptionsInstance4OrContainerStartOptionsInstance5OrContainerStartOptionsInstance6OrContainerStartResources`: one constructor per member type. -/
 inductive ContainerStartOptionsInstanceOrContainerStartOptionsInstance2OrContainerStartOptionsInstance3OrContainerStartOptionsInstance4OrContainerStartOptionsInstance5OrContainerStartOptionsInstance6OrContainerStartResources where
@@ -229,6 +238,13 @@ instance : ToJS ContainerDirectorySnapshot := ⟨fun d => Support.fields #[("id"
     ("size", toJS d.size),
     ("dir", toJS d.dir),
     ("name", Support.optional d.name)]⟩
+instance : FromJS ContainerDirectorySnapshot where
+  fromJS d := do return {
+    id := ← Lasm.JS.readField String d "id",
+    size := ← Lasm.JS.readField Float d "size",
+    dir := ← Lasm.JS.readField String d "dir",
+    name := ← Lasm.JS.readField (Option String) d "name" }
+  typeName := "Lasm.JS.Cloudflare.ContainerDirectorySnapshot"
 
 /-- `dictionary ContainerDirectorySnapshotRestoreParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerDirectorySnapshotRestoreParams where
@@ -238,6 +254,11 @@ structure ContainerDirectorySnapshotRestoreParams where
   mountPoint : Option String := none
 instance : ToJS ContainerDirectorySnapshotRestoreParams := ⟨fun d => Support.fields #[("snapshot", Support.optional d.snapshot),
     ("mountPoint", Support.optional d.mountPoint)]⟩
+instance : FromJS ContainerDirectorySnapshotRestoreParams where
+  fromJS d := do return {
+    snapshot := ← Lasm.JS.readField (Option ContainerDirectorySnapshot) d "snapshot",
+    mountPoint := ← Lasm.JS.readField (Option String) d "mountPoint" }
+  typeName := "Lasm.JS.Cloudflare.ContainerDirectorySnapshotRestoreParams"
 
 /-- `typedef DOMString or never DOMStringOrNever`: one constructor per member type. -/
 inductive DOMStringOrNever where
@@ -249,12 +270,22 @@ instance : ToJS DOMStringOrNever := ⟨fun
   | .domString v => toJS v
   | .never v => toJS v⟩
 instance : Coe String DOMStringOrNever := ⟨.domString⟩
+instance : FromJS DOMStringOrNever where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Value).map .never
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrNever"
 
 /-- `dictionary ContainerSnapshotRestoreParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerSnapshotRestoreParams where
   /-- `required DOMString id` -/
   id : String
 instance : ToJS ContainerSnapshotRestoreParams := ⟨fun d => Support.fields #[("id", toJS d.id)]⟩
+instance : FromJS ContainerSnapshotRestoreParams where
+  fromJS d := do return {
+    id := ← Lasm.JS.readField String d "id" }
+  typeName := "Lasm.JS.Cloudflare.ContainerSnapshotRestoreParams"
 
 /-- `typedef never or ContainerSnapshotRestoreParams NeverOrContainerSnapshotRestoreParams`: one constructor per member type. -/
 inductive NeverOrContainerSnapshotRestoreParams where
@@ -266,6 +297,12 @@ instance : ToJS NeverOrContainerSnapshotRestoreParams := ⟨fun
   | .never v => toJS v
   | .containerSnapshotRestoreParams v => toJS v⟩
 instance : Coe ContainerSnapshotRestoreParams NeverOrContainerSnapshotRestoreParams := ⟨.containerSnapshotRestoreParams⟩
+instance : FromJS NeverOrContainerSnapshotRestoreParams where
+  fromJS
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Value).map .never
+    | d@(.object _) => (FromJS.fromJS d : Except String ContainerSnapshotRestoreParams).map .containerSnapshotRestoreParams
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.NeverOrContainerSnapshotRestoreParams"
 
 /-- `dictionary ContainerStartOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerStartOptions where
@@ -302,14 +339,14 @@ instance : Nonempty ContainerGetTcpPortFetch := ⟨{ val := Classical.ofNonempty
 instance : ToJS ContainerGetTcpPortFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ContainerGetTcpPortFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ContainerGetTcpPortFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ContainerGetTcpPortFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO ContainerGetTcpPortFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerGetTcpPortFetch.ofFn (f : Data → Data → Async Response) : IO ContainerGetTcpPortFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ContainerGetTcpPortFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO ContainerGetTcpPortFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerGetTcpPortFetch.ofSyncFn (f : Data → Data → IO Response) : IO ContainerGetTcpPortFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -358,6 +395,8 @@ structure ContainerGetTcpPort where
   fetch : ContainerGetTcpPortFetch
   /-- `required ContainerGetTcpPortConnect connect` -/
   connect : ContainerGetTcpPortConnect
+instance : ToJS ContainerGetTcpPort := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
+    ("connect", toJS d.connect)]⟩
 instance : FromJS ContainerGetTcpPort where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField ContainerGetTcpPortFetch d "fetch",
@@ -372,14 +411,14 @@ instance : Nonempty ContainerInterceptOutboundHttpBindingFetch := ⟨{ val := Cl
 instance : ToJS ContainerInterceptOutboundHttpBindingFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ContainerInterceptOutboundHttpBindingFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ContainerInterceptOutboundHttpBindingFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ContainerInterceptOutboundHttpBindingFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO ContainerInterceptOutboundHttpBindingFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptOutboundHttpBindingFetch.ofFn (f : Data → Data → Async Response) : IO ContainerInterceptOutboundHttpBindingFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ContainerInterceptOutboundHttpBindingFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO ContainerInterceptOutboundHttpBindingFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptOutboundHttpBindingFetch.ofSyncFn (f : Data → Data → IO Response) : IO ContainerInterceptOutboundHttpBindingFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -412,6 +451,11 @@ structure ContainerInterceptOutboundHttpBinding where
   connect : ContainerInterceptOutboundHttpBindingConnect
 instance : ToJS ContainerInterceptOutboundHttpBinding := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
+instance : FromJS ContainerInterceptOutboundHttpBinding where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField ContainerInterceptOutboundHttpBindingFetch d "fetch",
+    connect := ← Lasm.JS.readField ContainerInterceptOutboundHttpBindingConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.ContainerInterceptOutboundHttpBinding"
 
 /-- `callback ContainerInterceptAllOutboundHttpBindingFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ContainerInterceptAllOutboundHttpBindingFetch where
@@ -421,14 +465,14 @@ instance : Nonempty ContainerInterceptAllOutboundHttpBindingFetch := ⟨{ val :=
 instance : ToJS ContainerInterceptAllOutboundHttpBindingFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ContainerInterceptAllOutboundHttpBindingFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ContainerInterceptAllOutboundHttpBindingFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ContainerInterceptAllOutboundHttpBindingFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO ContainerInterceptAllOutboundHttpBindingFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptAllOutboundHttpBindingFetch.ofFn (f : Data → Data → Async Response) : IO ContainerInterceptAllOutboundHttpBindingFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ContainerInterceptAllOutboundHttpBindingFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO ContainerInterceptAllOutboundHttpBindingFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptAllOutboundHttpBindingFetch.ofSyncFn (f : Data → Data → IO Response) : IO ContainerInterceptAllOutboundHttpBindingFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -461,12 +505,21 @@ structure ContainerInterceptAllOutboundHttpBinding where
   connect : ContainerInterceptAllOutboundHttpBindingConnect
 instance : ToJS ContainerInterceptAllOutboundHttpBinding := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
+instance : FromJS ContainerInterceptAllOutboundHttpBinding where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField ContainerInterceptAllOutboundHttpBindingFetch d "fetch",
+    connect := ← Lasm.JS.readField ContainerInterceptAllOutboundHttpBindingConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.ContainerInterceptAllOutboundHttpBinding"
 
 /-- `dictionary ContainerSnapshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerSnapshotOptions where
   /-- `DOMString name` -/
   name : Option String := none
 instance : ToJS ContainerSnapshotOptions := ⟨fun d => Support.fields #[("name", Support.optional d.name)]⟩
+instance : FromJS ContainerSnapshotOptions where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField (Option String) d "name" }
+  typeName := "Lasm.JS.Cloudflare.ContainerSnapshotOptions"
 
 /-- `dictionary ContainerSnapshot` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerSnapshot where
@@ -476,6 +529,9 @@ structure ContainerSnapshot where
   size : Float
   /-- `DOMString name` -/
   name : Option String := none
+instance : ToJS ContainerSnapshot := ⟨fun d => Support.fields #[("id", toJS d.id),
+    ("size", toJS d.size),
+    ("name", Support.optional d.name)]⟩
 instance : FromJS ContainerSnapshot where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -491,14 +547,14 @@ instance : Nonempty ContainerInterceptOutboundHttpsBindingFetch := ⟨{ val := C
 instance : ToJS ContainerInterceptOutboundHttpsBindingFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ContainerInterceptOutboundHttpsBindingFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ContainerInterceptOutboundHttpsBindingFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ContainerInterceptOutboundHttpsBindingFetch.ofFn (f : Data → (Option RequestInit) → Async Response) : IO ContainerInterceptOutboundHttpsBindingFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptOutboundHttpsBindingFetch.ofFn (f : Data → Data → Async Response) : IO ContainerInterceptOutboundHttpsBindingFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ContainerInterceptOutboundHttpsBindingFetch.ofSyncFn (f : Data → (Option RequestInit) → IO Response) : IO ContainerInterceptOutboundHttpsBindingFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option RequestInit) args 1))
+def ContainerInterceptOutboundHttpsBindingFetch.ofSyncFn (f : Data → Data → IO Response) : IO ContainerInterceptOutboundHttpsBindingFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -531,6 +587,11 @@ structure ContainerInterceptOutboundHttpsBinding where
   connect : ContainerInterceptOutboundHttpsBindingConnect
 instance : ToJS ContainerInterceptOutboundHttpsBinding := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
+instance : FromJS ContainerInterceptOutboundHttpsBinding where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField ContainerInterceptOutboundHttpsBindingFetch d "fetch",
+    connect := ← Lasm.JS.readField ContainerInterceptOutboundHttpsBindingConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.ContainerInterceptOutboundHttpsBinding"
 
 /-- `dictionary ContainerExecPtyOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerExecPtyOptions where
@@ -540,6 +601,11 @@ structure ContainerExecPtyOptions where
   rows : Option Float := none
 instance : ToJS ContainerExecPtyOptions := ⟨fun d => Support.fields #[("cols", Support.optional d.cols),
     ("rows", Support.optional d.rows)]⟩
+instance : FromJS ContainerExecPtyOptions where
+  fromJS d := do return {
+    cols := ← Lasm.JS.readField (Option Float) d "cols",
+    rows := ← Lasm.JS.readField (Option Float) d "rows" }
+  typeName := "Lasm.JS.Cloudflare.ContainerExecPtyOptions"
 
 /-- `typedef boolean or ContainerExecPtyOptions BooleanOrContainerExecPtyOptions`: one constructor per member type. -/
 inductive BooleanOrContainerExecPtyOptions where
@@ -552,6 +618,12 @@ instance : ToJS BooleanOrContainerExecPtyOptions := ⟨fun
   | .containerExecPtyOptions v => toJS v⟩
 instance : Coe Bool BooleanOrContainerExecPtyOptions := ⟨.boolean⟩
 instance : Coe ContainerExecPtyOptions BooleanOrContainerExecPtyOptions := ⟨.containerExecPtyOptions⟩
+instance : FromJS BooleanOrContainerExecPtyOptions where
+  fromJS
+    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
+    | d@(.object _) => (FromJS.fromJS d : Except String ContainerExecPtyOptions).map .containerExecPtyOptions
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.BooleanOrContainerExecPtyOptions"
 
 /-- `typedef ReadableStream or ContainerExecOptionsStdin ReadableStreamOrContainerExecOptionsStdin`: one constructor per member type. -/
 inductive ReadableStreamOrContainerExecOptionsStdin where
@@ -564,6 +636,12 @@ instance : ToJS ReadableStreamOrContainerExecOptionsStdin := ⟨fun
   | .containerExecOptionsStdin v => toJS v⟩
 instance : Coe ReadableStream ReadableStreamOrContainerExecOptionsStdin := ⟨.readableStream⟩
 instance : Coe ContainerExecOptionsStdin ReadableStreamOrContainerExecOptionsStdin := ⟨.containerExecOptionsStdin⟩
+instance : FromJS ReadableStreamOrContainerExecOptionsStdin where
+  fromJS
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String ReadableStream).map .readableStream
+    | d@(.string _) => (FromJS.fromJS d : Except String ContainerExecOptionsStdin).map .containerExecOptionsStdin
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.ReadableStreamOrContainerExecOptionsStdin"
 
 /-- `dictionary ContainerExecOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerExecOptions where
@@ -591,6 +669,17 @@ instance : ToJS ContainerExecOptions := ⟨fun d => Support.fields #[("cwd", Sup
     ("stdin", Support.optional d.stdin),
     ("stdout", Support.optional d.stdout),
     ("stderr", Support.optional d.stderr)]⟩
+instance : FromJS ContainerExecOptions where
+  fromJS d := do return {
+    cwd := ← Lasm.JS.readField (Option String) d "cwd",
+    env := ← Lasm.JS.readField (Option (Record String)) d "env",
+    user := ← Lasm.JS.readField (Option String) d "user",
+    signal := ← Lasm.JS.readField (Option AbortSignal) d "signal",
+    pty := ← Lasm.JS.readField (Option BooleanOrContainerExecPtyOptions) d "pty",
+    stdin := ← Lasm.JS.readField (Option ReadableStreamOrContainerExecOptionsStdin) d "stdin",
+    stdout := ← Lasm.JS.readField (Option ContainerExecOptionsStdout) d "stdout",
+    stderr := ← Lasm.JS.readField (Option ContainerExecOptionsStderr) d "stderr" }
+  typeName := "Lasm.JS.Cloudflare.ContainerExecOptions"
 
 /-- `dictionary ContainerInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ContainerInfo where
@@ -598,6 +687,8 @@ structure ContainerInfo where
   labels : Record String
   /-- `required DOMString image` -/
   image : String
+instance : ToJS ContainerInfo := ⟨fun d => Support.fields #[("labels", toJS d.labels),
+    ("image", toJS d.image)]⟩
 instance : FromJS ContainerInfo where
   fromJS d := do return {
     labels := ← Lasm.JS.readField (Record String) d "labels",

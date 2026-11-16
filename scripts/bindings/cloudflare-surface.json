@@ -550,13 +550,13 @@
         "digest",
         "bytesWritten"
       ],
-      "FixedLengthStream": [
-        null
-      ],
       "IdentityTransformStream": [
         null,
         "readable",
         "writable"
+      ],
+      "FixedLengthStream": [
+        null
       ],
       "AgentMemoryProfile": [
         "get",
