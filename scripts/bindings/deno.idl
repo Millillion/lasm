@@ -176,9 +176,6 @@ dictionary Deno_FileInfo {
   required boolean? isSocket;
 };
 
-[LasmHost="Deno", LasmLeanModule="Runtime", LasmName="DoubleOrObject"]
-typedef (double or object) Deno_DoubleOrObject;
-
 // object Deno.SetRawOptions
 [LasmHost="Deno", LasmLeanModule="Io", LasmFile="lib.deno.ns.d.ts", LasmName="SetRawOptions", LasmPath="Deno.SetRawOptions"]
 dictionary Deno_SetRawOptions {
@@ -214,9 +211,9 @@ interface Deno_FsFile {
   // syncDataSync(): void
   [LasmHost="Deno", LasmSignature="syncDataSync(): void"] undefined syncDataSync();
   // utime(atime: number | Date, mtime: number | Date): Promise<void>
-  [LasmHost="Deno", LasmSignature="utime(atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmSignature="utime(atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(any atime, any mtime);
   // utimeSync(atime: number | Date, mtime: number | Date): void
-  [LasmHost="Deno", LasmSignature="utimeSync(atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmSignature="utimeSync(atime: number | Date, mtime: number | Date): void"] undefined utimeSync(any atime, any mtime);
   // isTerminal(): boolean
   [LasmHost="Deno", LasmSignature="isTerminal(): boolean"] boolean isTerminal();
   // setRaw(mode: boolean, options?: SetRawOptions): void
@@ -1621,9 +1618,9 @@ namespace Deno_nsRuntime {
   // Deno.removeSignalListener(signal: Signal, handler: () => void): void
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.removeSignalListener(signal: Signal, handler: () => void): void"] undefined removeSignalListener(Deno_Signal signal, Deno_RemoveSignalListenerHandler handler);
   // Deno.refTimer(id: number | NodeJS.Timeout): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.refTimer(id: number | NodeJS.Timeout): void"] undefined refTimer(Deno_DoubleOrObject id);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.refTimer(id: number | NodeJS.Timeout): void"] undefined refTimer(any id);
   // Deno.unrefTimer(id: number | NodeJS.Timeout): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.unrefTimer(id: number | NodeJS.Timeout): void"] undefined unrefTimer(Deno_DoubleOrObject id);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.unrefTimer(id: number | NodeJS.Timeout): void"] undefined unrefTimer(any id);
   // Deno.uid(): number | null
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.uid(): number | null"] double? uid();
   // Deno.gid(): number | null
@@ -1775,9 +1772,9 @@ namespace Deno_nsFs {
   // Deno.symlinkSync(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): void
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.symlinkSync(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): void"] undefined symlinkSync(Deno_DOMStringOrURL oldpath, Deno_DOMStringOrURL newpath, optional Deno_SymlinkOptions options);
   // Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DOMStringOrURL path, Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void"] undefined utimeSync(Deno_DOMStringOrURL path, any atime, any mtime);
   // Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>
-  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DOMStringOrURL path, Deno_DoubleOrObject atime, Deno_DoubleOrObject mtime);
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>"] Promise<undefined> utime(Deno_DOMStringOrURL path, any atime, any mtime);
   // Deno.umask(mask?: number): number
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.umask(mask?: number): number"] double umask(optional double mask);
 };

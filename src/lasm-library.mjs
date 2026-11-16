@@ -44,7 +44,8 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Lasm.JS.Deno (the whole Deno namespace, docs/JS_BINDINGS.md "Lasm.JS.Deno") and Lasm.JS.Bun (Bun.serve),
   // generated from the runtimes' TypeScript declarations (scripts/bindings/serve-api.mjs, generate-web.mjs).
   'Lasm.JS.Deno.Runtime', 'Lasm.JS.Deno.Permissions', 'Lasm.JS.Deno.Io', 'Lasm.JS.Deno.Fs', 'Lasm.JS.Deno.Subprocess', 'Lasm.JS.Deno.Net',
-  'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno.WebSockets', 'Lasm.JS.Deno.Fetch', 'Lasm.JS.Deno.Kv', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',
+  'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno.WebSockets', 'Lasm.JS.Deno.Fetch', 'Lasm.JS.Deno.Kv', 'Lasm.JS.Deno',
+  'Lasm.JS.Bun.Core', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun.Shell', 'Lasm.JS.Bun.Sqlite', 'Lasm.JS.Bun.Sql', 'Lasm.JS.Bun.Redis', 'Lasm.JS.Bun.S3', 'Lasm.JS.Bun',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',

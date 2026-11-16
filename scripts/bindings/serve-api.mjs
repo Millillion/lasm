@@ -168,6 +168,11 @@ export function declarations(text, file) {
           doc: docBefore(src, i) });
         i = close + 1; continue;
       }
+      // `export import SpawnOptions = Spawn;`: another name of a namespace.
+      if ((m = /^import\s+([\w$]+)\s*=\s*([\w$.]+)\s*;/.exec(body))) {
+        out.push({ kind: 'nsalias', name: qual(m[1]), target: m[2], src, doc: '' });
+        i = i + lead + m[0].length; continue;
+      }
       if ((m = /^(const|let|var)\s+([\w$]+)\s*:/.exec(body))) {
         const stop = findTop(src.shape, i, end, ';', false);
         const e = stop < 0 ? end : stop;
@@ -202,6 +207,8 @@ export function membersOf(src, from, to) {
   return out;
 }
 export function parseMember(text, shape) {
+  // A call or construct signature (`(name: string): string`, `<T>(…): R`, `new (…): T`): the object is a function.
+  if (/^(new\s*)?[(<]/.test(text)) return { name: '()', kind: 'call', optional: false, readonly: false, type: squash(text) };
   let s = 0;
   const ws = () => { while (/\s/.test(text[s])) s++; };
   let readonly = false;
@@ -245,7 +252,8 @@ export function splitParams(text, shape) {
 }
 /** The overloads of a function declaration's text: [{ params, type }]. */
 export function functionSignature(text) {
-  const { shape } = blank(text);
+  const { code, shape } = blank(text);
+  text = code; // doc comments inside the parameter list are blanked
   const m = /function\s+[\w$]+\s*/.exec(shape);
   let at = m.index + m[0].length;
   if (shape[at] === '<') at = findTop(shape, at + 1, shape.length, '>') + 1;
@@ -266,8 +274,10 @@ const paramKey = params => params.map(p => `${p.rest ? '...' : ''}${p.name}${p.o
 
 // ---------- types ----------
 
-const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|\d+|[|&()<>[\]{},:?;=])/y;
+const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|-?\d+|[|&()<>[\]{},:?;=])/y;
 function tokenize(text) {
+  // A type of another module (`import("node:tls").PeerCertificate`, `typeof import("util").inspect.custom`): an object.
+  text = text.replace(/(?:typeof\s+)?import\(\s*"[^"]*"\s*\)(?:\.[\w$]+)*/g, 'object');
   const out = [];
   tokenRe.lastIndex = 0;
   let m;
@@ -320,7 +330,22 @@ export function parseType(text) {
       return { k: 'obj', body };
     }
     if (/^["'`]/.test(t)) { next(); if (t[0] === '`') fail(`template literal types are not lowered: ${text}`); return { k: 'lit', value: JSON.parse(t[0] === "'" ? `"${t.slice(1, -1)}"` : t) }; }
-    if (/^\d/.test(t)) { next(); return { k: 'num', value: +t }; }
+    if (/^-?\d/.test(t)) { next(); return { k: 'num', value: +t }; }
+    // A tuple `[a: A, b: B]`: its element types (labels dropped).
+    if (t === '[') {
+      next();
+      const elems = [];
+      while (peek() !== ']') {
+        if (peek() === '...') next();
+        if (toks[p + 1]?.t === ':' || (toks[p + 1]?.t === '?' && toks[p + 2]?.t === ':')) { next(); if (peek() === '?') next(); next(); }
+        if (peek() === '...') next();
+        elems.push(union());
+        if (peek() === '?') next();
+        if (peek() === ',') next();
+      }
+      expect(']');
+      return { k: 'tuple', elems };
+    }
     // `readonly T[]`: the array (Lean arrays are values).
     if (t === 'readonly' && toks[p + 1] && /^[A-Za-z_$(]/.test(toks[p + 1].t)) { next(); return postfix(); }
     if (['keyof', 'typeof', 'infer', 'unique'].includes(t)) fail(`${t} types are not lowered: ${text}`);
@@ -348,6 +373,7 @@ export const typeText = t => {
   case 'array': return `${typeText(t.inner)}[]`;
   case 'fn': return `(${t.params.map(x => `${x.name}${x.optional ? '?' : ''}: ${x.type}`).join(', ')}) => ${typeText(t.ret)}`;
   case 'obj': return `{${squash(t.body)}}`;
+  case 'tuple': return `[${t.elems.map(typeText).join(', ')}]`;
   default: return '?';
   }
 };

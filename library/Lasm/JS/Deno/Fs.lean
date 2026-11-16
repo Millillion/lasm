@@ -401,12 +401,12 @@ def FsFile.syncData (self : FsFile) : Async Unit :=
 def FsFile.syncDataSync (self : FsFile) : IO Unit :=
   self.val.callMethod "syncDataSync" (Support.args #[]) Unit
 
-/-- `utime(atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(DoubleOrObject atime, DoubleOrObject mtime)` -/
-def FsFile.utime (self : FsFile) (atime : DoubleOrObject) (mtime : DoubleOrObject) : Async Unit :=
+/-- `utime(atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(any atime, any mtime)` -/
+def FsFile.utime (self : FsFile) (atime : Data) (mtime : Data) : Async Unit :=
   self.val.callMethodAwait "utime" (Support.args #[toJS atime, toJS mtime]) Unit
 
-/-- `utimeSync(atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(DoubleOrObject atime, DoubleOrObject mtime)` -/
-def FsFile.utimeSync (self : FsFile) (atime : DoubleOrObject) (mtime : DoubleOrObject) : IO Unit :=
+/-- `utimeSync(atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(any atime, any mtime)` -/
+def FsFile.utimeSync (self : FsFile) (atime : Data) (mtime : Data) : IO Unit :=
   self.val.callMethod "utimeSync" (Support.args #[toJS atime, toJS mtime]) Unit
 
 /-- `isTerminal(): boolean`: `boolean isTerminal()` -/
@@ -727,13 +727,13 @@ def symlinkSync (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) (options :
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.symlinkSync", module := "globalThis", path := "Deno.symlinkSync", construct := false, arity := 3 }
     (Support.args #[toJS oldpath, toJS newpath, Support.optional options]) (await := false)
 
-/-- `Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(DOMStringOrURL path, DoubleOrObject atime, DoubleOrObject mtime)` (Deno 2.9.6 type declarations) -/
-def utimeSync (path : DOMStringOrURL) (atime : DoubleOrObject) (mtime : DoubleOrObject) : IO Unit :=
+/-- `Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(DOMStringOrURL path, any atime, any mtime)` (Deno 2.9.6 type declarations) -/
+def utimeSync (path : DOMStringOrURL) (atime : Data) (mtime : Data) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.utimeSync", module := "globalThis", path := "Deno.utimeSync", construct := false, arity := 3 }
     (Support.args #[toJS path, toJS atime, toJS mtime]) (await := false)
 
-/-- `Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(DOMStringOrURL path, DoubleOrObject atime, DoubleOrObject mtime)` (Deno 2.9.6 type declarations) -/
-def utime (path : DOMStringOrURL) (atime : DoubleOrObject) (mtime : DoubleOrObject) : Async Unit :=
+/-- `Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(DOMStringOrURL path, any atime, any mtime)` (Deno 2.9.6 type declarations) -/
+def utime (path : DOMStringOrURL) (atime : Data) (mtime : Data) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.utime", module := "globalThis", path := "Deno.utime", construct := false, arity := 3 }
     (Support.args #[toJS path, toJS atime, toJS mtime])
 

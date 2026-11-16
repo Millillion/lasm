@@ -742,6 +742,10 @@ const monad = res => res.async ? 'Async' : 'IO';
 const binding = (name, path, construct, arity, ns = NS, module = 'globalThis') =>
   `{ name := "${ns}.${name}", module := "${module}", path := "${path}", construct := ${construct}, arity := ${arity} }`;
 
+/** A module export's member (`Support.getExport` of Lasm.JS.Node.Support; for Lasm.JS.Deno and Lasm.JS.Bun, whose
+ * modules do not import it, the same through Lasm.JS.require). */
+const exportOf = (jsModule, path, type, host) => !host ? `Support.getExport "${jsModule}" ${path} ${type}`
+  : `(do\n    let o ← ${JSON.parse(path).slice(0, -1).reduce((acc, k) => `(← ${acc}).get ${JSON.stringify(k)} Value`, `Lasm.JS.require "${jsModule}"`)}\n    o.get ${JSON.stringify(JSON.parse(path).at(-1))} ${type})`;
 /** Overload names: the first overload keeps the name, the others add `With` and their first differing argument. */
 function overloadNames(group) {
   if (group.length === 0) return [];
@@ -818,7 +822,7 @@ function emitInterface(module, name) {
     const getName = take(isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name, 'attribute');
     if (isStatic) {
       const path = `[${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}, "${a.name}"]`;
-      const call = isNode ? `Support.getExport "${jsModule}" ${path} ${res.async ? 'Value' : res.req}` : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;
+      const call = isNode ? exportOf(jsModule, path, res.async ? 'Value' : res.req, !!hostOf(d)) : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  ${finish(`p.await ${res.req}`, res).replace(/^do\n {2}/, '')}` : finish(call, res)}`);
     } else if (res.async) {
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${applyPost(res.post, 'r')}` : `p.await ${res.req}`}`);
@@ -920,7 +924,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
       const res = resultOf(m.idlType);
       const path = [...pathPrefix, m.name].map(s => `"${s}"`).join(', ');
       const call = jsModule === 'globalThis' ? `Support.getGlobal [${path}] ${res.async ? 'Value' : res.req}`
-        : `Support.getExport "${jsModule}" [${path}] ${res.async ? 'Value' : res.req}`;
+        : exportOf(jsModule, `[${path}]`, res.async ? 'Value' : res.req, emittingHost);
       o.decls.push(`/-- ${nodeSignature(m)}\`${docText(memberIdl(m, owner))}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  p.await ${res.req}` : finish(call, res)}`);
       continue;
     }
@@ -951,7 +955,11 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
 // Supporting types: enums, callbacks (handles), dictionaries and unions.
 function emitEnum(name) {
   const d = def(name), T = leanTypeName(name);
-  const ctors = d.values.map(v => ({ v: v.value, c: enumCtor(v.value) }));
+  let ctors = d.values.map(v => ({ v: v.value, c: enumCtor(v.value) }));
+  // "hex" and "HEX" (Bun's color formats): the all-capitals one keeps its capitals (hEX).
+  ctors = ctors.map(x => ctors.some(y => y !== x && y.c === x.c) && /^[A-Z0-9_]+$/.test(x.v) ? { ...x, c: x.v[0].toLowerCase() + x.v.slice(1) } : x);
+  // Values that differ only in case ("m" and "M"): the capitalised one is `upperM`.
+  ctors = ctors.map(x => ctors.some(y => y !== x && y.c === x.c) && /^[A-Z]/.test(x.v) ? { ...x, c: 'upper' + x.v.replace(/[^A-Za-z0-9]/g, '') } : x);
   if (new Set(ctors.map(x => x.c)).size !== ctors.length) fail(`enum ${name}: constructor names collide`);
   const lines = [`/-- \`enum ${hostDoc(name)}\` (${specOf(d.spec)}): ${ctors.map(x => JSON.stringify(x.v)).join(', ')}. -/`, `inductive ${T} where`];
   for (const x of ctors) lines.push(`  /-- ${JSON.stringify(x.v)} -/\n  | ${id(x.c)}`);
@@ -1073,7 +1081,11 @@ for (const m of plan) inTier(m.tier, () => {
   for (const n of m.namespaces) {
     const jsModule = jsModuleOf(n);
     // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`).
-    if (hostOf(def(n))) emitNamespaceOrGlobal(m.key, n, def(n).members, [extValue(extAttr(def(n), 'LasmPath'))], '');
+    if (hostOf(def(n))) {
+      // Nested namespaces (`Bun.dns`) prefix their Lean names (`dns.lookup`); a runtime module (`bun:sqlite`) is loaded by name.
+      const path = extValue(extAttr(def(n), 'LasmPath'));
+      emitNamespaceOrGlobal(m.key, n, def(n).members, path ? path.split('.') : [], extValue(extAttr(def(n), 'LasmLeanPrefix')) ?? '', jsModule);
+    }
     else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
     else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
   }

@@ -5,7 +5,15 @@
   "cli/tsc/dts/lib.deno.unstable.d.ts": "5993271718a0562ea8725884c12d0cd5f97c5e7174cede5540899fee529b4b6a"
  },
  "Bun bun-v1.4.4": {
+  "packages/bun-types/bun.d.ts": "98936f06c9f0de499093fa4ab66bb9bf2566a17deda4e49cfd335a180c55c3bb",
   "packages/bun-types/serve.d.ts": "a006fe6f5a5c4b583ca303d5ed8e697ea506868d28e2a1d0401bbd64a915a6ec",
-  "packages/bun-types/bun.d.ts": "98936f06c9f0de499093fa4ab66bb9bf2566a17deda4e49cfd335a180c55c3bb"
+  "packages/bun-types/sqlite.d.ts": "c48cfa6fbdd40d1fa8083cb021455aeafe6910b16ef4e451ec84d427c5b8c87b",
+  "packages/bun-types/redis.d.ts": "3032a6078f614e6f8a3c137448bba6f262a4ba19259aaf5489b3c30da5c6ceba",
+  "packages/bun-types/sql.d.ts": "fbddf3f51abe13eef06e7a9d6859ca760220ddfee991540c94fe7adba98f71e3",
+  "packages/bun-types/s3.d.ts": "9d6d1979f27b9e189b8ea90f553b345617eebf94b0fa6bfe4162f25ba6571a10",
+  "packages/bun-types/shell.d.ts": "610a869934b3c2cab2878309cf9e2d9ca1307af2f543c7b6e3bb8b868f76a149",
+  "packages/bun-types/security.d.ts": "de80bbe4a22be906bc1220b9f4f97c1857826f3399642a0735a55f45efded87b",
+  "packages/bun-types/fetch.d.ts": "f2071e0794d585da33e5012483c573508a512b6182ace2117563b3bd85c05aac",
+  "packages/bun-types/wasm.d.ts": "00a196792eed6e9b7f988db0d3ced11a94ecd1e258fd19124ce89fe7642df35a"
  }
 }
