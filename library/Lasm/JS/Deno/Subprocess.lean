@@ -159,10 +159,10 @@ structure CommandOptions where
   clearEnv : Option Bool := none
   /-- `record<DOMString, DOMString> env` -/
   env : Option (Record String) := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
   /-- `CommandOptionsStdin stdin` -/
@@ -220,8 +220,8 @@ def ChildProcess.stderr (self : ChildProcess) : IO SubprocessReadableStream := d
   let r ← self.val.get "stderr" Value
   pure { val := r }
 
-/-- `readonly pid: number`: `readonly attribute double pid` -/
-def ChildProcess.pid (self : ChildProcess) : IO Float := self.val.get "pid" Float
+/-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
+def ChildProcess.pid (self : ChildProcess) : IO Int := self.val.get "pid" Int
 
 /-- `readonly status: Promise<CommandStatus>`: `readonly attribute Promise<CommandStatus> status` -/
 def ChildProcess.status (self : ChildProcess) : Async CommandStatus := do
@@ -262,8 +262,8 @@ def Command.spawn (self : Command) : IO ChildProcess := do
   let r ← self.val.callMethod "spawn" (Support.args #[]) Value
   pure { val := r }
 
-/-- `Deno.kill(pid: number, signo?: Signal | number): void`: `undefined kill(double pid, optional SignalOrDouble signo)` (Deno 2.9.6 type declarations) -/
-def kill (pid : Float) (signo : Option SignalOrDouble := none) : IO Unit :=
+/-- `Deno.kill(pid: number, signo?: Signal | number): void`: `undefined kill(double /* integer: Int */ pid, optional SignalOrDouble signo)` (Deno 2.9.6 type declarations) -/
+def kill (pid : Int) (signo : Option SignalOrDouble := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.kill", module := "globalThis", path := "Deno.kill", construct := false, arity := 2 }
     (Support.args #[toJS pid, Support.optional signo]) (await := false)
 

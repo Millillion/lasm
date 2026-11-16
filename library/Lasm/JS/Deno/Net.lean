@@ -395,8 +395,8 @@ instance : FromJS NetworkInterfaceInfo where
 structure ResolveDnsOptionsNameServer where
   /-- `required DOMString ipAddr` -/
   ipAddr : String
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
 instance : ToJS ResolveDnsOptionsNameServer := ⟨fun d => Support.fields #[("ipAddr", toJS d.ipAddr),
     ("port", Support.optional d.port)]⟩
 
@@ -493,26 +493,26 @@ structure SrvRecord where
   priority : Float
   /-- `required double weight` -/
   weight : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `required DOMString target` -/
   target : String
 instance : FromJS SrvRecord where
   fromJS d := do return {
     priority := ← Lasm.JS.readField Float d "priority",
     weight := ← Lasm.JS.readField Float d "weight",
-    port := ← Lasm.JS.readField Float d "port",
+    port := ← Lasm.JS.readField Nat d "port",
     target := ← Lasm.JS.readField String d "target" }
   typeName := "Lasm.JS.Deno.SrvRecord"
 
 /-- `dictionary ListenTcpOptions : TcpListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenTcpOptions where
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `double /* integer: Nat */ tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `ListenTcpOptionsTransport transport` -/
   transport : Option ListenTcpOptionsTransport := none
 instance : ToJS ListenTcpOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
@@ -531,12 +531,12 @@ instance : ToJS ListenUnixOptions := ⟨fun d => Support.fields #[("path", toJS 
 
 /-- `dictionary ListenTlsCertifiedOptions : ListenTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenTlsCertifiedOptions where
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `double /* integer: Nat */ tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `ListenTlsOptionsTransport transport` -/
   transport : Option ListenTlsOptionsTransport := none
   /-- `sequence<DOMString> alpnProtocols` -/
@@ -558,8 +558,8 @@ instance : ToJS ListenTlsCertifiedOptions := ⟨fun d => Support.fields #[("port
 
 /-- `dictionary ConnectOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectOptions where
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `ConnectOptionsTransport transport` -/
@@ -588,8 +588,8 @@ instance : ToJS UnixConnectOptions := ⟨fun d => Support.fields #[("transport",
 
 /-- `dictionary ConnectTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectTlsOptions where
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `sequence<DOMString> caCerts` -/
