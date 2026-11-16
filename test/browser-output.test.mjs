@@ -206,6 +206,25 @@ test('app names', () => {
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('browser output: the project\'s own JavaScript files are served beside the loader, which imports them unbundled', async () => {
+  const { root, project, args } = fixture();
+  try {
+    mkdirSync(join(project, 'ffi'));
+    writeFileSync(join(project, 'ffi/x.mjs'), "import { y } from './y.mjs';\nexport const f = () => y;\n");
+    writeFileSync(join(project, 'ffi/y.mjs'), 'export const y = 1;\n');
+    const binding = { name: 'Main.f', module: './ffi/x.mjs', path: 'f', arity: 0, relative: './ffi/x.mjs', file: join(project, 'Main.lean') };
+    const base = args();
+    const { output, manifest } = writeBrowserOutput({ ...base, result: { ...base.result, jsBindings: [binding] } });
+    assert.equal(readFileSync(join(output, 'project-modules/ffi/y.mjs'), 'utf8'), 'export const y = 1;\n');
+    assert.match(readFileSync(join(output, manifest.entry), 'utf8'), /^import \* as __lasmExternal\d+ from "\.\/project-modules\/ffi\/x\.mjs";$/m);
+    assert.deepEqual(manifest.modules, ['./ffi/x.mjs', 'lasm:app']);
+    // A Node build with no binding record (no Lasm.JS) still builds.
+    const plain = writeBrowserOutput({ ...base, result: { ...base.result, jsBindings: undefined } });
+    assert.equal(existsSync(join(plain.output, 'project-modules')), false);
+    assert.deepEqual(plain.manifest.modules, ['lasm:app']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('the configuration module and the loader bundle', async () => {
   assert.equal(browserConfigModule({ name: 'a"b', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:ui-dom', 'https://x.test/m.js'], suspend: 'jspi' }), [
     'import * as m0 from "./modules/ui-dom.mjs";', 'import * as m1 from "https://x.test/m.js";', 'export const name = "a\\"b";',
