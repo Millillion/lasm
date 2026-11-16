@@ -168,7 +168,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
 - **Where:** PR #307; unreleased. (Bun's WebSockets: the Bun PR.)
 - **Status:** pending sign-off.
 
-#### 0.4-21 Deno KV and Deno.cron are generated although Deno marks them unstable
+#### 0.4-10 Deno KV and Deno.cron are generated although Deno marks them unstable
 
 - **Decision:** from `lib.deno.unstable.d.ts` only Deno KV (`openKv`, `Kv`,
   `AtomicOperation`, `KvU64`, `KvListIterator`, the key, entry, selector and
@@ -194,7 +194,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
 - **Where:** PR #307; unreleased.
 - **Status:** pending sign-off.
 
-#### 0.4-22 How TypeScript declarations become Lean (ts-auto rules)
+#### 0.4-11 How TypeScript declarations become Lean (ts-auto rules)
 
 - **Decision:** the rules of [JS_BINDINGS.md, "How Deno's declarations become
   Lean"](JS_BINDINGS.md#how-denos-declarations-become-lean), among them:
@@ -229,7 +229,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   they land.
 - **Status:** pending sign-off.
 
-#### 0.4-23 The override tables of deno-tier2.mjs
+#### 0.4-12 The override tables of deno-tier2.mjs
 
 - **Decision:** four reviewed tables complete the mechanical rules:
   - **names** of overloads: `listenUnix`, `connectUnix`, `serveWithUnixOptions`,
@@ -254,7 +254,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
 - **Where:** PR #307; unreleased.
 - **Status:** pending sign-off.
 
-#### 0.4-24 What Lasm.JS.Deno leaves out
+#### 0.4-13 What Lasm.JS.Deno leaves out
 
 - **Decision:** not generated, each with its reason in `deno-tier2.mjs` and the
   header of `deno.idl`: FFI (`Deno.dlopen`, `UnsafePointer`: computed types, no
@@ -268,14 +268,14 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   `resolveDns(query, RecordType)`; the iterator protocol's own `next`/`return`;
   `PermissionStatus`'s typed `addEventListener`; Symbol-keyed members; and
   whatever Deno marks `@experimental`, `UNSTABLE` or `@deprecated` (VSOCK,
-  QUIC, WebTransport, `Deno.spawn`) except 0.4-21.
+  QUIC, WebTransport, `Deno.spawn`) except 0.4-10.
 - **Why:** only what makes no sense from Lean compiled to Wasm, cannot be
   expressed, or duplicates a generated member. Alternative: generate FFI as
   `Value`-typed functions (rejected: unusable without the computed types).
 - **Where:** PR #307; unreleased.
 - **Status:** pending sign-off.
 
-#### 0.4-25 Async iterables: values, iterator, next
+#### 0.4-14 Async iterables: values, iterator, next
 
 - **Decision:** a declaration that is or returns an `AsyncIterable<T>`
   (`Deno.readDir`, `Kv.list`, `FsWatcher`, `TcpListener`) has
@@ -297,7 +297,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   (0.3's question).
 - **Status:** pending sign-off.
 
-#### 0.4-26 Deno.serve's module: Unix sockets, one rename
+#### 0.4-15 Deno.serve's module: Unix sockets, one rename
 
 - **Decision:** `Deno.serveWithUnixOptions (options : ServeUnixOptions)
   (handler : ServeHandlerUnixAddr) : IO HttpServerUnixAddr` is new; the TLS

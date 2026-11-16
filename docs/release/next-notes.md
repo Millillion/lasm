@@ -15,7 +15,7 @@
   `.WebSockets`, `.Fetch`, `.Kv` (`import Lasm.JS.Deno` imports them all). Exclusions,
   each with its reason, are in `scripts/bindings/deno-tier2.mjs` (FFI, `Deno.test`,
   experimental APIs, in-place buffer reads). docs/JS_BINDINGS.md, "Standard bindings
-  for Deno"; docs/API_DECISIONS.md A2.1, A25.1, 0.4-21 to 0.4-26.
+  for Deno"; docs/API_DECISIONS.md A2.1, A25.1, 0.4-10 to 0.4-15.
 - **Deno KV needs Deno's `--unstable-kv` flag on the Deno CLI** (`deno run -A
   --unstable-kv deno/main.mjs`); Deno Deploy provides KV without it.
 - **`Deno.serveWithUnixOptions`** serves on a Unix domain socket.
