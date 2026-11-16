@@ -1,9 +1,7 @@
-# Unreleased
-
 ## The CLI (Stage 0, milestone 0.7)
 
 - **Breaking: `lasm build` takes one Lean source; the output is named only with
-  `--output`** (docs/API_DECISIONS.md 0.7-2). `lasm build Main.lean dist` now
+  `--output`** (docs/api/decisions/0.7.md, 0.7-2). `lasm build Main.lean dist` now
   fails with `Unexpected argument "dist": lasm build takes one Lean source. Name
   the output with --output.` Migration: `lasm build Main.lean dist` →
   `lasm build Main.lean --output dist`.
