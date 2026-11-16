@@ -56,7 +56,7 @@ for (const app of apps.filter(app => app.packages.netlify)) {
   await check('lasm package output: a v2 function serving every path', () => {
     const source = readFileSync(join(fn, 'lasm.mjs'), 'utf8');
     assert.match(source, /export const config = \{ path: '\/\*', preferStatic: true \}/);
-    for (const file of ['lasm-server.mjs', 'main.mjs', 'program.wasm', 'host/node-host.mjs']) assert.ok(existsSync(join(fn, file)), file);
+    for (const file of ['lasm-function.mjs', 'main.mjs', 'program.wasm', 'host/node-host.mjs']) assert.ok(existsSync(join(fn, file)), file);
   });
   const zip = join(app.project, '.netlify/functions/lasm.zip');
   await check('netlify build --offline bundles the function with included_files', () => {
@@ -74,7 +74,7 @@ for (const app of apps.filter(app => app.packages.netlify)) {
     const entry = names.find(name => /(^|\/)lasm\.mjs$/.test(name));
     assert.ok(entry, 'lasm.mjs is in the deploy zip: ' + names.slice(0, 20).join(' '));
     const prefix = run.zipPrefix = entry.slice(0, -'lasm.mjs'.length);
-    for (const file of ['program.wasm', 'program.cjs', 'main.mjs', 'lasm-server.mjs', 'host/node-host.mjs', 'host/native/manifest.json',
+    for (const file of ['program.wasm', 'program.cjs', 'main.mjs', 'lasm-function.mjs', 'host/node-host.mjs', 'host/native/manifest.json',
       'host/native/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node', 'host/native/process/linux-x64-gnu'])
       assert.ok(names.includes(prefix + file), `${prefix + file} is in the deploy zip (${names.length} entries, e.g. ${names.slice(0, 8).join(' ')})`);
     assert.ok(listing.split('\n').some(line => line.startsWith('-rwxr-xr-x') && line.endsWith(' ' + prefix + 'host/native/process/linux-x64-gnu')), 'the helper stays executable');

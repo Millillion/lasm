@@ -33,7 +33,7 @@ build tools.
 `--deploy <target>` (repeatable) adds a platform's files and an
 `npm run build:<target>` script:
 
-- **Serverless** (server templates): `lambda` (container image), `lambda-zip`,
+- **Serverless** (server templates): `lambda`, `lambda-container` (container image),
   `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`.
 - **Edge** (0.2.0): `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`
   (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`).

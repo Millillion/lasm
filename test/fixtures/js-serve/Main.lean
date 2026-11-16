@@ -1,8 +1,9 @@
 /-
 Conformance program for Lasm.JS.Deno and Lasm.JS.Bun (Deno.serve and Bun.serve,
-generated from the runtimes' TypeScript declarations) and for serving the same
-Lean handler on Node through @hono/node-server (an `@[js]` binding to the npm
-package this fixture installs). Built for Node, Bun and Deno and run by
+generated from the runtimes' TypeScript declarations), for Lasm's own Node.serve
+(Lasm.JS.Node.Serve, provided by Lasm), and for serving the same Lean handler on
+Node through @hono/node-server (an `@[js]` binding to the npm package this fixture
+installs). Built for Node, Bun and Deno and run by
 scripts/bindings/test-web.mjs --fixture js-serve (docs/TESTING.md, "Standard
 bindings"): each runtime runs the sections of its own server, which serve
 App.handle on 127.0.0.1 and request it over HTTP with Lasm.JS.Web's fetch.
@@ -21,6 +22,7 @@ import Lasm.JS
 import Lasm.JS.Web
 import Lasm.JS.Deno
 import Lasm.JS.Bun
+import Lasm.JS.Node.Serve
 import App
 import Surface
 import Tls
@@ -274,10 +276,82 @@ def bun (r : Checks) (live : Live) : Async Unit := do
     server.stop (some true)
     expect r "stop closes the server" (← throws (request s!"http://127.0.0.1:{port}/hello")) ""
 
+/-! Node: Node.serve (Lasm.JS.Node.Serve, provided by Lasm) -/
+
+/-- App.handle, and the routes of Node.serve's own guarantees. -/
+def nodeExtras (request : Request) : Async Response := do
+  match ← (← URL.new (← request.url)).pathname with
+  | "/cookies" => Response.new (some (.usvString "ok")) (some { headers := some (.sequence #[#["set-cookie", "a=1; Path=/"], #["set-cookie", "b=2"]]) })
+  | "/empty" => Response.new (some (.bufferSource .empty)) (some { status := some 200 })
+  | "/url" => App.text (← request.url)
+  | _ => App.handle request
+
+/-- Runs `Node.serve` in a thread of its own (it returns when the server stops); the
+handle comes from `onListen`. -/
+def startNode (options : Node.ServeOptions) : Async (Node.Server × Task (Except IO.Error Unit)) := do
+  let handle ← IO.mkRef (none : Option Node.Server)
+  let task ← IO.asTask (prio := .dedicated) (Node.serve { options with onListen := some fun s => handle.set (some s) })
+  let some server ← waitFor handle | throw (IO.userError "Node.serve did not listen")
+  return (server, task)
+
+def nodeServe (r : Checks) : Async Unit := do
+  runSection r "node.serve" do
+    let (server, task) ← startNode {
+      fetch := nodeExtras, port := some 0, hostname := some "127.0.0.1",
+      error := some fun e => App.text s!"handled: {e}" (status := 503) }
+    let port := server.port
+    -- The handle: the address listened on, the port chosen for port 0, its URL.
+    expect r "handle" (port > 0 && server.hostname == "127.0.0.1" && server.url == s!"http://127.0.0.1:{port}/") s!"{server.hostname} {port} {server.url}"
+    served r "node.serve" s!"http://127.0.0.1:{port}" 503
+    -- The error handler receives the handler's error.
+    let thrown ← request s!"http://127.0.0.1:{port}/throw"
+    expect r "error handler" (thrown.body == "handled: the handler threw") thrown.body
+    -- The request's URL is the client's Host with the path and query.
+    let url ← request s!"http://127.0.0.1:{port}/url?q=1"
+    expect r "request url" (url.body == s!"http://127.0.0.1:{port}/url?q=1") url.body
+    -- Each Set-Cookie arrives on its own.
+    let cookies ← fetch (.usvString s!"http://127.0.0.1:{port}/cookies") none
+    let setCookies ← (← cookies.headers).getSetCookie
+    expect r "Set-Cookie" (setCookies == #["a=1; Path=/", "b=2"]) s!"{setCookies}"
+    -- An empty byte body: no content type added, a zero length.
+    let empty ← fetch (.usvString s!"http://127.0.0.1:{port}/empty") none
+    let h ← empty.headers
+    let (ct, len, bytes) := (← h.get "content-type", ← h.get "content-length", (← empty.arrayBuffer).size)
+    expect r "empty body" (ct == none && len == some "0" && bytes == 0) s!"{ct} {len} {bytes}"
+    -- HEAD: the GET's status and fields, no body.
+    let head ← request s!"http://127.0.0.1:{port}/hello" (method := "HEAD")
+    expect r "HEAD" (head.status == 200 && head.body == "" && head.contentType == some "text/plain; charset=utf-8") s!"{head.status} {head.body}"
+    -- stop: the server closes, finished settles and Node.serve returns.
+    server.stop
+    server.finished
+    let returned ← (IO.wait task : BaseIO (Except IO.Error Unit))
+    expect r "Node.serve returns after stop" (match returned with | .ok _ => true | .error _ => false) ""
+    expect r "stop closes the server" (← throws (request s!"http://127.0.0.1:{port}/hello")) ""
+  runSection r "node.serve signal" do
+    -- Aborting the signal stops the server; with no error handler a throw is a 500.
+    let ac ← AbortController.new
+    let (server, task) ← startNode { fetch := App.handle, port := some 0, hostname := some "127.0.0.1", signal := some (← ac.signal) }
+    served r "node.serve default" s!"http://127.0.0.1:{server.port}" 500
+    ac.abort
+    discard (IO.wait task : BaseIO (Except IO.Error Unit))
+    expect r "signal closes the server" (← throws (request s!"http://127.0.0.1:{server.port}/hello")) ""
+
+/-! `exportDefault`'s typed form (Node only: on Bun and Deno a published handler is served after main) -/
+
+def typedExport (r : Checks) : Async Unit := do
+  runSection r "exportDefault" do
+    -- A Lean fetch handler becomes a JavaScript function; on Node outside a function
+    -- platform, exportDefault records it and returns.
+    exportDefault App.handle
+    let f ← (← Lasm.JS.global).get "__lasmDefaultExport" Value
+    let res ← f.callAwait #[toJS (← Request.new (.usvString "http://x.example/hello"))] Response
+    let (status, body) := (← res.status, ← res.text)
+    expect r "typed exportDefault" (status == 200 && body == "hello from Lean") s!"{status} {body}"
+
 /-! Node: @hono/node-server's serve({fetch}) (an npm package the program installs) -/
 
 /-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
+@[js "@hono/node-server" "serve"] opaque honoServe : Data → Value → IO Value
 
 def node (r : Checks) : Async Unit := do
   runSection r "node.honoNodeServer" do
@@ -289,7 +363,7 @@ def node (r : Checks) : Async Unit := do
       return .undefined
     -- The same App.handle, as the fetch function (Request → Promise<Response>).
     let fetch ← Function.ofFn1 App.handle
-    let server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS 0), ("hostname", toJS "127.0.0.1")]) onListen
+    let server ← honoServe (obj [("fetch", toJS fetch), ("port", toJS 0), ("hostname", toJS "127.0.0.1")]) onListen
     let some port ← waitFor listened | throw (IO.userError "not listening")
     served r "node" s!"http://127.0.0.1:{port}" 500
     let closed : IO.Promise Unit ← IO.Promise.new
@@ -326,7 +400,7 @@ def checks : Async (String × Nat) := do
   match rt with
   | .deno => deno r live
   | .bun => bun r live
-  | .node => node r
+  | .node => do nodeServe r; typedExport r; node r
   if rt != .node then runSection r "availability" (availability r rt live)
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)

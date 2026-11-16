@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { autoSetupEditor, editorLean, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
+import { autoSetupEditor, compileProjectLibrary, editorLean, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
 import { lakeConfigurationKey } from '../src/application-sources.mjs';
 
 const scratch = () => mkdtempSync(join(tmpdir(), 'lasm-editor-'));
@@ -139,4 +139,35 @@ test('the workspace-wide Lake key (no source) follows the packages\' configurati
     writeFileSync(join(root, 'dep', 'lakefile.toml'), 'name = "dep"\nprecompileModules = true\n');
     assert.notEqual(lakeConfigurationKey(root, undefined, lean), before);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the editor compiles only the lazily compiled library modules the project imports: the shipped ones need nothing', async () => {
+  const dir = scratch();
+  try {
+    // Lasm.JS.Web.Dom is in libraryModules (shipped compiled), so nothing is compiled and no Lean is needed.
+    writeFileSync(join(dir, 'Main.lean'), 'import Lasm.JS.Web.Dom\n');
+    mkdirSync(join(dir, 'prefix', 'lib', 'lean'), { recursive: true });
+    const logs = [];
+    assert.deepEqual((await compileProjectLibrary(dir, { prefix: join(dir, 'prefix') }, line => logs.push(line))).compiled, []);
+    assert.deepEqual(logs, []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('automatic setup compiles the project\'s library imports after a build, and not in the cached-only mode (lasm init)', async () => {
+  const dir = scratch();
+  try {
+    writeFileSync(join(dir, 'lakefile.toml'), 'name = "app"\n');
+    writeFileSync(join(dir, 'Main.lean'), 'import Lasm.JS\n');
+    const lean = { executionPrefix: join(dir, 'prefix'), prefix: join(dir, 'prefix'), version: '4.35.0' };
+    const compiled = [];
+    const logs = [];
+    const options = cachedOnly => ({ env: { PATH: '', ELAN_HOME: join(dir, 'elan') }, log: line => logs.push(line), cachedOnly, lean: async () => ({ lean, native: [] }),
+      compileLibrary: async (...a) => { compiled.push(a); } });
+    assert.equal((await autoSetupEditor(join(dir, 'Main.lean'), options(true))).status, 'no-elan', logs.join('\n'));
+    assert.deepEqual(compiled, []);
+    assert.equal((await autoSetupEditor(join(dir, 'Main.lean'), options(false))).status, 'no-elan');
+    assert.equal(compiled.length, 1);
+    assert.equal(compiled[0][0], dir);
+    assert.equal(compiled[0][1], lean);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
