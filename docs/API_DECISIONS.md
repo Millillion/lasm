@@ -76,8 +76,8 @@ linked section of the review.
 | A32 | Lasm.Fastly | Should errors stay `EIO FastlyStatus α`? | [Q32](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
 | A33 | Lasm.Fastly | Should Claude bind `send_v2`/`v3` with `EIO (FastlyStatus × SendErrorDetail) α`, or leave them unbound (v1 covers sending)? | [Q33](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
 | A34 | Lasm.Fastly | Fastly calls are namespaced by module (`HttpReq.methodGet req`): keep the witx layout, or also generate dot-notation aliases on the handle types? | [Q34](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
-| A35 | Lasm.UI | Keep UI's own `Http`, `Url` and `Storage` commands as pure data (Claude recommends this), or replace them with `Cmd.io` plus the generated bindings? | [Q35](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
-| A36 | Lasm.UI | Keep the `_` suffix names (`class_`, `main_`, `type_`), or use «guillemets» or another convention? | [Q36](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | pending sign-off |
+| A35 | Lasm.UI | Keep UI's own `Http`, `Url` and `Storage` commands as pure data (Claude recommends this), or replace them with `Cmd.io` plus the generated bindings? | [Q35](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | decided in 0.6 ([below](#a35-uis-own-http-url-and-storage)), pending sign-off |
+| A36 | Lasm.UI | Keep the `_` suffix names (`class_`, `main_`, `type_`), or use «guillemets» or another convention? | [Q36](api/SHAPES_REVIEW_2026-11-11.md#11-lasmui) | decided in 0.6 ([below](#a36-the-_-suffix-names-stay)), pending sign-off |
 | A37 | Lasm.RPC | Should `dispatch` replace `handler` (PR #213), and should RPC ship one-line adapters per server kind (e.g. `Lasm.RPC.webHandler`)? | [Q37](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
 | A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
 | A39 | Lasm.KV | What `Lasm.KV` becomes: keep `open` with `setWorkersEnv` (PR #213), or typed constructors taking the platform binding (recommended)? | [Q39](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
@@ -102,4 +102,134 @@ linked section of the review.
 | A53 | Templates | `lasm init --template fetch` uses `Lasm.Fetch` only on Node; Fastly, wasi:http/Spin and WASI get their own entry modules (#218, 0.8.0). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
-| A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+| A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | Lasm.UI decided ([A56.1](#a561-lasmui-stays-in-lasmcli-for-now-jordan-2026-11-16)); the rest pending decision |
+
+## Milestone 0.6: the `Lasm.*` libraries
+
+Decisions of ROADMAP.md's milestone 0.6, each with its shape, code, why, the
+alternatives, and where it shipped. New entries are numbered `0.6-1`, `0.6-2`,
+…; decisions on an existing question keep its id.
+
+### Lasm.UI
+
+#### 0.6-2: Lasm.UI is cut to its core (Jordan, 2026-11-16)
+
+**Decision.** Lasm.UI keeps what only a UI framework can do: `Html` and
+`html!`, the proved diff and applier, the app loop (`init`, `update`, `view`,
+`subscriptions`), events and decoders, URL changes and routing, SSR and
+hydration. Its own wrappers of browser APIs are removed. The app loop's own
+effects stay data; everything else is one generic command over the generated
+browser bindings:
+
+```lean
+inductive Effect (Msg : Type) where
+  | msg (msg : Msg)
+  | delay (ms : Nat) (msg : Msg)
+  | navigate (url : String) (replace : Bool)        -- Cmd.pushUrl / replaceUrl
+  | task (run : (Msg → IO Unit) → Async Unit)
+
+def Cmd.task (run : Async Msg) : Cmd Msg
+def afterFrame : Async Unit                          -- the next frame is on screen
+
+| .load, m => ({ m with loading := true }, Cmd.task do
+    let r ← Lasm.JS.Web.fetch (.usvString "/api/items")
+    return .loaded (← r.text))
+```
+
+Removed: `Http` (`Request`, `Response`, `Error`, `get`, `post`, `request`),
+`Storage`, and the commands `now`, `randomBytes`, `randomNat`, `back`,
+`forward`, `load`, `storageSet`/`Get`/`Remove`, `focus`, `blur`, `title`,
+`port` and `io`, with their `lasm:ui-dom` exports. Each is a few lines of
+`Cmd.task` over `Lasm.JS.Web.Browser` (`fetch`, `localStorage`,
+`crypto.getRandomValues`, `history.go`, `location.assign`, `document.title`),
+or `Mount.port` for ports. The migration table is in docs/release/next-notes.md.
+
+`Cmd.task` takes the platform's own shape for a browser action, an `Async`
+computation (the web's promise-returning APIs, awaited without holding a
+thread), and delivers the message it returns. Its effect is in
+continuation form, `(Msg → IO Unit) → Async Unit`, so one action can deliver
+no message, one, or a stream, and `Cmd.map` stays definitional: the proved
+`cmd_map_comp`, `cmd_map_id`, `cmd_map_effects` and `cmd_map_batch` keep their
+proofs unchanged. `Cmd.pushUrl` and `replaceUrl` stay because routing is the
+loop's: they make the history entry with the frame that shows the new page and
+run `onUrlChange`, which a bare `history.pushState` would not. `afterFrame`
+stays because only the loop knows when its frame is on screen (focusing an
+element the update just added).
+
+Apps that want effects they can inspect in tests and proofs declare their own
+effect data and interpret it with `Cmd.task` (docs/UI.md, "Effects you can
+test"); examples/ui/todomvc does, and proves what its `update` saves
+(`Todo.update_saves`).
+
+**Alternatives.** Keeping UI's wrappers as pure data (A35's recommendation
+before this decision): a second, smaller copy of the web platform to keep
+current. `Cmd.task : Async Msg → Cmd Msg` alone, without the continuation
+form: `Cmd.map` would need the functor laws of `Async`, which Std does not
+provide, and streams would need another effect.
+
+**Tests.** The proofs above (library-proofs.yml); test/ui/DocsTest.lean (the
+guide's examples); examples/ui/demo (HTTP, focus and ports through
+`Cmd.task`) and examples/ui/todomvc (storage and focus) in the browser suite
+(ui.yml); test/ui-dom.test.mjs (`afterFrame`).
+
+**Where.** PR (this one), next release (breaking). The example apps pinned
+to a published `@lasm/cli` (Conduit, Ledger, Tandem, Porter, Folio) move to
+`Cmd.task` with the version bump that moves their pins. **Status:** pending
+sign-off.
+
+#### A35: UI's own `Http`, `Url` and `Storage`
+
+**Decision.** `Http` and `Storage` are removed (0.6-2): the generated
+`fetch` and `localStorage` replace them through `Cmd.task`. `Url` stays: it is
+the type `onUrlChange` and `init` hand the app, pure data that routing code
+matches on and proofs reason about (`Url.parse`, `segments`, `param?`,
+`Url.build`).
+
+```lean
+def route (u : Url) : Page :=
+  match u.segments with
+  | ["items", id] => .item id.toNat!
+  | _ => .home
+```
+
+**Why.** `Url` is the app loop's routing input, not a wrapper of a browser
+call. **Alternatives.** Lasm.JS.Web's `URL` for routing: a handle, so a pure
+`view` and `route` could not use it, nor a proof.
+
+**Where.** PR (this one). **Status:** pending sign-off.
+
+#### A36: the `_` suffix names stay
+
+**Decision.** Names that clash with Lean keywords or core names keep a
+trailing underscore: `class_`, `main_`, `id_`, `type_`, `for_`, `section_`.
+`html!` uses the plain HTML names (`<main class="…">`), so only the function
+DSL sees the suffix.
+
+```lean
+main_ [class_ "app"] [section_ [] [text "…"]]
+html! <main class="app"><section>…</section></main>
+```
+
+**Why.** It is the common convention in Lean and the Elm-family libraries
+(Elm's `Html.Attributes.class` needs no suffix only because Elm has no
+`class` keyword). «guillemets» (`«class»`) are Lean's escape for an
+identifier, not meant for everyday calls, and they are hard to type.
+
+**Alternatives.** «guillemets»; a prefix (`hClass`); a namespace per kind
+(`Attr.class`, still a keyword clash).
+
+**Where.** Unchanged since Lasm.UI shipped. **Status:** pending sign-off.
+
+#### A56.1: Lasm.UI stays in `@lasm/cli` for now (Jordan, 2026-11-16)
+
+**Decision.** Lasm.UI keeps its name and ships inside the core package,
+`@lasm/cli`, compiled into the managed Lean prefix with Lasm.JS
+(`import Lasm.UI`). There is no separate `@lasm/ui` package for now; A56,
+where the libraries live, is otherwise still open.
+
+**Why.** Jordan's call: the split adds a resolution mechanism and a release
+artifact before anyone needs Lasm.UI without the CLI. Lasm.UI already uses
+only public Lasm.JS APIs plus its builtin `lasm:ui-dom` module, so a later
+split stays mechanical (with A6.1's project files carrying the applier).
+
+**Where.** Decided 2026-11-16. **Status:** pending sign-off.
