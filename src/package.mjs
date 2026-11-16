@@ -1,14 +1,17 @@
 // `lasm package`: turns a built application (`lasm build` output, default
 // dist/) into a function-platform deployment. File operations only: no
 // network, no Lean toolchain. Each target adds a small handler shim
-// (src/serverless/) that starts the Lean HTTP server inside the platform's
-// Node process and forwards requests to it over loopback.
+// (src/serverless/) that starts the Lean program inside the platform's Node
+// process and calls the fetch handler it publishes (Lasm.JS.exportDefault)
+// directly: no HTTP server, no port.
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zip } from './serverless/zip.mjs';
 
 const serverless = fileURLToPath(new URL('./serverless/', import.meta.url));
+// Node req/res ↔ web Request/Response (lasm:node-serve), copied as the shims' lasm-node-serve.mjs.
+const nodeServe = fileURLToPath(new URL('./lasm-modules/node-serve.mjs', import.meta.url));
 const MB = 1024 * 1024;
 
 // Platform limits checked by `lasm package` (see docs/deploy/*.md for sources).
@@ -29,9 +32,10 @@ export const packageTargets = {
 
 export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')} [--output PATH] [--allow-dev]
 
-Packages a built Lasm HTTP server (lasm build output, default dist/) for a
-function platform. The server must listen on $HOST and $PORT (every lasm init
-server template does). Writes, by target:
+Packages a built Lasm program (lasm build output, default dist/) for a
+function platform. Its main publishes a fetch handler with
+Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
+calls directly. Writes, by target:
 ${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
   ${'browser'.padEnd(12)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
 
@@ -127,7 +131,8 @@ function withoutMusl(input, files) {
 }
 
 function shimFiles(target) {
-  return ['lasm-server.mjs', packageTargets[target].shim].map(name => ({ name, source: join(serverless, name), mode: 0o644 }));
+  return [...['lasm-function.mjs', packageTargets[target].shim].map(name => ({ name, source: join(serverless, name), mode: 0o644 })),
+    { name: 'lasm-node-serve.mjs', source: nodeServe, mode: 0o644 }];
 }
 
 function writeTree(output, files, extra = {}) {

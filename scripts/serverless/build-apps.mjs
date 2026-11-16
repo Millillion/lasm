@@ -5,7 +5,7 @@
 // (lasm build --target).
 // Two projects per template, because Azure Functions and Google Cloud
 // Functions add their platform's npm package to the deployment:
-//   <template>          --deploy lambda-zip lambda-edge vercel netlify
+//   <template>          --deploy lambda lambda-edge vercel netlify
 //   <template>-hosted   --deploy azure gcf
 // Plus `probe` (scripts/serverless/probe/Main.lean), a program that uses the
 // native pieces (subprocess, files, environment) for the Linux variants.
@@ -48,7 +48,7 @@ const lasm = [process.execPath, join(cli, 'node_modules/@lasm/compiler/bin/lasm.
 const frameworks = { hono: 'Hono', express: 'Express', fastify: 'Fastify', 'std-http': 'Std.Http' };
 const apps = [];
 for (const template of templates) {
-  for (const [suffix, deploy, kind] of [['', ['lambda-zip', 'lambda-edge', 'vercel', 'netlify'], 'functions'], ['-hosted', ['azure', 'gcf'], 'hosted']]) {
+  for (const [suffix, deploy, kind] of [['', ['lambda', 'lambda-edge', 'vercel', 'netlify'], 'functions'], ['-hosted', ['azure', 'gcf'], 'hosted']]) {
     if (!only.includes(kind)) continue;
     const name = template + suffix, project = join(work, name);
     run(`lasm init ${name}`, lasm, ['init', project, '--template', template, ...deploy.flatMap(target => ['--deploy', target])], work);
@@ -56,7 +56,7 @@ for (const template of templates) {
     run(`npm install -D Lasm (${name})`, bin('npm'), ['install', '-D', tgz], project);
     run(`npm run build (${name})`, bin('npm'), ['run', 'build'], project);
     const packages = {};
-    for (const target of deploy.map(target => target === 'lambda-zip' ? 'lambda' : target)) {
+    for (const target of deploy) {
       const r = run(`npm run build:${target} (${name})`, bin('npm'), ['run', `build:${target}`], project);
       const output = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/output', netlify: 'netlify/functions/lasm',
         azure: 'azure-functions', gcf: 'gcf' }[target];

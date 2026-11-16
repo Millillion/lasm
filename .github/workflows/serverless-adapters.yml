@@ -1,7 +1,8 @@
 name: Serverless adapters
 # The function-platform shims (src/serverless/) on each platform's own local
 # runtime, with a stand-in application instead of a Lean build (no toolchain,
-# no build: scripts/serverless/stand-in-app.mjs): several Set-Cookie headers
+# no build: scripts/serverless/stand-in-app.mjs, a program that publishes a
+# fetch handler as Lasm.JS.exportDefault does): several Set-Cookie headers
 # in one reply, two Cookie header lines in one request, and a 303 with no
 # body must reach the other side intact (#80, #82;
 # scripts/serverless/adapter-platforms.mjs). Linux x64 free runners, local
@@ -12,6 +13,7 @@ on:
     paths:
       - '.github/workflows/serverless-adapters.yml'
       - 'src/serverless/**'
+      - 'src/lasm-modules/node-serve.mjs'
       - 'src/package.mjs'
       - 'scripts/serverless/adapter-platforms.mjs'
       - 'scripts/serverless/stand-in-app.mjs'
@@ -21,6 +23,7 @@ on:
     paths:
       - '.github/workflows/serverless-adapters.yml'
       - 'src/serverless/**'
+      - 'src/lasm-modules/node-serve.mjs'
       - 'src/package.mjs'
       - 'scripts/serverless/adapter-platforms.mjs'
       - 'scripts/serverless/stand-in-app.mjs'
