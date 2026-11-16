@@ -64,8 +64,8 @@ instance : ToJS TlsOptions := ⟨fun d => Support.fields #[("expectedServerHostn
 structure SocketAddress where
   /-- `required DOMString hostname` -/
   hostname : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
 instance : ToJS SocketAddress := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
 

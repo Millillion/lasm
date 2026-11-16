@@ -105,8 +105,8 @@ instance : Coe Headers R2ConditionalOrHeaders := ⟨.headers⟩
 structure R2Range where
   /-- `double offset` -/
   offset : Option Float := none
-  /-- `double length` -/
-  length : Option Float := none
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
   /-- `double suffix` -/
   suffix : Option Float := none
 instance : ToJS R2Range := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
@@ -115,7 +115,7 @@ instance : ToJS R2Range := ⟨fun d => Support.fields #[("offset", Support.optio
 instance : FromJS R2Range where
   fromJS d := do return {
     offset := ← Lasm.JS.readField (Option Float) d "offset",
-    length := ← Lasm.JS.readField (Option Float) d "length",
+    length := ← Lasm.JS.readField (Option Nat) d "length",
     suffix := ← Lasm.JS.readField (Option Float) d "suffix" }
   typeName := "Lasm.JS.Cloudflare.R2Range"
 
@@ -291,8 +291,8 @@ instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
 
 /-- `dictionary R2ListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2ListOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString prefix` -/
   «prefix» : Option String := none
   /-- `DOMString cursor` -/
@@ -406,8 +406,8 @@ def R2Object.key (self : R2Object) : IO String := self.val.get "key" String
 /-- `readonly version: string`: `readonly attribute DOMString version` -/
 def R2Object.version (self : R2Object) : IO String := self.val.get "version" String
 
-/-- `readonly size: number`: `readonly attribute double size` -/
-def R2Object.size (self : R2Object) : IO Float := self.val.get "size" Float
+/-- `readonly size: number`: `readonly attribute double /* integer: Nat */ size` -/
+def R2Object.size (self : R2Object) : IO Nat := self.val.get "size" Nat
 
 /-- `readonly etag: string`: `readonly attribute DOMString etag` -/
 def R2Object.etag (self : R2Object) : IO String := self.val.get "etag" String

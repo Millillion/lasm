@@ -104,13 +104,13 @@ instance : FromJS D1Result where
 
 /-- `dictionary D1ExecResult` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure D1ExecResult where
-  /-- `required double count` -/
-  count : Float
+  /-- `required double /* integer: Nat */ count` -/
+  count : Nat
   /-- `required double duration` -/
   duration : Float
 instance : FromJS D1ExecResult where
   fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
+    count := ← Lasm.JS.readField Nat d "count",
     duration := ← Lasm.JS.readField Float d "duration" }
   typeName := "Lasm.JS.Cloudflare.D1ExecResult"
 
