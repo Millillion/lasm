@@ -100,7 +100,7 @@ Wasm once by Lasm's CI and shipped prebuilt.
 
 ## 5. Why Stage 2, before shrinking
 
-Much of the JavaScript that Stages 3 and 4 would shrink, model and prove
+Much of the JavaScript that Stages 3 (shrink) and 4 (Lean all the way) would shrink, model and prove
 exists only to drive Clang, Emscripten and Binaryen: the link drivers
 (including the Python link-driver strings M4 modelled, #257), the
 reachability link-map reader (#278), the edge-link and Asyncify glue, the
@@ -174,7 +174,8 @@ and a benchmark only, never part of the build.
 ## 8. What stays outside the proof
 
 - **The C runtime** (allocator, big numbers, tasks), compiled once to Wasm.
-  Differential testing covers it; Stage 5 may move it into Lean.
+  Differential testing covers it; rewriting it in Lean is the first item
+  after 1.0 in [ROADMAP.md](../../ROADMAP.md).
 - **The Wasm engines.**
 - **The two semantics themselves**, which is why each is checked against an
   independent reference (native Lean; the Wasm spec tests).
@@ -187,7 +188,9 @@ and a benchmark only, never part of the build.
   `LCNF/PhaseExt.lean`). To be verified before Stage 2 starts. If it is not
   enough, CI compiles the standard library once from Lean's source with the
   backend and ships it prebuilt.
-- **The performance budget** is Jordan's to set; the suggestion is "no slower
-  than the Clang path", for speed and size.
+- **The performance budget:** "no slower than the Clang path", for speed and
+  size, is Stage 2's gate unless Jordan sets another; the other dimensions
+  follow the cross-stage ratchet of ROADMAP.md milestone 1.6, and Stage 5
+  (performance) sets the final targets.
 - **Lean upgrades.** A written process for re-checking the LCNF semantics and
   the proof when LCNF changes.

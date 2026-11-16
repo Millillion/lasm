@@ -39,8 +39,17 @@ original plan; each of its points is placed below.
   binding "Tiers". Where each went is in [History](#history).
 
 **The order:** Stage 0 API surface → Stage 1 initial robustness → Stage 2
-direct Lean → Wasm backend → Stage 3 shrinking → Stage 4 property tests
-(verification emulation) → Stage 5 remaining Lean rewrites.
+direct Lean → Wasm backend → Stage 3 shrink → Stage 4 Lean all the way →
+Stage 5 performance → Stage 6 1.0. After 1.0: the [post-1.0 list](#after-10).
+
+**Performance ratchet, across every stage (Jordan, 2026-11-16):** milestone
+1.6 measures five dimensions in CI and puts them on the evidence page: disk
+space (install and package size, output `.wasm` size), build time (cold,
+warm, incremental, `lasm dev` rebuild), runtime memory (peak, baseline), CPU
+usage, and speed (throughput, latency, startup), per platform and on the five
+apps. From then on, no stage may regress beyond the ratchet unless it records
+an explicit trade-off for Jordan (as #293 did). Stage 2 also keeps its own
+budget as a gate (no slower than the Clang path). Stage 5 sets the targets.
 
 **Current stage: none started.** Stage 0 starts when Jordan says go.
 
@@ -121,8 +130,9 @@ measured by CI on the [evidence page](content/learn/test-evidence.md).
 
 **Definition of done:** items 1–3 and 5–8 of the exit bar hold at the same
 time on the evidence page, target equivalence covers Ledger, Porter and
-Tandem, and the differential-fuzzing generator covers the remaining features
-of §2's "Next gap". Item 4, the streak of clean nightly campaigns, is
+Tandem, the differential-fuzzing generator covers the remaining features of
+§2's "Next gap", and the performance baselines and their ratchet are in CI
+(1.6). Item 4, the streak of clean nightly campaigns, is
 observed and reported only: it never blocks this stage or anything else
 (Jordan, 2026-11-16).
 
@@ -143,6 +153,11 @@ observed and reported only: it never blocks this stage or anything else
   2026-11-16; confirm nothing listed remains).
 - [ ] **1.5 Items 2, 3, 5 and 6 stay met** (mutation, coverage, flakes, apps;
   all met on 2026-11-16).
+- [ ] **1.6 Performance baselines.** The five dimensions of the
+  [performance ratchet](#how-the-roadmap-works-jordan-2026-11-16) measured in
+  CI per platform and on the five apps, on the evidence page, with a
+  no-regression ratchet that every later stage must hold or record a trade-off
+  against.
 - **Observed, not required:** the campaign streak (item 4). It broke on
   2026-11-14 with a `fuzz.yml` failure, to be looked into as a bug.
 
@@ -153,7 +168,8 @@ deliberation of 2026-11-16: an `EmitWasm` in Lean from LCNF's impure phase
 (the input `EmitC` takes), verified by proof and by differential testing
 against the Clang path, native Lean and several engines. It comes before
 shrinking because much of the code Stages 3 and 4 would shrink and prove
-exists only to drive Clang, Emscripten and Binaryen. No go/no-go gate: the
+exists only to drive Clang, Emscripten and Binaryen, and much of the
+JavaScript Stage 4 would model goes with it. No go/no-go gate: the
 backend implements all of Lean (Jordan, 2026-11-16).
 
 **Definition of done:**
@@ -172,12 +188,14 @@ backend implements all of Lean (Jordan, 2026-11-16).
   oracles, the metamorphic relations) against native Lean and, while it
   exists, the Clang path; allocation traces match exactly; every engine
   agrees.
-- **Performance:** within a budget Jordan sets (suggested: no slower than the
-  Clang path, for speed and size).
+- **Performance:** no slower than the Clang path, for speed and size (a gate;
+  Jordan may set a different budget), and no regression beyond the ratchet
+  of 1.6 in the other dimensions without a recorded trade-off.
 - **Lean upgrades:** a written process for re-checking the semantics and the
   proof when LCNF changes.
 
-Outside the proof: the C runtime (compiled once to Wasm) and the engines.
+Outside the proof: the C runtime (compiled once to Wasm; rewriting it in Lean
+is the first item [after 1.0](#after-10)) and the engines.
 
 - [ ] **2.1 Foundations.** Check whether Lean's `.olean` files carry enough
   compiled form for the standard library (else CI compiles it from source with
@@ -200,61 +218,98 @@ Outside the proof: the C runtime (compiled once to Wasm) and the engines.
 - [ ] **2.6 Switch-over.** The Clang path leaves the user's build; the
   installer and downloads shrink to Lean plus prebuilt runtime files.
 
-## Stage 3: shrinking
+## Stage 3: shrink
 
 [docs/proposals/IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md)'s removal list,
-after the backend has made the toolchain code obsolete.
+after the backend has made the toolchain code obsolete. It follows Stage 2
+and precedes Stage 4, so that Stage 4 models only the irreducible remainder.
 
 **Definition of done:** every remaining removal is done; an inventory of
 every shipped file, with its reason to exist, is signed off by Jordan; size
-metrics are recorded (shipped lines, dependencies, package size, repository
-size); Stage 1's definition of done still holds.
+metrics are recorded; Stage 1's definition of done and the performance
+ratchet still hold.
 
-- [ ] **3.1 The toolchain code Stage 2 made obsolete:** the C link drivers,
-  the Emscripten and Python paths, the Binaryen and Asyncify glue, the
-  toolchain downloads and their install code.
-- [ ] **3.2 M2's rest:** the full emsdk and Python paths maintainer-only (may
-  be moot after 3.1).
-- [ ] **3.3 M3's rest:** `library/prebuilt` generated in CI, not committed
-  (decided 2026-11-16; [REVIEW.md](docs/REVIEW.md#process) has the design);
-  one Lasm.JS wire codec once the host files are bundled (two copies until
-  then, JS_TO_LEAN.md §2). The `tar` target's nightly fuzzing is its exit
-  check and is already running.
+- [ ] **3.1 What Stage 2 made obsolete:** the C link drivers, the Emscripten
+  and Python paths, the Binaryen and Asyncify glue, the toolchain downloads
+  and their install code.
+- [ ] **3.2 M2's and M3's rest:** the full emsdk and Python paths
+  maintainer-only (may be moot after 3.1); `library/prebuilt` generated in CI,
+  not committed (decided 2026-11-16; [REVIEW.md](docs/REVIEW.md#process) has
+  the design); one Lasm.JS wire codec once the host files are bundled (two
+  copies until then, JS_TO_LEAN.md §2). The `tar` target's nightly fuzzing,
+  M3's exit check, is already running.
+- [ ] **3.3 Simplify** toward the irreducible state (issue #21).
 - [ ] **3.4 The inventory** of every shipped file and its reason to exist,
   for Jordan's sign-off, and the size metrics.
 
-## Stage 4: property tests (verification emulation)
+## Stage 4: Lean all the way
 
-[TESTING_STRATEGY.md §4](docs/TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs):
-propositions that carry over to proofs.
+Property tests and Lean rewrites in one stage, so no JavaScript is
+property-tested only to be deleted later (Jordan, 2026-11-16). The rule:
+every remaining module gets a Lean model with a model differential. Pure
+logic becomes proved Lean that *is* the implementation, compiled by Lasm;
+impure host glue that cannot be Lean keeps its JavaScript, held by its model,
+the differential and property tests. Every library candidate becomes a
+`Candidates.lean` definition with a `Tested by:` line
+([TESTING_STRATEGY.md §4](docs/TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)),
+and every proposition is exercised by a property test or a fuzz oracle.
 
-**Definition of done:** every shipped JavaScript and C module has a Lean
-model with a model differential in CI, or an exemption whose criteria Jordan
-approved (2026-11-16: 19 modelled, 22 pending, 132 exempt of 173,
-[verification/MODELS.md](verification/MODELS.md)); every library candidate is
-a `Candidates.lean` definition with a `Tested by:` line; every proposition is
-exercised by a property test or a fuzz oracle.
+**Definition of done:** every module is modelled, implemented in Lean, or
+exempt under criteria Jordan approved (2026-11-16: 19 modelled, 22 pending,
+132 exempt of 173, [verification/MODELS.md](verification/MODELS.md), before
+Stages 2 and 3 change the set); every proposition is exercised; the earlier
+stages' bars, and the performance ratchet, still hold.
 
 - [ ] **4.1 Exemption criteria** for Jordan's approval.
-- [ ] **4.2 Module models** (the old M4) for every module not exempt.
-- [ ] **4.3 Candidates everywhere,** and every proposition exercised.
-- [ ] **4.4 Glue specified in Lean** where it can be proved
-  ([JS_TO_LEAN.md](docs/proposals/JS_TO_LEAN.md); done so far: the UI patch
-  encoding, the Lasm.JS value codec, the function-platform mapping).
+- [ ] **4.2 Module models** with model differentials (the old M4) for every
+  module not exempt, and candidates everywhere.
+- [ ] **4.3 Pure glue into Lean,** compiled by Lasm, proved, replacing its
+  JavaScript (the old M6; [M6_GLUE.md](docs/proposals/M6_GLUE.md); two slices
+  merged, #286, #294, #295, paused 2026-11-14). Includes the WASI reactor
+  decision (A55). Specification work done so far: the UI patch encoding, the
+  Lasm.JS value codec, the function-platform mapping
+  ([JS_TO_LEAN.md](docs/proposals/JS_TO_LEAN.md)).
+- [ ] **4.4 Host glue property tests:** the JavaScript that stays, each held
+  by its model, its differential and named propositions.
+- [ ] **4.5 Toolchain validation of whatever remains after Stage 2** (the old
+  M5). `wasm-ld` against its map and inputs is done (#285,
+  `link-validation.yml`); the Binaryen draft (branch `m5-binaryen-draft`) is
+  moot once Binaryen leaves the build.
 
-## Stage 5: remaining Lean rewrites
+## Stage 5: performance
 
-**Definition of done:** written with Jordan before the stage starts.
+After Lean all the way, because only then does the final code exist.
 
-- [ ] **5.1 Pure glue in Lean,** compiled by Lasm (the old M6;
-  [M6_GLUE.md](docs/proposals/M6_GLUE.md)). Two slices are merged (#286,
-  #294, #295); paused 2026-11-14. Decided here, not before: the performance
-  budget, and the WASI reactor proposal (A55).
-- [ ] **5.2 Toolchain validation of what remains** (the old M5). `wasm-ld`
-  against its map and inputs is done (#285, `link-validation.yml`); the
-  Binaryen draft (branch `m5-binaryen-draft`) is moot once Stage 2 removes
-  Binaryen from the build.
-- [ ] **5.3 The C runtime:** assess moving it into Lean.
+**Definition of done:** every dimension of the performance ratchet (disk
+space, build time, runtime memory, CPU usage, speed) meets its
+Jordan-approved target on every platform, measured in CI.
+
+- [ ] **5.1 Targets,** set with Jordan at the start of the stage, against
+  native Lean, the Clang path (as last measured) and comparable Wasm
+  toolchains, per platform and on the five apps.
+- [ ] **5.2 Reach them.** Proved code stays proved while it is optimized:
+  faster versions go through `@[csimp]` or equivalence proofs.
+
+## Stage 6: 1.0
+
+**Definition of done:** Lasm 1.0.0 is released, with:
+
+- [ ] **6.1** every entry of [docs/API_DECISIONS.md](docs/API_DECISIONS.md)
+  signed off by Jordan;
+- [ ] **6.2** the stability promise (semantic versioning of the public
+  surface);
+- [ ] **6.3** the Lean version support policy;
+- [ ] **6.4** complete docs: [How Lasm works](docs/HOW_LASM_WORKS.md), the
+  reference, the guides, `llms.txt`;
+- [ ] **6.5** a final review of the evidence and the benchmarks;
+- [ ] **6.6** the 1.0.0 release.
+
+## After 1.0
+
+- [ ] Rewrite the C runtime (allocator, big numbers, tasks) in Lean: the
+  first item after 1.0, and the last piece outside Stage 2's proof.
+- [ ] Lean as a runtime library (parked since the language phases,
+  [docs/PLAN.md](docs/PLAN.md)).
 
 ## Maintenance
 
@@ -277,7 +332,8 @@ May interrupt any stage (Jordan, 2026-11-16).
   it's read (Claude's recommendation, 2026-11-02).
 - [ ] (J) Deno: generate and keep `Lasm.JS.Deno` and the Deno targets
   (leaning yes; milestone 0.4).
-- [ ] (J) The performance budget of Stage 2's backend.
+- [ ] (J) Stage 2's performance budget, if not "no slower than the Clang path";
+  Stage 5's targets.
 
 ## Jordan's checklist
 
@@ -309,7 +365,7 @@ in the release notes ([docs/release/](docs/release/)). In short:
 - **Language and launch phases** ([docs/PLAN.md](docs/PLAN.md)): language
   coverage on Node, JS/npm interop, the Node launch (0.1.0), the edge isolates
   and Bun/Deno (0.2.0), WASI, wasi-http/Spin, Fastly and browsers (0.3.0).
-  Complete; Lean as a runtime library stays parked.
+  Complete; Lean as a runtime library stays parked ([After 1.0](#after-10)).
 - **Releases** 0.3.6 to 0.8.0 (published 2026-11-14).
 - **Five flagship apps:** Conduit, Ledger, Folio, Porter and Tandem, each on
   every platform it claims with its outside oracle, proofs and fuzzing.
@@ -331,9 +387,9 @@ Where the retired structure went:
 | --- | --- |
 | Steps 1–2 (strategy, close the gaps) | Stage 1 |
 | Step 3: M1, M2, M3 | Stage 3 (M1 done) |
-| Step 4: M4, glue specified in Lean | Stage 4 |
-| Step 5: M5 | 5.2 |
-| Step 5: M6 | 5.1 |
+| Step 4: M4, glue specified in Lean | Stage 4 (4.2, 4.3) |
+| Step 5: M5 | 4.5 |
+| Step 5: M6 | 4.3 |
 | Step 5: M7 (direct backend) | Stage 2 |
 | Binding tiers 1–3, host bindings, `Lasm.Fetch` removal | Stage 0 |
 | "Now / Next / Later" | the stages, Maintenance, and History |

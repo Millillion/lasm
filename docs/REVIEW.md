@@ -441,8 +441,8 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   runs beside it.
 - [x] 8. The order of work is: strategy → gaps closed → reduction →
   transferable property tests → rewrite assessment. **Superseded 2026-11-16**
-  by ROADMAP.md's stages: API surface → robustness → backend → shrinking →
-  property tests → remaining rewrites.
+  by ROADMAP.md's stages: API surface → robustness → backend → shrink →
+  Lean all the way → performance → 1.0.
 - [ ] 9. No new testing libraries (no Plausible, fast-check, Jazzer.js or TLA+).
 - [ ] The property-testing convention ([§4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)):
   - Proved propositions go in `Spec.lean`.
