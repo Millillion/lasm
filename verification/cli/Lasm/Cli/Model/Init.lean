@@ -102,12 +102,13 @@ def templateOption (token : String) : Option (Option String) :=
   else if token.startsWith "-t=" then some (some (token.drop 3).toString)
   else none
 
-/-- The loop's state: the template, the deploy targets (each once, in order)
-and the positional words. -/
+/-- The loop's state: the template (and whether one was given), the deploy
+targets (each once, in order) and the positional words. -/
 structure InitState where
   template : String := "plain"
   deploy : List String := []
   positional : List String := []
+  templateGiven : Bool := false
 
 /-- The `for` loop: `.ok none` is the early `return { command: 'init-help' }`. -/
 def initLoop (st : InitState) : List String → Except String (Option InitState)
@@ -119,14 +120,18 @@ def initLoop (st : InitState) : List String → Except String (Option InitState)
         let next := takeValue inline rest
         have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
         match next.1 with
-        | some v => if v = "" ∨ v.startsWith "-" then .error ("--template requires a value\n\n" ++ initUsage) else initLoop { st with template := v } next.2
+        | some v =>
+          if v = "" ∨ v.startsWith "-" then .error ("--template requires a value\n\n" ++ initUsage)
+          else if st.templateGiven then .error "Specify --template only once"
+          else initLoop { st with template := v, templateGiven := true } next.2
         | none => .error ("--template requires a value\n\n" ++ initUsage)
       | none => match valuedOption "deploy" token with
         | some inline =>
           let next := takeValue inline rest
           have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
           let v := next.1.getD ""
-          if v ∉ deployTargets then .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ "\n\n" ++ initUsage)
+          if v ∉ deployTargets then
+            .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ (if v = "" then "" else targetHintAmong v deployTargets "--deploy") ++ "\n\n" ++ initUsage)
           else initLoop { st with deploy := if v ∈ st.deploy then st.deploy else st.deploy ++ [v] } next.2
         | none =>
           if token.startsWith "-" then .error ("Unknown lasm init option: " ++ token ++ "\n\n" ++ initUsage)
@@ -154,7 +159,7 @@ def deployChecks (template : String) (deploy : List String) : List DeployTarget 
 def initFinish (st : InitState) : Except String Parsed :=
   if st.positional.length ≠ 1 then .error initUsage
   else match templateTable.find? (·.name == st.template) with
-    | none => .error ("Unknown template \"" ++ st.template ++ "\". Choose one of: " ++ ", ".intercalate templates)
+    | none => .error ("Unknown template \"" ++ st.template ++ "\"" ++ targetHintAmong st.template templates "--template" ++ ". Choose one of: " ++ ", ".intercalate templates)
     | some t =>
       let chosen := st.deploy.filterMap fun d => deployTable.find? (·.name == d)
       match chosen.find? (!·.cli) with

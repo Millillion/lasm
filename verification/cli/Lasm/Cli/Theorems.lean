@@ -1664,7 +1664,7 @@ theorem finish_run (env : ArgumentsEnv) {src : String} (r : Parsed) (hc : r.comm
     (hpath : pathLike src = true) (hlean : src.endsWith ".lean" = true) (hjson : src.endsWith ".json" = false) :
     finish env r [src] = .ok { r with input? := some src, profile? := some (r.profile?.getD "dev") } := by
   unfold finish
-  cases r.profile? <;> simp [hc, ho, ha, hs, hb, ht, hpath, hlean, hjson, placeOutput, defaultProfile, checkOptions]
+  cases r.profile? <;> simp [hc, ho, ha, hs, hb, ht, hpath, hlean, hjson, defaultProfile, checkOptions]
 
 theorem run_args_kept : Spec.run_args_kept := by
   intro src flags args hlean hdash hflags
@@ -2015,13 +2015,6 @@ def FinishOK : Except String Parsed → Prop
 theorem jsRuntime_build : jsRuntime ∈ buildTargets := by
   rcases jsRuntimeOf.property with h | h | h <;> simp [jsRuntime, h, buildTargets, edgeBuildTargets, wasiBuildTargets]
 
-theorem placeOutput_fields (r : Parsed) (more : List String) :
-    (placeOutput r more).1.command = r.command ∧ (placeOutput r more).1.target? = r.target? ∧
-      (placeOutput r more).1.input? = r.input? := by
-  unfold placeOutput; split
-  · split <;> exact ⟨rfl, rfl, rfl⟩
-  · exact ⟨rfl, rfl, rfl⟩
-
 theorem defaultProfile_fields (r : Parsed) (first : String) :
     (defaultProfile r first).command = r.command ∧ (defaultProfile r first).target? = r.target? ∧
       (defaultProfile r first).input? = r.input? := by
@@ -2056,12 +2049,8 @@ theorem finish_spec (r : Parsed) (pos : List String) (h : ProgInv r) :
     dsimp only
     split
     · show NB _; nb
-    · obtain ⟨h1, h2, h3⟩ := placeOutput_fields { r with input? := some first } more
-      generalize placeOutput { r with input? := some first } more = q at h1 h2 h3
-      obtain ⟨r', more'⟩ := q
-      dsimp only at h1 h2 h3 ⊢
-      split
-      · show NB _; nb
+    · split
+      · split <;> (show NB _; nb)
       · split
         · show NB _; nb
         · split
@@ -2069,11 +2058,11 @@ theorem finish_spec (r : Parsed) (pos : List String) (h : ProgInv r) :
           · split
             · show NB _; nb
             · rename_i hx _
-              obtain ⟨d1, d2, d3⟩ := defaultProfile_fields r' first
+              obtain ⟨d1, d2, d3⟩ := defaultProfile_fields { r with input? := some first } first
               apply checkOptions_spec
-              · rw [d1, h1]; exact h.1
-              · rw [d2, h2]; exact h.2
-              · rw [d3, h3]
+              · rw [d1]; exact h.1
+              · rw [d2]; exact h.2
+              · rw [d3]
               · simp only [Bool.not_eq_true', Bool.or_eq_false_iff] at hx
                 cases hl : first.endsWith ".lean"
                 · cases hj : first.endsWith ".json"

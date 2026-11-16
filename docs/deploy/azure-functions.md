@@ -6,7 +6,7 @@ function on every route of an Azure Functions app (Node.js 22 or 24 on Linux).
 ```sh
 npx lasm init my-app --template hono --deploy azure   # adds @azure/functions to package.json
 cd my-app && npm install
-npm run build:azure                                   # lasm build --target azure: dist/ and azure-functions/
+npm run build:azure                                   # lasm build --target azure: azure-functions/
 cd azure-functions && func start                      # local, with Azure's own Core Tools
 func azure functionapp publish APP_NAME --no-build    # deploy, as built
 ```
