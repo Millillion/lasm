@@ -10,6 +10,20 @@ name = "Shared"
 [[lean_lib]]
 name = "View"
 
+# The server's site (routes, first page, embedded files) and HTTP as plain data,
+# shared by the server programs.
+[[lean_lib]]
+name = "Http"
+
+[[lean_lib]]
+name = "Embed"
+
+[[lean_lib]]
+name = "Site"
+
+[[lean_lib]]
+name = "JsSite"
+
 # Server.lean (Node), Export.lean (the edge, Bun, Deno), Fastly.lean,
 # WasiHttp.lean and Client.lean (the browser) are the programs: lasm builds them
 # (npm run build). They are not Lake targets.
