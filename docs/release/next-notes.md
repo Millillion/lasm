@@ -6,7 +6,7 @@ file into `<version>-notes.md`.
 ## Lasm.UI (breaking)
 
 - **Lasm.UI is cut to its core; browser effects go through `Cmd.task`**
-  (0.6-2, A35, docs/API_DECISIONS.md). `Cmd.task (run : Async Msg)` runs any
+  (0.6-8, A35, docs/API_DECISIONS.md). `Cmd.task (run : Async Msg)` runs any
   action with the generated browser bindings (`import Lasm.JS.Web.Browser`)
   and delivers its message; `Lasm.UI.afterFrame` waits for the next frame.
   `Cmd.delay`, `Cmd.pushUrl` and `Cmd.replaceUrl` stay. Migration:
@@ -29,4 +29,4 @@ file into `<version>-notes.md`.
   them (docs/UI.md, "Effects you can test"; examples/ui/todomvc).
 - `Lasm.RPC`'s `Endpoint.call` is now a `Cmd.task` over `fetch`; its
   proposition `call_valid` (about the removed HTTP effect) is gone. Lasm.RPC
-  itself is being removed (0.6-1).
+  itself is being removed (0.6-13).
