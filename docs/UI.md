@@ -305,33 +305,81 @@ command); if it no longer converts (its type changed), the app starts from
 
 ## Commands: `Cmd`
 
-An `update` returns the effects it wants as a `Cmd Msg`. A `Cmd` is data (a
-list of `Effect`s), so tests can check what `update` asked for.
+An `update` returns what it wants done besides changing the model as a
+`Cmd Msg`. The app loop's own effects are data; everything else the browser
+does is one generic command, `Cmd.task`, which runs any `Async` action and
+delivers the message it returns. The action uses the browser's own APIs
+through the generated bindings (`import Lasm.JS.Web.Browser`: `fetch`,
+`localStorage`, `document`, `crypto`, `history`, …), holding no thread while
+it waits.
 
 | Command | Effect |
 | --- | --- |
 | `Cmd.none`, `Cmd.batch [a, b]`, `a ++ b`, `Cmd.map f c` | combine |
 | `Cmd.send msg` | deliver `msg` after this update |
 | `Cmd.delay ms msg` | deliver `msg` after `ms` milliseconds |
-| `Http.get url handle`, `Http.post url body handle`, `Http.request req handle` | `fetch`; `handle` gets `Except Http.Error String` (or the full `Http.Response`) |
-| `Cmd.randomBytes n handle`, `Cmd.randomNat lo hi handle` | cryptographic randomness |
-| `Cmd.now handle` | `Date.now()` |
-| `Cmd.pushUrl url`, `Cmd.replaceUrl url`, `Cmd.back n`, `Cmd.forward n`, `Cmd.load url` | navigation |
-| `Cmd.storageSet key value`, `Cmd.storageGet key handle`, `Cmd.storageRemove key` | `localStorage` (or `(storage := .session)`) |
-| `Cmd.focus id`, `Cmd.blur id` | focus an element by its `id` attribute after the next frame |
-| `Cmd.title t` | `document.title` |
-| `Cmd.port name value` | send to JavaScript (`app.ports[name].subscribe`) |
-| `Cmd.io run` | any `IO` action; `run` gets a function that delivers messages |
+| `Cmd.pushUrl url`, `Cmd.replaceUrl url` | navigate within the app; `onUrlChange` gets the URL |
+| `Cmd.task (run : Async Msg)` | run any action, then deliver its message |
+| `Cmd.ofEffect (.task fun deliver => …)` | run any action that delivers any number of messages (none, or a stream) |
 
 ```lean
+import Lasm.UI
+import Lasm.JS.Web.Browser
+open Lasm.UI
+
 inductive Msg where
   | load
-  | loaded (r : Except Http.Error String)
+  | loaded (body : String)
+  | failed (error : String)
 
 def update : Msg → Model → Model × Cmd Msg
-  | .load, m => ({ m with loading := true }, Http.get "/api/items" .loaded)
-  | .loaded (.ok body), m => ({ m with loading := false, body }, .none)
-  | .loaded (.error e), m => ({ m with loading := false, error := toString e }, .none)
+  | .load, m => ({ m with loading := true }, Cmd.task do
+      try
+        let r ← Lasm.JS.Web.fetch (.usvString "/api/items")
+        return .loaded (← r.text)
+      catch e => return .failed (toString e))
+  | .loaded body, m => ({ m with loading := false, body }, .none)
+  | .failed e, m => ({ m with loading := false, error := e }, .none)
+```
+
+An error the action does not catch is reported on the console and delivers
+nothing. `Lasm.UI.afterFrame` waits until the next frame is on screen, for an
+action that needs an element the update just added (focusing it):
+
+```lean
+def focus (id : String) : Cmd Msg := Cmd.ofEffect (.task fun _ => do
+  afterFrame
+  if let some el ← (← Lasm.JS.Web.document).getElementById id then
+    ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus)
+```
+
+Ports to JavaScript are `Lasm.UI.Mount.port` (send) and `Subs.port`
+(receive): `Cmd.ofEffect (.task fun _ => do (← Mount.port "out").send v)`.
+
+### Effects you can test
+
+A `Cmd.task` is an action: a test cannot read what it will do. When you want
+tests and proofs about your effects, declare them as data and interpret them
+in one small function. `update` returns the data; the app maps it to commands.
+examples/ui/todomvc does this, and proves what `update` saves
+(`Todo.update_saves`):
+
+```lean
+/-- What the app asks the page to do. -/
+inductive Effect where
+  | save (key json : String)
+  deriving Repr, BEq
+
+def step : Msg → Model → Model × List Effect := …     -- pure, tested and proved
+
+def perform : Effect → Cmd Msg                       -- the interpreter
+  | .save key json => Cmd.ofEffect (.task fun _ => do (← Lasm.JS.Web.localStorage).setItem key json)
+
+def app : App Unit Model Msg where
+  update msg m := let (m', effects) := step msg m; (m', Cmd.batch (effects.map perform))
+  …
+
+#guard (step .clear {}).2 == [.save "todos" "[]"]
 ```
 
 ## Subscriptions: `Subs`
@@ -414,13 +462,13 @@ The app handle that `mount` returns has `ports` and `send`:
 
 ```js
 const app = await mount(element);
-app.ports.saved.subscribe(value => console.log('Lean saved', value));   // Cmd.port "saved" v
+app.ports.saved.subscribe(value => console.log('Lean saved', value));   // (← Mount.port "saved").send v
 await app.ports.query.send({ text: 'lean' });                           // Subs.port "query" f
 await app.send('refresh');                                              // App.receive
 ```
 
 Values cross as `Lasm.JS.Data` (plain JSON-like data). For anything else,
-`Cmd.io` and the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)) give typed access to the web platform from Lean.
+`Cmd.task` and the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)) give typed access to the web platform from Lean.
 
 ## Server-side rendering and hydration
 
@@ -589,8 +637,8 @@ Modules (all in `import Lasm.UI` except the DOM model, `import Lasm.UI.Model`, a
 | `Lasm.UI.Html` | `Html`, `Attr` (`Attr.custom`), `AttrKey`, `AttrVal`, `Listener`, `Handled`, `Decoder`, `EvVal`, `PropVal`, `Ns`, `Html.keyed`, `Html.map` |
 | `Lasm.UI.Elements` | the function DSL: `text`, `node`, `nodeNS`, `keyed`, `empty`, every HTML element (`div`, `span`, `a`, `button`, `input`, `ul`, `li`, `table`, … ; `main_`, `section_`, `map_`, `var_`, `template_`, `slot_`, `object_`, `sub_`), attributes (`attr`, `prop`, `boolProp`, `stringProp`, `style`, `data`, `aria`, `class_`, `classList`, `id_`, `type_`, `for_`, `max_`, `min_`, `value`, `checked`, `selected`, `disabled`, `hidden`, `readonly`, `required`, `multiple`, `autofocus`, `tabindex`, `colspan`, `rowspan`, `width`, `height`, `title`, `placeholder`, `href`, `src`, `alt`, `name`, `target`, `rel`, …), events (`on`, `preventDefaultOn`, `stopPropagationOn`, `custom`, `onClick`, `onDoubleClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseOver`, `onMouseOut`, `onFocus`, `onBlur`, `onInput`, `onChange`, `onCheck`, `onSubmit`, `onKeyDown`, `onKeyUp`, `onEnter`, `onEscape`), `Svg.*` (elements and `viewBox`, `d`, `fill`, `stroke`, `strokeWidth`, `cx`, `cy`, `r`, `x`, `y`, `points`, `transform`, …), `htmlTags`, `voidTags`, `Svg.tags` |
 | `Lasm.UI.Syntax` | `html!` |
-| `Lasm.UI.App` | `App`, `App.sandbox`, `App.element`, `App.run` |
-| `Lasm.UI.Cmd` | `Cmd`, `Effect`, `Http.Request`, `Http.Response`, `Http.Error`, `Http.get`, `Http.post`, `Http.request`, `Storage` |
+| `Lasm.UI.Cmd` | `Cmd` (`none`, `batch`, `map`, `send`, `delay`, `pushUrl`, `replaceUrl`, `task`, `ofEffect`), `Effect` |
+| `Lasm.UI.App` | `App`, `App.sandbox`, `App.element`, `App.run`, `afterFrame` |
 | `Lasm.UI.Subs` | `Subs`, `Subs.on`, `Subs.preventDefaultOn`, `Subs.stopPropagationOn`, `Subs.custom`, `Target`, `SubSpec`, `SubItem`, and the shorthands (`Subs.every`, `onAnimationFrame`, `onKeyDown`, `onKeyUp`, `onMouseMove`, `onMouseUp`, `onClick`, `onResize`, `onVisibilityChange`, `port`) |
 | `Lasm.UI.Url` | `Url`, `Url.parse`, `parseRelative`, `segments`, `params`, `param?`, `origin`, `pathAndQuery`, `Url.build`, `percentEncode`, `percentDecode` |
 | `Lasm.UI.Render` | `render`, `renderPage` |

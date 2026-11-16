@@ -1,0 +1,7 @@
+{
+  "$comment": "Checks of test/fixtures/js-bun that fail on Bun because of the runtime itself, never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
+  "bun": {
+    "available Bun.Socket.getX509Certificate": "declared in bun-types 1.4.4, but Bun 1.4.4's TCP sockets have no such method",
+    "available Bun.Socket.getPeerX509Certificate": "declared in bun-types 1.4.4, but Bun 1.4.4's TCP sockets have no such method"
+  }
+}
