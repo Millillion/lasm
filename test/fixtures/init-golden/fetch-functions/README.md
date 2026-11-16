@@ -103,8 +103,8 @@ See the [Netlify guide](https://github.com/Millillion/lasm/blob/main/docs/deploy
 `gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf`.
 See the [Cloud Functions guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/cloud-functions.md).
 
-`Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image behind the
-AWS Lambda Web Adapter): `docker build -f Dockerfile.lambda -t func-app.v2-lambda .`; see the
+`Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image, whose
+runtime calls the handler `Export.lean` publishes): `docker build -f Dockerfile.lambda -t func-app.v2-lambda .`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,

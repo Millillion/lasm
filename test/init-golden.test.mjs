@@ -38,9 +38,7 @@ const update = process.env.LASM_UPDATE_INIT_GOLDEN === '1';
 const configurations = [
   ...Object.keys(templates).map(template => ({ name: template, directory: `${template} app`, template, deploy: [] })),
   { name: 'fetch-functions', directory: 'Func App.v2', template: 'fetch', deploy: ['lambda', 'lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] },
-  { name: 'express-lambda', directory: 'express_lambda', template: 'express', deploy: ['lambda'] },
-  { name: 'fastify-lambda', directory: 'fastify_lambda', template: 'fastify', deploy: ['lambda'] },
-  { name: 'std-http-lambda', directory: '2nd-server', template: 'std-http', deploy: ['lambda'] },
+  { name: 'hono-lambda', directory: '2nd-server', template: 'hono', deploy: ['lambda'] },
   { name: 'hono-edge', directory: '@Edge App!', template: 'hono', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'] },
   { name: 'hono-netlify-azure', directory: 'hono-2', template: 'hono', deploy: ['netlify', 'azure', 'lambda-edge'] },
   { name: 'fetch-wasi', directory: 'Fetch.App', template: 'fetch', deploy: ['fastly', 'wasi-http', 'spin', 'workers'] },
@@ -159,20 +157,21 @@ test('lasm init arguments: every option form and every error message', () => {
   fails(['app', '--deploy', 'wasi', '--deploy', 'netlify'], '--deploy netlify needs a server template (express, hono, fastify, std-http or fetch), not plain');
   // Each refusal names the targets the template does support.
   const functions = 'lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf';
-  fails(['app', '-t', 'express', '--deploy', 'supabase-edge'], '--deploy supabase-edge supports the hono template, not express. The express template supports --deploy lambda');
-  // The function platforms call a published handler (exportDefault): not the templates that bring their own server.
+  fails(['app', '-t', 'express', '--deploy', 'supabase-edge'], '--deploy supabase-edge supports the hono template, not express. The express template has no --deploy targets: it runs wherever its Dockerfile runs');
+  // The function platforms (and the Lambda image) call a published handler (exportDefault): not the templates that bring their own server.
   for (const template of ['express', 'fastify', 'std-http'])
-    fails(['app', '-t', template, '--deploy', 'vercel'], `--deploy vercel supports the hono and fetch templates, not ${template}. The ${template} template supports --deploy lambda`);
+    for (const target of ['lambda', 'vercel'])
+      fails(['app', '-t', template, '--deploy', target], `--deploy ${target} supports the hono and fetch templates, not ${template}. The ${template} template has no --deploy targets: it runs wherever its Dockerfile runs`);
   fails(['app', '-t', 'hono', '--deploy', 'fastly'], `--deploy fastly supports the fetch and fullstack templates, not hono. The hono template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge`);
-  fails(['app', '-t', 'express', '--deploy', 'workers'], `--deploy workers supports the hono, fetch and fullstack templates, not express. The express template supports --deploy lambda`);
+  fails(['app', '-t', 'express', '--deploy', 'workers'], `--deploy workers supports the hono, fetch and fullstack templates, not express. The express template has no --deploy targets: it runs wherever its Dockerfile runs`);
   fails(['app', '-t', 'fetch', '--deploy', 'supabase-edge'], `--deploy supabase-edge supports the hono template, not fetch. The fetch template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin`);
   // Issue #168: the fullstack template writes no function-platform files, so it refuses them.
   for (const target of functions.split(', '))
-    fails(['app', '-t', 'fullstack', '--deploy', target], `--deploy ${target} supports the ${target === 'lambda' ? 'express, hono, fastify, std-http and fetch templates' : 'hono and fetch templates'}, not fullstack. `
+    fails(['app', '-t', 'fullstack', '--deploy', target], `--deploy ${target} supports the hono and fetch templates, not fullstack. `
       + 'The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
   // The issue's command: the first refused target is named.
   fails(['app', '--template', 'fullstack', '--deploy', 'workers', '--deploy', 'lambda', '--deploy', 'vercel', '--deploy', 'azure'],
-    '--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
+    '--deploy lambda supports the hono and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
   fails(['app', '-t', 'hono', '--deploy', 'vercel', '--deploy', 'vercel-edge'], '--deploy vercel-edge and --deploy vercel both configure the same platform; choose one');
   fails(['app', '-t', 'hono', '--deploy', 'netlify-edge', '--deploy', 'netlify'], '--deploy netlify-edge and --deploy netlify both configure the same platform; choose one');
 });
@@ -188,8 +187,8 @@ test('every deploy target accepts exactly its templates', () => {
   // Not fullstack on the function platforms (issue #168).
   const server = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
   const accepted = {
-    // The function platforms call a published handler: the hono and fetch templates (Export.lean).
-    lambda: server, 'lambda-zip': ['hono', 'fetch'], 'lambda-edge': ['hono', 'fetch'], vercel: ['hono', 'fetch'], netlify: ['hono', 'fetch'],
+    // The function platforms and the Lambda image call a published handler: the hono and fetch templates (Export.lean).
+    lambda: ['hono', 'fetch'], 'lambda-zip': ['hono', 'fetch'], 'lambda-edge': ['hono', 'fetch'], vercel: ['hono', 'fetch'], netlify: ['hono', 'fetch'],
     azure: ['hono', 'fetch'], gcf: ['hono', 'fetch'],
     workers: ['hono', 'fetch', 'fullstack'], 'vercel-edge': ['hono', 'fetch', 'fullstack'], 'netlify-edge': ['hono', 'fetch', 'fullstack'],
     'deno-deploy': ['hono', 'fetch', 'fullstack'], 'supabase-edge': ['hono'], fastly: ['fetch', 'fullstack'], wasi: ['plain'],

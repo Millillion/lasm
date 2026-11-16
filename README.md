@@ -538,8 +538,8 @@ cloud account. Full matrix: [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 | Windows x64 | Node 24.0.0 and 24.22.3 on `windows-2025`; installed acceptance with Node 26.13.1 |
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim`, Ubuntu 22.04/24.04; read-only, 512 MB, x64 and arm64 (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images and Dockerfiles; the platforms themselves are never deployed to |
-| AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
-| AWS Lambda (.zip, `nodejs24.x`) | every server template's `--target lambda` zip in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP, function URL and ALB events; `sam local invoke` and `sam local start-api` |
+| AWS Lambda (container image) | the hono template's `Dockerfile.lambda` (`public.ecr.aws/lambda/nodejs:24` with `CMD ["lasm-lambda.handler"]`, the program's default export, no server inside) through the Runtime Interface Emulator; `amazonlinux:2023` |
+| AWS Lambda (.zip, `nodejs24.x`) | the hono and fetch templates' `--target lambda` zips in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP, function URL and ALB events; `sam local invoke` and `sam local start-api` |
 | Lambda@Edge (origin request, x86_64) | the same image and emulator with CloudFront origin-request events |
 | Vercel Functions (Node.js 24) | `vercel build` offline; the function under `@vercel/node` in `public.ecr.aws/lambda/nodejs:24` |
 | Netlify Functions (v2) | `netlify build --offline` and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` |

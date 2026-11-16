@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
-# AWS Lambda container image: Lambda's managed Node 24 image, with the AWS Lambda
-# Web Adapter forwarding each invocation to the server's HTTP port.
+# AWS Lambda container image: Lambda's managed Node 24 image, whose runtime
+# interface client calls lasm-lambda.handler for each invocation, which calls the
+# handler Export.lean publishes (exportDefault). The same files as the .zip
+# package (lasm build Export.lean --target lambda); no HTTP server runs.
 #   docker build --platform linux/amd64 -f Dockerfile.lambda -t my-app-lambda .
 # Give the function at least 512 MB of memory. See https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md
 
@@ -9,13 +11,9 @@ WORKDIR /app
 # The whole project (see .dockerignore), so local file: dependencies resolve too.
 COPY . .
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
+RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Export.lean --target lambda \
+  && mkdir /lambda && unzip -q lambda.zip -d /lambda
 
 FROM public.ecr.aws/lambda/nodejs:24
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
-COPY --from=build /app/dist ${LAMBDA_TASK_ROOT}/
-RUN printf '#!/bin/sh\nexec node "$LAMBDA_TASK_ROOT/main.mjs"\n' > /opt/lasm-start && chmod 755 /opt/lasm-start
-# The server listens on PORT (not 8080: the local emulator uses it); the adapter
-# forwards requests once GET /health answers.
-ENV AWS_LAMBDA_EXEC_WRAPPER=/opt/lasm-start PORT=3000 AWS_LWA_PORT=3000 AWS_LWA_READINESS_CHECK_PATH=/health
-CMD ["main.mjs"]
+COPY --from=build /lambda ${LAMBDA_TASK_ROOT}/
+CMD ["lasm-lambda.handler"]

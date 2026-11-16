@@ -241,9 +241,9 @@ async (request, context)`, Vercel and GCF `(req, res)`, Lambda events, Azure
 `HttpResponseInit`). There is no HTTP server, port or loopback. Under that
 file, `exportDefault` hands the handler to the platform file and does not
 return, because the Lean runtime ends with `main`. A program that brings its
-own server (Express, Fastify, `Std.Http`, `Node.serve`) runs on Lambda only
-as a container image behind the AWS Lambda Web Adapter (`--deploy lambda`),
-which is that platform's own way to run a server. **Alternative:** keep the
+own server (Express, Fastify, `Std.Http`, `Node.serve`) does not run on the
+function platforms (the Lambda container image calls the handler too; 0.2-5).
+**Alternative:** keep the
 loopback adapter (`lasm-server.mjs`), which Jordan rejected on 2026-11-11.
 
 ### 0.2-3: templates serve with one entry module per serving model
@@ -255,8 +255,8 @@ handler once and one small program per way of serving it, with no
 | File | fetch | hono | Built by |
 | --- | --- | --- | --- |
 | `Handler.lean` / `Routes.lean` | `Handler.handle : Request → Async Response` | `Routes.app : IO Value` (the Hono app) | (imported) |
-| `Main.lean` | `Node.serve { fetch := Handler.handle }` | `@hono/node-server`'s `serve`, Hono's own Node adapter | `npm run build`, `dev`, `start`, the Dockerfile, `--deploy lambda` |
-| `Export.lean` | `exportDefault Handler.handle` | `exportDefault (← Routes.app)` | `build:bun`, `build:deno`, every edge and function-platform `build:<target>` |
+| `Main.lean` | `Node.serve { fetch := Handler.handle }` | `@hono/node-server`'s `serve`, Hono's own Node adapter | `npm run build`, `dev`, `start`, the Dockerfile |
+| `Export.lean` | `exportDefault Handler.handle` | `do exportDefault (← Routes.app)` | `build:bun`, `build:deno`, every edge and function-platform `build:<target>` |
 | `Fastly.lean`, `WasiHttp.lean` | the same routes on `Lasm.Fastly` and `Lasm.WASI.Http` (unchanged) | – | `build:fastly`, `build:wasi-http` |
 
 ```lean
@@ -282,14 +282,35 @@ name `Main.lean`). **Where:** this PR. Supersedes A53.
 
 ### 0.2-4: the function platforms take the templates that publish a handler
 
-**Decision.** `--deploy lambda-zip|lambda-edge|vercel|netlify|azure|gcf`
+**Decision.** `--deploy lambda|lambda-zip|lambda-edge|vercel|netlify|azure|gcf`
 accept the hono and fetch templates only (they build `Export.lean`). The
-express, fastify and std-http templates bring their own server, so on AWS they
-keep `--deploy lambda`, the container image behind the AWS Lambda Web
-Adapter, which runs a server as Lambda's own tooling intends; `lasm init`
-refuses the others with the targets the template supports. **Alternatives:**
-port express and fastify to a handler (they are Node servers by design);
-keep a loopback adapter (rejected by Jordan, 2026-11-11). **Where:** this PR.
+express, fastify and std-http templates bring their own server, so they have
+no function-platform target: they run on container platforms (the
+`Dockerfile`); `lasm init` refuses the others with the targets the template
+supports. **Alternatives:** port express and fastify to a handler (they are
+Node servers by design); keep a loopback adapter (rejected by Jordan,
+2026-11-11). **Where:** this PR.
+
+### 0.2-5: the Lambda container image calls the handler; no Web Adapter
+
+**Decision.** `--deploy lambda` writes a `Dockerfile.lambda` whose image is
+Lambda's own Node 24 base image with the .zip package's files (`lasm build
+Export.lean --target lambda`, unzipped) and `CMD ["lasm-lambda.handler"]`:
+the base image's runtime interface client calls the handler, which calls the
+program's `exportDefault` handler. No HTTP server runs inside the function.
+
+```dockerfile
+FROM public.ecr.aws/lambda/nodejs:24
+COPY --from=build /lambda ${LAMBDA_TASK_ROOT}/
+CMD ["lasm-lambda.handler"]
+```
+
+**Why:** the AWS Lambda Web Adapter forwards each invocation to a server on a
+port inside the function: a loopback adapter, which Jordan's rule excludes.
+The base image with a handler is AWS's documented container form for Node.
+**Consequence:** express, fastify and std-http lose `--deploy lambda` (they
+cannot publish a handler). **Alternatives:** keep the Web Adapter image for
+the server templates. **Where:** this PR.
 
 ### A44: the WASI CGI server mode is dropped (Jordan, 2026-11-16)
 

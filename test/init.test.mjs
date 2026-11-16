@@ -9,7 +9,9 @@ import { initProject, lakeName, packageName, supabaseFunctionNameOf, templates }
 test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', deploy: [], directory: 'my-app' });
   assert.deepEqual(parseLasmArguments(['init', 'my-app', '--template', 'hono']), { command: 'init', template: 'hono', deploy: [], directory: 'my-app' });
-  assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), { command: 'init', template: 'std-http', deploy: ['lambda'], directory: 'x' });
+  assert.deepEqual(parseLasmArguments(['init', '-t=fetch', 'x', '--deploy', 'lambda']), { command: 'init', template: 'fetch', deploy: ['lambda'], directory: 'x' });
+  // The Lambda image calls a published handler: not for a template that brings its own server.
+  assert.throws(() => parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), /has no --deploy targets/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
@@ -66,8 +68,10 @@ test('every template creates a complete project', () => {
     assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda'] }).files.includes('Dockerfile.lambda'));
     const recipe = readFileSync(join(lambda, 'Dockerfile.lambda'), 'utf8');
     assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
-    assert.match(recipe, /AWS_LWA_READINESS_CHECK_PATH=\/health/);
-    assert.match(recipe, /printf '#!\/bin\/sh\\nexec node "\$LAMBDA_TASK_ROOT\/main\.mjs"\\n'/);
+    // The handler on Lambda's own image: no Web Adapter, no server inside.
+    assert.match(recipe, /npx lasm build Export\.lean --target lambda/);
+    assert.match(recipe, /^CMD \["lasm-lambda\.handler"\]$/m);
+    assert.doesNotMatch(recipe, /lambda-adapter|AWS_LWA/);
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
     // Function platforms: npm scripts that build the default export (Export.lean) with lasm package, platform files and packages.
     const functions = join(root, 'functions');

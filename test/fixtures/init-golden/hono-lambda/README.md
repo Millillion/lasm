@@ -1,7 +1,7 @@
-# fastify_lambda
+# 2nd-server
 
-Fastify 5 with Lean route handlers (Lasm.JS), compiled ahead of time to WebAssembly by
-[Lasm](https://github.com/Millillion/lasm) and run by Node.js.
+Hono on @hono/node-server with Lean request handlers (Lasm.JS), compiled ahead of time to WebAssembly by
+[Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
 
@@ -33,8 +33,10 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program: routes and Lean request handlers. |
-| `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Main.lean` | The program on Node: the Hono app on `@hono/node-server`. |
+| `Routes.lean` | The Hono app: routes and Lean request handlers. |
+| `Export.lean` | The app as the program's default export (`exportDefault`), for Bun, Deno, the edge and the function platforms. |
+| `App.lean` | Pure Lean logic used by `Routes.lean`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
 | `package.json` | npm scripts, the npm packages Lean calls and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
@@ -43,6 +45,21 @@ Files:
 `Lasm.JS`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+
+## Bun and Deno
+
+`Export.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
+runs single-threaded there, with no files, sockets or processes, and the Hono app is
+served as the module's default export, as `bun` and `deno serve` serve one:
+
+```sh
+bun install && bun run dev:bun          # Lasm itself runs on Bun
+bun run build:bun && bun run start:bun     # bun/main.mjs
+deno install && deno task dev           # Lasm itself runs on Deno
+deno task build:deno && deno task start:deno   # deno/main.mjs
+```
+
+See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md).
 
 ## Deploy
 
@@ -53,14 +70,14 @@ own OS and architecture) and run `node dist/main.mjs`.
 With Docker:
 
 ```sh
-docker build -t fastify_lambda .
-docker run --rm -p 8080:8080 fastify_lambda
+docker build -t 2nd-server .
+docker run --rm -p 8080:8080 2nd-server
 ```
 
 The image sets `PORT=8080`; platforms that assign a port override it.
 
-`Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image behind the
-AWS Lambda Web Adapter): `docker build -f Dockerfile.lambda -t fastify_lambda-lambda .`; see the
+`Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image, whose
+runtime calls the handler `Export.lean` publishes): `docker build -f Dockerfile.lambda -t 2nd-server-lambda .`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,

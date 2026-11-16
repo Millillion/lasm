@@ -22,12 +22,12 @@ export const templateDependencies = npm;
 // publishes with `exportDefault` (Export.lean), through `lasm package`
 // (src/package.mjs); azure and gcf also deploy the platform's npm package. So
 // they take the templates with a handler (hono, fetch), not the ones that bring
-// their own server (express, fastify, std-http), which run on Lambda as a
-// container image behind the AWS Lambda Web Adapter (`--deploy lambda`), and
-// not fullstack: its init writes no platform files for them (issue #168).
+// their own server (express, fastify, std-http), and not fullstack: its init
+// writes no platform files for them (issue #168). The Lambda container image
+// is the same handler on Lambda's base image (no HTTP server inside).
 const functionTemplates = ['hono', 'fetch'];
 export const deployTargets = {
-  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: ['express', 'hono', 'fastify', 'std-http', 'fetch'] },
+  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda: Lambda\'s Node 24 image calling the default export)', templates: functionTemplates },
   'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
   'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
   vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
@@ -123,7 +123,7 @@ export function parseInitArguments(tokens) {
         const names = deployTargets[target].templates;
         const list = names.length === 1 ? `the ${names[0]} template` : `the ${names.slice(0, -1).join(', ')} and ${names.at(-1)} templates`;
         const supported = Object.keys(deployTargets).filter(name => deployTargets[name].templates.includes(result.template));
-        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}. The ${result.template} template supports --deploy ${supported.join(', ')}`);
+        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}. ` + (supported.length ? `The ${result.template} template supports --deploy ${supported.join(', ')}` : `The ${result.template} template has no --deploy targets: it runs wherever its Dockerfile runs`));
       }
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
@@ -340,8 +340,10 @@ EXPOSE 8080
 // deploy/lambda/Dockerfile and docs/deploy/lambda.md (Phase 5.1).
 function lambdaDockerfile() {
   return `# syntax=docker/dockerfile:1
-# AWS Lambda container image: Lambda's managed Node 24 image, with the AWS Lambda
-# Web Adapter forwarding each invocation to the server's HTTP port.
+# AWS Lambda container image: Lambda's managed Node 24 image, whose runtime
+# interface client calls lasm-lambda.handler for each invocation, which calls the
+# handler Export.lean publishes (exportDefault). The same files as the .zip
+# package (lasm build Export.lean --target lambda); no HTTP server runs.
 #   docker build --platform linux/amd64 -f Dockerfile.lambda -t my-app-lambda .
 # Give the function at least 512 MB of memory. See https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md
 
@@ -350,16 +352,12 @@ WORKDIR /app
 # The whole project (see .dockerignore), so local file: dependencies resolve too.
 COPY . .
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Main.lean --output dist
+RUN --mount=type=cache,target=/root/.cache/lasm npx lasm build Export.lean --target lambda \\
+  && mkdir /lambda && unzip -q lambda.zip -d /lambda
 
 FROM public.ecr.aws/lambda/nodejs:24
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
-COPY --from=build /app/dist \${LAMBDA_TASK_ROOT}/
-RUN printf '#!/bin/sh\\nexec node "$LAMBDA_TASK_ROOT/main.mjs"\\n' > /opt/lasm-start && chmod 755 /opt/lasm-start
-# The server listens on PORT (not 8080: the local emulator uses it); the adapter
-# forwards requests once GET /health answers.
-ENV AWS_LAMBDA_EXEC_WRAPPER=/opt/lasm-start PORT=3000 AWS_LWA_PORT=3000 AWS_LWA_READINESS_CHECK_PATH=/health
-CMD ["main.mjs"]
+COPY --from=build /lambda \${LAMBDA_TASK_ROOT}/
+CMD ["lasm-lambda.handler"]
 `;
 }
 
@@ -568,8 +566,8 @@ The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 ${deploy.some(target => deployTargets[target].package) ? `Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
 with your platform's own CLI (\`vercel\`, \`netlify\`, \`func\`, \`gcloud\`, \`aws\` or \`sam\`), installed as its docs say.
 
-` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
-AWS Lambda Web Adapter): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
+` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image, whose
+runtime calls the handler \`Export.lean\` publishes): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
 ` : ''}The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,

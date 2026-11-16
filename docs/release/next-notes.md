@@ -61,10 +61,14 @@
 - **`lasm init --template hono`** writes `Routes.lean` (the Hono app),
   `Main.lean` (Node, `@hono/node-server`) and `Export.lean`
   (`exportDefault (← Routes.app)`).
-- **The function platforms** (`--deploy lambda-zip`, `lambda-edge`, `vercel`,
-  `netlify`, `azure`, `gcf`) take the fetch and hono templates. express,
-  fastify and std-http keep `--deploy lambda` (the container image behind the
-  AWS Lambda Web Adapter).
+- **The function platforms** (`--deploy lambda`, `lambda-zip`, `lambda-edge`,
+  `vercel`, `netlify`, `azure`, `gcf`) take the fetch and hono templates.
+  express, fastify and std-http bring their own server, so they have no
+  `--deploy` target: they run wherever their `Dockerfile` runs.
+- **`--deploy lambda`'s `Dockerfile.lambda`** is Lambda's own Node 24 image with
+  the .zip package's files and `CMD ["lasm-lambda.handler"]`: the runtime calls
+  the handler `Export.lean` publishes. The AWS Lambda Web Adapter (which ran a
+  server inside the function) is gone, with `deploy/lambda/Dockerfile`.
 - **`--deploy wasi`** is for the plain template (command-line programs). The
   fetch template's `Cgi.lean` is gone: HTTP on WASI is wasi-http
   (`--deploy wasi-http`, `spin`).

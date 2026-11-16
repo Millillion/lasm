@@ -9,4 +9,4 @@ import Routes
 import Lasm.JS
 open Lasm.JS
 
-def main : IO Unit := exportDefault (← Routes.app)
+def main : IO Unit := do exportDefault (← Routes.app)

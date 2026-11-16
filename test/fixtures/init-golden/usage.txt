@@ -6,7 +6,7 @@ The directory must be new or empty. The default template is plain.
 --deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
-  lambda       AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)
+  lambda       AWS Lambda container image (Dockerfile.lambda: Lambda's Node 24 image calling the default export)
   lambda-zip   AWS Lambda .zip for nodejs24.x (npm run build:lambda)
   lambda-edge  Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)
   vercel       Vercel Function (vercel.json; Vercel runs the build)
