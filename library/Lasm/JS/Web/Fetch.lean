@@ -366,6 +366,12 @@ instance : ToJS HeadersInit := ⟨fun
   | .record v => toJS v⟩
 instance : Coe (Array (Array String)) HeadersInit := ⟨.sequence⟩
 instance : Coe (Record String) HeadersInit := ⟨.record⟩
+instance : FromJS HeadersInit where
+  fromJS
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array (Array String))).map .sequence
+    | d@(.object _) => (FromJS.fromJS d : Except String (Record String)).map .record
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.HeadersInit"
 
 /-- `typedef Request or USVString RequestInfo`: one constructor per member type. -/
 inductive RequestInfo where
@@ -454,6 +460,24 @@ instance : ToJS RequestInit := ⟨fun d => Support.fields #[("method", Support.o
     ("duplex", Support.optional d.duplex),
     ("priority", Support.optional d.priority),
     ("window", d.window)]⟩
+instance : FromJS RequestInit where
+  fromJS d := do return {
+    method := ← Lasm.JS.readField (Option String) d "method",
+    headers := ← Lasm.JS.readField (Option HeadersInit) d "headers",
+    body := ← Lasm.JS.readField Data d "body",
+    referrer := ← Lasm.JS.readField (Option String) d "referrer",
+    referrerPolicy := ← Lasm.JS.readField (Option ReferrerPolicy) d "referrerPolicy",
+    mode := ← Lasm.JS.readField (Option RequestMode) d "mode",
+    credentials := ← Lasm.JS.readField (Option RequestCredentials) d "credentials",
+    cache := ← Lasm.JS.readField (Option RequestCache) d "cache",
+    redirect := ← Lasm.JS.readField (Option RequestRedirect) d "redirect",
+    integrity := ← Lasm.JS.readField (Option String) d "integrity",
+    keepalive := ← Lasm.JS.readField (Option Bool) d "keepalive",
+    signal := ← Lasm.JS.readField (Option AbortSignal) d "signal",
+    duplex := ← Lasm.JS.readField (Option RequestDuplex) d "duplex",
+    priority := ← Lasm.JS.readField (Option RequestPriority) d "priority",
+    window := ← Lasm.JS.readField Data d "window" }
+  typeName := "Lasm.JS.Web.RequestInit"
 
 /-- `dictionary ResponseInit` (Fetch Standard (https://fetch.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseInit where

@@ -116,9 +116,9 @@ instance : FromJS D1ExecResult where
 
 /-- `dictionary D1PreparedStatementRawOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure D1PreparedStatementRawOptions where
-  /-- `boolean columnNames` -/
-  columnNames : Option Bool := none
-instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Support.fields #[("columnNames", Support.optional d.columnNames)]⟩
+  /-- `required boolean columnNames` -/
+  columnNames : Bool
+instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Support.fields #[("columnNames", toJS d.columnNames)]⟩
 
 /-- `prepare(query: string): D1PreparedStatement`: `D1PreparedStatement prepare(DOMString query)` -/
 def D1Database.prepare (self : D1Database) (query : String) : IO D1PreparedStatement := do
@@ -173,8 +173,12 @@ def D1PreparedStatement.run (self : D1PreparedStatement) : Async D1Result :=
 def D1PreparedStatement.all (self : D1PreparedStatement) : Async D1Result :=
   self.val.callMethodAwait "all" (Support.args #[]) D1Result
 
-/-- `raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>`: `Promise<sequence<sequence<any>>> raw(optional D1PreparedStatementRawOptions options)` -/
-def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1PreparedStatementRawOptions := none) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "raw" (Support.args #[Support.optional options]) (Array (Array Data))
+/-- `raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>`: `Promise<sequence<any>> raw(D1PreparedStatementRawOptions options)` -/
+def D1PreparedStatement.raw (self : D1PreparedStatement) (options : D1PreparedStatementRawOptions) : Async (Array Data) :=
+  self.val.callMethodAwait "raw" (Support.args #[toJS options]) (Array Data)
+
+/-- `raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>`: `Promise<sequence<sequence<any>>> raw(optional any options)` -/
+def D1PreparedStatement.raw1 (self : D1PreparedStatement) (options : Data := .undefined) : Async (Array (Array Data)) :=
+  self.val.callMethodAwait "raw" (Support.args #[options]) (Array (Array Data))
 
 end Lasm.JS.Cloudflare

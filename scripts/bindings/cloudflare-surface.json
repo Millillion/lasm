@@ -106,6 +106,33 @@
         "retryAll",
         "ackAll"
       ],
+      "QueueEvent": [
+        null,
+        "type",
+        "eventPhase",
+        "composed",
+        "bubbles",
+        "cancelable",
+        "defaultPrevented",
+        "currentTarget",
+        "target",
+        "timeStamp",
+        "isTrusted",
+        "stopImmediatePropagation",
+        "preventDefault",
+        "stopPropagation",
+        "composedPath",
+        "NONE",
+        "CAPTURING_PHASE",
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "waitUntil",
+        "messages",
+        "queue",
+        "metadata",
+        "retryAll",
+        "ackAll"
+      ],
       "CacheStorage": [
         "open",
         "default"
@@ -124,6 +151,33 @@
         "secureTransport",
         "close",
         "startTls"
+      ],
+      "ExecProcess": [
+        "stdin",
+        "stdout",
+        "stderr",
+        "pid",
+        "isPty",
+        "exitCode",
+        "output",
+        "kill",
+        "resize"
+      ],
+      "Container": [
+        "running",
+        "images",
+        "start",
+        "monitor",
+        "destroy",
+        "signal",
+        "getTcpPort",
+        "setInactivityTimeout",
+        "interceptOutboundHttp",
+        "interceptAllOutboundHttp",
+        "snapshotContainer",
+        "interceptOutboundHttps",
+        "exec",
+        "inspect"
       ],
       "DurableObjectNamespace": [
         "newUniqueId",
@@ -147,10 +201,21 @@
       ],
       "DurableObjectState": [
         "waitUntil",
+        "exports",
         "props",
         "id",
         "storage",
+        "container",
+        "facets",
         "blockConcurrencyWhile",
+        "acceptWebSocket",
+        "getWebSockets",
+        "setWebSocketAutoResponse",
+        "getWebSocketAutoResponse",
+        "getWebSocketAutoResponseTimestamp",
+        "setHibernatableWebSocketEventTimeout",
+        "getHibernatableWebSocketEventTimeout",
+        "getTags",
         "abort"
       ],
       "DurableObjectStorage": [
@@ -164,6 +229,9 @@
         "setAlarm",
         "deleteAlarm",
         "sync",
+        "sql",
+        "kv",
+        "transactionSync",
         "getCurrentBookmark",
         "getBookmarkForTime",
         "onNextSessionRestoreBookmark"
@@ -178,11 +246,109 @@
         "setAlarm",
         "deleteAlarm"
       ],
+      "ColoLocalActorNamespace": [
+        "get"
+      ],
+      "DurableObject": [
+        "fetch",
+        "connect",
+        "alarm",
+        "webSocketMessage",
+        "webSocketClose",
+        "webSocketError"
+      ],
+      "WebSocketRequestResponsePair": [
+        null,
+        "request",
+        "response"
+      ],
+      "DurableObjectFacets": [
+        "get",
+        "abort",
+        "delete",
+        "clone"
+      ],
+      "SqlStorage": [
+        "exec",
+        "databaseSize",
+        "Cursor",
+        "Statement"
+      ],
+      "SqlStorageStatement": [],
+      "SqlStorageCursor": [
+        "next",
+        "toArray",
+        "one",
+        "raw",
+        "columnNames",
+        "rowsRead",
+        "rowsWritten"
+      ],
+      "SyncKvStorage": [
+        "get",
+        "list",
+        "put",
+        "delete"
+      ],
+      "TailEvent": [
+        null,
+        "type",
+        "eventPhase",
+        "composed",
+        "bubbles",
+        "cancelable",
+        "defaultPrevented",
+        "currentTarget",
+        "target",
+        "timeStamp",
+        "isTrusted",
+        "stopImmediatePropagation",
+        "preventDefault",
+        "stopPropagation",
+        "composedPath",
+        "NONE",
+        "CAPTURING_PHASE",
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "waitUntil",
+        "events",
+        "traces"
+      ],
+      "TraceItemFetchEventInfoRequest": [
+        "cf",
+        "headers",
+        "method",
+        "url",
+        "getUnredacted"
+      ],
+      "UnsafeTraceMetrics": [
+        "fromTrace"
+      ],
+      "Tracing": [
+        "enterSpan",
+        "startActiveSpan",
+        "startSpan",
+        "getActiveSpan",
+        "Span"
+      ],
+      "Span": [
+        "isTraced",
+        "spanContext",
+        "setAttribute",
+        "setAttributes",
+        "recordException",
+        "updateName",
+        "setStatus",
+        "end"
+      ],
       "ExecutionContext": [
         "waitUntil",
         "passThroughOnException",
+        "exports",
         "props",
         "cache",
+        "access",
+        "tracing",
         "abort"
       ],
       "CacheContext": [
@@ -193,6 +359,730 @@
         "scheduledTime",
         "cron",
         "noRetry"
+      ],
+      "CloudflareAccessContext": [
+        "aud",
+        "getIdentity"
+      ],
+      "ScheduledEvent": [
+        null,
+        "type",
+        "eventPhase",
+        "composed",
+        "bubbles",
+        "cancelable",
+        "defaultPrevented",
+        "currentTarget",
+        "target",
+        "timeStamp",
+        "isTrusted",
+        "stopImmediatePropagation",
+        "preventDefault",
+        "stopPropagation",
+        "composedPath",
+        "NONE",
+        "CAPTURING_PHASE",
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "waitUntil",
+        "scheduledTime",
+        "cron",
+        "noRetry"
+      ],
+      "ForwardableEmailMessage": [
+        "raw",
+        "headers",
+        "rawSize",
+        "setReject",
+        "forward",
+        "reply"
+      ],
+      "SendEmail": [
+        "send"
+      ],
+      "EmailEvent": [
+        null,
+        "type",
+        "eventPhase",
+        "composed",
+        "bubbles",
+        "cancelable",
+        "defaultPrevented",
+        "currentTarget",
+        "target",
+        "timeStamp",
+        "isTrusted",
+        "stopImmediatePropagation",
+        "preventDefault",
+        "stopPropagation",
+        "composedPath",
+        "NONE",
+        "CAPTURING_PHASE",
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "waitUntil",
+        "message"
+      ],
+      "CloudflareWorkersModuleDurableObject": [
+        null,
+        "alarm",
+        "fetch",
+        "connect",
+        "webSocketMessage",
+        "webSocketClose",
+        "webSocketError"
+      ],
+      "HTMLRewriter": [
+        null,
+        "on",
+        "onDocument",
+        "transform"
+      ],
+      "HTMLRewriterElementContentHandlers": [
+        "element",
+        "comments",
+        "text"
+      ],
+      "HTMLRewriterDocumentContentHandlers": [
+        "doctype",
+        "comments",
+        "text",
+        "end"
+      ],
+      "EndTag": [
+        "name",
+        "before",
+        "after",
+        "remove"
+      ],
+      "DocumentEnd": [
+        "append"
+      ],
+      "ImageHandle": [
+        "details",
+        "bytes",
+        "signedUrl",
+        "update",
+        "delete"
+      ],
+      "HostedImagesBinding": [
+        "image",
+        "upload",
+        "list",
+        "createDirectUpload"
+      ],
+      "ImagesBinding": [
+        "info",
+        "input",
+        "text",
+        "hosted"
+      ],
+      "ImageTransformer": [
+        "transform",
+        "draw",
+        "output"
+      ],
+      "ImageTransformationResult": [
+        "response",
+        "contentType",
+        "image"
+      ],
+      "MediaBinding": [
+        "input"
+      ],
+      "MediaTransformer": [
+        "transform",
+        "output"
+      ],
+      "MediaTransformationGenerator": [
+        "output"
+      ],
+      "MediaTransformationResult": [
+        "media",
+        "response",
+        "contentType"
+      ],
+      "VectorizeIndex": [
+        "describe",
+        "query",
+        "insert",
+        "upsert",
+        "deleteByIds",
+        "getByIds"
+      ],
+      "Vectorize": [
+        "describe",
+        "query",
+        "queryById",
+        "insert",
+        "upsert",
+        "deleteByIds",
+        "getByIds"
+      ],
+      "Console": [
+        "assert",
+        "clear",
+        "count",
+        "countReset",
+        "debug",
+        "dir",
+        "dirxml",
+        "error",
+        "group",
+        "groupCollapsed",
+        "groupEnd",
+        "info",
+        "log",
+        "table",
+        "time",
+        "timeEnd",
+        "timeLog",
+        "timeStamp",
+        "trace",
+        "warn"
+      ],
+      "DigestStream": [
+        null,
+        "locked",
+        "abort",
+        "close",
+        "getWriter",
+        "digest",
+        "bytesWritten"
+      ],
+      "FixedLengthStream": [
+        null
+      ],
+      "IdentityTransformStream": [
+        null,
+        "readable",
+        "writable"
+      ],
+      "AgentMemoryProfile": [
+        "get",
+        "delete",
+        "remember",
+        "ingest",
+        "getSummary",
+        "recall",
+        "list",
+        "deleteSession"
+      ],
+      "AgentMemoryNamespace": [
+        "getProfile",
+        "deleteProfile"
+      ],
+      "AiSearchItem": [
+        "info",
+        "download",
+        "sync",
+        "logs",
+        "chunks"
+      ],
+      "AiSearchItems": [
+        "list",
+        "upload",
+        "uploadAndPoll",
+        "get",
+        "delete"
+      ],
+      "AiSearchJob": [
+        "info",
+        "logs",
+        "cancel"
+      ],
+      "AiSearchJobs": [
+        "list",
+        "create",
+        "get"
+      ],
+      "AiSearchInstance": [
+        "search",
+        "chatCompletions",
+        "update",
+        "info",
+        "stats",
+        "items",
+        "jobs"
+      ],
+      "AiSearchNamespace": [
+        "get",
+        "list",
+        "create",
+        "delete",
+        "search",
+        "chatCompletions"
+      ],
+      "BaseAiImageClassification": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiImageToText": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiImageTextToText": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiMultimodalEmbeddings": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiObjectDetection": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiSentenceSimilarity": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiAutomaticSpeechRecognition": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiSummarization": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTextClassification": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTextEmbeddings": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTextGeneration": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTextToSpeech": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTextToImage": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "BaseAiTranslation": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Baai_Bge_Base_En_V1_5": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Openai_Whisper": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Meta_M2M100_1_2B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Baai_Bge_Small_En_V1_5": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Baai_Bge_Large_En_V1_5": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Openai_Whisper_Tiny_En": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Openai_Whisper_Large_V3_Turbo": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Baai_Bge_M3": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Meta_Llama_Guard_3_8B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Baai_Bge_Reranker_Base": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Qwen_Qwq_32B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Google_Gemma_3_12B_It": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepgram_Nova_3": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Qwen_Qwen3_Embedding_0_6B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Openai_Gpt_Oss_120B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Openai_Gpt_Oss_20B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Leonardo_Phoenix_1_0": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Leonardo_Lucid_Origin": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepgram_Aura_1": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Pfnet_Plamo_Embedding_1B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepgram_Flux": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepgram_Aura_2_En": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepgram_Aura_2_Es": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Black_Forest_Labs_Flux_2_Dev": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Zai_Org_Glm_4_7_Flash": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Moonshotai_Kimi_K2_5": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Moonshotai_Kimi_K2_6": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Nvidia_Nemotron_3_120B_A12B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Google_Gemma_4_26B_A4B_It": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Google_Gemma_4_26B_A4B_IT": [],
+      "Base_Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Moonshotai_Kimi_K2_7_Code": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Zai_Org_Glm_5_2": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Moondream_Moondream3_1_9B_A2B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Flash_0731": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Deepseek_Ai_Deepseek_V4_Pro_0813": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Qwen_Qwen3_8_27B": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Zai_Org_Glm_5_3": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Base_Ai_Cf_Zai_Org_Glm_5_3_Flash": [
+        "inputs",
+        "postProcessedOutputs"
+      ],
+      "Ai": [
+        "aiGatewayLogId",
+        "gateway",
+        "websearch",
+        "run",
+        "models",
+        "toMarkdown"
+      ],
+      "AiGateway": [
+        "patchLog",
+        "getLog",
+        "run",
+        "getUrl"
+      ],
+      "ArtifactsRepo": [
+        "createToken",
+        "listTokens",
+        "revokeToken",
+        "info",
+        "readBlob",
+        "readTree",
+        "readCommit",
+        "readFile",
+        "log",
+        "fork"
+      ],
+      "Artifacts": [
+        "create",
+        "get",
+        "import",
+        "list",
+        "delete"
+      ],
+      "AutoRAG": [],
+      "Flagship": [
+        "getValue",
+        "getDetails",
+        "getBooleanValue",
+        "getStringValue",
+        "getNumberValue",
+        "getObjectValue",
+        "getBooleanDetails",
+        "getStringDetails",
+        "getNumberDetails",
+        "getObjectDetails"
+      ],
+      "HelloWorldBinding": [
+        "get",
+        "set"
+      ],
+      "NodeStyleServer": [
+        "listen",
+        "address"
+      ],
+      "PipelineTransformationEntrypoint": [
+        null,
+        "run"
+      ],
+      "Pipeline": [
+        "send"
+      ],
+      "RateLimit": [
+        "limit"
+      ],
+      "SecretsStoreSecret": [
+        "get"
+      ],
+      "StreamBinding": [
+        "video",
+        "upload",
+        "createDirectUpload",
+        "videos",
+        "watermarks"
+      ],
+      "StreamVideoHandle": [
+        "id",
+        "details",
+        "update",
+        "delete",
+        "generateToken",
+        "downloads",
+        "captions"
+      ],
+      "StreamScopedCaptions": [
+        "upload",
+        "generate",
+        "list",
+        "delete"
+      ],
+      "StreamScopedDownloads": [
+        "generate",
+        "get",
+        "delete"
+      ],
+      "StreamVideos": [
+        "list"
+      ],
+      "StreamWatermarks": [
+        "generate",
+        "list",
+        "get",
+        "delete"
+      ],
+      "ToMarkdownService": [
+        "transform",
+        "supported"
+      ],
+      "WebSearch": [
+        "search"
+      ],
+      "Hyperdrive": [
+        "connect",
+        "connectionString",
+        "host",
+        "ip",
+        "port",
+        "user",
+        "password",
+        "database"
+      ],
+      "HyperdriveDynamic": [
+        "database",
+        "user",
+        "password",
+        "connect"
+      ],
+      "HyperdriveDynamicApi": [
+        "get",
+        "getHyperdriveConnectionString"
+      ],
+      "WorkflowStep": [
+        "do",
+        "sleep",
+        "sleepUntil",
+        "waitForEvent"
+      ],
+      "WorkflowEntrypoint": [
+        null,
+        "run"
+      ],
+      "NonRetryableError": [
+        null
+      ],
+      "Workflow": [
+        "get",
+        "create",
+        "createBatch",
+        "deleteBatch"
+      ],
+      "WorkflowInstanceSubscription": [
+        "next"
+      ],
+      "WorkflowInstance": [
+        "id",
+        "pause",
+        "resume",
+        "terminate",
+        "restart",
+        "delete",
+        "status",
+        "sendEvent",
+        "subscribe"
+      ],
+      "WorkerStub": [
+        "getEntrypoint",
+        "getDurableObjectClass"
+      ],
+      "WorkerLoader": [
+        "get",
+        "load"
+      ],
+      "StubBase": [
+        "dup"
+      ],
+      "RpcTarget": [],
+      "WorkerEntrypoint": [
+        null,
+        "email",
+        "fetch",
+        "connect",
+        "queue",
+        "scheduled",
+        "tail",
+        "tailStream",
+        "test",
+        "trace"
+      ],
+      "DispatchNamespace": [
+        "get"
+      ],
+      "BrowserRun": [
+        "fetch",
+        "quickAction",
+        "acquire",
+        "launch",
+        "connectSession",
+        "getLiveView",
+        "listSessions",
+        "history",
+        "limits",
+        "getSession",
+        "closeSession",
+        "devtools"
+      ],
+      "AnalyticsEngineDataset": [
+        "writeDataPoint"
+      ],
+      "AnalyticsSQLBinding": [
+        "query"
       ]
     }
   }

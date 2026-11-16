@@ -68,6 +68,11 @@ structure SocketAddress where
   port : Float
 instance : ToJS SocketAddress := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
+instance : FromJS SocketAddress where
+  fromJS d := do return {
+    hostname := ← Lasm.JS.readField String d "hostname",
+    port := ← Lasm.JS.readField Float d "port" }
+  typeName := "Lasm.JS.Cloudflare.SocketAddress"
 
 /-- `typedef DOMString or SocketAddress DOMStringOrSocketAddress`: one constructor per member type. -/
 inductive DOMStringOrSocketAddress where
@@ -92,6 +97,12 @@ instance : ToJS DoubleOrBigint := ⟨fun
   | .bigint v => toJS v⟩
 instance : Coe Float DoubleOrBigint := ⟨.double⟩
 instance : Coe Int DoubleOrBigint := ⟨.bigint⟩
+instance : FromJS DoubleOrBigint where
+  fromJS
+    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
+    | d@(.bigint _) => (FromJS.fromJS d : Except String Int).map .bigint
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DoubleOrBigint"
 
 /-- `dictionary SocketOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketOptions where
@@ -104,6 +115,12 @@ structure SocketOptions where
 instance : ToJS SocketOptions := ⟨fun d => Support.fields #[("secureTransport", Support.optional d.secureTransport),
     ("allowHalfOpen", toJS d.allowHalfOpen),
     ("highWaterMark", Support.optional d.highWaterMark)]⟩
+instance : FromJS SocketOptions where
+  fromJS d := do return {
+    secureTransport := ← Lasm.JS.readField (Option String) d "secureTransport",
+    allowHalfOpen := ← Lasm.JS.readField Bool d "allowHalfOpen",
+    highWaterMark := ← Lasm.JS.readField (Option DoubleOrBigint) d "highWaterMark" }
+  typeName := "Lasm.JS.Cloudflare.SocketOptions"
 
 /-- `get readable(): ReadableStream`: `readonly attribute ReadableStream readable` -/
 def Socket.readable (self : Socket) : IO ReadableStream := do

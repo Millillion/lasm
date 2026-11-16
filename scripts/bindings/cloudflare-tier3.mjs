@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 // Tier 3 of the standard bindings: Lasm.JS.Cloudflare, the runtime APIs of Cloudflare
 // Workers: the bindings a Worker's `env` holds (Workers KV, D1, R2, Durable Objects,
 // Queues), the handler's ExecutionContext (waitUntil, passThroughOnException), the
@@ -33,6 +34,11 @@
 // Numbers stay WebIDL `double` (Lean Float): workers-types has no doc comments that
 // say a `number` is an integer, which is what Lasm.JS.Deno's narrowing quotes.
 
+/** The web platform's types that workers-types re-declares are Lasm.JS.Web's: the WebIDL name
+ * of each (the one table to change when Lasm.JS.Web's layout changes; today every name is
+ * Lasm.JS.Web's own). */
+export const webTypeName = name => name;
+
 /** The runtime, one Lean module tree Lasm.JS.Cloudflare. */
 export const hosts = [
   {
@@ -45,7 +51,11 @@ export const hosts = [
     rich: true,
     global: null,
     instantiate: {},
-    modules: [
+    // The Lean modules come from these areas: cloudflare-api.mjs merges areas whose types use
+    // each other's, orders them by use, and writes the result to cloudflare-modules.json, which
+    // generate-web.mjs reads as `modules`.
+    get modules() { return JSON.parse(readFileSync(new URL('./cloudflare-modules.json', import.meta.url), 'utf8')); },
+    areaModules: [
       { name: 'Kv', title: 'Workers KV (KVNamespace)' },
       { name: 'D1', title: 'D1, SQLite databases (D1Database)' },
       { name: 'R2', title: 'R2 object storage (R2Bucket)' },
@@ -54,7 +64,51 @@ export const hosts = [
       { name: 'Sockets', title: 'TCP sockets (connect of cloudflare:sockets)' },
       { name: 'DurableObjects', title: 'Durable Objects (DurableObjectNamespace, DurableObjectState)' },
       { name: 'Workers', title: 'handlers and their ExecutionContext (fetch, scheduled, queue; env of cloudflare:workers)' },
+      { name: 'Ai', title: 'Workers AI, AI Gateway, AI Search and AutoRAG, Agent memory (Ai, AiGateway, AiSearchNamespace)' },
+      { name: 'Vectorize', title: 'Vectorize, vector indexes (VectorizeIndex)' },
+      { name: 'Hyperdrive', title: 'Hyperdrive, database connection pooling (Hyperdrive)' },
+      { name: 'Images', title: 'Images and Media transformations (ImagesBinding, MediaBinding)' },
+      { name: 'Email', title: 'Email Workers and sending email (ForwardableEmailMessage, SendEmail)' },
+      { name: 'Tail', title: 'Tail Workers, trace events and tracing (TraceItem, TailStream, Tracing)' },
+      { name: 'Containers', title: 'Containers (Container)' },
+      { name: 'Workflows', title: 'Workflows (Workflow, WorkflowStep)' },
+      { name: 'Rpc', title: 'service bindings, RPC, dynamic dispatch and Worker loaders (Fetcher, WorkerStub, DispatchNamespace)' },
+      { name: 'BrowserRun', title: 'Browser Rendering (BrowserRun)' },
+      { name: 'Analytics', title: 'Workers Analytics Engine (AnalyticsEngineDataset)' },
+      { name: 'Stream', title: 'Cloudflare Stream (StreamBinding)' },
+      { name: 'HtmlRewriter', title: 'HTMLRewriter, a streaming HTML parser' },
+      { name: 'Cf', title: 'the cf properties of requests (IncomingRequestCfProperties, RequestInitCfProperties)' },
+      { name: 'Services', title: 'the other bindings: rate limiting, Secrets Store, Artifacts, Flagship, Pipelines, Markdown conversion' },
     ],
+    // Every declaration of Cloudflare's own is generated (Jordan, 2026-11-16: no hand-picked
+    // subset); cloudflare-classify.mjs tells them from the web platform's (Lasm.JS.Web's) and
+    // Node's. Each goes to the first module whose pattern its name matches (else Services).
+    // `declarations` below are only the ones that need more than the mechanical rules.
+    selectAll: true,
+    allOverloads: true,
+    areas: [
+      [/^KVNamespace/, 'Kv'], [/^D1/, 'D1'], [/^R2/, 'R2'],
+      [/^(Queue|Message|MessageBatch|MessageSend)/, 'Queues'],
+      [/^(Socket|TlsOptions|cloudflare:sockets)/, 'Sockets'],
+      [/^(DurableObject|SqlStorage|SyncKv|WebSocketRequestResponsePair|AlarmInvocationInfo|ColoLocalActor|FacetStartup|LoopbackDurable|LoopbackColo|cloudflare:durable-objects)/, 'DurableObjects'],
+      [/^(Vector|cloudflare:vectorize)/, 'Vectorize'], [/^Hyperdrive/, 'Hyperdrive'],
+      [/^(Image|HostedImages|Media|EmbeddedImage)/, 'Images'],
+      [/^(Email|ForwardableEmail|SendEmail|cloudflare:email)/, 'Email'],
+      [/^(Trace|Tail|ScriptVersion|UnsafeTrace|Tracing|Span|TailStream\.)/, 'Tail'],
+      [/^(Container|Exec)/, 'Containers'],
+      [/^(Workflow|cloudflare:workflows|CloudflareWorkersModule\.Workflow)/, 'Workflows'],
+      [/^(Rpc\.|Fetcher|Service|WorkerStub|WorkerLoader|workerd|DispatchNamespace|DynamicDispatch|Loopback|CloudflareWorkersModule\.(RpcTarget|WorkerEntrypoint|RpcStub))/, 'Rpc'],
+      [/^BrowserRun/, 'BrowserRun'], [/^Analytics/, 'Analytics'],
+      [/^(StreamBinding|StreamVideo|StreamScoped|StreamWatermark|StreamError|InternalError|BadRequestError|NotFoundError|ForbiddenError|RateLimitedError|QuotaReachedError|MaxFileSizeError|InvalidURLError|AlreadyUploadedError|TooManyWatermarksError)/, 'Stream'],
+      [/^(HTMLRewriter|Doctype|EndTag|DocumentEnd|ContentOptions|Element|Comment|Text)/, 'HtmlRewriter'],
+      [/^(RequestInitCf|IncomingRequestCf|CfProperties|BasicImageTransformations)/, 'Cf'],
+      [/^(Ai|AI|BaseAi|Base_Ai|AutoRAG|AutoRag|AgentMemory|Inference|UniversalGateway|Gateway|ChatCompletion|Response|Responses|Reasoning|RoleScoped|UsageTags|FunctionDefinition|DeveloperMessage|SystemMessage|UserMessage|AssistantMessage|ToolMessage|FunctionMessage|EasyInputMessage|PredictionContent|AudioParams|WebSearch|ChatTemplate|PromptTokens|CompletionTokens|CompletionUsage|Logprob|TopLogprob|Tool|StreamOptions|XOR|Without)/, 'Ai'],
+      [/^(ExecutionContext|ExportedHandler|ScheduledController|ScheduledEvent|QueueEvent|CacheContext|CachePurge|Cloudflare|CloudflareWorkersModule|EventContext|EventPluginContext|PagesFunction|PagesPluginFunction|TestController|ExportedHandler)/, 'Workers'],
+    ],
+    // JavaScript's and the web platform's types that Lasm.JS.Web does not declare: read as any (Data).
+    otherTypes: ['IteratorResult', 'Iterable', 'IterableIterator', 'AsyncIterable', 'AsyncIterableIterator', 'Iterator', 'Generator', 'AsyncGenerator',
+      'Float32Array', 'Float64Array', 'Int8Array', 'Int16Array', 'Int32Array', 'Uint16Array', 'Uint32Array', 'BigInt64Array', 'BigUint64Array', 'Uint8ClampedArray',
+      'WebAssembly.Module', 'Symbol', 'Function', 'RegExp', 'Map', 'Set', 'WeakMap', 'Error', 'Disposable'],
     globals: [
       { idl: 'globals_Cache', module: 'Cache', jsModule: 'globalThis', members: [{ const: 'caches', name: 'caches' }] },
       { idl: 'cloudflare_sockets', module: 'Sockets', jsModule: 'cloudflare:sockets', members: [{ function: 'cloudflare:sockets._connect', name: 'connect' }] },
@@ -62,41 +116,7 @@ export const hosts = [
     ],
     declarations: [
       // ---------- Workers KV ----------
-      { name: 'KVNamespace', as: 'interface', module: 'Kv',
-        overloads: {
-          get: {
-            'key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>': { lower: true },
-            'key: Key, type: "text"': { exclude: 'the same operation as get(key): a string' },
-            'key: Key, type: "json"': { lower: true },
-            'key: Key, type: "arrayBuffer"': { lower: true },
-            'key: Key, type: "stream"': { lower: true },
-            'key: Key, options?: KVNamespaceGetOptions<"text">': { exclude: 'get(key, type) with cacheTtl beside the type: KVNamespaceGetOptions instantiated with a literal type (a second instantiation); get(key, options) takes cacheTtl' },
-            'key: Key, options?: KVNamespaceGetOptions<"json">': { exclude: 'get(key, type) with cacheTtl (as above)' },
-            'key: Key, options?: KVNamespaceGetOptions<"arrayBuffer">': { exclude: 'get(key, type) with cacheTtl (as above)' },
-            'key: Key, options?: KVNamespaceGetOptions<"stream">': { exclude: 'get(key, type) with cacheTtl (as above)' },
-            'key: Array<Key>, type: "text"': { exclude: 'several keys at once (Array<Key>): the same parameter names as the one-key overloads, so Lasm.JS.Web\'s overload naming cannot tell them apart; one key per call' },
-            'key: Array<Key>, type: "json"': { exclude: 'several keys at once (as above)' },
-            'key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>': { exclude: 'several keys at once (as above)' },
-            'key: Array<Key>, options?: KVNamespaceGetOptions<"text">': { exclude: 'several keys at once (as above)' },
-            'key: Array<Key>, options?: KVNamespaceGetOptions<"json">': { exclude: 'several keys at once (as above)' },
-          },
-          getWithMetadata: {
-            'key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>': { lower: true },
-            'key: Key, type: "text"': { exclude: 'the same operation as getWithMetadata(key): a string' },
-            'key: Key, type: "json"': { exclude: 'KVNamespaceGetWithMetadataResult with another value type (a second instantiation): read the value with getJson and the metadata with getWithMetadata' },
-            'key: Key, type: "arrayBuffer"': { exclude: 'KVNamespaceGetWithMetadataResult with another value type (as above)' },
-            'key: Key, type: "stream"': { exclude: 'KVNamespaceGetWithMetadataResult with another value type (as above)' },
-            'key: Key, options: KVNamespaceGetOptions<"text">': { exclude: 'getWithMetadata(key, type) with cacheTtl (as get\'s)' },
-            'key: Key, options: KVNamespaceGetOptions<"json">': { exclude: 'getWithMetadata(key, type) with cacheTtl (as get\'s)' },
-            'key: Key, options: KVNamespaceGetOptions<"arrayBuffer">': { exclude: 'getWithMetadata(key, type) with cacheTtl (as get\'s)' },
-            'key: Key, options: KVNamespaceGetOptions<"stream">': { exclude: 'getWithMetadata(key, type) with cacheTtl (as get\'s)' },
-            'key: Array<Key>, type: "text"': { exclude: 'several keys at once (as get\'s)' },
-            'key: Array<Key>, type: "json"': { exclude: 'several keys at once (as get\'s)' },
-            'key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>': { exclude: 'several keys at once (as get\'s)' },
-            'key: Array<Key>, options?: KVNamespaceGetOptions<"text">': { exclude: 'several keys at once (as get\'s)' },
-            'key: Array<Key>, options?: KVNamespaceGetOptions<"json">': { exclude: 'several keys at once (as get\'s)' },
-          },
-        } },
+      { name: 'KVNamespace', as: 'interface', module: 'Kv' },
       { name: 'KVNamespaceListOptions', as: 'dictionary', module: 'Kv' },
       // `type: Type` with Type = undefined is never present: Partial<KVNamespaceGetOptions<undefined>> is { cacheTtl? }.
       { name: 'KVNamespaceGetOptions', as: 'dictionary', module: 'Kv', typeArgs: { Type: 'undefined' }, partial: true },
@@ -108,31 +128,13 @@ export const hosts = [
       // ---------- D1 ----------
       { name: 'D1Database', as: 'interface', module: 'D1' },
       { name: 'D1DatabaseSession', as: 'interface', module: 'D1' },
-      { name: 'D1PreparedStatement', as: 'interface', module: 'D1',
-        overloads: {
-          first: { 'colName: string': { lower: true }, '': { lower: true } },
-          raw: {
-            'options: { columnNames: true; }': { exclude: 'its result is a tuple type ([string[], ...T[]]: the column names, then the rows), which the lowering does not read; raw(options) without columnNames, and the names from all()' },
-            'options?: { columnNames?: false }': { lower: true },
-          },
-        } },
+      { name: 'D1PreparedStatement', as: 'interface', module: 'D1' },
       { name: 'D1Result', as: 'dictionary', module: 'D1', merge: true },
       { name: 'D1Meta', as: 'dictionary', module: 'D1' },
       { name: 'D1ExecResult', as: 'dictionary', module: 'D1' },
 
       // ---------- R2 ----------
-      { name: 'R2Bucket', as: 'interface', module: 'R2',
-        overloads: {
-          get: {
-            'key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }': { exclude: 'get(key, options) with onlyIf required: the same call (R2GetOptions has onlyIf), whose result is an R2Object without a body when the condition fails' },
-            'key: string, options?: R2GetOptions': { lower: true },
-          },
-          put: {
-            'key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }':
-              { exclude: 'put(key, value, options) with onlyIf required: the same call (R2PutOptions has onlyIf), whose result is null when the condition fails' },
-            'key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions': { lower: true },
-          },
-        } },
+      { name: 'R2Bucket', as: 'interface', module: 'R2' },
       { name: 'R2Object', as: 'interface', module: 'R2' },
       { name: 'R2ObjectBody', as: 'interface', module: 'R2' },
       { name: 'R2Checksums', as: 'interface', module: 'R2' },
@@ -186,37 +188,9 @@ export const hosts = [
       // the RPC methods of Rpc.Provider<T> are the Durable Object class's, typed from the class) and the stub's.
       { name: 'DurableObjectStub', as: 'interface', module: 'DurableObjects',
         compose: [{ from: 'Fetcher', objectPart: 0 }, { from: 'DurableObjectStub', objectPart: 0 }] },
-      { name: 'DurableObjectState', as: 'interface', module: 'DurableObjects',
-        exclude: {
-          exports: 'Cloudflare.Exports: loopback bindings of the Worker\'s own exports, typed from the program\'s main module (a mapped type)',
-          container: 'Containers (Container): outside the runtime APIs of this tier',
-          facets: 'Durable Object facets (DurableObjectFacets): child objects started from a class, outside this tier',
-          acceptWebSocket: 'WebSocket hibernation: WebSocket is Lasm.JS.Web\'s browser tier, which the server tiers do not use',
-          getWebSockets: 'WebSocket hibernation (as acceptWebSocket)',
-          setWebSocketAutoResponse: 'WebSocket hibernation (as acceptWebSocket)',
-          getWebSocketAutoResponse: 'WebSocket hibernation (as acceptWebSocket)',
-          getWebSocketAutoResponseTimestamp: 'WebSocket hibernation (as acceptWebSocket)',
-          setHibernatableWebSocketEventTimeout: 'WebSocket hibernation (as acceptWebSocket)',
-          getHibernatableWebSocketEventTimeout: 'WebSocket hibernation (as acceptWebSocket)',
-          getTags: 'WebSocket hibernation (as acceptWebSocket)',
-        } },
-      { name: 'DurableObjectStorage', as: 'interface', module: 'DurableObjects',
-        overloads: {
-          get: { 'key: string, options?: DurableObjectGetOptions': { lower: true }, 'keys: string[], options?: DurableObjectGetOptions': { lower: true } },
-          put: { 'key: string, value: T, options?: DurableObjectPutOptions': { lower: true }, 'entries: Record<string, T>, options?: DurableObjectPutOptions': { lower: true } },
-          delete: { 'key: string, options?: DurableObjectPutOptions': { lower: true }, 'keys: string[], options?: DurableObjectPutOptions': { lower: true } },
-        },
-        exclude: {
-          sql: 'SqlStorage, the synchronous SQLite API of SQLite-backed objects: its cursor is an iterator of rows (SqlStorageCursor), which this tier does not lower yet',
-          kv: 'SyncKvStorage, the synchronous key-value API of SQLite-backed objects: outside this tier (the asynchronous get, put, delete and list are lowered)',
-          transactionSync: 'a synchronous closure for the synchronous APIs (sql, kv), which are not lowered',
-        } },
-      { name: 'DurableObjectTransaction', as: 'interface', module: 'DurableObjects',
-        overloads: {
-          get: { 'key: string, options?: DurableObjectGetOptions': { lower: true }, 'keys: string[], options?: DurableObjectGetOptions': { lower: true } },
-          put: { 'key: string, value: T, options?: DurableObjectPutOptions': { lower: true }, 'entries: Record<string, T>, options?: DurableObjectPutOptions': { lower: true } },
-          delete: { 'key: string, options?: DurableObjectPutOptions': { lower: true }, 'keys: string[], options?: DurableObjectPutOptions': { lower: true } },
-        } },
+      { name: 'DurableObjectState', as: 'interface', module: 'DurableObjects' },
+      { name: 'DurableObjectStorage', as: 'interface', module: 'DurableObjects' },
+      { name: 'DurableObjectTransaction', as: 'interface', module: 'DurableObjects' },
       { name: 'DurableObjectNamespaceNewUniqueIdOptions', as: 'dictionary', module: 'DurableObjects' },
       { name: 'DurableObjectNamespaceGetDurableObjectOptions', as: 'dictionary', module: 'DurableObjects' },
       { name: 'DurableObjectAbortOptions', as: 'dictionary', module: 'DurableObjects' },
@@ -227,12 +201,7 @@ export const hosts = [
       { name: 'DurableObjectSetAlarmOptions', as: 'dictionary', module: 'DurableObjects' },
 
       // ---------- Handlers ----------
-      { name: 'ExecutionContext', as: 'interface', module: 'Workers',
-        exclude: {
-          exports: 'Cloudflare.Exports: loopback bindings of the Worker\'s own exports, typed from the program\'s main module (a mapped type)',
-          access: 'Cloudflare Access identity (CloudflareAccessContext, the claims of an Access JWT): outside this tier',
-          tracing: 'custom tracing spans (Tracing): outside this tier',
-        } },
+      { name: 'ExecutionContext', as: 'interface', module: 'Workers' },
       { name: 'CacheContext', as: 'interface', module: 'Workers' },
       { name: 'CachePurgeOptions', as: 'dictionary', module: 'Workers' },
       { name: 'CachePurgeResult', as: 'dictionary', module: 'Workers' },
@@ -241,15 +210,7 @@ export const hosts = [
       { name: 'ExportedHandlerFetchHandler', as: 'callback', module: 'Workers' },
       { name: 'ExportedHandlerScheduledHandler', as: 'callback', module: 'Workers' },
       { name: 'ExportedHandlerQueueHandler', as: 'callback', module: 'Workers' },
-      { name: 'ExportedHandler', as: 'dictionary', module: 'Workers',
-        exclude: {
-          connect: 'TCP connections to the Worker (a Socket handler): an inbound-socket entry point outside this tier',
-          tail: 'Tail Workers (TraceItem events of other Workers): outside this tier',
-          trace: 'trace events (TraceItem): outside this tier',
-          tailStream: 'streaming Tail Workers (TailStream): outside this tier',
-          test: 'the test handler of the Workers test harness: outside this tier',
-          email: 'Email Workers (ForwardableEmailMessage): outside this tier',
-        } },
+      { name: 'ExportedHandler', as: 'dictionary', module: 'Workers' },
     ],
     intersections: {},
     integers: {},
@@ -260,6 +221,7 @@ export const hosts = [
       // A JavaScript Date: Data (a reference; Lasm.JS.Web has no Date). Time in milliseconds is a number elsewhere.
       Date: 'any',
       unknown: 'any',
+      'Cloudflare.Exports': 'any', 'Cloudflare.GlobalProps': 'any',
     },
     // Workers' `Env` (the bindings object) is declared by the program: `structure Env where
     // KV : KVNamespace … deriving FromJS` (Jordan, 2026-11-16; API_DECISIONS A26). The
@@ -267,6 +229,9 @@ export const hosts = [
     // Lean type parameter with FromJS; `Data` still works as one.
     typeParameters: { Env: 'Env', 'Cloudflare.Env': 'Env' },
     notSelected: {
+      'Cloudflare.Env': 'the bindings object, declared by the program (typeParameters: a Lean type parameter with FromJS)',
+      'Cloudflare.GlobalProps': 'the program\'s own main module and Env, as TypeScript programs declare them (type-level only)',
+      'Cloudflare.Exports': 'loopback bindings of the program\'s own exports, typed from its main module (a mapped type): Data',
       Fetcher: 'its object part is DurableObjectStub\'s (fetch and connect); Rpc.Provider<T> is the class\'s RPC methods',
       R2Error: 'an Error with R2\'s code and action: errors are read as Data, as Lasm.JS.Web reads them',
       D1Response: 'merged into D1Result (D1Response & { results })',

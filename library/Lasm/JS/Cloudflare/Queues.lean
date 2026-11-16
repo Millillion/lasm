@@ -8,6 +8,7 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
+import Lasm.JS.Web.Dom
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
@@ -35,6 +36,14 @@ structure MessageBatch where
 instance : Nonempty MessageBatch := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS MessageBatch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MessageBatch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.MessageBatch", .data⟩
+
+/-- `interface QueueEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure QueueEvent where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QueueEvent := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QueueEvent := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QueueEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.QueueEvent", .data⟩
 
 /-- `enum QueueContentType` (@cloudflare/workers-types 5.20261019.1 type declarations): "text", "bytes", "json", "v8". -/
 inductive QueueContentType where
@@ -246,6 +255,90 @@ def MessageBatch.retryAll (self : MessageBatch) (options : Option QueueRetryOpti
 
 /-- `ackAll(): void`: `undefined ackAll()` -/
 def MessageBatch.ackAll (self : MessageBatch) : IO Unit :=
+  self.val.callMethod "ackAll" (Support.args #[]) Unit
+
+/-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
+def QueueEvent.new (type : String) (init : Option EventInit := none) : IO QueueEvent :=
+  Lasm.JS.Binding.invoke QueueEvent { name := "Lasm.JS.Cloudflare.QueueEvent.new", module := "globalThis", path := "Cloudflare_QueueEvent", construct := true, arity := 2 }
+    (Support.args #[toJS type, Support.optional init]) (await := false)
+
+/-- `get type(): string`: `readonly attribute DOMString type` -/
+def QueueEvent.type (self : QueueEvent) : IO String := self.val.get "type" String
+
+/-- `get eventPhase(): number`: `readonly attribute double eventPhase` -/
+def QueueEvent.eventPhase (self : QueueEvent) : IO Float := self.val.get "eventPhase" Float
+
+/-- `get composed(): boolean`: `readonly attribute boolean composed` -/
+def QueueEvent.composed (self : QueueEvent) : IO Bool := self.val.get "composed" Bool
+
+/-- `get bubbles(): boolean`: `readonly attribute boolean bubbles` -/
+def QueueEvent.bubbles (self : QueueEvent) : IO Bool := self.val.get "bubbles" Bool
+
+/-- `get cancelable(): boolean`: `readonly attribute boolean cancelable` -/
+def QueueEvent.cancelable (self : QueueEvent) : IO Bool := self.val.get "cancelable" Bool
+
+/-- `get defaultPrevented(): boolean`: `readonly attribute boolean defaultPrevented` -/
+def QueueEvent.defaultPrevented (self : QueueEvent) : IO Bool := self.val.get "defaultPrevented" Bool
+
+/-- `get currentTarget(): EventTarget | undefined`: `readonly attribute EventTarget? currentTarget` -/
+def QueueEvent.currentTarget (self : QueueEvent) : IO (Option EventTarget) := self.val.get "currentTarget" (Option EventTarget)
+
+/-- `get target(): EventTarget | undefined`: `readonly attribute EventTarget? target` -/
+def QueueEvent.target (self : QueueEvent) : IO (Option EventTarget) := self.val.get "target" (Option EventTarget)
+
+/-- `get timeStamp(): number`: `readonly attribute double timeStamp` -/
+def QueueEvent.timeStamp (self : QueueEvent) : IO Float := self.val.get "timeStamp" Float
+
+/-- `get isTrusted(): boolean`: `readonly attribute boolean isTrusted` -/
+def QueueEvent.isTrusted (self : QueueEvent) : IO Bool := self.val.get "isTrusted" Bool
+
+/-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
+def QueueEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "NONE"] Float
+
+/-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
+def QueueEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "CAPTURING_PHASE"] Float
+
+/-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
+def QueueEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "AT_TARGET"] Float
+
+/-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
+def QueueEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_QueueEvent", "BUBBLING_PHASE"] Float
+
+/-- `readonly messages: readonly Message<Body>[]`: `readonly attribute sequence<Message> messages` -/
+def QueueEvent.messages (self : QueueEvent) : IO (Array Message) := self.val.get "messages" (Array Message)
+
+/-- `readonly queue: string`: `readonly attribute DOMString queue` -/
+def QueueEvent.queue (self : QueueEvent) : IO String := self.val.get "queue" String
+
+/-- `readonly metadata: MessageBatchMetadata`: `readonly attribute MessageBatchMetadata metadata` -/
+def QueueEvent.metadata (self : QueueEvent) : IO MessageBatchMetadata := self.val.get "metadata" MessageBatchMetadata
+
+/-- `stopImmediatePropagation(): void`: `undefined stopImmediatePropagation()` -/
+def QueueEvent.stopImmediatePropagation (self : QueueEvent) : IO Unit :=
+  self.val.callMethod "stopImmediatePropagation" (Support.args #[]) Unit
+
+/-- `preventDefault(): void`: `undefined preventDefault()` -/
+def QueueEvent.preventDefault (self : QueueEvent) : IO Unit :=
+  self.val.callMethod "preventDefault" (Support.args #[]) Unit
+
+/-- `stopPropagation(): void`: `undefined stopPropagation()` -/
+def QueueEvent.stopPropagation (self : QueueEvent) : IO Unit :=
+  self.val.callMethod "stopPropagation" (Support.args #[]) Unit
+
+/-- `composedPath(): EventTarget[]`: `sequence<EventTarget> composedPath()` -/
+def QueueEvent.composedPath (self : QueueEvent) : IO (Array EventTarget) :=
+  self.val.callMethod "composedPath" (Support.args #[]) (Array EventTarget)
+
+/-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
+def QueueEvent.waitUntil (self : QueueEvent) (promise : Value) : IO Unit :=
+  self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
+
+/-- `retryAll(options?: QueueRetryOptions): void`: `undefined retryAll(optional QueueRetryOptions options)` -/
+def QueueEvent.retryAll (self : QueueEvent) (options : Option QueueRetryOptions := none) : IO Unit :=
+  self.val.callMethod "retryAll" (Support.args #[Support.optional options]) Unit
+
+/-- `ackAll(): void`: `undefined ackAll()` -/
+def QueueEvent.ackAll (self : QueueEvent) : IO Unit :=
   self.val.callMethod "ackAll" (Support.args #[]) Unit
 
 end Lasm.JS.Cloudflare

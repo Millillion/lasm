@@ -789,7 +789,17 @@ function overloadNames(group) {
   });
   // Two overloads that would get one name: each adds all its argument names (FileHandle's
   // read(options) and read(buffer, options): readWithOptions, readWithBufferOptions).
-  return names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  const second = names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  // Overloads with the same argument names (KVNamespace's get(key, type) and get(keys, type)):
+  // each later one adds the types of its arguments that differ from the first overload's
+  // (`getWithKeyTypeOfSequenceOfDOMString`), then, if still the same, its position.
+  const typeKey = t => idlText(t).replace(/^Cloudflare_/, '').replace(/[<>,?]/g, ' ').trim().split(/\s+/).map(w => capital(w.replace(/^Cloudflare_/, ''))).join('Of');
+  const third = second.map((n, i) => {
+    if (i === 0 || second.indexOf(n) === i) return n;
+    const diff = group[i].arguments.filter((a, j) => idlText(a.idlType) !== idlText(first[j]?.idlType ?? ''));
+    return diff.length ? `${n}Of${diff.map(a => typeKey(a.idlType)).join('And')}` : n;
+  });
+  return third.map((n, i) => third.indexOf(n) !== i ? `${n}${i + 1}` : n);
 }
 const constructorName = 'new';
 

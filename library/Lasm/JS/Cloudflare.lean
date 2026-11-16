@@ -17,5 +17,17 @@ import Lasm.JS.Cloudflare.R2
 import Lasm.JS.Cloudflare.Queues
 import Lasm.JS.Cloudflare.Cache
 import Lasm.JS.Cloudflare.Sockets
+import Lasm.JS.Cloudflare.Containers
 import Lasm.JS.Cloudflare.DurableObjects
+import Lasm.JS.Cloudflare.Tail
 import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.HtmlRewriter
+import Lasm.JS.Cloudflare.Images
+import Lasm.JS.Cloudflare.Vectorize
+import Lasm.JS.Cloudflare.Ai
+import Lasm.JS.Cloudflare.Hyperdrive
+import Lasm.JS.Cloudflare.Workflows
+import Lasm.JS.Cloudflare.Rpc
+import Lasm.JS.Cloudflare.BrowserRun
+import Lasm.JS.Cloudflare.Analytics
+import Lasm.JS.Cloudflare.Cf
