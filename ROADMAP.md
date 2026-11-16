@@ -390,7 +390,7 @@ in the release notes ([docs/release/](docs/release/)). In short:
   coverage on Node, JS/npm interop, the Node launch (0.1.0), the edge isolates
   and Bun/Deno (0.2.0), WASI, wasi-http/Spin, Fastly and browsers (0.3.0).
   Complete; Lean as a runtime library stays parked ([After 1.0](#after-10)).
-- **Releases** 0.3.6 to 0.8.0 (published 2026-11-14).
+- **Releases** 0.3.6 to 0.9.0 (0.9.0, Stage 0's first API release: `Node.serve`, direct function handlers, `Lasm.JS.Cloudflare`, the binding rules, the templates per serving model and the CLI changes; [0.9.0-notes.md](docs/release/0.9.0-notes.md)).
 - **Five flagship apps:** Conduit, Ledger, Folio, Porter and Tandem, each on
   every platform it claims with its outside oracle, proofs and fuzzing.
 - **Testing:** the strategy (2026-11-09), differential testing against
