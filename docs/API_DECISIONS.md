@@ -197,3 +197,39 @@ one consistent, minimal CLI that does what each platform expects.
   (verification/cli/Lasm/Cli/Model/) and the model differential, and the
   error corpus prints each.
 - **Where:** as 0.7-1. **Status:** pending sign-off.
+
+### 0.7-5 Each `lasm init --deploy` name is the target it builds (`lasm init`)
+
+- **Decision:** `--deploy <name>` adds the platform's files and
+  `npm run build:<name>`, which runs `lasm build --target <name>`. So
+  `--deploy lambda` is now the Lambda `.zip` (it was `lambda-zip`), and the
+  container image, which is not a `lasm build` target, is
+  `--deploy lambda-container` (it was `lambda`). `spin` stays: it names the
+  platform and builds `--target wasi-http` (`spin.toml`, `npm run build:wasi-http`).
+  `lambda-zip` is refused with `did you mean --deploy lambda?`.
+
+  ```sh
+  npm create @lasm@latest my-fn -- --template hono --deploy lambda             # npm run build:lambda → lambda.zip
+  npm create @lasm@latest my-fn -- --template hono --deploy lambda-container   # Dockerfile.lambda
+  ```
+- **Why:** `--deploy lambda` and `--target lambda` meant different things (a
+  container image and a zip). Alternatives: keep `lambda-zip` (two names for
+  the one target). Note for milestone 0.2: the container image runs the server
+  behind the AWS Lambda Web Adapter, a loopback adapter; whether it stays is
+  0.2's serving question, not a naming one.
+- **Where:** PR "lasm init --deploy names match the build targets" (milestone
+  0.7); release: next. **Status:** pending sign-off.
+
+### 0.7-6 Environment variables (CLI)
+
+- **Decision (kept, documented):** the supported variables are the ones in
+  the README's CLI reference, all `LASM_` prefixed: `LASM_TOOLCHAIN_CACHE`,
+  `LASM_BUILD_JOBS`, `LASM_EDITOR`, `LASM_ARTIFACT_SOURCE`,
+  `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`,
+  `LASM_DOWNLOAD_TOTAL_MS`, and for built programs on Node `LASM_THREAD_POOL`
+  and `LASM_VM_STACK_MB` (now in the table; it was documented only under
+  Known limitations). Durations end in `_MS`, booleans are `0`/`1`. Programs
+  read `PORT` and `HOST`, the platforms' own names. Every other `LASM_*` read in
+  the source is a maintainer diagnostic or test switch, not an interface.
+- **Why:** one prefix and the platforms' own variable names; nothing to
+  rename. **Where:** as 0.7-5. **Status:** pending sign-off.
