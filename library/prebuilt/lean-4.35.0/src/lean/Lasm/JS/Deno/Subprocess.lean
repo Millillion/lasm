@@ -262,38 +262,6 @@ def Command.spawn (self : Command) : IO ChildProcess := do
   let r ← self.val.callMethod "spawn" (Support.args #[]) Value
   pure { val := r }
 
-/-- `Deno.spawn(command: string | URL, options?: CommandOptions): ChildProcess`: `ChildProcess spawn(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawn (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO ChildProcess := do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.spawn", module := "globalThis", path := "Deno.spawn", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
-  pure { val := r }
-
-/-- `Deno.spawn(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): ChildProcess`: `ChildProcess spawn(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO ChildProcess := do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.spawnWithArgs", module := "globalThis", path := "Deno.spawn", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options]) (await := false)
-  pure { val := r }
-
-/-- `Deno.spawnAndWait(command: string | URL, options?: CommandOptions): Promise<CommandOutput>`: `Promise<CommandOutput> spawnAndWait(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWait (command : DOMStringOrURL) (options : Option CommandOptions := none) : Async CommandOutput :=
-  Lasm.JS.Binding.invokeAsync CommandOutput { name := "Lasm.JS.Deno.spawnAndWait", module := "globalThis", path := "Deno.spawnAndWait", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options])
-
-/-- `Deno.spawnAndWait(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): Promise<CommandOutput>`: `Promise<CommandOutput> spawnAndWait(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : Async CommandOutput :=
-  Lasm.JS.Binding.invokeAsync CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitWithArgs", module := "globalThis", path := "Deno.spawnAndWait", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options])
-
-/-- `Deno.spawnAndWaitSync(command: string | URL, options?: CommandOptions): CommandOutput`: `CommandOutput spawnAndWaitSync(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitSync (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO CommandOutput :=
-  Lasm.JS.Binding.invoke CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitSync", module := "globalThis", path := "Deno.spawnAndWaitSync", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
-
-/-- `Deno.spawnAndWaitSync(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): CommandOutput`: `CommandOutput spawnAndWaitSync(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitSyncWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO CommandOutput :=
-  Lasm.JS.Binding.invoke CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitSyncWithArgs", module := "globalThis", path := "Deno.spawnAndWaitSync", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options]) (await := false)
-
 /-- `Deno.kill(pid: number, signo?: Signal | number): void`: `undefined kill(double /* integer: Int */ pid, optional SignalOrDouble signo)` (Deno 2.9.6 type declarations) -/
 def kill (pid : Int) (signo : Option SignalOrDouble := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.kill", module := "globalThis", path := "Deno.kill", construct := false, arity := 2 }

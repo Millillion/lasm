@@ -168,9 +168,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**19 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**20 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (19)
+### Lasm.Cli (20)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -193,4 +193,5 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L222) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
 | [`glue_fields_round_trip`](Lasm/Cli/Candidates.lean#L236) | **The glue's fields round-trip.** Any list of fields, encoded as the glue program reads its request, is read back exactly as the same list, whatever the fields hold (digits, `:`, line ends, non-ASCII, nothing). | [test/glue.test.mjs](../../test/glue.test.mjs) |
 | [`glue_request_fields`](Lasm/Cli/Candidates.lean#L243) | **A glue request carries its fields.** Lists of fields, encoded as a request, carry exactly their fields in order, whichever format the encoding chose (a table of distinct fields, or lengths when a field holds a 0 byte). | [test/glue.test.mjs](../../test/glue.test.mjs) |
+| [`origin_form_url`](Lasm/Cli/Candidates.lean#L254) | **An origin-form target is the URL's path and query; only a plain Host is its authority.** For a target that starts with `/` (printable ASCII without `#`, space or backslash), `requestUrl` answers a URL that ends with the target, whose host is the Host field's when that is plain and parses as an authority, and the fallback's otherwise. | [test/node-serve.test.mjs](../../test/node-serve.test.mjs) |
 <!-- END CANDIDATES -->

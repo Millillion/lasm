@@ -25,8 +25,8 @@ export const templateDependencies = npm;
 // platform files for them (issue #168).
 const functionTemplates = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
 export const deployTargets = {
-  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: functionTemplates },
-  'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
+  lambda: { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
+  'lambda-container': { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: functionTemplates },
   'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
   vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify', templates: functionTemplates },
@@ -79,7 +79,7 @@ The directory must be new or empty. The default template is plain.
 --deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
-${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.summary}`).join('\n')}
+${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(16)} ${t.summary}`).join('\n')}
 
 Templates:
 ${Object.entries(templates).map(([name, t]) => `  ${name.padEnd(9)} ${t.summary}`).join('\n')}
@@ -452,7 +452,7 @@ import_map = "./functions/${name}/deno.json"
 `;
 
 function deployGitignore(deploy, template, name) {
-  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
+  const extra = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
     'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
     fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
@@ -557,7 +557,7 @@ The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 ${deploy.some(target => deployTargets[target].package) ? `Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
 with your platform's own CLI (\`vercel\`, \`netlify\`, \`func\`, \`gcloud\`, \`aws\` or \`sam\`), installed as its docs say.
 
-` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
+` : ''}${deploy.filter(target => target !== 'lambda-container').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda-container') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
 AWS Lambda Web Adapter): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
@@ -579,7 +579,7 @@ function entryRows(template, deploy) {
 
 const guide = page => `https://github.com/Millillion/lasm/blob/main/docs/deploy/${page}.md`;
 const deployReadme = {
-  'lambda-zip': () => `**AWS Lambda (.zip):** \`npm run build:lambda\` writes \`lambda.zip\` for the
+  lambda: () => `**AWS Lambda (.zip):** \`npm run build:lambda\` writes \`lambda.zip\` for the
 \`nodejs24.x\` runtime with handler \`lasm-lambda.handler\` (x86_64 or arm64, 512 MB or more); see the
 [Lambda guide](${guide('lambda')}).
 `,
@@ -695,7 +695,7 @@ export function initProject({ directory, template, deploy = [] }) {
     '.dockerignore': dockerignore,
     '.gitignore': deployGitignore(deploy, template, name),
   };
-  if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
+  if (deploy.includes('lambda-container')) files['Dockerfile.lambda'] = lambdaDockerfile();
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);

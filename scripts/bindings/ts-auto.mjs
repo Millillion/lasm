@@ -130,7 +130,7 @@ function classMembers(src, from, to) {
 /** Lowers a host's namespace. Returns { idl, excluded, modules }. */
 export function lowerAuto(host, files) {
   const G = host.global;
-  const all = files.flatMap(({ file, text }) => declarations(text, file).map(d => ({ ...d, file })));
+  const all = files.flatMap(({ file, text }) => declarations(text, file, { auto: true }).map(d => ({ ...d, file })));
   const excluded = [];     // [what, reason]
   const exclude = (what, reason) => { if (!excluded.some(([w]) => w === what)) excluded.push([what, reason]); };
   const used = new Set();  // keys of host.exclude, names, as, intersections, unstable used

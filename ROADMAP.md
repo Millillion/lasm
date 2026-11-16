@@ -109,7 +109,7 @@ the final APIs; no hand-written binding remains where a generated one exists.
   WebSockets, Bun's routes). **Deno is under deliberation, leaning yes**
   (Jordan, 2026-11-16: people use it now, and nobody knows what Cloudflare's
   acquisition will mean); A1–A3, A17, A18, A24, A25.
-- [ ] **0.5 Cloudflare, and the apps off hand-written bindings.**
+- [~] **0.5 Cloudflare, and the apps off hand-written bindings.**
   `Lasm.JS.Cloudflare` from Cloudflare's workers-types (KV, D1, R2, Durable
   Objects, env bindings; held PR #216); Porter and Ledger move off their
   hand-written D1 bindings, and Tandem's WebSocket client moves from

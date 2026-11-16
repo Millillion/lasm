@@ -384,7 +384,7 @@ draft of 31 July 2026), the web APIs that every JavaScript target Lasm supports
 has: Node 24 and 26, Bun, Deno, Cloudflare Workers, the Vercel, Netlify and
 Supabase edge functions, and browsers. Status: **current source, not yet
 released** (tier 1 of the standard bindings; later tiers are `Lasm.JS.Node`,
-`Lasm.JS.Deno`, `Lasm.JS.Bun` and `Lasm.JS.Cloudflare`, one surface per platform).
+`Lasm.JS.Deno`, `Lasm.JS.Bun` and [`Lasm.JS.Cloudflare`](#cloudflare-workers-lasmjscloudflare), one surface per platform).
 
 ```lean
 import Lasm.JS.Web
@@ -913,10 +913,11 @@ A server on a JavaScript runtime is one Lean function from a web `Request` to a
 
 | Runtime | Server | Lean |
 | --- | --- | --- |
-| Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault` |
+| Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault handle` |
+| Function platforms on Node (Netlify, Vercel, AWS Lambda and Lambda@Edge, Azure Functions, Google Cloud Functions) | the platform's handler export | `Lasm.JS.exportDefault handle` ([below](#function-platforms-exportdefault)) |
 | Deno | `Deno.serve` | `import Lasm.JS.Deno` (generated, below) |
 | Bun | `Bun.serve` | `import Lasm.JS.Bun` (generated, below) |
-| Node | none of its own takes a `Request`: an npm adapter, such as `@hono/node-server`'s `serve({fetch})` | an `@[js]` binding to the package ([Node](#node-an-npm-adapter)) |
+| Node | none of its own takes a `Request`: Lasm provides `Node.serve`, shaped like `Bun.serve` | `import Lasm.JS.Node.Serve` ([Node](#serving-http-on-node-nodeserve)) |
 
 Outbound HTTP is Lasm.JS.Web's `fetch` everywhere. Status: **current source, not
 yet released** (tier 2 of the standard bindings, second part).
@@ -1026,42 +1027,114 @@ The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
 every doc comment quotes the member's TypeScript declaration before its WebIDL.
 
-### Node: an npm adapter
+### Serving HTTP on Node: `Node.serve`
 
-Node has no server that takes a web `Request`, and Lasm adds no API for one:
-install an adapter and bind it with `@[js]`. `@hono/node-server` (MIT) is one:
-its `serve({fetch, port, hostname}, listening)` calls `fetch` with a `Request`
-and sends the `Response` it resolves to.
-
-```sh
-npm install @hono/node-server hono    # hono is its peer dependency
-```
+Node has no server that takes a web `Request`, so Lasm provides one:
+`Node.serve` in `Lasm.JS.Node.Serve`. It is **provided by Lasm**: hand-written,
+not generated, and not a Node API. Its shape is `Bun.serve`'s: one options
+record with `fetch` inside, and Bun's option names where Bun has the option.
+Underneath it is Node's `node:http`; Lasm's builtin module `lasm:node-serve`
+([`src/lasm-modules/node-serve.mjs`](../src/lasm-modules/node-serve.mjs))
+translates requests and responses. There is no npm dependency.
 
 ```lean
-import Lasm.JS                -- the @[js] attribute
-import Lasm.JS.Web
+import Lasm.JS.Node.Serve
 open Lasm.JS Lasm.JS.Web
 
-/-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
+def handle (request : Request) : Async Response := do
+  Response.new (some (.usvString s!"{← request.method} {← request.url}")) none
 
-def main : IO Unit := do
-  let fetch ← Function.ofFn1 handle                     -- Request → Async Response, as above
-  let listening ← Function.ofFn fun _ => do IO.println "listening on 3000"; return .undefined
-  let _server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS 3000)]) listening
-  waitForever
+def main : IO Unit :=
+  Node.serve { fetch := handle, port := some 3000, hostname := some "127.0.0.1" }
 ```
 
-The same `handle` then runs on Node, Deno (`Deno.serve`), Bun (`Bun.serve`) and
-Workers (`exportDefault`). A program built for several targets lists the adapter
-in `package.json`'s `"lasm": {"edge": {"exclude": ["@hono/node-server"]}}`, so
-that the Deno, Bun and edge builds leave it out (as the `hono` template does).
+`Node.serve` returns only after the server stops. The Lean runtime ends when
+`main` returns, so this call is what keeps the program running. The server
+stops on `Server.stop`, when `signal` is aborted, or on SIGTERM or SIGINT. A
+stop lets requests in progress finish; a second signal closes them. The
+`Server` handle goes to `onListen`:
+
+| Shape | Meaning |
+| --- | --- |
+| `Node.serve : ServeOptions → IO Unit` | serves until the server stops |
+| `fetch : Request → Async Response` | the handler (required; a Lean function, no `ofFn` step) |
+| `port : Option Nat` | default `$PORT`, else 3000 (as Bun); `some 0` lets the system choose |
+| `hostname : Option String` | default `0.0.0.0` (as Bun) |
+| `signal : Option AbortSignal` | aborting it stops the server (Deno.serve's `signal`) |
+| `onListen : Option (Server → IO Unit)` | called once listening (Deno.serve's `onListen`); by default `Listening on <url>` is printed |
+| `error : Option (IO.Error → Async Response)` | the response when `fetch` throws (Bun's `error`); by default a 500, with the error printed on stderr |
+| `Server.hostname : String`, `Server.port : Nat`, `Server.url : String` | the listening address (Bun's `hostname`, `port`, `url`) |
+| `Server.stop (closeActiveConnections := false) : Async Unit` | stops accepting connections and resolves once the server has closed (Bun's `stop`) |
+| `Server.finished : Async Unit` | resolves once the server has closed (Deno's `finished`) |
+
+What it guarantees (tested in
+[`test/node-serve.test.mjs`](../test/node-serve.test.mjs) and
+[`test/fixtures/js-serve`](../test/fixtures/js-serve)):
+
+- The URL comes from the Host header only when that header is a plain
+  `host[:port]`. A forged Host such as `x/admin#` gets the listening address
+  instead, so it cannot move the path or the query. This is the same rule the
+  function-platform shims use.
+- Several Cookie lines become one Cookie field, joined with `; `, as a browser
+  sends them. Hop-by-hop fields are not passed on.
+- Request and response bodies stream both ways, with backpressure. When a
+  client goes away, `request.signal` is aborted and the response body is
+  cancelled.
+- Each Set-Cookie is sent on its own header line.
+- HEAD responses and the null-body statuses (101, 204, 205, 304) send no body.
+- An empty body is sent as `content-length: 0`, and no content type is added.
+  (`@hono/node-server` adds `text/plain` for an empty byte body.)
+- When the handler throws, `error`'s response is sent, else a 500.
+
+A program built for several targets can import `Lasm.JS.Node.Serve`
+everywhere. The module loads on Bun, Deno and the edge platforms, and fails
+only when `Node.serve` is called there.
+
+An npm adapter such as `@hono/node-server` still works through an `@[js]`
+binding (`test/fixtures/js-serve` keeps such a section). A Hono app is served
+with Hono's own adapter in the same way.
+
+### Function platforms: `exportDefault`
+
+On Netlify (Functions v2), Vercel (Node functions), AWS Lambda and Lambda@Edge,
+Azure Functions and Google Cloud Functions, a program publishes its handler
+with `Lasm.JS.exportDefault`, as it does on Workers. The file that `lasm package`
+(or `lasm build --target …`) generates calls the handler directly. There is no
+HTTP server, no port and no loopback.
+
+```lean
+def main : IO Unit := exportDefault handle   -- handle : Request → Async Response
+```
+
+`exportDefault` takes a Lean function `α → Async β` (a fetch handler) and makes
+it a JavaScript function with `Function.ofFn1`. It also takes any JavaScript
+`Value`, such as a Hono app or an object with a `fetch` method. Behavior by
+target:
+
+- On an edge build, it records the handler and returns.
+- Under a function platform's entry
+  ([`src/serverless/lasm-function.mjs`](../src/serverless/lasm-function.mjs)),
+  it hands the handler over and does not return. The Lean runtime ends when
+  `main` returns, so `main` stays and serves the calls.
+- Elsewhere on Node, it records the value and returns.
+
+The generated platform files:
+
+| Target | Export | Calls |
+| --- | --- | --- |
+| `netlify` | `export default async (request, context) => …` | `handler(request, context)`; Cookie lines that Netlify joined with commas are rejoined with `; `; an empty body becomes no body (#82) |
+| `vercel`, `gcf` | `(req, res)` | the Node request as a web `Request` (`lasm:node-serve`), and the `Response` streamed back |
+| `lambda`, `lambda-edge` | `handler(event)` | each event shape mapped to a `Request` and back, with the existing Host, cookie, base64 and `__proto__` rules |
+| `azure` | `app.http('lasm', …)` | the `Request`, and the `Response` as `HttpResponseInit` (Set-Cookie through `cookies`, #80) |
+
+A program that brings its own HTTP server (Express, or `Node.serve`) cannot
+run on these platforms. There, a program has to publish a handler.
 
 ### Where it runs, tests and cost
 
 [`test/fixtures/js-serve`](../test/fixtures/js-serve) is one program run on Node,
 Bun and Deno: each serves `App.handle` with its own server (Deno.serve with
-options, the defaults and TLS; Bun.serve; @hono/node-server on Node) on
+options, the defaults and TLS; Bun.serve; Node.serve and @hono/node-server on Node) on
 127.0.0.1, and requests it with Lasm.JS.Web's `fetch`. Its properties: an echo of
 generated Unicode bodies returns them with their content type; a computed JSON
 answer for generated inputs; status codes for unknown paths, bad input and a
@@ -1073,7 +1146,10 @@ what their declarations say; and every generated member exists on the live
 objects. Then [`test-serve.mjs`](../scripts/bindings/test-serve.mjs) builds
 [`Serve.lean`](../test/fixtures/js-serve/Serve.lean) for each runtime, starts it
 on a free port, requests it from another process and shuts it down through
-`/shutdown` (exit status 0). `web-bindings.yml` runs both.
+`/shutdown` (exit status 0; Node.serve on Node). `web-bindings.yml` runs both.
+Node.serve's own guarantees (forged Host, cookies, streaming both ways with
+backpressure, client aborts, HEAD, empty bodies, errors, stop, signals) are
+checked over real sockets by `test/node-serve.test.mjs` (`unit.yml`).
 
 On 2026-11-10 (`web-bindings.yml` run 42918093803: Node 26.13.0, Bun 1.4.4,
 Deno 2.9.6, Linux x64) every check passed on Node (30) and Deno (75), and on Bun
@@ -1321,6 +1397,231 @@ codes, `bun:sqlite` rows against a list, a WebSocket echo through `Bun.serve`, a
 echo through `Bun.listen` and `Bun.connect`, and every generated member on the live
 objects. [examples/bun-sqlite](../examples/bun-sqlite) is a todo API on
 `bun:sqlite`, built and checked over HTTP by CI.
+
+## Cloudflare Workers: `Lasm.JS.Cloudflare`
+
+`import Lasm.JS.Cloudflare` gives typed bindings of the runtime APIs of
+Cloudflare Workers, **generated from Cloudflare's own TypeScript declarations**
+(`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
+CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
+3 of the standard bindings). It covers what a Worker's `env` holds and what its
+handlers receive:
+
+- the bindings: Workers KV, D1, R2, Durable Objects, Queues;
+- the handlers beside `fetch`: `scheduled` (cron triggers) and `queue` (queue
+  batches), and their `ExecutionContext` (`waitUntil`, `passThroughOnException`);
+- the Cache API (`caches`) and TCP sockets (`connect` of `cloudflare:sockets`);
+- `env` of `cloudflare:workers` (the bindings outside a handler).
+
+Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
+
+```lean
+import Lasm.JS              -- deriving FromJS
+import Lasm.JS.Cloudflare
+open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
+
+/-- The Worker's bindings and variables, as wrangler.toml declares them. -/
+structure Env where
+  KV : KVNamespace     -- [[kv_namespaces]] binding = "KV"
+  DB : D1Database      -- [[d1_databases]] binding = "DB"
+  GREETING : String    -- [vars] GREETING = "…"
+  deriving FromJS
+
+def main : IO Unit := do
+  let fetch ← ExportedHandlerFetchHandler.ofFn fun request (env : Env) ctx => do
+    let path ← (← URL.new (← request.url)).pathname
+    let hits := ((← env.KV.get path).bind String.toNat?).getD 0
+    -- waitUntil takes a promise: Async.toPromise starts the write and returns its promise
+    ctx.waitUntil (← Async.toPromise (env.KV.put path (.domString (toString (hits + 1)))))
+    let rows ← (← (← env.DB.prepare "SELECT name FROM people WHERE id = ?").bind #[toJS (1 : Nat)]).all
+    Response.new (some (.usvString s!"{env.GREETING}: {hits + 1} visits; {rows.results.size} rows")) none
+  let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller (env : Env) _ => do
+    env.KV.put "last-cron" (.domString (← controller.cron))
+  exportDefault ({ fetch := some fetch, scheduled := some scheduled } : ExportedHandler)
+```
+
+Build with `lasm build Main.lean --target workers`. The generated
+`workers/worker.mjs` forwards `fetch`, `scheduled` and `queue` to the object
+`exportDefault` published (a handler without `scheduled` or `queue` fails those
+events, saying so).
+
+**`env` is the program's own type** (API_DECISIONS A26). The declarations make it
+generic (`ExportedHandler<Env>`), and the program declares what `Env` holds, as a
+TypeScript Worker declares `interface Env`. In Lean that is a structure with
+`deriving FromJS`, whose fields are named as the bindings and variables are named
+in `wrangler.toml`. Every handler's `ofFn` and `ofSyncFn` take the type as a
+parameter (`{Env : Type} [FromJS Env]`), and so does `env` of `cloudflare:workers`
+(`let e : Env ← Lasm.JS.Cloudflare.env`). A missing binding fails the handler with
+an error that names the field. `Data` is still a valid `Env`: it reads the whole
+object.
+
+**Promises from Lean** (A27): `waitUntil`, and other APIs that take a promise of
+work still running, get one from `Lasm.JS.Async.toPromise : Async α → IO Value`. It
+starts the computation at once and returns its promise.
+
+### What is covered
+
+| Module | Members | Declared in |
+| --- | --- | --- |
+| `Lasm.JS.Cloudflare.Kv` | `KVNamespace`: `get` (text), `getJson`, `getArrayBuffer`, `getStream`, `getWithMetadata`, `put` (string, bytes or stream; `expiration`, `expirationTtl`, `metadata`), `list` (`prefix`, `limit`, `cursor`; `KVNamespaceListResult`), `delete` | `@cloudflare/workers-types` 5.20261019.1, `index.d.ts` |
+| `Lasm.JS.Cloudflare.D1` | `D1Database` (`prepare`, `batch`, `exec`, `withSession`), `D1DatabaseSession`, `D1PreparedStatement` (`bind`, `first`, `first0`, `run`, `all`, `raw`), `D1Result` with `D1Meta`, `D1ExecResult` | same |
+| `Lasm.JS.Cloudflare.R2` | `R2Bucket` (`head`, `get` with ranges and conditions, `put` with HTTP and custom metadata and checksums, `list`, `delete`, multipart uploads), `R2Object`, `R2ObjectBody` (`body`, `bytes`, `text`, `json`, `blob`, `arrayBuffer`), `R2Checksums`, `R2MultipartUpload` and every options dictionary | same |
+| `Lasm.JS.Cloudflare.Queues` | `Queue` (`send`, `sendBatch`, `metrics`), `MessageBatch` (`messages`, `queue`, `metadata`, `ackAll`, `retryAll`), `Message` (`id`, `timestamp`, `body`, `attempts`, `ack`, `retry`) | same |
+| `Lasm.JS.Cloudflare.Cache` | `caches` (`CacheStorage`: `default`, `open`), `Cache` (`match`, `put`, `delete`) | same |
+| `Lasm.JS.Cloudflare.Sockets` | `connect` (of `cloudflare:sockets`), `Socket` (`readable`, `writable`, `opened`, `closed`, `close`, `startTls`, `secureTransport`, `upgraded`) | same |
+| `Lasm.JS.Cloudflare.DurableObjects` | `DurableObjectNamespace` (`idFromName`, `idFromString`, `newUniqueId`, `get`, `getByName`, `jurisdiction`), `DurableObjectId`, `DurableObjectStub` (`fetch`, `connect`, `id`, `name`), `DurableObjectState` (`storage`, `id`, `waitUntil`, `blockConcurrencyWhile`, `abort`, `props`), `DurableObjectStorage` and `DurableObjectTransaction` (`get`, `put`, `delete`, `list`, `deleteAll`, `transaction`, alarms, `sync`, bookmarks) | same |
+| `Lasm.JS.Cloudflare.Workers` | `ExportedHandler` (`fetch`, `scheduled`, `queue`) and its handler types `ExportedHandlerFetchHandler`, `ExportedHandlerScheduledHandler`, `ExportedHandlerQueueHandler`; `ExecutionContext` (`waitUntil`, `passThroughOnException`, `abort`, `props`, `cache`), `CacheContext`, `ScheduledController` (`cron`, `scheduledTime`, `noRetry`); `env` (of `cloudflare:workers`) | same |
+
+Not generated, with the reason (each listed in
+[`cloudflare-tier3.mjs`](../scripts/bindings/cloudflare-tier3.mjs) and at the
+top of [`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+
+- **Overloads another overload already covers:** KV's `get(key, "text")` (that
+  is `get`), the `get(key, options)` forms that pair a type with `cacheTtl`
+  (`get` takes `cacheTtl`), and R2's `get` and `put` forms with `onlyIf`
+  required (the options have `onlyIf`).
+- **Not expressible yet:** KV's batch reads (an `Array<Key>` key: the same
+  parameter names as the one-key overloads, so the overload naming cannot tell
+  them apart), `getWithMetadata` of JSON, bytes or a stream (a second
+  instantiation of `KVNamespaceGetWithMetadataResult`), D1's
+  `raw({columnNames: true})` (a tuple result).
+- **Outside this tier:** the RPC methods of a Durable Object stub (they are the
+  class's own: call them with `Value.callMethodAwait`), WebSocket hibernation
+  (WebSocket is the browser tier's), SQLite storage (`storage.sql`, `kv`,
+  `transactionSync`), containers and facets, `ctx.exports`, Access identity,
+  tracing, and the `connect`, `tail`, `trace`, `tailStream`, `test` and
+  `email` handlers.
+- **Deprecated:** `D1Database.dump`.
+
+### How the declarations become Lean
+
+[`cloudflare-api.mjs`](../scripts/bindings/cloudflare-api.mjs) fetches the npm
+package, checks `index.d.ts` against its SHA-256 hash, and lowers what
+`cloudflare-tier3.mjs` selects to WebIDL with `serve-api.mjs`'s lowering
+(Lasm.JS.Deno's rules, above) and these rules for richer declarations;
+`generate-web.mjs` then generates Lean with Lasm.JS.Web's rules. Every member
+and overload of a selected declaration is lowered or excluded with a reason,
+or the lowering fails.
+
+| TypeScript | WebIDL | Lean |
+| --- | --- | --- |
+| `declare abstract class D1Database` | `interface` (its constructor and statics are not lowered) | a handle type |
+| `get body(): ReadableStream` (a getter) | `readonly attribute` | `body.body : IO ReadableStream` |
+| `readonly httpMetadata?: R2HTTPMetadata` | a nullable attribute | `IO (Option R2HTTPMetadata)` |
+| a generic parameter (`Key extends string = string`, `Message = unknown`) | its default (`unknown` when it has none), or the tier's `typeArgs` | `String`; `Data` |
+| a type the program declares (the handlers' `Env`, `Cloudflare.Env`; the tier's `typeParameters`) | `typedef any Cloudflare_Env` marked `[LasmTypeParameter="Env"]` | a type parameter `{Env : Type} [FromJS Env]`, read with `Support.declared` |
+| overloads of a method | each lowered or excluded by its parameter list | Lasm.JS.Web's overload naming |
+| a parameter of one string literal type (`get(key, type: "json")`) | the string passed as a constant (`[LasmConstant]`), the overload named with it (`[LasmOverloadName]`) | `KVNamespace.getJson kv key` |
+| `Map<string, V>` | `record<DOMString, V>`, the member marked `[LasmMap]` | `Record V`, read with `Array.from` |
+| `Record<string, V>` | `record<DOMString, V>` | `Record V` |
+| `Partial<D>` of an options type whose members are all optional | `D` | `D` |
+| `{ columnNames?: false }` (an object literal type) | a dictionary named after its owner, member and parameter | `D1PreparedStatementRawOptions` |
+| `{…} \| {…}` and `A & ({…} \| {…})` (`KVNamespaceListResult`, `R2Objects`, `R2Range`) | one dictionary: a member in every alternative keeps its optionality, the others are optional | a structure |
+| `T & Record<string, unknown>` | `T` | — |
+| `ArrayBuffer \| ArrayBufferView` | `BufferSource` | `ByteArray` |
+| a union | a typedef of the host (`Cloudflare_DOMStringOrBufferSource`) | an inductive in `Lasm.JS.Cloudflare`, with `Coe` from each member |
+| `"a" \| "b"` (an alias, or inline) | an enum named after its alias (`QueueContentType`) or member | an inductive |
+| a type alias not selected (`D1SessionBookmark`) | its definition | — |
+| `Date`, `unknown`, and a union holding them | `any` | `Data` (a `Date` is a reference) |
+| `never`, or `undefined` as a member's type | the member left out | — |
+| `...values: unknown[]` | `any... values` | `(values : Array Data := #[])` |
+| `toString()`, `toJSON()` | `toString_` with `[LasmName]` | `DurableObjectId.toString` |
+| `declare const caches`, `export const env` (of `cloudflare:workers`), `connect` (of `cloudflare:sockets`) | a namespace per module (`[LasmModule]`) | `Lasm.JS.Cloudflare.caches`, `env`, `connect` |
+
+Numbers are `Float`, as workers-types declares them, except the members that
+the shared integer table names (A11.1, `scripts/bindings/overrides.json`: `size`,
+`length`, `limit`, `port`, `expirationTtl`, …), which are `Nat`.
+
+### Durable Objects: a class in JavaScript
+
+Workers natively expects a Durable Object to be a JavaScript class that the
+Worker's main module exports (`export class Counter extends DurableObject`), and
+Lasm keeps it that way (API_DECISIONS A28). Lean does not define JavaScript
+classes, so the class is a few lines of JavaScript in the project. Its methods
+call Lean functions that the program publishes; the program's `main` runs first,
+in the same isolate. The project's own `wrangler.toml` names a main module that
+re-exports Lasm's entry:
+
+```js
+// index.mjs (wrangler.toml: main = "index.mjs", [[durable_objects.bindings]] class_name = "Counter")
+import { DurableObject } from 'cloudflare:workers';
+import worker from './workers/worker.mjs';
+export default worker;
+export class Counter extends DurableObject {
+  fetch(request) { return globalThis.counterFetch(request, this.ctx, this.env); }
+}
+```
+
+```lean
+let counter ← Function.ofFn fun args => do
+  let request ← decodeAs Request "request" (args[0]?.getD .undefined)
+  let state ← decodeAs DurableObjectState "state" (args[1]?.getD .undefined)
+  let storage ← state.storage
+  let n := match (← storage.get "n") with | .number x => x | _ => 0
+  storage.put "n" (toJS (n + 1))
+  return toJS (← Response.new (some (.usvString s!"{n + 1}")) none)
+(← Lasm.JS.global).set "counterFetch" counter
+```
+
+A Worker reaches the object through its namespace binding, a field of its `Env`
+(`COUNTER : DurableObjectNamespace`):
+`(← env.COUNTER.getByName "a").fetch (.usvString "https://do/")`. Inside the
+object, `state.blockConcurrencyWhile` takes a Lean function
+(`DurableObjectStateBlockConcurrencyWhileCallback.ofFn`), and `state.waitUntil`
+takes a promise (`Async.toPromise`).
+
+### Where it runs, tests and cost
+
+Only on Workers (`--target workers`): the bindings are looked up on the objects
+the runtime hands over, so a program that imports `Lasm.JS.Cloudflare` builds
+for any target, but the calls work only in a Worker.
+
+[`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare) is one Worker
+(with a Durable Object class in `index.mjs` and every binding in its
+`wrangler.toml`) built with a packed candidate and served by `wrangler dev`
+with **local emulation only**: workerd, and Miniflare's local KV, D1, R2,
+Durable Objects and Queues. No Cloudflare account is used. The runner triggers
+its cron handler (`wrangler dev --test-scheduled`), starts a TCP echo server
+for the sockets, then requests `/`, which runs the checks. Its properties: KV
+round trips of generated strings and bytes (text, JSON, `ArrayBuffer`, stream),
+metadata, `list` paging through exactly the keys under a prefix in key order,
+`expirationTtl`; D1 inserts read back by `all`, `first` and `raw`, a failing
+`batch` rolled back; R2 objects read back whole and by generated ranges, their
+MD5 checksum the bytes' MD5, a wrong SHA-256 rejected, a failed condition
+answered without a body, `list` with a delimiter and pages, multipart uploads
+whose result is the parts' concatenation; every queued message (one at a time
+and in a batch) delivered once to the queue handler, a retried one with
+`attempts` 2; the cron handler's `cron` and time, and its `waitUntil` work;
+Cache API `match` after `put` and nothing after `delete`; a TCP echo of
+generated bytes; a Durable Object counter that counts 1 to n through
+`getByName` and `get(idFromName)`, and its storage (round trips, `list` order,
+transactions committed and rolled back, alarms, `blockConcurrencyWhile`);
+`env` of `cloudflare:workers` the handler's bindings; and every generated member
+present on the live objects. `web-bindings.yml` runs it (`cloudflare-conformance`).
+
+Measured (web-bindings run 43215378780, `cloudflare-conformance`, wrangler
+4.152.0's local workerd 1.20261019.1): 321 checks pass and one fails as a
+known emulation gap (`available CacheContext`: local `wrangler dev` leaves
+`ExecutionContext.cache` undefined, since the cache purge context is a
+deployed zone's; `test/fixtures/js-cloudflare/known.json`). No generated
+member is missing on the live objects. Size (`test/fixtures/js-cloudflare-size`): a Worker
+that reads a KV key through `Lasm.JS.Cloudflare` builds a 610,093-byte
+WebAssembly module (776,809 bytes of output), 13,625 bytes more than the same
+Worker written with hand-written `Lasm.JS` calls (596,468; 763,178).
+
+### Pinned version and drift
+
+`index.d.ts` of `@cloudflare/workers-types` is fetched from the npm registry at
+the pinned version and checked against its SHA-256 hash in
+[`cloudflare-api.lock.json`](../scripts/bindings/cloudflare-api.lock.json).
+The version is the one generated from the workerd that CI's wrangler runs.
+`web-bindings.yml` fails when `cloudflare.idl` or the generated modules differ
+from what the pinned file gives. To move to a newer version: change `version`
+(and `workerd`, `wrangler`) in `cloudflare-tier3.mjs` and `WRANGLER_VERSION`
+in `web-bindings.yml`, run `node scripts/bindings/cloudflare-api.mjs
+--update-lock`, then `node scripts/bindings/generate-web.mjs`; decide every new
+member or overload the lowering reports, regenerate `library/prebuilt`
+(`library-prebuilt.yml`) and review the diff of `cloudflare.idl`.
 
 ## Worked examples (all built and run by CI)
 
