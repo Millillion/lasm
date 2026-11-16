@@ -857,11 +857,6 @@ structure Header where
   value : String
 instance : ToJS Header := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("value", toJS d.value)]⟩
-instance : FromJS Header where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    value := ← Lasm.JS.readField String d "value" }
-  typeName := "Lasm.JS.Cloudflare.Header"
 
 /-- `dictionary FetchEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FetchEventInfo where
@@ -880,24 +875,12 @@ instance : ToJS FetchEventInfo := ⟨fun d => Support.fields #[("type", toJS d.t
     ("url", toJS d.url),
     ("cfJson", d.cfJson),
     ("headers", toJS d.headers)]⟩
-instance : FromJS FetchEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField FetchEventInfoType d "type",
-    method := ← Lasm.JS.readField String d "method",
-    url := ← Lasm.JS.readField String d "url",
-    cfJson := ← Lasm.JS.readField Data d "cfJson",
-    headers := ← Lasm.JS.readField (Array Header) d "headers" }
-  typeName := "Lasm.JS.Cloudflare.FetchEventInfo"
 
 /-- `dictionary JsRpcEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure JsRpcEventInfo where
   /-- `required JsRpcEventInfoType type` -/
   type : JsRpcEventInfoType
 instance : ToJS JsRpcEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
-instance : FromJS JsRpcEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField JsRpcEventInfoType d "type" }
-  typeName := "Lasm.JS.Cloudflare.JsRpcEventInfo"
 
 /-- `dictionary ScheduledEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ScheduledEventInfo where
@@ -910,12 +893,6 @@ structure ScheduledEventInfo where
 instance : ToJS ScheduledEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("scheduledTime", toJS d.scheduledTime),
     ("cron", toJS d.cron)]⟩
-instance : FromJS ScheduledEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ScheduledEventInfoType d "type",
-    scheduledTime := ← Lasm.JS.readField Data d "scheduledTime",
-    cron := ← Lasm.JS.readField String d "cron" }
-  typeName := "Lasm.JS.Cloudflare.ScheduledEventInfo"
 
 /-- `dictionary AlarmEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AlarmEventInfo where
@@ -925,11 +902,6 @@ structure AlarmEventInfo where
   scheduledTime : Data
 instance : ToJS AlarmEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("scheduledTime", toJS d.scheduledTime)]⟩
-instance : FromJS AlarmEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField AlarmEventInfoType d "type",
-    scheduledTime := ← Lasm.JS.readField Data d "scheduledTime" }
-  typeName := "Lasm.JS.Cloudflare.AlarmEventInfo"
 
 /-- `dictionary QueueEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueueEventInfo where
@@ -942,12 +914,6 @@ structure QueueEventInfo where
 instance : ToJS QueueEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("queueName", toJS d.queueName),
     ("batchSize", toJS d.batchSize)]⟩
-instance : FromJS QueueEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField QueueEventInfoType d "type",
-    queueName := ← Lasm.JS.readField String d "queueName",
-    batchSize := ← Lasm.JS.readField Float d "batchSize" }
-  typeName := "Lasm.JS.Cloudflare.QueueEventInfo"
 
 /-- `dictionary EmailEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EmailEventInfo where
@@ -963,13 +929,6 @@ instance : ToJS EmailEventInfo := ⟨fun d => Support.fields #[("type", toJS d.t
     ("mailFrom", toJS d.mailFrom),
     ("rcptTo", toJS d.rcptTo),
     ("rawSize", toJS d.rawSize)]⟩
-instance : FromJS EmailEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField EmailEventInfoType d "type",
-    mailFrom := ← Lasm.JS.readField String d "mailFrom",
-    rcptTo := ← Lasm.JS.readField String d "rcptTo",
-    rawSize := ← Lasm.JS.readField Float d "rawSize" }
-  typeName := "Lasm.JS.Cloudflare.EmailEventInfo"
 
 /-- `dictionary TraceEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TraceEventInfo where
@@ -979,31 +938,18 @@ structure TraceEventInfo where
   traces : Array (Option String)
 instance : ToJS TraceEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("traces", toJS d.traces)]⟩
-instance : FromJS TraceEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField TraceEventInfoType d "type",
-    traces := ← Lasm.JS.readField (Array (Option String)) d "traces" }
-  typeName := "Lasm.JS.Cloudflare.TraceEventInfo"
 
 /-- `dictionary HibernatableWebSocketEventInfoMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HibernatableWebSocketEventInfoMessage where
   /-- `required HibernatableWebSocketEventInfoMessageType type` -/
   type : HibernatableWebSocketEventInfoMessageType
 instance : ToJS HibernatableWebSocketEventInfoMessage := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
-instance : FromJS HibernatableWebSocketEventInfoMessage where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField HibernatableWebSocketEventInfoMessageType d "type" }
-  typeName := "Lasm.JS.Cloudflare.HibernatableWebSocketEventInfoMessage"
 
 /-- `dictionary HibernatableWebSocketEventInfoError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HibernatableWebSocketEventInfoError where
   /-- `required HibernatableWebSocketEventInfoErrorType type` -/
   type : HibernatableWebSocketEventInfoErrorType
 instance : ToJS HibernatableWebSocketEventInfoError := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
-instance : FromJS HibernatableWebSocketEventInfoError where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField HibernatableWebSocketEventInfoErrorType d "type" }
-  typeName := "Lasm.JS.Cloudflare.HibernatableWebSocketEventInfoError"
 
 /-- `dictionary HibernatableWebSocketEventInfoClose` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure HibernatableWebSocketEventInfoClose where
@@ -1016,12 +962,6 @@ structure HibernatableWebSocketEventInfoClose where
 instance : ToJS HibernatableWebSocketEventInfoClose := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("code", toJS d.code),
     ("wasClean", toJS d.wasClean)]⟩
-instance : FromJS HibernatableWebSocketEventInfoClose where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField HibernatableWebSocketEventInfoCloseType d "type",
-    code := ← Lasm.JS.readField Float d "code",
-    wasClean := ← Lasm.JS.readField Bool d "wasClean" }
-  typeName := "Lasm.JS.Cloudflare.HibernatableWebSocketEventInfoClose"
 
 /-- `typedef HibernatableWebSocketEventInfoClose or HibernatableWebSocketEventInfoError or HibernatableWebSocketEventInfoMessage HibernatableWebSocketEventInfoCloseOrHibernatableWebSocketEventInfoErrorOrHibernatableWebSocketEventInfoMessage`: one constructor per member type. -/
 inductive HibernatableWebSocketEventInfoCloseOrHibernatableWebSocketEventInfoErrorOrHibernatableWebSocketEventInfoMessage where
@@ -1053,10 +993,6 @@ structure CustomEventInfo where
   /-- `required CustomEventInfoType type` -/
   type : CustomEventInfoType
 instance : ToJS CustomEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
-instance : FromJS CustomEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField CustomEventInfoType d "type" }
-  typeName := "Lasm.JS.Cloudflare.CustomEventInfo"
 
 /-- `dictionary FetchResponseInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FetchResponseInfo where
@@ -1066,21 +1002,12 @@ structure FetchResponseInfo where
   statusCode : Float
 instance : ToJS FetchResponseInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("statusCode", toJS d.statusCode)]⟩
-instance : FromJS FetchResponseInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField FetchEventInfoType d "type",
-    statusCode := ← Lasm.JS.readField Float d "statusCode" }
-  typeName := "Lasm.JS.Cloudflare.FetchResponseInfo"
 
 /-- `dictionary ConnectEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectEventInfo where
   /-- `required ConnectEventInfoType type` -/
   type : ConnectEventInfoType
 instance : ToJS ConnectEventInfo := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
-instance : FromJS ConnectEventInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ConnectEventInfoType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ConnectEventInfo"
 
 /-- `dictionary TailStreamScriptVersion` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TailStreamScriptVersion where
@@ -1093,12 +1020,6 @@ structure TailStreamScriptVersion where
 instance : ToJS TailStreamScriptVersion := ⟨fun d => Support.fields #[("id", toJS d.id),
     ("tag", Support.optional d.tag),
     ("message", Support.optional d.message)]⟩
-instance : FromJS TailStreamScriptVersion where
-  fromJS d := do return {
-    id := ← Lasm.JS.readField String d "id",
-    tag := ← Lasm.JS.readField (Option String) d "tag",
-    message := ← Lasm.JS.readField (Option String) d "message" }
-  typeName := "Lasm.JS.Cloudflare.TailStreamScriptVersion"
 
 /-- `typedef DOMString or sequence<DOMString> or boolean or sequence<boolean> or double or sequence<double> or bigint or sequence<bigint> DOMStringOrSequenceOfDOMStringOrBooleanOrSequenceOfBooleanOrDoubleOrSequenceOfDoubleOrBigintOrSequenceOfBigint`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfDOMStringOrBooleanOrSequenceOfBooleanOrDoubleOrSequenceOfDoubleOrBigintOrSequenceOfBigint where
@@ -1242,13 +1163,6 @@ instance : ToJS Outcome := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("outcome", toJS d.outcome),
     ("cpuTime", toJS d.cpuTime),
     ("wallTime", toJS d.wallTime)]⟩
-instance : FromJS Outcome where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField OutcomeType d "type",
-    outcome := ← Lasm.JS.readField EventOutcome d "outcome",
-    cpuTime := ← Lasm.JS.readField Float d "cpuTime",
-    wallTime := ← Lasm.JS.readField Float d "wallTime" }
-  typeName := "Lasm.JS.Cloudflare.Outcome"
 
 /-- `dictionary SpanStatus` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpanStatus where
@@ -1258,11 +1172,6 @@ structure SpanStatus where
   message : Option String := none
 instance : ToJS SpanStatus := ⟨fun d => Support.fields #[("code", toJS d.code),
     ("message", Support.optional d.message)]⟩
-instance : FromJS SpanStatus where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField SpanStatusCode d "code",
-    message := ← Lasm.JS.readField (Option String) d "message" }
-  typeName := "Lasm.JS.Cloudflare.SpanStatus"
 
 /-- `dictionary Attributes` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Attributes where
@@ -1312,11 +1221,6 @@ structure SpanClose where
   outcome : EventOutcome
 instance : ToJS SpanClose := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("outcome", toJS d.outcome)]⟩
-instance : FromJS SpanClose where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField SpanCloseType d "type",
-    outcome := ← Lasm.JS.readField EventOutcome d "outcome" }
-  typeName := "Lasm.JS.Cloudflare.SpanClose"
 
 /-- `dictionary SpanUpdateInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpanUpdateInfo where
@@ -1329,12 +1233,6 @@ structure SpanUpdateInfo where
 instance : ToJS SpanUpdateInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("name", Support.optional d.name),
     ("status", Support.optional d.status)]⟩
-instance : FromJS SpanUpdateInfo where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField SpanUpdateInfoType d "type",
-    name := ← Lasm.JS.readField (Option String) d "name",
-    status := ← Lasm.JS.readField (Option SpanStatus) d "status" }
-  typeName := "Lasm.JS.Cloudflare.SpanUpdateInfo"
 
 /-- `dictionary SpanUpdate` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpanUpdate where
@@ -1344,11 +1242,6 @@ structure SpanUpdate where
   info : SpanUpdateInfo
 instance : ToJS SpanUpdate := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("info", toJS d.info)]⟩
-instance : FromJS SpanUpdate where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField SpanUpdateType d "type",
-    info := ← Lasm.JS.readField SpanUpdateInfo d "info" }
-  typeName := "Lasm.JS.Cloudflare.SpanUpdate"
 
 /-- `dictionary DiagnosticChannelEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DiagnosticChannelEvent where
@@ -1361,12 +1254,6 @@ structure DiagnosticChannelEvent where
 instance : ToJS DiagnosticChannelEvent := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("channel", toJS d.channel),
     ("message", toJS d.message)]⟩
-instance : FromJS DiagnosticChannelEvent where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField DiagnosticChannelEventType d "type",
-    channel := ← Lasm.JS.readField String d "channel",
-    message := ← Lasm.JS.readField Data d "message" }
-  typeName := "Lasm.JS.Cloudflare.DiagnosticChannelEvent"
 
 /-- `dictionary Exception` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Exception where
@@ -1385,14 +1272,6 @@ instance : ToJS Exception := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("name", toJS d.name),
     ("message", toJS d.message),
     ("stack", Support.optional d.stack)]⟩
-instance : FromJS Exception where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ExceptionType d "type",
-    code := ← Lasm.JS.readField (Option DOMStringOrDouble) d "code",
-    name := ← Lasm.JS.readField String d "name",
-    message := ← Lasm.JS.readField String d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.Exception"
 
 /-- `dictionary DroppedEventsDiagnostic` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DroppedEventsDiagnostic where
@@ -1402,11 +1281,6 @@ structure DroppedEventsDiagnostic where
   count : Float
 instance : ToJS DroppedEventsDiagnostic := ⟨fun d => Support.fields #[("diagnosticsType", toJS d.diagnosticsType),
     ("count", toJS d.count)]⟩
-instance : FromJS DroppedEventsDiagnostic where
-  fromJS d := do return {
-    diagnosticsType := ← Lasm.JS.readField DroppedEventsDiagnosticDiagnosticsType d "diagnosticsType",
-    count := ← Lasm.JS.readField Float d "count" }
-  typeName := "Lasm.JS.Cloudflare.DroppedEventsDiagnostic"
 
 /-- `dictionary StreamDiagnostic` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StreamDiagnostic where
@@ -1416,11 +1290,6 @@ structure StreamDiagnostic where
   diagnostic : DroppedEventsDiagnostic
 instance : ToJS StreamDiagnostic := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("diagnostic", toJS d.diagnostic)]⟩
-instance : FromJS StreamDiagnostic where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField StreamDiagnosticType d "type",
-    diagnostic := ← Lasm.JS.readField DroppedEventsDiagnostic d "diagnostic" }
-  typeName := "Lasm.JS.Cloudflare.StreamDiagnostic"
 
 /-- `dictionary Return` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Return where
@@ -1430,11 +1299,6 @@ structure Return where
   info : Option FetchResponseInfo := none
 instance : ToJS Return := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("info", Support.optional d.info)]⟩
-instance : FromJS Return where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ReturnType d "type",
-    info := ← Lasm.JS.readField (Option FetchResponseInfo) d "info" }
-  typeName := "Lasm.JS.Cloudflare.Return"
 
 /-- `dictionary SpanContext` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SpanContext where

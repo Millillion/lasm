@@ -311,10 +311,6 @@ structure Cloudflare where
   /-- `required record<DOMString, boolean> compatibilityFlags` -/
   compatibilityFlags : Record Bool
 instance : ToJS Cloudflare := ⟨fun d => Support.fields #[("compatibilityFlags", toJS d.compatibilityFlags)]⟩
-instance : FromJS Cloudflare where
-  fromJS d := do return {
-    compatibilityFlags := ← Lasm.JS.readField (Record Bool) d "compatibilityFlags" }
-  typeName := "Lasm.JS.Cloudflare.Cloudflare"
 
 /-- `callback ExportedHandlerFetchHandler = Promise<Response> (Request request, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerFetchHandler where
@@ -408,13 +404,6 @@ instance : ToJS SpanRecordExceptionException := ⟨fun d => Support.fields #[("c
     ("name", Support.optional d.name),
     ("message", Support.optional d.message),
     ("stack", Support.optional d.stack)]⟩
-instance : FromJS SpanRecordExceptionException where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField DOMStringOrDouble d "code",
-    name := ← Lasm.JS.readField (Option String) d "name",
-    message := ← Lasm.JS.readField (Option String) d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.SpanRecordExceptionException"
 
 /-- `callback PagesFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesFunction where
@@ -441,20 +430,12 @@ structure PagesFunction2EnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
 instance : ToJS PagesFunction2EnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
-instance : FromJS PagesFunction2EnvASSETS where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField Data d "fetch" }
-  typeName := "Lasm.JS.Cloudflare.PagesFunction2EnvASSETS"
 
 /-- `dictionary PagesFunction2Env` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesFunction2Env where
   /-- `required PagesFunction2EnvASSETS ASSETS` -/
   ASSETS : PagesFunction2EnvASSETS
 instance : ToJS PagesFunction2Env := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
-instance : FromJS PagesFunction2Env where
-  fromJS d := do return {
-    ASSETS := ← Lasm.JS.readField PagesFunction2EnvASSETS d "ASSETS" }
-  typeName := "Lasm.JS.Cloudflare.PagesFunction2Env"
 
 /-- `dictionary PagesFunction2` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesFunction2 where
@@ -482,17 +463,6 @@ instance : ToJS PagesFunction2 := ⟨fun d => Support.fields #[("request", toJS 
     ("env", toJS d.env),
     ("params", toJS d.params),
     ("data", toJS d.data)]⟩
-instance : FromJS PagesFunction2 where
-  fromJS d := do return {
-    request := ← Lasm.JS.readField Request d "request",
-    functionPath := ← Lasm.JS.readField String d "functionPath",
-    waitUntil := ← Lasm.JS.readField PagesFunction d "waitUntil",
-    passThroughOnException := ← Lasm.JS.readField PagesFunction d "passThroughOnException",
-    next := ← Lasm.JS.readField PagesFunction d "next",
-    env := ← Lasm.JS.readField PagesFunction2Env d "env",
-    params := ← Lasm.JS.readField Data d "params",
-    data := ← Lasm.JS.readField Data d "data" }
-  typeName := "Lasm.JS.Cloudflare.PagesFunction2"
 
 /-- `callback PagesPluginFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesPluginFunction where
@@ -543,18 +513,6 @@ instance : ToJS PagesPluginFunction2 := ⟨fun d => Support.fields #[("request",
     ("params", toJS d.params),
     ("data", toJS d.data),
     ("pluginArgs", toJS d.pluginArgs)]⟩
-instance : FromJS PagesPluginFunction2 where
-  fromJS d := do return {
-    request := ← Lasm.JS.readField Request d "request",
-    functionPath := ← Lasm.JS.readField String d "functionPath",
-    waitUntil := ← Lasm.JS.readField PagesPluginFunction d "waitUntil",
-    passThroughOnException := ← Lasm.JS.readField PagesPluginFunction d "passThroughOnException",
-    next := ← Lasm.JS.readField PagesPluginFunction d "next",
-    env := ← Lasm.JS.readField PagesFunction2Env d "env",
-    params := ← Lasm.JS.readField Data d "params",
-    data := ← Lasm.JS.readField Data d "data",
-    pluginArgs := ← Lasm.JS.readField Data d "pluginArgs" }
-  typeName := "Lasm.JS.Cloudflare.PagesPluginFunction2"
 
 /-- `Disposable` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `TestController`. -/
 abbrev Disposable := TestController

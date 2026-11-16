@@ -173,7 +173,9 @@ test('serve-api reads declarations: namespaces, interfaces, type aliases and fun
   assert.match(d[0].doc, /A handler/);
   assert.equal(typeText(parseType('"a" | (string & {}) | Promise<Response[]> | ((x: number) => void)')),
     '"a" | string & {} | Promise<Response[]> | ((x: number) => void)');
-  assert.throws(() => parseType('T extends U ? A : B'), /conditional types are not lowered/);
+  // Conditional types parse (the rich lowering reads them as any).
+  assert.equal(parseType('T extends U ? A : B').k, 'cond');
+  assert.equal(typeText(parseType('A[K]["inputs"]')), 'A[K]["inputs"]');
 });
 
 test('serve-api lowers by its rules', () => {
@@ -243,7 +245,10 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
     for (const e of Object.keys(d.exclude ?? {})) assert.ok(!members.includes(e), `${d.name}.${e} is excluded but generated`);
   }
   // Every dictionary, callback and enum is generated, also those no member names (ExportedHandler).
-  const workers = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Workers.lean', import.meta.url), 'utf8');
+  // Every module's text: the handlers live with their events' modules (Queues, Tail, Email),
+  // ExportedHandler in Handlers.
+  const workers = readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))
+    .map(f => readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8')).join('\n');
   for (const n of ['structure ExportedHandler where', 'def ExportedHandlerFetchHandler.ofFn', 'def ExportedHandlerScheduledHandler.ofFn',
     'def ExportedHandlerQueueHandler.ofFn', 'def env {Env : Type} [FromJS Env] : IO Env']) assert.ok(workers.includes(n), n);
   // Workers' Env (API_DECISIONS A26): the program declares it; every handler takes it as a type
@@ -256,7 +261,7 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
   for (const f of readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))) {
     const text = readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8');
     for (const [, imported] of text.matchAll(/^import (Lasm\.\S+)$/gm))
-      assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.(Support|Dom|Streams|File|Url|Fetch)$)/, `${f} imports ${imported}`);
+      assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.(Support|Dom|Streams|File|Url|Fetch|Crypto)$)/, `${f} imports ${imported}`);
   }
   // Nullable record and ArrayBuffer results (D1's first() of no row, KV's get of a missing
   // key: null) are read as data: Option Value would be a reference to null, never none.
@@ -344,7 +349,7 @@ test('serve-api reads rich declarations: classes, constants, getters and generic
   assert.ok(!declarations(richSource, 'cf.d.ts').some(x => x.name === 'Store'), 'classes only when asked');
   assert.deepEqual(genericDefaults('Key extends string = string, T = unknown, U'), { Key: 'string', T: 'unknown', U: 'unknown' });
   assert.equal(typeText(parseType('readonly Entry[]')), 'Entry[]');
-  assert.throws(() => parseType('[string[], ...T[]]'), /tuple types are not lowered/);
+  assert.deepEqual(parseType('[string[], ...T[]]'), { k: 'tuple', items: [{ k: 'array', inner: { k: 'name', name: 'string', args: [] } }, { k: 'array', inner: { k: 'name', name: 'T', args: [] } }] });
 });
 
 test('serve-api lowers by its rich rules', () => {

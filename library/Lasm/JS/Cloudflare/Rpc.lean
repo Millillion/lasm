@@ -431,9 +431,6 @@ instance : ToJS WorkerLoaderModule := ⟨fun d => Support.fields #[("js", Suppor
 /-- `dictionary RpcTargetBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RpcTargetBranded where
 instance : ToJS RpcTargetBranded := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS RpcTargetBranded where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.RpcTargetBranded"
 
 /-- `WorkerEntrypointBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `RpcTargetBranded`. -/
 abbrev WorkerEntrypointBranded := RpcTargetBranded

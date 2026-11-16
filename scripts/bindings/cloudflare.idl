@@ -211,66 +211,66 @@ namespace Cloudflare_cloudflare_workers {
 // interface KVNamespace
 [LasmHost="Cloudflare", LasmLeanModule="Kv", LasmFile="index.d.ts", LasmName="KVNamespace", LasmPath="KVNamespace"]
 interface Cloudflare_KVNamespace {
-  // get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>"] Promise<DOMString?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
-  // get(key: Key, type: "text"): Promise<string | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'text'): Promise<string | null>", LasmOverloadName="getText"] Promise<DOMString?> get(DOMString key, [LasmConstant="text"] DOMString type);
-  // get<ExpectedValue = unknown>(key: Key, type: "json"): Promise<ExpectedValue | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>", LasmOverloadName="getJson"] Promise<any> get(DOMString key, [LasmConstant="json"] DOMString type);
-  // get(key: Key, type: "arrayBuffer"): Promise<ArrayBuffer | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>", LasmOverloadName="getArrayBuffer"] Promise<ArrayBuffer?> get(DOMString key, [LasmConstant="arrayBuffer"] DOMString type);
-  // get(key: Key, type: "stream"): Promise<ReadableStream | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'stream'): Promise<ReadableStream | null>", LasmOverloadName="getStream"] Promise<ReadableStream?> get(DOMString key, [LasmConstant="stream"] DOMString type);
   // get(key: Key, options?: KVNamespaceGetOptions<"text">): Promise<string | null>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: KVNamespaceGetOptions<'text'>): Promise<string | null>"] Promise<DOMString?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
-  // get<ExpectedValue = unknown>(key: Key, options?: KVNamespaceGetOptions<"json">): Promise<ExpectedValue | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Key, options?: KVNamespaceGetOptions<'json'>): Promise<ExpectedValue | null>"] Promise<any> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
-  // get(key: Key, options?: KVNamespaceGetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: KVNamespaceGetOptions<'arrayBuffer'>): Promise<ArrayBuffer | null>"] Promise<ArrayBuffer?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
   // get(key: Key, options?: KVNamespaceGetOptions<"stream">): Promise<ReadableStream | null>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: KVNamespaceGetOptions<'stream'>): Promise<ReadableStream | null>"] Promise<ReadableStream?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
-  // get(key: Array<Key>, type: "text"): Promise<Map<string, string | null>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Array<Key>, type: 'text'): Promise<Map<string, string | null>>", LasmOverloadName="getTextOfArray", LasmMap] Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, [LasmConstant="text"] DOMString type);
-  // get<ExpectedValue = unknown>(key: Array<Key>, type: "json"): Promise<Map<string, ExpectedValue | null>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, ExpectedValue | null>>", LasmOverloadName="getJsonOfArray", LasmMap] Promise<record<DOMString, any>> get(sequence<DOMString> key, [LasmConstant="json"] DOMString type);
-  // get(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, string | null>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, string | null>>", LasmMap] Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
+  // get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>"] Promise<DOMString?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
+  // get(key: Key, options?: KVNamespaceGetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, options?: KVNamespaceGetOptions<'arrayBuffer'>): Promise<ArrayBuffer | null>"] Promise<ArrayBuffer?> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
   // get(key: Array<Key>, options?: KVNamespaceGetOptions<"text">): Promise<Map<string, string | null>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, string | null>>", LasmMap] Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
+  // get<ExpectedValue = unknown>(key: Key, options?: KVNamespaceGetOptions<"json">): Promise<ExpectedValue | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Key, options?: KVNamespaceGetOptions<'json'>): Promise<ExpectedValue | null>"] Promise<any> get(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
+  // get(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, string | null>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, string | null>>", LasmMap] Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
   // get<ExpectedValue = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<"json">): Promise<Map<string, ExpectedValue | null>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'json'>): Promise<Map<string, ExpectedValue | null>>", LasmMap] Promise<record<DOMString, any>> get(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
+  // get(key: Key, type: "text"): Promise<string | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'text'): Promise<string | null>", LasmOverloadName="getText"] Promise<DOMString?> get(DOMString key, [LasmConstant="text"] DOMString type);
+  // get(key: Key, type: "stream"): Promise<ReadableStream | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'stream'): Promise<ReadableStream | null>", LasmOverloadName="getStream"] Promise<ReadableStream?> get(DOMString key, [LasmConstant="stream"] DOMString type);
+  // get(key: Key, type: "arrayBuffer"): Promise<ArrayBuffer | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>", LasmOverloadName="getArrayBuffer"] Promise<ArrayBuffer?> get(DOMString key, [LasmConstant="arrayBuffer"] DOMString type);
+  // get(key: Array<Key>, type: "text"): Promise<Map<string, string | null>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: Array<Key>, type: 'text'): Promise<Map<string, string | null>>", LasmOverloadName="getTextOfArray", LasmMap] Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, [LasmConstant="text"] DOMString type);
+  // get<ExpectedValue = unknown>(key: Key, type: "json"): Promise<ExpectedValue | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>", LasmOverloadName="getJson"] Promise<any> get(DOMString key, [LasmConstant="json"] DOMString type);
+  // get<ExpectedValue = unknown>(key: Array<Key>, type: "json"): Promise<Map<string, ExpectedValue | null>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get<ExpectedValue = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, ExpectedValue | null>>", LasmOverloadName="getJsonOfArray", LasmMap] Promise<record<DOMString, any>> get(sequence<DOMString> key, [LasmConstant="json"] DOMString type);
   // list<Metadata = unknown>(options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="list<Metadata = unknown>(options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>"] Promise<Cloudflare_KVNamespaceListResult> list(optional Cloudflare_KVNamespaceListOptions options);
   // put(key: Key, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: KVNamespacePutOptions): Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="put(key: Key, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: KVNamespacePutOptions): Promise<void>"] Promise<undefined> put(DOMString key, Cloudflare_DOMStringOrReadableStreamOrBufferSource value, optional Cloudflare_KVNamespacePutOptions options);
   // getWithMetadata<Metadata = unknown>(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, optional Cloudflare_KVNamespaceGetOptions options);
-  // getWithMetadata<Metadata = unknown>(key: Key, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'text'): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>", LasmOverloadName="getWithMetadataText"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="text"] DOMString type);
-  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: "json"): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: 'json'): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>", LasmOverloadName="getWithMetadataJson"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="json"] DOMString type);
-  // getWithMetadata<Metadata = unknown>(key: Key, type: "arrayBuffer"): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'arrayBuffer'): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>", LasmOverloadName="getWithMetadataArrayBuffer"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="arrayBuffer"] DOMString type);
-  // getWithMetadata<Metadata = unknown>(key: Key, type: "stream"): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'stream'): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>", LasmOverloadName="getWithMetadataStream"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="stream"] DOMString type);
-  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"text">): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'text'>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
-  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"json">): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'json'>): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
-  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"arrayBuffer">): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'arrayBuffer'>): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
-  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"stream">): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'stream'>): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
-  // getWithMetadata<Metadata = unknown>(key: Array<Key>, type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Array<Key>, type: 'text'): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>", LasmOverloadName="getWithMetadataTextOfArray", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, [LasmConstant="text"] DOMString type);
-  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: "json"): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>", LasmOverloadName="getWithMetadataJsonOfArray", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, [LasmConstant="json"] DOMString type);
-  // getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
   // getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<"text">): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
   // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<"json">): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'json'>): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"text">): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'text'>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"stream">): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'stream'>): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"arrayBuffer">): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'arrayBuffer'>): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<"json">): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'json'>): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, Cloudflare_KVNamespaceGetOptions options);
+  // getWithMetadata<Metadata = unknown>(key: Key, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'text'): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>", LasmOverloadName="getWithMetadataText"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="text"] DOMString type);
+  // getWithMetadata<Metadata = unknown>(key: Key, type: "stream"): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'stream'): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>", LasmOverloadName="getWithMetadataStream"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="stream"] DOMString type);
+  // getWithMetadata<Metadata = unknown>(key: Key, type: "arrayBuffer"): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Key, type: 'arrayBuffer'): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>", LasmOverloadName="getWithMetadataArrayBuffer"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="arrayBuffer"] DOMString type);
+  // getWithMetadata<Metadata = unknown>(key: Array<Key>, type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<Metadata = unknown>(key: Array<Key>, type: 'text'): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>", LasmOverloadName="getWithMetadataTextOfArray", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, [LasmConstant="text"] DOMString type);
+  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: "json"): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: 'json'): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>", LasmOverloadName="getWithMetadataJson"] Promise<Cloudflare_KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, [LasmConstant="json"] DOMString type);
+  // getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: "json"): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>", LasmOverloadName="getWithMetadataJsonOfArray", LasmMap] Promise<record<DOMString, Cloudflare_KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, [LasmConstant="json"] DOMString type);
   // delete(key: Key): Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="delete(key: Key): Promise<void>"] Promise<undefined> delete(DOMString key);
 };
@@ -376,10 +376,10 @@ interface Cloudflare_D1PreparedStatement {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<T = Record<string, unknown>>(): Promise<D1Result<T>>"] Promise<Cloudflare_D1Result> run();
   // all<T = Record<string, unknown>>(): Promise<D1Result<T>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="all<T = Record<string, unknown>>(): Promise<D1Result<T>>"] Promise<Cloudflare_D1Result> all();
-  // raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>"] Promise<sequence<any>> raw(Cloudflare_D1PreparedStatementRawOptions options);
   // raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>"] Promise<sequence<sequence<any>>> raw(optional any options);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>"] Promise<sequence<sequence<any>>> raw(optional Cloudflare_D1PreparedStatementRawOptions options);
+  // raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>"] Promise<sequence<any>> raw(any options);
 };
 
 // options D1Result
@@ -436,14 +436,14 @@ dictionary Cloudflare_D1ExecResult {
 interface Cloudflare_R2Bucket {
   // head(key: string): Promise<R2Object | null>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="head(key: string): Promise<R2Object | null>"] Promise<Cloudflare_R2Object?> head(DOMString key);
-  // get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>"] Promise<Cloudflare_R2ObjectBodyOrR2Object?> get(DOMString key, Cloudflare_R2BucketGetOptions options);
   // get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>"] Promise<Cloudflare_R2ObjectBody?> get(DOMString key, optional Cloudflare_R2GetOptions options);
-  // put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>"] Promise<Cloudflare_R2Object?> put(DOMString key, Cloudflare_ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional Cloudflare_R2BucketPutOptions options);
+  // get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>"] Promise<Cloudflare_R2ObjectBodyOrR2Object?> get(DOMString key, Cloudflare_R2BucketGetOptions options);
   // put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>"] Promise<Cloudflare_R2Object> put(DOMString key, Cloudflare_ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional Cloudflare_R2PutOptions options);
+  // put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>"] Promise<Cloudflare_R2Object?> put(DOMString key, Cloudflare_ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional Cloudflare_R2BucketPutOptions options);
   // createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>"] Promise<Cloudflare_R2MultipartUpload> createMultipartUpload(DOMString key, optional Cloudflare_R2MultipartOptions options);
   // resumeMultipartUpload(key: string, uploadId: string): R2MultipartUpload
@@ -3124,10 +3124,10 @@ interface Cloudflare_AiSearchJobs {
 interface Cloudflare_AiSearchInstance {
   // search(params: AiSearchSearchRequest): Promise<AiSearchSearchResponse>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="search(params: AiSearchSearchRequest): Promise<AiSearchSearchResponse>"] Promise<Cloudflare_AiSearchSearchResponse> search(Cloudflare_AiSearchSearchRequest params);
-  // chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>"] Promise<ReadableStream> chatCompletions(Cloudflare_AiSearchInstanceChatCompletionsParams params);
   // chatCompletions(params: AiSearchChatCompletionsRequest): Promise<AiSearchChatCompletionsResponse>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="chatCompletions(params: AiSearchChatCompletionsRequest): Promise<AiSearchChatCompletionsResponse>"] Promise<Cloudflare_AiSearchChatCompletionsResponse> chatCompletions(Cloudflare_AiSearchChatCompletionsRequest params);
+  // chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>"] Promise<ReadableStream> chatCompletions(Cloudflare_AiSearchInstanceChatCompletionsParams params);
   // update(config: Partial<AiSearchConfig>): Promise<AiSearchInstanceInfo>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="update(config: Partial<AiSearchConfig>): Promise<AiSearchInstanceInfo>"] Promise<Cloudflare_AiSearchInstanceInfo> update(Cloudflare_AiSearchInstanceUpdateConfig config);
   // info(): Promise<AiSearchInstanceInfo>
@@ -3160,7 +3160,7 @@ interface Cloudflare_AiSearchNamespace {
 };
 
 // options AiImageClassificationInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageClassificationInput", LasmPath="AiImageClassificationInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageClassificationInput", LasmPath="AiImageClassificationInput", LasmDirection="to"]
 dictionary Cloudflare_AiImageClassificationInput {
   // image: number[]
   required sequence<double> image;
@@ -3176,7 +3176,7 @@ interface Cloudflare_BaseAiImageClassification {
 };
 
 // options AiImageToTextInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageToTextInput", LasmPath="AiImageToTextInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageToTextInput", LasmPath="AiImageToTextInput", LasmDirection="to"]
 dictionary Cloudflare_AiImageToTextInput {
   // image: number[]
   required sequence<double> image;
@@ -3205,7 +3205,7 @@ dictionary Cloudflare_AiImageToTextInput {
 };
 
 // options AiImageToTextOutput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageToTextOutput", LasmPath="AiImageToTextOutput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiImageToTextOutput", LasmPath="AiImageToTextOutput", LasmDirection="from"]
 dictionary Cloudflare_AiImageToTextOutput {
   // description: string
   required DOMString description;
@@ -3348,7 +3348,7 @@ interface Cloudflare_BaseAiAutomaticSpeechRecognition {
 };
 
 // options AiSummarizationInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiSummarizationInput", LasmPath="AiSummarizationInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiSummarizationInput", LasmPath="AiSummarizationInput", LasmDirection="to"]
 dictionary Cloudflare_AiSummarizationInput {
   // input_text: string
   required DOMString input_text;
@@ -3356,7 +3356,7 @@ dictionary Cloudflare_AiSummarizationInput {
   double max_length;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiSummarizationOutput", LasmPath="AiSummarizationOutput", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiSummarizationOutput", LasmPath="AiSummarizationOutput", LasmDirection="from", LasmAlias]
 typedef Cloudflare_AgentMemoryGetSummaryResponse Cloudflare_AiSummarizationOutput;
 
 // interface BaseAiSummarization
@@ -3369,7 +3369,7 @@ interface Cloudflare_BaseAiSummarization {
 };
 
 // options AiTextClassificationInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextClassificationInput", LasmPath="AiTextClassificationInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextClassificationInput", LasmPath="AiTextClassificationInput", LasmDirection="to"]
 dictionary Cloudflare_AiTextClassificationInput {
   // text: string
   required DOMString text;
@@ -3385,14 +3385,14 @@ interface Cloudflare_BaseAiTextClassification {
 };
 
 // options AiTextEmbeddingsInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextEmbeddingsInput", LasmPath="AiTextEmbeddingsInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextEmbeddingsInput", LasmPath="AiTextEmbeddingsInput", LasmDirection="to"]
 dictionary Cloudflare_AiTextEmbeddingsInput {
   // text: string | string[]
   required Cloudflare_DOMStringOrSequenceOfDOMString text;
 };
 
 // options AiTextEmbeddingsOutput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextEmbeddingsOutput", LasmPath="AiTextEmbeddingsOutput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextEmbeddingsOutput", LasmPath="AiTextEmbeddingsOutput", LasmDirection="from"]
 dictionary Cloudflare_AiTextEmbeddingsOutput {
   // shape: number[]
   required sequence<double> shape;
@@ -3459,7 +3459,7 @@ dictionary Cloudflare_AiTextGenerationResponseFormat {
 };
 
 // options AiTextGenerationInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextGenerationInput", LasmPath="AiTextGenerationInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextGenerationInput", LasmPath="AiTextGenerationInput", LasmDirection="to"]
 dictionary Cloudflare_AiTextGenerationInput {
   // prompt?: string
   DOMString prompt;
@@ -3525,7 +3525,7 @@ dictionary Cloudflare_UsageTags {
 };
 
 // options AiTextGenerationOutput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextGenerationOutput", LasmPath="AiTextGenerationOutput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextGenerationOutput", LasmPath="AiTextGenerationOutput", LasmDirection="from"]
 dictionary Cloudflare_AiTextGenerationOutput {
   // response?: string
   DOMString response;
@@ -3545,7 +3545,7 @@ interface Cloudflare_BaseAiTextGeneration {
 };
 
 // options AiTextToSpeechInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextToSpeechInput", LasmPath="AiTextToSpeechInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextToSpeechInput", LasmPath="AiTextToSpeechInput", LasmDirection="to"]
 dictionary Cloudflare_AiTextToSpeechInput {
   // prompt: string
   required DOMString prompt;
@@ -3563,7 +3563,7 @@ interface Cloudflare_BaseAiTextToSpeech {
 };
 
 // options AiTextToImageInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextToImageInput", LasmPath="AiTextToImageInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="AiTextToImageInput", LasmPath="AiTextToImageInput", LasmDirection="to"]
 dictionary Cloudflare_AiTextToImageInput {
   // prompt: string
   required DOMString prompt;
@@ -3923,7 +3923,7 @@ dictionary Cloudflare_WebSearchOptions {
 };
 
 // options ChatTemplateKwargs
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ChatTemplateKwargs", LasmPath="ChatTemplateKwargs"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ChatTemplateKwargs", LasmPath="ChatTemplateKwargs", LasmDirection="to"]
 dictionary Cloudflare_ChatTemplateKwargs {
   // enable_thinking?: boolean
   boolean enable_thinking;
@@ -4192,7 +4192,7 @@ dictionary Cloudflare_ChatCompletionsMessagesInput {
 };
 
 // options ChatCompletionsOutput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ChatCompletionsOutput", LasmPath="ChatCompletionsOutput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ChatCompletionsOutput", LasmPath="ChatCompletionsOutput", LasmDirection="from"]
 dictionary Cloudflare_ChatCompletionsOutput {
   // id: string
   required DOMString id;
@@ -4213,7 +4213,7 @@ dictionary Cloudflare_ChatCompletionsOutput {
 };
 
 // options ResponsesInput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ResponsesInput", LasmPath="ResponsesInput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ResponsesInput", LasmPath="ResponsesInput", LasmDirection="to"]
 dictionary Cloudflare_ResponsesInput {
   // background?: boolean | null
   boolean? background;
@@ -4258,7 +4258,7 @@ dictionary Cloudflare_ResponsesInput {
 };
 
 // options ResponsesOutput
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ResponsesOutput", LasmPath="ResponsesOutput"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ResponsesOutput", LasmPath="ResponsesOutput", LasmDirection="from"]
 dictionary Cloudflare_ResponsesOutput {
   // id?: string
   DOMString id;
@@ -4353,7 +4353,7 @@ dictionary Cloudflare_ResponsePrompt {
 };
 
 // options Reasoning
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Reasoning", LasmPath="Reasoning"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Reasoning", LasmPath="Reasoning", LasmDirection="to"]
 dictionary Cloudflare_Reasoning {
   // effort?: ReasoningEffort | null
   Cloudflare_ReasoningEffort? effort;
@@ -4892,7 +4892,7 @@ dictionary Cloudflare_StreamOptions {
 };
 
 // options Ai_Cf_Baai_Bge_Base_En_V1_5_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Base_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Base_En_V1_5_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Base_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Base_En_V1_5_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
   // text?: string | string[]
   Cloudflare_DOMStringOrSequenceOfDOMString text;
@@ -4919,7 +4919,7 @@ interface Cloudflare_Base_Ai_Cf_Baai_Bge_Base_En_V1_5 {
 };
 
 // options Ai_Cf_Openai_Whisper_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Output", LasmPath="Ai_Cf_Openai_Whisper_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Output", LasmPath="Ai_Cf_Openai_Whisper_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Openai_Whisper_Output {
   // text: string
   required DOMString text;
@@ -4941,7 +4941,7 @@ interface Cloudflare_Base_Ai_Cf_Openai_Whisper {
 };
 
 // options Ai_Cf_Meta_M2M100_1_2B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_M2M100_1_2B_Input", LasmPath="Ai_Cf_Meta_M2M100_1_2B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_M2M100_1_2B_Input", LasmPath="Ai_Cf_Meta_M2M100_1_2B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Meta_M2M100_1_2B_Input {
   // text?: string
   DOMString text;
@@ -4965,7 +4965,7 @@ interface Cloudflare_Base_Ai_Cf_Meta_M2M100_1_2B {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Meta_M2M100_1_2B_Output"] readonly attribute Cloudflare_Base_Ai_Cf_Meta_M2M100_1_2BPostProcessedOutputsOrAi_Cf_Meta_M2M100_1_2B_AsyncResponse postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Small_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Small_En_V1_5_Input", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Small_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Small_En_V1_5_Input", LasmDirection="to", LasmAlias]
 typedef Cloudflare_Ai_Cf_Baai_Bge_Base_En_V1_5_Input Cloudflare_Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse", LasmPath="Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse", LasmAlias]
@@ -4980,7 +4980,7 @@ interface Cloudflare_Base_Ai_Cf_Baai_Bge_Small_En_V1_5 {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Baai_Bge_Small_En_V1_5_Output"] readonly attribute Cloudflare_Base_Ai_Cf_Baai_Bge_Small_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Large_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Large_En_V1_5_Input", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Large_En_V1_5_Input", LasmPath="Ai_Cf_Baai_Bge_Large_En_V1_5_Input", LasmDirection="to", LasmAlias]
 typedef Cloudflare_Ai_Cf_Baai_Bge_Base_En_V1_5_Input Cloudflare_Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
 
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse", LasmPath="Ai_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse", LasmAlias]
@@ -4995,7 +4995,7 @@ interface Cloudflare_Base_Ai_Cf_Baai_Bge_Large_En_V1_5 {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Baai_Bge_Large_En_V1_5_Output"] readonly attribute Cloudflare_Base_Ai_Cf_Baai_Bge_Large_En_V1_5PostProcessedOutputsOrAi_Cf_Baai_Bge_Large_En_V1_5_AsyncResponse postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output", LasmPath="Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output", LasmPath="Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_AiSearchCreateJobParams Cloudflare_Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output;
 
 // interface Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M
@@ -5007,7 +5007,7 @@ interface Cloudflare_Base_Ai_Cf_Unum_Uform_Gen2_Qwen_500M {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Unum_Uform_Gen2_Qwen_500M_Output"] readonly attribute Cloudflare_AiSearchCreateJobParams postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Tiny_En_Output", LasmPath="Ai_Cf_Openai_Whisper_Tiny_En_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Tiny_En_Output", LasmPath="Ai_Cf_Openai_Whisper_Tiny_En_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Openai_Whisper_Output Cloudflare_Ai_Cf_Openai_Whisper_Tiny_En_Output;
 
 // interface Base_Ai_Cf_Openai_Whisper_Tiny_En
@@ -5020,7 +5020,7 @@ interface Cloudflare_Base_Ai_Cf_Openai_Whisper_Tiny_En {
 };
 
 // options Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input", LasmPath="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input", LasmPath="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
   // audio: | string | { body?: object; contentType?: string; }
   required Cloudflare_DOMStringOrAi_Cf_Openai_Whisper_Large_V3_Turbo_InputAudio audio;
@@ -5049,7 +5049,7 @@ dictionary Cloudflare_Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
 };
 
 // options Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output", LasmPath="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output", LasmPath="Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
   // transcription_info?: { language?: string; language_probability?: number; duration?: number; duration_after_vad?: number; }
   Cloudflare_Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputTranscription_info transcription_info;
@@ -5140,7 +5140,7 @@ interface Cloudflare_Base_Ai_Cf_Baai_Bge_M3 {
 };
 
 // options Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
   // prompt: string
   required DOMString prompt;
@@ -5149,7 +5149,7 @@ dictionary Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
 };
 
 // options Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output {
   // image?: string
   DOMString image;
@@ -5227,7 +5227,7 @@ dictionary Cloudflare_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
 };
 
 // options Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output", LasmPath="Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output", LasmPath="Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
   // response?: string
   DOMString response;
@@ -5343,7 +5343,7 @@ interface Cloudflare_Base_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast {
 };
 
 // options Ai_Cf_Meta_Llama_Guard_3_8B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_Guard_3_8B_Input", LasmPath="Ai_Cf_Meta_Llama_Guard_3_8B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_Guard_3_8B_Input", LasmPath="Ai_Cf_Meta_Llama_Guard_3_8B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Meta_Llama_Guard_3_8B_Input {
   // messages: { role: "user" | "assistant"; content: string; }[]
   required sequence<Cloudflare_Ai_Cf_Meta_Llama_Guard_3_8B_InputMessages> messages;
@@ -5356,7 +5356,7 @@ dictionary Cloudflare_Ai_Cf_Meta_Llama_Guard_3_8B_Input {
 };
 
 // options Ai_Cf_Meta_Llama_Guard_3_8B_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_Guard_3_8B_Output", LasmPath="Ai_Cf_Meta_Llama_Guard_3_8B_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_Guard_3_8B_Output", LasmPath="Ai_Cf_Meta_Llama_Guard_3_8B_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Meta_Llama_Guard_3_8B_Output {
   // response?: | string | { safe?: boolean; categories?: string[]; }
   Cloudflare_DOMStringOrAi_Cf_Meta_Llama_Guard_3_8B_OutputResponse response;
@@ -5374,7 +5374,7 @@ interface Cloudflare_Base_Ai_Cf_Meta_Llama_Guard_3_8B {
 };
 
 // options Ai_Cf_Baai_Bge_Reranker_Base_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Reranker_Base_Input", LasmPath="Ai_Cf_Baai_Bge_Reranker_Base_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Reranker_Base_Input", LasmPath="Ai_Cf_Baai_Bge_Reranker_Base_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Baai_Bge_Reranker_Base_Input {
   // top_k?: number
   double top_k;
@@ -5382,7 +5382,7 @@ dictionary Cloudflare_Ai_Cf_Baai_Bge_Reranker_Base_Input {
   required sequence<Cloudflare_Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsContexts> contexts;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Reranker_Base_Output", LasmPath="Ai_Cf_Baai_Bge_Reranker_Base_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Baai_Bge_Reranker_Base_Output", LasmPath="Ai_Cf_Baai_Bge_Reranker_Base_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Baai_Bge_M3_Output_Query Cloudflare_Ai_Cf_Baai_Bge_Reranker_Base_Output;
 
 // interface Base_Ai_Cf_Baai_Bge_Reranker_Base
@@ -5437,7 +5437,7 @@ dictionary Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
 typedef Cloudflare_Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1;
 
 // options Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output", LasmPath="Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output", LasmPath="Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
   // response: string
   required DOMString response;
@@ -5518,7 +5518,7 @@ dictionary Cloudflare_Ai_Cf_Qwen_Qwq_32B_Messages {
   double presence_penalty;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwq_32B_Output", LasmPath="Ai_Cf_Qwen_Qwq_32B_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwq_32B_Output", LasmPath="Ai_Cf_Qwen_Qwq_32B_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output Cloudflare_Ai_Cf_Qwen_Qwq_32B_Output;
 
 // interface Base_Ai_Cf_Qwen_Qwq_32B
@@ -5566,7 +5566,7 @@ dictionary Cloudflare_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
   double presence_penalty;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output", LasmPath="Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output", LasmPath="Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output Cloudflare_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output;
 
 // interface Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct
@@ -5614,7 +5614,7 @@ dictionary Cloudflare_Ai_Cf_Google_Gemma_3_12B_It_Messages {
   double presence_penalty;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Google_Gemma_3_12B_It_Output", LasmPath="Ai_Cf_Google_Gemma_3_12B_It_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Google_Gemma_3_12B_It_Output", LasmPath="Ai_Cf_Google_Gemma_3_12B_It_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output Cloudflare_Ai_Cf_Google_Gemma_3_12B_It_Output;
 
 // interface Base_Ai_Cf_Google_Gemma_3_12B_It
@@ -5741,7 +5741,7 @@ dictionary Cloudflare_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
 };
 
 // options Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output", LasmPath="Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output", LasmPath="Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
   // response: string
   required DOMString response;
@@ -5900,7 +5900,7 @@ interface Cloudflare_Base_Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8 {
 };
 
 // options Ai_Cf_Deepgram_Nova_3_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Nova_3_Input", LasmPath="Ai_Cf_Deepgram_Nova_3_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Nova_3_Input", LasmPath="Ai_Cf_Deepgram_Nova_3_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Nova_3_Input {
   // audio: { body: object; contentType: string; }
   required Cloudflare_Ai_Cf_Deepgram_Nova_3_InputAudio audio;
@@ -5977,7 +5977,7 @@ dictionary Cloudflare_Ai_Cf_Deepgram_Nova_3_Input {
 };
 
 // options Ai_Cf_Deepgram_Nova_3_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Nova_3_Output", LasmPath="Ai_Cf_Deepgram_Nova_3_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Nova_3_Output", LasmPath="Ai_Cf_Deepgram_Nova_3_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Nova_3_Output {
   // results?: { channels?: { alternatives?: { confidence?: number; transcript?: string; words?: { confidence?: number; end?: number; start?: number; word?: string; }[]; }[]; }[]; summary?: { result?: string; short?: string; }; sentiments?: { segments?: { text?: string; start_word?: number; end_word?: number; sentiment?: string; sentiment_score?: number; }[]; average?: { sentiment?: string; sentiment_score?: number; }; }; }
   Cloudflare_Ai_Cf_Deepgram_Nova_3_OutputResults results;
@@ -5993,7 +5993,7 @@ interface Cloudflare_Base_Ai_Cf_Deepgram_Nova_3 {
 };
 
 // options Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input", LasmPath="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input", LasmPath="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input {
   // queries?: string | string[]
   Cloudflare_DOMStringOrSequenceOfDOMString queries;
@@ -6006,7 +6006,7 @@ dictionary Cloudflare_Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Input {
 };
 
 // options Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output", LasmPath="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output", LasmPath="Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
   // data?: number[][]
   sequence<sequence<double>> data;
@@ -6024,7 +6024,7 @@ interface Cloudflare_Base_Ai_Cf_Qwen_Qwen3_Embedding_0_6B {
 };
 
 // options Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input", LasmPath="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input", LasmPath="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
   // audio: ({ body: object; contentType: string; }) | (string)
   required Cloudflare_Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputAudioOrDOMString audio;
@@ -6033,7 +6033,7 @@ dictionary Cloudflare_Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
 };
 
 // options Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output", LasmPath="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output", LasmPath="Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Output {
   // is_complete?: boolean
   boolean is_complete;
@@ -6069,7 +6069,7 @@ interface Cloudflare_Base_Ai_Cf_Openai_Gpt_Oss_20B {
 };
 
 // options Ai_Cf_Leonardo_Phoenix_1_0_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Phoenix_1_0_Input", LasmPath="Ai_Cf_Leonardo_Phoenix_1_0_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Phoenix_1_0_Input", LasmPath="Ai_Cf_Leonardo_Phoenix_1_0_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Leonardo_Phoenix_1_0_Input {
   // prompt: string
   required DOMString prompt;
@@ -6097,7 +6097,7 @@ interface Cloudflare_Base_Ai_Cf_Leonardo_Phoenix_1_0 {
 };
 
 // options Ai_Cf_Leonardo_Lucid_Origin_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Lucid_Origin_Input", LasmPath="Ai_Cf_Leonardo_Lucid_Origin_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Lucid_Origin_Input", LasmPath="Ai_Cf_Leonardo_Lucid_Origin_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Leonardo_Lucid_Origin_Input {
   // prompt: string
   required DOMString prompt;
@@ -6115,7 +6115,7 @@ dictionary Cloudflare_Ai_Cf_Leonardo_Lucid_Origin_Input {
   double steps;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Lucid_Origin_Output", LasmPath="Ai_Cf_Leonardo_Lucid_Origin_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Leonardo_Lucid_Origin_Output", LasmPath="Ai_Cf_Leonardo_Lucid_Origin_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output Cloudflare_Ai_Cf_Leonardo_Lucid_Origin_Output;
 
 // interface Base_Ai_Cf_Leonardo_Lucid_Origin
@@ -6128,7 +6128,7 @@ interface Cloudflare_Base_Ai_Cf_Leonardo_Lucid_Origin {
 };
 
 // options Ai_Cf_Deepgram_Aura_1_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_1_Input", LasmPath="Ai_Cf_Deepgram_Aura_1_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_1_Input", LasmPath="Ai_Cf_Deepgram_Aura_1_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Aura_1_Input {
   // speaker?: | "angus" | "asteria" | "arcas" | "orion" | "orpheus" | "athena" | "luna" | "zeus" | "perseus" | "helios" | "hera" | "stella"
   Cloudflare_Ai_Cf_Deepgram_Aura_1_InputSpeaker speaker;
@@ -6154,7 +6154,7 @@ interface Cloudflare_Base_Ai_Cf_Deepgram_Aura_1 {
 };
 
 // options Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input", LasmPath="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input", LasmPath="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
   // text: string | string[]
   required Cloudflare_DOMStringOrSequenceOfDOMString text;
@@ -6163,7 +6163,7 @@ dictionary Cloudflare_Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
 };
 
 // options Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output", LasmPath="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output", LasmPath="Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
   // translations: string[]
   required sequence<DOMString> translations;
@@ -6287,10 +6287,10 @@ interface Cloudflare_Base_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Output"] readonly attribute Cloudflare_Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_ResponseOrDOMStringOrAi_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_AsyncResponse postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pfnet_Plamo_Embedding_1B_Input", LasmPath="Ai_Cf_Pfnet_Plamo_Embedding_1B_Input", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pfnet_Plamo_Embedding_1B_Input", LasmPath="Ai_Cf_Pfnet_Plamo_Embedding_1B_Input", LasmDirection="to", LasmAlias]
 typedef Cloudflare_AiTextEmbeddingsInput Cloudflare_Ai_Cf_Pfnet_Plamo_Embedding_1B_Input;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pfnet_Plamo_Embedding_1B_Output", LasmPath="Ai_Cf_Pfnet_Plamo_Embedding_1B_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Pfnet_Plamo_Embedding_1B_Output", LasmPath="Ai_Cf_Pfnet_Plamo_Embedding_1B_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_AiIMultimodalEmbeddingsOutput Cloudflare_Ai_Cf_Pfnet_Plamo_Embedding_1B_Output;
 
 // interface Base_Ai_Cf_Pfnet_Plamo_Embedding_1B
@@ -6303,7 +6303,7 @@ interface Cloudflare_Base_Ai_Cf_Pfnet_Plamo_Embedding_1B {
 };
 
 // options Ai_Cf_Deepgram_Flux_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Flux_Input", LasmPath="Ai_Cf_Deepgram_Flux_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Flux_Input", LasmPath="Ai_Cf_Deepgram_Flux_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Flux_Input {
   // encoding: "linear16"
   required Cloudflare_Ai_Cf_Deepgram_Flux_InputEncoding encoding;
@@ -6324,7 +6324,7 @@ dictionary Cloudflare_Ai_Cf_Deepgram_Flux_Input {
 };
 
 // options Ai_Cf_Deepgram_Flux_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Flux_Output", LasmPath="Ai_Cf_Deepgram_Flux_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Flux_Output", LasmPath="Ai_Cf_Deepgram_Flux_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Flux_Output {
   // request_id?: string
   DOMString request_id;
@@ -6356,7 +6356,7 @@ interface Cloudflare_Base_Ai_Cf_Deepgram_Flux {
 };
 
 // options Ai_Cf_Deepgram_Aura_2_En_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_2_En_Input", LasmPath="Ai_Cf_Deepgram_Aura_2_En_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_2_En_Input", LasmPath="Ai_Cf_Deepgram_Aura_2_En_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Aura_2_En_Input {
   // speaker?: | "amalthea" | "andromeda" | "apollo" | "arcas" | "aries" | "asteria" | "athena" | "atlas" | "aurora" | "callista" | "cora" | "cordelia" | "delia" | "draco" | "electra" | "harmonia" | "helena" | "hera" | "hermes" | "hyperion" | "iris" | "janus" | "juno" | "jupiter" | "luna" | "mars" | "minerva" | "neptune" | "odysseus" | "ophelia" | "orion" | "orpheus" | "pandora" | "phoebe" | "pluto" | "saturn" | "thalia" | "theia" | "vesta" | "zeus"
   Cloudflare_Ai_Cf_Deepgram_Aura_2_En_InputSpeaker speaker;
@@ -6382,7 +6382,7 @@ interface Cloudflare_Base_Ai_Cf_Deepgram_Aura_2_En {
 };
 
 // options Ai_Cf_Deepgram_Aura_2_Es_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_2_Es_Input", LasmPath="Ai_Cf_Deepgram_Aura_2_Es_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Deepgram_Aura_2_Es_Input", LasmPath="Ai_Cf_Deepgram_Aura_2_Es_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Deepgram_Aura_2_Es_Input {
   // speaker?: | "sirio" | "nestor" | "carina" | "celeste" | "alvaro" | "diana" | "aquila" | "selena" | "estrella" | "javier"
   Cloudflare_Ai_Cf_Deepgram_Aura_2_Es_InputSpeaker speaker;
@@ -6408,13 +6408,13 @@ interface Cloudflare_Base_Ai_Cf_Deepgram_Aura_2_Es {
 };
 
 // options Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input {
   // multipart: { body?: object; contentType?: string; }
   required Cloudflare_Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputAudio multipart;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output;
 
 // interface Base_Ai_Cf_Black_Forest_Labs_Flux_2_Dev
@@ -6426,10 +6426,10 @@ interface Cloudflare_Base_Ai_Cf_Black_Forest_Labs_Flux_2_Dev {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output"] readonly attribute Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input", LasmDirection="to", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output;
 
 // interface Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B
@@ -6441,10 +6441,10 @@ interface Cloudflare_Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output"] readonly attribute Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output postProcessedOutputs;
 };
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input", LasmDirection="to", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input;
 
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output", LasmAlias]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output", LasmPath="Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output", LasmDirection="from", LasmAlias]
 typedef Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Output Cloudflare_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output;
 
 // interface Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B
@@ -6484,7 +6484,7 @@ interface Cloudflare_Base_Ai_Cf_Moonshotai_Kimi_K2_6 {
 };
 
 // options Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input", LasmPath="Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input", LasmPath="Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Nvidia_Nemotron_3_120B_A12B_Input {
   // messages: Array<ChatCompletionMessageParam>
   required sequence<Cloudflare_DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages;
@@ -6560,7 +6560,7 @@ interface Cloudflare_Base_Ai_Cf_Nvidia_Nemotron_3_120B_A12B {
 };
 
 // options Ai_Cf_Google_Gemma_4_26B_A4B_It_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Google_Gemma_4_26B_A4B_It_Input", LasmPath="Ai_Cf_Google_Gemma_4_26B_A4B_It_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Google_Gemma_4_26B_A4B_It_Input", LasmPath="Ai_Cf_Google_Gemma_4_26B_A4B_It_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Google_Gemma_4_26B_A4B_It_Input {
   // messages: Array<ChatCompletionMessageParam>
   required sequence<Cloudflare_DeveloperMessageOrSystemMessageOrUserMessageOrAssistantMessageOrToolMessageOrFunctionMessage> messages;
@@ -6644,7 +6644,7 @@ interface Cloudflare_Base_Ai_Cf_Google_Gemma_4_26B_A4B_IT : Cloudflare_Base_Ai_C
 };
 
 // options Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input", LasmPath="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input", LasmPath="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input {
   // audio: ({ body: object; contentType: string; }) | (string)
   required Cloudflare_Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_InputAudioOrDOMString audio;
@@ -6657,7 +6657,7 @@ dictionary Cloudflare_Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Input {
 };
 
 // options Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output", LasmPath="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output", LasmPath="Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Nvidia_Nemotron_Speech_Streaming_En_0_6B_Output {
   // text?: string
   DOMString text;
@@ -6693,7 +6693,7 @@ interface Cloudflare_Base_Ai_Cf_Zai_Org_Glm_5_2 {
 };
 
 // options Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input", LasmPath="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input", LasmPath="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input", LasmDirection="to"]
 dictionary Cloudflare_Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input {
   // task?: "query" | "caption" | "point" | "detect"
   Cloudflare_Ai_Cf_Moondream_Moondream3_1_9B_A2B_InputTask task;
@@ -6720,7 +6720,7 @@ dictionary Cloudflare_Ai_Cf_Moondream_Moondream3_1_9B_A2B_Input {
 };
 
 // options Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output
-[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output", LasmPath="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output"]
+[LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output", LasmPath="Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output", LasmDirection="from"]
 dictionary Cloudflare_Ai_Cf_Moondream_Moondream3_1_9B_A2B_Output {
   // finish_reason: string
   required DOMString finish_reason;
@@ -6891,26 +6891,26 @@ interface Cloudflare_Ai {
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="gateway(gatewayId: string): AiGateway"] Cloudflare_AiGateway gateway(DOMString gatewayId);
   // websearch(request: AiWebSearchRequest): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="websearch(request: AiWebSearchRequest): Promise<Response>"] Promise<Response> websearch(Cloudflare_AiWebSearchRequest request);
-  // run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]["inputs"][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]['inputs'][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>"] Promise<Cloudflare_AiAsyncBatchResponse> run(any model, Cloudflare_AiRunInputs inputs, Cloudflare_AiRunOptions options);
-  // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"], options: AiOptions & { returnRawResponse: true; }): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { returnRawResponse: true; }): Promise<Response>"] Promise<Response> run(any model, any inputs, any options);
-  // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"], options: AiOptions & { websocket: true; }): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { websocket: true; }): Promise<Response>"] Promise<Response> run(any model, any inputs, any options);
   // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>"] Promise<ReadableStream> run(any model, any inputs, optional Cloudflare_AiOptions options);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>"] Promise<ReadableStream> run(any model, Cloudflare_AiRunInputs inputs, optional Cloudflare_AiOptions options);
   // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"], options?: AiOptions): Promise<AiModelList[Name]["postProcessedOutputs"]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options?: AiOptions): Promise<AiModelList[Name]['postProcessedOutputs']>"] Promise<any> run(any model, any inputs, optional Cloudflare_AiOptions options);
   // run<Model extends string>(model: Model extends keyof AiModelList ? never : Model, inputs: Record<string, unknown>, options?: AiOptions): Promise<Record<string, unknown>>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Model extends string>(model: Model extends keyof AiModelList ? never : Model, inputs: Record<string, unknown>, options?: AiOptions): Promise<Record<string, unknown>>"] Promise<record<DOMString, any>> run(any model, record<DOMString, any> inputs, optional Cloudflare_AiOptions options);
+  // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"], options: AiOptions & { websocket: true; }): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { websocket: true; }): Promise<Response>"] Promise<Response> run(any model, any inputs, Cloudflare_AiRunOptions options);
+  // run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"], options: AiOptions & { returnRawResponse: true; }): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { returnRawResponse: true; }): Promise<Response>"] Promise<Response> run(any model, any inputs, any options);
+  // run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]["inputs"][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]['inputs'][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>"] Promise<Cloudflare_AiAsyncBatchResponse> run(any model, any inputs, any options);
   // models(params?: AiModelsSearchParams): Promise<AiModelsSearchObject[]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="models(params?: AiModelsSearchParams): Promise<AiModelsSearchObject[]>"] Promise<sequence<Cloudflare_AiModelsSearchObject>> models(optional Cloudflare_AiModelsSearchParams params);
   // toMarkdown(): ToMarkdownService
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="toMarkdown(): ToMarkdownService"] Cloudflare_ToMarkdownService toMarkdown();
-  // toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>"] Promise<sequence<Cloudflare_ConversionResponse>> toMarkdown(sequence<Cloudflare_MarkdownDocument> files, optional Cloudflare_ConversionRequestOptions options);
   // toMarkdown(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="toMarkdown(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>"] Promise<Cloudflare_ConversionResponse> toMarkdown(Cloudflare_MarkdownDocument files, optional Cloudflare_ConversionRequestOptions options);
+  // toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>"] Promise<sequence<Cloudflare_ConversionResponse>> toMarkdown(sequence<Cloudflare_MarkdownDocument> files, optional Cloudflare_ConversionRequestOptions options);
 };
 
 // options GatewayRetries
@@ -8210,22 +8210,22 @@ dictionary Cloudflare_BrowserRunCloseSessionResult {
 interface Cloudflare_BrowserRun {
   // fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>"] Promise<Response> fetch(Cloudflare_RequestInfoOrURL input, optional RequestInit init);
-  // quickAction(action: "screenshot", options: BrowserRunScreenshotOptions): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'screenshot', options: BrowserRunScreenshotOptions): Promise<Response>", LasmOverloadName="quickActionScreenshot"] Promise<Response> quickAction([LasmConstant="screenshot"] DOMString action, Cloudflare_BrowserRunScreenshotOptions options);
   // quickAction(action: "pdf", options: BrowserRunPDFOptions): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'pdf', options: BrowserRunPDFOptions): Promise<Response>", LasmOverloadName="quickActionPdf"] Promise<Response> quickAction([LasmConstant="pdf"] DOMString action, Cloudflare_BrowserRunPDFOptions options);
-  // quickAction(action: "content", options: BrowserRunContentOptions): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'content', options: BrowserRunContentOptions): Promise<Response>", LasmOverloadName="quickActionContent"] Promise<Response> quickAction([LasmConstant="content"] DOMString action, Cloudflare_BrowserRunQuickActionOptions options);
-  // quickAction(action: "scrape", options: BrowserRunScrapeOptions): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'scrape', options: BrowserRunScrapeOptions): Promise<Response>", LasmOverloadName="quickActionScrape"] Promise<Response> quickAction([LasmConstant="scrape"] DOMString action, Cloudflare_BrowserRunScrapeOptions options);
+  // quickAction(action: "json", options: BrowserRunJsonOptions): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'json', options: BrowserRunJsonOptions): Promise<Response>", LasmOverloadName="quickActionJson"] Promise<Response> quickAction([LasmConstant="json"] DOMString action, Cloudflare_BrowserRunQuickActionOptions options);
   // quickAction(action: "links", options: BrowserRunLinksOptions): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'links', options: BrowserRunLinksOptions): Promise<Response>", LasmOverloadName="quickActionLinks"] Promise<Response> quickAction([LasmConstant="links"] DOMString action, Cloudflare_BrowserRunLinksOptions options);
+  // quickAction(action: "scrape", options: BrowserRunScrapeOptions): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'scrape', options: BrowserRunScrapeOptions): Promise<Response>", LasmOverloadName="quickActionScrape"] Promise<Response> quickAction([LasmConstant="scrape"] DOMString action, Cloudflare_BrowserRunScrapeOptions options);
+  // quickAction(action: "content", options: BrowserRunContentOptions): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'content', options: BrowserRunContentOptions): Promise<Response>", LasmOverloadName="quickActionContent"] Promise<Response> quickAction([LasmConstant="content"] DOMString action, any options);
   // quickAction(action: "snapshot", options: BrowserRunSnapshotOptions): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'snapshot', options: BrowserRunSnapshotOptions): Promise<Response>", LasmOverloadName="quickActionSnapshot"] Promise<Response> quickAction([LasmConstant="snapshot"] DOMString action, Cloudflare_BrowserRunSnapshotOptions options);
-  // quickAction(action: "json", options: BrowserRunJsonOptions): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'json', options: BrowserRunJsonOptions): Promise<Response>", LasmOverloadName="quickActionJson"] Promise<Response> quickAction([LasmConstant="json"] DOMString action, any options);
   // quickAction(action: "markdown", options: BrowserRunMarkdownOptions): Promise<Response>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'markdown', options: BrowserRunMarkdownOptions): Promise<Response>", LasmOverloadName="quickActionMarkdown"] Promise<Response> quickAction([LasmConstant="markdown"] DOMString action, Cloudflare_BrowserRunQuickActionOptions options);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'markdown', options: BrowserRunMarkdownOptions): Promise<Response>", LasmOverloadName="quickActionMarkdown"] Promise<Response> quickAction([LasmConstant="markdown"] DOMString action, any options);
+  // quickAction(action: "screenshot", options: BrowserRunScreenshotOptions): Promise<Response>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'screenshot', options: BrowserRunScreenshotOptions): Promise<Response>", LasmOverloadName="quickActionScreenshot"] Promise<Response> quickAction([LasmConstant="screenshot"] DOMString action, Cloudflare_BrowserRunScreenshotOptions options);
   // quickAction(action: "accessibilityTree", options: BrowserRunAccessibilityTreeOptions): Promise<Response>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="quickAction(action: 'accessibilityTree', options: BrowserRunAccessibilityTreeOptions): Promise<Response>", LasmOverloadName="quickActionAccessibilityTree"] Promise<Response> quickAction([LasmConstant="accessibilityTree"] DOMString action, Cloudflare_BrowserRunAccessibilityTreeOptions options);
   // acquire(options?: BrowserRunAcquireOptions): Promise<BrowserRunAcquireResult>
@@ -9640,12 +9640,12 @@ dictionary Cloudflare_WorkflowCronSchedule {
 interface Cloudflare_WorkflowStep {
   // do<T extends Rpc.Serializable<T>>(name: string, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepDoCallback2 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
-  // do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfigWithDelayFunction config, Cloudflare_WorkflowStepDoCallback3 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
-  // do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfigWithStaticDelay config, Cloudflare_WorkflowStepDoCallback4 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
   // do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfig config, Cloudflare_WorkflowStepDoCallback5 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfig config, Cloudflare_WorkflowStepDoCallback3 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
+  // do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfigWithDelayFunction config, Cloudflare_WorkflowStepDoCallback4 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
+  // do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>"] Promise<any> do(DOMString name, Cloudflare_WorkflowStepConfigWithStaticDelay config, Cloudflare_WorkflowStepDoCallback5 callback, optional Cloudflare_WorkflowStepDoRollbackOptions rollbackOptions);
   // sleep: (name: string, duration: WorkflowSleepDuration) => Promise<void>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="sleep: (name: string, duration: WorkflowSleepDuration) => Promise<void>"] readonly attribute Cloudflare_WorkflowStepSleep sleep;
   // sleepUntil: (name: string, timestamp: Date | number) => Promise<void>
@@ -10157,10 +10157,10 @@ dictionary Cloudflare_SupportedFileFormat {
 // interface ToMarkdownService
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmFile="index.d.ts", LasmName="ToMarkdownService", LasmPath="ToMarkdownService"]
 interface Cloudflare_ToMarkdownService {
-  // transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>"] Promise<sequence<Cloudflare_ConversionResponse>> transform(sequence<Cloudflare_MarkdownDocument> files, optional Cloudflare_ConversionRequestOptions options);
   // transform(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="transform(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>"] Promise<Cloudflare_ConversionResponse> transform(Cloudflare_MarkdownDocument files, optional Cloudflare_ConversionRequestOptions options);
+  // transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>"] Promise<sequence<Cloudflare_ConversionResponse>> transform(sequence<Cloudflare_MarkdownDocument> files, optional Cloudflare_ConversionRequestOptions options);
   // supported(): Promise<SupportedFileFormat[]>
   [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="supported(): Promise<SupportedFileFormat[]>"] Promise<sequence<Cloudflare_SupportedFileFormat>> supported();
 };
@@ -10910,11 +10910,11 @@ typedef any Cloudflare_Env;
 [LasmHost="Cloudflare", LasmLeanModule="Kv", LasmName="DOMStringOrReadableStreamOrBufferSource"]
 typedef (DOMString or ReadableStream or BufferSource) Cloudflare_DOMStringOrReadableStreamOrBufferSource;
 
-// {columnNames: true;}
+// {columnNames?: false}
 [LasmHost="Cloudflare", LasmLeanModule="D1", LasmName="D1PreparedStatementRawOptions"]
 dictionary Cloudflare_D1PreparedStatementRawOptions {
-  // columnNames: true
-  required boolean columnNames;
+  // columnNames?: false
+  boolean columnNames;
 };
 
 // {sql_duration_ms: number;}
@@ -14971,20 +14971,20 @@ dictionary Cloudflare_AiModelsSearchObjectProperties {
   required DOMString value;
 };
 
-// {requests: AiModelList[Name]["inputs"][];}
+// {stream: true;}
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="AiRunInputs"]
 dictionary Cloudflare_AiRunInputs {
-  // requests: AiModelList[Name]["inputs"][]
-  required sequence<any> requests;
+  // stream: true
+  required boolean stream;
 };
 
-// {queueRequest: true; websocket?: boolean; tags?: string[]; gateway?: GatewayOptions; returnRawResponse?: boolean; prefix?: string; extraHeaders?: object; signal?: AbortSignal;}
+// {queueRequest?: boolean; websocket: true; tags?: string[]; gateway?: GatewayOptions; returnRawResponse?: boolean; prefix?: string; extraHeaders?: object; signal?: AbortSignal;}
 [LasmHost="Cloudflare", LasmLeanModule="Ai", LasmName="AiRunOptions"]
 dictionary Cloudflare_AiRunOptions {
-  // queueRequest: true
-  required boolean queueRequest;
-  // websocket?: boolean
-  boolean websocket;
+  // queueRequest?: boolean
+  boolean queueRequest;
+  // websocket: true
+  required boolean websocket;
   // tags?: string[]
   sequence<DOMString> tags;
   // gateway?: GatewayOptions
@@ -16090,7 +16090,10 @@ typedef Cloudflare_BrowserRunBaseOptionsWaitForSelector Cloudflare_BrowserRunQui
 [LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunQuickActionOptionsBrowser", LasmAlias]
 typedef Cloudflare_BrowserRunAlternateBackendOptionsBrowser Cloudflare_BrowserRunQuickActionOptionsBrowser;
 
-// {addScriptTag?: Array<{ content?: string; url?: string; type?: string; id?: string; }>; addStyleTag?: Array<{ content?: string; url?: string; }>; authenticate?: { username: string; password: string; }; cookies?: Array<{ name: string; value: string; url?: string; domain?: string; path?: string; secure?: boolean; httpOnly?: boolean; sameSite?: "Strict" | "Lax" | "None"; expires?: number; priority?: "Low" | "Medium" | "High"; sameParty?: boolean; sourceScheme?: "Unset" | "NonSecure" | "Secure"; sourcePort?: number; partitionKey?: string; }>; emulateMediaType?: string; gotoOptions?: { timeout?: number; waitUntil?: BrowserRunLifecycleEvent | BrowserRunLifecycleEvent[]; referer?: string; referrerPolicy?: string; }; rejectRequestPattern?: string[]; allowRequestPattern?: string[]; rejectResourceTypes?: BrowserRunResourceType[]; allowResourceTypes?: BrowserRunResourceType[]; setExtraHTTPHeaders?: Record<string, string>; setJavaScriptEnabled?: boolean; userAgent?: string; viewport?: { width: number; height: number; deviceScaleFactor?: number; isMobile?: boolean; isLandscape?: boolean; hasTouch?: boolean; }; waitForSelector?: { selector: string; hidden?: true; visible?: true; timeout?: number; }; waitForTimeout?: number; bestAttempt?: boolean; actionTimeout?: number; cacheTTL?: number; browser?: "kitesurf"; url?: string; html?: string;}
+[LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunQuickActionOptionsCustom_ai", LasmAlias]
+typedef Cloudflare_BrowserRunJsonBaseOptionsCustom_ai Cloudflare_BrowserRunQuickActionOptionsCustom_ai;
+
+// {addScriptTag?: Array<{ content?: string; url?: string; type?: string; id?: string; }>; addStyleTag?: Array<{ content?: string; url?: string; }>; authenticate?: { username: string; password: string; }; cookies?: Array<{ name: string; value: string; url?: string; domain?: string; path?: string; secure?: boolean; httpOnly?: boolean; sameSite?: "Strict" | "Lax" | "None"; expires?: number; priority?: "Low" | "Medium" | "High"; sameParty?: boolean; sourceScheme?: "Unset" | "NonSecure" | "Secure"; sourcePort?: number; partitionKey?: string; }>; emulateMediaType?: string; gotoOptions?: { timeout?: number; waitUntil?: BrowserRunLifecycleEvent | BrowserRunLifecycleEvent[]; referer?: string; referrerPolicy?: string; }; rejectRequestPattern?: string[]; allowRequestPattern?: string[]; rejectResourceTypes?: BrowserRunResourceType[]; allowResourceTypes?: BrowserRunResourceType[]; setExtraHTTPHeaders?: Record<string, string>; setJavaScriptEnabled?: boolean; userAgent?: string; viewport?: { width: number; height: number; deviceScaleFactor?: number; isMobile?: boolean; isLandscape?: boolean; hasTouch?: boolean; }; waitForSelector?: { selector: string; hidden?: true; visible?: true; timeout?: number; }; waitForTimeout?: number; bestAttempt?: boolean; actionTimeout?: number; cacheTTL?: number; browser?: "kitesurf"; url?: string; html?: string; custom_ai?: Array<{ model: string; authorization?: string; }>; prompt?: string; response_format?: AiTextGenerationResponseFormat;}
 [LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunQuickActionOptions"]
 dictionary Cloudflare_BrowserRunQuickActionOptions {
   // addScriptTag?: Array<{ content?: string; url?: string; type?: string; id?: string; }>
@@ -16137,10 +16140,13 @@ dictionary Cloudflare_BrowserRunQuickActionOptions {
   DOMString url;
   // html?: string
   DOMString html;
+  // custom_ai?: Array<{ model: string; authorization?: string; }>
+  sequence<Cloudflare_BrowserRunJsonBaseOptionsCustom_ai> custom_ai;
+  // prompt?: string
+  DOMString prompt;
+  // response_format?: AiTextGenerationResponseFormat
+  Cloudflare_AiTextGenerationResponseFormat response_format;
 };
-
-[LasmHost="Cloudflare", LasmLeanModule="BrowserRun", LasmName="BrowserRunQuickActionOptionsCustom_ai", LasmAlias]
-typedef Cloudflare_BrowserRunJsonBaseOptionsCustom_ai Cloudflare_BrowserRunQuickActionOptionsCustom_ai;
 
 [LasmHost="Cloudflare", LasmLeanModule="Cf", LasmName="RequestInitCfPropertiesOriginRangeRequests"]
 enum Cloudflare_RequestInitCfPropertiesOriginRangeRequests { "on", "off" };
@@ -16828,16 +16834,16 @@ dictionary Cloudflare_WorkflowStepDoRollbackOptions {
   Cloudflare_WorkflowStepDoRollbackOptionsRollbackConfig rollbackConfig;
 };
 
-// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback3", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>"]
+// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback3", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>"]
 callback Cloudflare_WorkflowStepDoCallback3 = Promise<any> (Cloudflare_WorkflowDynamicDelayContextCtx ctx);
 
-// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback4", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>"]
+// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback4", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>"]
 callback Cloudflare_WorkflowStepDoCallback4 = Promise<any> (Cloudflare_WorkflowDynamicDelayContextCtx ctx);
 
-// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>
-[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback5", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>"]
+// CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>
+[LasmHost="Cloudflare", LasmLeanModule="Workflows", LasmFile="index.d.ts", LasmName="WorkflowStepDoCallback5", LasmSignature="CloudflareWorkersModule.WorkflowStep.do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>"]
 callback Cloudflare_WorkflowStepDoCallback5 = Promise<any> (Cloudflare_WorkflowDynamicDelayContextCtx ctx);
 
 // CloudflareWorkersModule.WorkflowStep.sleep: (name: string, duration: WorkflowSleepDuration) => Promise<void>

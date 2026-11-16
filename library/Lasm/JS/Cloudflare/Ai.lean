@@ -4434,21 +4434,6 @@ instance : FromJS AiSearchSearchResponse where
     chunks := ← Lasm.JS.readField (Array AiSearchSearchResponseChunks) d "chunks" }
   typeName := "Lasm.JS.Cloudflare.AiSearchSearchResponse"
 
-/-- `dictionary AiSearchInstanceChatCompletionsParams` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure AiSearchInstanceChatCompletionsParams where
-  /-- `required sequence<AiSearchMessage> messages` -/
-  messages : Array AiSearchMessage
-  /-- `DOMString model` -/
-  model : Option String := none
-  /-- `required boolean stream` -/
-  stream : Bool
-  /-- `AiSearchOptions ai_search_options` -/
-  ai_search_options : Option AiSearchOptions := none
-instance : ToJS AiSearchInstanceChatCompletionsParams := ⟨fun d => Support.fields #[("messages", toJS d.messages),
-    ("model", Support.optional d.model),
-    ("stream", toJS d.stream),
-    ("ai_search_options", Support.optional d.ai_search_options)]⟩
-
 /-- `dictionary AiSearchChatCompletionsRequest` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchChatCompletionsRequest where
   /-- `required sequence<AiSearchMessage> messages` -/
@@ -4496,6 +4481,21 @@ instance : FromJS AiSearchChatCompletionsResponse where
     choices := ← Lasm.JS.readField (Array AiSearchMultiChatCompletionsResponseChoices) d "choices",
     chunks := ← Lasm.JS.readField (Array AiSearchSearchResponseChunks) d "chunks" }
   typeName := "Lasm.JS.Cloudflare.AiSearchChatCompletionsResponse"
+
+/-- `dictionary AiSearchInstanceChatCompletionsParams` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AiSearchInstanceChatCompletionsParams where
+  /-- `required sequence<AiSearchMessage> messages` -/
+  messages : Array AiSearchMessage
+  /-- `DOMString model` -/
+  model : Option String := none
+  /-- `required boolean stream` -/
+  stream : Bool
+  /-- `AiSearchOptions ai_search_options` -/
+  ai_search_options : Option AiSearchOptions := none
+instance : ToJS AiSearchInstanceChatCompletionsParams := ⟨fun d => Support.fields #[("messages", toJS d.messages),
+    ("model", Support.optional d.model),
+    ("stream", toJS d.stream),
+    ("ai_search_options", Support.optional d.ai_search_options)]⟩
 
 /-- `dictionary AiSearchInstanceInfoIndex_method` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiSearchInstanceInfoIndex_method where
@@ -5275,6 +5275,8 @@ structure AiTextGenerationResponseFormat where
   type : String
   /-- `any json_schema` -/
   json_schema : Data := .undefined
+instance : ToJS AiTextGenerationResponseFormat := ⟨fun d => Support.fields #[("type", toJS d.type),
+    ("json_schema", d.json_schema)]⟩
 instance : FromJS AiTextGenerationResponseFormat where
   fromJS d := do return {
     type := ← Lasm.JS.readField String d "type",
@@ -9914,9 +9916,9 @@ instance : ToJS AiWebSearchRequest := ⟨fun d => Support.fields #[("gatewayId",
 
 /-- `dictionary AiRunInputs` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiRunInputs where
-  /-- `required sequence<any> requests` -/
-  requests : Array Data
-instance : ToJS AiRunInputs := ⟨fun d => Support.fields #[("requests", toJS d.requests)]⟩
+  /-- `required boolean stream` -/
+  stream : Bool
+instance : ToJS AiRunInputs := ⟨fun d => Support.fields #[("stream", toJS d.stream)]⟩
 
 /-- `typedef double or DOMString or boolean or bigint DoubleOrDOMStringOrBooleanOrBigint`: one constructor per member type. -/
 inductive DoubleOrDOMStringOrBooleanOrBigint where
@@ -9988,42 +9990,6 @@ instance : ToJS GatewayOptions := ⟨fun d => Support.fields #[("id", toJS d.id)
     ("requestTimeoutMs", Support.optional d.requestTimeoutMs),
     ("retries", Support.optional d.retries)]⟩
 
-/-- `dictionary AiRunOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure AiRunOptions where
-  /-- `required boolean queueRequest` -/
-  queueRequest : Bool
-  /-- `boolean websocket` -/
-  websocket : Option Bool := none
-  /-- `sequence<DOMString> tags` -/
-  tags : Option (Array String) := none
-  /-- `GatewayOptions gateway` -/
-  gateway : Option GatewayOptions := none
-  /-- `boolean returnRawResponse` -/
-  returnRawResponse : Option Bool := none
-  /-- `DOMString prefix` -/
-  «prefix» : Option String := none
-  /-- `any extraHeaders` -/
-  extraHeaders : Data := .undefined
-  /-- `AbortSignal signal` -/
-  signal : Option AbortSignal := none
-instance : ToJS AiRunOptions := ⟨fun d => Support.fields #[("queueRequest", toJS d.queueRequest),
-    ("websocket", Support.optional d.websocket),
-    ("tags", Support.optional d.tags),
-    ("gateway", Support.optional d.gateway),
-    ("returnRawResponse", Support.optional d.returnRawResponse),
-    ("prefix", Support.optional d.«prefix»),
-    ("extraHeaders", d.extraHeaders),
-    ("signal", Support.optional d.signal)]⟩
-
-/-- `dictionary AiAsyncBatchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure AiAsyncBatchResponse where
-  /-- `required DOMString request_id` -/
-  request_id : String
-instance : FromJS AiAsyncBatchResponse where
-  fromJS d := do return {
-    request_id := ← Lasm.JS.readField String d "request_id" }
-  typeName := "Lasm.JS.Cloudflare.AiAsyncBatchResponse"
-
 /-- `dictionary AiOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiOptions where
   /-- `boolean queueRequest` -/
@@ -10050,6 +10016,42 @@ instance : ToJS AiOptions := ⟨fun d => Support.fields #[("queueRequest", Suppo
     ("prefix", Support.optional d.«prefix»),
     ("extraHeaders", d.extraHeaders),
     ("signal", Support.optional d.signal)]⟩
+
+/-- `dictionary AiRunOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AiRunOptions where
+  /-- `boolean queueRequest` -/
+  queueRequest : Option Bool := none
+  /-- `required boolean websocket` -/
+  websocket : Bool
+  /-- `sequence<DOMString> tags` -/
+  tags : Option (Array String) := none
+  /-- `GatewayOptions gateway` -/
+  gateway : Option GatewayOptions := none
+  /-- `boolean returnRawResponse` -/
+  returnRawResponse : Option Bool := none
+  /-- `DOMString prefix` -/
+  «prefix» : Option String := none
+  /-- `any extraHeaders` -/
+  extraHeaders : Data := .undefined
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+instance : ToJS AiRunOptions := ⟨fun d => Support.fields #[("queueRequest", Support.optional d.queueRequest),
+    ("websocket", toJS d.websocket),
+    ("tags", Support.optional d.tags),
+    ("gateway", Support.optional d.gateway),
+    ("returnRawResponse", Support.optional d.returnRawResponse),
+    ("prefix", Support.optional d.«prefix»),
+    ("extraHeaders", d.extraHeaders),
+    ("signal", Support.optional d.signal)]⟩
+
+/-- `dictionary AiAsyncBatchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AiAsyncBatchResponse where
+  /-- `required DOMString request_id` -/
+  request_id : String
+instance : FromJS AiAsyncBatchResponse where
+  fromJS d := do return {
+    request_id := ← Lasm.JS.readField String d "request_id" }
+  typeName := "Lasm.JS.Cloudflare.AiAsyncBatchResponse"
 
 /-- `dictionary AiModelsSearchParams` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiModelsSearchParams where
@@ -11234,10 +11236,6 @@ structure EventTargetHandlerObject where
   /-- `required EventTargetHandlerObjectHandleEvent handleEvent` -/
   handleEvent : EventTargetHandlerObjectHandleEvent
 instance : ToJS EventTargetHandlerObject := ⟨fun d => Support.fields #[("handleEvent", toJS d.handleEvent)]⟩
-instance : FromJS EventTargetHandlerObject where
-  fromJS d := do return {
-    handleEvent := ← Lasm.JS.readField EventTargetHandlerObjectHandleEvent d "handleEvent" }
-  typeName := "Lasm.JS.Cloudflare.EventTargetHandlerObject"
 
 /-- `callback UnderlyingByteSourceStart = Promise<undefined> (ReadableByteStreamController controller)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UnderlyingByteSourceStart where
@@ -11316,24 +11314,12 @@ instance : ToJS UnderlyingByteSource := ⟨fun d => Support.fields #[("type", to
     ("start", Support.optional d.start),
     ("pull", Support.optional d.pull),
     ("cancel", Support.optional d.cancel)]⟩
-instance : FromJS UnderlyingByteSource where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField UnderlyingByteSourceType d "type",
-    autoAllocateChunkSize := ← Lasm.JS.readField (Option Float) d "autoAllocateChunkSize",
-    start := ← Lasm.JS.readField (Option UnderlyingByteSourceStart) d "start",
-    pull := ← Lasm.JS.readField (Option UnderlyingByteSourcePull) d "pull",
-    cancel := ← Lasm.JS.readField (Option UnderlyingByteSourceCancel) d "cancel" }
-  typeName := "Lasm.JS.Cloudflare.UnderlyingByteSource"
 
 /-- `dictionary ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions where
   /-- `double min` -/
   min : Option Float := none
 instance : ToJS ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions := ⟨fun d => Support.fields #[("min", Support.optional d.min)]⟩
-instance : FromJS ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions where
-  fromJS d := do return {
-    min := ← Lasm.JS.readField (Option Float) d "min" }
-  typeName := "Lasm.JS.Cloudflare.ReadableStreamBYOBReaderReadableStreamBYOBReaderReadOptions"
 
 /-- `dictionary UvMetricsInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UvMetricsInfo where
@@ -11346,12 +11332,6 @@ structure UvMetricsInfo where
 instance : ToJS UvMetricsInfo := ⟨fun d => Support.fields #[("loopCount", toJS d.loopCount),
     ("events", toJS d.events),
     ("eventsWaiting", toJS d.eventsWaiting)]⟩
-instance : FromJS UvMetricsInfo where
-  fromJS d := do return {
-    loopCount := ← Lasm.JS.readField Float d "loopCount",
-    events := ← Lasm.JS.readField Float d "events",
-    eventsWaiting := ← Lasm.JS.readField Float d "eventsWaiting" }
-  typeName := "Lasm.JS.Cloudflare.UvMetricsInfo"
 
 /-- `dictionary AiMultimodalEmbeddingsInput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiMultimodalEmbeddingsInput where
@@ -11361,11 +11341,6 @@ structure AiMultimodalEmbeddingsInput where
   text : Array String
 instance : ToJS AiMultimodalEmbeddingsInput := ⟨fun d => Support.fields #[("image", toJS d.image),
     ("text", toJS d.text)]⟩
-instance : FromJS AiMultimodalEmbeddingsInput where
-  fromJS d := do return {
-    image := ← Lasm.JS.readField String d "image",
-    text := ← Lasm.JS.readField (Array String) d "text" }
-  typeName := "Lasm.JS.Cloudflare.AiMultimodalEmbeddingsInput"
 
 /-- `dictionary AiTextGenerationToolLegacyOutput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AiTextGenerationToolLegacyOutput where
@@ -11375,11 +11350,6 @@ structure AiTextGenerationToolLegacyOutput where
   arguments : Data
 instance : ToJS AiTextGenerationToolLegacyOutput := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("arguments", toJS d.arguments)]⟩
-instance : FromJS AiTextGenerationToolLegacyOutput where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    arguments := ← Lasm.JS.readField Data d "arguments" }
-  typeName := "Lasm.JS.Cloudflare.AiTextGenerationToolLegacyOutput"
 
 /-- `dictionary ChatCompletionContentPartImageImage_url` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartImageImage_url where
@@ -11389,11 +11359,6 @@ structure ChatCompletionContentPartImageImage_url where
   detail : Option ChatCompletionContentPartImageImage_urlDetail := none
 instance : ToJS ChatCompletionContentPartImageImage_url := ⟨fun d => Support.fields #[("url", toJS d.url),
     ("detail", Support.optional d.detail)]⟩
-instance : FromJS ChatCompletionContentPartImageImage_url where
-  fromJS d := do return {
-    url := ← Lasm.JS.readField String d "url",
-    detail := ← Lasm.JS.readField (Option ChatCompletionContentPartImageImage_urlDetail) d "detail" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartImageImage_url"
 
 /-- `dictionary ChatCompletionContentPartImage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartImage where
@@ -11403,11 +11368,6 @@ structure ChatCompletionContentPartImage where
   image_url : ChatCompletionContentPartImageImage_url
 instance : ToJS ChatCompletionContentPartImage := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("image_url", toJS d.image_url)]⟩
-instance : FromJS ChatCompletionContentPartImage where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ChatCompletionContentPartImageType d "type",
-    image_url := ← Lasm.JS.readField ChatCompletionContentPartImageImage_url d "image_url" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartImage"
 
 /-- `dictionary ChatCompletionContentPartInputAudioInput_audio` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartInputAudioInput_audio where
@@ -11417,11 +11377,6 @@ structure ChatCompletionContentPartInputAudioInput_audio where
   format : ChatCompletionContentPartInputAudioInput_audioFormat
 instance : ToJS ChatCompletionContentPartInputAudioInput_audio := ⟨fun d => Support.fields #[("data", toJS d.data),
     ("format", toJS d.format)]⟩
-instance : FromJS ChatCompletionContentPartInputAudioInput_audio where
-  fromJS d := do return {
-    data := ← Lasm.JS.readField String d "data",
-    format := ← Lasm.JS.readField ChatCompletionContentPartInputAudioInput_audioFormat d "format" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartInputAudioInput_audio"
 
 /-- `dictionary ChatCompletionContentPartInputAudio` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartInputAudio where
@@ -11431,11 +11386,6 @@ structure ChatCompletionContentPartInputAudio where
   input_audio : ChatCompletionContentPartInputAudioInput_audio
 instance : ToJS ChatCompletionContentPartInputAudio := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("input_audio", toJS d.input_audio)]⟩
-instance : FromJS ChatCompletionContentPartInputAudio where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ChatCompletionContentPartInputAudioType d "type",
-    input_audio := ← Lasm.JS.readField ChatCompletionContentPartInputAudioInput_audio d "input_audio" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartInputAudio"
 
 /-- `dictionary ChatCompletionContentPartFile` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartFile where
@@ -11445,11 +11395,6 @@ structure ChatCompletionContentPartFile where
   file : ChatCompletionContentPartFileFile
 instance : ToJS ChatCompletionContentPartFile := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("file", toJS d.file)]⟩
-instance : FromJS ChatCompletionContentPartFile where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ChatCompletionContentPartFileType d "type",
-    file := ← Lasm.JS.readField ChatCompletionContentPartFileFile d "file" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartFile"
 
 /-- `dictionary ChatCompletionContentPartRefusal` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ChatCompletionContentPartRefusal where
@@ -11459,11 +11404,6 @@ structure ChatCompletionContentPartRefusal where
   refusal : String
 instance : ToJS ChatCompletionContentPartRefusal := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("refusal", toJS d.refusal)]⟩
-instance : FromJS ChatCompletionContentPartRefusal where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField ChatCompletionContentPartRefusalType d "type",
-    refusal := ← Lasm.JS.readField String d "refusal" }
-  typeName := "Lasm.JS.Cloudflare.ChatCompletionContentPartRefusal"
 
 /-- `typedef ChatCompletionToolChoiceOption or ChatCompletionToolChoiceOption2 or ChatCompletionToolChoiceOption3 or ChatCompletionToolChoiceFunction or ChatCompletionToolChoiceCustom or ChatCompletionToolChoiceAllowedTools ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption2OrChatCompletionToolChoiceOption3OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools`: one constructor per member type. -/
 inductive ChatCompletionToolChoiceOptionOrChatCompletionToolChoiceOption2OrChatCompletionToolChoiceOption3OrChatCompletionToolChoiceFunctionOrChatCompletionToolChoiceCustomOrChatCompletionToolChoiceAllowedTools where
@@ -11600,12 +11540,6 @@ instance : ToJS DOMStringOrResponseConversationParam := ⟨fun
   | .responseConversationParam v => toJS v⟩
 instance : Coe String DOMStringOrResponseConversationParam := ⟨.domString⟩
 instance : Coe ResponseConversationParam DOMStringOrResponseConversationParam := ⟨.responseConversationParam⟩
-instance : FromJS DOMStringOrResponseConversationParam where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.object _) => (FromJS.fromJS d : Except String ResponseConversationParam).map .responseConversationParam
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrResponseConversationParam"
 
 /-- `dictionary ResponseInputText` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseInputText where
@@ -11995,10 +11929,6 @@ structure StreamOptions where
   /-- `boolean include_obfuscation` -/
   include_obfuscation : Option Bool := none
 instance : ToJS StreamOptions := ⟨fun d => Support.fields #[("include_obfuscation", Support.optional d.include_obfuscation)]⟩
-instance : FromJS StreamOptions where
-  fromJS d := do return {
-    include_obfuscation := ← Lasm.JS.readField (Option Bool) d "include_obfuscation" }
-  typeName := "Lasm.JS.Cloudflare.StreamOptions"
 
 /-- `dictionary ResponseFormatTextJSONSchemaConfig` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFormatTextJSONSchemaConfig where
@@ -12076,12 +12006,6 @@ instance : ToJS ResponsesInputTool_choiceOrToolChoiceFunction := ⟨fun
   | .toolChoiceFunction v => toJS v⟩
 instance : Coe ChatCompletionToolChoiceOption ResponsesInputTool_choiceOrToolChoiceFunction := ⟨.chatCompletionToolChoiceOption⟩
 instance : Coe ToolChoiceFunction ResponsesInputTool_choiceOrToolChoiceFunction := ⟨.toolChoiceFunction⟩
-instance : FromJS ResponsesInputTool_choiceOrToolChoiceFunction where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String ChatCompletionToolChoiceOption).map .chatCompletionToolChoiceOption
-    | d@(.object _) => (FromJS.fromJS d : Except String ToolChoiceFunction).map .toolChoiceFunction
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.ResponsesInputTool_choiceOrToolChoiceFunction"
 
 /-- `dictionary ResponsesFunctionTool` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponsesFunctionTool where
@@ -12178,8 +12102,6 @@ structure ResponseError where
   code : ResponseErrorCode
   /-- `required DOMString message` -/
   message : String
-instance : ToJS ResponseError := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("message", toJS d.message)]⟩
 instance : FromJS ResponseError where
   fromJS d := do return {
     code := ← Lasm.JS.readField ResponseErrorCode d "code",
@@ -12190,7 +12112,6 @@ instance : FromJS ResponseError where
 structure ResponseIncompleteDetails where
   /-- `ResponseIncompleteDetailsReason reason` -/
   reason : Option ResponseIncompleteDetailsReason := none
-instance : ToJS ResponseIncompleteDetails := ⟨fun d => Support.fields #[("reason", Support.optional d.reason)]⟩
 instance : FromJS ResponseIncompleteDetails where
   fromJS d := do return {
     reason := ← Lasm.JS.readField (Option ResponseIncompleteDetailsReason) d "reason" }
@@ -12218,33 +12139,12 @@ inductive ResponsesOutputTool_choiceOrToolChoiceFunction where
   | chatCompletionToolChoiceOption (value : ChatCompletionToolChoiceOption)
   /-- `ToolChoiceFunction` -/
   | toolChoiceFunction (value : ToolChoiceFunction)
-instance : ToJS ResponsesOutputTool_choiceOrToolChoiceFunction := ⟨fun
-  | .chatCompletionToolChoiceOption v => toJS v
-  | .toolChoiceFunction v => toJS v⟩
-instance : Coe ChatCompletionToolChoiceOption ResponsesOutputTool_choiceOrToolChoiceFunction := ⟨.chatCompletionToolChoiceOption⟩
-instance : Coe ToolChoiceFunction ResponsesOutputTool_choiceOrToolChoiceFunction := ⟨.toolChoiceFunction⟩
 instance : FromJS ResponsesOutputTool_choiceOrToolChoiceFunction where
   fromJS
     | d@(.string _) => (FromJS.fromJS d : Except String ChatCompletionToolChoiceOption).map .chatCompletionToolChoiceOption
     | d@(.object _) => (FromJS.fromJS d : Except String ToolChoiceFunction).map .toolChoiceFunction
     | _ => .error ""
   typeName := "Lasm.JS.Cloudflare.ResponsesOutputTool_choiceOrToolChoiceFunction"
-
-/-- `typedef DOMString or ResponseInputText or ResponseInputImage DOMStringOrResponseInputTextOrResponseInputImage`: one constructor per member type. -/
-inductive DOMStringOrResponseInputTextOrResponseInputImage where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `ResponseInputText` -/
-  | responseInputText (value : ResponseInputText)
-  /-- `ResponseInputImage` -/
-  | responseInputImage (value : ResponseInputImage)
-instance : ToJS DOMStringOrResponseInputTextOrResponseInputImage := ⟨fun
-  | .domString v => toJS v
-  | .responseInputText v => toJS v
-  | .responseInputImage v => toJS v⟩
-instance : Coe String DOMStringOrResponseInputTextOrResponseInputImage := ⟨.domString⟩
-instance : Coe ResponseInputText DOMStringOrResponseInputTextOrResponseInputImage := ⟨.responseInputText⟩
-instance : Coe ResponseInputImage DOMStringOrResponseInputTextOrResponseInputImage := ⟨.responseInputImage⟩
 
 /-- `dictionary ResponsePrompt` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponsePrompt where
@@ -12254,9 +12154,6 @@ structure ResponsePrompt where
   variables : Option (Record DOMStringOrResponseInputTextOrResponseInputImage) := none
   /-- `DOMString? version` -/
   version : Option String := none
-instance : ToJS ResponsePrompt := ⟨fun d => Support.fields #[("id", toJS d.id),
-    ("variables", Support.optional d.variables),
-    ("version", Support.optional d.version)]⟩
 
 /-- `dictionary ResponseUsage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseUsage where
@@ -12266,9 +12163,6 @@ structure ResponseUsage where
   output_tokens : Float
   /-- `required double total_tokens` -/
   total_tokens : Float
-instance : ToJS ResponseUsage := ⟨fun d => Support.fields #[("input_tokens", toJS d.input_tokens),
-    ("output_tokens", toJS d.output_tokens),
-    ("total_tokens", toJS d.total_tokens)]⟩
 instance : FromJS ResponseUsage where
   fromJS d := do return {
     input_tokens := ← Lasm.JS.readField Float d "input_tokens",
@@ -12324,29 +12218,6 @@ structure ResponsesOutput where
   truncation : Option ResponsesInputTruncation := none
   /-- `ResponseUsage usage` -/
   usage : Option ResponseUsage := none
-instance : ToJS ResponsesOutput := ⟨fun d => Support.fields #[("id", Support.optional d.id),
-    ("created_at", Support.optional d.created_at),
-    ("output_text", Support.optional d.output_text),
-    ("error", Support.optional d.error),
-    ("incomplete_details", Support.optional d.incomplete_details),
-    ("instructions", Support.optional d.instructions),
-    ("object", Support.optional d.object),
-    ("output", Support.optional d.output),
-    ("parallel_tool_calls", Support.optional d.parallel_tool_calls),
-    ("temperature", Support.optional d.temperature),
-    ("tool_choice", Support.optional d.tool_choice),
-    ("tools", Support.optional d.tools),
-    ("top_p", Support.optional d.top_p),
-    ("max_output_tokens", Support.optional d.max_output_tokens),
-    ("previous_response_id", Support.optional d.previous_response_id),
-    ("prompt", Support.optional d.prompt),
-    ("reasoning", Support.optional d.reasoning),
-    ("safety_identifier", Support.optional d.safety_identifier),
-    ("service_tier", Support.optional d.service_tier),
-    ("status", Support.optional d.status),
-    ("text", Support.optional d.text),
-    ("truncation", Support.optional d.truncation),
-    ("usage", Support.optional d.usage)]⟩
 
 /-- `dictionary ResponseCreatedEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseCreatedEvent where
@@ -12359,12 +12230,6 @@ structure ResponseCreatedEvent where
 instance : ToJS ResponseCreatedEvent := ⟨fun d => Support.fields #[("response", toJS d.response),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseCreatedEvent where
-  fromJS d := do return {
-    response := ← Lasm.JS.readField Response d "response",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseCreatedEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseCreatedEvent"
 
 /-- `dictionary ResponseCustomToolCallOutput` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseCustomToolCallOutput where
@@ -12398,14 +12263,6 @@ instance : ToJS ResponseErrorEvent := ⟨fun d => Support.fields #[("code", toJS
     ("param", toJS d.param),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseErrorEvent where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField (Option String) d "code",
-    message := ← Lasm.JS.readField String d "message",
-    param := ← Lasm.JS.readField (Option String) d "param",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseErrorEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseErrorEvent"
 
 /-- `dictionary ResponseFailedEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFailedEvent where
@@ -12418,12 +12275,6 @@ structure ResponseFailedEvent where
 instance : ToJS ResponseFailedEvent := ⟨fun d => Support.fields #[("response", toJS d.response),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseFailedEvent where
-  fromJS d := do return {
-    response := ← Lasm.JS.readField Response d "response",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseFailedEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseFailedEvent"
 
 /-- `dictionary ResponseFunctionCallArgumentsDeltaEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFunctionCallArgumentsDeltaEvent where
@@ -12442,14 +12293,6 @@ instance : ToJS ResponseFunctionCallArgumentsDeltaEvent := ⟨fun d => Support.f
     ("output_index", toJS d.output_index),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseFunctionCallArgumentsDeltaEvent where
-  fromJS d := do return {
-    delta := ← Lasm.JS.readField String d "delta",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseFunctionCallArgumentsDeltaEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseFunctionCallArgumentsDeltaEvent"
 
 /-- `dictionary ResponseFunctionCallArgumentsDoneEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFunctionCallArgumentsDoneEvent where
@@ -12471,15 +12314,6 @@ instance : ToJS ResponseFunctionCallArgumentsDoneEvent := ⟨fun d => Support.fi
     ("output_index", toJS d.output_index),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseFunctionCallArgumentsDoneEvent where
-  fromJS d := do return {
-    arguments := ← Lasm.JS.readField String d "arguments",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    name := ← Lasm.JS.readField String d "name",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseFunctionCallArgumentsDoneEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseFunctionCallArgumentsDoneEvent"
 
 /-- `dictionary ResponseFunctionToolCallItem` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFunctionToolCallItem where
@@ -12501,15 +12335,6 @@ instance : ToJS ResponseFunctionToolCallItem := ⟨fun d => Support.fields #[("a
     ("type", toJS d.type),
     ("status", Support.optional d.status),
     ("id", toJS d.id)]⟩
-instance : FromJS ResponseFunctionToolCallItem where
-  fromJS d := do return {
-    arguments := ← Lasm.JS.readField String d "arguments",
-    call_id := ← Lasm.JS.readField String d "call_id",
-    name := ← Lasm.JS.readField String d "name",
-    type := ← Lasm.JS.readField ResponseFunctionToolCallType d "type",
-    status := ← Lasm.JS.readField (Option ResponseFunctionToolCallStatus) d "status",
-    id := ← Lasm.JS.readField String d "id" }
-  typeName := "Lasm.JS.Cloudflare.ResponseFunctionToolCallItem"
 
 /-- `dictionary ResponseFunctionToolCallOutputItem` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseFunctionToolCallOutputItem where
@@ -12540,12 +12365,6 @@ structure ResponseIncompleteEvent where
 instance : ToJS ResponseIncompleteEvent := ⟨fun d => Support.fields #[("response", toJS d.response),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseIncompleteEvent where
-  fromJS d := do return {
-    response := ← Lasm.JS.readField Response d "response",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseIncompleteEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseIncompleteEvent"
 
 /-- `dictionary ResponseInputMessageItem` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseInputMessageItem where
@@ -12615,15 +12434,6 @@ instance : ToJS ResponseReasoningTextDeltaEvent := ⟨fun d => Support.fields #[
     ("output_index", toJS d.output_index),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseReasoningTextDeltaEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    delta := ← Lasm.JS.readField String d "delta",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseReasoningTextDeltaEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseReasoningTextDeltaEvent"
 
 /-- `dictionary ResponseReasoningTextDoneEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseReasoningTextDoneEvent where
@@ -12645,15 +12455,6 @@ instance : ToJS ResponseReasoningTextDoneEvent := ⟨fun d => Support.fields #[(
     ("sequence_number", toJS d.sequence_number),
     ("text", toJS d.text),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseReasoningTextDoneEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    text := ← Lasm.JS.readField String d "text",
-    type := ← Lasm.JS.readField ResponseReasoningTextDoneEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseReasoningTextDoneEvent"
 
 /-- `dictionary ResponseRefusalDeltaEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseRefusalDeltaEvent where
@@ -12675,15 +12476,6 @@ instance : ToJS ResponseRefusalDeltaEvent := ⟨fun d => Support.fields #[("cont
     ("output_index", toJS d.output_index),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseRefusalDeltaEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    delta := ← Lasm.JS.readField String d "delta",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseRefusalDeltaEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseRefusalDeltaEvent"
 
 /-- `dictionary ResponseRefusalDoneEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseRefusalDoneEvent where
@@ -12705,15 +12497,6 @@ instance : ToJS ResponseRefusalDoneEvent := ⟨fun d => Support.fields #[("conte
     ("refusal", toJS d.refusal),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseRefusalDoneEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    refusal := ← Lasm.JS.readField String d "refusal",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseRefusalDoneEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseRefusalDoneEvent"
 
 /-- `dictionary ResponseCompletedEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseCompletedEvent where
@@ -12726,12 +12509,6 @@ structure ResponseCompletedEvent where
 instance : ToJS ResponseCompletedEvent := ⟨fun d => Support.fields #[("response", toJS d.response),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseCompletedEvent where
-  fromJS d := do return {
-    response := ← Lasm.JS.readField Response d "response",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseCompletedEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseCompletedEvent"
 
 /-- `dictionary ResponseTextDeltaEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseTextDeltaEvent where
@@ -12756,16 +12533,6 @@ instance : ToJS ResponseTextDeltaEvent := ⟨fun d => Support.fields #[("content
     ("output_index", toJS d.output_index),
     ("sequence_number", toJS d.sequence_number),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseTextDeltaEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    delta := ← Lasm.JS.readField String d "delta",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    logprobs := ← Lasm.JS.readField (Array Logprob) d "logprobs",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    type := ← Lasm.JS.readField ResponseTextDeltaEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseTextDeltaEvent"
 
 /-- `dictionary ResponseTextDoneEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResponseTextDoneEvent where
@@ -12790,26 +12557,12 @@ instance : ToJS ResponseTextDoneEvent := ⟨fun d => Support.fields #[("content_
     ("sequence_number", toJS d.sequence_number),
     ("text", toJS d.text),
     ("type", toJS d.type)]⟩
-instance : FromJS ResponseTextDoneEvent where
-  fromJS d := do return {
-    content_index := ← Lasm.JS.readField Float d "content_index",
-    item_id := ← Lasm.JS.readField String d "item_id",
-    logprobs := ← Lasm.JS.readField (Array Logprob) d "logprobs",
-    output_index := ← Lasm.JS.readField Float d "output_index",
-    sequence_number := ← Lasm.JS.readField Float d "sequence_number",
-    text := ← Lasm.JS.readField String d "text",
-    type := ← Lasm.JS.readField ResponseTextDoneEventType d "type" }
-  typeName := "Lasm.JS.Cloudflare.ResponseTextDoneEvent"
 
 /-- `dictionary AIGatewayHeaders` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AIGatewayHeaders where
   /-- `required DOMString Authorization` -/
   Authorization : String
 instance : ToJS AIGatewayHeaders := ⟨fun d => Support.fields #[("Authorization", toJS d.Authorization)]⟩
-instance : FromJS AIGatewayHeaders where
-  fromJS d := do return {
-    Authorization := ← Lasm.JS.readField String d "Authorization" }
-  typeName := "Lasm.JS.Cloudflare.AIGatewayHeaders"
 
 /-- `dictionary ArtifactsError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ArtifactsError where
@@ -12822,12 +12575,6 @@ structure ArtifactsError where
 instance : ToJS ArtifactsError := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("code", toJS d.code),
     ("numericCode", toJS d.numericCode)]⟩
-instance : FromJS ArtifactsError where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField Data d "name",
-    code := ← Lasm.JS.readField ArtifactsErrorCode d "code",
-    numericCode := ← Lasm.JS.readField Float d "numericCode" }
-  typeName := "Lasm.JS.Cloudflare.ArtifactsError"
 
 /-- `dictionary ComparisonFilter` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ComparisonFilter where
@@ -12840,12 +12587,6 @@ structure ComparisonFilter where
 instance : ToJS ComparisonFilter := ⟨fun d => Support.fields #[("key", toJS d.key),
     ("type", toJS d.type),
     ("value", toJS d.value)]⟩
-instance : FromJS ComparisonFilter where
-  fromJS d := do return {
-    key := ← Lasm.JS.readField String d "key",
-    type := ← Lasm.JS.readField ComparisonFilterType d "type",
-    value := ← Lasm.JS.readField DOMStringOrDoubleOrBoolean d "value" }
-  typeName := "Lasm.JS.Cloudflare.ComparisonFilter"
 
 /-- `dictionary CompoundFilter` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CompoundFilter where
@@ -12855,11 +12596,6 @@ structure CompoundFilter where
   filters : Array ComparisonFilter
 instance : ToJS CompoundFilter := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("filters", toJS d.filters)]⟩
-instance : FromJS CompoundFilter where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField AiSearchOptionsRetrievalKeyword_match_mode d "type",
-    filters := ← Lasm.JS.readField (Array ComparisonFilter) d "filters" }
-  typeName := "Lasm.JS.Cloudflare.CompoundFilter"
 
 /-- `typedef CompoundFilter or ComparisonFilter CompoundFilterOrComparisonFilter`: one constructor per member type. -/
 inductive CompoundFilterOrComparisonFilter where
@@ -12881,11 +12617,6 @@ structure AutoRagSearchRequestRanking_options where
   score_threshold : Option Float := none
 instance : ToJS AutoRagSearchRequestRanking_options := ⟨fun d => Support.fields #[("ranker", Support.optional d.ranker),
     ("score_threshold", Support.optional d.score_threshold)]⟩
-instance : FromJS AutoRagSearchRequestRanking_options where
-  fromJS d := do return {
-    ranker := ← Lasm.JS.readField (Option String) d "ranker",
-    score_threshold := ← Lasm.JS.readField (Option Float) d "score_threshold" }
-  typeName := "Lasm.JS.Cloudflare.AutoRagSearchRequestRanking_options"
 
 /-- `dictionary AutoRagSearchRequestReranking` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AutoRagSearchRequestReranking where
@@ -12895,11 +12626,6 @@ structure AutoRagSearchRequestReranking where
   model : Option String := none
 instance : ToJS AutoRagSearchRequestReranking := ⟨fun d => Support.fields #[("enabled", Support.optional d.enabled),
     ("model", Support.optional d.model)]⟩
-instance : FromJS AutoRagSearchRequestReranking where
-  fromJS d := do return {
-    enabled := ← Lasm.JS.readField (Option Bool) d "enabled",
-    model := ← Lasm.JS.readField (Option String) d "model" }
-  typeName := "Lasm.JS.Cloudflare.AutoRagSearchRequestReranking"
 
 /-- `dictionary AutoRagSearchRequest` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AutoRagSearchRequest where
@@ -12993,14 +12719,6 @@ instance : ToJS AutoRagSearchResponseData := ⟨fun d => Support.fields #[("file
     ("score", toJS d.score),
     ("attributes", toJS d.attributes),
     ("content", toJS d.content)]⟩
-instance : FromJS AutoRagSearchResponseData where
-  fromJS d := do return {
-    file_id := ← Lasm.JS.readField String d "file_id",
-    filename := ← Lasm.JS.readField String d "filename",
-    score := ← Lasm.JS.readField Float d "score",
-    attributes := ← Lasm.JS.readField (Record (Option DOMStringOrDoubleOrBoolean)) d "attributes",
-    content := ← Lasm.JS.readField (Array ChatCompletionContentPartText) d "content" }
-  typeName := "Lasm.JS.Cloudflare.AutoRagSearchResponseData"
 
 /-- `dictionary AutoRagSearchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AutoRagSearchResponse where
@@ -13019,14 +12737,6 @@ instance : ToJS AutoRagSearchResponse := ⟨fun d => Support.fields #[("object",
     ("data", toJS d.data),
     ("has_more", toJS d.has_more),
     ("next_page", toJS d.next_page)]⟩
-instance : FromJS AutoRagSearchResponse where
-  fromJS d := do return {
-    object := ← Lasm.JS.readField AutoRagSearchResponseObject d "object",
-    search_query := ← Lasm.JS.readField String d "search_query",
-    data := ← Lasm.JS.readField (Array AutoRagSearchResponseData) d "data",
-    has_more := ← Lasm.JS.readField Bool d "has_more",
-    next_page := ← Lasm.JS.readField (Option String) d "next_page" }
-  typeName := "Lasm.JS.Cloudflare.AutoRagSearchResponse"
 
 /-- `dictionary AutoRagAiSearchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AutoRagAiSearchResponse where
@@ -13048,15 +12758,6 @@ instance : ToJS AutoRagAiSearchResponse := ⟨fun d => Support.fields #[("object
     ("has_more", toJS d.has_more),
     ("next_page", toJS d.next_page),
     ("response", toJS d.response)]⟩
-instance : FromJS AutoRagAiSearchResponse where
-  fromJS d := do return {
-    object := ← Lasm.JS.readField AutoRagSearchResponseObject d "object",
-    search_query := ← Lasm.JS.readField String d "search_query",
-    data := ← Lasm.JS.readField (Array AutoRagSearchResponseData) d "data",
-    has_more := ← Lasm.JS.readField Bool d "has_more",
-    next_page := ← Lasm.JS.readField (Option String) d "next_page",
-    response := ← Lasm.JS.readField String d "response" }
-  typeName := "Lasm.JS.Cloudflare.AutoRagAiSearchResponse"
 
 /-- `typedef DOMString or Uint8Array DOMStringOrUint8Array`: one constructor per member type. -/
 inductive DOMStringOrUint8Array where
@@ -13069,12 +12770,6 @@ instance : ToJS DOMStringOrUint8Array := ⟨fun
   | .uint8Array v => toJS v⟩
 instance : Coe String DOMStringOrUint8Array := ⟨.domString⟩
 instance : Coe ByteArray DOMStringOrUint8Array := ⟨.uint8Array⟩
-instance : FromJS DOMStringOrUint8Array where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.bytes _) => (FromJS.fromJS d : Except String ByteArray).map .uint8Array
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrUint8Array"
 
 /-- `dictionary PubSubMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PubSubMessage where
@@ -13105,18 +12800,6 @@ instance : ToJS PubSubMessage := ⟨fun d => Support.fields #[("mid", toJS d.mid
     ("contentType", toJS d.contentType),
     ("payloadFormatIndicator", toJS d.payloadFormatIndicator),
     ("payload", toJS d.payload)]⟩
-instance : FromJS PubSubMessage where
-  fromJS d := do return {
-    mid := ← Lasm.JS.readField Float d "mid",
-    broker := ← Lasm.JS.readField String d "broker",
-    topic := ← Lasm.JS.readField String d "topic",
-    clientId := ← Lasm.JS.readField String d "clientId",
-    jti := ← Lasm.JS.readField (Option String) d "jti",
-    receivedAt := ← Lasm.JS.readField Float d "receivedAt",
-    contentType := ← Lasm.JS.readField String d "contentType",
-    payloadFormatIndicator := ← Lasm.JS.readField Float d "payloadFormatIndicator",
-    payload := ← Lasm.JS.readField DOMStringOrUint8Array d "payload" }
-  typeName := "Lasm.JS.Cloudflare.PubSubMessage"
 
 /-- `dictionary JsonWebKeyWithKid` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure JsonWebKeyWithKid where
@@ -13183,30 +12866,6 @@ instance : ToJS JsonWebKeyWithKid := ⟨fun d => Support.fields #[("kty", toJS d
     ("pub", Support.optional d.pub),
     ("priv", Support.optional d.priv),
     ("kid", toJS d.kid)]⟩
-instance : FromJS JsonWebKeyWithKid where
-  fromJS d := do return {
-    kty := ← Lasm.JS.readField String d "kty",
-    use := ← Lasm.JS.readField (Option String) d "use",
-    key_ops := ← Lasm.JS.readField (Option (Array String)) d "key_ops",
-    alg := ← Lasm.JS.readField (Option String) d "alg",
-    ext := ← Lasm.JS.readField (Option Bool) d "ext",
-    crv := ← Lasm.JS.readField (Option String) d "crv",
-    x := ← Lasm.JS.readField (Option String) d "x",
-    y := ← Lasm.JS.readField (Option String) d "y",
-    d := ← Lasm.JS.readField (Option String) d "d",
-    n := ← Lasm.JS.readField (Option String) d "n",
-    e := ← Lasm.JS.readField (Option String) d "e",
-    p := ← Lasm.JS.readField (Option String) d "p",
-    q := ← Lasm.JS.readField (Option String) d "q",
-    dp := ← Lasm.JS.readField (Option String) d "dp",
-    dq := ← Lasm.JS.readField (Option String) d "dq",
-    qi := ← Lasm.JS.readField (Option String) d "qi",
-    oth := ← Lasm.JS.readField (Option (Array RsaOtherPrimesInfo)) d "oth",
-    k := ← Lasm.JS.readField (Option String) d "k",
-    pub := ← Lasm.JS.readField (Option String) d "pub",
-    priv := ← Lasm.JS.readField (Option String) d "priv",
-    kid := ← Lasm.JS.readField String d "kid" }
-  typeName := "Lasm.JS.Cloudflare.JsonWebKeyWithKid"
 
 /-- `dictionary StreamError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StreamError where
@@ -13222,13 +12881,6 @@ instance : ToJS StreamError := ⟨fun d => Support.fields #[("code", toJS d.code
     ("statusCode", toJS d.statusCode),
     ("message", toJS d.message),
     ("stack", Support.optional d.stack)]⟩
-instance : FromJS StreamError where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField Float d "code",
-    statusCode := ← Lasm.JS.readField Float d "statusCode",
-    message := ← Lasm.JS.readField String d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.StreamError"
 
 /-- `dictionary InternalError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InternalError where
@@ -13247,14 +12899,6 @@ instance : ToJS InternalError := ⟨fun d => Support.fields #[("code", toJS d.co
     ("message", toJS d.message),
     ("stack", Support.optional d.stack),
     ("name", toJS d.name)]⟩
-instance : FromJS InternalError where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField Float d "code",
-    statusCode := ← Lasm.JS.readField Float d "statusCode",
-    message := ← Lasm.JS.readField String d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack",
-    name := ← Lasm.JS.readField Data d "name" }
-  typeName := "Lasm.JS.Cloudflare.InternalError"
 
 /-- `dictionary WorkerVersionMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkerVersionMetadata where
@@ -13267,12 +12911,6 @@ structure WorkerVersionMetadata where
 instance : ToJS WorkerVersionMetadata := ⟨fun d => Support.fields #[("id", toJS d.id),
     ("tag", toJS d.tag),
     ("timestamp", toJS d.timestamp)]⟩
-instance : FromJS WorkerVersionMetadata where
-  fromJS d := do return {
-    id := ← Lasm.JS.readField String d "id",
-    tag := ← Lasm.JS.readField String d "tag",
-    timestamp := ← Lasm.JS.readField String d "timestamp" }
-  typeName := "Lasm.JS.Cloudflare.WorkerVersionMetadata"
 
 /-- `dictionary Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties where
@@ -13282,11 +12920,6 @@ structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProper
   description : String
 instance : ToJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("description", toJS d.description)]⟩
-instance : FromJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField String d "type",
-    description := ← Lasm.JS.readField String d "description" }
-  typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties"
 
 /-- `dictionary Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters where
@@ -13299,12 +12932,6 @@ structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters where
 instance : ToJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("required", Support.optional d.required),
     ("properties", toJS d.properties)]⟩
-instance : FromJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters where
-  fromJS d := do return {
-    type := ← Lasm.JS.readField String d "type",
-    required := ← Lasm.JS.readField (Option (Array String)) d "required",
-    properties := ← Lasm.JS.readField (Record Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParametersProperties) d "properties" }
-  typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters"
 
 /-- `dictionary Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools where
@@ -13317,12 +12944,6 @@ structure Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools where
 instance : ToJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("description", toJS d.description),
     ("parameters", toJS d.parameters)]⟩
-instance : FromJS Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    description := ← Lasm.JS.readField String d "description",
-    parameters := ← Lasm.JS.readField Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesToolsParameters d "parameters" }
-  typeName := "Lasm.JS.Cloudflare.Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesTools"
 
 /-- `AgentMemoryGetSummaryOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `AgentMemoryIngestOptions`. -/
 abbrev AgentMemoryGetSummaryOptions := AgentMemoryIngestOptions
@@ -15028,15 +14649,15 @@ def AiSearchInstance.search (self : AiSearchInstance) (params : AiSearchSearchRe
   let r ← self.val.callMethodAwait "search" (Support.args #[toJS params]) Value
   Support.cloneAs AiSearchSearchResponse r
 
-/-- `chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>`: `Promise<ReadableStream> chatCompletions(AiSearchInstanceChatCompletionsParams params)` -/
-def AiSearchInstance.chatCompletions (self : AiSearchInstance) (params : AiSearchInstanceChatCompletionsParams) : Async ReadableStream := do
-  let r ← self.val.callMethodAwait "chatCompletions" (Support.args #[toJS params]) Value
-  pure { val := r }
-
 /-- `chatCompletions(params: AiSearchChatCompletionsRequest): Promise<AiSearchChatCompletionsResponse>`: `Promise<AiSearchChatCompletionsResponse> chatCompletions(AiSearchChatCompletionsRequest params)` -/
-def AiSearchInstance.chatCompletions1 (self : AiSearchInstance) (params : AiSearchChatCompletionsRequest) : Async AiSearchChatCompletionsResponse := do
+def AiSearchInstance.chatCompletions (self : AiSearchInstance) (params : AiSearchChatCompletionsRequest) : Async AiSearchChatCompletionsResponse := do
   let r ← self.val.callMethodAwait "chatCompletions" (Support.args #[toJS params]) Value
   Support.cloneAs AiSearchChatCompletionsResponse r
+
+/-- `chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>`: `Promise<ReadableStream> chatCompletions(AiSearchInstanceChatCompletionsParams params)` -/
+def AiSearchInstance.chatCompletions1 (self : AiSearchInstance) (params : AiSearchInstanceChatCompletionsParams) : Async ReadableStream := do
+  let r ← self.val.callMethodAwait "chatCompletions" (Support.args #[toJS params]) Value
+  pure { val := r }
 
 /-- `update(config: Partial<AiSearchConfig>): Promise<AiSearchInstanceInfo>`: `Promise<AiSearchInstanceInfo> update(AiSearchInstanceUpdateConfig config)` -/
 def AiSearchInstance.update (self : AiSearchInstance) (config : AiSearchInstanceUpdateConfig) : Async AiSearchInstanceInfo := do
@@ -15489,33 +15110,33 @@ def Ai.websearch (self : Ai) (request : AiWebSearchRequest) : Async Response := 
   let r ← self.val.callMethodAwait "websearch" (Support.args #[toJS request]) Value
   pure { val := r }
 
-/-- `run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]['inputs'][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>`: `Promise<AiAsyncBatchResponse> run(any model, AiRunInputs inputs, AiRunOptions options)` -/
-def Ai.run (self : Ai) (model : Data) (inputs : AiRunInputs) (options : AiRunOptions) : Async AiAsyncBatchResponse :=
-  self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) AiAsyncBatchResponse
-
-/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { returnRawResponse: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, any options)` -/
-def Ai.run3 (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async Response := do
-  let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) Value
-  pure { val := r }
-
-/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { websocket: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, any options)` -/
-def Ai.runWithModelInputsOptions (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async Response := do
-  let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) Value
-  pure { val := r }
-
-/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>`: `Promise<ReadableStream> run(any model, any inputs, optional AiOptions options)` -/
-def Ai.runWithModelInputsOptionsOfAnyAndAiOptions (self : Ai) (model : Data) (inputs : Data) (options : Option AiOptions := none) : Async ReadableStream := do
+/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>`: `Promise<ReadableStream> run(any model, AiRunInputs inputs, optional AiOptions options)` -/
+def Ai.run (self : Ai) (model : Data) (inputs : AiRunInputs) (options : Option AiOptions := none) : Async ReadableStream := do
   let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, Support.optional options]) Value
   pure { val := r }
 
 /-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options?: AiOptions): Promise<AiModelList[Name]['postProcessedOutputs']>`: `Promise<any> run(any model, any inputs, optional AiOptions options)` -/
-def Ai.runWithModelInputsOptionsOfAnyAndAiOptions5 (self : Ai) (model : Data) (inputs : Data) (options : Option AiOptions := none) : Async Data :=
+def Ai.run3 (self : Ai) (model : Data) (inputs : Data) (options : Option AiOptions := none) : Async Data :=
   self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, Support.optional options]) Data
 
 /-- `run<Model extends string>(model: Model extends keyof AiModelList ? never : Model, inputs: Record<string, unknown>, options?: AiOptions): Promise<Record<string, unknown>>`: `Promise<record<DOMString, any>> run(any model, record<DOMString, any> inputs, optional AiOptions options)` -/
-def Ai.runWithModelInputsOptionsOfRecordOfDOMStringOfAnyAndAiOptions (self : Ai) (model : Data) (inputs : Record Data) (options : Option AiOptions := none) : Async (Record Data) := do
+def Ai.runWithModelInputsOptions (self : Ai) (model : Data) (inputs : Record Data) (options : Option AiOptions := none) : Async (Record Data) := do
   let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, Support.optional options]) Value
   Support.recordOf Data r
+
+/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { websocket: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, AiRunOptions options)` -/
+def Ai.runWithModelInputsOptionsOfAnyAndAiRunOptions (self : Ai) (model : Data) (inputs : Data) (options : AiRunOptions) : Async Response := do
+  let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) Value
+  pure { val := r }
+
+/-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { returnRawResponse: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, any options)` -/
+def Ai.runWithModelInputsOptionsOfAnyAndAny (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async Response := do
+  let r ← self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) Value
+  pure { val := r }
+
+/-- `run<Name extends keyof AiModelList>(model: Name, inputs: { requests: AiModelList[Name]['inputs'][]; }, options: AiOptions & { queueRequest: true; }): Promise<AiAsyncBatchResponse>`: `Promise<AiAsyncBatchResponse> run(any model, any inputs, any options)` -/
+def Ai.runWithModelInputsOptionsOfAnyAndAny6 (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async AiAsyncBatchResponse :=
+  self.val.callMethodAwait "run" (Support.args #[toJS model, toJS inputs, toJS options]) AiAsyncBatchResponse
 
 /-- `models(params?: AiModelsSearchParams): Promise<AiModelsSearchObject[]>`: `Promise<sequence<AiModelsSearchObject>> models(optional AiModelsSearchParams params)` -/
 def Ai.models (self : Ai) (params : Option AiModelsSearchParams := none) : Async (Array AiModelsSearchObject) :=
@@ -15526,13 +15147,13 @@ def Ai.toMarkdown (self : Ai) : IO ToMarkdownService := do
   let r ← self.val.callMethod "toMarkdown" (Support.args #[]) Value
   pure { val := r }
 
-/-- `toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> toMarkdown(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
-def Ai.toMarkdownWithFiles (self : Ai) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) :=
-  self.val.callMethodAwait "toMarkdown" (Support.args #[toJS files, Support.optional options]) (Array ConversionResponse)
-
 /-- `toMarkdown(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>`: `Promise<ConversionResponse> toMarkdown(MarkdownDocument files, optional ConversionRequestOptions options)` -/
-def Ai.toMarkdownWithFilesOptions (self : Ai) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse :=
+def Ai.toMarkdownWithFiles (self : Ai) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse :=
   self.val.callMethodAwait "toMarkdown" (Support.args #[toJS files, Support.optional options]) ConversionResponse
+
+/-- `toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> toMarkdown(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
+def Ai.toMarkdownWithFilesOptions (self : Ai) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) :=
+  self.val.callMethodAwait "toMarkdown" (Support.args #[toJS files, Support.optional options]) (Array ConversionResponse)
 
 /-- `patchLog(logId: string, data: AiGatewayPatchLog): Promise<void>`: `Promise<undefined> patchLog(DOMString logId, AiGatewayPatchLog data)` -/
 def AiGateway.patchLog (self : AiGateway) (logId : String) (data : AiGatewayPatchLog) : Async Unit :=
@@ -15793,13 +15414,13 @@ def StreamWatermarks.get (self : StreamWatermarks) (watermarkId : String) : Asyn
 def StreamWatermarks.delete (self : StreamWatermarks) (watermarkId : String) : Async Unit :=
   self.val.callMethodAwait "delete" (Support.args #[toJS watermarkId]) Unit
 
-/-- `transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> transform(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
-def ToMarkdownService.transform (self : ToMarkdownService) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) :=
-  self.val.callMethodAwait "transform" (Support.args #[toJS files, Support.optional options]) (Array ConversionResponse)
-
 /-- `transform(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>`: `Promise<ConversionResponse> transform(MarkdownDocument files, optional ConversionRequestOptions options)` -/
-def ToMarkdownService.transform2 (self : ToMarkdownService) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse :=
+def ToMarkdownService.transform (self : ToMarkdownService) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse :=
   self.val.callMethodAwait "transform" (Support.args #[toJS files, Support.optional options]) ConversionResponse
+
+/-- `transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> transform(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
+def ToMarkdownService.transform2 (self : ToMarkdownService) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) :=
+  self.val.callMethodAwait "transform" (Support.args #[toJS files, Support.optional options]) (Array ConversionResponse)
 
 /-- `supported(): Promise<SupportedFileFormat[]>`: `Promise<sequence<SupportedFileFormat>> supported()` -/
 def ToMarkdownService.supported (self : ToMarkdownService) : Async (Array SupportedFileFormat) :=

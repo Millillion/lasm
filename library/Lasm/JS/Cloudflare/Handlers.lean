@@ -50,17 +50,5 @@ instance : ToJS ExportedHandler := ⟨fun d => Support.fields #[("fetch", Suppor
     ("test", Support.optional d.test),
     ("email", Support.optional d.email),
     ("queue", Support.optional d.queue)]⟩
-instance : FromJS ExportedHandler where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField (Option ExportedHandlerFetchHandler) d "fetch",
-    connect := ← Lasm.JS.readField (Option ExportedHandlerConnectHandler) d "connect",
-    tail := ← Lasm.JS.readField (Option ExportedHandlerTailHandler) d "tail",
-    trace := ← Lasm.JS.readField (Option ExportedHandlerTraceHandler) d "trace",
-    tailStream := ← Lasm.JS.readField (Option ExportedHandlerTailStreamHandler) d "tailStream",
-    scheduled := ← Lasm.JS.readField (Option ExportedHandlerScheduledHandler) d "scheduled",
-    test := ← Lasm.JS.readField (Option ExportedHandlerTestHandler) d "test",
-    email := ← Lasm.JS.readField (Option EmailExportedHandler) d "email",
-    queue := ← Lasm.JS.readField (Option ExportedHandlerQueueHandler) d "queue" }
-  typeName := "Lasm.JS.Cloudflare.ExportedHandler"
 
 end Lasm.JS.Cloudflare

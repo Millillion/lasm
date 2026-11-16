@@ -147,18 +147,6 @@ instance : ToJS ArrayBufferOrDOMString := ⟨fun
 instance : Coe ByteArray ArrayBufferOrDOMString := ⟨.arrayBuffer⟩
 instance : Coe String ArrayBufferOrDOMString := ⟨.domString⟩
 
-/-- `dictionary R2BucketGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure R2BucketGetOptions where
-  /-- `required R2ConditionalOrHeaders onlyIf` -/
-  onlyIf : R2ConditionalOrHeaders
-  /-- `R2RangeOrHeaders range` -/
-  range : Option R2RangeOrHeaders := none
-  /-- `ArrayBufferOrDOMString ssecKey` -/
-  ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2BucketGetOptions := ⟨fun d => Support.fields #[("onlyIf", toJS d.onlyIf),
-    ("range", Support.optional d.range),
-    ("ssecKey", Support.optional d.ssecKey)]⟩
-
 /-- `dictionary R2GetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2GetOptions where
   /-- `R2ConditionalOrHeaders onlyIf` -/
@@ -168,6 +156,18 @@ structure R2GetOptions where
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
 instance : ToJS R2GetOptions := ⟨fun d => Support.fields #[("onlyIf", Support.optional d.onlyIf),
+    ("range", Support.optional d.range),
+    ("ssecKey", Support.optional d.ssecKey)]⟩
+
+/-- `dictionary R2BucketGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketGetOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2RangeOrHeaders range` -/
+  range : Option R2RangeOrHeaders := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketGetOptions := ⟨fun d => Support.fields #[("onlyIf", toJS d.onlyIf),
     ("range", Support.optional d.range),
     ("ssecKey", Support.optional d.ssecKey)]⟩
 
@@ -245,39 +245,6 @@ instance : ToJS DOMStringOrBufferSource := ⟨fun
 instance : Coe String DOMStringOrBufferSource := ⟨.domString⟩
 instance : Coe ByteArray DOMStringOrBufferSource := ⟨.bufferSource⟩
 
-/-- `dictionary R2BucketPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure R2BucketPutOptions where
-  /-- `required R2ConditionalOrHeaders onlyIf` -/
-  onlyIf : R2ConditionalOrHeaders
-  /-- `R2HTTPMetadataOrHeaders httpMetadata` -/
-  httpMetadata : Option R2HTTPMetadataOrHeaders := none
-  /-- `record<DOMString, DOMString> customMetadata` -/
-  customMetadata : Option (Record String) := none
-  /-- `DOMStringOrBufferSource md5` -/
-  md5 : Option DOMStringOrBufferSource := none
-  /-- `DOMStringOrBufferSource sha1` -/
-  sha1 : Option DOMStringOrBufferSource := none
-  /-- `DOMStringOrBufferSource sha256` -/
-  sha256 : Option DOMStringOrBufferSource := none
-  /-- `DOMStringOrBufferSource sha384` -/
-  sha384 : Option DOMStringOrBufferSource := none
-  /-- `DOMStringOrBufferSource sha512` -/
-  sha512 : Option DOMStringOrBufferSource := none
-  /-- `DOMString storageClass` -/
-  storageClass : Option String := none
-  /-- `ArrayBufferOrDOMString ssecKey` -/
-  ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2BucketPutOptions := ⟨fun d => Support.fields #[("onlyIf", toJS d.onlyIf),
-    ("httpMetadata", Support.optional d.httpMetadata),
-    ("customMetadata", Support.optional d.customMetadata),
-    ("md5", Support.optional d.md5),
-    ("sha1", Support.optional d.sha1),
-    ("sha256", Support.optional d.sha256),
-    ("sha384", Support.optional d.sha384),
-    ("sha512", Support.optional d.sha512),
-    ("storageClass", Support.optional d.storageClass),
-    ("ssecKey", Support.optional d.ssecKey)]⟩
-
 /-- `dictionary R2PutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2PutOptions where
   /-- `R2ConditionalOrHeaders onlyIf` -/
@@ -301,6 +268,39 @@ structure R2PutOptions where
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
 instance : ToJS R2PutOptions := ⟨fun d => Support.fields #[("onlyIf", Support.optional d.onlyIf),
+    ("httpMetadata", Support.optional d.httpMetadata),
+    ("customMetadata", Support.optional d.customMetadata),
+    ("md5", Support.optional d.md5),
+    ("sha1", Support.optional d.sha1),
+    ("sha256", Support.optional d.sha256),
+    ("sha384", Support.optional d.sha384),
+    ("sha512", Support.optional d.sha512),
+    ("storageClass", Support.optional d.storageClass),
+    ("ssecKey", Support.optional d.ssecKey)]⟩
+
+/-- `dictionary R2BucketPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketPutOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2HTTPMetadataOrHeaders httpMetadata` -/
+  httpMetadata : Option R2HTTPMetadataOrHeaders := none
+  /-- `record<DOMString, DOMString> customMetadata` -/
+  customMetadata : Option (Record String) := none
+  /-- `DOMStringOrBufferSource md5` -/
+  md5 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha1` -/
+  sha1 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha256` -/
+  sha256 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha384` -/
+  sha384 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha512` -/
+  sha512 : Option DOMStringOrBufferSource := none
+  /-- `DOMString storageClass` -/
+  storageClass : Option String := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketPutOptions := ⟨fun d => Support.fields #[("onlyIf", toJS d.onlyIf),
     ("httpMetadata", Support.optional d.httpMetadata),
     ("customMetadata", Support.optional d.customMetadata),
     ("md5", Support.optional d.md5),
@@ -428,23 +428,23 @@ instance : FromJS R2UploadedPart where
 def R2Bucket.head (self : R2Bucket) (key : String) : Async (Option R2Object) :=
   self.val.callMethodAwait "head" (Support.args #[toJS key]) (Option R2Object)
 
+/-- `get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>`: `Promise<R2ObjectBody?> get(DOMString key, optional R2GetOptions options)` -/
+def R2Bucket.get (self : R2Bucket) (key : String) (options : Option R2GetOptions := none) : Async (Option R2ObjectBody) :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option R2ObjectBody)
+
 /-- `get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>`: `Promise<R2ObjectBodyOrR2Object?> get(DOMString key, R2BucketGetOptions options)` -/
-def R2Bucket.get (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := do
+def R2Bucket.get2 (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := do
   let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS options]) Data
   Support.optionalValue r
 
-/-- `get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>`: `Promise<R2ObjectBody?> get(DOMString key, optional R2GetOptions options)` -/
-def R2Bucket.get2 (self : R2Bucket) (key : String) (options : Option R2GetOptions := none) : Async (Option R2ObjectBody) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option R2ObjectBody)
-
-/-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>`: `Promise<R2Object?> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2BucketPutOptions options)` -/
-def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) :=
-  self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) (Option R2Object)
-
 /-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>`: `Promise<R2Object> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2PutOptions options)` -/
-def R2Bucket.put3 (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2PutOptions := none) : Async R2Object := do
+def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2PutOptions := none) : Async R2Object := do
   let r ← self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) Value
   pure { val := r }
+
+/-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>`: `Promise<R2Object?> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2BucketPutOptions options)` -/
+def R2Bucket.put3 (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) :=
+  self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) (Option R2Object)
 
 /-- `createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>`: `Promise<R2MultipartUpload> createMultipartUpload(DOMString key, optional R2MultipartOptions options)` -/
 def R2Bucket.createMultipartUpload (self : R2Bucket) (key : String) (options : Option R2MultipartOptions := none) : Async R2MultipartUpload := do

@@ -499,6 +499,7 @@ export function lowerHost(host, files) {
   const extra = new Map();  // generated enums and callbacks: IDL name → text
   const suffixes = new Map(); // rich: numbered names of generated types (nextSuffix)
   const objectNames = new Map(); // rich: owner|member|object type → its dictionary's name
+  const directions = new Map();  // rich: a selected type → the ways it flows (lowerIndex)
   const excluded = [];      // [what, reason]
   const integersUsed = new Set();
   const fileOf = d => d.src.file.split('/').at(-1);
@@ -857,6 +858,22 @@ export function lowerHost(host, files) {
   /** `T[K]`: the type of member K of the object type T (`AiModels[Name]["inputs"]` with Name a
    * generic parameter is any). */
   function lowerIndex(t, ctx) {
+    // `List[Name]["inputs"]` with Name a generic parameter over List's keys (Workers AI's
+    // `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"])`): any,
+    // and each of List's entries' member types flows the way this use does (into JavaScript as an
+    // argument, out of it as a result), which decides the instances generated for them.
+    if (rich && t.key.k === 'lit' && t.obj.k === 'index' && t.obj.key.k === 'name' && ctx.generics && Object.hasOwn(ctx.generics, t.obj.key.name)) {
+      const way = ['result', 'promised', 'attr', 'cbArg'].includes(ctx.role) ? 'from' : 'to';
+      let entries = [];
+      try { entries = objectMembers(t.obj.obj, ctx); } catch { entries = []; }
+      for (const e of entries) {
+        let ms = [];
+        try { ms = objectMembers(parseType(e.type), ctx); } catch { continue; }
+        const m = ms.find(x => x.name === t.key.value);
+        for (const n of new Set((m?.type ?? '').match(/[A-Za-z_$][\w$]*/g) ?? [])) if (selected.has(n)) (directions.get(n) ?? directions.set(n, new Set()).get(n)).add(way);
+      }
+      return 'any';
+    }
     if (t.key.k !== 'lit') return 'any';
     let ms;
     try { ms = objectMembers(t.obj, ctx); } catch { return 'any'; }
@@ -1145,6 +1162,21 @@ export function lowerHost(host, files) {
       for (const k of Object.keys(s.exclude ?? {})) if (!excluded.some(([w]) => w === `${s.name}.${k}`)) fail(`${s.name}.${k} is excluded but not a member`);
       const lines = [];
       const usedOverloadNames = new Set();
+      // The full surface: of a method's overloads with the same parameter names, the one with the fewest required arguments keeps
+      // the method's name (R2Bucket.get(key, options?) rather than get(key, options & { onlyIf })),
+      // the others are named by the overload rules; then the shortest declaration (the least
+      // constrained: put(key, value, options?: R2PutOptions) before the one with onlyIf required).
+      if (host.allOverloads) {
+        const required = m => m.kind === 'method' ? m.params.filter(p => !p.optional && !p.rest).length : 0;
+        const firstAt = new Map(); members.forEach((m, i) => { if (!firstAt.has(m.name)) firstAt.set(m.name, i); });
+        const names = m => m.kind === 'method' ? m.params.map(p => p.name).join(',') : '';
+        // Only overloads of the same parameter names are reordered (DurableObjectStorage's
+        // put(key, value) stays before put(entries)).
+        const firstOfNames = new Map(); members.forEach((m, i) => { const k = `${m.name}(${names(m)})`; if (!firstOfNames.has(k)) firstOfNames.set(k, i); });
+        members = members.map((m, i) => ({ m, i })).sort((a, b) => a.m.name !== b.m.name ? firstAt.get(a.m.name) - firstAt.get(b.m.name) || a.i - b.i
+          : names(a.m) !== names(b.m) ? firstOfNames.get(`${a.m.name}(${names(a.m)})`) - firstOfNames.get(`${b.m.name}(${names(b.m)})`)
+          : required(a.m) - required(b.m) || a.m.text.length - b.m.text.length || a.i - b.i).map(x => x.m);
+      }
       for (const m of members) {
         const ctx = ctxOf(m, m.d);
         const intKey = `${s.name}.${m.name}`;
@@ -1230,7 +1262,14 @@ export function lowerHost(host, files) {
     defs.push(`// options ${key}\n${attrs(null, { module: selected.get(a).module, LasmName: lean, LasmPath: `${host.global}.${key}` })}\ndictionary ${idlName(lean)} : ${base} {\n${lines.join('\n')}\n};`);
   }
   for (const k of Object.keys(host.integers)) if (!integersUsed.has(k)) fail(`${host.name}: integers[${k}] is not used`);
-  return { idl: [...defs, ...extra.values()].join('\n\n'), excluded };
+  // rich: the ways a type flows where the lowering found them (LasmDirection: to, from), for a
+  // type no member names (generate-web.mjs generates its instances by them).
+  const marked = defs.map(d => {
+    const m = /LasmName="([^"]+)"[^\]]*\]\n(?:dictionary|interface|enum) /.exec(d);
+    const ways = m && [...selected.values()].filter(x => leanOf(x) === m[1]).flatMap(x => [...(directions.get(x.name) ?? [])]);
+    return ways?.length ? d.replace(/\]\n(dictionary|interface|enum) /, `, LasmDirection="${[...new Set(ways)].sort().join(' ')}"]\n$1 `) : d;
+  });
+  return { idl: [...marked, ...extra.values()].join('\n\n'), excluded };
 }
 
 // ---------- writing ----------

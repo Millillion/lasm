@@ -333,11 +333,6 @@ structure VectorizeError where
   error : String
 instance : ToJS VectorizeError := ⟨fun d => Support.fields #[("code", Support.optional d.code),
     ("error", toJS d.error)]⟩
-instance : FromJS VectorizeError where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField (Option Float) d "code",
-    error := ← Lasm.JS.readField String d "error" }
-  typeName := "Lasm.JS.Cloudflare.VectorizeError"
 
 /-- `public describe(): Promise<VectorizeIndexDetails>`: `Promise<VectorizeIndexDetails> describe()` -/
 def VectorizeIndex.describe (self : VectorizeIndex) : Async VectorizeIndexDetails :=

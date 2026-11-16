@@ -1657,10 +1657,6 @@ structure RequestInitCfPropertiesVaryHeader where
   /-- `required RequestInitCfPropertiesVaryAction action` -/
   action : RequestInitCfPropertiesVaryAction
 instance : ToJS RequestInitCfPropertiesVaryHeader := ⟨fun d => Support.fields #[("action", toJS d.action)]⟩
-instance : FromJS RequestInitCfPropertiesVaryHeader where
-  fromJS d := do return {
-    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryHeader"
 
 /-- `dictionary RequestInitCfPropertiesVaryAcceptHeader` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryAcceptHeader where
@@ -1670,21 +1666,12 @@ structure RequestInitCfPropertiesVaryAcceptHeader where
   media_types : Option (Array String) := none
 instance : ToJS RequestInitCfPropertiesVaryAcceptHeader := ⟨fun d => Support.fields #[("action", toJS d.action),
     ("media_types", Support.optional d.media_types)]⟩
-instance : FromJS RequestInitCfPropertiesVaryAcceptHeader where
-  fromJS d := do return {
-    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action",
-    media_types := ← Lasm.JS.readField (Option (Array String)) d "media_types" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryAcceptHeader"
 
 /-- `dictionary RequestInitCfPropertiesVaryHeaders` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVaryHeaders where
   /-- `RequestInitCfPropertiesVaryAcceptHeader accept` -/
   accept : Option RequestInitCfPropertiesVaryAcceptHeader := none
 instance : ToJS RequestInitCfPropertiesVaryHeaders := ⟨fun d => Support.fields #[("accept", Support.optional d.accept)]⟩
-instance : FromJS RequestInitCfPropertiesVaryHeaders where
-  fromJS d := do return {
-    accept := ← Lasm.JS.readField (Option RequestInitCfPropertiesVaryAcceptHeader) d "accept" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryHeaders"
 
 /-- `dictionary RequestInitCfPropertiesVary` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesVary where
@@ -1694,11 +1681,6 @@ structure RequestInitCfPropertiesVary where
   headers : Option RequestInitCfPropertiesVaryHeaders := none
 instance : ToJS RequestInitCfPropertiesVary := ⟨fun d => Support.fields #[("default", toJS d.default),
     ("headers", Support.optional d.headers)]⟩
-instance : FromJS RequestInitCfPropertiesVary where
-  fromJS d := do return {
-    default := ← Lasm.JS.readField RequestInitCfPropertiesVaryHeader d "default",
-    headers := ← Lasm.JS.readField (Option RequestInitCfPropertiesVaryHeaders) d "headers" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVary"
 
 /-- `dictionary BasicImageTransformationsGravityCoordinates` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsGravityCoordinates where
@@ -1711,12 +1693,6 @@ structure BasicImageTransformationsGravityCoordinates where
 instance : ToJS BasicImageTransformationsGravityCoordinates := ⟨fun d => Support.fields #[("x", Support.optional d.x),
     ("y", Support.optional d.y),
     ("mode", Support.optional d.mode)]⟩
-instance : FromJS BasicImageTransformationsGravityCoordinates where
-  fromJS d := do return {
-    x := ← Lasm.JS.readField (Option Float) d "x",
-    y := ← Lasm.JS.readField (Option Float) d "y",
-    mode := ← Lasm.JS.readField (Option BasicImageTransformationsGravityCoordinatesMode) d "mode" }
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsGravityCoordinates"
 
 /-- `typedef BasicImageTransformationsGravity or BasicImageTransformationsGravity2 or BasicImageTransformationsGravity3 or BasicImageTransformationsGravity4 or BasicImageTransformationsGravity5 or BasicImageTransformationsGravity6 or BasicImageTransformationsGravity7 or BasicImageTransformationsGravity8 or BasicImageTransformationsGravityCoordinates RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
 inductive RequestInitCfPropertiesImageGravityOrRequestInitCfPropertiesImageGravity2OrRequestInitCfPropertiesImageGravity3OrRequestInitCfPropertiesImageGravity4OrRequestInitCfPropertiesImageGravity5OrRequestInitCfPropertiesImageGravity6OrRequestInitCfPropertiesImageGravity7OrRequestInitCfPropertiesImageGravity8OrBasicImageTransformationsGravityCoordinates where
@@ -2011,22 +1987,12 @@ structure RequestInitCfPropertiesImageMinify where
 instance : ToJS RequestInitCfPropertiesImageMinify := ⟨fun d => Support.fields #[("javascript", Support.optional d.javascript),
     ("css", Support.optional d.css),
     ("html", Support.optional d.html)]⟩
-instance : FromJS RequestInitCfPropertiesImageMinify where
-  fromJS d := do return {
-    javascript := ← Lasm.JS.readField (Option Bool) d "javascript",
-    css := ← Lasm.JS.readField (Option Bool) d "css",
-    html := ← Lasm.JS.readField (Option Bool) d "html" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesImageMinify"
 
 /-- `dictionary RequestInitCfPropertiesR2` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfPropertiesR2 where
   /-- `double bucketColoId` -/
   bucketColoId : Option Float := none
 instance : ToJS RequestInitCfPropertiesR2 := ⟨fun d => Support.fields #[("bucketColoId", Support.optional d.bucketColoId)]⟩
-instance : FromJS RequestInitCfPropertiesR2 where
-  fromJS d := do return {
-    bucketColoId := ← Lasm.JS.readField (Option Float) d "bucketColoId" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesR2"
 
 /-- `dictionary RequestInitCfProperties` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInitCfProperties where
@@ -2108,11 +2074,6 @@ structure RequestInitCfPropertiesVaryAcceptLanguageHeader where
   languages : Option (Array String) := none
 instance : ToJS RequestInitCfPropertiesVaryAcceptLanguageHeader := ⟨fun d => Support.fields #[("action", toJS d.action),
     ("languages", Support.optional d.languages)]⟩
-instance : FromJS RequestInitCfPropertiesVaryAcceptLanguageHeader where
-  fromJS d := do return {
-    action := ← Lasm.JS.readField RequestInitCfPropertiesVaryAction d "action",
-    languages := ← Lasm.JS.readField (Option (Array String)) d "languages" }
-  typeName := "Lasm.JS.Cloudflare.RequestInitCfPropertiesVaryAcceptLanguageHeader"
 
 /-- `typedef BasicImageTransformationsGravity or BasicImageTransformationsGravity2 or BasicImageTransformationsGravity3 or BasicImageTransformationsGravity4 or BasicImageTransformationsGravity5 or BasicImageTransformationsGravity6 or BasicImageTransformationsGravity7 or BasicImageTransformationsGravity8 or BasicImageTransformationsGravityCoordinates BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates`: one constructor per member type. -/
 inductive BasicImageTransformationsGravityOrBasicImageTransformationsGravity2OrBasicImageTransformationsGravity3OrBasicImageTransformationsGravity4OrBasicImageTransformationsGravity5OrBasicImageTransformationsGravity6OrBasicImageTransformationsGravity7OrBasicImageTransformationsGravity8OrBasicImageTransformationsGravityCoordinates where
@@ -2228,13 +2189,6 @@ instance : ToJS IncomingRequestCfPropertiesExportedAuthenticatorMetadata := ⟨f
     ("serverHandshake", toJS d.serverHandshake),
     ("clientFinished", toJS d.clientFinished),
     ("serverFinished", toJS d.serverFinished)]⟩
-instance : FromJS IncomingRequestCfPropertiesExportedAuthenticatorMetadata where
-  fromJS d := do return {
-    clientHandshake := ← Lasm.JS.readField String d "clientHandshake",
-    serverHandshake := ← Lasm.JS.readField String d "serverHandshake",
-    clientFinished := ← Lasm.JS.readField String d "clientFinished",
-    serverFinished := ← Lasm.JS.readField String d "serverFinished" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesExportedAuthenticatorMetadata"
 
 /-- `dictionary IncomingRequestCfPropertiesBase` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBase where
@@ -2271,20 +2225,6 @@ instance : ToJS IncomingRequestCfPropertiesBase := ⟨fun d => Support.fields #[
     ("tlsVersion", toJS d.tlsVersion),
     ("tlsCipher", toJS d.tlsCipher),
     ("tlsExportedAuthenticator", Support.optional d.tlsExportedAuthenticator)]⟩
-instance : FromJS IncomingRequestCfPropertiesBase where
-  fromJS d := do return {
-    asn := ← Lasm.JS.readField (Option Float) d "asn",
-    asOrganization := ← Lasm.JS.readField (Option String) d "asOrganization",
-    clientAcceptEncoding := ← Lasm.JS.readField (Option String) d "clientAcceptEncoding",
-    clientTcpRtt := ← Lasm.JS.readField (Option Float) d "clientTcpRtt",
-    colo := ← Lasm.JS.readField String d "colo",
-    edgeRequestKeepAliveStatus := ← Lasm.JS.readField Float d "edgeRequestKeepAliveStatus",
-    httpProtocol := ← Lasm.JS.readField String d "httpProtocol",
-    requestPriority := ← Lasm.JS.readField String d "requestPriority",
-    tlsVersion := ← Lasm.JS.readField String d "tlsVersion",
-    tlsCipher := ← Lasm.JS.readField String d "tlsCipher",
-    tlsExportedAuthenticator := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesExportedAuthenticatorMetadata) d "tlsExportedAuthenticator" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBase"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagementBase` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementBase where
@@ -2303,24 +2243,12 @@ instance : ToJS IncomingRequestCfPropertiesBotManagementBase := ⟨fun d => Supp
     ("corporateProxy", toJS d.corporateProxy),
     ("staticResource", toJS d.staticResource),
     ("detectionIds", toJS d.detectionIds)]⟩
-instance : FromJS IncomingRequestCfPropertiesBotManagementBase where
-  fromJS d := do return {
-    score := ← Lasm.JS.readField Float d "score",
-    verifiedBot := ← Lasm.JS.readField Bool d "verifiedBot",
-    corporateProxy := ← Lasm.JS.readField Bool d "corporateProxy",
-    staticResource := ← Lasm.JS.readField Bool d "staticResource",
-    detectionIds := ← Lasm.JS.readField (Array Float) d "detectionIds" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementBase"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagement` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagement where
   /-- `required IncomingRequestCfPropertiesBotManagementBase botManagement` -/
   botManagement : IncomingRequestCfPropertiesBotManagementBase
 instance : ToJS IncomingRequestCfPropertiesBotManagement := ⟨fun d => Support.fields #[("botManagement", toJS d.botManagement)]⟩
-instance : FromJS IncomingRequestCfPropertiesBotManagement where
-  fromJS d := do return {
-    botManagement := ← Lasm.JS.readField IncomingRequestCfPropertiesBotManagementBase d "botManagement" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagement"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement where
@@ -2342,35 +2270,18 @@ instance : ToJS IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement 
     ("staticResource", toJS d.staticResource),
     ("detectionIds", toJS d.detectionIds),
     ("ja3Hash", toJS d.ja3Hash)]⟩
-instance : FromJS IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement where
-  fromJS d := do return {
-    score := ← Lasm.JS.readField Float d "score",
-    verifiedBot := ← Lasm.JS.readField Bool d "verifiedBot",
-    corporateProxy := ← Lasm.JS.readField Bool d "corporateProxy",
-    staticResource := ← Lasm.JS.readField Bool d "staticResource",
-    detectionIds := ← Lasm.JS.readField (Array Float) d "detectionIds",
-    ja3Hash := ← Lasm.JS.readField String d "ja3Hash" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement"
 
 /-- `dictionary IncomingRequestCfPropertiesBotManagementEnterprise` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesBotManagementEnterprise where
   /-- `required IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement botManagement` -/
   botManagement : IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement
 instance : ToJS IncomingRequestCfPropertiesBotManagementEnterprise := ⟨fun d => Support.fields #[("botManagement", toJS d.botManagement)]⟩
-instance : FromJS IncomingRequestCfPropertiesBotManagementEnterprise where
-  fromJS d := do return {
-    botManagement := ← Lasm.JS.readField IncomingRequestCfPropertiesBotManagementEnterpriseBotManagement d "botManagement" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesBotManagementEnterprise"
 
 /-- `dictionary IncomingRequestCfPropertiesCloudflareForSaaSEnterprise` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesCloudflareForSaaSEnterprise where
   /-- `any hostMetadata` -/
   hostMetadata : Data := .undefined
 instance : ToJS IncomingRequestCfPropertiesCloudflareForSaaSEnterprise := ⟨fun d => Support.fields #[("hostMetadata", d.hostMetadata)]⟩
-instance : FromJS IncomingRequestCfPropertiesCloudflareForSaaSEnterprise where
-  fromJS d := do return {
-    hostMetadata := ← Lasm.JS.readField Data d "hostMetadata" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesCloudflareForSaaSEnterprise"
 
 /-- `dictionary IncomingRequestCfPropertiesTLSClientAuth` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesTLSClientAuth where
@@ -2437,30 +2348,6 @@ instance : ToJS IncomingRequestCfPropertiesTLSClientAuth := ⟨fun d => Support.
     ("certRFC9440TooLarge", toJS d.certRFC9440TooLarge),
     ("certChainRFC9440", toJS d.certChainRFC9440),
     ("certChainRFC9440TooLarge", toJS d.certChainRFC9440TooLarge)]⟩
-instance : FromJS IncomingRequestCfPropertiesTLSClientAuth where
-  fromJS d := do return {
-    certPresented := ← Lasm.JS.readField IncomingRequestCfPropertiesGeographicInformationIsEUCountry d "certPresented",
-    certVerified := ← Lasm.JS.readField CertVerificationStatus d "certVerified",
-    certRevoked := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthCertRevoked d "certRevoked",
-    certIssuerDN := ← Lasm.JS.readField String d "certIssuerDN",
-    certSubjectDN := ← Lasm.JS.readField String d "certSubjectDN",
-    certIssuerDNRFC2253 := ← Lasm.JS.readField String d "certIssuerDNRFC2253",
-    certSubjectDNRFC2253 := ← Lasm.JS.readField String d "certSubjectDNRFC2253",
-    certIssuerDNLegacy := ← Lasm.JS.readField String d "certIssuerDNLegacy",
-    certSubjectDNLegacy := ← Lasm.JS.readField String d "certSubjectDNLegacy",
-    certSerial := ← Lasm.JS.readField String d "certSerial",
-    certIssuerSerial := ← Lasm.JS.readField String d "certIssuerSerial",
-    certSKI := ← Lasm.JS.readField String d "certSKI",
-    certIssuerSKI := ← Lasm.JS.readField String d "certIssuerSKI",
-    certFingerprintSHA1 := ← Lasm.JS.readField String d "certFingerprintSHA1",
-    certFingerprintSHA256 := ← Lasm.JS.readField String d "certFingerprintSHA256",
-    certNotBefore := ← Lasm.JS.readField String d "certNotBefore",
-    certNotAfter := ← Lasm.JS.readField String d "certNotAfter",
-    certRFC9440 := ← Lasm.JS.readField String d "certRFC9440",
-    certRFC9440TooLarge := ← Lasm.JS.readField Bool d "certRFC9440TooLarge",
-    certChainRFC9440 := ← Lasm.JS.readField String d "certChainRFC9440",
-    certChainRFC9440TooLarge := ← Lasm.JS.readField Bool d "certChainRFC9440TooLarge" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesTLSClientAuth"
 
 /-- `dictionary IncomingRequestCfPropertiesTLSClientAuthPlaceholder` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure IncomingRequestCfPropertiesTLSClientAuthPlaceholder where
@@ -2527,30 +2414,6 @@ instance : ToJS IncomingRequestCfPropertiesTLSClientAuthPlaceholder := ⟨fun d 
     ("certRFC9440TooLarge", toJS d.certRFC9440TooLarge),
     ("certChainRFC9440", toJS d.certChainRFC9440),
     ("certChainRFC9440TooLarge", toJS d.certChainRFC9440TooLarge)]⟩
-instance : FromJS IncomingRequestCfPropertiesTLSClientAuthPlaceholder where
-  fromJS d := do return {
-    certPresented := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertPresented d "certPresented",
-    certVerified := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertVerified d "certVerified",
-    certRevoked := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertPresented d "certRevoked",
-    certIssuerDN := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerDN",
-    certSubjectDN := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certSubjectDN",
-    certIssuerDNRFC2253 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerDNRFC2253",
-    certSubjectDNRFC2253 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certSubjectDNRFC2253",
-    certIssuerDNLegacy := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerDNLegacy",
-    certSubjectDNLegacy := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certSubjectDNLegacy",
-    certSerial := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certSerial",
-    certIssuerSerial := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerSerial",
-    certSKI := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certSKI",
-    certIssuerSKI := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certIssuerSKI",
-    certFingerprintSHA1 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certFingerprintSHA1",
-    certFingerprintSHA256 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certFingerprintSHA256",
-    certNotBefore := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certNotBefore",
-    certNotAfter := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certNotAfter",
-    certRFC9440 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certRFC9440",
-    certRFC9440TooLarge := ← Lasm.JS.readField Bool d "certRFC9440TooLarge",
-    certChainRFC9440 := ← Lasm.JS.readField IncomingRequestCfPropertiesTLSClientAuthPlaceholderCertIssuerDN d "certChainRFC9440",
-    certChainRFC9440TooLarge := ← Lasm.JS.readField Bool d "certChainRFC9440TooLarge" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesTLSClientAuthPlaceholder"
 
 /-- `typedef IncomingRequestCfPropertiesTLSClientAuth or IncomingRequestCfPropertiesTLSClientAuthPlaceholder IncomingRequestCfPropertiesTLSClientAuthOrIncomingRequestCfPropertiesTLSClientAuthPlaceholder`: one constructor per member type. -/
 inductive IncomingRequestCfPropertiesTLSClientAuthOrIncomingRequestCfPropertiesTLSClientAuthPlaceholder where
@@ -2605,20 +2468,6 @@ instance : ToJS IncomingRequestCfPropertiesGeographicInformation := ⟨fun d => 
     ("region", Support.optional d.region),
     ("regionCode", Support.optional d.regionCode),
     ("metroCode", Support.optional d.metroCode)]⟩
-instance : FromJS IncomingRequestCfPropertiesGeographicInformation where
-  fromJS d := do return {
-    country := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesGeographicInformationCountry) d "country",
-    isEUCountry := ← Lasm.JS.readField (Option IncomingRequestCfPropertiesGeographicInformationIsEUCountry) d "isEUCountry",
-    continent := ← Lasm.JS.readField (Option ContinentCode) d "continent",
-    city := ← Lasm.JS.readField (Option String) d "city",
-    postalCode := ← Lasm.JS.readField (Option String) d "postalCode",
-    latitude := ← Lasm.JS.readField (Option String) d "latitude",
-    longitude := ← Lasm.JS.readField (Option String) d "longitude",
-    timezone := ← Lasm.JS.readField (Option String) d "timezone",
-    region := ← Lasm.JS.readField (Option String) d "region",
-    regionCode := ← Lasm.JS.readField (Option String) d "regionCode",
-    metroCode := ← Lasm.JS.readField (Option String) d "metroCode" }
-  typeName := "Lasm.JS.Cloudflare.IncomingRequestCfPropertiesGeographicInformation"
 
 /-- `dictionary BasicImageTransformationsTrimBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsTrimBorder where
@@ -2631,12 +2480,6 @@ structure BasicImageTransformationsTrimBorder where
 instance : ToJS BasicImageTransformationsTrimBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
     ("tolerance", Support.optional d.tolerance),
     ("keep", Support.optional d.keep)]⟩
-instance : FromJS BasicImageTransformationsTrimBorder where
-  fromJS d := do return {
-    color := ← Lasm.JS.readField (Option String) d "color",
-    tolerance := ← Lasm.JS.readField (Option Float) d "tolerance",
-    keep := ← Lasm.JS.readField (Option Float) d "keep" }
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsTrimBorder"
 
 /-- `dictionary BasicImageTransformationsBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BasicImageTransformationsBorder where
@@ -2646,11 +2489,6 @@ structure BasicImageTransformationsBorder where
   width : Float
 instance : ToJS BasicImageTransformationsBorder := ⟨fun d => Support.fields #[("color", toJS d.color),
     ("width", toJS d.width)]⟩
-instance : FromJS BasicImageTransformationsBorder where
-  fromJS d := do return {
-    color := ← Lasm.JS.readField String d "color",
-    width := ← Lasm.JS.readField Float d "width" }
-  typeName := "Lasm.JS.Cloudflare.BasicImageTransformationsBorder"
 
 /-- `RequestInitCfPropertiesImageDrawGravity` (@cloudflare/workers-types 5.20261019.1 type declarations): the same members as `BasicImageTransformationsGravity`. -/
 abbrev RequestInitCfPropertiesImageDrawGravity := BasicImageTransformationsGravity

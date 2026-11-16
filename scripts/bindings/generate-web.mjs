@@ -672,7 +672,15 @@ for (const m of plan) inTier(m.tier, () => {
     // here and written there), so it gets both instances where it can.
     // Lasm.JS.Cloudflare: a type no member uses (Workers AI's per-model inputs and outputs) gets
     // both instances, as a program may write or read it; one that members use gets what they need.
-    if (m.host?.rich) { if (moduleOfType.has(typeKey(resolveName(x)) ?? x)) continue; const t = resolveName(x); visit(t, 'to', m.key); visit(t, 'from', m.key); continue; }
+    // Lasm.JS.Cloudflare: a type no member names gets instances by the ways it flows where the
+    // declarations use it (LasmDirection: Workers AI's model inputs are written, its outputs read),
+    // else a ToJS, for a program to pass it (ExportedHandler to exportDefault).
+    if (m.host?.rich) {
+      if (moduleOfType.has(typeKey(resolveName(x)) ?? x)) continue;
+      const t = resolveName(x), ways = (extValue(extAttr(d, 'LasmDirection')) ?? 'to').split(' ');
+      for (const w of ways) visit(t, w, m.key);
+      continue;
+    }
     if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }

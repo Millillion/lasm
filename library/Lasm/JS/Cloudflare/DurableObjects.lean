@@ -721,15 +721,6 @@ instance : ToJS LoopbackDurableObjectNamespace := ⟨fun d => Support.fields #[(
     ("get", toJS d.get),
     ("getByName", toJS d.getByName),
     ("jurisdiction", toJS d.jurisdiction)]⟩
-instance : FromJS LoopbackDurableObjectNamespace where
-  fromJS d := do return {
-    newUniqueId := ← Lasm.JS.readField LoopbackDurableObjectNamespaceNewUniqueId d "newUniqueId",
-    idFromName := ← Lasm.JS.readField LoopbackDurableObjectNamespaceIdFromName d "idFromName",
-    idFromString := ← Lasm.JS.readField LoopbackDurableObjectNamespaceIdFromString d "idFromString",
-    get := ← Lasm.JS.readField LoopbackDurableObjectNamespaceGet d "get",
-    getByName := ← Lasm.JS.readField LoopbackDurableObjectNamespaceGetByName d "getByName",
-    jurisdiction := ← Lasm.JS.readField LoopbackDurableObjectNamespaceJurisdiction d "jurisdiction" }
-  typeName := "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespace"
 
 /-- `callback LoopbackColoLocalActorNamespaceGetFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure LoopbackColoLocalActorNamespaceGetFetch where
@@ -805,10 +796,6 @@ structure LoopbackColoLocalActorNamespace where
   /-- `required LoopbackColoLocalActorNamespaceGet2 get` -/
   get : LoopbackColoLocalActorNamespaceGet2
 instance : ToJS LoopbackColoLocalActorNamespace := ⟨fun d => Support.fields #[("get", toJS d.get)]⟩
-instance : FromJS LoopbackColoLocalActorNamespace where
-  fromJS d := do return {
-    get := ← Lasm.JS.readField LoopbackColoLocalActorNamespaceGet2 d "get" }
-  typeName := "Lasm.JS.Cloudflare.LoopbackColoLocalActorNamespace"
 
 /-- `newUniqueId(options?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId`: `DurableObjectId newUniqueId(optional DurableObjectNamespaceNewUniqueIdOptions options)` -/
 def DurableObjectNamespace.newUniqueId (self : DurableObjectNamespace) (options : Option DurableObjectNamespaceNewUniqueIdOptions := none) : IO DurableObjectId := do

@@ -594,13 +594,6 @@ instance : ToJS DOMStringOrDoubleOrBoolean := ⟨fun
 instance : Coe String DOMStringOrDoubleOrBoolean := ⟨.domString⟩
 instance : Coe Float DOMStringOrDoubleOrBoolean := ⟨.double⟩
 instance : Coe Bool DOMStringOrDoubleOrBoolean := ⟨.boolean⟩
-instance : FromJS DOMStringOrDoubleOrBoolean where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
-    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrDoubleOrBoolean"
 
 /-- `typedef sequence<DOMString> or sequence<double> SequenceOfDOMStringOrSequenceOfDouble`: one constructor per member type. -/
 inductive SequenceOfDOMStringOrSequenceOfDouble where
@@ -912,22 +905,12 @@ structure ImagesError where
 instance : ToJS ImagesError := ⟨fun d => Support.fields #[("code", toJS d.code),
     ("message", toJS d.message),
     ("stack", Support.optional d.stack)]⟩
-instance : FromJS ImagesError where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField Float d "code",
-    message := ← Lasm.JS.readField String d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.ImagesError"
 
 /-- `dictionary ImageConversionOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageConversionOptions where
   /-- `ImageConversionOptionsDescriptionLanguage descriptionLanguage` -/
   descriptionLanguage : Option ImageConversionOptionsDescriptionLanguage := none
 instance : ToJS ImageConversionOptions := ⟨fun d => Support.fields #[("descriptionLanguage", Support.optional d.descriptionLanguage)]⟩
-instance : FromJS ImageConversionOptions where
-  fromJS d := do return {
-    descriptionLanguage := ← Lasm.JS.readField (Option ImageConversionOptionsDescriptionLanguage) d "descriptionLanguage" }
-  typeName := "Lasm.JS.Cloudflare.ImageConversionOptions"
 
 /-- `dictionary EmbeddedImageConversionOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EmbeddedImageConversionOptions where
@@ -940,12 +923,6 @@ structure EmbeddedImageConversionOptions where
 instance : ToJS EmbeddedImageConversionOptions := ⟨fun d => Support.fields #[("descriptionLanguage", Support.optional d.descriptionLanguage),
     ("convert", Support.optional d.convert),
     ("maxConvertedImages", Support.optional d.maxConvertedImages)]⟩
-instance : FromJS EmbeddedImageConversionOptions where
-  fromJS d := do return {
-    descriptionLanguage := ← Lasm.JS.readField (Option ImageConversionOptionsDescriptionLanguage) d "descriptionLanguage",
-    convert := ← Lasm.JS.readField (Option Bool) d "convert",
-    maxConvertedImages := ← Lasm.JS.readField (Option Float) d "maxConvertedImages" }
-  typeName := "Lasm.JS.Cloudflare.EmbeddedImageConversionOptions"
 
 /-- `dictionary ImageTransformBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageTransformBorder where
@@ -955,11 +932,6 @@ structure ImageTransformBorder where
   width : Option Float := none
 instance : ToJS ImageTransformBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
     ("width", Support.optional d.width)]⟩
-instance : FromJS ImageTransformBorder where
-  fromJS d := do return {
-    color := ← Lasm.JS.readField (Option String) d "color",
-    width := ← Lasm.JS.readField (Option Float) d "width" }
-  typeName := "Lasm.JS.Cloudflare.ImageTransformBorder"
 
 /-- `dictionary ImageTransformTrimBorder` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageTransformTrimBorder where
@@ -972,12 +944,6 @@ structure ImageTransformTrimBorder where
 instance : ToJS ImageTransformTrimBorder := ⟨fun d => Support.fields #[("color", Support.optional d.color),
     ("tolerance", Support.optional d.tolerance),
     ("keep", Support.optional d.keep)]⟩
-instance : FromJS ImageTransformTrimBorder where
-  fromJS d := do return {
-    color := ← Lasm.JS.readField (Option String) d "color",
-    tolerance := ← Lasm.JS.readField (Option Float) d "tolerance",
-    keep := ← Lasm.JS.readField (Option Float) d "keep" }
-  typeName := "Lasm.JS.Cloudflare.ImageTransformTrimBorder"
 
 /-- `ImageTransformationOutputOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `ImageInputOptions`. -/
 abbrev ImageTransformationOutputOptions := ImageInputOptions

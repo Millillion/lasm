@@ -537,6 +537,38 @@ structure WorkflowStepDoRollbackOptions where
 instance : ToJS WorkflowStepDoRollbackOptions := ⟨fun d => Support.fields #[("rollback", toJS d.rollback),
     ("rollbackConfig", Support.optional d.rollbackConfig)]⟩
 
+/-- `dictionary WorkflowStepConfig` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure WorkflowStepConfig where
+  /-- `WorkflowStepConfigRetries retries` -/
+  retries : Option WorkflowStepConfigRetries := none
+  /-- `DOMStringOrDouble timeout` -/
+  timeout : Option DOMStringOrDouble := none
+  /-- `WorkflowStepSensitivity sensitive` -/
+  sensitive : Option WorkflowStepSensitivity := none
+instance : ToJS WorkflowStepConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
+    ("timeout", Support.optional d.timeout),
+    ("sensitive", Support.optional d.sensitive)]⟩
+
+/-- `callback WorkflowStepDoCallback3 = Promise<any> (WorkflowDynamicDelayContextCtx ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WorkflowStepDoCallback3 where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WorkflowStepDoCallback3 := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WorkflowStepDoCallback3 := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WorkflowStepDoCallback3 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.WorkflowStepDoCallback3", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WorkflowStepDoCallback3.ofFn (f : WorkflowDynamicDelayContextCtx → Async Data) : IO WorkflowStepDoCallback3 := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WorkflowStepDoCallback3.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO Data) : IO WorkflowStepDoCallback3 := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
 /-- `dictionary WorkflowStepConfigWithDelayFunctionRetries` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowStepConfigWithDelayFunctionRetries where
   /-- `required double limit` -/
@@ -561,21 +593,21 @@ instance : ToJS WorkflowStepConfigWithDelayFunction := ⟨fun d => Support.field
     ("sensitive", Support.optional d.sensitive),
     ("retries", toJS d.retries)]⟩
 
-/-- `callback WorkflowStepDoCallback3 = Promise<any> (WorkflowDynamicDelayContextCtx ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure WorkflowStepDoCallback3 where
+/-- `callback WorkflowStepDoCallback4 = Promise<any> (WorkflowDynamicDelayContextCtx ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WorkflowStepDoCallback4 where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty WorkflowStepDoCallback3 := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS WorkflowStepDoCallback3 := ⟨fun x => .ref x.val ""⟩
-instance : FromJS WorkflowStepDoCallback3 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.WorkflowStepDoCallback3", .data⟩
+instance : Nonempty WorkflowStepDoCallback4 := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WorkflowStepDoCallback4 := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WorkflowStepDoCallback4 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.WorkflowStepDoCallback4", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def WorkflowStepDoCallback3.ofFn (f : WorkflowDynamicDelayContextCtx → Async Data) : IO WorkflowStepDoCallback3 := do
+def WorkflowStepDoCallback4.ofFn (f : WorkflowDynamicDelayContextCtx → Async Data) : IO WorkflowStepDoCallback4 := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def WorkflowStepDoCallback3.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO Data) : IO WorkflowStepDoCallback3 := do
+def WorkflowStepDoCallback4.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO Data) : IO WorkflowStepDoCallback4 := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
@@ -604,38 +636,6 @@ structure WorkflowStepConfigWithStaticDelay where
 instance : ToJS WorkflowStepConfigWithStaticDelay := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
     ("sensitive", Support.optional d.sensitive),
     ("retries", Support.optional d.retries)]⟩
-
-/-- `callback WorkflowStepDoCallback4 = Promise<any> (WorkflowDynamicDelayContextCtx ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure WorkflowStepDoCallback4 where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty WorkflowStepDoCallback4 := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS WorkflowStepDoCallback4 := ⟨fun x => .ref x.val ""⟩
-instance : FromJS WorkflowStepDoCallback4 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.WorkflowStepDoCallback4", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def WorkflowStepDoCallback4.ofFn (f : WorkflowDynamicDelayContextCtx → Async Data) : IO WorkflowStepDoCallback4 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def WorkflowStepDoCallback4.ofSyncFn (f : WorkflowDynamicDelayContextCtx → IO Data) : IO WorkflowStepDoCallback4 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg WorkflowDynamicDelayContextCtx args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-
-/-- `dictionary WorkflowStepConfig` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure WorkflowStepConfig where
-  /-- `WorkflowStepConfigRetries retries` -/
-  retries : Option WorkflowStepConfigRetries := none
-  /-- `DOMStringOrDouble timeout` -/
-  timeout : Option DOMStringOrDouble := none
-  /-- `WorkflowStepSensitivity sensitive` -/
-  sensitive : Option WorkflowStepSensitivity := none
-instance : ToJS WorkflowStepConfig := ⟨fun d => Support.fields #[("retries", Support.optional d.retries),
-    ("timeout", Support.optional d.timeout),
-    ("sensitive", Support.optional d.sensitive)]⟩
 
 /-- `callback WorkflowStepDoCallback5 = Promise<any> (WorkflowDynamicDelayContextCtx ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkflowStepDoCallback5 where
@@ -759,11 +759,6 @@ structure WorkflowCreateBatchOptionsRetention where
   errorRetention : Option DOMStringOrDouble := none
 instance : ToJS WorkflowCreateBatchOptionsRetention := ⟨fun d => Support.fields #[("successRetention", Support.optional d.successRetention),
     ("errorRetention", Support.optional d.errorRetention)]⟩
-instance : FromJS WorkflowCreateBatchOptionsRetention where
-  fromJS d := do return {
-    successRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "successRetention",
-    errorRetention := ← Lasm.JS.readField (Option DOMStringOrDouble) d "errorRetention" }
-  typeName := "Lasm.JS.Cloudflare.WorkflowCreateBatchOptionsRetention"
 
 /-- `dictionary WorkflowInstanceCreateOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowInstanceCreateOptions where
@@ -923,11 +918,6 @@ structure WorkflowError where
   message : String
 instance : ToJS WorkflowError := ⟨fun d => Support.fields #[("code", Support.optional d.code),
     ("message", toJS d.message)]⟩
-instance : FromJS WorkflowError where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField (Option Float) d "code",
-    message := ← Lasm.JS.readField String d "message" }
-  typeName := "Lasm.JS.Cloudflare.WorkflowError"
 
 /-- `dictionary WorkflowCreateBatchOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkflowCreateBatchOptions where
@@ -943,13 +933,6 @@ instance : ToJS WorkflowCreateBatchOptions := ⟨fun d => Support.fields #[("cou
     ("params", d.params),
     ("retention", Support.optional d.retention),
     ("locationHint", Support.optional d.locationHint)]⟩
-instance : FromJS WorkflowCreateBatchOptions where
-  fromJS d := do return {
-    count := ← Lasm.JS.readField Float d "count",
-    params := ← Lasm.JS.readField Data d "params",
-    retention := ← Lasm.JS.readField (Option WorkflowCreateBatchOptionsRetention) d "retention",
-    locationHint := ← Lasm.JS.readField (Option WorkflowInstanceLocationHint) d "locationHint" }
-  typeName := "Lasm.JS.Cloudflare.WorkflowCreateBatchOptions"
 
 /-- `WorkflowRollbackHandler2CtxStep` (@cloudflare/workers-types 5.20261019.1 type declarations): the same members as `WorkflowDynamicDelayContextCtxStep`. -/
 abbrev WorkflowRollbackHandler2CtxStep := WorkflowDynamicDelayContextCtxStep
@@ -991,16 +974,16 @@ def WorkflowStep.sleepUntil (self : WorkflowStep) : IO WorkflowStepSleepUntil :=
 def WorkflowStep.«do» (self : WorkflowStep) (name : String) (callback : WorkflowStepDoCallback2) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
   self.val.callMethodAwait "do" (Support.args #[toJS name, toJS callback, Support.optional rollbackOptions]) Data
 
-/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfigWithDelayFunction config, WorkflowStepDoCallback3 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
-def WorkflowStep.doWithConfig (self : WorkflowStep) (name : String) (config : WorkflowStepConfigWithDelayFunction) (callback : WorkflowStepDoCallback3) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
+/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfig config, WorkflowStepDoCallback3 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
+def WorkflowStep.doWithConfig (self : WorkflowStep) (name : String) (config : WorkflowStepConfig) (callback : WorkflowStepDoCallback3) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
   self.val.callMethodAwait "do" (Support.args #[toJS name, toJS config, toJS callback, Support.optional rollbackOptions]) Data
 
-/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfigWithStaticDelay config, WorkflowStepDoCallback4 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
-def WorkflowStep.doWithNameConfigCallbackRollbackOptions (self : WorkflowStep) (name : String) (config : WorkflowStepConfigWithStaticDelay) (callback : WorkflowStepDoCallback4) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
+/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfigWithDelayFunction config, WorkflowStepDoCallback4 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
+def WorkflowStep.doWithNameConfigCallbackRollbackOptions (self : WorkflowStep) (name : String) (config : WorkflowStepConfigWithDelayFunction) (callback : WorkflowStepDoCallback4) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
   self.val.callMethodAwait "do" (Support.args #[toJS name, toJS config, toJS callback, Support.optional rollbackOptions]) Data
 
-/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfig config, WorkflowStepDoCallback5 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
-def WorkflowStep.doWithNameConfigCallbackRollbackOptionsOfWorkflowStepConfigAndWorkflowStepDoCallback5AndWorkflowStepDoRollbackOptions (self : WorkflowStep) (name : String) (config : WorkflowStepConfig) (callback : WorkflowStepDoCallback5) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
+/-- `do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>`: `Promise<any> do(DOMString name, WorkflowStepConfigWithStaticDelay config, WorkflowStepDoCallback5 callback, optional WorkflowStepDoRollbackOptions rollbackOptions)` -/
+def WorkflowStep.doWithNameConfigCallbackRollbackOptionsOfWorkflowStepConfigWithStaticDelayAndWorkflowStepDoCallback5AndWorkflowStepDoRollbackOptions (self : WorkflowStep) (name : String) (config : WorkflowStepConfigWithStaticDelay) (callback : WorkflowStepDoCallback5) (rollbackOptions : Option WorkflowStepDoRollbackOptions := none) : Async Data :=
   self.val.callMethodAwait "do" (Support.args #[toJS name, toJS config, toJS callback, Support.optional rollbackOptions]) Data
 
 /-- `waitForEvent<T extends Rpc.Serializable<T>>(name: string, options: { type: string; timeout?: WorkflowTimeoutDuration | number; }): Promise<WorkflowStepEvent<T>>`: `Promise<WorkflowStepWaitForEvent> waitForEvent(DOMString name, WorkflowStepWaitForEventOptions options)` -/

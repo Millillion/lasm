@@ -690,6 +690,12 @@ def context (r : Checks) (live : Live) (env : Env) (ctx : ExecutionContext) : As
 
 /-! Availability: every generated member exists on the live objects -/
 
+/-- The interfaces whose objects this Worker's bindings and handlers give it. -/
+def probed : List String := ["KVNamespace", "D1Database", "D1DatabaseSession", "D1PreparedStatement", "R2Bucket", "R2Object",
+  "R2ObjectBody", "R2Checksums", "R2MultipartUpload", "Queue", "Message", "MessageBatch", "CacheStorage", "Cache", "Socket",
+  "DurableObjectNamespace", "DurableObjectId", "DurableObjectStub", "DurableObjectState", "DurableObjectStorage",
+  "DurableObjectTransaction", "ExecutionContext", "CacheContext", "ScheduledController"]
+
 def availability (r : Checks) (live : Live) : Async Unit := do
   let surface ← jsonParse Surface.json
   let .object globals := surface.field "globals" | throw (IO.userError "no globals in the surface")
@@ -705,7 +711,9 @@ def availability (r : Checks) (live : Live) : Async Unit := do
     if elsewhere.contains iface then continue
     match (← live.get).find? (·.1 == iface) with
     | some (_, v) => merge r ("\n".intercalate (← probe iface v).toList)
-    | none => expect r s!"available {iface}" false "no live object was seen"
+    -- The bindings this Worker has (wrangler.toml) must be seen; the others (Workers AI,
+    -- Vectorize, …) need a Cloudflare account, which CI never uses: generated, not probed here.
+    | none => if probed.contains iface then expect r s!"available {iface}" false "no live object was seen"
 
 /-! Running -/
 

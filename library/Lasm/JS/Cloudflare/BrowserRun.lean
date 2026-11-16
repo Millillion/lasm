@@ -13,6 +13,7 @@ import Lasm.JS.Cloudflare.Workers
 import Lasm.JS.Cloudflare.Cache
 import Lasm.JS.Cloudflare.Sockets
 import Lasm.JS.Cloudflare.Containers
+import Lasm.JS.Cloudflare.Ai
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
@@ -263,44 +264,6 @@ instance : FromJS BrowserRunAlternateBackendOptionsBrowser where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.BrowserRunAlternateBackendOptionsBrowser"
 
-/-- `enum BrowserRunPuppeteerScreenshotOptionsType` (@cloudflare/workers-types 5.20261019.1 type declarations): "png", "jpeg", "webp". -/
-inductive BrowserRunPuppeteerScreenshotOptionsType where
-  /-- "png" -/
-  | png
-  /-- "jpeg" -/
-  | jpeg
-  /-- "webp" -/
-  | webp
-  deriving BEq, Repr, Inhabited
-instance : ToJS BrowserRunPuppeteerScreenshotOptionsType := ⟨fun
-  | .png => .string "png"
-  | .jpeg => .string "jpeg"
-  | .webp => .string "webp"⟩
-instance : FromJS BrowserRunPuppeteerScreenshotOptionsType where
-  fromJS
-    | .string "png" => .ok .png
-    | .string "jpeg" => .ok .jpeg
-    | .string "webp" => .ok .webp
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptionsType"
-
-/-- `enum BrowserRunPuppeteerScreenshotOptionsEncoding` (@cloudflare/workers-types 5.20261019.1 type declarations): "binary", "base64". -/
-inductive BrowserRunPuppeteerScreenshotOptionsEncoding where
-  /-- "binary" -/
-  | binary
-  /-- "base64" -/
-  | base64
-  deriving BEq, Repr, Inhabited
-instance : ToJS BrowserRunPuppeteerScreenshotOptionsEncoding := ⟨fun
-  | .binary => .string "binary"
-  | .base64 => .string "base64"⟩
-instance : FromJS BrowserRunPuppeteerScreenshotOptionsEncoding where
-  fromJS
-    | .string "binary" => .ok .binary
-    | .string "base64" => .ok .base64
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptionsEncoding"
-
 /-- `enum BrowserRunPDFOptionsPdfOptionsFormat` (@cloudflare/workers-types 5.20261019.1 type declarations): "letter", "legal", "tabloid", "ledger", "a0", "a1", "a2", "a3", "a4", "a5", "a6". -/
 inductive BrowserRunPDFOptionsPdfOptionsFormat where
   /-- "letter" -/
@@ -378,6 +341,44 @@ instance : FromJS BrowserRunSnapshotFormat where
     | .string "accessibilityTree" => .ok .accessibilityTree
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotFormat"
+
+/-- `enum BrowserRunPuppeteerScreenshotOptionsType` (@cloudflare/workers-types 5.20261019.1 type declarations): "png", "jpeg", "webp". -/
+inductive BrowserRunPuppeteerScreenshotOptionsType where
+  /-- "png" -/
+  | png
+  /-- "jpeg" -/
+  | jpeg
+  /-- "webp" -/
+  | webp
+  deriving BEq, Repr, Inhabited
+instance : ToJS BrowserRunPuppeteerScreenshotOptionsType := ⟨fun
+  | .png => .string "png"
+  | .jpeg => .string "jpeg"
+  | .webp => .string "webp"⟩
+instance : FromJS BrowserRunPuppeteerScreenshotOptionsType where
+  fromJS
+    | .string "png" => .ok .png
+    | .string "jpeg" => .ok .jpeg
+    | .string "webp" => .ok .webp
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptionsType"
+
+/-- `enum BrowserRunPuppeteerScreenshotOptionsEncoding` (@cloudflare/workers-types 5.20261019.1 type declarations): "binary", "base64". -/
+inductive BrowserRunPuppeteerScreenshotOptionsEncoding where
+  /-- "binary" -/
+  | binary
+  /-- "base64" -/
+  | base64
+  deriving BEq, Repr, Inhabited
+instance : ToJS BrowserRunPuppeteerScreenshotOptionsEncoding := ⟨fun
+  | .binary => .string "binary"
+  | .base64 => .string "base64"⟩
+instance : FromJS BrowserRunPuppeteerScreenshotOptionsEncoding where
+  fromJS
+    | .string "binary" => .ok .binary
+    | .string "base64" => .ok .base64
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Cloudflare.BrowserRunPuppeteerScreenshotOptionsEncoding"
 
 /-- `enum BrowserRunLiveViewMode` (@cloudflare/workers-types 5.20261019.1 type declarations): "devtools", "tab", "full". -/
 inductive BrowserRunLiveViewMode where
@@ -457,13 +458,6 @@ instance : ToJS BrowserRunBaseOptionsAddScriptTag := ⟨fun d => Support.fields 
     ("url", Support.optional d.url),
     ("type", Support.optional d.type),
     ("id", Support.optional d.id)]⟩
-instance : FromJS BrowserRunBaseOptionsAddScriptTag where
-  fromJS d := do return {
-    content := ← Lasm.JS.readField (Option String) d "content",
-    url := ← Lasm.JS.readField (Option String) d "url",
-    type := ← Lasm.JS.readField (Option String) d "type",
-    id := ← Lasm.JS.readField (Option String) d "id" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAddScriptTag"
 
 /-- `dictionary BrowserRunBaseOptionsAddStyleTag` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsAddStyleTag where
@@ -473,11 +467,6 @@ structure BrowserRunBaseOptionsAddStyleTag where
   url : Option String := none
 instance : ToJS BrowserRunBaseOptionsAddStyleTag := ⟨fun d => Support.fields #[("content", Support.optional d.content),
     ("url", Support.optional d.url)]⟩
-instance : FromJS BrowserRunBaseOptionsAddStyleTag where
-  fromJS d := do return {
-    content := ← Lasm.JS.readField (Option String) d "content",
-    url := ← Lasm.JS.readField (Option String) d "url" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAddStyleTag"
 
 /-- `dictionary BrowserRunBaseOptionsAuthenticate` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsAuthenticate where
@@ -487,11 +476,6 @@ structure BrowserRunBaseOptionsAuthenticate where
   password : String
 instance : ToJS BrowserRunBaseOptionsAuthenticate := ⟨fun d => Support.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
-instance : FromJS BrowserRunBaseOptionsAuthenticate where
-  fromJS d := do return {
-    username := ← Lasm.JS.readField String d "username",
-    password := ← Lasm.JS.readField String d "password" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsAuthenticate"
 
 /-- `dictionary BrowserRunBaseOptionsCookies` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunBaseOptionsCookies where
@@ -537,240 +521,6 @@ instance : ToJS BrowserRunBaseOptionsCookies := ⟨fun d => Support.fields #[("n
     ("sourceScheme", Support.optional d.sourceScheme),
     ("sourcePort", Support.optional d.sourcePort),
     ("partitionKey", Support.optional d.partitionKey)]⟩
-instance : FromJS BrowserRunBaseOptionsCookies where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    value := ← Lasm.JS.readField String d "value",
-    url := ← Lasm.JS.readField (Option String) d "url",
-    domain := ← Lasm.JS.readField (Option String) d "domain",
-    path := ← Lasm.JS.readField (Option String) d "path",
-    secure := ← Lasm.JS.readField (Option Bool) d "secure",
-    httpOnly := ← Lasm.JS.readField (Option Bool) d "httpOnly",
-    sameSite := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesSameSite) d "sameSite",
-    expires := ← Lasm.JS.readField (Option Float) d "expires",
-    priority := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesPriority) d "priority",
-    sameParty := ← Lasm.JS.readField (Option Bool) d "sameParty",
-    sourceScheme := ← Lasm.JS.readField (Option BrowserRunBaseOptionsCookiesSourceScheme) d "sourceScheme",
-    sourcePort := ← Lasm.JS.readField (Option Float) d "sourcePort",
-    partitionKey := ← Lasm.JS.readField (Option String) d "partitionKey" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsCookies"
-
-/-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
-inductive BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil (value : BrowserRunBaseOptionsGotoOptionsWaitUntil)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil2` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil2 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil2)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil3` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil3 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil3)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil4` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil4 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil4)
-  /-- `sequence<BrowserRunLifecycleEvent>` -/
-  | sequence (value : Array BrowserRunLifecycleEvent)
-instance : ToJS BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨fun
-  | .browserRunBaseOptionsGotoOptionsWaitUntil v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil2 v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil3 v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil4 v => toJS v
-  | .sequence v => toJS v⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil2 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil2⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil3 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil3⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil4 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil4⟩
-instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.sequence⟩
-
-/-- `dictionary BrowserRunScreenshotOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunScreenshotOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
-  /-- `BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
-  waitUntil : Option BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
-  /-- `DOMString referer` -/
-  referer : Option String := none
-  /-- `DOMString referrerPolicy` -/
-  referrerPolicy : Option String := none
-instance : ToJS BrowserRunScreenshotOptionsGotoOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
-    ("waitUntil", Support.optional d.waitUntil),
-    ("referer", Support.optional d.referer),
-    ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
-
-/-- `dictionary BrowserRunBaseOptionsViewport` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunBaseOptionsViewport where
-  /-- `required double width` -/
-  width : Float
-  /-- `required double height` -/
-  height : Float
-  /-- `double deviceScaleFactor` -/
-  deviceScaleFactor : Option Float := none
-  /-- `boolean isMobile` -/
-  isMobile : Option Bool := none
-  /-- `boolean isLandscape` -/
-  isLandscape : Option Bool := none
-  /-- `boolean hasTouch` -/
-  hasTouch : Option Bool := none
-instance : ToJS BrowserRunBaseOptionsViewport := ⟨fun d => Support.fields #[("width", toJS d.width),
-    ("height", toJS d.height),
-    ("deviceScaleFactor", Support.optional d.deviceScaleFactor),
-    ("isMobile", Support.optional d.isMobile),
-    ("isLandscape", Support.optional d.isLandscape),
-    ("hasTouch", Support.optional d.hasTouch)]⟩
-instance : FromJS BrowserRunBaseOptionsViewport where
-  fromJS d := do return {
-    width := ← Lasm.JS.readField Float d "width",
-    height := ← Lasm.JS.readField Float d "height",
-    deviceScaleFactor := ← Lasm.JS.readField (Option Float) d "deviceScaleFactor",
-    isMobile := ← Lasm.JS.readField (Option Bool) d "isMobile",
-    isLandscape := ← Lasm.JS.readField (Option Bool) d "isLandscape",
-    hasTouch := ← Lasm.JS.readField (Option Bool) d "hasTouch" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsViewport"
-
-/-- `dictionary BrowserRunBaseOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunBaseOptionsWaitForSelector where
-  /-- `required DOMString selector` -/
-  selector : String
-  /-- `boolean hidden` -/
-  hidden : Option Bool := none
-  /-- `boolean visible` -/
-  visible : Option Bool := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
-instance : ToJS BrowserRunBaseOptionsWaitForSelector := ⟨fun d => Support.fields #[("selector", toJS d.selector),
-    ("hidden", Support.optional d.hidden),
-    ("visible", Support.optional d.visible),
-    ("timeout", Support.optional d.timeout)]⟩
-instance : FromJS BrowserRunBaseOptionsWaitForSelector where
-  fromJS d := do return {
-    selector := ← Lasm.JS.readField String d "selector",
-    hidden := ← Lasm.JS.readField (Option Bool) d "hidden",
-    visible := ← Lasm.JS.readField (Option Bool) d "visible",
-    timeout := ← Lasm.JS.readField (Option Float) d "timeout" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunBaseOptionsWaitForSelector"
-
-/-- `dictionary BrowserRunPuppeteerScreenshotOptionsClip` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunPuppeteerScreenshotOptionsClip where
-  /-- `required double x` -/
-  x : Float
-  /-- `required double y` -/
-  y : Float
-  /-- `required double width` -/
-  width : Float
-  /-- `required double height` -/
-  height : Float
-  /-- `double scale` -/
-  scale : Option Float := none
-instance : ToJS BrowserRunPuppeteerScreenshotOptionsClip := ⟨fun d => Support.fields #[("x", toJS d.x),
-    ("y", toJS d.y),
-    ("width", toJS d.width),
-    ("height", toJS d.height),
-    ("scale", Support.optional d.scale)]⟩
-
-/-- `dictionary BrowserRunPuppeteerScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunPuppeteerScreenshotOptions where
-  /-- `BrowserRunPuppeteerScreenshotOptionsType type` -/
-  type : Option BrowserRunPuppeteerScreenshotOptionsType := none
-  /-- `BrowserRunPuppeteerScreenshotOptionsEncoding encoding` -/
-  encoding : Option BrowserRunPuppeteerScreenshotOptionsEncoding := none
-  /-- `double quality` -/
-  quality : Option Float := none
-  /-- `boolean fullPage` -/
-  fullPage : Option Bool := none
-  /-- `BrowserRunPuppeteerScreenshotOptionsClip clip` -/
-  clip : Option BrowserRunPuppeteerScreenshotOptionsClip := none
-  /-- `boolean omitBackground` -/
-  omitBackground : Option Bool := none
-  /-- `boolean optimizeForSpeed` -/
-  optimizeForSpeed : Option Bool := none
-  /-- `boolean captureBeyondViewport` -/
-  captureBeyondViewport : Option Bool := none
-  /-- `boolean fromSurface` -/
-  fromSurface : Option Bool := none
-instance : ToJS BrowserRunPuppeteerScreenshotOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("encoding", Support.optional d.encoding),
-    ("quality", Support.optional d.quality),
-    ("fullPage", Support.optional d.fullPage),
-    ("clip", Support.optional d.clip),
-    ("omitBackground", Support.optional d.omitBackground),
-    ("optimizeForSpeed", Support.optional d.optimizeForSpeed),
-    ("captureBeyondViewport", Support.optional d.captureBeyondViewport),
-    ("fromSurface", Support.optional d.fromSurface)]⟩
-
-/-- `dictionary BrowserRunScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunScreenshotOptions where
-  /-- `sequence<BrowserRunBaseOptionsAddScriptTag> addScriptTag` -/
-  addScriptTag : Option (Array BrowserRunBaseOptionsAddScriptTag) := none
-  /-- `sequence<BrowserRunBaseOptionsAddStyleTag> addStyleTag` -/
-  addStyleTag : Option (Array BrowserRunBaseOptionsAddStyleTag) := none
-  /-- `BrowserRunBaseOptionsAuthenticate authenticate` -/
-  authenticate : Option BrowserRunBaseOptionsAuthenticate := none
-  /-- `sequence<BrowserRunBaseOptionsCookies> cookies` -/
-  cookies : Option (Array BrowserRunBaseOptionsCookies) := none
-  /-- `DOMString emulateMediaType` -/
-  emulateMediaType : Option String := none
-  /-- `BrowserRunScreenshotOptionsGotoOptions gotoOptions` -/
-  gotoOptions : Option BrowserRunScreenshotOptionsGotoOptions := none
-  /-- `sequence<DOMString> rejectRequestPattern` -/
-  rejectRequestPattern : Option (Array String) := none
-  /-- `sequence<DOMString> allowRequestPattern` -/
-  allowRequestPattern : Option (Array String) := none
-  /-- `sequence<BrowserRunResourceType> rejectResourceTypes` -/
-  rejectResourceTypes : Option (Array BrowserRunResourceType) := none
-  /-- `sequence<BrowserRunResourceType> allowResourceTypes` -/
-  allowResourceTypes : Option (Array BrowserRunResourceType) := none
-  /-- `record<DOMString, DOMString> setExtraHTTPHeaders` -/
-  setExtraHTTPHeaders : Option (Record String) := none
-  /-- `boolean setJavaScriptEnabled` -/
-  setJavaScriptEnabled : Option Bool := none
-  /-- `DOMString userAgent` -/
-  userAgent : Option String := none
-  /-- `BrowserRunBaseOptionsViewport viewport` -/
-  viewport : Option BrowserRunBaseOptionsViewport := none
-  /-- `BrowserRunBaseOptionsWaitForSelector waitForSelector` -/
-  waitForSelector : Option BrowserRunBaseOptionsWaitForSelector := none
-  /-- `double waitForTimeout` -/
-  waitForTimeout : Option Float := none
-  /-- `boolean bestAttempt` -/
-  bestAttempt : Option Bool := none
-  /-- `double actionTimeout` -/
-  actionTimeout : Option Float := none
-  /-- `double cacheTTL` -/
-  cacheTTL : Option Float := none
-  /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
-  browser : Option BrowserRunAlternateBackendOptionsBrowser := none
-  /-- `DOMString url` -/
-  url : Option String := none
-  /-- `DOMString html` -/
-  html : Option String := none
-  /-- `DOMString selector` -/
-  selector : Option String := none
-  /-- `boolean scrollPage` -/
-  scrollPage : Option Bool := none
-  /-- `BrowserRunPuppeteerScreenshotOptions screenshotOptions` -/
-  screenshotOptions : Option BrowserRunPuppeteerScreenshotOptions := none
-instance : ToJS BrowserRunScreenshotOptions := ⟨fun d => Support.fields #[("addScriptTag", Support.optional d.addScriptTag),
-    ("addStyleTag", Support.optional d.addStyleTag),
-    ("authenticate", Support.optional d.authenticate),
-    ("cookies", Support.optional d.cookies),
-    ("emulateMediaType", Support.optional d.emulateMediaType),
-    ("gotoOptions", Support.optional d.gotoOptions),
-    ("rejectRequestPattern", Support.optional d.rejectRequestPattern),
-    ("allowRequestPattern", Support.optional d.allowRequestPattern),
-    ("rejectResourceTypes", Support.optional d.rejectResourceTypes),
-    ("allowResourceTypes", Support.optional d.allowResourceTypes),
-    ("setExtraHTTPHeaders", Support.optional d.setExtraHTTPHeaders),
-    ("setJavaScriptEnabled", Support.optional d.setJavaScriptEnabled),
-    ("userAgent", Support.optional d.userAgent),
-    ("viewport", Support.optional d.viewport),
-    ("waitForSelector", Support.optional d.waitForSelector),
-    ("waitForTimeout", Support.optional d.waitForTimeout),
-    ("bestAttempt", Support.optional d.bestAttempt),
-    ("actionTimeout", Support.optional d.actionTimeout),
-    ("cacheTTL", Support.optional d.cacheTTL),
-    ("browser", Support.optional d.browser),
-    ("url", Support.optional d.url),
-    ("html", Support.optional d.html),
-    ("selector", Support.optional d.selector),
-    ("scrollPage", Support.optional d.scrollPage),
-    ("screenshotOptions", Support.optional d.screenshotOptions)]⟩
 
 /-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunPDFOptionsGotoOptionsWaitUntilOrBrowserRunPDFOptionsGotoOptionsWaitUntil2OrBrowserRunPDFOptionsGotoOptionsWaitUntil3OrBrowserRunPDFOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -810,6 +560,42 @@ instance : ToJS BrowserRunPDFOptionsGotoOptions := ⟨fun d => Support.fields #[
     ("waitUntil", Support.optional d.waitUntil),
     ("referer", Support.optional d.referer),
     ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
+
+/-- `dictionary BrowserRunBaseOptionsViewport` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunBaseOptionsViewport where
+  /-- `required double width` -/
+  width : Float
+  /-- `required double height` -/
+  height : Float
+  /-- `double deviceScaleFactor` -/
+  deviceScaleFactor : Option Float := none
+  /-- `boolean isMobile` -/
+  isMobile : Option Bool := none
+  /-- `boolean isLandscape` -/
+  isLandscape : Option Bool := none
+  /-- `boolean hasTouch` -/
+  hasTouch : Option Bool := none
+instance : ToJS BrowserRunBaseOptionsViewport := ⟨fun d => Support.fields #[("width", toJS d.width),
+    ("height", toJS d.height),
+    ("deviceScaleFactor", Support.optional d.deviceScaleFactor),
+    ("isMobile", Support.optional d.isMobile),
+    ("isLandscape", Support.optional d.isLandscape),
+    ("hasTouch", Support.optional d.hasTouch)]⟩
+
+/-- `dictionary BrowserRunBaseOptionsWaitForSelector` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunBaseOptionsWaitForSelector where
+  /-- `required DOMString selector` -/
+  selector : String
+  /-- `boolean hidden` -/
+  hidden : Option Bool := none
+  /-- `boolean visible` -/
+  visible : Option Bool := none
+  /-- `double timeout` -/
+  timeout : Option Float := none
+instance : ToJS BrowserRunBaseOptionsWaitForSelector := ⟨fun d => Support.fields #[("selector", toJS d.selector),
+    ("hidden", Support.optional d.hidden),
+    ("visible", Support.optional d.visible),
+    ("timeout", Support.optional d.timeout)]⟩
 
 /-- `dictionary BrowserRunPDFOptionsPdfOptionsMargin` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunPDFOptionsPdfOptionsMargin where
@@ -988,6 +774,15 @@ instance : ToJS BrowserRunQuickActionOptionsGotoOptions := ⟨fun d => Support.f
     ("referer", Support.optional d.referer),
     ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
 
+/-- `dictionary BrowserRunJsonBaseOptionsCustom_ai` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunJsonBaseOptionsCustom_ai where
+  /-- `required DOMString model` -/
+  model : String
+  /-- `DOMString authorization` -/
+  authorization : Option String := none
+instance : ToJS BrowserRunJsonBaseOptionsCustom_ai := ⟨fun d => Support.fields #[("model", toJS d.model),
+    ("authorization", Support.optional d.authorization)]⟩
+
 /-- `dictionary BrowserRunQuickActionOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunQuickActionOptions where
   /-- `sequence<BrowserRunBaseOptionsAddScriptTag> addScriptTag` -/
@@ -1034,6 +829,12 @@ structure BrowserRunQuickActionOptions where
   url : Option String := none
   /-- `DOMString html` -/
   html : Option String := none
+  /-- `sequence<BrowserRunJsonBaseOptionsCustom_ai> custom_ai` -/
+  custom_ai : Option (Array BrowserRunJsonBaseOptionsCustom_ai) := none
+  /-- `DOMString prompt` -/
+  prompt : Option String := none
+  /-- `AiTextGenerationResponseFormat response_format` -/
+  response_format : Option AiTextGenerationResponseFormat := none
 instance : ToJS BrowserRunQuickActionOptions := ⟨fun d => Support.fields #[("addScriptTag", Support.optional d.addScriptTag),
     ("addStyleTag", Support.optional d.addStyleTag),
     ("authenticate", Support.optional d.authenticate),
@@ -1055,7 +856,124 @@ instance : ToJS BrowserRunQuickActionOptions := ⟨fun d => Support.fields #[("a
     ("cacheTTL", Support.optional d.cacheTTL),
     ("browser", Support.optional d.browser),
     ("url", Support.optional d.url),
-    ("html", Support.optional d.html)]⟩
+    ("html", Support.optional d.html),
+    ("custom_ai", Support.optional d.custom_ai),
+    ("prompt", Support.optional d.prompt),
+    ("response_format", Support.optional d.response_format)]⟩
+
+/-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
+inductive BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil (value : BrowserRunBaseOptionsGotoOptionsWaitUntil)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil2` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil2 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil2)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil3` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil3 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil3)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil4` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil4 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil4)
+  /-- `sequence<BrowserRunLifecycleEvent>` -/
+  | sequence (value : Array BrowserRunLifecycleEvent)
+instance : ToJS BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨fun
+  | .browserRunBaseOptionsGotoOptionsWaitUntil v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil2 v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil3 v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil4 v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil2 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil2⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil3 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil3⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil4 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil4⟩
+instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.sequence⟩
+
+/-- `dictionary BrowserRunLinksOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunLinksOptionsGotoOptions where
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
+  waitUntil : Option BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
+  /-- `DOMString referer` -/
+  referer : Option String := none
+  /-- `DOMString referrerPolicy` -/
+  referrerPolicy : Option String := none
+instance : ToJS BrowserRunLinksOptionsGotoOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
+    ("waitUntil", Support.optional d.waitUntil),
+    ("referer", Support.optional d.referer),
+    ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
+
+/-- `dictionary BrowserRunLinksOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunLinksOptions where
+  /-- `sequence<BrowserRunBaseOptionsAddScriptTag> addScriptTag` -/
+  addScriptTag : Option (Array BrowserRunBaseOptionsAddScriptTag) := none
+  /-- `sequence<BrowserRunBaseOptionsAddStyleTag> addStyleTag` -/
+  addStyleTag : Option (Array BrowserRunBaseOptionsAddStyleTag) := none
+  /-- `BrowserRunBaseOptionsAuthenticate authenticate` -/
+  authenticate : Option BrowserRunBaseOptionsAuthenticate := none
+  /-- `sequence<BrowserRunBaseOptionsCookies> cookies` -/
+  cookies : Option (Array BrowserRunBaseOptionsCookies) := none
+  /-- `DOMString emulateMediaType` -/
+  emulateMediaType : Option String := none
+  /-- `BrowserRunLinksOptionsGotoOptions gotoOptions` -/
+  gotoOptions : Option BrowserRunLinksOptionsGotoOptions := none
+  /-- `sequence<DOMString> rejectRequestPattern` -/
+  rejectRequestPattern : Option (Array String) := none
+  /-- `sequence<DOMString> allowRequestPattern` -/
+  allowRequestPattern : Option (Array String) := none
+  /-- `sequence<BrowserRunResourceType> rejectResourceTypes` -/
+  rejectResourceTypes : Option (Array BrowserRunResourceType) := none
+  /-- `sequence<BrowserRunResourceType> allowResourceTypes` -/
+  allowResourceTypes : Option (Array BrowserRunResourceType) := none
+  /-- `record<DOMString, DOMString> setExtraHTTPHeaders` -/
+  setExtraHTTPHeaders : Option (Record String) := none
+  /-- `boolean setJavaScriptEnabled` -/
+  setJavaScriptEnabled : Option Bool := none
+  /-- `DOMString userAgent` -/
+  userAgent : Option String := none
+  /-- `BrowserRunBaseOptionsViewport viewport` -/
+  viewport : Option BrowserRunBaseOptionsViewport := none
+  /-- `BrowserRunBaseOptionsWaitForSelector waitForSelector` -/
+  waitForSelector : Option BrowserRunBaseOptionsWaitForSelector := none
+  /-- `double waitForTimeout` -/
+  waitForTimeout : Option Float := none
+  /-- `boolean bestAttempt` -/
+  bestAttempt : Option Bool := none
+  /-- `double actionTimeout` -/
+  actionTimeout : Option Float := none
+  /-- `double cacheTTL` -/
+  cacheTTL : Option Float := none
+  /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
+  browser : Option BrowserRunAlternateBackendOptionsBrowser := none
+  /-- `DOMString url` -/
+  url : Option String := none
+  /-- `DOMString html` -/
+  html : Option String := none
+  /-- `boolean visibleLinksOnly` -/
+  visibleLinksOnly : Option Bool := none
+  /-- `boolean excludeExternalLinks` -/
+  excludeExternalLinks : Option Bool := none
+instance : ToJS BrowserRunLinksOptions := ⟨fun d => Support.fields #[("addScriptTag", Support.optional d.addScriptTag),
+    ("addStyleTag", Support.optional d.addStyleTag),
+    ("authenticate", Support.optional d.authenticate),
+    ("cookies", Support.optional d.cookies),
+    ("emulateMediaType", Support.optional d.emulateMediaType),
+    ("gotoOptions", Support.optional d.gotoOptions),
+    ("rejectRequestPattern", Support.optional d.rejectRequestPattern),
+    ("allowRequestPattern", Support.optional d.allowRequestPattern),
+    ("rejectResourceTypes", Support.optional d.rejectResourceTypes),
+    ("allowResourceTypes", Support.optional d.allowResourceTypes),
+    ("setExtraHTTPHeaders", Support.optional d.setExtraHTTPHeaders),
+    ("setJavaScriptEnabled", Support.optional d.setJavaScriptEnabled),
+    ("userAgent", Support.optional d.userAgent),
+    ("viewport", Support.optional d.viewport),
+    ("waitForSelector", Support.optional d.waitForSelector),
+    ("waitForTimeout", Support.optional d.waitForTimeout),
+    ("bestAttempt", Support.optional d.bestAttempt),
+    ("actionTimeout", Support.optional d.actionTimeout),
+    ("cacheTTL", Support.optional d.cacheTTL),
+    ("browser", Support.optional d.browser),
+    ("url", Support.optional d.url),
+    ("html", Support.optional d.html),
+    ("visibleLinksOnly", Support.optional d.visibleLinksOnly),
+    ("excludeExternalLinks", Support.optional d.excludeExternalLinks)]⟩
 
 /-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunScrapeOptionsGotoOptionsWaitUntilOrBrowserRunScrapeOptionsGotoOptionsWaitUntil2OrBrowserRunScrapeOptionsGotoOptionsWaitUntil3OrBrowserRunScrapeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
@@ -1174,120 +1092,6 @@ instance : ToJS BrowserRunScrapeOptions := ⟨fun d => Support.fields #[("addScr
     ("html", Support.optional d.html),
     ("elements", toJS d.elements)]⟩
 
-/-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
-inductive BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil (value : BrowserRunBaseOptionsGotoOptionsWaitUntil)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil2` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil2 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil2)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil3` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil3 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil3)
-  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil4` -/
-  | browserRunBaseOptionsGotoOptionsWaitUntil4 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil4)
-  /-- `sequence<BrowserRunLifecycleEvent>` -/
-  | sequence (value : Array BrowserRunLifecycleEvent)
-instance : ToJS BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨fun
-  | .browserRunBaseOptionsGotoOptionsWaitUntil v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil2 v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil3 v => toJS v
-  | .browserRunBaseOptionsGotoOptionsWaitUntil4 v => toJS v
-  | .sequence v => toJS v⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil2 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil2⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil3 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil3⟩
-instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil4 BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil4⟩
-instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.sequence⟩
-
-/-- `dictionary BrowserRunLinksOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunLinksOptionsGotoOptions where
-  /-- `double timeout` -/
-  timeout : Option Float := none
-  /-- `BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
-  waitUntil : Option BrowserRunLinksOptionsGotoOptionsWaitUntilOrBrowserRunLinksOptionsGotoOptionsWaitUntil2OrBrowserRunLinksOptionsGotoOptionsWaitUntil3OrBrowserRunLinksOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
-  /-- `DOMString referer` -/
-  referer : Option String := none
-  /-- `DOMString referrerPolicy` -/
-  referrerPolicy : Option String := none
-instance : ToJS BrowserRunLinksOptionsGotoOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
-    ("waitUntil", Support.optional d.waitUntil),
-    ("referer", Support.optional d.referer),
-    ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
-
-/-- `dictionary BrowserRunLinksOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunLinksOptions where
-  /-- `sequence<BrowserRunBaseOptionsAddScriptTag> addScriptTag` -/
-  addScriptTag : Option (Array BrowserRunBaseOptionsAddScriptTag) := none
-  /-- `sequence<BrowserRunBaseOptionsAddStyleTag> addStyleTag` -/
-  addStyleTag : Option (Array BrowserRunBaseOptionsAddStyleTag) := none
-  /-- `BrowserRunBaseOptionsAuthenticate authenticate` -/
-  authenticate : Option BrowserRunBaseOptionsAuthenticate := none
-  /-- `sequence<BrowserRunBaseOptionsCookies> cookies` -/
-  cookies : Option (Array BrowserRunBaseOptionsCookies) := none
-  /-- `DOMString emulateMediaType` -/
-  emulateMediaType : Option String := none
-  /-- `BrowserRunLinksOptionsGotoOptions gotoOptions` -/
-  gotoOptions : Option BrowserRunLinksOptionsGotoOptions := none
-  /-- `sequence<DOMString> rejectRequestPattern` -/
-  rejectRequestPattern : Option (Array String) := none
-  /-- `sequence<DOMString> allowRequestPattern` -/
-  allowRequestPattern : Option (Array String) := none
-  /-- `sequence<BrowserRunResourceType> rejectResourceTypes` -/
-  rejectResourceTypes : Option (Array BrowserRunResourceType) := none
-  /-- `sequence<BrowserRunResourceType> allowResourceTypes` -/
-  allowResourceTypes : Option (Array BrowserRunResourceType) := none
-  /-- `record<DOMString, DOMString> setExtraHTTPHeaders` -/
-  setExtraHTTPHeaders : Option (Record String) := none
-  /-- `boolean setJavaScriptEnabled` -/
-  setJavaScriptEnabled : Option Bool := none
-  /-- `DOMString userAgent` -/
-  userAgent : Option String := none
-  /-- `BrowserRunBaseOptionsViewport viewport` -/
-  viewport : Option BrowserRunBaseOptionsViewport := none
-  /-- `BrowserRunBaseOptionsWaitForSelector waitForSelector` -/
-  waitForSelector : Option BrowserRunBaseOptionsWaitForSelector := none
-  /-- `double waitForTimeout` -/
-  waitForTimeout : Option Float := none
-  /-- `boolean bestAttempt` -/
-  bestAttempt : Option Bool := none
-  /-- `double actionTimeout` -/
-  actionTimeout : Option Float := none
-  /-- `double cacheTTL` -/
-  cacheTTL : Option Float := none
-  /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
-  browser : Option BrowserRunAlternateBackendOptionsBrowser := none
-  /-- `DOMString url` -/
-  url : Option String := none
-  /-- `DOMString html` -/
-  html : Option String := none
-  /-- `boolean visibleLinksOnly` -/
-  visibleLinksOnly : Option Bool := none
-  /-- `boolean excludeExternalLinks` -/
-  excludeExternalLinks : Option Bool := none
-instance : ToJS BrowserRunLinksOptions := ⟨fun d => Support.fields #[("addScriptTag", Support.optional d.addScriptTag),
-    ("addStyleTag", Support.optional d.addStyleTag),
-    ("authenticate", Support.optional d.authenticate),
-    ("cookies", Support.optional d.cookies),
-    ("emulateMediaType", Support.optional d.emulateMediaType),
-    ("gotoOptions", Support.optional d.gotoOptions),
-    ("rejectRequestPattern", Support.optional d.rejectRequestPattern),
-    ("allowRequestPattern", Support.optional d.allowRequestPattern),
-    ("rejectResourceTypes", Support.optional d.rejectResourceTypes),
-    ("allowResourceTypes", Support.optional d.allowResourceTypes),
-    ("setExtraHTTPHeaders", Support.optional d.setExtraHTTPHeaders),
-    ("setJavaScriptEnabled", Support.optional d.setJavaScriptEnabled),
-    ("userAgent", Support.optional d.userAgent),
-    ("viewport", Support.optional d.viewport),
-    ("waitForSelector", Support.optional d.waitForSelector),
-    ("waitForTimeout", Support.optional d.waitForTimeout),
-    ("bestAttempt", Support.optional d.bestAttempt),
-    ("actionTimeout", Support.optional d.actionTimeout),
-    ("cacheTTL", Support.optional d.cacheTTL),
-    ("browser", Support.optional d.browser),
-    ("url", Support.optional d.url),
-    ("html", Support.optional d.html),
-    ("visibleLinksOnly", Support.optional d.visibleLinksOnly),
-    ("excludeExternalLinks", Support.optional d.excludeExternalLinks)]⟩
-
 /-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
 inductive BrowserRunSnapshotOptionsGotoOptionsWaitUntilOrBrowserRunSnapshotOptionsGotoOptionsWaitUntil2OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil3OrBrowserRunSnapshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
   /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil` -/
@@ -1326,6 +1130,24 @@ instance : ToJS BrowserRunSnapshotOptionsGotoOptions := ⟨fun d => Support.fiel
     ("waitUntil", Support.optional d.waitUntil),
     ("referer", Support.optional d.referer),
     ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
+
+/-- `dictionary BrowserRunPuppeteerScreenshotOptionsClip` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunPuppeteerScreenshotOptionsClip where
+  /-- `required double x` -/
+  x : Float
+  /-- `required double y` -/
+  y : Float
+  /-- `required double width` -/
+  width : Float
+  /-- `required double height` -/
+  height : Float
+  /-- `double scale` -/
+  scale : Option Float := none
+instance : ToJS BrowserRunPuppeteerScreenshotOptionsClip := ⟨fun d => Support.fields #[("x", toJS d.x),
+    ("y", toJS d.y),
+    ("width", toJS d.width),
+    ("height", toJS d.height),
+    ("scale", Support.optional d.scale)]⟩
 
 /-- `dictionary BrowserRunSnapshotOptionsScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotOptionsScreenshotOptions where
@@ -1427,6 +1249,153 @@ instance : ToJS BrowserRunSnapshotOptions := ⟨fun d => Support.fields #[("addS
     ("url", Support.optional d.url),
     ("html", Support.optional d.html),
     ("formats", Support.optional d.formats),
+    ("screenshotOptions", Support.optional d.screenshotOptions)]⟩
+
+/-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
+inductive BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent where
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil (value : BrowserRunBaseOptionsGotoOptionsWaitUntil)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil2` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil2 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil2)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil3` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil3 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil3)
+  /-- `BrowserRunBaseOptionsGotoOptionsWaitUntil4` -/
+  | browserRunBaseOptionsGotoOptionsWaitUntil4 (value : BrowserRunBaseOptionsGotoOptionsWaitUntil4)
+  /-- `sequence<BrowserRunLifecycleEvent>` -/
+  | sequence (value : Array BrowserRunLifecycleEvent)
+instance : ToJS BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨fun
+  | .browserRunBaseOptionsGotoOptionsWaitUntil v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil2 v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil3 v => toJS v
+  | .browserRunBaseOptionsGotoOptionsWaitUntil4 v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil2 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil2⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil3 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil3⟩
+instance : Coe BrowserRunBaseOptionsGotoOptionsWaitUntil4 BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.browserRunBaseOptionsGotoOptionsWaitUntil4⟩
+instance : Coe (Array BrowserRunLifecycleEvent) BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := ⟨.sequence⟩
+
+/-- `dictionary BrowserRunScreenshotOptionsGotoOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunScreenshotOptionsGotoOptions where
+  /-- `double timeout` -/
+  timeout : Option Float := none
+  /-- `BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent waitUntil` -/
+  waitUntil : Option BrowserRunScreenshotOptionsGotoOptionsWaitUntilOrBrowserRunScreenshotOptionsGotoOptionsWaitUntil2OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil3OrBrowserRunScreenshotOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent := none
+  /-- `DOMString referer` -/
+  referer : Option String := none
+  /-- `DOMString referrerPolicy` -/
+  referrerPolicy : Option String := none
+instance : ToJS BrowserRunScreenshotOptionsGotoOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
+    ("waitUntil", Support.optional d.waitUntil),
+    ("referer", Support.optional d.referer),
+    ("referrerPolicy", Support.optional d.referrerPolicy)]⟩
+
+/-- `dictionary BrowserRunPuppeteerScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunPuppeteerScreenshotOptions where
+  /-- `BrowserRunPuppeteerScreenshotOptionsType type` -/
+  type : Option BrowserRunPuppeteerScreenshotOptionsType := none
+  /-- `BrowserRunPuppeteerScreenshotOptionsEncoding encoding` -/
+  encoding : Option BrowserRunPuppeteerScreenshotOptionsEncoding := none
+  /-- `double quality` -/
+  quality : Option Float := none
+  /-- `boolean fullPage` -/
+  fullPage : Option Bool := none
+  /-- `BrowserRunPuppeteerScreenshotOptionsClip clip` -/
+  clip : Option BrowserRunPuppeteerScreenshotOptionsClip := none
+  /-- `boolean omitBackground` -/
+  omitBackground : Option Bool := none
+  /-- `boolean optimizeForSpeed` -/
+  optimizeForSpeed : Option Bool := none
+  /-- `boolean captureBeyondViewport` -/
+  captureBeyondViewport : Option Bool := none
+  /-- `boolean fromSurface` -/
+  fromSurface : Option Bool := none
+instance : ToJS BrowserRunPuppeteerScreenshotOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type),
+    ("encoding", Support.optional d.encoding),
+    ("quality", Support.optional d.quality),
+    ("fullPage", Support.optional d.fullPage),
+    ("clip", Support.optional d.clip),
+    ("omitBackground", Support.optional d.omitBackground),
+    ("optimizeForSpeed", Support.optional d.optimizeForSpeed),
+    ("captureBeyondViewport", Support.optional d.captureBeyondViewport),
+    ("fromSurface", Support.optional d.fromSurface)]⟩
+
+/-- `dictionary BrowserRunScreenshotOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BrowserRunScreenshotOptions where
+  /-- `sequence<BrowserRunBaseOptionsAddScriptTag> addScriptTag` -/
+  addScriptTag : Option (Array BrowserRunBaseOptionsAddScriptTag) := none
+  /-- `sequence<BrowserRunBaseOptionsAddStyleTag> addStyleTag` -/
+  addStyleTag : Option (Array BrowserRunBaseOptionsAddStyleTag) := none
+  /-- `BrowserRunBaseOptionsAuthenticate authenticate` -/
+  authenticate : Option BrowserRunBaseOptionsAuthenticate := none
+  /-- `sequence<BrowserRunBaseOptionsCookies> cookies` -/
+  cookies : Option (Array BrowserRunBaseOptionsCookies) := none
+  /-- `DOMString emulateMediaType` -/
+  emulateMediaType : Option String := none
+  /-- `BrowserRunScreenshotOptionsGotoOptions gotoOptions` -/
+  gotoOptions : Option BrowserRunScreenshotOptionsGotoOptions := none
+  /-- `sequence<DOMString> rejectRequestPattern` -/
+  rejectRequestPattern : Option (Array String) := none
+  /-- `sequence<DOMString> allowRequestPattern` -/
+  allowRequestPattern : Option (Array String) := none
+  /-- `sequence<BrowserRunResourceType> rejectResourceTypes` -/
+  rejectResourceTypes : Option (Array BrowserRunResourceType) := none
+  /-- `sequence<BrowserRunResourceType> allowResourceTypes` -/
+  allowResourceTypes : Option (Array BrowserRunResourceType) := none
+  /-- `record<DOMString, DOMString> setExtraHTTPHeaders` -/
+  setExtraHTTPHeaders : Option (Record String) := none
+  /-- `boolean setJavaScriptEnabled` -/
+  setJavaScriptEnabled : Option Bool := none
+  /-- `DOMString userAgent` -/
+  userAgent : Option String := none
+  /-- `BrowserRunBaseOptionsViewport viewport` -/
+  viewport : Option BrowserRunBaseOptionsViewport := none
+  /-- `BrowserRunBaseOptionsWaitForSelector waitForSelector` -/
+  waitForSelector : Option BrowserRunBaseOptionsWaitForSelector := none
+  /-- `double waitForTimeout` -/
+  waitForTimeout : Option Float := none
+  /-- `boolean bestAttempt` -/
+  bestAttempt : Option Bool := none
+  /-- `double actionTimeout` -/
+  actionTimeout : Option Float := none
+  /-- `double cacheTTL` -/
+  cacheTTL : Option Float := none
+  /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
+  browser : Option BrowserRunAlternateBackendOptionsBrowser := none
+  /-- `DOMString url` -/
+  url : Option String := none
+  /-- `DOMString html` -/
+  html : Option String := none
+  /-- `DOMString selector` -/
+  selector : Option String := none
+  /-- `boolean scrollPage` -/
+  scrollPage : Option Bool := none
+  /-- `BrowserRunPuppeteerScreenshotOptions screenshotOptions` -/
+  screenshotOptions : Option BrowserRunPuppeteerScreenshotOptions := none
+instance : ToJS BrowserRunScreenshotOptions := ⟨fun d => Support.fields #[("addScriptTag", Support.optional d.addScriptTag),
+    ("addStyleTag", Support.optional d.addStyleTag),
+    ("authenticate", Support.optional d.authenticate),
+    ("cookies", Support.optional d.cookies),
+    ("emulateMediaType", Support.optional d.emulateMediaType),
+    ("gotoOptions", Support.optional d.gotoOptions),
+    ("rejectRequestPattern", Support.optional d.rejectRequestPattern),
+    ("allowRequestPattern", Support.optional d.allowRequestPattern),
+    ("rejectResourceTypes", Support.optional d.rejectResourceTypes),
+    ("allowResourceTypes", Support.optional d.allowResourceTypes),
+    ("setExtraHTTPHeaders", Support.optional d.setExtraHTTPHeaders),
+    ("setJavaScriptEnabled", Support.optional d.setJavaScriptEnabled),
+    ("userAgent", Support.optional d.userAgent),
+    ("viewport", Support.optional d.viewport),
+    ("waitForSelector", Support.optional d.waitForSelector),
+    ("waitForTimeout", Support.optional d.waitForTimeout),
+    ("bestAttempt", Support.optional d.bestAttempt),
+    ("actionTimeout", Support.optional d.actionTimeout),
+    ("cacheTTL", Support.optional d.cacheTTL),
+    ("browser", Support.optional d.browser),
+    ("url", Support.optional d.url),
+    ("html", Support.optional d.html),
+    ("selector", Support.optional d.selector),
+    ("scrollPage", Support.optional d.scrollPage),
     ("screenshotOptions", Support.optional d.screenshotOptions)]⟩
 
 /-- `typedef BrowserRunBaseOptionsGotoOptionsWaitUntil or BrowserRunBaseOptionsGotoOptionsWaitUntil2 or BrowserRunBaseOptionsGotoOptionsWaitUntil3 or BrowserRunBaseOptionsGotoOptionsWaitUntil4 or sequence<BrowserRunLifecycleEvent> BrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntilOrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil2OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil3OrBrowserRunAccessibilityTreeOptionsGotoOptionsWaitUntil4OrSequenceOfBrowserRunLifecycleEvent`: one constructor per member type. -/
@@ -2220,34 +2189,12 @@ structure BrowserRunAlternateBackendOptions where
   /-- `BrowserRunAlternateBackendOptionsBrowser browser` -/
   browser : Option BrowserRunAlternateBackendOptionsBrowser := none
 instance : ToJS BrowserRunAlternateBackendOptions := ⟨fun d => Support.fields #[("browser", Support.optional d.browser)]⟩
-instance : FromJS BrowserRunAlternateBackendOptions where
-  fromJS d := do return {
-    browser := ← Lasm.JS.readField (Option BrowserRunAlternateBackendOptionsBrowser) d "browser" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunAlternateBackendOptions"
-
-/-- `dictionary BrowserRunJsonBaseOptionsCustom_ai` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BrowserRunJsonBaseOptionsCustom_ai where
-  /-- `required DOMString model` -/
-  model : String
-  /-- `DOMString authorization` -/
-  authorization : Option String := none
-instance : ToJS BrowserRunJsonBaseOptionsCustom_ai := ⟨fun d => Support.fields #[("model", toJS d.model),
-    ("authorization", Support.optional d.authorization)]⟩
-instance : FromJS BrowserRunJsonBaseOptionsCustom_ai where
-  fromJS d := do return {
-    model := ← Lasm.JS.readField String d "model",
-    authorization := ← Lasm.JS.readField (Option String) d "authorization" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonBaseOptionsCustom_ai"
 
 /-- `dictionary BrowserRunJsonBaseOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonBaseOptions where
   /-- `sequence<BrowserRunJsonBaseOptionsCustom_ai> custom_ai` -/
   custom_ai : Option (Array BrowserRunJsonBaseOptionsCustom_ai) := none
 instance : ToJS BrowserRunJsonBaseOptions := ⟨fun d => Support.fields #[("custom_ai", Support.optional d.custom_ai)]⟩
-instance : FromJS BrowserRunJsonBaseOptions where
-  fromJS d := do return {
-    custom_ai := ← Lasm.JS.readField (Option (Array BrowserRunJsonBaseOptionsCustom_ai)) d "custom_ai" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonBaseOptions"
 
 /-- `dictionary BrowserRunRedirectHop` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunRedirectHop where
@@ -2260,12 +2207,6 @@ structure BrowserRunRedirectHop where
 instance : ToJS BrowserRunRedirectHop := ⟨fun d => Support.fields #[("url", toJS d.url),
     ("status", toJS d.status),
     ("headers", toJS d.headers)]⟩
-instance : FromJS BrowserRunRedirectHop where
-  fromJS d := do return {
-    url := ← Lasm.JS.readField String d "url",
-    status := ← Lasm.JS.readField Float d "status",
-    headers := ← Lasm.JS.readField (Record String) d "headers" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunRedirectHop"
 
 /-- `dictionary BrowserRunResponseMeta` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunResponseMeta where
@@ -2284,14 +2225,6 @@ instance : ToJS BrowserRunResponseMeta := ⟨fun d => Support.fields #[("status"
     ("headers", Support.optional d.headers),
     ("finalUrl", Support.optional d.finalUrl),
     ("redirectChain", Support.optional d.redirectChain)]⟩
-instance : FromJS BrowserRunResponseMeta where
-  fromJS d := do return {
-    status := ← Lasm.JS.readField Float d "status",
-    title := ← Lasm.JS.readField String d "title",
-    headers := ← Lasm.JS.readField (Option (Record String)) d "headers",
-    finalUrl := ← Lasm.JS.readField (Option String) d "finalUrl",
-    redirectChain := ← Lasm.JS.readField (Option (Array BrowserRunRedirectHop)) d "redirectChain" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunResponseMeta"
 
 /-- `typedef boolean or BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodeChecked`: one constructor per member type. -/
 inductive BooleanOrBrowserRunSerializedAXNodeChecked where
@@ -2304,12 +2237,6 @@ instance : ToJS BooleanOrBrowserRunSerializedAXNodeChecked := ⟨fun
   | .browserRunSerializedAXNodeChecked v => toJS v⟩
 instance : Coe Bool BooleanOrBrowserRunSerializedAXNodeChecked := ⟨.boolean⟩
 instance : Coe BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodeChecked := ⟨.browserRunSerializedAXNodeChecked⟩
-instance : FromJS BooleanOrBrowserRunSerializedAXNodeChecked where
-  fromJS
-    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
-    | d@(.string _) => (FromJS.fromJS d : Except String BrowserRunSerializedAXNodeChecked).map .browserRunSerializedAXNodeChecked
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.BooleanOrBrowserRunSerializedAXNodeChecked"
 
 /-- `typedef boolean or BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodePressed`: one constructor per member type. -/
 inductive BooleanOrBrowserRunSerializedAXNodePressed where
@@ -2322,12 +2249,6 @@ instance : ToJS BooleanOrBrowserRunSerializedAXNodePressed := ⟨fun
   | .browserRunSerializedAXNodeChecked v => toJS v⟩
 instance : Coe Bool BooleanOrBrowserRunSerializedAXNodePressed := ⟨.boolean⟩
 instance : Coe BrowserRunSerializedAXNodeChecked BooleanOrBrowserRunSerializedAXNodePressed := ⟨.browserRunSerializedAXNodeChecked⟩
-instance : FromJS BooleanOrBrowserRunSerializedAXNodePressed where
-  fromJS
-    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
-    | d@(.string _) => (FromJS.fromJS d : Except String BrowserRunSerializedAXNodeChecked).map .browserRunSerializedAXNodeChecked
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.BooleanOrBrowserRunSerializedAXNodePressed"
 
 /-- `dictionary BrowserRunSerializedAXNode` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSerializedAXNode where
@@ -2409,35 +2330,6 @@ instance : ToJS BrowserRunSerializedAXNode := ⟨fun d => Support.fields #[("rol
     ("valuemin", Support.optional d.valuemin),
     ("valuetext", Support.optional d.valuetext),
     ("children", d.children)]⟩
-instance : FromJS BrowserRunSerializedAXNode where
-  fromJS d := do return {
-    role := ← Lasm.JS.readField String d "role",
-    autocomplete := ← Lasm.JS.readField (Option String) d "autocomplete",
-    checked := ← Lasm.JS.readField (Option BooleanOrBrowserRunSerializedAXNodeChecked) d "checked",
-    description := ← Lasm.JS.readField (Option String) d "description",
-    disabled := ← Lasm.JS.readField (Option Bool) d "disabled",
-    expanded := ← Lasm.JS.readField (Option Bool) d "expanded",
-    focused := ← Lasm.JS.readField (Option Bool) d "focused",
-    haspopup := ← Lasm.JS.readField (Option String) d "haspopup",
-    invalid := ← Lasm.JS.readField (Option String) d "invalid",
-    keyshortcuts := ← Lasm.JS.readField (Option String) d "keyshortcuts",
-    level := ← Lasm.JS.readField (Option Float) d "level",
-    modal := ← Lasm.JS.readField (Option Bool) d "modal",
-    multiline := ← Lasm.JS.readField (Option Bool) d "multiline",
-    multiselectable := ← Lasm.JS.readField (Option Bool) d "multiselectable",
-    name := ← Lasm.JS.readField (Option String) d "name",
-    orientation := ← Lasm.JS.readField (Option String) d "orientation",
-    pressed := ← Lasm.JS.readField (Option BooleanOrBrowserRunSerializedAXNodePressed) d "pressed",
-    readonly := ← Lasm.JS.readField (Option Bool) d "readonly",
-    required := ← Lasm.JS.readField (Option Bool) d "required",
-    roledescription := ← Lasm.JS.readField (Option String) d "roledescription",
-    selected := ← Lasm.JS.readField (Option Bool) d "selected",
-    value := ← Lasm.JS.readField (Option DOMStringOrDouble) d "value",
-    valuemax := ← Lasm.JS.readField (Option Float) d "valuemax",
-    valuemin := ← Lasm.JS.readField (Option Float) d "valuemin",
-    valuetext := ← Lasm.JS.readField (Option String) d "valuetext",
-    children := ← Lasm.JS.readField Data d "children" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunSerializedAXNode"
 
 /-- `dictionary BrowserRunContentSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunContentSuccessResponse where
@@ -2450,12 +2342,6 @@ structure BrowserRunContentSuccessResponse where
 instance : ToJS BrowserRunContentSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunContentSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField String d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunContentSuccessResponse"
 
 /-- `dictionary BrowserRunLinksSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunLinksSuccessResponse where
@@ -2468,12 +2354,6 @@ structure BrowserRunLinksSuccessResponse where
 instance : ToJS BrowserRunLinksSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunLinksSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField (Array String) d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunLinksSuccessResponse"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResultResultsAttributes` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResultResultsAttributes where
@@ -2483,11 +2363,6 @@ structure BrowserRunScrapeSuccessResponseResultResultsAttributes where
   value : String
 instance : ToJS BrowserRunScrapeSuccessResponseResultResultsAttributes := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("value", toJS d.value)]⟩
-instance : FromJS BrowserRunScrapeSuccessResponseResultResultsAttributes where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    value := ← Lasm.JS.readField String d "value" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResultResultsAttributes"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResultResults` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResultResults where
@@ -2512,16 +2387,6 @@ instance : ToJS BrowserRunScrapeSuccessResponseResultResults := ⟨fun d => Supp
     ("top", toJS d.top),
     ("left", toJS d.left),
     ("attributes", toJS d.attributes)]⟩
-instance : FromJS BrowserRunScrapeSuccessResponseResultResults where
-  fromJS d := do return {
-    html := ← Lasm.JS.readField String d "html",
-    text := ← Lasm.JS.readField String d "text",
-    width := ← Lasm.JS.readField Float d "width",
-    height := ← Lasm.JS.readField Float d "height",
-    top := ← Lasm.JS.readField Float d "top",
-    left := ← Lasm.JS.readField Float d "left",
-    attributes := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResultResultsAttributes) d "attributes" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResultResults"
 
 /-- `dictionary BrowserRunScrapeSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponseResult where
@@ -2531,11 +2396,6 @@ structure BrowserRunScrapeSuccessResponseResult where
   results : Array BrowserRunScrapeSuccessResponseResultResults
 instance : ToJS BrowserRunScrapeSuccessResponseResult := ⟨fun d => Support.fields #[("selector", toJS d.selector),
     ("results", toJS d.results)]⟩
-instance : FromJS BrowserRunScrapeSuccessResponseResult where
-  fromJS d := do return {
-    selector := ← Lasm.JS.readField String d "selector",
-    results := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResultResults) d "results" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponseResult"
 
 /-- `dictionary BrowserRunScrapeSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunScrapeSuccessResponse where
@@ -2548,12 +2408,6 @@ structure BrowserRunScrapeSuccessResponse where
 instance : ToJS BrowserRunScrapeSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunScrapeSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField (Array BrowserRunScrapeSuccessResponseResult) d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunScrapeSuccessResponse"
 
 /-- `dictionary BrowserRunSnapshotSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotSuccessResponseResult where
@@ -2569,13 +2423,6 @@ instance : ToJS BrowserRunSnapshotSuccessResponseResult := ⟨fun d => Support.f
     ("screenshot", Support.optional d.screenshot),
     ("markdown", Support.optional d.markdown),
     ("accessibilityTree", Support.optional d.accessibilityTree)]⟩
-instance : FromJS BrowserRunSnapshotSuccessResponseResult where
-  fromJS d := do return {
-    content := ← Lasm.JS.readField (Option String) d "content",
-    screenshot := ← Lasm.JS.readField (Option String) d "screenshot",
-    markdown := ← Lasm.JS.readField (Option String) d "markdown",
-    accessibilityTree := ← Lasm.JS.readField (Option BrowserRunSerializedAXNode) d "accessibilityTree" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotSuccessResponseResult"
 
 /-- `dictionary BrowserRunSnapshotSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunSnapshotSuccessResponse where
@@ -2588,22 +2435,12 @@ structure BrowserRunSnapshotSuccessResponse where
 instance : ToJS BrowserRunSnapshotSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunSnapshotSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField BrowserRunSnapshotSuccessResponseResult d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunSnapshotSuccessResponse"
 
 /-- `dictionary BrowserRunAccessibilityTreeSuccessResponseResult` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeSuccessResponseResult where
   /-- `required BrowserRunSerializedAXNode? accessibilityTree` -/
   accessibilityTree : Option BrowserRunSerializedAXNode
 instance : ToJS BrowserRunAccessibilityTreeSuccessResponseResult := ⟨fun d => Support.fields #[("accessibilityTree", toJS d.accessibilityTree)]⟩
-instance : FromJS BrowserRunAccessibilityTreeSuccessResponseResult where
-  fromJS d := do return {
-    accessibilityTree := ← Lasm.JS.readField (Option BrowserRunSerializedAXNode) d "accessibilityTree" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeSuccessResponseResult"
 
 /-- `dictionary BrowserRunAccessibilityTreeSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunAccessibilityTreeSuccessResponse where
@@ -2616,12 +2453,6 @@ structure BrowserRunAccessibilityTreeSuccessResponse where
 instance : ToJS BrowserRunAccessibilityTreeSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunAccessibilityTreeSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField BrowserRunAccessibilityTreeSuccessResponseResult d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunAccessibilityTreeSuccessResponse"
 
 /-- `dictionary BrowserRunJsonSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonSuccessResponse where
@@ -2634,12 +2465,6 @@ structure BrowserRunJsonSuccessResponse where
 instance : ToJS BrowserRunJsonSuccessResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("result", toJS d.result),
     ("meta", toJS d.«meta»)]⟩
-instance : FromJS BrowserRunJsonSuccessResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    result := ← Lasm.JS.readField (Record Data) d "result",
-    «meta» := ← Lasm.JS.readField BrowserRunResponseMeta d "meta" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonSuccessResponse"
 
 /-- `dictionary BrowserRunErrorResponseErrors` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunErrorResponseErrors where
@@ -2655,13 +2480,6 @@ instance : ToJS BrowserRunErrorResponseErrors := ⟨fun d => Support.fields #[("
     ("code", Support.optional d.code),
     ("detail", Support.optional d.detail),
     ("path", Support.optional d.path)]⟩
-instance : FromJS BrowserRunErrorResponseErrors where
-  fromJS d := do return {
-    message := ← Lasm.JS.readField String d "message",
-    code := ← Lasm.JS.readField (Option Float) d "code",
-    detail := ← Lasm.JS.readField (Option String) d "detail",
-    path := ← Lasm.JS.readField (Option String) d "path" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunErrorResponseErrors"
 
 /-- `dictionary BrowserRunErrorResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunErrorResponse where
@@ -2671,11 +2489,6 @@ structure BrowserRunErrorResponse where
   errors : Array BrowserRunErrorResponseErrors
 instance : ToJS BrowserRunErrorResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("errors", toJS d.errors)]⟩
-instance : FromJS BrowserRunErrorResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    errors := ← Lasm.JS.readField (Array BrowserRunErrorResponseErrors) d "errors" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunErrorResponse"
 
 /-- `dictionary BrowserRunJsonErrorResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BrowserRunJsonErrorResponse where
@@ -2688,12 +2501,6 @@ structure BrowserRunJsonErrorResponse where
 instance : ToJS BrowserRunJsonErrorResponse := ⟨fun d => Support.fields #[("success", toJS d.success),
     ("errors", toJS d.errors),
     ("rawAiResponse", Support.optional d.rawAiResponse)]⟩
-instance : FromJS BrowserRunJsonErrorResponse where
-  fromJS d := do return {
-    success := ← Lasm.JS.readField Bool d "success",
-    errors := ← Lasm.JS.readField (Array BrowserRunErrorResponseErrors) d "errors",
-    rawAiResponse := ← Lasm.JS.readField (Option String) d "rawAiResponse" }
-  typeName := "Lasm.JS.Cloudflare.BrowserRunJsonErrorResponse"
 
 /-- `BrowserRunMarkdownSuccessResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `BrowserRunContentSuccessResponse`. -/
 abbrev BrowserRunMarkdownSuccessResponse := BrowserRunContentSuccessResponse
@@ -3018,24 +2825,14 @@ def BrowserRun.fetch (self : BrowserRun) (input : RequestInfoOrURL) (init : Opti
   let r ← self.val.callMethodAwait "fetch" (Support.args #[toJS input, Support.optional init]) Value
   pure { val := r }
 
-/-- `quickAction(action: 'screenshot', options: BrowserRunScreenshotOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunScreenshotOptions options)` -/
-def BrowserRun.quickActionScreenshot (self : BrowserRun) (options : BrowserRunScreenshotOptions) : Async Response := do
-  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "screenshot", toJS options]) Value
-  pure { val := r }
-
 /-- `quickAction(action: 'pdf', options: BrowserRunPDFOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunPDFOptions options)` -/
 def BrowserRun.quickActionPdf (self : BrowserRun) (options : BrowserRunPDFOptions) : Async Response := do
   let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "pdf", toJS options]) Value
   pure { val := r }
 
-/-- `quickAction(action: 'content', options: BrowserRunContentOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunQuickActionOptions options)` -/
-def BrowserRun.quickActionContent (self : BrowserRun) (options : BrowserRunQuickActionOptions) : Async Response := do
-  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "content", toJS options]) Value
-  pure { val := r }
-
-/-- `quickAction(action: 'scrape', options: BrowserRunScrapeOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunScrapeOptions options)` -/
-def BrowserRun.quickActionScrape (self : BrowserRun) (options : BrowserRunScrapeOptions) : Async Response := do
-  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "scrape", toJS options]) Value
+/-- `quickAction(action: 'json', options: BrowserRunJsonOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunQuickActionOptions options)` -/
+def BrowserRun.quickActionJson (self : BrowserRun) (options : BrowserRunQuickActionOptions) : Async Response := do
+  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "json", toJS options]) Value
   pure { val := r }
 
 /-- `quickAction(action: 'links', options: BrowserRunLinksOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunLinksOptions options)` -/
@@ -3043,19 +2840,29 @@ def BrowserRun.quickActionLinks (self : BrowserRun) (options : BrowserRunLinksOp
   let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "links", toJS options]) Value
   pure { val := r }
 
+/-- `quickAction(action: 'scrape', options: BrowserRunScrapeOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunScrapeOptions options)` -/
+def BrowserRun.quickActionScrape (self : BrowserRun) (options : BrowserRunScrapeOptions) : Async Response := do
+  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "scrape", toJS options]) Value
+  pure { val := r }
+
+/-- `quickAction(action: 'content', options: BrowserRunContentOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, any options)` -/
+def BrowserRun.quickActionContent (self : BrowserRun) (options : Data) : Async Response := do
+  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "content", toJS options]) Value
+  pure { val := r }
+
 /-- `quickAction(action: 'snapshot', options: BrowserRunSnapshotOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunSnapshotOptions options)` -/
 def BrowserRun.quickActionSnapshot (self : BrowserRun) (options : BrowserRunSnapshotOptions) : Async Response := do
   let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "snapshot", toJS options]) Value
   pure { val := r }
 
-/-- `quickAction(action: 'json', options: BrowserRunJsonOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, any options)` -/
-def BrowserRun.quickActionJson (self : BrowserRun) (options : Data) : Async Response := do
-  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "json", toJS options]) Value
+/-- `quickAction(action: 'markdown', options: BrowserRunMarkdownOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, any options)` -/
+def BrowserRun.quickActionMarkdown (self : BrowserRun) (options : Data) : Async Response := do
+  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "markdown", toJS options]) Value
   pure { val := r }
 
-/-- `quickAction(action: 'markdown', options: BrowserRunMarkdownOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunQuickActionOptions options)` -/
-def BrowserRun.quickActionMarkdown (self : BrowserRun) (options : BrowserRunQuickActionOptions) : Async Response := do
-  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "markdown", toJS options]) Value
+/-- `quickAction(action: 'screenshot', options: BrowserRunScreenshotOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunScreenshotOptions options)` -/
+def BrowserRun.quickActionScreenshot (self : BrowserRun) (options : BrowserRunScreenshotOptions) : Async Response := do
+  let r ← self.val.callMethodAwait "quickAction" (Support.args #[toJS "screenshot", toJS options]) Value
   pure { val := r }
 
 /-- `quickAction(action: 'accessibilityTree', options: BrowserRunAccessibilityTreeOptions): Promise<Response>`: `Promise<Response> quickAction(DOMString action, BrowserRunAccessibilityTreeOptions options)` -/

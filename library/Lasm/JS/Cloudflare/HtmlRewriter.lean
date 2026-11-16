@@ -97,10 +97,6 @@ structure TextOptionsFont where
   /-- `required DOMString url` -/
   url : String
 instance : ToJS TextOptionsFont := ⟨fun d => Support.fields #[("url", toJS d.url)]⟩
-instance : FromJS TextOptionsFont where
-  fromJS d := do return {
-    url := ← Lasm.JS.readField String d "url" }
-  typeName := "Lasm.JS.Cloudflare.TextOptionsFont"
 
 /-- `dictionary TextOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextOptions where
@@ -113,12 +109,6 @@ structure TextOptions where
 instance : ToJS TextOptions := ⟨fun d => Support.fields #[("font", toJS d.font),
     ("size", Support.optional d.size),
     ("color", Support.optional d.color)]⟩
-instance : FromJS TextOptions where
-  fromJS d := do return {
-    font := ← Lasm.JS.readField TextOptionsFont d "font",
-    size := ← Lasm.JS.readField (Option Float) d "size",
-    color := ← Lasm.JS.readField (Option String) d "color" }
-  typeName := "Lasm.JS.Cloudflare.TextOptions"
 
 /-- `dictionary TextRasterize` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextRasterize where
@@ -128,11 +118,6 @@ structure TextRasterize where
   options : TextOptions
 instance : ToJS TextRasterize := ⟨fun d => Support.fields #[("content", toJS d.content),
     ("options", toJS d.options)]⟩
-instance : FromJS TextRasterize where
-  fromJS d := do return {
-    content := ← Lasm.JS.readField String d "content",
-    options := ← Lasm.JS.readField TextOptions d "options" }
-  typeName := "Lasm.JS.Cloudflare.TextRasterize"
 
 /-- `constructor()`: `constructor()` -/
 def HTMLRewriter.new : IO HTMLRewriter :=
