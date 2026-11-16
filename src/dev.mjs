@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { jsRuntime } from './js-runtime.mjs';
-import { targetHintAmong } from './cli-arguments.mjs';
+import { targetHintAmong } from './cli-names.mjs';
 
 const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];

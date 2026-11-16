@@ -1279,9 +1279,9 @@ The generated platform files:
 | Target | Export | Calls |
 | --- | --- | --- |
 | `netlify` | `export default async (request, context) => …` | `handler(request, context)`; Cookie lines that Netlify joined with commas are rejoined with `; `; an empty body becomes no body (#82) |
-| `vercel`, `gcf` | `(req, res)` | the Node request as a web `Request` (`lasm:node-serve`), and the `Response` streamed back |
+| `vercel`, `cloud-functions` | `(req, res)` | the Node request as a web `Request` (`lasm:node-serve`), and the `Response` streamed back |
 | `lambda`, `lambda-edge` | `handler(event)` | each event shape mapped to a `Request` and back, with the existing Host, cookie, base64 and `__proto__` rules |
-| `azure` | `app.http('lasm', …)` | the `Request`, and the `Response` as `HttpResponseInit` (Set-Cookie through `cookies`, #80) |
+| `azure-functions` | `app.http('lasm', …)` | the `Request`, and the `Response` as `HttpResponseInit` (Set-Cookie through `cookies`, #80) |
 
 A program that brings its own HTTP server (Express, or `Node.serve`) cannot
 run on these platforms. There, a program has to publish a handler.

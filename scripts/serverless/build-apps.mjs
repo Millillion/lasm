@@ -9,7 +9,7 @@
 // function platforms call it directly, so express, fastify and std-http (which
 // bring their own server) run only as the Lambda container image.
 //   <template>          --deploy lambda lambda-edge vercel netlify
-//   <template>-hosted   --deploy azure gcf
+//   <template>-hosted   --deploy azure-functions cloud-functions
 // Plus `std-http` (the template's Node server, no function package) for the
 // Linux variants' time-zone checks, and `probe` (scripts/serverless/probe/Main.lean), a program that uses the
 // native pieces (subprocess, files, environment) for the Linux variants.
@@ -52,7 +52,7 @@ const lasm = [process.execPath, join(cli, 'node_modules/@lasm/compiler/bin/lasm.
 const frameworks = { hono: 'Hono', fetch: 'Lasm.JS.Web' };
 const apps = [];
 for (const template of templates) {
-  for (const [suffix, deploy, kind] of [['', ['lambda', 'lambda-edge', 'vercel', 'netlify'], 'functions'], ['-hosted', ['azure', 'gcf'], 'hosted']]) {
+  for (const [suffix, deploy, kind] of [['', ['lambda', 'lambda-edge', 'vercel', 'netlify'], 'functions'], ['-hosted', ['azure-functions', 'cloud-functions'], 'hosted']]) {
     if (!only.includes(kind)) continue;
     const name = template + suffix, project = join(work, name);
     run(`lasm init ${name}`, lasm, ['init', project, '--template', template, ...deploy.flatMap(target => ['--deploy', target])], work);
@@ -63,7 +63,7 @@ for (const template of templates) {
     for (const target of deploy) {
       const r = run(`npm run build:${target} (${name})`, bin('npm'), ['run', `build:${target}`], project);
       const output = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/output', netlify: 'netlify/functions/lasm',
-        azure: 'azure-functions', gcf: 'gcf' }[target];
+        'azure-functions': 'azure-functions', 'cloud-functions': 'cloud-functions' }[target];
       packages[target] = { path: join(project, output), bytes: size(join(project, output)), log: r.stdout.trim().split('\n').slice(-4).join('\n') };
     }
     apps.push({ name, template, framework: frameworks[template], project, dist: join(project, 'dist'), distBytes: size(join(project, 'dist')), packages });

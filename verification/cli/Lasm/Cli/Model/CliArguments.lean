@@ -76,7 +76,7 @@ def wasiBuildTargets : List String := ["wasi", "fastly", "wasi-http"]
 /-- `['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser']`:
 the keys of src/package.mjs `packageTargets` are written out. -/
 def buildTargets : List String :=
-  ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure", "gcf"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
+  ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure-functions", "cloud-functions"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
 def fixedLayoutTargets : List String := ["vercel-edge", "netlify-edge"]
 def suspendModes : List String := ["none", "jspi"]
 def commandNames : List String := ["build", "run", "dev", "init", "package", "editor", "cache"]
@@ -84,17 +84,17 @@ def commandNames : List String := ["build", "run", "dev", "init", "package", "ed
 def targetAliases : List (String × String) :=
   [("cloudflare", "workers"), ("cloudflare-workers", "workers"), ("worker", "workers"), ("aws", "lambda"), ("aws-lambda", "lambda"),
    ("cloudfront", "lambda-edge"), ("supabase", "supabase-edge"), ("deno-deploy-edge", "deno-deploy"), ("spin", "wasi-http"),
-   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure-functions", "azure"), ("google-cloud-functions", "gcf"),
-   ("cloud-functions", "gcf"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
+   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure", "azure-functions"), ("gcf", "cloud-functions"),
+   ("google-cloud-functions", "cloud-functions"), ("cloud-run-functions", "cloud-functions"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
 
 /-- The usage text: one literal in the JavaScript, two pieces here, so that a
 proof sees its first word without decoding the whole text. -/
 def cliUsage : String := "Usage:" ++ " lasm <Main.lean> [--release] [-- arguments…]
        lasm run <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
-       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
+       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
        lasm init <directory> [--template NAME] [--deploy TARGET]…
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--output PATH] [--allow-dev]
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|browser [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 

@@ -193,11 +193,11 @@ function subcommandLine(r, options, values) {
 }
 const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'constructor', '__proto__', 'lambda',
   'lambda-container', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
-  'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
+  'deno-deploy', 'azure-functions', 'cloud-functions', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
 const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
   'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c',
   'worker', 'cloudflare', 'brwser', 'node,brwser', 'aws', 'lambda'];
-const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
+const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
 
 /** WebAssembly instructions as the lowering reads them: every immediate

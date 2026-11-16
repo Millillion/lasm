@@ -8,6 +8,7 @@ import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSy
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zip } from './serverless/zip.mjs';
+import { targetHintAmong } from './cli-names.mjs';
 
 const serverless = fileURLToPath(new URL('./serverless/', import.meta.url));
 // Node req/res ↔ web Request/Response (lasm:node-serve), copied as the shims' lasm-node-serve.mjs.
@@ -24,9 +25,9 @@ export const packageTargets = {
     shim: 'lasm-vercel.mjs', unzipped: 250 * MB },
   netlify: { summary: 'Netlify Function (v2, netlify/functions/lasm)', output: 'netlify/functions/lasm',
     shim: 'lasm-netlify.mjs', unzipped: 250 * MB },
-  azure: { summary: 'Azure Functions app (Node.js v4 programming model)', output: 'azure-functions',
+  'azure-functions': { summary: 'Azure Functions app (Node.js v4 programming model)', output: 'azure-functions',
     shim: 'lasm-azure.mjs', dependency: '@azure/functions' },
-  gcf: { summary: 'Google Cloud Functions (gen2, Functions Framework) source directory', output: 'gcf',
+  'cloud-functions': { summary: 'Google Cloud Functions (gen2, Functions Framework) source directory', output: 'cloud-functions',
     shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
 };
 
@@ -36,8 +37,8 @@ Packages a built Lasm program (lasm build output, default dist/) for a
 function platform. Its main publishes a fetch handler with
 Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
 calls directly. Writes, by target:
-${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
-  ${'browser'.padEnd(12)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
+${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(15)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
+  ${'browser'.padEnd(15)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
 
 lasm build Main.lean --target <target> builds and packages in one step; use
 lasm package to package one build for several platforms. Lasm never installs
@@ -66,7 +67,7 @@ export function parsePackageArguments(tokens) {
   }
   if (positional.length > 1) throw new Error(packageUsage);
   if (!result.target) throw new Error('--target is required\n\n' + packageUsage);
-  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown target "${result.target}". Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
+  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown target "${result.target}"${targetHintAmong(result.target, [...Object.keys(packageTargets), 'browser'])}. Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
   if (result.target === 'browser' && result.output !== undefined) throw new Error('lasm package --target browser checks the build in place; --output does not apply');
   result.input = positional[0] ?? 'dist';
   return result;
@@ -229,7 +230,7 @@ export function packageApplication({ input = 'dist', target, output, allowDev = 
     }
   }
   const files2 = files.filter(file => file.name !== 'package.json');
-  if (target === 'azure') {
+  if (target === 'azure-functions') {
     writeTree(output, files2, {
       'package.json': { ...pkg, name: 'lasm-azure-app', main: 'lasm-azure.mjs', dependencies },
       // Routes are the server's own: no /api prefix.
@@ -265,8 +266,8 @@ function runFunctionPackage(options) {
     'lambda-edge': `Create it in us-east-1 with runtime nodejs24.x, handler ${result.handler}, architecture x86_64, then attach a published version to a CloudFront origin-request trigger (with "Include body" for POST bodies).`,
     vercel: 'Deploy the prebuilt output: npx vercel deploy --prebuilt',
     netlify: 'Deploy with netlify deploy (netlify.toml: [functions] directory = "netlify/functions").',
-    azure: `Run locally with func start in ${where}; publish with func azure functionapp publish APP_NAME.`,
-    gcf: `Run locally with npx @google-cloud/functions-framework --target=lasm in ${where}; deploy with gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source ${where}.`,
+    'azure-functions': `Run locally with func start in ${where}; publish with func azure functionapp publish APP_NAME.`,
+    'cloud-functions': `Run locally with npx @google-cloud/functions-framework --target=lasm in ${where}; deploy with gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source ${where}.`,
   }[result.target];
   console.log(`Packaged ${relative(process.cwd(), result.input) || '.'} for ${result.target}: ${where} (${result.files} files, ${size}).\n${next}`);
   for (const warning of result.warnings) console.warn('Warning: ' + warning);

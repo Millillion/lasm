@@ -8,7 +8,7 @@
     "build": "lasm build Main.lean",
     "start": "node dist/main.mjs",
     "build:netlify": "lasm build Export.lean --target netlify",
-    "build:azure": "lasm build Export.lean --target azure",
+    "build:azure-functions": "lasm build Export.lean --target azure-functions",
     "build:lambda-edge": "lasm build Export.lean --target lambda-edge",
     "dev:bun": "bun x --bun lasm dev Main.lean",
     "build:bun": "bun x --bun lasm build Export.lean --target bun",

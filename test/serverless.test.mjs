@@ -55,7 +55,7 @@ test('lasm package refuses what is not a Linux-capable Lasm build', () => {
   writeFileSync(join(app, 'host/native/manifest.json'), JSON.stringify({ deployment: { targets: ['darwin-arm64'] } }));
   assert.throws(() => packageApplication({ input: app, target: 'lambda', output: join(directory, 'x.zip') }), /no Linux native support/);
   fakeApplication(app);
-  assert.throws(() => packageApplication({ input: app, target: 'azure', output: join(directory, 'az') }), /needs the npm package @azure\/functions/);
+  assert.throws(() => packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'az') }), /needs the npm package @azure\/functions/);
   assert.throws(() => packageApplication({ input: app, target: 'vercel', output: directory }), /must not contain the build/);
 });
 
@@ -231,7 +231,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual(viaFetch.seeOther, [303, '/there', null]);
   assert.equal(viaFetch.requestCookies.cookie, 'a=1; b=2');
 
-  const azure = packageApplication({ input: app, target: 'azure', output: join(directory, 'azure') });
+  const azure = packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'azure') });
   assert.equal(azure.dependency, '@azure/functions@1.2.3');
   const azurePackage = JSON.parse(readFileSync(join(azure.output, 'package.json'), 'utf8'));
   assert.equal(azurePackage.main, 'lasm-azure.mjs');
@@ -252,7 +252,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual(viaAzure.cookies, { list: [{ name: 'b', value: '2', path: '/' }], setCookie: ['a=1; Path=/'], many: 'p, q' });
   assert.deepEqual(viaAzure.seeOther, { status: 303, location: '/there', body: null });
 
-  const gcf = packageApplication({ input: app, target: 'gcf', output: join(directory, 'gcf') });
+  const gcf = packageApplication({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') });
   assert.equal(JSON.parse(readFileSync(join(gcf.output, 'package.json'), 'utf8')).main, 'lasm-gcf.mjs');
   const viaGcf = inProcess(`
     import http from 'node:http';

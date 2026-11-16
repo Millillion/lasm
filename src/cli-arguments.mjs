@@ -3,6 +3,8 @@ import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
 import { parseDevArguments } from './dev.mjs';
+import { asciiLower, closest, targetAliases } from './cli-names.mjs';
+export { asciiLower, closest, editDistance, targetHintAmong } from './cli-names.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
@@ -26,25 +28,11 @@ export const fixedLayoutTargets = ['vercel-edge', 'netlify-edge'];
 // --suspend (browser): none (the default: blocking waits stop the instance) or
 // jspi (they suspend in browsers that have JSPI).
 export const suspendModes = ['none', 'jspi'];
-// Names people try for a target, and the target they mean.
-const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
-  cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
-  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify', 'lambda-zip': 'lambda' };
 export function targetHint(value) {
   const alias = asciiLower(value);
   const guess = (Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined) ?? closest(value, buildTargets);
   return guess ? ` (did you mean --target ${guess}?)` : '';
 }
-/** The same hint among `candidates` only (lasm dev's targets, lasm package's,
- * lasm init's --deploy targets): an alias that names one of them, else the
- * closest of them. */
-export function targetHintAmong(value, candidates, option = '--target') {
-  const alias = asciiLower(value);
-  const named = Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined;
-  const guess = named !== undefined && candidates.includes(named) ? named : closest(value, candidates);
-  return guess ? ` (did you mean ${option} ${guess}?)` : '';
-}
-
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm run <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
@@ -68,38 +56,6 @@ lasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this
 Application arguments must follow --.`;
 
 export const commandNames = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache'];
-
-/** ASCII letters lowercased, every other character kept: command and target
- * names are ASCII (and Unicode case mapping would match the Kelvin sign K to k). */
-export const asciiLower = text => text.replace(/[A-Z]/g, c => c.toLowerCase());
-
-/** Levenshtein distance between the code points of two words (so an astral
- * character such as an emoji is one edit, not two UTF-16 units), for "did
- * you mean" suggestions. */
-export function editDistance(a, b) {
-  a = [...a]; b = [...b];
-  const row = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i++) {
-    let previous = row[0]; row[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const current = row[j];
-      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1));
-      previous = current;
-    }
-  }
-  return row[b.length];
-}
-
-/** The closest candidate (ignoring ASCII case) within a third of its length
- * in code points (at least 2 edits), or undefined. */
-export function closest(word, candidates) {
-  let best, distance = Infinity;
-  for (const candidate of candidates) {
-    const d = editDistance(asciiLower(word), asciiLower(candidate));
-    if (d < distance) { best = candidate; distance = d; }
-  }
-  return distance <= Math.max(2, Math.floor((best === undefined ? 0 : [...best].length) / 3)) ? best : undefined;
-}
 
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {

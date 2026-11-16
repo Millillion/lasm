@@ -6,7 +6,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
 import { packageTargets } from './package.mjs';
-import { targetHintAmong } from './cli-arguments.mjs';
+import { targetHintAmong } from './cli-names.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -21,7 +21,7 @@ export const templateDependencies = npm;
 
 // `--deploy` targets. Function platforms call the handler the program
 // publishes with `exportDefault` (Export.lean), through `lasm package`
-// (src/package.mjs); azure and gcf also deploy the platform's npm package. So
+// (src/package.mjs); azure-functions and cloud-functions also deploy the platform's npm package. So
 // they take the templates with a handler (hono, fetch), not the ones that bring
 // their own server (express, fastify, std-http), and not fullstack: its init
 // writes no platform files for them (issue #168). The Lambda container image
@@ -33,8 +33,8 @@ export const deployTargets = {
   'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
   vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify', templates: functionTemplates },
-  azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' }, templates: functionTemplates },
-  gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' }, templates: functionTemplates },
+  'azure-functions': { summary: 'Azure Functions app (npm run build:azure-functions)', package: 'azure-functions', dependencies: { '@azure/functions': '4.17.0' }, templates: functionTemplates },
+  'cloud-functions': { summary: 'Google Cloud Functions gen2 (npm run build:cloud-functions)', package: 'cloud-functions', dependencies: { '@google-cloud/functions-framework': '5.0.5' }, templates: functionTemplates },
   // Edge targets (docs/EDGE.md): the edge build, Hono and fetch templates.
   workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch', 'fullstack'] },
   'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch', 'fullstack'], conflicts: ['vercel'] },
@@ -461,7 +461,7 @@ import_map = "./functions/${name}/deno.json"
 `;
 
 function deployGitignore(deploy, template, name) {
-  const extra = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
+  const extra = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', 'azure-functions': 'azure-functions/', 'cloud-functions': 'cloud-functions/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
     'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
     fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
@@ -607,7 +607,7 @@ repository). See the [Vercel guide](${guide('vercel')}).
 writes the function to \`netlify/functions/lasm\`; deploy with \`netlify deploy --build\`.
 See the [Netlify guide](${guide('netlify')}).
 `,
-  azure: () => `**Azure Functions:** \`npm run build:azure\` writes the function app to
+  'azure-functions': () => `**Azure Functions:** \`npm run build:azure-functions\` writes the function app to
 \`azure-functions/\`; test it with \`func start\` there and publish with
 \`func azure functionapp publish APP_NAME\`. See the [Azure guide](${guide('azure-functions')}).
 `,
@@ -656,8 +656,8 @@ after \`/${fn}\`. Supabase's runtime has no JSPI, so the build uses Asyncify. Se
 [Supabase guide](${guide('supabase-edge')}).
 `;
   },
-  gcf: () => `**Google Cloud Functions:** \`npm run build:gcf\` writes \`gcf/\`; deploy with
-\`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf\`.
+  'cloud-functions': () => `**Google Cloud Functions:** \`npm run build:cloud-functions\` writes \`cloud-functions/\`; deploy with
+\`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source cloud-functions\`.
 See the [Cloud Functions guide](${guide('cloud-functions')}).
 `,
 };
