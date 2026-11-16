@@ -8,7 +8,7 @@ design and limits are in [EDGE.md](../EDGE.md).
 ```sh
 npx lasm init my-app --template hono --deploy deno-deploy
 cd my-app && npm install
-npm run build:deno-deploy    # lasm build Main.lean --target deno-deploy → deno/
+npm run build:deno-deploy    # lasm build Export.lean --target deno-deploy → deno/
 deno task start:deno         # deno run -A deno/main.mjs (PORT, default 8000)
 ```
 

@@ -5,14 +5,16 @@
 //   node dev-edge-check.mjs APP_DIR RESULT.json
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const [appArg, resultArg] = process.argv.slice(2);
 assert.ok(appArg && resultArg, 'Usage: node dev-edge-check.mjs APP_DIR RESULT.json');
 const app = resolve(appArg), lasm = fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url));
-const child = spawn(process.execPath, [lasm, 'dev', 'Main.lean', '--target', 'workers'], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, NO_COLOR: '1' } });
+// The Hono template's default export (Export.lean) is what Workers run.
+const entry = existsSync(join(app, 'Export.lean')) ? 'Export.lean' : 'Main.lean';
+const child = spawn(process.execPath, [lasm, 'dev', entry, '--target', 'workers'], { cwd: app, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, NO_COLOR: '1' } });
 let out = '';
 for (const stream of [child.stdout, child.stderr]) stream.on('data', d => { out += d; process.stderr.write(d); });
 const wait = async (re, from, ms = 900_000) => {
