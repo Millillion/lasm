@@ -1121,31 +1121,48 @@ handlers receive:
 Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
 
 ```lean
+import Lasm.JS              -- deriving FromJS
 import Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
+/-- The Worker's bindings and variables, as wrangler.toml declares them. -/
+structure Env where
+  KV : KVNamespace     -- [[kv_namespaces]] binding = "KV"
+  DB : D1Database      -- [[d1_databases]] binding = "DB"
+  GREETING : String    -- [vars] GREETING = "…"
+  deriving FromJS
+
 def main : IO Unit := do
-  let fetch ← ExportedHandlerFetchHandler.ofFn fun request env ctx => do
-    let kv ← IO.ofExcept (readField KVNamespace env "KV")      -- wrangler.toml: [[kv_namespaces]] binding = "KV"
-    let db ← IO.ofExcept (readField D1Database env "DB")       -- [[d1_databases]] binding = "DB"
+  let fetch ← ExportedHandlerFetchHandler.ofFn fun request (env : Env) ctx => do
     let path ← (← URL.new (← request.url)).pathname
-    let hits := ((← kv.get path).bind String.toNat?).getD 0
-    kv.put path (.domString (toString (hits + 1)))
-    let rows ← (← (← db.prepare "SELECT name FROM people WHERE id = ?").bind #[toJS (1 : Nat)]).all
-    ctx.passThroughOnException
-    Response.new (some (.usvString s!"{hits + 1} visits; {rows.results.size} rows")) none
-  let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller env _ => do
-    let kv ← IO.ofExcept (readField KVNamespace env "KV")
-    kv.put "last-cron" (.domString (← controller.cron))
+    let hits := ((← env.KV.get path).bind String.toNat?).getD 0
+    -- waitUntil takes a promise: Async.toPromise starts the write and returns its promise
+    ctx.waitUntil (← Async.toPromise (env.KV.put path (.domString (toString (hits + 1)))))
+    let rows ← (← (← env.DB.prepare "SELECT name FROM people WHERE id = ?").bind #[toJS (1 : Nat)]).all
+    Response.new (some (.usvString s!"{env.GREETING}: {hits + 1} visits; {rows.results.size} rows")) none
+  let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller (env : Env) _ => do
+    env.KV.put "last-cron" (.domString (← controller.cron))
   exportDefault ({ fetch := some fetch, scheduled := some scheduled } : ExportedHandler)
 ```
 
 Build with `lasm build Main.lean --target workers`. The generated
 `workers/worker.mjs` forwards `fetch`, `scheduled` and `queue` to the object
 `exportDefault` published (a handler without `scheduled` or `queue` fails those
-events, saying so). `env` is `Data`, as its declaration is `unknown` (the
-program declares its own `Env`): its fields are the bindings, read with
-`Lasm.JS.readField`.
+events, saying so).
+
+**`env` is the program's own type** (API_DECISIONS A26). The declarations make it
+generic (`ExportedHandler<Env>`), and the program declares what `Env` holds, as a
+TypeScript Worker declares `interface Env`. In Lean that is a structure with
+`deriving FromJS`, whose fields are named as the bindings and variables are named
+in `wrangler.toml`. Every handler's `ofFn` and `ofSyncFn` take the type as a
+parameter (`{Env : Type} [FromJS Env]`), and so does `env` of `cloudflare:workers`
+(`let e : Env ← Lasm.JS.Cloudflare.env`). A missing binding fails the handler with
+an error that names the field. `Data` is still a valid `Env`: it reads the whole
+object.
+
+**Promises from Lean** (A27): `waitUntil`, and other APIs that take a promise of
+work still running, get one from `Lasm.JS.Async.toPromise : Async α → IO Value`. It
+starts the computation at once and returns its promise.
 
 ### What is covered
 
@@ -1196,7 +1213,8 @@ or the lowering fails.
 | `declare abstract class D1Database` | `interface` (its constructor and statics are not lowered) | a handle type |
 | `get body(): ReadableStream` (a getter) | `readonly attribute` | `body.body : IO ReadableStream` |
 | `readonly httpMetadata?: R2HTTPMetadata` | a nullable attribute | `IO (Option R2HTTPMetadata)` |
-| a generic parameter (`Key extends string = string`, `Env = unknown`) | its default (`unknown` when it has none), or the tier's `typeArgs` | `String`; `Data` |
+| a generic parameter (`Key extends string = string`, `Message = unknown`) | its default (`unknown` when it has none), or the tier's `typeArgs` | `String`; `Data` |
+| a type the program declares (the handlers' `Env`, `Cloudflare.Env`; the tier's `typeParameters`) | `typedef any Cloudflare_Env` marked `[LasmTypeParameter="Env"]` | a type parameter `{Env : Type} [FromJS Env]`, read with `Support.declared` |
 | overloads of a method | each lowered or excluded by its parameter list | Lasm.JS.Web's overload naming |
 | a parameter of one string literal type (`get(key, type: "json")`) | the string passed as a constant (`[LasmConstant]`), the overload named with it (`[LasmOverloadName]`) | `KVNamespace.getJson kv key` |
 | `Map<string, V>` | `record<DOMString, V>`, the member marked `[LasmMap]` | `Record V`, read with `Array.from` |
@@ -1220,10 +1238,13 @@ an integer, which Lasm.JS.Deno's narrowing quotes (`limit := some 10` works).
 
 ### Durable Objects: a class in JavaScript
 
-Lean does not define JavaScript classes, so a Durable Object's class is a few
-lines of JavaScript in the project, whose methods call Lean functions the
-program publishes (the program's `main` runs in the same isolate first). The
-project's own `wrangler.toml` names a main module that re-exports Lasm's entry:
+Workers natively expects a Durable Object to be a JavaScript class that the
+Worker's main module exports (`export class Counter extends DurableObject`), and
+Lasm keeps it that way (API_DECISIONS A28). Lean does not define JavaScript
+classes, so the class is a few lines of JavaScript in the project. Its methods
+call Lean functions that the program publishes; the program's `main` runs first,
+in the same isolate. The project's own `wrangler.toml` names a main module that
+re-exports Lasm's entry:
 
 ```js
 // index.mjs (wrangler.toml: main = "index.mjs", [[durable_objects.bindings]] class_name = "Counter")
@@ -1246,8 +1267,12 @@ let counter ← Function.ofFn fun args => do
 (← Lasm.JS.global).set "counterFetch" counter
 ```
 
-A Worker reaches it through its namespace binding:
-`(← (← IO.ofExcept (readField DurableObjectNamespace env "COUNTER")).getByName "a").fetch (.usvString "https://do/")`.
+A Worker reaches the object through its namespace binding, a field of its `Env`
+(`COUNTER : DurableObjectNamespace`):
+`(← env.COUNTER.getByName "a").fetch (.usvString "https://do/")`. Inside the
+object, `state.blockConcurrencyWhile` takes a Lean function
+(`DurableObjectStateBlockConcurrencyWhileCallback.ofFn`), and `state.waitUntil`
+takes a promise (`Async.toPromise`).
 
 ### Where it runs, tests and cost
 

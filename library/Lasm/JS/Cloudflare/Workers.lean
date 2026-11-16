@@ -74,7 +74,7 @@ instance : FromJS CachePurgeResult where
     errors := ← Lasm.JS.readField (Array CachePurgeError) d "errors" }
   typeName := "Lasm.JS.Cloudflare.CachePurgeResult"
 
-/-- `callback ExportedHandlerFetchHandler = Promise<Response> (Request request, any env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback ExportedHandlerFetchHandler = Promise<Response> (Request request, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerFetchHandler where
   /-- The JavaScript function. -/
   val : Value
@@ -82,19 +82,19 @@ instance : Nonempty ExportedHandlerFetchHandler := ⟨{ val := Classical.ofNonem
 instance : ToJS ExportedHandlerFetchHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerFetchHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerFetchHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerFetchHandler.ofFn (f : Request → Data → ExecutionContext → Async Response) : IO ExportedHandlerFetchHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerFetchHandler.ofFn {Env : Type} [FromJS Env] (f : Request → Env → ExecutionContext → Async Response) : IO ExportedHandlerFetchHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerFetchHandler.ofSyncFn (f : Request → Data → ExecutionContext → IO Response) : IO ExportedHandlerFetchHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerFetchHandler.ofSyncFn {Env : Type} [FromJS Env] (f : Request → Env → ExecutionContext → IO Response) : IO ExportedHandlerFetchHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 
-/-- `callback ExportedHandlerScheduledHandler = Promise<undefined> (ScheduledController controller, any env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback ExportedHandlerScheduledHandler = Promise<undefined> (ScheduledController controller, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerScheduledHandler where
   /-- The JavaScript function. -/
   val : Value
@@ -102,19 +102,19 @@ instance : Nonempty ExportedHandlerScheduledHandler := ⟨{ val := Classical.ofN
 instance : ToJS ExportedHandlerScheduledHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerScheduledHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerScheduledHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerScheduledHandler.ofFn (f : ScheduledController → Data → ExecutionContext → Async Unit) : IO ExportedHandlerScheduledHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerScheduledHandler.ofFn {Env : Type} [FromJS Env] (f : ScheduledController → Env → ExecutionContext → Async Unit) : IO ExportedHandlerScheduledHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerScheduledHandler.ofSyncFn (f : ScheduledController → Data → ExecutionContext → IO Unit) : IO ExportedHandlerScheduledHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerScheduledHandler.ofSyncFn {Env : Type} [FromJS Env] (f : ScheduledController → Env → ExecutionContext → IO Unit) : IO ExportedHandlerScheduledHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 
-/-- `callback ExportedHandlerQueueHandler = Promise<undefined> (MessageBatch batch, any env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback ExportedHandlerQueueHandler = Promise<undefined> (MessageBatch batch, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerQueueHandler where
   /-- The JavaScript function. -/
   val : Value
@@ -122,14 +122,14 @@ instance : Nonempty ExportedHandlerQueueHandler := ⟨{ val := Classical.ofNonem
 instance : ToJS ExportedHandlerQueueHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerQueueHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerQueueHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ExportedHandlerQueueHandler.ofFn (f : MessageBatch → Data → ExecutionContext → Async Unit) : IO ExportedHandlerQueueHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg MessageBatch args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerQueueHandler.ofFn {Env : Type} [FromJS Env] (f : MessageBatch → Env → ExecutionContext → Async Unit) : IO ExportedHandlerQueueHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg MessageBatch args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ExportedHandlerQueueHandler.ofSyncFn (f : MessageBatch → Data → ExecutionContext → IO Unit) : IO ExportedHandlerQueueHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg MessageBatch args 0) (← Support.arg Data args 1) (← Support.arg ExecutionContext args 2))
+def ExportedHandlerQueueHandler.ofSyncFn {Env : Type} [FromJS Env] (f : MessageBatch → Env → ExecutionContext → IO Unit) : IO ExportedHandlerQueueHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg MessageBatch args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -182,7 +182,9 @@ def ScheduledController.cron (self : ScheduledController) : IO String := self.va
 def ScheduledController.noRetry (self : ScheduledController) : IO Unit :=
   self.val.callMethod "noRetry" (Support.args #[]) Unit
 
-/-- `const env: Cloudflare.Env`: `readonly attribute any env` (@cloudflare/workers-types 5.20261019.1 type declarations) -/
-def env : IO Data := Support.getExport "cloudflare:workers" ["env"] Data
+/-- `const env: Cloudflare.Env`: `readonly attribute Env env` (@cloudflare/workers-types 5.20261019.1 type declarations) -/
+def env {Env : Type} [FromJS Env] : IO Env := do
+  let r ← Support.getExport "cloudflare:workers" ["env"] Data
+  Support.declared Env r
 
 end Lasm.JS.Cloudflare

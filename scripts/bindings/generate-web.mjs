@@ -376,10 +376,19 @@ function resolveName(n) {
   case 'enum': return { k: 'enum', name: n };
   case 'callback': case 'callback interface': return { k: 'callback', name: n };
   case 'typedef':
+    // LasmTypeParameter (Lasm.JS.Cloudflare's Env): a type the program declares, a Lean type
+    // parameter read with its FromJS (typeBinders).
+    if (extAttr(d, 'LasmTypeParameter')) { const p = extValue(extAttr(d, 'LasmTypeParameter')); return { k: 'prim', lean: p, idl: n, typeParam: p }; }
     if (d.idlType.union) return makeUnion(d.idlType.idlType, n, d.idlType.nullable);
     return resolve(d.idlType);
   default: return { k: 'unknown', idl: n };
   }
+}
+/** The Lean type parameters (LasmTypeParameter) that resolved types mention, as implicit
+ * binders read with FromJS: ` {Env : Type} [FromJS Env]`. */
+function typeBinders(...ts) {
+  const ps = new Set(ts.flatMap(function tp(t) { return !t ? [] : t.typeParam ? [t.typeParam] : t.inner ? tp(t.inner) : []; }));
+  return [...ps].map(p => ` {${p} : Type} [FromJS ${p}]`).join('');
 }
 /** Flattened alternatives of a union (typedef'd unions inside are spliced in). */
 function flatAlternatives(types, out = { alts: [], nullable: false }) {
@@ -730,6 +739,9 @@ function resultOf(idlType, member = null) {
     if (t.k !== 'record' || needsPost(t.inner)) fail(`${member.name}: LasmMap on a result that is not a record`);
     return { async, t, lean, req: 'Value', post: `Support.mapOf ${paren(retType(t.inner))}` };
   }
+  // A program-declared type (LasmTypeParameter, Workers' Env) is read as data and decoded with
+  // its FromJS; an object that is not plain is copied first (Support.declared).
+  if (t.typeParam) return { async, t, lean, req: 'Data', post: `Support.declared ${t.typeParam}` };
   // An interface result is read as a reference and wrapped: some runtimes return
   // plain objects for interface instances (Bun's navigator), which data would copy.
   if (t.k === 'iface') return { async, t, lean, req: 'Value', post: 'wrap' };
@@ -931,7 +943,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
       const path = [...pathPrefix, m.name].map(s => `"${s}"`).join(', ');
       const call = jsModule === 'globalThis' ? `Support.getGlobal [${path}] ${res.async ? 'Value' : res.req}`
         : `Support.getExport "${jsModule}" [${path}] ${res.async ? 'Value' : res.req}`;
-      o.decls.push(`/-- ${nodeSignature(m)}\`${docText(memberIdl(m, owner))}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  p.await ${res.req}` : finish(call, res)}`);
+      o.decls.push(`/-- ${nodeSignature(m)}\`${docText(memberIdl(m, owner))}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)}${typeBinders(r)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  p.await ${res.req}` : finish(call, res)}`);
       continue;
     }
     if (m.type !== 'operation') fail(`${owner}: unsupported member ${m.type}`);
@@ -975,16 +987,17 @@ function emitCallback(module, name) {
   const c = callbackSignature(name);
   const sig = d.type === 'callback' ? `callback ${name} = ${idlText(d.idlType)} (${c.args.map(a => `${a.optional ? 'optional ' : ''}${idlText(a.idlType)}${a.variadic ? '...' : ''} ${a.name}`).join(', ')})`
     : `callback interface ${name} { ${memberIdl(c.idl, name)}; }`;
-  const params = [], reads = [];
+  const params = [], reads = [], resolved = [];
   c.args.forEach((a, i) => {
     const t = resolve(a.idlType);
+    resolved.push(t);
     requireType(module, t);
     if (a.variadic) { params.push('Array Data'); reads.push(`(args.extract ${i} args.size)`); return; }
     const opt = a.optional && retType(t) !== 'Data' && t.k !== 'nullable';
     const R = opt ? `Option ${paren(retType(t))}` : retType(t);
-    const Q = opt ? `Option ${paren(reqType(t))}` : reqType(t);
+    const Q = t.typeParam ? 'Data' : opt ? `Option ${paren(reqType(t))}` : reqType(t);
     params.push(paren(R));
-    const post = postFn(t);
+    const post = t.typeParam ? `Support.declared ${t.typeParam}` : postFn(t);
     reads.push(post ? `(← ${opt ? `(fun x => x.mapM ${post})` : post} (← Support.arg ${paren(Q)} args ${i}))` : `(← Support.arg ${paren(Q)} args ${i})`);
   });
   let ret = c.ret.k === 'promise' ? c.ret.inner : c.ret;
@@ -1001,8 +1014,8 @@ function emitCallback(module, name) {
     `instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`,
     `instance : ToJS ${T} := ⟨fun x => .ref x.val ""⟩`,
     `instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${nsOf(module)}.${T}", .data⟩`,
-    `/-- A JavaScript function that runs \`f\` asynchronously (\`Lasm.JS.Function.ofFn\`): it returns a promise at once and \`f\` runs as a Lean task, holding no Lean thread while it awaits. -/\ndef ${T}.ofFn (f : ${fnType('Async')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`,
-    `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
+    `/-- A JavaScript function that runs \`f\` asynchronously (\`Lasm.JS.Function.ofFn\`): it returns a promise at once and \`f\` runs as a Lean task, holding no Lean thread while it awaits. -/\ndef ${T}.ofFn${typeBinders(...resolved)} (f : ${fnType('Async')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`,
+    `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn${typeBinders(...resolved)} (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
   return lines.join('\n');
 }
 function emitDict(module, name) {

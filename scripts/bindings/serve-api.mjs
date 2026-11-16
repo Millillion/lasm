@@ -581,6 +581,16 @@ export function lowerHost(host, files) {
     }
     if (n in host.instantiate) return lower(parseType(host.instantiate[n]), ctx);
     if (rich) {
+      // A type the program declares (Workers' `Env`): the tier's typeParameters name it, as a
+      // generic parameter or a declared name. It lowers to a typedef of any marked
+      // LasmTypeParameter, which generate-web.mjs makes a Lean type parameter with FromJS.
+      const param = host.typeParameters && Object.hasOwn(host.typeParameters, n)
+        && (n.includes('.') || (ctx.generics && Object.hasOwn(ctx.generics, n))) && host.typeParameters[n];
+      if (param) {
+        const name = idlName(param);
+        extra.set(name, `${attrs(null, { LasmName: param, LasmTypeParameter: param })}\ntypedef any ${name};`);
+        return name;
+      }
       // A generic parameter of the declaration or method being lowered: its default (or the
       // tier's typeArgs), `unknown` when it has none.
       if (ctx.generics && Object.hasOwn(ctx.generics, n)) {

@@ -17,25 +17,34 @@
   `scheduled` and `queue`:
 
   ```lean
+  import Lasm.JS
   import Lasm.JS.Cloudflare
   open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
+  structure Env where
+    KV : KVNamespace     -- wrangler.toml: [[kv_namespaces]] binding = "KV"
+    deriving FromJS
+
   def main : IO Unit := do
-    let fetch ← ExportedHandlerFetchHandler.ofFn fun request env _ctx => do
-      let kv ← IO.ofExcept (readField KVNamespace env "KV")
-      let hits := ((← kv.get "hits").bind String.toNat?).getD 0
-      kv.put "hits" (.domString (toString (hits + 1)))
+    let fetch ← ExportedHandlerFetchHandler.ofFn fun _request (env : Env) ctx => do
+      let hits := ((← env.KV.get "hits").bind String.toNat?).getD 0
+      ctx.waitUntil (← Async.toPromise (env.KV.put "hits" (.domString (toString (hits + 1)))))
       Response.new (some (.usvString s!"{hits + 1}")) none
-    let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller env _ => do
-      let kv ← IO.ofExcept (readField KVNamespace env "KV")
-      kv.put "last-cron" (.domString (← controller.cron))
+    let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller (env : Env) _ => do
+      env.KV.put "last-cron" (.domString (← controller.cron))
     exportDefault ({ fetch := some fetch, scheduled := some scheduled } : ExportedHandler)
   ```
 
-  Build with `lasm build Main.lean --target workers`. A Durable Object's
+  The handlers receive the Worker's `env` typed: the program declares its
+  bindings as a structure with `deriving FromJS`, and each handler's `ofFn` takes
+  it as a type parameter (`Data` also works). Build with
+  `lasm build Main.lean --target workers`. A Durable Object's
   class stays a few lines of JavaScript that call Lean functions. Guide,
   coverage and mapping rules: docs/JS_BINDINGS.md, "Cloudflare Workers:
   Lasm.JS.Cloudflare". Tested under `wrangler dev` with local emulation only.
+- **New: `Lasm.JS.Async.toPromise : Async α → IO Value`** starts a Lean `Async`
+  computation and returns a JavaScript promise of its result, for APIs that take
+  a promise of running work (Workers' `ctx.waitUntil`, `state.waitUntil`).
 - **`Lasm.JS.exportDefault` takes any `ToJS` value** (it took a `Value`), so a
   handler object such as an `ExportedHandler` can be published as it is.
   Programs that pass a `Value` are unchanged.

@@ -232,6 +232,7 @@ test('serve-api fails on what its selection does not decide', () => {
 
 // Lasm.JS.Cloudflare (scripts/bindings/cloudflare-api.mjs lowers @cloudflare/workers-types with
 // serve-api.mjs's rich rules; its --check needs the network and runs in web-bindings.yml).
+const idl0 = () => readFileSync(new URL('../scripts/bindings/cloudflare.idl', import.meta.url), 'utf8');
 test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () => {
   const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/cloudflare-surface.json', import.meta.url), 'utf8'));
   const [h] = cloudflareTier.hosts;
@@ -244,7 +245,13 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
   // Every dictionary, callback and enum is generated, also those no member names (ExportedHandler).
   const workers = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Workers.lean', import.meta.url), 'utf8');
   for (const n of ['structure ExportedHandler where', 'def ExportedHandlerFetchHandler.ofFn', 'def ExportedHandlerScheduledHandler.ofFn',
-    'def ExportedHandlerQueueHandler.ofFn', 'def env : IO Data']) assert.ok(workers.includes(n), n);
+    'def ExportedHandlerQueueHandler.ofFn', 'def env {Env : Type} [FromJS Env] : IO Env']) assert.ok(workers.includes(n), n);
+  // Workers' Env (API_DECISIONS A26): the program declares it; every handler takes it as a type
+  // parameter read with its FromJS (Support.declared), never as Data.
+  for (const h of ['Fetch', 'Scheduled', 'Queue']) for (const k of ['ofFn', 'ofSyncFn'])
+    assert.match(workers, new RegExp(`def ExportedHandler${h}Handler\\.${k} \\{Env : Type\\} \\[FromJS Env\\] \\(f : \\w+ → Env → ExecutionContext →`));
+  assert.doesNotMatch(workers, /\(← Support\.arg Data args 1\) \(← Support\.arg ExecutionContext/);
+  assert.match(idl0(), /\[LasmHost="Cloudflare", LasmName="Env", LasmTypeParameter="Env"\]\ntypedef any Cloudflare_Env;/);
   // The server tiers never import the browser tier, nor Node's modules.
   for (const f of readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))) {
     const text = readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8');

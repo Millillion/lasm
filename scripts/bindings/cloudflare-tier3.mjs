@@ -27,13 +27,11 @@
 //
 // Generics: a generic declaration is lowered once, each parameter as its default
 // (`Key extends string = string` → string), `unknown` (WebIDL any, Lean Data) when it
-// has none, or as `typeArgs` says. So `Env` (the bindings object a program declares) is
-// Data, and a KV value of type `ExpectedValue` is Data.
+// has none, or as `typeArgs` says. So a KV value of type `ExpectedValue` is Data. The
+// exception is `Env` (the bindings object), a Lean type parameter (typeParameters below).
 //
 // Numbers stay WebIDL `double` (Lean Float): workers-types has no doc comments that
 // say a `number` is an integer, which is what Lasm.JS.Deno's narrowing quotes.
-
-const unknownEnv = 'the bindings object (`Env`, which the program declares; `unknown` here): Data, whose fields are the bindings (read one with Lasm.JS.readField)';
 
 /** The runtime, one Lean module tree Lasm.JS.Cloudflare. */
 export const hosts = [
@@ -262,10 +260,13 @@ export const hosts = [
       // A JavaScript Date: Data (a reference; Lasm.JS.Web has no Date). Time in milliseconds is a number elsewhere.
       Date: 'any',
       unknown: 'any',
-      'Cloudflare.Env': 'any',
     },
+    // Workers' `Env` (the bindings object) is declared by the program: `structure Env where
+    // KV : KVNamespace … deriving FromJS` (Jordan, 2026-11-16; API_DECISIONS A26). The
+    // handlers' generic parameter `Env` and `Cloudflare.Env` (cloudflare:workers' `env`) are a
+    // Lean type parameter with FromJS; `Data` still works as one.
+    typeParameters: { Env: 'Env', 'Cloudflare.Env': 'Env' },
     notSelected: {
-      'Cloudflare.Env': unknownEnv,
       Fetcher: 'its object part is DurableObjectStub\'s (fetch and connect); Rpc.Provider<T> is the class\'s RPC methods',
       R2Error: 'an Error with R2\'s code and action: errors are read as Data, as Lasm.JS.Web reads them',
       D1Response: 'merged into D1Result (D1Response & { results })',

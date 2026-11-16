@@ -56,7 +56,6 @@
 //   - ExportedHandler.tailStream: streaming Tail Workers (TailStream): outside this tier
 //   - ExportedHandler.test: the test handler of the Workers test harness: outside this tier
 //   - ExportedHandler.email: Email Workers (ForwardableEmailMessage): outside this tier
-//   - Cloudflare.Env (not selected): the bindings object (`Env`, which the program declares; `unknown` here): Data, whose fields are the bindings (read one with Lasm.JS.readField)
 //   - Fetcher (not selected): its object part is DurableObjectStub's (fetch and connect); Rpc.Provider<T> is the class's RPC methods
 //   - R2Error (not selected): an Error with R2's code and action: errors are read as Data, as Lasm.JS.Web reads them
 //   - D1Response (not selected): merged into D1Result (D1Response & { results })
@@ -79,7 +78,7 @@ namespace Cloudflare_cloudflare_sockets {
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmModule="cloudflare:workers", LasmPath=""]
 namespace Cloudflare_cloudflare_workers {
   // const env: Cloudflare.Env
-  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="const env: Cloudflare.Env"] readonly attribute any env;
+  [LasmHost="Cloudflare", LasmFile="index.d.ts", LasmSignature="const env: Cloudflare.Env"] readonly attribute Cloudflare_Env env;
 };
 
 // interface KVNamespace
@@ -1033,6 +1032,9 @@ dictionary Cloudflare_ExportedHandler {
 [LasmHost="Cloudflare", LasmLeanModule="Sockets", LasmName="DOMStringOrSocketAddress"]
 typedef (DOMString or Cloudflare_SocketAddress) Cloudflare_DOMStringOrSocketAddress;
 
+[LasmHost="Cloudflare", LasmName="Env", LasmTypeParameter="Env"]
+typedef any Cloudflare_Env;
+
 [LasmHost="Cloudflare", LasmLeanModule="Kv", LasmName="DOMStringOrReadableStreamOrBufferSource"]
 typedef (DOMString or ReadableStream or BufferSource) Cloudflare_DOMStringOrReadableStreamOrBufferSource;
 
@@ -1108,12 +1110,12 @@ enum Cloudflare_DurableObjectRoutingMode { "primary-only" };
 
 // type ExportedHandlerFetchHandler<Env = unknown, CfHostMetadata = unknown, Props = unknown> = (request: Request<CfHostMetadata, IncomingRequestCfProperties<CfHostMetadata>>, env: Env, ctx: ExecutionContext<Props>) => Response | Promise<Response>
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ExportedHandlerFetchHandler", LasmSignature="type ExportedHandlerFetchHandler<Env = unknown, CfHostMetadata = unknown, Props = unknown> = (request: Request<CfHostMetadata, IncomingRequestCfProperties<CfHostMetadata>>, env: Env, ctx: ExecutionContext<Props>) => Response | Promise<Response>"]
-callback Cloudflare_ExportedHandlerFetchHandler = Promise<Response> (Request request, any env, Cloudflare_ExecutionContext ctx);
+callback Cloudflare_ExportedHandlerFetchHandler = Promise<Response> (Request request, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);
 
 // type ExportedHandlerScheduledHandler<Env = unknown, Props = unknown> = (controller: ScheduledController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ExportedHandlerScheduledHandler", LasmSignature="type ExportedHandlerScheduledHandler<Env = unknown, Props = unknown> = (controller: ScheduledController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>"]
-callback Cloudflare_ExportedHandlerScheduledHandler = Promise<undefined> (Cloudflare_ScheduledController controller, any env, Cloudflare_ExecutionContext ctx);
+callback Cloudflare_ExportedHandlerScheduledHandler = Promise<undefined> (Cloudflare_ScheduledController controller, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);
 
 // type ExportedHandlerQueueHandler<Env = unknown, Message = unknown, Props = unknown> = (batch: MessageBatch<Message>, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>
 [LasmHost="Cloudflare", LasmLeanModule="Workers", LasmFile="index.d.ts", LasmName="ExportedHandlerQueueHandler", LasmSignature="type ExportedHandlerQueueHandler<Env = unknown, Message = unknown, Props = unknown> = (batch: MessageBatch<Message>, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>"]
-callback Cloudflare_ExportedHandlerQueueHandler = Promise<undefined> (Cloudflare_MessageBatch batch, any env, Cloudflare_ExecutionContext ctx);
+callback Cloudflare_ExportedHandlerQueueHandler = Promise<undefined> (Cloudflare_MessageBatch batch, Cloudflare_Env env, Cloudflare_ExecutionContext ctx);

@@ -48,7 +48,7 @@ linked section of the review.
 | A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
-| A7 | Lasm.JS core | Should `exportDefault` take `[ToJS α]` (branch)? | [Q7](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
+| A7 | Lasm.JS core | Should `exportDefault` take `[ToJS α]` (branch)? **Decided:** [milestone 0.5](#a7-exportdefault-tojs-α-implemented-here). | [Q7](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A8 | Lasm.JS core | Confirm the core shapes in REVIEW.md §1: Symbol and number keys (#170); no fire-and-forget `Async` in `ofSyncFn`; waits inside synchronous callbacks stay a clear error. | [Q8](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A9 | Generated-binding mapping rules | Overload naming. Should Claude keep the mechanical rule, or add a small override table for names that read badly? | [Q9](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
 | A10 | Generated-binding mapping rules | Callback type names. Should Claude keep the mechanical names, or add hand-picked aliases (`Bun.FetchHandler`, `Cloudflare.FetchHandler`)? | [Q10](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
@@ -67,10 +67,10 @@ linked section of the review.
 | A23 | `Node.serve`, and serverless `exportDefault` | On function platforms, should `Lasm.Serverless`'s proofs about the shims be rewritten for the new event → `Request` conversion, or dropped with the shims? | [Q23](api/SHAPES_REVIEW_2026-11-11.md#6-nodeserve-and-serverless-exportdefault) | pending sign-off |
 | A24 | Lasm.JS.Bun and Lasm.JS.Deno | Bun's `port`. Keep `DOMStringOrUnsignedShort` as declared, or narrow it to `Option Nat` through the override table (Q9)? | [Q24](api/SHAPES_REVIEW_2026-11-11.md#7-lasmjsbun-and-lasmjsdeno) | pending sign-off |
 | A25 | Lasm.JS.Bun and Lasm.JS.Deno | WebSockets on Bun and Deno (`Server.upgrade`, `Deno.upgradeWebSocket`): generate them next, or wait for a concrete app? | [Q25](api/SHAPES_REVIEW_2026-11-11.md#7-lasmjsbun-and-lasmjsdeno) | pending sign-off |
-| A26 | Lasm.JS.Cloudflare | Workers `env`: `Data` + `readField` (current), or a program-declared `structure Env` with `deriving FromJS` passed to the handler (needs a generic handler type)? | [Q26](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
-| A27 | Lasm.JS.Cloudflare | `waitUntil` and `blockConcurrencyWhile` need `Async` → JS promise: add `Lasm.JS.Async.toPromise : Async α → IO Value` (new core API), or leave it to programs? | [Q27](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
-| A28 | Lasm.JS.Cloudflare | Durable Objects. Keep the JavaScript class shim until `Lasm.JS.Class.define` (Q6) exists, or block Durable Objects support on it? | [Q28](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
-| A29 | Lasm.JS.Cloudflare | Should Claude merge the branch as it is (with Q9, Q10 and Q11 applied later)? | [Q29](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
+| A26 | Lasm.JS.Cloudflare | Workers `env`: `Data` + `readField` (current), or a program-declared `structure Env` with `deriving FromJS` passed to the handler (needs a generic handler type)? **Decided:** [milestone 0.5](#a26-workers-env-the-program-declares-env-the-handlers-receive-it-typed). | [Q26](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
+| A27 | Lasm.JS.Cloudflare | `waitUntil` and `blockConcurrencyWhile` need `Async` → JS promise: add `Lasm.JS.Async.toPromise : Async α → IO Value` (new core API), or leave it to programs? **Decided:** [milestone 0.5](#a27-lasmjsasynctopromise). | [Q27](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
+| A28 | Lasm.JS.Cloudflare | Durable Objects. Keep the JavaScript class shim until `Lasm.JS.Class.define` (Q6) exists, or block Durable Objects support on it? **Decided:** [milestone 0.5](#a28-durable-objects-stay-a-javascript-class-in-the-project). | [Q28](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
+| A29 | Lasm.JS.Cloudflare | Should Claude merge the branch as it is (with Q9, Q10 and Q11 applied later)? **Decided:** [milestone 0.5](#a29-lasmjscloudflare-merged-with-the-shared-rules-applied-afterwards). | [Q29](api/SHAPES_REVIEW_2026-11-11.md#8-lasmjscloudflare-in-progress) | pending sign-off |
 | A30 | Lasm.WASI.Http | Please confirm the WASI mapping rules above. | [Q30](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | pending sign-off |
 | A31 | Lasm.WASI.Http | A wasi-http server is ~60 low-level lines per app: keep it per app, or add one thin helper such as `Lasm.WASI.Http.respond`? | [Q31](api/SHAPES_REVIEW_2026-11-11.md#9-lasmwasihttp) | pending sign-off |
 | A32 | Lasm.Fastly | Should errors stay `EIO FastlyStatus α`? | [Q32](api/SHAPES_REVIEW_2026-11-11.md#10-lasmfastly) | pending sign-off |
@@ -103,3 +103,113 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.5: Lasm.JS.Cloudflare, the apps off hand-written bindings, Lasm.KV deleted
+
+Decided by Claude where Jordan had not (his 2026-11-16 rule: the platform-native
+option), built, and recorded here. All entries are pending Jordan's sign-off at the
+milestone's end.
+
+### A26 Workers `env`: the program declares `Env`, the handlers receive it typed
+
+- **Decision** (Jordan, 2026-11-16, option (b)): the program declares its bindings as
+  a structure with `deriving FromJS`, and every handler gets it typed. The generated
+  `ofFn` and `ofSyncFn` of `ExportedHandlerFetchHandler`,
+  `ExportedHandlerScheduledHandler` and `ExportedHandlerQueueHandler` take
+  `{Env : Type} [FromJS Env]`, and so does `Lasm.JS.Cloudflare.env` (`env` of
+  `cloudflare:workers`). The handle types themselves stay unparameterized: they are
+  JavaScript functions.
+
+  ```lean
+  structure Env where
+    KV : KVNamespace     -- [[kv_namespaces]] binding = "KV"
+    DB : D1Database      -- [[d1_databases]] binding = "DB"
+    GREETING : String    -- [vars]
+    deriving FromJS
+
+  let fetch ← ExportedHandlerFetchHandler.ofFn fun request (env : Env) ctx => do
+    let hits := ((← env.KV.get "hits").bind String.toNat?).getD 0
+    …
+  let e : Env ← Lasm.JS.Cloudflare.env
+  ```
+- **How it is generated:** the tier's `typeParameters` (`cloudflare-tier3.mjs`) names
+  `Env`. The lowering writes the type as `typedef any Cloudflare_Env` marked
+  `[LasmTypeParameter="Env"]`, and `generate-web.mjs` makes such a typedef a Lean type
+  parameter, decoded by `Lasm.JS.Cloudflare.Support.declared`. That function reads a
+  plain object as data and first copies an object that is not plain (a proxy) with
+  `Object.entries`. A missing binding fails with an error naming the field.
+- **Why:** it is what the platform expects. `ExportedHandler<Env>` is generic, and a
+  TypeScript Worker declares `interface Env`. Typed fields replace per-request
+  `readField KVNamespace env "KV"` lookups that fail only at run time.
+- **Alternatives:** (a) `Data` and `readField` (the previous shape; still possible,
+  since `Data` is a valid `Env`); (c) generated accessors per binding name (Lasm cannot
+  know the program's names).
+- **Breaking:** a handler that annotated `env : Data` keeps working. A handler that
+  left `env` unannotated and used `readField` on it must now say `(env : Data)` or
+  declare an `Env`.
+- **Where:** PR #216 (unreleased). **Status:** pending sign-off.
+
+### A27 `Lasm.JS.Async.toPromise`
+
+- **Decision:** a new core function, `Lasm.JS.Async.toPromise [ToJS α] : Async α → IO Value`.
+  It starts the computation at once as a Lean task, holding no Lean thread while it
+  awaits, and returns a JavaScript promise of `toJS` of its result. The promise
+  rejects with an `Error` if the computation throws.
+
+  ```lean
+  ctx.waitUntil (← Async.toPromise (env.KV.put "seen" (.domString "1")))
+  state.waitUntil (← Async.toPromise (flushLog env))
+  ```
+- **Why:** `ExecutionContext.waitUntil`, `DurableObjectState.waitUntil` and any API
+  typed `Promise<T>` take a promise of work already running. Programs had to write the
+  `Function.ofFn` / `call` pair by hand. `blockConcurrencyWhile` needs nothing new:
+  it takes a callback, which the generated `DurableObjectStateBlockConcurrencyWhileCallback.ofFn` makes.
+- **Alternatives:** leave it to programs (the previous state); type the generated
+  `Promise` parameters as `Async α` (it hides a promise that already exists, such as one
+  returned by another binding).
+- **Where:** PR #216 (unreleased); in Lasm.JS core, agreed with the 0.6 stream through
+  main. **Status:** pending sign-off.
+
+### A28 Durable Objects stay a JavaScript class in the project
+
+- **Decision:** a Durable Object is the JavaScript class that the Worker's main module
+  exports (`export class Counter extends DurableObject`), a few lines in the project's
+  `index.mjs` whose methods call Lean functions published on `globalThis`. Every
+  Durable Object API (namespaces, ids, stubs, `DurableObjectState`, storage,
+  transactions, alarms) is generated and usable from Lean today. This support does
+  not wait for `Lasm.JS.Class.define` (A6).
+- **Why:** the class is what Workers natively expects. Lean does not define JavaScript
+  classes yet, and a Lasm-generated class shim would be the kind of indirection that
+  Jordan's rule excludes. When A6's `Class.define` exists, a program can define the
+  class from Lean through it, with no change to these bindings.
+- **Alternatives:** block Durable Objects on A6; have Lasm's entry generate the class
+  from a naming convention (context-dependent).
+- **Where:** PR #216 (unreleased); docs/JS_BINDINGS.md, "Durable Objects: a class in
+  JavaScript"; test/fixtures/js-cloudflare/index.mjs. **Status:** pending sign-off.
+
+### A29 Lasm.JS.Cloudflare merged, with the shared rules applied afterwards
+
+- **Decision:** PR #216 merges with its mapping (documented in docs/JS_BINDINGS.md,
+  "How the declarations become Lean"). Its shape choices: string-literal overloads become
+  named functions (`getJson`, `getArrayBuffer`, `getStream`); same-name overloads
+  follow the shared rule (`D1PreparedStatement.first0`); numbers are `Float`; `Date`
+  is `Data`. The shared generated-binding rules of A9–A12 (0.3 stream) are applied to
+  it when they merge, and every override they add is its own entry.
+- **Where:** PR #216. **Status:** pending sign-off.
+
+### A7 `exportDefault [ToJS α]` (implemented here)
+
+- **Decision:** `Lasm.JS.exportDefault [ToJS α] (v : α) : IO Unit`, so an
+  `ExportedHandler` is published as it is. A `Value` still works.
+- **Where:** PR #216. **Status:** pending sign-off.
+
+### 0.5-1 The Workers entry forwards `scheduled` and `queue`
+
+- **Decision:** the generated `workers/worker.mjs` exports `scheduled` and `queue`
+  beside `fetch`. Each calls the method of that name on the object that
+  `exportDefault` published, and fails the event with a message when there is none.
+  The entry also imports `cloudflare:workers` and `cloudflare:sockets`, so that
+  `Lasm.JS.require` finds them.
+- **Why:** these are Workers' own handler names (`ExportedHandler`); cron triggers and
+  queues otherwise never reach Lean.
+- **Where:** PR #216. **Status:** pending sign-off.
