@@ -130,3 +130,69 @@ test('every lasm command\'s step: the package, the link, and whether Lake builds
     assert.equal(ensureLakeLibrary(project, prefix, { eager, cache }).required, true);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+// Lake 4.35's manifest after `lake update` for a project requiring Lasm's package (recorded from Lake itself).
+const lakeWritten = `{"version": "1.3.0",
+ "packagesDir": ".lake/packages",
+ "packages":
+ [{"type": "path",
+   "scope": "",
+   "name": "lasm",
+   "manifestFile": "lake-manifest.json",
+   "inherited": false,
+   "dir": ".lake/lasm-library",
+   "copy": false,
+   "configFile": "lakefile.toml"}],
+ "name": "app",
+ "lakeDir": ".lake",
+ "fixedToolchain": false}
+`;
+
+test('the manifest entry Lake needs for the require: written as lake update writes it, added to an existing manifest, idempotent', async () => {
+  const { ensureLakeManifest, lakePackageNameOf } = await import('../src/lake-library.mjs');
+  const { dir, project } = fixture();
+  try {
+    const manifest = join(project, 'lake-manifest.json');
+    // No manifest (a fresh lasm init, or lasm editor adding the require): Lake's own text.
+    assert.equal(ensureLakeManifest(project), true);
+    assert.equal(readFileSync(manifest, 'utf8'), lakeWritten);
+    // Again: unchanged.
+    assert.equal(ensureLakeManifest(project), false);
+    assert.equal(readFileSync(manifest, 'utf8'), lakeWritten);
+    // A manifest with another package and no lasm (a project with dependencies): lasm is added, the other kept.
+    const dep = { type: 'git', scope: '', name: 'batteries', manifestFile: 'lake-manifest.json', inherited: false, url: 'https://github.com/leanprover-community/batteries', rev: 'abc', inputRev: 'main', configFile: 'lakefile.toml' };
+    writeFileSync(manifest, JSON.stringify({ version: '1.3.0', packagesDir: '.lake/packages', packages: [dep], name: 'app', lakeDir: '.lake', fixedToolchain: false }));
+    assert.equal(ensureLakeManifest(project), true);
+    const parsed = JSON.parse(readFileSync(manifest, 'utf8'));
+    assert.deepEqual(parsed.packages.map(p => p.name), ['batteries', 'lasm']);
+    assert.deepEqual(parsed.packages[0], dep);
+    assert.equal(ensureLakeManifest(project), false);
+    // A wrong lasm entry (another path) is corrected.
+    parsed.packages[1].dir = 'elsewhere';
+    writeFileSync(manifest, JSON.stringify(parsed));
+    assert.equal(ensureLakeManifest(project), true);
+    assert.equal(JSON.parse(readFileSync(manifest, 'utf8')).packages[1].dir, '.lake/lasm-library');
+    // An unreadable manifest is left to Lake to report.
+    writeFileSync(manifest, '{ not json');
+    assert.equal(ensureLakeManifest(project), false);
+    assert.equal(readFileSync(manifest, 'utf8'), '{ not json');
+    // The package name for a new manifest, from either lakefile.
+    assert.equal(lakePackageNameOf(project), 'app');
+    rmSync(join(project, 'lakefile.toml'));
+    writeFileSync(join(project, 'lakefile.lean'), 'import Lake\nopen Lake DSL\n\npackage «my-app» where\n');
+    assert.equal(lakePackageNameOf(project), 'my-app');
+    rmSync(join(project, 'lakefile.lean'));
+    assert.equal(lakePackageNameOf(project), undefined);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('every lasm command\'s step writes the manifest entry once the lakefile requires Lasm\'s package, and not before', () => {
+  const { dir, prefix, cache, project, eager } = fixture();
+  try {
+    ensureLakeLibrary(project, prefix, { eager, cache });
+    assert.ok(!existsSync(join(project, 'lake-manifest.json')), 'no require: no manifest written');
+    addLakeRequire(project);
+    ensureLakeLibrary(project, prefix, { eager, cache });
+    assert.equal(readFileSync(join(project, 'lake-manifest.json'), 'utf8'), lakeWritten);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

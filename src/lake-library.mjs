@@ -147,6 +147,45 @@ export function addLakeRequire(project) {
   return true;
 }
 
+/** The project's Lake package name, from its lakefile (`name = "app"`, `package app`), for a new manifest. */
+export function lakePackageNameOf(project) {
+  const file = lakefileOf(project);
+  if (!file) return undefined;
+  const text = readFileSync(file, 'utf8');
+  const m = file.endsWith('.toml') ? /^\s*name\s*=\s*"([^"]+)"/m.exec(text) : /^\s*package\s+(?:«([^»]+)»|"([^"]+)"|([^\s:]+))/m.exec(text);
+  return m && (m[1] ?? m[2] ?? m[3]);
+}
+
+/** Lake 4.35's manifest entry of the path package the require names, as `lake update` writes it. */
+export const lakeManifestEntry = { type: 'path', scope: '', name: lakePackageName, manifestFile: 'lake-manifest.json', inherited: false,
+  dir: '.lake/lasm-library', copy: false, configFile: 'lakefile.toml' };
+
+/**
+ * The project's lake-manifest.json with Lasm's package in it (Lake needs a manifest entry for every require; the
+ * language server's `lake setup-file` does not update the manifest itself). Without a manifest it writes one, as
+ * `lake update` would for this require; with one, it adds or corrects only Lasm's entry, other packages as they are.
+ * Returns whether it changed the file.
+ */
+export function ensureLakeManifest(project) {
+  const file = join(project, 'lake-manifest.json');
+  let manifest;
+  try { manifest = JSON.parse(readFileSync(file, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') return false; }
+  manifest ??= { version: '1.3.0', packagesDir: '.lake/packages', packages: [], name: lakePackageNameOf(project), lakeDir: '.lake', fixedToolchain: false };
+  if (!Array.isArray(manifest.packages)) return false;
+  const at = manifest.packages.findIndex(p => p?.name === lakePackageName);
+  if (at >= 0 && JSON.stringify(manifest.packages[at]) === JSON.stringify(lakeManifestEntry)) return false;
+  if (at >= 0) manifest.packages[at] = lakeManifestEntry; else manifest.packages.push(lakeManifestEntry);
+  writeAtomic(file, lakeManifestText(manifest));
+  return true;
+}
+
+/** A manifest as Lake writes it: one key per line at the top, each package on its own lines. */
+function lakeManifestText(manifest) {
+  const entries = Object.entries(manifest).map(([key, value]) => key !== 'packages' ? ` ${JSON.stringify(key)}: ${JSON.stringify(value)}`
+    : ` "packages":\n ${value.length ? '[' + value.map(p => '{' + Object.entries(p).map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)}`).join(',\n   ') + '}').join(',\n  ') + ']' : '[]'}`);
+  return '{' + entries.join(',\n').slice(1) + '}\n';
+}
+
 /**
  * Every lasm command's step for a Lake project: the package for `prefix`, and the project's link to it.
  * Returns { required, directory } (required: the lakefile requires the package, so Lake builds those modules).
@@ -154,5 +193,8 @@ export function addLakeRequire(project) {
 export function ensureLakeLibrary(project, prefix, { eager, cache, root } = {}) {
   const directory = ensureLakePackage(prefix, { eager, cache, root });
   ensureProjectLink(project, directory);
-  return { required: requiresLakePackage(project), directory };
+  const required = requiresLakePackage(project);
+  // Lake needs the require in the manifest (lasm editor adds the require; a fresh lasm init has no manifest yet).
+  if (required) ensureLakeManifest(project);
+  return { required, directory };
 }
