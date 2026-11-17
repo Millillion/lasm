@@ -3,7 +3,7 @@
 Status: **the platform half is in branch source and measured in CI
 (2026-10-26):** `lasm build --target browser`, the loader and mount API,
 builtin `lasm:*` modules, the web APIs from Lean (since 2026-11-10 the
-generated `Lasm.JS.Web.Browser`, which replaced the hand-written `Lasm.Web`), the Vite plugin (`@lasm/cli/vite`), `lasm init --template web`
+generated `Lasm.JS.Web`, which replaced the hand-written `Lasm.Web`), the Vite plugin (`@lasm/cli/vite`), `lasm init --template web`
 and the browser CI. `Lasm.UI` (Html, diff, patch protocol, `html!`, SSR,
 proofs) is built against it on branch `browser-ui`. This document is the
 contract; sections are marked *measured* as they land.
@@ -25,7 +25,7 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Mount API | `import { mount } from './app.<hash>.js'; const app = await mount(element, { flags })` returns `{ unmount(), send(msg), ports }`. Also auto-mount: `<div data-lasm-app></div>` + `<script type="module" src="app.<hash>.js">`. Several apps can mount on one page. | Works in a plain page, inside React/Vue/Svelte apps, and in CMS pages. |
 | Bundlers | The Vite plugin `@lasm/cli/vite` (shipped in the CLI package): `import app from './Main.lean?lasm'` in dev and build; dev server rebuilds on save and hot-reloads, preserving the model when its type is unchanged. esbuild/webpack/Rollup consume `dist/` as plain ES modules and assets. | Vite is the default frontend toolchain; nothing else needs special support. |
 | DOM model | **The Elm architecture (`Lasm.UI`)**: `init`, pure `update : Msg → Model → Model × Cmd Msg`, pure `view : Model → Html Msg`, `subscriptions`. Diffing runs **in Lean** and emits a compact binary patch stream; a small JS applier (`lasm:ui-dom`) applies it, one boundary crossing per frame (requestAnimationFrame batching). | Pure `update`/`view` are exactly what Lean can prove theorems about; one crossing per frame avoids per-node call overhead. |
-| Imperative escape hatch | `Lasm.JS.Web.Browser`: the web platform's own APIs (the DOM and HTML elements, events, the window, `location`, `history`, storage, canvas 2D, WebSocket, and tier 1's `fetch`, timers, `URL`, `FormData`, `crypto`, `console`), **generated from the specifications' WebIDL** ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)); it replaced the hand-written `Lasm.Web` (2026-11-10). `Lasm.UI` interoperates through ports and `Cmd`s. | Spec-faithful bindings of the standards, not premade npm bindings or a Lasm-designed API; anything else uses `@[js]` bindings as on Node. |
+| Imperative escape hatch | `Lasm.JS.Web`: the whole web platform (the DOM and HTML elements, events, the window, storage, canvas, WebGL, IndexedDB, WebSocket, `fetch`, timers, `URL`, `crypto`, …), one module per spec, **generated from the specifications' WebIDL** ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)); it replaced the hand-written `Lasm.Web` (2026-11-10). `Lasm.UI` interoperates through ports and `Cmd`s. | Spec-faithful bindings of the standards, not premade npm bindings or a Lasm-designed API; anything else uses `@[js]` bindings as on Node. |
 | Markup | Both a function DSL (`div [class_ "x", onClick .inc] [text "hi"]`) and a JSX-like `html!` syntax (`<div class="x" onClick={.inc}>hi</div>`), with tag/attribute checking at elaboration. | Familiar to web developers; still plain Lean terms. |
 | SSR | `Html.render : Html Msg → String` runs anywhere (server, edge, Node); `mount` with `{ hydrate: true }` adopts server-rendered DOM. | Fast first paint and SEO for full-stack apps. |
 | Full stack | `Lasm.RPC`: shared Lean API types and functions; the server mounts them on Hono/Fastify/edge fetch handlers, the browser calls them through generated typed clients over `fetch` (JSON via `ToJson`/`FromJson` derivations). Template `fullstack`. | One language, one set of types, end to end. |
@@ -235,23 +235,37 @@ app.unmount();                            // Lean: App.onUnmount; listeners, tim
   module: several apps on one page are independent.
 - User Timing marks: `lasm:evaluated`, `lasm:compiled`, `lasm:mounted`.
 
-## Web APIs from Lean: `Lasm.JS.Web.Browser` and `Lasm.UI.Mount`
+## Web APIs from Lean: `Lasm.JS.Web` and `Lasm.UI.Mount`
 
-`import Lasm.JS.Web.Browser` gives the web platform's APIs, generated from the
+`import Lasm.JS.Web.Dom`, `import Lasm.JS.Web.Html` (and any other spec's module) give the web platform's APIs, generated from the
 WebIDL of the specifications (DOM, HTML, CSSOM, UI Events, WebSockets, and the
 WinterTC common APIs: `fetch`, timers, `URL`, `crypto`, `console`, …):
-[JS_BINDINGS.md, "The browser tier"](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)
+[JS_BINDINGS.md, "Lasm.JS.Web"](JS_BINDINGS.md#standard-bindings-lasmjsweb)
 has the modules, the mapping and the examples. Names and arguments are the
 standards' own (`document.createElement`, `element.addEventListener`,
 `ctx.fillRect`), so MDN is their documentation. Listeners and callbacks act on
-the page directly: an app removes what it added when it unmounts
-(`Mount.onUnmount`).
+the page directly: an app removes what it added when it unmounts. The
+platform's own way is `Mount.signal`, an `AbortSignal` that aborts on unmount:
+pass it where the platform takes a signal, and the platform does the removing.
+
+```lean
+let signal ← Mount.signal AbortSignal
+button.addEventListener "click" (some onClick) (some (.addEventListenerOptions { signal := some signal }))
+let res ← fetch "/api/items" (some { signal := some signal })   -- cancelled by an unmount
+let timer ← setInterval tick (some 1000)
+signal.addEventListener "abort" (some (← EventListener.ofSyncFn fun _ => clearInterval (some timer)))
+```
+
+`Mount.onUnmount` runs a Lean action after the signal aborts. `lasm build --target browser` refuses a web API that
+Chromium 153, Firefox 155 and Safari 26.6 do not all provide
+([JS_BINDINGS.md](JS_BINDINGS.md#availability-per-target-checked-by-lasm-build)).
 
 `import Lasm.UI.Mount` ([library/Lasm/UI/Mount.lean](../library/Lasm/UI/Mount.lean))
 is what the loader's `mount(element, { flags })` gives the program (`lasm:app`):
 `root` (the element, as any handle type: `Mount.root Element`), `flags`,
 `hydrating`, `target`, ports (`port`, `Port.send`, `Port.subscribe`),
-`onMessage` (`app.send`), `onUnmount`, and `hotState`/`onHotSave` (Vite hot
+`onMessage` (`app.send`), `onUnmount`, `signal` (an `AbortSignal` that aborts on
+unmount), and `hotState`/`onHotSave` (Vite hot
 reload). `Lasm.UI.App.run` uses it; programs that draw the page themselves use
 it directly. It is Lasm's own loader, not a web standard, so it is written by
 hand (it was `Lasm.Web.App`).
@@ -293,8 +307,7 @@ Never run browsers locally on the desktop (no headed browsers, no `open`).
 ## Layout
 
 - `library/Lasm/JS/Web/…` — the web platform bindings, generated
-  (`scripts/bindings/generate-web.mjs`; the browser tier is
-  `scripts/bindings/web-browser.mjs`).
+  (`scripts/bindings/generate-web.mjs`, one module per spec).
 - `library/Lasm/UI/…` — `Html`, attributes, events, `diff`, the patch encoder,
   `App`, `Mount` (the loader's `lasm:app`), `Cmd`, `Subs`, router, `html!` syntax, SSR, proofs.
 - `library/Lasm/RPC.lean` — shared API definitions and adapters.

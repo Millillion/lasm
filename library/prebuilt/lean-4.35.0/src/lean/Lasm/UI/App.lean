@@ -53,16 +53,16 @@ namespace Runtime
 
 -- The exports of `lasm:ui-dom` (src/lasm-modules/ui-dom.mjs), per mounted app.
 namespace Dom
-@[js "lasm:ui-dom" "options"] opaque options : IO Data
-@[js "lasm:ui-dom" "connect"] opaque connect : Data → IO Unit
-@[js "lasm:ui-dom" "apply"] opaque apply : ByteArray → IO Unit
-@[js "lasm:ui-dom" "schedule"] opaque schedule : IO Unit
-@[js "lasm:ui-dom" "error"] opaque error : String → IO Unit
-@[js "lasm:ui-dom" "sub"] opaque sub : Nat → Data → IO Unit
-@[js "lasm:ui-dom" "unsub"] opaque unsub : Nat → IO Unit
-@[js "lasm:ui-dom" "timeout"] opaque timeout : Nat → Value → IO Unit
-@[js "lasm:ui-dom" "navigate"] opaque navigate : String → Bool → IO Unit
-@[js "lasm:ui-dom" "afterFrame"] opaque afterFrame : Value → IO Unit
+@[js "lasm:ui-dom" "options"] private opaque options : IO Data
+@[js "lasm:ui-dom" "connect"] private opaque connect : Data → IO Unit
+@[js "lasm:ui-dom" "apply"] private opaque apply : ByteArray → IO Unit
+@[js "lasm:ui-dom" "schedule"] private opaque schedule : IO Unit
+@[js "lasm:ui-dom" "error"] private opaque error : String → IO Unit
+@[js "lasm:ui-dom" "sub"] private opaque sub : Nat → Data → IO Unit
+@[js "lasm:ui-dom" "unsub"] private opaque unsub : Nat → IO Unit
+@[js "lasm:ui-dom" "timeout"] private opaque timeout : Nat → Value → IO Unit
+@[js "lasm:ui-dom" "navigate"] private opaque navigate : String → Bool → IO Unit
+@[js "lasm:ui-dom" "afterFrame"] private opaque afterFrame : Value → IO Unit
 end Dom
 
 structure State (Model Msg : Type) where

@@ -11,6 +11,9 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Bun.SQL.SQLError` (Bun 1.4.4 type declarations, sql.d.ts): a handle to the JavaScript object. -/
 structure SQLSQLError where
@@ -77,23 +80,23 @@ structure SQLPostgresErrorNewOptions where
   line : Option String := none
   /-- `DOMString routine` -/
   routine : Option String := none
-instance : ToJS SQLPostgresErrorNewOptions := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("errno", Support.optional d.errno),
-    ("detail", Support.optional d.detail),
-    ("hint", Support.optional d.hint),
-    ("severity", Support.optional d.severity),
-    ("position", Support.optional d.position),
-    ("internalPosition", Support.optional d.internalPosition),
-    ("internalQuery", Support.optional d.internalQuery),
-    ("where", Support.optional d.«where»),
-    ("schema", Support.optional d.schema),
-    ("table", Support.optional d.table),
-    ("column", Support.optional d.column),
-    ("dataType", Support.optional d.dataType),
-    ("constraint", Support.optional d.constraint),
-    ("file", Support.optional d.file),
-    ("line", Support.optional d.line),
-    ("routine", Support.optional d.routine)]⟩
+instance : ToJS SQLPostgresErrorNewOptions := ⟨fun d => Internal.fields #[("code", toJS d.code),
+    ("errno", Internal.optional d.errno),
+    ("detail", Internal.optional d.detail),
+    ("hint", Internal.optional d.hint),
+    ("severity", Internal.optional d.severity),
+    ("position", Internal.optional d.position),
+    ("internalPosition", Internal.optional d.internalPosition),
+    ("internalQuery", Internal.optional d.internalQuery),
+    ("where", Internal.optional d.«where»),
+    ("schema", Internal.optional d.schema),
+    ("table", Internal.optional d.table),
+    ("column", Internal.optional d.column),
+    ("dataType", Internal.optional d.dataType),
+    ("constraint", Internal.optional d.constraint),
+    ("file", Internal.optional d.file),
+    ("line", Internal.optional d.line),
+    ("routine", Internal.optional d.routine)]⟩
 
 /-- `dictionary SQLMySQLErrorNewOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SQLMySQLErrorNewOptions where
@@ -103,7 +106,7 @@ structure SQLMySQLErrorNewOptions where
   errno : Option Float
   /-- `required DOMString? sqlState` -/
   sqlState : Option String
-instance : ToJS SQLMySQLErrorNewOptions := ⟨fun d => Support.fields #[("code", toJS d.code),
+instance : ToJS SQLMySQLErrorNewOptions := ⟨fun d => Internal.fields #[("code", toJS d.code),
     ("errno", toJS d.errno),
     ("sqlState", toJS d.sqlState)]⟩
 
@@ -115,9 +118,9 @@ structure SQLSQLiteErrorNewOptions where
   errno : Float
   /-- `double byteOffset` -/
   byteOffset : Option Float := none
-instance : ToJS SQLSQLiteErrorNewOptions := ⟨fun d => Support.fields #[("code", toJS d.code),
+instance : ToJS SQLSQLiteErrorNewOptions := ⟨fun d => Internal.fields #[("code", toJS d.code),
     ("errno", toJS d.errno),
-    ("byteOffset", Support.optional d.byteOffset)]⟩
+    ("byteOffset", Internal.optional d.byteOffset)]⟩
 
 /-- `callback SQLColumnTransformFrom = DOMString (DOMString name)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SQLColumnTransformFrom where
@@ -128,13 +131,13 @@ instance : ToJS SQLColumnTransformFrom := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLColumnTransformFrom := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLColumnTransformFrom", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SQLColumnTransformFrom.ofFn (f : String → Async String) : IO SQLColumnTransformFrom := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SQLColumnTransformFrom.ofSyncFn (f : String → IO String) : IO SQLColumnTransformFrom := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -148,13 +151,13 @@ instance : ToJS SQLColumnTransformTo := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLColumnTransformTo := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLColumnTransformTo", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SQLColumnTransformTo.ofFn (f : String → Async String) : IO SQLColumnTransformTo := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SQLColumnTransformTo.ofSyncFn (f : String → IO String) : IO SQLColumnTransformTo := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -208,119 +211,151 @@ instance : FromJS SQLNameTransform where
   typeName := "Lasm.JS.Bun.SQLNameTransform"
 
 /-- `constructor(message: string)`: `constructor(DOMString message)` -/
-def SQLSQLError.new (message : String) : IO SQLSQLError :=
+@[macro_inline] def SQLSQLError.new (message : String) : IO SQLSQLError := Internal.api "Lasm.JS.Bun.SQLSQLError.new" do
   Lasm.JS.Binding.invoke SQLSQLError { name := "Lasm.JS.Bun.SQLSQLError.new", module := "globalThis", path := "Bun.SQL.SQLError", construct := true, arity := 1 }
-    (Support.args #[toJS message]) (await := false)
+    (Internal.args #[toJS message]) (await := false)
 
 /-- `constructor(message: string, options: { code: string; errno?: string | undefined; detail?: string; hint?: string | undefined; severity?: string | undefined; position?: string | undefined; internalPosition?: string; internalQuery?: string; where?: string | undefined; schema?: string; table?: string | undefined; column?: string | undefined; dataType?: string | undefined; constraint?: string; file?: string | undefined; line?: string | undefined; routine?: string | undefined; })`: `constructor(DOMString message, SQLPostgresErrorNewOptions options)` -/
-def SQLPostgresError.new (message : String) (options : SQLPostgresErrorNewOptions) : IO SQLPostgresError :=
+@[macro_inline] def SQLPostgresError.new (message : String) (options : SQLPostgresErrorNewOptions) : IO SQLPostgresError := Internal.api "Lasm.JS.Bun.SQLPostgresError.new" do
   Lasm.JS.Binding.invoke SQLPostgresError { name := "Lasm.JS.Bun.SQLPostgresError.new", module := "globalThis", path := "Bun.SQL.PostgresError", construct := true, arity := 2 }
-    (Support.args #[toJS message, toJS options]) (await := false)
+    (Internal.args #[toJS message, toJS options]) (await := false)
 
 /-- `public readonly code: string`: `readonly attribute DOMString code` -/
-def SQLPostgresError.code (self : SQLPostgresError) : IO String := self.val.get "code" String
+@[macro_inline] def SQLPostgresError.code (self : SQLPostgresError) : IO String := Internal.api "Lasm.JS.Bun.SQLPostgresError.code" do
+  self.val.get "code" String
 
 /-- `public readonly errno?: string | undefined`: `readonly attribute DOMString? errno` -/
-def SQLPostgresError.errno (self : SQLPostgresError) : IO (Option String) := self.val.get "errno" (Option String)
+@[macro_inline] def SQLPostgresError.errno (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.errno" do
+  self.val.get "errno" (Option String)
 
 /-- `public readonly detail?: string | undefined`: `readonly attribute DOMString? detail` -/
-def SQLPostgresError.detail (self : SQLPostgresError) : IO (Option String) := self.val.get "detail" (Option String)
+@[macro_inline] def SQLPostgresError.detail (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.detail" do
+  self.val.get "detail" (Option String)
 
 /-- `public readonly hint?: string | undefined`: `readonly attribute DOMString? hint` -/
-def SQLPostgresError.hint (self : SQLPostgresError) : IO (Option String) := self.val.get "hint" (Option String)
+@[macro_inline] def SQLPostgresError.hint (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.hint" do
+  self.val.get "hint" (Option String)
 
 /-- `public readonly severity?: string | undefined`: `readonly attribute DOMString? severity` -/
-def SQLPostgresError.severity (self : SQLPostgresError) : IO (Option String) := self.val.get "severity" (Option String)
+@[macro_inline] def SQLPostgresError.severity (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.severity" do
+  self.val.get "severity" (Option String)
 
 /-- `public readonly position?: string | undefined`: `readonly attribute DOMString? position` -/
-def SQLPostgresError.position (self : SQLPostgresError) : IO (Option String) := self.val.get "position" (Option String)
+@[macro_inline] def SQLPostgresError.position (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.position" do
+  self.val.get "position" (Option String)
 
 /-- `public readonly internalPosition?: string | undefined`: `readonly attribute DOMString? internalPosition` -/
-def SQLPostgresError.internalPosition (self : SQLPostgresError) : IO (Option String) := self.val.get "internalPosition" (Option String)
+@[macro_inline] def SQLPostgresError.internalPosition (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.internalPosition" do
+  self.val.get "internalPosition" (Option String)
 
 /-- `public readonly internalQuery?: string | undefined`: `readonly attribute DOMString? internalQuery` -/
-def SQLPostgresError.internalQuery (self : SQLPostgresError) : IO (Option String) := self.val.get "internalQuery" (Option String)
+@[macro_inline] def SQLPostgresError.internalQuery (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.internalQuery" do
+  self.val.get "internalQuery" (Option String)
 
 /-- `public readonly where?: string | undefined`: `readonly attribute DOMString? where` -/
-def SQLPostgresError.«where» (self : SQLPostgresError) : IO (Option String) := self.val.get "where" (Option String)
+@[macro_inline] def SQLPostgresError.«where» (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.where" do
+  self.val.get "where" (Option String)
 
 /-- `public readonly schema?: string | undefined`: `readonly attribute DOMString? schema` -/
-def SQLPostgresError.schema (self : SQLPostgresError) : IO (Option String) := self.val.get "schema" (Option String)
+@[macro_inline] def SQLPostgresError.schema (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.schema" do
+  self.val.get "schema" (Option String)
 
 /-- `public readonly table?: string | undefined`: `readonly attribute DOMString? table` -/
-def SQLPostgresError.table (self : SQLPostgresError) : IO (Option String) := self.val.get "table" (Option String)
+@[macro_inline] def SQLPostgresError.table (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.table" do
+  self.val.get "table" (Option String)
 
 /-- `public readonly column?: string | undefined`: `readonly attribute DOMString? column` -/
-def SQLPostgresError.column (self : SQLPostgresError) : IO (Option String) := self.val.get "column" (Option String)
+@[macro_inline] def SQLPostgresError.column (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.column" do
+  self.val.get "column" (Option String)
 
 /-- `public readonly dataType?: string | undefined`: `readonly attribute DOMString? dataType` -/
-def SQLPostgresError.dataType (self : SQLPostgresError) : IO (Option String) := self.val.get "dataType" (Option String)
+@[macro_inline] def SQLPostgresError.dataType (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.dataType" do
+  self.val.get "dataType" (Option String)
 
 /-- `public readonly constraint?: string | undefined`: `readonly attribute DOMString? constraint` -/
-def SQLPostgresError.constraint (self : SQLPostgresError) : IO (Option String) := self.val.get "constraint" (Option String)
+@[macro_inline] def SQLPostgresError.constraint (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.constraint" do
+  self.val.get "constraint" (Option String)
 
 /-- `public readonly file?: string | undefined`: `readonly attribute DOMString? file` -/
-def SQLPostgresError.file (self : SQLPostgresError) : IO (Option String) := self.val.get "file" (Option String)
+@[macro_inline] def SQLPostgresError.file (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.file" do
+  self.val.get "file" (Option String)
 
 /-- `public readonly line?: string | undefined`: `readonly attribute DOMString? line` -/
-def SQLPostgresError.line (self : SQLPostgresError) : IO (Option String) := self.val.get "line" (Option String)
+@[macro_inline] def SQLPostgresError.line (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.line" do
+  self.val.get "line" (Option String)
 
 /-- `public readonly routine?: string | undefined`: `readonly attribute DOMString? routine` -/
-def SQLPostgresError.routine (self : SQLPostgresError) : IO (Option String) := self.val.get "routine" (Option String)
+@[macro_inline] def SQLPostgresError.routine (self : SQLPostgresError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLPostgresError.routine" do
+  self.val.get "routine" (Option String)
 
 /-- `constructor(message: string, options: { code: string; errno: number | undefined; sqlState: string | undefined })`: `constructor(DOMString message, SQLMySQLErrorNewOptions options)` -/
-def SQLMySQLError.new (message : String) (options : SQLMySQLErrorNewOptions) : IO SQLMySQLError :=
+@[macro_inline] def SQLMySQLError.new (message : String) (options : SQLMySQLErrorNewOptions) : IO SQLMySQLError := Internal.api "Lasm.JS.Bun.SQLMySQLError.new" do
   Lasm.JS.Binding.invoke SQLMySQLError { name := "Lasm.JS.Bun.SQLMySQLError.new", module := "globalThis", path := "Bun.SQL.MySQLError", construct := true, arity := 2 }
-    (Support.args #[toJS message, toJS options]) (await := false)
+    (Internal.args #[toJS message, toJS options]) (await := false)
 
 /-- `public readonly code: string`: `readonly attribute DOMString code` -/
-def SQLMySQLError.code (self : SQLMySQLError) : IO String := self.val.get "code" String
+@[macro_inline] def SQLMySQLError.code (self : SQLMySQLError) : IO String := Internal.api "Lasm.JS.Bun.SQLMySQLError.code" do
+  self.val.get "code" String
 
 /-- `public readonly errno?: number | undefined`: `readonly attribute double? errno` -/
-def SQLMySQLError.errno (self : SQLMySQLError) : IO (Option Float) := self.val.get "errno" (Option Float)
+@[macro_inline] def SQLMySQLError.errno (self : SQLMySQLError) : IO (Option Float) := Internal.api "Lasm.JS.Bun.SQLMySQLError.errno" do
+  self.val.get "errno" (Option Float)
 
 /-- `public readonly sqlState?: string | undefined`: `readonly attribute DOMString? sqlState` -/
-def SQLMySQLError.sqlState (self : SQLMySQLError) : IO (Option String) := self.val.get "sqlState" (Option String)
+@[macro_inline] def SQLMySQLError.sqlState (self : SQLMySQLError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLMySQLError.sqlState" do
+  self.val.get "sqlState" (Option String)
 
 /-- `constructor(message: string, options: { code: string; errno: number; byteOffset?: number | undefined })`: `constructor(DOMString message, SQLSQLiteErrorNewOptions options)` -/
-def SQLSQLiteError.new (message : String) (options : SQLSQLiteErrorNewOptions) : IO SQLSQLiteError :=
+@[macro_inline] def SQLSQLiteError.new (message : String) (options : SQLSQLiteErrorNewOptions) : IO SQLSQLiteError := Internal.api "Lasm.JS.Bun.SQLSQLiteError.new" do
   Lasm.JS.Binding.invoke SQLSQLiteError { name := "Lasm.JS.Bun.SQLSQLiteError.new", module := "globalThis", path := "Bun.SQL.SQLiteError", construct := true, arity := 2 }
-    (Support.args #[toJS message, toJS options]) (await := false)
+    (Internal.args #[toJS message, toJS options]) (await := false)
 
 /-- `public readonly code: string`: `readonly attribute DOMString code` -/
-def SQLSQLiteError.code (self : SQLSQLiteError) : IO String := self.val.get "code" String
+@[macro_inline] def SQLSQLiteError.code (self : SQLSQLiteError) : IO String := Internal.api "Lasm.JS.Bun.SQLSQLiteError.code" do
+  self.val.get "code" String
 
 /-- `public readonly errno: number`: `readonly attribute double errno` -/
-def SQLSQLiteError.errno (self : SQLSQLiteError) : IO Float := self.val.get "errno" Float
+@[macro_inline] def SQLSQLiteError.errno (self : SQLSQLiteError) : IO Float := Internal.api "Lasm.JS.Bun.SQLSQLiteError.errno" do
+  self.val.get "errno" Float
 
 /-- `public readonly byteOffset?: number | undefined`: `readonly attribute double? byteOffset` -/
-def SQLSQLiteError.byteOffset (self : SQLSQLiteError) : IO (Option Float) := self.val.get "byteOffset" (Option Float)
+@[macro_inline] def SQLSQLiteError.byteOffset (self : SQLSQLiteError) : IO (Option Float) := Internal.api "Lasm.JS.Bun.SQLSQLiteError.byteOffset" do
+  self.val.get "byteOffset" (Option Float)
 
 /-- `const Bun.SQL.camel: { readonly column: Required<ColumnTransform> }`: `readonly attribute SQLCamel camel` (Bun 1.4.4 type declarations) -/
-def SQL.camel : IO SQLCamel := Support.getGlobal ["Bun", "SQL", "camel"] SQLCamel
+@[macro_inline] def SQL.camel : IO SQLCamel := Internal.api "Lasm.JS.Bun.SQL.camel" do
+  Internal.getGlobal ["Bun", "SQL", "camel"] SQLCamel
 
 /-- `const Bun.SQL.pascal: { readonly column: Required<ColumnTransform> }`: `readonly attribute SQLPascal pascal` (Bun 1.4.4 type declarations) -/
-def SQL.pascal : IO SQLPascal := Support.getGlobal ["Bun", "SQL", "pascal"] SQLPascal
+@[macro_inline] def SQL.pascal : IO SQLPascal := Internal.api "Lasm.JS.Bun.SQL.pascal" do
+  Internal.getGlobal ["Bun", "SQL", "pascal"] SQLPascal
 
 /-- `const Bun.SQL.kebab: { readonly column: Required<ColumnTransform> }`: `readonly attribute SQLKebab kebab` (Bun 1.4.4 type declarations) -/
-def SQL.kebab : IO SQLKebab := Support.getGlobal ["Bun", "SQL", "kebab"] SQLKebab
+@[macro_inline] def SQL.kebab : IO SQLKebab := Internal.api "Lasm.JS.Bun.SQL.kebab" do
+  Internal.getGlobal ["Bun", "SQL", "kebab"] SQLKebab
 
 /-- `const Bun.SQL.toCamel: NameTransform`: `readonly attribute SQLNameTransform toCamel` (Bun 1.4.4 type declarations) -/
-def SQL.toCamel : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "toCamel"] SQLNameTransform
+@[macro_inline] def SQL.toCamel : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.toCamel" do
+  Internal.getGlobal ["Bun", "SQL", "toCamel"] SQLNameTransform
 
 /-- `const Bun.SQL.toPascal: NameTransform`: `readonly attribute SQLNameTransform toPascal` (Bun 1.4.4 type declarations) -/
-def SQL.toPascal : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "toPascal"] SQLNameTransform
+@[macro_inline] def SQL.toPascal : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.toPascal" do
+  Internal.getGlobal ["Bun", "SQL", "toPascal"] SQLNameTransform
 
 /-- `const Bun.SQL.toKebab: NameTransform`: `readonly attribute SQLNameTransform toKebab` (Bun 1.4.4 type declarations) -/
-def SQL.toKebab : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "toKebab"] SQLNameTransform
+@[macro_inline] def SQL.toKebab : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.toKebab" do
+  Internal.getGlobal ["Bun", "SQL", "toKebab"] SQLNameTransform
 
 /-- `const Bun.SQL.fromCamel: NameTransform`: `readonly attribute SQLNameTransform fromCamel` (Bun 1.4.4 type declarations) -/
-def SQL.fromCamel : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "fromCamel"] SQLNameTransform
+@[macro_inline] def SQL.fromCamel : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.fromCamel" do
+  Internal.getGlobal ["Bun", "SQL", "fromCamel"] SQLNameTransform
 
 /-- `const Bun.SQL.fromPascal: NameTransform`: `readonly attribute SQLNameTransform fromPascal` (Bun 1.4.4 type declarations) -/
-def SQL.fromPascal : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "fromPascal"] SQLNameTransform
+@[macro_inline] def SQL.fromPascal : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.fromPascal" do
+  Internal.getGlobal ["Bun", "SQL", "fromPascal"] SQLNameTransform
 
 /-- `const Bun.SQL.fromKebab: NameTransform`: `readonly attribute SQLNameTransform fromKebab` (Bun 1.4.4 type declarations) -/
-def SQL.fromKebab : IO SQLNameTransform := Support.getGlobal ["Bun", "SQL", "fromKebab"] SQLNameTransform
+@[macro_inline] def SQL.fromKebab : IO SQLNameTransform := Internal.api "Lasm.JS.Bun.SQL.fromKebab" do
+  Internal.getGlobal ["Bun", "SQL", "fromKebab"] SQLNameTransform
 
 end Lasm.JS.Bun

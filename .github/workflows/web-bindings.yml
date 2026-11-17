@@ -51,6 +51,7 @@ on:
       - 'test/fixtures/js-web-size/**'
       - 'test/fixtures/js-node/**'
       - 'test/fixtures/js-node-size/**'
+      - 'examples/node-core/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
       - 'test/fixtures/js-deno/**'
@@ -62,7 +63,7 @@ on:
       - 'test/fixtures/js-core/**'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
-      - 'docs/API_DECISIONS.md'
+      - 'docs/api/decisions/0.3.md'
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
       - 'src/project-modules.mjs'
@@ -83,6 +84,7 @@ on:
       - 'test/fixtures/js-web-size/**'
       - 'test/fixtures/js-node/**'
       - 'test/fixtures/js-node-size/**'
+      - 'examples/node-core/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
       - 'test/fixtures/js-deno/**'
@@ -284,6 +286,16 @@ jobs:
           node scripts/bindings/test-web.mjs --fixture js-node --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-node" \
             --targets node,node24,bun,deno --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
             --report "$RUNNER_TEMP/js-node/report.json" --sizes
+      - name: The node-core example (Lasm.JS.Node only) on Node 26 and Node 24
+        run: |
+          set -euo pipefail
+          D="$RUNNER_TEMP/node-core"; cp -r examples/node-core "$D"; cd "$D"
+          node "${{ steps.candidate.outputs.lasm }}" build Main.lean
+          node dist/main.mjs | tee out26.txt
+          "$NODE24" dist/main.mjs | tee out24.txt
+          grep -q '^node v26\..*: ok$' out26.txt
+          grep -q '^node v24\..*: ok$' out24.txt
+          grep -q '^hello.txt	13 bytes	sha256 853ff93762a06ddbf722c4ebe9ddd66d8f63ddaea97f521c3ecc20da7c976020	' out26.txt
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

@@ -112,6 +112,23 @@ VS Code extension; without elan, `lasm` prints how to get it. `LASM_EDITOR=0`
 stops `lasm init`, `lasm dev` and `lasm build` from doing this automatically (they never do it
 on CI).
 
+Most of `Lasm.JS.Web`, `Lasm.JS.Node` and the other generated bindings ship as
+source and are compiled the first time a program imports them. In the editor,
+Lake builds them: the project's `lakefile.toml` requires Lasm's library as a
+Lake package (`lasm init` writes this in the templates that use it, `lasm editor` adds it to an existing
+project):
+
+```toml
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"
+```
+
+`.lake/lasm-library` is a link that every lasm command (`lasm init`, `lasm dev`,
+`lasm build`, `lasm editor`) makes or repairs; `.lake/` is not in git. **On a
+fresh clone, run any lasm command once** (`npm run dev`, `npx lasm editor`): a
+plain `lake build` needs the link.
+
 ## 3. Call an npm package from Lean
 
 Add [marked](https://www.npmjs.com/package/marked), a Markdown renderer:

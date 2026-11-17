@@ -182,6 +182,24 @@ test('the fullstack template: shared, server and client modules; Node and Worker
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('templates that use Lasm\'s library require it as a Lake package and get .lake/ for its link (0.3-7); the others stay plain Lake projects', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-lake-'));
+  try {
+    for (const template of Object.keys(templates)) {
+      const { directory } = initProject({ directory: join(root, template), template });
+      const lakefile = readFileSync(join(directory, 'lakefile.toml'), 'utf8');
+      const uses = !!(templates[template].interop || templates[template].library || templates[template].fullstack || templates[template].browser);
+      assert.equal(/^\[\[require\]\]\nname = "lasm"\npath = "\.lake\/lasm-library"$/m.test(lakefile), uses, template);
+      assert.equal(existsSync(join(directory, '.lake')), uses, template);
+      assert.match(readFileSync(join(directory, '.gitignore'), 'utf8'), /^\.lake\/?$/m, template);
+      if (uses) assert.match(readFileSync(join(directory, 'README.md'), 'utf8'), /on a fresh clone, run any lasm command once/, template);
+    }
+    // A target several levels down: its directories are made, then .lake/ in it.
+    const nested = initProject({ directory: join(root, 'a', 'b', 'web'), template: 'web' }).directory;
+    assert.ok(existsSync(join(nested, '.lake')));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 // The program each target builds (entryFile): Main.lean on Node, the default
 // export (Export.lean) for the templates that publish a handler, and the fetch
 // template's own programs for Fastly and wasi:http.

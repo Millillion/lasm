@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.Conn` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
 structure Conn where
@@ -153,371 +156,415 @@ instance : ToJS DatagramConn := ⟨fun x => .ref x.val ""⟩
 instance : FromJS DatagramConn := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.DatagramConn", .data⟩
 
 /-- `enum NetAddrTransport` (Deno 2.9.6 type declarations): "tcp", "udp". -/
-inductive NetAddrTransport where
-  /-- "tcp" -/
-  | tcp
-  /-- "udp" -/
-  | udp
+structure NetAddrTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS NetAddrTransport := ⟨fun
-  | .tcp => .string "tcp"
-  | .udp => .string "udp"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev NetAddrTransport.tcp : NetAddrTransport := .unsafeOfString "tcp"
+/-- "udp" -/
+@[match_pattern] abbrev NetAddrTransport.udp : NetAddrTransport := .unsafeOfString "udp"
+instance : ToJS NetAddrTransport := ⟨fun x => .string x.val⟩
 instance : FromJS NetAddrTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | .string "udp" => .ok .udp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.NetAddrTransport"
 
 /-- `enum UnixAddrTransport` (Deno 2.9.6 type declarations): "unix", "unixpacket". -/
-inductive UnixAddrTransport where
-  /-- "unix" -/
-  | unix
-  /-- "unixpacket" -/
-  | unixpacket
+structure UnixAddrTransport where
+  /-- A value from its string, unchecked: the generated values (`.unix`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS UnixAddrTransport := ⟨fun
-  | .unix => .string "unix"
-  | .unixpacket => .string "unixpacket"⟩
+/-- "unix" -/
+@[match_pattern] abbrev UnixAddrTransport.unix : UnixAddrTransport := .unsafeOfString "unix"
+/-- "unixpacket" -/
+@[match_pattern] abbrev UnixAddrTransport.unixpacket : UnixAddrTransport := .unsafeOfString "unixpacket"
+instance : ToJS UnixAddrTransport := ⟨fun x => .string x.val⟩
 instance : FromJS UnixAddrTransport where
   fromJS
-    | .string "unix" => .ok .unix
-    | .string "unixpacket" => .ok .unixpacket
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.UnixAddrTransport"
 
 /-- `enum VsockAddrTransport` (Deno 2.9.6 type declarations): "vsock". -/
-inductive VsockAddrTransport where
-  /-- "vsock" -/
-  | vsock
+structure VsockAddrTransport where
+  /-- A value from its string, unchecked: the generated values (`.vsock`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS VsockAddrTransport := ⟨fun
-  | .vsock => .string "vsock"⟩
+/-- "vsock" -/
+@[match_pattern] abbrev VsockAddrTransport.vsock : VsockAddrTransport := .unsafeOfString "vsock"
+instance : ToJS VsockAddrTransport := ⟨fun x => .string x.val⟩
 instance : FromJS VsockAddrTransport where
   fromJS
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.VsockAddrTransport"
 
 /-- `enum QuicTransportOptionsCongestionControl` (Deno 2.9.6 type declarations): "throughput", "low-latency", "default". -/
-inductive QuicTransportOptionsCongestionControl where
-  /-- "throughput" -/
-  | throughput
-  /-- "low-latency" -/
-  | lowLatency
-  /-- "default" -/
-  | default
+structure QuicTransportOptionsCongestionControl where
+  /-- A value from its string, unchecked: the generated values (`.throughput`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS QuicTransportOptionsCongestionControl := ⟨fun
-  | .throughput => .string "throughput"
-  | .lowLatency => .string "low-latency"
-  | .default => .string "default"⟩
+/-- "throughput" -/
+@[match_pattern] abbrev QuicTransportOptionsCongestionControl.throughput : QuicTransportOptionsCongestionControl := .unsafeOfString "throughput"
+/-- "low-latency" -/
+@[match_pattern] abbrev QuicTransportOptionsCongestionControl.lowLatency : QuicTransportOptionsCongestionControl := .unsafeOfString "low-latency"
+/-- "default" -/
+@[match_pattern] abbrev QuicTransportOptionsCongestionControl.default : QuicTransportOptionsCongestionControl := .unsafeOfString "default"
+instance : ToJS QuicTransportOptionsCongestionControl := ⟨fun x => .string x.val⟩
 instance : FromJS QuicTransportOptionsCongestionControl where
   fromJS
-    | .string "throughput" => .ok .throughput
-    | .string "low-latency" => .ok .lowLatency
-    | .string "default" => .ok .default
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.QuicTransportOptionsCongestionControl"
 
 /-- `enum AddrTransport` (Deno 2.9.6 type declarations): "tcp", "udp", "unix", "unixpacket", "vsock". -/
-inductive AddrTransport where
-  /-- "tcp" -/
-  | tcp
-  /-- "udp" -/
-  | udp
-  /-- "unix" -/
-  | unix
-  /-- "unixpacket" -/
-  | unixpacket
-  /-- "vsock" -/
-  | vsock
+structure AddrTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS AddrTransport := ⟨fun
-  | .tcp => .string "tcp"
-  | .udp => .string "udp"
-  | .unix => .string "unix"
-  | .unixpacket => .string "unixpacket"
-  | .vsock => .string "vsock"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev AddrTransport.tcp : AddrTransport := .unsafeOfString "tcp"
+/-- "udp" -/
+@[match_pattern] abbrev AddrTransport.udp : AddrTransport := .unsafeOfString "udp"
+/-- "unix" -/
+@[match_pattern] abbrev AddrTransport.unix : AddrTransport := .unsafeOfString "unix"
+/-- "unixpacket" -/
+@[match_pattern] abbrev AddrTransport.unixpacket : AddrTransport := .unsafeOfString "unixpacket"
+/-- "vsock" -/
+@[match_pattern] abbrev AddrTransport.vsock : AddrTransport := .unsafeOfString "vsock"
+instance : ToJS AddrTransport := ⟨fun x => .string x.val⟩
 instance : FromJS AddrTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | .string "udp" => .ok .udp
-    | .string "unix" => .ok .unix
-    | .string "unixpacket" => .ok .unixpacket
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.AddrTransport"
 
 /-- `enum NetworkInterfaceInfoFamily` (Deno 2.9.6 type declarations): "IPv4", "IPv6". -/
-inductive NetworkInterfaceInfoFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure NetworkInterfaceInfoFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS NetworkInterfaceInfoFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev NetworkInterfaceInfoFamily.iPv4 : NetworkInterfaceInfoFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev NetworkInterfaceInfoFamily.iPv6 : NetworkInterfaceInfoFamily := .unsafeOfString "IPv6"
+instance : ToJS NetworkInterfaceInfoFamily := ⟨fun x => .string x.val⟩
 instance : FromJS NetworkInterfaceInfoFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.NetworkInterfaceInfoFamily"
 
 /-- `enum ResolveDnsRecordType` (Deno 2.9.6 type declarations): "A", "AAAA", "ANAME", "CNAME", "NS", "PTR". -/
-inductive ResolveDnsRecordType where
-  /-- "A" -/
-  | a
-  /-- "AAAA" -/
-  | aaaa
-  /-- "ANAME" -/
-  | aname
-  /-- "CNAME" -/
-  | cname
-  /-- "NS" -/
-  | ns
-  /-- "PTR" -/
-  | ptr
+structure ResolveDnsRecordType where
+  /-- A value from its string, unchecked: the generated values (`.a`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsRecordType := ⟨fun
-  | .a => .string "A"
-  | .aaaa => .string "AAAA"
-  | .aname => .string "ANAME"
-  | .cname => .string "CNAME"
-  | .ns => .string "NS"
-  | .ptr => .string "PTR"⟩
+/-- "A" -/
+@[match_pattern] abbrev ResolveDnsRecordType.a : ResolveDnsRecordType := .unsafeOfString "A"
+/-- "AAAA" -/
+@[match_pattern] abbrev ResolveDnsRecordType.aaaa : ResolveDnsRecordType := .unsafeOfString "AAAA"
+/-- "ANAME" -/
+@[match_pattern] abbrev ResolveDnsRecordType.aname : ResolveDnsRecordType := .unsafeOfString "ANAME"
+/-- "CNAME" -/
+@[match_pattern] abbrev ResolveDnsRecordType.cname : ResolveDnsRecordType := .unsafeOfString "CNAME"
+/-- "NS" -/
+@[match_pattern] abbrev ResolveDnsRecordType.ns : ResolveDnsRecordType := .unsafeOfString "NS"
+/-- "PTR" -/
+@[match_pattern] abbrev ResolveDnsRecordType.ptr : ResolveDnsRecordType := .unsafeOfString "PTR"
+instance : ToJS ResolveDnsRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsRecordType where
   fromJS
-    | .string "A" => .ok .a
-    | .string "AAAA" => .ok .aaaa
-    | .string "ANAME" => .ok .aname
-    | .string "CNAME" => .ok .cname
-    | .string "NS" => .ok .ns
-    | .string "PTR" => .ok .ptr
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsRecordType"
 
 /-- `enum ResolveDnsCaaRecordType` (Deno 2.9.6 type declarations): "CAA". -/
-inductive ResolveDnsCaaRecordType where
-  /-- "CAA" -/
-  | caa
+structure ResolveDnsCaaRecordType where
+  /-- A value from its string, unchecked: the generated values (`.caa`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsCaaRecordType := ⟨fun
-  | .caa => .string "CAA"⟩
+/-- "CAA" -/
+@[match_pattern] abbrev ResolveDnsCaaRecordType.caa : ResolveDnsCaaRecordType := .unsafeOfString "CAA"
+instance : ToJS ResolveDnsCaaRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsCaaRecordType where
   fromJS
-    | .string "CAA" => .ok .caa
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsCaaRecordType"
 
 /-- `enum ResolveDnsMxRecordType` (Deno 2.9.6 type declarations): "MX". -/
-inductive ResolveDnsMxRecordType where
-  /-- "MX" -/
-  | mx
+structure ResolveDnsMxRecordType where
+  /-- A value from its string, unchecked: the generated values (`.mx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsMxRecordType := ⟨fun
-  | .mx => .string "MX"⟩
+/-- "MX" -/
+@[match_pattern] abbrev ResolveDnsMxRecordType.mx : ResolveDnsMxRecordType := .unsafeOfString "MX"
+instance : ToJS ResolveDnsMxRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsMxRecordType where
   fromJS
-    | .string "MX" => .ok .mx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsMxRecordType"
 
 /-- `enum ResolveDnsNaptrRecordType` (Deno 2.9.6 type declarations): "NAPTR". -/
-inductive ResolveDnsNaptrRecordType where
-  /-- "NAPTR" -/
-  | naptr
+structure ResolveDnsNaptrRecordType where
+  /-- A value from its string, unchecked: the generated values (`.naptr`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsNaptrRecordType := ⟨fun
-  | .naptr => .string "NAPTR"⟩
+/-- "NAPTR" -/
+@[match_pattern] abbrev ResolveDnsNaptrRecordType.naptr : ResolveDnsNaptrRecordType := .unsafeOfString "NAPTR"
+instance : ToJS ResolveDnsNaptrRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsNaptrRecordType where
   fromJS
-    | .string "NAPTR" => .ok .naptr
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsNaptrRecordType"
 
 /-- `enum ResolveDnsSoaRecordType` (Deno 2.9.6 type declarations): "SOA". -/
-inductive ResolveDnsSoaRecordType where
-  /-- "SOA" -/
-  | soa
+structure ResolveDnsSoaRecordType where
+  /-- A value from its string, unchecked: the generated values (`.soa`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsSoaRecordType := ⟨fun
-  | .soa => .string "SOA"⟩
+/-- "SOA" -/
+@[match_pattern] abbrev ResolveDnsSoaRecordType.soa : ResolveDnsSoaRecordType := .unsafeOfString "SOA"
+instance : ToJS ResolveDnsSoaRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsSoaRecordType where
   fromJS
-    | .string "SOA" => .ok .soa
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsSoaRecordType"
 
 /-- `enum ResolveDnsSrvRecordType` (Deno 2.9.6 type declarations): "SRV". -/
-inductive ResolveDnsSrvRecordType where
-  /-- "SRV" -/
-  | srv
+structure ResolveDnsSrvRecordType where
+  /-- A value from its string, unchecked: the generated values (`.srv`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsSrvRecordType := ⟨fun
-  | .srv => .string "SRV"⟩
+/-- "SRV" -/
+@[match_pattern] abbrev ResolveDnsSrvRecordType.srv : ResolveDnsSrvRecordType := .unsafeOfString "SRV"
+instance : ToJS ResolveDnsSrvRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsSrvRecordType where
   fromJS
-    | .string "SRV" => .ok .srv
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsSrvRecordType"
 
 /-- `enum ResolveDnsTxtRecordType` (Deno 2.9.6 type declarations): "TXT". -/
-inductive ResolveDnsTxtRecordType where
-  /-- "TXT" -/
-  | txt
+structure ResolveDnsTxtRecordType where
+  /-- A value from its string, unchecked: the generated values (`.txt`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ResolveDnsTxtRecordType := ⟨fun
-  | .txt => .string "TXT"⟩
+/-- "TXT" -/
+@[match_pattern] abbrev ResolveDnsTxtRecordType.txt : ResolveDnsTxtRecordType := .unsafeOfString "TXT"
+instance : ToJS ResolveDnsTxtRecordType := ⟨fun x => .string x.val⟩
 instance : FromJS ResolveDnsTxtRecordType where
   fromJS
-    | .string "TXT" => .ok .txt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ResolveDnsTxtRecordType"
 
 /-- `enum ListenTcpOptionsTransport` (Deno 2.9.6 type declarations): "tcp". -/
-inductive ListenTcpOptionsTransport where
-  /-- "tcp" -/
-  | tcp
+structure ListenTcpOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenTcpOptionsTransport := ⟨fun
-  | .tcp => .string "tcp"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev ListenTcpOptionsTransport.tcp : ListenTcpOptionsTransport := .unsafeOfString "tcp"
+instance : ToJS ListenTcpOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenTcpOptionsTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenTcpOptionsTransport"
 
 /-- `enum ListenUnixOptionsTransport` (Deno 2.9.6 type declarations): "unix". -/
-inductive ListenUnixOptionsTransport where
-  /-- "unix" -/
-  | unix
+structure ListenUnixOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.unix`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenUnixOptionsTransport := ⟨fun
-  | .unix => .string "unix"⟩
+/-- "unix" -/
+@[match_pattern] abbrev ListenUnixOptionsTransport.unix : ListenUnixOptionsTransport := .unsafeOfString "unix"
+instance : ToJS ListenUnixOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenUnixOptionsTransport where
   fromJS
-    | .string "unix" => .ok .unix
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenUnixOptionsTransport"
 
 /-- `enum ListenVsockOptionsTransport` (Deno 2.9.6 type declarations): "vsock". -/
-inductive ListenVsockOptionsTransport where
-  /-- "vsock" -/
-  | vsock
+structure ListenVsockOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.vsock`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenVsockOptionsTransport := ⟨fun
-  | .vsock => .string "vsock"⟩
+/-- "vsock" -/
+@[match_pattern] abbrev ListenVsockOptionsTransport.vsock : ListenVsockOptionsTransport := .unsafeOfString "vsock"
+instance : ToJS ListenVsockOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenVsockOptionsTransport where
   fromJS
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenVsockOptionsTransport"
 
 /-- `enum ListenTlsOptionsTransport` (Deno 2.9.6 type declarations): "tcp". -/
-inductive ListenTlsOptionsTransport where
-  /-- "tcp" -/
-  | tcp
+structure ListenTlsOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenTlsOptionsTransport := ⟨fun
-  | .tcp => .string "tcp"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev ListenTlsOptionsTransport.tcp : ListenTlsOptionsTransport := .unsafeOfString "tcp"
+instance : ToJS ListenTlsOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenTlsOptionsTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenTlsOptionsTransport"
 
 /-- `enum ListenTlsCertifiedOptionsKeyFormat` (Deno 2.9.6 type declarations): "pem". -/
-inductive ListenTlsCertifiedOptionsKeyFormat where
-  /-- "pem" -/
-  | pem
+structure ListenTlsCertifiedOptionsKeyFormat where
+  /-- A value from its string, unchecked: the generated values (`.pem`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenTlsCertifiedOptionsKeyFormat := ⟨fun
-  | .pem => .string "pem"⟩
+/-- "pem" -/
+@[match_pattern] abbrev ListenTlsCertifiedOptionsKeyFormat.pem : ListenTlsCertifiedOptionsKeyFormat := .unsafeOfString "pem"
+instance : ToJS ListenTlsCertifiedOptionsKeyFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ListenTlsCertifiedOptionsKeyFormat where
   fromJS
-    | .string "pem" => .ok .pem
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenTlsCertifiedOptionsKeyFormat"
 
 /-- `enum ConnectOptionsTransport` (Deno 2.9.6 type declarations): "tcp". -/
-inductive ConnectOptionsTransport where
-  /-- "tcp" -/
-  | tcp
+structure ConnectOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ConnectOptionsTransport := ⟨fun
-  | .tcp => .string "tcp"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev ConnectOptionsTransport.tcp : ConnectOptionsTransport := .unsafeOfString "tcp"
+instance : ToJS ConnectOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ConnectOptionsTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ConnectOptionsTransport"
 
 /-- `enum UnixConnectOptionsTransport` (Deno 2.9.6 type declarations): "unix". -/
-inductive UnixConnectOptionsTransport where
-  /-- "unix" -/
-  | unix
+structure UnixConnectOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.unix`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS UnixConnectOptionsTransport := ⟨fun
-  | .unix => .string "unix"⟩
+/-- "unix" -/
+@[match_pattern] abbrev UnixConnectOptionsTransport.unix : UnixConnectOptionsTransport := .unsafeOfString "unix"
+instance : ToJS UnixConnectOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS UnixConnectOptionsTransport where
   fromJS
-    | .string "unix" => .ok .unix
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.UnixConnectOptionsTransport"
 
 /-- `enum VsockConnectOptionsTransport` (Deno 2.9.6 type declarations): "vsock". -/
-inductive VsockConnectOptionsTransport where
-  /-- "vsock" -/
-  | vsock
+structure VsockConnectOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.vsock`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS VsockConnectOptionsTransport := ⟨fun
-  | .vsock => .string "vsock"⟩
+/-- "vsock" -/
+@[match_pattern] abbrev VsockConnectOptionsTransport.vsock : VsockConnectOptionsTransport := .unsafeOfString "vsock"
+instance : ToJS VsockConnectOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS VsockConnectOptionsTransport where
   fromJS
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.VsockConnectOptionsTransport"
 
 /-- `enum ConnectTlsOptionsKeyFormat` (Deno 2.9.6 type declarations): "pem". -/
-inductive ConnectTlsOptionsKeyFormat where
-  /-- "pem" -/
-  | pem
+structure ConnectTlsOptionsKeyFormat where
+  /-- A value from its string, unchecked: the generated values (`.pem`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ConnectTlsOptionsKeyFormat := ⟨fun
-  | .pem => .string "pem"⟩
+/-- "pem" -/
+@[match_pattern] abbrev ConnectTlsOptionsKeyFormat.pem : ConnectTlsOptionsKeyFormat := .unsafeOfString "pem"
+instance : ToJS ConnectTlsOptionsKeyFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ConnectTlsOptionsKeyFormat where
   fromJS
-    | .string "pem" => .ok .pem
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ConnectTlsOptionsKeyFormat"
 
 /-- `enum ListenDatagramUdpOptionsTransport` (Deno 2.9.6 type declarations): "udp". -/
-inductive ListenDatagramUdpOptionsTransport where
-  /-- "udp" -/
-  | udp
+structure ListenDatagramUdpOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.udp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenDatagramUdpOptionsTransport := ⟨fun
-  | .udp => .string "udp"⟩
+/-- "udp" -/
+@[match_pattern] abbrev ListenDatagramUdpOptionsTransport.udp : ListenDatagramUdpOptionsTransport := .unsafeOfString "udp"
+instance : ToJS ListenDatagramUdpOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenDatagramUdpOptionsTransport where
   fromJS
-    | .string "udp" => .ok .udp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenDatagramUdpOptionsTransport"
 
 /-- `enum ListenDatagramUnixOptionsTransport` (Deno 2.9.6 type declarations): "unixpacket". -/
-inductive ListenDatagramUnixOptionsTransport where
-  /-- "unixpacket" -/
-  | unixpacket
+structure ListenDatagramUnixOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.unixpacket`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ListenDatagramUnixOptionsTransport := ⟨fun
-  | .unixpacket => .string "unixpacket"⟩
+/-- "unixpacket" -/
+@[match_pattern] abbrev ListenDatagramUnixOptionsTransport.unixpacket : ListenDatagramUnixOptionsTransport := .unsafeOfString "unixpacket"
+instance : ToJS ListenDatagramUnixOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ListenDatagramUnixOptionsTransport where
   fromJS
-    | .string "unixpacket" => .ok .unixpacket
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ListenDatagramUnixOptionsTransport"
 
 /-- `dictionary NetAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -591,15 +638,15 @@ structure QuicAcceptOptions where
   alpnProtocols : Option (Array String) := none
   /-- `boolean zeroRtt` -/
   zeroRtt : Option Bool := none
-instance : ToJS QuicAcceptOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
-    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
-    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
-    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
-    ("congestionControl", Support.optional d.congestionControl),
-    ("preferredAddressV4", Support.optional d.preferredAddressV4),
-    ("preferredAddressV6", Support.optional d.preferredAddressV6),
-    ("alpnProtocols", Support.optional d.alpnProtocols),
-    ("zeroRtt", Support.optional d.zeroRtt)]⟩
+instance : ToJS QuicAcceptOptions := ⟨fun d => Internal.fields #[("keepAliveInterval", Internal.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Internal.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Internal.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Internal.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Internal.optional d.congestionControl),
+    ("preferredAddressV4", Internal.optional d.preferredAddressV4),
+    ("preferredAddressV6", Internal.optional d.preferredAddressV6),
+    ("alpnProtocols", Internal.optional d.alpnProtocols),
+    ("zeroRtt", Internal.optional d.zeroRtt)]⟩
 
 /-- `dictionary QuicEndpointOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QuicEndpointOptions where
@@ -607,8 +654,8 @@ structure QuicEndpointOptions where
   hostname : Option String := none
   /-- `double /* integer: Nat */ port` -/
   port : Option Nat := none
-instance : ToJS QuicEndpointOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port)]⟩
+instance : ToJS QuicEndpointOptions := ⟨fun d => Internal.fields #[("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port)]⟩
 
 /-- `dictionary QuicListenOptions : QuicServerTransportOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QuicListenOptions where
@@ -632,13 +679,13 @@ structure QuicListenOptions where
   key : String
   /-- `required DOMString cert` -/
   cert : String
-instance : ToJS QuicListenOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
-    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
-    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
-    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
-    ("congestionControl", Support.optional d.congestionControl),
-    ("preferredAddressV4", Support.optional d.preferredAddressV4),
-    ("preferredAddressV6", Support.optional d.preferredAddressV6),
+instance : ToJS QuicListenOptions := ⟨fun d => Internal.fields #[("keepAliveInterval", Internal.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Internal.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Internal.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Internal.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Internal.optional d.congestionControl),
+    ("preferredAddressV4", Internal.optional d.preferredAddressV4),
+    ("preferredAddressV6", Internal.optional d.preferredAddressV6),
     ("alpnProtocols", toJS d.alpnProtocols),
     ("key", toJS d.key),
     ("cert", toJS d.cert)]⟩
@@ -649,7 +696,7 @@ structure QuicCloseInfo where
   closeCode : Float
   /-- `required DOMString reason` -/
   reason : String
-instance : ToJS QuicCloseInfo := ⟨fun d => Support.fields #[("closeCode", toJS d.closeCode),
+instance : ToJS QuicCloseInfo := ⟨fun d => Internal.fields #[("closeCode", toJS d.closeCode),
     ("reason", toJS d.reason)]⟩
 instance : FromJS QuicCloseInfo where
   fromJS d := do return {
@@ -663,8 +710,8 @@ structure QuicSendStreamOptions where
   sendOrder : Option Float := none
   /-- `boolean waitUntilAvailable` -/
   waitUntilAvailable : Option Bool := none
-instance : ToJS QuicSendStreamOptions := ⟨fun d => Support.fields #[("sendOrder", Support.optional d.sendOrder),
-    ("waitUntilAvailable", Support.optional d.waitUntilAvailable)]⟩
+instance : ToJS QuicSendStreamOptions := ⟨fun d => Internal.fields #[("sendOrder", Internal.optional d.sendOrder),
+    ("waitUntilAvailable", Internal.optional d.waitUntilAvailable)]⟩
 
 /-- `dictionary QuicBidirectionalStream` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QuicBidirectionalStream where
@@ -707,13 +754,13 @@ instance : ToJS MulticastV4MembershipSetLoopback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MulticastV4MembershipSetLoopback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV4MembershipSetLoopback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MulticastV4MembershipSetLoopback.ofFn (f : Bool → Async Unit) : IO MulticastV4MembershipSetLoopback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Bool args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MulticastV4MembershipSetLoopback.ofSyncFn (f : Bool → IO Unit) : IO MulticastV4MembershipSetLoopback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Bool args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -727,13 +774,13 @@ instance : ToJS MulticastV4MembershipSetTTL := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MulticastV4MembershipSetTTL := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV4MembershipSetTTL", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MulticastV4MembershipSetTTL.ofFn (f : Float → Async Unit) : IO MulticastV4MembershipSetTTL := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Float args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MulticastV4MembershipSetTTL.ofSyncFn (f : Float → IO Unit) : IO MulticastV4MembershipSetTTL := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Float args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -782,13 +829,13 @@ instance : ToJS MulticastV6MembershipSetLoopback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MulticastV6MembershipSetLoopback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.MulticastV6MembershipSetLoopback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MulticastV6MembershipSetLoopback.ofFn (f : Bool → Async Unit) : IO MulticastV6MembershipSetLoopback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Bool args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MulticastV6MembershipSetLoopback.ofSyncFn (f : Bool → IO Unit) : IO MulticastV6MembershipSetLoopback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Bool args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -817,11 +864,11 @@ structure Addr where
   path : Option String := none
   /-- `double cid` -/
   cid : Option Float := none
-instance : ToJS Addr := ⟨fun d => Support.fields #[("transport", toJS d.transport),
-    ("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("path", Support.optional d.path),
-    ("cid", Support.optional d.cid)]⟩
+instance : ToJS Addr := ⟨fun d => Internal.fields #[("transport", toJS d.transport),
+    ("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("path", Internal.optional d.path),
+    ("cid", Internal.optional d.cid)]⟩
 instance : FromJS Addr where
   fromJS d := do return {
     transport := ← Lasm.JS.readField AddrTransport d "transport",
@@ -864,8 +911,8 @@ structure ResolveDnsOptionsNameServer where
   ipAddr : String
   /-- `double /* integer: Nat */ port` -/
   port : Option Nat := none
-instance : ToJS ResolveDnsOptionsNameServer := ⟨fun d => Support.fields #[("ipAddr", toJS d.ipAddr),
-    ("port", Support.optional d.port)]⟩
+instance : ToJS ResolveDnsOptionsNameServer := ⟨fun d => Internal.fields #[("ipAddr", toJS d.ipAddr),
+    ("port", Internal.optional d.port)]⟩
 
 /-- `dictionary ResolveDnsOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResolveDnsOptions where
@@ -873,8 +920,8 @@ structure ResolveDnsOptions where
   nameServer : Option ResolveDnsOptionsNameServer := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ResolveDnsOptions := ⟨fun d => Support.fields #[("nameServer", Support.optional d.nameServer),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS ResolveDnsOptions := ⟨fun d => Internal.fields #[("nameServer", Internal.optional d.nameServer),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary CaaRecord` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaaRecord where
@@ -984,11 +1031,11 @@ structure ListenTcpOptions where
   reusePort : Option Bool := none
   /-- `ListenTcpOptionsTransport transport` -/
   transport : Option ListenTcpOptionsTransport := none
-instance : ToJS ListenTcpOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
-    ("hostname", Support.optional d.hostname),
-    ("tcpBacklog", Support.optional d.tcpBacklog),
-    ("reusePort", Support.optional d.reusePort),
-    ("transport", Support.optional d.transport)]⟩
+instance : ToJS ListenTcpOptions := ⟨fun d => Internal.fields #[("port", Internal.optional d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("tcpBacklog", Internal.optional d.tcpBacklog),
+    ("reusePort", Internal.optional d.reusePort),
+    ("transport", Internal.optional d.transport)]⟩
 
 /-- `dictionary ListenUnixOptions : UnixListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenUnixOptions where
@@ -996,7 +1043,7 @@ structure ListenUnixOptions where
   path : String
   /-- `required ListenUnixOptionsTransport transport` -/
   transport : ListenUnixOptionsTransport
-instance : ToJS ListenUnixOptions := ⟨fun d => Support.fields #[("path", toJS d.path),
+instance : ToJS ListenUnixOptions := ⟨fun d => Internal.fields #[("path", toJS d.path),
     ("transport", toJS d.transport)]⟩
 
 /-- `dictionary ListenVsockOptions : VsockListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1007,7 +1054,7 @@ structure ListenVsockOptions where
   port : Nat
   /-- `required ListenVsockOptionsTransport transport` -/
   transport : ListenVsockOptionsTransport
-instance : ToJS ListenVsockOptions := ⟨fun d => Support.fields #[("cid", toJS d.cid),
+instance : ToJS ListenVsockOptions := ⟨fun d => Internal.fields #[("cid", toJS d.cid),
     ("port", toJS d.port),
     ("transport", toJS d.transport)]⟩
 
@@ -1031,13 +1078,13 @@ structure ListenTlsCertifiedOptions where
   key : String
   /-- `required DOMString cert` -/
   cert : String
-instance : ToJS ListenTlsCertifiedOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
-    ("hostname", Support.optional d.hostname),
-    ("tcpBacklog", Support.optional d.tcpBacklog),
-    ("reusePort", Support.optional d.reusePort),
-    ("transport", Support.optional d.transport),
-    ("alpnProtocols", Support.optional d.alpnProtocols),
-    ("keyFormat", Support.optional d.keyFormat),
+instance : ToJS ListenTlsCertifiedOptions := ⟨fun d => Internal.fields #[("port", Internal.optional d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("tcpBacklog", Internal.optional d.tcpBacklog),
+    ("reusePort", Internal.optional d.reusePort),
+    ("transport", Internal.optional d.transport),
+    ("alpnProtocols", Internal.optional d.alpnProtocols),
+    ("keyFormat", Internal.optional d.keyFormat),
     ("key", toJS d.key),
     ("cert", toJS d.cert)]⟩
 
@@ -1055,12 +1102,12 @@ structure ConnectOptions where
   autoSelectFamily : Option Bool := none
   /-- `double autoSelectFamilyAttemptDelay` -/
   autoSelectFamilyAttemptDelay : Option Float := none
-instance : ToJS ConnectOptions := ⟨fun d => Support.fields #[("port", toJS d.port),
-    ("hostname", Support.optional d.hostname),
-    ("transport", Support.optional d.transport),
-    ("signal", Support.optional d.signal),
-    ("autoSelectFamily", Support.optional d.autoSelectFamily),
-    ("autoSelectFamilyAttemptDelay", Support.optional d.autoSelectFamilyAttemptDelay)]⟩
+instance : ToJS ConnectOptions := ⟨fun d => Internal.fields #[("port", toJS d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("transport", Internal.optional d.transport),
+    ("signal", Internal.optional d.signal),
+    ("autoSelectFamily", Internal.optional d.autoSelectFamily),
+    ("autoSelectFamilyAttemptDelay", Internal.optional d.autoSelectFamilyAttemptDelay)]⟩
 
 /-- `dictionary UnixConnectOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UnixConnectOptions where
@@ -1068,7 +1115,7 @@ structure UnixConnectOptions where
   transport : UnixConnectOptionsTransport
   /-- `required DOMString path` -/
   path : String
-instance : ToJS UnixConnectOptions := ⟨fun d => Support.fields #[("transport", toJS d.transport),
+instance : ToJS UnixConnectOptions := ⟨fun d => Internal.fields #[("transport", toJS d.transport),
     ("path", toJS d.path)]⟩
 
 /-- `dictionary VsockConnectOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1079,7 +1126,7 @@ structure VsockConnectOptions where
   cid : Float
   /-- `required double /* integer: Nat */ port` -/
   port : Nat
-instance : ToJS VsockConnectOptions := ⟨fun d => Support.fields #[("transport", toJS d.transport),
+instance : ToJS VsockConnectOptions := ⟨fun d => Internal.fields #[("transport", toJS d.transport),
     ("cid", toJS d.cid),
     ("port", toJS d.port)]⟩
 
@@ -1105,16 +1152,16 @@ structure ConnectTlsOptions where
   key : Option String := none
   /-- `DOMString cert` -/
   cert : Option String := none
-instance : ToJS ConnectTlsOptions := ⟨fun d => Support.fields #[("port", toJS d.port),
-    ("hostname", Support.optional d.hostname),
-    ("caCerts", Support.optional d.caCerts),
-    ("alpnProtocols", Support.optional d.alpnProtocols),
-    ("unsafelyDisableHostnameVerification", Support.optional d.unsafelyDisableHostnameVerification),
-    ("autoSelectFamily", Support.optional d.autoSelectFamily),
-    ("autoSelectFamilyAttemptDelay", Support.optional d.autoSelectFamilyAttemptDelay),
-    ("keyFormat", Support.optional d.keyFormat),
-    ("key", Support.optional d.key),
-    ("cert", Support.optional d.cert)]⟩
+instance : ToJS ConnectTlsOptions := ⟨fun d => Internal.fields #[("port", toJS d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("caCerts", Internal.optional d.caCerts),
+    ("alpnProtocols", Internal.optional d.alpnProtocols),
+    ("unsafelyDisableHostnameVerification", Internal.optional d.unsafelyDisableHostnameVerification),
+    ("autoSelectFamily", Internal.optional d.autoSelectFamily),
+    ("autoSelectFamilyAttemptDelay", Internal.optional d.autoSelectFamilyAttemptDelay),
+    ("keyFormat", Internal.optional d.keyFormat),
+    ("key", Internal.optional d.key),
+    ("cert", Internal.optional d.cert)]⟩
 
 /-- `dictionary StartTlsOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StartTlsOptions where
@@ -1126,10 +1173,10 @@ structure StartTlsOptions where
   alpnProtocols : Option (Array String) := none
   /-- `boolean unsafelyDisableHostnameVerification` -/
   unsafelyDisableHostnameVerification : Option Bool := none
-instance : ToJS StartTlsOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
-    ("caCerts", Support.optional d.caCerts),
-    ("alpnProtocols", Support.optional d.alpnProtocols),
-    ("unsafelyDisableHostnameVerification", Support.optional d.unsafelyDisableHostnameVerification)]⟩
+instance : ToJS StartTlsOptions := ⟨fun d => Internal.fields #[("hostname", Internal.optional d.hostname),
+    ("caCerts", Internal.optional d.caCerts),
+    ("alpnProtocols", Internal.optional d.alpnProtocols),
+    ("unsafelyDisableHostnameVerification", Internal.optional d.unsafelyDisableHostnameVerification)]⟩
 
 /-- `dictionary ConnectQuicOptions : QuicTransportOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectQuicOptions where
@@ -1157,18 +1204,18 @@ structure ConnectQuicOptions where
   endpoint : Option QuicEndpoint := none
   /-- `boolean zeroRtt` -/
   zeroRtt : Option Bool := none
-instance : ToJS ConnectQuicOptions := ⟨fun d => Support.fields #[("keepAliveInterval", Support.optional d.keepAliveInterval),
-    ("maxIdleTimeout", Support.optional d.maxIdleTimeout),
-    ("maxConcurrentBidirectionalStreams", Support.optional d.maxConcurrentBidirectionalStreams),
-    ("maxConcurrentUnidirectionalStreams", Support.optional d.maxConcurrentUnidirectionalStreams),
-    ("congestionControl", Support.optional d.congestionControl),
+instance : ToJS ConnectQuicOptions := ⟨fun d => Internal.fields #[("keepAliveInterval", Internal.optional d.keepAliveInterval),
+    ("maxIdleTimeout", Internal.optional d.maxIdleTimeout),
+    ("maxConcurrentBidirectionalStreams", Internal.optional d.maxConcurrentBidirectionalStreams),
+    ("maxConcurrentUnidirectionalStreams", Internal.optional d.maxConcurrentUnidirectionalStreams),
+    ("congestionControl", Internal.optional d.congestionControl),
     ("port", toJS d.port),
     ("hostname", toJS d.hostname),
-    ("serverName", Support.optional d.serverName),
+    ("serverName", Internal.optional d.serverName),
     ("alpnProtocols", toJS d.alpnProtocols),
-    ("caCerts", Support.optional d.caCerts),
-    ("endpoint", Support.optional d.endpoint),
-    ("zeroRtt", Support.optional d.zeroRtt)]⟩
+    ("caCerts", Internal.optional d.caCerts),
+    ("endpoint", Internal.optional d.endpoint),
+    ("zeroRtt", Internal.optional d.zeroRtt)]⟩
 
 /-- `dictionary ListenDatagramUdpOptions : UdpListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenDatagramUdpOptions where
@@ -1184,11 +1231,11 @@ structure ListenDatagramUdpOptions where
   loopback : Option Bool := none
   /-- `required ListenDatagramUdpOptionsTransport transport` -/
   transport : ListenDatagramUdpOptionsTransport
-instance : ToJS ListenDatagramUdpOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
-    ("hostname", Support.optional d.hostname),
-    ("tcpBacklog", Support.optional d.tcpBacklog),
-    ("reuseAddress", Support.optional d.reuseAddress),
-    ("loopback", Support.optional d.loopback),
+instance : ToJS ListenDatagramUdpOptions := ⟨fun d => Internal.fields #[("port", Internal.optional d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("tcpBacklog", Internal.optional d.tcpBacklog),
+    ("reuseAddress", Internal.optional d.reuseAddress),
+    ("loopback", Internal.optional d.loopback),
     ("transport", toJS d.transport)]⟩
 
 /-- `dictionary ListenDatagramUnixOptions : UnixListenDatagramOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -1197,68 +1244,71 @@ structure ListenDatagramUnixOptions where
   path : Option String := none
   /-- `required ListenDatagramUnixOptionsTransport transport` -/
   transport : ListenDatagramUnixOptionsTransport
-instance : ToJS ListenDatagramUnixOptions := ⟨fun d => Support.fields #[("path", Support.optional d.path),
+instance : ToJS ListenDatagramUnixOptions := ⟨fun d => Internal.fields #[("path", Internal.optional d.path),
     ("transport", toJS d.transport)]⟩
 
 /-- `readonly localAddr: A`: `readonly attribute NetAddr localAddr` -/
-def Conn.localAddr (self : Conn) : IO NetAddr := self.val.get "localAddr" NetAddr
+@[macro_inline] def Conn.localAddr (self : Conn) : IO NetAddr := Internal.api "Lasm.JS.Deno.Conn.localAddr" do
+  self.val.get "localAddr" NetAddr
 
 /-- `readonly remoteAddr: A`: `readonly attribute NetAddr remoteAddr` -/
-def Conn.remoteAddr (self : Conn) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+@[macro_inline] def Conn.remoteAddr (self : Conn) : IO NetAddr := Internal.api "Lasm.JS.Deno.Conn.remoteAddr" do
+  self.val.get "remoteAddr" NetAddr
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def Conn.readable (self : Conn) : IO ReadableStream := do
+@[macro_inline] def Conn.readable (self : Conn) : IO ReadableStream := Internal.api "Lasm.JS.Deno.Conn.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def Conn.writable (self : Conn) : IO WritableStream := do
+@[macro_inline] def Conn.writable (self : Conn) : IO WritableStream := Internal.api "Lasm.JS.Deno.Conn.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def Conn.close (self : Conn) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Conn.close (self : Conn) : IO Unit := Internal.api "Lasm.JS.Deno.Conn.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `closeWrite(): Promise<void>`: `Promise<undefined> closeWrite()` -/
-def Conn.closeWrite (self : Conn) : Async Unit :=
-  self.val.callMethodAwait "closeWrite" (Support.args #[]) Unit
+@[macro_inline] def Conn.closeWrite (self : Conn) : Async Unit := Internal.api "Lasm.JS.Deno.Conn.closeWrite" do
+  self.val.callMethodAwait "closeWrite" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def Conn.ref (self : Conn) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Conn.ref (self : Conn) : IO Unit := Internal.api "Lasm.JS.Deno.Conn.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def Conn.unref (self : Conn) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Conn.unref (self : Conn) : IO Unit := Internal.api "Lasm.JS.Deno.Conn.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `setNoDelay(noDelay?: boolean): void`: `undefined setNoDelay(optional boolean noDelay)` -/
-def TcpConn.setNoDelay (self : TcpConn) (noDelay : Option Bool := none) : IO Unit :=
-  self.val.callMethod "setNoDelay" (Support.args #[Support.optional noDelay]) Unit
+@[macro_inline] def TcpConn.setNoDelay (self : TcpConn) (noDelay : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Deno.TcpConn.setNoDelay" do
+  self.val.callMethod "setNoDelay" (Internal.args #[Internal.optional noDelay]) Unit
 
 /-- `setKeepAlive(keepAlive?: boolean): void`: `undefined setKeepAlive(optional boolean keepAlive)` -/
-def TcpConn.setKeepAlive (self : TcpConn) (keepAlive : Option Bool := none) : IO Unit :=
-  self.val.callMethod "setKeepAlive" (Support.args #[Support.optional keepAlive]) Unit
+@[macro_inline] def TcpConn.setKeepAlive (self : TcpConn) (keepAlive : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Deno.TcpConn.setKeepAlive" do
+  self.val.callMethod "setKeepAlive" (Internal.args #[Internal.optional keepAlive]) Unit
 
 /-- `readonly addr: A`: `readonly attribute NetAddr addr` -/
-def TcpListener.addr (self : TcpListener) : IO NetAddr := self.val.get "addr" NetAddr
+@[macro_inline] def TcpListener.addr (self : TcpListener) : IO NetAddr := Internal.api "Lasm.JS.Deno.TcpListener.addr" do
+  self.val.get "addr" NetAddr
 
 /-- `accept(): Promise<T>`: `Promise<TcpConn> accept()` -/
-def TcpListener.accept (self : TcpListener) : Async TcpConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+@[macro_inline] def TcpListener.accept (self : TcpListener) : Async TcpConn := Internal.api "Lasm.JS.Deno.TcpListener.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def TcpListener.close (self : TcpListener) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def TcpListener.close (self : TcpListener) : IO Unit := Internal.api "Lasm.JS.Deno.TcpListener.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def TcpListener.ref (self : TcpListener) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def TcpListener.ref (self : TcpListener) : IO Unit := Internal.api "Lasm.JS.Deno.TcpListener.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def TcpListener.unref (self : TcpListener) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def TcpListener.unref (self : TcpListener) : IO Unit := Internal.api "Lasm.JS.Deno.TcpListener.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<TcpConn>` (the object's `[Symbol.asyncIterator]()`). -/
 structure TcpListener.Iterator where
@@ -1289,56 +1339,59 @@ partial def TcpListener.values (self : TcpListener) : Async (Array TcpConn) := d
   loop #[]
 
 /-- `readonly localAddr: A`: `readonly attribute UnixAddr localAddr` -/
-def ConnUnixAddr.localAddr (self : ConnUnixAddr) : IO UnixAddr := self.val.get "localAddr" UnixAddr
+@[macro_inline] def ConnUnixAddr.localAddr (self : ConnUnixAddr) : IO UnixAddr := Internal.api "Lasm.JS.Deno.ConnUnixAddr.localAddr" do
+  self.val.get "localAddr" UnixAddr
 
 /-- `readonly remoteAddr: A`: `readonly attribute UnixAddr remoteAddr` -/
-def ConnUnixAddr.remoteAddr (self : ConnUnixAddr) : IO UnixAddr := self.val.get "remoteAddr" UnixAddr
+@[macro_inline] def ConnUnixAddr.remoteAddr (self : ConnUnixAddr) : IO UnixAddr := Internal.api "Lasm.JS.Deno.ConnUnixAddr.remoteAddr" do
+  self.val.get "remoteAddr" UnixAddr
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def ConnUnixAddr.readable (self : ConnUnixAddr) : IO ReadableStream := do
+@[macro_inline] def ConnUnixAddr.readable (self : ConnUnixAddr) : IO ReadableStream := Internal.api "Lasm.JS.Deno.ConnUnixAddr.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def ConnUnixAddr.writable (self : ConnUnixAddr) : IO WritableStream := do
+@[macro_inline] def ConnUnixAddr.writable (self : ConnUnixAddr) : IO WritableStream := Internal.api "Lasm.JS.Deno.ConnUnixAddr.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def ConnUnixAddr.close (self : ConnUnixAddr) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def ConnUnixAddr.close (self : ConnUnixAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnUnixAddr.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `closeWrite(): Promise<void>`: `Promise<undefined> closeWrite()` -/
-def ConnUnixAddr.closeWrite (self : ConnUnixAddr) : Async Unit :=
-  self.val.callMethodAwait "closeWrite" (Support.args #[]) Unit
+@[macro_inline] def ConnUnixAddr.closeWrite (self : ConnUnixAddr) : Async Unit := Internal.api "Lasm.JS.Deno.ConnUnixAddr.closeWrite" do
+  self.val.callMethodAwait "closeWrite" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def ConnUnixAddr.ref (self : ConnUnixAddr) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def ConnUnixAddr.ref (self : ConnUnixAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnUnixAddr.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def ConnUnixAddr.unref (self : ConnUnixAddr) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def ConnUnixAddr.unref (self : ConnUnixAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnUnixAddr.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `readonly addr: A`: `readonly attribute UnixAddr addr` -/
-def UnixListener.addr (self : UnixListener) : IO UnixAddr := self.val.get "addr" UnixAddr
+@[macro_inline] def UnixListener.addr (self : UnixListener) : IO UnixAddr := Internal.api "Lasm.JS.Deno.UnixListener.addr" do
+  self.val.get "addr" UnixAddr
 
 /-- `accept(): Promise<T>`: `Promise<UnixConn> accept()` -/
-def UnixListener.accept (self : UnixListener) : Async UnixConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+@[macro_inline] def UnixListener.accept (self : UnixListener) : Async UnixConn := Internal.api "Lasm.JS.Deno.UnixListener.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def UnixListener.close (self : UnixListener) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def UnixListener.close (self : UnixListener) : IO Unit := Internal.api "Lasm.JS.Deno.UnixListener.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def UnixListener.ref (self : UnixListener) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def UnixListener.ref (self : UnixListener) : IO Unit := Internal.api "Lasm.JS.Deno.UnixListener.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def UnixListener.unref (self : UnixListener) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def UnixListener.unref (self : UnixListener) : IO Unit := Internal.api "Lasm.JS.Deno.UnixListener.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<UnixConn>` (the object's `[Symbol.asyncIterator]()`). -/
 structure UnixListener.Iterator where
@@ -1369,56 +1422,59 @@ partial def UnixListener.values (self : UnixListener) : Async (Array UnixConn) :
   loop #[]
 
 /-- `readonly localAddr: A`: `readonly attribute VsockAddr localAddr` -/
-def ConnVsockAddr.localAddr (self : ConnVsockAddr) : IO VsockAddr := self.val.get "localAddr" VsockAddr
+@[macro_inline] def ConnVsockAddr.localAddr (self : ConnVsockAddr) : IO VsockAddr := Internal.api "Lasm.JS.Deno.ConnVsockAddr.localAddr" do
+  self.val.get "localAddr" VsockAddr
 
 /-- `readonly remoteAddr: A`: `readonly attribute VsockAddr remoteAddr` -/
-def ConnVsockAddr.remoteAddr (self : ConnVsockAddr) : IO VsockAddr := self.val.get "remoteAddr" VsockAddr
+@[macro_inline] def ConnVsockAddr.remoteAddr (self : ConnVsockAddr) : IO VsockAddr := Internal.api "Lasm.JS.Deno.ConnVsockAddr.remoteAddr" do
+  self.val.get "remoteAddr" VsockAddr
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def ConnVsockAddr.readable (self : ConnVsockAddr) : IO ReadableStream := do
+@[macro_inline] def ConnVsockAddr.readable (self : ConnVsockAddr) : IO ReadableStream := Internal.api "Lasm.JS.Deno.ConnVsockAddr.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def ConnVsockAddr.writable (self : ConnVsockAddr) : IO WritableStream := do
+@[macro_inline] def ConnVsockAddr.writable (self : ConnVsockAddr) : IO WritableStream := Internal.api "Lasm.JS.Deno.ConnVsockAddr.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def ConnVsockAddr.close (self : ConnVsockAddr) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def ConnVsockAddr.close (self : ConnVsockAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnVsockAddr.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `closeWrite(): Promise<void>`: `Promise<undefined> closeWrite()` -/
-def ConnVsockAddr.closeWrite (self : ConnVsockAddr) : Async Unit :=
-  self.val.callMethodAwait "closeWrite" (Support.args #[]) Unit
+@[macro_inline] def ConnVsockAddr.closeWrite (self : ConnVsockAddr) : Async Unit := Internal.api "Lasm.JS.Deno.ConnVsockAddr.closeWrite" do
+  self.val.callMethodAwait "closeWrite" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def ConnVsockAddr.ref (self : ConnVsockAddr) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def ConnVsockAddr.ref (self : ConnVsockAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnVsockAddr.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def ConnVsockAddr.unref (self : ConnVsockAddr) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def ConnVsockAddr.unref (self : ConnVsockAddr) : IO Unit := Internal.api "Lasm.JS.Deno.ConnVsockAddr.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `readonly addr: A`: `readonly attribute VsockAddr addr` -/
-def VsockListener.addr (self : VsockListener) : IO VsockAddr := self.val.get "addr" VsockAddr
+@[macro_inline] def VsockListener.addr (self : VsockListener) : IO VsockAddr := Internal.api "Lasm.JS.Deno.VsockListener.addr" do
+  self.val.get "addr" VsockAddr
 
 /-- `accept(): Promise<T>`: `Promise<VsockConn> accept()` -/
-def VsockListener.accept (self : VsockListener) : Async VsockConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+@[macro_inline] def VsockListener.accept (self : VsockListener) : Async VsockConn := Internal.api "Lasm.JS.Deno.VsockListener.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def VsockListener.close (self : VsockListener) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def VsockListener.close (self : VsockListener) : IO Unit := Internal.api "Lasm.JS.Deno.VsockListener.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def VsockListener.ref (self : VsockListener) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def VsockListener.ref (self : VsockListener) : IO Unit := Internal.api "Lasm.JS.Deno.VsockListener.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def VsockListener.unref (self : VsockListener) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def VsockListener.unref (self : VsockListener) : IO Unit := Internal.api "Lasm.JS.Deno.VsockListener.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<VsockConn>` (the object's `[Symbol.asyncIterator]()`). -/
 structure VsockListener.Iterator where
@@ -1449,28 +1505,29 @@ partial def VsockListener.values (self : VsockListener) : Async (Array VsockConn
   loop #[]
 
 /-- `handshake(): Promise<TlsHandshakeInfo>`: `Promise<TlsHandshakeInfo> handshake()` -/
-def TlsConn.handshake (self : TlsConn) : Async TlsHandshakeInfo :=
-  self.val.callMethodAwait "handshake" (Support.args #[]) TlsHandshakeInfo
+@[macro_inline] def TlsConn.handshake (self : TlsConn) : Async TlsHandshakeInfo := Internal.api "Lasm.JS.Deno.TlsConn.handshake" do
+  self.val.callMethodAwait "handshake" (Internal.args #[]) TlsHandshakeInfo
 
 /-- `readonly addr: A`: `readonly attribute NetAddr addr` -/
-def TlsListener.addr (self : TlsListener) : IO NetAddr := self.val.get "addr" NetAddr
+@[macro_inline] def TlsListener.addr (self : TlsListener) : IO NetAddr := Internal.api "Lasm.JS.Deno.TlsListener.addr" do
+  self.val.get "addr" NetAddr
 
 /-- `accept(): Promise<T>`: `Promise<TlsConn> accept()` -/
-def TlsListener.accept (self : TlsListener) : Async TlsConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+@[macro_inline] def TlsListener.accept (self : TlsListener) : Async TlsConn := Internal.api "Lasm.JS.Deno.TlsListener.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def TlsListener.close (self : TlsListener) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def TlsListener.close (self : TlsListener) : IO Unit := Internal.api "Lasm.JS.Deno.TlsListener.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def TlsListener.ref (self : TlsListener) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def TlsListener.ref (self : TlsListener) : IO Unit := Internal.api "Lasm.JS.Deno.TlsListener.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def TlsListener.unref (self : TlsListener) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def TlsListener.unref (self : TlsListener) : IO Unit := Internal.api "Lasm.JS.Deno.TlsListener.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<TlsConn>` (the object's `[Symbol.asyncIterator]()`). -/
 structure TlsListener.Iterator where
@@ -1501,54 +1558,60 @@ partial def TlsListener.values (self : TlsListener) : Async (Array TlsConn) := d
   loop #[]
 
 /-- `readonly id: bigint`: `readonly attribute bigint id` -/
-def QuicReceiveStream.id (self : QuicReceiveStream) : IO Int := self.val.get "id" Int
+@[macro_inline] def QuicReceiveStream.id (self : QuicReceiveStream) : IO Int := Internal.api "Lasm.JS.Deno.QuicReceiveStream.id" do
+  self.val.get "id" Int
 
 /-- `sendOrder: number`: `readonly attribute double sendOrder` -/
-def QuicSendStream.sendOrder (self : QuicSendStream) : IO Float := self.val.get "sendOrder" Float
+@[macro_inline] def QuicSendStream.sendOrder (self : QuicSendStream) : IO Float := Internal.api "Lasm.JS.Deno.QuicSendStream.sendOrder" do
+  self.val.get "sendOrder" Float
 
 /-- `readonly id: bigint`: `readonly attribute bigint id` -/
-def QuicSendStream.id (self : QuicSendStream) : IO Int := self.val.get "id" Int
+@[macro_inline] def QuicSendStream.id (self : QuicSendStream) : IO Int := Internal.api "Lasm.JS.Deno.QuicSendStream.id" do
+  self.val.get "id" Int
 
 /-- `readonly localIp: string`: `readonly attribute DOMString localIp` -/
-def QuicIncoming.localIp (self : QuicIncoming) : IO String := self.val.get "localIp" String
+@[macro_inline] def QuicIncoming.localIp (self : QuicIncoming) : IO String := Internal.api "Lasm.JS.Deno.QuicIncoming.localIp" do
+  self.val.get "localIp" String
 
 /-- `readonly remoteAddr: NetAddr`: `readonly attribute NetAddr remoteAddr` -/
-def QuicIncoming.remoteAddr (self : QuicIncoming) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+@[macro_inline] def QuicIncoming.remoteAddr (self : QuicIncoming) : IO NetAddr := Internal.api "Lasm.JS.Deno.QuicIncoming.remoteAddr" do
+  self.val.get "remoteAddr" NetAddr
 
 /-- `readonly remoteAddressValidated: boolean`: `readonly attribute boolean remoteAddressValidated` -/
-def QuicIncoming.remoteAddressValidated (self : QuicIncoming) : IO Bool := self.val.get "remoteAddressValidated" Bool
+@[macro_inline] def QuicIncoming.remoteAddressValidated (self : QuicIncoming) : IO Bool := Internal.api "Lasm.JS.Deno.QuicIncoming.remoteAddressValidated" do
+  self.val.get "remoteAddressValidated" Bool
 
 /-- `accept<ZRTT extends boolean>(options?: QuicAcceptOptions<ZRTT>): ZRTT extends true ? QuicConn : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)`: `Promise<QuicConn> accept(optional QuicAcceptOptions options)` -/
-def QuicIncoming.accept (self : QuicIncoming) (options : Option QuicAcceptOptions := none) : Async QuicConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[Support.optional options]) Value
+@[macro_inline] def QuicIncoming.accept (self : QuicIncoming) (options : Option QuicAcceptOptions := none) : Async QuicConn := Internal.api "Lasm.JS.Deno.QuicIncoming.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `refuse(): void`: `undefined refuse()` -/
-def QuicIncoming.refuse (self : QuicIncoming) : IO Unit :=
-  self.val.callMethod "refuse" (Support.args #[]) Unit
+@[macro_inline] def QuicIncoming.refuse (self : QuicIncoming) : IO Unit := Internal.api "Lasm.JS.Deno.QuicIncoming.refuse" do
+  self.val.callMethod "refuse" (Internal.args #[]) Unit
 
 /-- `ignore(): void`: `undefined ignore()` -/
-def QuicIncoming.ignore (self : QuicIncoming) : IO Unit :=
-  self.val.callMethod "ignore" (Support.args #[]) Unit
+@[macro_inline] def QuicIncoming.ignore (self : QuicIncoming) : IO Unit := Internal.api "Lasm.JS.Deno.QuicIncoming.ignore" do
+  self.val.callMethod "ignore" (Internal.args #[]) Unit
 
 /-- `readonly endpoint: QuicEndpoint`: `readonly attribute QuicEndpoint endpoint` -/
-def QuicListener.endpoint (self : QuicListener) : IO QuicEndpoint := do
+@[macro_inline] def QuicListener.endpoint (self : QuicListener) : IO QuicEndpoint := Internal.api "Lasm.JS.Deno.QuicListener.endpoint" do
   let r ← self.val.get "endpoint" Value
   pure { val := r }
 
 /-- `incoming(): Promise<QuicIncoming>`: `Promise<QuicIncoming> incoming()` -/
-def QuicListener.incoming (self : QuicListener) : Async QuicIncoming := do
-  let r ← self.val.callMethodAwait "incoming" (Support.args #[]) Value
+@[macro_inline] def QuicListener.incoming (self : QuicListener) : Async QuicIncoming := Internal.api "Lasm.JS.Deno.QuicListener.incoming" do
+  let r ← self.val.callMethodAwait "incoming" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `accept(): Promise<QuicConn>`: `Promise<QuicConn> accept()` -/
-def QuicListener.accept (self : QuicListener) : Async QuicConn := do
-  let r ← self.val.callMethodAwait "accept" (Support.args #[]) Value
+@[macro_inline] def QuicListener.accept (self : QuicListener) : Async QuicConn := Internal.api "Lasm.JS.Deno.QuicListener.accept" do
+  let r ← self.val.callMethodAwait "accept" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `stop(): void`: `undefined stop()` -/
-def QuicListener.stop (self : QuicListener) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def QuicListener.stop (self : QuicListener) : IO Unit := Internal.api "Lasm.JS.Deno.QuicListener.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<QuicIncoming>` (the object's `[Symbol.asyncIterator]()`). -/
 structure QuicListener.Iterator where
@@ -1579,102 +1642,108 @@ partial def QuicListener.values (self : QuicListener) : Async (Array QuicIncomin
   loop #[]
 
 /-- `constructor(options?: QuicEndpointOptions)`: `constructor(optional QuicEndpointOptions options)` -/
-def QuicEndpoint.new (options : Option QuicEndpointOptions := none) : IO QuicEndpoint :=
+@[macro_inline] def QuicEndpoint.new (options : Option QuicEndpointOptions := none) : IO QuicEndpoint := Internal.api "Lasm.JS.Deno.QuicEndpoint.new" do
   Lasm.JS.Binding.invoke QuicEndpoint { name := "Lasm.JS.Deno.QuicEndpoint.new", module := "globalThis", path := "Deno.QuicEndpoint", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readonly addr: NetAddr`: `readonly attribute NetAddr addr` -/
-def QuicEndpoint.addr (self : QuicEndpoint) : IO NetAddr := self.val.get "addr" NetAddr
+@[macro_inline] def QuicEndpoint.addr (self : QuicEndpoint) : IO NetAddr := Internal.api "Lasm.JS.Deno.QuicEndpoint.addr" do
+  self.val.get "addr" NetAddr
 
 /-- `listen(options: QuicListenOptions): QuicListener`: `QuicListener listen(QuicListenOptions options)` -/
-def QuicEndpoint.listen (self : QuicEndpoint) (options : QuicListenOptions) : IO QuicListener := do
-  let r ← self.val.callMethod "listen" (Support.args #[toJS options]) Value
+@[macro_inline] def QuicEndpoint.listen (self : QuicEndpoint) (options : QuicListenOptions) : IO QuicListener := Internal.api "Lasm.JS.Deno.QuicEndpoint.listen" do
+  let r ← self.val.callMethod "listen" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `close(info?: QuicCloseInfo): void`: `undefined close(optional QuicCloseInfo info)` -/
-def QuicEndpoint.close (self : QuicEndpoint) (info : Option QuicCloseInfo := none) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[Support.optional info]) Unit
+@[macro_inline] def QuicEndpoint.close (self : QuicEndpoint) (info : Option QuicCloseInfo := none) : IO Unit := Internal.api "Lasm.JS.Deno.QuicEndpoint.close" do
+  self.val.callMethod "close" (Internal.args #[Internal.optional info]) Unit
 
 /-- `readonly endpoint: QuicEndpoint`: `readonly attribute QuicEndpoint endpoint` -/
-def QuicConn.endpoint (self : QuicConn) : IO QuicEndpoint := do
+@[macro_inline] def QuicConn.endpoint (self : QuicConn) : IO QuicEndpoint := Internal.api "Lasm.JS.Deno.QuicConn.endpoint" do
   let r ← self.val.get "endpoint" Value
   pure { val := r }
 
 /-- `readonly handshake: Promise<void>`: `readonly attribute Promise<undefined> handshake` -/
-def QuicConn.handshake (self : QuicConn) : Async Unit := do
+@[macro_inline] def QuicConn.handshake (self : QuicConn) : Async Unit := Internal.api "Lasm.JS.Deno.QuicConn.handshake" do
   let p ← self.val.get "handshake" Value
   p.await Unit
 
 /-- `readonly remoteAddr: NetAddr`: `readonly attribute NetAddr remoteAddr` -/
-def QuicConn.remoteAddr (self : QuicConn) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+@[macro_inline] def QuicConn.remoteAddr (self : QuicConn) : IO NetAddr := Internal.api "Lasm.JS.Deno.QuicConn.remoteAddr" do
+  self.val.get "remoteAddr" NetAddr
 
 /-- `readonly protocol: string | undefined`: `readonly attribute DOMString? protocol` -/
-def QuicConn.protocol (self : QuicConn) : IO (Option String) := self.val.get "protocol" (Option String)
+@[macro_inline] def QuicConn.protocol (self : QuicConn) : IO (Option String) := Internal.api "Lasm.JS.Deno.QuicConn.protocol" do
+  self.val.get "protocol" (Option String)
 
 /-- `readonly serverName: string | undefined`: `readonly attribute DOMString? serverName` -/
-def QuicConn.serverName (self : QuicConn) : IO (Option String) := self.val.get "serverName" (Option String)
+@[macro_inline] def QuicConn.serverName (self : QuicConn) : IO (Option String) := Internal.api "Lasm.JS.Deno.QuicConn.serverName" do
+  self.val.get "serverName" (Option String)
 
 /-- `readonly closed: Promise<QuicCloseInfo>`: `readonly attribute Promise<QuicCloseInfo> closed` -/
-def QuicConn.closed (self : QuicConn) : Async QuicCloseInfo := do
+@[macro_inline] def QuicConn.closed (self : QuicConn) : Async QuicCloseInfo := Internal.api "Lasm.JS.Deno.QuicConn.closed" do
   let p ← self.val.get "closed" Value
   p.await QuicCloseInfo
 
 /-- `readonly incomingBidirectionalStreams: ReadableStream<QuicBidirectionalStream>`: `readonly attribute ReadableStream incomingBidirectionalStreams` -/
-def QuicConn.incomingBidirectionalStreams (self : QuicConn) : IO ReadableStream := do
+@[macro_inline] def QuicConn.incomingBidirectionalStreams (self : QuicConn) : IO ReadableStream := Internal.api "Lasm.JS.Deno.QuicConn.incomingBidirectionalStreams" do
   let r ← self.val.get "incomingBidirectionalStreams" Value
   pure { val := r }
 
 /-- `readonly incomingUnidirectionalStreams: ReadableStream<QuicReceiveStream>`: `readonly attribute ReadableStream incomingUnidirectionalStreams` -/
-def QuicConn.incomingUnidirectionalStreams (self : QuicConn) : IO ReadableStream := do
+@[macro_inline] def QuicConn.incomingUnidirectionalStreams (self : QuicConn) : IO ReadableStream := Internal.api "Lasm.JS.Deno.QuicConn.incomingUnidirectionalStreams" do
   let r ← self.val.get "incomingUnidirectionalStreams" Value
   pure { val := r }
 
 /-- `readonly maxDatagramSize: number`: `readonly attribute double maxDatagramSize` -/
-def QuicConn.maxDatagramSize (self : QuicConn) : IO Float := self.val.get "maxDatagramSize" Float
+@[macro_inline] def QuicConn.maxDatagramSize (self : QuicConn) : IO Float := Internal.api "Lasm.JS.Deno.QuicConn.maxDatagramSize" do
+  self.val.get "maxDatagramSize" Float
 
 /-- `close(info?: QuicCloseInfo): void`: `undefined close(optional QuicCloseInfo info)` -/
-def QuicConn.close (self : QuicConn) (info : Option QuicCloseInfo := none) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[Support.optional info]) Unit
+@[macro_inline] def QuicConn.close (self : QuicConn) (info : Option QuicCloseInfo := none) : IO Unit := Internal.api "Lasm.JS.Deno.QuicConn.close" do
+  self.val.callMethod "close" (Internal.args #[Internal.optional info]) Unit
 
 /-- `createBidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicBidirectionalStream>`: `Promise<QuicBidirectionalStream> createBidirectionalStream(optional QuicSendStreamOptions options)` -/
-def QuicConn.createBidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicBidirectionalStream :=
-  self.val.callMethodAwait "createBidirectionalStream" (Support.args #[Support.optional options]) QuicBidirectionalStream
+@[macro_inline] def QuicConn.createBidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicBidirectionalStream := Internal.api "Lasm.JS.Deno.QuicConn.createBidirectionalStream" do
+  self.val.callMethodAwait "createBidirectionalStream" (Internal.args #[Internal.optional options]) QuicBidirectionalStream
 
 /-- `createUnidirectionalStream(options?: QuicSendStreamOptions): Promise<QuicSendStream>`: `Promise<QuicSendStream> createUnidirectionalStream(optional QuicSendStreamOptions options)` -/
-def QuicConn.createUnidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicSendStream := do
-  let r ← self.val.callMethodAwait "createUnidirectionalStream" (Support.args #[Support.optional options]) Value
+@[macro_inline] def QuicConn.createUnidirectionalStream (self : QuicConn) (options : Option QuicSendStreamOptions := none) : Async QuicSendStream := Internal.api "Lasm.JS.Deno.QuicConn.createUnidirectionalStream" do
+  let r ← self.val.callMethodAwait "createUnidirectionalStream" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `sendDatagram(data: Uint8Array): Promise<void>`: `Promise<undefined> sendDatagram(Uint8Array data)` -/
-def QuicConn.sendDatagram (self : QuicConn) (data : ByteArray) : Async Unit :=
-  self.val.callMethodAwait "sendDatagram" (Support.args #[toJS data]) Unit
+@[macro_inline] def QuicConn.sendDatagram (self : QuicConn) (data : ByteArray) : Async Unit := Internal.api "Lasm.JS.Deno.QuicConn.sendDatagram" do
+  self.val.callMethodAwait "sendDatagram" (Internal.args #[toJS data]) Unit
 
 /-- `readDatagram(): Promise<Uint8Array<ArrayBuffer>>`: `Promise<Uint8Array> readDatagram()` -/
-def QuicConn.readDatagram (self : QuicConn) : Async ByteArray :=
-  self.val.callMethodAwait "readDatagram" (Support.args #[]) ByteArray
+@[macro_inline] def QuicConn.readDatagram (self : QuicConn) : Async ByteArray := Internal.api "Lasm.JS.Deno.QuicConn.readDatagram" do
+  self.val.callMethodAwait "readDatagram" (Internal.args #[]) ByteArray
 
 /-- `readonly addr: Addr`: `readonly attribute Addr addr` -/
-def DatagramConn.addr (self : DatagramConn) : IO Addr := self.val.get "addr" Addr
+@[macro_inline] def DatagramConn.addr (self : DatagramConn) : IO Addr := Internal.api "Lasm.JS.Deno.DatagramConn.addr" do
+  self.val.get "addr" Addr
 
 /-- `joinMulticastV4(address: string, networkInterface: string): Promise<MulticastV4Membership>`: `Promise<MulticastV4Membership> joinMulticastV4(DOMString address, DOMString networkInterface)` -/
-def DatagramConn.joinMulticastV4 (self : DatagramConn) (address : String) (networkInterface : String) : Async MulticastV4Membership :=
-  self.val.callMethodAwait "joinMulticastV4" (Support.args #[toJS address, toJS networkInterface]) MulticastV4Membership
+@[macro_inline] def DatagramConn.joinMulticastV4 (self : DatagramConn) (address : String) (networkInterface : String) : Async MulticastV4Membership := Internal.api "Lasm.JS.Deno.DatagramConn.joinMulticastV4" do
+  self.val.callMethodAwait "joinMulticastV4" (Internal.args #[toJS address, toJS networkInterface]) MulticastV4Membership
 
 /-- `joinMulticastV6(address: string, networkInterface: number): Promise<MulticastV6Membership>`: `Promise<MulticastV6Membership> joinMulticastV6(DOMString address, double networkInterface)` -/
-def DatagramConn.joinMulticastV6 (self : DatagramConn) (address : String) (networkInterface : Float) : Async MulticastV6Membership :=
-  self.val.callMethodAwait "joinMulticastV6" (Support.args #[toJS address, toJS networkInterface]) MulticastV6Membership
+@[macro_inline] def DatagramConn.joinMulticastV6 (self : DatagramConn) (address : String) (networkInterface : Float) : Async MulticastV6Membership := Internal.api "Lasm.JS.Deno.DatagramConn.joinMulticastV6" do
+  self.val.callMethodAwait "joinMulticastV6" (Internal.args #[toJS address, toJS networkInterface]) MulticastV6Membership
 
 /-- `receive(p?: Uint8Array): Promise<[Uint8Array<ArrayBuffer>, Addr]>`: `Promise<sequence<any>> receive(optional Uint8Array p)` -/
-def DatagramConn.receive (self : DatagramConn) (p : Option ByteArray := none) : Async (Array Data) :=
-  self.val.callMethodAwait "receive" (Support.args #[Support.optional p]) (Array Data)
+@[macro_inline] def DatagramConn.receive (self : DatagramConn) (p : Option ByteArray := none) : Async (Array Data) := Internal.api "Lasm.JS.Deno.DatagramConn.receive" do
+  self.val.callMethodAwait "receive" (Internal.args #[Internal.optional p]) (Array Data)
 
 /-- `send(p: Uint8Array, addr: Addr): Promise<number>`: `Promise<double> send(Uint8Array p, Addr addr)` -/
-def DatagramConn.send (self : DatagramConn) (p : ByteArray) (addr : Addr) : Async Float :=
-  self.val.callMethodAwait "send" (Support.args #[toJS p, toJS addr]) Float
+@[macro_inline] def DatagramConn.send (self : DatagramConn) (p : ByteArray) (addr : Addr) : Async Float := Internal.api "Lasm.JS.Deno.DatagramConn.send" do
+  self.val.callMethodAwait "send" (Internal.args #[toJS p, toJS addr]) Float
 
 /-- `close(): void`: `undefined close()` -/
-def DatagramConn.close (self : DatagramConn) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def DatagramConn.close (self : DatagramConn) : IO Unit := Internal.api "Lasm.JS.Deno.DatagramConn.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<sequence<any>>` (the object's `[Symbol.asyncIterator]()`). -/
 structure DatagramConn.Iterator where
@@ -1703,120 +1772,120 @@ partial def DatagramConn.values (self : DatagramConn) : Async (Array (Array Data
   loop #[]
 
 /-- `Deno.networkInterfaces(): NetworkInterfaceInfo[]`: `sequence<NetworkInterfaceInfo> networkInterfaces()` (Deno 2.9.6 type declarations) -/
-def networkInterfaces : IO (Array NetworkInterfaceInfo) :=
+@[macro_inline] def networkInterfaces : IO (Array NetworkInterfaceInfo) := Internal.api "Lasm.JS.Deno.networkInterfaces" do
   Lasm.JS.Binding.invoke (Array NetworkInterfaceInfo) { name := "Lasm.JS.Deno.networkInterfaces", module := "globalThis", path := "Deno.networkInterfaces", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.resolveDns(query: string, recordType: 'A' | 'AAAA' | 'ANAME' | 'CNAME' | 'NS' | 'PTR', options?: ResolveDnsOptions): Promise<string[]>`: `Promise<sequence<DOMString>> resolveDns(DOMString query, ResolveDnsRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDns (query : String) (recordType : ResolveDnsRecordType) (options : Option ResolveDnsOptions := none) : Async (Array String) :=
+@[macro_inline] def resolveDns (query : String) (recordType : ResolveDnsRecordType) (options : Option ResolveDnsOptions := none) : Async (Array String) := Internal.api "Lasm.JS.Deno.resolveDns" do
   Lasm.JS.Binding.invokeAsync (Array String) { name := "Lasm.JS.Deno.resolveDns", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'CAA', options?: ResolveDnsOptions): Promise<CaaRecord[]>`: `Promise<sequence<CaaRecord>> resolveDns(DOMString query, ResolveDnsCaaRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsCaa (query : String) (recordType : ResolveDnsCaaRecordType) (options : Option ResolveDnsOptions := none) : Async (Array CaaRecord) :=
+@[macro_inline] def resolveDnsCaa (query : String) (recordType : ResolveDnsCaaRecordType) (options : Option ResolveDnsOptions := none) : Async (Array CaaRecord) := Internal.api "Lasm.JS.Deno.resolveDnsCaa" do
   Lasm.JS.Binding.invokeAsync (Array CaaRecord) { name := "Lasm.JS.Deno.resolveDnsCaa", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'MX', options?: ResolveDnsOptions): Promise<MxRecord[]>`: `Promise<sequence<MxRecord>> resolveDns(DOMString query, ResolveDnsMxRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsMx (query : String) (recordType : ResolveDnsMxRecordType) (options : Option ResolveDnsOptions := none) : Async (Array MxRecord) :=
+@[macro_inline] def resolveDnsMx (query : String) (recordType : ResolveDnsMxRecordType) (options : Option ResolveDnsOptions := none) : Async (Array MxRecord) := Internal.api "Lasm.JS.Deno.resolveDnsMx" do
   Lasm.JS.Binding.invokeAsync (Array MxRecord) { name := "Lasm.JS.Deno.resolveDnsMx", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'NAPTR', options?: ResolveDnsOptions): Promise<NaptrRecord[]>`: `Promise<sequence<NaptrRecord>> resolveDns(DOMString query, ResolveDnsNaptrRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsNaptr (query : String) (recordType : ResolveDnsNaptrRecordType) (options : Option ResolveDnsOptions := none) : Async (Array NaptrRecord) :=
+@[macro_inline] def resolveDnsNaptr (query : String) (recordType : ResolveDnsNaptrRecordType) (options : Option ResolveDnsOptions := none) : Async (Array NaptrRecord) := Internal.api "Lasm.JS.Deno.resolveDnsNaptr" do
   Lasm.JS.Binding.invokeAsync (Array NaptrRecord) { name := "Lasm.JS.Deno.resolveDnsNaptr", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'SOA', options?: ResolveDnsOptions): Promise<SoaRecord[]>`: `Promise<sequence<SoaRecord>> resolveDns(DOMString query, ResolveDnsSoaRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsSoa (query : String) (recordType : ResolveDnsSoaRecordType) (options : Option ResolveDnsOptions := none) : Async (Array SoaRecord) :=
+@[macro_inline] def resolveDnsSoa (query : String) (recordType : ResolveDnsSoaRecordType) (options : Option ResolveDnsOptions := none) : Async (Array SoaRecord) := Internal.api "Lasm.JS.Deno.resolveDnsSoa" do
   Lasm.JS.Binding.invokeAsync (Array SoaRecord) { name := "Lasm.JS.Deno.resolveDnsSoa", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'SRV', options?: ResolveDnsOptions): Promise<SrvRecord[]>`: `Promise<sequence<SrvRecord>> resolveDns(DOMString query, ResolveDnsSrvRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsSrv (query : String) (recordType : ResolveDnsSrvRecordType) (options : Option ResolveDnsOptions := none) : Async (Array SrvRecord) :=
+@[macro_inline] def resolveDnsSrv (query : String) (recordType : ResolveDnsSrvRecordType) (options : Option ResolveDnsOptions := none) : Async (Array SrvRecord) := Internal.api "Lasm.JS.Deno.resolveDnsSrv" do
   Lasm.JS.Binding.invokeAsync (Array SrvRecord) { name := "Lasm.JS.Deno.resolveDnsSrv", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.resolveDns(query: string, recordType: 'TXT', options?: ResolveDnsOptions): Promise<string[][]>`: `Promise<sequence<sequence<DOMString>>> resolveDns(DOMString query, ResolveDnsTxtRecordType recordType, optional ResolveDnsOptions options)` (Deno 2.9.6 type declarations) -/
-def resolveDnsTxt (query : String) (recordType : ResolveDnsTxtRecordType) (options : Option ResolveDnsOptions := none) : Async (Array (Array String)) :=
+@[macro_inline] def resolveDnsTxt (query : String) (recordType : ResolveDnsTxtRecordType) (options : Option ResolveDnsOptions := none) : Async (Array (Array String)) := Internal.api "Lasm.JS.Deno.resolveDnsTxt" do
   Lasm.JS.Binding.invokeAsync (Array (Array String)) { name := "Lasm.JS.Deno.resolveDnsTxt", module := "globalThis", path := "Deno.resolveDns", construct := false, arity := 3 }
-    (Support.args #[toJS query, toJS recordType, Support.optional options])
+    (Internal.args #[toJS query, toJS recordType, Internal.optional options])
 
 /-- `Deno.listen(options: TcpListenOptions & { transport?: 'tcp' }): TcpListener`: `TcpListener listen(ListenTcpOptions options)` (Deno 2.9.6 type declarations) -/
-def listen (options : ListenTcpOptions) : IO TcpListener := do
+@[macro_inline] def listen (options : ListenTcpOptions) : IO TcpListener := Internal.api "Lasm.JS.Deno.listen" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listen", module := "globalThis", path := "Deno.listen", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Deno.listen(options: UnixListenOptions & { transport: 'unix' }): UnixListener`: `UnixListener listen(ListenUnixOptions options)` (Deno 2.9.6 type declarations) -/
-def listenUnix (options : ListenUnixOptions) : IO UnixListener := do
+@[macro_inline] def listenUnix (options : ListenUnixOptions) : IO UnixListener := Internal.api "Lasm.JS.Deno.listenUnix" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenUnix", module := "globalThis", path := "Deno.listen", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Deno.listen(options: VsockListenOptions & { transport: 'vsock' }): VsockListener`: `VsockListener listen(ListenVsockOptions options)` (Deno 2.9.6 type declarations) -/
-def listenWithVsockListenOptionsTransportVsock (options : ListenVsockOptions) : IO VsockListener := do
+@[macro_inline] def listenWithVsockListenOptionsTransportVsock (options : ListenVsockOptions) : IO VsockListener := Internal.api "Lasm.JS.Deno.listenWithVsockListenOptionsTransportVsock" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenWithVsockListenOptionsTransportVsock", module := "globalThis", path := "Deno.listen", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Deno.listenTls(options: ListenTlsOptions & TlsCertifiedKeyPem): TlsListener`: `TlsListener listenTls(ListenTlsCertifiedOptions options)` (Deno 2.9.6 type declarations) -/
-def listenTls (options : ListenTlsCertifiedOptions) : IO TlsListener := do
+@[macro_inline] def listenTls (options : ListenTlsCertifiedOptions) : IO TlsListener := Internal.api "Lasm.JS.Deno.listenTls" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenTls", module := "globalThis", path := "Deno.listenTls", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Deno.connect(options: ConnectOptions): Promise<TcpConn>`: `Promise<TcpConn> connect(ConnectOptions options)` (Deno 2.9.6 type declarations) -/
-def connect (options : ConnectOptions) : Async TcpConn := do
+@[macro_inline] def connect (options : ConnectOptions) : Async TcpConn := Internal.api "Lasm.JS.Deno.connect" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connect", module := "globalThis", path := "Deno.connect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Deno.connect(options: UnixConnectOptions): Promise<UnixConn>`: `Promise<UnixConn> connect(UnixConnectOptions options)` (Deno 2.9.6 type declarations) -/
-def connectUnix (options : UnixConnectOptions) : Async UnixConn := do
+@[macro_inline] def connectUnix (options : UnixConnectOptions) : Async UnixConn := Internal.api "Lasm.JS.Deno.connectUnix" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectUnix", module := "globalThis", path := "Deno.connect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Deno.connect(options: VsockConnectOptions): Promise<VsockConn>`: `Promise<VsockConn> connect(VsockConnectOptions options)` (Deno 2.9.6 type declarations) -/
-def connectWithVsockConnectOptions (options : VsockConnectOptions) : Async VsockConn := do
+@[macro_inline] def connectWithVsockConnectOptions (options : VsockConnectOptions) : Async VsockConn := Internal.api "Lasm.JS.Deno.connectWithVsockConnectOptions" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectWithVsockConnectOptions", module := "globalThis", path := "Deno.connect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Deno.connectTls(options: ConnectTlsOptions | (ConnectTlsOptions & TlsCertifiedKeyPem)): Promise<TlsConn>`: `Promise<TlsConn> connectTls(ConnectTlsOptions options)` (Deno 2.9.6 type declarations) -/
-def connectTls (options : ConnectTlsOptions) : Async TlsConn := do
+@[macro_inline] def connectTls (options : ConnectTlsOptions) : Async TlsConn := Internal.api "Lasm.JS.Deno.connectTls" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectTls", module := "globalThis", path := "Deno.connectTls", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Deno.startTls(conn: TcpConn, options?: StartTlsOptions): Promise<TlsConn>`: `Promise<TlsConn> startTls(TcpConn conn, optional StartTlsOptions options)` (Deno 2.9.6 type declarations) -/
-def startTls (conn : TcpConn) (options : Option StartTlsOptions := none) : Async TlsConn := do
+@[macro_inline] def startTls (conn : TcpConn) (options : Option StartTlsOptions := none) : Async TlsConn := Internal.api "Lasm.JS.Deno.startTls" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.startTls", module := "globalThis", path := "Deno.startTls", construct := false, arity := 2 }
-    (Support.args #[toJS conn, Support.optional options])
+    (Internal.args #[toJS conn, Internal.optional options])
   pure { val := r }
 
 /-- `Deno.connectQuic<ZRTT extends boolean>(options: ConnectQuicOptions<ZRTT>): ZRTT extends true ? (QuicConn | Promise<QuicConn>) : Promise<QuicConn> (read as Promise<QuicConn>: conditional on zero-RTT (a QuicConn at once, or its promise): awaited either way)`: `Promise<QuicConn> connectQuic(ConnectQuicOptions options)` (Deno 2.9.6 type declarations) -/
-def connectQuic (options : ConnectQuicOptions) : Async QuicConn := do
+@[macro_inline] def connectQuic (options : ConnectQuicOptions) : Async QuicConn := Internal.api "Lasm.JS.Deno.connectQuic" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.connectQuic", module := "globalThis", path := "Deno.connectQuic", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Deno.upgradeWebTransport(conn: QuicConn): Promise<WebTransport & { url: string }> (read as Promise<unknown>: a web WebTransport with its url, which Lasm.JS.Web does not generate: the object as Data)`: `Promise<any> upgradeWebTransport(QuicConn conn)` (Deno 2.9.6 type declarations) -/
-def upgradeWebTransport (conn : QuicConn) : Async Data :=
+@[macro_inline] def upgradeWebTransport (conn : QuicConn) : Async Data := Internal.api "Lasm.JS.Deno.upgradeWebTransport" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Deno.upgradeWebTransport", module := "globalThis", path := "Deno.upgradeWebTransport", construct := false, arity := 1 }
-    (Support.args #[toJS conn])
+    (Internal.args #[toJS conn])
 
 /-- `Deno.listenDatagram(options: UdpListenOptions & { transport: 'udp' }): DatagramConn`: `DatagramConn listenDatagram(ListenDatagramUdpOptions options)` (Deno 2.9.6 type declarations) -/
-def listenDatagram (options : ListenDatagramUdpOptions) : IO DatagramConn := do
+@[macro_inline] def listenDatagram (options : ListenDatagramUdpOptions) : IO DatagramConn := Internal.api "Lasm.JS.Deno.listenDatagram" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagram", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn`: `DatagramConn listenDatagram(ListenDatagramUnixOptions options)` (Deno 2.9.6 type declarations) -/
-def listenDatagramUnix (options : ListenDatagramUnixOptions) : IO DatagramConn := do
+@[macro_inline] def listenDatagramUnix (options : ListenDatagramUnixOptions) : IO DatagramConn := Internal.api "Lasm.JS.Deno.listenDatagramUnix" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagramUnix", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Deno

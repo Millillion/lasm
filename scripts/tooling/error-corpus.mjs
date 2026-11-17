@@ -29,6 +29,9 @@ async function occupyPort() {
 const main = 'def main : IO Unit := IO.println "hello"\n';
 const lakefile = 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n';
 const project = (files = {}) => ({ 'Main.lean': main, 'lakefile.toml': lakefile, 'lean-toolchain': 'leanprover/lean4:v4.35.0\n', ...files });
+/** A Lean program binding `name` from the project file `path`; `withMain`: with a `main`. */
+const jsMain = (path, name = 'f', withMain = true) => `import Lasm.JS\n@[js "${path}" "${name}"] opaque ${name} : IO Nat\n`
+  + (withMain ? `def main : IO Unit := do IO.println (← ${name})\n` : '');
 const posixUser = process.platform !== 'win32' && process.getuid?.() !== 0;
 
 /** kind: parse (no toolchain), build (a failing build), network (a failing download). */
@@ -113,7 +116,7 @@ export const cases = [
   { id: 'suspend-twice', kind: 'parse', args: ['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi', '--suspend', 'none'], files: { 'Main.lean': main }, expect: /Specify --suspend only once/ },
   { id: 'output-for-vercel-edge', kind: 'parse', args: ['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'x'], files: { 'Main.lean': main }, expect: /--output does not apply to --target vercel-edge: the platform fixes its layout/ },
   // Binding configurations (.json), which the CLI no longer builds: not a source (0.7-15).
-  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /lasm\.json/ },
+  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /Expected a Lean source file \(Main\.lean\), not lasm\.json/, fixedIn: '0.9.0' },
   // Lasm's environment settings.
   { id: 'download-idle-too-small', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'https', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), LASM_DOWNLOAD_IDLE_MS: '5' }), expect: /LASM_DOWNLOAD_IDLE_MS must be an integer from 1000 to 1800000/ },
@@ -158,6 +161,23 @@ export const cases = [
   { id: 'edge-output-not-a-build', kind: 'build', args: ['build', 'Main.lean', '--target', 'workers'], files: { 'Main.lean': main, 'workers/notes.txt': 'mine\n' }, expect: /workers/ },
   { id: 'edge-modules-not-a-list', kind: 'build', args: ['build', 'Main.lean', '--target', 'workers'], files: { 'Main.lean': main, 'package.json': '{"private":true,"lasm":{"edge":{"modules":"hono"}}}\n' },
     expect: /package\.json "lasm\.edge\.modules" must be an array of module names/ },
+  // The project's own JavaScript files (@[js "./ffi/x.mjs" …], src/project-modules.mjs).
+  { id: 'project-file-missing', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.0',
+    files: { 'Main.lean': jsMain('./ffi/missing.mjs') }, expect: /Lasm\.JS binding f \(@\[js "\.\/ffi\/missing\.mjs" …\] in .*Main\.lean\): .*missing\.mjs does not exist/ },
+  { id: 'project-file-not-mjs', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.0',
+    files: { 'Main.lean': jsMain('./ffi/plain.js'), 'ffi/plain.js': 'export const f = () => 1;\n' }, expect: /plain\.js must be an ES module file ending in \.mjs/ },
+  { id: 'project-file-outside-root', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.0',
+    files: { 'Main.lean': jsMain('../outside.mjs') }, expect: /outside\.mjs is outside the Lean source root; keep project JavaScript files beside or below the Lean files/ },
+  { id: 'project-file-two-files', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.0',
+    // Two source roots (the library's srcDir a/ and the project's), one specifier ./x.mjs for two files.
+    files: { 'Main.lean': 'import Foo\n' + jsMain('./x.mjs', 'g'), 'x.mjs': 'export const g = () => 1;\n', 'a/Foo.lean': jsMain('./x.mjs', 'f', false),
+      'a/x.mjs': 'export const f = () => 2;\n', 'lean-toolchain': 'leanprover/lean4:v4.35.0\n',
+      'lakefile.toml': 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_lib]]\nname = "Foo"\nsrcDir = "a"\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n' },
+    expect: /\.\/x\.mjs names two files, .*x\.mjs and .*x\.mjs/ },
+  { id: 'project-file-unrecognised-form', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.0',
+    // `@[js"./…"` (no space) is a binding Lean accepts but the build's source scan does not see.
+    files: { 'Main.lean': jsMain('./ffi/x.mjs').replace('@[js "', '@[js"'), 'ffi/x.mjs': 'export const f = () => 1;\n' },
+    expect: /A Lasm\.JS binding names a project JavaScript file in a form the build did not find; write it as @\[js "\.\/path\/file\.mjs" "export"\]/ },
   { id: 'generated-file-edited', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
     afterPrepare: dir => writeFileSync(join(dir, 'dist/main.mjs'), readFileSync(join(dir, 'dist/main.mjs'), 'utf8') + '// my edit\n'),
     expect: /Generated application file was modified: .*main\.mjs\. Preserve the edit or choose a different output directory/ },

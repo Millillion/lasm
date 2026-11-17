@@ -99,6 +99,9 @@ test('workers: an object handler\'s scheduled and queue methods receive cron tri
   assert.equal(await worker.queue({ queue: 'jobs', messages: [] }, { n: 3 }, { c: 4 }), 'done');
   assert.deepEqual(seen, [['scheduled', '*/5 * * * *', 1, 2], ['queue', 'jobs', 3, 4]]);
   assert.equal(await (await worker.fetch(new Request('http://x/'), {}, {})).text(), 'fetch');
+  // Every other handler of ExportedHandler is forwarded too, and fails, saying why, where the object has none.
+  for (const name of ['email', 'tail', 'trace', 'tailStream', 'connect', 'test'])
+    await assert.rejects(worker[name]({}, {}, {}), { message: `The handler of the Lean program (Lasm.JS.exportDefault) has no ${name} method` });
 });
 
 test('workers: an object handler\'s fetch, a stopped instance replaced, and a program without a handler', async () => {

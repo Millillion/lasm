@@ -20,4 +20,3 @@
   `stream.Duplex` is new (`toWeb`, `fromWeb`).
 - Instances of generated `Lasm.JS.Node` types now have explicit names
   (`instFromJSFsStats`); nothing refers to the automatic ones.
-

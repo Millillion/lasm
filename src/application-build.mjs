@@ -12,7 +12,8 @@ import { withCacheLease } from './cache-lifecycle.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject, assertDefinesMain } from './application-sources.mjs';
 import { glueHeaders, importsLibrary, librarySources, libraryModules } from './lasm-library.mjs';
-import { ensureProgramLibrary } from './lazy-library.mjs';
+import { ensureProgramLibrary, libraryRoot } from './lazy-library.mjs';
+import { ensureLakeLibrary } from './lake-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
 import { copyProjectModules, programNamesProjectFiles, projectCheckPlan, projectModules, withAbsoluteFiles } from './project-modules.mjs';
@@ -67,7 +68,7 @@ export async function buildApplication(file, options = {}) {
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
   cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports,
-  bindingTarget } = {}) {
+  bindingTarget, webTarget } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -99,7 +100,12 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   await mkdir(work, { recursive: true });
   progress?.({ stage: project ? 'Checking Lean sources and Lake dependencies' : 'Checking Lean sources and imports' });
   // Lasm's library modules compiled on first import (src/lazy-library.mjs): those this program's files import.
-  const ensureLibrary = prefix => ensureProgramLibrary(prefix, directory, { eager: libraryModules, log, progress, lock: withApplicationLock });
+  // A Lake project gets Lasm's library as a Lake package (src/lake-library.mjs, its `.lake/lasm-library`
+  // link made or repaired here); when its lakefile requires it, Lake builds those modules instead.
+  const ensureLibrary = async prefix => {
+    const lake = project ? ensureLakeLibrary(project, prefix, { eager: libraryModules, cache }) : undefined;
+    if (!lake?.required) await ensureProgramLibrary(prefix, directory, { eager: libraryModules, log, progress, lock: withApplicationLock });
+  };
   await ensureLibrary(lean.prefix);
   let generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, afterImports });
   if (generated.needsCCompiler) {
@@ -116,14 +122,22 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   // Licence files of the Lake dependencies whose code is compiled in (dist/licenses/).
   const dependencyLicenses = project ? lakeDependencyLicenses(project,
     [...generated.inputs.map(input => input.source), ...nativeCompilations.map(item => item.source)],
-    { exclude: [lean.prefix, lean.executionPrefix] }) : [];
+    { exclude: [lean.prefix, lean.executionPrefix, libraryRoot] }) : [];
   // Programs that import Lasm's library (Lasm.JS, Lasm.UI) link the generated
   // C of the modules they use, and the Lasm.JS C glue.
   const usesJs = importsLibrary(generated.sources);
   const programSources = generated.inputs.map(input => input.source);
   let library;
   if (usesJs) {
-    library = librarySources(lean, generated.sources);
+    // Library modules Lake built (a project requiring Lasm's Lake package) are linked from Lake's C, once.
+    library = librarySources(lean, generated.sources, { supplied: generated.inputs.map(input => input.module.replace(/^\+/, '')) });
+    // --target's web APIs (src/web-availability.mjs): the program's C and the library modules outside
+    // Lasm.JS.Web name the Lasm.JS.Web functions they call; the target must provide each.
+    if (webTarget !== undefined) {
+      const texts = [...generated.sources, ...library.sources.filter((_, i) => !library.inputs[i].module.startsWith('+Lasm.JS.Web'))]
+        .map(file => readFileSync(file, 'latin1'));
+      (await import('./web-availability.mjs')).assertWebAvailable(texts, webTarget);
+    }
     generated = { ...generated, sources: [...generated.sources, ...library.sources], inputs: [...generated.inputs, ...library.inputs] };
   }
   // npm packages for Lasm.JS: package.json next to the lakefile (or the source).
