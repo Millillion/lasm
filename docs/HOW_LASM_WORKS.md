@@ -111,7 +111,9 @@ path = ".lake/lasm-library"
 ```
 
 `.lake/lasm-library` is a link (a junction on Windows) that every lasm command
-(`init`, `build`, `dev`, `editor`) makes or repairs. It points to one package
+(`init`, `build`, `dev`, `editor`) makes or repairs, with the package's entry in
+`lake-manifest.json` (as `lake update` writes it: Lake needs a manifest entry for
+every require, and the editor's `lake setup-file` does not update the manifest). It points to one package
 per Lean prefix in Lasm's cache ([src/lake-library.mjs](../src/lake-library.mjs)):
 a lakefile whose one library has as roots the modules compiled on first import,
 from the installed library's sources. Lake then builds those modules on demand,
