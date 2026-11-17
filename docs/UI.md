@@ -309,8 +309,8 @@ An `update` returns what it wants done besides changing the model as a
 `Cmd Msg`. The app loop's own effects are data; everything else the browser
 does is one generic command, `Cmd.task`, which runs any `Async` action and
 delivers the message it returns. The action uses the browser's own APIs
-through the generated bindings (`import Lasm.JS.Web.Browser`: `fetch`,
-`localStorage`, `document`, `crypto`, `history`, …), holding no thread while
+through the generated bindings (`Lasm.JS.Web`: `import Lasm.JS.Web.Fetch` for `fetch`,
+`Lasm.JS.Web.Html` for `localStorage`, `document` and `history`, …), holding no thread while
 it waits.
 
 | Command | Effect |
@@ -324,7 +324,9 @@ it waits.
 
 ```lean
 import Lasm.UI
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 open Lasm.UI
 
 inductive Msg where
@@ -468,7 +470,7 @@ await app.send('refresh');                                              // App.r
 ```
 
 Values cross as `Lasm.JS.Data` (plain JSON-like data). For anything else,
-`Cmd.task` and the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)) give typed access to the web platform from Lean.
+`Cmd.task` and the generated `Lasm.JS.Web` ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) give typed access to the web platform from Lean.
 
 ## Server-side rendering and hydration
 

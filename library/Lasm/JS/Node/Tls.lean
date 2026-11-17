@@ -8,7 +8,7 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Net
@@ -16,6 +16,9 @@ import Lasm.JS.Node.Crypto
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class tls.Server extends net.Server` of `node:tls` (Node.js 24.22.2 documentation, tls.md): a handle to the JavaScript object. -/
 structure tls.Server extends net.Server
@@ -40,10 +43,10 @@ instance instToJSTlsServerConnectionListener : ToJS tls.Server.ConnectionListene
 instance instFromJSTlsServerConnectionListener : FromJS tls.Server.ConnectionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.tls.Server.ConnectionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def tls.Server.ConnectionListener.ofFn (f : stream.Duplex → Async Unit) : IO tls.Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def tls.Server.ConnectionListener.ofSyncFn (f : stream.Duplex → IO Unit) : IO tls.Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 
 /-- `callback tls.Server.KeylogListener = undefined (Uint8Array line, tls.TLSSocket tlsSocket)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure tls.Server.KeylogListener where
@@ -54,10 +57,10 @@ instance instToJSTlsServerKeylogListener : ToJS tls.Server.KeylogListener := ⟨
 instance instFromJSTlsServerKeylogListener : FromJS tls.Server.KeylogListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.tls.Server.KeylogListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def tls.Server.KeylogListener.ofFn (f : ByteArray → tls.TLSSocket → Async Unit) : IO tls.Server.KeylogListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ByteArray args 0) (← Support.arg tls.TLSSocket args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0) (← Internal.arg tls.TLSSocket args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def tls.Server.KeylogListener.ofSyncFn (f : ByteArray → tls.TLSSocket → IO Unit) : IO tls.Server.KeylogListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ByteArray args 0) (← Support.arg tls.TLSSocket args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0) (← Internal.arg tls.TLSSocket args 1)) }
 
 /-- `callback tls.Server.NewSessionListener = undefined (any... args)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure tls.Server.NewSessionListener where
@@ -138,10 +141,10 @@ instance instToJSTlsTLSSocketKeylogListener : ToJS tls.TLSSocket.KeylogListener 
 instance instFromJSTlsTLSSocketKeylogListener : FromJS tls.TLSSocket.KeylogListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.tls.TLSSocket.KeylogListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def tls.TLSSocket.KeylogListener.ofFn (f : ByteArray → Async Unit) : IO tls.TLSSocket.KeylogListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def tls.TLSSocket.KeylogListener.ofSyncFn (f : ByteArray → IO Unit) : IO tls.TLSSocket.KeylogListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 
 /-- `callback tls.TLSSocket.OCSPResponseListener = undefined (any... args)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure tls.TLSSocket.OCSPResponseListener where
@@ -194,10 +197,10 @@ instance instToJSTlsTLSSocketSessionListener : ToJS tls.TLSSocket.SessionListene
 instance instFromJSTlsTLSSocketSessionListener : FromJS tls.TLSSocket.SessionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.tls.TLSSocket.SessionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def tls.TLSSocket.SessionListener.ofFn (f : ByteArray → Async Unit) : IO tls.TLSSocket.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def tls.TLSSocket.SessionListener.ofSyncFn (f : ByteArray → IO Unit) : IO tls.TLSSocket.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 
 /-- `dictionary tls.TLSSocket.RenegotiateOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure tls.TLSSocket.RenegotiateOptions where
@@ -205,7 +208,7 @@ structure tls.TLSSocket.RenegotiateOptions where
   rejectUnauthorized : Option Bool := none
   /-- `any requestCert` -/
   requestCert : Data := .undefined
-instance instToJSTlsTLSSocketRenegotiateOptions : ToJS tls.TLSSocket.RenegotiateOptions := ⟨fun d => Support.fields #[("rejectUnauthorized", Support.optional d.rejectUnauthorized),
+instance instToJSTlsTLSSocketRenegotiateOptions : ToJS tls.TLSSocket.RenegotiateOptions := ⟨fun d => Internal.fields #[("rejectUnauthorized", Internal.optional d.rejectUnauthorized),
     ("requestCert", d.requestCert)]⟩
 
 /-- `(DOMString or boolean)`: one constructor per member type. -/
@@ -269,21 +272,21 @@ structure tls.ConnectOptions where
   secureContext : Data := .undefined
   /-- `object onread` -/
   onread : Data := .undefined
-instance instToJSTlsConnectOptions : ToJS tls.ConnectOptions := ⟨fun d => Support.fields #[("enableTrace", d.enableTrace),
-    ("host", Support.optional d.host),
-    ("port", Support.optional d.port),
-    ("path", Support.optional d.path),
-    ("socket", Support.optional d.socket),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen),
-    ("rejectUnauthorized", Support.optional d.rejectUnauthorized),
-    ("pskCallback", Support.optional d.pskCallback),
-    ("ALPNProtocols", Support.optional d.ALPNProtocols),
-    ("servername", Support.optional d.servername),
-    ("session", Support.optional d.session),
-    ("requestOCSP", Support.optional d.requestOCSP),
-    ("minDHSize", Support.optional d.minDHSize),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("timeout", Support.optional d.timeout),
+instance instToJSTlsConnectOptions : ToJS tls.ConnectOptions := ⟨fun d => Internal.fields #[("enableTrace", d.enableTrace),
+    ("host", Internal.optional d.host),
+    ("port", Internal.optional d.port),
+    ("path", Internal.optional d.path),
+    ("socket", Internal.optional d.socket),
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen),
+    ("rejectUnauthorized", Internal.optional d.rejectUnauthorized),
+    ("pskCallback", Internal.optional d.pskCallback),
+    ("ALPNProtocols", Internal.optional d.ALPNProtocols),
+    ("servername", Internal.optional d.servername),
+    ("session", Internal.optional d.session),
+    ("requestOCSP", Internal.optional d.requestOCSP),
+    ("minDHSize", Internal.optional d.minDHSize),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("timeout", Internal.optional d.timeout),
     ("secureContext", d.secureContext),
     ("onread", d.onread)]⟩
 
@@ -379,29 +382,29 @@ structure tls.CreateSecureContextOptions where
   ticketKeys : Option ByteArray := none
   /-- `double sessionTimeout = 300` -/
   sessionTimeout : Option Float := none
-instance instToJSTlsCreateSecureContextOptions : ToJS tls.CreateSecureContextOptions := ⟨fun d => Support.fields #[("allowPartialTrustChain", Support.optional d.allowPartialTrustChain),
-    ("ca", Support.optional d.ca),
-    ("cert", Support.optional d.cert),
-    ("certificateCompression", Support.optional d.certificateCompression),
-    ("sigalgs", Support.optional d.sigalgs),
-    ("ciphers", Support.optional d.ciphers),
-    ("clientCertEngine", Support.optional d.clientCertEngine),
-    ("crl", Support.optional d.crl),
-    ("dhparam", Support.optional d.dhparam),
-    ("ecdhCurve", Support.optional d.ecdhCurve),
-    ("honorCipherOrder", Support.optional d.honorCipherOrder),
-    ("key", Support.optional d.key),
-    ("privateKeyEngine", Support.optional d.privateKeyEngine),
-    ("privateKeyIdentifier", Support.optional d.privateKeyIdentifier),
-    ("maxVersion", Support.optional d.maxVersion),
-    ("minVersion", Support.optional d.minVersion),
-    ("passphrase", Support.optional d.passphrase),
-    ("pfx", Support.optional d.pfx),
-    ("secureOptions", Support.optional d.secureOptions),
-    ("secureProtocol", Support.optional d.secureProtocol),
-    ("sessionIdContext", Support.optional d.sessionIdContext),
-    ("ticketKeys", Support.optional d.ticketKeys),
-    ("sessionTimeout", Support.optional d.sessionTimeout)]⟩
+instance instToJSTlsCreateSecureContextOptions : ToJS tls.CreateSecureContextOptions := ⟨fun d => Internal.fields #[("allowPartialTrustChain", Internal.optional d.allowPartialTrustChain),
+    ("ca", Internal.optional d.ca),
+    ("cert", Internal.optional d.cert),
+    ("certificateCompression", Internal.optional d.certificateCompression),
+    ("sigalgs", Internal.optional d.sigalgs),
+    ("ciphers", Internal.optional d.ciphers),
+    ("clientCertEngine", Internal.optional d.clientCertEngine),
+    ("crl", Internal.optional d.crl),
+    ("dhparam", Internal.optional d.dhparam),
+    ("ecdhCurve", Internal.optional d.ecdhCurve),
+    ("honorCipherOrder", Internal.optional d.honorCipherOrder),
+    ("key", Internal.optional d.key),
+    ("privateKeyEngine", Internal.optional d.privateKeyEngine),
+    ("privateKeyIdentifier", Internal.optional d.privateKeyIdentifier),
+    ("maxVersion", Internal.optional d.maxVersion),
+    ("minVersion", Internal.optional d.minVersion),
+    ("passphrase", Internal.optional d.passphrase),
+    ("pfx", Internal.optional d.pfx),
+    ("secureOptions", Internal.optional d.secureOptions),
+    ("secureProtocol", Internal.optional d.secureProtocol),
+    ("sessionIdContext", Internal.optional d.sessionIdContext),
+    ("ticketKeys", Internal.optional d.ticketKeys),
+    ("sessionTimeout", Internal.optional d.sessionTimeout)]⟩
 
 /-- `dictionary tls.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure tls.CreateServerOptions where
@@ -427,17 +430,17 @@ structure tls.CreateServerOptions where
   pskCallback : Option JSFunction := none
   /-- `DOMString pskIdentityHint` -/
   pskIdentityHint : Option String := none
-instance instToJSTlsCreateServerOptions : ToJS tls.CreateServerOptions := ⟨fun d => Support.fields #[("ALPNProtocols", Support.optional d.ALPNProtocols),
-    ("ALPNCallback", Support.optional d.ALPNCallback),
-    ("clientCertEngine", Support.optional d.clientCertEngine),
-    ("enableTrace", Support.optional d.enableTrace),
-    ("handshakeTimeout", Support.optional d.handshakeTimeout),
-    ("rejectUnauthorized", Support.optional d.rejectUnauthorized),
-    ("requestCert", Support.optional d.requestCert),
-    ("sessionTimeout", Support.optional d.sessionTimeout),
-    ("ticketKeys", Support.optional d.ticketKeys),
-    ("pskCallback", Support.optional d.pskCallback),
-    ("pskIdentityHint", Support.optional d.pskIdentityHint)]⟩
+instance instToJSTlsCreateServerOptions : ToJS tls.CreateServerOptions := ⟨fun d => Internal.fields #[("ALPNProtocols", Internal.optional d.ALPNProtocols),
+    ("ALPNCallback", Internal.optional d.ALPNCallback),
+    ("clientCertEngine", Internal.optional d.clientCertEngine),
+    ("enableTrace", Internal.optional d.enableTrace),
+    ("handshakeTimeout", Internal.optional d.handshakeTimeout),
+    ("rejectUnauthorized", Internal.optional d.rejectUnauthorized),
+    ("requestCert", Internal.optional d.requestCert),
+    ("sessionTimeout", Internal.optional d.sessionTimeout),
+    ("ticketKeys", Internal.optional d.ticketKeys),
+    ("pskCallback", Internal.optional d.pskCallback),
+    ("pskIdentityHint", Internal.optional d.pskIdentityHint)]⟩
 
 /-- `(sequence<DOMString> or sequence<Uint8Array>)`: one constructor per member type. -/
 inductive SequenceOfDOMStringOrSequenceOfUint8Array where
@@ -452,341 +455,356 @@ instance : Coe (Array String) SequenceOfDOMStringOrSequenceOfUint8Array := ⟨.s
 instance : Coe (Array ByteArray) SequenceOfDOMStringOrSequenceOfUint8Array := ⟨.sequence2⟩
 
 /-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
-def tls.Server.cast? (v : Value) : IO (Option tls.Server) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tls" ["Server"] Value) v) then some { val := v } else none
+@[macro_inline] def tls.Server.cast? (v : Value) : IO (Option tls.Server) := Internal.api "Lasm.JS.Node.tls.Server.cast?" do
+  Internal.cast (Support.getExport "node:tls" ["Server"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'connection'` (added in Node.js v0.3.2): `tls.Server onConnection(tls.Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
-def tls.Server.onConnection (self : tls.Server) (listener : tls.Server.ConnectionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def tls.Server.onConnection (self : tls.Server) (listener : tls.Server.ConnectionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onConnection" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v0.3.2): `tls.Server onceConnection(tls.Server.ConnectionListener listener)`: calls `once("connection", listener)` -/
-def tls.Server.onceConnection (self : tls.Server) (listener : tls.Server.ConnectionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def tls.Server.onceConnection (self : tls.Server) (listener : tls.Server.ConnectionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceConnection" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'keylog'` (added in Node.js v12.3.0, v10.20.0): `tls.Server onKeylog(tls.Server.KeylogListener listener)`: calls `on("keylog", listener)` -/
-def tls.Server.onKeylog (self : tls.Server) (listener : tls.Server.KeylogListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "keylog", toJS listener]) Value
+@[macro_inline] def tls.Server.onKeylog (self : tls.Server) (listener : tls.Server.KeylogListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onKeylog" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "keylog", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'keylog'` (added in Node.js v12.3.0, v10.20.0): `tls.Server onceKeylog(tls.Server.KeylogListener listener)`: calls `once("keylog", listener)` -/
-def tls.Server.onceKeylog (self : tls.Server) (listener : tls.Server.KeylogListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "keylog", toJS listener]) Value
+@[macro_inline] def tls.Server.onceKeylog (self : tls.Server) (listener : tls.Server.KeylogListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceKeylog" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "keylog", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'newSession'` (added in Node.js v0.9.2): `tls.Server onNewSession(tls.Server.NewSessionListener listener)`: calls `on("newSession", listener)` -/
-def tls.Server.onNewSession (self : tls.Server) (listener : tls.Server.NewSessionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "newSession", toJS listener]) Value
+@[macro_inline] def tls.Server.onNewSession (self : tls.Server) (listener : tls.Server.NewSessionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onNewSession" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "newSession", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'newSession'` (added in Node.js v0.9.2): `tls.Server onceNewSession(tls.Server.NewSessionListener listener)`: calls `once("newSession", listener)` -/
-def tls.Server.onceNewSession (self : tls.Server) (listener : tls.Server.NewSessionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "newSession", toJS listener]) Value
+@[macro_inline] def tls.Server.onceNewSession (self : tls.Server) (listener : tls.Server.NewSessionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceNewSession" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "newSession", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'OCSPRequest'` (added in Node.js v0.11.13): `tls.Server onOCSPRequest(tls.Server.OCSPRequestListener listener)`: calls `on("OCSPRequest", listener)` -/
-def tls.Server.onOCSPRequest (self : tls.Server) (listener : tls.Server.OCSPRequestListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "OCSPRequest", toJS listener]) Value
+@[macro_inline] def tls.Server.onOCSPRequest (self : tls.Server) (listener : tls.Server.OCSPRequestListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onOCSPRequest" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "OCSPRequest", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'OCSPRequest'` (added in Node.js v0.11.13): `tls.Server onceOCSPRequest(tls.Server.OCSPRequestListener listener)`: calls `once("OCSPRequest", listener)` -/
-def tls.Server.onceOCSPRequest (self : tls.Server) (listener : tls.Server.OCSPRequestListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "OCSPRequest", toJS listener]) Value
+@[macro_inline] def tls.Server.onceOCSPRequest (self : tls.Server) (listener : tls.Server.OCSPRequestListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceOCSPRequest" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "OCSPRequest", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resumeSession'` (added in Node.js v0.9.2): `tls.Server onResumeSession(tls.Server.ResumeSessionListener listener)`: calls `on("resumeSession", listener)` -/
-def tls.Server.onResumeSession (self : tls.Server) (listener : tls.Server.ResumeSessionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "resumeSession", toJS listener]) Value
+@[macro_inline] def tls.Server.onResumeSession (self : tls.Server) (listener : tls.Server.ResumeSessionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onResumeSession" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "resumeSession", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resumeSession'` (added in Node.js v0.9.2): `tls.Server onceResumeSession(tls.Server.ResumeSessionListener listener)`: calls `once("resumeSession", listener)` -/
-def tls.Server.onceResumeSession (self : tls.Server) (listener : tls.Server.ResumeSessionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "resumeSession", toJS listener]) Value
+@[macro_inline] def tls.Server.onceResumeSession (self : tls.Server) (listener : tls.Server.ResumeSessionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceResumeSession" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "resumeSession", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secureConnection'` (added in Node.js v0.3.2): `tls.Server onSecureConnection(tls.Server.SecureConnectionListener listener)`: calls `on("secureConnection", listener)` -/
-def tls.Server.onSecureConnection (self : tls.Server) (listener : tls.Server.SecureConnectionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "secureConnection", toJS listener]) Value
+@[macro_inline] def tls.Server.onSecureConnection (self : tls.Server) (listener : tls.Server.SecureConnectionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onSecureConnection" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "secureConnection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secureConnection'` (added in Node.js v0.3.2): `tls.Server onceSecureConnection(tls.Server.SecureConnectionListener listener)`: calls `once("secureConnection", listener)` -/
-def tls.Server.onceSecureConnection (self : tls.Server) (listener : tls.Server.SecureConnectionListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "secureConnection", toJS listener]) Value
+@[macro_inline] def tls.Server.onceSecureConnection (self : tls.Server) (listener : tls.Server.SecureConnectionListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceSecureConnection" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "secureConnection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'tlsClientError'` (added in Node.js v6.0.0): `tls.Server onTlsClientError(tls.Server.TlsClientErrorListener listener)`: calls `on("tlsClientError", listener)` -/
-def tls.Server.onTlsClientError (self : tls.Server) (listener : tls.Server.TlsClientErrorListener) : IO tls.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "tlsClientError", toJS listener]) Value
+@[macro_inline] def tls.Server.onTlsClientError (self : tls.Server) (listener : tls.Server.TlsClientErrorListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onTlsClientError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "tlsClientError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'tlsClientError'` (added in Node.js v6.0.0): `tls.Server onceTlsClientError(tls.Server.TlsClientErrorListener listener)`: calls `once("tlsClientError", listener)` -/
-def tls.Server.onceTlsClientError (self : tls.Server) (listener : tls.Server.TlsClientErrorListener) : IO tls.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "tlsClientError", toJS listener]) Value
+@[macro_inline] def tls.Server.onceTlsClientError (self : tls.Server) (listener : tls.Server.TlsClientErrorListener) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.onceTlsClientError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "tlsClientError", toJS listener]) Value
   pure { val := r }
 
 /-- `server.addContext(hostname, context)` (added in Node.js v0.5.3): `undefined addContext(DOMString hostname, object context)` -/
-def tls.Server.addContext (self : tls.Server) (hostname : String) (context : Data) : IO Unit :=
-  self.val.callMethod "addContext" (Support.args #[toJS hostname, toJS context]) Unit
+@[macro_inline] def tls.Server.addContext (self : tls.Server) (hostname : String) (context : Data) : IO Unit := Internal.api "Lasm.JS.Node.tls.Server.addContext" do
+  self.val.callMethod "addContext" (Internal.args #[toJS hostname, toJS context]) Unit
 
 /-- `server.address()` (added in Node.js v0.6.0): `object address()` -/
-def tls.Server.address (self : tls.Server) : IO Data :=
-  self.val.callMethod "address" (Support.args #[]) Data
+@[macro_inline] def tls.Server.address (self : tls.Server) : IO Data := Internal.api "Lasm.JS.Node.tls.Server.address" do
+  self.val.callMethod "address" (Internal.args #[]) Data
 
 /-- `server.close([callback])` (added in Node.js v0.3.2): `tls.Server close()` -/
-def tls.Server.close (self : tls.Server) : IO tls.Server := do
-  let r ← self.val.callMethod "close" (Support.args #[]) Value
+@[macro_inline] def tls.Server.close (self : tls.Server) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.Server.close" do
+  let r ← self.val.callMethod "close" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `server.getTicketKeys()` (added in Node.js v3.0.0): `Uint8Array getTicketKeys()` -/
-def tls.Server.getTicketKeys (self : tls.Server) : IO ByteArray :=
-  self.val.callMethod "getTicketKeys" (Support.args #[]) ByteArray
+@[macro_inline] def tls.Server.getTicketKeys (self : tls.Server) : IO ByteArray := Internal.api "Lasm.JS.Node.tls.Server.getTicketKeys" do
+  self.val.callMethod "getTicketKeys" (Internal.args #[]) ByteArray
 
 /-- `server.listen()`: `undefined listen()` -/
-def tls.Server.listen (self : tls.Server) : IO Unit :=
-  self.val.callMethod "listen" (Support.args #[]) Unit
+@[macro_inline] def tls.Server.listen (self : tls.Server) : IO Unit := Internal.api "Lasm.JS.Node.tls.Server.listen" do
+  self.val.callMethod "listen" (Internal.args #[]) Unit
 
 /-- `server.setSecureContext(options)` (added in Node.js v11.0.0): `undefined setSecureContext(object options)` -/
-def tls.Server.setSecureContext (self : tls.Server) (options : Data) : IO Unit :=
-  self.val.callMethod "setSecureContext" (Support.args #[toJS options]) Unit
+@[macro_inline] def tls.Server.setSecureContext (self : tls.Server) (options : Data) : IO Unit := Internal.api "Lasm.JS.Node.tls.Server.setSecureContext" do
+  self.val.callMethod "setSecureContext" (Internal.args #[toJS options]) Unit
 
 /-- `server.setTicketKeys(keys)` (added in Node.js v3.0.0): `undefined setTicketKeys(Uint8Array keys)` -/
-def tls.Server.setTicketKeys (self : tls.Server) (keys : ByteArray) : IO Unit :=
-  self.val.callMethod "setTicketKeys" (Support.args #[toJS keys]) Unit
+@[macro_inline] def tls.Server.setTicketKeys (self : tls.Server) (keys : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.tls.Server.setTicketKeys" do
+  self.val.callMethod "setTicketKeys" (Internal.args #[toJS keys]) Unit
 
 /-- `v instanceof TLSSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TLSSocket`). -/
-def tls.TLSSocket.cast? (v : Value) : IO (Option tls.TLSSocket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tls" ["TLSSocket"] Value) v) then some { val := v } else none
+@[macro_inline] def tls.TLSSocket.cast? (v : Value) : IO (Option tls.TLSSocket) := Internal.api "Lasm.JS.Node.tls.TLSSocket.cast?" do
+  Internal.cast (Support.getExport "node:tls" ["TLSSocket"] Value) (fun x => { val := x }) v
 
 /-- `tlsSocket.alpnProtocol` (added in Node.js v6.0.0): `readonly attribute (DOMString or boolean)? alpnProtocol` -/
-def tls.TLSSocket.alpnProtocol (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
+@[macro_inline] def tls.TLSSocket.alpnProtocol (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := Internal.api "Lasm.JS.Node.tls.TLSSocket.alpnProtocol" do
+  self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
 
 /-- `tlsSocket.authorizationError` (added in Node.js v0.11.4): `readonly attribute any authorizationError` -/
-def tls.TLSSocket.authorizationError (self : tls.TLSSocket) : IO Data := self.val.get "authorizationError" Data
+@[macro_inline] def tls.TLSSocket.authorizationError (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.authorizationError" do
+  self.val.get "authorizationError" Data
 
 /-- `tlsSocket.authorized` (added in Node.js v0.11.4): `readonly attribute boolean authorized` -/
-def tls.TLSSocket.authorized (self : tls.TLSSocket) : IO Bool := self.val.get "authorized" Bool
+@[macro_inline] def tls.TLSSocket.authorized (self : tls.TLSSocket) : IO Bool := Internal.api "Lasm.JS.Node.tls.TLSSocket.authorized" do
+  self.val.get "authorized" Bool
 
 /-- `tlsSocket.encrypted` (added in Node.js v0.11.4): `readonly attribute any encrypted` -/
-def tls.TLSSocket.encrypted (self : tls.TLSSocket) : IO Data := self.val.get "encrypted" Data
+@[macro_inline] def tls.TLSSocket.encrypted (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.encrypted" do
+  self.val.get "encrypted" Data
 
 /-- `tlsSocket.localAddress` (added in Node.js v0.11.4): `readonly attribute DOMString localAddress` -/
-def tls.TLSSocket.localAddress (self : tls.TLSSocket) : IO String := self.val.get "localAddress" String
+@[macro_inline] def tls.TLSSocket.localAddress (self : tls.TLSSocket) : IO String := Internal.api "Lasm.JS.Node.tls.TLSSocket.localAddress" do
+  self.val.get "localAddress" String
 
 /-- `tlsSocket.localPort` (added in Node.js v0.11.4): `readonly attribute long long localPort` -/
-def tls.TLSSocket.localPort (self : tls.TLSSocket) : IO Int := self.val.get "localPort" Int
+@[macro_inline] def tls.TLSSocket.localPort (self : tls.TLSSocket) : IO Int := Internal.api "Lasm.JS.Node.tls.TLSSocket.localPort" do
+  self.val.get "localPort" Int
 
 /-- `tlsSocket.remoteAddress` (added in Node.js v0.11.4): `readonly attribute DOMString remoteAddress` -/
-def tls.TLSSocket.remoteAddress (self : tls.TLSSocket) : IO String := self.val.get "remoteAddress" String
+@[macro_inline] def tls.TLSSocket.remoteAddress (self : tls.TLSSocket) : IO String := Internal.api "Lasm.JS.Node.tls.TLSSocket.remoteAddress" do
+  self.val.get "remoteAddress" String
 
 /-- `tlsSocket.remoteFamily` (added in Node.js v0.11.4): `readonly attribute DOMString remoteFamily` -/
-def tls.TLSSocket.remoteFamily (self : tls.TLSSocket) : IO String := self.val.get "remoteFamily" String
+@[macro_inline] def tls.TLSSocket.remoteFamily (self : tls.TLSSocket) : IO String := Internal.api "Lasm.JS.Node.tls.TLSSocket.remoteFamily" do
+  self.val.get "remoteFamily" String
 
 /-- `tlsSocket.remotePort` (added in Node.js v0.11.4): `readonly attribute long long remotePort` -/
-def tls.TLSSocket.remotePort (self : tls.TLSSocket) : IO Int := self.val.get "remotePort" Int
+@[macro_inline] def tls.TLSSocket.remotePort (self : tls.TLSSocket) : IO Int := Internal.api "Lasm.JS.Node.tls.TLSSocket.remotePort" do
+  self.val.get "remotePort" Int
 
 /-- `tlsSocket.servername` (added in Node.js v0.11.3): `readonly attribute (DOMString or boolean)? servername` -/
-def tls.TLSSocket.servername (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := self.val.get "servername" (Option DOMStringOrBoolean)
+@[macro_inline] def tls.TLSSocket.servername (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := Internal.api "Lasm.JS.Node.tls.TLSSocket.servername" do
+  self.val.get "servername" (Option DOMStringOrBoolean)
 
 /-- `Event: 'keylog'` (added in Node.js v12.3.0, v10.20.0): `tls.TLSSocket onKeylog(tls.TLSSocket.KeylogListener listener)`: calls `on("keylog", listener)` -/
-def tls.TLSSocket.onKeylog (self : tls.TLSSocket) (listener : tls.TLSSocket.KeylogListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "keylog", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onKeylog (self : tls.TLSSocket) (listener : tls.TLSSocket.KeylogListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onKeylog" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "keylog", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'keylog'` (added in Node.js v12.3.0, v10.20.0): `tls.TLSSocket onceKeylog(tls.TLSSocket.KeylogListener listener)`: calls `once("keylog", listener)` -/
-def tls.TLSSocket.onceKeylog (self : tls.TLSSocket) (listener : tls.TLSSocket.KeylogListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "keylog", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onceKeylog (self : tls.TLSSocket) (listener : tls.TLSSocket.KeylogListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onceKeylog" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "keylog", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'OCSPResponse'` (added in Node.js v0.11.13): `tls.TLSSocket onOCSPResponse(tls.TLSSocket.OCSPResponseListener listener)`: calls `on("OCSPResponse", listener)` -/
-def tls.TLSSocket.onOCSPResponse (self : tls.TLSSocket) (listener : tls.TLSSocket.OCSPResponseListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "OCSPResponse", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onOCSPResponse (self : tls.TLSSocket) (listener : tls.TLSSocket.OCSPResponseListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onOCSPResponse" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "OCSPResponse", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'OCSPResponse'` (added in Node.js v0.11.13): `tls.TLSSocket onceOCSPResponse(tls.TLSSocket.OCSPResponseListener listener)`: calls `once("OCSPResponse", listener)` -/
-def tls.TLSSocket.onceOCSPResponse (self : tls.TLSSocket) (listener : tls.TLSSocket.OCSPResponseListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "OCSPResponse", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onceOCSPResponse (self : tls.TLSSocket) (listener : tls.TLSSocket.OCSPResponseListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onceOCSPResponse" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "OCSPResponse", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secure'` (added in Node.js v0.11.4): `tls.TLSSocket onSecure(tls.TLSSocket.SecureListener listener)`: calls `on("secure", listener)` -/
-def tls.TLSSocket.onSecure (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "secure", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onSecure (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onSecure" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "secure", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secure'` (added in Node.js v0.11.4): `tls.TLSSocket onceSecure(tls.TLSSocket.SecureListener listener)`: calls `once("secure", listener)` -/
-def tls.TLSSocket.onceSecure (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "secure", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onceSecure (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onceSecure" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "secure", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secureConnect'` (added in Node.js v0.11.4): `tls.TLSSocket onSecureConnect(tls.TLSSocket.SecureConnectListener listener)`: calls `on("secureConnect", listener)` -/
-def tls.TLSSocket.onSecureConnect (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureConnectListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "secureConnect", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onSecureConnect (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureConnectListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onSecureConnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "secureConnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'secureConnect'` (added in Node.js v0.11.4): `tls.TLSSocket onceSecureConnect(tls.TLSSocket.SecureConnectListener listener)`: calls `once("secureConnect", listener)` -/
-def tls.TLSSocket.onceSecureConnect (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureConnectListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "secureConnect", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onceSecureConnect (self : tls.TLSSocket) (listener : tls.TLSSocket.SecureConnectListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onceSecureConnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "secureConnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v11.10.0): `tls.TLSSocket onSession(tls.TLSSocket.SessionListener listener)`: calls `on("session", listener)` -/
-def tls.TLSSocket.onSession (self : tls.TLSSocket) (listener : tls.TLSSocket.SessionListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onSession (self : tls.TLSSocket) (listener : tls.TLSSocket.SessionListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onSession" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v11.10.0): `tls.TLSSocket onceSession(tls.TLSSocket.SessionListener listener)`: calls `once("session", listener)` -/
-def tls.TLSSocket.onceSession (self : tls.TLSSocket) (listener : tls.TLSSocket.SessionListener) : IO tls.TLSSocket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def tls.TLSSocket.onceSession (self : tls.TLSSocket) (listener : tls.TLSSocket.SessionListener) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.onceSession" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `tlsSocket.address()` (added in Node.js v0.11.4): `object address()` -/
-def tls.TLSSocket.address (self : tls.TLSSocket) : IO Data :=
-  self.val.callMethod "address" (Support.args #[]) Data
+@[macro_inline] def tls.TLSSocket.address (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.address" do
+  self.val.callMethod "address" (Internal.args #[]) Data
 
 /-- `tlsSocket.disableRenegotiation()` (added in Node.js v8.4.0): `undefined disableRenegotiation()` -/
-def tls.TLSSocket.disableRenegotiation (self : tls.TLSSocket) : IO Unit :=
-  self.val.callMethod "disableRenegotiation" (Support.args #[]) Unit
+@[macro_inline] def tls.TLSSocket.disableRenegotiation (self : tls.TLSSocket) : IO Unit := Internal.api "Lasm.JS.Node.tls.TLSSocket.disableRenegotiation" do
+  self.val.callMethod "disableRenegotiation" (Internal.args #[]) Unit
 
 /-- `tlsSocket.enableTrace()` (added in Node.js v12.2.0): `undefined enableTrace()` -/
-def tls.TLSSocket.enableTrace (self : tls.TLSSocket) : IO Unit :=
-  self.val.callMethod "enableTrace" (Support.args #[]) Unit
+@[macro_inline] def tls.TLSSocket.enableTrace (self : tls.TLSSocket) : IO Unit := Internal.api "Lasm.JS.Node.tls.TLSSocket.enableTrace" do
+  self.val.callMethod "enableTrace" (Internal.args #[]) Unit
 
 /-- `tlsSocket.exportKeyingMaterial(length, label[, context])` (added in Node.js v13.10.0, v12.17.0): `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional Uint8Array context)` -/
-def tls.TLSSocket.exportKeyingMaterial (self : tls.TLSSocket) (length : Nat) (label : String) (context : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) ByteArray
+@[macro_inline] def tls.TLSSocket.exportKeyingMaterial (self : tls.TLSSocket) (length : Nat) (label : String) (context : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Node.tls.TLSSocket.exportKeyingMaterial" do
+  self.val.callMethod "exportKeyingMaterial" (Internal.args #[toJS length, toJS label, Internal.optional context]) ByteArray
 
 /-- `tlsSocket.getCertificate()` (added in Node.js v11.2.0): `object getCertificate()` -/
-def tls.TLSSocket.getCertificate (self : tls.TLSSocket) : IO Data :=
-  self.val.callMethod "getCertificate" (Support.args #[]) Data
+@[macro_inline] def tls.TLSSocket.getCertificate (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.getCertificate" do
+  self.val.callMethod "getCertificate" (Internal.args #[]) Data
 
 /-- `tlsSocket.getCipher()` (added in Node.js v0.11.4): `object getCipher()` -/
-def tls.TLSSocket.getCipher (self : tls.TLSSocket) : IO Data :=
-  self.val.callMethod "getCipher" (Support.args #[]) Data
+@[macro_inline] def tls.TLSSocket.getCipher (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.getCipher" do
+  self.val.callMethod "getCipher" (Internal.args #[]) Data
 
 /-- `tlsSocket.getEphemeralKeyInfo()` (added in Node.js v5.0.0): `object getEphemeralKeyInfo()` -/
-def tls.TLSSocket.getEphemeralKeyInfo (self : tls.TLSSocket) : IO Data :=
-  self.val.callMethod "getEphemeralKeyInfo" (Support.args #[]) Data
+@[macro_inline] def tls.TLSSocket.getEphemeralKeyInfo (self : tls.TLSSocket) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.getEphemeralKeyInfo" do
+  self.val.callMethod "getEphemeralKeyInfo" (Internal.args #[]) Data
 
 /-- `tlsSocket.getFinished()` (added in Node.js v9.9.0): `Uint8Array? getFinished()` -/
-def tls.TLSSocket.getFinished (self : tls.TLSSocket) : IO (Option ByteArray) :=
-  self.val.callMethod "getFinished" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def tls.TLSSocket.getFinished (self : tls.TLSSocket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Node.tls.TLSSocket.getFinished" do
+  self.val.callMethod "getFinished" (Internal.args #[]) (Option ByteArray)
 
 /-- `tlsSocket.getPeerCertificate([detailed])` (added in Node.js v0.11.4): `object getPeerCertificate(optional boolean detailed)` -/
-def tls.TLSSocket.getPeerCertificate (self : tls.TLSSocket) (detailed : Option Bool := none) : IO Data :=
-  self.val.callMethod "getPeerCertificate" (Support.args #[Support.optional detailed]) Data
+@[macro_inline] def tls.TLSSocket.getPeerCertificate (self : tls.TLSSocket) (detailed : Option Bool := none) : IO Data := Internal.api "Lasm.JS.Node.tls.TLSSocket.getPeerCertificate" do
+  self.val.callMethod "getPeerCertificate" (Internal.args #[Internal.optional detailed]) Data
 
 /-- `tlsSocket.getPeerFinished()` (added in Node.js v9.9.0): `Uint8Array? getPeerFinished()` -/
-def tls.TLSSocket.getPeerFinished (self : tls.TLSSocket) : IO (Option ByteArray) :=
-  self.val.callMethod "getPeerFinished" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def tls.TLSSocket.getPeerFinished (self : tls.TLSSocket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Node.tls.TLSSocket.getPeerFinished" do
+  self.val.callMethod "getPeerFinished" (Internal.args #[]) (Option ByteArray)
 
 /-- `tlsSocket.getPeerX509Certificate()` (added in Node.js v15.9.0): `X509Certificate getPeerX509Certificate()` -/
-def tls.TLSSocket.getPeerX509Certificate (self : tls.TLSSocket) : IO X509Certificate := do
-  let r ← self.val.callMethod "getPeerX509Certificate" (Support.args #[]) Value
+@[macro_inline] def tls.TLSSocket.getPeerX509Certificate (self : tls.TLSSocket) : IO X509Certificate := Internal.api "Lasm.JS.Node.tls.TLSSocket.getPeerX509Certificate" do
+  let r ← self.val.callMethod "getPeerX509Certificate" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `tlsSocket.getProtocol()` (added in Node.js v5.7.0): `DOMString? getProtocol()` -/
-def tls.TLSSocket.getProtocol (self : tls.TLSSocket) : IO (Option String) :=
-  self.val.callMethod "getProtocol" (Support.args #[]) (Option String)
+@[macro_inline] def tls.TLSSocket.getProtocol (self : tls.TLSSocket) : IO (Option String) := Internal.api "Lasm.JS.Node.tls.TLSSocket.getProtocol" do
+  self.val.callMethod "getProtocol" (Internal.args #[]) (Option String)
 
 /-- `tlsSocket.getSession()` (added in Node.js v0.11.4): `undefined getSession()` -/
-def tls.TLSSocket.getSession (self : tls.TLSSocket) : IO Unit :=
-  self.val.callMethod "getSession" (Support.args #[]) Unit
+@[macro_inline] def tls.TLSSocket.getSession (self : tls.TLSSocket) : IO Unit := Internal.api "Lasm.JS.Node.tls.TLSSocket.getSession" do
+  self.val.callMethod "getSession" (Internal.args #[]) Unit
 
 /-- `tlsSocket.getSharedSigalgs()` (added in Node.js v12.11.0): `sequence<any> getSharedSigalgs()` -/
-def tls.TLSSocket.getSharedSigalgs (self : tls.TLSSocket) : IO (Array Data) :=
-  self.val.callMethod "getSharedSigalgs" (Support.args #[]) (Array Data)
+@[macro_inline] def tls.TLSSocket.getSharedSigalgs (self : tls.TLSSocket) : IO (Array Data) := Internal.api "Lasm.JS.Node.tls.TLSSocket.getSharedSigalgs" do
+  self.val.callMethod "getSharedSigalgs" (Internal.args #[]) (Array Data)
 
 /-- `tlsSocket.getTLSTicket()` (added in Node.js v0.11.4): `undefined getTLSTicket()` -/
-def tls.TLSSocket.getTLSTicket (self : tls.TLSSocket) : IO Unit :=
-  self.val.callMethod "getTLSTicket" (Support.args #[]) Unit
+@[macro_inline] def tls.TLSSocket.getTLSTicket (self : tls.TLSSocket) : IO Unit := Internal.api "Lasm.JS.Node.tls.TLSSocket.getTLSTicket" do
+  self.val.callMethod "getTLSTicket" (Internal.args #[]) Unit
 
 /-- `tlsSocket.getX509Certificate()` (added in Node.js v15.9.0): `X509Certificate getX509Certificate()` -/
-def tls.TLSSocket.getX509Certificate (self : tls.TLSSocket) : IO X509Certificate := do
-  let r ← self.val.callMethod "getX509Certificate" (Support.args #[]) Value
+@[macro_inline] def tls.TLSSocket.getX509Certificate (self : tls.TLSSocket) : IO X509Certificate := Internal.api "Lasm.JS.Node.tls.TLSSocket.getX509Certificate" do
+  let r ← self.val.callMethod "getX509Certificate" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `tlsSocket.isSessionReused()` (added in Node.js v0.5.6): `boolean isSessionReused()` -/
-def tls.TLSSocket.isSessionReused (self : tls.TLSSocket) : IO Bool :=
-  self.val.callMethod "isSessionReused" (Support.args #[]) Bool
+@[macro_inline] def tls.TLSSocket.isSessionReused (self : tls.TLSSocket) : IO Bool := Internal.api "Lasm.JS.Node.tls.TLSSocket.isSessionReused" do
+  self.val.callMethod "isSessionReused" (Internal.args #[]) Bool
 
 /-- `tlsSocket.renegotiate(options, callback)` (added in Node.js v0.11.8): `boolean renegotiate(tls.TLSSocket.RenegotiateOptions options, Function callback)` -/
-def tls.TLSSocket.renegotiate (self : tls.TLSSocket) (options : tls.TLSSocket.RenegotiateOptions) (callback : JSFunction) : IO Bool :=
-  self.val.callMethod "renegotiate" (Support.args #[toJS options, toJS callback]) Bool
+@[macro_inline] def tls.TLSSocket.renegotiate (self : tls.TLSSocket) (options : tls.TLSSocket.RenegotiateOptions) (callback : JSFunction) : IO Bool := Internal.api "Lasm.JS.Node.tls.TLSSocket.renegotiate" do
+  self.val.callMethod "renegotiate" (Internal.args #[toJS options, toJS callback]) Bool
 
 /-- `tlsSocket.setKeyCert(context)` (added in Node.js v22.5.0, v20.17.0): `undefined setKeyCert(object context)` -/
-def tls.TLSSocket.setKeyCert (self : tls.TLSSocket) (context : Data) : IO Unit :=
-  self.val.callMethod "setKeyCert" (Support.args #[toJS context]) Unit
+@[macro_inline] def tls.TLSSocket.setKeyCert (self : tls.TLSSocket) (context : Data) : IO Unit := Internal.api "Lasm.JS.Node.tls.TLSSocket.setKeyCert" do
+  self.val.callMethod "setKeyCert" (Internal.args #[toJS context]) Unit
 
 /-- `tlsSocket.setMaxSendFragment(size)` (added in Node.js v0.11.11): `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
-def tls.TLSSocket.setMaxSendFragment (self : tls.TLSSocket) (size : Nat) : IO Bool :=
-  self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
+@[macro_inline] def tls.TLSSocket.setMaxSendFragment (self : tls.TLSSocket) (size : Nat) : IO Bool := Internal.api "Lasm.JS.Node.tls.TLSSocket.setMaxSendFragment" do
+  self.val.callMethod "setMaxSendFragment" (Internal.args #[toJS size]) Bool
 
 /-- `tls.rootCertificates` (added in Node.js v12.3.0): `readonly attribute sequence<DOMString> rootCertificates` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.rootCertificates : IO (Array String) := Support.getExport "node:tls" ["rootCertificates"] (Array String)
+@[macro_inline] def tls.rootCertificates : IO (Array String) := Internal.api "Lasm.JS.Node.tls.rootCertificates" do
+  Support.getExport "node:tls" ["rootCertificates"] (Array String)
 
 /-- `tls.DEFAULT_ECDH_CURVE` (added in Node.js v0.11.13): `readonly attribute any DEFAULT_ECDH_CURVE` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.DEFAULT_ECDH_CURVE : IO Data := Support.getExport "node:tls" ["DEFAULT_ECDH_CURVE"] Data
+@[macro_inline] def tls.DEFAULT_ECDH_CURVE : IO Data := Internal.api "Lasm.JS.Node.tls.DEFAULT_ECDH_CURVE" do
+  Support.getExport "node:tls" ["DEFAULT_ECDH_CURVE"] Data
 
 /-- `tls.DEFAULT_MAX_VERSION` (added in Node.js v11.4.0): `readonly attribute DOMString DEFAULT_MAX_VERSION` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.DEFAULT_MAX_VERSION : IO String := Support.getExport "node:tls" ["DEFAULT_MAX_VERSION"] String
+@[macro_inline] def tls.DEFAULT_MAX_VERSION : IO String := Internal.api "Lasm.JS.Node.tls.DEFAULT_MAX_VERSION" do
+  Support.getExport "node:tls" ["DEFAULT_MAX_VERSION"] String
 
 /-- `tls.DEFAULT_MIN_VERSION` (added in Node.js v11.4.0): `readonly attribute DOMString DEFAULT_MIN_VERSION` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.DEFAULT_MIN_VERSION : IO String := Support.getExport "node:tls" ["DEFAULT_MIN_VERSION"] String
+@[macro_inline] def tls.DEFAULT_MIN_VERSION : IO String := Internal.api "Lasm.JS.Node.tls.DEFAULT_MIN_VERSION" do
+  Support.getExport "node:tls" ["DEFAULT_MIN_VERSION"] String
 
 /-- `tls.DEFAULT_CIPHERS` (added in Node.js v0.11.3): `readonly attribute DOMString DEFAULT_CIPHERS` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.DEFAULT_CIPHERS : IO String := Support.getExport "node:tls" ["DEFAULT_CIPHERS"] String
+@[macro_inline] def tls.DEFAULT_CIPHERS : IO String := Internal.api "Lasm.JS.Node.tls.DEFAULT_CIPHERS" do
+  Support.getExport "node:tls" ["DEFAULT_CIPHERS"] String
 
 /-- `tls.checkServerIdentity(hostname, cert)` (added in Node.js v0.8.4): `any checkServerIdentity(DOMString hostname, object cert)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.checkServerIdentity (hostname : String) (cert : Data) : IO Data :=
+@[macro_inline] def tls.checkServerIdentity (hostname : String) (cert : Data) : IO Data := Internal.api "Lasm.JS.Node.tls.checkServerIdentity" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.tls.checkServerIdentity", module := "node:tls", path := "checkServerIdentity", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, toJS cert]) (await := false)
+    (Internal.args #[toJS hostname, toJS cert]) (await := false)
 
 /-- `tls.connect(options[, callback])` (added in Node.js v0.11.3): `tls.TLSSocket connect(tls.ConnectOptions options)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.connect (options : tls.ConnectOptions) : IO tls.TLSSocket := do
+@[macro_inline] def tls.connect (options : tls.ConnectOptions) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.connect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.tls.connect", module := "node:tls", path := "connect", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `tls.connect(path[, options][, callback])` (added in Node.js v0.11.3): `tls.TLSSocket connect(DOMString path, optional object options)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.connectWithPath (path_ : String) (options : Data := .undefined) : IO tls.TLSSocket := do
+@[macro_inline] def tls.connectWithPath (path_ : String) (options : Data := .undefined) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.connectWithPath" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.tls.connectWithPath", module := "node:tls", path := "connect", construct := false, arity := 2 }
-    (Support.args #[toJS path_, options]) (await := false)
+    (Internal.args #[toJS path_, options]) (await := false)
   pure { val := r }
 
 /-- `tls.connect(port[, host][, options][, callback])` (added in Node.js v0.11.3): `tls.TLSSocket connect(double /* integer: Nat */ port, optional DOMString host, optional object options)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.connectWithPort (port : Nat) (host : Option String := none) (options : Data := .undefined) : IO tls.TLSSocket := do
+@[macro_inline] def tls.connectWithPort (port : Nat) (host : Option String := none) (options : Data := .undefined) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.connectWithPort" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.tls.connectWithPort", module := "node:tls", path := "connect", construct := false, arity := 3 }
-    (Support.args #[toJS port, Support.optional host, options]) (await := false)
+    (Internal.args #[toJS port, Internal.optional host, options]) (await := false)
   pure { val := r }
 
 /-- `tls.createSecureContext([options])` (added in Node.js v0.11.13): `undefined createSecureContext(optional tls.CreateSecureContextOptions options)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.createSecureContext (options : Option tls.CreateSecureContextOptions := none) : IO Unit :=
+@[macro_inline] def tls.createSecureContext (options : Option tls.CreateSecureContextOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.tls.createSecureContext" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.tls.createSecureContext", module := "node:tls", path := "createSecureContext", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `tls.createServer([options][, secureConnectionListener])` (added in Node.js v0.3.2): `tls.Server createServer(optional tls.CreateServerOptions options, optional Function secureConnectionListener)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.createServer (options : Option tls.CreateServerOptions := none) (secureConnectionListener : Option JSFunction := none) : IO tls.Server := do
+@[macro_inline] def tls.createServer (options : Option tls.CreateServerOptions := none) (secureConnectionListener : Option JSFunction := none) : IO tls.Server := Internal.api "Lasm.JS.Node.tls.createServer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.tls.createServer", module := "node:tls", path := "createServer", construct := false, arity := 2 }
-    (Support.args #[Support.optional options, Support.optional secureConnectionListener]) (await := false)
+    (Internal.args #[Internal.optional options, Internal.optional secureConnectionListener]) (await := false)
   pure { val := r }
 
 /-- `tls.setDefaultCACertificates(certs)` (added in Node.js v24.5.0): `undefined setDefaultCACertificates((sequence<DOMString> or sequence<Uint8Array>) certs)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.setDefaultCACertificates (certs : SequenceOfDOMStringOrSequenceOfUint8Array) : IO Unit :=
+@[macro_inline] def tls.setDefaultCACertificates (certs : SequenceOfDOMStringOrSequenceOfUint8Array) : IO Unit := Internal.api "Lasm.JS.Node.tls.setDefaultCACertificates" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.tls.setDefaultCACertificates", module := "node:tls", path := "setDefaultCACertificates", construct := false, arity := 1 }
-    (Support.args #[toJS certs]) (await := false)
+    (Internal.args #[toJS certs]) (await := false)
 
 /-- `tls.getCACertificates([type])` (added in Node.js v23.10.0, v22.15.0): `sequence<DOMString> getCACertificates(optional DOMString type)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.getCACertificates (type : Option String := none) : IO (Array String) :=
+@[macro_inline] def tls.getCACertificates (type : Option String := none) : IO (Array String) := Internal.api "Lasm.JS.Node.tls.getCACertificates" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.tls.getCACertificates", module := "node:tls", path := "getCACertificates", construct := false, arity := 1 }
-    (Support.args #[Support.optional type]) (await := false)
+    (Internal.args #[Internal.optional type]) (await := false)
 
 /-- `tls.getCiphers()` (added in Node.js v0.10.2): `sequence<DOMString> getCiphers()` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.getCiphers : IO (Array String) :=
+@[macro_inline] def tls.getCiphers : IO (Array String) := Internal.api "Lasm.JS.Node.tls.getCiphers" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.tls.getCiphers", module := "node:tls", path := "getCiphers", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `tls.getCertificateCompressionAlgorithms()` (added in Node.js v24.19.0): `sequence<DOMString> getCertificateCompressionAlgorithms()` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.getCertificateCompressionAlgorithms : IO (Array String) :=
+@[macro_inline] def tls.getCertificateCompressionAlgorithms : IO (Array String) := Internal.api "Lasm.JS.Node.tls.getCertificateCompressionAlgorithms" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.tls.getCertificateCompressionAlgorithms", module := "node:tls", path := "getCertificateCompressionAlgorithms", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Node

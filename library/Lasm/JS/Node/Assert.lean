@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Process
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class assert.AssertionError` of `node:assert` (Node.js 24.22.2 documentation, assert.md): a handle to the JavaScript object. -/
 structure assert.AssertionError where
@@ -39,130 +42,130 @@ instance instToJSAssertCallTracker : ToJS assert.CallTracker := ⟨fun x => .ref
 instance instFromJSAssertCallTracker : FromJS assert.CallTracker := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.assert.CallTracker", .data⟩
 
 /-- `v instanceof AssertionError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AssertionError`). -/
-def assert.AssertionError.cast? (v : Value) : IO (Option assert.AssertionError) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["AssertionError"] Value) v) then some { val := v } else none
+@[macro_inline] def assert.AssertionError.cast? (v : Value) : IO (Option assert.AssertionError) := Internal.api "Lasm.JS.Node.assert.AssertionError.cast?" do
+  Internal.cast (Support.getExport "node:assert" ["AssertionError"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Assert`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Assert`). -/
-def assert.Assert.cast? (v : Value) : IO (Option assert.Assert) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["Assert"] Value) v) then some { val := v } else none
+@[macro_inline] def assert.Assert.cast? (v : Value) : IO (Option assert.Assert) := Internal.api "Lasm.JS.Node.assert.Assert.cast?" do
+  Internal.cast (Support.getExport "node:assert" ["Assert"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof CallTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CallTracker`). -/
-def assert.CallTracker.cast? (v : Value) : IO (Option assert.CallTracker) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["CallTracker"] Value) v) then some { val := v } else none
+@[macro_inline] def assert.CallTracker.cast? (v : Value) : IO (Option assert.CallTracker) := Internal.api "Lasm.JS.Node.assert.CallTracker.cast?" do
+  Internal.cast (Support.getExport "node:assert" ["CallTracker"] Value) (fun x => { val := x }) v
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.calls([fn][, exact])` (added in Node.js v14.2.0, v12.19.0): `Function calls(optional Function fn, optional double exact)` -/
-def assert.CallTracker.calls (self : assert.CallTracker) (fn : Option JSFunction := none) (exact : Option Float := none) : IO JSFunction :=
-  self.val.callMethod "calls" (Support.args #[Support.optional fn, Support.optional exact]) JSFunction
+@[macro_inline] def assert.CallTracker.calls (self : assert.CallTracker) (fn : Option JSFunction := none) (exact : Option Float := none) : IO JSFunction := Internal.api "Lasm.JS.Node.assert.CallTracker.calls" do
+  self.val.callMethod "calls" (Internal.args #[Internal.optional fn, Internal.optional exact]) JSFunction
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.getCalls(fn)` (added in Node.js v18.8.0, v16.18.0): `sequence<any> getCalls(Function fn)` -/
-def assert.CallTracker.getCalls (self : assert.CallTracker) (fn : JSFunction) : IO (Array Data) :=
-  self.val.callMethod "getCalls" (Support.args #[toJS fn]) (Array Data)
+@[macro_inline] def assert.CallTracker.getCalls (self : assert.CallTracker) (fn : JSFunction) : IO (Array Data) := Internal.api "Lasm.JS.Node.assert.CallTracker.getCalls" do
+  self.val.callMethod "getCalls" (Internal.args #[toJS fn]) (Array Data)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.report()` (added in Node.js v14.2.0, v12.19.0): `sequence<any> report()` -/
-def assert.CallTracker.report (self : assert.CallTracker) : IO (Array Data) :=
-  self.val.callMethod "report" (Support.args #[]) (Array Data)
+@[macro_inline] def assert.CallTracker.report (self : assert.CallTracker) : IO (Array Data) := Internal.api "Lasm.JS.Node.assert.CallTracker.report" do
+  self.val.callMethod "report" (Internal.args #[]) (Array Data)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.reset([fn])` (added in Node.js v18.8.0, v16.18.0): `undefined reset(optional Function fn)` -/
-def assert.CallTracker.reset (self : assert.CallTracker) (fn : Option JSFunction := none) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[Support.optional fn]) Unit
+@[macro_inline] def assert.CallTracker.reset (self : assert.CallTracker) (fn : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.assert.CallTracker.reset" do
+  self.val.callMethod "reset" (Internal.args #[Internal.optional fn]) Unit
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.verify()` (added in Node.js v14.2.0, v12.19.0): `undefined verify()` -/
-def assert.CallTracker.verify (self : assert.CallTracker) : IO Unit :=
-  self.val.callMethod "verify" (Support.args #[]) Unit
+@[macro_inline] def assert.CallTracker.verify (self : assert.CallTracker) : IO Unit := Internal.api "Lasm.JS.Node.assert.CallTracker.verify" do
+  self.val.callMethod "verify" (Internal.args #[]) Unit
 
 /-- `assert.deepEqual(actual, expected[, message])` (added in Node.js v0.1.21): `undefined deepEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.deepEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.deepEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.deepEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.deepEqual", module := "node:assert", path := "deepEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.deepStrictEqual(actual, expected[, message])` (added in Node.js v1.2.0): `undefined deepStrictEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.deepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.deepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.deepStrictEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.deepStrictEqual", module := "node:assert", path := "deepStrictEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.doesNotMatch(string, regexp[, message])` (added in Node.js v13.6.0, v12.16.0): `undefined doesNotMatch(DOMString string, object regexp, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.doesNotMatch (string : String) (regexp : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.doesNotMatch (string : String) (regexp : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.doesNotMatch" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.doesNotMatch", module := "node:assert", path := "doesNotMatch", construct := false, arity := 3 }
-    (Support.args #[toJS string, toJS regexp, message]) (await := false)
+    (Internal.args #[toJS string, toJS regexp, message]) (await := false)
 
 /-- `assert.doesNotReject(asyncFn[, error][, message])` (added in Node.js v10.0.0): `Promise<any> doesNotReject(any asyncFn, optional (object or Function) error, optional DOMString message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.doesNotReject (asyncFn : Data) (error : Option ObjectOrJSFunction := none) (message : Option String := none) : Async Data :=
+@[macro_inline] def assert.doesNotReject (asyncFn : Data) (error : Option ObjectOrJSFunction := none) (message : Option String := none) : Async Data := Internal.api "Lasm.JS.Node.assert.doesNotReject" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.assert.doesNotReject", module := "node:assert", path := "doesNotReject", construct := false, arity := 3 }
-    (Support.args #[toJS asyncFn, Support.optional error, Support.optional message])
+    (Internal.args #[toJS asyncFn, Internal.optional error, Internal.optional message])
 
 /-- `assert.doesNotThrow(fn[, error][, message])` (added in Node.js v0.1.21): `undefined doesNotThrow(Function fn, optional (object or Function) error, optional DOMString message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.doesNotThrow (fn : JSFunction) (error : Option ObjectOrJSFunction := none) (message : Option String := none) : IO Unit :=
+@[macro_inline] def assert.doesNotThrow (fn : JSFunction) (error : Option ObjectOrJSFunction := none) (message : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.assert.doesNotThrow" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.doesNotThrow", module := "node:assert", path := "doesNotThrow", construct := false, arity := 3 }
-    (Support.args #[toJS fn, Support.optional error, Support.optional message]) (await := false)
+    (Internal.args #[toJS fn, Internal.optional error, Internal.optional message]) (await := false)
 
 /-- `assert.equal(actual, expected[, message])` (added in Node.js v0.1.21): `undefined equal(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.equal (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.equal (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.equal" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.equal", module := "node:assert", path := "equal", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.fail([message])` (added in Node.js v0.1.21): `undefined fail(optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.fail (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.fail (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.fail" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.fail", module := "node:assert", path := "fail", construct := false, arity := 1 }
-    (Support.args #[message]) (await := false)
+    (Internal.args #[message]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` (added in Node.js v0.1.21): `undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.failWithActual (actual : Data) (expected : Data) (message : Data := .undefined) (operator : Option String := none) (stackStartFn : Option JSFunction := none) : IO Unit :=
+@[macro_inline] def assert.failWithActual (actual : Data) (expected : Data) (message : Data := .undefined) (operator : Option String := none) (stackStartFn : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.assert.failWithActual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.failWithActual", module := "node:assert", path := "fail", construct := false, arity := 5 }
-    (Support.args #[toJS actual, toJS expected, message, Support.optional operator, Support.optional stackStartFn]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message, Internal.optional operator, Internal.optional stackStartFn]) (await := false)
 
 /-- `assert.ifError(value)` (added in Node.js v0.1.97): `undefined ifError(any value)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.ifError (value : Data) : IO Unit :=
+@[macro_inline] def assert.ifError (value : Data) : IO Unit := Internal.api "Lasm.JS.Node.assert.ifError" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.ifError", module := "node:assert", path := "ifError", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
 
 /-- `assert.match(string, regexp[, message])` (added in Node.js v13.6.0, v12.16.0): `undefined match(DOMString string, object regexp, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.«match» (string : String) (regexp : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.«match» (string : String) (regexp : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.match" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.match", module := "node:assert", path := "match", construct := false, arity := 3 }
-    (Support.args #[toJS string, toJS regexp, message]) (await := false)
+    (Internal.args #[toJS string, toJS regexp, message]) (await := false)
 
 /-- `assert.notDeepEqual(actual, expected[, message])` (added in Node.js v0.1.21): `undefined notDeepEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.notDeepEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.notDeepEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.notDeepEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.notDeepEqual", module := "node:assert", path := "notDeepEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.notDeepStrictEqual(actual, expected[, message])` (added in Node.js v1.2.0): `undefined notDeepStrictEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.notDeepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.notDeepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.notDeepStrictEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.notDeepStrictEqual", module := "node:assert", path := "notDeepStrictEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.notEqual(actual, expected[, message])` (added in Node.js v0.1.21): `undefined notEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.notEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.notEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.notEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.notEqual", module := "node:assert", path := "notEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.notStrictEqual(actual, expected[, message])` (added in Node.js v0.1.21): `undefined notStrictEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.notStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.notStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.notStrictEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.notStrictEqual", module := "node:assert", path := "notStrictEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.ok(value[, message])` (added in Node.js v0.1.21): `undefined ok(any value, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.ok (value : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.ok (value : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.ok" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.ok", module := "node:assert", path := "ok", construct := false, arity := 2 }
-    (Support.args #[toJS value, message]) (await := false)
+    (Internal.args #[toJS value, message]) (await := false)
 
 /-- `assert.rejects(asyncFn[, error][, message])` (added in Node.js v10.0.0): `Promise<any> rejects(any asyncFn, optional any error, optional DOMString message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.rejects (asyncFn : Data) (error : Data := .undefined) (message : Option String := none) : Async Data :=
+@[macro_inline] def assert.rejects (asyncFn : Data) (error : Data := .undefined) (message : Option String := none) : Async Data := Internal.api "Lasm.JS.Node.assert.rejects" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.assert.rejects", module := "node:assert", path := "rejects", construct := false, arity := 3 }
-    (Support.args #[toJS asyncFn, error, Support.optional message])
+    (Internal.args #[toJS asyncFn, error, Internal.optional message])
 
 /-- `assert.strictEqual(actual, expected[, message])` (added in Node.js v0.1.21): `undefined strictEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.strictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.strictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.strictEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.strictEqual", module := "node:assert", path := "strictEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 /-- `assert.throws(fn[, error][, message])` (added in Node.js v0.1.21): `undefined throws(Function fn, optional any error, optional DOMString message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.throws (fn : JSFunction) (error : Data := .undefined) (message : Option String := none) : IO Unit :=
+@[macro_inline] def assert.throws (fn : JSFunction) (error : Data := .undefined) (message : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.assert.throws" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.throws", module := "node:assert", path := "throws", construct := false, arity := 3 }
-    (Support.args #[toJS fn, error, Support.optional message]) (await := false)
+    (Internal.args #[toJS fn, error, Internal.optional message]) (await := false)
 
 /-- `assert.partialDeepStrictEqual(actual, expected[, message])` (added in Node.js v23.4.0, v22.13.0): `undefined partialDeepStrictEqual(any actual, any expected, optional any message)` (Node.js 24.22.2 documentation, assert.md) -/
-def assert.partialDeepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit :=
+@[macro_inline] def assert.partialDeepStrictEqual (actual : Data) (expected : Data) (message : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.assert.partialDeepStrictEqual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.partialDeepStrictEqual", module := "node:assert", path := "partialDeepStrictEqual", construct := false, arity := 3 }
-    (Support.args #[toJS actual, toJS expected, message]) (await := false)
+    (Internal.args #[toJS actual, toJS expected, message]) (await := false)
 
 end Lasm.JS.Node

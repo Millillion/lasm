@@ -208,7 +208,7 @@ if (values.sizes) {
   const wasmBytes = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).filter(f => String(f).endsWith('.wasm'))
     .reduce((n, f) => n + statSync(join(dir, f)).size, 0) : 0;
   const sizeFixture = join(root, 'test', 'fixtures', `${values.fixture}-size`);
-  // js-web: Browser.lean imports the browser tier too (Lasm.JS.Web.Browser), built for the browser as well.
+  // js-web: Browser.lean imports the umbrella Lasm.JS.Web (every spec's module), built for the browser as well.
   const sizeTargets = values.fixture === 'js-web' ? [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno'], ['browser', ['--target', 'browser'], 'dist']]
     // js-cloudflare: the Workers build, the only target of Lasm.JS.Cloudflare.
     : values.fixture === 'js-cloudflare' ? [['workers', ['--target', 'workers'], 'workers']]

@@ -12,7 +12,7 @@ editing), then the program prints one line per replica, `text <hex>`, and
 server, kills and restarts the server in the middle, and checks that every
 replica, in every process, ends with the server's text. -/
 import Tandem
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
 import Std.Async
 open Tandem Lasm.JS Lasm.JS.Web
 

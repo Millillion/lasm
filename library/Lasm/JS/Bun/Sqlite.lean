@@ -12,6 +12,9 @@ import Lasm.JS.Bun.Core
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Statement` (Bun 1.4.4 type declarations, sqlite.d.ts): a handle to the JavaScript object. -/
 structure Statement where
@@ -38,45 +41,43 @@ instance : ToJS SQLiteError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLiteError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SQLiteError", .data⟩
 
 /-- `enum StatementColumnTypes` (Bun 1.4.4 type declarations): "INTEGER", "FLOAT", "TEXT", "BLOB", "NULL". -/
-inductive StatementColumnTypes where
-  /-- "INTEGER" -/
-  | integer
-  /-- "FLOAT" -/
-  | float
-  /-- "TEXT" -/
-  | text
-  /-- "BLOB" -/
-  | blob
-  /-- "NULL" -/
-  | null
+structure StatementColumnTypes where
+  /-- A value from its string, unchecked: the generated values (`.integer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS StatementColumnTypes := ⟨fun
-  | .integer => .string "INTEGER"
-  | .float => .string "FLOAT"
-  | .text => .string "TEXT"
-  | .blob => .string "BLOB"
-  | .null => .string "NULL"⟩
+/-- "INTEGER" -/
+@[match_pattern] abbrev StatementColumnTypes.integer : StatementColumnTypes := .unsafeOfString "INTEGER"
+/-- "FLOAT" -/
+@[match_pattern] abbrev StatementColumnTypes.float : StatementColumnTypes := .unsafeOfString "FLOAT"
+/-- "TEXT" -/
+@[match_pattern] abbrev StatementColumnTypes.text : StatementColumnTypes := .unsafeOfString "TEXT"
+/-- "BLOB" -/
+@[match_pattern] abbrev StatementColumnTypes.blob : StatementColumnTypes := .unsafeOfString "BLOB"
+/-- "NULL" -/
+@[match_pattern] abbrev StatementColumnTypes.null : StatementColumnTypes := .unsafeOfString "NULL"
+instance : ToJS StatementColumnTypes := ⟨fun x => .string x.val⟩
 instance : FromJS StatementColumnTypes where
   fromJS
-    | .string "INTEGER" => .ok .integer
-    | .string "FLOAT" => .ok .float
-    | .string "TEXT" => .ok .text
-    | .string "BLOB" => .ok .blob
-    | .string "NULL" => .ok .null
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.StatementColumnTypes"
 
 /-- `enum SQLiteErrorName` (Bun 1.4.4 type declarations): "SQLiteError". -/
-inductive SQLiteErrorName where
-  /-- "SQLiteError" -/
-  | sQLiteError
+structure SQLiteErrorName where
+  /-- A value from its string, unchecked: the generated values (`.sQLiteError`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SQLiteErrorName := ⟨fun
-  | .sQLiteError => .string "SQLiteError"⟩
+/-- "SQLiteError" -/
+@[match_pattern] abbrev SQLiteErrorName.sQLiteError : SQLiteErrorName := .unsafeOfString "SQLiteError"
+instance : ToJS SQLiteErrorName := ⟨fun x => .string x.val⟩
 instance : FromJS SQLiteErrorName where
   fromJS
-    | .string "SQLiteError" => .ok .sQLiteError
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SQLiteErrorName"
 
 /-- `dictionary Changes` (Bun 1.4.4 type declarations, sqlite.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -140,11 +141,11 @@ structure DatabaseOptions where
   safeIntegers : Option Bool := none
   /-- `boolean strict` -/
   strict : Option Bool := none
-instance : ToJS DatabaseOptions := ⟨fun d => Support.fields #[("readonly", Support.optional d.readonly),
-    ("create", Support.optional d.create),
-    ("readwrite", Support.optional d.readwrite),
-    ("safeIntegers", Support.optional d.safeIntegers),
-    ("strict", Support.optional d.strict)]⟩
+instance : ToJS DatabaseOptions := ⟨fun d => Internal.fields #[("readonly", Internal.optional d.readonly),
+    ("create", Internal.optional d.create),
+    ("readwrite", Internal.optional d.readwrite),
+    ("safeIntegers", Internal.optional d.safeIntegers),
+    ("strict", Internal.optional d.strict)]⟩
 
 /-- `typedef double or DatabaseOptions DoubleOrDatabaseOptions`: one constructor per member type. -/
 inductive DoubleOrDatabaseOptions where
@@ -296,10 +297,10 @@ structure FunctionOptions where
   directOnly : Option Bool := none
   /-- `boolean safeIntegers` -/
   safeIntegers : Option Bool := none
-instance : ToJS FunctionOptions := ⟨fun d => Support.fields #[("varargs", Support.optional d.varargs),
-    ("deterministic", Support.optional d.deterministic),
-    ("directOnly", Support.optional d.directOnly),
-    ("safeIntegers", Support.optional d.safeIntegers)]⟩
+instance : ToJS FunctionOptions := ⟨fun d => Internal.fields #[("varargs", Internal.optional d.varargs),
+    ("deterministic", Internal.optional d.deterministic),
+    ("directOnly", Internal.optional d.directOnly),
+    ("safeIntegers", Internal.optional d.safeIntegers)]⟩
 
 /-- `callback DatabaseFunctionWithOptionsFn = SQLFunctionResult? (any... args)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DatabaseFunctionWithOptionsFn where
@@ -330,13 +331,13 @@ instance : ToJS AggregateOptionsStep := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AggregateOptionsStep := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.AggregateOptionsStep", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def AggregateOptionsStep.ofFn (f : Data → Array Data → Async Data) : IO AggregateOptionsStep := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (args.extract 1 args.size))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (args.extract 1 args.size))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def AggregateOptionsStep.ofSyncFn (f : Data → Array Data → IO Data) : IO AggregateOptionsStep := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (args.extract 1 args.size))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (args.extract 1 args.size))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -350,13 +351,13 @@ instance : ToJS AggregateOptionsInverse := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AggregateOptionsInverse := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.AggregateOptionsInverse", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def AggregateOptionsInverse.ofFn (f : Data → Array Data → Async Data) : IO AggregateOptionsInverse := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (args.extract 1 args.size))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (args.extract 1 args.size))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def AggregateOptionsInverse.ofSyncFn (f : Data → Array Data → IO Data) : IO AggregateOptionsInverse := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (args.extract 1 args.size))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (args.extract 1 args.size))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -370,13 +371,13 @@ instance : ToJS AggregateOptionsResult := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AggregateOptionsResult := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.AggregateOptionsResult", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def AggregateOptionsResult.ofFn (f : Data → Async (Option SQLFunctionResult)) : IO AggregateOptionsResult := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def AggregateOptionsResult.ofSyncFn (f : Data → IO (Option SQLFunctionResult)) : IO AggregateOptionsResult := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -399,14 +400,14 @@ structure AggregateOptions where
   inverse : Option AggregateOptionsInverse := none
   /-- `AggregateOptionsResult result` -/
   result : Option AggregateOptionsResult := none
-instance : ToJS AggregateOptions := ⟨fun d => Support.fields #[("varargs", Support.optional d.varargs),
-    ("deterministic", Support.optional d.deterministic),
-    ("directOnly", Support.optional d.directOnly),
-    ("safeIntegers", Support.optional d.safeIntegers),
+instance : ToJS AggregateOptions := ⟨fun d => Internal.fields #[("varargs", Internal.optional d.varargs),
+    ("deterministic", Internal.optional d.deterministic),
+    ("directOnly", Internal.optional d.directOnly),
+    ("safeIntegers", Internal.optional d.safeIntegers),
     ("start", d.start),
     ("step", toJS d.step),
-    ("inverse", Support.optional d.inverse),
-    ("result", Support.optional d.result)]⟩
+    ("inverse", Internal.optional d.inverse),
+    ("result", Internal.optional d.result)]⟩
 
 /-- `callback UpdateHook = undefined (Database database, DOMString tableName, DoubleOrBigint rowid, DOMString schemaName)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UpdateHook where
@@ -417,13 +418,13 @@ instance : ToJS UpdateHook := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UpdateHook := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UpdateHook", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UpdateHook.ofFn (f : Database → String → DoubleOrBigint → String → Async Unit) : IO UpdateHook := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Database args 0) (← Support.arg String args 1) (← Support.arg DoubleOrBigint args 2) (← Support.arg String args 3))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Database args 0) (← Internal.arg String args 1) (← Internal.arg DoubleOrBigint args 2) (← Internal.arg String args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UpdateHook.ofSyncFn (f : Database → String → DoubleOrBigint → String → IO Unit) : IO UpdateHook := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Database args 0) (← Support.arg String args 1) (← Support.arg DoubleOrBigint args 2) (← Support.arg String args 3))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Database args 0) (← Internal.arg String args 1) (← Internal.arg DoubleOrBigint args 2) (← Internal.arg String args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
@@ -441,538 +442,623 @@ instance : Coe ByteArray Uint8ArrayOrDouble := ⟨.uint8Array⟩
 instance : Coe Float Uint8ArrayOrDouble := ⟨.double⟩
 
 /-- `constructor(nativeHandle: any)`: `constructor(any nativeHandle)` -/
-def Statement.new (nativeHandle : Data) : IO Statement :=
+@[macro_inline] def Statement.new (nativeHandle : Data) : IO Statement := Internal.api "Lasm.JS.Bun.Statement.new" do
   Lasm.JS.Binding.invoke Statement { name := "Lasm.JS.Bun.Statement.new", module := "bun:sqlite", path := "Statement", construct := true, arity := 1 }
-    (Support.args #[toJS nativeHandle]) (await := false)
+    (Internal.args #[toJS nativeHandle]) (await := false)
 
 /-- `readonly columnNames: string[]`: `readonly attribute sequence<DOMString> columnNames` -/
-def Statement.columnNames (self : Statement) : IO (Array String) := self.val.get "columnNames" (Array String)
+@[macro_inline] def Statement.columnNames (self : Statement) : IO (Array String) := Internal.api "Lasm.JS.Bun.Statement.columnNames" do
+  self.val.get "columnNames" (Array String)
 
 /-- `readonly paramsCount: number`: `readonly attribute double paramsCount` -/
-def Statement.paramsCount (self : Statement) : IO Float := self.val.get "paramsCount" Float
+@[macro_inline] def Statement.paramsCount (self : Statement) : IO Float := Internal.api "Lasm.JS.Bun.Statement.paramsCount" do
+  self.val.get "paramsCount" Float
 
 /-- `readonly reader: boolean`: `readonly attribute boolean reader` -/
-def Statement.reader (self : Statement) : IO Bool := self.val.get "reader" Bool
+@[macro_inline] def Statement.reader (self : Statement) : IO Bool := Internal.api "Lasm.JS.Bun.Statement.reader" do
+  self.val.get "reader" Bool
 
 /-- `readonly readonly: boolean`: `readonly attribute boolean readonly` -/
-def Statement.readonly (self : Statement) : IO Bool := self.val.get "readonly" Bool
+@[macro_inline] def Statement.readonly (self : Statement) : IO Bool := Internal.api "Lasm.JS.Bun.Statement.readonly" do
+  self.val.get "readonly" Bool
 
 /-- `readonly isFinalized: boolean`: `readonly attribute boolean isFinalized` -/
-def Statement.isFinalized (self : Statement) : IO Bool := self.val.get "isFinalized" Bool
+@[macro_inline] def Statement.isFinalized (self : Statement) : IO Bool := Internal.api "Lasm.JS.Bun.Statement.isFinalized" do
+  self.val.get "isFinalized" Bool
 
 /-- `readonly columnTypes: Array<'INTEGER' | 'FLOAT' | 'TEXT' | 'BLOB' | 'NULL' | null>`: `readonly attribute sequence<StatementColumnTypes?> columnTypes` -/
-def Statement.columnTypes (self : Statement) : IO (Array (Option StatementColumnTypes)) := self.val.get "columnTypes" (Array (Option StatementColumnTypes))
+@[macro_inline] def Statement.columnTypes (self : Statement) : IO (Array (Option StatementColumnTypes)) := Internal.api "Lasm.JS.Bun.Statement.columnTypes" do
+  self.val.get "columnTypes" (Array (Option StatementColumnTypes))
 
 /-- `readonly declaredTypes: Array<string | null>`: `readonly attribute sequence<DOMString?> declaredTypes` -/
-def Statement.declaredTypes (self : Statement) : IO (Array (Option String)) := self.val.get "declaredTypes" (Array (Option String))
+@[macro_inline] def Statement.declaredTypes (self : Statement) : IO (Array (Option String)) := Internal.api "Lasm.JS.Bun.Statement.declaredTypes" do
+  self.val.get "declaredTypes" (Array (Option String))
 
 /-- `readonly native: any`: `readonly attribute any native` -/
-def Statement.native (self : Statement) : IO Data := self.val.get "native" Data
+@[macro_inline] def Statement.native (self : Statement) : IO Data := Internal.api "Lasm.JS.Bun.Statement.native" do
+  self.val.get "native" Data
 
 /-- `all(...params: ParamsType): ReturnType[]`: `sequence<any> all(sequence<any>... params)` -/
-def Statement.all (self : Statement) (params : Array (Array Data) := #[]) : IO (Array Data) :=
-  self.val.callMethod "all" (Support.argsWith #[] (params.map toJS)) (Array Data)
+@[macro_inline] def Statement.all (self : Statement) (params : Array (Array Data) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Bun.Statement.all" do
+  self.val.callMethod "all" (Internal.argsWith #[] (params.map toJS)) (Array Data)
 
 /-- `get(...params: ParamsType): ReturnType | null`: `any get(sequence<any>... params)` -/
-def Statement.get (self : Statement) (params : Array (Array Data) := #[]) : IO Data :=
-  self.val.callMethod "get" (Support.argsWith #[] (params.map toJS)) Data
+@[macro_inline] def Statement.get (self : Statement) (params : Array (Array Data) := #[]) : IO Data := Internal.api "Lasm.JS.Bun.Statement.get" do
+  self.val.callMethod "get" (Internal.argsWith #[] (params.map toJS)) Data
 
 /-- `run(...params: ParamsType): Changes`: `Changes run(sequence<any>... params)` -/
-def Statement.run (self : Statement) (params : Array (Array Data) := #[]) : IO Changes :=
-  self.val.callMethod "run" (Support.argsWith #[] (params.map toJS)) Changes
+@[macro_inline] def Statement.run (self : Statement) (params : Array (Array Data) := #[]) : IO Changes := Internal.api "Lasm.JS.Bun.Statement.run" do
+  self.val.callMethod "run" (Internal.argsWith #[] (params.map toJS)) Changes
 
 /-- `values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>`: `sequence<sequence<DOMStringOrBigintOrDoubleOrUint8Array?>> values(sequence<any>... params)` -/
-def Statement.values (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array))) :=
-  self.val.callMethod "values" (Support.argsWith #[] (params.map toJS)) (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array)))
+@[macro_inline] def Statement.values (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array))) := Internal.api "Lasm.JS.Bun.Statement.values" do
+  self.val.callMethod "values" (Internal.argsWith #[] (params.map toJS)) (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array)))
 
 /-- `raw(...params: ParamsType): Array<Array<Uint8Array | null>>`: `sequence<sequence<Uint8Array?>> raw(sequence<any>... params)` -/
-def Statement.raw (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option ByteArray))) :=
-  self.val.callMethod "raw" (Support.argsWith #[] (params.map toJS)) (Array (Array (Option ByteArray)))
+@[macro_inline] def Statement.raw (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option ByteArray))) := Internal.api "Lasm.JS.Bun.Statement.raw" do
+  self.val.callMethod "raw" (Internal.argsWith #[] (params.map toJS)) (Array (Array (Option ByteArray)))
 
 /-- `safeIntegers(enabled: boolean): this`: `Statement safeIntegers(boolean enabled)` -/
-def Statement.safeIntegers (self : Statement) (enabled : Bool) : IO Statement := do
-  let r ← self.val.callMethod "safeIntegers" (Support.args #[toJS enabled]) Value
+@[macro_inline] def Statement.safeIntegers (self : Statement) (enabled : Bool) : IO Statement := Internal.api "Lasm.JS.Bun.Statement.safeIntegers" do
+  let r ← self.val.callMethod "safeIntegers" (Internal.args #[toJS enabled]) Value
   pure { val := r }
 
 /-- `safeIntegers(): boolean`: `boolean safeIntegers()` -/
-def Statement.safeIntegers0 (self : Statement) : IO Bool :=
-  self.val.callMethod "safeIntegers" (Support.args #[]) Bool
+@[macro_inline] def Statement.safeIntegers0 (self : Statement) : IO Bool := Internal.api "Lasm.JS.Bun.Statement.safeIntegers0" do
+  self.val.callMethod "safeIntegers" (Internal.args #[]) Bool
 
 /-- `finalize(): void`: `undefined finalize()` -/
-def Statement.finalize (self : Statement) : IO Unit :=
-  self.val.callMethod "finalize" (Support.args #[]) Unit
+@[macro_inline] def Statement.finalize (self : Statement) : IO Unit := Internal.api "Lasm.JS.Bun.Statement.finalize" do
+  self.val.callMethod "finalize" (Internal.args #[]) Unit
 
 /-- `toString(): string`: `DOMString toString()` -/
-def Statement.toString (self : Statement) : IO String :=
-  self.val.callMethod "toString" (Support.args #[]) String
+@[macro_inline] def Statement.toString (self : Statement) : IO String := Internal.api "Lasm.JS.Bun.Statement.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) String
 
 /-- `toJSON(): { sql: string; isFinalized: boolean; paramsCount: number; columnNames: string[] }`: `StatementToJSON toJSON()` -/
-def Statement.toJSON (self : Statement) : IO StatementToJSON :=
-  self.val.callMethod "toJSON" (Support.args #[]) StatementToJSON
+@[macro_inline] def Statement.toJSON (self : Statement) : IO StatementToJSON := Internal.api "Lasm.JS.Bun.Statement.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) StatementToJSON
 
 /-- `constructor(filename?: string, options?: number | DatabaseOptions)`: `constructor(optional DOMString filename, optional DoubleOrDatabaseOptions options)` -/
-def Database.new (filename : Option String := none) (options : Option DoubleOrDatabaseOptions := none) : IO Database :=
+@[macro_inline] def Database.new (filename : Option String := none) (options : Option DoubleOrDatabaseOptions := none) : IO Database := Internal.api "Lasm.JS.Bun.Database.new" do
   Lasm.JS.Binding.invoke Database { name := "Lasm.JS.Bun.Database.new", module := "bun:sqlite", path := "Database", construct := true, arity := 2 }
-    (Support.args #[Support.optional filename, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional filename, Internal.optional options]) (await := false)
 
 /-- `static MAX_QUERY_CACHE_SIZE: number`: `static attribute double MAX_QUERY_CACHE_SIZE` -/
-def Database.MAX_QUERY_CACHE_SIZE : IO Float := (do
+@[macro_inline] def Database.MAX_QUERY_CACHE_SIZE : IO Float := Internal.api "Lasm.JS.Bun.Database.MAX_QUERY_CACHE_SIZE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "Database" Value
     o.get "MAX_QUERY_CACHE_SIZE" Float)
 
 /-- `get inTransaction(): boolean`: `readonly attribute boolean inTransaction` -/
-def Database.inTransaction (self : Database) : IO Bool := self.val.get "inTransaction" Bool
+@[macro_inline] def Database.inTransaction (self : Database) : IO Bool := Internal.api "Lasm.JS.Bun.Database.inTransaction" do
+  self.val.get "inTransaction" Bool
 
 /-- `readonly filename: string`: `readonly attribute DOMString filename` -/
-def Database.filename (self : Database) : IO String := self.val.get "filename" String
+@[macro_inline] def Database.filename (self : Database) : IO String := Internal.api "Lasm.JS.Bun.Database.filename" do
+  self.val.get "filename" String
 
 /-- `readonly handle: number`: `readonly attribute double handle` -/
-def Database.handle (self : Database) : IO Float := self.val.get "handle" Float
+@[macro_inline] def Database.handle (self : Database) : IO Float := Internal.api "Lasm.JS.Bun.Database.handle" do
+  self.val.get "handle" Float
 
 /-- `get onInsert(): UpdateHook | null`: `attribute UpdateHook? onInsert` -/
-def Database.onInsert (self : Database) : IO (Option UpdateHook) := self.val.get "onInsert" (Option UpdateHook)
+@[macro_inline] def Database.onInsert (self : Database) : IO (Option UpdateHook) := Internal.api "Lasm.JS.Bun.Database.onInsert" do
+  self.val.get "onInsert" (Option UpdateHook)
 
 /-- Sets `onInsert`: `attribute UpdateHook? onInsert` -/
-def Database.setOnInsert (self : Database) (value : Option UpdateHook) : IO Unit :=
+@[macro_inline] def Database.setOnInsert (self : Database) (value : Option UpdateHook) : IO Unit := Internal.api "Lasm.JS.Bun.Database.setOnInsert" do
   self.val.set "onInsert" (toJS value)
 
 /-- `get onUpdate(): UpdateHook | null`: `attribute UpdateHook? onUpdate` -/
-def Database.onUpdate (self : Database) : IO (Option UpdateHook) := self.val.get "onUpdate" (Option UpdateHook)
+@[macro_inline] def Database.onUpdate (self : Database) : IO (Option UpdateHook) := Internal.api "Lasm.JS.Bun.Database.onUpdate" do
+  self.val.get "onUpdate" (Option UpdateHook)
 
 /-- Sets `onUpdate`: `attribute UpdateHook? onUpdate` -/
-def Database.setOnUpdate (self : Database) (value : Option UpdateHook) : IO Unit :=
+@[macro_inline] def Database.setOnUpdate (self : Database) (value : Option UpdateHook) : IO Unit := Internal.api "Lasm.JS.Bun.Database.setOnUpdate" do
   self.val.set "onUpdate" (toJS value)
 
 /-- `get onDelete(): UpdateHook | null`: `attribute UpdateHook? onDelete` -/
-def Database.onDelete (self : Database) : IO (Option UpdateHook) := self.val.get "onDelete" (Option UpdateHook)
+@[macro_inline] def Database.onDelete (self : Database) : IO (Option UpdateHook) := Internal.api "Lasm.JS.Bun.Database.onDelete" do
+  self.val.get "onDelete" (Option UpdateHook)
 
 /-- Sets `onDelete`: `attribute UpdateHook? onDelete` -/
-def Database.setOnDelete (self : Database) (value : Option UpdateHook) : IO Unit :=
+@[macro_inline] def Database.setOnDelete (self : Database) (value : Option UpdateHook) : IO Unit := Internal.api "Lasm.JS.Bun.Database.setOnDelete" do
   self.val.set "onDelete" (toJS value)
 
 /-- `static open(filename: string, options?: number | DatabaseOptions): Database`: `static Database open(DOMString filename, optional DoubleOrDatabaseOptions options)` -/
-def Database.«open» (filename : String) (options : Option DoubleOrDatabaseOptions := none) : IO Database := do
+@[macro_inline] def Database.«open» (filename : String) (options : Option DoubleOrDatabaseOptions := none) : IO Database := Internal.api "Lasm.JS.Bun.Database.open" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.Database.open", module := "bun:sqlite", path := "Database.open", construct := false, arity := 2 }
-    (Support.args #[toJS filename, Support.optional options]) (await := false)
+    (Internal.args #[toJS filename, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `clearQueryCache(): void`: `undefined clearQueryCache()` -/
-def Database.clearQueryCache (self : Database) : IO Unit :=
-  self.val.callMethod "clearQueryCache" (Support.args #[]) Unit
+@[macro_inline] def Database.clearQueryCache (self : Database) : IO Unit := Internal.api "Lasm.JS.Bun.Database.clearQueryCache" do
+  self.val.callMethod "clearQueryCache" (Internal.args #[]) Unit
 
 /-- `run<ParamsType extends SQLQueryBindings[]>(sql: string, ...bindings: ParamsType[]): Changes`: `Changes run(DOMString sql, sequence<SQLQueryBindings?>... bindings)` -/
-def Database.run (self : Database) (sql : String) (bindings : Array (Array (Option SQLQueryBindings)) := #[]) : IO Changes :=
-  self.val.callMethod "run" (Support.argsWith #[toJS sql] (bindings.map toJS)) Changes
+@[macro_inline] def Database.run (self : Database) (sql : String) (bindings : Array (Array (Option SQLQueryBindings)) := #[]) : IO Changes := Internal.api "Lasm.JS.Bun.Database.run" do
+  self.val.callMethod "run" (Internal.argsWith #[toJS sql] (bindings.map toJS)) Changes
 
 /-- `query<ReturnType, ParamsType extends SQLQueryBindings | SQLQueryBindings[]>(sql: string): Statement<ReturnType, ParamsType extends any[] ? ParamsType : [ParamsType]> (read as Statement: a conditional type of the parameters)`: `Statement query(DOMString sql)` -/
-def Database.query (self : Database) (sql : String) : IO Statement := do
-  let r ← self.val.callMethod "query" (Support.args #[toJS sql]) Value
+@[macro_inline] def Database.query (self : Database) (sql : String) : IO Statement := Internal.api "Lasm.JS.Bun.Database.query" do
+  let r ← self.val.callMethod "query" (Internal.args #[toJS sql]) Value
   pure { val := r }
 
 /-- `prepare<ReturnType, ParamsType extends SQLQueryBindings | SQLQueryBindings[]>(sql: string, params?: ParamsType): Statement<ReturnType, ParamsType extends any[] ? ParamsType : [ParamsType]> (read as Statement: a conditional type of the parameters)`: `Statement prepare(DOMString sql, optional SQLQueryBindingsOrSequenceOfSQLQueryBindings params)` -/
-def Database.prepare (self : Database) (sql : String) (params : Option SQLQueryBindingsOrSequenceOfSQLQueryBindings := none) : IO Statement := do
-  let r ← self.val.callMethod "prepare" (Support.args #[toJS sql, Support.optional params]) Value
+@[macro_inline] def Database.prepare (self : Database) (sql : String) (params : Option SQLQueryBindingsOrSequenceOfSQLQueryBindings := none) : IO Statement := Internal.api "Lasm.JS.Bun.Database.prepare" do
+  let r ← self.val.callMethod "prepare" (Internal.args #[toJS sql, Internal.optional params]) Value
   pure { val := r }
 
 /-- `close(throwOnError?: boolean): void`: `undefined close(optional boolean throwOnError)` -/
-def Database.close (self : Database) (throwOnError : Option Bool := none) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[Support.optional throwOnError]) Unit
+@[macro_inline] def Database.close (self : Database) (throwOnError : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Bun.Database.close" do
+  self.val.callMethod "close" (Internal.args #[Internal.optional throwOnError]) Unit
 
 /-- `loadExtension(extension: string, entryPoint?: string): void`: `undefined loadExtension(DOMString extension, optional DOMString entryPoint)` -/
-def Database.loadExtension (self : Database) (extension : String) (entryPoint : Option String := none) : IO Unit :=
-  self.val.callMethod "loadExtension" (Support.args #[toJS extension, Support.optional entryPoint]) Unit
+@[macro_inline] def Database.loadExtension (self : Database) (extension : String) (entryPoint : Option String := none) : IO Unit := Internal.api "Lasm.JS.Bun.Database.loadExtension" do
+  self.val.callMethod "loadExtension" (Internal.args #[toJS extension, Internal.optional entryPoint]) Unit
 
 /-- `static setCustomSQLite(path: string): boolean`: `static boolean setCustomSQLite(DOMString path)` -/
-def Database.setCustomSQLite (path : String) : IO Bool :=
+@[macro_inline] def Database.setCustomSQLite (path : String) : IO Bool := Internal.api "Lasm.JS.Bun.Database.setCustomSQLite" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.Database.setCustomSQLite", module := "bun:sqlite", path := "Database.setCustomSQLite", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `function(name: string, fn: (...args: any[]) => SQLFunctionResult): this`: `Database function(DOMString name, DatabaseFunctionFn fn)` -/
-def Database.function (self : Database) (name : String) (fn : DatabaseFunctionFn) : IO Database := do
-  let r ← self.val.callMethod "function" (Support.args #[toJS name, toJS fn]) Value
+@[macro_inline] def Database.function (self : Database) (name : String) (fn : DatabaseFunctionFn) : IO Database := Internal.api "Lasm.JS.Bun.Database.function" do
+  let r ← self.val.callMethod "function" (Internal.args #[toJS name, toJS fn]) Value
   pure { val := r }
 
 /-- `function(name: string, options: FunctionOptions, fn: (...args: any[]) => SQLFunctionResult): this`: `Database function(DOMString name, FunctionOptions options, DatabaseFunctionWithOptionsFn fn)` -/
-def Database.functionWithOptions (self : Database) (name : String) (options : FunctionOptions) (fn : DatabaseFunctionWithOptionsFn) : IO Database := do
-  let r ← self.val.callMethod "function" (Support.args #[toJS name, toJS options, toJS fn]) Value
+@[macro_inline] def Database.functionWithOptions (self : Database) (name : String) (options : FunctionOptions) (fn : DatabaseFunctionWithOptionsFn) : IO Database := Internal.api "Lasm.JS.Bun.Database.functionWithOptions" do
+  let r ← self.val.callMethod "function" (Internal.args #[toJS name, toJS options, toJS fn]) Value
   pure { val := r }
 
 /-- `aggregate<T = any>(name: string, options: AggregateOptions<T>): this`: `Database aggregate(DOMString name, AggregateOptions options)` -/
-def Database.aggregate (self : Database) (name : String) (options : AggregateOptions) : IO Database := do
-  let r ← self.val.callMethod "aggregate" (Support.args #[toJS name, toJS options]) Value
+@[macro_inline] def Database.aggregate (self : Database) (name : String) (options : AggregateOptions) : IO Database := Internal.api "Lasm.JS.Bun.Database.aggregate" do
+  let r ← self.val.callMethod "aggregate" (Internal.args #[toJS name, toJS options]) Value
   pure { val := r }
 
 /-- `serialize(name?: string): Buffer`: `Uint8Array serialize(optional DOMString name)` -/
-def Database.serialize (self : Database) (name : Option String := none) : IO ByteArray :=
-  self.val.callMethod "serialize" (Support.args #[Support.optional name]) ByteArray
+@[macro_inline] def Database.serialize (self : Database) (name : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.Database.serialize" do
+  self.val.callMethod "serialize" (Internal.args #[Internal.optional name]) ByteArray
 
 /-- `static deserialize(serialized: NodeJS.TypedArray | ArrayBufferLike, isReadOnly?: boolean): Database`: `static Database deserialize(Uint8Array serialized, optional boolean isReadOnly)` -/
-def Database.deserialize (serialized : ByteArray) (isReadOnly : Option Bool := none) : IO Database := do
+@[macro_inline] def Database.deserialize (serialized : ByteArray) (isReadOnly : Option Bool := none) : IO Database := Internal.api "Lasm.JS.Bun.Database.deserialize" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.Database.deserialize", module := "bun:sqlite", path := "Database.deserialize", construct := false, arity := 2 }
-    (Support.args #[toJS serialized, Support.optional isReadOnly]) (await := false)
+    (Internal.args #[toJS serialized, Internal.optional isReadOnly]) (await := false)
   pure { val := r }
 
 /-- `static deserialize(serialized: NodeJS.TypedArray | ArrayBufferLike, options?: Pick<DatabaseOptions, 'readonly' | 'strict' | 'safeIntegers'>): Database`: `static Database deserialize(Uint8Array serialized, optional DatabaseOptions options)` -/
-def Database.deserializeWithOptions (serialized : ByteArray) (options : Option DatabaseOptions := none) : IO Database := do
+@[macro_inline] def Database.deserializeWithOptions (serialized : ByteArray) (options : Option DatabaseOptions := none) : IO Database := Internal.api "Lasm.JS.Bun.Database.deserializeWithOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.Database.deserializeWithOptions", module := "bun:sqlite", path := "Database.deserialize", construct := false, arity := 2 }
-    (Support.args #[toJS serialized, Support.optional options]) (await := false)
+    (Internal.args #[toJS serialized, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fileControl(op: number, arg?: ArrayBufferView | number | null): number`: `double fileControl(double op, optional Uint8ArrayOrDouble arg)` -/
-def Database.fileControl (self : Database) (op : Float) (arg : Option Uint8ArrayOrDouble := none) : IO Float :=
-  self.val.callMethod "fileControl" (Support.args #[toJS op, Support.optional arg]) Float
+@[macro_inline] def Database.fileControl (self : Database) (op : Float) (arg : Option Uint8ArrayOrDouble := none) : IO Float := Internal.api "Lasm.JS.Bun.Database.fileControl" do
+  self.val.callMethod "fileControl" (Internal.args #[toJS op, Internal.optional arg]) Float
 
 /-- `fileControl(zDbName: string, op: number, arg?: ArrayBufferView | number | null): number`: `double fileControl(DOMString zDbName, double op, optional Uint8ArrayOrDouble arg)` -/
-def Database.fileControlWithZDbName (self : Database) (zDbName : String) (op : Float) (arg : Option Uint8ArrayOrDouble := none) : IO Float :=
-  self.val.callMethod "fileControl" (Support.args #[toJS zDbName, toJS op, Support.optional arg]) Float
+@[macro_inline] def Database.fileControlWithZDbName (self : Database) (zDbName : String) (op : Float) (arg : Option Uint8ArrayOrDouble := none) : IO Float := Internal.api "Lasm.JS.Bun.Database.fileControlWithZDbName" do
+  self.val.callMethod "fileControl" (Internal.args #[toJS zDbName, toJS op, Internal.optional arg]) Float
 
 /-- `readonly name: 'SQLiteError'`: `readonly attribute SQLiteErrorName name` -/
-def SQLiteError.name (self : SQLiteError) : IO SQLiteErrorName := self.val.get "name" SQLiteErrorName
+@[macro_inline] def SQLiteError.name (self : SQLiteError) : IO SQLiteErrorName := Internal.api "Lasm.JS.Bun.SQLiteError.name" do
+  self.val.get "name" SQLiteErrorName
 
 /-- `errno: number`: `attribute double errno` -/
-def SQLiteError.errno (self : SQLiteError) : IO Float := self.val.get "errno" Float
+@[macro_inline] def SQLiteError.errno (self : SQLiteError) : IO Float := Internal.api "Lasm.JS.Bun.SQLiteError.errno" do
+  self.val.get "errno" Float
 
 /-- Sets `errno`: `attribute double errno` -/
-def SQLiteError.setErrno (self : SQLiteError) (value : Float) : IO Unit :=
+@[macro_inline] def SQLiteError.setErrno (self : SQLiteError) (value : Float) : IO Unit := Internal.api "Lasm.JS.Bun.SQLiteError.setErrno" do
   self.val.set "errno" (toJS value)
 
 /-- `code?: string`: `attribute DOMString? code` -/
-def SQLiteError.code (self : SQLiteError) : IO (Option String) := self.val.get "code" (Option String)
+@[macro_inline] def SQLiteError.code (self : SQLiteError) : IO (Option String) := Internal.api "Lasm.JS.Bun.SQLiteError.code" do
+  self.val.get "code" (Option String)
 
 /-- Sets `code`: `attribute DOMString? code` -/
-def SQLiteError.setCode (self : SQLiteError) (value : Option String) : IO Unit :=
+@[macro_inline] def SQLiteError.setCode (self : SQLiteError) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Bun.SQLiteError.setCode" do
   self.val.set "code" (toJS value)
 
 /-- `readonly byteOffset: number`: `readonly attribute double byteOffset` -/
-def SQLiteError.byteOffset (self : SQLiteError) : IO Float := self.val.get "byteOffset" Float
+@[macro_inline] def SQLiteError.byteOffset (self : SQLiteError) : IO Float := Internal.api "Lasm.JS.Bun.SQLiteError.byteOffset" do
+  self.val.get "byteOffset" Float
 
 /-- `const Bun.constants.SQLITE_OPEN_READONLY: number`: `readonly attribute double SQLITE_OPEN_READONLY` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_READONLY : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_READONLY : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_READONLY" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_READONLY" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_READWRITE: number`: `readonly attribute double SQLITE_OPEN_READWRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_READWRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_READWRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_READWRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_READWRITE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_CREATE: number`: `readonly attribute double SQLITE_OPEN_CREATE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_CREATE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_CREATE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_CREATE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_CREATE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_DELETEONCLOSE: number`: `readonly attribute double SQLITE_OPEN_DELETEONCLOSE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_DELETEONCLOSE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_DELETEONCLOSE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_DELETEONCLOSE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_DELETEONCLOSE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_EXCLUSIVE: number`: `readonly attribute double SQLITE_OPEN_EXCLUSIVE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_EXCLUSIVE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_EXCLUSIVE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_EXCLUSIVE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_EXCLUSIVE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_AUTOPROXY: number`: `readonly attribute double SQLITE_OPEN_AUTOPROXY` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_AUTOPROXY : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_AUTOPROXY : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_AUTOPROXY" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_AUTOPROXY" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_URI: number`: `readonly attribute double SQLITE_OPEN_URI` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_URI : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_URI : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_URI" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_URI" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_MEMORY: number`: `readonly attribute double SQLITE_OPEN_MEMORY` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_MEMORY : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_MEMORY : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_MEMORY" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_MEMORY" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_MAIN_DB: number`: `readonly attribute double SQLITE_OPEN_MAIN_DB` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_MAIN_DB : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_MAIN_DB : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_MAIN_DB" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_MAIN_DB" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_TEMP_DB: number`: `readonly attribute double SQLITE_OPEN_TEMP_DB` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_TEMP_DB : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_TEMP_DB : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_TEMP_DB" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_TEMP_DB" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_TRANSIENT_DB: number`: `readonly attribute double SQLITE_OPEN_TRANSIENT_DB` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_TRANSIENT_DB : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_TRANSIENT_DB : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_TRANSIENT_DB" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_TRANSIENT_DB" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_MAIN_JOURNAL: number`: `readonly attribute double SQLITE_OPEN_MAIN_JOURNAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_MAIN_JOURNAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_MAIN_JOURNAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_MAIN_JOURNAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_MAIN_JOURNAL" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_TEMP_JOURNAL: number`: `readonly attribute double SQLITE_OPEN_TEMP_JOURNAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_TEMP_JOURNAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_TEMP_JOURNAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_TEMP_JOURNAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_TEMP_JOURNAL" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_SUBJOURNAL: number`: `readonly attribute double SQLITE_OPEN_SUBJOURNAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_SUBJOURNAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_SUBJOURNAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_SUBJOURNAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_SUBJOURNAL" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_SUPER_JOURNAL: number`: `readonly attribute double SQLITE_OPEN_SUPER_JOURNAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_SUPER_JOURNAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_SUPER_JOURNAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_SUPER_JOURNAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_SUPER_JOURNAL" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_NOMUTEX: number`: `readonly attribute double SQLITE_OPEN_NOMUTEX` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_NOMUTEX : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_NOMUTEX : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_NOMUTEX" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_NOMUTEX" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_FULLMUTEX: number`: `readonly attribute double SQLITE_OPEN_FULLMUTEX` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_FULLMUTEX : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_FULLMUTEX : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_FULLMUTEX" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_FULLMUTEX" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_SHAREDCACHE: number`: `readonly attribute double SQLITE_OPEN_SHAREDCACHE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_SHAREDCACHE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_SHAREDCACHE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_SHAREDCACHE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_SHAREDCACHE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_PRIVATECACHE: number`: `readonly attribute double SQLITE_OPEN_PRIVATECACHE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_PRIVATECACHE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_PRIVATECACHE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_PRIVATECACHE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_PRIVATECACHE" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_WAL: number`: `readonly attribute double SQLITE_OPEN_WAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_WAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_WAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_WAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_WAL" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_NOFOLLOW: number`: `readonly attribute double SQLITE_OPEN_NOFOLLOW` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_NOFOLLOW : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_NOFOLLOW : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_NOFOLLOW" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_NOFOLLOW" Float)
 
 /-- `const Bun.constants.SQLITE_OPEN_EXRESCODE: number`: `readonly attribute double SQLITE_OPEN_EXRESCODE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_OPEN_EXRESCODE : IO Float := (do
+@[macro_inline] def constants.SQLITE_OPEN_EXRESCODE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_OPEN_EXRESCODE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_OPEN_EXRESCODE" Float)
 
 /-- `const Bun.constants.SQLITE_PREPARE_PERSISTENT: number`: `readonly attribute double SQLITE_PREPARE_PERSISTENT` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_PREPARE_PERSISTENT : IO Float := (do
+@[macro_inline] def constants.SQLITE_PREPARE_PERSISTENT : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_PREPARE_PERSISTENT" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_PREPARE_PERSISTENT" Float)
 
 /-- `const Bun.constants.SQLITE_PREPARE_NORMALIZE: number`: `readonly attribute double SQLITE_PREPARE_NORMALIZE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_PREPARE_NORMALIZE : IO Float := (do
+@[macro_inline] def constants.SQLITE_PREPARE_NORMALIZE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_PREPARE_NORMALIZE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_PREPARE_NORMALIZE" Float)
 
 /-- `const Bun.constants.SQLITE_PREPARE_NO_VTAB: number`: `readonly attribute double SQLITE_PREPARE_NO_VTAB` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_PREPARE_NO_VTAB : IO Float := (do
+@[macro_inline] def constants.SQLITE_PREPARE_NO_VTAB : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_PREPARE_NO_VTAB" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_PREPARE_NO_VTAB" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_LOCKSTATE: number`: `readonly attribute double SQLITE_FCNTL_LOCKSTATE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_LOCKSTATE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_LOCKSTATE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_LOCKSTATE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_LOCKSTATE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_GET_LOCKPROXYFILE: number`: `readonly attribute double SQLITE_FCNTL_GET_LOCKPROXYFILE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_GET_LOCKPROXYFILE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_GET_LOCKPROXYFILE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_GET_LOCKPROXYFILE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_GET_LOCKPROXYFILE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_SET_LOCKPROXYFILE: number`: `readonly attribute double SQLITE_FCNTL_SET_LOCKPROXYFILE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_SET_LOCKPROXYFILE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_SET_LOCKPROXYFILE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_SET_LOCKPROXYFILE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_SET_LOCKPROXYFILE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_LAST_ERRNO: number`: `readonly attribute double SQLITE_FCNTL_LAST_ERRNO` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_LAST_ERRNO : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_LAST_ERRNO : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_LAST_ERRNO" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_LAST_ERRNO" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_SIZE_HINT: number`: `readonly attribute double SQLITE_FCNTL_SIZE_HINT` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_SIZE_HINT : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_SIZE_HINT : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_SIZE_HINT" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_SIZE_HINT" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_CHUNK_SIZE: number`: `readonly attribute double SQLITE_FCNTL_CHUNK_SIZE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_CHUNK_SIZE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_CHUNK_SIZE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_CHUNK_SIZE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_CHUNK_SIZE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_FILE_POINTER: number`: `readonly attribute double SQLITE_FCNTL_FILE_POINTER` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_FILE_POINTER : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_FILE_POINTER : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_FILE_POINTER" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_FILE_POINTER" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_SYNC_OMITTED: number`: `readonly attribute double SQLITE_FCNTL_SYNC_OMITTED` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_SYNC_OMITTED : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_SYNC_OMITTED : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_SYNC_OMITTED" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_SYNC_OMITTED" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_WIN32_AV_RETRY: number`: `readonly attribute double SQLITE_FCNTL_WIN32_AV_RETRY` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_WIN32_AV_RETRY : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_WIN32_AV_RETRY : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_WIN32_AV_RETRY" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_WIN32_AV_RETRY" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_PERSIST_WAL: number`: `readonly attribute double SQLITE_FCNTL_PERSIST_WAL` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_PERSIST_WAL : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_PERSIST_WAL : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_PERSIST_WAL" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_PERSIST_WAL" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_OVERWRITE: number`: `readonly attribute double SQLITE_FCNTL_OVERWRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_OVERWRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_OVERWRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_OVERWRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_OVERWRITE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_VFSNAME: number`: `readonly attribute double SQLITE_FCNTL_VFSNAME` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_VFSNAME : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_VFSNAME : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_VFSNAME" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_VFSNAME" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_POWERSAFE_OVERWRITE: number`: `readonly attribute double SQLITE_FCNTL_POWERSAFE_OVERWRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_POWERSAFE_OVERWRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_POWERSAFE_OVERWRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_POWERSAFE_OVERWRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_POWERSAFE_OVERWRITE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_PRAGMA: number`: `readonly attribute double SQLITE_FCNTL_PRAGMA` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_PRAGMA : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_PRAGMA : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_PRAGMA" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_PRAGMA" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_BUSYHANDLER: number`: `readonly attribute double SQLITE_FCNTL_BUSYHANDLER` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_BUSYHANDLER : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_BUSYHANDLER : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_BUSYHANDLER" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_BUSYHANDLER" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_TEMPFILENAME: number`: `readonly attribute double SQLITE_FCNTL_TEMPFILENAME` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_TEMPFILENAME : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_TEMPFILENAME : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_TEMPFILENAME" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_TEMPFILENAME" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_MMAP_SIZE: number`: `readonly attribute double SQLITE_FCNTL_MMAP_SIZE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_MMAP_SIZE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_MMAP_SIZE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_MMAP_SIZE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_MMAP_SIZE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_TRACE: number`: `readonly attribute double SQLITE_FCNTL_TRACE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_TRACE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_TRACE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_TRACE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_TRACE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_HAS_MOVED: number`: `readonly attribute double SQLITE_FCNTL_HAS_MOVED` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_HAS_MOVED : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_HAS_MOVED : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_HAS_MOVED" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_HAS_MOVED" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_SYNC: number`: `readonly attribute double SQLITE_FCNTL_SYNC` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_SYNC : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_SYNC : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_SYNC" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_SYNC" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_COMMIT_PHASETWO: number`: `readonly attribute double SQLITE_FCNTL_COMMIT_PHASETWO` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_COMMIT_PHASETWO : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_COMMIT_PHASETWO : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_COMMIT_PHASETWO" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_COMMIT_PHASETWO" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_WIN32_SET_HANDLE: number`: `readonly attribute double SQLITE_FCNTL_WIN32_SET_HANDLE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_WIN32_SET_HANDLE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_WIN32_SET_HANDLE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_WIN32_SET_HANDLE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_WIN32_SET_HANDLE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_WAL_BLOCK: number`: `readonly attribute double SQLITE_FCNTL_WAL_BLOCK` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_WAL_BLOCK : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_WAL_BLOCK : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_WAL_BLOCK" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_WAL_BLOCK" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_ZIPVFS: number`: `readonly attribute double SQLITE_FCNTL_ZIPVFS` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_ZIPVFS : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_ZIPVFS : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_ZIPVFS" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_ZIPVFS" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_RBU: number`: `readonly attribute double SQLITE_FCNTL_RBU` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_RBU : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_RBU : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_RBU" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_RBU" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_VFS_POINTER: number`: `readonly attribute double SQLITE_FCNTL_VFS_POINTER` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_VFS_POINTER : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_VFS_POINTER : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_VFS_POINTER" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_VFS_POINTER" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_JOURNAL_POINTER: number`: `readonly attribute double SQLITE_FCNTL_JOURNAL_POINTER` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_JOURNAL_POINTER : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_JOURNAL_POINTER : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_JOURNAL_POINTER" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_JOURNAL_POINTER" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_WIN32_GET_HANDLE: number`: `readonly attribute double SQLITE_FCNTL_WIN32_GET_HANDLE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_WIN32_GET_HANDLE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_WIN32_GET_HANDLE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_WIN32_GET_HANDLE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_WIN32_GET_HANDLE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_PDB: number`: `readonly attribute double SQLITE_FCNTL_PDB` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_PDB : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_PDB : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_PDB" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_PDB" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_BEGIN_ATOMIC_WRITE: number`: `readonly attribute double SQLITE_FCNTL_BEGIN_ATOMIC_WRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_BEGIN_ATOMIC_WRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_BEGIN_ATOMIC_WRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_BEGIN_ATOMIC_WRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_BEGIN_ATOMIC_WRITE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_COMMIT_ATOMIC_WRITE: number`: `readonly attribute double SQLITE_FCNTL_COMMIT_ATOMIC_WRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_COMMIT_ATOMIC_WRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_COMMIT_ATOMIC_WRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_COMMIT_ATOMIC_WRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_COMMIT_ATOMIC_WRITE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE: number`: `readonly attribute double SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_LOCK_TIMEOUT: number`: `readonly attribute double SQLITE_FCNTL_LOCK_TIMEOUT` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_LOCK_TIMEOUT : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_LOCK_TIMEOUT : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_LOCK_TIMEOUT" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_LOCK_TIMEOUT" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_DATA_VERSION: number`: `readonly attribute double SQLITE_FCNTL_DATA_VERSION` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_DATA_VERSION : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_DATA_VERSION : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_DATA_VERSION" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_DATA_VERSION" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_SIZE_LIMIT: number`: `readonly attribute double SQLITE_FCNTL_SIZE_LIMIT` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_SIZE_LIMIT : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_SIZE_LIMIT : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_SIZE_LIMIT" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_SIZE_LIMIT" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_CKPT_DONE: number`: `readonly attribute double SQLITE_FCNTL_CKPT_DONE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_CKPT_DONE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_CKPT_DONE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_CKPT_DONE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_CKPT_DONE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_RESERVE_BYTES: number`: `readonly attribute double SQLITE_FCNTL_RESERVE_BYTES` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_RESERVE_BYTES : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_RESERVE_BYTES : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_RESERVE_BYTES" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_RESERVE_BYTES" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_CKPT_START: number`: `readonly attribute double SQLITE_FCNTL_CKPT_START` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_CKPT_START : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_CKPT_START : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_CKPT_START" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_CKPT_START" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_EXTERNAL_READER: number`: `readonly attribute double SQLITE_FCNTL_EXTERNAL_READER` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_EXTERNAL_READER : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_EXTERNAL_READER : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_EXTERNAL_READER" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_EXTERNAL_READER" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_CKSM_FILE: number`: `readonly attribute double SQLITE_FCNTL_CKSM_FILE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_CKSM_FILE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_CKSM_FILE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_CKSM_FILE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_CKSM_FILE" Float)
 
 /-- `const Bun.constants.SQLITE_FCNTL_RESET_CACHE: number`: `readonly attribute double SQLITE_FCNTL_RESET_CACHE` (Bun 1.4.4 type declarations) -/
-def constants.SQLITE_FCNTL_RESET_CACHE : IO Float := (do
+@[macro_inline] def constants.SQLITE_FCNTL_RESET_CACHE : IO Float := Internal.api "Lasm.JS.Bun.constants.SQLITE_FCNTL_RESET_CACHE" do
+  (do
     let o ← (← Lasm.JS.require "bun:sqlite").get "constants" Value
     o.get "SQLITE_FCNTL_RESET_CACHE" Float)
 

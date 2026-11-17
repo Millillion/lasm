@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.AsyncHooks
 import Lasm.JS.Node.Events
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class Channel` of `node:diagnostics_channel` (Node.js 24.22.2 documentation, diagnostics_channel.md): a handle to the JavaScript object. -/
 structure Channel where
@@ -67,11 +70,11 @@ structure TracingChannel.SubscribeSubscribers where
   asyncEnd : Option JSFunction := none
   /-- `Function error` -/
   error : Option JSFunction := none
-instance instToJSTracingChannelSubscribeSubscribers : ToJS TracingChannel.SubscribeSubscribers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
-    ("end", Support.optional d.«end»),
-    ("asyncStart", Support.optional d.asyncStart),
-    ("asyncEnd", Support.optional d.asyncEnd),
-    ("error", Support.optional d.error)]⟩
+instance instToJSTracingChannelSubscribeSubscribers : ToJS TracingChannel.SubscribeSubscribers := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»),
+    ("asyncStart", Internal.optional d.asyncStart),
+    ("asyncEnd", Internal.optional d.asyncEnd),
+    ("error", Internal.optional d.error)]⟩
 
 /-- `dictionary TracingChannel.UnsubscribeSubscribers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TracingChannel.UnsubscribeSubscribers where
@@ -85,11 +88,11 @@ structure TracingChannel.UnsubscribeSubscribers where
   asyncEnd : Option JSFunction := none
   /-- `Function error` -/
   error : Option JSFunction := none
-instance instToJSTracingChannelUnsubscribeSubscribers : ToJS TracingChannel.UnsubscribeSubscribers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
-    ("end", Support.optional d.«end»),
-    ("asyncStart", Support.optional d.asyncStart),
-    ("asyncEnd", Support.optional d.asyncEnd),
-    ("error", Support.optional d.error)]⟩
+instance instToJSTracingChannelUnsubscribeSubscribers : ToJS TracingChannel.UnsubscribeSubscribers := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»),
+    ("asyncStart", Internal.optional d.asyncStart),
+    ("asyncEnd", Internal.optional d.asyncEnd),
+    ("error", Internal.optional d.error)]⟩
 
 /-- `dictionary BoundedChannel.SubscribeHandlers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BoundedChannel.SubscribeHandlers where
@@ -97,8 +100,8 @@ structure BoundedChannel.SubscribeHandlers where
   start : Option JSFunction := none
   /-- `Function end` -/
   «end» : Option JSFunction := none
-instance instToJSBoundedChannelSubscribeHandlers : ToJS BoundedChannel.SubscribeHandlers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
-    ("end", Support.optional d.«end»)]⟩
+instance instToJSBoundedChannelSubscribeHandlers : ToJS BoundedChannel.SubscribeHandlers := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»)]⟩
 
 /-- `dictionary BoundedChannel.UnsubscribeHandlers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BoundedChannel.UnsubscribeHandlers where
@@ -106,8 +109,8 @@ structure BoundedChannel.UnsubscribeHandlers where
   start : Option JSFunction := none
   /-- `Function end` -/
   «end» : Option JSFunction := none
-instance instToJSBoundedChannelUnsubscribeHandlers : ToJS BoundedChannel.UnsubscribeHandlers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
-    ("end", Support.optional d.«end»)]⟩
+instance instToJSBoundedChannelUnsubscribeHandlers : ToJS BoundedChannel.UnsubscribeHandlers := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»)]⟩
 
 /-- `(DOMString or TracingChannel)`: one constructor per member type. -/
 inductive DOMStringOrTracingChannel where
@@ -134,128 +137,130 @@ instance : Coe String DOMStringOrBoundedChannel := ⟨.domString⟩
 instance : Coe BoundedChannel DOMStringOrBoundedChannel := ⟨.boundedChannel⟩
 
 /-- `v instanceof Channel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Channel`). -/
-def Channel.cast? (v : Value) : IO (Option Channel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["Channel"] Value) v) then some { val := v } else none
+@[macro_inline] def Channel.cast? (v : Value) : IO (Option Channel) := Internal.api "Lasm.JS.Node.Channel.cast?" do
+  Internal.cast (Support.getExport "node:diagnostics_channel" ["Channel"] Value) (fun x => { val := x }) v
 
 /-- `channel.hasSubscribers` (added in Node.js v15.1.0, v14.17.0): `readonly attribute boolean hasSubscribers` -/
-def Channel.hasSubscribers (self : Channel) : IO Bool := self.val.get "hasSubscribers" Bool
+@[macro_inline] def Channel.hasSubscribers (self : Channel) : IO Bool := Internal.api "Lasm.JS.Node.Channel.hasSubscribers" do
+  self.val.get "hasSubscribers" Bool
 
 /-- `channel.publish(message)` (added in Node.js v15.1.0, v14.17.0): `undefined publish(any message)` -/
-def Channel.publish (self : Channel) (message : Data) : IO Unit :=
-  self.val.callMethod "publish" (Support.args #[toJS message]) Unit
+@[macro_inline] def Channel.publish (self : Channel) (message : Data) : IO Unit := Internal.api "Lasm.JS.Node.Channel.publish" do
+  self.val.callMethod "publish" (Internal.args #[toJS message]) Unit
 
 /-- `channel.subscribe(onMessage)` (added in Node.js v15.1.0, v14.17.0): `undefined subscribe(Function onMessage)` -/
-def Channel.subscribe (self : Channel) (onMessage : JSFunction) : IO Unit :=
-  self.val.callMethod "subscribe" (Support.args #[toJS onMessage]) Unit
+@[macro_inline] def Channel.subscribe (self : Channel) (onMessage : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Channel.subscribe" do
+  self.val.callMethod "subscribe" (Internal.args #[toJS onMessage]) Unit
 
 /-- `channel.unsubscribe(onMessage)` (added in Node.js v15.1.0, v14.17.0): `boolean unsubscribe(Function onMessage)` -/
-def Channel.unsubscribe (self : Channel) (onMessage : JSFunction) : IO Bool :=
-  self.val.callMethod "unsubscribe" (Support.args #[toJS onMessage]) Bool
+@[macro_inline] def Channel.unsubscribe (self : Channel) (onMessage : JSFunction) : IO Bool := Internal.api "Lasm.JS.Node.Channel.unsubscribe" do
+  self.val.callMethod "unsubscribe" (Internal.args #[toJS onMessage]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `channel.bindStore(store[, transform])` (added in Node.js v19.9.0, v18.19.0): `undefined bindStore(AsyncLocalStorage store, optional Function transform)` -/
-def Channel.bindStore (self : Channel) (store : AsyncLocalStorage) (transform : Option JSFunction := none) : IO Unit :=
-  self.val.callMethod "bindStore" (Support.args #[toJS store, Support.optional transform]) Unit
+@[macro_inline] def Channel.bindStore (self : Channel) (store : AsyncLocalStorage) (transform : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.Channel.bindStore" do
+  self.val.callMethod "bindStore" (Internal.args #[toJS store, Internal.optional transform]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `channel.unbindStore(store)` (added in Node.js v19.9.0, v18.19.0): `boolean unbindStore(AsyncLocalStorage store)` -/
-def Channel.unbindStore (self : Channel) (store : AsyncLocalStorage) : IO Bool :=
-  self.val.callMethod "unbindStore" (Support.args #[toJS store]) Bool
+@[macro_inline] def Channel.unbindStore (self : Channel) (store : AsyncLocalStorage) : IO Bool := Internal.api "Lasm.JS.Node.Channel.unbindStore" do
+  self.val.callMethod "unbindStore" (Internal.args #[toJS store]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `channel.runStores(context, fn[, thisArg[, ...args]])` (added in Node.js v19.9.0, v18.19.0): `undefined runStores(any context, Function fn, optional any thisArg, any... args)` -/
-def Channel.runStores (self : Channel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "runStores" (Support.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Unit
+@[macro_inline] def Channel.runStores (self : Channel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Channel.runStores" do
+  self.val.callMethod "runStores" (Internal.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Unit
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `channel.withStoreScope(data)` (added in Node.js v26.1.0): `RunStoresScope withStoreScope(any data)` -/
-def Channel.withStoreScope (self : Channel) (data : Data) : IO RunStoresScope := do
-  let r ← self.val.callMethod "withStoreScope" (Support.args #[toJS data]) Value
+@[macro_inline] def Channel.withStoreScope (self : Channel) (data : Data) : IO RunStoresScope := Internal.api "Lasm.JS.Node.Channel.withStoreScope" do
+  let r ← self.val.callMethod "withStoreScope" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `v instanceof TracingChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TracingChannel`). -/
-def TracingChannel.cast? (v : Value) : IO (Option TracingChannel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["TracingChannel"] Value) v) then some { val := v } else none
+@[macro_inline] def TracingChannel.cast? (v : Value) : IO (Option TracingChannel) := Internal.api "Lasm.JS.Node.TracingChannel.cast?" do
+  Internal.cast (Support.getExport "node:diagnostics_channel" ["TracingChannel"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
-def TracingChannel.hasSubscribers (self : TracingChannel) : IO Bool := self.val.get "hasSubscribers" Bool
+@[macro_inline] def TracingChannel.hasSubscribers (self : TracingChannel) : IO Bool := Internal.api "Lasm.JS.Node.TracingChannel.hasSubscribers" do
+  self.val.get "hasSubscribers" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.subscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `undefined subscribe(TracingChannel.SubscribeSubscribers subscribers)` -/
-def TracingChannel.subscribe (self : TracingChannel) (subscribers : TracingChannel.SubscribeSubscribers) : IO Unit :=
-  self.val.callMethod "subscribe" (Support.args #[toJS subscribers]) Unit
+@[macro_inline] def TracingChannel.subscribe (self : TracingChannel) (subscribers : TracingChannel.SubscribeSubscribers) : IO Unit := Internal.api "Lasm.JS.Node.TracingChannel.subscribe" do
+  self.val.callMethod "subscribe" (Internal.args #[toJS subscribers]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.unsubscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `boolean unsubscribe(TracingChannel.UnsubscribeSubscribers subscribers)` -/
-def TracingChannel.unsubscribe (self : TracingChannel) (subscribers : TracingChannel.UnsubscribeSubscribers) : IO Bool :=
-  self.val.callMethod "unsubscribe" (Support.args #[toJS subscribers]) Bool
+@[macro_inline] def TracingChannel.unsubscribe (self : TracingChannel) (subscribers : TracingChannel.UnsubscribeSubscribers) : IO Bool := Internal.api "Lasm.JS.Node.TracingChannel.unsubscribe" do
+  self.val.callMethod "unsubscribe" (Internal.args #[toJS subscribers]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `any traceSync(Function fn, optional object context, optional any thisArg, any... args)` -/
-def TracingChannel.traceSync (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "traceSync" (Support.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
+@[macro_inline] def TracingChannel.traceSync (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Node.TracingChannel.traceSync" do
+  self.val.callMethod "traceSync" (Internal.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `Promise<any> tracePromise(Function fn, optional object context, optional any thisArg, any... args)` -/
-def TracingChannel.tracePromise (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : Async Data :=
-  self.val.callMethodAwait "tracePromise" (Support.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
+@[macro_inline] def TracingChannel.tracePromise (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : Async Data := Internal.api "Lasm.JS.Node.TracingChannel.tracePromise" do
+  self.val.callMethodAwait "tracePromise" (Internal.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])` (added in Node.js v19.9.0, v18.19.0): `any traceCallback(Function fn, optional double position, optional object context, optional any thisArg, any... args)` -/
-def TracingChannel.traceCallback (self : TracingChannel) (fn : JSFunction) (position : Option Float := none) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "traceCallback" (Support.argsWith #[toJS fn, Support.optional position, context, thisArg] (args.map toJS)) Data
+@[macro_inline] def TracingChannel.traceCallback (self : TracingChannel) (fn : JSFunction) (position : Option Float := none) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Node.TracingChannel.traceCallback" do
+  self.val.callMethod "traceCallback" (Internal.argsWith #[toJS fn, Internal.optional position, context, thisArg] (args.map toJS)) Data
 
 /-- `v instanceof RunStoresScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RunStoresScope`). -/
-def RunStoresScope.cast? (v : Value) : IO (Option RunStoresScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["RunStoresScope"] Value) v) then some { val := v } else none
+@[macro_inline] def RunStoresScope.cast? (v : Value) : IO (Option RunStoresScope) := Internal.api "Lasm.JS.Node.RunStoresScope.cast?" do
+  Internal.cast (Support.getExport "node:diagnostics_channel" ["RunStoresScope"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof BoundedChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BoundedChannel`). -/
-def BoundedChannel.cast? (v : Value) : IO (Option BoundedChannel) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["BoundedChannel"] Value) v) then some { val := v } else none
+@[macro_inline] def BoundedChannel.cast? (v : Value) : IO (Option BoundedChannel) := Internal.api "Lasm.JS.Node.BoundedChannel.cast?" do
+  Internal.cast (Support.getExport "node:diagnostics_channel" ["BoundedChannel"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.subscribe(handlers)` (added in Node.js v26.1.0): `undefined subscribe(BoundedChannel.SubscribeHandlers handlers)` -/
-def BoundedChannel.subscribe (self : BoundedChannel) (handlers : BoundedChannel.SubscribeHandlers) : IO Unit :=
-  self.val.callMethod "subscribe" (Support.args #[toJS handlers]) Unit
+@[macro_inline] def BoundedChannel.subscribe (self : BoundedChannel) (handlers : BoundedChannel.SubscribeHandlers) : IO Unit := Internal.api "Lasm.JS.Node.BoundedChannel.subscribe" do
+  self.val.callMethod "subscribe" (Internal.args #[toJS handlers]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.unsubscribe(handlers)` (added in Node.js v26.1.0): `boolean unsubscribe(BoundedChannel.UnsubscribeHandlers handlers)` -/
-def BoundedChannel.unsubscribe (self : BoundedChannel) (handlers : BoundedChannel.UnsubscribeHandlers) : IO Bool :=
-  self.val.callMethod "unsubscribe" (Support.args #[toJS handlers]) Bool
+@[macro_inline] def BoundedChannel.unsubscribe (self : BoundedChannel) (handlers : BoundedChannel.UnsubscribeHandlers) : IO Bool := Internal.api "Lasm.JS.Node.BoundedChannel.unsubscribe" do
+  self.val.callMethod "unsubscribe" (Internal.args #[toJS handlers]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.run(context, fn[, thisArg[, ...args]])` (added in Node.js v26.1.0): `any run(object context, Function fn, optional any thisArg, any... args)` -/
-def BoundedChannel.run (self : BoundedChannel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "run" (Support.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Data
+@[macro_inline] def BoundedChannel.run (self : BoundedChannel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Node.BoundedChannel.run" do
+  self.val.callMethod "run" (Internal.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.withScope([context])` (added in Node.js v26.1.0): `BoundedChannelScope withScope(optional object context)` -/
-def BoundedChannel.withScope (self : BoundedChannel) (context : Data := .undefined) : IO BoundedChannelScope := do
-  let r ← self.val.callMethod "withScope" (Support.args #[context]) Value
+@[macro_inline] def BoundedChannel.withScope (self : BoundedChannel) (context : Data := .undefined) : IO BoundedChannelScope := Internal.api "Lasm.JS.Node.BoundedChannel.withScope" do
+  let r ← self.val.callMethod "withScope" (Internal.args #[context]) Value
   pure { val := r }
 
 /-- `v instanceof BoundedChannelScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BoundedChannelScope`). -/
-def BoundedChannelScope.cast? (v : Value) : IO (Option BoundedChannelScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["BoundedChannelScope"] Value) v) then some { val := v } else none
+@[macro_inline] def BoundedChannelScope.cast? (v : Value) : IO (Option BoundedChannelScope) := Internal.api "Lasm.JS.Node.BoundedChannelScope.cast?" do
+  Internal.cast (Support.getExport "node:diagnostics_channel" ["BoundedChannelScope"] Value) (fun x => { val := x }) v
 
 /-- `diagnostics_channel.hasSubscribers(name)` (added in Node.js v15.1.0, v14.17.0): `boolean hasSubscribers((DOMString or symbol) name)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.hasSubscribers (name : DOMStringOrSymbol) : IO Bool :=
+@[macro_inline] def diagnostics_channel.hasSubscribers (name : DOMStringOrSymbol) : IO Bool := Internal.api "Lasm.JS.Node.diagnostics_channel.hasSubscribers" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.diagnostics_channel.hasSubscribers", module := "node:diagnostics_channel", path := "hasSubscribers", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
 
 /-- `diagnostics_channel.channel(name)` (added in Node.js v15.1.0, v14.17.0): `Channel channel((DOMString or symbol) name)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.channel (name : DOMStringOrSymbol) : IO Channel := do
+@[macro_inline] def diagnostics_channel.channel (name : DOMStringOrSymbol) : IO Channel := Internal.api "Lasm.JS.Node.diagnostics_channel.channel" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.diagnostics_channel.channel", module := "node:diagnostics_channel", path := "channel", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
   pure { val := r }
 
 /-- `diagnostics_channel.subscribe(name, onMessage)` (added in Node.js v18.7.0, v16.17.0): `undefined subscribe((DOMString or symbol) name, Function onMessage)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.subscribe (name : DOMStringOrSymbol) (onMessage : JSFunction) : IO Unit :=
+@[macro_inline] def diagnostics_channel.subscribe (name : DOMStringOrSymbol) (onMessage : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.diagnostics_channel.subscribe" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.diagnostics_channel.subscribe", module := "node:diagnostics_channel", path := "subscribe", construct := false, arity := 2 }
-    (Support.args #[toJS name, toJS onMessage]) (await := false)
+    (Internal.args #[toJS name, toJS onMessage]) (await := false)
 
 /-- `diagnostics_channel.unsubscribe(name, onMessage)` (added in Node.js v18.7.0, v16.17.0): `boolean unsubscribe((DOMString or symbol) name, Function onMessage)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.unsubscribe (name : DOMStringOrSymbol) (onMessage : JSFunction) : IO Bool :=
+@[macro_inline] def diagnostics_channel.unsubscribe (name : DOMStringOrSymbol) (onMessage : JSFunction) : IO Bool := Internal.api "Lasm.JS.Node.diagnostics_channel.unsubscribe" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.diagnostics_channel.unsubscribe", module := "node:diagnostics_channel", path := "unsubscribe", construct := false, arity := 2 }
-    (Support.args #[toJS name, toJS onMessage]) (await := false)
+    (Internal.args #[toJS name, toJS onMessage]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `diagnostics_channel.tracingChannel(nameOrChannels)` (added in Node.js v19.9.0, v18.19.0): `TracingChannel tracingChannel((DOMString or TracingChannel) nameOrChannels)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.tracingChannel (nameOrChannels : DOMStringOrTracingChannel) : IO TracingChannel := do
+@[macro_inline] def diagnostics_channel.tracingChannel (nameOrChannels : DOMStringOrTracingChannel) : IO TracingChannel := Internal.api "Lasm.JS.Node.diagnostics_channel.tracingChannel" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.diagnostics_channel.tracingChannel", module := "node:diagnostics_channel", path := "tracingChannel", construct := false, arity := 1 }
-    (Support.args #[toJS nameOrChannels]) (await := false)
+    (Internal.args #[toJS nameOrChannels]) (await := false)
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `diagnostics_channel.boundedChannel(nameOrChannels)` (added in Node.js v26.1.0): `BoundedChannel boundedChannel((DOMString or BoundedChannel) nameOrChannels)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
-def diagnostics_channel.boundedChannel (nameOrChannels : DOMStringOrBoundedChannel) : IO BoundedChannel := do
+@[macro_inline] def diagnostics_channel.boundedChannel (nameOrChannels : DOMStringOrBoundedChannel) : IO BoundedChannel := Internal.api "Lasm.JS.Node.diagnostics_channel.boundedChannel" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.diagnostics_channel.boundedChannel", module := "node:diagnostics_channel", path := "boundedChannel", construct := false, arity := 1 }
-    (Support.args #[toJS nameOrChannels]) (await := false)
+    (Internal.args #[toJS nameOrChannels]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

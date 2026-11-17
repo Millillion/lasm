@@ -8,13 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Net
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class zlib.BrotliCompress` of `node:zlib` (Node.js 24.22.2 documentation, zlib.md): a handle to the JavaScript object. -/
 structure zlib.BrotliCompress where
@@ -166,8 +169,8 @@ structure zlib.ZipBuffer.ToBufferOptions where
   comment : Option String := none
   /-- `double baseOffset = 0` -/
   baseOffset : Option Float := none
-instance instToJSZlibZipBufferToBufferOptions : ToJS zlib.ZipBuffer.ToBufferOptions := ⟨fun d => Support.fields #[("comment", Support.optional d.comment),
-    ("baseOffset", Support.optional d.baseOffset)]⟩
+instance instToJSZlibZipBufferToBufferOptions : ToJS zlib.ZipBuffer.ToBufferOptions := ⟨fun d => Internal.fields #[("comment", Internal.optional d.comment),
+    ("baseOffset", Internal.optional d.baseOffset)]⟩
 
 /-- `(DOMString or zlib.ZipBuffer.ToBufferOptions)`: one constructor per member type. -/
 inductive zlib.ZipBuffer.DOMStringOrToBufferOptions where
@@ -198,8 +201,8 @@ structure zlib.ZipEntry.ContentOptions where
   verify : Option Bool := none
   /-- `double maxSize` -/
   maxSize : Option Float := none
-instance instToJSZlibZipEntryContentOptions : ToJS zlib.ZipEntry.ContentOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
-    ("maxSize", Support.optional d.maxSize)]⟩
+instance instToJSZlibZipEntryContentOptions : ToJS zlib.ZipEntry.ContentOptions := ⟨fun d => Internal.fields #[("verify", Internal.optional d.verify),
+    ("maxSize", Internal.optional d.maxSize)]⟩
 
 /-- `dictionary zlib.ZipEntry.ContentIteratorOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure zlib.ZipEntry.ContentIteratorOptions where
@@ -207,8 +210,8 @@ structure zlib.ZipEntry.ContentIteratorOptions where
   verify : Option Bool := none
   /-- `double maxSize` -/
   maxSize : Option Float := none
-instance instToJSZlibZipEntryContentIteratorOptions : ToJS zlib.ZipEntry.ContentIteratorOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
-    ("maxSize", Support.optional d.maxSize)]⟩
+instance instToJSZlibZipEntryContentIteratorOptions : ToJS zlib.ZipEntry.ContentIteratorOptions := ⟨fun d => Internal.fields #[("verify", Internal.optional d.verify),
+    ("maxSize", Internal.optional d.maxSize)]⟩
 
 /-- `dictionary zlib.ZipFile.StreamOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure zlib.ZipFile.StreamOptions where
@@ -216,8 +219,8 @@ structure zlib.ZipFile.StreamOptions where
   verify : Option Bool := none
   /-- `double maxSize` -/
   maxSize : Option Float := none
-instance instToJSZlibZipFileStreamOptions : ToJS zlib.ZipFile.StreamOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
-    ("maxSize", Support.optional d.maxSize)]⟩
+instance instToJSZlibZipFileStreamOptions : ToJS zlib.ZipFile.StreamOptions := ⟨fun d => Internal.fields #[("verify", Internal.optional d.verify),
+    ("maxSize", Internal.optional d.maxSize)]⟩
 
 /-- `dictionary zlib.CreateZipArchiveOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure zlib.CreateZipArchiveOptions where
@@ -225,8 +228,8 @@ structure zlib.CreateZipArchiveOptions where
   comment : Option String := none
   /-- `double baseOffset = 0` -/
   baseOffset : Option Float := none
-instance instToJSZlibCreateZipArchiveOptions : ToJS zlib.CreateZipArchiveOptions := ⟨fun d => Support.fields #[("comment", Support.optional d.comment),
-    ("baseOffset", Support.optional d.baseOffset)]⟩
+instance instToJSZlibCreateZipArchiveOptions : ToJS zlib.CreateZipArchiveOptions := ⟨fun d => Internal.fields #[("comment", Internal.optional d.comment),
+    ("baseOffset", Internal.optional d.baseOffset)]⟩
 
 /-- `(DOMString or zlib.CreateZipArchiveOptions)`: one constructor per member type. -/
 inductive zlib.DOMStringOrCreateZipArchiveOptions where
@@ -248,9 +251,9 @@ structure zlib.ZipFilesOptions where
   comment : Option String := none
   /-- `double baseOffset` -/
   baseOffset : Option Float := none
-instance instToJSZlibZipFilesOptions : ToJS zlib.ZipFilesOptions := ⟨fun d => Support.fields #[("followSymlinks", Support.optional d.followSymlinks),
-    ("comment", Support.optional d.comment),
-    ("baseOffset", Support.optional d.baseOffset)]⟩
+instance instToJSZlibZipFilesOptions : ToJS zlib.ZipFilesOptions := ⟨fun d => Internal.fields #[("followSymlinks", Internal.optional d.followSymlinks),
+    ("comment", Internal.optional d.comment),
+    ("baseOffset", Internal.optional d.baseOffset)]⟩
 
 /-- `(DOMString or zlib.ZipFilesOptions)`: one constructor per member type. -/
 inductive zlib.DOMStringOrZipFilesOptions where
@@ -265,489 +268,512 @@ instance instCoeStringZlibDOMStringOrZipFilesOptions : Coe String zlib.DOMString
 instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.ZipFilesOptions zlib.DOMStringOrZipFilesOptions := ⟨.zipFilesOptions⟩
 
 /-- `v instanceof BrotliCompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliCompress`). -/
-def zlib.BrotliCompress.cast? (v : Value) : IO (Option zlib.BrotliCompress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliCompress"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.BrotliCompress.cast? (v : Value) : IO (Option zlib.BrotliCompress) := Internal.api "Lasm.JS.Node.zlib.BrotliCompress.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["BrotliCompress"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof BrotliDecompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliDecompress`). -/
-def zlib.BrotliDecompress.cast? (v : Value) : IO (Option zlib.BrotliDecompress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliDecompress"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.BrotliDecompress.cast? (v : Value) : IO (Option zlib.BrotliDecompress) := Internal.api "Lasm.JS.Node.zlib.BrotliDecompress.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["BrotliDecompress"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Deflate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Deflate`). -/
-def zlib.Deflate.cast? (v : Value) : IO (Option zlib.Deflate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Deflate"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.Deflate.cast? (v : Value) : IO (Option zlib.Deflate) := Internal.api "Lasm.JS.Node.zlib.Deflate.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Deflate"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof DeflateRaw`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeflateRaw`). -/
-def zlib.DeflateRaw.cast? (v : Value) : IO (Option zlib.DeflateRaw) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["DeflateRaw"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.DeflateRaw.cast? (v : Value) : IO (Option zlib.DeflateRaw) := Internal.api "Lasm.JS.Node.zlib.DeflateRaw.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["DeflateRaw"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Gunzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Gunzip`). -/
-def zlib.Gunzip.cast? (v : Value) : IO (Option zlib.Gunzip) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Gunzip"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.Gunzip.cast? (v : Value) : IO (Option zlib.Gunzip) := Internal.api "Lasm.JS.Node.zlib.Gunzip.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Gunzip"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Gzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Gzip`). -/
-def zlib.Gzip.cast? (v : Value) : IO (Option zlib.Gzip) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Gzip"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.Gzip.cast? (v : Value) : IO (Option zlib.Gzip) := Internal.api "Lasm.JS.Node.zlib.Gzip.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Gzip"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Inflate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Inflate`). -/
-def zlib.Inflate.cast? (v : Value) : IO (Option zlib.Inflate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Inflate"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.Inflate.cast? (v : Value) : IO (Option zlib.Inflate) := Internal.api "Lasm.JS.Node.zlib.Inflate.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Inflate"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof InflateRaw`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InflateRaw`). -/
-def zlib.InflateRaw.cast? (v : Value) : IO (Option zlib.InflateRaw) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["InflateRaw"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.InflateRaw.cast? (v : Value) : IO (Option zlib.InflateRaw) := Internal.api "Lasm.JS.Node.zlib.InflateRaw.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["InflateRaw"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Unzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Unzip`). -/
-def zlib.Unzip.cast? (v : Value) : IO (Option zlib.Unzip) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Unzip"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.Unzip.cast? (v : Value) : IO (Option zlib.Unzip) := Internal.api "Lasm.JS.Node.zlib.Unzip.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Unzip"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ZlibBase`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZlibBase`). -/
-def zlib.ZlibBase.cast? (v : Value) : IO (Option zlib.ZlibBase) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZlibBase"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZlibBase.cast? (v : Value) : IO (Option zlib.ZlibBase) := Internal.api "Lasm.JS.Node.zlib.ZlibBase.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZlibBase"] Value) (fun x => { val := x }) v
 
 /-- `bytesWritten` (added in Node.js v10.0.0): `readonly attribute double bytesWritten` -/
-def zlib.ZlibBase.bytesWritten (self : zlib.ZlibBase) : IO Float := self.val.get "bytesWritten" Float
+@[macro_inline] def zlib.ZlibBase.bytesWritten (self : zlib.ZlibBase) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZlibBase.bytesWritten" do
+  self.val.get "bytesWritten" Float
 
 /-- `v instanceof ZstdCompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdCompress`). -/
-def zlib.ZstdCompress.cast? (v : Value) : IO (Option zlib.ZstdCompress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdCompress"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZstdCompress.cast? (v : Value) : IO (Option zlib.ZstdCompress) := Internal.api "Lasm.JS.Node.zlib.ZstdCompress.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZstdCompress"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ZstdDecompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdDecompress`). -/
-def zlib.ZstdDecompress.cast? (v : Value) : IO (Option zlib.ZstdDecompress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdDecompress"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZstdDecompress.cast? (v : Value) : IO (Option zlib.ZstdDecompress) := Internal.api "Lasm.JS.Node.zlib.ZstdDecompress.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZstdDecompress"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Options`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Options`). -/
-def Options.cast? (v : Value) : IO (Option Options) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Options"] Value) v) then some { val := v } else none
+@[macro_inline] def Options.cast? (v : Value) : IO (Option Options) := Internal.api "Lasm.JS.Node.Options.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["Options"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof BrotliOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliOptions`). -/
-def BrotliOptions.cast? (v : Value) : IO (Option BrotliOptions) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliOptions"] Value) v) then some { val := v } else none
+@[macro_inline] def BrotliOptions.cast? (v : Value) : IO (Option BrotliOptions) := Internal.api "Lasm.JS.Node.BrotliOptions.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["BrotliOptions"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ZstdOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdOptions`). -/
-def ZstdOptions.cast? (v : Value) : IO (Option ZstdOptions) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdOptions"] Value) v) then some { val := v } else none
+@[macro_inline] def ZstdOptions.cast? (v : Value) : IO (Option ZstdOptions) := Internal.api "Lasm.JS.Node.ZstdOptions.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZstdOptions"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ZipBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipBuffer`). -/
-def zlib.ZipBuffer.cast? (v : Value) : IO (Option zlib.ZipBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZipBuffer.cast? (v : Value) : IO (Option zlib.ZipBuffer) := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZipBuffer"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
-def zlib.ZipBuffer.comment (self : zlib.ZipBuffer) : IO String := self.val.get "comment" String
+@[macro_inline] def zlib.ZipBuffer.comment (self : zlib.ZipBuffer) : IO String := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.comment" do
+  self.val.get "comment" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
-def zlib.ZipBuffer.size (self : zlib.ZipBuffer) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def zlib.ZipBuffer.size (self : zlib.ZipBuffer) : IO Nat := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.size" do
+  self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
-def zlib.ZipBuffer.writable (self : zlib.ZipBuffer) : IO Bool := self.val.get "writable" Bool
+@[macro_inline] def zlib.ZipBuffer.writable (self : zlib.ZipBuffer) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.writable" do
+  self.val.get "writable" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.add(filename, data[, options])` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> add(DOMString filename, Uint8Array data, optional object options)` -/
-def zlib.ZipBuffer.add (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := do
-  let r ← self.val.callMethodAwait "add" (Support.args #[toJS filename, toJS data, options]) Value
+@[macro_inline] def zlib.ZipBuffer.add (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.add" do
+  let r ← self.val.callMethodAwait "add" (Internal.args #[toJS filename, toJS data, options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.addSync(filename, data[, options])` (added in Node.js v26.8.0): `zlib.ZipEntry addSync(DOMString filename, Uint8Array data, optional object options)` -/
-def zlib.ZipBuffer.addSync (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "addSync" (Support.args #[toJS filename, toJS data, options]) Value
+@[macro_inline] def zlib.ZipBuffer.addSync (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.addSync" do
+  let r ← self.val.callMethod "addSync" (Internal.args #[toJS filename, toJS data, options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.addEntry(entry)` (added in Node.js v26.8.0): `zlib.ZipEntry addEntry(zlib.ZipEntry entry)` -/
-def zlib.ZipBuffer.addEntry (self : zlib.ZipBuffer) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "addEntry" (Support.args #[toJS entry]) Value
+@[macro_inline] def zlib.ZipBuffer.addEntry (self : zlib.ZipBuffer) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.addEntry" do
+  let r ← self.val.callMethod "addEntry" (Internal.args #[toJS entry]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.clear()` (added in Node.js v26.8.0): `undefined clear()` -/
-def zlib.ZipBuffer.clear (self : zlib.ZipBuffer) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def zlib.ZipBuffer.clear (self : zlib.ZipBuffer) : IO Unit := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.delete(name)` (added in Node.js v26.8.0): `boolean delete(DOMString name)` -/
-def zlib.ZipBuffer.delete (self : zlib.ZipBuffer) (name : String) : IO Bool :=
-  self.val.callMethod "delete" (Support.args #[toJS name]) Bool
+@[macro_inline] def zlib.ZipBuffer.delete (self : zlib.ZipBuffer) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS name]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.entries()` (added in Node.js v26.8.0): `object entries()` -/
-def zlib.ZipBuffer.entries (self : zlib.ZipBuffer) : IO Data :=
-  self.val.callMethod "entries" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipBuffer.entries (self : zlib.ZipBuffer) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.entries" do
+  self.val.callMethod "entries" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.forEach(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEach(Function callback, optional any thisArg)` -/
-def zlib.ZipBuffer.forEach (self : zlib.ZipBuffer) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
-  self.val.callMethod "forEach" (Support.args #[toJS callback, thisArg]) Unit
+@[macro_inline] def zlib.ZipBuffer.forEach (self : zlib.ZipBuffer) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.forEach" do
+  self.val.callMethod "forEach" (Internal.args #[toJS callback, thisArg]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.get(name)` (added in Node.js v26.8.0): `zlib.ZipEntry get(DOMString name)` -/
-def zlib.ZipBuffer.get (self : zlib.ZipBuffer) (name : String) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "get" (Support.args #[toJS name]) Value
+@[macro_inline] def zlib.ZipBuffer.get (self : zlib.ZipBuffer) (name : String) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.get" do
+  let r ← self.val.callMethod "get" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.has(name)` (added in Node.js v26.8.0): `boolean has(DOMString name)` -/
-def zlib.ZipBuffer.has (self : zlib.ZipBuffer) (name : String) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+@[macro_inline] def zlib.ZipBuffer.has (self : zlib.ZipBuffer) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.has" do
+  self.val.callMethod "has" (Internal.args #[toJS name]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.keys()` (added in Node.js v26.8.0): `object keys()` -/
-def zlib.ZipBuffer.keys (self : zlib.ZipBuffer) : IO Data :=
-  self.val.callMethod "keys" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipBuffer.keys (self : zlib.ZipBuffer) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.keys" do
+  self.val.callMethod "keys" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.toBuffer([options])` (added in Node.js v26.8.0): `Promise<Uint8Array> toBuffer(optional (DOMString or zlib.ZipBuffer.ToBufferOptions) options)` -/
-def zlib.ZipBuffer.toBuffer (self : zlib.ZipBuffer) (options : Option zlib.ZipBuffer.DOMStringOrToBufferOptions := none) : Async ByteArray :=
-  self.val.callMethodAwait "toBuffer" (Support.args #[Support.optional options]) ByteArray
+@[macro_inline] def zlib.ZipBuffer.toBuffer (self : zlib.ZipBuffer) (options : Option zlib.ZipBuffer.DOMStringOrToBufferOptions := none) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.toBuffer" do
+  self.val.callMethodAwait "toBuffer" (Internal.args #[Internal.optional options]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.toBufferSync([options])` (added in Node.js v26.8.0): `Uint8Array toBufferSync(optional (DOMString or object) options)` -/
-def zlib.ZipBuffer.toBufferSync (self : zlib.ZipBuffer) (options : Option DOMStringOrObject := none) : IO ByteArray :=
-  self.val.callMethod "toBufferSync" (Support.args #[Support.optional options]) ByteArray
+@[macro_inline] def zlib.ZipBuffer.toBufferSync (self : zlib.ZipBuffer) (options : Option DOMStringOrObject := none) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.toBufferSync" do
+  self.val.callMethod "toBufferSync" (Internal.args #[Internal.optional options]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.values()` (added in Node.js v26.8.0): `object values()` -/
-def zlib.ZipBuffer.values (self : zlib.ZipBuffer) : IO Data :=
-  self.val.callMethod "values" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipBuffer.values (self : zlib.ZipBuffer) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.values" do
+  self.val.callMethod "values" (Internal.args #[]) Data
 
 /-- `v instanceof ZipEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipEntry`). -/
-def zlib.ZipEntry.cast? (v : Value) : IO (Option zlib.ZipEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZipEntry.cast? (v : Value) : IO (Option zlib.ZipEntry) := Internal.api "Lasm.JS.Node.zlib.ZipEntry.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZipEntry"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
-def zlib.ZipEntry.comment (self : zlib.ZipEntry) : IO String := self.val.get "comment" String
+@[macro_inline] def zlib.ZipEntry.comment (self : zlib.ZipEntry) : IO String := Internal.api "Lasm.JS.Node.zlib.ZipEntry.comment" do
+  self.val.get "comment" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.compressed` (added in Node.js v26.8.0): `readonly attribute boolean compressed` -/
-def zlib.ZipEntry.compressed (self : zlib.ZipEntry) : IO Bool := self.val.get "compressed" Bool
+@[macro_inline] def zlib.ZipEntry.compressed (self : zlib.ZipEntry) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipEntry.compressed" do
+  self.val.get "compressed" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.compressedSize` (added in Node.js v26.8.0): `readonly attribute double compressedSize` -/
-def zlib.ZipEntry.compressedSize (self : zlib.ZipEntry) : IO Float := self.val.get "compressedSize" Float
+@[macro_inline] def zlib.ZipEntry.compressedSize (self : zlib.ZipEntry) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZipEntry.compressedSize" do
+  self.val.get "compressedSize" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.crc32` (added in Node.js v26.8.0): `readonly attribute double crc32` -/
-def zlib.ZipEntry.crc32 (self : zlib.ZipEntry) : IO Float := self.val.get "crc32" Float
+@[macro_inline] def zlib.ZipEntry.crc32 (self : zlib.ZipEntry) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZipEntry.crc32" do
+  self.val.get "crc32" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.flags` (added in Node.js v26.8.0): `readonly attribute double flags` -/
-def zlib.ZipEntry.flags (self : zlib.ZipEntry) : IO Float := self.val.get "flags" Float
+@[macro_inline] def zlib.ZipEntry.flags (self : zlib.ZipEntry) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZipEntry.flags" do
+  self.val.get "flags" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isDirectory` (added in Node.js v26.8.0): `readonly attribute boolean isDirectory` -/
-def zlib.ZipEntry.isDirectory (self : zlib.ZipEntry) : IO Bool := self.val.get "isDirectory" Bool
+@[macro_inline] def zlib.ZipEntry.isDirectory (self : zlib.ZipEntry) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipEntry.isDirectory" do
+  self.val.get "isDirectory" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isFile` (added in Node.js v26.8.0): `readonly attribute boolean isFile` -/
-def zlib.ZipEntry.isFile (self : zlib.ZipEntry) : IO Bool := self.val.get "isFile" Bool
+@[macro_inline] def zlib.ZipEntry.isFile (self : zlib.ZipEntry) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipEntry.isFile" do
+  self.val.get "isFile" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isSymlink` (added in Node.js v26.8.0): `readonly attribute boolean isSymlink` -/
-def zlib.ZipEntry.isSymlink (self : zlib.ZipEntry) : IO Bool := self.val.get "isSymlink" Bool
+@[macro_inline] def zlib.ZipEntry.isSymlink (self : zlib.ZipEntry) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipEntry.isSymlink" do
+  self.val.get "isSymlink" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.mode` (added in Node.js v26.8.0): `readonly attribute double mode` -/
-def zlib.ZipEntry.mode (self : zlib.ZipEntry) : IO Float := self.val.get "mode" Float
+@[macro_inline] def zlib.ZipEntry.mode (self : zlib.ZipEntry) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZipEntry.mode" do
+  self.val.get "mode" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.modified` (added in Node.js v26.8.0): `readonly attribute object modified` -/
-def zlib.ZipEntry.modified (self : zlib.ZipEntry) : IO Data := self.val.get "modified" Data
+@[macro_inline] def zlib.ZipEntry.modified (self : zlib.ZipEntry) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipEntry.modified" do
+  self.val.get "modified" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.method` (added in Node.js v26.8.0): `readonly attribute double method` -/
-def zlib.ZipEntry.method (self : zlib.ZipEntry) : IO Float := self.val.get "method" Float
+@[macro_inline] def zlib.ZipEntry.method (self : zlib.ZipEntry) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZipEntry.method" do
+  self.val.get "method" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.name` (added in Node.js v26.8.0): `readonly attribute DOMString name` -/
-def zlib.ZipEntry.name (self : zlib.ZipEntry) : IO String := self.val.get "name" String
+@[macro_inline] def zlib.ZipEntry.name (self : zlib.ZipEntry) : IO String := Internal.api "Lasm.JS.Node.zlib.ZipEntry.name" do
+  self.val.get "name" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.nameBuffer` (added in Node.js v26.8.0): `readonly attribute Uint8Array nameBuffer` -/
-def zlib.ZipEntry.nameBuffer (self : zlib.ZipEntry) : IO ByteArray := self.val.get "nameBuffer" ByteArray
+@[macro_inline] def zlib.ZipEntry.nameBuffer (self : zlib.ZipEntry) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipEntry.nameBuffer" do
+  self.val.get "nameBuffer" ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.rawContent` (added in Node.js v26.8.0): `readonly attribute Uint8Array? rawContent` -/
-def zlib.ZipEntry.rawContent (self : zlib.ZipEntry) : IO (Option ByteArray) := self.val.get "rawContent" (Option ByteArray)
+@[macro_inline] def zlib.ZipEntry.rawContent (self : zlib.ZipEntry) : IO (Option ByteArray) := Internal.api "Lasm.JS.Node.zlib.ZipEntry.rawContent" do
+  self.val.get "rawContent" (Option ByteArray)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
-def zlib.ZipEntry.size (self : zlib.ZipEntry) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def zlib.ZipEntry.size (self : zlib.ZipEntry) : IO Nat := Internal.api "Lasm.JS.Node.zlib.ZipEntry.size" do
+  self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.content([options])` (added in Node.js v26.8.0): `Promise<Uint8Array> content(optional zlib.ZipEntry.ContentOptions options)` -/
-def zlib.ZipEntry.content (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentOptions := none) : Async ByteArray :=
-  self.val.callMethodAwait "content" (Support.args #[Support.optional options]) ByteArray
+@[macro_inline] def zlib.ZipEntry.content (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentOptions := none) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipEntry.content" do
+  self.val.callMethodAwait "content" (Internal.args #[Internal.optional options]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.contentSync([options])` (added in Node.js v26.8.0): `Uint8Array contentSync(optional object options)` -/
-def zlib.ZipEntry.contentSync (self : zlib.ZipEntry) (options : Data := .undefined) : IO ByteArray :=
-  self.val.callMethod "contentSync" (Support.args #[options]) ByteArray
+@[macro_inline] def zlib.ZipEntry.contentSync (self : zlib.ZipEntry) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipEntry.contentSync" do
+  self.val.callMethod "contentSync" (Internal.args #[options]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.contentIterator([options])` (added in Node.js v26.8.0): `object contentIterator(optional zlib.ZipEntry.ContentIteratorOptions options)` -/
-def zlib.ZipEntry.contentIterator (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentIteratorOptions := none) : IO Data :=
-  self.val.callMethod "contentIterator" (Support.args #[Support.optional options]) Data
+@[macro_inline] def zlib.ZipEntry.contentIterator (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentIteratorOptions := none) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipEntry.contentIterator" do
+  self.val.callMethod "contentIterator" (Internal.args #[Internal.optional options]) Data
 
 /-- `v instanceof ZipFile`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipFile`). -/
-def zlib.ZipFile.cast? (v : Value) : IO (Option zlib.ZipFile) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipFile"] Value) v) then some { val := v } else none
+@[macro_inline] def zlib.ZipFile.cast? (v : Value) : IO (Option zlib.ZipFile) := Internal.api "Lasm.JS.Node.zlib.ZipFile.cast?" do
+  Internal.cast (Support.getExport "node:zlib" ["ZipFile"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
-def zlib.ZipFile.comment (self : zlib.ZipFile) : IO String := self.val.get "comment" String
+@[macro_inline] def zlib.ZipFile.comment (self : zlib.ZipFile) : IO String := Internal.api "Lasm.JS.Node.zlib.ZipFile.comment" do
+  self.val.get "comment" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
-def zlib.ZipFile.size (self : zlib.ZipFile) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def zlib.ZipFile.size (self : zlib.ZipFile) : IO Nat := Internal.api "Lasm.JS.Node.zlib.ZipFile.size" do
+  self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
-def zlib.ZipFile.writable (self : zlib.ZipFile) : IO Bool := self.val.get "writable" Bool
+@[macro_inline] def zlib.ZipFile.writable (self : zlib.ZipFile) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipFile.writable" do
+  self.val.get "writable" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.add(filename, data[, options])` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> add(DOMString filename, Uint8Array data, optional object options)` -/
-def zlib.ZipFile.add (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := do
-  let r ← self.val.callMethodAwait "add" (Support.args #[toJS filename, toJS data, options]) Value
+@[macro_inline] def zlib.ZipFile.add (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipFile.add" do
+  let r ← self.val.callMethodAwait "add" (Internal.args #[toJS filename, toJS data, options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addEntry(entry)` (added in Node.js v26.8.0): `Promise<any> addEntry(zlib.ZipEntry entry)` -/
-def zlib.ZipFile.addEntry (self : zlib.ZipFile) (entry : zlib.ZipEntry) : Async Data :=
-  self.val.callMethodAwait "addEntry" (Support.args #[toJS entry]) Data
+@[macro_inline] def zlib.ZipFile.addEntry (self : zlib.ZipFile) (entry : zlib.ZipEntry) : Async Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.addEntry" do
+  self.val.callMethodAwait "addEntry" (Internal.args #[toJS entry]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addEntrySync(entry)` (added in Node.js v26.8.0): `zlib.ZipEntry addEntrySync(zlib.ZipEntry entry)` -/
-def zlib.ZipFile.addEntrySync (self : zlib.ZipFile) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "addEntrySync" (Support.args #[toJS entry]) Value
+@[macro_inline] def zlib.ZipFile.addEntrySync (self : zlib.ZipFile) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipFile.addEntrySync" do
+  let r ← self.val.callMethod "addEntrySync" (Internal.args #[toJS entry]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addSync(filename, data[, options])` (added in Node.js v26.8.0): `zlib.ZipEntry addSync(DOMString filename, Uint8Array data, optional object options)` -/
-def zlib.ZipFile.addSync (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "addSync" (Support.args #[toJS filename, toJS data, options]) Value
+@[macro_inline] def zlib.ZipFile.addSync (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipFile.addSync" do
+  let r ← self.val.callMethod "addSync" (Internal.args #[toJS filename, toJS data, options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.close()` (added in Node.js v26.8.0): `Promise<any> close()` -/
-def zlib.ZipFile.close (self : zlib.ZipFile) : Async Data :=
-  self.val.callMethodAwait "close" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.close (self : zlib.ZipFile) : Async Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.closeSync()` (added in Node.js v26.8.0): `undefined closeSync()` -/
-def zlib.ZipFile.closeSync (self : zlib.ZipFile) : IO Unit :=
-  self.val.callMethod "closeSync" (Support.args #[]) Unit
+@[macro_inline] def zlib.ZipFile.closeSync (self : zlib.ZipFile) : IO Unit := Internal.api "Lasm.JS.Node.zlib.ZipFile.closeSync" do
+  self.val.callMethod "closeSync" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.compact([comment])` (added in Node.js v26.8.0): `stream.Readable compact(optional DOMString comment)` -/
-def zlib.ZipFile.compact (self : zlib.ZipFile) (comment : Option String := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "compact" (Support.args #[Support.optional comment]) Value
+@[macro_inline] def zlib.ZipFile.compact (self : zlib.ZipFile) (comment : Option String := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.zlib.ZipFile.compact" do
+  let r ← self.val.callMethod "compact" (Internal.args #[Internal.optional comment]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.compactSync([comment])` (added in Node.js v26.8.0): `Uint8Array compactSync(optional DOMString comment)` -/
-def zlib.ZipFile.compactSync (self : zlib.ZipFile) (comment : Option String := none) : IO ByteArray :=
-  self.val.callMethod "compactSync" (Support.args #[Support.optional comment]) ByteArray
+@[macro_inline] def zlib.ZipFile.compactSync (self : zlib.ZipFile) (comment : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.ZipFile.compactSync" do
+  self.val.callMethod "compactSync" (Internal.args #[Internal.optional comment]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.delete(name)` (added in Node.js v26.8.0): `Promise<any> delete(DOMString name)` -/
-def zlib.ZipFile.delete (self : zlib.ZipFile) (name : String) : Async Data :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS name]) Data
+@[macro_inline] def zlib.ZipFile.delete (self : zlib.ZipFile) (name : String) : Async Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS name]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.deleteSync(name)` (added in Node.js v26.8.0): `boolean deleteSync(DOMString name)` -/
-def zlib.ZipFile.deleteSync (self : zlib.ZipFile) (name : String) : IO Bool :=
-  self.val.callMethod "deleteSync" (Support.args #[toJS name]) Bool
+@[macro_inline] def zlib.ZipFile.deleteSync (self : zlib.ZipFile) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipFile.deleteSync" do
+  self.val.callMethod "deleteSync" (Internal.args #[toJS name]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.entries()` (added in Node.js v26.8.0): `object entries()` -/
-def zlib.ZipFile.entries (self : zlib.ZipFile) : IO Data :=
-  self.val.callMethod "entries" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.entries (self : zlib.ZipFile) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.entries" do
+  self.val.callMethod "entries" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.entriesSync()` (added in Node.js v26.8.0): `object entriesSync()` -/
-def zlib.ZipFile.entriesSync (self : zlib.ZipFile) : IO Data :=
-  self.val.callMethod "entriesSync" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.entriesSync (self : zlib.ZipFile) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.entriesSync" do
+  self.val.callMethod "entriesSync" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.forEach(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEach(Function callback, optional any thisArg)` -/
-def zlib.ZipFile.forEach (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
-  self.val.callMethod "forEach" (Support.args #[toJS callback, thisArg]) Unit
+@[macro_inline] def zlib.ZipFile.forEach (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.ZipFile.forEach" do
+  self.val.callMethod "forEach" (Internal.args #[toJS callback, thisArg]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.forEachSync(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEachSync(Function callback, optional any thisArg)` -/
-def zlib.ZipFile.forEachSync (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
-  self.val.callMethod "forEachSync" (Support.args #[toJS callback, thisArg]) Unit
+@[macro_inline] def zlib.ZipFile.forEachSync (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.ZipFile.forEachSync" do
+  self.val.callMethod "forEachSync" (Internal.args #[toJS callback, thisArg]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.get(name)` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> get(DOMString name)` -/
-def zlib.ZipFile.get (self : zlib.ZipFile) (name : String) : Async zlib.ZipEntry := do
-  let r ← self.val.callMethodAwait "get" (Support.args #[toJS name]) Value
+@[macro_inline] def zlib.ZipFile.get (self : zlib.ZipFile) (name : String) : Async zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipFile.get" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.getSync(name)` (added in Node.js v26.8.0): `zlib.ZipEntry getSync(DOMString name)` -/
-def zlib.ZipFile.getSync (self : zlib.ZipFile) (name : String) : IO zlib.ZipEntry := do
-  let r ← self.val.callMethod "getSync" (Support.args #[toJS name]) Value
+@[macro_inline] def zlib.ZipFile.getSync (self : zlib.ZipFile) (name : String) : IO zlib.ZipEntry := Internal.api "Lasm.JS.Node.zlib.ZipFile.getSync" do
+  let r ← self.val.callMethod "getSync" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.has(name)` (added in Node.js v26.8.0): `boolean has(DOMString name)` -/
-def zlib.ZipFile.has (self : zlib.ZipFile) (name : String) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+@[macro_inline] def zlib.ZipFile.has (self : zlib.ZipFile) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.zlib.ZipFile.has" do
+  self.val.callMethod "has" (Internal.args #[toJS name]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.keys()` (added in Node.js v26.8.0): `object keys()` -/
-def zlib.ZipFile.keys (self : zlib.ZipFile) : IO Data :=
-  self.val.callMethod "keys" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.keys (self : zlib.ZipFile) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.keys" do
+  self.val.callMethod "keys" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.stream(name[, options])` (added in Node.js v26.8.0): `Promise<stream.Readable> stream(DOMString name, optional zlib.ZipFile.StreamOptions options)` -/
-def zlib.ZipFile.stream (self : zlib.ZipFile) (name : String) (options : Option zlib.ZipFile.StreamOptions := none) : Async stream.Readable := do
-  let r ← self.val.callMethodAwait "stream" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def zlib.ZipFile.stream (self : zlib.ZipFile) (name : String) (options : Option zlib.ZipFile.StreamOptions := none) : Async stream.Readable := Internal.api "Lasm.JS.Node.zlib.ZipFile.stream" do
+  let r ← self.val.callMethodAwait "stream" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.values()` (added in Node.js v26.8.0): `object values()` -/
-def zlib.ZipFile.values (self : zlib.ZipFile) : IO Data :=
-  self.val.callMethod "values" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.values (self : zlib.ZipFile) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.values" do
+  self.val.callMethod "values" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.valuesSync()` (added in Node.js v26.8.0): `object valuesSync()` -/
-def zlib.ZipFile.valuesSync (self : zlib.ZipFile) : IO Data :=
-  self.val.callMethod "valuesSync" (Support.args #[]) Data
+@[macro_inline] def zlib.ZipFile.valuesSync (self : zlib.ZipFile) : IO Data := Internal.api "Lasm.JS.Node.zlib.ZipFile.valuesSync" do
+  self.val.callMethod "valuesSync" (Internal.args #[]) Data
 
 /-- `zlib.constants` (added in Node.js v7.0.0): `readonly attribute any constants` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.constants : IO Data := Support.getExport "node:zlib" ["constants"] Data
+@[macro_inline] def zlib.constants : IO Data := Internal.api "Lasm.JS.Node.zlib.constants" do
+  Support.getExport "node:zlib" ["constants"] Data
 
 /-- `zlib.crc32(data[, value])` (added in Node.js v22.2.0, v20.15.0): `long long crc32((DOMString or Uint8Array) data, optional long long value)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.crc32 (data : DOMStringOrUint8Array) (value : Option Int := none) : IO Int :=
+@[macro_inline] def zlib.crc32 (data : DOMStringOrUint8Array) (value : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.zlib.crc32" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.zlib.crc32", module := "node:zlib", path := "crc32", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional value]) (await := false)
+    (Internal.args #[toJS data, Internal.optional value]) (await := false)
 
 /-- `zlib.createBrotliCompress([options])` (added in Node.js v11.7.0, v10.16.0): `undefined createBrotliCompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createBrotliCompress (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createBrotliCompress (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createBrotliCompress" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createBrotliCompress", module := "node:zlib", path := "createBrotliCompress", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createBrotliDecompress([options])` (added in Node.js v11.7.0, v10.16.0): `undefined createBrotliDecompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createBrotliDecompress (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createBrotliDecompress (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createBrotliDecompress" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createBrotliDecompress", module := "node:zlib", path := "createBrotliDecompress", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createDeflate([options])` (added in Node.js v0.5.8): `undefined createDeflate(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createDeflate (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createDeflate (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createDeflate" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createDeflate", module := "node:zlib", path := "createDeflate", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createDeflateRaw([options])` (added in Node.js v0.5.8): `undefined createDeflateRaw(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createDeflateRaw (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createDeflateRaw (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createDeflateRaw" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createDeflateRaw", module := "node:zlib", path := "createDeflateRaw", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createGunzip([options])` (added in Node.js v0.5.8): `undefined createGunzip(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createGunzip (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createGunzip (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createGunzip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createGunzip", module := "node:zlib", path := "createGunzip", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createGzip([options])` (added in Node.js v0.5.8): `undefined createGzip(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createGzip (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createGzip (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createGzip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createGzip", module := "node:zlib", path := "createGzip", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createInflate([options])` (added in Node.js v0.5.8): `undefined createInflate(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createInflate (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createInflate (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createInflate" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createInflate", module := "node:zlib", path := "createInflate", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createInflateRaw([options])` (added in Node.js v0.5.8): `undefined createInflateRaw(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createInflateRaw (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createInflateRaw (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createInflateRaw" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createInflateRaw", module := "node:zlib", path := "createInflateRaw", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- `zlib.createUnzip([options])` (added in Node.js v0.5.8): `undefined createUnzip(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createUnzip (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createUnzip (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createUnzip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createUnzip", module := "node:zlib", path := "createUnzip", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zlib.createZstdCompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdCompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createZstdCompress (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createZstdCompress (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createZstdCompress" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createZstdCompress", module := "node:zlib", path := "createZstdCompress", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zlib.createZstdDecompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdDecompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createZstdDecompress (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def zlib.createZstdDecompress (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.zlib.createZstdDecompress" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createZstdDecompress", module := "node:zlib", path := "createZstdDecompress", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.createZipArchive(entries[, options])` (added in Node.js v26.8.0): `stream.Readable createZipArchive(object entries, optional (DOMString or zlib.CreateZipArchiveOptions) options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createZipArchive (entries : Data) (options : Option zlib.DOMStringOrCreateZipArchiveOptions := none) : IO stream.Readable := do
+@[macro_inline] def zlib.createZipArchive (entries : Data) (options : Option zlib.DOMStringOrCreateZipArchiveOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.zlib.createZipArchive" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.zlib.createZipArchive", module := "node:zlib", path := "createZipArchive", construct := false, arity := 2 }
-    (Support.args #[toJS entries, Support.optional options]) (await := false)
+    (Internal.args #[toJS entries, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.createZipArchiveSync(entries[, options])` (added in Node.js v26.8.0): `object createZipArchiveSync(object entries, optional (DOMString or object) options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.createZipArchiveSync (entries : Data) (options : Option DOMStringOrObject := none) : IO Data :=
+@[macro_inline] def zlib.createZipArchiveSync (entries : Data) (options : Option DOMStringOrObject := none) : IO Data := Internal.api "Lasm.JS.Node.zlib.createZipArchiveSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.zlib.createZipArchiveSync", module := "node:zlib", path := "createZipArchiveSync", construct := false, arity := 2 }
-    (Support.args #[toJS entries, Support.optional options]) (await := false)
+    (Internal.args #[toJS entries, Internal.optional options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zipFiles(files[, options])` (added in Node.js v26.8.0): `stream.Readable zipFiles(object files, optional (DOMString or zlib.ZipFilesOptions) options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.zipFiles (files : Data) (options : Option zlib.DOMStringOrZipFilesOptions := none) : IO stream.Readable := do
+@[macro_inline] def zlib.zipFiles (files : Data) (options : Option zlib.DOMStringOrZipFilesOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.zlib.zipFiles" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.zlib.zipFiles", module := "node:zlib", path := "zipFiles", construct := false, arity := 2 }
-    (Support.args #[toJS files, Support.optional options]) (await := false)
+    (Internal.args #[toJS files, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.getMaxZipContentSize()` (added in Node.js v26.8.0): `double getMaxZipContentSize()` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.getMaxZipContentSize : IO Float :=
+@[macro_inline] def zlib.getMaxZipContentSize : IO Float := Internal.api "Lasm.JS.Node.zlib.getMaxZipContentSize" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.zlib.getMaxZipContentSize", module := "node:zlib", path := "getMaxZipContentSize", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.setMaxZipContentSize(size)` (added in Node.js v26.8.0): `undefined setMaxZipContentSize(double /* integer: Nat */ size)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.setMaxZipContentSize (size : Nat) : IO Unit :=
+@[macro_inline] def zlib.setMaxZipContentSize (size : Nat) : IO Unit := Internal.api "Lasm.JS.Node.zlib.setMaxZipContentSize" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.setMaxZipContentSize", module := "node:zlib", path := "setMaxZipContentSize", construct := false, arity := 1 }
-    (Support.args #[toJS size]) (await := false)
+    (Internal.args #[toJS size]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliCompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.brotliCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "brotliCompress" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.brotliCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompress" do
+  Support.promisified ByteArray "node:zlib" "brotliCompress" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliCompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.brotliCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.brotliCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliCompressSync", module := "node:zlib", path := "brotliCompressSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliDecompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.brotliDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "brotliDecompress" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.brotliDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompress" do
+  Support.promisified ByteArray "node:zlib" "brotliDecompress" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliDecompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.brotliDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.brotliDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliDecompressSync", module := "node:zlib", path := "brotliDecompressSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.deflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "deflate" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.deflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflate" do
+  Support.promisified ByteArray "node:zlib" "deflate" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.deflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.deflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateSync", module := "node:zlib", path := "deflateSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.deflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "deflateRaw" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.deflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRaw" do
+  Support.promisified ByteArray "node:zlib" "deflateRaw" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.deflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.deflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRawSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateRawSync", module := "node:zlib", path := "deflateRawSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gunzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gunzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.gunzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "gunzip" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.gunzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzip" do
+  Support.promisified ByteArray "node:zlib" "gunzip" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gunzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gunzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.gunzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.gunzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzipSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gunzipSync", module := "node:zlib", path := "gunzipSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.gzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "gzip" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.gzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gzip" do
+  Support.promisified ByteArray "node:zlib" "gzip" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.gzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.gzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gzipSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gzipSync", module := "node:zlib", path := "gzipSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.inflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "inflate" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.inflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflate" do
+  Support.promisified ByteArray "node:zlib" "inflate" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.inflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.inflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateSync", module := "node:zlib", path := "inflateSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.inflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "inflateRaw" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.inflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRaw" do
+  Support.promisified ByteArray "node:zlib" "inflateRaw" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.inflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.inflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRawSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateRawSync", module := "node:zlib", path := "inflateRawSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.unzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> unzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.unzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "unzip" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.unzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.unzip" do
+  Support.promisified ByteArray "node:zlib" "unzip" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.unzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array unzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.unzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.unzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.unzipSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.unzipSync", module := "node:zlib", path := "unzipSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.zstdCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "zstdCompress" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.zstdCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompress" do
+  Support.promisified ByteArray "node:zlib" "zstdCompress" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdCompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.zstdCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.zstdCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdCompressSync", module := "node:zlib", path := "zstdCompressSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.zstdDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray :=
-  Support.promisified ByteArray "node:zlib" "zstdDecompress" (Support.args #[toJS buffer_, options])
+@[macro_inline] def zlib.zstdDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompress" do
+  Support.promisified ByteArray "node:zlib" "zstdDecompress" (Internal.args #[toJS buffer_, options])
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdDecompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.zstdDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def zlib.zstdDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdDecompressSync", module := "node:zlib", path := "zstdDecompressSync", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, options]) (await := false)
+    (Internal.args #[toJS buffer_, options]) (await := false)
 
 end Lasm.JS.Node

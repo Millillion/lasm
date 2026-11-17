@@ -8,15 +8,18 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Web.MediacaptureStreams
 import Lasm.JS.Node.Events
-import Lasm.JS.Node.Process
 import Lasm.JS.Node.Fs
 import Lasm.JS.Node.Tls
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class MockFunctionContext` of `node:test` (Node.js 24.22.2 documentation, test.md): a handle to the JavaScript object. -/
 structure MockFunctionContext where
@@ -86,7 +89,7 @@ instance : FromJS SuiteContext := ⟨fun | .ref v _ => .ok { val := v } | _ => .
 structure MockTracker.FnOptions where
   /-- `long long times` -/
   times : Option Int := none
-instance instToJSMockTrackerFnOptions : ToJS MockTracker.FnOptions := ⟨fun d => Support.fields #[("times", Support.optional d.times)]⟩
+instance instToJSMockTrackerFnOptions : ToJS MockTracker.FnOptions := ⟨fun d => Internal.fields #[("times", Internal.optional d.times)]⟩
 
 /-- `dictionary MockTracker.MethodOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.MethodOptions where
@@ -96,15 +99,15 @@ structure MockTracker.MethodOptions where
   setter : Option Bool := none
   /-- `long long times` -/
   times : Option Int := none
-instance instToJSMockTrackerMethodOptions : ToJS MockTracker.MethodOptions := ⟨fun d => Support.fields #[("getter", Support.optional d.getter),
-    ("setter", Support.optional d.setter),
-    ("times", Support.optional d.times)]⟩
+instance instToJSMockTrackerMethodOptions : ToJS MockTracker.MethodOptions := ⟨fun d => Internal.fields #[("getter", Internal.optional d.getter),
+    ("setter", Internal.optional d.setter),
+    ("times", Internal.optional d.times)]⟩
 
 /-- `dictionary MockTracker.ModuleOptionsExports` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.ModuleOptionsExports where
   /-- `any If` -/
   If : Data := .undefined
-instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Support.fields #[("If", d.If)]⟩
+instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Internal.fields #[("If", d.If)]⟩
 
 /-- `dictionary MockTracker.ModuleOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.ModuleOptions where
@@ -116,8 +119,8 @@ structure MockTracker.ModuleOptions where
   defaultExport : Data := .undefined
   /-- `object namedExports` -/
   namedExports : Data := .undefined
-instance instToJSMockTrackerModuleOptions : ToJS MockTracker.ModuleOptions := ⟨fun d => Support.fields #[("cache", Support.optional d.cache),
-    ("exports", Support.optional d.exports),
+instance instToJSMockTrackerModuleOptions : ToJS MockTracker.ModuleOptions := ⟨fun d => Internal.fields #[("cache", Internal.optional d.cache),
+    ("exports", Internal.optional d.exports),
     ("defaultExport", d.defaultExport),
     ("namedExports", d.namedExports)]⟩
 
@@ -208,10 +211,10 @@ instance instToJSTestsStreamTestCoverageListener : ToJS TestsStream.TestCoverage
 instance instFromJSTestsStreamTestCoverageListener : FromJS TestsStream.TestCoverageListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestCoverageListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestCoverageListener.ofFn (f : TestsStream.TestCoverageData → Async Unit) : IO TestsStream.TestCoverageListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestCoverageData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestCoverageData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestCoverageListener.ofSyncFn (f : TestsStream.TestCoverageData → IO Unit) : IO TestsStream.TestCoverageListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestCoverageData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestCoverageData args 0)) }
 
 /-- `dictionary TestsStream.TestCompleteDataDetails` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestCompleteDataDetails where
@@ -285,10 +288,10 @@ instance instToJSTestsStreamTestCompleteListener : ToJS TestsStream.TestComplete
 instance instFromJSTestsStreamTestCompleteListener : FromJS TestsStream.TestCompleteListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestCompleteListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestCompleteListener.ofFn (f : TestsStream.TestCompleteData → Async Unit) : IO TestsStream.TestCompleteListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestCompleteData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestCompleteData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestCompleteListener.ofSyncFn (f : TestsStream.TestCompleteData → IO Unit) : IO TestsStream.TestCompleteListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestCompleteData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestCompleteData args 0)) }
 
 /-- `dictionary TestsStream.TestDequeueData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestDequeueData where
@@ -335,10 +338,10 @@ instance instToJSTestsStreamTestDequeueListener : ToJS TestsStream.TestDequeueLi
 instance instFromJSTestsStreamTestDequeueListener : FromJS TestsStream.TestDequeueListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestDequeueListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestDequeueListener.ofFn (f : TestsStream.TestDequeueData → Async Unit) : IO TestsStream.TestDequeueListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestDequeueData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestDequeueData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestDequeueListener.ofSyncFn (f : TestsStream.TestDequeueData → IO Unit) : IO TestsStream.TestDequeueListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestDequeueData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestDequeueData args 0)) }
 
 /-- `dictionary TestsStream.TestDiagnosticData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestDiagnosticData where
@@ -376,10 +379,10 @@ instance instToJSTestsStreamTestDiagnosticListener : ToJS TestsStream.TestDiagno
 instance instFromJSTestsStreamTestDiagnosticListener : FromJS TestsStream.TestDiagnosticListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestDiagnosticListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestDiagnosticListener.ofFn (f : TestsStream.TestDiagnosticData → Async Unit) : IO TestsStream.TestDiagnosticListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestDiagnosticData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestDiagnosticData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestDiagnosticListener.ofSyncFn (f : TestsStream.TestDiagnosticData → IO Unit) : IO TestsStream.TestDiagnosticListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestDiagnosticData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestDiagnosticData args 0)) }
 
 /-- `dictionary TestsStream.TestEnqueueData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestEnqueueData where
@@ -426,10 +429,10 @@ instance instToJSTestsStreamTestEnqueueListener : ToJS TestsStream.TestEnqueueLi
 instance instFromJSTestsStreamTestEnqueueListener : FromJS TestsStream.TestEnqueueListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestEnqueueListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestEnqueueListener.ofFn (f : TestsStream.TestEnqueueData → Async Unit) : IO TestsStream.TestEnqueueListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestEnqueueData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestEnqueueData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestEnqueueListener.ofSyncFn (f : TestsStream.TestEnqueueData → IO Unit) : IO TestsStream.TestEnqueueListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestEnqueueData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestEnqueueData args 0)) }
 
 /-- `dictionary TestsStream.TestFailDataDetails` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestFailDataDetails where
@@ -503,10 +506,10 @@ instance instToJSTestsStreamTestFailListener : ToJS TestsStream.TestFailListener
 instance instFromJSTestsStreamTestFailListener : FromJS TestsStream.TestFailListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestFailListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestFailListener.ofFn (f : TestsStream.TestFailData → Async Unit) : IO TestsStream.TestFailListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestFailData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestFailData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestFailListener.ofSyncFn (f : TestsStream.TestFailData → IO Unit) : IO TestsStream.TestFailListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestFailData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestFailData args 0)) }
 
 /-- `dictionary TestsStream.TestInterruptedData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestInterruptedData where
@@ -526,10 +529,10 @@ instance instToJSTestsStreamTestInterruptedListener : ToJS TestsStream.TestInter
 instance instFromJSTestsStreamTestInterruptedListener : FromJS TestsStream.TestInterruptedListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestInterruptedListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestInterruptedListener.ofFn (f : TestsStream.TestInterruptedData → Async Unit) : IO TestsStream.TestInterruptedListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestInterruptedData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestInterruptedData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestInterruptedListener.ofSyncFn (f : TestsStream.TestInterruptedData → IO Unit) : IO TestsStream.TestInterruptedListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestInterruptedData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestInterruptedData args 0)) }
 
 /-- `dictionary TestsStream.TestLogData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestLogData where
@@ -576,10 +579,10 @@ instance instToJSTestsStreamTestLogListener : ToJS TestsStream.TestLogListener :
 instance instFromJSTestsStreamTestLogListener : FromJS TestsStream.TestLogListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestLogListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestLogListener.ofFn (f : TestsStream.TestLogData → Async Unit) : IO TestsStream.TestLogListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestLogData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestLogData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestLogListener.ofSyncFn (f : TestsStream.TestLogData → IO Unit) : IO TestsStream.TestLogListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestLogData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestLogData args 0)) }
 
 /-- `dictionary TestsStream.TestPassDataDetails` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestPassDataDetails where
@@ -653,10 +656,10 @@ instance instToJSTestsStreamTestPassListener : ToJS TestsStream.TestPassListener
 instance instFromJSTestsStreamTestPassListener : FromJS TestsStream.TestPassListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestPassListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestPassListener.ofFn (f : TestsStream.TestPassData → Async Unit) : IO TestsStream.TestPassListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestPassData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestPassData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestPassListener.ofSyncFn (f : TestsStream.TestPassData → IO Unit) : IO TestsStream.TestPassListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestPassData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestPassData args 0)) }
 
 /-- `dictionary TestsStream.TestPlanData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestPlanData where
@@ -691,10 +694,10 @@ instance instToJSTestsStreamTestPlanListener : ToJS TestsStream.TestPlanListener
 instance instFromJSTestsStreamTestPlanListener : FromJS TestsStream.TestPlanListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestPlanListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestPlanListener.ofFn (f : TestsStream.TestPlanData → Async Unit) : IO TestsStream.TestPlanListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestPlanData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestPlanData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestPlanListener.ofSyncFn (f : TestsStream.TestPlanData → IO Unit) : IO TestsStream.TestPlanListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestPlanData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestPlanData args 0)) }
 
 /-- `dictionary TestsStream.TestStartData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestStartData where
@@ -738,10 +741,10 @@ instance instToJSTestsStreamTestStartListener : ToJS TestsStream.TestStartListen
 instance instFromJSTestsStreamTestStartListener : FromJS TestsStream.TestStartListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestStartListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestStartListener.ofFn (f : TestsStream.TestStartData → Async Unit) : IO TestsStream.TestStartListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStartData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStartData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestStartListener.ofSyncFn (f : TestsStream.TestStartData → IO Unit) : IO TestsStream.TestStartListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStartData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStartData args 0)) }
 
 /-- `dictionary TestsStream.TestStderrData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestStderrData where
@@ -767,10 +770,10 @@ instance instToJSTestsStreamTestStderrListener : ToJS TestsStream.TestStderrList
 instance instFromJSTestsStreamTestStderrListener : FromJS TestsStream.TestStderrListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestStderrListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestStderrListener.ofFn (f : TestsStream.TestStderrData → Async Unit) : IO TestsStream.TestStderrListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStderrData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStderrData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestStderrListener.ofSyncFn (f : TestsStream.TestStderrData → IO Unit) : IO TestsStream.TestStderrListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStderrData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStderrData args 0)) }
 
 /-- `dictionary TestsStream.TestStdoutData` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestStdoutData where
@@ -796,10 +799,10 @@ instance instToJSTestsStreamTestStdoutListener : ToJS TestsStream.TestStdoutList
 instance instFromJSTestsStreamTestStdoutListener : FromJS TestsStream.TestStdoutListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestStdoutListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestStdoutListener.ofFn (f : TestsStream.TestStdoutData → Async Unit) : IO TestsStream.TestStdoutListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStdoutData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStdoutData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestStdoutListener.ofSyncFn (f : TestsStream.TestStdoutData → IO Unit) : IO TestsStream.TestStdoutListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestStdoutData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestStdoutData args 0)) }
 
 /-- `dictionary TestsStream.TestSummaryDataCounts` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestsStream.TestSummaryDataCounts where
@@ -858,10 +861,10 @@ instance instToJSTestsStreamTestSummaryListener : ToJS TestsStream.TestSummaryLi
 instance instFromJSTestsStreamTestSummaryListener : FromJS TestsStream.TestSummaryListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TestsStream.TestSummaryListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TestsStream.TestSummaryListener.ofFn (f : TestsStream.TestSummaryData → Async Unit) : IO TestsStream.TestSummaryListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestsStream.TestSummaryData args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestSummaryData args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TestsStream.TestSummaryListener.ofSyncFn (f : TestsStream.TestSummaryData → IO Unit) : IO TestsStream.TestSummaryListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestsStream.TestSummaryData args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestsStream.TestSummaryData args 0)) }
 
 /-- `callback TestsStream.TestWatchDrainedListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure TestsStream.TestWatchDrainedListener where
@@ -897,8 +900,8 @@ structure TestContext.BeforeOptions where
   signal : Option AbortSignal := none
   /-- `double /* integer: Nat */ timeout` -/
   timeout : Option Nat := none
-instance instToJSTestContextBeforeOptions : ToJS TestContext.BeforeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout)]⟩
+instance instToJSTestContextBeforeOptions : ToJS TestContext.BeforeOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `dictionary TestContext.BeforeEachOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestContext.BeforeEachOptions where
@@ -906,8 +909,8 @@ structure TestContext.BeforeEachOptions where
   signal : Option AbortSignal := none
   /-- `double /* integer: Nat */ timeout` -/
   timeout : Option Nat := none
-instance instToJSTestContextBeforeEachOptions : ToJS TestContext.BeforeEachOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout)]⟩
+instance instToJSTestContextBeforeEachOptions : ToJS TestContext.BeforeEachOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `dictionary TestContext.AfterOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestContext.AfterOptions where
@@ -915,8 +918,8 @@ structure TestContext.AfterOptions where
   signal : Option AbortSignal := none
   /-- `double /* integer: Nat */ timeout` -/
   timeout : Option Nat := none
-instance instToJSTestContextAfterOptions : ToJS TestContext.AfterOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout)]⟩
+instance instToJSTestContextAfterOptions : ToJS TestContext.AfterOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `dictionary TestContext.AfterEachOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestContext.AfterEachOptions where
@@ -924,8 +927,8 @@ structure TestContext.AfterEachOptions where
   signal : Option AbortSignal := none
   /-- `double /* integer: Nat */ timeout` -/
   timeout : Option Nat := none
-instance instToJSTestContextAfterEachOptions : ToJS TestContext.AfterEachOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout)]⟩
+instance instToJSTestContextAfterEachOptions : ToJS TestContext.AfterEachOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `(boolean or double)`: one constructor per member type. -/
 inductive BooleanOrDouble where
@@ -943,7 +946,7 @@ instance : Coe Float BooleanOrDouble := ⟨.double⟩
 structure TestContext.PlanOptions where
   /-- `(boolean or double) wait` -/
   wait : Option BooleanOrDouble := none
-instance instToJSTestContextPlanOptions : ToJS TestContext.PlanOptions := ⟨fun d => Support.fields #[("wait", Support.optional d.wait)]⟩
+instance instToJSTestContextPlanOptions : ToJS TestContext.PlanOptions := ⟨fun d => Internal.fields #[("wait", Internal.optional d.wait)]⟩
 
 /-- `(double or boolean)`: one constructor per member type. -/
 inductive DoubleOrBoolean where
@@ -975,14 +978,14 @@ structure TestContext.TestOptions where
   timeout : Option Nat := none
   /-- `double plan` -/
   plan : Option Float := none
-instance instToJSTestContextTestOptions : ToJS TestContext.TestOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("only", Support.optional d.only),
-    ("signal", Support.optional d.signal),
-    ("skip", Support.optional d.skip),
-    ("tags", Support.optional d.tags),
-    ("todo", Support.optional d.todo),
-    ("timeout", Support.optional d.timeout),
-    ("plan", Support.optional d.plan)]⟩
+instance instToJSTestContextTestOptions : ToJS TestContext.TestOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("only", Internal.optional d.only),
+    ("signal", Internal.optional d.signal),
+    ("skip", Internal.optional d.skip),
+    ("tags", Internal.optional d.tags),
+    ("todo", Internal.optional d.todo),
+    ("timeout", Internal.optional d.timeout),
+    ("plan", Internal.optional d.plan)]⟩
 
 /-- `dictionary TestContext.WaitForOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestContext.WaitForOptions where
@@ -990,480 +993,496 @@ structure TestContext.WaitForOptions where
   interval : Option Float := none
   /-- `double /* integer: Nat */ timeout = 1000` -/
   timeout : Option Nat := none
-instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := ⟨fun d => Support.fields #[("interval", Support.optional d.interval),
-    ("timeout", Support.optional d.timeout)]⟩
+instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := ⟨fun d => Internal.fields #[("interval", Internal.optional d.interval),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `v instanceof MockFunctionContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockFunctionContext`). -/
-def MockFunctionContext.cast? (v : Value) : IO (Option MockFunctionContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockFunctionContext"] Value) v) then some { val := v } else none
+@[macro_inline] def MockFunctionContext.cast? (v : Value) : IO (Option MockFunctionContext) := Internal.api "Lasm.JS.Node.MockFunctionContext.cast?" do
+  Internal.cast (Support.getExport "node:test" ["MockFunctionContext"] Value) (fun x => { val := x }) v
 
 /-- `ctx.calls` (added in Node.js v19.1.0, v18.13.0): `readonly attribute sequence<any> calls` -/
-def MockFunctionContext.calls (self : MockFunctionContext) : IO (Array Data) := self.val.get "calls" (Array Data)
+@[macro_inline] def MockFunctionContext.calls (self : MockFunctionContext) : IO (Array Data) := Internal.api "Lasm.JS.Node.MockFunctionContext.calls" do
+  self.val.get "calls" (Array Data)
 
 /-- `ctx.callCount()` (added in Node.js v19.1.0, v18.13.0): `long long callCount()` -/
-def MockFunctionContext.callCount (self : MockFunctionContext) : IO Int :=
-  self.val.callMethod "callCount" (Support.args #[]) Int
+@[macro_inline] def MockFunctionContext.callCount (self : MockFunctionContext) : IO Int := Internal.api "Lasm.JS.Node.MockFunctionContext.callCount" do
+  self.val.callMethod "callCount" (Internal.args #[]) Int
 
 /-- `ctx.mockImplementation(implementation)` (added in Node.js v19.1.0, v18.13.0): `undefined mockImplementation(Function implementation)` -/
-def MockFunctionContext.mockImplementation (self : MockFunctionContext) (implementation : JSFunction) : IO Unit :=
-  self.val.callMethod "mockImplementation" (Support.args #[toJS implementation]) Unit
+@[macro_inline] def MockFunctionContext.mockImplementation (self : MockFunctionContext) (implementation : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.MockFunctionContext.mockImplementation" do
+  self.val.callMethod "mockImplementation" (Internal.args #[toJS implementation]) Unit
 
 /-- `ctx.mockImplementationOnce(implementation[, onCall])` (added in Node.js v19.1.0, v18.13.0): `undefined mockImplementationOnce(Function implementation, optional long long onCall)` -/
-def MockFunctionContext.mockImplementationOnce (self : MockFunctionContext) (implementation : JSFunction) (onCall : Option Int := none) : IO Unit :=
-  self.val.callMethod "mockImplementationOnce" (Support.args #[toJS implementation, Support.optional onCall]) Unit
+@[macro_inline] def MockFunctionContext.mockImplementationOnce (self : MockFunctionContext) (implementation : JSFunction) (onCall : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.MockFunctionContext.mockImplementationOnce" do
+  self.val.callMethod "mockImplementationOnce" (Internal.args #[toJS implementation, Internal.optional onCall]) Unit
 
 /-- `ctx.resetCalls()` (added in Node.js v19.3.0, v18.13.0): `undefined resetCalls()` -/
-def MockFunctionContext.resetCalls (self : MockFunctionContext) : IO Unit :=
-  self.val.callMethod "resetCalls" (Support.args #[]) Unit
+@[macro_inline] def MockFunctionContext.resetCalls (self : MockFunctionContext) : IO Unit := Internal.api "Lasm.JS.Node.MockFunctionContext.resetCalls" do
+  self.val.callMethod "resetCalls" (Internal.args #[]) Unit
 
 /-- `ctx.restore()` (added in Node.js v19.1.0, v18.13.0): `undefined restore()` -/
-def MockFunctionContext.restore (self : MockFunctionContext) : IO Unit :=
-  self.val.callMethod "restore" (Support.args #[]) Unit
+@[macro_inline] def MockFunctionContext.restore (self : MockFunctionContext) : IO Unit := Internal.api "Lasm.JS.Node.MockFunctionContext.restore" do
+  self.val.callMethod "restore" (Internal.args #[]) Unit
 
 /-- `v instanceof MockModuleContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockModuleContext`). -/
-def MockModuleContext.cast? (v : Value) : IO (Option MockModuleContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockModuleContext"] Value) v) then some { val := v } else none
+@[macro_inline] def MockModuleContext.cast? (v : Value) : IO (Option MockModuleContext) := Internal.api "Lasm.JS.Node.MockModuleContext.cast?" do
+  Internal.cast (Support.getExport "node:test" ["MockModuleContext"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `ctx.restore()` (added in Node.js v22.3.0, v20.18.0): `undefined restore()` -/
-def MockModuleContext.restore (self : MockModuleContext) : IO Unit :=
-  self.val.callMethod "restore" (Support.args #[]) Unit
+@[macro_inline] def MockModuleContext.restore (self : MockModuleContext) : IO Unit := Internal.api "Lasm.JS.Node.MockModuleContext.restore" do
+  self.val.callMethod "restore" (Internal.args #[]) Unit
 
 /-- `v instanceof MockPropertyContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockPropertyContext`). -/
-def MockPropertyContext.cast? (v : Value) : IO (Option MockPropertyContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockPropertyContext"] Value) v) then some { val := v } else none
+@[macro_inline] def MockPropertyContext.cast? (v : Value) : IO (Option MockPropertyContext) := Internal.api "Lasm.JS.Node.MockPropertyContext.cast?" do
+  Internal.cast (Support.getExport "node:test" ["MockPropertyContext"] Value) (fun x => { val := x }) v
 
 /-- `ctx.accesses`: `readonly attribute sequence<any> accesses` -/
-def MockPropertyContext.accesses (self : MockPropertyContext) : IO (Array Data) := self.val.get "accesses" (Array Data)
+@[macro_inline] def MockPropertyContext.accesses (self : MockPropertyContext) : IO (Array Data) := Internal.api "Lasm.JS.Node.MockPropertyContext.accesses" do
+  self.val.get "accesses" (Array Data)
 
 /-- `ctx.accessCount()`: `long long accessCount()` -/
-def MockPropertyContext.accessCount (self : MockPropertyContext) : IO Int :=
-  self.val.callMethod "accessCount" (Support.args #[]) Int
+@[macro_inline] def MockPropertyContext.accessCount (self : MockPropertyContext) : IO Int := Internal.api "Lasm.JS.Node.MockPropertyContext.accessCount" do
+  self.val.callMethod "accessCount" (Internal.args #[]) Int
 
 /-- `ctx.mockImplementation(value)`: `undefined mockImplementation(any value)` -/
-def MockPropertyContext.mockImplementation (self : MockPropertyContext) (value : Data) : IO Unit :=
-  self.val.callMethod "mockImplementation" (Support.args #[toJS value]) Unit
+@[macro_inline] def MockPropertyContext.mockImplementation (self : MockPropertyContext) (value : Data) : IO Unit := Internal.api "Lasm.JS.Node.MockPropertyContext.mockImplementation" do
+  self.val.callMethod "mockImplementation" (Internal.args #[toJS value]) Unit
 
 /-- `ctx.mockImplementationOnce(value[, onAccess])`: `undefined mockImplementationOnce(any value, optional long long onAccess)` -/
-def MockPropertyContext.mockImplementationOnce (self : MockPropertyContext) (value : Data) (onAccess : Option Int := none) : IO Unit :=
-  self.val.callMethod "mockImplementationOnce" (Support.args #[toJS value, Support.optional onAccess]) Unit
+@[macro_inline] def MockPropertyContext.mockImplementationOnce (self : MockPropertyContext) (value : Data) (onAccess : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.MockPropertyContext.mockImplementationOnce" do
+  self.val.callMethod "mockImplementationOnce" (Internal.args #[toJS value, Internal.optional onAccess]) Unit
 
 /-- `ctx.resetAccesses()`: `undefined resetAccesses()` -/
-def MockPropertyContext.resetAccesses (self : MockPropertyContext) : IO Unit :=
-  self.val.callMethod "resetAccesses" (Support.args #[]) Unit
+@[macro_inline] def MockPropertyContext.resetAccesses (self : MockPropertyContext) : IO Unit := Internal.api "Lasm.JS.Node.MockPropertyContext.resetAccesses" do
+  self.val.callMethod "resetAccesses" (Internal.args #[]) Unit
 
 /-- `ctx.restore()`: `undefined restore()` -/
-def MockPropertyContext.restore (self : MockPropertyContext) : IO Unit :=
-  self.val.callMethod "restore" (Support.args #[]) Unit
+@[macro_inline] def MockPropertyContext.restore (self : MockPropertyContext) : IO Unit := Internal.api "Lasm.JS.Node.MockPropertyContext.restore" do
+  self.val.callMethod "restore" (Internal.args #[]) Unit
 
 /-- `v instanceof MockTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTracker`). -/
-def MockTracker.cast? (v : Value) : IO (Option MockTracker) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockTracker"] Value) v) then some { val := v } else none
+@[macro_inline] def MockTracker.cast? (v : Value) : IO (Option MockTracker) := Internal.api "Lasm.JS.Node.MockTracker.cast?" do
+  Internal.cast (Support.getExport "node:test" ["MockTracker"] Value) (fun x => { val := x }) v
 
 /-- `mock.fn([original[, implementation]][, options])` (added in Node.js v19.1.0, v18.13.0): `object fn(optional Function original, optional Function implementation, optional MockTracker.FnOptions options)` -/
-def MockTracker.fn (self : MockTracker) (original : Option JSFunction := none) (implementation : Option JSFunction := none) (options : Option MockTracker.FnOptions := none) : IO Data :=
-  self.val.callMethod "fn" (Support.args #[Support.optional original, Support.optional implementation, Support.optional options]) Data
+@[macro_inline] def MockTracker.fn (self : MockTracker) (original : Option JSFunction := none) (implementation : Option JSFunction := none) (options : Option MockTracker.FnOptions := none) : IO Data := Internal.api "Lasm.JS.Node.MockTracker.fn" do
+  self.val.callMethod "fn" (Internal.args #[Internal.optional original, Internal.optional implementation, Internal.optional options]) Data
 
 /-- `mock.getter(object, methodName[, implementation][, options])` (added in Node.js v19.3.0, v18.13.0): `undefined getter(any object, any methodName, optional any implementation, optional any options)` -/
-def MockTracker.getter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit :=
-  self.val.callMethod "getter" (Support.args #[toJS object, toJS methodName, implementation, options]) Unit
+@[macro_inline] def MockTracker.getter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTracker.getter" do
+  self.val.callMethod "getter" (Internal.args #[toJS object, toJS methodName, implementation, options]) Unit
 
 /-- `mock.method(object, methodName[, implementation][, options])` (added in Node.js v19.1.0, v18.13.0): `object method(object object, (DOMString or symbol) methodName, optional Function implementation, optional MockTracker.MethodOptions options)` -/
-def MockTracker.method (self : MockTracker) (object : Data) (methodName : DOMStringOrSymbol) (implementation : Option JSFunction := none) (options : Option MockTracker.MethodOptions := none) : IO Data :=
-  self.val.callMethod "method" (Support.args #[toJS object, toJS methodName, Support.optional implementation, Support.optional options]) Data
+@[macro_inline] def MockTracker.method (self : MockTracker) (object : Data) (methodName : DOMStringOrSymbol) (implementation : Option JSFunction := none) (options : Option MockTracker.MethodOptions := none) : IO Data := Internal.api "Lasm.JS.Node.MockTracker.method" do
+  self.val.callMethod "method" (Internal.args #[toJS object, toJS methodName, Internal.optional implementation, Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `mock.module(specifier[, options])` (added in Node.js v22.3.0, v20.18.0): `MockModuleContext module((DOMString or URL) specifier, optional MockTracker.ModuleOptions options)` -/
-def MockTracker.«module» (self : MockTracker) (specifier : DOMStringOrURL) (options : Option MockTracker.ModuleOptions := none) : IO MockModuleContext := do
-  let r ← self.val.callMethod "module" (Support.args #[toJS specifier, Support.optional options]) Value
+@[macro_inline] def MockTracker.«module» (self : MockTracker) (specifier : DOMStringOrURL) (options : Option MockTracker.ModuleOptions := none) : IO MockModuleContext := Internal.api "Lasm.JS.Node.MockTracker.module" do
+  let r ← self.val.callMethod "module" (Internal.args #[toJS specifier, Internal.optional options]) Value
   pure { val := r }
 
 /-- `mock.property(object, propertyName[, value])` (added in Node.js v24.3.0): `object property(object object, (DOMString or symbol) propertyName, optional any value)` -/
-def MockTracker.property (self : MockTracker) (object : Data) (propertyName : DOMStringOrSymbol) (value : Data := .undefined) : IO Data :=
-  self.val.callMethod "property" (Support.args #[toJS object, toJS propertyName, value]) Data
+@[macro_inline] def MockTracker.property (self : MockTracker) (object : Data) (propertyName : DOMStringOrSymbol) (value : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.MockTracker.property" do
+  self.val.callMethod "property" (Internal.args #[toJS object, toJS propertyName, value]) Data
 
 /-- `mock.reset()` (added in Node.js v19.1.0, v18.13.0): `undefined reset()` -/
-def MockTracker.reset (self : MockTracker) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def MockTracker.reset (self : MockTracker) : IO Unit := Internal.api "Lasm.JS.Node.MockTracker.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `mock.restoreAll()` (added in Node.js v19.1.0, v18.13.0): `undefined restoreAll()` -/
-def MockTracker.restoreAll (self : MockTracker) : IO Unit :=
-  self.val.callMethod "restoreAll" (Support.args #[]) Unit
+@[macro_inline] def MockTracker.restoreAll (self : MockTracker) : IO Unit := Internal.api "Lasm.JS.Node.MockTracker.restoreAll" do
+  self.val.callMethod "restoreAll" (Internal.args #[]) Unit
 
 /-- `mock.setter(object, methodName[, implementation][, options])` (added in Node.js v19.3.0, v18.13.0): `undefined setter(any object, any methodName, optional any implementation, optional any options)` -/
-def MockTracker.setter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit :=
-  self.val.callMethod "setter" (Support.args #[toJS object, toJS methodName, implementation, options]) Unit
+@[macro_inline] def MockTracker.setter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTracker.setter" do
+  self.val.callMethod "setter" (Internal.args #[toJS object, toJS methodName, implementation, options]) Unit
 
 /-- `v instanceof MockTimers`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTimers`). -/
-def MockTimers.cast? (v : Value) : IO (Option MockTimers) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockTimers"] Value) v) then some { val := v } else none
+@[macro_inline] def MockTimers.cast? (v : Value) : IO (Option MockTimers) := Internal.api "Lasm.JS.Node.MockTimers.cast?" do
+  Internal.cast (Support.getExport "node:test" ["MockTimers"] Value) (fun x => { val := x }) v
 
 /-- `timers.enable([enableOptions])` (added in Node.js v20.4.0, v18.19.0): `undefined enable(optional any enableOptions)` -/
-def MockTimers.enable (self : MockTimers) (enableOptions : Data := .undefined) : IO Unit :=
-  self.val.callMethod "enable" (Support.args #[enableOptions]) Unit
+@[macro_inline] def MockTimers.enable (self : MockTimers) (enableOptions : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.enable" do
+  self.val.callMethod "enable" (Internal.args #[enableOptions]) Unit
 
 /-- `timers.reset()` (added in Node.js v20.4.0, v18.19.0): `undefined reset()` -/
-def MockTimers.reset (self : MockTimers) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def MockTimers.reset (self : MockTimers) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `timers.tick([milliseconds])` (added in Node.js v20.4.0, v18.19.0): `undefined tick(optional any milliseconds)` -/
-def MockTimers.tick (self : MockTimers) (milliseconds : Data := .undefined) : IO Unit :=
-  self.val.callMethod "tick" (Support.args #[milliseconds]) Unit
+@[macro_inline] def MockTimers.tick (self : MockTimers) (milliseconds : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.tick" do
+  self.val.callMethod "tick" (Internal.args #[milliseconds]) Unit
 
 /-- `timers.runAll()` (added in Node.js v20.4.0, v18.19.0): `undefined runAll()` -/
-def MockTimers.runAll (self : MockTimers) : IO Unit :=
-  self.val.callMethod "runAll" (Support.args #[]) Unit
+@[macro_inline] def MockTimers.runAll (self : MockTimers) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.runAll" do
+  self.val.callMethod "runAll" (Internal.args #[]) Unit
 
 /-- `timers.setTime(milliseconds)` (added in Node.js v21.2.0, v20.11.0): `undefined setTime(any milliseconds)` -/
-def MockTimers.setTime (self : MockTimers) (milliseconds : Data) : IO Unit :=
-  self.val.callMethod "setTime" (Support.args #[toJS milliseconds]) Unit
+@[macro_inline] def MockTimers.setTime (self : MockTimers) (milliseconds : Data) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.setTime" do
+  self.val.callMethod "setTime" (Internal.args #[toJS milliseconds]) Unit
 
 /-- `v instanceof TestsStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestsStream`). -/
-def TestsStream.cast? (v : Value) : IO (Option TestsStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["TestsStream"] Value) v) then some { val := v } else none
+@[macro_inline] def TestsStream.cast? (v : Value) : IO (Option TestsStream) := Internal.api "Lasm.JS.Node.TestsStream.cast?" do
+  Internal.cast (Support.getExport "node:test" ["TestsStream"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'test:coverage'`: `TestsStream onTestCoverage(TestsStream.TestCoverageListener listener)`: calls `on("test:coverage", listener)` -/
-def TestsStream.onTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:coverage", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestCoverage" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:coverage", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:coverage'`: `TestsStream onceTestCoverage(TestsStream.TestCoverageListener listener)`: calls `once("test:coverage", listener)` -/
-def TestsStream.onceTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:coverage", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestCoverage" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:coverage", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:complete'`: `TestsStream onTestComplete(TestsStream.TestCompleteListener listener)`: calls `on("test:complete", listener)` -/
-def TestsStream.onTestComplete (self : TestsStream) (listener : TestsStream.TestCompleteListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:complete", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestComplete (self : TestsStream) (listener : TestsStream.TestCompleteListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestComplete" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:complete", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:complete'`: `TestsStream onceTestComplete(TestsStream.TestCompleteListener listener)`: calls `once("test:complete", listener)` -/
-def TestsStream.onceTestComplete (self : TestsStream) (listener : TestsStream.TestCompleteListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:complete", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestComplete (self : TestsStream) (listener : TestsStream.TestCompleteListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestComplete" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:complete", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:dequeue'`: `TestsStream onTestDequeue(TestsStream.TestDequeueListener listener)`: calls `on("test:dequeue", listener)` -/
-def TestsStream.onTestDequeue (self : TestsStream) (listener : TestsStream.TestDequeueListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:dequeue", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestDequeue (self : TestsStream) (listener : TestsStream.TestDequeueListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestDequeue" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:dequeue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:dequeue'`: `TestsStream onceTestDequeue(TestsStream.TestDequeueListener listener)`: calls `once("test:dequeue", listener)` -/
-def TestsStream.onceTestDequeue (self : TestsStream) (listener : TestsStream.TestDequeueListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:dequeue", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestDequeue (self : TestsStream) (listener : TestsStream.TestDequeueListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestDequeue" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:dequeue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:diagnostic'`: `TestsStream onTestDiagnostic(TestsStream.TestDiagnosticListener listener)`: calls `on("test:diagnostic", listener)` -/
-def TestsStream.onTestDiagnostic (self : TestsStream) (listener : TestsStream.TestDiagnosticListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:diagnostic", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestDiagnostic (self : TestsStream) (listener : TestsStream.TestDiagnosticListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestDiagnostic" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:diagnostic", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:diagnostic'`: `TestsStream onceTestDiagnostic(TestsStream.TestDiagnosticListener listener)`: calls `once("test:diagnostic", listener)` -/
-def TestsStream.onceTestDiagnostic (self : TestsStream) (listener : TestsStream.TestDiagnosticListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:diagnostic", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestDiagnostic (self : TestsStream) (listener : TestsStream.TestDiagnosticListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestDiagnostic" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:diagnostic", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:enqueue'`: `TestsStream onTestEnqueue(TestsStream.TestEnqueueListener listener)`: calls `on("test:enqueue", listener)` -/
-def TestsStream.onTestEnqueue (self : TestsStream) (listener : TestsStream.TestEnqueueListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:enqueue", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestEnqueue (self : TestsStream) (listener : TestsStream.TestEnqueueListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestEnqueue" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:enqueue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:enqueue'`: `TestsStream onceTestEnqueue(TestsStream.TestEnqueueListener listener)`: calls `once("test:enqueue", listener)` -/
-def TestsStream.onceTestEnqueue (self : TestsStream) (listener : TestsStream.TestEnqueueListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:enqueue", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestEnqueue (self : TestsStream) (listener : TestsStream.TestEnqueueListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestEnqueue" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:enqueue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:fail'`: `TestsStream onTestFail(TestsStream.TestFailListener listener)`: calls `on("test:fail", listener)` -/
-def TestsStream.onTestFail (self : TestsStream) (listener : TestsStream.TestFailListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:fail", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestFail (self : TestsStream) (listener : TestsStream.TestFailListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestFail" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:fail", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:fail'`: `TestsStream onceTestFail(TestsStream.TestFailListener listener)`: calls `once("test:fail", listener)` -/
-def TestsStream.onceTestFail (self : TestsStream) (listener : TestsStream.TestFailListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:fail", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestFail (self : TestsStream) (listener : TestsStream.TestFailListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestFail" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:fail", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:interrupted'` (added in Node.js v24.15.0): `TestsStream onTestInterrupted(TestsStream.TestInterruptedListener listener)`: calls `on("test:interrupted", listener)` -/
-def TestsStream.onTestInterrupted (self : TestsStream) (listener : TestsStream.TestInterruptedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:interrupted", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestInterrupted (self : TestsStream) (listener : TestsStream.TestInterruptedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestInterrupted" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:interrupted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:interrupted'` (added in Node.js v24.15.0): `TestsStream onceTestInterrupted(TestsStream.TestInterruptedListener listener)`: calls `once("test:interrupted", listener)` -/
-def TestsStream.onceTestInterrupted (self : TestsStream) (listener : TestsStream.TestInterruptedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:interrupted", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestInterrupted (self : TestsStream) (listener : TestsStream.TestInterruptedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestInterrupted" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:interrupted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:log'` (added in Node.js v24.20.0): `TestsStream onTestLog(TestsStream.TestLogListener listener)`: calls `on("test:log", listener)` -/
-def TestsStream.onTestLog (self : TestsStream) (listener : TestsStream.TestLogListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:log", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestLog (self : TestsStream) (listener : TestsStream.TestLogListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestLog" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:log", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:log'` (added in Node.js v24.20.0): `TestsStream onceTestLog(TestsStream.TestLogListener listener)`: calls `once("test:log", listener)` -/
-def TestsStream.onceTestLog (self : TestsStream) (listener : TestsStream.TestLogListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:log", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestLog (self : TestsStream) (listener : TestsStream.TestLogListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestLog" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:log", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:pass'`: `TestsStream onTestPass(TestsStream.TestPassListener listener)`: calls `on("test:pass", listener)` -/
-def TestsStream.onTestPass (self : TestsStream) (listener : TestsStream.TestPassListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:pass", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestPass (self : TestsStream) (listener : TestsStream.TestPassListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestPass" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:pass", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:pass'`: `TestsStream onceTestPass(TestsStream.TestPassListener listener)`: calls `once("test:pass", listener)` -/
-def TestsStream.onceTestPass (self : TestsStream) (listener : TestsStream.TestPassListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:pass", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestPass (self : TestsStream) (listener : TestsStream.TestPassListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestPass" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:pass", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:plan'`: `TestsStream onTestPlan(TestsStream.TestPlanListener listener)`: calls `on("test:plan", listener)` -/
-def TestsStream.onTestPlan (self : TestsStream) (listener : TestsStream.TestPlanListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:plan", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestPlan (self : TestsStream) (listener : TestsStream.TestPlanListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestPlan" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:plan", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:plan'`: `TestsStream onceTestPlan(TestsStream.TestPlanListener listener)`: calls `once("test:plan", listener)` -/
-def TestsStream.onceTestPlan (self : TestsStream) (listener : TestsStream.TestPlanListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:plan", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestPlan (self : TestsStream) (listener : TestsStream.TestPlanListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestPlan" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:plan", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:start'`: `TestsStream onTestStart(TestsStream.TestStartListener listener)`: calls `on("test:start", listener)` -/
-def TestsStream.onTestStart (self : TestsStream) (listener : TestsStream.TestStartListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:start", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestStart (self : TestsStream) (listener : TestsStream.TestStartListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestStart" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:start", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:start'`: `TestsStream onceTestStart(TestsStream.TestStartListener listener)`: calls `once("test:start", listener)` -/
-def TestsStream.onceTestStart (self : TestsStream) (listener : TestsStream.TestStartListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:start", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestStart (self : TestsStream) (listener : TestsStream.TestStartListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestStart" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:start", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:stderr'`: `TestsStream onTestStderr(TestsStream.TestStderrListener listener)`: calls `on("test:stderr", listener)` -/
-def TestsStream.onTestStderr (self : TestsStream) (listener : TestsStream.TestStderrListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:stderr", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestStderr (self : TestsStream) (listener : TestsStream.TestStderrListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestStderr" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:stderr", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:stderr'`: `TestsStream onceTestStderr(TestsStream.TestStderrListener listener)`: calls `once("test:stderr", listener)` -/
-def TestsStream.onceTestStderr (self : TestsStream) (listener : TestsStream.TestStderrListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:stderr", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestStderr (self : TestsStream) (listener : TestsStream.TestStderrListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestStderr" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:stderr", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:stdout'`: `TestsStream onTestStdout(TestsStream.TestStdoutListener listener)`: calls `on("test:stdout", listener)` -/
-def TestsStream.onTestStdout (self : TestsStream) (listener : TestsStream.TestStdoutListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:stdout", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestStdout (self : TestsStream) (listener : TestsStream.TestStdoutListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestStdout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:stdout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:stdout'`: `TestsStream onceTestStdout(TestsStream.TestStdoutListener listener)`: calls `once("test:stdout", listener)` -/
-def TestsStream.onceTestStdout (self : TestsStream) (listener : TestsStream.TestStdoutListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:stdout", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestStdout (self : TestsStream) (listener : TestsStream.TestStdoutListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestStdout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:stdout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:summary'`: `TestsStream onTestSummary(TestsStream.TestSummaryListener listener)`: calls `on("test:summary", listener)` -/
-def TestsStream.onTestSummary (self : TestsStream) (listener : TestsStream.TestSummaryListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:summary", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestSummary (self : TestsStream) (listener : TestsStream.TestSummaryListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestSummary" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:summary", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:summary'`: `TestsStream onceTestSummary(TestsStream.TestSummaryListener listener)`: calls `once("test:summary", listener)` -/
-def TestsStream.onceTestSummary (self : TestsStream) (listener : TestsStream.TestSummaryListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:summary", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestSummary (self : TestsStream) (listener : TestsStream.TestSummaryListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestSummary" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:summary", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:watch:drained'`: `TestsStream onTestWatchDrained(TestsStream.TestWatchDrainedListener listener)`: calls `on("test:watch:drained", listener)` -/
-def TestsStream.onTestWatchDrained (self : TestsStream) (listener : TestsStream.TestWatchDrainedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:watch:drained", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestWatchDrained (self : TestsStream) (listener : TestsStream.TestWatchDrainedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestWatchDrained" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:watch:drained", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:watch:drained'`: `TestsStream onceTestWatchDrained(TestsStream.TestWatchDrainedListener listener)`: calls `once("test:watch:drained", listener)` -/
-def TestsStream.onceTestWatchDrained (self : TestsStream) (listener : TestsStream.TestWatchDrainedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:watch:drained", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestWatchDrained (self : TestsStream) (listener : TestsStream.TestWatchDrainedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestWatchDrained" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:watch:drained", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:watch:restarted'`: `TestsStream onTestWatchRestarted(TestsStream.TestWatchRestartedListener listener)`: calls `on("test:watch:restarted", listener)` -/
-def TestsStream.onTestWatchRestarted (self : TestsStream) (listener : TestsStream.TestWatchRestartedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "test:watch:restarted", toJS listener]) Value
+@[macro_inline] def TestsStream.onTestWatchRestarted (self : TestsStream) (listener : TestsStream.TestWatchRestartedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestWatchRestarted" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "test:watch:restarted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'test:watch:restarted'`: `TestsStream onceTestWatchRestarted(TestsStream.TestWatchRestartedListener listener)`: calls `once("test:watch:restarted", listener)` -/
-def TestsStream.onceTestWatchRestarted (self : TestsStream) (listener : TestsStream.TestWatchRestartedListener) : IO TestsStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "test:watch:restarted", toJS listener]) Value
+@[macro_inline] def TestsStream.onceTestWatchRestarted (self : TestsStream) (listener : TestsStream.TestWatchRestartedListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onceTestWatchRestarted" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "test:watch:restarted", toJS listener]) Value
   pure { val := r }
 
 /-- `v instanceof TestContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestContext`). -/
-def TestContext.cast? (v : Value) : IO (Option TestContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["TestContext"] Value) v) then some { val := v } else none
+@[macro_inline] def TestContext.cast? (v : Value) : IO (Option TestContext) := Internal.api "Lasm.JS.Node.TestContext.cast?" do
+  Internal.cast (Support.getExport "node:test" ["TestContext"] Value) (fun x => { val := x }) v
 
 /-- `context.assert` (added in Node.js v22.2.0, v20.15.0): `readonly attribute any assert` -/
-def TestContext.assert (self : TestContext) : IO Data := self.val.get "assert" Data
+@[macro_inline] def TestContext.assert (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.assert" do
+  self.val.get "assert" Data
 
 /-- `context.filePath` (added in Node.js v22.6.0, v20.16.0): `readonly attribute any filePath` -/
-def TestContext.filePath (self : TestContext) : IO Data := self.val.get "filePath" Data
+@[macro_inline] def TestContext.filePath (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.filePath" do
+  self.val.get "filePath" Data
 
 /-- `context.fullName` (added in Node.js v22.3.0, v20.16.0): `readonly attribute any fullName` -/
-def TestContext.fullName (self : TestContext) : IO Data := self.val.get "fullName" Data
+@[macro_inline] def TestContext.fullName (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.fullName" do
+  self.val.get "fullName" Data
 
 /-- `context.name` (added in Node.js v18.8.0, v16.18.0): `readonly attribute any name` -/
-def TestContext.name (self : TestContext) : IO Data := self.val.get "name" Data
+@[macro_inline] def TestContext.name (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.name" do
+  self.val.get "name" Data
 
 /-- `context.passed` (added in Node.js v21.7.0, v20.12.0): `readonly attribute boolean passed` -/
-def TestContext.passed (self : TestContext) : IO Bool := self.val.get "passed" Bool
+@[macro_inline] def TestContext.passed (self : TestContext) : IO Bool := Internal.api "Lasm.JS.Node.TestContext.passed" do
+  self.val.get "passed" Bool
 
 /-- `context.error` (added in Node.js v21.7.0, v20.12.0): `readonly attribute any error` -/
-def TestContext.error (self : TestContext) : IO Data := self.val.get "error" Data
+@[macro_inline] def TestContext.error (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.error" do
+  self.val.get "error" Data
 
 /-- `context.attempt` (added in Node.js v25.0.0): `readonly attribute double attempt` -/
-def TestContext.attempt (self : TestContext) : IO Float := self.val.get "attempt" Float
+@[macro_inline] def TestContext.attempt (self : TestContext) : IO Float := Internal.api "Lasm.JS.Node.TestContext.attempt" do
+  self.val.get "attempt" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `context.tags` (added in Node.js v24.19.0): `readonly attribute sequence<DOMString> tags` -/
-def TestContext.tags (self : TestContext) : IO (Array String) := self.val.get "tags" (Array String)
+@[macro_inline] def TestContext.tags (self : TestContext) : IO (Array String) := Internal.api "Lasm.JS.Node.TestContext.tags" do
+  self.val.get "tags" (Array String)
 
 /-- `context.workerId` (added in Node.js v24.15.0): `readonly attribute double? workerId` -/
-def TestContext.workerId (self : TestContext) : IO (Option Float) := self.val.get "workerId" (Option Float)
+@[macro_inline] def TestContext.workerId (self : TestContext) : IO (Option Float) := Internal.api "Lasm.JS.Node.TestContext.workerId" do
+  self.val.get "workerId" (Option Float)
 
 /-- `context.signal` (added in Node.js v18.7.0, v16.17.0): `readonly attribute AbortSignal signal` -/
-def TestContext.signal (self : TestContext) : IO AbortSignal := do
+@[macro_inline] def TestContext.signal (self : TestContext) : IO AbortSignal := Internal.api "Lasm.JS.Node.TestContext.signal" do
   let r ← self.val.get "signal" Value
   pure { val := r }
 
 /-- `context.before([fn][, options])` (added in Node.js v20.1.0, v18.17.0): `undefined before(optional Function fn, optional TestContext.BeforeOptions options)` -/
-def TestContext.before (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.BeforeOptions := none) : IO Unit :=
-  self.val.callMethod "before" (Support.args #[Support.optional fn, Support.optional options]) Unit
+@[macro_inline] def TestContext.before (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.BeforeOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.before" do
+  self.val.callMethod "before" (Internal.args #[Internal.optional fn, Internal.optional options]) Unit
 
 /-- `context.beforeEach([fn][, options])` (added in Node.js v18.8.0, v16.18.0): `undefined beforeEach(optional Function fn, optional TestContext.BeforeEachOptions options)` -/
-def TestContext.beforeEach (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.BeforeEachOptions := none) : IO Unit :=
-  self.val.callMethod "beforeEach" (Support.args #[Support.optional fn, Support.optional options]) Unit
+@[macro_inline] def TestContext.beforeEach (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.BeforeEachOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.beforeEach" do
+  self.val.callMethod "beforeEach" (Internal.args #[Internal.optional fn, Internal.optional options]) Unit
 
 /-- `context.after([fn][, options])` (added in Node.js v19.3.0, v18.13.0): `undefined after(optional Function fn, optional TestContext.AfterOptions options)` -/
-def TestContext.after (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.AfterOptions := none) : IO Unit :=
-  self.val.callMethod "after" (Support.args #[Support.optional fn, Support.optional options]) Unit
+@[macro_inline] def TestContext.after (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.AfterOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.after" do
+  self.val.callMethod "after" (Internal.args #[Internal.optional fn, Internal.optional options]) Unit
 
 /-- `context.afterEach([fn][, options])` (added in Node.js v18.8.0, v16.18.0): `undefined afterEach(optional Function fn, optional TestContext.AfterEachOptions options)` -/
-def TestContext.afterEach (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.AfterEachOptions := none) : IO Unit :=
-  self.val.callMethod "afterEach" (Support.args #[Support.optional fn, Support.optional options]) Unit
+@[macro_inline] def TestContext.afterEach (self : TestContext) (fn : Option JSFunction := none) (options : Option TestContext.AfterEachOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.afterEach" do
+  self.val.callMethod "afterEach" (Internal.args #[Internal.optional fn, Internal.optional options]) Unit
 
 /-- `context.diagnostic(message)` (added in Node.js v18.0.0, v16.17.0): `undefined diagnostic(DOMString message)` -/
-def TestContext.diagnostic (self : TestContext) (message : String) : IO Unit :=
-  self.val.callMethod "diagnostic" (Support.args #[toJS message]) Unit
+@[macro_inline] def TestContext.diagnostic (self : TestContext) (message : String) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.diagnostic" do
+  self.val.callMethod "diagnostic" (Internal.args #[toJS message]) Unit
 
 /-- `context.log(message[, data])` (added in Node.js v24.20.0): `undefined log(DOMString message, optional any data)` -/
-def TestContext.log (self : TestContext) (message : String) (data : Data := .undefined) : IO Unit :=
-  self.val.callMethod "log" (Support.args #[toJS message, data]) Unit
+@[macro_inline] def TestContext.log (self : TestContext) (message : String) (data : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.log" do
+  self.val.callMethod "log" (Internal.args #[toJS message, data]) Unit
 
 /-- `context.plan(count[,options])` (added in Node.js v22.2.0, v20.15.0): `undefined plan(double /* integer: Nat */ count, optional TestContext.PlanOptions options)` -/
-def TestContext.plan (self : TestContext) (count : Nat) (options : Option TestContext.PlanOptions := none) : IO Unit :=
-  self.val.callMethod "plan" (Support.args #[toJS count, Support.optional options]) Unit
+@[macro_inline] def TestContext.plan (self : TestContext) (count : Nat) (options : Option TestContext.PlanOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.plan" do
+  self.val.callMethod "plan" (Internal.args #[toJS count, Internal.optional options]) Unit
 
 /-- `context.runOnly(shouldRunOnlyTests)` (added in Node.js v18.0.0, v16.17.0): `undefined runOnly(boolean shouldRunOnlyTests)` -/
-def TestContext.runOnly (self : TestContext) (shouldRunOnlyTests : Bool) : IO Unit :=
-  self.val.callMethod "runOnly" (Support.args #[toJS shouldRunOnlyTests]) Unit
+@[macro_inline] def TestContext.runOnly (self : TestContext) (shouldRunOnlyTests : Bool) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.runOnly" do
+  self.val.callMethod "runOnly" (Internal.args #[toJS shouldRunOnlyTests]) Unit
 
 /-- `context.skip([message])` (added in Node.js v18.0.0, v16.17.0): `undefined skip(optional DOMString message)` -/
-def TestContext.skip (self : TestContext) (message : Option String := none) : IO Unit :=
-  self.val.callMethod "skip" (Support.args #[Support.optional message]) Unit
+@[macro_inline] def TestContext.skip (self : TestContext) (message : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.skip" do
+  self.val.callMethod "skip" (Internal.args #[Internal.optional message]) Unit
 
 /-- `context.todo([message])` (added in Node.js v18.0.0, v16.17.0): `undefined todo(optional DOMString message)` -/
-def TestContext.todo (self : TestContext) (message : Option String := none) : IO Unit :=
-  self.val.callMethod "todo" (Support.args #[Support.optional message]) Unit
+@[macro_inline] def TestContext.todo (self : TestContext) (message : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.TestContext.todo" do
+  self.val.callMethod "todo" (Internal.args #[Internal.optional message]) Unit
 
 /-- `context.test([name][, options][, fn])` (added in Node.js v18.0.0, v16.17.0): `Promise<any> test(optional DOMString name, optional TestContext.TestOptions options, optional Function fn)` -/
-def TestContext.test (self : TestContext) (name : Option String := none) (options : Option TestContext.TestOptions := none) (fn : Option JSFunction := none) : Async Data :=
-  self.val.callMethodAwait "test" (Support.args #[Support.optional name, Support.optional options, Support.optional fn]) Data
+@[macro_inline] def TestContext.test (self : TestContext) (name : Option String := none) (options : Option TestContext.TestOptions := none) (fn : Option JSFunction := none) : Async Data := Internal.api "Lasm.JS.Node.TestContext.test" do
+  self.val.callMethodAwait "test" (Internal.args #[Internal.optional name, Internal.optional options, Internal.optional fn]) Data
 
 /-- `context.waitFor(condition[, options])` (added in Node.js v23.7.0, v22.14.0): `Promise<any> waitFor(Function condition, optional TestContext.WaitForOptions options)` -/
-def TestContext.waitFor (self : TestContext) (condition : JSFunction) (options : Option TestContext.WaitForOptions := none) : Async Data :=
-  self.val.callMethodAwait "waitFor" (Support.args #[toJS condition, Support.optional options]) Data
+@[macro_inline] def TestContext.waitFor (self : TestContext) (condition : JSFunction) (options : Option TestContext.WaitForOptions := none) : Async Data := Internal.api "Lasm.JS.Node.TestContext.waitFor" do
+  self.val.callMethodAwait "waitFor" (Internal.args #[toJS condition, Internal.optional options]) Data
 
 /-- `v instanceof SuiteContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SuiteContext`). -/
-def SuiteContext.cast? (v : Value) : IO (Option SuiteContext) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["SuiteContext"] Value) v) then some { val := v } else none
+@[macro_inline] def SuiteContext.cast? (v : Value) : IO (Option SuiteContext) := Internal.api "Lasm.JS.Node.SuiteContext.cast?" do
+  Internal.cast (Support.getExport "node:test" ["SuiteContext"] Value) (fun x => { val := x }) v
 
 /-- `context.filePath` (added in Node.js v22.6.0): `readonly attribute any filePath` -/
-def SuiteContext.filePath (self : SuiteContext) : IO Data := self.val.get "filePath" Data
+@[macro_inline] def SuiteContext.filePath (self : SuiteContext) : IO Data := Internal.api "Lasm.JS.Node.SuiteContext.filePath" do
+  self.val.get "filePath" Data
 
 /-- `context.fullName` (added in Node.js v22.3.0, v20.16.0): `readonly attribute any fullName` -/
-def SuiteContext.fullName (self : SuiteContext) : IO Data := self.val.get "fullName" Data
+@[macro_inline] def SuiteContext.fullName (self : SuiteContext) : IO Data := Internal.api "Lasm.JS.Node.SuiteContext.fullName" do
+  self.val.get "fullName" Data
 
 /-- `context.name` (added in Node.js v18.8.0, v16.18.0): `readonly attribute any name` -/
-def SuiteContext.name (self : SuiteContext) : IO Data := self.val.get "name" Data
+@[macro_inline] def SuiteContext.name (self : SuiteContext) : IO Data := Internal.api "Lasm.JS.Node.SuiteContext.name" do
+  self.val.get "name" Data
 
 /-- `context.signal` (added in Node.js v18.7.0, v16.17.0): `readonly attribute AbortSignal signal` -/
-def SuiteContext.signal (self : SuiteContext) : IO AbortSignal := do
+@[macro_inline] def SuiteContext.signal (self : SuiteContext) : IO AbortSignal := Internal.api "Lasm.JS.Node.SuiteContext.signal" do
   let r ← self.val.get "signal" Value
   pure { val := r }
 
 /-- `context.passed` (added in Node.js v24.16.0): `readonly attribute boolean passed` -/
-def SuiteContext.passed (self : SuiteContext) : IO Bool := self.val.get "passed" Bool
+@[macro_inline] def SuiteContext.passed (self : SuiteContext) : IO Bool := Internal.api "Lasm.JS.Node.SuiteContext.passed" do
+  self.val.get "passed" Bool
 
 /-- `context.attempt` (added in Node.js v24.16.0): `readonly attribute double attempt` -/
-def SuiteContext.attempt (self : SuiteContext) : IO Float := self.val.get "attempt" Float
+@[macro_inline] def SuiteContext.attempt (self : SuiteContext) : IO Float := Internal.api "Lasm.JS.Node.SuiteContext.attempt" do
+  self.val.get "attempt" Float
 
 /-- `context.diagnostic(message)` (added in Node.js v24.16.0): `undefined diagnostic(DOMString message)` -/
-def SuiteContext.diagnostic (self : SuiteContext) (message : String) : IO Unit :=
-  self.val.callMethod "diagnostic" (Support.args #[toJS message]) Unit
+@[macro_inline] def SuiteContext.diagnostic (self : SuiteContext) (message : String) : IO Unit := Internal.api "Lasm.JS.Node.SuiteContext.diagnostic" do
+  self.val.callMethod "diagnostic" (Internal.args #[toJS message]) Unit
 
 /-- `context.log(message[, data])` (added in Node.js v24.20.0): `undefined log(DOMString message, optional any data)` -/
-def SuiteContext.log (self : SuiteContext) (message : String) (data : Data := .undefined) : IO Unit :=
-  self.val.callMethod "log" (Support.args #[toJS message, data]) Unit
+@[macro_inline] def SuiteContext.log (self : SuiteContext) (message : String) (data : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.SuiteContext.log" do
+  self.val.callMethod "log" (Internal.args #[toJS message, data]) Unit
 
 /-- `suite.skip([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def suite.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def suite.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.suite.skip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.skip", module := "node:test", path := "suite.skip", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `suite.todo([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def suite.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def suite.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.suite.todo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.todo", module := "node:test", path := "suite.todo", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `suite.only([name][, options][, fn])` (added in Node.js v22.0.0, v20.13.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def suite.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def suite.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.suite.only" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.suite.only", module := "node:test", path := "suite.only", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `test.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def test.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def test.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.test.skip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.test.skip", module := "node:test", path := "skip", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `test.todo([name][, options][, fn])`: `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def test.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def test.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.test.todo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.test.todo", module := "node:test", path := "todo", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `test.only([name][, options][, fn])`: `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def test.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def test.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.test.only" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.test.only", module := "node:test", path := "only", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `describe.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def describe.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def describe.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.describe.skip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.skip", module := "node:test", path := "describe.skip", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `describe.todo([name][, options][, fn])`: `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def describe.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def describe.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.describe.todo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.todo", module := "node:test", path := "describe.todo", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `describe.only([name][, options][, fn])` (added in Node.js v19.8.0, v18.15.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def describe.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def describe.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.describe.only" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.describe.only", module := "node:test", path := "describe.only", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `it.skip([name][, options][, fn])`: `undefined skip(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def it.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def it.skip (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.it.skip" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.skip", module := "node:test", path := "it.skip", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `it.todo([name][, options][, fn])`: `undefined todo(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def it.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def it.todo (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.it.todo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.todo", module := "node:test", path := "it.todo", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `it.only([name][, options][, fn])` (added in Node.js v19.8.0, v18.15.0): `undefined only(optional any name, optional any options, optional any fn)` (Node.js 24.22.2 documentation, test.md) -/
-def it.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit :=
+@[macro_inline] def it.only (name : Data := .undefined) (options : Data := .undefined) (fn : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.it.only" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.it.only", module := "node:test", path := "it.only", construct := false, arity := 3 }
-    (Support.args #[name, options, fn]) (await := false)
+    (Internal.args #[name, options, fn]) (await := false)
 
 /-- `snapshot.setDefaultSnapshotSerializers(serializers)` (added in Node.js v22.3.0): `undefined setDefaultSnapshotSerializers(sequence<any> serializers)` (Node.js 24.22.2 documentation, test.md) -/
-def snapshot.setDefaultSnapshotSerializers (serializers : Array Data) : IO Unit :=
+@[macro_inline] def snapshot.setDefaultSnapshotSerializers (serializers : Array Data) : IO Unit := Internal.api "Lasm.JS.Node.snapshot.setDefaultSnapshotSerializers" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setDefaultSnapshotSerializers", module := "node:test", path := "snapshot.setDefaultSnapshotSerializers", construct := false, arity := 1 }
-    (Support.args #[toJS serializers]) (await := false)
+    (Internal.args #[toJS serializers]) (await := false)
 
 /-- `snapshot.setResolveSnapshotPath(fn)` (added in Node.js v22.3.0): `undefined setResolveSnapshotPath(Function fn)` (Node.js 24.22.2 documentation, test.md) -/
-def snapshot.setResolveSnapshotPath (fn : JSFunction) : IO Unit :=
+@[macro_inline] def snapshot.setResolveSnapshotPath (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.snapshot.setResolveSnapshotPath" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.snapshot.setResolveSnapshotPath", module := "node:test", path := "snapshot.setResolveSnapshotPath", construct := false, arity := 1 }
-    (Support.args #[toJS fn]) (await := false)
+    (Internal.args #[toJS fn]) (await := false)
 
 end Lasm.JS.Node

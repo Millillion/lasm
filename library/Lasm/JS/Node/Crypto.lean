@@ -8,9 +8,9 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.Crypto
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Types.Webcrypto
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Net
@@ -19,6 +19,9 @@ import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class Certificate` of `node:crypto` (Node.js 24.22.2 documentation, crypto.md): a handle to the JavaScript object. -/
 structure Certificate where
@@ -123,8 +126,8 @@ structure Cipheriv.SetAADOptions where
   plaintextLength : Option Float := none
   /-- `DOMString encoding` -/
   encoding : Option String := none
-instance instToJSCipherivSetAADOptions : ToJS Cipheriv.SetAADOptions := ⟨fun d => Support.fields #[("plaintextLength", Support.optional d.plaintextLength),
-    ("encoding", Support.optional d.encoding)]⟩
+instance instToJSCipherivSetAADOptions : ToJS Cipheriv.SetAADOptions := ⟨fun d => Internal.fields #[("plaintextLength", Internal.optional d.plaintextLength),
+    ("encoding", Internal.optional d.encoding)]⟩
 
 /-- `dictionary Decipheriv.SetAADOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Decipheriv.SetAADOptions where
@@ -132,14 +135,14 @@ structure Decipheriv.SetAADOptions where
   plaintextLength : Option Float := none
   /-- `DOMString encoding` -/
   encoding : Option String := none
-instance instToJSDecipherivSetAADOptions : ToJS Decipheriv.SetAADOptions := ⟨fun d => Support.fields #[("plaintextLength", Support.optional d.plaintextLength),
-    ("encoding", Support.optional d.encoding)]⟩
+instance instToJSDecipherivSetAADOptions : ToJS Decipheriv.SetAADOptions := ⟨fun d => Internal.fields #[("plaintextLength", Internal.optional d.plaintextLength),
+    ("encoding", Internal.optional d.encoding)]⟩
 
 /-- `dictionary X509Certificate.CheckEmailOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure X509Certificate.CheckEmailOptions where
   /-- `DOMString subject = "default"` -/
   subject : Option String := none
-instance instToJSX509CertificateCheckEmailOptions : ToJS X509Certificate.CheckEmailOptions := ⟨fun d => Support.fields #[("subject", Support.optional d.subject)]⟩
+instance instToJSX509CertificateCheckEmailOptions : ToJS X509Certificate.CheckEmailOptions := ⟨fun d => Internal.fields #[("subject", Internal.optional d.subject)]⟩
 
 /-- `dictionary X509Certificate.CheckHostOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure X509Certificate.CheckHostOptions where
@@ -153,11 +156,11 @@ structure X509Certificate.CheckHostOptions where
   multiLabelWildcards : Option Bool := none
   /-- `boolean singleLabelSubdomains = false` -/
   singleLabelSubdomains : Option Bool := none
-instance instToJSX509CertificateCheckHostOptions : ToJS X509Certificate.CheckHostOptions := ⟨fun d => Support.fields #[("subject", Support.optional d.subject),
-    ("wildcards", Support.optional d.wildcards),
-    ("partialWildcards", Support.optional d.partialWildcards),
-    ("multiLabelWildcards", Support.optional d.multiLabelWildcards),
-    ("singleLabelSubdomains", Support.optional d.singleLabelSubdomains)]⟩
+instance instToJSX509CertificateCheckHostOptions : ToJS X509Certificate.CheckHostOptions := ⟨fun d => Internal.fields #[("subject", Internal.optional d.subject),
+    ("wildcards", Internal.optional d.wildcards),
+    ("partialWildcards", Internal.optional d.partialWildcards),
+    ("multiLabelWildcards", Internal.optional d.multiLabelWildcards),
+    ("singleLabelSubdomains", Internal.optional d.singleLabelSubdomains)]⟩
 
 /-- `dictionary crypto.Argon2Parameters` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.Argon2Parameters where
@@ -177,14 +180,14 @@ structure crypto.Argon2Parameters where
   secret : Option DOMStringOrUint8Array := none
   /-- `(DOMString or Uint8Array)? associatedData` -/
   associatedData : Option DOMStringOrUint8Array := none
-instance instToJSCryptoArgon2Parameters : ToJS crypto.Argon2Parameters := ⟨fun d => Support.fields #[("message", Support.optional d.message),
-    ("nonce", Support.optional d.nonce),
-    ("parallelism", Support.optional d.parallelism),
-    ("tagLength", Support.optional d.tagLength),
-    ("memory", Support.optional d.memory),
-    ("passes", Support.optional d.passes),
-    ("secret", Support.optional d.secret),
-    ("associatedData", Support.optional d.associatedData)]⟩
+instance instToJSCryptoArgon2Parameters : ToJS crypto.Argon2Parameters := ⟨fun d => Internal.fields #[("message", Internal.optional d.message),
+    ("nonce", Internal.optional d.nonce),
+    ("parallelism", Internal.optional d.parallelism),
+    ("tagLength", Internal.optional d.tagLength),
+    ("memory", Internal.optional d.memory),
+    ("passes", Internal.optional d.passes),
+    ("secret", Internal.optional d.secret),
+    ("associatedData", Internal.optional d.associatedData)]⟩
 
 /-- `dictionary crypto.Argon2SyncParameters` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.Argon2SyncParameters where
@@ -204,14 +207,14 @@ structure crypto.Argon2SyncParameters where
   secret : Option DOMStringOrUint8Array := none
   /-- `(DOMString or Uint8Array)? associatedData` -/
   associatedData : Option DOMStringOrUint8Array := none
-instance instToJSCryptoArgon2SyncParameters : ToJS crypto.Argon2SyncParameters := ⟨fun d => Support.fields #[("message", Support.optional d.message),
-    ("nonce", Support.optional d.nonce),
-    ("parallelism", Support.optional d.parallelism),
-    ("tagLength", Support.optional d.tagLength),
-    ("memory", Support.optional d.memory),
-    ("passes", Support.optional d.passes),
-    ("secret", Support.optional d.secret),
-    ("associatedData", Support.optional d.associatedData)]⟩
+instance instToJSCryptoArgon2SyncParameters : ToJS crypto.Argon2SyncParameters := ⟨fun d => Internal.fields #[("message", Internal.optional d.message),
+    ("nonce", Internal.optional d.nonce),
+    ("parallelism", Internal.optional d.parallelism),
+    ("tagLength", Internal.optional d.tagLength),
+    ("memory", Internal.optional d.memory),
+    ("passes", Internal.optional d.passes),
+    ("secret", Internal.optional d.secret),
+    ("associatedData", Internal.optional d.associatedData)]⟩
 
 /-- `(Uint8Array or bigint)`: one constructor per member type. -/
 inductive Uint8ArrayOrBigint where
@@ -229,13 +232,13 @@ instance : Coe Int Uint8ArrayOrBigint := ⟨.bigint⟩
 structure crypto.CheckPrimeOptions where
   /-- `double checks = 0` -/
   checks : Option Float := none
-instance instToJSCryptoCheckPrimeOptions : ToJS crypto.CheckPrimeOptions := ⟨fun d => Support.fields #[("checks", Support.optional d.checks)]⟩
+instance instToJSCryptoCheckPrimeOptions : ToJS crypto.CheckPrimeOptions := ⟨fun d => Internal.fields #[("checks", Internal.optional d.checks)]⟩
 
 /-- `dictionary crypto.CheckPrimeSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.CheckPrimeSyncOptions where
   /-- `double checks = 0` -/
   checks : Option Float := none
-instance instToJSCryptoCheckPrimeSyncOptions : ToJS crypto.CheckPrimeSyncOptions := ⟨fun d => Support.fields #[("checks", Support.optional d.checks)]⟩
+instance instToJSCryptoCheckPrimeSyncOptions : ToJS crypto.CheckPrimeSyncOptions := ⟨fun d => Internal.fields #[("checks", Internal.optional d.checks)]⟩
 
 /-- `(DOMString or Uint8Array or KeyObject or CryptoKey)`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey where
@@ -267,10 +270,10 @@ structure crypto.CreateCipherivOptions where
   encoding : Option String := none
   /-- `DOMString xtsStandard = "GB"` -/
   xtsStandard : Option String := none
-instance instToJSCryptoCreateCipherivOptions : ToJS crypto.CreateCipherivOptions := ⟨fun d => Support.fields #[("authTagLength", Support.optional d.authTagLength),
-    ("ctsMode", Support.optional d.ctsMode),
-    ("encoding", Support.optional d.encoding),
-    ("xtsStandard", Support.optional d.xtsStandard)]⟩
+instance instToJSCryptoCreateCipherivOptions : ToJS crypto.CreateCipherivOptions := ⟨fun d => Internal.fields #[("authTagLength", Internal.optional d.authTagLength),
+    ("ctsMode", Internal.optional d.ctsMode),
+    ("encoding", Internal.optional d.encoding),
+    ("xtsStandard", Internal.optional d.xtsStandard)]⟩
 
 /-- `dictionary crypto.CreateDecipherivOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.CreateDecipherivOptions where
@@ -282,10 +285,10 @@ structure crypto.CreateDecipherivOptions where
   encoding : Option String := none
   /-- `DOMString xtsStandard = "GB"` -/
   xtsStandard : Option String := none
-instance instToJSCryptoCreateDecipherivOptions : ToJS crypto.CreateDecipherivOptions := ⟨fun d => Support.fields #[("authTagLength", Support.optional d.authTagLength),
-    ("ctsMode", Support.optional d.ctsMode),
-    ("encoding", Support.optional d.encoding),
-    ("xtsStandard", Support.optional d.xtsStandard)]⟩
+instance instToJSCryptoCreateDecipherivOptions : ToJS crypto.CreateDecipherivOptions := ⟨fun d => Internal.fields #[("authTagLength", Internal.optional d.authTagLength),
+    ("ctsMode", Internal.optional d.ctsMode),
+    ("encoding", Internal.optional d.encoding),
+    ("xtsStandard", Internal.optional d.xtsStandard)]⟩
 
 /-- `(double or DOMString or Uint8Array)`: one constructor per member type. -/
 inductive DoubleOrDOMStringOrUint8Array where
@@ -311,15 +314,15 @@ structure crypto.CreateHashOptions where
   functionName : Option DOMStringOrUint8Array := none
   /-- `double /* integer: Nat */ outputLength` -/
   outputLength : Option Nat := none
-instance instToJSCryptoCreateHashOptions : ToJS crypto.CreateHashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
-    ("functionName", Support.optional d.functionName),
-    ("outputLength", Support.optional d.outputLength)]⟩
+instance instToJSCryptoCreateHashOptions : ToJS crypto.CreateHashOptions := ⟨fun d => Internal.fields #[("customization", Internal.optional d.customization),
+    ("functionName", Internal.optional d.functionName),
+    ("outputLength", Internal.optional d.outputLength)]⟩
 
 /-- `dictionary crypto.CreateHmacOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.CreateHmacOptions where
   /-- `DOMString encoding` -/
   encoding : Option String := none
-instance instToJSCryptoCreateHmacOptions : ToJS crypto.CreateHmacOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSCryptoCreateHmacOptions : ToJS crypto.CreateHmacOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(Uint8Array or KeyObject)`: one constructor per member type. -/
 inductive Uint8ArrayOrKeyObject where
@@ -347,12 +350,12 @@ structure crypto.CreateMacOptions where
   salt : Option ByteArray := none
   /-- `double /* integer: Nat */ outputLength` -/
   outputLength : Option Nat := none
-instance instToJSCryptoCreateMacOptions : ToJS crypto.CreateMacOptions := ⟨fun d => Support.fields #[("digest", Support.optional d.digest),
-    ("cipher", Support.optional d.cipher),
-    ("iv", Support.optional d.iv),
-    ("customization", Support.optional d.customization),
-    ("salt", Support.optional d.salt),
-    ("outputLength", Support.optional d.outputLength)]⟩
+instance instToJSCryptoCreateMacOptions : ToJS crypto.CreateMacOptions := ⟨fun d => Internal.fields #[("digest", Internal.optional d.digest),
+    ("cipher", Internal.optional d.cipher),
+    ("iv", Internal.optional d.iv),
+    ("customization", Internal.optional d.customization),
+    ("salt", Internal.optional d.salt),
+    ("outputLength", Internal.optional d.outputLength)]⟩
 
 /-- `(object or DOMString or Uint8Array or KeyObject or URL)`: one constructor per member type. -/
 inductive ObjectOrDOMStringOrUint8ArrayOrKeyObjectOrURL where
@@ -402,14 +405,14 @@ structure crypto.DiffieHellmanOptions where
   privateKey : Option ObjectOrDOMStringOrUint8ArrayOrKeyObjectOrURL := none
   /-- `(object or DOMString or Uint8Array or Node_KeyObject) publicKey` -/
   publicKey : Option ObjectOrDOMStringOrUint8ArrayOrKeyObject := none
-instance instToJSCryptoDiffieHellmanOptions : ToJS crypto.DiffieHellmanOptions := ⟨fun d => Support.fields #[("privateKey", Support.optional d.privateKey),
-    ("publicKey", Support.optional d.publicKey)]⟩
+instance instToJSCryptoDiffieHellmanOptions : ToJS crypto.DiffieHellmanOptions := ⟨fun d => Internal.fields #[("privateKey", Internal.optional d.privateKey),
+    ("publicKey", Internal.optional d.publicKey)]⟩
 
 /-- `dictionary crypto.GenerateKeyOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.GenerateKeyOptions where
   /-- `double /* integer: Nat */ length` -/
   length : Option Nat := none
-instance instToJSCryptoGenerateKeyOptions : ToJS crypto.GenerateKeyOptions := ⟨fun d => Support.fields #[("length", Support.optional d.length)]⟩
+instance instToJSCryptoGenerateKeyOptions : ToJS crypto.GenerateKeyOptions := ⟨fun d => Internal.fields #[("length", Internal.optional d.length)]⟩
 
 /-- `dictionary crypto.GenerateKeyPairOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.GenerateKeyPairOptions where
@@ -441,18 +444,18 @@ structure crypto.GenerateKeyPairOptions where
   publicKeyEncoding : Data := .undefined
   /-- `object privateKeyEncoding` -/
   privateKeyEncoding : Data := .undefined
-instance instToJSCryptoGenerateKeyPairOptions : ToJS crypto.GenerateKeyPairOptions := ⟨fun d => Support.fields #[("modulusLength", Support.optional d.modulusLength),
-    ("publicExponent", Support.optional d.publicExponent),
-    ("hashAlgorithm", Support.optional d.hashAlgorithm),
-    ("mgf1HashAlgorithm", Support.optional d.mgf1HashAlgorithm),
-    ("saltLength", Support.optional d.saltLength),
-    ("divisorLength", Support.optional d.divisorLength),
-    ("namedCurve", Support.optional d.namedCurve),
-    ("prime", Support.optional d.prime),
-    ("primeLength", Support.optional d.primeLength),
-    ("generator", Support.optional d.generator),
-    ("groupName", Support.optional d.groupName),
-    ("paramEncoding", Support.optional d.paramEncoding),
+instance instToJSCryptoGenerateKeyPairOptions : ToJS crypto.GenerateKeyPairOptions := ⟨fun d => Internal.fields #[("modulusLength", Internal.optional d.modulusLength),
+    ("publicExponent", Internal.optional d.publicExponent),
+    ("hashAlgorithm", Internal.optional d.hashAlgorithm),
+    ("mgf1HashAlgorithm", Internal.optional d.mgf1HashAlgorithm),
+    ("saltLength", Internal.optional d.saltLength),
+    ("divisorLength", Internal.optional d.divisorLength),
+    ("namedCurve", Internal.optional d.namedCurve),
+    ("prime", Internal.optional d.prime),
+    ("primeLength", Internal.optional d.primeLength),
+    ("generator", Internal.optional d.generator),
+    ("groupName", Internal.optional d.groupName),
+    ("paramEncoding", Internal.optional d.paramEncoding),
     ("publicKeyEncoding", d.publicKeyEncoding),
     ("privateKeyEncoding", d.privateKeyEncoding)]⟩
 
@@ -486,18 +489,18 @@ structure crypto.GenerateKeyPairSyncOptions where
   publicKeyEncoding : Data := .undefined
   /-- `object privateKeyEncoding` -/
   privateKeyEncoding : Data := .undefined
-instance instToJSCryptoGenerateKeyPairSyncOptions : ToJS crypto.GenerateKeyPairSyncOptions := ⟨fun d => Support.fields #[("modulusLength", Support.optional d.modulusLength),
-    ("publicExponent", Support.optional d.publicExponent),
-    ("hashAlgorithm", Support.optional d.hashAlgorithm),
-    ("mgf1HashAlgorithm", Support.optional d.mgf1HashAlgorithm),
-    ("saltLength", Support.optional d.saltLength),
-    ("divisorLength", Support.optional d.divisorLength),
-    ("namedCurve", Support.optional d.namedCurve),
-    ("prime", Support.optional d.prime),
-    ("primeLength", Support.optional d.primeLength),
-    ("generator", Support.optional d.generator),
-    ("groupName", Support.optional d.groupName),
-    ("paramEncoding", Support.optional d.paramEncoding),
+instance instToJSCryptoGenerateKeyPairSyncOptions : ToJS crypto.GenerateKeyPairSyncOptions := ⟨fun d => Internal.fields #[("modulusLength", Internal.optional d.modulusLength),
+    ("publicExponent", Internal.optional d.publicExponent),
+    ("hashAlgorithm", Internal.optional d.hashAlgorithm),
+    ("mgf1HashAlgorithm", Internal.optional d.mgf1HashAlgorithm),
+    ("saltLength", Internal.optional d.saltLength),
+    ("divisorLength", Internal.optional d.divisorLength),
+    ("namedCurve", Internal.optional d.namedCurve),
+    ("prime", Internal.optional d.prime),
+    ("primeLength", Internal.optional d.primeLength),
+    ("generator", Internal.optional d.generator),
+    ("groupName", Internal.optional d.groupName),
+    ("paramEncoding", Internal.optional d.paramEncoding),
     ("publicKeyEncoding", d.publicKeyEncoding),
     ("privateKeyEncoding", d.privateKeyEncoding)]⟩
 
@@ -505,7 +508,7 @@ instance instToJSCryptoGenerateKeyPairSyncOptions : ToJS crypto.GenerateKeyPairS
 structure crypto.GenerateKeySyncOptions where
   /-- `double /* integer: Nat */ length` -/
   length : Option Nat := none
-instance instToJSCryptoGenerateKeySyncOptions : ToJS crypto.GenerateKeySyncOptions := ⟨fun d => Support.fields #[("length", Support.optional d.length)]⟩
+instance instToJSCryptoGenerateKeySyncOptions : ToJS crypto.GenerateKeySyncOptions := ⟨fun d => Internal.fields #[("length", Internal.optional d.length)]⟩
 
 /-- `dictionary crypto.GeneratePrimeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.GeneratePrimeOptions where
@@ -517,10 +520,10 @@ structure crypto.GeneratePrimeOptions where
   safe : Option Bool := none
   /-- `boolean bigint` -/
   bigint : Option Bool := none
-instance instToJSCryptoGeneratePrimeOptions : ToJS crypto.GeneratePrimeOptions := ⟨fun d => Support.fields #[("add", Support.optional d.add),
-    ("rem", Support.optional d.rem),
-    ("safe", Support.optional d.safe),
-    ("bigint", Support.optional d.bigint)]⟩
+instance instToJSCryptoGeneratePrimeOptions : ToJS crypto.GeneratePrimeOptions := ⟨fun d => Internal.fields #[("add", Internal.optional d.add),
+    ("rem", Internal.optional d.rem),
+    ("safe", Internal.optional d.safe),
+    ("bigint", Internal.optional d.bigint)]⟩
 
 /-- `(ArrayBuffer or bigint)`: one constructor per member type. -/
 inductive ArrayBufferOrBigint where
@@ -531,7 +534,7 @@ inductive ArrayBufferOrBigint where
 /-- Reads a `ArrayBufferOrBigint` (one member is an ArrayBuffer, copied with one more host call). -/
 def ArrayBufferOrBigint.decode (d : Data) : IO ArrayBufferOrBigint :=
   match d with
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrBigint" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrBigint" d))
   | .bigint _ => do return .bigint (← Lasm.JS.decodeAs Int "ArrayBufferOrBigint" d)
   | _ => throw (IO.userError s!"Lasm.JS.Node: expected a ArrayBufferOrBigint, received JavaScript {d.describe}")
 
@@ -545,10 +548,10 @@ structure crypto.GeneratePrimeSyncOptions where
   safe : Option Bool := none
   /-- `boolean bigint` -/
   bigint : Option Bool := none
-instance instToJSCryptoGeneratePrimeSyncOptions : ToJS crypto.GeneratePrimeSyncOptions := ⟨fun d => Support.fields #[("add", Support.optional d.add),
-    ("rem", Support.optional d.rem),
-    ("safe", Support.optional d.safe),
-    ("bigint", Support.optional d.bigint)]⟩
+instance instToJSCryptoGeneratePrimeSyncOptions : ToJS crypto.GeneratePrimeSyncOptions := ⟨fun d => Internal.fields #[("add", Internal.optional d.add),
+    ("rem", Internal.optional d.rem),
+    ("safe", Internal.optional d.safe),
+    ("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary crypto.GetCipherInfoOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.GetCipherInfoOptions where
@@ -556,8 +559,8 @@ structure crypto.GetCipherInfoOptions where
   keyLength : Option Float := none
   /-- `double ivLength` -/
   ivLength : Option Float := none
-instance instToJSCryptoGetCipherInfoOptions : ToJS crypto.GetCipherInfoOptions := ⟨fun d => Support.fields #[("keyLength", Support.optional d.keyLength),
-    ("ivLength", Support.optional d.ivLength)]⟩
+instance instToJSCryptoGetCipherInfoOptions : ToJS crypto.GetCipherInfoOptions := ⟨fun d => Internal.fields #[("keyLength", Internal.optional d.keyLength),
+    ("ivLength", Internal.optional d.ivLength)]⟩
 
 /-- `dictionary crypto.HashOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.HashOptions where
@@ -569,10 +572,10 @@ structure crypto.HashOptions where
   outputEncoding : Option String := none
   /-- `double /* integer: Nat */ outputLength` -/
   outputLength : Option Nat := none
-instance instToJSCryptoHashOptions : ToJS crypto.HashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
-    ("functionName", Support.optional d.functionName),
-    ("outputEncoding", Support.optional d.outputEncoding),
-    ("outputLength", Support.optional d.outputLength)]⟩
+instance instToJSCryptoHashOptions : ToJS crypto.HashOptions := ⟨fun d => Internal.fields #[("customization", Internal.optional d.customization),
+    ("functionName", Internal.optional d.functionName),
+    ("outputEncoding", Internal.optional d.outputEncoding),
+    ("outputLength", Internal.optional d.outputLength)]⟩
 
 /-- `(crypto.HashOptions or DOMString)`: one constructor per member type. -/
 inductive crypto.HashOptionsOrDOMString where
@@ -606,13 +609,13 @@ instance : Coe KeyObject DOMStringOrUint8ArrayOrKeyObject := ⟨.keyObject⟩
 structure crypto.ParsePKCS12Options where
   /-- `(DOMString or Uint8Array) passphrase` -/
   passphrase : Option DOMStringOrUint8Array := none
-instance instToJSCryptoParsePKCS12Options : ToJS crypto.ParsePKCS12Options := ⟨fun d => Support.fields #[("passphrase", Support.optional d.passphrase)]⟩
+instance instToJSCryptoParsePKCS12Options : ToJS crypto.ParsePKCS12Options := ⟨fun d => Internal.fields #[("passphrase", Internal.optional d.passphrase)]⟩
 
 /-- `dictionary crypto.RandomUUIDv7Options` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.RandomUUIDv7Options where
   /-- `boolean disableEntropyCache = false` -/
   disableEntropyCache : Option Bool := none
-instance instToJSCryptoRandomUUIDv7Options : ToJS crypto.RandomUUIDv7Options := ⟨fun d => Support.fields #[("disableEntropyCache", Support.optional d.disableEntropyCache)]⟩
+instance instToJSCryptoRandomUUIDv7Options : ToJS crypto.RandomUUIDv7Options := ⟨fun d => Internal.fields #[("disableEntropyCache", Internal.optional d.disableEntropyCache)]⟩
 
 /-- `dictionary crypto.ScryptOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.ScryptOptions where
@@ -630,13 +633,13 @@ structure crypto.ScryptOptions where
   p : Option Nat := none
   /-- `double /* integer: Nat */ maxmem` -/
   maxmem : Option Nat := none
-instance instToJSCryptoScryptOptions : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Support.optional d.cost),
-    ("blockSize", Support.optional d.blockSize),
-    ("parallelization", Support.optional d.parallelization),
-    ("N", Support.optional d.N),
-    ("r", Support.optional d.r),
-    ("p", Support.optional d.p),
-    ("maxmem", Support.optional d.maxmem)]⟩
+instance instToJSCryptoScryptOptions : ToJS crypto.ScryptOptions := ⟨fun d => Internal.fields #[("cost", Internal.optional d.cost),
+    ("blockSize", Internal.optional d.blockSize),
+    ("parallelization", Internal.optional d.parallelization),
+    ("N", Internal.optional d.N),
+    ("r", Internal.optional d.r),
+    ("p", Internal.optional d.p),
+    ("maxmem", Internal.optional d.maxmem)]⟩
 
 /-- `dictionary crypto.ScryptSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.ScryptSyncOptions where
@@ -654,680 +657,705 @@ structure crypto.ScryptSyncOptions where
   p : Option Float := none
   /-- `double /* integer: Nat */ maxmem` -/
   maxmem : Option Nat := none
-instance instToJSCryptoScryptSyncOptions : ToJS crypto.ScryptSyncOptions := ⟨fun d => Support.fields #[("cost", Support.optional d.cost),
-    ("blockSize", Support.optional d.blockSize),
-    ("parallelization", Support.optional d.parallelization),
-    ("N", Support.optional d.N),
-    ("r", Support.optional d.r),
-    ("p", Support.optional d.p),
-    ("maxmem", Support.optional d.maxmem)]⟩
+instance instToJSCryptoScryptSyncOptions : ToJS crypto.ScryptSyncOptions := ⟨fun d => Internal.fields #[("cost", Internal.optional d.cost),
+    ("blockSize", Internal.optional d.blockSize),
+    ("parallelization", Internal.optional d.parallelization),
+    ("N", Internal.optional d.N),
+    ("r", Internal.optional d.r),
+    ("p", Internal.optional d.p),
+    ("maxmem", Internal.optional d.maxmem)]⟩
 
 /-- `v instanceof Certificate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Certificate`). -/
-def Certificate.cast? (v : Value) : IO (Option Certificate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Certificate"] Value) v) then some { val := v } else none
+@[macro_inline] def Certificate.cast? (v : Value) : IO (Option Certificate) := Internal.api "Lasm.JS.Node.Certificate.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Certificate"] Value) (fun x => { val := x }) v
 
 /-- `Certificate.exportChallenge(spkac[, encoding])` (added in Node.js v9.0.0): `static Uint8Array exportChallenge((DOMString or Uint8Array) spkac, optional DOMString encoding)` -/
-def Certificate.exportChallenge (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO ByteArray :=
+@[macro_inline] def Certificate.exportChallenge (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Certificate.exportChallenge" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Certificate.exportChallenge", module := "node:crypto", path := "Certificate.exportChallenge", construct := false, arity := 2 }
-    (Support.args #[toJS spkac, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS spkac, Internal.optional encoding]) (await := false)
 
 /-- `Certificate.exportPublicKey(spkac[, encoding])` (added in Node.js v9.0.0): `static Uint8Array exportPublicKey((DOMString or Uint8Array) spkac, optional DOMString encoding)` -/
-def Certificate.exportPublicKey (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO ByteArray :=
+@[macro_inline] def Certificate.exportPublicKey (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Certificate.exportPublicKey" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Certificate.exportPublicKey", module := "node:crypto", path := "Certificate.exportPublicKey", construct := false, arity := 2 }
-    (Support.args #[toJS spkac, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS spkac, Internal.optional encoding]) (await := false)
 
 /-- `Certificate.verifySpkac(spkac[, encoding])` (added in Node.js v9.0.0): `static boolean verifySpkac((DOMString or Uint8Array) spkac, optional DOMString encoding)` -/
-def Certificate.verifySpkac (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
+@[macro_inline] def Certificate.verifySpkac (spkac : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.Certificate.verifySpkac" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.Certificate.verifySpkac", module := "node:crypto", path := "Certificate.verifySpkac", construct := false, arity := 2 }
-    (Support.args #[toJS spkac, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS spkac, Internal.optional encoding]) (await := false)
 
 /-- `v instanceof Cipheriv`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Cipheriv`). -/
-def Cipheriv.cast? (v : Value) : IO (Option Cipheriv) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Cipheriv"] Value) v) then some { val := v } else none
+@[macro_inline] def Cipheriv.cast? (v : Value) : IO (Option Cipheriv) := Internal.api "Lasm.JS.Node.Cipheriv.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Cipheriv"] Value) (fun x => { val := x }) v
 
 /-- `cipher.final([outputEncoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) final(optional DOMString outputEncoding)` -/
-def Cipheriv.final (self : Cipheriv) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "final" (Support.args #[Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Cipheriv.final (self : Cipheriv) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Cipheriv.final" do
+  self.val.callMethod "final" (Internal.args #[Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `cipher.getAuthTag()` (added in Node.js v1.0.0): `Uint8Array getAuthTag()` -/
-def Cipheriv.getAuthTag (self : Cipheriv) : IO ByteArray :=
-  self.val.callMethod "getAuthTag" (Support.args #[]) ByteArray
+@[macro_inline] def Cipheriv.getAuthTag (self : Cipheriv) : IO ByteArray := Internal.api "Lasm.JS.Node.Cipheriv.getAuthTag" do
+  self.val.callMethod "getAuthTag" (Internal.args #[]) ByteArray
 
 /-- `cipher.setAAD(buffer[, options])` (added in Node.js v1.0.0): `Cipheriv setAAD((DOMString or Uint8Array) buffer, optional Cipheriv.SetAADOptions options)` -/
-def Cipheriv.setAAD (self : Cipheriv) (buffer_ : DOMStringOrUint8Array) (options : Option Cipheriv.SetAADOptions := none) : IO Cipheriv := do
-  let r ← self.val.callMethod "setAAD" (Support.args #[toJS buffer_, Support.optional options]) Value
+@[macro_inline] def Cipheriv.setAAD (self : Cipheriv) (buffer_ : DOMStringOrUint8Array) (options : Option Cipheriv.SetAADOptions := none) : IO Cipheriv := Internal.api "Lasm.JS.Node.Cipheriv.setAAD" do
+  let r ← self.val.callMethod "setAAD" (Internal.args #[toJS buffer_, Internal.optional options]) Value
   pure { val := r }
 
 /-- `cipher.setAutoPadding([autoPadding])` (added in Node.js v0.7.1): `Cipheriv setAutoPadding(optional boolean autoPadding)` -/
-def Cipheriv.setAutoPadding (self : Cipheriv) (autoPadding : Option Bool := none) : IO Cipheriv := do
-  let r ← self.val.callMethod "setAutoPadding" (Support.args #[Support.optional autoPadding]) Value
+@[macro_inline] def Cipheriv.setAutoPadding (self : Cipheriv) (autoPadding : Option Bool := none) : IO Cipheriv := Internal.api "Lasm.JS.Node.Cipheriv.setAutoPadding" do
+  let r ← self.val.callMethod "setAutoPadding" (Internal.args #[Internal.optional autoPadding]) Value
   pure { val := r }
 
 /-- `cipher.update(data[, inputEncoding][, outputEncoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) update((DOMString or Uint8Array) data, optional DOMString inputEncoding, optional DOMString outputEncoding)` -/
-def Cipheriv.update (self : Cipheriv) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding, Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Cipheriv.update (self : Cipheriv) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Cipheriv.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding, Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `v instanceof Decipheriv`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Decipheriv`). -/
-def Decipheriv.cast? (v : Value) : IO (Option Decipheriv) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Decipheriv"] Value) v) then some { val := v } else none
+@[macro_inline] def Decipheriv.cast? (v : Value) : IO (Option Decipheriv) := Internal.api "Lasm.JS.Node.Decipheriv.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Decipheriv"] Value) (fun x => { val := x }) v
 
 /-- `decipher.final([outputEncoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) final(optional DOMString outputEncoding)` -/
-def Decipheriv.final (self : Decipheriv) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "final" (Support.args #[Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Decipheriv.final (self : Decipheriv) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Decipheriv.final" do
+  self.val.callMethod "final" (Internal.args #[Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `decipher.setAAD(buffer[, options])` (added in Node.js v1.0.0): `Decipheriv setAAD((DOMString or Uint8Array) buffer, optional Decipheriv.SetAADOptions options)` -/
-def Decipheriv.setAAD (self : Decipheriv) (buffer_ : DOMStringOrUint8Array) (options : Option Decipheriv.SetAADOptions := none) : IO Decipheriv := do
-  let r ← self.val.callMethod "setAAD" (Support.args #[toJS buffer_, Support.optional options]) Value
+@[macro_inline] def Decipheriv.setAAD (self : Decipheriv) (buffer_ : DOMStringOrUint8Array) (options : Option Decipheriv.SetAADOptions := none) : IO Decipheriv := Internal.api "Lasm.JS.Node.Decipheriv.setAAD" do
+  let r ← self.val.callMethod "setAAD" (Internal.args #[toJS buffer_, Internal.optional options]) Value
   pure { val := r }
 
 /-- `decipher.setAuthTag(buffer[, encoding])` (added in Node.js v1.0.0): `Decipheriv setAuthTag((DOMString or Uint8Array) buffer, optional DOMString encoding)` -/
-def Decipheriv.setAuthTag (self : Decipheriv) (buffer_ : DOMStringOrUint8Array) (encoding : Option String := none) : IO Decipheriv := do
-  let r ← self.val.callMethod "setAuthTag" (Support.args #[toJS buffer_, Support.optional encoding]) Value
+@[macro_inline] def Decipheriv.setAuthTag (self : Decipheriv) (buffer_ : DOMStringOrUint8Array) (encoding : Option String := none) : IO Decipheriv := Internal.api "Lasm.JS.Node.Decipheriv.setAuthTag" do
+  let r ← self.val.callMethod "setAuthTag" (Internal.args #[toJS buffer_, Internal.optional encoding]) Value
   pure { val := r }
 
 /-- `decipher.setAutoPadding([autoPadding])` (added in Node.js v0.7.1): `Decipheriv setAutoPadding(optional boolean autoPadding)` -/
-def Decipheriv.setAutoPadding (self : Decipheriv) (autoPadding : Option Bool := none) : IO Decipheriv := do
-  let r ← self.val.callMethod "setAutoPadding" (Support.args #[Support.optional autoPadding]) Value
+@[macro_inline] def Decipheriv.setAutoPadding (self : Decipheriv) (autoPadding : Option Bool := none) : IO Decipheriv := Internal.api "Lasm.JS.Node.Decipheriv.setAutoPadding" do
+  let r ← self.val.callMethod "setAutoPadding" (Internal.args #[Internal.optional autoPadding]) Value
   pure { val := r }
 
 /-- `decipher.update(data[, inputEncoding][, outputEncoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) update((DOMString or Uint8Array) data, optional DOMString inputEncoding, optional DOMString outputEncoding)` -/
-def Decipheriv.update (self : Decipheriv) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding, Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Decipheriv.update (self : Decipheriv) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Decipheriv.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding, Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `v instanceof DiffieHellman`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DiffieHellman`). -/
-def DiffieHellman.cast? (v : Value) : IO (Option DiffieHellman) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["DiffieHellman"] Value) v) then some { val := v } else none
+@[macro_inline] def DiffieHellman.cast? (v : Value) : IO (Option DiffieHellman) := Internal.api "Lasm.JS.Node.DiffieHellman.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["DiffieHellman"] Value) (fun x => { val := x }) v
 
 /-- `diffieHellman.verifyError` (added in Node.js v0.11.12): `readonly attribute any verifyError` -/
-def DiffieHellman.verifyError (self : DiffieHellman) : IO Data := self.val.get "verifyError" Data
+@[macro_inline] def DiffieHellman.verifyError (self : DiffieHellman) : IO Data := Internal.api "Lasm.JS.Node.DiffieHellman.verifyError" do
+  self.val.get "verifyError" Data
 
 /-- `diffieHellman.computeSecret(otherPublicKey[, inputEncoding][, outputEncoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) computeSecret((DOMString or Uint8Array) otherPublicKey, optional DOMString inputEncoding, optional DOMString outputEncoding)` -/
-def DiffieHellman.computeSecret (self : DiffieHellman) (otherPublicKey : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "computeSecret" (Support.args #[toJS otherPublicKey, Support.optional inputEncoding, Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.computeSecret (self : DiffieHellman) (otherPublicKey : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.computeSecret" do
+  self.val.callMethod "computeSecret" (Internal.args #[toJS otherPublicKey, Internal.optional inputEncoding, Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.generateKeys([encoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) generateKeys(optional DOMString encoding)` -/
-def DiffieHellman.generateKeys (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "generateKeys" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.generateKeys (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.generateKeys" do
+  self.val.callMethod "generateKeys" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.getGenerator([encoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) getGenerator(optional DOMString encoding)` -/
-def DiffieHellman.getGenerator (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getGenerator" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.getGenerator (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.getGenerator" do
+  self.val.callMethod "getGenerator" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.getPrime([encoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) getPrime(optional DOMString encoding)` -/
-def DiffieHellman.getPrime (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getPrime" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.getPrime (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.getPrime" do
+  self.val.callMethod "getPrime" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.getPrivateKey([encoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) getPrivateKey(optional DOMString encoding)` -/
-def DiffieHellman.getPrivateKey (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getPrivateKey" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.getPrivateKey (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.getPrivateKey" do
+  self.val.callMethod "getPrivateKey" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.getPublicKey([encoding])` (added in Node.js v0.5.0): `(Uint8Array or DOMString) getPublicKey(optional DOMString encoding)` -/
-def DiffieHellman.getPublicKey (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getPublicKey" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def DiffieHellman.getPublicKey (self : DiffieHellman) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.DiffieHellman.getPublicKey" do
+  self.val.callMethod "getPublicKey" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `diffieHellman.setPrivateKey(privateKey[, encoding])` (added in Node.js v0.5.0): `undefined setPrivateKey((DOMString or Uint8Array) privateKey, optional DOMString encoding)` -/
-def DiffieHellman.setPrivateKey (self : DiffieHellman) (privateKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "setPrivateKey" (Support.args #[toJS privateKey, Support.optional encoding]) Unit
+@[macro_inline] def DiffieHellman.setPrivateKey (self : DiffieHellman) (privateKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.DiffieHellman.setPrivateKey" do
+  self.val.callMethod "setPrivateKey" (Internal.args #[toJS privateKey, Internal.optional encoding]) Unit
 
 /-- `diffieHellman.setPublicKey(publicKey[, encoding])` (added in Node.js v0.5.0): `undefined setPublicKey((DOMString or Uint8Array) publicKey, optional DOMString encoding)` -/
-def DiffieHellman.setPublicKey (self : DiffieHellman) (publicKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "setPublicKey" (Support.args #[toJS publicKey, Support.optional encoding]) Unit
+@[macro_inline] def DiffieHellman.setPublicKey (self : DiffieHellman) (publicKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.DiffieHellman.setPublicKey" do
+  self.val.callMethod "setPublicKey" (Internal.args #[toJS publicKey, Internal.optional encoding]) Unit
 
 /-- `v instanceof DiffieHellmanGroup`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DiffieHellmanGroup`). -/
-def DiffieHellmanGroup.cast? (v : Value) : IO (Option DiffieHellmanGroup) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["DiffieHellmanGroup"] Value) v) then some { val := v } else none
+@[macro_inline] def DiffieHellmanGroup.cast? (v : Value) : IO (Option DiffieHellmanGroup) := Internal.api "Lasm.JS.Node.DiffieHellmanGroup.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["DiffieHellmanGroup"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ECDH`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ECDH`). -/
-def ECDH.cast? (v : Value) : IO (Option ECDH) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["ECDH"] Value) v) then some { val := v } else none
+@[macro_inline] def ECDH.cast? (v : Value) : IO (Option ECDH) := Internal.api "Lasm.JS.Node.ECDH.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["ECDH"] Value) (fun x => { val := x }) v
 
 /-- `ecdh.computeSecret(otherPublicKey[, inputEncoding][, outputEncoding])` (added in Node.js v0.11.14): `(Uint8Array or DOMString) computeSecret((DOMString or Uint8Array) otherPublicKey, optional DOMString inputEncoding, optional DOMString outputEncoding)` -/
-def ECDH.computeSecret (self : ECDH) (otherPublicKey : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "computeSecret" (Support.args #[toJS otherPublicKey, Support.optional inputEncoding, Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def ECDH.computeSecret (self : ECDH) (otherPublicKey : DOMStringOrUint8Array) (inputEncoding : Option String := none) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.ECDH.computeSecret" do
+  self.val.callMethod "computeSecret" (Internal.args #[toJS otherPublicKey, Internal.optional inputEncoding, Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `ecdh.generateKeys([encoding[, format]])` (added in Node.js v0.11.14): `(Uint8Array or DOMString) generateKeys(optional DOMString encoding, optional DOMString format)` -/
-def ECDH.generateKeys (self : ECDH) (encoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "generateKeys" (Support.args #[Support.optional encoding, Support.optional format]) Uint8ArrayOrDOMString
+@[macro_inline] def ECDH.generateKeys (self : ECDH) (encoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.ECDH.generateKeys" do
+  self.val.callMethod "generateKeys" (Internal.args #[Internal.optional encoding, Internal.optional format]) Uint8ArrayOrDOMString
 
 /-- `ecdh.getPrivateKey([encoding])` (added in Node.js v0.11.14): `(Uint8Array or DOMString) getPrivateKey(optional DOMString encoding)` -/
-def ECDH.getPrivateKey (self : ECDH) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getPrivateKey" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def ECDH.getPrivateKey (self : ECDH) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.ECDH.getPrivateKey" do
+  self.val.callMethod "getPrivateKey" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `ecdh.getPublicKey([encoding][, format])` (added in Node.js v0.11.14): `(Uint8Array or DOMString) getPublicKey(optional DOMString encoding, optional DOMString format)` -/
-def ECDH.getPublicKey (self : ECDH) (encoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "getPublicKey" (Support.args #[Support.optional encoding, Support.optional format]) Uint8ArrayOrDOMString
+@[macro_inline] def ECDH.getPublicKey (self : ECDH) (encoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.ECDH.getPublicKey" do
+  self.val.callMethod "getPublicKey" (Internal.args #[Internal.optional encoding, Internal.optional format]) Uint8ArrayOrDOMString
 
 /-- `ecdh.setPrivateKey(privateKey[, encoding])` (added in Node.js v0.11.14): `undefined setPrivateKey((DOMString or Uint8Array) privateKey, optional DOMString encoding)` -/
-def ECDH.setPrivateKey (self : ECDH) (privateKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "setPrivateKey" (Support.args #[toJS privateKey, Support.optional encoding]) Unit
+@[macro_inline] def ECDH.setPrivateKey (self : ECDH) (privateKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.ECDH.setPrivateKey" do
+  self.val.callMethod "setPrivateKey" (Internal.args #[toJS privateKey, Internal.optional encoding]) Unit
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `ecdh.setPublicKey(publicKey[, encoding])` (added in Node.js v0.11.14): `undefined setPublicKey((DOMString or Uint8Array) publicKey, optional DOMString encoding)` -/
-def ECDH.setPublicKey (self : ECDH) (publicKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "setPublicKey" (Support.args #[toJS publicKey, Support.optional encoding]) Unit
+@[macro_inline] def ECDH.setPublicKey (self : ECDH) (publicKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.ECDH.setPublicKey" do
+  self.val.callMethod "setPublicKey" (Internal.args #[toJS publicKey, Internal.optional encoding]) Unit
 
 /-- `ECDH.convertKey(key, curve[, inputEncoding[, outputEncoding[, format]]])` (added in Node.js v10.0.0): `static (Uint8Array or DOMString) convertKey((DOMString or Uint8Array) key, DOMString curve, optional DOMString inputEncoding, optional DOMString outputEncoding, optional DOMString format)` -/
-def ECDH.convertKey (key : DOMStringOrUint8Array) (curve : String) (inputEncoding : Option String := none) (outputEncoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString :=
+@[macro_inline] def ECDH.convertKey (key : DOMStringOrUint8Array) (curve : String) (inputEncoding : Option String := none) (outputEncoding : Option String := none) (format : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.ECDH.convertKey" do
   Lasm.JS.Binding.invoke Uint8ArrayOrDOMString { name := "Lasm.JS.Node.ECDH.convertKey", module := "node:crypto", path := "ECDH.convertKey", construct := false, arity := 5 }
-    (Support.args #[toJS key, toJS curve, Support.optional inputEncoding, Support.optional outputEncoding, Support.optional format]) (await := false)
+    (Internal.args #[toJS key, toJS curve, Internal.optional inputEncoding, Internal.optional outputEncoding, Internal.optional format]) (await := false)
 
 /-- `v instanceof Hash`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hash`). -/
-def Hash.cast? (v : Value) : IO (Option Hash) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hash"] Value) v) then some { val := v } else none
+@[macro_inline] def Hash.cast? (v : Value) : IO (Option Hash) := Internal.api "Lasm.JS.Node.Hash.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Hash"] Value) (fun x => { val := x }) v
 
 /-- `hash.copy([options])` (added in Node.js v13.1.0): `Hash copy(optional object options)` -/
-def Hash.copy (self : Hash) (options : Data := .undefined) : IO Hash := do
-  let r ← self.val.callMethod "copy" (Support.args #[options]) Value
+@[macro_inline] def Hash.copy (self : Hash) (options : Data := .undefined) : IO Hash := Internal.api "Lasm.JS.Node.Hash.copy" do
+  let r ← self.val.callMethod "copy" (Internal.args #[options]) Value
   pure { val := r }
 
 /-- `hash.digest([encoding])` (added in Node.js v0.1.92): `(Uint8Array or DOMString) digest(optional DOMString encoding)` -/
-def Hash.digest (self : Hash) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "digest" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Hash.digest (self : Hash) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Hash.digest" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `hash.update(data[, inputEncoding])` (added in Node.js v0.1.92): `undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
-def Hash.update (self : Hash) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Unit
+@[macro_inline] def Hash.update (self : Hash) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Hash.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding]) Unit
 
 /-- `v instanceof Hmac`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hmac`). -/
-def Hmac.cast? (v : Value) : IO (Option Hmac) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hmac"] Value) v) then some { val := v } else none
+@[macro_inline] def Hmac.cast? (v : Value) : IO (Option Hmac) := Internal.api "Lasm.JS.Node.Hmac.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Hmac"] Value) (fun x => { val := x }) v
 
 /-- `hmac.digest([encoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) digest(optional DOMString encoding)` -/
-def Hmac.digest (self : Hmac) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "digest" (Support.args #[Support.optional encoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Hmac.digest (self : Hmac) (encoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Hmac.digest" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional encoding]) Uint8ArrayOrDOMString
 
 /-- `hmac.update(data[, inputEncoding])` (added in Node.js v0.1.94): `undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
-def Hmac.update (self : Hmac) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Unit
+@[macro_inline] def Hmac.update (self : Hmac) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Hmac.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding]) Unit
 
 /-- `v instanceof KeyObject`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyObject`). -/
-def KeyObject.cast? (v : Value) : IO (Option KeyObject) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["KeyObject"] Value) v) then some { val := v } else none
+@[macro_inline] def KeyObject.cast? (v : Value) : IO (Option KeyObject) := Internal.api "Lasm.JS.Node.KeyObject.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["KeyObject"] Value) (fun x => { val := x }) v
 
 /-- `keyObject.asymmetricKeyDetails` (added in Node.js v15.7.0): `readonly attribute object asymmetricKeyDetails` -/
-def KeyObject.asymmetricKeyDetails (self : KeyObject) : IO Data := self.val.get "asymmetricKeyDetails" Data
+@[macro_inline] def KeyObject.asymmetricKeyDetails (self : KeyObject) : IO Data := Internal.api "Lasm.JS.Node.KeyObject.asymmetricKeyDetails" do
+  self.val.get "asymmetricKeyDetails" Data
 
 /-- `keyObject.asymmetricKeyType` (added in Node.js v11.6.0): `readonly attribute DOMString asymmetricKeyType` -/
-def KeyObject.asymmetricKeyType (self : KeyObject) : IO String := self.val.get "asymmetricKeyType" String
+@[macro_inline] def KeyObject.asymmetricKeyType (self : KeyObject) : IO String := Internal.api "Lasm.JS.Node.KeyObject.asymmetricKeyType" do
+  self.val.get "asymmetricKeyType" String
 
 /-- `keyObject.symmetricKeySize` (added in Node.js v11.6.0): `readonly attribute double symmetricKeySize` -/
-def KeyObject.symmetricKeySize (self : KeyObject) : IO Float := self.val.get "symmetricKeySize" Float
+@[macro_inline] def KeyObject.symmetricKeySize (self : KeyObject) : IO Float := Internal.api "Lasm.JS.Node.KeyObject.symmetricKeySize" do
+  self.val.get "symmetricKeySize" Float
 
 /-- `keyObject.type` (added in Node.js v11.6.0): `readonly attribute DOMString type` -/
-def KeyObject.type (self : KeyObject) : IO String := self.val.get "type" String
+@[macro_inline] def KeyObject.type (self : KeyObject) : IO String := Internal.api "Lasm.JS.Node.KeyObject.type" do
+  self.val.get "type" String
 
 /-- `keyObject.equals(otherKeyObject)` (added in Node.js v17.7.0, v16.15.0): `boolean equals(KeyObject otherKeyObject)` -/
-def KeyObject.equals (self : KeyObject) (otherKeyObject : KeyObject) : IO Bool :=
-  self.val.callMethod "equals" (Support.args #[toJS otherKeyObject]) Bool
+@[macro_inline] def KeyObject.equals (self : KeyObject) (otherKeyObject : KeyObject) : IO Bool := Internal.api "Lasm.JS.Node.KeyObject.equals" do
+  self.val.callMethod "equals" (Internal.args #[toJS otherKeyObject]) Bool
 
 /-- `keyObject.export([options])` (added in Node.js v11.6.0): `(DOMString or Uint8Array or object) export(optional object options)` -/
-def KeyObject.«export» (self : KeyObject) (options : Data := .undefined) : IO Data :=
-  self.val.callMethod "export" (Support.args #[options]) Data
+@[macro_inline] def KeyObject.«export» (self : KeyObject) (options : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.KeyObject.export" do
+  self.val.callMethod "export" (Internal.args #[options]) Data
 
 /-- `keyObject.toCryptoKey(algorithm, extractable, keyUsages)` (added in Node.js v23.0.0, v22.10.0): `CryptoKey toCryptoKey(any algorithm, any extractable, any keyUsages)` -/
-def KeyObject.toCryptoKey (self : KeyObject) (algorithm : Data) (extractable : Data) (keyUsages : Data) : IO CryptoKey := do
-  let r ← self.val.callMethod "toCryptoKey" (Support.args #[toJS algorithm, toJS extractable, toJS keyUsages]) Value
+@[macro_inline] def KeyObject.toCryptoKey (self : KeyObject) (algorithm : Data) (extractable : Data) (keyUsages : Data) : IO CryptoKey := Internal.api "Lasm.JS.Node.KeyObject.toCryptoKey" do
+  let r ← self.val.callMethod "toCryptoKey" (Internal.args #[toJS algorithm, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
 /-- `KeyObject.from(key)` (added in Node.js v15.0.0): `static KeyObject from(CryptoKey key)` -/
-def KeyObject.«from» (key : CryptoKey) : IO KeyObject := do
+@[macro_inline] def KeyObject.«from» (key : CryptoKey) : IO KeyObject := Internal.api "Lasm.JS.Node.KeyObject.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.KeyObject.from", module := "node:crypto", path := "KeyObject.from", construct := false, arity := 1 }
-    (Support.args #[toJS key]) (await := false)
+    (Internal.args #[toJS key]) (await := false)
   pure { val := r }
 
 /-- `v instanceof Mac`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Mac`). -/
-def Mac.cast? (v : Value) : IO (Option Mac) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Mac"] Value) v) then some { val := v } else none
+@[macro_inline] def Mac.cast? (v : Value) : IO (Option Mac) := Internal.api "Lasm.JS.Node.Mac.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Mac"] Value) (fun x => { val := x }) v
 
 /-- `mac.final([outputEncoding])` (added in Node.js v24.22.0): `(Uint8Array or DOMString) final(optional DOMString outputEncoding)` -/
-def Mac.final (self : Mac) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString :=
-  self.val.callMethod "final" (Support.args #[Support.optional outputEncoding]) Uint8ArrayOrDOMString
+@[macro_inline] def Mac.final (self : Mac) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Mac.final" do
+  self.val.callMethod "final" (Internal.args #[Internal.optional outputEncoding]) Uint8ArrayOrDOMString
 
 /-- `mac.update(data[, inputEncoding])` (added in Node.js v24.22.0): `Mac update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
-def Mac.update (self : Mac) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Mac := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Value
+@[macro_inline] def Mac.update (self : Mac) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Mac := Internal.api "Lasm.JS.Node.Mac.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding]) Value
   pure { val := r }
 
 /-- `v instanceof Sign`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Sign`). -/
-def Sign.cast? (v : Value) : IO (Option Sign) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Sign"] Value) v) then some { val := v } else none
+@[macro_inline] def Sign.cast? (v : Value) : IO (Option Sign) := Internal.api "Lasm.JS.Node.Sign.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Sign"] Value) (fun x => { val := x }) v
 
 /-- `sign.sign(privateKey[, outputEncoding])` (added in Node.js v0.1.92): `Uint8Array sign(any privateKey, optional any outputEncoding)` -/
-def Sign.sign (self : Sign) (privateKey : Data) (outputEncoding : Data := .undefined) : IO ByteArray :=
-  self.val.callMethod "sign" (Support.args #[toJS privateKey, outputEncoding]) ByteArray
+@[macro_inline] def Sign.sign (self : Sign) (privateKey : Data) (outputEncoding : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.Sign.sign" do
+  self.val.callMethod "sign" (Internal.args #[toJS privateKey, outputEncoding]) ByteArray
 
 /-- `sign.update(data[, inputEncoding])` (added in Node.js v0.1.92): `undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
-def Sign.update (self : Sign) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Unit
+@[macro_inline] def Sign.update (self : Sign) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Sign.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding]) Unit
 
 /-- `v instanceof Verify`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Verify`). -/
-def Verify.cast? (v : Value) : IO (Option Verify) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Verify"] Value) v) then some { val := v } else none
+@[macro_inline] def Verify.cast? (v : Value) : IO (Option Verify) := Internal.api "Lasm.JS.Node.Verify.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["Verify"] Value) (fun x => { val := x }) v
 
 /-- `verify.update(data[, inputEncoding])` (added in Node.js v0.1.92): `undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
-def Verify.update (self : Verify) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit :=
-  self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Unit
+@[macro_inline] def Verify.update (self : Verify) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Verify.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data, Internal.optional inputEncoding]) Unit
 
 /-- `verify.verify(key, signature[, signatureEncoding])` (added in Node.js v0.1.92): `boolean verify(any key, any signature, optional any signatureEncoding)` -/
-def Verify.verify (self : Verify) (key : Data) (signature : Data) (signatureEncoding : Data := .undefined) : IO Bool :=
-  self.val.callMethod "verify" (Support.args #[toJS key, toJS signature, signatureEncoding]) Bool
+@[macro_inline] def Verify.verify (self : Verify) (key : Data) (signature : Data) (signatureEncoding : Data := .undefined) : IO Bool := Internal.api "Lasm.JS.Node.Verify.verify" do
+  self.val.callMethod "verify" (Internal.args #[toJS key, toJS signature, signatureEncoding]) Bool
 
 /-- `v instanceof X509Certificate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `X509Certificate`). -/
-def X509Certificate.cast? (v : Value) : IO (Option X509Certificate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["X509Certificate"] Value) v) then some { val := v } else none
+@[macro_inline] def X509Certificate.cast? (v : Value) : IO (Option X509Certificate) := Internal.api "Lasm.JS.Node.X509Certificate.cast?" do
+  Internal.cast (Support.getExport "node:crypto" ["X509Certificate"] Value) (fun x => { val := x }) v
 
 /-- `x509.ca` (added in Node.js v15.6.0): `readonly attribute boolean ca` -/
-def X509Certificate.ca (self : X509Certificate) : IO Bool := self.val.get "ca" Bool
+@[macro_inline] def X509Certificate.ca (self : X509Certificate) : IO Bool := Internal.api "Lasm.JS.Node.X509Certificate.ca" do
+  self.val.get "ca" Bool
 
 /-- `x509.fingerprint` (added in Node.js v15.6.0): `readonly attribute DOMString fingerprint` -/
-def X509Certificate.fingerprint (self : X509Certificate) : IO String := self.val.get "fingerprint" String
+@[macro_inline] def X509Certificate.fingerprint (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.fingerprint" do
+  self.val.get "fingerprint" String
 
 /-- `x509.fingerprint256` (added in Node.js v15.6.0): `readonly attribute DOMString fingerprint256` -/
-def X509Certificate.fingerprint256 (self : X509Certificate) : IO String := self.val.get "fingerprint256" String
+@[macro_inline] def X509Certificate.fingerprint256 (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.fingerprint256" do
+  self.val.get "fingerprint256" String
 
 /-- `x509.fingerprint512` (added in Node.js v17.2.0, v16.14.0): `readonly attribute DOMString fingerprint512` -/
-def X509Certificate.fingerprint512 (self : X509Certificate) : IO String := self.val.get "fingerprint512" String
+@[macro_inline] def X509Certificate.fingerprint512 (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.fingerprint512" do
+  self.val.get "fingerprint512" String
 
 /-- `x509.infoAccess` (added in Node.js v15.6.0): `readonly attribute DOMString infoAccess` -/
-def X509Certificate.infoAccess (self : X509Certificate) : IO String := self.val.get "infoAccess" String
+@[macro_inline] def X509Certificate.infoAccess (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.infoAccess" do
+  self.val.get "infoAccess" String
 
 /-- `x509.issuer` (added in Node.js v15.6.0): `readonly attribute DOMString issuer` -/
-def X509Certificate.issuer (self : X509Certificate) : IO String := self.val.get "issuer" String
+@[macro_inline] def X509Certificate.issuer (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.issuer" do
+  self.val.get "issuer" String
 
 /-- `x509.issuerCertificate` (added in Node.js v15.9.0): `readonly attribute X509Certificate issuerCertificate` -/
-def X509Certificate.issuerCertificate (self : X509Certificate) : IO X509Certificate := do
+@[macro_inline] def X509Certificate.issuerCertificate (self : X509Certificate) : IO X509Certificate := Internal.api "Lasm.JS.Node.X509Certificate.issuerCertificate" do
   let r ← self.val.get "issuerCertificate" Value
   pure { val := r }
 
 /-- `x509.keyUsage` (added in Node.js v15.6.0): `readonly attribute sequence<DOMString> keyUsage` -/
-def X509Certificate.keyUsage (self : X509Certificate) : IO (Array String) := self.val.get "keyUsage" (Array String)
+@[macro_inline] def X509Certificate.keyUsage (self : X509Certificate) : IO (Array String) := Internal.api "Lasm.JS.Node.X509Certificate.keyUsage" do
+  self.val.get "keyUsage" (Array String)
 
 /-- `x509.publicKey` (added in Node.js v15.6.0): `readonly attribute KeyObject publicKey` -/
-def X509Certificate.publicKey (self : X509Certificate) : IO KeyObject := do
+@[macro_inline] def X509Certificate.publicKey (self : X509Certificate) : IO KeyObject := Internal.api "Lasm.JS.Node.X509Certificate.publicKey" do
   let r ← self.val.get "publicKey" Value
   pure { val := r }
 
 /-- `x509.raw` (added in Node.js v15.6.0): `readonly attribute Uint8Array raw` -/
-def X509Certificate.raw (self : X509Certificate) : IO ByteArray := self.val.get "raw" ByteArray
+@[macro_inline] def X509Certificate.raw (self : X509Certificate) : IO ByteArray := Internal.api "Lasm.JS.Node.X509Certificate.raw" do
+  self.val.get "raw" ByteArray
 
 /-- `x509.serialNumber` (added in Node.js v15.6.0): `readonly attribute DOMString serialNumber` -/
-def X509Certificate.serialNumber (self : X509Certificate) : IO String := self.val.get "serialNumber" String
+@[macro_inline] def X509Certificate.serialNumber (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.serialNumber" do
+  self.val.get "serialNumber" String
 
 /-- `x509.subject` (added in Node.js v15.6.0): `readonly attribute DOMString subject` -/
-def X509Certificate.subject (self : X509Certificate) : IO String := self.val.get "subject" String
+@[macro_inline] def X509Certificate.subject (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.subject" do
+  self.val.get "subject" String
 
 /-- `x509.subjectAltName` (added in Node.js v15.6.0): `readonly attribute DOMString subjectAltName` -/
-def X509Certificate.subjectAltName (self : X509Certificate) : IO String := self.val.get "subjectAltName" String
+@[macro_inline] def X509Certificate.subjectAltName (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.subjectAltName" do
+  self.val.get "subjectAltName" String
 
 /-- `x509.validFrom` (added in Node.js v15.6.0): `readonly attribute DOMString validFrom` -/
-def X509Certificate.validFrom (self : X509Certificate) : IO String := self.val.get "validFrom" String
+@[macro_inline] def X509Certificate.validFrom (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.validFrom" do
+  self.val.get "validFrom" String
 
 /-- `x509.validFromDate` (added in Node.js v23.0.0, v22.10.0): `readonly attribute object validFromDate` -/
-def X509Certificate.validFromDate (self : X509Certificate) : IO Data := self.val.get "validFromDate" Data
+@[macro_inline] def X509Certificate.validFromDate (self : X509Certificate) : IO Data := Internal.api "Lasm.JS.Node.X509Certificate.validFromDate" do
+  self.val.get "validFromDate" Data
 
 /-- `x509.validTo` (added in Node.js v15.6.0): `readonly attribute DOMString validTo` -/
-def X509Certificate.validTo (self : X509Certificate) : IO String := self.val.get "validTo" String
+@[macro_inline] def X509Certificate.validTo (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.validTo" do
+  self.val.get "validTo" String
 
 /-- `x509.validToDate` (added in Node.js v23.0.0, v22.10.0): `readonly attribute object validToDate` -/
-def X509Certificate.validToDate (self : X509Certificate) : IO Data := self.val.get "validToDate" Data
+@[macro_inline] def X509Certificate.validToDate (self : X509Certificate) : IO Data := Internal.api "Lasm.JS.Node.X509Certificate.validToDate" do
+  self.val.get "validToDate" Data
 
 /-- `x509.signatureAlgorithm` (added in Node.js v24.9.0): `readonly attribute DOMString? signatureAlgorithm` -/
-def X509Certificate.signatureAlgorithm (self : X509Certificate) : IO (Option String) := self.val.get "signatureAlgorithm" (Option String)
+@[macro_inline] def X509Certificate.signatureAlgorithm (self : X509Certificate) : IO (Option String) := Internal.api "Lasm.JS.Node.X509Certificate.signatureAlgorithm" do
+  self.val.get "signatureAlgorithm" (Option String)
 
 /-- `x509.signatureAlgorithmOid` (added in Node.js v24.9.0): `readonly attribute DOMString signatureAlgorithmOid` -/
-def X509Certificate.signatureAlgorithmOid (self : X509Certificate) : IO String := self.val.get "signatureAlgorithmOid" String
+@[macro_inline] def X509Certificate.signatureAlgorithmOid (self : X509Certificate) : IO String := Internal.api "Lasm.JS.Node.X509Certificate.signatureAlgorithmOid" do
+  self.val.get "signatureAlgorithmOid" String
 
 /-- `x509.checkEmail(email[, options])` (added in Node.js v15.6.0): `DOMString? checkEmail(DOMString email, optional X509Certificate.CheckEmailOptions options)` -/
-def X509Certificate.checkEmail (self : X509Certificate) (email : String) (options : Option X509Certificate.CheckEmailOptions := none) : IO (Option String) :=
-  self.val.callMethod "checkEmail" (Support.args #[toJS email, Support.optional options]) (Option String)
+@[macro_inline] def X509Certificate.checkEmail (self : X509Certificate) (email : String) (options : Option X509Certificate.CheckEmailOptions := none) : IO (Option String) := Internal.api "Lasm.JS.Node.X509Certificate.checkEmail" do
+  self.val.callMethod "checkEmail" (Internal.args #[toJS email, Internal.optional options]) (Option String)
 
 /-- `x509.checkHost(name[, options])` (added in Node.js v15.6.0): `DOMString? checkHost(DOMString name, optional X509Certificate.CheckHostOptions options)` -/
-def X509Certificate.checkHost (self : X509Certificate) (name : String) (options : Option X509Certificate.CheckHostOptions := none) : IO (Option String) :=
-  self.val.callMethod "checkHost" (Support.args #[toJS name, Support.optional options]) (Option String)
+@[macro_inline] def X509Certificate.checkHost (self : X509Certificate) (name : String) (options : Option X509Certificate.CheckHostOptions := none) : IO (Option String) := Internal.api "Lasm.JS.Node.X509Certificate.checkHost" do
+  self.val.callMethod "checkHost" (Internal.args #[toJS name, Internal.optional options]) (Option String)
 
 /-- `x509.checkIP(ip)` (added in Node.js v15.6.0): `DOMString? checkIP(DOMString ip)` -/
-def X509Certificate.checkIP (self : X509Certificate) (ip : String) : IO (Option String) :=
-  self.val.callMethod "checkIP" (Support.args #[toJS ip]) (Option String)
+@[macro_inline] def X509Certificate.checkIP (self : X509Certificate) (ip : String) : IO (Option String) := Internal.api "Lasm.JS.Node.X509Certificate.checkIP" do
+  self.val.callMethod "checkIP" (Internal.args #[toJS ip]) (Option String)
 
 /-- `x509.checkIssued(otherCert)` (added in Node.js v15.6.0): `boolean checkIssued(X509Certificate otherCert)` -/
-def X509Certificate.checkIssued (self : X509Certificate) (otherCert : X509Certificate) : IO Bool :=
-  self.val.callMethod "checkIssued" (Support.args #[toJS otherCert]) Bool
+@[macro_inline] def X509Certificate.checkIssued (self : X509Certificate) (otherCert : X509Certificate) : IO Bool := Internal.api "Lasm.JS.Node.X509Certificate.checkIssued" do
+  self.val.callMethod "checkIssued" (Internal.args #[toJS otherCert]) Bool
 
 /-- `x509.checkPrivateKey(privateKey)` (added in Node.js v15.6.0): `boolean checkPrivateKey(KeyObject privateKey)` -/
-def X509Certificate.checkPrivateKey (self : X509Certificate) (privateKey : KeyObject) : IO Bool :=
-  self.val.callMethod "checkPrivateKey" (Support.args #[toJS privateKey]) Bool
+@[macro_inline] def X509Certificate.checkPrivateKey (self : X509Certificate) (privateKey : KeyObject) : IO Bool := Internal.api "Lasm.JS.Node.X509Certificate.checkPrivateKey" do
+  self.val.callMethod "checkPrivateKey" (Internal.args #[toJS privateKey]) Bool
 
 /-- `x509.toJSON()` (added in Node.js v15.6.0): `undefined toJSON()` -/
-def X509Certificate.toJSON (self : X509Certificate) : IO Unit :=
-  self.val.callMethod "toJSON" (Support.args #[]) Unit
+@[macro_inline] def X509Certificate.toJSON (self : X509Certificate) : IO Unit := Internal.api "Lasm.JS.Node.X509Certificate.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) Unit
 
 /-- `x509.toLegacyObject()` (added in Node.js v15.6.0): `undefined toLegacyObject()` -/
-def X509Certificate.toLegacyObject (self : X509Certificate) : IO Unit :=
-  self.val.callMethod "toLegacyObject" (Support.args #[]) Unit
+@[macro_inline] def X509Certificate.toLegacyObject (self : X509Certificate) : IO Unit := Internal.api "Lasm.JS.Node.X509Certificate.toLegacyObject" do
+  self.val.callMethod "toLegacyObject" (Internal.args #[]) Unit
 
 /-- `x509.toString()` (added in Node.js v15.6.0): `undefined toString()` -/
-def X509Certificate.toString (self : X509Certificate) : IO Unit :=
-  self.val.callMethod "toString" (Support.args #[]) Unit
+@[macro_inline] def X509Certificate.toString (self : X509Certificate) : IO Unit := Internal.api "Lasm.JS.Node.X509Certificate.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) Unit
 
 /-- `x509.verify(publicKey)` (added in Node.js v15.6.0): `boolean verify(KeyObject publicKey)` -/
-def X509Certificate.verify (self : X509Certificate) (publicKey : KeyObject) : IO Bool :=
-  self.val.callMethod "verify" (Support.args #[toJS publicKey]) Bool
+@[macro_inline] def X509Certificate.verify (self : X509Certificate) (publicKey : KeyObject) : IO Bool := Internal.api "Lasm.JS.Node.X509Certificate.verify" do
+  self.val.callMethod "verify" (Internal.args #[toJS publicKey]) Bool
 
 /-- `crypto.constants` (added in Node.js v6.3.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.constants : IO Data := Support.getExport "node:crypto" ["constants"] Data
+@[macro_inline] def crypto.constants : IO Data := Internal.api "Lasm.JS.Node.crypto.constants" do
+  Support.getExport "node:crypto" ["constants"] Data
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `crypto.fips` (added in Node.js v6.0.0): `readonly attribute any fips` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.fips : IO Data := Support.getExport "node:crypto" ["fips"] Data
+@[macro_inline] def crypto.fips : IO Data := Internal.api "Lasm.JS.Node.crypto.fips" do
+  Support.getExport "node:crypto" ["fips"] Data
 
 /-- `crypto.webcrypto` (added in Node.js v15.0.0): `readonly attribute any webcrypto` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.webcrypto : IO Data := Support.getExport "node:crypto" ["webcrypto"] Data
+@[macro_inline] def crypto.webcrypto : IO Data := Internal.api "Lasm.JS.Node.crypto.webcrypto" do
+  Support.getExport "node:crypto" ["webcrypto"] Data
 
 /-- `crypto.argon2(algorithm, parameters, callback)` (added in Node.js v24.7.0): `Promise<Uint8Array> argon2(DOMString algorithm, crypto.Argon2Parameters parameters)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.argon2 (algorithm : String) (parameters : crypto.Argon2Parameters) : Async ByteArray :=
-  Support.promisified ByteArray "node:crypto" "argon2" (Support.args #[toJS algorithm, toJS parameters])
+@[macro_inline] def crypto.argon2 (algorithm : String) (parameters : crypto.Argon2Parameters) : Async ByteArray := Internal.api "Lasm.JS.Node.crypto.argon2" do
+  Support.promisified ByteArray "node:crypto" "argon2" (Internal.args #[toJS algorithm, toJS parameters])
 
 /-- `crypto.argon2Sync(algorithm, parameters)` (added in Node.js v24.7.0): `Uint8Array argon2Sync(DOMString algorithm, crypto.Argon2SyncParameters parameters)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.argon2Sync (algorithm : String) (parameters : crypto.Argon2SyncParameters) : IO ByteArray :=
+@[macro_inline] def crypto.argon2Sync (algorithm : String) (parameters : crypto.Argon2SyncParameters) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.argon2Sync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.argon2Sync", module := "node:crypto", path := "argon2Sync", construct := false, arity := 2 }
-    (Support.args #[toJS algorithm, toJS parameters]) (await := false)
+    (Internal.args #[toJS algorithm, toJS parameters]) (await := false)
 
 /-- `crypto.checkPrime(candidate[, options], callback)` (added in Node.js v15.8.0): `Promise<boolean> checkPrime((Uint8Array or bigint) candidate, optional crypto.CheckPrimeOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.checkPrime (candidate : Uint8ArrayOrBigint) (options : Option crypto.CheckPrimeOptions := none) : Async Bool :=
-  Support.promisified Bool "node:crypto" "checkPrime" (Support.args #[toJS candidate, Support.optional options])
+@[macro_inline] def crypto.checkPrime (candidate : Uint8ArrayOrBigint) (options : Option crypto.CheckPrimeOptions := none) : Async Bool := Internal.api "Lasm.JS.Node.crypto.checkPrime" do
+  Support.promisified Bool "node:crypto" "checkPrime" (Internal.args #[toJS candidate, Internal.optional options])
 
 /-- `crypto.checkPrimeSync(candidate[, options])` (added in Node.js v15.8.0): `boolean checkPrimeSync((Uint8Array or bigint) candidate, optional crypto.CheckPrimeSyncOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.checkPrimeSync (candidate : Uint8ArrayOrBigint) (options : Option crypto.CheckPrimeSyncOptions := none) : IO Bool :=
+@[macro_inline] def crypto.checkPrimeSync (candidate : Uint8ArrayOrBigint) (options : Option crypto.CheckPrimeSyncOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.crypto.checkPrimeSync" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.crypto.checkPrimeSync", module := "node:crypto", path := "checkPrimeSync", construct := false, arity := 2 }
-    (Support.args #[toJS candidate, Support.optional options]) (await := false)
+    (Internal.args #[toJS candidate, Internal.optional options]) (await := false)
 
 /-- `crypto.createCipheriv(algorithm, key, iv[, options])` (added in Node.js v0.1.94): `Cipheriv createCipheriv(DOMString algorithm, (DOMString or Uint8Array or KeyObject or CryptoKey) key, (DOMString or Uint8Array)? iv, optional crypto.CreateCipherivOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createCipheriv (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (iv : Option DOMStringOrUint8Array) (options : Option crypto.CreateCipherivOptions := none) : IO Cipheriv := do
+@[macro_inline] def crypto.createCipheriv (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (iv : Option DOMStringOrUint8Array) (options : Option crypto.CreateCipherivOptions := none) : IO Cipheriv := Internal.api "Lasm.JS.Node.crypto.createCipheriv" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createCipheriv", module := "node:crypto", path := "createCipheriv", construct := false, arity := 4 }
-    (Support.args #[toJS algorithm, toJS key, toJS iv, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, toJS key, toJS iv, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `crypto.createDecipheriv(algorithm, key, iv[, options])` (added in Node.js v0.1.94): `Decipheriv createDecipheriv(DOMString algorithm, (DOMString or Uint8Array or KeyObject or CryptoKey) key, (DOMString or Uint8Array)? iv, optional crypto.CreateDecipherivOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createDecipheriv (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (iv : Option DOMStringOrUint8Array) (options : Option crypto.CreateDecipherivOptions := none) : IO Decipheriv := do
+@[macro_inline] def crypto.createDecipheriv (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (iv : Option DOMStringOrUint8Array) (options : Option crypto.CreateDecipherivOptions := none) : IO Decipheriv := Internal.api "Lasm.JS.Node.crypto.createDecipheriv" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createDecipheriv", module := "node:crypto", path := "createDecipheriv", construct := false, arity := 4 }
-    (Support.args #[toJS algorithm, toJS key, toJS iv, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, toJS key, toJS iv, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `crypto.createDiffieHellman(prime[, primeEncoding][, generator][, generatorEncoding])` (added in Node.js v0.11.12): `DiffieHellman createDiffieHellman((DOMString or Uint8Array) prime, optional DOMString primeEncoding, optional (double or DOMString or Uint8Array) generator, optional DOMString generatorEncoding)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createDiffieHellman (prime : DOMStringOrUint8Array) (primeEncoding : Option String := none) (generator : Option DoubleOrDOMStringOrUint8Array := none) (generatorEncoding : Option String := none) : IO DiffieHellman := do
+@[macro_inline] def crypto.createDiffieHellman (prime : DOMStringOrUint8Array) (primeEncoding : Option String := none) (generator : Option DoubleOrDOMStringOrUint8Array := none) (generatorEncoding : Option String := none) : IO DiffieHellman := Internal.api "Lasm.JS.Node.crypto.createDiffieHellman" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createDiffieHellman", module := "node:crypto", path := "createDiffieHellman", construct := false, arity := 4 }
-    (Support.args #[toJS prime, Support.optional primeEncoding, Support.optional generator, Support.optional generatorEncoding]) (await := false)
+    (Internal.args #[toJS prime, Internal.optional primeEncoding, Internal.optional generator, Internal.optional generatorEncoding]) (await := false)
   pure { val := r }
 
 /-- `crypto.createDiffieHellman(primeLength[, generator])` (added in Node.js v0.5.0): `DiffieHellman createDiffieHellman(double primeLength, optional double generator)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createDiffieHellmanWithPrimeLength (primeLength : Float) (generator : Option Float := none) : IO DiffieHellman := do
+@[macro_inline] def crypto.createDiffieHellmanWithPrimeLength (primeLength : Float) (generator : Option Float := none) : IO DiffieHellman := Internal.api "Lasm.JS.Node.crypto.createDiffieHellmanWithPrimeLength" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createDiffieHellmanWithPrimeLength", module := "node:crypto", path := "createDiffieHellman", construct := false, arity := 2 }
-    (Support.args #[toJS primeLength, Support.optional generator]) (await := false)
+    (Internal.args #[toJS primeLength, Internal.optional generator]) (await := false)
   pure { val := r }
 
 /-- `crypto.createDiffieHellmanGroup(name)` (added in Node.js v0.9.3): `DiffieHellmanGroup createDiffieHellmanGroup(DOMString name)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createDiffieHellmanGroup (name : String) : IO DiffieHellmanGroup := do
+@[macro_inline] def crypto.createDiffieHellmanGroup (name : String) : IO DiffieHellmanGroup := Internal.api "Lasm.JS.Node.crypto.createDiffieHellmanGroup" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createDiffieHellmanGroup", module := "node:crypto", path := "createDiffieHellmanGroup", construct := false, arity := 1 }
-    (Support.args #[toJS name]) (await := false)
+    (Internal.args #[toJS name]) (await := false)
   pure { val := r }
 
 /-- `crypto.createECDH(curveName)` (added in Node.js v0.11.14): `ECDH createECDH(DOMString curveName)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createECDH (curveName : String) : IO ECDH := do
+@[macro_inline] def crypto.createECDH (curveName : String) : IO ECDH := Internal.api "Lasm.JS.Node.crypto.createECDH" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createECDH", module := "node:crypto", path := "createECDH", construct := false, arity := 1 }
-    (Support.args #[toJS curveName]) (await := false)
+    (Internal.args #[toJS curveName]) (await := false)
   pure { val := r }
 
 /-- `crypto.createHash(algorithm[, options])` (added in Node.js v0.1.92): `Hash createHash(DOMString algorithm, optional crypto.CreateHashOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createHash (algorithm : String) (options : Option crypto.CreateHashOptions := none) : IO Hash := do
+@[macro_inline] def crypto.createHash (algorithm : String) (options : Option crypto.CreateHashOptions := none) : IO Hash := Internal.api "Lasm.JS.Node.crypto.createHash" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createHash", module := "node:crypto", path := "createHash", construct := false, arity := 2 }
-    (Support.args #[toJS algorithm, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `crypto.createHmac(algorithm, key[, options])` (added in Node.js v0.1.94): `Hmac createHmac(DOMString algorithm, (DOMString or Uint8Array or KeyObject or CryptoKey) key, optional crypto.CreateHmacOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createHmac (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (options : Option crypto.CreateHmacOptions := none) : IO Hmac := do
+@[macro_inline] def crypto.createHmac (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObjectOrCryptoKey) (options : Option crypto.CreateHmacOptions := none) : IO Hmac := Internal.api "Lasm.JS.Node.crypto.createHmac" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createHmac", module := "node:crypto", path := "createHmac", construct := false, arity := 3 }
-    (Support.args #[toJS algorithm, toJS key, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, toJS key, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `crypto.createMac(algorithm, key[, options])` (added in Node.js v24.22.0): `Mac createMac(DOMString algorithm, (Uint8Array or KeyObject) key, optional crypto.CreateMacOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createMac (algorithm : String) (key : Uint8ArrayOrKeyObject) (options : Option crypto.CreateMacOptions := none) : IO Mac := do
+@[macro_inline] def crypto.createMac (algorithm : String) (key : Uint8ArrayOrKeyObject) (options : Option crypto.CreateMacOptions := none) : IO Mac := Internal.api "Lasm.JS.Node.crypto.createMac" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createMac", module := "node:crypto", path := "createMac", construct := false, arity := 3 }
-    (Support.args #[toJS algorithm, toJS key, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, toJS key, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `crypto.createPrivateKey(key)` (added in Node.js v11.6.0): `KeyObject createPrivateKey(any key)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createPrivateKey (key : Data) : IO KeyObject := do
+@[macro_inline] def crypto.createPrivateKey (key : Data) : IO KeyObject := Internal.api "Lasm.JS.Node.crypto.createPrivateKey" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createPrivateKey", module := "node:crypto", path := "createPrivateKey", construct := false, arity := 1 }
-    (Support.args #[toJS key]) (await := false)
+    (Internal.args #[toJS key]) (await := false)
   pure { val := r }
 
 /-- `crypto.createPublicKey(key)` (added in Node.js v11.6.0): `KeyObject createPublicKey(any key)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createPublicKey (key : Data) : IO KeyObject := do
+@[macro_inline] def crypto.createPublicKey (key : Data) : IO KeyObject := Internal.api "Lasm.JS.Node.crypto.createPublicKey" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createPublicKey", module := "node:crypto", path := "createPublicKey", construct := false, arity := 1 }
-    (Support.args #[toJS key]) (await := false)
+    (Internal.args #[toJS key]) (await := false)
   pure { val := r }
 
 /-- `crypto.createSecretKey(key[, encoding])` (added in Node.js v11.6.0): `KeyObject createSecretKey((DOMString or Uint8Array) key, optional DOMString encoding)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createSecretKey (key : DOMStringOrUint8Array) (encoding : Option String := none) : IO KeyObject := do
+@[macro_inline] def crypto.createSecretKey (key : DOMStringOrUint8Array) (encoding : Option String := none) : IO KeyObject := Internal.api "Lasm.JS.Node.crypto.createSecretKey" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createSecretKey", module := "node:crypto", path := "createSecretKey", construct := false, arity := 2 }
-    (Support.args #[toJS key, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS key, Internal.optional encoding]) (await := false)
   pure { val := r }
 
 /-- `crypto.createSign(algorithm[, options])` (added in Node.js v0.1.92): `Sign createSign(DOMString algorithm, optional object options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createSign (algorithm : String) (options : Data := .undefined) : IO Sign := do
+@[macro_inline] def crypto.createSign (algorithm : String) (options : Data := .undefined) : IO Sign := Internal.api "Lasm.JS.Node.crypto.createSign" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createSign", module := "node:crypto", path := "createSign", construct := false, arity := 2 }
-    (Support.args #[toJS algorithm, options]) (await := false)
+    (Internal.args #[toJS algorithm, options]) (await := false)
   pure { val := r }
 
 /-- `crypto.createVerify(algorithm[, options])` (added in Node.js v0.1.92): `Verify createVerify(DOMString algorithm, optional object options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.createVerify (algorithm : String) (options : Data := .undefined) : IO Verify := do
+@[macro_inline] def crypto.createVerify (algorithm : String) (options : Data := .undefined) : IO Verify := Internal.api "Lasm.JS.Node.crypto.createVerify" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createVerify", module := "node:crypto", path := "createVerify", construct := false, arity := 2 }
-    (Support.args #[toJS algorithm, options]) (await := false)
+    (Internal.args #[toJS algorithm, options]) (await := false)
   pure { val := r }
 
 /-- `crypto.decapsulate(key, ciphertext[, callback])` (added in Node.js v24.7.0): `Uint8Array decapsulate((object or DOMString or Uint8Array or KeyObject or URL) key, Uint8Array ciphertext)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.decapsulate (key : ObjectOrDOMStringOrUint8ArrayOrKeyObjectOrURL) (ciphertext : ByteArray) : IO ByteArray :=
+@[macro_inline] def crypto.decapsulate (key : ObjectOrDOMStringOrUint8ArrayOrKeyObjectOrURL) (ciphertext : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.decapsulate" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.decapsulate", module := "node:crypto", path := "decapsulate", construct := false, arity := 2 }
-    (Support.args #[toJS key, toJS ciphertext]) (await := false)
+    (Internal.args #[toJS key, toJS ciphertext]) (await := false)
 
 /-- `crypto.diffieHellman(options[, callback])` (added in Node.js v13.9.0, v12.17.0): `Uint8Array diffieHellman(crypto.DiffieHellmanOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.diffieHellman (options : crypto.DiffieHellmanOptions) : IO ByteArray :=
+@[macro_inline] def crypto.diffieHellman (options : crypto.DiffieHellmanOptions) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.diffieHellman" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.diffieHellman", module := "node:crypto", path := "diffieHellman", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `crypto.encapsulate(key[, callback])` (added in Node.js v24.7.0): `object encapsulate((object or DOMString or Uint8Array or KeyObject) key)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.encapsulate (key : ObjectOrDOMStringOrUint8ArrayOrKeyObject) : IO Data :=
+@[macro_inline] def crypto.encapsulate (key : ObjectOrDOMStringOrUint8ArrayOrKeyObject) : IO Data := Internal.api "Lasm.JS.Node.crypto.encapsulate" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.encapsulate", module := "node:crypto", path := "encapsulate", construct := false, arity := 1 }
-    (Support.args #[toJS key]) (await := false)
+    (Internal.args #[toJS key]) (await := false)
 
 /-- `crypto.generateKey(type, options, callback)` (added in Node.js v15.0.0): `Promise<KeyObject> generateKey(DOMString type, crypto.GenerateKeyOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generateKey (type : String) (options : crypto.GenerateKeyOptions) : Async KeyObject := do
-  let r ← Support.promisified Value "node:crypto" "generateKey" (Support.args #[toJS type, toJS options])
+@[macro_inline] def crypto.generateKey (type : String) (options : crypto.GenerateKeyOptions) : Async KeyObject := Internal.api "Lasm.JS.Node.crypto.generateKey" do
+  let r ← Support.promisified Value "node:crypto" "generateKey" (Internal.args #[toJS type, toJS options])
   pure { val := r }
 
 /-- `crypto.generateKeyPair(type, options, callback)` (added in Node.js v10.12.0): `undefined generateKeyPair(DOMString type, crypto.GenerateKeyPairOptions options, Function callback)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generateKeyPair (type : String) (options : crypto.GenerateKeyPairOptions) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def crypto.generateKeyPair (type : String) (options : crypto.GenerateKeyPairOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.crypto.generateKeyPair" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.generateKeyPair", module := "node:crypto", path := "generateKeyPair", construct := false, arity := 3 }
-    (Support.args #[toJS type, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS type, toJS options, toJS callback]) (await := false)
 
 /-- `crypto.generateKeyPairSync(type, options)` (added in Node.js v10.12.0): `object generateKeyPairSync(DOMString type, crypto.GenerateKeyPairSyncOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generateKeyPairSync (type : String) (options : crypto.GenerateKeyPairSyncOptions) : IO Data :=
+@[macro_inline] def crypto.generateKeyPairSync (type : String) (options : crypto.GenerateKeyPairSyncOptions) : IO Data := Internal.api "Lasm.JS.Node.crypto.generateKeyPairSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.generateKeyPairSync", module := "node:crypto", path := "generateKeyPairSync", construct := false, arity := 2 }
-    (Support.args #[toJS type, toJS options]) (await := false)
+    (Internal.args #[toJS type, toJS options]) (await := false)
 
 /-- `crypto.generateKeySync(type, options)` (added in Node.js v15.0.0): `KeyObject generateKeySync(DOMString type, crypto.GenerateKeySyncOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generateKeySync (type : String) (options : crypto.GenerateKeySyncOptions) : IO KeyObject := do
+@[macro_inline] def crypto.generateKeySync (type : String) (options : crypto.GenerateKeySyncOptions) : IO KeyObject := Internal.api "Lasm.JS.Node.crypto.generateKeySync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.generateKeySync", module := "node:crypto", path := "generateKeySync", construct := false, arity := 2 }
-    (Support.args #[toJS type, toJS options]) (await := false)
+    (Internal.args #[toJS type, toJS options]) (await := false)
   pure { val := r }
 
 /-- `crypto.generatePrime(size[, options], callback)` (added in Node.js v15.8.0): `Promise<(ArrayBuffer or bigint)> generatePrime(double /* integer: Nat */ size, optional crypto.GeneratePrimeOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generatePrime (size : Nat) (options : Option crypto.GeneratePrimeOptions := none) : Async ArrayBufferOrBigint := do
-  let r ← Support.promisified Data "node:crypto" "generatePrime" (Support.args #[toJS size, Support.optional options])
+@[macro_inline] def crypto.generatePrime (size : Nat) (options : Option crypto.GeneratePrimeOptions := none) : Async ArrayBufferOrBigint := Internal.api "Lasm.JS.Node.crypto.generatePrime" do
+  let r ← Support.promisified Data "node:crypto" "generatePrime" (Internal.args #[toJS size, Internal.optional options])
   ArrayBufferOrBigint.decode r
 
 /-- `crypto.generatePrimeSync(size[, options])` (added in Node.js v15.8.0): `(ArrayBuffer or bigint) generatePrimeSync(double /* integer: Nat */ size, optional crypto.GeneratePrimeSyncOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.generatePrimeSync (size : Nat) (options : Option crypto.GeneratePrimeSyncOptions := none) : IO ArrayBufferOrBigint := do
+@[macro_inline] def crypto.generatePrimeSync (size : Nat) (options : Option crypto.GeneratePrimeSyncOptions := none) : IO ArrayBufferOrBigint := Internal.api "Lasm.JS.Node.crypto.generatePrimeSync" do
   let r ← Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.generatePrimeSync", module := "node:crypto", path := "generatePrimeSync", construct := false, arity := 2 }
-    (Support.args #[toJS size, Support.optional options]) (await := false)
+    (Internal.args #[toJS size, Internal.optional options]) (await := false)
   ArrayBufferOrBigint.decode r
 
 /-- `crypto.getCipherInfo(nameOrNid[, options])` (added in Node.js v15.0.0): `object getCipherInfo((DOMString or double) nameOrNid, optional crypto.GetCipherInfoOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getCipherInfo (nameOrNid : DOMStringOrDouble) (options : Option crypto.GetCipherInfoOptions := none) : IO Data :=
+@[macro_inline] def crypto.getCipherInfo (nameOrNid : DOMStringOrDouble) (options : Option crypto.GetCipherInfoOptions := none) : IO Data := Internal.api "Lasm.JS.Node.crypto.getCipherInfo" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.getCipherInfo", module := "node:crypto", path := "getCipherInfo", construct := false, arity := 2 }
-    (Support.args #[toJS nameOrNid, Support.optional options]) (await := false)
+    (Internal.args #[toJS nameOrNid, Internal.optional options]) (await := false)
 
 /-- `crypto.getCiphers()` (added in Node.js v0.9.3): `sequence<DOMString> getCiphers()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getCiphers : IO (Array String) :=
+@[macro_inline] def crypto.getCiphers : IO (Array String) := Internal.api "Lasm.JS.Node.crypto.getCiphers" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getCiphers", module := "node:crypto", path := "getCiphers", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `crypto.getCurves()` (added in Node.js v2.3.0): `sequence<DOMString> getCurves()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getCurves : IO (Array String) :=
+@[macro_inline] def crypto.getCurves : IO (Array String) := Internal.api "Lasm.JS.Node.crypto.getCurves" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getCurves", module := "node:crypto", path := "getCurves", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `crypto.getDiffieHellman(groupName)` (added in Node.js v0.7.5): `DiffieHellmanGroup getDiffieHellman(DOMString groupName)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getDiffieHellman (groupName : String) : IO DiffieHellmanGroup := do
+@[macro_inline] def crypto.getDiffieHellman (groupName : String) : IO DiffieHellmanGroup := Internal.api "Lasm.JS.Node.crypto.getDiffieHellman" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.getDiffieHellman", module := "node:crypto", path := "getDiffieHellman", construct := false, arity := 1 }
-    (Support.args #[toJS groupName]) (await := false)
+    (Internal.args #[toJS groupName]) (await := false)
   pure { val := r }
 
 /-- `crypto.getFips()` (added in Node.js v10.0.0): `double getFips()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getFips : IO Float :=
+@[macro_inline] def crypto.getFips : IO Float := Internal.api "Lasm.JS.Node.crypto.getFips" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.crypto.getFips", module := "node:crypto", path := "getFips", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `crypto.getHashes()` (added in Node.js v0.9.3): `sequence<DOMString> getHashes()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getHashes : IO (Array String) :=
+@[macro_inline] def crypto.getHashes : IO (Array String) := Internal.api "Lasm.JS.Node.crypto.getHashes" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getHashes", module := "node:crypto", path := "getHashes", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `crypto.getMacs()` (added in Node.js v24.22.0): `sequence<DOMString> getMacs()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.getMacs : IO (Array String) :=
+@[macro_inline] def crypto.getMacs : IO (Array String) := Internal.api "Lasm.JS.Node.crypto.getMacs" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getMacs", module := "node:crypto", path := "getMacs", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `crypto.hash(algorithm, data[, options])` (added in Node.js v21.7.0, v20.12.0): `(DOMString or Uint8Array) hash(DOMString? algorithm, (DOMString or Uint8Array) data, optional (crypto.HashOptions or DOMString) options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.hash (algorithm : Option String) (data : DOMStringOrUint8Array) (options : Option crypto.HashOptionsOrDOMString := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def crypto.hash (algorithm : Option String) (data : DOMStringOrUint8Array) (options : Option crypto.HashOptionsOrDOMString := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.crypto.hash" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.crypto.hash", module := "node:crypto", path := "hash", construct := false, arity := 3 }
-    (Support.args #[toJS algorithm, toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS algorithm, toJS data, Internal.optional options]) (await := false)
 
 /-- `crypto.hkdf(digest, ikm, salt, info, keylen, callback)` (added in Node.js v15.0.0): `Promise<ArrayBuffer> hkdf(DOMString digest, (DOMString or Uint8Array or KeyObject) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double /* integer: Nat */ keylen)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.hkdf (digest : String) (ikm : DOMStringOrUint8ArrayOrKeyObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Nat) : Async ByteArray := do
-  let r ← Support.promisified Value "node:crypto" "hkdf" (Support.args #[toJS digest, toJS ikm, toJS salt, toJS info, toJS keylen])
-  Support.arrayBufferBytes r
+@[macro_inline] def crypto.hkdf (digest : String) (ikm : DOMStringOrUint8ArrayOrKeyObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Nat) : Async ByteArray := Internal.api "Lasm.JS.Node.crypto.hkdf" do
+  let r ← Support.promisified Value "node:crypto" "hkdf" (Internal.args #[toJS digest, toJS ikm, toJS salt, toJS info, toJS keylen])
+  Internal.arrayBufferBytes r
 
 /-- `crypto.hkdfSync(digest, ikm, salt, info, keylen)` (added in Node.js v15.0.0): `ArrayBuffer hkdfSync(DOMString digest, (DOMString or Uint8Array or KeyObject) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double /* integer: Nat */ keylen)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.hkdfSync (digest : String) (ikm : DOMStringOrUint8ArrayOrKeyObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Nat) : IO ByteArray := do
+@[macro_inline] def crypto.hkdfSync (digest : String) (ikm : DOMStringOrUint8ArrayOrKeyObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Nat) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.hkdfSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.hkdfSync", module := "node:crypto", path := "hkdfSync", construct := false, arity := 5 }
-    (Support.args #[toJS digest, toJS ikm, toJS salt, toJS info, toJS keylen]) (await := false)
-  Support.arrayBufferBytes r
+    (Internal.args #[toJS digest, toJS ikm, toJS salt, toJS info, toJS keylen]) (await := false)
+  Internal.arrayBufferBytes r
 
 /-- `crypto.parsePKCS12(bundle[, options])` (added in Node.js v24.22.0): `object parsePKCS12(Uint8Array bundle, optional crypto.ParsePKCS12Options options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.parsePKCS12 (bundle : ByteArray) (options : Option crypto.ParsePKCS12Options := none) : IO Data :=
+@[macro_inline] def crypto.parsePKCS12 (bundle : ByteArray) (options : Option crypto.ParsePKCS12Options := none) : IO Data := Internal.api "Lasm.JS.Node.crypto.parsePKCS12" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.parsePKCS12", module := "node:crypto", path := "parsePKCS12", construct := false, arity := 2 }
-    (Support.args #[toJS bundle, Support.optional options]) (await := false)
+    (Internal.args #[toJS bundle, Internal.optional options]) (await := false)
 
 /-- `crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)` (added in Node.js v0.5.5): `Promise<Uint8Array> pbkdf2((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ iterations, double /* integer: Nat */ keylen, DOMString digest)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.pbkdf2 (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Nat) (keylen : Nat) (digest : String) : Async ByteArray :=
-  Support.promisified ByteArray "node:crypto" "pbkdf2" (Support.args #[toJS password, toJS salt, toJS iterations, toJS keylen, toJS digest])
+@[macro_inline] def crypto.pbkdf2 (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Nat) (keylen : Nat) (digest : String) : Async ByteArray := Internal.api "Lasm.JS.Node.crypto.pbkdf2" do
+  Support.promisified ByteArray "node:crypto" "pbkdf2" (Internal.args #[toJS password, toJS salt, toJS iterations, toJS keylen, toJS digest])
 
 /-- `crypto.pbkdf2Sync(password, salt, iterations, keylen, digest)` (added in Node.js v0.9.3): `Uint8Array pbkdf2Sync((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ iterations, double /* integer: Nat */ keylen, DOMString digest)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.pbkdf2Sync (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Nat) (keylen : Nat) (digest : String) : IO ByteArray :=
+@[macro_inline] def crypto.pbkdf2Sync (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Nat) (keylen : Nat) (digest : String) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.pbkdf2Sync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.pbkdf2Sync", module := "node:crypto", path := "pbkdf2Sync", construct := false, arity := 5 }
-    (Support.args #[toJS password, toJS salt, toJS iterations, toJS keylen, toJS digest]) (await := false)
+    (Internal.args #[toJS password, toJS salt, toJS iterations, toJS keylen, toJS digest]) (await := false)
 
 /-- `crypto.privateDecrypt(privateKey, buffer)` (added in Node.js v0.11.14): `Uint8Array privateDecrypt(any privateKey, any buffer)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.privateDecrypt (privateKey : Data) (buffer_ : Data) : IO ByteArray :=
+@[macro_inline] def crypto.privateDecrypt (privateKey : Data) (buffer_ : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.privateDecrypt" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.privateDecrypt", module := "node:crypto", path := "privateDecrypt", construct := false, arity := 2 }
-    (Support.args #[toJS privateKey, toJS buffer_]) (await := false)
+    (Internal.args #[toJS privateKey, toJS buffer_]) (await := false)
 
 /-- `crypto.privateEncrypt(privateKey, buffer)` (added in Node.js v1.1.0): `Uint8Array privateEncrypt(any privateKey, any buffer)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.privateEncrypt (privateKey : Data) (buffer_ : Data) : IO ByteArray :=
+@[macro_inline] def crypto.privateEncrypt (privateKey : Data) (buffer_ : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.privateEncrypt" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.privateEncrypt", module := "node:crypto", path := "privateEncrypt", construct := false, arity := 2 }
-    (Support.args #[toJS privateKey, toJS buffer_]) (await := false)
+    (Internal.args #[toJS privateKey, toJS buffer_]) (await := false)
 
 /-- `crypto.publicDecrypt(key, buffer)` (added in Node.js v1.1.0): `Uint8Array publicDecrypt(any key, any buffer)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.publicDecrypt (key : Data) (buffer_ : Data) : IO ByteArray :=
+@[macro_inline] def crypto.publicDecrypt (key : Data) (buffer_ : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.publicDecrypt" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.publicDecrypt", module := "node:crypto", path := "publicDecrypt", construct := false, arity := 2 }
-    (Support.args #[toJS key, toJS buffer_]) (await := false)
+    (Internal.args #[toJS key, toJS buffer_]) (await := false)
 
 /-- `crypto.publicEncrypt(key, buffer)` (added in Node.js v0.11.14): `Uint8Array publicEncrypt(any key, any buffer)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.publicEncrypt (key : Data) (buffer_ : Data) : IO ByteArray :=
+@[macro_inline] def crypto.publicEncrypt (key : Data) (buffer_ : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.publicEncrypt" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.publicEncrypt", module := "node:crypto", path := "publicEncrypt", construct := false, arity := 2 }
-    (Support.args #[toJS key, toJS buffer_]) (await := false)
+    (Internal.args #[toJS key, toJS buffer_]) (await := false)
 
 /-- `crypto.randomBytes(size[, callback])` (added in Node.js v0.5.8): `Uint8Array randomBytes(double /* integer: Nat */ size)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomBytes (size : Nat) : IO ByteArray :=
+@[macro_inline] def crypto.randomBytes (size : Nat) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.randomBytes" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.randomBytes", module := "node:crypto", path := "randomBytes", construct := false, arity := 1 }
-    (Support.args #[toJS size]) (await := false)
+    (Internal.args #[toJS size]) (await := false)
 
 /-- `crypto.randomFill(buffer[, offset][, size], callback)` (added in Node.js v7.10.0, v6.13.0): `undefined randomFill(Uint8Array buffer, Function callback)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomFill (buffer_ : ByteArray) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def crypto.randomFill (buffer_ : ByteArray) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.crypto.randomFill" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.randomFill", module := "node:crypto", path := "randomFill", construct := false, arity := 2 }
-    (Support.args #[toJS buffer_, toJS callback]) (await := false)
+    (Internal.args #[toJS buffer_, toJS callback]) (await := false)
 
 /-- `crypto.randomFill(buffer[, offset][, size], callback)` (added in Node.js v7.10.0, v6.13.0): `undefined randomFill(Uint8Array buffer, double offset, double /* integer: Nat */ size, Function callback)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomFillWithOffset (buffer_ : ByteArray) (offset : Float) (size : Nat) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def crypto.randomFillWithOffset (buffer_ : ByteArray) (offset : Float) (size : Nat) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.crypto.randomFillWithOffset" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.randomFillWithOffset", module := "node:crypto", path := "randomFill", construct := false, arity := 4 }
-    (Support.args #[toJS buffer_, toJS offset, toJS size, toJS callback]) (await := false)
+    (Internal.args #[toJS buffer_, toJS offset, toJS size, toJS callback]) (await := false)
 
 /-- `crypto.randomFillSync(buffer[, offset][, size])` (added in Node.js v7.10.0, v6.13.0): `Uint8Array randomFillSync(Uint8Array buffer, optional double offset, optional double /* integer: Nat */ size)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomFillSync (buffer_ : ByteArray) (offset : Option Float := none) (size : Option Nat := none) : IO ByteArray :=
+@[macro_inline] def crypto.randomFillSync (buffer_ : ByteArray) (offset : Option Float := none) (size : Option Nat := none) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.randomFillSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.randomFillSync", module := "node:crypto", path := "randomFillSync", construct := false, arity := 3 }
-    (Support.args #[toJS buffer_, Support.optional offset, Support.optional size]) (await := false)
+    (Internal.args #[toJS buffer_, Internal.optional offset, Internal.optional size]) (await := false)
 
 /-- `crypto.randomInt([min, ]max[, callback])` (added in Node.js v14.10.0, v12.19.0): `long long randomInt(long long max)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomInt (max : Int) : IO Int :=
+@[macro_inline] def crypto.randomInt (max : Int) : IO Int := Internal.api "Lasm.JS.Node.crypto.randomInt" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.crypto.randomInt", module := "node:crypto", path := "randomInt", construct := false, arity := 1 }
-    (Support.args #[toJS max]) (await := false)
+    (Internal.args #[toJS max]) (await := false)
 
 /-- `crypto.randomInt([min, ]max[, callback])` (added in Node.js v14.10.0, v12.19.0): `long long randomInt(long long min, long long max)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomIntWithMin (min : Int) (max : Int) : IO Int :=
+@[macro_inline] def crypto.randomIntWithMin (min : Int) (max : Int) : IO Int := Internal.api "Lasm.JS.Node.crypto.randomIntWithMin" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.crypto.randomIntWithMin", module := "node:crypto", path := "randomInt", construct := false, arity := 2 }
-    (Support.args #[toJS min, toJS max]) (await := false)
+    (Internal.args #[toJS min, toJS max]) (await := false)
 
 /-- `crypto.randomUUIDv7([options])` (added in Node.js v24.16.0): `DOMString randomUUIDv7(optional crypto.RandomUUIDv7Options options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomUUIDv7 (options : Option crypto.RandomUUIDv7Options := none) : IO String :=
+@[macro_inline] def crypto.randomUUIDv7 (options : Option crypto.RandomUUIDv7Options := none) : IO String := Internal.api "Lasm.JS.Node.crypto.randomUUIDv7" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.crypto.randomUUIDv7", module := "node:crypto", path := "randomUUIDv7", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `crypto.scrypt(password, salt, keylen[, options], callback)` (added in Node.js v10.5.0): `Promise<Uint8Array> scrypt((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ keylen, optional crypto.ScryptOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.scrypt (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Nat) (options : Option crypto.ScryptOptions := none) : Async ByteArray :=
-  Support.promisified ByteArray "node:crypto" "scrypt" (Support.args #[toJS password, toJS salt, toJS keylen, Support.optional options])
+@[macro_inline] def crypto.scrypt (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Nat) (options : Option crypto.ScryptOptions := none) : Async ByteArray := Internal.api "Lasm.JS.Node.crypto.scrypt" do
+  Support.promisified ByteArray "node:crypto" "scrypt" (Internal.args #[toJS password, toJS salt, toJS keylen, Internal.optional options])
 
 /-- `crypto.scryptSync(password, salt, keylen[, options])` (added in Node.js v10.5.0): `Uint8Array scryptSync((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ keylen, optional crypto.ScryptSyncOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.scryptSync (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Nat) (options : Option crypto.ScryptSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def crypto.scryptSync (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Nat) (options : Option crypto.ScryptSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.scryptSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.scryptSync", module := "node:crypto", path := "scryptSync", construct := false, arity := 4 }
-    (Support.args #[toJS password, toJS salt, toJS keylen, Support.optional options]) (await := false)
+    (Internal.args #[toJS password, toJS salt, toJS keylen, Internal.optional options]) (await := false)
 
 /-- `crypto.secureHeapUsed()` (added in Node.js v15.6.0): `object secureHeapUsed()` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.secureHeapUsed : IO Data :=
+@[macro_inline] def crypto.secureHeapUsed : IO Data := Internal.api "Lasm.JS.Node.crypto.secureHeapUsed" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.secureHeapUsed", module := "node:crypto", path := "secureHeapUsed", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `crypto.setEngine(engine[, flags])` (added in Node.js v0.11.11): `undefined setEngine(DOMString engine, optional object flags)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.setEngine (engine : String) (flags : Data := .undefined) : IO Unit :=
+@[macro_inline] def crypto.setEngine (engine : String) (flags : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.crypto.setEngine" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.setEngine", module := "node:crypto", path := "setEngine", construct := false, arity := 2 }
-    (Support.args #[toJS engine, flags]) (await := false)
+    (Internal.args #[toJS engine, flags]) (await := false)
 
 /-- `crypto.setFips(bool)` (added in Node.js v10.0.0): `undefined setFips(boolean bool)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.setFips (bool : Bool) : IO Unit :=
+@[macro_inline] def crypto.setFips (bool : Bool) : IO Unit := Internal.api "Lasm.JS.Node.crypto.setFips" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.setFips", module := "node:crypto", path := "setFips", construct := false, arity := 1 }
-    (Support.args #[toJS bool]) (await := false)
+    (Internal.args #[toJS bool]) (await := false)
 
 /-- `crypto.sign(algorithm, data, key[, callback])` (added in Node.js v12.0.0): `Uint8Array sign(any algorithm, any data, any key, optional any callback)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.sign (algorithm : Data) (data : Data) (key : Data) (callback : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def crypto.sign (algorithm : Data) (data : Data) (key : Data) (callback : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.crypto.sign" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.sign", module := "node:crypto", path := "sign", construct := false, arity := 4 }
-    (Support.args #[toJS algorithm, toJS data, toJS key, callback]) (await := false)
+    (Internal.args #[toJS algorithm, toJS data, toJS key, callback]) (await := false)
 
 /-- `crypto.timingSafeEqual(a, b)` (added in Node.js v6.6.0): `boolean timingSafeEqual(Uint8Array a, Uint8Array b)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.timingSafeEqual (a : ByteArray) (b : ByteArray) : IO Bool :=
+@[macro_inline] def crypto.timingSafeEqual (a : ByteArray) (b : ByteArray) : IO Bool := Internal.api "Lasm.JS.Node.crypto.timingSafeEqual" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.crypto.timingSafeEqual", module := "node:crypto", path := "timingSafeEqual", construct := false, arity := 2 }
-    (Support.args #[toJS a, toJS b]) (await := false)
+    (Internal.args #[toJS a, toJS b]) (await := false)
 
 /-- `crypto.verify(algorithm, data, key, signature[, callback])` (added in Node.js v12.0.0): `boolean verify(any algorithm, any data, any key, any signature, optional any callback)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.verify (algorithm : Data) (data : Data) (key : Data) (signature : Data) (callback : Data := .undefined) : IO Bool :=
+@[macro_inline] def crypto.verify (algorithm : Data) (data : Data) (key : Data) (signature : Data) (callback : Data := .undefined) : IO Bool := Internal.api "Lasm.JS.Node.crypto.verify" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.crypto.verify", module := "node:crypto", path := "verify", construct := false, arity := 5 }
-    (Support.args #[toJS algorithm, toJS data, toJS key, toJS signature, callback]) (await := false)
+    (Internal.args #[toJS algorithm, toJS data, toJS key, toJS signature, callback]) (await := false)
 
 end Lasm.JS.Node

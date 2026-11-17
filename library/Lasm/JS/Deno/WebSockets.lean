@@ -8,10 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.Websockets
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `dictionary UpgradeWebSocketOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UpgradeWebSocketOptions where
@@ -21,25 +25,25 @@ structure UpgradeWebSocketOptions where
   idleTimeout : Option Nat := none
   /-- `Uint8Array head` -/
   head : Option ByteArray := none
-instance : ToJS UpgradeWebSocketOptions := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),
-    ("idleTimeout", Support.optional d.idleTimeout),
-    ("head", Support.optional d.head)]⟩
+instance : ToJS UpgradeWebSocketOptions := ⟨fun d => Internal.fields #[("protocol", Internal.optional d.protocol),
+    ("idleTimeout", Internal.optional d.idleTimeout),
+    ("head", Internal.optional d.head)]⟩
 
 /-- `dictionary WebSocketUpgrade` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WebSocketUpgrade where
   /-- `required Response response` -/
   response : Response
   /-- `required WebSocket socket` -/
-  socket : Value
+  socket : WebSocket
 instance : FromJS WebSocketUpgrade where
   fromJS d := do return {
     response := ← Lasm.JS.readField Response d "response",
-    socket := ← Lasm.JS.readField Value d "socket" }
+    socket := ← Lasm.JS.readField WebSocket d "socket" }
   typeName := "Lasm.JS.Deno.WebSocketUpgrade"
 
 /-- `Deno.upgradeWebSocket(request: Request, options?: UpgradeWebSocketOptions): WebSocketUpgrade`: `WebSocketUpgrade upgradeWebSocket(Request request, optional UpgradeWebSocketOptions options)` (Deno 2.9.6 type declarations) -/
-def upgradeWebSocket (request : Request) (options : Option UpgradeWebSocketOptions := none) : IO WebSocketUpgrade :=
+@[macro_inline] def upgradeWebSocket (request : Request) (options : Option UpgradeWebSocketOptions := none) : IO WebSocketUpgrade := Internal.api "Lasm.JS.Deno.upgradeWebSocket" do
   Lasm.JS.Binding.invoke WebSocketUpgrade { name := "Lasm.JS.Deno.upgradeWebSocket", module := "globalThis", path := "Deno.upgradeWebSocket", construct := false, arity := 2 }
-    (Support.args #[toJS request, Support.optional options]) (await := false)
+    (Internal.args #[toJS request, Internal.optional options]) (await := false)
 
 end Lasm.JS.Deno

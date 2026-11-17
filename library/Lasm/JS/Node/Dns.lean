@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Buffer
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class dnsPromises.Resolver` of `node:dns/promises` (Node.js 24.22.2 documentation, dns.md): a handle to the JavaScript object. -/
 structure dnsPromises.Resolver where
@@ -42,11 +45,11 @@ structure dns.LookupOptions where
   order : Option String := none
   /-- `boolean verbatim` -/
   verbatim : Option Bool := none
-instance instToJSDnsLookupOptions : ToJS dns.LookupOptions := ⟨fun d => Support.fields #[("family", Support.optional d.family),
-    ("hints", Support.optional d.hints),
-    ("all", Support.optional d.all),
-    ("order", Support.optional d.order),
-    ("verbatim", Support.optional d.verbatim)]⟩
+instance instToJSDnsLookupOptions : ToJS dns.LookupOptions := ⟨fun d => Internal.fields #[("family", Internal.optional d.family),
+    ("hints", Internal.optional d.hints),
+    ("all", Internal.optional d.all),
+    ("order", Internal.optional d.order),
+    ("verbatim", Internal.optional d.verbatim)]⟩
 
 /-- `(long long or dns.LookupOptions)`: one constructor per member type. -/
 inductive dns.LongLongOrLookupOptions where
@@ -64,13 +67,13 @@ instance instCoeDnsLookupOptionsDnsLongLongOrLookupOptions : Coe dns.LookupOptio
 structure dns.Resolve4Options where
   /-- `boolean ttl` -/
   ttl : Option Bool := none
-instance instToJSDnsResolve4Options : ToJS dns.Resolve4Options := ⟨fun d => Support.fields #[("ttl", Support.optional d.ttl)]⟩
+instance instToJSDnsResolve4Options : ToJS dns.Resolve4Options := ⟨fun d => Internal.fields #[("ttl", Internal.optional d.ttl)]⟩
 
 /-- `dictionary dns.Resolve6Options` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure dns.Resolve6Options where
   /-- `boolean ttl` -/
   ttl : Option Bool := none
-instance instToJSDnsResolve6Options : ToJS dns.Resolve6Options := ⟨fun d => Support.fields #[("ttl", Support.optional d.ttl)]⟩
+instance instToJSDnsResolve6Options : ToJS dns.Resolve6Options := ⟨fun d => Internal.fields #[("ttl", Internal.optional d.ttl)]⟩
 
 /-- `dictionary dnsPromises.LookupOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure dnsPromises.LookupOptions where
@@ -84,11 +87,11 @@ structure dnsPromises.LookupOptions where
   order : Option String := none
   /-- `boolean verbatim` -/
   verbatim : Option Bool := none
-instance instToJSDnsPromisesLookupOptions : ToJS dnsPromises.LookupOptions := ⟨fun d => Support.fields #[("family", Support.optional d.family),
-    ("hints", Support.optional d.hints),
-    ("all", Support.optional d.all),
-    ("order", Support.optional d.order),
-    ("verbatim", Support.optional d.verbatim)]⟩
+instance instToJSDnsPromisesLookupOptions : ToJS dnsPromises.LookupOptions := ⟨fun d => Internal.fields #[("family", Internal.optional d.family),
+    ("hints", Internal.optional d.hints),
+    ("all", Internal.optional d.all),
+    ("order", Internal.optional d.order),
+    ("verbatim", Internal.optional d.verbatim)]⟩
 
 /-- `(long long or dnsPromises.LookupOptions)`: one constructor per member type. -/
 inductive dnsPromises.LongLongOrLookupOptions where
@@ -106,234 +109,234 @@ instance instCoeDnsPromisesLookupOptionsDnsPromisesLongLongOrLookupOptions : Coe
 structure dnsPromises.Resolve4Options where
   /-- `boolean ttl` -/
   ttl : Option Bool := none
-instance instToJSDnsPromisesResolve4Options : ToJS dnsPromises.Resolve4Options := ⟨fun d => Support.fields #[("ttl", Support.optional d.ttl)]⟩
+instance instToJSDnsPromisesResolve4Options : ToJS dnsPromises.Resolve4Options := ⟨fun d => Internal.fields #[("ttl", Internal.optional d.ttl)]⟩
 
 /-- `dictionary dnsPromises.Resolve6Options` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure dnsPromises.Resolve6Options where
   /-- `boolean ttl` -/
   ttl : Option Bool := none
-instance instToJSDnsPromisesResolve6Options : ToJS dnsPromises.Resolve6Options := ⟨fun d => Support.fields #[("ttl", Support.optional d.ttl)]⟩
+instance instToJSDnsPromisesResolve6Options : ToJS dnsPromises.Resolve6Options := ⟨fun d => Internal.fields #[("ttl", Internal.optional d.ttl)]⟩
 
 /-- `v instanceof Resolver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Resolver`). -/
-def dnsPromises.Resolver.cast? (v : Value) : IO (Option dnsPromises.Resolver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dns/promises" ["Resolver"] Value) v) then some { val := v } else none
+@[macro_inline] def dnsPromises.Resolver.cast? (v : Value) : IO (Option dnsPromises.Resolver) := Internal.api "Lasm.JS.Node.dnsPromises.Resolver.cast?" do
+  Internal.cast (Support.getExport "node:dns/promises" ["Resolver"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof Resolver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Resolver`). -/
-def dns.Resolver.cast? (v : Value) : IO (Option dns.Resolver) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dns" ["Resolver"] Value) v) then some { val := v } else none
+@[macro_inline] def dns.Resolver.cast? (v : Value) : IO (Option dns.Resolver) := Internal.api "Lasm.JS.Node.dns.Resolver.cast?" do
+  Internal.cast (Support.getExport "node:dns" ["Resolver"] Value) (fun x => { val := x }) v
 
 /-- `resolver.cancel()` (added in Node.js v8.3.0): `undefined cancel()` -/
-def dns.Resolver.cancel (self : dns.Resolver) : IO Unit :=
-  self.val.callMethod "cancel" (Support.args #[]) Unit
+@[macro_inline] def dns.Resolver.cancel (self : dns.Resolver) : IO Unit := Internal.api "Lasm.JS.Node.dns.Resolver.cancel" do
+  self.val.callMethod "cancel" (Internal.args #[]) Unit
 
 /-- `resolver.setLocalAddress([ipv4][, ipv6])` (added in Node.js v15.1.0, v14.17.0): `undefined setLocalAddress(optional DOMString ipv4, optional DOMString ipv6)` -/
-def dns.Resolver.setLocalAddress (self : dns.Resolver) (ipv4 : Option String := none) (ipv6 : Option String := none) : IO Unit :=
-  self.val.callMethod "setLocalAddress" (Support.args #[Support.optional ipv4, Support.optional ipv6]) Unit
+@[macro_inline] def dns.Resolver.setLocalAddress (self : dns.Resolver) (ipv4 : Option String := none) (ipv6 : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dns.Resolver.setLocalAddress" do
+  self.val.callMethod "setLocalAddress" (Internal.args #[Internal.optional ipv4, Internal.optional ipv6]) Unit
 
 /-- `dns.getServers()` (added in Node.js v0.11.3): `sequence<DOMString> getServers()` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.getServers : IO (Array String) :=
+@[macro_inline] def dns.getServers : IO (Array String) := Internal.api "Lasm.JS.Node.dns.getServers" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.dns.getServers", module := "node:dns", path := "getServers", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `dns.lookup(hostname[, options], callback)` (added in Node.js v0.1.90): `undefined lookup(DOMString hostname, Function callback)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.lookup (hostname : String) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def dns.lookup (hostname : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.dns.lookup" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookup", module := "node:dns", path := "lookup", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, toJS callback]) (await := false)
+    (Internal.args #[toJS hostname, toJS callback]) (await := false)
 
 /-- `dns.lookup(hostname[, options], callback)` (added in Node.js v0.1.90): `undefined lookup(DOMString hostname, (long long or dns.LookupOptions) options, Function callback)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.lookupWithOptions (hostname : String) (options : dns.LongLongOrLookupOptions) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def dns.lookupWithOptions (hostname : String) (options : dns.LongLongOrLookupOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.dns.lookupWithOptions" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookupWithOptions", module := "node:dns", path := "lookup", construct := false, arity := 3 }
-    (Support.args #[toJS hostname, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS hostname, toJS options, toJS callback]) (await := false)
 
 /-- `dns.lookup()`: `undefined lookup()` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.lookup0 : IO Unit :=
+@[macro_inline] def dns.lookup0 : IO Unit := Internal.api "Lasm.JS.Node.dns.lookup0" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookup0", module := "node:dns", path := "lookup", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `dns.lookupService(address, port, callback)` (added in Node.js v0.11.14): `undefined lookupService(DOMString address, double /* integer: Nat */ port, Function callback)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.lookupService (address : String) (port : Nat) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def dns.lookupService (address : String) (port : Nat) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.dns.lookupService" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookupService", module := "node:dns", path := "lookupService", construct := false, arity := 3 }
-    (Support.args #[toJS address, toJS port, toJS callback]) (await := false)
+    (Internal.args #[toJS address, toJS port, toJS callback]) (await := false)
 
 /-- `dns.resolve(hostname[, rrtype], callback)` (added in Node.js v0.1.27): `Promise<(sequence<DOMString> or sequence<object> or object)> resolve(DOMString hostname, optional DOMString rrtype)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolve (hostname : String) (rrtype : Option String := none) : Async Data :=
-  Support.promisified Data "node:dns" "resolve" (Support.args #[toJS hostname, Support.optional rrtype])
+@[macro_inline] def dns.resolve (hostname : String) (rrtype : Option String := none) : Async Data := Internal.api "Lasm.JS.Node.dns.resolve" do
+  Support.promisified Data "node:dns" "resolve" (Internal.args #[toJS hostname, Internal.optional rrtype])
 
 /-- `dns.resolve4(hostname[, options], callback)` (added in Node.js v0.1.16): `Promise<(sequence<DOMString> or sequence<object>)> resolve4(DOMString hostname, optional dns.Resolve4Options options)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolve4 (hostname : String) (options : Option dns.Resolve4Options := none) : Async Data :=
-  Support.promisified Data "node:dns" "resolve4" (Support.args #[toJS hostname, Support.optional options])
+@[macro_inline] def dns.resolve4 (hostname : String) (options : Option dns.Resolve4Options := none) : Async Data := Internal.api "Lasm.JS.Node.dns.resolve4" do
+  Support.promisified Data "node:dns" "resolve4" (Internal.args #[toJS hostname, Internal.optional options])
 
 /-- `dns.resolve6(hostname[, options], callback)` (added in Node.js v0.1.16): `Promise<(sequence<DOMString> or sequence<object>)> resolve6(DOMString hostname, optional dns.Resolve6Options options)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolve6 (hostname : String) (options : Option dns.Resolve6Options := none) : Async Data :=
-  Support.promisified Data "node:dns" "resolve6" (Support.args #[toJS hostname, Support.optional options])
+@[macro_inline] def dns.resolve6 (hostname : String) (options : Option dns.Resolve6Options := none) : Async Data := Internal.api "Lasm.JS.Node.dns.resolve6" do
+  Support.promisified Data "node:dns" "resolve6" (Internal.args #[toJS hostname, Internal.optional options])
 
 /-- `dns.resolveAny(hostname, callback)`: `Promise<sequence<object>> resolveAny(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveAny (hostname : String) : Async (Array Data) :=
-  Support.promisified (Array Data) "node:dns" "resolveAny" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveAny (hostname : String) : Async (Array Data) := Internal.api "Lasm.JS.Node.dns.resolveAny" do
+  Support.promisified (Array Data) "node:dns" "resolveAny" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveCname(hostname, callback)` (added in Node.js v0.3.2): `Promise<sequence<DOMString>> resolveCname(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveCname (hostname : String) : Async (Array String) :=
-  Support.promisified (Array String) "node:dns" "resolveCname" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveCname (hostname : String) : Async (Array String) := Internal.api "Lasm.JS.Node.dns.resolveCname" do
+  Support.promisified (Array String) "node:dns" "resolveCname" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveCaa(hostname, callback)` (added in Node.js v15.0.0, v14.17.0): `Promise<sequence<object>> resolveCaa(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveCaa (hostname : String) : Async (Array Data) :=
-  Support.promisified (Array Data) "node:dns" "resolveCaa" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveCaa (hostname : String) : Async (Array Data) := Internal.api "Lasm.JS.Node.dns.resolveCaa" do
+  Support.promisified (Array Data) "node:dns" "resolveCaa" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveMx(hostname, callback)` (added in Node.js v0.1.27): `Promise<sequence<object>> resolveMx(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveMx (hostname : String) : Async (Array Data) :=
-  Support.promisified (Array Data) "node:dns" "resolveMx" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveMx (hostname : String) : Async (Array Data) := Internal.api "Lasm.JS.Node.dns.resolveMx" do
+  Support.promisified (Array Data) "node:dns" "resolveMx" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveNaptr(hostname, callback)` (added in Node.js v0.9.12): `Promise<sequence<object>> resolveNaptr(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveNaptr (hostname : String) : Async (Array Data) :=
-  Support.promisified (Array Data) "node:dns" "resolveNaptr" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveNaptr (hostname : String) : Async (Array Data) := Internal.api "Lasm.JS.Node.dns.resolveNaptr" do
+  Support.promisified (Array Data) "node:dns" "resolveNaptr" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveNs(hostname, callback)` (added in Node.js v0.1.90): `Promise<sequence<DOMString>> resolveNs(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveNs (hostname : String) : Async (Array String) :=
-  Support.promisified (Array String) "node:dns" "resolveNs" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveNs (hostname : String) : Async (Array String) := Internal.api "Lasm.JS.Node.dns.resolveNs" do
+  Support.promisified (Array String) "node:dns" "resolveNs" (Internal.args #[toJS hostname])
 
 /-- `dns.resolvePtr(hostname, callback)` (added in Node.js v6.0.0): `Promise<sequence<DOMString>> resolvePtr(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolvePtr (hostname : String) : Async (Array String) :=
-  Support.promisified (Array String) "node:dns" "resolvePtr" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolvePtr (hostname : String) : Async (Array String) := Internal.api "Lasm.JS.Node.dns.resolvePtr" do
+  Support.promisified (Array String) "node:dns" "resolvePtr" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveSoa(hostname, callback)` (added in Node.js v0.11.10): `Promise<object> resolveSoa(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveSoa (hostname : String) : Async Data :=
-  Support.promisified Data "node:dns" "resolveSoa" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveSoa (hostname : String) : Async Data := Internal.api "Lasm.JS.Node.dns.resolveSoa" do
+  Support.promisified Data "node:dns" "resolveSoa" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveSrv(hostname, callback)` (added in Node.js v0.1.27): `Promise<sequence<object>> resolveSrv(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveSrv (hostname : String) : Async (Array Data) :=
-  Support.promisified (Array Data) "node:dns" "resolveSrv" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveSrv (hostname : String) : Async (Array Data) := Internal.api "Lasm.JS.Node.dns.resolveSrv" do
+  Support.promisified (Array Data) "node:dns" "resolveSrv" (Internal.args #[toJS hostname])
 
 /-- `dns.resolveTlsa(hostname, callback)` (added in Node.js v23.9.0, v22.15.0): `undefined resolveTlsa(any hostname, any callback)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveTlsa (hostname : Data) (callback : Data) : IO Unit :=
+@[macro_inline] def dns.resolveTlsa (hostname : Data) (callback : Data) : IO Unit := Internal.api "Lasm.JS.Node.dns.resolveTlsa" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.resolveTlsa", module := "node:dns", path := "resolveTlsa", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, toJS callback]) (await := false)
+    (Internal.args #[toJS hostname, toJS callback]) (await := false)
 
 /-- `dns.resolveTxt(hostname, callback)` (added in Node.js v0.1.27): `Promise<sequence<DOMString>> resolveTxt(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.resolveTxt (hostname : String) : Async (Array String) :=
-  Support.promisified (Array String) "node:dns" "resolveTxt" (Support.args #[toJS hostname])
+@[macro_inline] def dns.resolveTxt (hostname : String) : Async (Array String) := Internal.api "Lasm.JS.Node.dns.resolveTxt" do
+  Support.promisified (Array String) "node:dns" "resolveTxt" (Internal.args #[toJS hostname])
 
 /-- `dns.reverse(ip, callback)` (added in Node.js v0.1.16): `Promise<sequence<DOMString>> reverse(DOMString ip)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.reverse (ip : String) : Async (Array String) :=
-  Support.promisified (Array String) "node:dns" "reverse" (Support.args #[toJS ip])
+@[macro_inline] def dns.reverse (ip : String) : Async (Array String) := Internal.api "Lasm.JS.Node.dns.reverse" do
+  Support.promisified (Array String) "node:dns" "reverse" (Internal.args #[toJS ip])
 
 /-- `dns.setDefaultResultOrder(order)` (added in Node.js v16.4.0, v14.18.0): `undefined setDefaultResultOrder(DOMString order)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.setDefaultResultOrder (order : String) : IO Unit :=
+@[macro_inline] def dns.setDefaultResultOrder (order : String) : IO Unit := Internal.api "Lasm.JS.Node.dns.setDefaultResultOrder" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.setDefaultResultOrder", module := "node:dns", path := "setDefaultResultOrder", construct := false, arity := 1 }
-    (Support.args #[toJS order]) (await := false)
+    (Internal.args #[toJS order]) (await := false)
 
 /-- `dns.getDefaultResultOrder()` (added in Node.js v20.1.0, v18.17.0): `undefined getDefaultResultOrder()` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.getDefaultResultOrder : IO Unit :=
+@[macro_inline] def dns.getDefaultResultOrder : IO Unit := Internal.api "Lasm.JS.Node.dns.getDefaultResultOrder" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.getDefaultResultOrder", module := "node:dns", path := "getDefaultResultOrder", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `dns.setServers(servers)` (added in Node.js v0.11.3): `undefined setServers(sequence<DOMString> servers)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.setServers (servers : Array String) : IO Unit :=
+@[macro_inline] def dns.setServers (servers : Array String) : IO Unit := Internal.api "Lasm.JS.Node.dns.setServers" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.setServers", module := "node:dns", path := "setServers", construct := false, arity := 1 }
-    (Support.args #[toJS servers]) (await := false)
+    (Internal.args #[toJS servers]) (await := false)
 
 /-- `dnsPromises.getServers()` (added in Node.js v10.6.0): `sequence<DOMString> getServers()` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.getServers : IO (Array String) :=
+@[macro_inline] def dnsPromises.getServers : IO (Array String) := Internal.api "Lasm.JS.Node.dnsPromises.getServers" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.dnsPromises.getServers", module := "node:dns/promises", path := "getServers", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `dnsPromises.lookup(hostname[, options])` (added in Node.js v10.6.0): `undefined lookup(DOMString hostname, optional (long long or dnsPromises.LookupOptions) options)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.lookup (hostname : String) (options : Option dnsPromises.LongLongOrLookupOptions := none) : IO Unit :=
+@[macro_inline] def dnsPromises.lookup (hostname : String) (options : Option dnsPromises.LongLongOrLookupOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.lookup" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.lookup", module := "node:dns/promises", path := "lookup", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional options]) (await := false)
+    (Internal.args #[toJS hostname, Internal.optional options]) (await := false)
 
 /-- `dnsPromises.lookupService(address, port)` (added in Node.js v10.6.0): `undefined lookupService(DOMString address, double /* integer: Nat */ port)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.lookupService (address : String) (port : Nat) : IO Unit :=
+@[macro_inline] def dnsPromises.lookupService (address : String) (port : Nat) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.lookupService" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.lookupService", module := "node:dns/promises", path := "lookupService", construct := false, arity := 2 }
-    (Support.args #[toJS address, toJS port]) (await := false)
+    (Internal.args #[toJS address, toJS port]) (await := false)
 
 /-- `dnsPromises.resolve(hostname[, rrtype])` (added in Node.js v10.6.0): `undefined resolve(DOMString hostname, optional DOMString rrtype)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolve (hostname : String) (rrtype : Option String := none) : IO Unit :=
+@[macro_inline] def dnsPromises.resolve (hostname : String) (rrtype : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolve" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolve", module := "node:dns/promises", path := "resolve", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional rrtype]) (await := false)
+    (Internal.args #[toJS hostname, Internal.optional rrtype]) (await := false)
 
 /-- `dnsPromises.resolve4(hostname[, options])` (added in Node.js v10.6.0): `undefined resolve4(DOMString hostname, optional dnsPromises.Resolve4Options options)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolve4 (hostname : String) (options : Option dnsPromises.Resolve4Options := none) : IO Unit :=
+@[macro_inline] def dnsPromises.resolve4 (hostname : String) (options : Option dnsPromises.Resolve4Options := none) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolve4" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolve4", module := "node:dns/promises", path := "resolve4", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional options]) (await := false)
+    (Internal.args #[toJS hostname, Internal.optional options]) (await := false)
 
 /-- `dnsPromises.resolve6(hostname[, options])` (added in Node.js v10.6.0): `undefined resolve6(DOMString hostname, optional dnsPromises.Resolve6Options options)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolve6 (hostname : String) (options : Option dnsPromises.Resolve6Options := none) : IO Unit :=
+@[macro_inline] def dnsPromises.resolve6 (hostname : String) (options : Option dnsPromises.Resolve6Options := none) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolve6" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolve6", module := "node:dns/promises", path := "resolve6", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional options]) (await := false)
+    (Internal.args #[toJS hostname, Internal.optional options]) (await := false)
 
 /-- `dnsPromises.resolveAny(hostname)` (added in Node.js v10.6.0): `undefined resolveAny(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveAny (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveAny (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveAny" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveAny", module := "node:dns/promises", path := "resolveAny", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveCaa(hostname)` (added in Node.js v15.0.0, v14.17.0): `undefined resolveCaa(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveCaa (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveCaa (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveCaa" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveCaa", module := "node:dns/promises", path := "resolveCaa", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveCname(hostname)` (added in Node.js v10.6.0): `undefined resolveCname(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveCname (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveCname (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveCname" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveCname", module := "node:dns/promises", path := "resolveCname", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveMx(hostname)` (added in Node.js v10.6.0): `undefined resolveMx(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveMx (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveMx (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveMx" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveMx", module := "node:dns/promises", path := "resolveMx", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveNaptr(hostname)` (added in Node.js v10.6.0): `undefined resolveNaptr(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveNaptr (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveNaptr (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveNaptr" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveNaptr", module := "node:dns/promises", path := "resolveNaptr", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveNs(hostname)` (added in Node.js v10.6.0): `undefined resolveNs(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveNs (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveNs (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveNs" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveNs", module := "node:dns/promises", path := "resolveNs", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolvePtr(hostname)` (added in Node.js v10.6.0): `undefined resolvePtr(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolvePtr (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolvePtr (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolvePtr" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolvePtr", module := "node:dns/promises", path := "resolvePtr", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveSoa(hostname)` (added in Node.js v10.6.0): `undefined resolveSoa(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveSoa (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveSoa (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveSoa" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveSoa", module := "node:dns/promises", path := "resolveSoa", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveSrv(hostname)` (added in Node.js v10.6.0): `undefined resolveSrv(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveSrv (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveSrv (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveSrv" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveSrv", module := "node:dns/promises", path := "resolveSrv", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveTlsa(hostname)` (added in Node.js v23.9.0, v22.15.0): `undefined resolveTlsa(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveTlsa (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveTlsa (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveTlsa" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveTlsa", module := "node:dns/promises", path := "resolveTlsa", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.resolveTxt(hostname)` (added in Node.js v10.6.0): `undefined resolveTxt(DOMString hostname)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.resolveTxt (hostname : String) : IO Unit :=
+@[macro_inline] def dnsPromises.resolveTxt (hostname : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.resolveTxt" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.resolveTxt", module := "node:dns/promises", path := "resolveTxt", construct := false, arity := 1 }
-    (Support.args #[toJS hostname]) (await := false)
+    (Internal.args #[toJS hostname]) (await := false)
 
 /-- `dnsPromises.reverse(ip)` (added in Node.js v10.6.0): `undefined reverse(DOMString ip)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.reverse (ip : String) : IO Unit :=
+@[macro_inline] def dnsPromises.reverse (ip : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.reverse" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.reverse", module := "node:dns/promises", path := "reverse", construct := false, arity := 1 }
-    (Support.args #[toJS ip]) (await := false)
+    (Internal.args #[toJS ip]) (await := false)
 
 /-- `dnsPromises.setDefaultResultOrder(order)` (added in Node.js v16.4.0, v14.18.0): `undefined setDefaultResultOrder(DOMString order)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.setDefaultResultOrder (order : String) : IO Unit :=
+@[macro_inline] def dnsPromises.setDefaultResultOrder (order : String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.setDefaultResultOrder" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.setDefaultResultOrder", module := "node:dns/promises", path := "setDefaultResultOrder", construct := false, arity := 1 }
-    (Support.args #[toJS order]) (await := false)
+    (Internal.args #[toJS order]) (await := false)
 
 /-- `dnsPromises.getDefaultResultOrder()` (added in Node.js v20.1.0, v18.17.0): `undefined getDefaultResultOrder()` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.getDefaultResultOrder : IO Unit :=
+@[macro_inline] def dnsPromises.getDefaultResultOrder : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.getDefaultResultOrder" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.getDefaultResultOrder", module := "node:dns/promises", path := "getDefaultResultOrder", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `dnsPromises.setServers(servers)` (added in Node.js v10.6.0): `undefined setServers(sequence<DOMString> servers)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.setServers (servers : Array String) : IO Unit :=
+@[macro_inline] def dnsPromises.setServers (servers : Array String) : IO Unit := Internal.api "Lasm.JS.Node.dnsPromises.setServers" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.setServers", module := "node:dns/promises", path := "setServers", construct := false, arity := 1 }
-    (Support.args #[toJS servers]) (await := false)
+    (Internal.args #[toJS servers]) (await := false)
 
 end Lasm.JS.Node

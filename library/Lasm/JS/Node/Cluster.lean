@@ -13,6 +13,9 @@ import Lasm.JS.Node.ChildProcess
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class cluster.Worker extends EventEmitter` of `node:cluster` (Node.js 24.22.2 documentation, cluster.md): a handle to the JavaScript object. -/
 structure cluster.Worker extends EventEmitter
@@ -58,10 +61,10 @@ instance instToJSClusterWorkerExitListener : ToJS cluster.Worker.ExitListener :=
 instance instFromJSClusterWorkerExitListener : FromJS cluster.Worker.ExitListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.cluster.Worker.ExitListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def cluster.Worker.ExitListener.ofFn (f : Float → String → Async Unit) : IO cluster.Worker.ExitListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg String args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg String args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def cluster.Worker.ExitListener.ofSyncFn (f : Float → String → IO Unit) : IO cluster.Worker.ExitListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg String args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg String args 1)) }
 
 /-- `callback cluster.Worker.ListeningListener = undefined (object address)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure cluster.Worker.ListeningListener where
@@ -72,10 +75,10 @@ instance instToJSClusterWorkerListeningListener : ToJS cluster.Worker.ListeningL
 instance instFromJSClusterWorkerListeningListener : FromJS cluster.Worker.ListeningListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.cluster.Worker.ListeningListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def cluster.Worker.ListeningListener.ofFn (f : Data → Async Unit) : IO cluster.Worker.ListeningListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def cluster.Worker.ListeningListener.ofSyncFn (f : Data → IO Unit) : IO cluster.Worker.ListeningListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback cluster.Worker.MessageListener = undefined (object message, object? handle)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure cluster.Worker.MessageListener where
@@ -86,10 +89,10 @@ instance instToJSClusterWorkerMessageListener : ToJS cluster.Worker.MessageListe
 instance instFromJSClusterWorkerMessageListener : FromJS cluster.Worker.MessageListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.cluster.Worker.MessageListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def cluster.Worker.MessageListener.ofFn (f : Data → (Option Data) → Async Unit) : IO cluster.Worker.MessageListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg (Option Data) args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def cluster.Worker.MessageListener.ofSyncFn (f : Data → (Option Data) → IO Unit) : IO cluster.Worker.MessageListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg (Option Data) args 1)) }
 
 /-- `callback cluster.Worker.OnlineListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure cluster.Worker.OnlineListener where
@@ -109,144 +112,153 @@ def cluster.Worker.OnlineListener.ofSyncFn (f : IO Unit) : IO cluster.Worker.Onl
 structure cluster.Worker.SendOptions where
   /-- `boolean keepOpen = false` -/
   keepOpen : Option Bool := none
-instance instToJSClusterWorkerSendOptions : ToJS cluster.Worker.SendOptions := ⟨fun d => Support.fields #[("keepOpen", Support.optional d.keepOpen)]⟩
+instance instToJSClusterWorkerSendOptions : ToJS cluster.Worker.SendOptions := ⟨fun d => Internal.fields #[("keepOpen", Internal.optional d.keepOpen)]⟩
 
 /-- `v instanceof Worker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Worker`). -/
-def cluster.Worker.cast? (v : Value) : IO (Option cluster.Worker) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:cluster" ["Worker"] Value) v) then some { val := v } else none
+@[macro_inline] def cluster.Worker.cast? (v : Value) : IO (Option cluster.Worker) := Internal.api "Lasm.JS.Node.cluster.Worker.cast?" do
+  Internal.cast (Support.getExport "node:cluster" ["Worker"] Value) (fun x => { val := x }) v
 
 /-- `worker.exitedAfterDisconnect` (added in Node.js v6.0.0): `readonly attribute boolean exitedAfterDisconnect` -/
-def cluster.Worker.exitedAfterDisconnect (self : cluster.Worker) : IO Bool := self.val.get "exitedAfterDisconnect" Bool
+@[macro_inline] def cluster.Worker.exitedAfterDisconnect (self : cluster.Worker) : IO Bool := Internal.api "Lasm.JS.Node.cluster.Worker.exitedAfterDisconnect" do
+  self.val.get "exitedAfterDisconnect" Bool
 
 /-- `worker.id` (added in Node.js v0.8.0): `readonly attribute long long id` -/
-def cluster.Worker.id (self : cluster.Worker) : IO Int := self.val.get "id" Int
+@[macro_inline] def cluster.Worker.id (self : cluster.Worker) : IO Int := Internal.api "Lasm.JS.Node.cluster.Worker.id" do
+  self.val.get "id" Int
 
 /-- `worker.process` (added in Node.js v0.7.0): `readonly attribute ChildProcess process` -/
-def cluster.Worker.process (self : cluster.Worker) : IO ChildProcess := do
+@[macro_inline] def cluster.Worker.process (self : cluster.Worker) : IO ChildProcess := Internal.api "Lasm.JS.Node.cluster.Worker.process" do
   let r ← self.val.get "process" Value
   pure { val := r }
 
 /-- `Event: 'disconnect'` (added in Node.js v0.7.7): `cluster.Worker onDisconnect(cluster.Worker.DisconnectListener listener)`: calls `on("disconnect", listener)` -/
-def cluster.Worker.onDisconnect (self : cluster.Worker) (listener : cluster.Worker.DisconnectListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "disconnect", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onDisconnect (self : cluster.Worker) (listener : cluster.Worker.DisconnectListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onDisconnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "disconnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'disconnect'` (added in Node.js v0.7.7): `cluster.Worker onceDisconnect(cluster.Worker.DisconnectListener listener)`: calls `once("disconnect", listener)` -/
-def cluster.Worker.onceDisconnect (self : cluster.Worker) (listener : cluster.Worker.DisconnectListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "disconnect", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceDisconnect (self : cluster.Worker) (listener : cluster.Worker.DisconnectListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceDisconnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "disconnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.7.3): `cluster.Worker onError(cluster.Worker.ErrorListener listener)`: calls `on("error", listener)` -/
-def cluster.Worker.onError (self : cluster.Worker) (listener : cluster.Worker.ErrorListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onError (self : cluster.Worker) (listener : cluster.Worker.ErrorListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.7.3): `cluster.Worker onceError(cluster.Worker.ErrorListener listener)`: calls `once("error", listener)` -/
-def cluster.Worker.onceError (self : cluster.Worker) (listener : cluster.Worker.ErrorListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceError (self : cluster.Worker) (listener : cluster.Worker.ErrorListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'exit'` (added in Node.js v0.11.2): `cluster.Worker onExit(cluster.Worker.ExitListener listener)`: calls `on("exit", listener)` -/
-def cluster.Worker.onExit (self : cluster.Worker) (listener : cluster.Worker.ExitListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onExit (self : cluster.Worker) (listener : cluster.Worker.ExitListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onExit" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'exit'` (added in Node.js v0.11.2): `cluster.Worker onceExit(cluster.Worker.ExitListener listener)`: calls `once("exit", listener)` -/
-def cluster.Worker.onceExit (self : cluster.Worker) (listener : cluster.Worker.ExitListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceExit (self : cluster.Worker) (listener : cluster.Worker.ExitListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceExit" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.7.0): `cluster.Worker onListening(cluster.Worker.ListeningListener listener)`: calls `on("listening", listener)` -/
-def cluster.Worker.onListening (self : cluster.Worker) (listener : cluster.Worker.ListeningListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onListening (self : cluster.Worker) (listener : cluster.Worker.ListeningListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onListening" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.7.0): `cluster.Worker onceListening(cluster.Worker.ListeningListener listener)`: calls `once("listening", listener)` -/
-def cluster.Worker.onceListening (self : cluster.Worker) (listener : cluster.Worker.ListeningListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceListening (self : cluster.Worker) (listener : cluster.Worker.ListeningListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceListening" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.7.0): `cluster.Worker onMessage(cluster.Worker.MessageListener listener)`: calls `on("message", listener)` -/
-def cluster.Worker.onMessage (self : cluster.Worker) (listener : cluster.Worker.MessageListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onMessage (self : cluster.Worker) (listener : cluster.Worker.MessageListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onMessage" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.7.0): `cluster.Worker onceMessage(cluster.Worker.MessageListener listener)`: calls `once("message", listener)` -/
-def cluster.Worker.onceMessage (self : cluster.Worker) (listener : cluster.Worker.MessageListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceMessage (self : cluster.Worker) (listener : cluster.Worker.MessageListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceMessage" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'online'` (added in Node.js v0.7.0): `cluster.Worker onOnline(cluster.Worker.OnlineListener listener)`: calls `on("online", listener)` -/
-def cluster.Worker.onOnline (self : cluster.Worker) (listener : cluster.Worker.OnlineListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "online", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onOnline (self : cluster.Worker) (listener : cluster.Worker.OnlineListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onOnline" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "online", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'online'` (added in Node.js v0.7.0): `cluster.Worker onceOnline(cluster.Worker.OnlineListener listener)`: calls `once("online", listener)` -/
-def cluster.Worker.onceOnline (self : cluster.Worker) (listener : cluster.Worker.OnlineListener) : IO cluster.Worker := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "online", toJS listener]) Value
+@[macro_inline] def cluster.Worker.onceOnline (self : cluster.Worker) (listener : cluster.Worker.OnlineListener) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.onceOnline" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "online", toJS listener]) Value
   pure { val := r }
 
 /-- `worker.disconnect()` (added in Node.js v0.7.7): `cluster.Worker disconnect()` -/
-def cluster.Worker.disconnect (self : cluster.Worker) : IO cluster.Worker := do
-  let r ← self.val.callMethod "disconnect" (Support.args #[]) Value
+@[macro_inline] def cluster.Worker.disconnect (self : cluster.Worker) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.Worker.disconnect" do
+  let r ← self.val.callMethod "disconnect" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `worker.isConnected()` (added in Node.js v0.11.14): `undefined isConnected()` -/
-def cluster.Worker.isConnected (self : cluster.Worker) : IO Unit :=
-  self.val.callMethod "isConnected" (Support.args #[]) Unit
+@[macro_inline] def cluster.Worker.isConnected (self : cluster.Worker) : IO Unit := Internal.api "Lasm.JS.Node.cluster.Worker.isConnected" do
+  self.val.callMethod "isConnected" (Internal.args #[]) Unit
 
 /-- `worker.isDead()` (added in Node.js v0.11.14): `undefined isDead()` -/
-def cluster.Worker.isDead (self : cluster.Worker) : IO Unit :=
-  self.val.callMethod "isDead" (Support.args #[]) Unit
+@[macro_inline] def cluster.Worker.isDead (self : cluster.Worker) : IO Unit := Internal.api "Lasm.JS.Node.cluster.Worker.isDead" do
+  self.val.callMethod "isDead" (Internal.args #[]) Unit
 
 /-- `worker.kill([signal])` (added in Node.js v0.9.12): `undefined kill(optional DOMString signal)` -/
-def cluster.Worker.kill (self : cluster.Worker) (signal : Option String := none) : IO Unit :=
-  self.val.callMethod "kill" (Support.args #[Support.optional signal]) Unit
+@[macro_inline] def cluster.Worker.kill (self : cluster.Worker) (signal : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.cluster.Worker.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional signal]) Unit
 
 /-- `worker.send(message[, sendHandle[, options]][, callback])` (added in Node.js v0.7.0): `boolean send(object message, optional object sendHandle, optional cluster.Worker.SendOptions options)` -/
-def cluster.Worker.send (self : cluster.Worker) (message : Data) (sendHandle : Data := .undefined) (options : Option cluster.Worker.SendOptions := none) : IO Bool :=
-  self.val.callMethod "send" (Support.args #[toJS message, sendHandle, Support.optional options]) Bool
+@[macro_inline] def cluster.Worker.send (self : cluster.Worker) (message : Data) (sendHandle : Data := .undefined) (options : Option cluster.Worker.SendOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.cluster.Worker.send" do
+  self.val.callMethod "send" (Internal.args #[toJS message, sendHandle, Internal.optional options]) Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `cluster.isMaster` (added in Node.js v0.8.1): `readonly attribute any isMaster` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.isMaster : IO Data := Support.getExport "node:cluster" ["isMaster"] Data
+@[macro_inline] def cluster.isMaster : IO Data := Internal.api "Lasm.JS.Node.cluster.isMaster" do
+  Support.getExport "node:cluster" ["isMaster"] Data
 
 /-- `cluster.isPrimary` (added in Node.js v16.0.0): `readonly attribute boolean isPrimary` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.isPrimary : IO Bool := Support.getExport "node:cluster" ["isPrimary"] Bool
+@[macro_inline] def cluster.isPrimary : IO Bool := Internal.api "Lasm.JS.Node.cluster.isPrimary" do
+  Support.getExport "node:cluster" ["isPrimary"] Bool
 
 /-- `cluster.isWorker` (added in Node.js v0.6.0): `readonly attribute boolean isWorker` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.isWorker : IO Bool := Support.getExport "node:cluster" ["isWorker"] Bool
+@[macro_inline] def cluster.isWorker : IO Bool := Internal.api "Lasm.JS.Node.cluster.isWorker" do
+  Support.getExport "node:cluster" ["isWorker"] Bool
 
 /-- `cluster.schedulingPolicy` (added in Node.js v0.11.2): `readonly attribute any schedulingPolicy` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.schedulingPolicy : IO Data := Support.getExport "node:cluster" ["schedulingPolicy"] Data
+@[macro_inline] def cluster.schedulingPolicy : IO Data := Internal.api "Lasm.JS.Node.cluster.schedulingPolicy" do
+  Support.getExport "node:cluster" ["schedulingPolicy"] Data
 
 /-- `cluster.settings` (added in Node.js v0.7.1): `readonly attribute object settings` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.settings : IO Data := Support.getExport "node:cluster" ["settings"] Data
+@[macro_inline] def cluster.settings : IO Data := Internal.api "Lasm.JS.Node.cluster.settings" do
+  Support.getExport "node:cluster" ["settings"] Data
 
 /-- `cluster.worker` (added in Node.js v0.7.0): `readonly attribute object worker` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.worker : IO Data := Support.getExport "node:cluster" ["worker"] Data
+@[macro_inline] def cluster.worker : IO Data := Internal.api "Lasm.JS.Node.cluster.worker" do
+  Support.getExport "node:cluster" ["worker"] Data
 
 /-- `cluster.workers` (added in Node.js v0.7.0): `readonly attribute object workers` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.workers : IO Data := Support.getExport "node:cluster" ["workers"] Data
+@[macro_inline] def cluster.workers : IO Data := Internal.api "Lasm.JS.Node.cluster.workers" do
+  Support.getExport "node:cluster" ["workers"] Data
 
 /-- `cluster.disconnect([callback])` (added in Node.js v0.7.7): `undefined disconnect()` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.disconnect : IO Unit :=
+@[macro_inline] def cluster.disconnect : IO Unit := Internal.api "Lasm.JS.Node.cluster.disconnect" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.cluster.disconnect", module := "node:cluster", path := "disconnect", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `cluster.fork([env])` (added in Node.js v0.6.0): `cluster.Worker fork(optional object env)` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.fork (env : Data := .undefined) : IO cluster.Worker := do
+@[macro_inline] def cluster.fork (env : Data := .undefined) : IO cluster.Worker := Internal.api "Lasm.JS.Node.cluster.fork" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.cluster.fork", module := "node:cluster", path := "fork", construct := false, arity := 1 }
-    (Support.args #[env]) (await := false)
+    (Internal.args #[env]) (await := false)
   pure { val := r }
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `cluster.setupMaster([settings])` (added in Node.js v0.7.1): `undefined setupMaster(optional any settings)` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.setupMaster (settings : Data := .undefined) : IO Unit :=
+@[macro_inline] def cluster.setupMaster (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.cluster.setupMaster" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.cluster.setupMaster", module := "node:cluster", path := "setupMaster", construct := false, arity := 1 }
-    (Support.args #[settings]) (await := false)
+    (Internal.args #[settings]) (await := false)
 
 /-- `cluster.setupPrimary([settings])` (added in Node.js v16.0.0): `undefined setupPrimary(optional object settings)` (Node.js 24.22.2 documentation, cluster.md) -/
-def cluster.setupPrimary (settings : Data := .undefined) : IO Unit :=
+@[macro_inline] def cluster.setupPrimary (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.cluster.setupPrimary" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.cluster.setupPrimary", module := "node:cluster", path := "setupPrimary", construct := false, arity := 1 }
-    (Support.args #[settings]) (await := false)
+    (Internal.args #[settings]) (await := false)
 
 end Lasm.JS.Node

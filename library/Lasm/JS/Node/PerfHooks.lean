@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class PerformanceNodeEntry` of `node:perf_hooks` (Node.js 24.22.2 documentation, perf_hooks.md): a handle to the JavaScript object. -/
 structure PerformanceNodeEntry where
@@ -64,13 +67,13 @@ instance : FromJS SlidingWindowHistogram := ⟨fun | .ref v _ => .ok { val := v 
 structure Histogram.MeanCIOptions where
   /-- `double confidence = 0.95` -/
   confidence : Option Float := none
-instance instToJSHistogramMeanCIOptions : ToJS Histogram.MeanCIOptions := ⟨fun d => Support.fields #[("confidence", Support.optional d.confidence)]⟩
+instance instToJSHistogramMeanCIOptions : ToJS Histogram.MeanCIOptions := ⟨fun d => Internal.fields #[("confidence", Internal.optional d.confidence)]⟩
 
 /-- `dictionary Histogram.PercentileCIOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Histogram.PercentileCIOptions where
   /-- `double confidence = 0.95` -/
   confidence : Option Float := none
-instance instToJSHistogramPercentileCIOptions : ToJS Histogram.PercentileCIOptions := ⟨fun d => Support.fields #[("confidence", Support.optional d.confidence)]⟩
+instance instToJSHistogramPercentileCIOptions : ToJS Histogram.PercentileCIOptions := ⟨fun d => Internal.fields #[("confidence", Internal.optional d.confidence)]⟩
 
 /-- `dictionary Histogram.QrdeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Histogram.QrdeOptions where
@@ -82,16 +85,16 @@ structure Histogram.QrdeOptions where
   dequantize : Option String := none
   /-- `boolean cache = false` -/
   cache : Option Bool := none
-instance instToJSHistogramQrdeOptions : ToJS Histogram.QrdeOptions := ⟨fun d => Support.fields #[("bins", Support.optional d.bins),
-    ("probabilities", Support.optional d.probabilities),
-    ("dequantize", Support.optional d.dequantize),
-    ("cache", Support.optional d.cache)]⟩
+instance instToJSHistogramQrdeOptions : ToJS Histogram.QrdeOptions := ⟨fun d => Internal.fields #[("bins", Internal.optional d.bins),
+    ("probabilities", Internal.optional d.probabilities),
+    ("dequantize", Internal.optional d.dequantize),
+    ("cache", Internal.optional d.cache)]⟩
 
 /-- `dictionary Histogram.WelchTestOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Histogram.WelchTestOptions where
   /-- `double confidence = 0.95` -/
   confidence : Option Float := none
-instance instToJSHistogramWelchTestOptions : ToJS Histogram.WelchTestOptions := ⟨fun d => Support.fields #[("confidence", Support.optional d.confidence)]⟩
+instance instToJSHistogramWelchTestOptions : ToJS Histogram.WelchTestOptions := ⟨fun d => Internal.fields #[("confidence", Internal.optional d.confidence)]⟩
 
 /-- `dictionary perf_hooks.CreateHistogramOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure perf_hooks.CreateHistogramOptions where
@@ -105,11 +108,11 @@ structure perf_hooks.CreateHistogramOptions where
   halfLife : Option Float := none
   /-- `double threshold` -/
   threshold : Option Float := none
-instance instToJSPerf_hooksCreateHistogramOptions : ToJS perf_hooks.CreateHistogramOptions := ⟨fun d => Support.fields #[("lowest", Support.optional d.lowest),
-    ("highest", Support.optional d.highest),
-    ("figures", Support.optional d.figures),
-    ("halfLife", Support.optional d.halfLife),
-    ("threshold", Support.optional d.threshold)]⟩
+instance instToJSPerf_hooksCreateHistogramOptions : ToJS perf_hooks.CreateHistogramOptions := ⟨fun d => Internal.fields #[("lowest", Internal.optional d.lowest),
+    ("highest", Internal.optional d.highest),
+    ("figures", Internal.optional d.figures),
+    ("halfLife", Internal.optional d.halfLife),
+    ("threshold", Internal.optional d.threshold)]⟩
 
 /-- `dictionary perf_hooks.CreateSlidingWindowHistogramOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure perf_hooks.CreateSlidingWindowHistogramOptions where
@@ -125,12 +128,12 @@ structure perf_hooks.CreateSlidingWindowHistogramOptions where
   highest : Option DoubleOrBigint := none
   /-- `double figures = 3` -/
   figures : Option Float := none
-instance instToJSPerf_hooksCreateSlidingWindowHistogramOptions : ToJS perf_hooks.CreateSlidingWindowHistogramOptions := ⟨fun d => Support.fields #[("chunks", Support.optional d.chunks),
-    ("chunkDuration", Support.optional d.chunkDuration),
-    ("recordsPerChunk", Support.optional d.recordsPerChunk),
-    ("lowest", Support.optional d.lowest),
-    ("highest", Support.optional d.highest),
-    ("figures", Support.optional d.figures)]⟩
+instance instToJSPerf_hooksCreateSlidingWindowHistogramOptions : ToJS perf_hooks.CreateSlidingWindowHistogramOptions := ⟨fun d => Internal.fields #[("chunks", Internal.optional d.chunks),
+    ("chunkDuration", Internal.optional d.chunkDuration),
+    ("recordsPerChunk", Internal.optional d.recordsPerChunk),
+    ("lowest", Internal.optional d.lowest),
+    ("highest", Internal.optional d.highest),
+    ("figures", Internal.optional d.figures)]⟩
 
 /-- `dictionary perf_hooks.MonitorEventLoopDelayOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure perf_hooks.MonitorEventLoopDelayOptions where
@@ -138,317 +141,348 @@ structure perf_hooks.MonitorEventLoopDelayOptions where
   samplePerIteration : Option Bool := none
   /-- `double resolution = 10` -/
   resolution : Option Float := none
-instance instToJSPerf_hooksMonitorEventLoopDelayOptions : ToJS perf_hooks.MonitorEventLoopDelayOptions := ⟨fun d => Support.fields #[("samplePerIteration", Support.optional d.samplePerIteration),
-    ("resolution", Support.optional d.resolution)]⟩
+instance instToJSPerf_hooksMonitorEventLoopDelayOptions : ToJS perf_hooks.MonitorEventLoopDelayOptions := ⟨fun d => Internal.fields #[("samplePerIteration", Internal.optional d.samplePerIteration),
+    ("resolution", Internal.optional d.resolution)]⟩
 
 /-- `dictionary perf_hooks.TimerifyOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure perf_hooks.TimerifyOptions where
   /-- `Node_RecordableHistogram histogram` -/
   histogram : Option RecordableHistogram := none
-instance instToJSPerf_hooksTimerifyOptions : ToJS perf_hooks.TimerifyOptions := ⟨fun d => Support.fields #[("histogram", Support.optional d.histogram)]⟩
+instance instToJSPerf_hooksTimerifyOptions : ToJS perf_hooks.TimerifyOptions := ⟨fun d => Internal.fields #[("histogram", Internal.optional d.histogram)]⟩
 
 /-- `dictionary performance.TimerifyOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure performance.TimerifyOptions where
   /-- `Node_RecordableHistogram histogram` -/
   histogram : Option RecordableHistogram := none
-instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions := ⟨fun d => Support.fields #[("histogram", Support.optional d.histogram)]⟩
+instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions := ⟨fun d => Internal.fields #[("histogram", Internal.optional d.histogram)]⟩
 
 /-- `v instanceof PerformanceNodeEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeEntry`). -/
-def PerformanceNodeEntry.cast? (v : Value) : IO (Option PerformanceNodeEntry) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["PerformanceNodeEntry"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceNodeEntry.cast? (v : Value) : IO (Option PerformanceNodeEntry) := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["PerformanceNodeEntry"] Value) (fun x => { val := x }) v
 
 /-- `detail` (added in Node.js v16.0.0): `readonly attribute any detail` -/
-def PerformanceNodeEntry.detail (self : PerformanceNodeEntry) : IO Data := self.val.get "detail" Data
+@[macro_inline] def PerformanceNodeEntry.detail (self : PerformanceNodeEntry) : IO Data := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.detail" do
+  self.val.get "detail" Data
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `flags` (added in Node.js v13.9.0, v12.17.0): `readonly attribute double flags` -/
-def PerformanceNodeEntry.flags (self : PerformanceNodeEntry) : IO Float := self.val.get "flags" Float
+@[macro_inline] def PerformanceNodeEntry.flags (self : PerformanceNodeEntry) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.flags" do
+  self.val.get "flags" Float
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `kind` (added in Node.js v8.5.0): `readonly attribute double kind` -/
-def PerformanceNodeEntry.kind (self : PerformanceNodeEntry) : IO Float := self.val.get "kind" Float
+@[macro_inline] def PerformanceNodeEntry.kind (self : PerformanceNodeEntry) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.kind" do
+  self.val.get "kind" Float
 
 /-- `v instanceof PerformanceNodeTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeTiming`). -/
-def PerformanceNodeTiming.cast? (v : Value) : IO (Option PerformanceNodeTiming) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["PerformanceNodeTiming"] Value) v) then some { val := v } else none
+@[macro_inline] def PerformanceNodeTiming.cast? (v : Value) : IO (Option PerformanceNodeTiming) := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["PerformanceNodeTiming"] Value) (fun x => { val := x }) v
 
 /-- `bootstrapComplete` (added in Node.js v8.5.0): `readonly attribute double bootstrapComplete` -/
-def PerformanceNodeTiming.bootstrapComplete (self : PerformanceNodeTiming) : IO Float := self.val.get "bootstrapComplete" Float
+@[macro_inline] def PerformanceNodeTiming.bootstrapComplete (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.bootstrapComplete" do
+  self.val.get "bootstrapComplete" Float
 
 /-- `environment` (added in Node.js v8.5.0): `readonly attribute double environment` -/
-def PerformanceNodeTiming.environment (self : PerformanceNodeTiming) : IO Float := self.val.get "environment" Float
+@[macro_inline] def PerformanceNodeTiming.environment (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.environment" do
+  self.val.get "environment" Float
 
 /-- `idleTime` (added in Node.js v14.10.0, v12.19.0): `readonly attribute double idleTime` -/
-def PerformanceNodeTiming.idleTime (self : PerformanceNodeTiming) : IO Float := self.val.get "idleTime" Float
+@[macro_inline] def PerformanceNodeTiming.idleTime (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.idleTime" do
+  self.val.get "idleTime" Float
 
 /-- `loopExit` (added in Node.js v8.5.0): `readonly attribute double loopExit` -/
-def PerformanceNodeTiming.loopExit (self : PerformanceNodeTiming) : IO Float := self.val.get "loopExit" Float
+@[macro_inline] def PerformanceNodeTiming.loopExit (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.loopExit" do
+  self.val.get "loopExit" Float
 
 /-- `loopStart` (added in Node.js v8.5.0): `readonly attribute double loopStart` -/
-def PerformanceNodeTiming.loopStart (self : PerformanceNodeTiming) : IO Float := self.val.get "loopStart" Float
+@[macro_inline] def PerformanceNodeTiming.loopStart (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.loopStart" do
+  self.val.get "loopStart" Float
 
 /-- `nodeStart` (added in Node.js v8.5.0): `readonly attribute double nodeStart` -/
-def PerformanceNodeTiming.nodeStart (self : PerformanceNodeTiming) : IO Float := self.val.get "nodeStart" Float
+@[macro_inline] def PerformanceNodeTiming.nodeStart (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.nodeStart" do
+  self.val.get "nodeStart" Float
 
 /-- `uvMetricsInfo` (added in Node.js v22.8.0, v20.18.0): `readonly attribute object uvMetricsInfo` -/
-def PerformanceNodeTiming.uvMetricsInfo (self : PerformanceNodeTiming) : IO Data := self.val.get "uvMetricsInfo" Data
+@[macro_inline] def PerformanceNodeTiming.uvMetricsInfo (self : PerformanceNodeTiming) : IO Data := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.uvMetricsInfo" do
+  self.val.get "uvMetricsInfo" Data
 
 /-- `v8Start` (added in Node.js v8.5.0): `readonly attribute double v8Start` -/
-def PerformanceNodeTiming.v8Start (self : PerformanceNodeTiming) : IO Float := self.val.get "v8Start" Float
+@[macro_inline] def PerformanceNodeTiming.v8Start (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.v8Start" do
+  self.val.get "v8Start" Float
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `uvMetricsInfoBigInt` (added in Node.js v26.11.0): `readonly attribute object uvMetricsInfoBigInt` -/
-def PerformanceNodeTiming.uvMetricsInfoBigInt (self : PerformanceNodeTiming) : IO Data := self.val.get "uvMetricsInfoBigInt" Data
+@[macro_inline] def PerformanceNodeTiming.uvMetricsInfoBigInt (self : PerformanceNodeTiming) : IO Data := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.uvMetricsInfoBigInt" do
+  self.val.get "uvMetricsInfoBigInt" Data
 
 /-- `v instanceof Histogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Histogram`). -/
-def Histogram.cast? (v : Value) : IO (Option Histogram) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["Histogram"] Value) v) then some { val := v } else none
+@[macro_inline] def Histogram.cast? (v : Value) : IO (Option Histogram) := Internal.api "Lasm.JS.Node.Histogram.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["Histogram"] Value) (fun x => { val := x }) v
 
 /-- `histogram.count` (added in Node.js v17.4.0, v16.14.0): `readonly attribute double /* integer: Nat */ count` -/
-def Histogram.count (self : Histogram) : IO Nat := self.val.get "count" Nat
+@[macro_inline] def Histogram.count (self : Histogram) : IO Nat := Internal.api "Lasm.JS.Node.Histogram.count" do
+  self.val.get "count" Nat
 
 /-- `histogram.countBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute bigint countBigInt` -/
-def Histogram.countBigInt (self : Histogram) : IO Int := self.val.get "countBigInt" Int
+@[macro_inline] def Histogram.countBigInt (self : Histogram) : IO Int := Internal.api "Lasm.JS.Node.Histogram.countBigInt" do
+  self.val.get "countBigInt" Int
 
 /-- `histogram.exceeds` (added in Node.js v11.10.0): `readonly attribute double exceeds` -/
-def Histogram.exceeds (self : Histogram) : IO Float := self.val.get "exceeds" Float
+@[macro_inline] def Histogram.exceeds (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.exceeds" do
+  self.val.get "exceeds" Float
 
 /-- `histogram.exceedsBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute bigint exceedsBigInt` -/
-def Histogram.exceedsBigInt (self : Histogram) : IO Int := self.val.get "exceedsBigInt" Int
+@[macro_inline] def Histogram.exceedsBigInt (self : Histogram) : IO Int := Internal.api "Lasm.JS.Node.Histogram.exceedsBigInt" do
+  self.val.get "exceedsBigInt" Int
 
 /-- `histogram.ewmaMean` (added in Node.js v24.21.0): `readonly attribute double ewmaMean` -/
-def Histogram.ewmaMean (self : Histogram) : IO Float := self.val.get "ewmaMean" Float
+@[macro_inline] def Histogram.ewmaMean (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.ewmaMean" do
+  self.val.get "ewmaMean" Float
 
 /-- `histogram.ewmaStddev` (added in Node.js v24.21.0): `readonly attribute double ewmaStddev` -/
-def Histogram.ewmaStddev (self : Histogram) : IO Float := self.val.get "ewmaStddev" Float
+@[macro_inline] def Histogram.ewmaStddev (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.ewmaStddev" do
+  self.val.get "ewmaStddev" Float
 
 /-- `histogram.ewmaErrorRate` (added in Node.js v24.21.0): `readonly attribute double ewmaErrorRate` -/
-def Histogram.ewmaErrorRate (self : Histogram) : IO Float := self.val.get "ewmaErrorRate" Float
+@[macro_inline] def Histogram.ewmaErrorRate (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.ewmaErrorRate" do
+  self.val.get "ewmaErrorRate" Float
 
 /-- `histogram.kurtosis` (added in Node.js v24.21.0): `readonly attribute double kurtosis` -/
-def Histogram.kurtosis (self : Histogram) : IO Float := self.val.get "kurtosis" Float
+@[macro_inline] def Histogram.kurtosis (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.kurtosis" do
+  self.val.get "kurtosis" Float
 
 /-- `histogram.max` (added in Node.js v11.10.0): `readonly attribute double max` -/
-def Histogram.max (self : Histogram) : IO Float := self.val.get "max" Float
+@[macro_inline] def Histogram.max (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.max" do
+  self.val.get "max" Float
 
 /-- `histogram.maxBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute bigint maxBigInt` -/
-def Histogram.maxBigInt (self : Histogram) : IO Int := self.val.get "maxBigInt" Int
+@[macro_inline] def Histogram.maxBigInt (self : Histogram) : IO Int := Internal.api "Lasm.JS.Node.Histogram.maxBigInt" do
+  self.val.get "maxBigInt" Int
 
 /-- `histogram.mean` (added in Node.js v11.10.0): `readonly attribute double mean` -/
-def Histogram.mean (self : Histogram) : IO Float := self.val.get "mean" Float
+@[macro_inline] def Histogram.mean (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.mean" do
+  self.val.get "mean" Float
 
 /-- `histogram.min` (added in Node.js v11.10.0): `readonly attribute double min` -/
-def Histogram.min (self : Histogram) : IO Float := self.val.get "min" Float
+@[macro_inline] def Histogram.min (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.min" do
+  self.val.get "min" Float
 
 /-- `histogram.minBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute bigint minBigInt` -/
-def Histogram.minBigInt (self : Histogram) : IO Int := self.val.get "minBigInt" Int
+@[macro_inline] def Histogram.minBigInt (self : Histogram) : IO Int := Internal.api "Lasm.JS.Node.Histogram.minBigInt" do
+  self.val.get "minBigInt" Int
 
 /-- `histogram.percentiles` (added in Node.js v11.10.0): `readonly attribute object percentiles` -/
-def Histogram.percentiles (self : Histogram) : IO Data := self.val.get "percentiles" Data
+@[macro_inline] def Histogram.percentiles (self : Histogram) : IO Data := Internal.api "Lasm.JS.Node.Histogram.percentiles" do
+  self.val.get "percentiles" Data
 
 /-- `histogram.percentilesBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute object percentilesBigInt` -/
-def Histogram.percentilesBigInt (self : Histogram) : IO Data := self.val.get "percentilesBigInt" Data
+@[macro_inline] def Histogram.percentilesBigInt (self : Histogram) : IO Data := Internal.api "Lasm.JS.Node.Histogram.percentilesBigInt" do
+  self.val.get "percentilesBigInt" Data
 
 /-- `histogram.skewness` (added in Node.js v24.21.0): `readonly attribute double skewness` -/
-def Histogram.skewness (self : Histogram) : IO Float := self.val.get "skewness" Float
+@[macro_inline] def Histogram.skewness (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.skewness" do
+  self.val.get "skewness" Float
 
 /-- `histogram.stddev` (added in Node.js v11.10.0): `readonly attribute double stddev` -/
-def Histogram.stddev (self : Histogram) : IO Float := self.val.get "stddev" Float
+@[macro_inline] def Histogram.stddev (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.stddev" do
+  self.val.get "stddev" Float
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.resetCount` (added in Node.js v26.11.0): `readonly attribute double resetCount` -/
-def Histogram.resetCount (self : Histogram) : IO Float := self.val.get "resetCount" Float
+@[macro_inline] def Histogram.resetCount (self : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.resetCount" do
+  self.val.get "resetCount" Float
 
 /-- `histogram.ccdf(value)` (added in Node.js v24.21.0): `double ccdf(double value)` -/
-def Histogram.ccdf (self : Histogram) (value : Float) : IO Float :=
-  self.val.callMethod "ccdf" (Support.args #[toJS value]) Float
+@[macro_inline] def Histogram.ccdf (self : Histogram) (value : Float) : IO Float := Internal.api "Lasm.JS.Node.Histogram.ccdf" do
+  self.val.callMethod "ccdf" (Internal.args #[toJS value]) Float
 
 /-- `histogram.cdf(value)` (added in Node.js v24.21.0): `double cdf(double value)` -/
-def Histogram.cdf (self : Histogram) (value : Float) : IO Float :=
-  self.val.callMethod "cdf" (Support.args #[toJS value]) Float
+@[macro_inline] def Histogram.cdf (self : Histogram) (value : Float) : IO Float := Internal.api "Lasm.JS.Node.Histogram.cdf" do
+  self.val.callMethod "cdf" (Internal.args #[toJS value]) Float
 
 /-- `histogram.cliffsD(other)` (added in Node.js v24.21.0): `double cliffsD(Histogram other)` -/
-def Histogram.cliffsD (self : Histogram) (other : Histogram) : IO Float :=
-  self.val.callMethod "cliffsD" (Support.args #[toJS other]) Float
+@[macro_inline] def Histogram.cliffsD (self : Histogram) (other : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.cliffsD" do
+  self.val.callMethod "cliffsD" (Internal.args #[toJS other]) Float
 
 /-- `histogram.cohensD(other)` (added in Node.js v24.21.0): `double cohensD(Histogram other)` -/
-def Histogram.cohensD (self : Histogram) (other : Histogram) : IO Float :=
-  self.val.callMethod "cohensD" (Support.args #[toJS other]) Float
+@[macro_inline] def Histogram.cohensD (self : Histogram) (other : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.cohensD" do
+  self.val.callMethod "cohensD" (Internal.args #[toJS other]) Float
 
 /-- `histogram.countAt(value)` (added in Node.js v24.21.0): `double countAt(double value)` -/
-def Histogram.countAt (self : Histogram) (value : Float) : IO Float :=
-  self.val.callMethod "countAt" (Support.args #[toJS value]) Float
+@[macro_inline] def Histogram.countAt (self : Histogram) (value : Float) : IO Float := Internal.api "Lasm.JS.Node.Histogram.countAt" do
+  self.val.callMethod "countAt" (Internal.args #[toJS value]) Float
 
 /-- `histogram.export()` (added in Node.js v24.22.0): `Uint8Array export()` -/
-def Histogram.«export» (self : Histogram) : IO ByteArray :=
-  self.val.callMethod "export" (Support.args #[]) ByteArray
+@[macro_inline] def Histogram.«export» (self : Histogram) : IO ByteArray := Internal.api "Lasm.JS.Node.Histogram.export" do
+  self.val.callMethod "export" (Internal.args #[]) ByteArray
 
 /-- `histogram.burnRate(sloTarget)` (added in Node.js v24.21.0): `double burnRate(double sloTarget)` -/
-def Histogram.burnRate (self : Histogram) (sloTarget : Float) : IO Float :=
-  self.val.callMethod "burnRate" (Support.args #[toJS sloTarget]) Float
+@[macro_inline] def Histogram.burnRate (self : Histogram) (sloTarget : Float) : IO Float := Internal.api "Lasm.JS.Node.Histogram.burnRate" do
+  self.val.callMethod "burnRate" (Internal.args #[toJS sloTarget]) Float
 
 /-- `histogram.ksTest(other)` (added in Node.js v24.21.0): `double ksTest(Histogram other)` -/
-def Histogram.ksTest (self : Histogram) (other : Histogram) : IO Float :=
-  self.val.callMethod "ksTest" (Support.args #[toJS other]) Float
+@[macro_inline] def Histogram.ksTest (self : Histogram) (other : Histogram) : IO Float := Internal.api "Lasm.JS.Node.Histogram.ksTest" do
+  self.val.callMethod "ksTest" (Internal.args #[toJS other]) Float
 
 /-- `histogram.linearBuckets(stepSize)` (added in Node.js v24.21.0): `object linearBuckets(double stepSize)` -/
-def Histogram.linearBuckets (self : Histogram) (stepSize : Float) : IO Data :=
-  self.val.callMethod "linearBuckets" (Support.args #[toJS stepSize]) Data
+@[macro_inline] def Histogram.linearBuckets (self : Histogram) (stepSize : Float) : IO Data := Internal.api "Lasm.JS.Node.Histogram.linearBuckets" do
+  self.val.callMethod "linearBuckets" (Internal.args #[toJS stepSize]) Data
 
 /-- `histogram.logBuckets(firstBucket, base)` (added in Node.js v24.21.0): `object logBuckets(double firstBucket, double base)` -/
-def Histogram.logBuckets (self : Histogram) (firstBucket : Float) (base : Float) : IO Data :=
-  self.val.callMethod "logBuckets" (Support.args #[toJS firstBucket, toJS base]) Data
+@[macro_inline] def Histogram.logBuckets (self : Histogram) (firstBucket : Float) (base : Float) : IO Data := Internal.api "Lasm.JS.Node.Histogram.logBuckets" do
+  self.val.callMethod "logBuckets" (Internal.args #[toJS firstBucket, toJS base]) Data
 
 /-- `histogram.mannWhitneyTest(other)` (added in Node.js v24.21.0): `object mannWhitneyTest(Histogram other)` -/
-def Histogram.mannWhitneyTest (self : Histogram) (other : Histogram) : IO Data :=
-  self.val.callMethod "mannWhitneyTest" (Support.args #[toJS other]) Data
+@[macro_inline] def Histogram.mannWhitneyTest (self : Histogram) (other : Histogram) : IO Data := Internal.api "Lasm.JS.Node.Histogram.mannWhitneyTest" do
+  self.val.callMethod "mannWhitneyTest" (Internal.args #[toJS other]) Data
 
 /-- `histogram.meanCI([options])` (added in Node.js v24.22.0): `object meanCI(optional Histogram.MeanCIOptions options)` -/
-def Histogram.meanCI (self : Histogram) (options : Option Histogram.MeanCIOptions := none) : IO Data :=
-  self.val.callMethod "meanCI" (Support.args #[Support.optional options]) Data
+@[macro_inline] def Histogram.meanCI (self : Histogram) (options : Option Histogram.MeanCIOptions := none) : IO Data := Internal.api "Lasm.JS.Node.Histogram.meanCI" do
+  self.val.callMethod "meanCI" (Internal.args #[Internal.optional options]) Data
 
 /-- `histogram.percentile(percentile)` (added in Node.js v11.10.0): `double percentile(double percentile)` -/
-def Histogram.percentile (self : Histogram) (percentile : Float) : IO Float :=
-  self.val.callMethod "percentile" (Support.args #[toJS percentile]) Float
+@[macro_inline] def Histogram.percentile (self : Histogram) (percentile : Float) : IO Float := Internal.api "Lasm.JS.Node.Histogram.percentile" do
+  self.val.callMethod "percentile" (Internal.args #[toJS percentile]) Float
 
 /-- `histogram.percentileBigInt(percentile)` (added in Node.js v17.4.0, v16.14.0): `bigint percentileBigInt(double percentile)` -/
-def Histogram.percentileBigInt (self : Histogram) (percentile : Float) : IO Int :=
-  self.val.callMethod "percentileBigInt" (Support.args #[toJS percentile]) Int
+@[macro_inline] def Histogram.percentileBigInt (self : Histogram) (percentile : Float) : IO Int := Internal.api "Lasm.JS.Node.Histogram.percentileBigInt" do
+  self.val.callMethod "percentileBigInt" (Internal.args #[toJS percentile]) Int
 
 /-- `histogram.percentileCI(percentile[, options])` (added in Node.js v24.21.0): `object percentileCI(double percentile, optional Histogram.PercentileCIOptions options)` -/
-def Histogram.percentileCI (self : Histogram) (percentile : Float) (options : Option Histogram.PercentileCIOptions := none) : IO Data :=
-  self.val.callMethod "percentileCI" (Support.args #[toJS percentile, Support.optional options]) Data
+@[macro_inline] def Histogram.percentileCI (self : Histogram) (percentile : Float) (options : Option Histogram.PercentileCIOptions := none) : IO Data := Internal.api "Lasm.JS.Node.Histogram.percentileCI" do
+  self.val.callMethod "percentileCI" (Internal.args #[toJS percentile, Internal.optional options]) Data
 
 /-- `histogram.percentilesAt(percentiles)` (added in Node.js v24.21.0): `object percentilesAt(sequence<double> percentiles)` -/
-def Histogram.percentilesAt (self : Histogram) (percentiles : Array Float) : IO Data :=
-  self.val.callMethod "percentilesAt" (Support.args #[toJS percentiles]) Data
+@[macro_inline] def Histogram.percentilesAt (self : Histogram) (percentiles : Array Float) : IO Data := Internal.api "Lasm.JS.Node.Histogram.percentilesAt" do
+  self.val.callMethod "percentilesAt" (Internal.args #[toJS percentiles]) Data
 
 /-- `histogram.qrde([options])` (added in Node.js v24.22.0): `Promise<object> qrde(optional Histogram.QrdeOptions options)` -/
-def Histogram.qrde (self : Histogram) (options : Option Histogram.QrdeOptions := none) : Async Data :=
-  self.val.callMethodAwait "qrde" (Support.args #[Support.optional options]) Data
+@[macro_inline] def Histogram.qrde (self : Histogram) (options : Option Histogram.QrdeOptions := none) : Async Data := Internal.api "Lasm.JS.Node.Histogram.qrde" do
+  self.val.callMethodAwait "qrde" (Internal.args #[Internal.optional options]) Data
 
 /-- `histogram.reset()` (added in Node.js v11.10.0): `undefined reset()` -/
-def Histogram.reset (self : Histogram) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def Histogram.reset (self : Histogram) : IO Unit := Internal.api "Lasm.JS.Node.Histogram.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `histogram.welchTest(other[, options])` (added in Node.js v24.21.0): `object welchTest(Histogram other, optional Histogram.WelchTestOptions options)` -/
-def Histogram.welchTest (self : Histogram) (other : Histogram) (options : Option Histogram.WelchTestOptions := none) : IO Data :=
-  self.val.callMethod "welchTest" (Support.args #[toJS other, Support.optional options]) Data
+@[macro_inline] def Histogram.welchTest (self : Histogram) (other : Histogram) (options : Option Histogram.WelchTestOptions := none) : IO Data := Internal.api "Lasm.JS.Node.Histogram.welchTest" do
+  self.val.callMethod "welchTest" (Internal.args #[toJS other, Internal.optional options]) Data
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.diff(other)` (added in Node.js v26.11.0): `Histogram diff(Histogram other)` -/
-def Histogram.diff (self : Histogram) (other : Histogram) : IO Histogram := do
-  let r ← self.val.callMethod "diff" (Support.args #[toJS other]) Value
+@[macro_inline] def Histogram.diff (self : Histogram) (other : Histogram) : IO Histogram := Internal.api "Lasm.JS.Node.Histogram.diff" do
+  let r ← self.val.callMethod "diff" (Internal.args #[toJS other]) Value
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.snapshot()` (added in Node.js v26.11.0): `Histogram snapshot()` -/
-def Histogram.snapshot (self : Histogram) : IO Histogram := do
-  let r ← self.val.callMethod "snapshot" (Support.args #[]) Value
+@[macro_inline] def Histogram.snapshot (self : Histogram) : IO Histogram := Internal.api "Lasm.JS.Node.Histogram.snapshot" do
+  let r ← self.val.callMethod "snapshot" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof ELDHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ELDHistogram`). -/
-def ELDHistogram.cast? (v : Value) : IO (Option ELDHistogram) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["ELDHistogram"] Value) v) then some { val := v } else none
+@[macro_inline] def ELDHistogram.cast? (v : Value) : IO (Option ELDHistogram) := Internal.api "Lasm.JS.Node.ELDHistogram.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["ELDHistogram"] Value) (fun x => { val := x }) v
 
 /-- `histogram.disable()` (added in Node.js v11.10.0): `boolean disable()` -/
-def ELDHistogram.disable (self : ELDHistogram) : IO Bool :=
-  self.val.callMethod "disable" (Support.args #[]) Bool
+@[macro_inline] def ELDHistogram.disable (self : ELDHistogram) : IO Bool := Internal.api "Lasm.JS.Node.ELDHistogram.disable" do
+  self.val.callMethod "disable" (Internal.args #[]) Bool
 
 /-- `histogram.enable()` (added in Node.js v11.10.0): `boolean enable()` -/
-def ELDHistogram.enable (self : ELDHistogram) : IO Bool :=
-  self.val.callMethod "enable" (Support.args #[]) Bool
+@[macro_inline] def ELDHistogram.enable (self : ELDHistogram) : IO Bool := Internal.api "Lasm.JS.Node.ELDHistogram.enable" do
+  self.val.callMethod "enable" (Internal.args #[]) Bool
 
 /-- `v instanceof RecordableHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RecordableHistogram`). -/
-def RecordableHistogram.cast? (v : Value) : IO (Option RecordableHistogram) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["RecordableHistogram"] Value) v) then some { val := v } else none
+@[macro_inline] def RecordableHistogram.cast? (v : Value) : IO (Option RecordableHistogram) := Internal.api "Lasm.JS.Node.RecordableHistogram.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["RecordableHistogram"] Value) (fun x => { val := x }) v
 
 /-- `histogram.add(other)` (added in Node.js v17.4.0, v16.14.0): `undefined add(RecordableHistogram other)` -/
-def RecordableHistogram.add (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit :=
-  self.val.callMethod "add" (Support.args #[toJS other]) Unit
+@[macro_inline] def RecordableHistogram.add (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.add" do
+  self.val.callMethod "add" (Internal.args #[toJS other]) Unit
 
 /-- `histogram.record(val)` (added in Node.js v15.9.0, v14.18.0): `undefined record((double or bigint) val)` -/
-def RecordableHistogram.record (self : RecordableHistogram) (val : DoubleOrBigint) : IO Unit :=
-  self.val.callMethod "record" (Support.args #[toJS val]) Unit
+@[macro_inline] def RecordableHistogram.record (self : RecordableHistogram) (val : DoubleOrBigint) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.record" do
+  self.val.callMethod "record" (Internal.args #[toJS val]) Unit
 
 /-- `histogram.recordDelta()` (added in Node.js v15.9.0, v14.18.0): `undefined recordDelta()` -/
-def RecordableHistogram.recordDelta (self : RecordableHistogram) : IO Unit :=
-  self.val.callMethod "recordDelta" (Support.args #[]) Unit
+@[macro_inline] def RecordableHistogram.recordDelta (self : RecordableHistogram) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.recordDelta" do
+  self.val.callMethod "recordDelta" (Internal.args #[]) Unit
 
 /-- `histogram.recordCorrected(val, expectedInterval)` (added in Node.js v24.21.0): `undefined recordCorrected((double or bigint) val, (double or bigint) expectedInterval)` -/
-def RecordableHistogram.recordCorrected (self : RecordableHistogram) (val : DoubleOrBigint) (expectedInterval : DoubleOrBigint) : IO Unit :=
-  self.val.callMethod "recordCorrected" (Support.args #[toJS val, toJS expectedInterval]) Unit
+@[macro_inline] def RecordableHistogram.recordCorrected (self : RecordableHistogram) (val : DoubleOrBigint) (expectedInterval : DoubleOrBigint) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.recordCorrected" do
+  self.val.callMethod "recordCorrected" (Internal.args #[toJS val, toJS expectedInterval]) Unit
 
 /-- `histogram.subtract(other)` (added in Node.js v24.21.0): `undefined subtract(RecordableHistogram other)` -/
-def RecordableHistogram.subtract (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit :=
-  self.val.callMethod "subtract" (Support.args #[toJS other]) Unit
+@[macro_inline] def RecordableHistogram.subtract (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.subtract" do
+  self.val.callMethod "subtract" (Internal.args #[toJS other]) Unit
 
 /-- `v instanceof SlidingWindowHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SlidingWindowHistogram`). -/
-def SlidingWindowHistogram.cast? (v : Value) : IO (Option SlidingWindowHistogram) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["SlidingWindowHistogram"] Value) v) then some { val := v } else none
+@[macro_inline] def SlidingWindowHistogram.cast? (v : Value) : IO (Option SlidingWindowHistogram) := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.cast?" do
+  Internal.cast (Support.getExport "node:perf_hooks" ["SlidingWindowHistogram"] Value) (fun x => { val := x }) v
 
 /-- `slidingWindowHistogram.record(val)` (added in Node.js v24.22.0): `undefined record((double or bigint) val)` -/
-def SlidingWindowHistogram.record (self : SlidingWindowHistogram) (val : DoubleOrBigint) : IO Unit :=
-  self.val.callMethod "record" (Support.args #[toJS val]) Unit
+@[macro_inline] def SlidingWindowHistogram.record (self : SlidingWindowHistogram) (val : DoubleOrBigint) : IO Unit := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.record" do
+  self.val.callMethod "record" (Internal.args #[toJS val]) Unit
 
 /-- `slidingWindowHistogram.reset()` (added in Node.js v24.22.0): `undefined reset()` -/
-def SlidingWindowHistogram.reset (self : SlidingWindowHistogram) : IO Unit :=
-  self.val.callMethod "reset" (Support.args #[]) Unit
+@[macro_inline] def SlidingWindowHistogram.reset (self : SlidingWindowHistogram) : IO Unit := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.reset" do
+  self.val.callMethod "reset" (Internal.args #[]) Unit
 
 /-- `slidingWindowHistogram.snapshot()` (added in Node.js v24.22.0): `Histogram snapshot()` -/
-def SlidingWindowHistogram.snapshot (self : SlidingWindowHistogram) : IO Histogram := do
-  let r ← self.val.callMethod "snapshot" (Support.args #[]) Value
+@[macro_inline] def SlidingWindowHistogram.snapshot (self : SlidingWindowHistogram) : IO Histogram := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.snapshot" do
+  let r ← self.val.callMethod "snapshot" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `perf_hooks.performance` (added in Node.js v8.5.0): `readonly attribute any performance` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.performance : IO Data := Support.getExport "node:perf_hooks" ["performance"] Data
+@[macro_inline] def perf_hooks.performance : IO Data := Internal.api "Lasm.JS.Node.perf_hooks.performance" do
+  Support.getExport "node:perf_hooks" ["performance"] Data
 
 /-- `perf_hooks.createHistogram([options])` (added in Node.js v15.9.0, v14.18.0): `RecordableHistogram createHistogram(optional perf_hooks.CreateHistogramOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.createHistogram (options : Option perf_hooks.CreateHistogramOptions := none) : IO RecordableHistogram := do
+@[macro_inline] def perf_hooks.createHistogram (options : Option perf_hooks.CreateHistogramOptions := none) : IO RecordableHistogram := Internal.api "Lasm.JS.Node.perf_hooks.createHistogram" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.perf_hooks.createHistogram", module := "node:perf_hooks", path := "createHistogram", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `perf_hooks.createSlidingWindowHistogram(options)` (added in Node.js v24.22.0): `SlidingWindowHistogram createSlidingWindowHistogram(perf_hooks.CreateSlidingWindowHistogramOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.createSlidingWindowHistogram (options : perf_hooks.CreateSlidingWindowHistogramOptions) : IO SlidingWindowHistogram := do
+@[macro_inline] def perf_hooks.createSlidingWindowHistogram (options : perf_hooks.CreateSlidingWindowHistogramOptions) : IO SlidingWindowHistogram := Internal.api "Lasm.JS.Node.perf_hooks.createSlidingWindowHistogram" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.perf_hooks.createSlidingWindowHistogram", module := "node:perf_hooks", path := "createSlidingWindowHistogram", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `perf_hooks.importHistogram(data)` (added in Node.js v24.22.0): `RecordableHistogram importHistogram(Uint8Array data)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.importHistogram (data : ByteArray) : IO RecordableHistogram := do
+@[macro_inline] def perf_hooks.importHistogram (data : ByteArray) : IO RecordableHistogram := Internal.api "Lasm.JS.Node.perf_hooks.importHistogram" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.perf_hooks.importHistogram", module := "node:perf_hooks", path := "importHistogram", construct := false, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
   pure { val := r }
 
 /-- `perf_hooks.eventLoopUtilization([utilization1[, utilization2]])` (added in Node.js v24.12.0): `object eventLoopUtilization(optional object utilization1, optional object utilization2)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data :=
+@[macro_inline] def perf_hooks.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.perf_hooks.eventLoopUtilization" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.perf_hooks.eventLoopUtilization", module := "node:perf_hooks", path := "eventLoopUtilization", construct := false, arity := 2 }
-    (Support.args #[utilization1, utilization2]) (await := false)
+    (Internal.args #[utilization1, utilization2]) (await := false)
 
 /-- `perf_hooks.monitorEventLoopDelay([options])` (added in Node.js v11.10.0): `ELDHistogram monitorEventLoopDelay(optional perf_hooks.MonitorEventLoopDelayOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.monitorEventLoopDelay (options : Option perf_hooks.MonitorEventLoopDelayOptions := none) : IO ELDHistogram := do
+@[macro_inline] def perf_hooks.monitorEventLoopDelay (options : Option perf_hooks.MonitorEventLoopDelayOptions := none) : IO ELDHistogram := Internal.api "Lasm.JS.Node.perf_hooks.monitorEventLoopDelay" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.perf_hooks.monitorEventLoopDelay", module := "node:perf_hooks", path := "monitorEventLoopDelay", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `perf_hooks.timerify(fn[, options])` (added in Node.js v24.12.0): `undefined timerify(Function fn, optional perf_hooks.TimerifyOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def perf_hooks.timerify (fn : JSFunction) (options : Option perf_hooks.TimerifyOptions := none) : IO Unit :=
+@[macro_inline] def perf_hooks.timerify (fn : JSFunction) (options : Option perf_hooks.TimerifyOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.timerify" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.timerify", module := "node:perf_hooks", path := "timerify", construct := false, arity := 2 }
-    (Support.args #[toJS fn, Support.optional options]) (await := false)
+    (Internal.args #[toJS fn, Internal.optional options]) (await := false)
 
 /-- `performance.nodeTiming` (added in Node.js v8.5.0): `readonly attribute PerformanceNodeTiming nodeTiming` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def performance.nodeTiming : IO PerformanceNodeTiming := do
+@[macro_inline] def performance.nodeTiming : IO PerformanceNodeTiming := Internal.api "Lasm.JS.Node.performance.nodeTiming" do
   let r ← Support.getExport "node:perf_hooks" ["performance", "nodeTiming"] Value
   pure { val := r }
 
 /-- `performance.eventLoopUtilization([utilization1[, utilization2]])` (added in Node.js v14.10.0, v12.19.0): `object eventLoopUtilization(optional object utilization1, optional object utilization2)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def performance.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data :=
+@[macro_inline] def performance.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.performance.eventLoopUtilization" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.performance.eventLoopUtilization", module := "node:perf_hooks", path := "performance.eventLoopUtilization", construct := false, arity := 2 }
-    (Support.args #[utilization1, utilization2]) (await := false)
+    (Internal.args #[utilization1, utilization2]) (await := false)
 
 /-- `performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])` (added in Node.js v18.2.0, v16.17.0): `undefined markResourceTiming(object timingInfo, DOMString requestedUrl, DOMString initiatorType, object global, DOMString cacheMode, object bodyInfo, double responseStatus, optional DOMString deliveryType)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def performance.markResourceTiming (timingInfo : Data) (requestedUrl : String) (initiatorType : String) (global : Data) (cacheMode : String) (bodyInfo : Data) (responseStatus : Float) (deliveryType : Option String := none) : IO Unit :=
+@[macro_inline] def performance.markResourceTiming (timingInfo : Data) (requestedUrl : String) (initiatorType : String) (global : Data) (cacheMode : String) (bodyInfo : Data) (responseStatus : Float) (deliveryType : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.performance.markResourceTiming" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.markResourceTiming", module := "node:perf_hooks", path := "performance.markResourceTiming", construct := false, arity := 8 }
-    (Support.args #[toJS timingInfo, toJS requestedUrl, toJS initiatorType, toJS global, toJS cacheMode, toJS bodyInfo, toJS responseStatus, Support.optional deliveryType]) (await := false)
+    (Internal.args #[toJS timingInfo, toJS requestedUrl, toJS initiatorType, toJS global, toJS cacheMode, toJS bodyInfo, toJS responseStatus, Internal.optional deliveryType]) (await := false)
 
 /-- `performance.timerify(fn[, options])` (added in Node.js v8.5.0): `undefined timerify(Function fn, optional performance.TimerifyOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-def performance.timerify (fn : JSFunction) (options : Option performance.TimerifyOptions := none) : IO Unit :=
+@[macro_inline] def performance.timerify (fn : JSFunction) (options : Option performance.TimerifyOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.performance.timerify" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.timerify", module := "node:perf_hooks", path := "performance.timerify", construct := false, arity := 2 }
-    (Support.args #[toJS fn, Support.optional options]) (await := false)
+    (Internal.args #[toJS fn, Internal.optional options]) (await := false)
 
 end Lasm.JS.Node

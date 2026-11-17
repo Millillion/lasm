@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class module.SourceMap` of `node:module` (Node.js 24.22.2 documentation, module.md): a handle to the JavaScript object. -/
 structure module.SourceMap where
@@ -30,9 +33,9 @@ structure module.RegisterOptions where
   data : Data := .undefined
   /-- `sequence<object> transferList` -/
   transferList : Option (Array Data) := none
-instance instToJSModuleRegisterOptions : ToJS module.RegisterOptions := ⟨fun d => Support.fields #[("parentURL", Support.optional d.parentURL),
+instance instToJSModuleRegisterOptions : ToJS module.RegisterOptions := ⟨fun d => Internal.fields #[("parentURL", Internal.optional d.parentURL),
     ("data", d.data),
-    ("transferList", Support.optional d.transferList)]⟩
+    ("transferList", Internal.optional d.transferList)]⟩
 
 /-- `dictionary module.RegisterHooksOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure module.RegisterHooksOptions where
@@ -40,8 +43,8 @@ structure module.RegisterHooksOptions where
   load : Option JSFunction := none
   /-- `Function? resolve` -/
   resolve : Option JSFunction := none
-instance instToJSModuleRegisterHooksOptions : ToJS module.RegisterHooksOptions := ⟨fun d => Support.fields #[("load", Support.optional d.load),
-    ("resolve", Support.optional d.resolve)]⟩
+instance instToJSModuleRegisterHooksOptions : ToJS module.RegisterHooksOptions := ⟨fun d => Internal.fields #[("load", Internal.optional d.load),
+    ("resolve", Internal.optional d.resolve)]⟩
 
 /-- `dictionary module.StripTypeScriptTypesOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure module.StripTypeScriptTypesOptions where
@@ -51,9 +54,9 @@ structure module.StripTypeScriptTypesOptions where
   sourceMap : Option Bool := none
   /-- `DOMString sourceUrl` -/
   sourceUrl : Option String := none
-instance instToJSModuleStripTypeScriptTypesOptions : ToJS module.StripTypeScriptTypesOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
-    ("sourceMap", Support.optional d.sourceMap),
-    ("sourceUrl", Support.optional d.sourceUrl)]⟩
+instance instToJSModuleStripTypeScriptTypesOptions : ToJS module.StripTypeScriptTypesOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode),
+    ("sourceMap", Internal.optional d.sourceMap),
+    ("sourceUrl", Internal.optional d.sourceUrl)]⟩
 
 /-- `dictionary module.EnableCompileCacheOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure module.EnableCompileCacheOptions where
@@ -61,8 +64,8 @@ structure module.EnableCompileCacheOptions where
   directory : Option String := none
   /-- `boolean portable` -/
   portable : Option Bool := none
-instance instToJSModuleEnableCompileCacheOptions : ToJS module.EnableCompileCacheOptions := ⟨fun d => Support.fields #[("directory", Support.optional d.directory),
-    ("portable", Support.optional d.portable)]⟩
+instance instToJSModuleEnableCompileCacheOptions : ToJS module.EnableCompileCacheOptions := ⟨fun d => Internal.fields #[("directory", Internal.optional d.directory),
+    ("portable", Internal.optional d.portable)]⟩
 
 /-- `(DOMString or module.EnableCompileCacheOptions)`: one constructor per member type. -/
 inductive module.DOMStringOrEnableCompileCacheOptions where
@@ -82,93 +85,96 @@ structure module.SetSourceMapsSupportOptions where
   nodeModules : Option Bool := none
   /-- `boolean generatedCode = false` -/
   generatedCode : Option Bool := none
-instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSupportOptions := ⟨fun d => Support.fields #[("nodeModules", Support.optional d.nodeModules),
-    ("generatedCode", Support.optional d.generatedCode)]⟩
+instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSupportOptions := ⟨fun d => Internal.fields #[("nodeModules", Internal.optional d.nodeModules),
+    ("generatedCode", Internal.optional d.generatedCode)]⟩
 
 /-- `v instanceof SourceMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceMap`). -/
-def module.SourceMap.cast? (v : Value) : IO (Option module.SourceMap) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:module" ["SourceMap"] Value) v) then some { val := v } else none
+@[macro_inline] def module.SourceMap.cast? (v : Value) : IO (Option module.SourceMap) := Internal.api "Lasm.JS.Node.module.SourceMap.cast?" do
+  Internal.cast (Support.getExport "node:module" ["SourceMap"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
-def module.SourceMap.payload (self : module.SourceMap) : IO Data := self.val.get "payload" Data
+@[macro_inline] def module.SourceMap.payload (self : module.SourceMap) : IO Data := Internal.api "Lasm.JS.Node.module.SourceMap.payload" do
+  self.val.get "payload" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.findEntry(lineOffset, columnOffset)`: `object findEntry(double lineOffset, double columnOffset)` -/
-def module.SourceMap.findEntry (self : module.SourceMap) (lineOffset : Float) (columnOffset : Float) : IO Data :=
-  self.val.callMethod "findEntry" (Support.args #[toJS lineOffset, toJS columnOffset]) Data
+@[macro_inline] def module.SourceMap.findEntry (self : module.SourceMap) (lineOffset : Float) (columnOffset : Float) : IO Data := Internal.api "Lasm.JS.Node.module.SourceMap.findEntry" do
+  self.val.callMethod "findEntry" (Internal.args #[toJS lineOffset, toJS columnOffset]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.findOrigin(lineNumber, columnNumber)` (added in Node.js v20.4.0, v18.18.0): `object findOrigin(double lineNumber, double columnNumber)` -/
-def module.SourceMap.findOrigin (self : module.SourceMap) (lineNumber : Float) (columnNumber : Float) : IO Data :=
-  self.val.callMethod "findOrigin" (Support.args #[toJS lineNumber, toJS columnNumber]) Data
+@[macro_inline] def module.SourceMap.findOrigin (self : module.SourceMap) (lineNumber : Float) (columnNumber : Float) : IO Data := Internal.api "Lasm.JS.Node.module.SourceMap.findOrigin" do
+  self.val.callMethod "findOrigin" (Internal.args #[toJS lineNumber, toJS columnNumber]) Data
 
 /-- `module.builtinModules` (added in Node.js v9.3.0, v8.10.0, v6.13.0): `readonly attribute sequence<DOMString> builtinModules` (Node.js 24.22.2 documentation, module.md) -/
-def module.builtinModules : IO (Array String) := Support.getExport "node:module" ["builtinModules"] (Array String)
+@[macro_inline] def module.builtinModules : IO (Array String) := Internal.api "Lasm.JS.Node.module.builtinModules" do
+  Support.getExport "node:module" ["builtinModules"] (Array String)
 
 /-- `module.createRequire(filename)` (added in Node.js v12.2.0): `Function createRequire((DOMString or URL) filename)` (Node.js 24.22.2 documentation, module.md) -/
-def module.createRequire (filename : DOMStringOrURL) : IO JSFunction :=
+@[macro_inline] def module.createRequire (filename : DOMStringOrURL) : IO JSFunction := Internal.api "Lasm.JS.Node.module.createRequire" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.module.createRequire", module := "node:module", path := "createRequire", construct := false, arity := 1 }
-    (Support.args #[toJS filename]) (await := false)
+    (Internal.args #[toJS filename]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.findPackageJSON(specifier[, base])` (added in Node.js v23.2.0, v22.14.0): `DOMString? findPackageJSON((DOMString or URL) specifier, optional (DOMString or URL) base)` (Node.js 24.22.2 documentation, module.md) -/
-def module.findPackageJSON (specifier : DOMStringOrURL) (base : Option DOMStringOrURL := none) : IO (Option String) :=
+@[macro_inline] def module.findPackageJSON (specifier : DOMStringOrURL) (base : Option DOMStringOrURL := none) : IO (Option String) := Internal.api "Lasm.JS.Node.module.findPackageJSON" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Node.module.findPackageJSON", module := "node:module", path := "findPackageJSON", construct := false, arity := 2 }
-    (Support.args #[toJS specifier, Support.optional base]) (await := false)
+    (Internal.args #[toJS specifier, Internal.optional base]) (await := false)
 
 /-- `module.isBuiltin(moduleName)` (added in Node.js v18.6.0, v16.17.0): `boolean isBuiltin(DOMString moduleName)` (Node.js 24.22.2 documentation, module.md) -/
-def module.isBuiltin (moduleName : String) : IO Bool :=
+@[macro_inline] def module.isBuiltin (moduleName : String) : IO Bool := Internal.api "Lasm.JS.Node.module.isBuiltin" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.module.isBuiltin", module := "node:module", path := "isBuiltin", construct := false, arity := 1 }
-    (Support.args #[toJS moduleName]) (await := false)
+    (Internal.args #[toJS moduleName]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `module.register(specifier[, parentURL][, options])` (added in Node.js v20.6.0, v18.19.0): `undefined register((DOMString or URL) specifier, optional (DOMString or URL) parentURL, optional module.RegisterOptions options)` (Node.js 24.22.2 documentation, module.md) -/
-def module.register (specifier : DOMStringOrURL) (parentURL : Option DOMStringOrURL := none) (options : Option module.RegisterOptions := none) : IO Unit :=
+@[macro_inline] def module.register (specifier : DOMStringOrURL) (parentURL : Option DOMStringOrURL := none) (options : Option module.RegisterOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.module.register" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.register", module := "node:module", path := "register", construct := false, arity := 3 }
-    (Support.args #[toJS specifier, Support.optional parentURL, Support.optional options]) (await := false)
+    (Internal.args #[toJS specifier, Internal.optional parentURL, Internal.optional options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.registerHooks(options)` (added in Node.js v23.5.0, v22.15.0): `object registerHooks(module.RegisterHooksOptions options)` (Node.js 24.22.2 documentation, module.md) -/
-def module.registerHooks (options : module.RegisterHooksOptions) : IO Data :=
+@[macro_inline] def module.registerHooks (options : module.RegisterHooksOptions) : IO Data := Internal.api "Lasm.JS.Node.module.registerHooks" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.module.registerHooks", module := "node:module", path := "registerHooks", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.stripTypeScriptTypes(code[, options])` (added in Node.js v23.2.0, v22.13.0): `DOMString stripTypeScriptTypes(DOMString code, optional module.StripTypeScriptTypesOptions options)` (Node.js 24.22.2 documentation, module.md) -/
-def module.stripTypeScriptTypes (code : String) (options : Option module.StripTypeScriptTypesOptions := none) : IO String :=
+@[macro_inline] def module.stripTypeScriptTypes (code : String) (options : Option module.StripTypeScriptTypesOptions := none) : IO String := Internal.api "Lasm.JS.Node.module.stripTypeScriptTypes" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.module.stripTypeScriptTypes", module := "node:module", path := "stripTypeScriptTypes", construct := false, arity := 2 }
-    (Support.args #[toJS code, Support.optional options]) (await := false)
+    (Internal.args #[toJS code, Internal.optional options]) (await := false)
 
 /-- `module.syncBuiltinESMExports()` (added in Node.js v12.12.0): `undefined syncBuiltinESMExports()` (Node.js 24.22.2 documentation, module.md) -/
-def module.syncBuiltinESMExports : IO Unit :=
+@[macro_inline] def module.syncBuiltinESMExports : IO Unit := Internal.api "Lasm.JS.Node.module.syncBuiltinESMExports" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.syncBuiltinESMExports", module := "node:module", path := "syncBuiltinESMExports", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `module.enableCompileCache([options])` (added in Node.js v22.8.0): `object enableCompileCache(optional (DOMString or module.EnableCompileCacheOptions) options)` (Node.js 24.22.2 documentation, module.md) -/
-def module.enableCompileCache (options : Option module.DOMStringOrEnableCompileCacheOptions := none) : IO Data :=
+@[macro_inline] def module.enableCompileCache (options : Option module.DOMStringOrEnableCompileCacheOptions := none) : IO Data := Internal.api "Lasm.JS.Node.module.enableCompileCache" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.module.enableCompileCache", module := "node:module", path := "enableCompileCache", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `module.flushCompileCache()` (added in Node.js v23.0.0, v22.10.0): `undefined flushCompileCache()` (Node.js 24.22.2 documentation, module.md) -/
-def module.flushCompileCache : IO Unit :=
+@[macro_inline] def module.flushCompileCache : IO Unit := Internal.api "Lasm.JS.Node.module.flushCompileCache" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.flushCompileCache", module := "node:module", path := "flushCompileCache", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `module.getCompileCacheDir()` (added in Node.js v22.8.0): `DOMString? getCompileCacheDir()` (Node.js 24.22.2 documentation, module.md) -/
-def module.getCompileCacheDir : IO (Option String) :=
+@[macro_inline] def module.getCompileCacheDir : IO (Option String) := Internal.api "Lasm.JS.Node.module.getCompileCacheDir" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Node.module.getCompileCacheDir", module := "node:module", path := "getCompileCacheDir", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.getSourceMapsSupport()` (added in Node.js v23.7.0, v22.14.0): `object getSourceMapsSupport()` (Node.js 24.22.2 documentation, module.md) -/
-def module.getSourceMapsSupport : IO Data :=
+@[macro_inline] def module.getSourceMapsSupport : IO Data := Internal.api "Lasm.JS.Node.module.getSourceMapsSupport" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.module.getSourceMapsSupport", module := "node:module", path := "getSourceMapsSupport", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.findSourceMap(path)` (added in Node.js v13.7.0, v12.17.0): `module.SourceMap? findSourceMap(DOMString path)` (Node.js 24.22.2 documentation, module.md) -/
-def module.findSourceMap (path_ : String) : IO (Option module.SourceMap) :=
+@[macro_inline] def module.findSourceMap (path_ : String) : IO (Option module.SourceMap) := Internal.api "Lasm.JS.Node.module.findSourceMap" do
   Lasm.JS.Binding.invoke (Option module.SourceMap) { name := "Lasm.JS.Node.module.findSourceMap", module := "node:module", path := "findSourceMap", construct := false, arity := 1 }
-    (Support.args #[toJS path_]) (await := false)
+    (Internal.args #[toJS path_]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.setSourceMapsSupport(enabled[, options])` (added in Node.js v23.7.0, v22.14.0): `undefined setSourceMapsSupport(boolean enabled, optional module.SetSourceMapsSupportOptions options)` (Node.js 24.22.2 documentation, module.md) -/
-def module.setSourceMapsSupport (enabled : Bool) (options : Option module.SetSourceMapsSupportOptions := none) : IO Unit :=
+@[macro_inline] def module.setSourceMapsSupport (enabled : Bool) (options : Option module.SetSourceMapsSupportOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.module.setSourceMapsSupport" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.setSourceMapsSupport", module := "node:module", path := "setSourceMapsSupport", construct := false, arity := 2 }
-    (Support.args #[toJS enabled, Support.optional options]) (await := false)
+    (Internal.args #[toJS enabled, Internal.optional options]) (await := false)
 
 /-- `module.constants.compileCacheStatus` (added in Node.js v22.8.0): `readonly attribute any compileCacheStatus` (Node.js 24.22.2 documentation, module.md) -/
-def module.constants.compileCacheStatus : IO Data := Support.getExport "node:module" ["constants", "compileCacheStatus"] Data
+@[macro_inline] def module.constants.compileCacheStatus : IO Data := Internal.api "Lasm.JS.Node.module.constants.compileCacheStatus" do
+  Support.getExport "node:module" ["constants", "compileCacheStatus"] Data
 
 end Lasm.JS.Node

@@ -3,7 +3,8 @@
 `App.pageSize`: the function the theorems in App.lean are about.
 -/
 import App
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lean.Data.Json
 open Lasm.JS Lasm.JS.Web Lean
 

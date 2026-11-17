@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Stream
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class v8.Serializer` of `node:v8` (Node.js 24.22.2 documentation, v8.md): a handle to the JavaScript object. -/
 structure v8.Serializer where
@@ -92,14 +95,14 @@ structure v8.GetHeapSnapshotOptions where
   exposeInternals : Option Bool := none
   /-- `boolean exposeNumericValues = false` -/
   exposeNumericValues : Option Bool := none
-instance instToJSV8GetHeapSnapshotOptions : ToJS v8.GetHeapSnapshotOptions := ⟨fun d => Support.fields #[("exposeInternals", Support.optional d.exposeInternals),
-    ("exposeNumericValues", Support.optional d.exposeNumericValues)]⟩
+instance instToJSV8GetHeapSnapshotOptions : ToJS v8.GetHeapSnapshotOptions := ⟨fun d => Internal.fields #[("exposeInternals", Internal.optional d.exposeInternals),
+    ("exposeNumericValues", Internal.optional d.exposeNumericValues)]⟩
 
 /-- `dictionary v8.QueryObjectsOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure v8.QueryObjectsOptions where
   /-- `DOMString format` -/
   format : Option String := none
-instance instToJSV8QueryObjectsOptions : ToJS v8.QueryObjectsOptions := ⟨fun d => Support.fields #[("format", Support.optional d.format)]⟩
+instance instToJSV8QueryObjectsOptions : ToJS v8.QueryObjectsOptions := ⟨fun d => Internal.fields #[("format", Internal.optional d.format)]⟩
 
 /-- `(double or sequence<DOMString>)`: one constructor per member type. -/
 inductive DoubleOrSequenceOfDOMString where
@@ -120,8 +123,8 @@ structure v8.WriteHeapSnapshotOptions where
   exposeInternals : Option Bool := none
   /-- `boolean exposeNumericValues = false` -/
   exposeNumericValues : Option Bool := none
-instance instToJSV8WriteHeapSnapshotOptions : ToJS v8.WriteHeapSnapshotOptions := ⟨fun d => Support.fields #[("exposeInternals", Support.optional d.exposeInternals),
-    ("exposeNumericValues", Support.optional d.exposeNumericValues)]⟩
+instance instToJSV8WriteHeapSnapshotOptions : ToJS v8.WriteHeapSnapshotOptions := ⟨fun d => Internal.fields #[("exposeInternals", Internal.optional d.exposeInternals),
+    ("exposeNumericValues", Internal.optional d.exposeNumericValues)]⟩
 
 /-- `dictionary v8.StartCpuProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure v8.StartCpuProfileOptions where
@@ -129,8 +132,8 @@ structure v8.StartCpuProfileOptions where
   sampleInterval : Option Float := none
   /-- `long long maxBufferSize = 4294967295` -/
   maxBufferSize : Option Int := none
-instance instToJSV8StartCpuProfileOptions : ToJS v8.StartCpuProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
-    ("maxBufferSize", Support.optional d.maxBufferSize)]⟩
+instance instToJSV8StartCpuProfileOptions : ToJS v8.StartCpuProfileOptions := ⟨fun d => Internal.fields #[("sampleInterval", Internal.optional d.sampleInterval),
+    ("maxBufferSize", Internal.optional d.maxBufferSize)]⟩
 
 /-- `dictionary v8.StartHeapProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure v8.StartHeapProfileOptions where
@@ -144,11 +147,11 @@ structure v8.StartHeapProfileOptions where
   includeObjectsCollectedByMajorGC : Option Bool := none
   /-- `boolean includeObjectsCollectedByMinorGC = false` -/
   includeObjectsCollectedByMinorGC : Option Bool := none
-instance instToJSV8StartHeapProfileOptions : ToJS v8.StartHeapProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
-    ("stackDepth", Support.optional d.stackDepth),
-    ("forceGC", Support.optional d.forceGC),
-    ("includeObjectsCollectedByMajorGC", Support.optional d.includeObjectsCollectedByMajorGC),
-    ("includeObjectsCollectedByMinorGC", Support.optional d.includeObjectsCollectedByMinorGC)]⟩
+instance instToJSV8StartHeapProfileOptions : ToJS v8.StartHeapProfileOptions := ⟨fun d => Internal.fields #[("sampleInterval", Internal.optional d.sampleInterval),
+    ("stackDepth", Internal.optional d.stackDepth),
+    ("forceGC", Internal.optional d.forceGC),
+    ("includeObjectsCollectedByMajorGC", Internal.optional d.includeObjectsCollectedByMajorGC),
+    ("includeObjectsCollectedByMinorGC", Internal.optional d.includeObjectsCollectedByMinorGC)]⟩
 
 /-- `dictionary promiseHooks.CreateHookCallbacks` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure promiseHooks.CreateHookCallbacks where
@@ -160,297 +163,297 @@ structure promiseHooks.CreateHookCallbacks where
   after : Option JSFunction := none
   /-- `Function settled` -/
   settled : Option JSFunction := none
-instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookCallbacks := ⟨fun d => Support.fields #[("init", Support.optional d.init),
-    ("before", Support.optional d.before),
-    ("after", Support.optional d.after),
-    ("settled", Support.optional d.settled)]⟩
+instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookCallbacks := ⟨fun d => Internal.fields #[("init", Internal.optional d.init),
+    ("before", Internal.optional d.before),
+    ("after", Internal.optional d.after),
+    ("settled", Internal.optional d.settled)]⟩
 
 /-- `v instanceof Serializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Serializer`). -/
-def v8.Serializer.cast? (v : Value) : IO (Option v8.Serializer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["Serializer"] Value) v) then some { val := v } else none
+@[macro_inline] def v8.Serializer.cast? (v : Value) : IO (Option v8.Serializer) := Internal.api "Lasm.JS.Node.v8.Serializer.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["Serializer"] Value) (fun x => { val := x }) v
 
 /-- `serializer.writeHeader()`: `undefined writeHeader()` -/
-def v8.Serializer.writeHeader (self : v8.Serializer) : IO Unit :=
-  self.val.callMethod "writeHeader" (Support.args #[]) Unit
+@[macro_inline] def v8.Serializer.writeHeader (self : v8.Serializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeHeader" do
+  self.val.callMethod "writeHeader" (Internal.args #[]) Unit
 
 /-- `serializer.writeValue(value)`: `undefined writeValue(any value)` -/
-def v8.Serializer.writeValue (self : v8.Serializer) (value : Data) : IO Unit :=
-  self.val.callMethod "writeValue" (Support.args #[toJS value]) Unit
+@[macro_inline] def v8.Serializer.writeValue (self : v8.Serializer) (value : Data) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeValue" do
+  self.val.callMethod "writeValue" (Internal.args #[toJS value]) Unit
 
 /-- `serializer.releaseBuffer()`: `Uint8Array releaseBuffer()` -/
-def v8.Serializer.releaseBuffer (self : v8.Serializer) : IO ByteArray :=
-  self.val.callMethod "releaseBuffer" (Support.args #[]) ByteArray
+@[macro_inline] def v8.Serializer.releaseBuffer (self : v8.Serializer) : IO ByteArray := Internal.api "Lasm.JS.Node.v8.Serializer.releaseBuffer" do
+  self.val.callMethod "releaseBuffer" (Internal.args #[]) ByteArray
 
 /-- `serializer.transferArrayBuffer(id, arrayBuffer)`: `undefined transferArrayBuffer(long long id, ArrayBuffer arrayBuffer)` -/
-def v8.Serializer.transferArrayBuffer (self : v8.Serializer) (id : Int) (arrayBuffer : ByteArray) : IO Unit :=
-  self.val.callMethod "transferArrayBuffer" (Support.args #[toJS id, toJS arrayBuffer]) Unit
+@[macro_inline] def v8.Serializer.transferArrayBuffer (self : v8.Serializer) (id : Int) (arrayBuffer : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.transferArrayBuffer" do
+  self.val.callMethod "transferArrayBuffer" (Internal.args #[toJS id, toJS arrayBuffer]) Unit
 
 /-- `serializer.writeUint32(value)`: `undefined writeUint32(long long value)` -/
-def v8.Serializer.writeUint32 (self : v8.Serializer) (value : Int) : IO Unit :=
-  self.val.callMethod "writeUint32" (Support.args #[toJS value]) Unit
+@[macro_inline] def v8.Serializer.writeUint32 (self : v8.Serializer) (value : Int) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeUint32" do
+  self.val.callMethod "writeUint32" (Internal.args #[toJS value]) Unit
 
 /-- `serializer.writeUint64(hi, lo)`: `undefined writeUint64(long long hi, long long lo)` -/
-def v8.Serializer.writeUint64 (self : v8.Serializer) (hi : Int) (lo : Int) : IO Unit :=
-  self.val.callMethod "writeUint64" (Support.args #[toJS hi, toJS lo]) Unit
+@[macro_inline] def v8.Serializer.writeUint64 (self : v8.Serializer) (hi : Int) (lo : Int) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeUint64" do
+  self.val.callMethod "writeUint64" (Internal.args #[toJS hi, toJS lo]) Unit
 
 /-- `serializer.writeDouble(value)`: `undefined writeDouble(double value)` -/
-def v8.Serializer.writeDouble (self : v8.Serializer) (value : Float) : IO Unit :=
-  self.val.callMethod "writeDouble" (Support.args #[toJS value]) Unit
+@[macro_inline] def v8.Serializer.writeDouble (self : v8.Serializer) (value : Float) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeDouble" do
+  self.val.callMethod "writeDouble" (Internal.args #[toJS value]) Unit
 
 /-- `serializer.writeRawBytes(buffer)`: `undefined writeRawBytes(Uint8Array buffer)` -/
-def v8.Serializer.writeRawBytes (self : v8.Serializer) (buffer_ : ByteArray) : IO Unit :=
-  self.val.callMethod "writeRawBytes" (Support.args #[toJS buffer_]) Unit
+@[macro_inline] def v8.Serializer.writeRawBytes (self : v8.Serializer) (buffer_ : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeRawBytes" do
+  self.val.callMethod "writeRawBytes" (Internal.args #[toJS buffer_]) Unit
 
 /-- `serializer._writeHostObject(object)`: `undefined writeHostObject(object object)` -/
-def v8.Serializer.writeHostObject (self : v8.Serializer) (object : Data) : IO Unit :=
-  self.val.callMethod "writeHostObject" (Support.args #[toJS object]) Unit
+@[macro_inline] def v8.Serializer.writeHostObject (self : v8.Serializer) (object : Data) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeHostObject" do
+  self.val.callMethod "writeHostObject" (Internal.args #[toJS object]) Unit
 
 /-- `serializer._getDataCloneError(message)`: `undefined getDataCloneError(DOMString message)` -/
-def v8.Serializer.getDataCloneError (self : v8.Serializer) (message : String) : IO Unit :=
-  self.val.callMethod "getDataCloneError" (Support.args #[toJS message]) Unit
+@[macro_inline] def v8.Serializer.getDataCloneError (self : v8.Serializer) (message : String) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.getDataCloneError" do
+  self.val.callMethod "getDataCloneError" (Internal.args #[toJS message]) Unit
 
 /-- `serializer._getSharedArrayBufferId(sharedArrayBuffer)`: `undefined getSharedArrayBufferId(Uint8Array sharedArrayBuffer)` -/
-def v8.Serializer.getSharedArrayBufferId (self : v8.Serializer) (sharedArrayBuffer : ByteArray) : IO Unit :=
-  self.val.callMethod "getSharedArrayBufferId" (Support.args #[toJS sharedArrayBuffer]) Unit
+@[macro_inline] def v8.Serializer.getSharedArrayBufferId (self : v8.Serializer) (sharedArrayBuffer : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.getSharedArrayBufferId" do
+  self.val.callMethod "getSharedArrayBufferId" (Internal.args #[toJS sharedArrayBuffer]) Unit
 
 /-- `serializer._setTreatArrayBufferViewsAsHostObjects(flag)`: `undefined setTreatArrayBufferViewsAsHostObjects(boolean flag)` -/
-def v8.Serializer.setTreatArrayBufferViewsAsHostObjects (self : v8.Serializer) (flag : Bool) : IO Unit :=
-  self.val.callMethod "setTreatArrayBufferViewsAsHostObjects" (Support.args #[toJS flag]) Unit
+@[macro_inline] def v8.Serializer.setTreatArrayBufferViewsAsHostObjects (self : v8.Serializer) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.setTreatArrayBufferViewsAsHostObjects" do
+  self.val.callMethod "setTreatArrayBufferViewsAsHostObjects" (Internal.args #[toJS flag]) Unit
 
 /-- `v instanceof Deserializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Deserializer`). -/
-def v8.Deserializer.cast? (v : Value) : IO (Option v8.Deserializer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["Deserializer"] Value) v) then some { val := v } else none
+@[macro_inline] def v8.Deserializer.cast? (v : Value) : IO (Option v8.Deserializer) := Internal.api "Lasm.JS.Node.v8.Deserializer.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["Deserializer"] Value) (fun x => { val := x }) v
 
 /-- `deserializer.readHeader()`: `undefined readHeader()` -/
-def v8.Deserializer.readHeader (self : v8.Deserializer) : IO Unit :=
-  self.val.callMethod "readHeader" (Support.args #[]) Unit
+@[macro_inline] def v8.Deserializer.readHeader (self : v8.Deserializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.readHeader" do
+  self.val.callMethod "readHeader" (Internal.args #[]) Unit
 
 /-- `deserializer.readValue()`: `undefined readValue()` -/
-def v8.Deserializer.readValue (self : v8.Deserializer) : IO Unit :=
-  self.val.callMethod "readValue" (Support.args #[]) Unit
+@[macro_inline] def v8.Deserializer.readValue (self : v8.Deserializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.readValue" do
+  self.val.callMethod "readValue" (Internal.args #[]) Unit
 
 /-- `deserializer.transferArrayBuffer(id, arrayBuffer)`: `undefined transferArrayBuffer(long long id, Uint8Array arrayBuffer)` -/
-def v8.Deserializer.transferArrayBuffer (self : v8.Deserializer) (id : Int) (arrayBuffer : ByteArray) : IO Unit :=
-  self.val.callMethod "transferArrayBuffer" (Support.args #[toJS id, toJS arrayBuffer]) Unit
+@[macro_inline] def v8.Deserializer.transferArrayBuffer (self : v8.Deserializer) (id : Int) (arrayBuffer : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.transferArrayBuffer" do
+  self.val.callMethod "transferArrayBuffer" (Internal.args #[toJS id, toJS arrayBuffer]) Unit
 
 /-- `deserializer.getWireFormatVersion()`: `long long getWireFormatVersion()` -/
-def v8.Deserializer.getWireFormatVersion (self : v8.Deserializer) : IO Int :=
-  self.val.callMethod "getWireFormatVersion" (Support.args #[]) Int
+@[macro_inline] def v8.Deserializer.getWireFormatVersion (self : v8.Deserializer) : IO Int := Internal.api "Lasm.JS.Node.v8.Deserializer.getWireFormatVersion" do
+  self.val.callMethod "getWireFormatVersion" (Internal.args #[]) Int
 
 /-- `deserializer.readUint32()`: `long long readUint32()` -/
-def v8.Deserializer.readUint32 (self : v8.Deserializer) : IO Int :=
-  self.val.callMethod "readUint32" (Support.args #[]) Int
+@[macro_inline] def v8.Deserializer.readUint32 (self : v8.Deserializer) : IO Int := Internal.api "Lasm.JS.Node.v8.Deserializer.readUint32" do
+  self.val.callMethod "readUint32" (Internal.args #[]) Int
 
 /-- `deserializer.readUint64()`: `sequence<long long> readUint64()` -/
-def v8.Deserializer.readUint64 (self : v8.Deserializer) : IO (Array Int) :=
-  self.val.callMethod "readUint64" (Support.args #[]) (Array Int)
+@[macro_inline] def v8.Deserializer.readUint64 (self : v8.Deserializer) : IO (Array Int) := Internal.api "Lasm.JS.Node.v8.Deserializer.readUint64" do
+  self.val.callMethod "readUint64" (Internal.args #[]) (Array Int)
 
 /-- `deserializer.readDouble()`: `double readDouble()` -/
-def v8.Deserializer.readDouble (self : v8.Deserializer) : IO Float :=
-  self.val.callMethod "readDouble" (Support.args #[]) Float
+@[macro_inline] def v8.Deserializer.readDouble (self : v8.Deserializer) : IO Float := Internal.api "Lasm.JS.Node.v8.Deserializer.readDouble" do
+  self.val.callMethod "readDouble" (Internal.args #[]) Float
 
 /-- `deserializer.readRawBytes(length)`: `Uint8Array readRawBytes(long long length)` -/
-def v8.Deserializer.readRawBytes (self : v8.Deserializer) (length : Int) : IO ByteArray :=
-  self.val.callMethod "readRawBytes" (Support.args #[toJS length]) ByteArray
+@[macro_inline] def v8.Deserializer.readRawBytes (self : v8.Deserializer) (length : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.v8.Deserializer.readRawBytes" do
+  self.val.callMethod "readRawBytes" (Internal.args #[toJS length]) ByteArray
 
 /-- `deserializer._readHostObject()`: `undefined readHostObject()` -/
-def v8.Deserializer.readHostObject (self : v8.Deserializer) : IO Unit :=
-  self.val.callMethod "readHostObject" (Support.args #[]) Unit
+@[macro_inline] def v8.Deserializer.readHostObject (self : v8.Deserializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.readHostObject" do
+  self.val.callMethod "readHostObject" (Internal.args #[]) Unit
 
 /-- `v instanceof DefaultSerializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DefaultSerializer`). -/
-def v8.DefaultSerializer.cast? (v : Value) : IO (Option v8.DefaultSerializer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["DefaultSerializer"] Value) v) then some { val := v } else none
+@[macro_inline] def v8.DefaultSerializer.cast? (v : Value) : IO (Option v8.DefaultSerializer) := Internal.api "Lasm.JS.Node.v8.DefaultSerializer.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["DefaultSerializer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof DefaultDeserializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DefaultDeserializer`). -/
-def v8.DefaultDeserializer.cast? (v : Value) : IO (Option v8.DefaultDeserializer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["DefaultDeserializer"] Value) v) then some { val := v } else none
+@[macro_inline] def v8.DefaultDeserializer.cast? (v : Value) : IO (Option v8.DefaultDeserializer) := Internal.api "Lasm.JS.Node.v8.DefaultDeserializer.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["DefaultDeserializer"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof GCProfiler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GCProfiler`). -/
-def v8.GCProfiler.cast? (v : Value) : IO (Option v8.GCProfiler) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["GCProfiler"] Value) v) then some { val := v } else none
+@[macro_inline] def v8.GCProfiler.cast? (v : Value) : IO (Option v8.GCProfiler) := Internal.api "Lasm.JS.Node.v8.GCProfiler.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["GCProfiler"] Value) (fun x => { val := x }) v
 
 /-- `profiler.start()` (added in Node.js v19.6.0, v18.15.0): `undefined start()` -/
-def v8.GCProfiler.start (self : v8.GCProfiler) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[]) Unit
+@[macro_inline] def v8.GCProfiler.start (self : v8.GCProfiler) : IO Unit := Internal.api "Lasm.JS.Node.v8.GCProfiler.start" do
+  self.val.callMethod "start" (Internal.args #[]) Unit
 
 /-- `profiler.stop()` (added in Node.js v19.6.0, v18.15.0): `undefined stop()` -/
-def v8.GCProfiler.stop (self : v8.GCProfiler) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[]) Unit
+@[macro_inline] def v8.GCProfiler.stop (self : v8.GCProfiler) : IO Unit := Internal.api "Lasm.JS.Node.v8.GCProfiler.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) Unit
 
 /-- `v instanceof SyncCPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncCPUProfileHandle`). -/
-def SyncCPUProfileHandle.cast? (v : Value) : IO (Option SyncCPUProfileHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["SyncCPUProfileHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def SyncCPUProfileHandle.cast? (v : Value) : IO (Option SyncCPUProfileHandle) := Internal.api "Lasm.JS.Node.SyncCPUProfileHandle.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["SyncCPUProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- `syncCpuProfileHandle.stop()` (added in Node.js v24.12.0): `DOMString stop()` -/
-def SyncCPUProfileHandle.stop (self : SyncCPUProfileHandle) : IO String :=
-  self.val.callMethod "stop" (Support.args #[]) String
+@[macro_inline] def SyncCPUProfileHandle.stop (self : SyncCPUProfileHandle) : IO String := Internal.api "Lasm.JS.Node.SyncCPUProfileHandle.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) String
 
 /-- `v instanceof CPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CPUProfileHandle`). -/
-def CPUProfileHandle.cast? (v : Value) : IO (Option CPUProfileHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["CPUProfileHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def CPUProfileHandle.cast? (v : Value) : IO (Option CPUProfileHandle) := Internal.api "Lasm.JS.Node.CPUProfileHandle.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["CPUProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- `cpuProfileHandle.stop()` (added in Node.js v24.8.0): `Promise<any> stop()` -/
-def CPUProfileHandle.stop (self : CPUProfileHandle) : Async Data :=
-  self.val.callMethodAwait "stop" (Support.args #[]) Data
+@[macro_inline] def CPUProfileHandle.stop (self : CPUProfileHandle) : Async Data := Internal.api "Lasm.JS.Node.CPUProfileHandle.stop" do
+  self.val.callMethodAwait "stop" (Internal.args #[]) Data
 
 /-- `v instanceof HeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HeapProfileHandle`). -/
-def HeapProfileHandle.cast? (v : Value) : IO (Option HeapProfileHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["HeapProfileHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def HeapProfileHandle.cast? (v : Value) : IO (Option HeapProfileHandle) := Internal.api "Lasm.JS.Node.HeapProfileHandle.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["HeapProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- `heapProfileHandle.stop()` (added in Node.js v24.9.0): `Promise<any> stop()` -/
-def HeapProfileHandle.stop (self : HeapProfileHandle) : Async Data :=
-  self.val.callMethodAwait "stop" (Support.args #[]) Data
+@[macro_inline] def HeapProfileHandle.stop (self : HeapProfileHandle) : Async Data := Internal.api "Lasm.JS.Node.HeapProfileHandle.stop" do
+  self.val.callMethodAwait "stop" (Internal.args #[]) Data
 
 /-- `v instanceof SyncHeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncHeapProfileHandle`). -/
-def SyncHeapProfileHandle.cast? (v : Value) : IO (Option SyncHeapProfileHandle) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["SyncHeapProfileHandle"] Value) v) then some { val := v } else none
+@[macro_inline] def SyncHeapProfileHandle.cast? (v : Value) : IO (Option SyncHeapProfileHandle) := Internal.api "Lasm.JS.Node.SyncHeapProfileHandle.cast?" do
+  Internal.cast (Support.getExport "node:v8" ["SyncHeapProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syncHeapProfileHandle.stop()` (added in Node.js v26.1.0): `DOMString stop()` -/
-def SyncHeapProfileHandle.stop (self : SyncHeapProfileHandle) : IO String :=
-  self.val.callMethod "stop" (Support.args #[]) String
+@[macro_inline] def SyncHeapProfileHandle.stop (self : SyncHeapProfileHandle) : IO String := Internal.api "Lasm.JS.Node.SyncHeapProfileHandle.stop" do
+  self.val.callMethod "stop" (Internal.args #[]) String
 
 /-- `v8.cachedDataVersionTag()` (added in Node.js v8.0.0): `long long cachedDataVersionTag()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.cachedDataVersionTag : IO Int :=
+@[macro_inline] def v8.cachedDataVersionTag : IO Int := Internal.api "Lasm.JS.Node.v8.cachedDataVersionTag" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.v8.cachedDataVersionTag", module := "node:v8", path := "cachedDataVersionTag", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.getHeapCodeStatistics()` (added in Node.js v12.8.0): `object getHeapCodeStatistics()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.getHeapCodeStatistics : IO Data :=
+@[macro_inline] def v8.getHeapCodeStatistics : IO Data := Internal.api "Lasm.JS.Node.v8.getHeapCodeStatistics" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.v8.getHeapCodeStatistics", module := "node:v8", path := "getHeapCodeStatistics", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.getHeapSnapshot([options])` (added in Node.js v11.13.0): `stream.Readable getHeapSnapshot(optional v8.GetHeapSnapshotOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.getHeapSnapshot (options : Option v8.GetHeapSnapshotOptions := none) : IO stream.Readable := do
+@[macro_inline] def v8.getHeapSnapshot (options : Option v8.GetHeapSnapshotOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.v8.getHeapSnapshot" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.getHeapSnapshot", module := "node:v8", path := "getHeapSnapshot", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `v8.getHeapSpaceStatistics()` (added in Node.js v6.0.0): `sequence<object> getHeapSpaceStatistics()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.getHeapSpaceStatistics : IO (Array Data) :=
+@[macro_inline] def v8.getHeapSpaceStatistics : IO (Array Data) := Internal.api "Lasm.JS.Node.v8.getHeapSpaceStatistics" do
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Node.v8.getHeapSpaceStatistics", module := "node:v8", path := "getHeapSpaceStatistics", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.getHeapStatistics()` (added in Node.js v1.0.0): `object getHeapStatistics()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.getHeapStatistics : IO Data :=
+@[macro_inline] def v8.getHeapStatistics : IO Data := Internal.api "Lasm.JS.Node.v8.getHeapStatistics" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.v8.getHeapStatistics", module := "node:v8", path := "getHeapStatistics", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.getCppHeapStatistics([detailLevel])`: `undefined getCppHeapStatistics(optional any detailLevel)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.getCppHeapStatistics (detailLevel : Data := .undefined) : IO Unit :=
+@[macro_inline] def v8.getCppHeapStatistics (detailLevel : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.v8.getCppHeapStatistics" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.getCppHeapStatistics", module := "node:v8", path := "getCppHeapStatistics", construct := false, arity := 1 }
-    (Support.args #[detailLevel]) (await := false)
+    (Internal.args #[detailLevel]) (await := false)
 
 /-- `v8.queryObjects(ctor[, options])` (added in Node.js v22.0.0, v20.13.0): `(double or sequence<DOMString>) queryObjects(Function ctor, optional v8.QueryObjectsOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.queryObjects (ctor : JSFunction) (options : Option v8.QueryObjectsOptions := none) : IO DoubleOrSequenceOfDOMString :=
+@[macro_inline] def v8.queryObjects (ctor : JSFunction) (options : Option v8.QueryObjectsOptions := none) : IO DoubleOrSequenceOfDOMString := Internal.api "Lasm.JS.Node.v8.queryObjects" do
   Lasm.JS.Binding.invoke DoubleOrSequenceOfDOMString { name := "Lasm.JS.Node.v8.queryObjects", module := "node:v8", path := "queryObjects", construct := false, arity := 2 }
-    (Support.args #[toJS ctor, Support.optional options]) (await := false)
+    (Internal.args #[toJS ctor, Internal.optional options]) (await := false)
 
 /-- `v8.setFlagsFromString(flags)` (added in Node.js v1.0.0): `undefined setFlagsFromString(DOMString flags)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.setFlagsFromString (flags : String) : IO Unit :=
+@[macro_inline] def v8.setFlagsFromString (flags : String) : IO Unit := Internal.api "Lasm.JS.Node.v8.setFlagsFromString" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.setFlagsFromString", module := "node:v8", path := "setFlagsFromString", construct := false, arity := 1 }
-    (Support.args #[toJS flags]) (await := false)
+    (Internal.args #[toJS flags]) (await := false)
 
 /-- `v8.stopCoverage()` (added in Node.js v15.1.0, v14.18.0, v12.22.0): `undefined stopCoverage()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.stopCoverage : IO Unit :=
+@[macro_inline] def v8.stopCoverage : IO Unit := Internal.api "Lasm.JS.Node.v8.stopCoverage" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.stopCoverage", module := "node:v8", path := "stopCoverage", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.takeCoverage()` (added in Node.js v15.1.0, v14.18.0, v12.22.0): `undefined takeCoverage()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.takeCoverage : IO Unit :=
+@[macro_inline] def v8.takeCoverage : IO Unit := Internal.api "Lasm.JS.Node.v8.takeCoverage" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.takeCoverage", module := "node:v8", path := "takeCoverage", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `v8.writeHeapSnapshot([filename[,options]])` (added in Node.js v11.13.0): `DOMString writeHeapSnapshot(optional DOMString filename, optional v8.WriteHeapSnapshotOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.writeHeapSnapshot (filename : Option String := none) (options : Option v8.WriteHeapSnapshotOptions := none) : IO String :=
+@[macro_inline] def v8.writeHeapSnapshot (filename : Option String := none) (options : Option v8.WriteHeapSnapshotOptions := none) : IO String := Internal.api "Lasm.JS.Node.v8.writeHeapSnapshot" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.v8.writeHeapSnapshot", module := "node:v8", path := "writeHeapSnapshot", construct := false, arity := 2 }
-    (Support.args #[Support.optional filename, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional filename, Internal.optional options]) (await := false)
 
 /-- `v8.setHeapSnapshotNearHeapLimit(limit)` (added in Node.js v18.10.0, v16.18.0): `undefined setHeapSnapshotNearHeapLimit(long long limit)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.setHeapSnapshotNearHeapLimit (limit : Int) : IO Unit :=
+@[macro_inline] def v8.setHeapSnapshotNearHeapLimit (limit : Int) : IO Unit := Internal.api "Lasm.JS.Node.v8.setHeapSnapshotNearHeapLimit" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.setHeapSnapshotNearHeapLimit", module := "node:v8", path := "setHeapSnapshotNearHeapLimit", construct := false, arity := 1 }
-    (Support.args #[toJS limit]) (await := false)
+    (Internal.args #[toJS limit]) (await := false)
 
 /-- `v8.isStringOneByteRepresentation(content)` (added in Node.js v23.10.0, v22.15.0): `boolean isStringOneByteRepresentation(DOMString content)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.isStringOneByteRepresentation (content : String) : IO Bool :=
+@[macro_inline] def v8.isStringOneByteRepresentation (content : String) : IO Bool := Internal.api "Lasm.JS.Node.v8.isStringOneByteRepresentation" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.v8.isStringOneByteRepresentation", module := "node:v8", path := "isStringOneByteRepresentation", construct := false, arity := 1 }
-    (Support.args #[toJS content]) (await := false)
+    (Internal.args #[toJS content]) (await := false)
 
 /-- `v8.startCpuProfile()` (added in Node.js v24.12.0): `SyncCPUProfileHandle startCpuProfile()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startCpuProfile : IO SyncCPUProfileHandle := do
+@[macro_inline] def v8.startCpuProfile : IO SyncCPUProfileHandle := Internal.api "Lasm.JS.Node.v8.startCpuProfile" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startCpuProfile", module := "node:v8", path := "startCpuProfile", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `v8.startCpuProfile([options])` (added in Node.js v25.0.0, v24.12.0): `SyncCPUProfileHandle startCpuProfile(optional v8.StartCpuProfileOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startCpuProfileWithOptions (options : Option v8.StartCpuProfileOptions := none) : IO SyncCPUProfileHandle := do
+@[macro_inline] def v8.startCpuProfileWithOptions (options : Option v8.StartCpuProfileOptions := none) : IO SyncCPUProfileHandle := Internal.api "Lasm.JS.Node.v8.startCpuProfileWithOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startCpuProfileWithOptions", module := "node:v8", path := "startCpuProfile", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `v8.serialize(value)` (added in Node.js v8.0.0): `Uint8Array serialize(any value)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.serialize (value : Data) : IO ByteArray :=
+@[macro_inline] def v8.serialize (value : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.v8.serialize" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.v8.serialize", module := "node:v8", path := "serialize", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
 
 /-- `v8.deserialize(buffer)` (added in Node.js v8.0.0): `undefined deserialize(Uint8Array buffer)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.deserialize (buffer_ : ByteArray) : IO Unit :=
+@[macro_inline] def v8.deserialize (buffer_ : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.deserialize" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.deserialize", module := "node:v8", path := "deserialize", construct := false, arity := 1 }
-    (Support.args #[toJS buffer_]) (await := false)
+    (Internal.args #[toJS buffer_]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `v8.startHeapProfile([options])` (added in Node.js v26.1.0): `SyncHeapProfileHandle startHeapProfile(optional v8.StartHeapProfileOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startHeapProfile (options : Option v8.StartHeapProfileOptions := none) : IO SyncHeapProfileHandle := do
+@[macro_inline] def v8.startHeapProfile (options : Option v8.StartHeapProfileOptions := none) : IO SyncHeapProfileHandle := Internal.api "Lasm.JS.Node.v8.startHeapProfile" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startHeapProfile", module := "node:v8", path := "startHeapProfile", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `v8.setHeapProfileNearHeapLimit(limit)` (added in Node.js v26.9.0): `undefined setHeapProfileNearHeapLimit(long long limit)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.setHeapProfileNearHeapLimit (limit : Int) : IO Unit :=
+@[macro_inline] def v8.setHeapProfileNearHeapLimit (limit : Int) : IO Unit := Internal.api "Lasm.JS.Node.v8.setHeapProfileNearHeapLimit" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.setHeapProfileNearHeapLimit", module := "node:v8", path := "setHeapProfileNearHeapLimit", construct := false, arity := 1 }
-    (Support.args #[toJS limit]) (await := false)
+    (Internal.args #[toJS limit]) (await := false)
 
 /-- `promiseHooks.onInit(init)` (added in Node.js v17.1.0, v16.14.0): `Function onInit(Function init)` (Node.js 24.22.2 documentation, v8.md) -/
-def promiseHooks.onInit (init : JSFunction) : IO JSFunction :=
+@[macro_inline] def promiseHooks.onInit (init : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.promiseHooks.onInit" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onInit", module := "node:v8", path := "promiseHooks.onInit", construct := false, arity := 1 }
-    (Support.args #[toJS init]) (await := false)
+    (Internal.args #[toJS init]) (await := false)
 
 /-- `promiseHooks.onSettled(settled)` (added in Node.js v17.1.0, v16.14.0): `Function onSettled(Function settled)` (Node.js 24.22.2 documentation, v8.md) -/
-def promiseHooks.onSettled (settled : JSFunction) : IO JSFunction :=
+@[macro_inline] def promiseHooks.onSettled (settled : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.promiseHooks.onSettled" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onSettled", module := "node:v8", path := "promiseHooks.onSettled", construct := false, arity := 1 }
-    (Support.args #[toJS settled]) (await := false)
+    (Internal.args #[toJS settled]) (await := false)
 
 /-- `promiseHooks.onBefore(before)` (added in Node.js v17.1.0, v16.14.0): `Function onBefore(Function before)` (Node.js 24.22.2 documentation, v8.md) -/
-def promiseHooks.onBefore (before : JSFunction) : IO JSFunction :=
+@[macro_inline] def promiseHooks.onBefore (before : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.promiseHooks.onBefore" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onBefore", module := "node:v8", path := "promiseHooks.onBefore", construct := false, arity := 1 }
-    (Support.args #[toJS before]) (await := false)
+    (Internal.args #[toJS before]) (await := false)
 
 /-- `promiseHooks.onAfter(after)` (added in Node.js v17.1.0, v16.14.0): `Function onAfter(Function after)` (Node.js 24.22.2 documentation, v8.md) -/
-def promiseHooks.onAfter (after : JSFunction) : IO JSFunction :=
+@[macro_inline] def promiseHooks.onAfter (after : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.promiseHooks.onAfter" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.onAfter", module := "node:v8", path := "promiseHooks.onAfter", construct := false, arity := 1 }
-    (Support.args #[toJS after]) (await := false)
+    (Internal.args #[toJS after]) (await := false)
 
 /-- `promiseHooks.createHook(callbacks)` (added in Node.js v17.1.0, v16.14.0): `Function createHook(promiseHooks.CreateHookCallbacks callbacks)` (Node.js 24.22.2 documentation, v8.md) -/
-def promiseHooks.createHook (callbacks : promiseHooks.CreateHookCallbacks) : IO JSFunction :=
+@[macro_inline] def promiseHooks.createHook (callbacks : promiseHooks.CreateHookCallbacks) : IO JSFunction := Internal.api "Lasm.JS.Node.promiseHooks.createHook" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.promiseHooks.createHook", module := "node:v8", path := "promiseHooks.createHook", construct := false, arity := 1 }
-    (Support.args #[toJS callbacks]) (await := false)
+    (Internal.args #[toJS callbacks]) (await := false)
 
 /-- `v8.startupSnapshot.addSerializeCallback(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined addSerializeCallback(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startupSnapshot.addSerializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
+@[macro_inline] def v8.startupSnapshot.addSerializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.v8.startupSnapshot.addSerializeCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addSerializeCallback", module := "node:v8", path := "startupSnapshot.addSerializeCallback", construct := false, arity := 2 }
-    (Support.args #[toJS callback, data]) (await := false)
+    (Internal.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.addDeserializeCallback(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined addDeserializeCallback(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startupSnapshot.addDeserializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
+@[macro_inline] def v8.startupSnapshot.addDeserializeCallback (callback : JSFunction) (data : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.v8.startupSnapshot.addDeserializeCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.addDeserializeCallback", module := "node:v8", path := "startupSnapshot.addDeserializeCallback", construct := false, arity := 2 }
-    (Support.args #[toJS callback, data]) (await := false)
+    (Internal.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.setDeserializeMainFunction(callback[, data])` (added in Node.js v18.6.0, v16.17.0): `undefined setDeserializeMainFunction(Function callback, optional any data)` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startupSnapshot.setDeserializeMainFunction (callback : JSFunction) (data : Data := .undefined) : IO Unit :=
+@[macro_inline] def v8.startupSnapshot.setDeserializeMainFunction (callback : JSFunction) (data : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.v8.startupSnapshot.setDeserializeMainFunction" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.startupSnapshot.setDeserializeMainFunction", module := "node:v8", path := "startupSnapshot.setDeserializeMainFunction", construct := false, arity := 2 }
-    (Support.args #[toJS callback, data]) (await := false)
+    (Internal.args #[toJS callback, data]) (await := false)
 
 /-- `v8.startupSnapshot.isBuildingSnapshot()` (added in Node.js v18.6.0, v16.17.0): `boolean isBuildingSnapshot()` (Node.js 24.22.2 documentation, v8.md) -/
-def v8.startupSnapshot.isBuildingSnapshot : IO Bool :=
+@[macro_inline] def v8.startupSnapshot.isBuildingSnapshot : IO Bool := Internal.api "Lasm.JS.Node.v8.startupSnapshot.isBuildingSnapshot" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.v8.startupSnapshot.isBuildingSnapshot", module := "node:v8", path := "startupSnapshot.isBuildingSnapshot", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Node

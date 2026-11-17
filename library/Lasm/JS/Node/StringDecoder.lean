@@ -12,6 +12,9 @@ import Lasm.JS.Node.Buffer
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class StringDecoder` of `node:string_decoder` (Node.js 24.22.2 documentation, string_decoder.md): a handle to the JavaScript object. -/
 structure StringDecoder where
@@ -22,15 +25,15 @@ instance : ToJS StringDecoder := ⟨fun x => .ref x.val ""⟩
 instance : FromJS StringDecoder := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.StringDecoder", .data⟩
 
 /-- `v instanceof StringDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StringDecoder`). -/
-def StringDecoder.cast? (v : Value) : IO (Option StringDecoder) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:string_decoder" ["StringDecoder"] Value) v) then some { val := v } else none
+@[macro_inline] def StringDecoder.cast? (v : Value) : IO (Option StringDecoder) := Internal.api "Lasm.JS.Node.StringDecoder.cast?" do
+  Internal.cast (Support.getExport "node:string_decoder" ["StringDecoder"] Value) (fun x => { val := x }) v
 
 /-- `stringDecoder.end([buffer])` (added in Node.js v0.9.3): `DOMString end(optional (DOMString or Uint8Array) buffer)` -/
-def StringDecoder.«end» (self : StringDecoder) (buffer_ : Option DOMStringOrUint8Array := none) : IO String :=
-  self.val.callMethod "end" (Support.args #[Support.optional buffer_]) String
+@[macro_inline] def StringDecoder.«end» (self : StringDecoder) (buffer_ : Option DOMStringOrUint8Array := none) : IO String := Internal.api "Lasm.JS.Node.StringDecoder.end" do
+  self.val.callMethod "end" (Internal.args #[Internal.optional buffer_]) String
 
 /-- `stringDecoder.write(buffer)` (added in Node.js v0.1.99): `DOMString write((DOMString or Uint8Array) buffer)` -/
-def StringDecoder.write (self : StringDecoder) (buffer_ : DOMStringOrUint8Array) : IO String :=
-  self.val.callMethod "write" (Support.args #[toJS buffer_]) String
+@[macro_inline] def StringDecoder.write (self : StringDecoder) (buffer_ : DOMStringOrUint8Array) : IO String := Internal.api "Lasm.JS.Node.StringDecoder.write" do
+  self.val.callMethod "write" (Internal.args #[toJS buffer_]) String
 
 end Lasm.JS.Node

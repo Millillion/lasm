@@ -11,6 +11,9 @@ import Lasm.JS.Node.Support
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class RunScope` of `node:async_hooks` (Node.js 24.22.2 documentation, async_context.md): a handle to the JavaScript object. -/
 structure RunScope where
@@ -21,11 +24,11 @@ instance : ToJS RunScope := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RunScope := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.RunScope", .data⟩
 
 /-- `v instanceof RunScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RunScope`). -/
-def RunScope.cast? (v : Value) : IO (Option RunScope) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["RunScope"] Value) v) then some { val := v } else none
+@[macro_inline] def RunScope.cast? (v : Value) : IO (Option RunScope) := Internal.api "Lasm.JS.Node.RunScope.cast?" do
+  Internal.cast (Support.getExport "node:async_hooks" ["RunScope"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `scope.dispose()` (added in Node.js v24.20.0): `undefined dispose()` -/
-def RunScope.dispose (self : RunScope) : IO Unit :=
-  self.val.callMethod "dispose" (Support.args #[]) Unit
+@[macro_inline] def RunScope.dispose (self : RunScope) : IO Unit := Internal.api "Lasm.JS.Node.RunScope.dispose" do
+  self.val.callMethod "dispose" (Internal.args #[]) Unit
 
 end Lasm.JS.Node

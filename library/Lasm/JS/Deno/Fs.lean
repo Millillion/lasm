@@ -8,13 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
 import Lasm.JS.Deno.Runtime
 import Lasm.JS.Deno.Io
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.FsFile` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure FsFile where
@@ -41,74 +44,67 @@ instance : ToJS FsWatcher := ⟨fun x => .ref x.val ""⟩
 instance : FromJS FsWatcher := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.FsWatcher", .data⟩
 
 /-- `enum FsEventKind` (Deno 2.9.6 type declarations): "any", "access", "create", "modify", "rename", "remove", "other". -/
-inductive FsEventKind where
-  /-- "any" -/
-  | any
-  /-- "access" -/
-  | access
-  /-- "create" -/
-  | create
-  /-- "modify" -/
-  | modify
-  /-- "rename" -/
-  | rename
-  /-- "remove" -/
-  | remove
-  /-- "other" -/
-  | other
+structure FsEventKind where
+  /-- A value from its string, unchecked: the generated values (`.any`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS FsEventKind := ⟨fun
-  | .any => .string "any"
-  | .access => .string "access"
-  | .create => .string "create"
-  | .modify => .string "modify"
-  | .rename => .string "rename"
-  | .remove => .string "remove"
-  | .other => .string "other"⟩
+/-- "any" -/
+@[match_pattern] abbrev FsEventKind.any : FsEventKind := .unsafeOfString "any"
+/-- "access" -/
+@[match_pattern] abbrev FsEventKind.access : FsEventKind := .unsafeOfString "access"
+/-- "create" -/
+@[match_pattern] abbrev FsEventKind.create : FsEventKind := .unsafeOfString "create"
+/-- "modify" -/
+@[match_pattern] abbrev FsEventKind.modify : FsEventKind := .unsafeOfString "modify"
+/-- "rename" -/
+@[match_pattern] abbrev FsEventKind.rename : FsEventKind := .unsafeOfString "rename"
+/-- "remove" -/
+@[match_pattern] abbrev FsEventKind.remove : FsEventKind := .unsafeOfString "remove"
+/-- "other" -/
+@[match_pattern] abbrev FsEventKind.other : FsEventKind := .unsafeOfString "other"
+instance : ToJS FsEventKind := ⟨fun x => .string x.val⟩
 instance : FromJS FsEventKind where
   fromJS
-    | .string "any" => .ok .any
-    | .string "access" => .ok .access
-    | .string "create" => .ok .create
-    | .string "modify" => .ok .modify
-    | .string "rename" => .ok .rename
-    | .string "remove" => .ok .remove
-    | .string "other" => .ok .other
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.FsEventKind"
 
 /-- `enum FsEventFlag` (Deno 2.9.6 type declarations): "rescan". -/
-inductive FsEventFlag where
-  /-- "rescan" -/
-  | rescan
+structure FsEventFlag where
+  /-- A value from its string, unchecked: the generated values (`.rescan`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS FsEventFlag := ⟨fun
-  | .rescan => .string "rescan"⟩
+/-- "rescan" -/
+@[match_pattern] abbrev FsEventFlag.rescan : FsEventFlag := .unsafeOfString "rescan"
+instance : ToJS FsEventFlag := ⟨fun x => .string x.val⟩
 instance : FromJS FsEventFlag where
   fromJS
-    | .string "rescan" => .ok .rescan
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.FsEventFlag"
 
 /-- `enum SymlinkOptionsType` (Deno 2.9.6 type declarations): "file", "dir", "junction". -/
-inductive SymlinkOptionsType where
-  /-- "file" -/
-  | file
-  /-- "dir" -/
-  | dir
-  /-- "junction" -/
-  | junction
+structure SymlinkOptionsType where
+  /-- A value from its string, unchecked: the generated values (`.file`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SymlinkOptionsType := ⟨fun
-  | .file => .string "file"
-  | .dir => .string "dir"
-  | .junction => .string "junction"⟩
+/-- "file" -/
+@[match_pattern] abbrev SymlinkOptionsType.file : SymlinkOptionsType := .unsafeOfString "file"
+/-- "dir" -/
+@[match_pattern] abbrev SymlinkOptionsType.dir : SymlinkOptionsType := .unsafeOfString "dir"
+/-- "junction" -/
+@[match_pattern] abbrev SymlinkOptionsType.junction : SymlinkOptionsType := .unsafeOfString "junction"
+instance : ToJS SymlinkOptionsType := ⟨fun x => .string x.val⟩
 instance : FromJS SymlinkOptionsType where
   fromJS
-    | .string "file" => .ok .file
-    | .string "dir" => .ok .dir
-    | .string "junction" => .ok .junction
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.SymlinkOptionsType"
 
 /-- `typedef double or bigint DoubleOrBigint`: one constructor per member type. -/
@@ -241,13 +237,13 @@ structure OpenOptions where
   createNew : Option Bool := none
   /-- `double mode` -/
   mode : Option Float := none
-instance : ToJS OpenOptions := ⟨fun d => Support.fields #[("read", Support.optional d.read),
-    ("write", Support.optional d.write),
-    ("append", Support.optional d.append),
-    ("truncate", Support.optional d.truncate),
-    ("create", Support.optional d.create),
-    ("createNew", Support.optional d.createNew),
-    ("mode", Support.optional d.mode)]⟩
+instance : ToJS OpenOptions := ⟨fun d => Internal.fields #[("read", Internal.optional d.read),
+    ("write", Internal.optional d.write),
+    ("append", Internal.optional d.append),
+    ("truncate", Internal.optional d.truncate),
+    ("create", Internal.optional d.create),
+    ("createNew", Internal.optional d.createNew),
+    ("mode", Internal.optional d.mode)]⟩
 
 /-- `dictionary MkdirOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MkdirOptions where
@@ -255,8 +251,8 @@ structure MkdirOptions where
   recursive : Option Bool := none
   /-- `double mode` -/
   mode : Option Float := none
-instance : ToJS MkdirOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
-    ("mode", Support.optional d.mode)]⟩
+instance : ToJS MkdirOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive),
+    ("mode", Internal.optional d.mode)]⟩
 
 /-- `dictionary MakeTempOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MakeTempOptions where
@@ -266,21 +262,21 @@ structure MakeTempOptions where
   «prefix» : Option String := none
   /-- `DOMString suffix` -/
   suffix : Option String := none
-instance : ToJS MakeTempOptions := ⟨fun d => Support.fields #[("dir", Support.optional d.dir),
-    ("prefix", Support.optional d.«prefix»),
-    ("suffix", Support.optional d.suffix)]⟩
+instance : ToJS MakeTempOptions := ⟨fun d => Internal.fields #[("dir", Internal.optional d.dir),
+    ("prefix", Internal.optional d.«prefix»),
+    ("suffix", Internal.optional d.suffix)]⟩
 
 /-- `dictionary RemoveOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RemoveOptions where
   /-- `boolean recursive` -/
   recursive : Option Bool := none
-instance : ToJS RemoveOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive)]⟩
+instance : ToJS RemoveOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive)]⟩
 
 /-- `dictionary ReadFileOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ReadFileOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS ReadFileOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance : ToJS ReadFileOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `typedef Uint8Array or ReadableStream Uint8ArrayOrReadableStream`: one constructor per member type. -/
 inductive Uint8ArrayOrReadableStream where
@@ -306,11 +302,11 @@ structure WriteFileOptions where
   mode : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS WriteFileOptions := ⟨fun d => Support.fields #[("append", Support.optional d.append),
-    ("create", Support.optional d.create),
-    ("createNew", Support.optional d.createNew),
-    ("mode", Support.optional d.mode),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS WriteFileOptions := ⟨fun d => Internal.fields #[("append", Internal.optional d.append),
+    ("create", Internal.optional d.create),
+    ("createNew", Internal.optional d.createNew),
+    ("mode", Internal.optional d.mode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `typedef DOMString or ReadableStream DOMStringOrReadableStream`: one constructor per member type. -/
 inductive DOMStringOrReadableStream where
@@ -342,108 +338,108 @@ structure WatchFsOptions where
   recursive : Option Bool := none
   /-- `DOMStringOrSequenceOfDOMString ignore` -/
   ignore : Option DOMStringOrSequenceOfDOMString := none
-instance : ToJS WatchFsOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
-    ("ignore", Support.optional d.ignore)]⟩
+instance : ToJS WatchFsOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive),
+    ("ignore", Internal.optional d.ignore)]⟩
 
 /-- `dictionary SymlinkOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SymlinkOptions where
   /-- `required SymlinkOptionsType type` -/
   type : SymlinkOptionsType
-instance : ToJS SymlinkOptions := ⟨fun d => Support.fields #[("type", toJS d.type)]⟩
+instance : ToJS SymlinkOptions := ⟨fun d => Internal.fields #[("type", toJS d.type)]⟩
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def FsFile.readable (self : FsFile) : IO ReadableStream := do
+@[macro_inline] def FsFile.readable (self : FsFile) : IO ReadableStream := Internal.api "Lasm.JS.Deno.FsFile.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def FsFile.writable (self : FsFile) : IO WritableStream := do
+@[macro_inline] def FsFile.writable (self : FsFile) : IO WritableStream := Internal.api "Lasm.JS.Deno.FsFile.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `truncate(len?: number): Promise<void>`: `Promise<undefined> truncate(optional double len)` -/
-def FsFile.truncate (self : FsFile) (len : Option Float := none) : Async Unit :=
-  self.val.callMethodAwait "truncate" (Support.args #[Support.optional len]) Unit
+@[macro_inline] def FsFile.truncate (self : FsFile) (len : Option Float := none) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.truncate" do
+  self.val.callMethodAwait "truncate" (Internal.args #[Internal.optional len]) Unit
 
 /-- `truncateSync(len?: number): void`: `undefined truncateSync(optional double len)` -/
-def FsFile.truncateSync (self : FsFile) (len : Option Float := none) : IO Unit :=
-  self.val.callMethod "truncateSync" (Support.args #[Support.optional len]) Unit
+@[macro_inline] def FsFile.truncateSync (self : FsFile) (len : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.truncateSync" do
+  self.val.callMethod "truncateSync" (Internal.args #[Internal.optional len]) Unit
 
 /-- `seek(offset: number | bigint, whence: SeekMode): Promise<number>`: `Promise<double> seek(DoubleOrBigint offset, SeekMode whence)` -/
-def FsFile.seek (self : FsFile) (offset : DoubleOrBigint) (whence : Nat) : Async Float :=
-  self.val.callMethodAwait "seek" (Support.args #[toJS offset, toJS whence]) Float
+@[macro_inline] def FsFile.seek (self : FsFile) (offset : DoubleOrBigint) (whence : Nat) : Async Float := Internal.api "Lasm.JS.Deno.FsFile.seek" do
+  self.val.callMethodAwait "seek" (Internal.args #[toJS offset, toJS whence]) Float
 
 /-- `seekSync(offset: number | bigint, whence: SeekMode): number`: `double seekSync(DoubleOrBigint offset, SeekMode whence)` -/
-def FsFile.seekSync (self : FsFile) (offset : DoubleOrBigint) (whence : Nat) : IO Float :=
-  self.val.callMethod "seekSync" (Support.args #[toJS offset, toJS whence]) Float
+@[macro_inline] def FsFile.seekSync (self : FsFile) (offset : DoubleOrBigint) (whence : Nat) : IO Float := Internal.api "Lasm.JS.Deno.FsFile.seekSync" do
+  self.val.callMethod "seekSync" (Internal.args #[toJS offset, toJS whence]) Float
 
 /-- `stat(): Promise<FileInfo>`: `Promise<FileInfo> stat()` -/
-def FsFile.stat (self : FsFile) : Async FileInfo :=
-  self.val.callMethodAwait "stat" (Support.args #[]) FileInfo
+@[macro_inline] def FsFile.stat (self : FsFile) : Async FileInfo := Internal.api "Lasm.JS.Deno.FsFile.stat" do
+  self.val.callMethodAwait "stat" (Internal.args #[]) FileInfo
 
 /-- `statSync(): FileInfo`: `FileInfo statSync()` -/
-def FsFile.statSync (self : FsFile) : IO FileInfo :=
-  self.val.callMethod "statSync" (Support.args #[]) FileInfo
+@[macro_inline] def FsFile.statSync (self : FsFile) : IO FileInfo := Internal.api "Lasm.JS.Deno.FsFile.statSync" do
+  self.val.callMethod "statSync" (Internal.args #[]) FileInfo
 
 /-- `sync(): Promise<void>`: `Promise<undefined> sync()` -/
-def FsFile.sync (self : FsFile) : Async Unit :=
-  self.val.callMethodAwait "sync" (Support.args #[]) Unit
+@[macro_inline] def FsFile.sync (self : FsFile) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.sync" do
+  self.val.callMethodAwait "sync" (Internal.args #[]) Unit
 
 /-- `syncSync(): void`: `undefined syncSync()` -/
-def FsFile.syncSync (self : FsFile) : IO Unit :=
-  self.val.callMethod "syncSync" (Support.args #[]) Unit
+@[macro_inline] def FsFile.syncSync (self : FsFile) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.syncSync" do
+  self.val.callMethod "syncSync" (Internal.args #[]) Unit
 
 /-- `syncData(): Promise<void>`: `Promise<undefined> syncData()` -/
-def FsFile.syncData (self : FsFile) : Async Unit :=
-  self.val.callMethodAwait "syncData" (Support.args #[]) Unit
+@[macro_inline] def FsFile.syncData (self : FsFile) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.syncData" do
+  self.val.callMethodAwait "syncData" (Internal.args #[]) Unit
 
 /-- `syncDataSync(): void`: `undefined syncDataSync()` -/
-def FsFile.syncDataSync (self : FsFile) : IO Unit :=
-  self.val.callMethod "syncDataSync" (Support.args #[]) Unit
+@[macro_inline] def FsFile.syncDataSync (self : FsFile) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.syncDataSync" do
+  self.val.callMethod "syncDataSync" (Internal.args #[]) Unit
 
 /-- `utime(atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(any atime, any mtime)` -/
-def FsFile.utime (self : FsFile) (atime : Data) (mtime : Data) : Async Unit :=
-  self.val.callMethodAwait "utime" (Support.args #[toJS atime, toJS mtime]) Unit
+@[macro_inline] def FsFile.utime (self : FsFile) (atime : Data) (mtime : Data) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.utime" do
+  self.val.callMethodAwait "utime" (Internal.args #[toJS atime, toJS mtime]) Unit
 
 /-- `utimeSync(atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(any atime, any mtime)` -/
-def FsFile.utimeSync (self : FsFile) (atime : Data) (mtime : Data) : IO Unit :=
-  self.val.callMethod "utimeSync" (Support.args #[toJS atime, toJS mtime]) Unit
+@[macro_inline] def FsFile.utimeSync (self : FsFile) (atime : Data) (mtime : Data) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.utimeSync" do
+  self.val.callMethod "utimeSync" (Internal.args #[toJS atime, toJS mtime]) Unit
 
 /-- `isTerminal(): boolean`: `boolean isTerminal()` -/
-def FsFile.isTerminal (self : FsFile) : IO Bool :=
-  self.val.callMethod "isTerminal" (Support.args #[]) Bool
+@[macro_inline] def FsFile.isTerminal (self : FsFile) : IO Bool := Internal.api "Lasm.JS.Deno.FsFile.isTerminal" do
+  self.val.callMethod "isTerminal" (Internal.args #[]) Bool
 
 /-- `setRaw(mode: boolean, options?: SetRawOptions): void`: `undefined setRaw(boolean mode, optional SetRawOptions options)` -/
-def FsFile.setRaw (self : FsFile) (mode : Bool) (options : Option SetRawOptions := none) : IO Unit :=
-  self.val.callMethod "setRaw" (Support.args #[toJS mode, Support.optional options]) Unit
+@[macro_inline] def FsFile.setRaw (self : FsFile) (mode : Bool) (options : Option SetRawOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.setRaw" do
+  self.val.callMethod "setRaw" (Internal.args #[toJS mode, Internal.optional options]) Unit
 
 /-- `lock(exclusive?: boolean): Promise<void>`: `Promise<undefined> lock(optional boolean exclusive)` -/
-def FsFile.lock (self : FsFile) (exclusive : Option Bool := none) : Async Unit :=
-  self.val.callMethodAwait "lock" (Support.args #[Support.optional exclusive]) Unit
+@[macro_inline] def FsFile.lock (self : FsFile) (exclusive : Option Bool := none) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.lock" do
+  self.val.callMethodAwait "lock" (Internal.args #[Internal.optional exclusive]) Unit
 
 /-- `lockSync(exclusive?: boolean): void`: `undefined lockSync(optional boolean exclusive)` -/
-def FsFile.lockSync (self : FsFile) (exclusive : Option Bool := none) : IO Unit :=
-  self.val.callMethod "lockSync" (Support.args #[Support.optional exclusive]) Unit
+@[macro_inline] def FsFile.lockSync (self : FsFile) (exclusive : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.lockSync" do
+  self.val.callMethod "lockSync" (Internal.args #[Internal.optional exclusive]) Unit
 
 /-- `tryLock(exclusive?: boolean): Promise<boolean>`: `Promise<boolean> tryLock(optional boolean exclusive)` -/
-def FsFile.tryLock (self : FsFile) (exclusive : Option Bool := none) : Async Bool :=
-  self.val.callMethodAwait "tryLock" (Support.args #[Support.optional exclusive]) Bool
+@[macro_inline] def FsFile.tryLock (self : FsFile) (exclusive : Option Bool := none) : Async Bool := Internal.api "Lasm.JS.Deno.FsFile.tryLock" do
+  self.val.callMethodAwait "tryLock" (Internal.args #[Internal.optional exclusive]) Bool
 
 /-- `tryLockSync(exclusive?: boolean): boolean`: `boolean tryLockSync(optional boolean exclusive)` -/
-def FsFile.tryLockSync (self : FsFile) (exclusive : Option Bool := none) : IO Bool :=
-  self.val.callMethod "tryLockSync" (Support.args #[Support.optional exclusive]) Bool
+@[macro_inline] def FsFile.tryLockSync (self : FsFile) (exclusive : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Deno.FsFile.tryLockSync" do
+  self.val.callMethod "tryLockSync" (Internal.args #[Internal.optional exclusive]) Bool
 
 /-- `unlock(): Promise<void>`: `Promise<undefined> unlock()` -/
-def FsFile.unlock (self : FsFile) : Async Unit :=
-  self.val.callMethodAwait "unlock" (Support.args #[]) Unit
+@[macro_inline] def FsFile.unlock (self : FsFile) : Async Unit := Internal.api "Lasm.JS.Deno.FsFile.unlock" do
+  self.val.callMethodAwait "unlock" (Internal.args #[]) Unit
 
 /-- `unlockSync(): void`: `undefined unlockSync()` -/
-def FsFile.unlockSync (self : FsFile) : IO Unit :=
-  self.val.callMethod "unlockSync" (Support.args #[]) Unit
+@[macro_inline] def FsFile.unlockSync (self : FsFile) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.unlockSync" do
+  self.val.callMethod "unlockSync" (Internal.args #[]) Unit
 
 /-- `close(): void`: `undefined close()` -/
-def FsFile.close (self : FsFile) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def FsFile.close (self : FsFile) : IO Unit := Internal.api "Lasm.JS.Deno.FsFile.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<DirEntry>` (the object's `[Symbol.asyncIterator]()`). -/
 structure DirEntryAsyncIterable.Iterator where
@@ -472,8 +468,8 @@ partial def DirEntryAsyncIterable.values (self : DirEntryAsyncIterable) : Async 
   loop #[]
 
 /-- `close(): void`: `undefined close()` -/
-def FsWatcher.close (self : FsWatcher) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def FsWatcher.close (self : FsWatcher) : IO Unit := Internal.api "Lasm.JS.Deno.FsWatcher.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- An iterator of `async iterable<FsEvent>` (the object's `[Symbol.asyncIterator]()`). -/
 structure FsWatcher.Iterator where
@@ -502,244 +498,244 @@ partial def FsWatcher.values (self : FsWatcher) : Async (Array FsEvent) := do
   loop #[]
 
 /-- `Deno.link(oldpath: string, newpath: string): Promise<void>`: `Promise<undefined> link(DOMString oldpath, DOMString newpath)` (Deno 2.9.6 type declarations) -/
-def link (oldpath : String) (newpath : String) : Async Unit :=
+@[macro_inline] def link (oldpath : String) (newpath : String) : Async Unit := Internal.api "Lasm.JS.Deno.link" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.link", module := "globalThis", path := "Deno.link", construct := false, arity := 2 }
-    (Support.args #[toJS oldpath, toJS newpath])
+    (Internal.args #[toJS oldpath, toJS newpath])
 
 /-- `Deno.linkSync(oldpath: string, newpath: string): void`: `undefined linkSync(DOMString oldpath, DOMString newpath)` (Deno 2.9.6 type declarations) -/
-def linkSync (oldpath : String) (newpath : String) : IO Unit :=
+@[macro_inline] def linkSync (oldpath : String) (newpath : String) : IO Unit := Internal.api "Lasm.JS.Deno.linkSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.linkSync", module := "globalThis", path := "Deno.linkSync", construct := false, arity := 2 }
-    (Support.args #[toJS oldpath, toJS newpath]) (await := false)
+    (Internal.args #[toJS oldpath, toJS newpath]) (await := false)
 
 /-- `Deno.open(path: string | URL, options?: OpenOptions): Promise<FsFile>`: `Promise<FsFile> open(DOMStringOrURL path, optional OpenOptions options)` (Deno 2.9.6 type declarations) -/
-def «open» (path : DOMStringOrURL) (options : Option OpenOptions := none) : Async FsFile := do
+@[macro_inline] def «open» (path : DOMStringOrURL) (options : Option OpenOptions := none) : Async FsFile := Internal.api "Lasm.JS.Deno.open" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.open", module := "globalThis", path := "Deno.open", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
   pure { val := r }
 
 /-- `Deno.openSync(path: string | URL, options?: OpenOptions): FsFile`: `FsFile openSync(DOMStringOrURL path, optional OpenOptions options)` (Deno 2.9.6 type declarations) -/
-def openSync (path : DOMStringOrURL) (options : Option OpenOptions := none) : IO FsFile := do
+@[macro_inline] def openSync (path : DOMStringOrURL) (options : Option OpenOptions := none) : IO FsFile := Internal.api "Lasm.JS.Deno.openSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.openSync", module := "globalThis", path := "Deno.openSync", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Deno.create(path: string | URL): Promise<FsFile>`: `Promise<FsFile> create(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def create (path : DOMStringOrURL) : Async FsFile := do
+@[macro_inline] def create (path : DOMStringOrURL) : Async FsFile := Internal.api "Lasm.JS.Deno.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.create", module := "globalThis", path := "Deno.create", construct := false, arity := 1 }
-    (Support.args #[toJS path])
+    (Internal.args #[toJS path])
   pure { val := r }
 
 /-- `Deno.createSync(path: string | URL): FsFile`: `FsFile createSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def createSync (path : DOMStringOrURL) : IO FsFile := do
+@[macro_inline] def createSync (path : DOMStringOrURL) : IO FsFile := Internal.api "Lasm.JS.Deno.createSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.createSync", module := "globalThis", path := "Deno.createSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
   pure { val := r }
 
 /-- `Deno.mkdir(path: string | URL, options?: MkdirOptions): Promise<void>`: `Promise<undefined> mkdir(DOMStringOrURL path, optional MkdirOptions options)` (Deno 2.9.6 type declarations) -/
-def mkdir (path : DOMStringOrURL) (options : Option MkdirOptions := none) : Async Unit :=
+@[macro_inline] def mkdir (path : DOMStringOrURL) (options : Option MkdirOptions := none) : Async Unit := Internal.api "Lasm.JS.Deno.mkdir" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.mkdir", module := "globalThis", path := "Deno.mkdir", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `Deno.mkdirSync(path: string | URL, options?: MkdirOptions): void`: `undefined mkdirSync(DOMStringOrURL path, optional MkdirOptions options)` (Deno 2.9.6 type declarations) -/
-def mkdirSync (path : DOMStringOrURL) (options : Option MkdirOptions := none) : IO Unit :=
+@[macro_inline] def mkdirSync (path : DOMStringOrURL) (options : Option MkdirOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.mkdirSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.mkdirSync", module := "globalThis", path := "Deno.mkdirSync", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
 
 /-- `Deno.makeTempDir(options?: MakeTempOptions): Promise<string>`: `Promise<DOMString> makeTempDir(optional MakeTempOptions options)` (Deno 2.9.6 type declarations) -/
-def makeTempDir (options : Option MakeTempOptions := none) : Async String :=
+@[macro_inline] def makeTempDir (options : Option MakeTempOptions := none) : Async String := Internal.api "Lasm.JS.Deno.makeTempDir" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Deno.makeTempDir", module := "globalThis", path := "Deno.makeTempDir", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Deno.makeTempDirSync(options?: MakeTempOptions): string`: `DOMString makeTempDirSync(optional MakeTempOptions options)` (Deno 2.9.6 type declarations) -/
-def makeTempDirSync (options : Option MakeTempOptions := none) : IO String :=
+@[macro_inline] def makeTempDirSync (options : Option MakeTempOptions := none) : IO String := Internal.api "Lasm.JS.Deno.makeTempDirSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.makeTempDirSync", module := "globalThis", path := "Deno.makeTempDirSync", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `Deno.makeTempFile(options?: MakeTempOptions): Promise<string>`: `Promise<DOMString> makeTempFile(optional MakeTempOptions options)` (Deno 2.9.6 type declarations) -/
-def makeTempFile (options : Option MakeTempOptions := none) : Async String :=
+@[macro_inline] def makeTempFile (options : Option MakeTempOptions := none) : Async String := Internal.api "Lasm.JS.Deno.makeTempFile" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Deno.makeTempFile", module := "globalThis", path := "Deno.makeTempFile", construct := false, arity := 1 }
-    (Support.args #[Support.optional options])
+    (Internal.args #[Internal.optional options])
 
 /-- `Deno.makeTempFileSync(options?: MakeTempOptions): string`: `DOMString makeTempFileSync(optional MakeTempOptions options)` (Deno 2.9.6 type declarations) -/
-def makeTempFileSync (options : Option MakeTempOptions := none) : IO String :=
+@[macro_inline] def makeTempFileSync (options : Option MakeTempOptions := none) : IO String := Internal.api "Lasm.JS.Deno.makeTempFileSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.makeTempFileSync", module := "globalThis", path := "Deno.makeTempFileSync", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `Deno.chmod(path: string | URL, mode: number): Promise<void>`: `Promise<undefined> chmod(DOMStringOrURL path, double mode)` (Deno 2.9.6 type declarations) -/
-def chmod (path : DOMStringOrURL) (mode : Float) : Async Unit :=
+@[macro_inline] def chmod (path : DOMStringOrURL) (mode : Float) : Async Unit := Internal.api "Lasm.JS.Deno.chmod" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.chmod", module := "globalThis", path := "Deno.chmod", construct := false, arity := 2 }
-    (Support.args #[toJS path, toJS mode])
+    (Internal.args #[toJS path, toJS mode])
 
 /-- `Deno.chmodSync(path: string | URL, mode: number): void`: `undefined chmodSync(DOMStringOrURL path, double mode)` (Deno 2.9.6 type declarations) -/
-def chmodSync (path : DOMStringOrURL) (mode : Float) : IO Unit :=
+@[macro_inline] def chmodSync (path : DOMStringOrURL) (mode : Float) : IO Unit := Internal.api "Lasm.JS.Deno.chmodSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.chmodSync", module := "globalThis", path := "Deno.chmodSync", construct := false, arity := 2 }
-    (Support.args #[toJS path, toJS mode]) (await := false)
+    (Internal.args #[toJS path, toJS mode]) (await := false)
 
 /-- `Deno.chown(path: string | URL, uid: number | null, gid: number | null): Promise<void>`: `Promise<undefined> chown(DOMStringOrURL path, double /* integer: Nat */? uid, double /* integer: Nat */? gid)` (Deno 2.9.6 type declarations) -/
-def chown (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : Async Unit :=
+@[macro_inline] def chown (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : Async Unit := Internal.api "Lasm.JS.Deno.chown" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.chown", module := "globalThis", path := "Deno.chown", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS uid, toJS gid])
+    (Internal.args #[toJS path, toJS uid, toJS gid])
 
 /-- `Deno.chownSync(path: string | URL, uid: number | null, gid: number | null): void`: `undefined chownSync(DOMStringOrURL path, double /* integer: Nat */? uid, double /* integer: Nat */? gid)` (Deno 2.9.6 type declarations) -/
-def chownSync (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : IO Unit :=
+@[macro_inline] def chownSync (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : IO Unit := Internal.api "Lasm.JS.Deno.chownSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.chownSync", module := "globalThis", path := "Deno.chownSync", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS uid, toJS gid]) (await := false)
+    (Internal.args #[toJS path, toJS uid, toJS gid]) (await := false)
 
 /-- `Deno.remove(path: string | URL, options?: RemoveOptions): Promise<void>`: `Promise<undefined> remove(DOMStringOrURL path, optional RemoveOptions options)` (Deno 2.9.6 type declarations) -/
-def remove (path : DOMStringOrURL) (options : Option RemoveOptions := none) : Async Unit :=
+@[macro_inline] def remove (path : DOMStringOrURL) (options : Option RemoveOptions := none) : Async Unit := Internal.api "Lasm.JS.Deno.remove" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.remove", module := "globalThis", path := "Deno.remove", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `Deno.removeSync(path: string | URL, options?: RemoveOptions): void`: `undefined removeSync(DOMStringOrURL path, optional RemoveOptions options)` (Deno 2.9.6 type declarations) -/
-def removeSync (path : DOMStringOrURL) (options : Option RemoveOptions := none) : IO Unit :=
+@[macro_inline] def removeSync (path : DOMStringOrURL) (options : Option RemoveOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.removeSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.removeSync", module := "globalThis", path := "Deno.removeSync", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
 
 /-- `Deno.renameSync(oldpath: string | URL, newpath: string | URL): void`: `undefined renameSync(DOMStringOrURL oldpath, DOMStringOrURL newpath)` (Deno 2.9.6 type declarations) -/
-def renameSync (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) : IO Unit :=
+@[macro_inline] def renameSync (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) : IO Unit := Internal.api "Lasm.JS.Deno.renameSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.renameSync", module := "globalThis", path := "Deno.renameSync", construct := false, arity := 2 }
-    (Support.args #[toJS oldpath, toJS newpath]) (await := false)
+    (Internal.args #[toJS oldpath, toJS newpath]) (await := false)
 
 /-- `Deno.rename(oldpath: string | URL, newpath: string | URL): Promise<void>`: `Promise<undefined> rename(DOMStringOrURL oldpath, DOMStringOrURL newpath)` (Deno 2.9.6 type declarations) -/
-def rename (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) : Async Unit :=
+@[macro_inline] def rename (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) : Async Unit := Internal.api "Lasm.JS.Deno.rename" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.rename", module := "globalThis", path := "Deno.rename", construct := false, arity := 2 }
-    (Support.args #[toJS oldpath, toJS newpath])
+    (Internal.args #[toJS oldpath, toJS newpath])
 
 /-- `Deno.readTextFile(path: string | URL, options?: ReadFileOptions): Promise<string>`: `Promise<DOMString> readTextFile(DOMStringOrURL path, optional ReadFileOptions options)` (Deno 2.9.6 type declarations) -/
-def readTextFile (path : DOMStringOrURL) (options : Option ReadFileOptions := none) : Async String :=
+@[macro_inline] def readTextFile (path : DOMStringOrURL) (options : Option ReadFileOptions := none) : Async String := Internal.api "Lasm.JS.Deno.readTextFile" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Deno.readTextFile", module := "globalThis", path := "Deno.readTextFile", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `Deno.readTextFileSync(path: string | URL): string`: `DOMString readTextFileSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def readTextFileSync (path : DOMStringOrURL) : IO String :=
+@[macro_inline] def readTextFileSync (path : DOMStringOrURL) : IO String := Internal.api "Lasm.JS.Deno.readTextFileSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.readTextFileSync", module := "globalThis", path := "Deno.readTextFileSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.readFile(path: string | URL, options?: ReadFileOptions): Promise<Uint8Array<ArrayBuffer>>`: `Promise<Uint8Array> readFile(DOMStringOrURL path, optional ReadFileOptions options)` (Deno 2.9.6 type declarations) -/
-def readFile (path : DOMStringOrURL) (options : Option ReadFileOptions := none) : Async ByteArray :=
+@[macro_inline] def readFile (path : DOMStringOrURL) (options : Option ReadFileOptions := none) : Async ByteArray := Internal.api "Lasm.JS.Deno.readFile" do
   Lasm.JS.Binding.invokeAsync ByteArray { name := "Lasm.JS.Deno.readFile", module := "globalThis", path := "Deno.readFile", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `Deno.readFileSync(path: string | URL): Uint8Array<ArrayBuffer>`: `Uint8Array readFileSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def readFileSync (path : DOMStringOrURL) : IO ByteArray :=
+@[macro_inline] def readFileSync (path : DOMStringOrURL) : IO ByteArray := Internal.api "Lasm.JS.Deno.readFileSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Deno.readFileSync", module := "globalThis", path := "Deno.readFileSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.realPath(path: string | URL): Promise<string>`: `Promise<DOMString> realPath(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def realPath (path : DOMStringOrURL) : Async String :=
+@[macro_inline] def realPath (path : DOMStringOrURL) : Async String := Internal.api "Lasm.JS.Deno.realPath" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Deno.realPath", module := "globalThis", path := "Deno.realPath", construct := false, arity := 1 }
-    (Support.args #[toJS path])
+    (Internal.args #[toJS path])
 
 /-- `Deno.realPathSync(path: string | URL): string`: `DOMString realPathSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def realPathSync (path : DOMStringOrURL) : IO String :=
+@[macro_inline] def realPathSync (path : DOMStringOrURL) : IO String := Internal.api "Lasm.JS.Deno.realPathSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.realPathSync", module := "globalThis", path := "Deno.realPathSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.readDir(path: string | URL): AsyncIterable<DirEntry>`: `DirEntryAsyncIterable readDir(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def readDir (path : DOMStringOrURL) : IO DirEntryAsyncIterable := do
+@[macro_inline] def readDir (path : DOMStringOrURL) : IO DirEntryAsyncIterable := Internal.api "Lasm.JS.Deno.readDir" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.readDir", module := "globalThis", path := "Deno.readDir", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
   pure { val := r }
 
 /-- `Deno.copyFile(fromPath: string | URL, toPath: string | URL): Promise<void>`: `Promise<undefined> copyFile(DOMStringOrURL fromPath, DOMStringOrURL toPath)` (Deno 2.9.6 type declarations) -/
-def copyFile (fromPath : DOMStringOrURL) (toPath : DOMStringOrURL) : Async Unit :=
+@[macro_inline] def copyFile (fromPath : DOMStringOrURL) (toPath : DOMStringOrURL) : Async Unit := Internal.api "Lasm.JS.Deno.copyFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.copyFile", module := "globalThis", path := "Deno.copyFile", construct := false, arity := 2 }
-    (Support.args #[toJS fromPath, toJS toPath])
+    (Internal.args #[toJS fromPath, toJS toPath])
 
 /-- `Deno.copyFileSync(fromPath: string | URL, toPath: string | URL): void`: `undefined copyFileSync(DOMStringOrURL fromPath, DOMStringOrURL toPath)` (Deno 2.9.6 type declarations) -/
-def copyFileSync (fromPath : DOMStringOrURL) (toPath : DOMStringOrURL) : IO Unit :=
+@[macro_inline] def copyFileSync (fromPath : DOMStringOrURL) (toPath : DOMStringOrURL) : IO Unit := Internal.api "Lasm.JS.Deno.copyFileSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.copyFileSync", module := "globalThis", path := "Deno.copyFileSync", construct := false, arity := 2 }
-    (Support.args #[toJS fromPath, toJS toPath]) (await := false)
+    (Internal.args #[toJS fromPath, toJS toPath]) (await := false)
 
 /-- `Deno.readLink(path: string | URL): Promise<string>`: `Promise<DOMString> readLink(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def readLink (path : DOMStringOrURL) : Async String :=
+@[macro_inline] def readLink (path : DOMStringOrURL) : Async String := Internal.api "Lasm.JS.Deno.readLink" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Deno.readLink", module := "globalThis", path := "Deno.readLink", construct := false, arity := 1 }
-    (Support.args #[toJS path])
+    (Internal.args #[toJS path])
 
 /-- `Deno.readLinkSync(path: string | URL): string`: `DOMString readLinkSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def readLinkSync (path : DOMStringOrURL) : IO String :=
+@[macro_inline] def readLinkSync (path : DOMStringOrURL) : IO String := Internal.api "Lasm.JS.Deno.readLinkSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.readLinkSync", module := "globalThis", path := "Deno.readLinkSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.lstat(path: string | URL): Promise<FileInfo>`: `Promise<FileInfo> lstat(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def lstat (path : DOMStringOrURL) : Async FileInfo :=
+@[macro_inline] def lstat (path : DOMStringOrURL) : Async FileInfo := Internal.api "Lasm.JS.Deno.lstat" do
   Lasm.JS.Binding.invokeAsync FileInfo { name := "Lasm.JS.Deno.lstat", module := "globalThis", path := "Deno.lstat", construct := false, arity := 1 }
-    (Support.args #[toJS path])
+    (Internal.args #[toJS path])
 
 /-- `Deno.lstatSync(path: string | URL): FileInfo`: `FileInfo lstatSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def lstatSync (path : DOMStringOrURL) : IO FileInfo :=
+@[macro_inline] def lstatSync (path : DOMStringOrURL) : IO FileInfo := Internal.api "Lasm.JS.Deno.lstatSync" do
   Lasm.JS.Binding.invoke FileInfo { name := "Lasm.JS.Deno.lstatSync", module := "globalThis", path := "Deno.lstatSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.stat(path: string | URL): Promise<FileInfo>`: `Promise<FileInfo> stat(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def stat (path : DOMStringOrURL) : Async FileInfo :=
+@[macro_inline] def stat (path : DOMStringOrURL) : Async FileInfo := Internal.api "Lasm.JS.Deno.stat" do
   Lasm.JS.Binding.invokeAsync FileInfo { name := "Lasm.JS.Deno.stat", module := "globalThis", path := "Deno.stat", construct := false, arity := 1 }
-    (Support.args #[toJS path])
+    (Internal.args #[toJS path])
 
 /-- `Deno.statSync(path: string | URL): FileInfo`: `FileInfo statSync(DOMStringOrURL path)` (Deno 2.9.6 type declarations) -/
-def statSync (path : DOMStringOrURL) : IO FileInfo :=
+@[macro_inline] def statSync (path : DOMStringOrURL) : IO FileInfo := Internal.api "Lasm.JS.Deno.statSync" do
   Lasm.JS.Binding.invoke FileInfo { name := "Lasm.JS.Deno.statSync", module := "globalThis", path := "Deno.statSync", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
 
 /-- `Deno.writeFile(path: string | URL, data: Uint8Array | ReadableStream<Uint8Array>, options?: WriteFileOptions): Promise<void>`: `Promise<undefined> writeFile(DOMStringOrURL path, Uint8ArrayOrReadableStream data, optional WriteFileOptions options)` (Deno 2.9.6 type declarations) -/
-def writeFile (path : DOMStringOrURL) (data : Uint8ArrayOrReadableStream) (options : Option WriteFileOptions := none) : Async Unit :=
+@[macro_inline] def writeFile (path : DOMStringOrURL) (data : Uint8ArrayOrReadableStream) (options : Option WriteFileOptions := none) : Async Unit := Internal.api "Lasm.JS.Deno.writeFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.writeFile", module := "globalThis", path := "Deno.writeFile", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options])
+    (Internal.args #[toJS path, toJS data, Internal.optional options])
 
 /-- `Deno.writeFileSync(path: string | URL, data: Uint8Array, options?: WriteFileOptions): void`: `undefined writeFileSync(DOMStringOrURL path, Uint8Array data, optional WriteFileOptions options)` (Deno 2.9.6 type declarations) -/
-def writeFileSync (path : DOMStringOrURL) (data : ByteArray) (options : Option WriteFileOptions := none) : IO Unit :=
+@[macro_inline] def writeFileSync (path : DOMStringOrURL) (data : ByteArray) (options : Option WriteFileOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.writeFileSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.writeFileSync", module := "globalThis", path := "Deno.writeFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, toJS data, Internal.optional options]) (await := false)
 
 /-- `Deno.writeTextFile(path: string | URL, data: string | ReadableStream<string>, options?: WriteFileOptions): Promise<void>`: `Promise<undefined> writeTextFile(DOMStringOrURL path, DOMStringOrReadableStream data, optional WriteFileOptions options)` (Deno 2.9.6 type declarations) -/
-def writeTextFile (path : DOMStringOrURL) (data : DOMStringOrReadableStream) (options : Option WriteFileOptions := none) : Async Unit :=
+@[macro_inline] def writeTextFile (path : DOMStringOrURL) (data : DOMStringOrReadableStream) (options : Option WriteFileOptions := none) : Async Unit := Internal.api "Lasm.JS.Deno.writeTextFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.writeTextFile", module := "globalThis", path := "Deno.writeTextFile", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options])
+    (Internal.args #[toJS path, toJS data, Internal.optional options])
 
 /-- `Deno.writeTextFileSync(path: string | URL, data: string, options?: WriteFileOptions): void`: `undefined writeTextFileSync(DOMStringOrURL path, DOMString data, optional WriteFileOptions options)` (Deno 2.9.6 type declarations) -/
-def writeTextFileSync (path : DOMStringOrURL) (data : String) (options : Option WriteFileOptions := none) : IO Unit :=
+@[macro_inline] def writeTextFileSync (path : DOMStringOrURL) (data : String) (options : Option WriteFileOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.writeTextFileSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.writeTextFileSync", module := "globalThis", path := "Deno.writeTextFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, toJS data, Internal.optional options]) (await := false)
 
 /-- `Deno.truncate(name: string, len?: number): Promise<void>`: `Promise<undefined> truncate(DOMString name, optional double len)` (Deno 2.9.6 type declarations) -/
-def truncate (name : String) (len : Option Float := none) : Async Unit :=
+@[macro_inline] def truncate (name : String) (len : Option Float := none) : Async Unit := Internal.api "Lasm.JS.Deno.truncate" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.truncate", module := "globalThis", path := "Deno.truncate", construct := false, arity := 2 }
-    (Support.args #[toJS name, Support.optional len])
+    (Internal.args #[toJS name, Internal.optional len])
 
 /-- `Deno.truncateSync(name: string, len?: number): void`: `undefined truncateSync(DOMString name, optional double len)` (Deno 2.9.6 type declarations) -/
-def truncateSync (name : String) (len : Option Float := none) : IO Unit :=
+@[macro_inline] def truncateSync (name : String) (len : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Deno.truncateSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.truncateSync", module := "globalThis", path := "Deno.truncateSync", construct := false, arity := 2 }
-    (Support.args #[toJS name, Support.optional len]) (await := false)
+    (Internal.args #[toJS name, Internal.optional len]) (await := false)
 
 /-- `Deno.watchFs(paths: string | string[], options?: { recursive?: boolean; ignore?: string | string[] }): FsWatcher`: `FsWatcher watchFs(DOMStringOrSequenceOfDOMString paths, optional WatchFsOptions options)` (Deno 2.9.6 type declarations) -/
-def watchFs (paths : DOMStringOrSequenceOfDOMString) (options : Option WatchFsOptions := none) : IO FsWatcher := do
+@[macro_inline] def watchFs (paths : DOMStringOrSequenceOfDOMString) (options : Option WatchFsOptions := none) : IO FsWatcher := Internal.api "Lasm.JS.Deno.watchFs" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.watchFs", module := "globalThis", path := "Deno.watchFs", construct := false, arity := 2 }
-    (Support.args #[toJS paths, Support.optional options]) (await := false)
+    (Internal.args #[toJS paths, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Deno.symlink(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): Promise<void>`: `Promise<undefined> symlink(DOMStringOrURL oldpath, DOMStringOrURL newpath, optional SymlinkOptions options)` (Deno 2.9.6 type declarations) -/
-def symlink (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) (options : Option SymlinkOptions := none) : Async Unit :=
+@[macro_inline] def symlink (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) (options : Option SymlinkOptions := none) : Async Unit := Internal.api "Lasm.JS.Deno.symlink" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.symlink", module := "globalThis", path := "Deno.symlink", construct := false, arity := 3 }
-    (Support.args #[toJS oldpath, toJS newpath, Support.optional options])
+    (Internal.args #[toJS oldpath, toJS newpath, Internal.optional options])
 
 /-- `Deno.symlinkSync(oldpath: string | URL, newpath: string | URL, options?: SymlinkOptions): void`: `undefined symlinkSync(DOMStringOrURL oldpath, DOMStringOrURL newpath, optional SymlinkOptions options)` (Deno 2.9.6 type declarations) -/
-def symlinkSync (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) (options : Option SymlinkOptions := none) : IO Unit :=
+@[macro_inline] def symlinkSync (oldpath : DOMStringOrURL) (newpath : DOMStringOrURL) (options : Option SymlinkOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.symlinkSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.symlinkSync", module := "globalThis", path := "Deno.symlinkSync", construct := false, arity := 3 }
-    (Support.args #[toJS oldpath, toJS newpath, Support.optional options]) (await := false)
+    (Internal.args #[toJS oldpath, toJS newpath, Internal.optional options]) (await := false)
 
 /-- `Deno.utimeSync(path: string | URL, atime: number | Date, mtime: number | Date): void`: `undefined utimeSync(DOMStringOrURL path, any atime, any mtime)` (Deno 2.9.6 type declarations) -/
-def utimeSync (path : DOMStringOrURL) (atime : Data) (mtime : Data) : IO Unit :=
+@[macro_inline] def utimeSync (path : DOMStringOrURL) (atime : Data) (mtime : Data) : IO Unit := Internal.api "Lasm.JS.Deno.utimeSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.utimeSync", module := "globalThis", path := "Deno.utimeSync", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS atime, toJS mtime]) (await := false)
+    (Internal.args #[toJS path, toJS atime, toJS mtime]) (await := false)
 
 /-- `Deno.utime(path: string | URL, atime: number | Date, mtime: number | Date): Promise<void>`: `Promise<undefined> utime(DOMStringOrURL path, any atime, any mtime)` (Deno 2.9.6 type declarations) -/
-def utime (path : DOMStringOrURL) (atime : Data) (mtime : Data) : Async Unit :=
+@[macro_inline] def utime (path : DOMStringOrURL) (atime : Data) (mtime : Data) : Async Unit := Internal.api "Lasm.JS.Deno.utime" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.utime", module := "globalThis", path := "Deno.utime", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS atime, toJS mtime])
+    (Internal.args #[toJS path, toJS atime, toJS mtime])
 
 /-- `Deno.umask(mask?: number): number`: `double umask(optional double mask)` (Deno 2.9.6 type declarations) -/
-def umask (mask : Option Float := none) : IO Float :=
+@[macro_inline] def umask (mask : Option Float := none) : IO Float := Internal.api "Lasm.JS.Deno.umask" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Deno.umask", module := "globalThis", path := "Deno.umask", construct := false, arity := 1 }
-    (Support.args #[Support.optional mask]) (await := false)
+    (Internal.args #[Internal.optional mask]) (await := false)
 
 end Lasm.JS.Deno

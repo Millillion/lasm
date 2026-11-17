@@ -8,12 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Events
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class stream.Writable extends EventEmitter` of `node:stream` (Node.js 24.22.2 documentation, stream.md): a handle to the JavaScript object. -/
 structure stream.Writable extends EventEmitter
@@ -89,10 +93,10 @@ instance instToJSStreamWritableErrorListener : ToJS stream.Writable.ErrorListene
 instance instFromJSStreamWritableErrorListener : FromJS stream.Writable.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.stream.Writable.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def stream.Writable.ErrorListener.ofFn (f : Data → Async Unit) : IO stream.Writable.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Writable.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO stream.Writable.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback stream.Writable.FinishListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure stream.Writable.FinishListener where
@@ -117,10 +121,10 @@ instance instToJSStreamWritablePipeListener : ToJS stream.Writable.PipeListener 
 instance instFromJSStreamWritablePipeListener : FromJS stream.Writable.PipeListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.stream.Writable.PipeListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def stream.Writable.PipeListener.ofFn (f : stream.Readable → Async Unit) : IO stream.Writable.PipeListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Readable args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Readable args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Writable.PipeListener.ofSyncFn (f : stream.Readable → IO Unit) : IO stream.Writable.PipeListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Readable args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Readable args 0)) }
 
 /-- `callback stream.Writable.UnpipeListener = undefined (stream.Readable src)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure stream.Writable.UnpipeListener where
@@ -131,10 +135,10 @@ instance instToJSStreamWritableUnpipeListener : ToJS stream.Writable.UnpipeListe
 instance instFromJSStreamWritableUnpipeListener : FromJS stream.Writable.UnpipeListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.stream.Writable.UnpipeListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def stream.Writable.UnpipeListener.ofFn (f : stream.Readable → Async Unit) : IO stream.Writable.UnpipeListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Readable args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Readable args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Writable.UnpipeListener.ofSyncFn (f : stream.Readable → IO Unit) : IO stream.Writable.UnpipeListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Readable args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Readable args 0)) }
 
 /-- `dictionary stream.Writable.FromWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Writable.FromWebOptions where
@@ -146,10 +150,10 @@ structure stream.Writable.FromWebOptions where
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamWritableFromWebOptions : ToJS stream.Writable.FromWebOptions := ⟨fun d => Support.fields #[("decodeStrings", Support.optional d.decodeStrings),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("objectMode", Support.optional d.objectMode),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamWritableFromWebOptions : ToJS stream.Writable.FromWebOptions := ⟨fun d => Internal.fields #[("decodeStrings", Internal.optional d.decodeStrings),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("objectMode", Internal.optional d.objectMode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `callback stream.Readable.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure stream.Readable.CloseListener where
@@ -174,10 +178,10 @@ instance instToJSStreamReadableDataListener : ToJS stream.Readable.DataListener 
 instance instFromJSStreamReadableDataListener : FromJS stream.Readable.DataListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.stream.Readable.DataListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def stream.Readable.DataListener.ofFn (f : Data → Async Unit) : IO stream.Readable.DataListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Readable.DataListener.ofSyncFn (f : Data → IO Unit) : IO stream.Readable.DataListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback stream.Readable.EndListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure stream.Readable.EndListener where
@@ -202,10 +206,10 @@ instance instToJSStreamReadableErrorListener : ToJS stream.Readable.ErrorListene
 instance instFromJSStreamReadableErrorListener : FromJS stream.Readable.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.stream.Readable.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def stream.Readable.ErrorListener.ofFn (f : Data → Async Unit) : IO stream.Readable.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Readable.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO stream.Readable.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback stream.Readable.PauseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure stream.Readable.PauseListener where
@@ -253,7 +257,7 @@ def stream.Readable.ResumeListener.ofSyncFn (f : IO Unit) : IO stream.Readable.R
 structure stream.Readable.PipeOptions where
   /-- `boolean end = true` -/
   «end» : Option Bool := none
-instance instToJSStreamReadablePipeOptions : ToJS stream.Readable.PipeOptions := ⟨fun d => Support.fields #[("end", Support.optional d.«end»)]⟩
+instance instToJSStreamReadablePipeOptions : ToJS stream.Readable.PipeOptions := ⟨fun d => Internal.fields #[("end", Internal.optional d.«end»)]⟩
 
 /-- `(stream.Writable or stream.Duplex or WritableStream or TransformStream or Function)`: one constructor per member type. -/
 inductive stream.WritableOrDuplexOrWritableStreamOrTransformStreamOrJSFunction where
@@ -283,13 +287,13 @@ instance instCoeJSFunctionStreamWritableOrDuplexOrWritableStreamOrTransformStrea
 structure stream.Readable.ComposeOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableComposeOptions : ToJS stream.Readable.ComposeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableComposeOptions : ToJS stream.Readable.ComposeOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.IteratorOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.IteratorOptions where
   /-- `boolean destroyOnReturn = true` -/
   destroyOnReturn : Option Bool := none
-instance instToJSStreamReadableIteratorOptions : ToJS stream.Readable.IteratorOptions := ⟨fun d => Support.fields #[("destroyOnReturn", Support.optional d.destroyOnReturn)]⟩
+instance instToJSStreamReadableIteratorOptions : ToJS stream.Readable.IteratorOptions := ⟨fun d => Internal.fields #[("destroyOnReturn", Internal.optional d.destroyOnReturn)]⟩
 
 /-- `dictionary stream.Readable.MapOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.MapOptions where
@@ -299,9 +303,9 @@ structure stream.Readable.MapOptions where
   highWaterMark : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableMapOptions : ToJS stream.Readable.MapOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableMapOptions : ToJS stream.Readable.MapOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.FilterOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.FilterOptions where
@@ -311,9 +315,9 @@ structure stream.Readable.FilterOptions where
   highWaterMark : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableFilterOptions : ToJS stream.Readable.FilterOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableFilterOptions : ToJS stream.Readable.FilterOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.ForEachOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ForEachOptions where
@@ -321,14 +325,14 @@ structure stream.Readable.ForEachOptions where
   concurrency : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableForEachOptions : ToJS stream.Readable.ForEachOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableForEachOptions : ToJS stream.Readable.ForEachOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.ToArrayOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToArrayOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableToArrayOptions : ToJS stream.Readable.ToArrayOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableToArrayOptions : ToJS stream.Readable.ToArrayOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.SomeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.SomeOptions where
@@ -336,8 +340,8 @@ structure stream.Readable.SomeOptions where
   concurrency : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableSomeOptions : ToJS stream.Readable.SomeOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableSomeOptions : ToJS stream.Readable.SomeOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.FindOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.FindOptions where
@@ -345,8 +349,8 @@ structure stream.Readable.FindOptions where
   concurrency : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableFindOptions : ToJS stream.Readable.FindOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableFindOptions : ToJS stream.Readable.FindOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.EveryOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.EveryOptions where
@@ -354,8 +358,8 @@ structure stream.Readable.EveryOptions where
   concurrency : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableEveryOptions : ToJS stream.Readable.EveryOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableEveryOptions : ToJS stream.Readable.EveryOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.FlatMapOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.FlatMapOptions where
@@ -363,26 +367,26 @@ structure stream.Readable.FlatMapOptions where
   concurrency : Option Float := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableFlatMapOptions : ToJS stream.Readable.FlatMapOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableFlatMapOptions : ToJS stream.Readable.FlatMapOptions := ⟨fun d => Internal.fields #[("concurrency", Internal.optional d.concurrency),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.DropOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.DropOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableDropOptions : ToJS stream.Readable.DropOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableDropOptions : ToJS stream.Readable.DropOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.TakeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.TakeOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableTakeOptions : ToJS stream.Readable.TakeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableTakeOptions : ToJS stream.Readable.TakeOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.ReduceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ReduceOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableReduceOptions : ToJS stream.Readable.ReduceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableReduceOptions : ToJS stream.Readable.ReduceOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.FromWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.FromWebOptions where
@@ -394,10 +398,10 @@ structure stream.Readable.FromWebOptions where
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamReadableFromWebOptions : ToJS stream.Readable.FromWebOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("objectMode", Support.optional d.objectMode),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamReadableFromWebOptions : ToJS stream.Readable.FromWebOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("objectMode", Internal.optional d.objectMode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(stream.Readable or ReadableStream)`: one constructor per member type. -/
 inductive stream.ReadableOrReadableStream where
@@ -417,8 +421,8 @@ structure stream.Readable.ToWebOptionsStrategy where
   highWaterMark : Option Nat := none
   /-- `Function size` -/
   size : Option JSFunction := none
-instance instToJSStreamReadableToWebOptionsStrategy : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
-    ("size", Support.optional d.size)]⟩
+instance instToJSStreamReadableToWebOptionsStrategy : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark),
+    ("size", Internal.optional d.size)]⟩
 
 /-- `dictionary stream.Readable.ToWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptions where
@@ -426,8 +430,8 @@ structure stream.Readable.ToWebOptions where
   strategy : Option stream.Readable.ToWebOptionsStrategy := none
   /-- `DOMString type` -/
   type : Option String := none
-instance instToJSStreamReadableToWebOptions : ToJS stream.Readable.ToWebOptions := ⟨fun d => Support.fields #[("strategy", Support.optional d.strategy),
-    ("type", Support.optional d.type)]⟩
+instance instToJSStreamReadableToWebOptions : ToJS stream.Readable.ToWebOptions := ⟨fun d => Internal.fields #[("strategy", Internal.optional d.strategy),
+    ("type", Internal.optional d.type)]⟩
 
 /-- `dictionary stream.Duplex.FromWebPair` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Duplex.FromWebPair where
@@ -435,8 +439,8 @@ structure stream.Duplex.FromWebPair where
   readable : Option ReadableStream := none
   /-- `WritableStream writable` -/
   writable : Option WritableStream := none
-instance instToJSStreamDuplexFromWebPair : ToJS stream.Duplex.FromWebPair := ⟨fun d => Support.fields #[("readable", Support.optional d.readable),
-    ("writable", Support.optional d.writable)]⟩
+instance instToJSStreamDuplexFromWebPair : ToJS stream.Duplex.FromWebPair := ⟨fun d => Internal.fields #[("readable", Internal.optional d.readable),
+    ("writable", Internal.optional d.writable)]⟩
 
 /-- `dictionary stream.Duplex.FromWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Duplex.FromWebOptions where
@@ -452,18 +456,18 @@ structure stream.Duplex.FromWebOptions where
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamDuplexFromWebOptions : ToJS stream.Duplex.FromWebOptions := ⟨fun d => Support.fields #[("allowHalfOpen", Support.optional d.allowHalfOpen),
-    ("decodeStrings", Support.optional d.decodeStrings),
-    ("encoding", Support.optional d.encoding),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("objectMode", Support.optional d.objectMode),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamDuplexFromWebOptions : ToJS stream.Duplex.FromWebOptions := ⟨fun d => Internal.fields #[("allowHalfOpen", Internal.optional d.allowHalfOpen),
+    ("decodeStrings", Internal.optional d.decodeStrings),
+    ("encoding", Internal.optional d.encoding),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("objectMode", Internal.optional d.objectMode),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Duplex.ToWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Duplex.ToWebOptions where
   /-- `DOMString readableType` -/
   readableType : Option String := none
-instance instToJSStreamDuplexToWebOptions : ToJS stream.Duplex.ToWebOptions := ⟨fun d => Support.fields #[("readableType", Support.optional d.readableType)]⟩
+instance instToJSStreamDuplexToWebOptions : ToJS stream.Duplex.ToWebOptions := ⟨fun d => Internal.fields #[("readableType", Internal.optional d.readableType)]⟩
 
 /-- `(EventEmitter or ReadableStream or WritableStream)`: one constructor per member type. -/
 inductive EventEmitterOrReadableStreamOrWritableStream where
@@ -491,10 +495,10 @@ structure stream.FinishedOptions where
   writable : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSStreamFinishedOptions : ToJS stream.FinishedOptions := ⟨fun d => Support.fields #[("error", Support.optional d.error),
-    ("readable", Support.optional d.readable),
-    ("writable", Support.optional d.writable),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSStreamFinishedOptions : ToJS stream.FinishedOptions := ⟨fun d => Internal.fields #[("error", Internal.optional d.error),
+    ("readable", Internal.optional d.readable),
+    ("writable", Internal.optional d.writable),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(EventEmitter or object or Function or ReadableStream)`: one constructor per member type. -/
 inductive EventEmitterOrObjectOrJSFunctionOrReadableStream where
@@ -689,8 +693,8 @@ structure stream.PipelineOptions where
   signal : Option AbortSignal := none
   /-- `boolean end = true` -/
   «end» : Option Bool := none
-instance instToJSStreamPipelineOptions : ToJS stream.PipelineOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("end", Support.optional d.«end»)]⟩
+instance instToJSStreamPipelineOptions : ToJS stream.PipelineOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("end", Internal.optional d.«end»)]⟩
 
 /-- `dictionary stream.FinishedOptions2` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.FinishedOptions2 where
@@ -704,564 +708,585 @@ structure stream.FinishedOptions2 where
   signal : Option AbortSignal := none
   /-- `boolean? cleanup = false` -/
   cleanup : Option Bool := none
-instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun d => Support.fields #[("error", Support.optional d.error),
-    ("readable", Support.optional d.readable),
-    ("writable", Support.optional d.writable),
-    ("signal", Support.optional d.signal),
-    ("cleanup", Support.optional d.cleanup)]⟩
+instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun d => Internal.fields #[("error", Internal.optional d.error),
+    ("readable", Internal.optional d.readable),
+    ("writable", Internal.optional d.writable),
+    ("signal", Internal.optional d.signal),
+    ("cleanup", Internal.optional d.cleanup)]⟩
 
 /-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
-def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := Internal.api "Lasm.JS.Node.stream.Writable.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Writable"] Value) (fun x => { val := x }) v
 
 /-- `writable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
-def stream.Writable.closed (self : stream.Writable) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def stream.Writable.closed (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.closed" do
+  self.val.get "closed" Bool
 
 /-- `writable.destroyed` (added in Node.js v8.0.0): `readonly attribute boolean destroyed` -/
-def stream.Writable.destroyed (self : stream.Writable) : IO Bool := self.val.get "destroyed" Bool
+@[macro_inline] def stream.Writable.destroyed (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.destroyed" do
+  self.val.get "destroyed" Bool
 
 /-- `writable.writable` (added in Node.js v11.4.0): `readonly attribute boolean writable` -/
-def stream.Writable.writable (self : stream.Writable) : IO Bool := self.val.get "writable" Bool
+@[macro_inline] def stream.Writable.writable (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writable" do
+  self.val.get "writable" Bool
 
 /-- `writable.writableAborted` (added in Node.js v18.0.0, v16.17.0): `readonly attribute boolean writableAborted` -/
-def stream.Writable.writableAborted (self : stream.Writable) : IO Bool := self.val.get "writableAborted" Bool
+@[macro_inline] def stream.Writable.writableAborted (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writableAborted" do
+  self.val.get "writableAborted" Bool
 
 /-- `writable.writableEnded` (added in Node.js v12.9.0): `readonly attribute boolean writableEnded` -/
-def stream.Writable.writableEnded (self : stream.Writable) : IO Bool := self.val.get "writableEnded" Bool
+@[macro_inline] def stream.Writable.writableEnded (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writableEnded" do
+  self.val.get "writableEnded" Bool
 
 /-- `writable.writableCorked` (added in Node.js v13.2.0, v12.16.0): `readonly attribute long long writableCorked` -/
-def stream.Writable.writableCorked (self : stream.Writable) : IO Int := self.val.get "writableCorked" Int
+@[macro_inline] def stream.Writable.writableCorked (self : stream.Writable) : IO Int := Internal.api "Lasm.JS.Node.stream.Writable.writableCorked" do
+  self.val.get "writableCorked" Int
 
 /-- `writable.errored` (added in Node.js v18.0.0): `readonly attribute any errored` -/
-def stream.Writable.errored (self : stream.Writable) : IO Data := self.val.get "errored" Data
+@[macro_inline] def stream.Writable.errored (self : stream.Writable) : IO Data := Internal.api "Lasm.JS.Node.stream.Writable.errored" do
+  self.val.get "errored" Data
 
 /-- `writable.writableFinished` (added in Node.js v12.6.0): `readonly attribute boolean writableFinished` -/
-def stream.Writable.writableFinished (self : stream.Writable) : IO Bool := self.val.get "writableFinished" Bool
+@[macro_inline] def stream.Writable.writableFinished (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writableFinished" do
+  self.val.get "writableFinished" Bool
 
 /-- `writable.writableHighWaterMark` (added in Node.js v9.3.0): `readonly attribute double writableHighWaterMark` -/
-def stream.Writable.writableHighWaterMark (self : stream.Writable) : IO Float := self.val.get "writableHighWaterMark" Float
+@[macro_inline] def stream.Writable.writableHighWaterMark (self : stream.Writable) : IO Float := Internal.api "Lasm.JS.Node.stream.Writable.writableHighWaterMark" do
+  self.val.get "writableHighWaterMark" Float
 
 /-- `writable.writableLength` (added in Node.js v9.4.0): `readonly attribute double writableLength` -/
-def stream.Writable.writableLength (self : stream.Writable) : IO Float := self.val.get "writableLength" Float
+@[macro_inline] def stream.Writable.writableLength (self : stream.Writable) : IO Float := Internal.api "Lasm.JS.Node.stream.Writable.writableLength" do
+  self.val.get "writableLength" Float
 
 /-- `writable.writableNeedDrain` (added in Node.js v15.2.0, v14.17.0): `readonly attribute boolean writableNeedDrain` -/
-def stream.Writable.writableNeedDrain (self : stream.Writable) : IO Bool := self.val.get "writableNeedDrain" Bool
+@[macro_inline] def stream.Writable.writableNeedDrain (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writableNeedDrain" do
+  self.val.get "writableNeedDrain" Bool
 
 /-- `writable.writableObjectMode` (added in Node.js v12.3.0): `readonly attribute boolean writableObjectMode` -/
-def stream.Writable.writableObjectMode (self : stream.Writable) : IO Bool := self.val.get "writableObjectMode" Bool
+@[macro_inline] def stream.Writable.writableObjectMode (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.writableObjectMode" do
+  self.val.get "writableObjectMode" Bool
 
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Writable onClose(stream.Writable.CloseListener listener)`: calls `on("close", listener)` -/
-def stream.Writable.onClose (self : stream.Writable) (listener : stream.Writable.CloseListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def stream.Writable.onClose (self : stream.Writable) (listener : stream.Writable.CloseListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Writable onceClose(stream.Writable.CloseListener listener)`: calls `once("close", listener)` -/
-def stream.Writable.onceClose (self : stream.Writable) (listener : stream.Writable.CloseListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def stream.Writable.onceClose (self : stream.Writable) (listener : stream.Writable.CloseListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drain'` (added in Node.js v0.9.4): `stream.Writable onDrain(stream.Writable.DrainListener listener)`: calls `on("drain", listener)` -/
-def stream.Writable.onDrain (self : stream.Writable) (listener : stream.Writable.DrainListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def stream.Writable.onDrain (self : stream.Writable) (listener : stream.Writable.DrainListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onDrain" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drain'` (added in Node.js v0.9.4): `stream.Writable onceDrain(stream.Writable.DrainListener listener)`: calls `once("drain", listener)` -/
-def stream.Writable.onceDrain (self : stream.Writable) (listener : stream.Writable.DrainListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def stream.Writable.onceDrain (self : stream.Writable) (listener : stream.Writable.DrainListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onceDrain" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.9.4): `stream.Writable onError(stream.Writable.ErrorListener listener)`: calls `on("error", listener)` -/
-def stream.Writable.onError (self : stream.Writable) (listener : stream.Writable.ErrorListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def stream.Writable.onError (self : stream.Writable) (listener : stream.Writable.ErrorListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.9.4): `stream.Writable onceError(stream.Writable.ErrorListener listener)`: calls `once("error", listener)` -/
-def stream.Writable.onceError (self : stream.Writable) (listener : stream.Writable.ErrorListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def stream.Writable.onceError (self : stream.Writable) (listener : stream.Writable.ErrorListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'finish'` (added in Node.js v0.9.4): `stream.Writable onFinish(stream.Writable.FinishListener listener)`: calls `on("finish", listener)` -/
-def stream.Writable.onFinish (self : stream.Writable) (listener : stream.Writable.FinishListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def stream.Writable.onFinish (self : stream.Writable) (listener : stream.Writable.FinishListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onFinish" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'finish'` (added in Node.js v0.9.4): `stream.Writable onceFinish(stream.Writable.FinishListener listener)`: calls `once("finish", listener)` -/
-def stream.Writable.onceFinish (self : stream.Writable) (listener : stream.Writable.FinishListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def stream.Writable.onceFinish (self : stream.Writable) (listener : stream.Writable.FinishListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onceFinish" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pipe'` (added in Node.js v0.9.4): `stream.Writable onPipe(stream.Writable.PipeListener listener)`: calls `on("pipe", listener)` -/
-def stream.Writable.onPipe (self : stream.Writable) (listener : stream.Writable.PipeListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "pipe", toJS listener]) Value
+@[macro_inline] def stream.Writable.onPipe (self : stream.Writable) (listener : stream.Writable.PipeListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onPipe" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "pipe", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pipe'` (added in Node.js v0.9.4): `stream.Writable oncePipe(stream.Writable.PipeListener listener)`: calls `once("pipe", listener)` -/
-def stream.Writable.oncePipe (self : stream.Writable) (listener : stream.Writable.PipeListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "pipe", toJS listener]) Value
+@[macro_inline] def stream.Writable.oncePipe (self : stream.Writable) (listener : stream.Writable.PipeListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.oncePipe" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "pipe", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'unpipe'` (added in Node.js v0.9.4): `stream.Writable onUnpipe(stream.Writable.UnpipeListener listener)`: calls `on("unpipe", listener)` -/
-def stream.Writable.onUnpipe (self : stream.Writable) (listener : stream.Writable.UnpipeListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "unpipe", toJS listener]) Value
+@[macro_inline] def stream.Writable.onUnpipe (self : stream.Writable) (listener : stream.Writable.UnpipeListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onUnpipe" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "unpipe", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'unpipe'` (added in Node.js v0.9.4): `stream.Writable onceUnpipe(stream.Writable.UnpipeListener listener)`: calls `once("unpipe", listener)` -/
-def stream.Writable.onceUnpipe (self : stream.Writable) (listener : stream.Writable.UnpipeListener) : IO stream.Writable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "unpipe", toJS listener]) Value
+@[macro_inline] def stream.Writable.onceUnpipe (self : stream.Writable) (listener : stream.Writable.UnpipeListener) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.onceUnpipe" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "unpipe", toJS listener]) Value
   pure { val := r }
 
 /-- `writable.cork()` (added in Node.js v0.11.2): `undefined cork()` -/
-def stream.Writable.cork (self : stream.Writable) : IO Unit :=
-  self.val.callMethod "cork" (Support.args #[]) Unit
+@[macro_inline] def stream.Writable.cork (self : stream.Writable) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.cork" do
+  self.val.callMethod "cork" (Internal.args #[]) Unit
 
 /-- `writable.destroy([error])` (added in Node.js v8.0.0): `stream.Writable destroy(optional any error)` -/
-def stream.Writable.destroy (self : stream.Writable) (error : Data := .undefined) : IO stream.Writable := do
-  let r ← self.val.callMethod "destroy" (Support.args #[error]) Value
+@[macro_inline] def stream.Writable.destroy (self : stream.Writable) (error : Data := .undefined) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.destroy" do
+  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
 /-- `writable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined destroy(any err, Function callback)` -/
-def stream.Writable.destroyWithErr (self : stream.Writable) (err : Data) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[toJS err, toJS callback]) Unit
+@[macro_inline] def stream.Writable.destroyWithErr (self : stream.Writable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.destroyWithErr" do
+  self.val.callMethod "destroy" (Internal.args #[toJS err, toJS callback]) Unit
 
 /-- `writable.end([chunk[, encoding]][, callback])` (added in Node.js v0.9.4): `stream.Writable end(optional any chunk, optional DOMString encoding)` -/
-def stream.Writable.«end» (self : stream.Writable) (chunk : Data := .undefined) (encoding : Option String := none) : IO stream.Writable := do
-  let r ← self.val.callMethod "end" (Support.args #[chunk, Support.optional encoding]) Value
+@[macro_inline] def stream.Writable.«end» (self : stream.Writable) (chunk : Data := .undefined) (encoding : Option String := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.end" do
+  let r ← self.val.callMethod "end" (Internal.args #[chunk, Internal.optional encoding]) Value
   pure { val := r }
 
 /-- `writable.setDefaultEncoding(encoding)` (added in Node.js v0.11.15): `stream.Writable setDefaultEncoding(DOMString encoding)` -/
-def stream.Writable.setDefaultEncoding (self : stream.Writable) (encoding : String) : IO stream.Writable := do
-  let r ← self.val.callMethod "setDefaultEncoding" (Support.args #[toJS encoding]) Value
+@[macro_inline] def stream.Writable.setDefaultEncoding (self : stream.Writable) (encoding : String) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.setDefaultEncoding" do
+  let r ← self.val.callMethod "setDefaultEncoding" (Internal.args #[toJS encoding]) Value
   pure { val := r }
 
 /-- `writable.uncork()` (added in Node.js v0.11.2): `undefined uncork()` -/
-def stream.Writable.uncork (self : stream.Writable) : IO Unit :=
-  self.val.callMethod "uncork" (Support.args #[]) Unit
+@[macro_inline] def stream.Writable.uncork (self : stream.Writable) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.uncork" do
+  self.val.callMethod "uncork" (Internal.args #[]) Unit
 
 /-- `writable.write(chunk[, encoding][, callback])` (added in Node.js v0.9.4): `boolean write(any chunk, optional DOMString encoding)` -/
-def stream.Writable.write (self : stream.Writable) (chunk : Data) (encoding : Option String := none) : IO Bool :=
-  self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+@[macro_inline] def stream.Writable.write (self : stream.Writable) (chunk : Data) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.write" do
+  self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
 
 /-- `writable._write(chunk, encoding, callback)`: `undefined write(any chunk, DOMString encoding, Function callback)` -/
-def stream.Writable.writeWithCallback (self : stream.Writable) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "write" (Support.args #[toJS chunk, toJS encoding, toJS callback]) Unit
+@[macro_inline] def stream.Writable.writeWithCallback (self : stream.Writable) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.writeWithCallback" do
+  self.val.callMethod "write" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
 
 /-- `writable._construct(callback)` (added in Node.js v15.0.0): `undefined construct(Function callback)` -/
-def stream.Writable.construct (self : stream.Writable) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "construct" (Support.args #[toJS callback]) Unit
+@[macro_inline] def stream.Writable.construct (self : stream.Writable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.construct" do
+  self.val.callMethod "construct" (Internal.args #[toJS callback]) Unit
 
 /-- `writable._writev(chunks, callback)`: `undefined writev(sequence<object> chunks, Function callback)` -/
-def stream.Writable.writev (self : stream.Writable) (chunks : Array Data) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "writev" (Support.args #[toJS chunks, toJS callback]) Unit
+@[macro_inline] def stream.Writable.writev (self : stream.Writable) (chunks : Array Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.writev" do
+  self.val.callMethod "writev" (Internal.args #[toJS chunks, toJS callback]) Unit
 
 /-- `writable._final(callback)` (added in Node.js v8.0.0): `undefined final(Function callback)` -/
-def stream.Writable.final (self : stream.Writable) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "final" (Support.args #[toJS callback]) Unit
+@[macro_inline] def stream.Writable.final (self : stream.Writable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.final" do
+  self.val.callMethod "final" (Internal.args #[toJS callback]) Unit
 
 /-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
-def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := do
+@[macro_inline] def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.fromWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.fromWeb", module := "node:stream", path := "Writable.fromWeb", construct := false, arity := 2 }
-    (Support.args #[toJS writableStream, Support.optional options]) (await := false)
+    (Internal.args #[toJS writableStream, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `stream.Writable.toWeb(streamWritable)` (added in Node.js v17.0.0): `static WritableStream toWeb(stream.Writable streamWritable)` -/
-def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream := do
+@[macro_inline] def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream := Internal.api "Lasm.JS.Node.stream.Writable.toWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.toWeb", module := "node:stream", path := "Writable.toWeb", construct := false, arity := 1 }
-    (Support.args #[toJS streamWritable]) (await := false)
+    (Internal.args #[toJS streamWritable]) (await := false)
   pure { val := r }
 
 /-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
-def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.stream.Readable.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Readable"] Value) (fun x => { val := x }) v
 
 /-- `readable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
-def stream.Readable.closed (self : stream.Readable) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def stream.Readable.closed (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.closed" do
+  self.val.get "closed" Bool
 
 /-- `readable.destroyed` (added in Node.js v8.0.0): `readonly attribute boolean destroyed` -/
-def stream.Readable.destroyed (self : stream.Readable) : IO Bool := self.val.get "destroyed" Bool
+@[macro_inline] def stream.Readable.destroyed (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.destroyed" do
+  self.val.get "destroyed" Bool
 
 /-- `readable.readable` (added in Node.js v11.4.0): `readonly attribute boolean readable` -/
-def stream.Readable.readable (self : stream.Readable) : IO Bool := self.val.get "readable" Bool
+@[macro_inline] def stream.Readable.readable (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readable" do
+  self.val.get "readable" Bool
 
 /-- `readable.readableAborted` (added in Node.js v16.8.0): `readonly attribute boolean readableAborted` -/
-def stream.Readable.readableAborted (self : stream.Readable) : IO Bool := self.val.get "readableAborted" Bool
+@[macro_inline] def stream.Readable.readableAborted (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readableAborted" do
+  self.val.get "readableAborted" Bool
 
 /-- `readable.readableDidRead` (added in Node.js v16.7.0, v14.18.0): `readonly attribute boolean readableDidRead` -/
-def stream.Readable.readableDidRead (self : stream.Readable) : IO Bool := self.val.get "readableDidRead" Bool
+@[macro_inline] def stream.Readable.readableDidRead (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readableDidRead" do
+  self.val.get "readableDidRead" Bool
 
 /-- `readable.readableEncoding` (added in Node.js v12.7.0): `readonly attribute DOMString? readableEncoding` -/
-def stream.Readable.readableEncoding (self : stream.Readable) : IO (Option String) := self.val.get "readableEncoding" (Option String)
+@[macro_inline] def stream.Readable.readableEncoding (self : stream.Readable) : IO (Option String) := Internal.api "Lasm.JS.Node.stream.Readable.readableEncoding" do
+  self.val.get "readableEncoding" (Option String)
 
 /-- `readable.readableEnded` (added in Node.js v12.9.0): `readonly attribute boolean readableEnded` -/
-def stream.Readable.readableEnded (self : stream.Readable) : IO Bool := self.val.get "readableEnded" Bool
+@[macro_inline] def stream.Readable.readableEnded (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readableEnded" do
+  self.val.get "readableEnded" Bool
 
 /-- `readable.errored` (added in Node.js v18.0.0): `readonly attribute any errored` -/
-def stream.Readable.errored (self : stream.Readable) : IO Data := self.val.get "errored" Data
+@[macro_inline] def stream.Readable.errored (self : stream.Readable) : IO Data := Internal.api "Lasm.JS.Node.stream.Readable.errored" do
+  self.val.get "errored" Data
 
 /-- `readable.readableFlowing` (added in Node.js v9.4.0): `readonly attribute boolean readableFlowing` -/
-def stream.Readable.readableFlowing (self : stream.Readable) : IO Bool := self.val.get "readableFlowing" Bool
+@[macro_inline] def stream.Readable.readableFlowing (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readableFlowing" do
+  self.val.get "readableFlowing" Bool
 
 /-- `readable.readableHighWaterMark` (added in Node.js v9.3.0): `readonly attribute double readableHighWaterMark` -/
-def stream.Readable.readableHighWaterMark (self : stream.Readable) : IO Float := self.val.get "readableHighWaterMark" Float
+@[macro_inline] def stream.Readable.readableHighWaterMark (self : stream.Readable) : IO Float := Internal.api "Lasm.JS.Node.stream.Readable.readableHighWaterMark" do
+  self.val.get "readableHighWaterMark" Float
 
 /-- `readable.readableLength` (added in Node.js v9.4.0): `readonly attribute double readableLength` -/
-def stream.Readable.readableLength (self : stream.Readable) : IO Float := self.val.get "readableLength" Float
+@[macro_inline] def stream.Readable.readableLength (self : stream.Readable) : IO Float := Internal.api "Lasm.JS.Node.stream.Readable.readableLength" do
+  self.val.get "readableLength" Float
 
 /-- `readable.readableObjectMode` (added in Node.js v12.3.0): `readonly attribute boolean readableObjectMode` -/
-def stream.Readable.readableObjectMode (self : stream.Readable) : IO Bool := self.val.get "readableObjectMode" Bool
+@[macro_inline] def stream.Readable.readableObjectMode (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.readableObjectMode" do
+  self.val.get "readableObjectMode" Bool
 
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Readable onClose(stream.Readable.CloseListener listener)`: calls `on("close", listener)` -/
-def stream.Readable.onClose (self : stream.Readable) (listener : stream.Readable.CloseListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def stream.Readable.onClose (self : stream.Readable) (listener : stream.Readable.CloseListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Readable onceClose(stream.Readable.CloseListener listener)`: calls `once("close", listener)` -/
-def stream.Readable.onceClose (self : stream.Readable) (listener : stream.Readable.CloseListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceClose (self : stream.Readable) (listener : stream.Readable.CloseListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'data'` (added in Node.js v0.9.4): `stream.Readable onData(stream.Readable.DataListener listener)`: calls `on("data", listener)` -/
-def stream.Readable.onData (self : stream.Readable) (listener : stream.Readable.DataListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "data", toJS listener]) Value
+@[macro_inline] def stream.Readable.onData (self : stream.Readable) (listener : stream.Readable.DataListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onData" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "data", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'data'` (added in Node.js v0.9.4): `stream.Readable onceData(stream.Readable.DataListener listener)`: calls `once("data", listener)` -/
-def stream.Readable.onceData (self : stream.Readable) (listener : stream.Readable.DataListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "data", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceData (self : stream.Readable) (listener : stream.Readable.DataListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceData" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "data", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'end'` (added in Node.js v0.9.4): `stream.Readable onEnd(stream.Readable.EndListener listener)`: calls `on("end", listener)` -/
-def stream.Readable.onEnd (self : stream.Readable) (listener : stream.Readable.EndListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "end", toJS listener]) Value
+@[macro_inline] def stream.Readable.onEnd (self : stream.Readable) (listener : stream.Readable.EndListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onEnd" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "end", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'end'` (added in Node.js v0.9.4): `stream.Readable onceEnd(stream.Readable.EndListener listener)`: calls `once("end", listener)` -/
-def stream.Readable.onceEnd (self : stream.Readable) (listener : stream.Readable.EndListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "end", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceEnd (self : stream.Readable) (listener : stream.Readable.EndListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceEnd" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "end", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.9.4): `stream.Readable onError(stream.Readable.ErrorListener listener)`: calls `on("error", listener)` -/
-def stream.Readable.onError (self : stream.Readable) (listener : stream.Readable.ErrorListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def stream.Readable.onError (self : stream.Readable) (listener : stream.Readable.ErrorListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.9.4): `stream.Readable onceError(stream.Readable.ErrorListener listener)`: calls `once("error", listener)` -/
-def stream.Readable.onceError (self : stream.Readable) (listener : stream.Readable.ErrorListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceError (self : stream.Readable) (listener : stream.Readable.ErrorListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pause'` (added in Node.js v0.9.4): `stream.Readable onPause(stream.Readable.PauseListener listener)`: calls `on("pause", listener)` -/
-def stream.Readable.onPause (self : stream.Readable) (listener : stream.Readable.PauseListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "pause", toJS listener]) Value
+@[macro_inline] def stream.Readable.onPause (self : stream.Readable) (listener : stream.Readable.PauseListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onPause" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "pause", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pause'` (added in Node.js v0.9.4): `stream.Readable oncePause(stream.Readable.PauseListener listener)`: calls `once("pause", listener)` -/
-def stream.Readable.oncePause (self : stream.Readable) (listener : stream.Readable.PauseListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "pause", toJS listener]) Value
+@[macro_inline] def stream.Readable.oncePause (self : stream.Readable) (listener : stream.Readable.PauseListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.oncePause" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "pause", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'readable'` (added in Node.js v0.9.4): `stream.Readable onReadable(stream.Readable.ReadableListener listener)`: calls `on("readable", listener)` -/
-def stream.Readable.onReadable (self : stream.Readable) (listener : stream.Readable.ReadableListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "readable", toJS listener]) Value
+@[macro_inline] def stream.Readable.onReadable (self : stream.Readable) (listener : stream.Readable.ReadableListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onReadable" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "readable", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'readable'` (added in Node.js v0.9.4): `stream.Readable onceReadable(stream.Readable.ReadableListener listener)`: calls `once("readable", listener)` -/
-def stream.Readable.onceReadable (self : stream.Readable) (listener : stream.Readable.ReadableListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "readable", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceReadable (self : stream.Readable) (listener : stream.Readable.ReadableListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceReadable" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "readable", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resume'` (added in Node.js v0.9.4): `stream.Readable onResume(stream.Readable.ResumeListener listener)`: calls `on("resume", listener)` -/
-def stream.Readable.onResume (self : stream.Readable) (listener : stream.Readable.ResumeListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "resume", toJS listener]) Value
+@[macro_inline] def stream.Readable.onResume (self : stream.Readable) (listener : stream.Readable.ResumeListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onResume" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "resume", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resume'` (added in Node.js v0.9.4): `stream.Readable onceResume(stream.Readable.ResumeListener listener)`: calls `once("resume", listener)` -/
-def stream.Readable.onceResume (self : stream.Readable) (listener : stream.Readable.ResumeListener) : IO stream.Readable := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "resume", toJS listener]) Value
+@[macro_inline] def stream.Readable.onceResume (self : stream.Readable) (listener : stream.Readable.ResumeListener) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.onceResume" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "resume", toJS listener]) Value
   pure { val := r }
 
 /-- `readable.destroy([error])` (added in Node.js v8.0.0): `stream.Readable destroy(optional any error)` -/
-def stream.Readable.destroy (self : stream.Readable) (error : Data := .undefined) : IO stream.Readable := do
-  let r ← self.val.callMethod "destroy" (Support.args #[error]) Value
+@[macro_inline] def stream.Readable.destroy (self : stream.Readable) (error : Data := .undefined) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.destroy" do
+  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
 /-- `readable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined destroy(any err, Function callback)` -/
-def stream.Readable.destroyWithErr (self : stream.Readable) (err : Data) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[toJS err, toJS callback]) Unit
+@[macro_inline] def stream.Readable.destroyWithErr (self : stream.Readable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.destroyWithErr" do
+  self.val.callMethod "destroy" (Internal.args #[toJS err, toJS callback]) Unit
 
 /-- `readable.isPaused()` (added in Node.js v0.11.14): `boolean isPaused()` -/
-def stream.Readable.isPaused (self : stream.Readable) : IO Bool :=
-  self.val.callMethod "isPaused" (Support.args #[]) Bool
+@[macro_inline] def stream.Readable.isPaused (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.isPaused" do
+  self.val.callMethod "isPaused" (Internal.args #[]) Bool
 
 /-- `readable.pause()` (added in Node.js v0.9.4): `stream.Readable pause()` -/
-def stream.Readable.pause (self : stream.Readable) : IO stream.Readable := do
-  let r ← self.val.callMethod "pause" (Support.args #[]) Value
+@[macro_inline] def stream.Readable.pause (self : stream.Readable) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.pause" do
+  let r ← self.val.callMethod "pause" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readable.pipe(destination[, options])` (added in Node.js v0.9.4): `stream.Writable pipe(stream.Writable destination, optional stream.Readable.PipeOptions options)` -/
-def stream.Readable.pipe (self : stream.Readable) (destination : stream.Writable) (options : Option stream.Readable.PipeOptions := none) : IO stream.Writable := do
-  let r ← self.val.callMethod "pipe" (Support.args #[toJS destination, Support.optional options]) Value
+@[macro_inline] def stream.Readable.pipe (self : stream.Readable) (destination : stream.Writable) (options : Option stream.Readable.PipeOptions := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Readable.pipe" do
+  let r ← self.val.callMethod "pipe" (Internal.args #[toJS destination, Internal.optional options]) Value
   pure { val := r }
 
 /-- `readable.read([size])` (added in Node.js v0.9.4): `any read(optional double /* integer: Nat */ size)` -/
-def stream.Readable.read (self : stream.Readable) (size : Option Nat := none) : IO Data :=
-  self.val.callMethod "read" (Support.args #[Support.optional size]) Data
+@[macro_inline] def stream.Readable.read (self : stream.Readable) (size : Option Nat := none) : IO Data := Internal.api "Lasm.JS.Node.stream.Readable.read" do
+  self.val.callMethod "read" (Internal.args #[Internal.optional size]) Data
 
 /-- `readable.read(0)`: `undefined read()` -/
-def stream.Readable.read0 (self : stream.Readable) : IO Unit :=
-  self.val.callMethod "read" (Support.args #[]) Unit
-
-/-- `readable._read(size)` (added in Node.js v0.9.4): `undefined read(double /* integer: Nat */ size)` -/
-def stream.Readable.read1 (self : stream.Readable) (size : Nat) : IO Unit :=
-  self.val.callMethod "read" (Support.args #[toJS size]) Unit
+@[macro_inline] def stream.Readable.read0 (self : stream.Readable) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.read0" do
+  self.val.callMethod "read" (Internal.args #[]) Unit
 
 /-- `readable.resume()` (added in Node.js v0.9.4): `stream.Readable resume()` -/
-def stream.Readable.resume (self : stream.Readable) : IO stream.Readable := do
-  let r ← self.val.callMethod "resume" (Support.args #[]) Value
+@[macro_inline] def stream.Readable.resume (self : stream.Readable) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.resume" do
+  let r ← self.val.callMethod "resume" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readable.setEncoding(encoding)` (added in Node.js v0.9.4): `stream.Readable setEncoding(DOMString encoding)` -/
-def stream.Readable.setEncoding (self : stream.Readable) (encoding : String) : IO stream.Readable := do
-  let r ← self.val.callMethod "setEncoding" (Support.args #[toJS encoding]) Value
+@[macro_inline] def stream.Readable.setEncoding (self : stream.Readable) (encoding : String) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.setEncoding" do
+  let r ← self.val.callMethod "setEncoding" (Internal.args #[toJS encoding]) Value
   pure { val := r }
 
 /-- `readable.unpipe([destination])` (added in Node.js v0.9.4): `stream.Readable unpipe(optional stream.Writable destination)` -/
-def stream.Readable.unpipe (self : stream.Readable) (destination : Option stream.Writable := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "unpipe" (Support.args #[Support.optional destination]) Value
+@[macro_inline] def stream.Readable.unpipe (self : stream.Readable) (destination : Option stream.Writable := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.unpipe" do
+  let r ← self.val.callMethod "unpipe" (Internal.args #[Internal.optional destination]) Value
   pure { val := r }
 
 /-- `readable.unshift(chunk[, encoding])` (added in Node.js v0.9.11): `undefined unshift(any chunk, optional DOMString encoding)` -/
-def stream.Readable.unshift (self : stream.Readable) (chunk : Data) (encoding : Option String := none) : IO Unit :=
-  self.val.callMethod "unshift" (Support.args #[toJS chunk, Support.optional encoding]) Unit
+@[macro_inline] def stream.Readable.unshift (self : stream.Readable) (chunk : Data) (encoding : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.unshift" do
+  self.val.callMethod "unshift" (Internal.args #[toJS chunk, Internal.optional encoding]) Unit
 
 /-- `readable.wrap(stream)` (added in Node.js v0.9.4): `stream.Readable wrap(EventEmitter stream)` -/
-def stream.Readable.wrap (self : stream.Readable) (stream_ : EventEmitter) : IO stream.Readable := do
-  let r ← self.val.callMethod "wrap" (Support.args #[toJS stream_]) Value
+@[macro_inline] def stream.Readable.wrap (self : stream.Readable) (stream_ : EventEmitter) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.wrap" do
+  let r ← self.val.callMethod "wrap" (Internal.args #[toJS stream_]) Value
   pure { val := r }
 
 /-- `readable.compose(stream[, options])` (added in Node.js v19.1.0, v18.13.0): `stream.Duplex compose((stream.Writable or stream.Duplex or WritableStream or TransformStream or Function) stream, optional stream.Readable.ComposeOptions options)` -/
-def stream.Readable.compose (self : stream.Readable) (stream_ : stream.WritableOrDuplexOrWritableStreamOrTransformStreamOrJSFunction) (options : Option stream.Readable.ComposeOptions := none) : IO stream.Duplex := do
-  let r ← self.val.callMethod "compose" (Support.args #[toJS stream_, Support.optional options]) Value
+@[macro_inline] def stream.Readable.compose (self : stream.Readable) (stream_ : stream.WritableOrDuplexOrWritableStreamOrTransformStreamOrJSFunction) (options : Option stream.Readable.ComposeOptions := none) : IO stream.Duplex := Internal.api "Lasm.JS.Node.stream.Readable.compose" do
+  let r ← self.val.callMethod "compose" (Internal.args #[toJS stream_, Internal.optional options]) Value
   pure { val := r }
 
 /-- `readable.iterator([options])` (added in Node.js v16.3.0): `object iterator(optional stream.Readable.IteratorOptions options)` -/
-def stream.Readable.iterator (self : stream.Readable) (options : Option stream.Readable.IteratorOptions := none) : IO Data :=
-  self.val.callMethod "iterator" (Support.args #[Support.optional options]) Data
+@[macro_inline] def stream.Readable.iterator (self : stream.Readable) (options : Option stream.Readable.IteratorOptions := none) : IO Data := Internal.api "Lasm.JS.Node.stream.Readable.iterator" do
+  self.val.callMethod "iterator" (Internal.args #[Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.map(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable map(Function fn, optional stream.Readable.MapOptions options)` -/
-def stream.Readable.map (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.MapOptions := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "map" (Support.args #[toJS fn, Support.optional options]) Value
+@[macro_inline] def stream.Readable.map (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.MapOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.map" do
+  let r ← self.val.callMethod "map" (Internal.args #[toJS fn, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.filter(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable filter(Function fn, optional stream.Readable.FilterOptions options)` -/
-def stream.Readable.filter (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FilterOptions := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "filter" (Support.args #[toJS fn, Support.optional options]) Value
+@[macro_inline] def stream.Readable.filter (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FilterOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.filter" do
+  let r ← self.val.callMethod "filter" (Internal.args #[toJS fn, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.forEach(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> forEach(Function fn, optional stream.Readable.ForEachOptions options)` -/
-def stream.Readable.forEach (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.ForEachOptions := none) : Async Data :=
-  self.val.callMethodAwait "forEach" (Support.args #[toJS fn, Support.optional options]) Data
+@[macro_inline] def stream.Readable.forEach (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.ForEachOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.forEach" do
+  self.val.callMethodAwait "forEach" (Internal.args #[toJS fn, Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.toArray([options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> toArray(optional stream.Readable.ToArrayOptions options)` -/
-def stream.Readable.toArray (self : stream.Readable) (options : Option stream.Readable.ToArrayOptions := none) : Async Data :=
-  self.val.callMethodAwait "toArray" (Support.args #[Support.optional options]) Data
+@[macro_inline] def stream.Readable.toArray (self : stream.Readable) (options : Option stream.Readable.ToArrayOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.toArray" do
+  self.val.callMethodAwait "toArray" (Internal.args #[Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.some(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> some(Function fn, optional stream.Readable.SomeOptions options)` -/
-def stream.Readable.some (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.SomeOptions := none) : Async Data :=
-  self.val.callMethodAwait "some" (Support.args #[toJS fn, Support.optional options]) Data
+@[macro_inline] def stream.Readable.some (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.SomeOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.some" do
+  self.val.callMethodAwait "some" (Internal.args #[toJS fn, Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.find(fn[, options])` (added in Node.js v17.5.0, v16.17.0): `Promise<any> find(Function fn, optional stream.Readable.FindOptions options)` -/
-def stream.Readable.find (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FindOptions := none) : Async Data :=
-  self.val.callMethodAwait "find" (Support.args #[toJS fn, Support.optional options]) Data
+@[macro_inline] def stream.Readable.find (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FindOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.find" do
+  self.val.callMethodAwait "find" (Internal.args #[toJS fn, Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.every(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> every(Function fn, optional stream.Readable.EveryOptions options)` -/
-def stream.Readable.every (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.EveryOptions := none) : Async Data :=
-  self.val.callMethodAwait "every" (Support.args #[toJS fn, Support.optional options]) Data
+@[macro_inline] def stream.Readable.every (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.EveryOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.every" do
+  self.val.callMethodAwait "every" (Internal.args #[toJS fn, Internal.optional options]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.flatMap(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable flatMap(Function fn, optional stream.Readable.FlatMapOptions options)` -/
-def stream.Readable.flatMap (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FlatMapOptions := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "flatMap" (Support.args #[toJS fn, Support.optional options]) Value
+@[macro_inline] def stream.Readable.flatMap (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FlatMapOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.flatMap" do
+  let r ← self.val.callMethod "flatMap" (Internal.args #[toJS fn, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.drop(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable drop(double /* integer: Nat */ limit, optional stream.Readable.DropOptions options)` -/
-def stream.Readable.drop (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.DropOptions := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "drop" (Support.args #[toJS limit, Support.optional options]) Value
+@[macro_inline] def stream.Readable.drop (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.DropOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.drop" do
+  let r ← self.val.callMethod "drop" (Internal.args #[toJS limit, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.take(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable take(double /* integer: Nat */ limit, optional stream.Readable.TakeOptions options)` -/
-def stream.Readable.take (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.TakeOptions := none) : IO stream.Readable := do
-  let r ← self.val.callMethod "take" (Support.args #[toJS limit, Support.optional options]) Value
+@[macro_inline] def stream.Readable.take (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.TakeOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.take" do
+  let r ← self.val.callMethod "take" (Internal.args #[toJS limit, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `readable.reduce(fn[, initial[, options]])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> reduce(Function fn, optional any initial, optional stream.Readable.ReduceOptions options)` -/
-def stream.Readable.reduce (self : stream.Readable) (fn : JSFunction) (initial : Data := .undefined) (options : Option stream.Readable.ReduceOptions := none) : Async Data :=
-  self.val.callMethodAwait "reduce" (Support.args #[toJS fn, initial, Support.optional options]) Data
+@[macro_inline] def stream.Readable.reduce (self : stream.Readable) (fn : JSFunction) (initial : Data := .undefined) (options : Option stream.Readable.ReduceOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.Readable.reduce" do
+  self.val.callMethodAwait "reduce" (Internal.args #[toJS fn, initial, Internal.optional options]) Data
 
 /-- `readable.push('')`: `undefined push()` -/
-def stream.Readable.push (self : stream.Readable) : IO Unit :=
-  self.val.callMethod "push" (Support.args #[]) Unit
+@[macro_inline] def stream.Readable.push (self : stream.Readable) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.push" do
+  self.val.callMethod "push" (Internal.args #[]) Unit
 
 /-- `readable.push(chunk[, encoding])`: `boolean push(any chunk, optional DOMString encoding)` -/
-def stream.Readable.pushWithChunk (self : stream.Readable) (chunk : Data) (encoding : Option String := none) : IO Bool :=
-  self.val.callMethod "push" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+@[macro_inline] def stream.Readable.pushWithChunk (self : stream.Readable) (chunk : Data) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.pushWithChunk" do
+  self.val.callMethod "push" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
 
 /-- `readable._construct(callback)` (added in Node.js v15.0.0): `undefined construct(Function callback)` -/
-def stream.Readable.construct (self : stream.Readable) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "construct" (Support.args #[toJS callback]) Unit
+@[macro_inline] def stream.Readable.construct (self : stream.Readable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.construct" do
+  self.val.callMethod "construct" (Internal.args #[toJS callback]) Unit
 
 /-- `stream.Readable.from(iterable[, options])` (added in Node.js v12.3.0, v10.17.0): `static stream.Readable from(object iterable, optional object options)` -/
-def stream.Readable.«from» (iterable : Data) (options : Data := .undefined) : IO stream.Readable := do
+@[macro_inline] def stream.Readable.«from» (iterable : Data) (options : Data := .undefined) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.from", module := "node:stream", path := "Readable.from", construct := false, arity := 2 }
-    (Support.args #[toJS iterable, options]) (await := false)
+    (Internal.args #[toJS iterable, options]) (await := false)
   pure { val := r }
 
 /-- `stream.Readable.fromWeb(readableStream[, options])` (added in Node.js v17.0.0): `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
-def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := do
+@[macro_inline] def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.fromWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.fromWeb", module := "node:stream", path := "Readable.fromWeb", construct := false, arity := 2 }
-    (Support.args #[toJS readableStream, Support.optional options]) (await := false)
+    (Internal.args #[toJS readableStream, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `stream.Readable.isDisturbed(stream)` (added in Node.js v16.8.0): `static any isDisturbed((stream.Readable or ReadableStream) stream)` -/
-def stream.Readable.isDisturbed (stream_ : stream.ReadableOrReadableStream) : IO Data :=
+@[macro_inline] def stream.Readable.isDisturbed (stream_ : stream.ReadableOrReadableStream) : IO Data := Internal.api "Lasm.JS.Node.stream.Readable.isDisturbed" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.stream.Readable.isDisturbed", module := "node:stream", path := "Readable.isDisturbed", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- `stream.Readable.toWeb(streamReadable[, options])` (added in Node.js v17.0.0): `static ReadableStream toWeb(stream.Readable streamReadable, optional stream.Readable.ToWebOptions options)` -/
-def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option stream.Readable.ToWebOptions := none) : IO ReadableStream := do
+@[macro_inline] def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option stream.Readable.ToWebOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Node.stream.Readable.toWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.toWeb", module := "node:stream", path := "Readable.toWeb", construct := false, arity := 2 }
-    (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
+    (Internal.args #[toJS streamReadable, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `v instanceof Duplex`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Duplex`). -/
-def stream.Duplex.cast? (v : Value) : IO (Option stream.Duplex) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Duplex"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Duplex.cast? (v : Value) : IO (Option stream.Duplex) := Internal.api "Lasm.JS.Node.stream.Duplex.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Duplex"] Value) (fun x => { val := x }) v
 
 /-- `allowHalfOpen` (added in Node.js v0.9.4): `readonly attribute boolean allowHalfOpen` -/
-def stream.Duplex.allowHalfOpen (self : stream.Duplex) : IO Bool := self.val.get "allowHalfOpen" Bool
+@[macro_inline] def stream.Duplex.allowHalfOpen (self : stream.Duplex) : IO Bool := Internal.api "Lasm.JS.Node.stream.Duplex.allowHalfOpen" do
+  self.val.get "allowHalfOpen" Bool
 
 /-- `stream.Duplex.from(src)` (added in Node.js v16.8.0): `static stream.Duplex from(any src)` -/
-def stream.Duplex.«from» (src : Data) : IO stream.Duplex := do
+@[macro_inline] def stream.Duplex.«from» (src : Data) : IO stream.Duplex := Internal.api "Lasm.JS.Node.stream.Duplex.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Duplex.from", module := "node:stream", path := "Duplex.from", construct := false, arity := 1 }
-    (Support.args #[toJS src]) (await := false)
+    (Internal.args #[toJS src]) (await := false)
   pure { val := r }
 
 /-- `stream.Duplex.fromWeb(pair[, options])` (added in Node.js v17.0.0): `static stream.Duplex fromWeb(stream.Duplex.FromWebPair pair, optional stream.Duplex.FromWebOptions options)` -/
-def stream.Duplex.fromWeb (pair : stream.Duplex.FromWebPair) (options : Option stream.Duplex.FromWebOptions := none) : IO stream.Duplex := do
+@[macro_inline] def stream.Duplex.fromWeb (pair : stream.Duplex.FromWebPair) (options : Option stream.Duplex.FromWebOptions := none) : IO stream.Duplex := Internal.api "Lasm.JS.Node.stream.Duplex.fromWeb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Duplex.fromWeb", module := "node:stream", path := "Duplex.fromWeb", construct := false, arity := 2 }
-    (Support.args #[toJS pair, Support.optional options]) (await := false)
+    (Internal.args #[toJS pair, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `stream.Duplex.toWeb(streamDuplex[, options])` (added in Node.js v17.0.0): `static object toWeb(stream.Duplex streamDuplex, optional stream.Duplex.ToWebOptions options)` -/
-def stream.Duplex.toWeb (streamDuplex : stream.Duplex) (options : Option stream.Duplex.ToWebOptions := none) : IO Data :=
+@[macro_inline] def stream.Duplex.toWeb (streamDuplex : stream.Duplex) (options : Option stream.Duplex.ToWebOptions := none) : IO Data := Internal.api "Lasm.JS.Node.stream.Duplex.toWeb" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.stream.Duplex.toWeb", module := "node:stream", path := "Duplex.toWeb", construct := false, arity := 2 }
-    (Support.args #[toJS streamDuplex, Support.optional options]) (await := false)
+    (Internal.args #[toJS streamDuplex, Internal.optional options]) (await := false)
 
 /-- `v instanceof Transform`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Transform`). -/
-def stream.Transform.cast? (v : Value) : IO (Option stream.Transform) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Transform"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.Transform.cast? (v : Value) : IO (Option stream.Transform) := Internal.api "Lasm.JS.Node.stream.Transform.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["Transform"] Value) (fun x => { val := x }) v
 
 /-- `transform.destroy([error])` (added in Node.js v8.0.0): `stream.Transform destroy(optional any error)` -/
-def stream.Transform.destroy (self : stream.Transform) (error : Data := .undefined) : IO stream.Transform := do
-  let r ← self.val.callMethod "destroy" (Support.args #[error]) Value
+@[macro_inline] def stream.Transform.destroy (self : stream.Transform) (error : Data := .undefined) : IO stream.Transform := Internal.api "Lasm.JS.Node.stream.Transform.destroy" do
+  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
 /-- `transform._flush(callback)`: `undefined flush(Function callback)` -/
-def stream.Transform.flush (self : stream.Transform) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "flush" (Support.args #[toJS callback]) Unit
+@[macro_inline] def stream.Transform.flush (self : stream.Transform) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Transform.flush" do
+  self.val.callMethod "flush" (Internal.args #[toJS callback]) Unit
 
 /-- `transform._transform(chunk, encoding, callback)`: `undefined transform(any chunk, DOMString encoding, Function callback)` -/
-def stream.Transform.transform (self : stream.Transform) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "transform" (Support.args #[toJS chunk, toJS encoding, toJS callback]) Unit
+@[macro_inline] def stream.Transform.transform (self : stream.Transform) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Transform.transform" do
+  self.val.callMethod "transform" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
 
 /-- `v instanceof PassThrough`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PassThrough`). -/
-def stream.PassThrough.cast? (v : Value) : IO (Option stream.PassThrough) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["PassThrough"] Value) v) then some { val := v } else none
+@[macro_inline] def stream.PassThrough.cast? (v : Value) : IO (Option stream.PassThrough) := Internal.api "Lasm.JS.Node.stream.PassThrough.cast?" do
+  Internal.cast (Support.getExport "node:stream" ["PassThrough"] Value) (fun x => { val := x }) v
 
 /-- `stream.finished(stream[, options], callback)` (added in Node.js v10.0.0): `Function finished((EventEmitter or ReadableStream or WritableStream) stream, Function callback)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.finished (stream_ : EventEmitterOrReadableStreamOrWritableStream) (callback : JSFunction) : IO JSFunction :=
+@[macro_inline] def stream.finished (stream_ : EventEmitterOrReadableStreamOrWritableStream) (callback : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.stream.finished" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.stream.finished", module := "node:stream", path := "finished", construct := false, arity := 2 }
-    (Support.args #[toJS stream_, toJS callback]) (await := false)
+    (Internal.args #[toJS stream_, toJS callback]) (await := false)
 
 /-- `stream.finished(stream[, options], callback)` (added in Node.js v10.0.0): `Function finished((EventEmitter or ReadableStream or WritableStream) stream, stream.FinishedOptions options, Function callback)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.finishedWithOptions (stream_ : EventEmitterOrReadableStreamOrWritableStream) (options : stream.FinishedOptions) (callback : JSFunction) : IO JSFunction :=
+@[macro_inline] def stream.finishedWithOptions (stream_ : EventEmitterOrReadableStreamOrWritableStream) (options : stream.FinishedOptions) (callback : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.stream.finishedWithOptions" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.stream.finishedWithOptions", module := "node:stream", path := "finished", construct := false, arity := 3 }
-    (Support.args #[toJS stream_, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS stream_, toJS options, toJS callback]) (await := false)
 
 /-- `stream.finished(stream[, options])` (added in Node.js v15.0.0): `Promise<any> finished((EventEmitter or ReadableStream or WritableStream) stream, optional stream.FinishedOptions2 options)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.finishedWithStreamOptions (stream_ : EventEmitterOrReadableStreamOrWritableStream) (options : Option stream.FinishedOptions2 := none) : Async Data :=
+@[macro_inline] def stream.finishedWithStreamOptions (stream_ : EventEmitterOrReadableStreamOrWritableStream) (options : Option stream.FinishedOptions2 := none) : Async Data := Internal.api "Lasm.JS.Node.stream.finishedWithStreamOptions" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.stream.finishedWithStreamOptions", module := "node:stream", path := "finished", construct := false, arity := 2 }
-    (Support.args #[toJS stream_, Support.optional options])
+    (Internal.args #[toJS stream_, Internal.optional options])
 
 /-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipeline (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data :=
-  Support.promisified Data "node:stream" "pipeline" (Support.args #[toJS source, toJS destination])
+@[macro_inline] def stream.pipeline (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data := Internal.api "Lasm.JS.Node.stream.pipeline" do
+  Support.promisified Data "node:stream" "pipeline" (Internal.args #[toJS source, toJS destination])
 
 /-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or TransformStream)... transforms, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithTransforms (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data :=
-  Support.promisified Data "node:stream" "pipeline" (Support.argsWith #[toJS source, toJS destination] (transforms.map toJS))
+@[macro_inline] def stream.pipelineWithTransforms (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data := Internal.api "Lasm.JS.Node.stream.pipelineWithTransforms" do
+  Support.promisified Data "node:stream" "pipeline" (Internal.argsWith #[toJS source, toJS destination] (transforms.map toJS))
 
 /-- `stream.pipeline(streams, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream>) streams)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithStreams (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) : Async Data :=
-  Support.promisified Data "node:stream" "pipeline" (Support.args #[toJS streams])
+@[macro_inline] def stream.pipelineWithStreams (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) : Async Data := Internal.api "Lasm.JS.Node.stream.pipelineWithStreams" do
+  Support.promisified Data "node:stream" "pipeline" (Internal.args #[toJS streams])
 
 /-- `stream.pipeline(streams[, options])` (added in Node.js v15.0.0): `Promise<any> pipeline((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream>) streams, optional stream.PipelineOptions options)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithStreamsOptions (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) (options : Option stream.PipelineOptions := none) : Async Data :=
+@[macro_inline] def stream.pipelineWithStreamsOptions (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) (options : Option stream.PipelineOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.pipelineWithStreamsOptions" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.stream.pipelineWithStreamsOptions", module := "node:stream", path := "pipeline", construct := false, arity := 2 }
-    (Support.args #[toJS streams, Support.optional options])
+    (Internal.args #[toJS streams, Internal.optional options])
 
 /-- `stream.pipeline(source[, ...transforms], destination[, options])` (added in Node.js v15.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or WritableStream) destination, optional stream.PipelineOptions options)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithOptions (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) (options : Option stream.PipelineOptions := none) : Async Data :=
+@[macro_inline] def stream.pipelineWithOptions (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) (options : Option stream.PipelineOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.pipelineWithOptions" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.stream.pipelineWithOptions", module := "node:stream", path := "pipeline", construct := false, arity := 3 }
-    (Support.args #[toJS source, toJS destination, Support.optional options])
+    (Internal.args #[toJS source, toJS destination, Internal.optional options])
 
 /-- `stream.pipeline(source[, ...transforms], destination[, options])` (added in Node.js v15.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or TransformStream)... transforms, (EventEmitter or Function or WritableStream) destination, optional stream.PipelineOptions options)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithSourceTransformsDestinationOptions (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) (options : Option stream.PipelineOptions := none) : Async Data :=
+@[macro_inline] def stream.pipelineWithSourceTransformsDestinationOptions (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) (options : Option stream.PipelineOptions := none) : Async Data := Internal.api "Lasm.JS.Node.stream.pipelineWithSourceTransformsDestinationOptions" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.stream.pipelineWithSourceTransformsDestinationOptions", module := "node:stream", path := "pipeline", construct := false, arity := 4 }
-    (Support.argsWith #[toJS source, toJS destination, Support.optional options] (transforms.map toJS))
+    (Internal.argsWith #[toJS source, toJS destination, Internal.optional options] (transforms.map toJS))
 
 /-- `stream.compose(...streams)` (added in Node.js v16.9.0): `stream.Duplex compose((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream> or sequence<stream.Duplex> or Function)... streams)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.compose (streams : Array SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStreamOrSequenceOfDuplexOrJSFunction := #[]) : IO stream.Duplex := do
+@[macro_inline] def stream.compose (streams : Array SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStreamOrSequenceOfDuplexOrJSFunction := #[]) : IO stream.Duplex := Internal.api "Lasm.JS.Node.stream.compose" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.compose", module := "node:stream", path := "compose", construct := false, arity := 1 }
-    (Support.argsWith #[] (streams.map toJS)) (await := false)
+    (Internal.argsWith #[] (streams.map toJS)) (await := false)
   pure { val := r }
 
 /-- `stream.isDestroyed(stream)` (added in Node.js v19.9.0, v18.17.0): `boolean? isDestroyed((stream.Readable or stream.Writable or stream.Duplex) stream)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.isDestroyed (stream_ : stream.ReadableOrWritableOrDuplex) : IO (Option Bool) :=
+@[macro_inline] def stream.isDestroyed (stream_ : stream.ReadableOrWritableOrDuplex) : IO (Option Bool) := Internal.api "Lasm.JS.Node.stream.isDestroyed" do
   Lasm.JS.Binding.invoke (Option Bool) { name := "Lasm.JS.Node.stream.isDestroyed", module := "node:stream", path := "isDestroyed", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- `stream.isErrored(stream)` (added in Node.js v17.3.0, v16.14.0): `boolean isErrored((stream.Readable or stream.Writable or stream.Duplex or WritableStream or ReadableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.isErrored (stream_ : stream.ReadableOrWritableOrDuplexOrWritableStreamOrReadableStream) : IO Bool :=
+@[macro_inline] def stream.isErrored (stream_ : stream.ReadableOrWritableOrDuplexOrWritableStreamOrReadableStream) : IO Bool := Internal.api "Lasm.JS.Node.stream.isErrored" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.stream.isErrored", module := "node:stream", path := "isErrored", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- `stream.isReadable(stream)` (added in Node.js v17.4.0, v16.14.0): `boolean? isReadable((stream.Readable or stream.Duplex or ReadableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.isReadable (stream_ : stream.ReadableOrDuplexOrReadableStream) : IO (Option Bool) :=
+@[macro_inline] def stream.isReadable (stream_ : stream.ReadableOrDuplexOrReadableStream) : IO (Option Bool) := Internal.api "Lasm.JS.Node.stream.isReadable" do
   Lasm.JS.Binding.invoke (Option Bool) { name := "Lasm.JS.Node.stream.isReadable", module := "node:stream", path := "isReadable", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- `stream.isWritable(stream)`: `boolean? isWritable((stream.Writable or stream.Duplex or WritableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.isWritable (stream_ : stream.WritableOrDuplexOrWritableStream) : IO (Option Bool) :=
+@[macro_inline] def stream.isWritable (stream_ : stream.WritableOrDuplexOrWritableStream) : IO (Option Bool) := Internal.api "Lasm.JS.Node.stream.isWritable" do
   Lasm.JS.Binding.invoke (Option Bool) { name := "Lasm.JS.Node.stream.isWritable", module := "node:stream", path := "isWritable", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `stream.addAbortSignal(signal, stream)` (added in Node.js v15.4.0): `undefined addAbortSignal(AbortSignal signal, (EventEmitter or ReadableStream or WritableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.addAbortSignal (signal : AbortSignal) (stream_ : EventEmitterOrReadableStreamOrWritableStream) : IO Unit :=
+@[macro_inline] def stream.addAbortSignal (signal : AbortSignal) (stream_ : EventEmitterOrReadableStreamOrWritableStream) : IO Unit := Internal.api "Lasm.JS.Node.stream.addAbortSignal" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.stream.addAbortSignal", module := "node:stream", path := "addAbortSignal", construct := false, arity := 2 }
-    (Support.args #[toJS signal, toJS stream_]) (await := false)
+    (Internal.args #[toJS signal, toJS stream_]) (await := false)
 
 /-- `stream.getDefaultHighWaterMark(objectMode)` (added in Node.js v19.9.0, v18.17.0): `long long getDefaultHighWaterMark(boolean objectMode)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.getDefaultHighWaterMark (objectMode : Bool) : IO Int :=
+@[macro_inline] def stream.getDefaultHighWaterMark (objectMode : Bool) : IO Int := Internal.api "Lasm.JS.Node.stream.getDefaultHighWaterMark" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.stream.getDefaultHighWaterMark", module := "node:stream", path := "getDefaultHighWaterMark", construct := false, arity := 1 }
-    (Support.args #[toJS objectMode]) (await := false)
+    (Internal.args #[toJS objectMode]) (await := false)
 
 /-- `stream.setDefaultHighWaterMark(objectMode, value)` (added in Node.js v19.9.0, v18.17.0): `undefined setDefaultHighWaterMark(boolean objectMode, long long value)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.setDefaultHighWaterMark (objectMode : Bool) (value : Int) : IO Unit :=
+@[macro_inline] def stream.setDefaultHighWaterMark (objectMode : Bool) (value : Int) : IO Unit := Internal.api "Lasm.JS.Node.stream.setDefaultHighWaterMark" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.stream.setDefaultHighWaterMark", module := "node:stream", path := "setDefaultHighWaterMark", construct := false, arity := 2 }
-    (Support.args #[toJS objectMode, toJS value]) (await := false)
+    (Internal.args #[toJS objectMode, toJS value]) (await := false)
 
 /-- `stream.duplexPair([options])` (added in Node.js v22.6.0, v20.17.0): `sequence<any> duplexPair(optional object options)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.duplexPair (options : Data := .undefined) : IO (Array Data) :=
+@[macro_inline] def stream.duplexPair (options : Data := .undefined) : IO (Array Data) := Internal.api "Lasm.JS.Node.stream.duplexPair" do
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Node.stream.duplexPair", module := "node:stream", path := "duplexPair", construct := false, arity := 1 }
-    (Support.args #[options]) (await := false)
+    (Internal.args #[options]) (await := false)
 
 end Lasm.JS.Node

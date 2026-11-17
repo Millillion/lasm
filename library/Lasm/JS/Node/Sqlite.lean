@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class DatabaseSync` of `node:sqlite` (Node.js 24.22.2 documentation, sqlite.md): a handle to the JavaScript object. -/
 structure DatabaseSync where
@@ -72,16 +75,16 @@ structure DatabaseSync.FunctionOptions where
   useBigIntArguments : Option Bool := none
   /-- `boolean varargs = false` -/
   varargs : Option Bool := none
-instance instToJSDatabaseSyncFunctionOptions : ToJS DatabaseSync.FunctionOptions := ⟨fun d => Support.fields #[("deterministic", Support.optional d.deterministic),
-    ("directOnly", Support.optional d.directOnly),
-    ("useBigIntArguments", Support.optional d.useBigIntArguments),
-    ("varargs", Support.optional d.varargs)]⟩
+instance instToJSDatabaseSyncFunctionOptions : ToJS DatabaseSync.FunctionOptions := ⟨fun d => Internal.fields #[("deterministic", Internal.optional d.deterministic),
+    ("directOnly", Internal.optional d.directOnly),
+    ("useBigIntArguments", Internal.optional d.useBigIntArguments),
+    ("varargs", Internal.optional d.varargs)]⟩
 
 /-- `dictionary DatabaseSync.DeserializeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.DeserializeOptions where
   /-- `DOMString dbName = "main"` -/
   dbName : Option String := none
-instance instToJSDatabaseSyncDeserializeOptions : ToJS DatabaseSync.DeserializeOptions := ⟨fun d => Support.fields #[("dbName", Support.optional d.dbName)]⟩
+instance instToJSDatabaseSyncDeserializeOptions : ToJS DatabaseSync.DeserializeOptions := ⟨fun d => Internal.fields #[("dbName", Internal.optional d.dbName)]⟩
 
 /-- `dictionary DatabaseSync.PrepareOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.PrepareOptions where
@@ -93,10 +96,10 @@ structure DatabaseSync.PrepareOptions where
   allowBareNamedParameters : Option Bool := none
   /-- `boolean allowUnknownNamedParameters` -/
   allowUnknownNamedParameters : Option Bool := none
-instance instToJSDatabaseSyncPrepareOptions : ToJS DatabaseSync.PrepareOptions := ⟨fun d => Support.fields #[("readBigInts", Support.optional d.readBigInts),
-    ("returnArrays", Support.optional d.returnArrays),
-    ("allowBareNamedParameters", Support.optional d.allowBareNamedParameters),
-    ("allowUnknownNamedParameters", Support.optional d.allowUnknownNamedParameters)]⟩
+instance instToJSDatabaseSyncPrepareOptions : ToJS DatabaseSync.PrepareOptions := ⟨fun d => Internal.fields #[("readBigInts", Internal.optional d.readBigInts),
+    ("returnArrays", Internal.optional d.returnArrays),
+    ("allowBareNamedParameters", Internal.optional d.allowBareNamedParameters),
+    ("allowUnknownNamedParameters", Internal.optional d.allowUnknownNamedParameters)]⟩
 
 /-- `dictionary DatabaseSync.CreateSessionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.CreateSessionOptions where
@@ -104,8 +107,8 @@ structure DatabaseSync.CreateSessionOptions where
   table : Option String := none
   /-- `DOMString db` -/
   db : Option String := none
-instance instToJSDatabaseSyncCreateSessionOptions : ToJS DatabaseSync.CreateSessionOptions := ⟨fun d => Support.fields #[("table", Support.optional d.table),
-    ("db", Support.optional d.db)]⟩
+instance instToJSDatabaseSyncCreateSessionOptions : ToJS DatabaseSync.CreateSessionOptions := ⟨fun d => Internal.fields #[("table", Internal.optional d.table),
+    ("db", Internal.optional d.db)]⟩
 
 /-- `dictionary DatabaseSync.ApplyChangesetOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.ApplyChangesetOptions where
@@ -113,8 +116,8 @@ structure DatabaseSync.ApplyChangesetOptions where
   filter : Option JSFunction := none
   /-- `Function onConflict` -/
   onConflict : Option JSFunction := none
-instance instToJSDatabaseSyncApplyChangesetOptions : ToJS DatabaseSync.ApplyChangesetOptions := ⟨fun d => Support.fields #[("filter", Support.optional d.filter),
-    ("onConflict", Support.optional d.onConflict)]⟩
+instance instToJSDatabaseSyncApplyChangesetOptions : ToJS DatabaseSync.ApplyChangesetOptions := ⟨fun d => Internal.fields #[("filter", Internal.optional d.filter),
+    ("onConflict", Internal.optional d.onConflict)]⟩
 
 /-- `(double or bigint or boolean or DOMString or Uint8Array)`: one constructor per member type. -/
 inductive DoubleOrBigintOrBooleanOrDOMStringOrUint8Array where
@@ -181,14 +184,14 @@ structure Database.AggregateOptions where
   result : Option JSFunction := none
   /-- `Function inverse` -/
   inverse : Option JSFunction := none
-instance instToJSDatabaseAggregateOptions : ToJS Database.AggregateOptions := ⟨fun d => Support.fields #[("deterministic", Support.optional d.deterministic),
-    ("directOnly", Support.optional d.directOnly),
-    ("useBigIntArguments", Support.optional d.useBigIntArguments),
-    ("varargs", Support.optional d.varargs),
-    ("start", Support.optional d.start),
-    ("step", Support.optional d.step),
-    ("result", Support.optional d.result),
-    ("inverse", Support.optional d.inverse)]⟩
+instance instToJSDatabaseAggregateOptions : ToJS Database.AggregateOptions := ⟨fun d => Internal.fields #[("deterministic", Internal.optional d.deterministic),
+    ("directOnly", Internal.optional d.directOnly),
+    ("useBigIntArguments", Internal.optional d.useBigIntArguments),
+    ("varargs", Internal.optional d.varargs),
+    ("start", Internal.optional d.start),
+    ("step", Internal.optional d.step),
+    ("result", Internal.optional d.result),
+    ("inverse", Internal.optional d.inverse)]⟩
 
 /-- `dictionary Database.FunctionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.FunctionOptions where
@@ -200,16 +203,16 @@ structure Database.FunctionOptions where
   useBigIntArguments : Option Bool := none
   /-- `boolean varargs = false` -/
   varargs : Option Bool := none
-instance instToJSDatabaseFunctionOptions : ToJS Database.FunctionOptions := ⟨fun d => Support.fields #[("deterministic", Support.optional d.deterministic),
-    ("directOnly", Support.optional d.directOnly),
-    ("useBigIntArguments", Support.optional d.useBigIntArguments),
-    ("varargs", Support.optional d.varargs)]⟩
+instance instToJSDatabaseFunctionOptions : ToJS Database.FunctionOptions := ⟨fun d => Internal.fields #[("deterministic", Internal.optional d.deterministic),
+    ("directOnly", Internal.optional d.directOnly),
+    ("useBigIntArguments", Internal.optional d.useBigIntArguments),
+    ("varargs", Internal.optional d.varargs)]⟩
 
 /-- `dictionary Database.DeserializeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.DeserializeOptions where
   /-- `DOMString dbName = "main"` -/
   dbName : Option String := none
-instance instToJSDatabaseDeserializeOptions : ToJS Database.DeserializeOptions := ⟨fun d => Support.fields #[("dbName", Support.optional d.dbName)]⟩
+instance instToJSDatabaseDeserializeOptions : ToJS Database.DeserializeOptions := ⟨fun d => Internal.fields #[("dbName", Internal.optional d.dbName)]⟩
 
 /-- `dictionary Database.PrepareOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.PrepareOptions where
@@ -223,11 +226,11 @@ structure Database.PrepareOptions where
   allowUnknownNamedParameters : Option Bool := none
   /-- `boolean persistent = false` -/
   persistent : Option Bool := none
-instance instToJSDatabasePrepareOptions : ToJS Database.PrepareOptions := ⟨fun d => Support.fields #[("readBigInts", Support.optional d.readBigInts),
-    ("returnArrays", Support.optional d.returnArrays),
-    ("allowBareNamedParameters", Support.optional d.allowBareNamedParameters),
-    ("allowUnknownNamedParameters", Support.optional d.allowUnknownNamedParameters),
-    ("persistent", Support.optional d.persistent)]⟩
+instance instToJSDatabasePrepareOptions : ToJS Database.PrepareOptions := ⟨fun d => Internal.fields #[("readBigInts", Internal.optional d.readBigInts),
+    ("returnArrays", Internal.optional d.returnArrays),
+    ("allowBareNamedParameters", Internal.optional d.allowBareNamedParameters),
+    ("allowUnknownNamedParameters", Internal.optional d.allowUnknownNamedParameters),
+    ("persistent", Internal.optional d.persistent)]⟩
 
 /-- `dictionary Database.CreateModuleOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.CreateModuleOptions where
@@ -239,10 +242,10 @@ structure Database.CreateModuleOptions where
   directOnly : Option Bool := none
   /-- `boolean useBigIntArguments = false` -/
   useBigIntArguments : Option Bool := none
-instance instToJSDatabaseCreateModuleOptions : ToJS Database.CreateModuleOptions := ⟨fun d => Support.fields #[("columns", Support.optional d.columns),
-    ("rows", Support.optional d.rows),
-    ("directOnly", Support.optional d.directOnly),
-    ("useBigIntArguments", Support.optional d.useBigIntArguments)]⟩
+instance instToJSDatabaseCreateModuleOptions : ToJS Database.CreateModuleOptions := ⟨fun d => Internal.fields #[("columns", Internal.optional d.columns),
+    ("rows", Internal.optional d.rows),
+    ("directOnly", Internal.optional d.directOnly),
+    ("useBigIntArguments", Internal.optional d.useBigIntArguments)]⟩
 
 /-- `dictionary Database.CreateSessionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.CreateSessionOptions where
@@ -250,8 +253,8 @@ structure Database.CreateSessionOptions where
   table : Option String := none
   /-- `DOMString db` -/
   db : Option String := none
-instance instToJSDatabaseCreateSessionOptions : ToJS Database.CreateSessionOptions := ⟨fun d => Support.fields #[("table", Support.optional d.table),
-    ("db", Support.optional d.db)]⟩
+instance instToJSDatabaseCreateSessionOptions : ToJS Database.CreateSessionOptions := ⟨fun d => Internal.fields #[("table", Internal.optional d.table),
+    ("db", Internal.optional d.db)]⟩
 
 /-- `dictionary Database.ApplyChangesetOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Database.ApplyChangesetOptions where
@@ -259,8 +262,8 @@ structure Database.ApplyChangesetOptions where
   filter : Option JSFunction := none
   /-- `Function onConflict` -/
   onConflict : Option JSFunction := none
-instance instToJSDatabaseApplyChangesetOptions : ToJS Database.ApplyChangesetOptions := ⟨fun d => Support.fields #[("filter", Support.optional d.filter),
-    ("onConflict", Support.optional d.onConflict)]⟩
+instance instToJSDatabaseApplyChangesetOptions : ToJS Database.ApplyChangesetOptions := ⟨fun d => Internal.fields #[("filter", Internal.optional d.filter),
+    ("onConflict", Internal.optional d.onConflict)]⟩
 
 /-- `dictionary sqlite.BackupOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure sqlite.BackupOptions where
@@ -272,348 +275,361 @@ structure sqlite.BackupOptions where
   rate : Option Int := none
   /-- `Function progress` -/
   progress : Option JSFunction := none
-instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => Support.fields #[("source", Support.optional d.source),
-    ("target", Support.optional d.target),
-    ("rate", Support.optional d.rate),
-    ("progress", Support.optional d.progress)]⟩
+instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => Internal.fields #[("source", Internal.optional d.source),
+    ("target", Internal.optional d.target),
+    ("rate", Internal.optional d.rate),
+    ("progress", Internal.optional d.progress)]⟩
 
 /-- `v instanceof DatabaseSync`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DatabaseSync`). -/
-def DatabaseSync.cast? (v : Value) : IO (Option DatabaseSync) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["DatabaseSync"] Value) v) then some { val := v } else none
+@[macro_inline] def DatabaseSync.cast? (v : Value) : IO (Option DatabaseSync) := Internal.api "Lasm.JS.Node.DatabaseSync.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["DatabaseSync"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
-def DatabaseSync.isOpen (self : DatabaseSync) : IO Bool := self.val.get "isOpen" Bool
+@[macro_inline] def DatabaseSync.isOpen (self : DatabaseSync) : IO Bool := Internal.api "Lasm.JS.Node.DatabaseSync.isOpen" do
+  self.val.get "isOpen" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isTransaction` (added in Node.js v24.0.0): `readonly attribute boolean isTransaction` -/
-def DatabaseSync.isTransaction (self : DatabaseSync) : IO Bool := self.val.get "isTransaction" Bool
+@[macro_inline] def DatabaseSync.isTransaction (self : DatabaseSync) : IO Bool := Internal.api "Lasm.JS.Node.DatabaseSync.isTransaction" do
+  self.val.get "isTransaction" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.limits` (added in Node.js v24.15.0): `readonly attribute object limits` -/
-def DatabaseSync.limits (self : DatabaseSync) : IO Data := self.val.get "limits" Data
+@[macro_inline] def DatabaseSync.limits (self : DatabaseSync) : IO Data := Internal.api "Lasm.JS.Node.DatabaseSync.limits" do
+  self.val.get "limits" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.aggregate(name, options)` (added in Node.js v24.0.0): `undefined aggregate(any name, any options)` -/
-def DatabaseSync.aggregate (self : DatabaseSync) (name : Data) (options : Data) : IO Unit :=
-  self.val.callMethod "aggregate" (Support.args #[toJS name, toJS options]) Unit
+@[macro_inline] def DatabaseSync.aggregate (self : DatabaseSync) (name : Data) (options : Data) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.aggregate" do
+  self.val.callMethod "aggregate" (Internal.args #[toJS name, toJS options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.close()` (added in Node.js v22.5.0): `undefined close()` -/
-def DatabaseSync.close (self : DatabaseSync) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def DatabaseSync.close (self : DatabaseSync) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.loadExtension(path[, entryPoint])` (added in Node.js v23.5.0, v22.13.0): `undefined loadExtension(DOMString path, optional DOMString entryPoint)` -/
-def DatabaseSync.loadExtension (self : DatabaseSync) (path_ : String) (entryPoint : Option String := none) : IO Unit :=
-  self.val.callMethod "loadExtension" (Support.args #[toJS path_, Support.optional entryPoint]) Unit
+@[macro_inline] def DatabaseSync.loadExtension (self : DatabaseSync) (path_ : String) (entryPoint : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.loadExtension" do
+  self.val.callMethod "loadExtension" (Internal.args #[toJS path_, Internal.optional entryPoint]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.enableLoadExtension(allow)` (added in Node.js v23.5.0, v22.13.0): `undefined enableLoadExtension(boolean allow)` -/
-def DatabaseSync.enableLoadExtension (self : DatabaseSync) (allow : Bool) : IO Unit :=
-  self.val.callMethod "enableLoadExtension" (Support.args #[toJS allow]) Unit
+@[macro_inline] def DatabaseSync.enableLoadExtension (self : DatabaseSync) (allow : Bool) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.enableLoadExtension" do
+  self.val.callMethod "enableLoadExtension" (Internal.args #[toJS allow]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.enableDefensive(active)` (added in Node.js v24.12.0): `undefined enableDefensive(boolean active)` -/
-def DatabaseSync.enableDefensive (self : DatabaseSync) (active : Bool) : IO Unit :=
-  self.val.callMethod "enableDefensive" (Support.args #[toJS active]) Unit
+@[macro_inline] def DatabaseSync.enableDefensive (self : DatabaseSync) (active : Bool) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.enableDefensive" do
+  self.val.callMethod "enableDefensive" (Internal.args #[toJS active]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.location([dbName])` (added in Node.js v24.0.0): `DOMString? location(optional DOMString dbName)` -/
-def DatabaseSync.location (self : DatabaseSync) (dbName : Option String := none) : IO (Option String) :=
-  self.val.callMethod "location" (Support.args #[Support.optional dbName]) (Option String)
+@[macro_inline] def DatabaseSync.location (self : DatabaseSync) (dbName : Option String := none) : IO (Option String) := Internal.api "Lasm.JS.Node.DatabaseSync.location" do
+  self.val.callMethod "location" (Internal.args #[Internal.optional dbName]) (Option String)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.exec(sql)` (added in Node.js v22.5.0): `undefined exec(DOMString sql)` -/
-def DatabaseSync.exec (self : DatabaseSync) (sql : String) : IO Unit :=
-  self.val.callMethod "exec" (Support.args #[toJS sql]) Unit
+@[macro_inline] def DatabaseSync.exec (self : DatabaseSync) (sql : String) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.exec" do
+  self.val.callMethod "exec" (Internal.args #[toJS sql]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Function fn)` -/
-def DatabaseSync.function (self : DatabaseSync) (name : String) (fn : JSFunction) : IO Unit :=
-  self.val.callMethod "function" (Support.args #[toJS name, toJS fn]) Unit
+@[macro_inline] def DatabaseSync.function (self : DatabaseSync) (name : String) (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.function" do
+  self.val.callMethod "function" (Internal.args #[toJS name, toJS fn]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, DatabaseSync.FunctionOptions options, Function fn)` -/
-def DatabaseSync.functionWithOptions (self : DatabaseSync) (name : String) (options : DatabaseSync.FunctionOptions) (fn : JSFunction) : IO Unit :=
-  self.val.callMethod "function" (Support.args #[toJS name, toJS options, toJS fn]) Unit
+@[macro_inline] def DatabaseSync.functionWithOptions (self : DatabaseSync) (name : String) (options : DatabaseSync.FunctionOptions) (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.functionWithOptions" do
+  self.val.callMethod "function" (Internal.args #[toJS name, toJS options, toJS fn]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.setAuthorizer(callback)` (added in Node.js v24.10.0): `undefined setAuthorizer(Function? callback)` -/
-def DatabaseSync.setAuthorizer (self : DatabaseSync) (callback : Option JSFunction) : IO Unit :=
-  self.val.callMethod "setAuthorizer" (Support.args #[toJS callback]) Unit
+@[macro_inline] def DatabaseSync.setAuthorizer (self : DatabaseSync) (callback : Option JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.setAuthorizer" do
+  self.val.callMethod "setAuthorizer" (Internal.args #[toJS callback]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.open()` (added in Node.js v22.5.0): `undefined open()` -/
-def DatabaseSync.«open» (self : DatabaseSync) : IO Unit :=
-  self.val.callMethod "open" (Support.args #[]) Unit
+@[macro_inline] def DatabaseSync.«open» (self : DatabaseSync) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.open" do
+  self.val.callMethod "open" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.serialize([dbName])` (added in Node.js v24.16.0): `Uint8Array serialize(optional DOMString dbName)` -/
-def DatabaseSync.serialize (self : DatabaseSync) (dbName : Option String := none) : IO ByteArray :=
-  self.val.callMethod "serialize" (Support.args #[Support.optional dbName]) ByteArray
+@[macro_inline] def DatabaseSync.serialize (self : DatabaseSync) (dbName : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.DatabaseSync.serialize" do
+  self.val.callMethod "serialize" (Internal.args #[Internal.optional dbName]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.deserialize(buffer[, options])` (added in Node.js v24.16.0): `undefined deserialize(Uint8Array buffer, optional DatabaseSync.DeserializeOptions options)` -/
-def DatabaseSync.deserialize (self : DatabaseSync) (buffer_ : ByteArray) (options : Option DatabaseSync.DeserializeOptions := none) : IO Unit :=
-  self.val.callMethod "deserialize" (Support.args #[toJS buffer_, Support.optional options]) Unit
+@[macro_inline] def DatabaseSync.deserialize (self : DatabaseSync) (buffer_ : ByteArray) (options : Option DatabaseSync.DeserializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.DatabaseSync.deserialize" do
+  self.val.callMethod "deserialize" (Internal.args #[toJS buffer_, Internal.optional options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.prepare(sql[, options])` (added in Node.js v22.5.0): `StatementSync prepare(DOMString sql, optional DatabaseSync.PrepareOptions options)` -/
-def DatabaseSync.prepare (self : DatabaseSync) (sql : String) (options : Option DatabaseSync.PrepareOptions := none) : IO StatementSync := do
-  let r ← self.val.callMethod "prepare" (Support.args #[toJS sql, Support.optional options]) Value
+@[macro_inline] def DatabaseSync.prepare (self : DatabaseSync) (sql : String) (options : Option DatabaseSync.PrepareOptions := none) : IO StatementSync := Internal.api "Lasm.JS.Node.DatabaseSync.prepare" do
+  let r ← self.val.callMethod "prepare" (Internal.args #[toJS sql, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.createTagStore([maxSize])` (added in Node.js v24.9.0): `SQLTagStore createTagStore(optional long long maxSize)` -/
-def DatabaseSync.createTagStore (self : DatabaseSync) (maxSize : Option Int := none) : IO SQLTagStore := do
-  let r ← self.val.callMethod "createTagStore" (Support.args #[Support.optional maxSize]) Value
+@[macro_inline] def DatabaseSync.createTagStore (self : DatabaseSync) (maxSize : Option Int := none) : IO SQLTagStore := Internal.api "Lasm.JS.Node.DatabaseSync.createTagStore" do
+  let r ← self.val.callMethod "createTagStore" (Internal.args #[Internal.optional maxSize]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.createSession([options])` (added in Node.js v23.3.0, v22.12.0): `Session createSession(optional DatabaseSync.CreateSessionOptions options)` -/
-def DatabaseSync.createSession (self : DatabaseSync) (options : Option DatabaseSync.CreateSessionOptions := none) : IO Session := do
-  let r ← self.val.callMethod "createSession" (Support.args #[Support.optional options]) Value
+@[macro_inline] def DatabaseSync.createSession (self : DatabaseSync) (options : Option DatabaseSync.CreateSessionOptions := none) : IO Session := Internal.api "Lasm.JS.Node.DatabaseSync.createSession" do
+  let r ← self.val.callMethod "createSession" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional DatabaseSync.ApplyChangesetOptions options)` -/
-def DatabaseSync.applyChangeset (self : DatabaseSync) (changeset : ByteArray) (options : Option DatabaseSync.ApplyChangesetOptions := none) : IO Bool :=
-  self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
+@[macro_inline] def DatabaseSync.applyChangeset (self : DatabaseSync) (changeset : ByteArray) (options : Option DatabaseSync.ApplyChangesetOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.DatabaseSync.applyChangeset" do
+  self.val.callMethod "applyChangeset" (Internal.args #[toJS changeset, Internal.optional options]) Bool
 
 /-- `v instanceof Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Session`). -/
-def Session.cast? (v : Value) : IO (Option Session) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Session"] Value) v) then some { val := v } else none
+@[macro_inline] def Session.cast? (v : Value) : IO (Option Session) := Internal.api "Lasm.JS.Node.Session.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["Session"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `session.changeset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array changeset()` -/
-def Session.changeset (self : Session) : IO ByteArray :=
-  self.val.callMethod "changeset" (Support.args #[]) ByteArray
+@[macro_inline] def Session.changeset (self : Session) : IO ByteArray := Internal.api "Lasm.JS.Node.Session.changeset" do
+  self.val.callMethod "changeset" (Internal.args #[]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `session.patchset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array patchset()` -/
-def Session.patchset (self : Session) : IO ByteArray :=
-  self.val.callMethod "patchset" (Support.args #[]) ByteArray
+@[macro_inline] def Session.patchset (self : Session) : IO ByteArray := Internal.api "Lasm.JS.Node.Session.patchset" do
+  self.val.callMethod "patchset" (Internal.args #[]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `session.close()`: `undefined close()` -/
-def Session.close (self : Session) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Session.close (self : Session) : IO Unit := Internal.api "Lasm.JS.Node.Session.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `v instanceof StatementSync`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatementSync`). -/
-def StatementSync.cast? (v : Value) : IO (Option StatementSync) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["StatementSync"] Value) v) then some { val := v } else none
+@[macro_inline] def StatementSync.cast? (v : Value) : IO (Option StatementSync) := Internal.api "Lasm.JS.Node.StatementSync.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["StatementSync"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
-def StatementSync.expandedSQL (self : StatementSync) : IO String := self.val.get "expandedSQL" String
+@[macro_inline] def StatementSync.expandedSQL (self : StatementSync) : IO String := Internal.api "Lasm.JS.Node.StatementSync.expandedSQL" do
+  self.val.get "expandedSQL" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.sourceSQL` (added in Node.js v22.5.0): `readonly attribute DOMString sourceSQL` -/
-def StatementSync.sourceSQL (self : StatementSync) : IO String := self.val.get "sourceSQL" String
+@[macro_inline] def StatementSync.sourceSQL (self : StatementSync) : IO String := Internal.api "Lasm.JS.Node.StatementSync.sourceSQL" do
+  self.val.get "sourceSQL" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def StatementSync.all (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
-  self.val.callMethod "all" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
+@[macro_inline] def StatementSync.all (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.all" do
+  self.val.callMethod "all" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v24.22.0): `undefined close()` -/
-def StatementSync.close (self : StatementSync) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def StatementSync.close (self : StatementSync) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.columns()` (added in Node.js v23.11.0): `sequence<any> columns()` -/
-def StatementSync.columns (self : StatementSync) : IO (Array Data) :=
-  self.val.callMethod "columns" (Support.args #[]) (Array Data)
+@[macro_inline] def StatementSync.columns (self : StatementSync) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.columns" do
+  self.val.callMethod "columns" (Internal.args #[]) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def StatementSync.get (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
-  self.val.callMethod "get" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
+@[macro_inline] def StatementSync.get (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.StatementSync.get" do
+  self.val.callMethod "get" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def StatementSync.iterate (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "iterate" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+@[macro_inline] def StatementSync.iterate (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.iterate" do
+  self.val.callMethod "iterate" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def StatementSync.run (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "run" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+@[macro_inline] def StatementSync.run (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.run" do
+  self.val.callMethod "run" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
-def StatementSync.setAllowBareNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setAllowBareNamedParameters" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def StatementSync.setAllowBareNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setAllowBareNamedParameters" do
+  self.val.callMethod "setAllowBareNamedParameters" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowUnknownNamedParameters(enabled)` (added in Node.js v23.11.0, v22.15.0): `undefined setAllowUnknownNamedParameters(boolean enabled)` -/
-def StatementSync.setAllowUnknownNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setAllowUnknownNamedParameters" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def StatementSync.setAllowUnknownNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setAllowUnknownNamedParameters" do
+  self.val.callMethod "setAllowUnknownNamedParameters" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReturnArrays(enabled)` (added in Node.js v24.0.0): `undefined setReturnArrays(boolean enabled)` -/
-def StatementSync.setReturnArrays (self : StatementSync) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setReturnArrays" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def StatementSync.setReturnArrays (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setReturnArrays" do
+  self.val.callMethod "setReturnArrays" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReadBigInts(enabled)` (added in Node.js v22.5.0): `undefined setReadBigInts(boolean enabled)` -/
-def StatementSync.setReadBigInts (self : StatementSync) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setReadBigInts" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def StatementSync.setReadBigInts (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setReadBigInts" do
+  self.val.callMethod "setReadBigInts" (Internal.args #[toJS enabled]) Unit
 
 /-- `v instanceof SQLTagStore`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SQLTagStore`). -/
-def SQLTagStore.cast? (v : Value) : IO (Option SQLTagStore) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["SQLTagStore"] Value) v) then some { val := v } else none
+@[macro_inline] def SQLTagStore.cast? (v : Value) : IO (Option SQLTagStore) := Internal.api "Lasm.JS.Node.SQLTagStore.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["SQLTagStore"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.size` (added in Node.js v24.9.0): `readonly attribute long long size` -/
-def SQLTagStore.size (self : SQLTagStore) : IO Int := self.val.get "size" Int
+@[macro_inline] def SQLTagStore.size (self : SQLTagStore) : IO Int := Internal.api "Lasm.JS.Node.SQLTagStore.size" do
+  self.val.get "size" Int
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.capacity` (added in Node.js v24.9.0): `readonly attribute long long capacity` -/
-def SQLTagStore.capacity (self : SQLTagStore) : IO Int := self.val.get "capacity" Int
+@[macro_inline] def SQLTagStore.capacity (self : SQLTagStore) : IO Int := Internal.api "Lasm.JS.Node.SQLTagStore.capacity" do
+  self.val.get "capacity" Int
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.db` (added in Node.js v24.9.0): `readonly attribute DatabaseSync db` -/
-def SQLTagStore.db (self : SQLTagStore) : IO DatabaseSync := do
+@[macro_inline] def SQLTagStore.db (self : SQLTagStore) : IO DatabaseSync := Internal.api "Lasm.JS.Node.SQLTagStore.db" do
   let r ← self.val.get "db" Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.all(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-def SQLTagStore.all (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
-  self.val.callMethod "all" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Array Data)
+@[macro_inline] def SQLTagStore.all (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.SQLTagStore.all" do
+  self.val.callMethod "all" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.get(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object? get(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-def SQLTagStore.get (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
-  self.val.callMethod "get" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Option Data)
+@[macro_inline] def SQLTagStore.get (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.SQLTagStore.get" do
+  self.val.callMethod "get" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Option Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.iterate(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object iterate(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-def SQLTagStore.iterate (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "iterate" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
+@[macro_inline] def SQLTagStore.iterate (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.iterate" do
+  self.val.callMethod "iterate" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.run(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object run(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "run" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
+@[macro_inline] def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.run" do
+  self.val.callMethod "run" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.clear()` (added in Node.js v24.9.0): `undefined clear()` -/
-def SQLTagStore.clear (self : SQLTagStore) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def SQLTagStore.clear (self : SQLTagStore) : IO Unit := Internal.api "Lasm.JS.Node.SQLTagStore.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `v instanceof Database`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Database`). -/
-def Database.cast? (v : Value) : IO (Option Database) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Database"] Value) v) then some { val := v } else none
+@[macro_inline] def Database.cast? (v : Value) : IO (Option Database) := Internal.api "Lasm.JS.Node.Database.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["Database"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
-def Database.isOpen (self : Database) : IO Bool := self.val.get "isOpen" Bool
+@[macro_inline] def Database.isOpen (self : Database) : IO Bool := Internal.api "Lasm.JS.Node.Database.isOpen" do
+  self.val.get "isOpen" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isTransaction` (added in Node.js v24.0.0, v22.16.0): `readonly attribute boolean isTransaction` -/
-def Database.isTransaction (self : Database) : IO Bool := self.val.get "isTransaction" Bool
+@[macro_inline] def Database.isTransaction (self : Database) : IO Bool := Internal.api "Lasm.JS.Node.Database.isTransaction" do
+  self.val.get "isTransaction" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.limits` (added in Node.js v25.8.0): `readonly attribute object limits` -/
-def Database.limits (self : Database) : IO Data := self.val.get "limits" Data
+@[macro_inline] def Database.limits (self : Database) : IO Data := Internal.api "Lasm.JS.Node.Database.limits" do
+  self.val.get "limits" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.aggregate(name, options)` (added in Node.js v24.0.0, v22.16.0): `undefined aggregate(DOMString name, Database.AggregateOptions options)` -/
-def Database.aggregate (self : Database) (name : String) (options : Database.AggregateOptions) : IO Unit :=
-  self.val.callMethod "aggregate" (Support.args #[toJS name, toJS options]) Unit
+@[macro_inline] def Database.aggregate (self : Database) (name : String) (options : Database.AggregateOptions) : IO Unit := Internal.api "Lasm.JS.Node.Database.aggregate" do
+  self.val.callMethod "aggregate" (Internal.args #[toJS name, toJS options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.close()` (added in Node.js v22.5.0): `undefined close()` -/
-def Database.close (self : Database) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Database.close (self : Database) : IO Unit := Internal.api "Lasm.JS.Node.Database.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.loadExtension(path[, entryPoint])` (added in Node.js v23.5.0, v22.13.0): `undefined loadExtension(DOMString path, optional DOMString entryPoint)` -/
-def Database.loadExtension (self : Database) (path_ : String) (entryPoint : Option String := none) : IO Unit :=
-  self.val.callMethod "loadExtension" (Support.args #[toJS path_, Support.optional entryPoint]) Unit
+@[macro_inline] def Database.loadExtension (self : Database) (path_ : String) (entryPoint : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Database.loadExtension" do
+  self.val.callMethod "loadExtension" (Internal.args #[toJS path_, Internal.optional entryPoint]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.enableLoadExtension(allow)` (added in Node.js v23.5.0, v22.13.0): `undefined enableLoadExtension(boolean allow)` -/
-def Database.enableLoadExtension (self : Database) (allow : Bool) : IO Unit :=
-  self.val.callMethod "enableLoadExtension" (Support.args #[toJS allow]) Unit
+@[macro_inline] def Database.enableLoadExtension (self : Database) (allow : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Database.enableLoadExtension" do
+  self.val.callMethod "enableLoadExtension" (Internal.args #[toJS allow]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.enableDefensive(active)` (added in Node.js v25.1.0, v24.12.0): `undefined enableDefensive(boolean active)` -/
-def Database.enableDefensive (self : Database) (active : Bool) : IO Unit :=
-  self.val.callMethod "enableDefensive" (Support.args #[toJS active]) Unit
+@[macro_inline] def Database.enableDefensive (self : Database) (active : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Database.enableDefensive" do
+  self.val.callMethod "enableDefensive" (Internal.args #[toJS active]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.location([dbName])` (added in Node.js v24.0.0, v22.16.0): `DOMString? location(optional DOMString dbName)` -/
-def Database.location (self : Database) (dbName : Option String := none) : IO (Option String) :=
-  self.val.callMethod "location" (Support.args #[Support.optional dbName]) (Option String)
+@[macro_inline] def Database.location (self : Database) (dbName : Option String := none) : IO (Option String) := Internal.api "Lasm.JS.Node.Database.location" do
+  self.val.callMethod "location" (Internal.args #[Internal.optional dbName]) (Option String)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.exec(sql)` (added in Node.js v22.5.0): `undefined exec(DOMString sql)` -/
-def Database.exec (self : Database) (sql : String) : IO Unit :=
-  self.val.callMethod "exec" (Support.args #[toJS sql]) Unit
+@[macro_inline] def Database.exec (self : Database) (sql : String) : IO Unit := Internal.api "Lasm.JS.Node.Database.exec" do
+  self.val.callMethod "exec" (Internal.args #[toJS sql]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Function fn)` -/
-def Database.function (self : Database) (name : String) (fn : JSFunction) : IO Unit :=
-  self.val.callMethod "function" (Support.args #[toJS name, toJS fn]) Unit
+@[macro_inline] def Database.function (self : Database) (name : String) (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Database.function" do
+  self.val.callMethod "function" (Internal.args #[toJS name, toJS fn]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Database.FunctionOptions options, Function fn)` -/
-def Database.functionWithOptions (self : Database) (name : String) (options : Database.FunctionOptions) (fn : JSFunction) : IO Unit :=
-  self.val.callMethod "function" (Support.args #[toJS name, toJS options, toJS fn]) Unit
+@[macro_inline] def Database.functionWithOptions (self : Database) (name : String) (options : Database.FunctionOptions) (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Database.functionWithOptions" do
+  self.val.callMethod "function" (Internal.args #[toJS name, toJS options, toJS fn]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.setAuthorizer(callback)` (added in Node.js v24.10.0): `undefined setAuthorizer(Function? callback)` -/
-def Database.setAuthorizer (self : Database) (callback : Option JSFunction) : IO Unit :=
-  self.val.callMethod "setAuthorizer" (Support.args #[toJS callback]) Unit
+@[macro_inline] def Database.setAuthorizer (self : Database) (callback : Option JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Database.setAuthorizer" do
+  self.val.callMethod "setAuthorizer" (Internal.args #[toJS callback]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.open()` (added in Node.js v22.5.0): `undefined open()` -/
-def Database.«open» (self : Database) : IO Unit :=
-  self.val.callMethod "open" (Support.args #[]) Unit
+@[macro_inline] def Database.«open» (self : Database) : IO Unit := Internal.api "Lasm.JS.Node.Database.open" do
+  self.val.callMethod "open" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.serialize([dbName])` (added in Node.js v26.1.0): `Uint8Array serialize(optional DOMString dbName)` -/
-def Database.serialize (self : Database) (dbName : Option String := none) : IO ByteArray :=
-  self.val.callMethod "serialize" (Support.args #[Support.optional dbName]) ByteArray
+@[macro_inline] def Database.serialize (self : Database) (dbName : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Database.serialize" do
+  self.val.callMethod "serialize" (Internal.args #[Internal.optional dbName]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.deserialize(buffer[, options])` (added in Node.js v26.1.0): `undefined deserialize(Uint8Array buffer, optional Database.DeserializeOptions options)` -/
-def Database.deserialize (self : Database) (buffer_ : ByteArray) (options : Option Database.DeserializeOptions := none) : IO Unit :=
-  self.val.callMethod "deserialize" (Support.args #[toJS buffer_, Support.optional options]) Unit
+@[macro_inline] def Database.deserialize (self : Database) (buffer_ : ByteArray) (options : Option Database.DeserializeOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.Database.deserialize" do
+  self.val.callMethod "deserialize" (Internal.args #[toJS buffer_, Internal.optional options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.prepare(sql[, options])` (added in Node.js v22.5.0): `Statement prepare(DOMString sql, optional Database.PrepareOptions options)` -/
-def Database.prepare (self : Database) (sql : String) (options : Option Database.PrepareOptions := none) : IO Statement := do
-  let r ← self.val.callMethod "prepare" (Support.args #[toJS sql, Support.optional options]) Value
+@[macro_inline] def Database.prepare (self : Database) (sql : String) (options : Option Database.PrepareOptions := none) : IO Statement := Internal.api "Lasm.JS.Node.Database.prepare" do
+  let r ← self.val.callMethod "prepare" (Internal.args #[toJS sql, Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.createTagStore([maxSize])` (added in Node.js v24.9.0): `SQLTagStore createTagStore(optional long long maxSize)` -/
-def Database.createTagStore (self : Database) (maxSize : Option Int := none) : IO SQLTagStore := do
-  let r ← self.val.callMethod "createTagStore" (Support.args #[Support.optional maxSize]) Value
+@[macro_inline] def Database.createTagStore (self : Database) (maxSize : Option Int := none) : IO SQLTagStore := Internal.api "Lasm.JS.Node.Database.createTagStore" do
+  let r ← self.val.callMethod "createTagStore" (Internal.args #[Internal.optional maxSize]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.createModule(name, options)` (added in Node.js v26.11.0): `undefined createModule(DOMString name, Database.CreateModuleOptions options)` -/
-def Database.createModule (self : Database) (name : String) (options : Database.CreateModuleOptions) : IO Unit :=
-  self.val.callMethod "createModule" (Support.args #[toJS name, toJS options]) Unit
+@[macro_inline] def Database.createModule (self : Database) (name : String) (options : Database.CreateModuleOptions) : IO Unit := Internal.api "Lasm.JS.Node.Database.createModule" do
+  self.val.callMethod "createModule" (Internal.args #[toJS name, toJS options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.createSession([options])` (added in Node.js v23.3.0, v22.12.0): `Session createSession(optional Database.CreateSessionOptions options)` -/
-def Database.createSession (self : Database) (options : Option Database.CreateSessionOptions := none) : IO Session := do
-  let r ← self.val.callMethod "createSession" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Database.createSession (self : Database) (options : Option Database.CreateSessionOptions := none) : IO Session := Internal.api "Lasm.JS.Node.Database.createSession" do
+  let r ← self.val.callMethod "createSession" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional Database.ApplyChangesetOptions options)` -/
-def Database.applyChangeset (self : Database) (changeset : ByteArray) (options : Option Database.ApplyChangesetOptions := none) : IO Bool :=
-  self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
+@[macro_inline] def Database.applyChangeset (self : Database) (changeset : ByteArray) (options : Option Database.ApplyChangesetOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.Database.applyChangeset" do
+  self.val.callMethod "applyChangeset" (Internal.args #[toJS changeset, Internal.optional options]) Bool
 
 /-- `v instanceof Statement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Statement`). -/
-def Statement.cast? (v : Value) : IO (Option Statement) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Statement"] Value) v) then some { val := v } else none
+@[macro_inline] def Statement.cast? (v : Value) : IO (Option Statement) := Internal.api "Lasm.JS.Node.Statement.cast?" do
+  Internal.cast (Support.getExport "node:sqlite" ["Statement"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
-def Statement.expandedSQL (self : Statement) : IO String := self.val.get "expandedSQL" String
+@[macro_inline] def Statement.expandedSQL (self : Statement) : IO String := Internal.api "Lasm.JS.Node.Statement.expandedSQL" do
+  self.val.get "expandedSQL" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.sourceSQL` (added in Node.js v22.5.0): `readonly attribute DOMString sourceSQL` -/
-def Statement.sourceSQL (self : Statement) : IO String := self.val.get "sourceSQL" String
+@[macro_inline] def Statement.sourceSQL (self : Statement) : IO String := Internal.api "Lasm.JS.Node.Statement.sourceSQL" do
+  self.val.get "sourceSQL" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def Statement.all (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
-  self.val.callMethod "all" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
+@[macro_inline] def Statement.all (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.all" do
+  self.val.callMethod "all" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v26.8.0): `undefined close()` -/
-def Statement.close (self : Statement) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Statement.close (self : Statement) : IO Unit := Internal.api "Lasm.JS.Node.Statement.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.columns()` (added in Node.js v23.11.0, v22.16.0): `sequence<any> columns()` -/
-def Statement.columns (self : Statement) : IO (Array Data) :=
-  self.val.callMethod "columns" (Support.args #[]) (Array Data)
+@[macro_inline] def Statement.columns (self : Statement) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.columns" do
+  self.val.callMethod "columns" (Internal.args #[]) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def Statement.get (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
-  self.val.callMethod "get" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
+@[macro_inline] def Statement.get (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.Statement.get" do
+  self.val.callMethod "get" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def Statement.iterate (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "iterate" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+@[macro_inline] def Statement.iterate (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.iterate" do
+  self.val.callMethod "iterate" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.resetStats()` (added in Node.js v26.8.0): `undefined resetStats()` -/
-def Statement.resetStats (self : Statement) : IO Unit :=
-  self.val.callMethod "resetStats" (Support.args #[]) Unit
+@[macro_inline] def Statement.resetStats (self : Statement) : IO Unit := Internal.api "Lasm.JS.Node.Statement.resetStats" do
+  self.val.callMethod "resetStats" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-def Statement.run (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
-  self.val.callMethod "run" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+@[macro_inline] def Statement.run (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.run" do
+  self.val.callMethod "run" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
-def Statement.setAllowBareNamedParameters (self : Statement) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setAllowBareNamedParameters" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def Statement.setAllowBareNamedParameters (self : Statement) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Statement.setAllowBareNamedParameters" do
+  self.val.callMethod "setAllowBareNamedParameters" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowUnknownNamedParameters(enabled)` (added in Node.js v23.11.0, v22.15.0): `undefined setAllowUnknownNamedParameters(boolean enabled)` -/
-def Statement.setAllowUnknownNamedParameters (self : Statement) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setAllowUnknownNamedParameters" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def Statement.setAllowUnknownNamedParameters (self : Statement) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Statement.setAllowUnknownNamedParameters" do
+  self.val.callMethod "setAllowUnknownNamedParameters" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReturnArrays(enabled)` (added in Node.js v24.0.0, v22.16.0): `undefined setReturnArrays(boolean enabled)` -/
-def Statement.setReturnArrays (self : Statement) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setReturnArrays" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def Statement.setReturnArrays (self : Statement) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Statement.setReturnArrays" do
+  self.val.callMethod "setReturnArrays" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReadBigInts(enabled)` (added in Node.js v22.5.0): `undefined setReadBigInts(boolean enabled)` -/
-def Statement.setReadBigInts (self : Statement) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setReadBigInts" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def Statement.setReadBigInts (self : Statement) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Statement.setReadBigInts" do
+  self.val.callMethod "setReadBigInts" (Internal.args #[toJS enabled]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.stat(counter)` (added in Node.js v26.8.0): `double stat(DOMString counter)` -/
-def Statement.stat (self : Statement) (counter : String) : IO Float :=
-  self.val.callMethod "stat" (Support.args #[toJS counter]) Float
+@[macro_inline] def Statement.stat (self : Statement) (counter : String) : IO Float := Internal.api "Lasm.JS.Node.Statement.stat" do
+  self.val.callMethod "stat" (Internal.args #[toJS counter]) Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlite.constants` (added in Node.js v23.5.0, v22.13.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, sqlite.md) -/
-def sqlite.constants : IO Data := Support.getExport "node:sqlite" ["constants"] Data
+@[macro_inline] def sqlite.constants : IO Data := Internal.api "Lasm.JS.Node.sqlite.constants" do
+  Support.getExport "node:sqlite" ["constants"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlite.backup(sourceDb, path[, options])` (added in Node.js v23.8.0): `Promise<any> backup(DatabaseSync sourceDb, (DOMString or Uint8Array or URL) path, optional sqlite.BackupOptions options)` (Node.js 24.22.2 documentation, sqlite.md) -/
-def sqlite.backup (sourceDb : DatabaseSync) (path_ : DOMStringOrUint8ArrayOrURL) (options : Option sqlite.BackupOptions := none) : Async Data :=
+@[macro_inline] def sqlite.backup (sourceDb : DatabaseSync) (path_ : DOMStringOrUint8ArrayOrURL) (options : Option sqlite.BackupOptions := none) : Async Data := Internal.api "Lasm.JS.Node.sqlite.backup" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.sqlite.backup", module := "node:sqlite", path := "backup", construct := false, arity := 3 }
-    (Support.args #[toJS sourceDb, toJS path_, Support.optional options])
+    (Internal.args #[toJS sourceDb, toJS path_, Internal.optional options])
 
 end Lasm.JS.Node

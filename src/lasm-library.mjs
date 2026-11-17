@@ -5,11 +5,11 @@
 // its modules and the C glue are linked only into programs that import it.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
-import { compiledLazyModules, lazyModules } from './lazy-library.mjs';
+import { compiledLazyModules, importsOfSource, lazyModules } from './lazy-library.mjs';
 
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
@@ -18,6 +18,28 @@ export const libraryLeanVersions = ['4.35.0'];
 const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding', 'Abi', 'Uap', 'HttpBody', 'Log', 'HttpReq',
   'HttpDownstream', 'HttpResp', 'Dictionary', 'Geo', 'DeviceDetection', 'Erl', 'ObjectStore', 'ImageOptimizer', 'KvStore', 'SecretStore',
   'Backend', 'AsyncIo', 'Purge', 'ComputeRuntime', 'Acl'].map(name => `Lasm.Fastly.${name}`).concat('Lasm.Fastly');
+// Lasm.JS.Web's generated modules, one per web spec, in import order, then the umbrella module (generate-web.mjs).
+// Lasm.JS.Web's modules compiled with the prefix (and prebuilt): those the templates and the example apps import,
+// with what they import (test/web-bindings.test.mjs checks the templates and examples need no other). Every other
+// module of the whole platform ships as source and is compiled on first import (src/lazy-library.mjs, 0.3-6).
+export const eagerWebRoots = ['Lasm.JS.Web.Dom', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Websockets'];
+const webModules = (() => {
+  const all = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
+  const need = new Set();
+  const visit = module => {
+    if (need.has(module) || !all.includes(module)) return;
+    need.add(module);
+    for (const imported of importsOfSource(readFileSync(join(root, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
+  };
+  // And whatever Lasm.JS.Node, Deno and Bun (compiled with the prefix) import of it.
+  const hostRoots = ['Node', 'Deno', 'Bun'].flatMap(host => {
+    const dir = join(root, 'Lasm', 'JS', host);
+    const files = [`${dir}.lean`, ...(existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.lean')).map(f => join(dir, f)) : [])];
+    return files.filter(existsSync).flatMap(file => importsOfSource(readFileSync(file, 'utf8')));
+  });
+  [...eagerWebRoots, ...hostRoots].forEach(visit);
+  return all.filter(module => need.has(module));
+})();
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
 // Http.Respond is hand-written (whole bodies and respond), imported by the umbrella module.
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
@@ -33,14 +55,9 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // WASI 0.2.12 WIT by scripts/bindings/generate-wasi-http.mjs (wasiHttpModules, in import order).
   ...wasiHttpModules,
   'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
-  // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
-  // generated from WebIDL by scripts/bindings/generate-web.mjs.
-  'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
-  'Lasm.JS.Web.Encoding', 'Lasm.JS.Web.Compression', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Crypto',
-  'Lasm.JS.Web.Performance', 'Lasm.JS.Web.Timers', 'Lasm.JS.Web.Global', 'Lasm.JS.Web.Console', 'Lasm.JS.Web.Wasm', 'Lasm.JS.Web',
-  // Its browser tier (docs/JS_BINDINGS.md, "The browser tier"; scripts/bindings/web-browser.mjs).
-  'Lasm.JS.Web.Geometry', 'Lasm.JS.Web.Css', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.UiEvents', 'Lasm.JS.Web.Canvas', 'Lasm.JS.Web.WebSocket',
-  'Lasm.JS.Web.Browser',
+  // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
+  // @webref/idl by scripts/bindings/generate-web.mjs (webModules, in import order).
+  'Lasm.JS.Web.Support', ...webModules,
   // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's core set, compiled (scripts/bindings/node-modules.json
   // `core`, in import order). Every other Lasm.JS.Node.* module ships as source and is compiled on first import
   // (src/lazy-library.mjs). No umbrella module: programs import each module they use (0.4-39).

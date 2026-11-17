@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class AsyncResource` of `node:async_hooks` (Node.js 24.22.2 documentation, async_hooks.md): a handle to the JavaScript object. -/
 structure AsyncResource where
@@ -51,62 +54,64 @@ structure async_hooks.CreateHookOptions where
   promiseResolve : Option JSFunction := none
   /-- `boolean trackPromises` -/
   trackPromises : Option Bool := none
-instance instToJSAsync_hooksCreateHookOptions : ToJS async_hooks.CreateHookOptions := ⟨fun d => Support.fields #[("init", Support.optional d.init),
-    ("before", Support.optional d.before),
-    ("after", Support.optional d.after),
-    ("destroy", Support.optional d.destroy),
-    ("promiseResolve", Support.optional d.promiseResolve),
-    ("trackPromises", Support.optional d.trackPromises)]⟩
+instance instToJSAsync_hooksCreateHookOptions : ToJS async_hooks.CreateHookOptions := ⟨fun d => Internal.fields #[("init", Internal.optional d.init),
+    ("before", Internal.optional d.before),
+    ("after", Internal.optional d.after),
+    ("destroy", Internal.optional d.destroy),
+    ("promiseResolve", Internal.optional d.promiseResolve),
+    ("trackPromises", Internal.optional d.trackPromises)]⟩
 
 /-- `v instanceof AsyncResource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncResource`). -/
-def AsyncResource.cast? (v : Value) : IO (Option AsyncResource) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncResource"] Value) v) then some { val := v } else none
+@[macro_inline] def AsyncResource.cast? (v : Value) : IO (Option AsyncResource) := Internal.api "Lasm.JS.Node.AsyncResource.cast?" do
+  Internal.cast (Support.getExport "node:async_hooks" ["AsyncResource"] Value) (fun x => { val := x }) v
 
 /-- `AsyncResource.bind(fn[, type[, thisArg]])` (added in Node.js v14.8.0, v12.19.0): `static undefined bind(Function fn, optional DOMString type, optional any thisArg)` -/
-def AsyncResource.bind (fn : JSFunction) (type : Option String := none) (thisArg : Data := .undefined) : IO Unit :=
+@[macro_inline] def AsyncResource.bind (fn : JSFunction) (type : Option String := none) (thisArg : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.AsyncResource.bind" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.AsyncResource.bind", module := "node:async_hooks", path := "AsyncResource.bind", construct := false, arity := 3 }
-    (Support.args #[toJS fn, Support.optional type, thisArg]) (await := false)
+    (Internal.args #[toJS fn, Internal.optional type, thisArg]) (await := false)
 
 /-- `v instanceof AsyncHook`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncHook`). -/
-def AsyncHook.cast? (v : Value) : IO (Option AsyncHook) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncHook"] Value) v) then some { val := v } else none
+@[macro_inline] def AsyncHook.cast? (v : Value) : IO (Option AsyncHook) := Internal.api "Lasm.JS.Node.AsyncHook.cast?" do
+  Internal.cast (Support.getExport "node:async_hooks" ["AsyncHook"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
-def AsyncHook.asyncWrapProviders (self : AsyncHook) : IO Data := self.val.get "asyncWrapProviders" Data
+@[macro_inline] def AsyncHook.asyncWrapProviders (self : AsyncHook) : IO Data := Internal.api "Lasm.JS.Node.AsyncHook.asyncWrapProviders" do
+  self.val.get "asyncWrapProviders" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.executionAsyncResource()` (added in Node.js v13.9.0, v12.17.0): `object executionAsyncResource()` -/
-def AsyncHook.executionAsyncResource (self : AsyncHook) : IO Data :=
-  self.val.callMethod "executionAsyncResource" (Support.args #[]) Data
+@[macro_inline] def AsyncHook.executionAsyncResource (self : AsyncHook) : IO Data := Internal.api "Lasm.JS.Node.AsyncHook.executionAsyncResource" do
+  self.val.callMethod "executionAsyncResource" (Internal.args #[]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.executionAsyncId()` (added in Node.js v8.1.0): `double executionAsyncId()` -/
-def AsyncHook.executionAsyncId (self : AsyncHook) : IO Float :=
-  self.val.callMethod "executionAsyncId" (Support.args #[]) Float
+@[macro_inline] def AsyncHook.executionAsyncId (self : AsyncHook) : IO Float := Internal.api "Lasm.JS.Node.AsyncHook.executionAsyncId" do
+  self.val.callMethod "executionAsyncId" (Internal.args #[]) Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.triggerAsyncId()`: `double triggerAsyncId()` -/
-def AsyncHook.triggerAsyncId (self : AsyncHook) : IO Float :=
-  self.val.callMethod "triggerAsyncId" (Support.args #[]) Float
+@[macro_inline] def AsyncHook.triggerAsyncId (self : AsyncHook) : IO Float := Internal.api "Lasm.JS.Node.AsyncHook.triggerAsyncId" do
+  self.val.callMethod "triggerAsyncId" (Internal.args #[]) Float
 
 /-- `v instanceof AsyncLocalStorage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncLocalStorage`). -/
-def AsyncLocalStorage.cast? (v : Value) : IO (Option AsyncLocalStorage) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncLocalStorage"] Value) v) then some { val := v } else none
+@[macro_inline] def AsyncLocalStorage.cast? (v : Value) : IO (Option AsyncLocalStorage) := Internal.api "Lasm.JS.Node.AsyncLocalStorage.cast?" do
+  Internal.cast (Support.getExport "node:async_hooks" ["AsyncLocalStorage"] Value) (fun x => { val := x }) v
 
 /-- `name` (added in Node.js v24.0.0): `readonly attribute DOMString name` -/
-def AsyncLocalStorage.name (self : AsyncLocalStorage) : IO String := self.val.get "name" String
+@[macro_inline] def AsyncLocalStorage.name (self : AsyncLocalStorage) : IO String := Internal.api "Lasm.JS.Node.AsyncLocalStorage.name" do
+  self.val.get "name" String
 
 /-- `AsyncLocalStorage.bind(fn)` (added in Node.js v19.8.0, v18.16.0): `static Function bind(Function fn)` -/
-def AsyncLocalStorage.bind (fn : JSFunction) : IO JSFunction :=
+@[macro_inline] def AsyncLocalStorage.bind (fn : JSFunction) : IO JSFunction := Internal.api "Lasm.JS.Node.AsyncLocalStorage.bind" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.AsyncLocalStorage.bind", module := "node:async_hooks", path := "AsyncLocalStorage.bind", construct := false, arity := 1 }
-    (Support.args #[toJS fn]) (await := false)
+    (Internal.args #[toJS fn]) (await := false)
 
 /-- `AsyncLocalStorage.snapshot()` (added in Node.js v19.8.0, v18.16.0): `static Function snapshot()` -/
-def AsyncLocalStorage.snapshot : IO JSFunction :=
+@[macro_inline] def AsyncLocalStorage.snapshot : IO JSFunction := Internal.api "Lasm.JS.Node.AsyncLocalStorage.snapshot" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.AsyncLocalStorage.snapshot", module := "node:async_hooks", path := "AsyncLocalStorage.snapshot", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.createHook(options)` (added in Node.js v8.1.0): `AsyncHook createHook(async_hooks.CreateHookOptions options)` (Node.js 24.22.2 documentation, async_hooks.md) -/
-def async_hooks.createHook (options : async_hooks.CreateHookOptions) : IO AsyncHook := do
+@[macro_inline] def async_hooks.createHook (options : async_hooks.CreateHookOptions) : IO AsyncHook := Internal.api "Lasm.JS.Node.async_hooks.createHook" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.async_hooks.createHook", module := "node:async_hooks", path := "createHook", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

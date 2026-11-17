@@ -1,7 +1,7 @@
 /-
 Lasm.JS.Node.Support: the definitions the generated Node bindings
 (library/Lasm/JS/Node/*.lean, scripts/bindings/generate-web.mjs) need beyond
-Lasm.JS.Web.Support: properties of Node modules, functions that take a final
+Lasm.JS.Web.Internal: properties of Node modules, functions that take a final
 `(err, value)` callback, and Buffer methods called on bytes. Hand-written; the
 mapping is in docs/JS_BINDINGS.md ("Lasm.JS.Node").
 
@@ -51,13 +51,6 @@ Buffer prototype are callable with a Uint8Array instance"). -/
 def callOnBytes (module path : String) (self : ByteArray) (args : Array Data) (α : Type) [FromJS α] : IO α := do
   let f ← getExport module (path.splitOn ".") Value
   f.call args α (this := .bytes self)
-
-/-- `Object.entries(v)`, read as a record of `α`: a record result whose object is not plain
-(Node's `process.env`; Deno's is a Proxy, which `structuredClone` rejects). -/
-def recordOf (α : Type) [FromJS α] (v : Value) : IO (Lasm.JS.Web.Record α) := do
-  let entries ← Lasm.JS.Binding.invoke (Array (String × α)) { name := "Lasm.JS.Node.Support.recordOf", module := "globalThis", path := "Object.entries", construct := false, arity := 1 }
-    #[.ref v ""] (await := false)
-  return ⟨entries⟩
 
 end Support
 end Lasm.JS.Node

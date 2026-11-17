@@ -8,13 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Process
 import Lasm.JS.Node.Readline
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class REPLServer extends readline.Interface` of `node:repl` (Node.js 24.22.2 documentation, repl.md): a handle to the JavaScript object. -/
 structure REPLServer extends readline.Interface
@@ -61,10 +64,10 @@ structure REPLServer.SetupHistoryHistoryConfig where
   removeHistoryDuplicates : Option Bool := none
   /-- `Function onHistoryFileLoaded` -/
   onHistoryFileLoaded : Option JSFunction := none
-instance instToJSREPLServerSetupHistoryHistoryConfig : ToJS REPLServer.SetupHistoryHistoryConfig := ⟨fun d => Support.fields #[("filePath", Support.optional d.filePath),
-    ("size", Support.optional d.size),
-    ("removeHistoryDuplicates", Support.optional d.removeHistoryDuplicates),
-    ("onHistoryFileLoaded", Support.optional d.onHistoryFileLoaded)]⟩
+instance instToJSREPLServerSetupHistoryHistoryConfig : ToJS REPLServer.SetupHistoryHistoryConfig := ⟨fun d => Internal.fields #[("filePath", Internal.optional d.filePath),
+    ("size", Internal.optional d.size),
+    ("removeHistoryDuplicates", Internal.optional d.removeHistoryDuplicates),
+    ("onHistoryFileLoaded", Internal.optional d.onHistoryFileLoaded)]⟩
 
 /-- `(REPLServer.SetupHistoryHistoryConfig or DOMString)`: one constructor per member type. -/
 inductive REPLServer.SetupHistoryHistoryConfigOrDOMString where
@@ -106,19 +109,19 @@ structure repl.StartOptions where
   breakEvalOnSigint : Option Bool := none
   /-- `boolean preview` -/
   preview : Option Bool := none
-instance instToJSReplStartOptions : ToJS repl.StartOptions := ⟨fun d => Support.fields #[("prompt", Support.optional d.prompt),
-    ("input", Support.optional d.input),
-    ("output", Support.optional d.output),
-    ("terminal", Support.optional d.terminal),
-    ("eval", Support.optional d.eval),
-    ("useColors", Support.optional d.useColors),
-    ("useGlobal", Support.optional d.useGlobal),
-    ("ignoreUndefined", Support.optional d.ignoreUndefined),
-    ("writer", Support.optional d.writer),
-    ("completer", Support.optional d.completer),
-    ("replMode", Support.optional d.replMode),
-    ("breakEvalOnSigint", Support.optional d.breakEvalOnSigint),
-    ("preview", Support.optional d.preview)]⟩
+instance instToJSReplStartOptions : ToJS repl.StartOptions := ⟨fun d => Internal.fields #[("prompt", Internal.optional d.prompt),
+    ("input", Internal.optional d.input),
+    ("output", Internal.optional d.output),
+    ("terminal", Internal.optional d.terminal),
+    ("eval", Internal.optional d.eval),
+    ("useColors", Internal.optional d.useColors),
+    ("useGlobal", Internal.optional d.useGlobal),
+    ("ignoreUndefined", Internal.optional d.ignoreUndefined),
+    ("writer", Internal.optional d.writer),
+    ("completer", Internal.optional d.completer),
+    ("replMode", Internal.optional d.replMode),
+    ("breakEvalOnSigint", Internal.optional d.breakEvalOnSigint),
+    ("preview", Internal.optional d.preview)]⟩
 
 /-- `(repl.StartOptions or DOMString)`: one constructor per member type. -/
 inductive repl.StartOptionsOrDOMString where
@@ -133,53 +136,54 @@ instance instCoeReplStartOptionsReplStartOptionsOrDOMString : Coe repl.StartOpti
 instance instCoeStringReplStartOptionsOrDOMString : Coe String repl.StartOptionsOrDOMString := ⟨.domString⟩
 
 /-- `v instanceof REPLServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `REPLServer`). -/
-def REPLServer.cast? (v : Value) : IO (Option REPLServer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:repl" ["REPLServer"] Value) v) then some { val := v } else none
+@[macro_inline] def REPLServer.cast? (v : Value) : IO (Option REPLServer) := Internal.api "Lasm.JS.Node.REPLServer.cast?" do
+  Internal.cast (Support.getExport "node:repl" ["REPLServer"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'exit'` (added in Node.js v0.7.7): `REPLServer onExit(REPLServer.ExitListener listener)`: calls `on("exit", listener)` -/
-def REPLServer.onExit (self : REPLServer) (listener : REPLServer.ExitListener) : IO REPLServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def REPLServer.onExit (self : REPLServer) (listener : REPLServer.ExitListener) : IO REPLServer := Internal.api "Lasm.JS.Node.REPLServer.onExit" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'exit'` (added in Node.js v0.7.7): `REPLServer onceExit(REPLServer.ExitListener listener)`: calls `once("exit", listener)` -/
-def REPLServer.onceExit (self : REPLServer) (listener : REPLServer.ExitListener) : IO REPLServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def REPLServer.onceExit (self : REPLServer) (listener : REPLServer.ExitListener) : IO REPLServer := Internal.api "Lasm.JS.Node.REPLServer.onceExit" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'reset'` (added in Node.js v0.11.0): `REPLServer onReset(REPLServer.ResetListener listener)`: calls `on("reset", listener)` -/
-def REPLServer.onReset (self : REPLServer) (listener : REPLServer.ResetListener) : IO REPLServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "reset", toJS listener]) Value
+@[macro_inline] def REPLServer.onReset (self : REPLServer) (listener : REPLServer.ResetListener) : IO REPLServer := Internal.api "Lasm.JS.Node.REPLServer.onReset" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "reset", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'reset'` (added in Node.js v0.11.0): `REPLServer onceReset(REPLServer.ResetListener listener)`: calls `once("reset", listener)` -/
-def REPLServer.onceReset (self : REPLServer) (listener : REPLServer.ResetListener) : IO REPLServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "reset", toJS listener]) Value
+@[macro_inline] def REPLServer.onceReset (self : REPLServer) (listener : REPLServer.ResetListener) : IO REPLServer := Internal.api "Lasm.JS.Node.REPLServer.onceReset" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "reset", toJS listener]) Value
   pure { val := r }
 
 /-- `replServer.defineCommand(keyword, cmd)` (added in Node.js v0.3.0): `undefined defineCommand(DOMString keyword, (object or Function) cmd)` -/
-def REPLServer.defineCommand (self : REPLServer) (keyword : String) (cmd : ObjectOrJSFunction) : IO Unit :=
-  self.val.callMethod "defineCommand" (Support.args #[toJS keyword, toJS cmd]) Unit
+@[macro_inline] def REPLServer.defineCommand (self : REPLServer) (keyword : String) (cmd : ObjectOrJSFunction) : IO Unit := Internal.api "Lasm.JS.Node.REPLServer.defineCommand" do
+  self.val.callMethod "defineCommand" (Internal.args #[toJS keyword, toJS cmd]) Unit
 
 /-- `replServer.displayPrompt([preserveCursor])` (added in Node.js v0.1.91): `undefined displayPrompt(optional boolean preserveCursor)` -/
-def REPLServer.displayPrompt (self : REPLServer) (preserveCursor : Option Bool := none) : IO Unit :=
-  self.val.callMethod "displayPrompt" (Support.args #[Support.optional preserveCursor]) Unit
+@[macro_inline] def REPLServer.displayPrompt (self : REPLServer) (preserveCursor : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Node.REPLServer.displayPrompt" do
+  self.val.callMethod "displayPrompt" (Internal.args #[Internal.optional preserveCursor]) Unit
 
 /-- `replServer.clearBufferedCommand()` (added in Node.js v9.0.0): `undefined clearBufferedCommand()` -/
-def REPLServer.clearBufferedCommand (self : REPLServer) : IO Unit :=
-  self.val.callMethod "clearBufferedCommand" (Support.args #[]) Unit
+@[macro_inline] def REPLServer.clearBufferedCommand (self : REPLServer) : IO Unit := Internal.api "Lasm.JS.Node.REPLServer.clearBufferedCommand" do
+  self.val.callMethod "clearBufferedCommand" (Internal.args #[]) Unit
 
 /-- `replServer.setupHistory(historyConfig, callback)` (added in Node.js v11.10.0): `Promise<REPLServer> setupHistory((REPLServer.SetupHistoryHistoryConfig or DOMString) historyConfig)` -/
-def REPLServer.setupHistory (self : REPLServer) (historyConfig : REPLServer.SetupHistoryHistoryConfigOrDOMString) : Async REPLServer := do
-  let r ← Support.promisifiedMethod Value self.val "setupHistory" (Support.args #[toJS historyConfig])
+@[macro_inline] def REPLServer.setupHistory (self : REPLServer) (historyConfig : REPLServer.SetupHistoryHistoryConfigOrDOMString) : Async REPLServer := Internal.api "Lasm.JS.Node.REPLServer.setupHistory" do
+  let r ← Support.promisifiedMethod Value self.val "setupHistory" (Internal.args #[toJS historyConfig])
   pure { val := r }
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `repl.builtinModules` (added in Node.js v14.5.0): `readonly attribute sequence<DOMString> builtinModules` (Node.js 24.22.2 documentation, repl.md) -/
-def repl.builtinModules : IO (Array String) := Support.getExport "node:repl" ["builtinModules"] (Array String)
+@[macro_inline] def repl.builtinModules : IO (Array String) := Internal.api "Lasm.JS.Node.repl.builtinModules" do
+  Support.getExport "node:repl" ["builtinModules"] (Array String)
 
 /-- `repl.start([options])` (added in Node.js v0.1.91): `REPLServer start(optional (repl.StartOptions or DOMString) options)` (Node.js 24.22.2 documentation, repl.md) -/
-def repl.start (options : Option repl.StartOptionsOrDOMString := none) : IO REPLServer := do
+@[macro_inline] def repl.start (options : Option repl.StartOptionsOrDOMString := none) : IO REPLServer := Internal.api "Lasm.JS.Node.repl.start" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.repl.start", module := "node:repl", path := "start", construct := false, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

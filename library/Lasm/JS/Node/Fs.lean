@@ -8,11 +8,12 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
-import Lasm.JS.Web.File
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.WebSocket
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Net
@@ -21,6 +22,9 @@ import Lasm.JS.Node.Readline
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class FileHandle` of `node:fs` (Node.js 24.22.2 documentation, fs.md): a handle to the JavaScript object. -/
 structure FileHandle where
@@ -136,8 +140,8 @@ structure FileHandle.AppendFileOptions where
   encoding : Option String := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance instToJSFileHandleAppendFileOptions : ToJS FileHandle.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFileHandleAppendFileOptions : ToJS FileHandle.AppendFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(FileHandle.AppendFileOptions or DOMString)`: one constructor per member type. -/
 inductive FileHandle.AppendFileOptionsOrDOMString where
@@ -167,13 +171,13 @@ structure FileHandle.CreateReadStreamOptions where
   highWaterMark : Option Int := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance instToJSFileHandleCreateReadStreamOptions : ToJS FileHandle.CreateReadStreamOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("autoClose", Support.optional d.autoClose),
-    ("emitClose", Support.optional d.emitClose),
-    ("start", Support.optional d.start),
-    ("end", Support.optional d.«end»),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFileHandleCreateReadStreamOptions : ToJS FileHandle.CreateReadStreamOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("autoClose", Internal.optional d.autoClose),
+    ("emitClose", Internal.optional d.emitClose),
+    ("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary FileHandle.CreateWriteStreamOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.CreateWriteStreamOptions where
@@ -189,12 +193,12 @@ structure FileHandle.CreateWriteStreamOptions where
   highWaterMark : Option Nat := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
-instance instToJSFileHandleCreateWriteStreamOptions : ToJS FileHandle.CreateWriteStreamOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("autoClose", Support.optional d.autoClose),
-    ("emitClose", Support.optional d.emitClose),
-    ("start", Support.optional d.start),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("flush", Support.optional d.flush)]⟩
+instance instToJSFileHandleCreateWriteStreamOptions : ToJS FileHandle.CreateWriteStreamOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("autoClose", Internal.optional d.autoClose),
+    ("emitClose", Internal.optional d.emitClose),
+    ("start", Internal.optional d.start),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(Function or object)`: one constructor per member type. -/
 inductive JSFunctionOrObject where
@@ -219,11 +223,11 @@ structure FileHandle.PullOptions where
   limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
-instance instToJSFileHandlePullOptions : ToJS FileHandle.PullOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("autoClose", Support.optional d.autoClose),
-    ("start", Support.optional d.start),
-    ("limit", Support.optional d.limit),
-    ("chunkSize", Support.optional d.chunkSize)]⟩
+instance instToJSFileHandlePullOptions : ToJS FileHandle.PullOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("autoClose", Internal.optional d.autoClose),
+    ("start", Internal.optional d.start),
+    ("limit", Internal.optional d.limit),
+    ("chunkSize", Internal.optional d.chunkSize)]⟩
 
 /-- `dictionary FileHandle.PullSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.PullSyncOptions where
@@ -235,10 +239,10 @@ structure FileHandle.PullSyncOptions where
   limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
-instance instToJSFileHandlePullSyncOptions : ToJS FileHandle.PullSyncOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose),
-    ("start", Support.optional d.start),
-    ("limit", Support.optional d.limit),
-    ("chunkSize", Support.optional d.chunkSize)]⟩
+instance instToJSFileHandlePullSyncOptions : ToJS FileHandle.PullSyncOptions := ⟨fun d => Internal.fields #[("autoClose", Internal.optional d.autoClose),
+    ("start", Internal.optional d.start),
+    ("limit", Internal.optional d.limit),
+    ("chunkSize", Internal.optional d.chunkSize)]⟩
 
 /-- `(long long or bigint)`: one constructor per member type. -/
 inductive LongLongOrBigint where
@@ -272,10 +276,10 @@ structure FileHandle.ReadOptions where
   length : Option Int := none
   /-- `(long long or bigint)? position` -/
   position : Option LongLongOrBigint := none
-instance instToJSFileHandleReadOptions : ToJS FileHandle.ReadOptions := ⟨fun d => Support.fields #[("buffer", Support.optional d.buffer),
-    ("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFileHandleReadOptions : ToJS FileHandle.ReadOptions := ⟨fun d => Internal.fields #[("buffer", Internal.optional d.buffer),
+    ("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary FileHandle.ReadOptions2` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.ReadOptions2 where
@@ -285,15 +289,15 @@ structure FileHandle.ReadOptions2 where
   length : Option Int := none
   /-- `(long long or bigint)? position` -/
   position : Option LongLongOrBigint := none
-instance instToJSFileHandleReadOptions2 : ToJS FileHandle.ReadOptions2 := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFileHandleReadOptions2 : ToJS FileHandle.ReadOptions2 := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary FileHandle.ReadableWebStreamOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.ReadableWebStreamOptions where
   /-- `boolean autoClose = false` -/
   autoClose : Option Bool := none
-instance instToJSFileHandleReadableWebStreamOptions : ToJS FileHandle.ReadableWebStreamOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose)]⟩
+instance instToJSFileHandleReadableWebStreamOptions : ToJS FileHandle.ReadableWebStreamOptions := ⟨fun d => Internal.fields #[("autoClose", Internal.optional d.autoClose)]⟩
 
 /-- `dictionary FileHandle.ReadFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.ReadFileOptions where
@@ -303,9 +307,9 @@ structure FileHandle.ReadFileOptions where
   signal : Option AbortSignal := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance instToJSFileHandleReadFileOptions : ToJS FileHandle.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("signal", Support.optional d.signal),
-    ("buffer", Support.optional d.buffer)]⟩
+instance instToJSFileHandleReadFileOptions : ToJS FileHandle.ReadFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("signal", Internal.optional d.signal),
+    ("buffer", Internal.optional d.buffer)]⟩
 
 /-- `(FileHandle.ReadFileOptions or DOMString)`: one constructor per member type. -/
 inductive FileHandle.ReadFileOptionsOrDOMString where
@@ -333,12 +337,12 @@ structure FileHandle.ReadLinesOptions where
   «end» : Option Int := none
   /-- `long long highWaterMark` -/
   highWaterMark : Option Int := none
-instance instToJSFileHandleReadLinesOptions : ToJS FileHandle.ReadLinesOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("autoClose", Support.optional d.autoClose),
-    ("emitClose", Support.optional d.emitClose),
-    ("start", Support.optional d.start),
-    ("end", Support.optional d.«end»),
-    ("highWaterMark", Support.optional d.highWaterMark)]⟩
+instance instToJSFileHandleReadLinesOptions : ToJS FileHandle.ReadLinesOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("autoClose", Internal.optional d.autoClose),
+    ("emitClose", Internal.optional d.emitClose),
+    ("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»),
+    ("highWaterMark", Internal.optional d.highWaterMark)]⟩
 
 /-- `dictionary FileHandle.StatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.StatOptions where
@@ -346,8 +350,8 @@ structure FileHandle.StatOptions where
   bigint : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSFileHandleStatOptions : ToJS FileHandle.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFileHandleStatOptions : ToJS FileHandle.StatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(double or DOMString or object)`: one constructor per member type. -/
 inductive DoubleOrDOMStringOrObject where
@@ -384,9 +388,9 @@ structure FileHandle.WriteOptions where
   length : Option Int := none
   /-- `long long? position = null` -/
   position : Option Int := none
-instance instToJSFileHandleWriteOptions : ToJS FileHandle.WriteOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFileHandleWriteOptions : ToJS FileHandle.WriteOptions := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary FileHandle.WriteStringResult` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.WriteStringResult where
@@ -406,8 +410,8 @@ structure FileHandle.WriteFileOptions where
   encoding : Option String := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance instToJSFileHandleWriteFileOptions : ToJS FileHandle.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFileHandleWriteFileOptions : ToJS FileHandle.WriteFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(FileHandle.WriteFileOptions or DOMString)`: one constructor per member type. -/
 inductive FileHandle.WriteFileOptionsOrDOMString where
@@ -431,10 +435,10 @@ structure FileHandle.WriterOptions where
   limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
-instance instToJSFileHandleWriterOptions : ToJS FileHandle.WriterOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose),
-    ("start", Support.optional d.start),
-    ("limit", Support.optional d.limit),
-    ("chunkSize", Support.optional d.chunkSize)]⟩
+instance instToJSFileHandleWriterOptions : ToJS FileHandle.WriterOptions := ⟨fun d => Internal.fields #[("autoClose", Internal.optional d.autoClose),
+    ("start", Internal.optional d.start),
+    ("limit", Internal.optional d.limit),
+    ("chunkSize", Internal.optional d.chunkSize)]⟩
 
 /-- `callback fs.FSWatcher.ChangeListener = undefined (DOMString eventType, (DOMString or Uint8Array) filename)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.FSWatcher.ChangeListener where
@@ -445,10 +449,10 @@ instance instToJSFsFSWatcherChangeListener : ToJS fs.FSWatcher.ChangeListener :=
 instance instFromJSFsFSWatcherChangeListener : FromJS fs.FSWatcher.ChangeListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.FSWatcher.ChangeListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def fs.FSWatcher.ChangeListener.ofFn (f : String → DOMStringOrUint8Array → Async Unit) : IO fs.FSWatcher.ChangeListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg DOMStringOrUint8Array args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg DOMStringOrUint8Array args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def fs.FSWatcher.ChangeListener.ofSyncFn (f : String → DOMStringOrUint8Array → IO Unit) : IO fs.FSWatcher.ChangeListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg DOMStringOrUint8Array args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg DOMStringOrUint8Array args 1)) }
 
 /-- `callback fs.FSWatcher.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.FSWatcher.CloseListener where
@@ -473,10 +477,10 @@ instance instToJSFsFSWatcherErrorListener : ToJS fs.FSWatcher.ErrorListener := �
 instance instFromJSFsFSWatcherErrorListener : FromJS fs.FSWatcher.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.FSWatcher.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def fs.FSWatcher.ErrorListener.ofFn (f : Data → Async Unit) : IO fs.FSWatcher.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def fs.FSWatcher.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO fs.FSWatcher.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback fs.ReadStream.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.ReadStream.CloseListener where
@@ -501,10 +505,10 @@ instance instToJSFsReadStreamOpenListener : ToJS fs.ReadStream.OpenListener := �
 instance instFromJSFsReadStreamOpenListener : FromJS fs.ReadStream.OpenListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.ReadStream.OpenListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def fs.ReadStream.OpenListener.ofFn (f : Int → Async Unit) : IO fs.ReadStream.OpenListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Int args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Int args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def fs.ReadStream.OpenListener.ofSyncFn (f : Int → IO Unit) : IO fs.ReadStream.OpenListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Int args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Int args 0)) }
 
 /-- `callback fs.ReadStream.ReadyListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.ReadStream.ReadyListener where
@@ -693,10 +697,10 @@ instance instToJSFsWriteStreamOpenListener : ToJS fs.WriteStream.OpenListener :=
 instance instFromJSFsWriteStreamOpenListener : FromJS fs.WriteStream.OpenListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.WriteStream.OpenListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def fs.WriteStream.OpenListener.ofFn (f : Int → Async Unit) : IO fs.WriteStream.OpenListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Int args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Int args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def fs.WriteStream.OpenListener.ofSyncFn (f : Int → IO Unit) : IO fs.WriteStream.OpenListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Int args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Int args 0)) }
 
 /-- `callback fs.WriteStream.ReadyListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.WriteStream.ReadyListener where
@@ -742,10 +746,10 @@ structure fsPromises.AppendFileOptions where
   flag : Option String := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
-instance instToJSFsPromisesAppendFileOptions : ToJS fsPromises.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush)]⟩
+instance instToJSFsPromisesAppendFileOptions : ToJS fsPromises.AppendFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(fsPromises.AppendFileOptions or DOMString)`: one constructor per member type. -/
 inductive fsPromises.AppendFileOptionsOrDOMString where
@@ -789,14 +793,14 @@ structure fsPromises.CpOptions where
   recursive : Option Bool := none
   /-- `boolean verbatimSymlinks = false` -/
   verbatimSymlinks : Option Bool := none
-instance instToJSFsPromisesCpOptions : ToJS fsPromises.CpOptions := ⟨fun d => Support.fields #[("dereference", Support.optional d.dereference),
-    ("errorOnExist", Support.optional d.errorOnExist),
-    ("filter", Support.optional d.filter),
-    ("force", Support.optional d.force),
-    ("mode", Support.optional d.mode),
-    ("preserveTimestamps", Support.optional d.preserveTimestamps),
-    ("recursive", Support.optional d.recursive),
-    ("verbatimSymlinks", Support.optional d.verbatimSymlinks)]⟩
+instance instToJSFsPromisesCpOptions : ToJS fsPromises.CpOptions := ⟨fun d => Internal.fields #[("dereference", Internal.optional d.dereference),
+    ("errorOnExist", Internal.optional d.errorOnExist),
+    ("filter", Internal.optional d.filter),
+    ("force", Internal.optional d.force),
+    ("mode", Internal.optional d.mode),
+    ("preserveTimestamps", Internal.optional d.preserveTimestamps),
+    ("recursive", Internal.optional d.recursive),
+    ("verbatimSymlinks", Internal.optional d.verbatimSymlinks)]⟩
 
 /-- `(Function or sequence<DOMString>)`: one constructor per member type. -/
 inductive JSFunctionOrSequenceOfDOMString where
@@ -820,16 +824,16 @@ structure fsPromises.GlobOptions where
   followSymlinks : Option Bool := none
   /-- `boolean withFileTypes = false` -/
   withFileTypes : Option Bool := none
-instance instToJSFsPromisesGlobOptions : ToJS fsPromises.GlobOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("exclude", Support.optional d.exclude),
-    ("followSymlinks", Support.optional d.followSymlinks),
-    ("withFileTypes", Support.optional d.withFileTypes)]⟩
+instance instToJSFsPromisesGlobOptions : ToJS fsPromises.GlobOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("exclude", Internal.optional d.exclude),
+    ("followSymlinks", Internal.optional d.followSymlinks),
+    ("withFileTypes", Internal.optional d.withFileTypes)]⟩
 
 /-- `dictionary fsPromises.LstatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.LstatOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsPromisesLstatOptions : ToJS fsPromises.LstatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsPromisesLstatOptions : ToJS fsPromises.LstatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fsPromises.MkdirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.MkdirOptions where
@@ -837,8 +841,8 @@ structure fsPromises.MkdirOptions where
   recursive : Option Bool := none
   /-- `(DOMString or long long) mode` -/
   mode : Option DOMStringOrLongLong := none
-instance instToJSFsPromisesMkdirOptions : ToJS fsPromises.MkdirOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
-    ("mode", Support.optional d.mode)]⟩
+instance instToJSFsPromisesMkdirOptions : ToJS fsPromises.MkdirOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive),
+    ("mode", Internal.optional d.mode)]⟩
 
 /-- `(fsPromises.MkdirOptions or long long)`: one constructor per member type. -/
 inductive fsPromises.MkdirOptionsOrLongLong where
@@ -856,7 +860,7 @@ instance instCoeIntFsPromisesMkdirOptionsOrLongLong : Coe Int fsPromises.MkdirOp
 structure fsPromises.MkdtempOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsPromisesMkdtempOptions : ToJS fsPromises.MkdtempOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesMkdtempOptions : ToJS fsPromises.MkdtempOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.MkdtempOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrMkdtempOptions where
@@ -874,7 +878,7 @@ instance instCoeFsPromisesMkdtempOptionsFsPromisesDOMStringOrMkdtempOptions : Co
 structure fsPromises.MkdtempDisposableOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsPromisesMkdtempDisposableOptions : ToJS fsPromises.MkdtempDisposableOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesMkdtempDisposableOptions : ToJS fsPromises.MkdtempDisposableOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.MkdtempDisposableOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrMkdtempDisposableOptions where
@@ -896,9 +900,9 @@ structure fsPromises.OpendirOptions where
   bufferSize : Option Float := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsPromisesOpendirOptions : ToJS fsPromises.OpendirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("bufferSize", Support.optional d.bufferSize),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsPromisesOpendirOptions : ToJS fsPromises.OpendirOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("bufferSize", Internal.optional d.bufferSize),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `dictionary fsPromises.ReaddirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.ReaddirOptions where
@@ -908,9 +912,9 @@ structure fsPromises.ReaddirOptions where
   withFileTypes : Option Bool := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsPromisesReaddirOptions : ToJS fsPromises.ReaddirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("withFileTypes", Support.optional d.withFileTypes),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsPromisesReaddirOptions : ToJS fsPromises.ReaddirOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("withFileTypes", Internal.optional d.withFileTypes),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `(DOMString or fsPromises.ReaddirOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrReaddirOptions where
@@ -950,10 +954,10 @@ structure fsPromises.ReadFileOptions where
   signal : Option AbortSignal := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance instToJSFsPromisesReadFileOptions : ToJS fsPromises.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("flag", Support.optional d.flag),
-    ("signal", Support.optional d.signal),
-    ("buffer", Support.optional d.buffer)]⟩
+instance instToJSFsPromisesReadFileOptions : ToJS fsPromises.ReadFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("flag", Internal.optional d.flag),
+    ("signal", Internal.optional d.signal),
+    ("buffer", Internal.optional d.buffer)]⟩
 
 /-- `(fsPromises.ReadFileOptions or DOMString)`: one constructor per member type. -/
 inductive fsPromises.ReadFileOptionsOrDOMString where
@@ -971,7 +975,7 @@ instance instCoeStringFsPromisesReadFileOptionsOrDOMString : Coe String fsPromis
 structure fsPromises.ReadlinkOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsPromisesReadlinkOptions : ToJS fsPromises.ReadlinkOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesReadlinkOptions : ToJS fsPromises.ReadlinkOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.ReadlinkOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrReadlinkOptions where
@@ -989,7 +993,7 @@ instance instCoeFsPromisesReadlinkOptionsFsPromisesDOMStringOrReadlinkOptions : 
 structure fsPromises.RealpathOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsPromisesRealpathOptions : ToJS fsPromises.RealpathOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesRealpathOptions : ToJS fsPromises.RealpathOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.RealpathOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrRealpathOptions where
@@ -1011,9 +1015,9 @@ structure fsPromises.RmdirOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsPromisesRmdirOptions : ToJS fsPromises.RmdirOptions := ⟨fun d => Support.fields #[("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsPromisesRmdirOptions : ToJS fsPromises.RmdirOptions := ⟨fun d => Internal.fields #[("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fsPromises.RmOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.RmOptions where
@@ -1025,10 +1029,10 @@ structure fsPromises.RmOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsPromisesRmOptions : ToJS fsPromises.RmOptions := ⟨fun d => Support.fields #[("force", Support.optional d.force),
-    ("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsPromisesRmOptions : ToJS fsPromises.RmOptions := ⟨fun d => Internal.fields #[("force", Internal.optional d.force),
+    ("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fsPromises.StatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.StatOptions where
@@ -1036,14 +1040,14 @@ structure fsPromises.StatOptions where
   bigint : Option Bool := none
   /-- `boolean throwIfNoEntry = true` -/
   throwIfNoEntry : Option Bool := none
-instance instToJSFsPromisesStatOptions : ToJS fsPromises.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("throwIfNoEntry", Support.optional d.throwIfNoEntry)]⟩
+instance instToJSFsPromisesStatOptions : ToJS fsPromises.StatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("throwIfNoEntry", Internal.optional d.throwIfNoEntry)]⟩
 
 /-- `dictionary fsPromises.StatfsOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.StatfsOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsPromisesStatfsOptions : ToJS fsPromises.StatfsOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsPromisesStatfsOptions : ToJS fsPromises.StatfsOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `(DOMString or object or Function or sequence<any>)`: one constructor per member type. -/
 inductive DOMStringOrObjectOrJSFunctionOrSequenceOfAny where
@@ -1080,13 +1084,13 @@ structure fsPromises.WatchOptions where
   overflow : Option String := none
   /-- `(DOMString or object or Function or sequence<any>) ignore` -/
   ignore : Option DOMStringOrObjectOrJSFunctionOrSequenceOfAny := none
-instance instToJSFsPromisesWatchOptions : ToJS fsPromises.WatchOptions := ⟨fun d => Support.fields #[("persistent", Support.optional d.persistent),
-    ("recursive", Support.optional d.recursive),
-    ("encoding", Support.optional d.encoding),
-    ("signal", Support.optional d.signal),
-    ("maxQueue", Support.optional d.maxQueue),
-    ("overflow", Support.optional d.overflow),
-    ("ignore", Support.optional d.ignore)]⟩
+instance instToJSFsPromisesWatchOptions : ToJS fsPromises.WatchOptions := ⟨fun d => Internal.fields #[("persistent", Internal.optional d.persistent),
+    ("recursive", Internal.optional d.recursive),
+    ("encoding", Internal.optional d.encoding),
+    ("signal", Internal.optional d.signal),
+    ("maxQueue", Internal.optional d.maxQueue),
+    ("overflow", Internal.optional d.overflow),
+    ("ignore", Internal.optional d.ignore)]⟩
 
 /-- `(DOMString or fsPromises.WatchOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrWatchOptions where
@@ -1112,11 +1116,11 @@ structure fsPromises.WriteFileOptions where
   flush : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSFsPromisesWriteFileOptions : ToJS fsPromises.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFsPromisesWriteFileOptions : ToJS fsPromises.WriteFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(fsPromises.WriteFileOptions or DOMString)`: one constructor per member type. -/
 inductive fsPromises.WriteFileOptionsOrDOMString where
@@ -1160,10 +1164,10 @@ structure fs.AppendFileOptions where
   flag : Option String := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
-instance instToJSFsAppendFileOptions : ToJS fs.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush)]⟩
+instance instToJSFsAppendFileOptions : ToJS fs.AppendFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(fs.AppendFileOptions or DOMString)`: one constructor per member type. -/
 inductive fs.AppendFileOptionsOrDOMString where
@@ -1195,14 +1199,14 @@ structure fs.CpOptions where
   recursive : Option Bool := none
   /-- `boolean verbatimSymlinks = false` -/
   verbatimSymlinks : Option Bool := none
-instance instToJSFsCpOptions : ToJS fs.CpOptions := ⟨fun d => Support.fields #[("dereference", Support.optional d.dereference),
-    ("errorOnExist", Support.optional d.errorOnExist),
-    ("filter", Support.optional d.filter),
-    ("force", Support.optional d.force),
-    ("mode", Support.optional d.mode),
-    ("preserveTimestamps", Support.optional d.preserveTimestamps),
-    ("recursive", Support.optional d.recursive),
-    ("verbatimSymlinks", Support.optional d.verbatimSymlinks)]⟩
+instance instToJSFsCpOptions : ToJS fs.CpOptions := ⟨fun d => Internal.fields #[("dereference", Internal.optional d.dereference),
+    ("errorOnExist", Internal.optional d.errorOnExist),
+    ("filter", Internal.optional d.filter),
+    ("force", Internal.optional d.force),
+    ("mode", Internal.optional d.mode),
+    ("preserveTimestamps", Internal.optional d.preserveTimestamps),
+    ("recursive", Internal.optional d.recursive),
+    ("verbatimSymlinks", Internal.optional d.verbatimSymlinks)]⟩
 
 /-- `(long long or FileHandle)`: one constructor per member type. -/
 inductive LongLongOrFileHandle where
@@ -1242,18 +1246,18 @@ structure fs.CreateReadStreamOptions where
   signal : Option AbortSignal := none
   /-- `bigint windowsHandle = null` -/
   windowsHandle : Option Int := none
-instance instToJSFsCreateReadStreamOptions : ToJS fs.CreateReadStreamOptions := ⟨fun d => Support.fields #[("flags", Support.optional d.flags),
-    ("encoding", Support.optional d.encoding),
-    ("fd", Support.optional d.fd),
-    ("mode", Support.optional d.mode),
-    ("autoClose", Support.optional d.autoClose),
-    ("emitClose", Support.optional d.emitClose),
-    ("start", Support.optional d.start),
-    ("end", Support.optional d.«end»),
-    ("highWaterMark", Support.optional d.highWaterMark),
+instance instToJSFsCreateReadStreamOptions : ToJS fs.CreateReadStreamOptions := ⟨fun d => Internal.fields #[("flags", Internal.optional d.flags),
+    ("encoding", Internal.optional d.encoding),
+    ("fd", Internal.optional d.fd),
+    ("mode", Internal.optional d.mode),
+    ("autoClose", Internal.optional d.autoClose),
+    ("emitClose", Internal.optional d.emitClose),
+    ("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»),
+    ("highWaterMark", Internal.optional d.highWaterMark),
     ("fs", d.fs),
-    ("signal", Support.optional d.signal),
-    ("windowsHandle", Support.optional d.windowsHandle)]⟩
+    ("signal", Internal.optional d.signal),
+    ("windowsHandle", Internal.optional d.windowsHandle)]⟩
 
 /-- `(DOMString or fs.CreateReadStreamOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrCreateReadStreamOptions where
@@ -1293,18 +1297,18 @@ structure fs.CreateWriteStreamOptions where
   flush : Option Bool := none
   /-- `bigint windowsHandle = null` -/
   windowsHandle : Option Int := none
-instance instToJSFsCreateWriteStreamOptions : ToJS fs.CreateWriteStreamOptions := ⟨fun d => Support.fields #[("flags", Support.optional d.flags),
-    ("encoding", Support.optional d.encoding),
-    ("fd", Support.optional d.fd),
-    ("mode", Support.optional d.mode),
-    ("autoClose", Support.optional d.autoClose),
-    ("emitClose", Support.optional d.emitClose),
-    ("start", Support.optional d.start),
+instance instToJSFsCreateWriteStreamOptions : ToJS fs.CreateWriteStreamOptions := ⟨fun d => Internal.fields #[("flags", Internal.optional d.flags),
+    ("encoding", Internal.optional d.encoding),
+    ("fd", Internal.optional d.fd),
+    ("mode", Internal.optional d.mode),
+    ("autoClose", Internal.optional d.autoClose),
+    ("emitClose", Internal.optional d.emitClose),
+    ("start", Internal.optional d.start),
     ("fs", d.fs),
-    ("signal", Support.optional d.signal),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("flush", Support.optional d.flush),
-    ("windowsHandle", Support.optional d.windowsHandle)]⟩
+    ("signal", Internal.optional d.signal),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("flush", Internal.optional d.flush),
+    ("windowsHandle", Internal.optional d.windowsHandle)]⟩
 
 /-- `(DOMString or fs.CreateWriteStreamOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrCreateWriteStreamOptions where
@@ -1322,7 +1326,7 @@ instance instCoeFsCreateWriteStreamOptionsFsDOMStringOrCreateWriteStreamOptions 
 structure fs.FstatOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsFstatOptions : ToJS fs.FstatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsFstatOptions : ToJS fs.FstatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fs.GlobOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.GlobOptions where
@@ -1334,16 +1338,16 @@ structure fs.GlobOptions where
   followSymlinks : Option Bool := none
   /-- `boolean withFileTypes = false` -/
   withFileTypes : Option Bool := none
-instance instToJSFsGlobOptions : ToJS fs.GlobOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("exclude", Support.optional d.exclude),
-    ("followSymlinks", Support.optional d.followSymlinks),
-    ("withFileTypes", Support.optional d.withFileTypes)]⟩
+instance instToJSFsGlobOptions : ToJS fs.GlobOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("exclude", Internal.optional d.exclude),
+    ("followSymlinks", Internal.optional d.followSymlinks),
+    ("withFileTypes", Internal.optional d.withFileTypes)]⟩
 
 /-- `dictionary fs.LstatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.LstatOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsLstatOptions : ToJS fs.LstatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsLstatOptions : ToJS fs.LstatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fs.MkdirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.MkdirOptions where
@@ -1351,8 +1355,8 @@ structure fs.MkdirOptions where
   recursive : Option Bool := none
   /-- `(DOMString or long long) mode` -/
   mode : Option DOMStringOrLongLong := none
-instance instToJSFsMkdirOptions : ToJS fs.MkdirOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
-    ("mode", Support.optional d.mode)]⟩
+instance instToJSFsMkdirOptions : ToJS fs.MkdirOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive),
+    ("mode", Internal.optional d.mode)]⟩
 
 /-- `(fs.MkdirOptions or long long)`: one constructor per member type. -/
 inductive fs.MkdirOptionsOrLongLong where
@@ -1370,7 +1374,7 @@ instance instCoeIntFsMkdirOptionsOrLongLong : Coe Int fs.MkdirOptionsOrLongLong 
 structure fs.MkdtempOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsMkdtempOptions : ToJS fs.MkdtempOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsMkdtempOptions : ToJS fs.MkdtempOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.MkdtempOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrMkdtempOptions where
@@ -1388,7 +1392,7 @@ instance instCoeFsMkdtempOptionsFsDOMStringOrMkdtempOptions : Coe fs.MkdtempOpti
 structure fs.OpenAsBlobOptions where
   /-- `DOMString type` -/
   type : Option String := none
-instance instToJSFsOpenAsBlobOptions : ToJS fs.OpenAsBlobOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type)]⟩
+instance instToJSFsOpenAsBlobOptions : ToJS fs.OpenAsBlobOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type)]⟩
 
 /-- `dictionary fs.OpendirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.OpendirOptions where
@@ -1398,9 +1402,9 @@ structure fs.OpendirOptions where
   bufferSize : Option Float := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsOpendirOptions : ToJS fs.OpendirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("bufferSize", Support.optional d.bufferSize),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsOpendirOptions : ToJS fs.OpendirOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("bufferSize", Internal.optional d.bufferSize),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `dictionary fs.ReadOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.ReadOptions where
@@ -1412,10 +1416,10 @@ structure fs.ReadOptions where
   length : Option Int := none
   /-- `(long long or bigint)? position = null` -/
   position : Option LongLongOrBigint := none
-instance instToJSFsReadOptions : ToJS fs.ReadOptions := ⟨fun d => Support.fields #[("buffer", Support.optional d.buffer),
-    ("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFsReadOptions : ToJS fs.ReadOptions := ⟨fun d => Internal.fields #[("buffer", Internal.optional d.buffer),
+    ("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary fs.ReadOptions2` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.ReadOptions2 where
@@ -1425,9 +1429,9 @@ structure fs.ReadOptions2 where
   length : Option Int := none
   /-- `(long long or bigint) position = null` -/
   position : Option LongLongOrBigint := none
-instance instToJSFsReadOptions2 : ToJS fs.ReadOptions2 := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFsReadOptions2 : ToJS fs.ReadOptions2 := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary fs.ReaddirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.ReaddirOptions where
@@ -1437,9 +1441,9 @@ structure fs.ReaddirOptions where
   withFileTypes : Option Bool := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsReaddirOptions : ToJS fs.ReaddirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("withFileTypes", Support.optional d.withFileTypes),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsReaddirOptions : ToJS fs.ReaddirOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("withFileTypes", Internal.optional d.withFileTypes),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `(DOMString or fs.ReaddirOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrReaddirOptions where
@@ -1483,10 +1487,10 @@ structure fs.ReadFileOptions where
   signal : Option AbortSignal := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance instToJSFsReadFileOptions : ToJS fs.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("flag", Support.optional d.flag),
-    ("signal", Support.optional d.signal),
-    ("buffer", Support.optional d.buffer)]⟩
+instance instToJSFsReadFileOptions : ToJS fs.ReadFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("flag", Internal.optional d.flag),
+    ("signal", Internal.optional d.signal),
+    ("buffer", Internal.optional d.buffer)]⟩
 
 /-- `(fs.ReadFileOptions or DOMString)`: one constructor per member type. -/
 inductive fs.ReadFileOptionsOrDOMString where
@@ -1504,7 +1508,7 @@ instance instCoeStringFsReadFileOptionsOrDOMString : Coe String fs.ReadFileOptio
 structure fs.ReadlinkOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsReadlinkOptions : ToJS fs.ReadlinkOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsReadlinkOptions : ToJS fs.ReadlinkOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.ReadlinkOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrReadlinkOptions where
@@ -1522,7 +1526,7 @@ instance instCoeFsReadlinkOptionsFsDOMStringOrReadlinkOptions : Coe fs.ReadlinkO
 structure fs.RealpathOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsRealpathOptions : ToJS fs.RealpathOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsRealpathOptions : ToJS fs.RealpathOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.RealpathOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrRealpathOptions where
@@ -1544,9 +1548,9 @@ structure fs.RmdirOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsRmdirOptions : ToJS fs.RmdirOptions := ⟨fun d => Support.fields #[("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsRmdirOptions : ToJS fs.RmdirOptions := ⟨fun d => Internal.fields #[("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fs.RmOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.RmOptions where
@@ -1558,10 +1562,10 @@ structure fs.RmOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsRmOptions : ToJS fs.RmOptions := ⟨fun d => Support.fields #[("force", Support.optional d.force),
-    ("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsRmOptions : ToJS fs.RmOptions := ⟨fun d => Internal.fields #[("force", Internal.optional d.force),
+    ("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fs.StatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.StatOptions where
@@ -1569,14 +1573,14 @@ structure fs.StatOptions where
   bigint : Option Bool := none
   /-- `boolean throwIfNoEntry = true` -/
   throwIfNoEntry : Option Bool := none
-instance instToJSFsStatOptions : ToJS fs.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("throwIfNoEntry", Support.optional d.throwIfNoEntry)]⟩
+instance instToJSFsStatOptions : ToJS fs.StatOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("throwIfNoEntry", Internal.optional d.throwIfNoEntry)]⟩
 
 /-- `dictionary fs.StatfsOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.StatfsOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsStatfsOptions : ToJS fs.StatfsOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsStatfsOptions : ToJS fs.StatfsOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fs.WatchOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.WatchOptions where
@@ -1592,12 +1596,12 @@ structure fs.WatchOptions where
   throwIfNoEntry : Option Bool := none
   /-- `(DOMString or object or Function or sequence<any>) ignore` -/
   ignore : Option DOMStringOrObjectOrJSFunctionOrSequenceOfAny := none
-instance instToJSFsWatchOptions : ToJS fs.WatchOptions := ⟨fun d => Support.fields #[("persistent", Support.optional d.persistent),
-    ("recursive", Support.optional d.recursive),
-    ("encoding", Support.optional d.encoding),
-    ("signal", Support.optional d.signal),
-    ("throwIfNoEntry", Support.optional d.throwIfNoEntry),
-    ("ignore", Support.optional d.ignore)]⟩
+instance instToJSFsWatchOptions : ToJS fs.WatchOptions := ⟨fun d => Internal.fields #[("persistent", Internal.optional d.persistent),
+    ("recursive", Internal.optional d.recursive),
+    ("encoding", Internal.optional d.encoding),
+    ("signal", Internal.optional d.signal),
+    ("throwIfNoEntry", Internal.optional d.throwIfNoEntry),
+    ("ignore", Internal.optional d.ignore)]⟩
 
 /-- `(DOMString or fs.WatchOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrWatchOptions where
@@ -1619,9 +1623,9 @@ structure fs.WatchFileOptions where
   persistent : Option Bool := none
   /-- `long long interval = 5007` -/
   interval : Option Int := none
-instance instToJSFsWatchFileOptions : ToJS fs.WatchFileOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("persistent", Support.optional d.persistent),
-    ("interval", Support.optional d.interval)]⟩
+instance instToJSFsWatchFileOptions : ToJS fs.WatchFileOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("persistent", Internal.optional d.persistent),
+    ("interval", Internal.optional d.interval)]⟩
 
 /-- `dictionary fs.WriteOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.WriteOptions where
@@ -1631,9 +1635,9 @@ structure fs.WriteOptions where
   length : Option Int := none
   /-- `long long? position = null` -/
   position : Option Int := none
-instance instToJSFsWriteOptions : ToJS fs.WriteOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFsWriteOptions : ToJS fs.WriteOptions := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary fs.WriteFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.WriteFileOptions where
@@ -1647,11 +1651,11 @@ structure fs.WriteFileOptions where
   flush : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSFsWriteFileOptions : ToJS fs.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSFsWriteFileOptions : ToJS fs.WriteFileOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `(fs.WriteFileOptions or DOMString)`: one constructor per member type. -/
 inductive fs.WriteFileOptionsOrDOMString where
@@ -1675,10 +1679,10 @@ structure fs.AppendFileSyncOptions where
   flag : Option String := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
-instance instToJSFsAppendFileSyncOptions : ToJS fs.AppendFileSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush)]⟩
+instance instToJSFsAppendFileSyncOptions : ToJS fs.AppendFileSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(fs.AppendFileSyncOptions or DOMString)`: one constructor per member type. -/
 inductive fs.AppendFileSyncOptionsOrDOMString where
@@ -1710,20 +1714,20 @@ structure fs.CpSyncOptions where
   recursive : Option Bool := none
   /-- `boolean verbatimSymlinks = false` -/
   verbatimSymlinks : Option Bool := none
-instance instToJSFsCpSyncOptions : ToJS fs.CpSyncOptions := ⟨fun d => Support.fields #[("dereference", Support.optional d.dereference),
-    ("errorOnExist", Support.optional d.errorOnExist),
-    ("filter", Support.optional d.filter),
-    ("force", Support.optional d.force),
-    ("mode", Support.optional d.mode),
-    ("preserveTimestamps", Support.optional d.preserveTimestamps),
-    ("recursive", Support.optional d.recursive),
-    ("verbatimSymlinks", Support.optional d.verbatimSymlinks)]⟩
+instance instToJSFsCpSyncOptions : ToJS fs.CpSyncOptions := ⟨fun d => Internal.fields #[("dereference", Internal.optional d.dereference),
+    ("errorOnExist", Internal.optional d.errorOnExist),
+    ("filter", Internal.optional d.filter),
+    ("force", Internal.optional d.force),
+    ("mode", Internal.optional d.mode),
+    ("preserveTimestamps", Internal.optional d.preserveTimestamps),
+    ("recursive", Internal.optional d.recursive),
+    ("verbatimSymlinks", Internal.optional d.verbatimSymlinks)]⟩
 
 /-- `dictionary fs.FstatSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.FstatSyncOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsFstatSyncOptions : ToJS fs.FstatSyncOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsFstatSyncOptions : ToJS fs.FstatSyncOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fs.GlobSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.GlobSyncOptions where
@@ -1735,10 +1739,10 @@ structure fs.GlobSyncOptions where
   followSymlinks : Option Bool := none
   /-- `boolean withFileTypes = false` -/
   withFileTypes : Option Bool := none
-instance instToJSFsGlobSyncOptions : ToJS fs.GlobSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("exclude", Support.optional d.exclude),
-    ("followSymlinks", Support.optional d.followSymlinks),
-    ("withFileTypes", Support.optional d.withFileTypes)]⟩
+instance instToJSFsGlobSyncOptions : ToJS fs.GlobSyncOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("exclude", Internal.optional d.exclude),
+    ("followSymlinks", Internal.optional d.followSymlinks),
+    ("withFileTypes", Internal.optional d.withFileTypes)]⟩
 
 /-- `dictionary fs.LstatSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.LstatSyncOptions where
@@ -1746,8 +1750,8 @@ structure fs.LstatSyncOptions where
   bigint : Option Bool := none
   /-- `boolean throwIfNoEntry = true` -/
   throwIfNoEntry : Option Bool := none
-instance instToJSFsLstatSyncOptions : ToJS fs.LstatSyncOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("throwIfNoEntry", Support.optional d.throwIfNoEntry)]⟩
+instance instToJSFsLstatSyncOptions : ToJS fs.LstatSyncOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("throwIfNoEntry", Internal.optional d.throwIfNoEntry)]⟩
 
 /-- `dictionary fs.MkdirSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.MkdirSyncOptions where
@@ -1755,8 +1759,8 @@ structure fs.MkdirSyncOptions where
   recursive : Option Bool := none
   /-- `(DOMString or long long) mode` -/
   mode : Option DOMStringOrLongLong := none
-instance instToJSFsMkdirSyncOptions : ToJS fs.MkdirSyncOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
-    ("mode", Support.optional d.mode)]⟩
+instance instToJSFsMkdirSyncOptions : ToJS fs.MkdirSyncOptions := ⟨fun d => Internal.fields #[("recursive", Internal.optional d.recursive),
+    ("mode", Internal.optional d.mode)]⟩
 
 /-- `(fs.MkdirSyncOptions or long long)`: one constructor per member type. -/
 inductive fs.MkdirSyncOptionsOrLongLong where
@@ -1774,7 +1778,7 @@ instance instCoeIntFsMkdirSyncOptionsOrLongLong : Coe Int fs.MkdirSyncOptionsOrL
 structure fs.MkdtempSyncOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsMkdtempSyncOptions : ToJS fs.MkdtempSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsMkdtempSyncOptions : ToJS fs.MkdtempSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.MkdtempSyncOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrMkdtempSyncOptions where
@@ -1792,7 +1796,7 @@ instance instCoeFsMkdtempSyncOptionsFsDOMStringOrMkdtempSyncOptions : Coe fs.Mkd
 structure fs.MkdtempDisposableSyncOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsMkdtempDisposableSyncOptions : ToJS fs.MkdtempDisposableSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsMkdtempDisposableSyncOptions : ToJS fs.MkdtempDisposableSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.MkdtempDisposableSyncOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrMkdtempDisposableSyncOptions where
@@ -1814,9 +1818,9 @@ structure fs.OpendirSyncOptions where
   bufferSize : Option Float := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsOpendirSyncOptions : ToJS fs.OpendirSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("bufferSize", Support.optional d.bufferSize),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsOpendirSyncOptions : ToJS fs.OpendirSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("bufferSize", Internal.optional d.bufferSize),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `dictionary fs.ReaddirSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.ReaddirSyncOptions where
@@ -1826,9 +1830,9 @@ structure fs.ReaddirSyncOptions where
   withFileTypes : Option Bool := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance instToJSFsReaddirSyncOptions : ToJS fs.ReaddirSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("withFileTypes", Support.optional d.withFileTypes),
-    ("recursive", Support.optional d.recursive)]⟩
+instance instToJSFsReaddirSyncOptions : ToJS fs.ReaddirSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("withFileTypes", Internal.optional d.withFileTypes),
+    ("recursive", Internal.optional d.recursive)]⟩
 
 /-- `(DOMString or fs.ReaddirSyncOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrReaddirSyncOptions where
@@ -1850,9 +1854,9 @@ structure fs.ReadFileSyncOptions where
   flag : Option String := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance instToJSFsReadFileSyncOptions : ToJS fs.ReadFileSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("flag", Support.optional d.flag),
-    ("buffer", Support.optional d.buffer)]⟩
+instance instToJSFsReadFileSyncOptions : ToJS fs.ReadFileSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("flag", Internal.optional d.flag),
+    ("buffer", Internal.optional d.buffer)]⟩
 
 /-- `(fs.ReadFileSyncOptions or DOMString)`: one constructor per member type. -/
 inductive fs.ReadFileSyncOptionsOrDOMString where
@@ -1870,7 +1874,7 @@ instance instCoeStringFsReadFileSyncOptionsOrDOMString : Coe String fs.ReadFileS
 structure fs.ReadlinkSyncOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsReadlinkSyncOptions : ToJS fs.ReadlinkSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsReadlinkSyncOptions : ToJS fs.ReadlinkSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.ReadlinkSyncOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrReadlinkSyncOptions where
@@ -1892,15 +1896,15 @@ structure fs.ReadSyncOptions where
   length : Option Int := none
   /-- `(long long or bigint)? position = null` -/
   position : Option LongLongOrBigint := none
-instance instToJSFsReadSyncOptions : ToJS fs.ReadSyncOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFsReadSyncOptions : ToJS fs.ReadSyncOptions := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary fs.RealpathSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.RealpathSyncOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsRealpathSyncOptions : ToJS fs.RealpathSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsRealpathSyncOptions : ToJS fs.RealpathSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.RealpathSyncOptions)`: one constructor per member type. -/
 inductive fs.DOMStringOrRealpathSyncOptions where
@@ -1922,9 +1926,9 @@ structure fs.RmdirSyncOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsRmdirSyncOptions : ToJS fs.RmdirSyncOptions := ⟨fun d => Support.fields #[("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsRmdirSyncOptions : ToJS fs.RmdirSyncOptions := ⟨fun d => Internal.fields #[("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fs.RmSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.RmSyncOptions where
@@ -1936,10 +1940,10 @@ structure fs.RmSyncOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance instToJSFsRmSyncOptions : ToJS fs.RmSyncOptions := ⟨fun d => Support.fields #[("force", Support.optional d.force),
-    ("maxRetries", Support.optional d.maxRetries),
-    ("recursive", Support.optional d.recursive),
-    ("retryDelay", Support.optional d.retryDelay)]⟩
+instance instToJSFsRmSyncOptions : ToJS fs.RmSyncOptions := ⟨fun d => Internal.fields #[("force", Internal.optional d.force),
+    ("maxRetries", Internal.optional d.maxRetries),
+    ("recursive", Internal.optional d.recursive),
+    ("retryDelay", Internal.optional d.retryDelay)]⟩
 
 /-- `dictionary fs.StatSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.StatSyncOptions where
@@ -1947,14 +1951,14 @@ structure fs.StatSyncOptions where
   bigint : Option Bool := none
   /-- `boolean throwIfNoEntry = true` -/
   throwIfNoEntry : Option Bool := none
-instance instToJSFsStatSyncOptions : ToJS fs.StatSyncOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
-    ("throwIfNoEntry", Support.optional d.throwIfNoEntry)]⟩
+instance instToJSFsStatSyncOptions : ToJS fs.StatSyncOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint),
+    ("throwIfNoEntry", Internal.optional d.throwIfNoEntry)]⟩
 
 /-- `dictionary fs.StatfsSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.StatfsSyncOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance instToJSFsStatfsSyncOptions : ToJS fs.StatfsSyncOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsStatfsSyncOptions : ToJS fs.StatfsSyncOptions := ⟨fun d => Internal.fields #[("bigint", Internal.optional d.bigint)]⟩
 
 /-- `dictionary fs.WriteFileSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.WriteFileSyncOptions where
@@ -1966,10 +1970,10 @@ structure fs.WriteFileSyncOptions where
   flag : Option String := none
   /-- `boolean flush` -/
   flush : Option Bool := none
-instance instToJSFsWriteFileSyncOptions : ToJS fs.WriteFileSyncOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
-    ("mode", Support.optional d.mode),
-    ("flag", Support.optional d.flag),
-    ("flush", Support.optional d.flush)]⟩
+instance instToJSFsWriteFileSyncOptions : ToJS fs.WriteFileSyncOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding),
+    ("mode", Internal.optional d.mode),
+    ("flag", Internal.optional d.flag),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(fs.WriteFileSyncOptions or DOMString)`: one constructor per member type. -/
 inductive fs.WriteFileSyncOptionsOrDOMString where
@@ -1991,21 +1995,21 @@ structure fs.WriteSyncOptions where
   length : Option Int := none
   /-- `long long? position = null` -/
   position : Option Int := none
-instance instToJSFsWriteSyncOptions : ToJS fs.WriteSyncOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("position", Support.optional d.position)]⟩
+instance instToJSFsWriteSyncOptions : ToJS fs.WriteSyncOptions := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("position", Internal.optional d.position)]⟩
 
 /-- `dictionary fs.OpenAsBlobSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.OpenAsBlobSyncOptions where
   /-- `DOMString type` -/
   type : Option String := none
-instance instToJSFsOpenAsBlobSyncOptions : ToJS fs.OpenAsBlobSyncOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type)]⟩
+instance instToJSFsOpenAsBlobSyncOptions : ToJS fs.OpenAsBlobSyncOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type)]⟩
 
 /-- `dictionary fs.realpath.NativeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.realpath.NativeOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsRealpathNativeOptions : ToJS fs.realpath.NativeOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsRealpathNativeOptions : ToJS fs.realpath.NativeOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.realpath.NativeOptions)`: one constructor per member type. -/
 inductive fs.realpath.DOMStringOrNativeOptions where
@@ -2023,7 +2027,7 @@ instance instCoeFsRealpathNativeOptionsFsRealpathDOMStringOrNativeOptions : Coe 
 structure fs.realpathSync.NativeOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance instToJSFsRealpathSyncNativeOptions : ToJS fs.realpathSync.NativeOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsRealpathSyncNativeOptions : ToJS fs.realpathSync.NativeOptions := ⟨fun d => Internal.fields #[("encoding", Internal.optional d.encoding)]⟩
 
 /-- `(DOMString or fs.realpathSync.NativeOptions)`: one constructor per member type. -/
 inductive fs.realpathSync.DOMStringOrNativeOptions where
@@ -2038,1308 +2042,1353 @@ instance instCoeStringFsRealpathSyncDOMStringOrNativeOptions : Coe String fs.rea
 instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOptions : Coe fs.realpathSync.NativeOptions fs.realpathSync.DOMStringOrNativeOptions := ⟨.nativeOptions⟩
 
 /-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double /* integer: Nat */ fd` -/
-def FileHandle.fd (self : FileHandle) : IO Nat := self.val.get "fd" Nat
+@[macro_inline] def FileHandle.fd (self : FileHandle) : IO Nat := Internal.api "Lasm.JS.Node.FileHandle.fd" do
+  self.val.get "fd" Nat
 
 /-- `Event: 'close'` (added in Node.js v15.4.0): `FileHandle onClose(FileHandle.CloseListener listener)`: calls `on("close", listener)` -/
-def FileHandle.onClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def FileHandle.onClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := Internal.api "Lasm.JS.Node.FileHandle.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v15.4.0): `FileHandle onceClose(FileHandle.CloseListener listener)`: calls `once("close", listener)` -/
-def FileHandle.onceClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def FileHandle.onceClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := Internal.api "Lasm.JS.Node.FileHandle.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `filehandle.appendFile(data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (FileHandle.AppendFileOptions or DOMString) options)` -/
-def FileHandle.appendFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option FileHandle.AppendFileOptionsOrDOMString := none) : Async Unit :=
-  self.val.callMethodAwait "appendFile" (Support.args #[toJS data, Support.optional options]) Unit
+@[macro_inline] def FileHandle.appendFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option FileHandle.AppendFileOptionsOrDOMString := none) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.appendFile" do
+  self.val.callMethodAwait "appendFile" (Internal.args #[toJS data, Internal.optional options]) Unit
 
 /-- `filehandle.chmod(mode)` (added in Node.js v10.0.0): `Promise<undefined> chmod(long long mode)` -/
-def FileHandle.chmod (self : FileHandle) (mode : Int) : Async Unit :=
-  self.val.callMethodAwait "chmod" (Support.args #[toJS mode]) Unit
+@[macro_inline] def FileHandle.chmod (self : FileHandle) (mode : Int) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.chmod" do
+  self.val.callMethodAwait "chmod" (Internal.args #[toJS mode]) Unit
 
 /-- `filehandle.chown(uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> chown(long long uid, long long gid)` -/
-def FileHandle.chown (self : FileHandle) (uid : Int) (gid : Int) : Async Unit :=
-  self.val.callMethodAwait "chown" (Support.args #[toJS uid, toJS gid]) Unit
+@[macro_inline] def FileHandle.chown (self : FileHandle) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.chown" do
+  self.val.callMethodAwait "chown" (Internal.args #[toJS uid, toJS gid]) Unit
 
 /-- `filehandle.close()` (added in Node.js v10.0.0): `Promise<undefined> close()` -/
-def FileHandle.close (self : FileHandle) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def FileHandle.close (self : FileHandle) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `filehandle.createReadStream([options])` (added in Node.js v16.11.0): `fs.ReadStream createReadStream(optional FileHandle.CreateReadStreamOptions options)` -/
-def FileHandle.createReadStream (self : FileHandle) (options : Option FileHandle.CreateReadStreamOptions := none) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "createReadStream" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileHandle.createReadStream (self : FileHandle) (options : Option FileHandle.CreateReadStreamOptions := none) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.FileHandle.createReadStream" do
+  let r ← self.val.callMethod "createReadStream" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `filehandle.createWriteStream([options])` (added in Node.js v16.11.0): `fs.WriteStream createWriteStream(optional FileHandle.CreateWriteStreamOptions options)` -/
-def FileHandle.createWriteStream (self : FileHandle) (options : Option FileHandle.CreateWriteStreamOptions := none) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "createWriteStream" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileHandle.createWriteStream (self : FileHandle) (options : Option FileHandle.CreateWriteStreamOptions := none) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.FileHandle.createWriteStream" do
+  let r ← self.val.callMethod "createWriteStream" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `filehandle.datasync()` (added in Node.js v10.0.0): `Promise<undefined> datasync()` -/
-def FileHandle.datasync (self : FileHandle) : Async Unit :=
-  self.val.callMethodAwait "datasync" (Support.args #[]) Unit
+@[macro_inline] def FileHandle.datasync (self : FileHandle) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.datasync" do
+  self.val.callMethodAwait "datasync" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.pull([...transforms][, options])` (added in Node.js v24.20.0): `object pull((Function or object)... transforms, optional FileHandle.PullOptions options)` -/
-def FileHandle.pull (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullOptions := none) : IO Data :=
-  self.val.callMethod "pull" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
+@[macro_inline] def FileHandle.pull (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullOptions := none) : IO Data := Internal.api "Lasm.JS.Node.FileHandle.pull" do
+  self.val.callMethod "pull" (Internal.argsWith #[Internal.optional options] (transforms.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.pullSync([...transforms][, options])` (added in Node.js v24.20.0): `object pullSync((Function or object)... transforms, optional FileHandle.PullSyncOptions options)` -/
-def FileHandle.pullSync (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullSyncOptions := none) : IO Data :=
-  self.val.callMethod "pullSync" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
+@[macro_inline] def FileHandle.pullSync (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullSyncOptions := none) : IO Data := Internal.api "Lasm.JS.Node.FileHandle.pullSync" do
+  self.val.callMethod "pullSync" (Internal.argsWith #[Internal.optional options] (transforms.map toJS)) Data
 
 /-- `filehandle.read(buffer, offset, length, position)` (added in Node.js v10.0.0): `Promise<FileHandle.ReadResult> read(Uint8Array buffer, long long offset, long long length, (long long or bigint)? position)` -/
-def FileHandle.read (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint) : Async FileHandle.ReadResult :=
-  self.val.callMethodAwait "read" (Support.args #[toJS buffer_, toJS offset, toJS length, toJS position]) FileHandle.ReadResult
+@[macro_inline] def FileHandle.read (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint) : Async FileHandle.ReadResult := Internal.api "Lasm.JS.Node.FileHandle.read" do
+  self.val.callMethodAwait "read" (Internal.args #[toJS buffer_, toJS offset, toJS length, toJS position]) FileHandle.ReadResult
 
 /-- `filehandle.read([options])` (added in Node.js v13.11.0, v12.17.0): `Promise<FileHandle.ReadResult> read(optional FileHandle.ReadOptions options)` -/
-def FileHandle.readWithOptions (self : FileHandle) (options : Option FileHandle.ReadOptions := none) : Async FileHandle.ReadResult :=
-  self.val.callMethodAwait "read" (Support.args #[Support.optional options]) FileHandle.ReadResult
+@[macro_inline] def FileHandle.readWithOptions (self : FileHandle) (options : Option FileHandle.ReadOptions := none) : Async FileHandle.ReadResult := Internal.api "Lasm.JS.Node.FileHandle.readWithOptions" do
+  self.val.callMethodAwait "read" (Internal.args #[Internal.optional options]) FileHandle.ReadResult
 
 /-- `filehandle.read(buffer[, options])` (added in Node.js v18.2.0, v16.17.0): `Promise<FileHandle.ReadResult> read(Uint8Array buffer, optional FileHandle.ReadOptions2 options)` -/
-def FileHandle.readWithBufferOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.ReadOptions2 := none) : Async FileHandle.ReadResult :=
-  self.val.callMethodAwait "read" (Support.args #[toJS buffer_, Support.optional options]) FileHandle.ReadResult
+@[macro_inline] def FileHandle.readWithBufferOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.ReadOptions2 := none) : Async FileHandle.ReadResult := Internal.api "Lasm.JS.Node.FileHandle.readWithBufferOptions" do
+  self.val.callMethodAwait "read" (Internal.args #[toJS buffer_, Internal.optional options]) FileHandle.ReadResult
 
 /-- `filehandle.readableWebStream([options])` (added in Node.js v17.0.0): `ReadableStream readableWebStream(optional FileHandle.ReadableWebStreamOptions options)` -/
-def FileHandle.readableWebStream (self : FileHandle) (options : Option FileHandle.ReadableWebStreamOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "readableWebStream" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileHandle.readableWebStream (self : FileHandle) (options : Option FileHandle.ReadableWebStreamOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Node.FileHandle.readableWebStream" do
+  let r ← self.val.callMethod "readableWebStream" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `filehandle.readFile(options)` (added in Node.js v10.0.0): `Promise<(Uint8Array or DOMString)> readFile((FileHandle.ReadFileOptions or DOMString) options)` -/
-def FileHandle.readFile (self : FileHandle) (options : FileHandle.ReadFileOptionsOrDOMString) : Async Uint8ArrayOrDOMString :=
-  self.val.callMethodAwait "readFile" (Support.args #[toJS options]) Uint8ArrayOrDOMString
+@[macro_inline] def FileHandle.readFile (self : FileHandle) (options : FileHandle.ReadFileOptionsOrDOMString) : Async Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.FileHandle.readFile" do
+  self.val.callMethodAwait "readFile" (Internal.args #[toJS options]) Uint8ArrayOrDOMString
 
 /-- `filehandle.readLines([options])` (added in Node.js v18.11.0): `InterfaceConstructor readLines(optional FileHandle.ReadLinesOptions options)` -/
-def FileHandle.readLines (self : FileHandle) (options : Option FileHandle.ReadLinesOptions := none) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "readLines" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileHandle.readLines (self : FileHandle) (options : Option FileHandle.ReadLinesOptions := none) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.FileHandle.readLines" do
+  let r ← self.val.callMethod "readLines" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `filehandle.readv(buffers[, position])` (added in Node.js v13.13.0, v12.17.0): `Promise<any> readv(sequence<Uint8Array> buffers, optional long long position)` -/
-def FileHandle.readv (self : FileHandle) (buffers : Array ByteArray) (position : Option Int := none) : Async Data :=
-  self.val.callMethodAwait "readv" (Support.args #[toJS buffers, Support.optional position]) Data
+@[macro_inline] def FileHandle.readv (self : FileHandle) (buffers : Array ByteArray) (position : Option Int := none) : Async Data := Internal.api "Lasm.JS.Node.FileHandle.readv" do
+  self.val.callMethodAwait "readv" (Internal.args #[toJS buffers, Internal.optional position]) Data
 
 /-- `filehandle.stat([options])` (added in Node.js v10.0.0): `Promise<fs.Stats> stat(optional FileHandle.StatOptions options)` -/
-def FileHandle.stat (self : FileHandle) (options : Option FileHandle.StatOptions := none) : Async fs.Stats := do
-  let r ← self.val.callMethodAwait "stat" (Support.args #[Support.optional options]) Value
+@[macro_inline] def FileHandle.stat (self : FileHandle) (options : Option FileHandle.StatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.FileHandle.stat" do
+  let r ← self.val.callMethodAwait "stat" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `filehandle.sync()` (added in Node.js v10.0.0): `Promise<undefined> sync()` -/
-def FileHandle.sync (self : FileHandle) : Async Unit :=
-  self.val.callMethodAwait "sync" (Support.args #[]) Unit
+@[macro_inline] def FileHandle.sync (self : FileHandle) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.sync" do
+  self.val.callMethodAwait "sync" (Internal.args #[]) Unit
 
 /-- `filehandle.truncate(len)` (added in Node.js v10.0.0): `Promise<undefined> truncate(long long len)` -/
-def FileHandle.truncate (self : FileHandle) (len : Int) : Async Unit :=
-  self.val.callMethodAwait "truncate" (Support.args #[toJS len]) Unit
+@[macro_inline] def FileHandle.truncate (self : FileHandle) (len : Int) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.truncate" do
+  self.val.callMethodAwait "truncate" (Internal.args #[toJS len]) Unit
 
 /-- `filehandle.utimes(atime, mtime)` (added in Node.js v10.0.0): `Promise<undefined> utimes((double or DOMString or object) atime, (double or DOMString or object) mtime)` -/
-def FileHandle.utimes (self : FileHandle) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
-  self.val.callMethodAwait "utimes" (Support.args #[toJS atime, toJS mtime]) Unit
+@[macro_inline] def FileHandle.utimes (self : FileHandle) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.utimes" do
+  self.val.callMethodAwait "utimes" (Internal.args #[toJS atime, toJS mtime]) Unit
 
 /-- `filehandle.write(buffer, offset[, length[, position]])` (added in Node.js v10.0.0): `Promise<FileHandle.WriteResult> write(Uint8Array buffer, long long offset, optional long long length, optional long long position)` -/
-def FileHandle.write (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Option Int := none) (position : Option Int := none) : Async FileHandle.WriteResult :=
-  self.val.callMethodAwait "write" (Support.args #[toJS buffer_, toJS offset, Support.optional length, Support.optional position]) FileHandle.WriteResult
+@[macro_inline] def FileHandle.write (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Option Int := none) (position : Option Int := none) : Async FileHandle.WriteResult := Internal.api "Lasm.JS.Node.FileHandle.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS buffer_, toJS offset, Internal.optional length, Internal.optional position]) FileHandle.WriteResult
 
 /-- `filehandle.write(buffer[, options])` (added in Node.js v18.3.0, v16.17.0): `Promise<FileHandle.WriteResult> write(Uint8Array buffer, optional FileHandle.WriteOptions options)` -/
-def FileHandle.writeWithOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.WriteOptions := none) : Async FileHandle.WriteResult :=
-  self.val.callMethodAwait "write" (Support.args #[toJS buffer_, Support.optional options]) FileHandle.WriteResult
+@[macro_inline] def FileHandle.writeWithOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.WriteOptions := none) : Async FileHandle.WriteResult := Internal.api "Lasm.JS.Node.FileHandle.writeWithOptions" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS buffer_, Internal.optional options]) FileHandle.WriteResult
 
 /-- `filehandle.write(string[, position[, encoding]])` (added in Node.js v10.0.0): `Promise<FileHandle.WriteStringResult> write(DOMString string, optional long long position, optional DOMString encoding)` -/
-def FileHandle.writeWithString (self : FileHandle) (string : String) (position : Option Int := none) (encoding : Option String := none) : Async FileHandle.WriteStringResult :=
-  self.val.callMethodAwait "write" (Support.args #[toJS string, Support.optional position, Support.optional encoding]) FileHandle.WriteStringResult
+@[macro_inline] def FileHandle.writeWithString (self : FileHandle) (string : String) (position : Option Int := none) (encoding : Option String := none) : Async FileHandle.WriteStringResult := Internal.api "Lasm.JS.Node.FileHandle.writeWithString" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS string, Internal.optional position, Internal.optional encoding]) FileHandle.WriteStringResult
 
 /-- `filehandle.writeFile(data, options)` (added in Node.js v10.0.0): `Promise<undefined> writeFile((DOMString or Uint8Array or object) data, (FileHandle.WriteFileOptions or DOMString) options)` -/
-def FileHandle.writeFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : FileHandle.WriteFileOptionsOrDOMString) : Async Unit :=
-  self.val.callMethodAwait "writeFile" (Support.args #[toJS data, toJS options]) Unit
+@[macro_inline] def FileHandle.writeFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : FileHandle.WriteFileOptionsOrDOMString) : Async Unit := Internal.api "Lasm.JS.Node.FileHandle.writeFile" do
+  self.val.callMethodAwait "writeFile" (Internal.args #[toJS data, toJS options]) Unit
 
 /-- `filehandle.writev(buffers[, position])` (added in Node.js v12.9.0): `Promise<any> writev(sequence<Uint8Array> buffers, optional long long position)` -/
-def FileHandle.writev (self : FileHandle) (buffers : Array ByteArray) (position : Option Int := none) : Async Data :=
-  self.val.callMethodAwait "writev" (Support.args #[toJS buffers, Support.optional position]) Data
+@[macro_inline] def FileHandle.writev (self : FileHandle) (buffers : Array ByteArray) (position : Option Int := none) : Async Data := Internal.api "Lasm.JS.Node.FileHandle.writev" do
+  self.val.callMethodAwait "writev" (Internal.args #[toJS buffers, Internal.optional position]) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.writer([options])` (added in Node.js v24.20.0): `object writer(optional FileHandle.WriterOptions options)` -/
-def FileHandle.writer (self : FileHandle) (options : Option FileHandle.WriterOptions := none) : IO Data :=
-  self.val.callMethod "writer" (Support.args #[Support.optional options]) Data
+@[macro_inline] def FileHandle.writer (self : FileHandle) (options : Option FileHandle.WriterOptions := none) : IO Data := Internal.api "Lasm.JS.Node.FileHandle.writer" do
+  self.val.callMethod "writer" (Internal.args #[Internal.optional options]) Data
 
 /-- `v instanceof Dir`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dir`). -/
-def fs.Dir.cast? (v : Value) : IO (Option fs.Dir) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dir"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.Dir.cast? (v : Value) : IO (Option fs.Dir) := Internal.api "Lasm.JS.Node.fs.Dir.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["Dir"] Value) (fun x => { val := x }) v
 
 /-- `dir.path` (added in Node.js v12.12.0): `readonly attribute DOMString path` -/
-def fs.Dir.path (self : fs.Dir) : IO String := self.val.get "path" String
+@[macro_inline] def fs.Dir.path (self : fs.Dir) : IO String := Internal.api "Lasm.JS.Node.fs.Dir.path" do
+  self.val.get "path" String
 
 /-- `dir.close()` (added in Node.js v12.12.0): `Promise<any> close()` -/
-def fs.Dir.close (self : fs.Dir) : Async Data :=
-  self.val.callMethodAwait "close" (Support.args #[]) Data
-
-/-- `dir.close(callback)` (added in Node.js v12.12.0): `Promise<undefined> close()` -/
-def fs.Dir.close0 (self : fs.Dir) : Async Unit :=
-  Support.promisifiedMethod Unit self.val "close" (Support.args #[])
+@[macro_inline] def fs.Dir.close (self : fs.Dir) : Async Data := Internal.api "Lasm.JS.Node.fs.Dir.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Data
 
 /-- `dir.closeSync()` (added in Node.js v12.12.0): `undefined closeSync()` -/
-def fs.Dir.closeSync (self : fs.Dir) : IO Unit :=
-  self.val.callMethod "closeSync" (Support.args #[]) Unit
+@[macro_inline] def fs.Dir.closeSync (self : fs.Dir) : IO Unit := Internal.api "Lasm.JS.Node.fs.Dir.closeSync" do
+  self.val.callMethod "closeSync" (Internal.args #[]) Unit
 
 /-- `dir.read()` (added in Node.js v12.12.0): `Promise<fs.Dirent?> read()` -/
-def fs.Dir.read (self : fs.Dir) : Async (Option fs.Dirent) :=
-  self.val.callMethodAwait "read" (Support.args #[]) (Option fs.Dirent)
-
-/-- `dir.read(callback)` (added in Node.js v12.12.0): `Promise<fs.Dirent?> read()` -/
-def fs.Dir.read0 (self : fs.Dir) : Async (Option fs.Dirent) :=
-  Support.promisifiedMethod (Option fs.Dirent) self.val "read" (Support.args #[])
+@[macro_inline] def fs.Dir.read (self : fs.Dir) : Async (Option fs.Dirent) := Internal.api "Lasm.JS.Node.fs.Dir.read" do
+  self.val.callMethodAwait "read" (Internal.args #[]) (Option fs.Dirent)
 
 /-- `dir.readSync()` (added in Node.js v12.12.0): `fs.Dirent? readSync()` -/
-def fs.Dir.readSync (self : fs.Dir) : IO (Option fs.Dirent) :=
-  self.val.callMethod "readSync" (Support.args #[]) (Option fs.Dirent)
+@[macro_inline] def fs.Dir.readSync (self : fs.Dir) : IO (Option fs.Dirent) := Internal.api "Lasm.JS.Node.fs.Dir.readSync" do
+  self.val.callMethod "readSync" (Internal.args #[]) (Option fs.Dirent)
 
 /-- `v instanceof Dirent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dirent`). -/
-def fs.Dirent.cast? (v : Value) : IO (Option fs.Dirent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dirent"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.Dirent.cast? (v : Value) : IO (Option fs.Dirent) := Internal.api "Lasm.JS.Node.fs.Dirent.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["Dirent"] Value) (fun x => { val := x }) v
 
 /-- `dirent.name` (added in Node.js v10.10.0): `readonly attribute (DOMString or Uint8Array) name` -/
-def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := self.val.get "name" DOMStringOrUint8Array
+@[macro_inline] def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.Dirent.name" do
+  self.val.get "name" DOMStringOrUint8Array
 
 /-- `dirent.parentPath` (added in Node.js v21.4.0, v20.12.0, v18.20.0): `readonly attribute DOMString parentPath` -/
-def fs.Dirent.parentPath (self : fs.Dirent) : IO String := self.val.get "parentPath" String
+@[macro_inline] def fs.Dirent.parentPath (self : fs.Dirent) : IO String := Internal.api "Lasm.JS.Node.fs.Dirent.parentPath" do
+  self.val.get "parentPath" String
 
 /-- `dirent.isBlockDevice()` (added in Node.js v10.10.0): `boolean isBlockDevice()` -/
-def fs.Dirent.isBlockDevice (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isBlockDevice" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isBlockDevice (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isBlockDevice" do
+  self.val.callMethod "isBlockDevice" (Internal.args #[]) Bool
 
 /-- `dirent.isCharacterDevice()` (added in Node.js v10.10.0): `boolean isCharacterDevice()` -/
-def fs.Dirent.isCharacterDevice (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isCharacterDevice" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isCharacterDevice (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isCharacterDevice" do
+  self.val.callMethod "isCharacterDevice" (Internal.args #[]) Bool
 
 /-- `dirent.isDirectory()` (added in Node.js v10.10.0): `boolean isDirectory()` -/
-def fs.Dirent.isDirectory (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isDirectory" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isDirectory (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isDirectory" do
+  self.val.callMethod "isDirectory" (Internal.args #[]) Bool
 
 /-- `dirent.isFIFO()` (added in Node.js v10.10.0): `boolean isFIFO()` -/
-def fs.Dirent.isFIFO (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isFIFO" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isFIFO (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isFIFO" do
+  self.val.callMethod "isFIFO" (Internal.args #[]) Bool
 
 /-- `dirent.isFile()` (added in Node.js v10.10.0): `boolean isFile()` -/
-def fs.Dirent.isFile (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isFile" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isFile (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isFile" do
+  self.val.callMethod "isFile" (Internal.args #[]) Bool
 
 /-- `dirent.isSocket()` (added in Node.js v10.10.0): `boolean isSocket()` -/
-def fs.Dirent.isSocket (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isSocket" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isSocket (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isSocket" do
+  self.val.callMethod "isSocket" (Internal.args #[]) Bool
 
 /-- `dirent.isSymbolicLink()` (added in Node.js v10.10.0): `boolean isSymbolicLink()` -/
-def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool :=
-  self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
+@[macro_inline] def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isSymbolicLink" do
+  self.val.callMethod "isSymbolicLink" (Internal.args #[]) Bool
 
 /-- `v instanceof FSWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FSWatcher`). -/
-def fs.FSWatcher.cast? (v : Value) : IO (Option fs.FSWatcher) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["FSWatcher"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.FSWatcher.cast? (v : Value) : IO (Option fs.FSWatcher) := Internal.api "Lasm.JS.Node.fs.FSWatcher.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["FSWatcher"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'change'` (added in Node.js v0.5.8): `fs.FSWatcher onChange(fs.FSWatcher.ChangeListener listener)`: calls `on("change", listener)` -/
-def fs.FSWatcher.onChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "change", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onChange" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "change", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'change'` (added in Node.js v0.5.8): `fs.FSWatcher onceChange(fs.FSWatcher.ChangeListener listener)`: calls `once("change", listener)` -/
-def fs.FSWatcher.onceChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "change", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onceChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onceChange" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "change", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v10.0.0): `fs.FSWatcher onClose(fs.FSWatcher.CloseListener listener)`: calls `on("close", listener)` -/
-def fs.FSWatcher.onClose (self : fs.FSWatcher) (listener : fs.FSWatcher.CloseListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onClose (self : fs.FSWatcher) (listener : fs.FSWatcher.CloseListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v10.0.0): `fs.FSWatcher onceClose(fs.FSWatcher.CloseListener listener)`: calls `once("close", listener)` -/
-def fs.FSWatcher.onceClose (self : fs.FSWatcher) (listener : fs.FSWatcher.CloseListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onceClose (self : fs.FSWatcher) (listener : fs.FSWatcher.CloseListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.5.8): `fs.FSWatcher onError(fs.FSWatcher.ErrorListener listener)`: calls `on("error", listener)` -/
-def fs.FSWatcher.onError (self : fs.FSWatcher) (listener : fs.FSWatcher.ErrorListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onError (self : fs.FSWatcher) (listener : fs.FSWatcher.ErrorListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.5.8): `fs.FSWatcher onceError(fs.FSWatcher.ErrorListener listener)`: calls `once("error", listener)` -/
-def fs.FSWatcher.onceError (self : fs.FSWatcher) (listener : fs.FSWatcher.ErrorListener) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def fs.FSWatcher.onceError (self : fs.FSWatcher) (listener : fs.FSWatcher.ErrorListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `watcher.close()` (added in Node.js v0.5.8): `undefined close()` -/
-def fs.FSWatcher.close (self : fs.FSWatcher) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def fs.FSWatcher.close (self : fs.FSWatcher) : IO Unit := Internal.api "Lasm.JS.Node.fs.FSWatcher.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `watcher.ref()` (added in Node.js v14.3.0, v12.20.0): `fs.FSWatcher ref()` -/
-def fs.FSWatcher.ref (self : fs.FSWatcher) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def fs.FSWatcher.ref (self : fs.FSWatcher) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `watcher.unref()` (added in Node.js v14.3.0, v12.20.0): `fs.FSWatcher unref()` -/
-def fs.FSWatcher.unref (self : fs.FSWatcher) : IO fs.FSWatcher := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def fs.FSWatcher.unref (self : fs.FSWatcher) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof StatWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatWatcher`). -/
-def fs.StatWatcher.cast? (v : Value) : IO (Option fs.StatWatcher) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["StatWatcher"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.StatWatcher.cast? (v : Value) : IO (Option fs.StatWatcher) := Internal.api "Lasm.JS.Node.fs.StatWatcher.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["StatWatcher"] Value) (fun x => { val := x }) v
 
 /-- `watcher.ref()` (added in Node.js v14.3.0, v12.20.0): `fs.StatWatcher ref()` -/
-def fs.StatWatcher.ref (self : fs.StatWatcher) : IO fs.StatWatcher := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def fs.StatWatcher.ref (self : fs.StatWatcher) : IO fs.StatWatcher := Internal.api "Lasm.JS.Node.fs.StatWatcher.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `watcher.unref()` (added in Node.js v14.3.0, v12.20.0): `fs.StatWatcher unref()` -/
-def fs.StatWatcher.unref (self : fs.StatWatcher) : IO fs.StatWatcher := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def fs.StatWatcher.unref (self : fs.StatWatcher) : IO fs.StatWatcher := Internal.api "Lasm.JS.Node.fs.StatWatcher.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof ReadStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadStream`). -/
-def fs.ReadStream.cast? (v : Value) : IO (Option fs.ReadStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["ReadStream"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.ReadStream.cast? (v : Value) : IO (Option fs.ReadStream) := Internal.api "Lasm.JS.Node.fs.ReadStream.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["ReadStream"] Value) (fun x => { val := x }) v
 
 /-- `bytesRead` (added in Node.js v6.4.0): `readonly attribute double bytesRead` -/
-def fs.ReadStream.bytesRead (self : fs.ReadStream) : IO Float := self.val.get "bytesRead" Float
+@[macro_inline] def fs.ReadStream.bytesRead (self : fs.ReadStream) : IO Float := Internal.api "Lasm.JS.Node.fs.ReadStream.bytesRead" do
+  self.val.get "bytesRead" Float
 
 /-- `path` (added in Node.js v0.1.93): `readonly attribute (DOMString or Uint8Array) path` -/
-def fs.ReadStream.path (self : fs.ReadStream) : IO DOMStringOrUint8Array := self.val.get "path" DOMStringOrUint8Array
+@[macro_inline] def fs.ReadStream.path (self : fs.ReadStream) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.ReadStream.path" do
+  self.val.get "path" DOMStringOrUint8Array
 
 /-- `pending` (added in Node.js v11.2.0, v10.16.0): `readonly attribute boolean pending` -/
-def fs.ReadStream.pending (self : fs.ReadStream) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def fs.ReadStream.pending (self : fs.ReadStream) : IO Bool := Internal.api "Lasm.JS.Node.fs.ReadStream.pending" do
+  self.val.get "pending" Bool
 
 /-- `Event: 'close'` (added in Node.js v0.1.93): `fs.ReadStream onClose(fs.ReadStream.CloseListener listener)`: calls `on("close", listener)` -/
-def fs.ReadStream.onClose (self : fs.ReadStream) (listener : fs.ReadStream.CloseListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onClose (self : fs.ReadStream) (listener : fs.ReadStream.CloseListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.1.93): `fs.ReadStream onceClose(fs.ReadStream.CloseListener listener)`: calls `once("close", listener)` -/
-def fs.ReadStream.onceClose (self : fs.ReadStream) (listener : fs.ReadStream.CloseListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onceClose (self : fs.ReadStream) (listener : fs.ReadStream.CloseListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'open'` (added in Node.js v0.1.93): `fs.ReadStream onOpen(fs.ReadStream.OpenListener listener)`: calls `on("open", listener)` -/
-def fs.ReadStream.onOpen (self : fs.ReadStream) (listener : fs.ReadStream.OpenListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "open", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onOpen (self : fs.ReadStream) (listener : fs.ReadStream.OpenListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onOpen" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "open", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'open'` (added in Node.js v0.1.93): `fs.ReadStream onceOpen(fs.ReadStream.OpenListener listener)`: calls `once("open", listener)` -/
-def fs.ReadStream.onceOpen (self : fs.ReadStream) (listener : fs.ReadStream.OpenListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "open", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onceOpen (self : fs.ReadStream) (listener : fs.ReadStream.OpenListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onceOpen" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "open", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `fs.ReadStream onReady(fs.ReadStream.ReadyListener listener)`: calls `on("ready", listener)` -/
-def fs.ReadStream.onReady (self : fs.ReadStream) (listener : fs.ReadStream.ReadyListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onReady (self : fs.ReadStream) (listener : fs.ReadStream.ReadyListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onReady" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `fs.ReadStream onceReady(fs.ReadStream.ReadyListener listener)`: calls `once("ready", listener)` -/
-def fs.ReadStream.onceReady (self : fs.ReadStream) (listener : fs.ReadStream.ReadyListener) : IO fs.ReadStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.ReadStream.onceReady (self : fs.ReadStream) (listener : fs.ReadStream.ReadyListener) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.ReadStream.onceReady" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `v instanceof Stats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Stats`). -/
-def fs.Stats.cast? (v : Value) : IO (Option fs.Stats) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Stats"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.Stats.cast? (v : Value) : IO (Option fs.Stats) := Internal.api "Lasm.JS.Node.fs.Stats.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["Stats"] Value) (fun x => { val := x }) v
 
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
-def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint
+@[macro_inline] def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.dev" do
+  self.val.get "dev" DoubleOrBigint
 
 /-- `stats.ino`: `readonly attribute (double or bigint) ino` -/
-def fs.Stats.ino (self : fs.Stats) : IO DoubleOrBigint := self.val.get "ino" DoubleOrBigint
+@[macro_inline] def fs.Stats.ino (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.ino" do
+  self.val.get "ino" DoubleOrBigint
 
 /-- `stats.mode`: `readonly attribute (double or bigint) mode` -/
-def fs.Stats.mode (self : fs.Stats) : IO DoubleOrBigint := self.val.get "mode" DoubleOrBigint
+@[macro_inline] def fs.Stats.mode (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.mode" do
+  self.val.get "mode" DoubleOrBigint
 
 /-- `stats.nlink`: `readonly attribute (double or bigint) nlink` -/
-def fs.Stats.nlink (self : fs.Stats) : IO DoubleOrBigint := self.val.get "nlink" DoubleOrBigint
+@[macro_inline] def fs.Stats.nlink (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.nlink" do
+  self.val.get "nlink" DoubleOrBigint
 
 /-- `stats.uid`: `readonly attribute (double or bigint) uid` -/
-def fs.Stats.uid (self : fs.Stats) : IO DoubleOrBigint := self.val.get "uid" DoubleOrBigint
+@[macro_inline] def fs.Stats.uid (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.uid" do
+  self.val.get "uid" DoubleOrBigint
 
 /-- `stats.gid`: `readonly attribute (double or bigint) gid` -/
-def fs.Stats.gid (self : fs.Stats) : IO DoubleOrBigint := self.val.get "gid" DoubleOrBigint
+@[macro_inline] def fs.Stats.gid (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.gid" do
+  self.val.get "gid" DoubleOrBigint
 
 /-- `stats.rdev`: `readonly attribute (double or bigint) rdev` -/
-def fs.Stats.rdev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "rdev" DoubleOrBigint
+@[macro_inline] def fs.Stats.rdev (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.rdev" do
+  self.val.get "rdev" DoubleOrBigint
 
 /-- `stats.size`: `readonly attribute (double or bigint) size` -/
-def fs.Stats.size (self : fs.Stats) : IO DoubleOrBigint := self.val.get "size" DoubleOrBigint
+@[macro_inline] def fs.Stats.size (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.size" do
+  self.val.get "size" DoubleOrBigint
 
 /-- `stats.blksize`: `readonly attribute (double or bigint) blksize` -/
-def fs.Stats.blksize (self : fs.Stats) : IO DoubleOrBigint := self.val.get "blksize" DoubleOrBigint
+@[macro_inline] def fs.Stats.blksize (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.blksize" do
+  self.val.get "blksize" DoubleOrBigint
 
 /-- `stats.blocks`: `readonly attribute (double or bigint) blocks` -/
-def fs.Stats.blocks (self : fs.Stats) : IO DoubleOrBigint := self.val.get "blocks" DoubleOrBigint
+@[macro_inline] def fs.Stats.blocks (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.blocks" do
+  self.val.get "blocks" DoubleOrBigint
 
 /-- `stats.atimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) atimeMs` -/
-def fs.Stats.atimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "atimeMs" DoubleOrBigint
+@[macro_inline] def fs.Stats.atimeMs (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.atimeMs" do
+  self.val.get "atimeMs" DoubleOrBigint
 
 /-- `stats.mtimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) mtimeMs` -/
-def fs.Stats.mtimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "mtimeMs" DoubleOrBigint
+@[macro_inline] def fs.Stats.mtimeMs (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.mtimeMs" do
+  self.val.get "mtimeMs" DoubleOrBigint
 
 /-- `stats.ctimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) ctimeMs` -/
-def fs.Stats.ctimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "ctimeMs" DoubleOrBigint
+@[macro_inline] def fs.Stats.ctimeMs (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.ctimeMs" do
+  self.val.get "ctimeMs" DoubleOrBigint
 
 /-- `stats.birthtimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) birthtimeMs` -/
-def fs.Stats.birthtimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "birthtimeMs" DoubleOrBigint
+@[macro_inline] def fs.Stats.birthtimeMs (self : fs.Stats) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.Stats.birthtimeMs" do
+  self.val.get "birthtimeMs" DoubleOrBigint
 
 /-- `stats.atimeNs` (added in Node.js v12.10.0): `readonly attribute bigint atimeNs` -/
-def fs.Stats.atimeNs (self : fs.Stats) : IO Int := self.val.get "atimeNs" Int
+@[macro_inline] def fs.Stats.atimeNs (self : fs.Stats) : IO Int := Internal.api "Lasm.JS.Node.fs.Stats.atimeNs" do
+  self.val.get "atimeNs" Int
 
 /-- `stats.mtimeNs` (added in Node.js v12.10.0): `readonly attribute bigint mtimeNs` -/
-def fs.Stats.mtimeNs (self : fs.Stats) : IO Int := self.val.get "mtimeNs" Int
+@[macro_inline] def fs.Stats.mtimeNs (self : fs.Stats) : IO Int := Internal.api "Lasm.JS.Node.fs.Stats.mtimeNs" do
+  self.val.get "mtimeNs" Int
 
 /-- `stats.ctimeNs` (added in Node.js v12.10.0): `readonly attribute bigint ctimeNs` -/
-def fs.Stats.ctimeNs (self : fs.Stats) : IO Int := self.val.get "ctimeNs" Int
+@[macro_inline] def fs.Stats.ctimeNs (self : fs.Stats) : IO Int := Internal.api "Lasm.JS.Node.fs.Stats.ctimeNs" do
+  self.val.get "ctimeNs" Int
 
 /-- `stats.birthtimeNs` (added in Node.js v12.10.0): `readonly attribute bigint birthtimeNs` -/
-def fs.Stats.birthtimeNs (self : fs.Stats) : IO Int := self.val.get "birthtimeNs" Int
+@[macro_inline] def fs.Stats.birthtimeNs (self : fs.Stats) : IO Int := Internal.api "Lasm.JS.Node.fs.Stats.birthtimeNs" do
+  self.val.get "birthtimeNs" Int
 
 /-- `stats.atime` (added in Node.js v0.11.13): `readonly attribute object atime` -/
-def fs.Stats.atime (self : fs.Stats) : IO Data := self.val.get "atime" Data
+@[macro_inline] def fs.Stats.atime (self : fs.Stats) : IO Data := Internal.api "Lasm.JS.Node.fs.Stats.atime" do
+  self.val.get "atime" Data
 
 /-- `stats.mtime` (added in Node.js v0.11.13): `readonly attribute object mtime` -/
-def fs.Stats.mtime (self : fs.Stats) : IO Data := self.val.get "mtime" Data
+@[macro_inline] def fs.Stats.mtime (self : fs.Stats) : IO Data := Internal.api "Lasm.JS.Node.fs.Stats.mtime" do
+  self.val.get "mtime" Data
 
 /-- `stats.ctime` (added in Node.js v0.11.13): `readonly attribute object ctime` -/
-def fs.Stats.ctime (self : fs.Stats) : IO Data := self.val.get "ctime" Data
+@[macro_inline] def fs.Stats.ctime (self : fs.Stats) : IO Data := Internal.api "Lasm.JS.Node.fs.Stats.ctime" do
+  self.val.get "ctime" Data
 
 /-- `stats.birthtime` (added in Node.js v0.11.13): `readonly attribute object birthtime` -/
-def fs.Stats.birthtime (self : fs.Stats) : IO Data := self.val.get "birthtime" Data
+@[macro_inline] def fs.Stats.birthtime (self : fs.Stats) : IO Data := Internal.api "Lasm.JS.Node.fs.Stats.birthtime" do
+  self.val.get "birthtime" Data
 
 /-- `stats.isBlockDevice()` (added in Node.js v0.1.10): `boolean isBlockDevice()` -/
-def fs.Stats.isBlockDevice (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isBlockDevice" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isBlockDevice (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isBlockDevice" do
+  self.val.callMethod "isBlockDevice" (Internal.args #[]) Bool
 
 /-- `stats.isCharacterDevice()` (added in Node.js v0.1.10): `boolean isCharacterDevice()` -/
-def fs.Stats.isCharacterDevice (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isCharacterDevice" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isCharacterDevice (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isCharacterDevice" do
+  self.val.callMethod "isCharacterDevice" (Internal.args #[]) Bool
 
 /-- `stats.isDirectory()` (added in Node.js v0.1.10): `boolean isDirectory()` -/
-def fs.Stats.isDirectory (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isDirectory" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isDirectory (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isDirectory" do
+  self.val.callMethod "isDirectory" (Internal.args #[]) Bool
 
 /-- `stats.isFIFO()` (added in Node.js v0.1.10): `boolean isFIFO()` -/
-def fs.Stats.isFIFO (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isFIFO" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isFIFO (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isFIFO" do
+  self.val.callMethod "isFIFO" (Internal.args #[]) Bool
 
 /-- `stats.isFile()` (added in Node.js v0.1.10): `boolean isFile()` -/
-def fs.Stats.isFile (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isFile" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isFile (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isFile" do
+  self.val.callMethod "isFile" (Internal.args #[]) Bool
 
 /-- `stats.isSocket()` (added in Node.js v0.1.10): `boolean isSocket()` -/
-def fs.Stats.isSocket (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isSocket" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isSocket (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isSocket" do
+  self.val.callMethod "isSocket" (Internal.args #[]) Bool
 
 /-- `stats.isSymbolicLink()` (added in Node.js v0.1.10): `boolean isSymbolicLink()` -/
-def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool :=
-  self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
+@[macro_inline] def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isSymbolicLink" do
+  self.val.callMethod "isSymbolicLink" (Internal.args #[]) Bool
 
 /-- `v instanceof StatFs`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatFs`). -/
-def fs.StatFs.cast? (v : Value) : IO (Option fs.StatFs) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["StatFs"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.StatFs.cast? (v : Value) : IO (Option fs.StatFs) := Internal.api "Lasm.JS.Node.fs.StatFs.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["StatFs"] Value) (fun x => { val := x }) v
 
 /-- `bavail` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) bavail` -/
-def fs.StatFs.bavail (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "bavail" DoubleOrBigint
+@[macro_inline] def fs.StatFs.bavail (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.bavail" do
+  self.val.get "bavail" DoubleOrBigint
 
 /-- `bfree` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) bfree` -/
-def fs.StatFs.bfree (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "bfree" DoubleOrBigint
+@[macro_inline] def fs.StatFs.bfree (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.bfree" do
+  self.val.get "bfree" DoubleOrBigint
 
 /-- `blocks` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) blocks` -/
-def fs.StatFs.blocks (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "blocks" DoubleOrBigint
+@[macro_inline] def fs.StatFs.blocks (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.blocks" do
+  self.val.get "blocks" DoubleOrBigint
 
 /-- `bsize` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) bsize` -/
-def fs.StatFs.bsize (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "bsize" DoubleOrBigint
+@[macro_inline] def fs.StatFs.bsize (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.bsize" do
+  self.val.get "bsize" DoubleOrBigint
 
 /-- `frsize` (added in Node.js v24.16.0): `readonly attribute (double or bigint) frsize` -/
-def fs.StatFs.frsize (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "frsize" DoubleOrBigint
+@[macro_inline] def fs.StatFs.frsize (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.frsize" do
+  self.val.get "frsize" DoubleOrBigint
 
 /-- `ffree` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) ffree` -/
-def fs.StatFs.ffree (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "ffree" DoubleOrBigint
+@[macro_inline] def fs.StatFs.ffree (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.ffree" do
+  self.val.get "ffree" DoubleOrBigint
 
 /-- `files` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) files` -/
-def fs.StatFs.files (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "files" DoubleOrBigint
+@[macro_inline] def fs.StatFs.files (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.files" do
+  self.val.get "files" DoubleOrBigint
 
 /-- `type` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) type` -/
-def fs.StatFs.type (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "type" DoubleOrBigint
+@[macro_inline] def fs.StatFs.type (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.type" do
+  self.val.get "type" DoubleOrBigint
 
 /-- `v instanceof Utf8Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Utf8Stream`). -/
-def fs.Utf8Stream.cast? (v : Value) : IO (Option fs.Utf8Stream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Utf8Stream"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.Utf8Stream.cast? (v : Value) : IO (Option fs.Utf8Stream) := Internal.api "Lasm.JS.Node.fs.Utf8Stream.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["Utf8Stream"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
-def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := self.val.get "append" Bool
+@[macro_inline] def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.append" do
+  self.val.get "append" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
-def fs.Utf8Stream.contentMode (self : fs.Utf8Stream) : IO String := self.val.get "contentMode" String
+@[macro_inline] def fs.Utf8Stream.contentMode (self : fs.Utf8Stream) : IO String := Internal.api "Lasm.JS.Node.fs.Utf8Stream.contentMode" do
+  self.val.get "contentMode" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double /* integer: Nat */ fd` -/
-def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Nat := self.val.get "fd" Nat
+@[macro_inline] def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Nat := Internal.api "Lasm.JS.Node.fs.Utf8Stream.fd" do
+  self.val.get "fd" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.file`: `readonly attribute DOMString file` -/
-def fs.Utf8Stream.file (self : fs.Utf8Stream) : IO String := self.val.get "file" String
+@[macro_inline] def fs.Utf8Stream.file (self : fs.Utf8Stream) : IO String := Internal.api "Lasm.JS.Node.fs.Utf8Stream.file" do
+  self.val.get "file" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fsync`: `readonly attribute boolean fsync` -/
-def fs.Utf8Stream.fsync (self : fs.Utf8Stream) : IO Bool := self.val.get "fsync" Bool
+@[macro_inline] def fs.Utf8Stream.fsync (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.fsync" do
+  self.val.get "fsync" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.maxLength`: `readonly attribute double maxLength` -/
-def fs.Utf8Stream.maxLength (self : fs.Utf8Stream) : IO Float := self.val.get "maxLength" Float
+@[macro_inline] def fs.Utf8Stream.maxLength (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.maxLength" do
+  self.val.get "maxLength" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.minLength`: `readonly attribute double minLength` -/
-def fs.Utf8Stream.minLength (self : fs.Utf8Stream) : IO Float := self.val.get "minLength" Float
+@[macro_inline] def fs.Utf8Stream.minLength (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.minLength" do
+  self.val.get "minLength" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mkdir`: `readonly attribute boolean mkdir` -/
-def fs.Utf8Stream.mkdir (self : fs.Utf8Stream) : IO Bool := self.val.get "mkdir" Bool
+@[macro_inline] def fs.Utf8Stream.mkdir (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.mkdir" do
+  self.val.get "mkdir" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mode`: `readonly attribute (double or DOMString) mode` -/
-def fs.Utf8Stream.mode (self : fs.Utf8Stream) : IO DoubleOrDOMString := self.val.get "mode" DoubleOrDOMString
+@[macro_inline] def fs.Utf8Stream.mode (self : fs.Utf8Stream) : IO DoubleOrDOMString := Internal.api "Lasm.JS.Node.fs.Utf8Stream.mode" do
+  self.val.get "mode" DoubleOrDOMString
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.periodicFlush`: `readonly attribute double periodicFlush` -/
-def fs.Utf8Stream.periodicFlush (self : fs.Utf8Stream) : IO Float := self.val.get "periodicFlush" Float
+@[macro_inline] def fs.Utf8Stream.periodicFlush (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.periodicFlush" do
+  self.val.get "periodicFlush" Float
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.sync`: `readonly attribute boolean sync` -/
-def fs.Utf8Stream.sync (self : fs.Utf8Stream) : IO Bool := self.val.get "sync" Bool
+@[macro_inline] def fs.Utf8Stream.sync (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.sync" do
+  self.val.get "sync" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.writing`: `readonly attribute boolean writing` -/
-def fs.Utf8Stream.writing (self : fs.Utf8Stream) : IO Bool := self.val.get "writing" Bool
+@[macro_inline] def fs.Utf8Stream.writing (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.writing" do
+  self.val.get "writing" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'close'`: `fs.Utf8Stream onClose(fs.Utf8Stream.CloseListener listener)`: calls `on("close", listener)` -/
-def fs.Utf8Stream.onClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'close'`: `fs.Utf8Stream onceClose(fs.Utf8Stream.CloseListener listener)`: calls `once("close", listener)` -/
-def fs.Utf8Stream.onceClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drain'`: `fs.Utf8Stream onDrain(fs.Utf8Stream.DrainListener listener)`: calls `on("drain", listener)` -/
-def fs.Utf8Stream.onDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onDrain" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drain'`: `fs.Utf8Stream onceDrain(fs.Utf8Stream.DrainListener listener)`: calls `once("drain", listener)` -/
-def fs.Utf8Stream.onceDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceDrain" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drop'`: `fs.Utf8Stream onDrop(fs.Utf8Stream.DropListener listener)`: calls `on("drop", listener)` -/
-def fs.Utf8Stream.onDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "drop", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onDrop" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drop'`: `fs.Utf8Stream onceDrop(fs.Utf8Stream.DropListener listener)`: calls `once("drop", listener)` -/
-def fs.Utf8Stream.onceDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "drop", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceDrop" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'error'`: `fs.Utf8Stream onError(fs.Utf8Stream.ErrorListener listener)`: calls `on("error", listener)` -/
-def fs.Utf8Stream.onError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'error'`: `fs.Utf8Stream onceError(fs.Utf8Stream.ErrorListener listener)`: calls `once("error", listener)` -/
-def fs.Utf8Stream.onceError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'finish'`: `fs.Utf8Stream onFinish(fs.Utf8Stream.FinishListener listener)`: calls `on("finish", listener)` -/
-def fs.Utf8Stream.onFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onFinish" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'finish'`: `fs.Utf8Stream onceFinish(fs.Utf8Stream.FinishListener listener)`: calls `once("finish", listener)` -/
-def fs.Utf8Stream.onceFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceFinish" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'ready'`: `fs.Utf8Stream onReady(fs.Utf8Stream.ReadyListener listener)`: calls `on("ready", listener)` -/
-def fs.Utf8Stream.onReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onReady" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'ready'`: `fs.Utf8Stream onceReady(fs.Utf8Stream.ReadyListener listener)`: calls `once("ready", listener)` -/
-def fs.Utf8Stream.onceReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceReady" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'write'`: `fs.Utf8Stream onWrite(fs.Utf8Stream.WriteListener listener)`: calls `on("write", listener)` -/
-def fs.Utf8Stream.onWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "write", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onWrite" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "write", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'write'`: `fs.Utf8Stream onceWrite(fs.Utf8Stream.WriteListener listener)`: calls `once("write", listener)` -/
-def fs.Utf8Stream.onceWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "write", toJS listener]) Value
+@[macro_inline] def fs.Utf8Stream.onceWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.onceWrite" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "write", toJS listener]) Value
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.destroy()`: `undefined destroy()` -/
-def fs.Utf8Stream.destroy (self : fs.Utf8Stream) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[]) Unit
+@[macro_inline] def fs.Utf8Stream.destroy (self : fs.Utf8Stream) : IO Unit := Internal.api "Lasm.JS.Node.fs.Utf8Stream.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.end()`: `undefined end()` -/
-def fs.Utf8Stream.«end» (self : fs.Utf8Stream) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def fs.Utf8Stream.«end» (self : fs.Utf8Stream) : IO Unit := Internal.api "Lasm.JS.Node.fs.Utf8Stream.end" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.flush(callback)`: `Promise<undefined> flush()` -/
-def fs.Utf8Stream.flush (self : fs.Utf8Stream) : Async Unit :=
-  Support.promisifiedMethod Unit self.val "flush" (Support.args #[])
+@[macro_inline] def fs.Utf8Stream.flush (self : fs.Utf8Stream) : Async Unit := Internal.api "Lasm.JS.Node.fs.Utf8Stream.flush" do
+  Support.promisifiedMethod Unit self.val "flush" (Internal.args #[])
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.flushSync()`: `undefined flushSync()` -/
-def fs.Utf8Stream.flushSync (self : fs.Utf8Stream) : IO Unit :=
-  self.val.callMethod "flushSync" (Support.args #[]) Unit
+@[macro_inline] def fs.Utf8Stream.flushSync (self : fs.Utf8Stream) : IO Unit := Internal.api "Lasm.JS.Node.fs.Utf8Stream.flushSync" do
+  self.val.callMethod "flushSync" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.reopen(file)`: `undefined reopen((DOMString or Uint8Array or URL) file)` -/
-def fs.Utf8Stream.reopen (self : fs.Utf8Stream) (file : DOMStringOrUint8ArrayOrURL) : IO Unit :=
-  self.val.callMethod "reopen" (Support.args #[toJS file]) Unit
+@[macro_inline] def fs.Utf8Stream.reopen (self : fs.Utf8Stream) (file : DOMStringOrUint8ArrayOrURL) : IO Unit := Internal.api "Lasm.JS.Node.fs.Utf8Stream.reopen" do
+  self.val.callMethod "reopen" (Internal.args #[toJS file]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.write(data)`: `boolean write((DOMString or Uint8Array) data)` -/
-def fs.Utf8Stream.write (self : fs.Utf8Stream) (data : DOMStringOrUint8Array) : IO Bool :=
-  self.val.callMethod "write" (Support.args #[toJS data]) Bool
+@[macro_inline] def fs.Utf8Stream.write (self : fs.Utf8Stream) (data : DOMStringOrUint8Array) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data]) Bool
 
 /-- `v instanceof WriteStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WriteStream`). -/
-def fs.WriteStream.cast? (v : Value) : IO (Option fs.WriteStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["WriteStream"] Value) v) then some { val := v } else none
+@[macro_inline] def fs.WriteStream.cast? (v : Value) : IO (Option fs.WriteStream) := Internal.api "Lasm.JS.Node.fs.WriteStream.cast?" do
+  Internal.cast (Support.getExport "node:fs" ["WriteStream"] Value) (fun x => { val := x }) v
 
 /-- `writeStream.bytesWritten` (added in Node.js v0.4.7): `readonly attribute any bytesWritten` -/
-def fs.WriteStream.bytesWritten (self : fs.WriteStream) : IO Data := self.val.get "bytesWritten" Data
+@[macro_inline] def fs.WriteStream.bytesWritten (self : fs.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.fs.WriteStream.bytesWritten" do
+  self.val.get "bytesWritten" Data
 
 /-- `writeStream.path` (added in Node.js v0.1.93): `readonly attribute any path` -/
-def fs.WriteStream.path (self : fs.WriteStream) : IO Data := self.val.get "path" Data
+@[macro_inline] def fs.WriteStream.path (self : fs.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.fs.WriteStream.path" do
+  self.val.get "path" Data
 
 /-- `writeStream.pending` (added in Node.js v11.2.0): `readonly attribute boolean pending` -/
-def fs.WriteStream.pending (self : fs.WriteStream) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def fs.WriteStream.pending (self : fs.WriteStream) : IO Bool := Internal.api "Lasm.JS.Node.fs.WriteStream.pending" do
+  self.val.get "pending" Bool
 
 /-- `Event: 'close'` (added in Node.js v0.1.93): `fs.WriteStream onClose(fs.WriteStream.CloseListener listener)`: calls `on("close", listener)` -/
-def fs.WriteStream.onClose (self : fs.WriteStream) (listener : fs.WriteStream.CloseListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onClose (self : fs.WriteStream) (listener : fs.WriteStream.CloseListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.1.93): `fs.WriteStream onceClose(fs.WriteStream.CloseListener listener)`: calls `once("close", listener)` -/
-def fs.WriteStream.onceClose (self : fs.WriteStream) (listener : fs.WriteStream.CloseListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onceClose (self : fs.WriteStream) (listener : fs.WriteStream.CloseListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'open'` (added in Node.js v0.1.93): `fs.WriteStream onOpen(fs.WriteStream.OpenListener listener)`: calls `on("open", listener)` -/
-def fs.WriteStream.onOpen (self : fs.WriteStream) (listener : fs.WriteStream.OpenListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "open", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onOpen (self : fs.WriteStream) (listener : fs.WriteStream.OpenListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onOpen" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "open", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'open'` (added in Node.js v0.1.93): `fs.WriteStream onceOpen(fs.WriteStream.OpenListener listener)`: calls `once("open", listener)` -/
-def fs.WriteStream.onceOpen (self : fs.WriteStream) (listener : fs.WriteStream.OpenListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "open", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onceOpen (self : fs.WriteStream) (listener : fs.WriteStream.OpenListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onceOpen" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "open", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `fs.WriteStream onReady(fs.WriteStream.ReadyListener listener)`: calls `on("ready", listener)` -/
-def fs.WriteStream.onReady (self : fs.WriteStream) (listener : fs.WriteStream.ReadyListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onReady (self : fs.WriteStream) (listener : fs.WriteStream.ReadyListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onReady" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `fs.WriteStream onceReady(fs.WriteStream.ReadyListener listener)`: calls `once("ready", listener)` -/
-def fs.WriteStream.onceReady (self : fs.WriteStream) (listener : fs.WriteStream.ReadyListener) : IO fs.WriteStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def fs.WriteStream.onceReady (self : fs.WriteStream) (listener : fs.WriteStream.ReadyListener) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.WriteStream.onceReady" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `writeStream.close([callback])` (added in Node.js v0.9.4): `undefined close()` -/
-def fs.WriteStream.close (self : fs.WriteStream) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def fs.WriteStream.close (self : fs.WriteStream) : IO Unit := Internal.api "Lasm.JS.Node.fs.WriteStream.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `fsPromises.constants` (added in Node.js v18.4.0, v16.17.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.constants : IO Data := Support.getExport "node:fs/promises" ["constants"] Data
+@[macro_inline] def fsPromises.constants : IO Data := Internal.api "Lasm.JS.Node.fsPromises.constants" do
+  Support.getExport "node:fs/promises" ["constants"] Data
 
 /-- `fsPromises.access(path[, mode])` (added in Node.js v10.0.0): `Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.access (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
+@[macro_inline] def fsPromises.access (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.access" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.access", module := "node:fs/promises", path := "access", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional mode])
+    (Internal.args #[toJS path_, Internal.optional mode])
 
 /-- `fsPromises.appendFile(path, data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or URL or FileHandle) path, (DOMString or Uint8Array or object) data, optional (fsPromises.AppendFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.appendFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.AppendFileOptionsOrDOMString := none) : Async Unit :=
+@[macro_inline] def fsPromises.appendFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.AppendFileOptionsOrDOMString := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.appendFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.appendFile", module := "node:fs/promises", path := "appendFile", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS data, Support.optional options])
+    (Internal.args #[toJS path_, toJS data, Internal.optional options])
 
 /-- `fsPromises.chmod(path, mode)` (added in Node.js v10.0.0): `Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.chmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : Async Unit :=
+@[macro_inline] def fsPromises.chmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.chmod" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.chmod", module := "node:fs/promises", path := "chmod", construct := false, arity := 2 }
-    (Support.args #[toJS path_, toJS mode])
+    (Internal.args #[toJS path_, toJS mode])
 
 /-- `fsPromises.chown(path, uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.chown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
+@[macro_inline] def fsPromises.chown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.chown" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.chown", module := "node:fs/promises", path := "chown", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS uid, toJS gid])
+    (Internal.args #[toJS path_, toJS uid, toJS gid])
 
 /-- `fsPromises.copyFile(src, dest[, mode])` (added in Node.js v10.0.0): `Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.copyFile (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
+@[macro_inline] def fsPromises.copyFile (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.copyFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.copyFile", module := "node:fs/promises", path := "copyFile", construct := false, arity := 3 }
-    (Support.args #[toJS src, toJS dest, Support.optional mode])
+    (Internal.args #[toJS src, toJS dest, Internal.optional mode])
 
 /-- `fsPromises.cp(src, dest[, options])` (added in Node.js v16.7.0): `Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional fsPromises.CpOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.cp (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fsPromises.CpOptions := none) : Async Unit :=
+@[macro_inline] def fsPromises.cp (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fsPromises.CpOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.cp" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.cp", module := "node:fs/promises", path := "cp", construct := false, arity := 3 }
-    (Support.args #[toJS src, toJS dest, Support.optional options])
+    (Internal.args #[toJS src, toJS dest, Internal.optional options])
 
 /-- `fsPromises.glob(pattern[, options])` (added in Node.js v22.0.0): `object glob((DOMString or sequence<DOMString>) pattern, optional fsPromises.GlobOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option fsPromises.GlobOptions := none) : IO Data :=
+@[macro_inline] def fsPromises.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option fsPromises.GlobOptions := none) : IO Data := Internal.api "Lasm.JS.Node.fsPromises.glob" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fsPromises.glob", module := "node:fs/promises", path := "glob", construct := false, arity := 2 }
-    (Support.args #[toJS pattern, Support.optional options]) (await := false)
+    (Internal.args #[toJS pattern, Internal.optional options]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `fsPromises.lchmod(path, mode)` (added in Node.js v10.0.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit :=
+@[macro_inline] def fsPromises.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.lchmod" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lchmod", module := "node:fs/promises", path := "lchmod", construct := false, arity := 2 }
-    (Support.args #[toJS path_, toJS mode])
+    (Internal.args #[toJS path_, toJS mode])
 
 /-- `fsPromises.lchown(path, uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.lchown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
+@[macro_inline] def fsPromises.lchown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.lchown" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lchown", module := "node:fs/promises", path := "lchown", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS uid, toJS gid])
+    (Internal.args #[toJS path_, toJS uid, toJS gid])
 
 /-- `fsPromises.lutimes(path, atime, mtime)` (added in Node.js v14.5.0, v12.19.0): `Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.lutimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
+@[macro_inline] def fsPromises.lutimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.lutimes" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lutimes", module := "node:fs/promises", path := "lutimes", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS atime, toJS mtime])
+    (Internal.args #[toJS path_, toJS atime, toJS mtime])
 
 /-- `fsPromises.link(existingPath, newPath)` (added in Node.js v10.0.0): `Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.link (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
+@[macro_inline] def fsPromises.link (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.link" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.link", module := "node:fs/promises", path := "link", construct := false, arity := 2 }
-    (Support.args #[toJS existingPath, toJS newPath])
+    (Internal.args #[toJS existingPath, toJS newPath])
 
 /-- `fsPromises.lstat(path[, options])` (added in Node.js v10.0.0): `Promise<fs.Stats> lstat((DOMString or Uint8Array or URL) path, optional fsPromises.LstatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.lstat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.LstatOptions := none) : Async fs.Stats := do
+@[macro_inline] def fsPromises.lstat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.LstatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.fsPromises.lstat" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.lstat", module := "node:fs/promises", path := "lstat", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fsPromises.mkdir(path[, options])` (added in Node.js v10.0.0): `Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (fsPromises.MkdirOptions or long long) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.mkdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.MkdirOptionsOrLongLong := none) : Async (Option String) :=
+@[macro_inline] def fsPromises.mkdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.MkdirOptionsOrLongLong := none) : Async (Option String) := Internal.api "Lasm.JS.Node.fsPromises.mkdir" do
   Lasm.JS.Binding.invokeAsync (Option String) { name := "Lasm.JS.Node.fsPromises.mkdir", module := "node:fs/promises", path := "mkdir", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.mkdtemp(prefix[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or fsPromises.MkdtempOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.mkdtemp («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrMkdtempOptions := none) : Async DOMStringOrUint8Array :=
+@[macro_inline] def fsPromises.mkdtemp («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrMkdtempOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fsPromises.mkdtemp" do
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.mkdtemp", module := "node:fs/promises", path := "mkdtemp", construct := false, arity := 2 }
-    (Support.args #[toJS «prefix», Support.optional options])
+    (Internal.args #[toJS «prefix», Internal.optional options])
 
 /-- `fsPromises.mkdtempDisposable(prefix[, options])` (added in Node.js v24.4.0): `Promise<any> mkdtempDisposable((DOMString or Uint8Array or URL) prefix, optional (DOMString or fsPromises.MkdtempDisposableOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.mkdtempDisposable («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrMkdtempDisposableOptions := none) : Async Data :=
+@[macro_inline] def fsPromises.mkdtempDisposable («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrMkdtempDisposableOptions := none) : Async Data := Internal.api "Lasm.JS.Node.fsPromises.mkdtempDisposable" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.fsPromises.mkdtempDisposable", module := "node:fs/promises", path := "mkdtempDisposable", construct := false, arity := 2 }
-    (Support.args #[toJS «prefix», Support.optional options])
+    (Internal.args #[toJS «prefix», Internal.optional options])
 
 /-- `fsPromises.open(path, flags[, mode])` (added in Node.js v10.0.0): `Promise<FileHandle> open((DOMString or Uint8Array or URL) path, (DOMString or double) flags, optional (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.«open» (path_ : DOMStringOrUint8ArrayOrURL) (flags : DOMStringOrDouble) (mode : Option DOMStringOrLongLong := none) : Async FileHandle := do
+@[macro_inline] def fsPromises.«open» (path_ : DOMStringOrUint8ArrayOrURL) (flags : DOMStringOrDouble) (mode : Option DOMStringOrLongLong := none) : Async FileHandle := Internal.api "Lasm.JS.Node.fsPromises.open" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.open", module := "node:fs/promises", path := "open", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS flags, Support.optional mode])
+    (Internal.args #[toJS path_, toJS flags, Internal.optional mode])
   pure { val := r }
 
 /-- `fsPromises.opendir(path[, options])` (added in Node.js v12.12.0): `Promise<fs.Dir> opendir((DOMString or Uint8Array or URL) path, optional fsPromises.OpendirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.opendir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.OpendirOptions := none) : Async fs.Dir := do
+@[macro_inline] def fsPromises.opendir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.OpendirOptions := none) : Async fs.Dir := Internal.api "Lasm.JS.Node.fsPromises.opendir" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.opendir", module := "node:fs/promises", path := "opendir", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fsPromises.readdir(path[, options])` (added in Node.js v10.0.0): `Promise<sequence<(DOMString or Uint8Array or fs.Dirent)>> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReaddirOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.readdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReaddirOptions := none) : Async (Array fs.DOMStringOrUint8ArrayOrDirent) :=
+@[macro_inline] def fsPromises.readdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReaddirOptions := none) : Async (Array fs.DOMStringOrUint8ArrayOrDirent) := Internal.api "Lasm.JS.Node.fsPromises.readdir" do
   Lasm.JS.Binding.invokeAsync (Array fs.DOMStringOrUint8ArrayOrDirent) { name := "Lasm.JS.Node.fsPromises.readdir", module := "node:fs/promises", path := "readdir", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.readFile(path[, options])` (added in Node.js v10.0.0): `Promise<(Uint8Array or DOMString)> readFile((DOMString or Uint8Array or URL or FileHandle) path, optional (fsPromises.ReadFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.readFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (options : Option fsPromises.ReadFileOptionsOrDOMString := none) : Async Uint8ArrayOrDOMString :=
+@[macro_inline] def fsPromises.readFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (options : Option fsPromises.ReadFileOptionsOrDOMString := none) : Async Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.fsPromises.readFile" do
   Lasm.JS.Binding.invokeAsync Uint8ArrayOrDOMString { name := "Lasm.JS.Node.fsPromises.readFile", module := "node:fs/promises", path := "readFile", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.readlink(path[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReadlinkOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.readlink (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReadlinkOptions := none) : Async DOMStringOrUint8Array :=
+@[macro_inline] def fsPromises.readlink (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReadlinkOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fsPromises.readlink" do
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.readlink", module := "node:fs/promises", path := "readlink", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.realpath(path[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.RealpathOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.realpath (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrRealpathOptions := none) : Async DOMStringOrUint8Array :=
+@[macro_inline] def fsPromises.realpath (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrRealpathOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fsPromises.realpath" do
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.realpath", module := "node:fs/promises", path := "realpath", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.rename(oldPath, newPath)` (added in Node.js v10.0.0): `Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.rename (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
+@[macro_inline] def fsPromises.rename (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.rename" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rename", module := "node:fs/promises", path := "rename", construct := false, arity := 2 }
-    (Support.args #[toJS oldPath, toJS newPath])
+    (Internal.args #[toJS oldPath, toJS newPath])
 
 /-- `fsPromises.rmdir(path[, options])` (added in Node.js v10.0.0): `Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional fsPromises.RmdirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.rmdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmdirOptions := none) : Async Unit :=
+@[macro_inline] def fsPromises.rmdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmdirOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.rmdir" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rmdir", module := "node:fs/promises", path := "rmdir", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.rm(path[, options])` (added in Node.js v14.14.0): `Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional fsPromises.RmOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.rm (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmOptions := none) : Async Unit :=
+@[macro_inline] def fsPromises.rm (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.rm" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rm", module := "node:fs/promises", path := "rm", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fsPromises.stat(path[, options])` (added in Node.js v10.0.0): `Promise<fs.Stats> stat((DOMString or Uint8Array or URL) path, optional fsPromises.StatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.stat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.StatOptions := none) : Async fs.Stats := do
+@[macro_inline] def fsPromises.stat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.StatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.fsPromises.stat" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.stat", module := "node:fs/promises", path := "stat", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fsPromises.statfs(path[, options])` (added in Node.js v19.6.0, v18.15.0): `Promise<fs.StatFs> statfs((DOMString or Uint8Array or URL) path, optional fsPromises.StatfsOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.statfs (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.StatfsOptions := none) : Async fs.StatFs := do
+@[macro_inline] def fsPromises.statfs (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.StatfsOptions := none) : Async fs.StatFs := Internal.api "Lasm.JS.Node.fsPromises.statfs" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.statfs", module := "node:fs/promises", path := "statfs", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fsPromises.symlink(target, path[, type])` (added in Node.js v10.0.0): `Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.symlink (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : Async Unit :=
+@[macro_inline] def fsPromises.symlink (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.symlink" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.symlink", module := "node:fs/promises", path := "symlink", construct := false, arity := 3 }
-    (Support.args #[toJS target, toJS path_, Support.optional type])
+    (Internal.args #[toJS target, toJS path_, Internal.optional type])
 
 /-- `fsPromises.truncate(path[, len])` (added in Node.js v10.0.0): `Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.truncate (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : Async Unit :=
+@[macro_inline] def fsPromises.truncate (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.truncate" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.truncate", module := "node:fs/promises", path := "truncate", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional len])
+    (Internal.args #[toJS path_, Internal.optional len])
 
 /-- `fsPromises.unlink(path)` (added in Node.js v10.0.0): `Promise<undefined> unlink((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.unlink (path_ : DOMStringOrUint8ArrayOrURL) : Async Unit :=
+@[macro_inline] def fsPromises.unlink (path_ : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.unlink" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.unlink", module := "node:fs/promises", path := "unlink", construct := false, arity := 1 }
-    (Support.args #[toJS path_])
+    (Internal.args #[toJS path_])
 
 /-- `fsPromises.utimes(path, atime, mtime)` (added in Node.js v10.0.0): `Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.utimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
+@[macro_inline] def fsPromises.utimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.utimes" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.utimes", module := "node:fs/promises", path := "utimes", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS atime, toJS mtime])
+    (Internal.args #[toJS path_, toJS atime, toJS mtime])
 
 /-- `fsPromises.watch(filename[, options])` (added in Node.js v15.9.0, v14.18.0): `object watch((DOMString or Uint8Array or URL) filename, optional (DOMString or fsPromises.WatchOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.watch (filename : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrWatchOptions := none) : IO Data :=
+@[macro_inline] def fsPromises.watch (filename : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrWatchOptions := none) : IO Data := Internal.api "Lasm.JS.Node.fsPromises.watch" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fsPromises.watch", module := "node:fs/promises", path := "watch", construct := false, arity := 2 }
-    (Support.args #[toJS filename, Support.optional options]) (await := false)
+    (Internal.args #[toJS filename, Internal.optional options]) (await := false)
 
 /-- `fsPromises.writeFile(file, data[, options])` (added in Node.js v10.0.0): `Promise<undefined> writeFile((DOMString or Uint8Array or URL or FileHandle) file, (DOMString or Uint8Array or object) data, optional (fsPromises.WriteFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fsPromises.writeFile (file : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.WriteFileOptionsOrDOMString := none) : Async Unit :=
+@[macro_inline] def fsPromises.writeFile (file : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.WriteFileOptionsOrDOMString := none) : Async Unit := Internal.api "Lasm.JS.Node.fsPromises.writeFile" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.writeFile", module := "node:fs/promises", path := "writeFile", construct := false, arity := 3 }
-    (Support.args #[toJS file, toJS data, Support.optional options])
+    (Internal.args #[toJS file, toJS data, Internal.optional options])
 
 /-- `fs.access(path[, mode], callback)` (added in Node.js v0.11.15): `Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.access (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "access" (Support.args #[toJS path_, Support.optional mode])
+@[macro_inline] def fs.access (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.access" do
+  Support.promisified Unit "node:fs" "access" (Internal.args #[toJS path_, Internal.optional mode])
 
 /-- `fs.appendFile(path, data[, options], callback)` (added in Node.js v0.6.7): `Promise<undefined> appendFile((DOMString or Uint8Array or URL or double) path, (DOMString or Uint8Array) data, optional (fs.AppendFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.appendFile (path_ : DOMStringOrUint8ArrayOrURLOrDouble) (data : DOMStringOrUint8Array) (options : Option fs.AppendFileOptionsOrDOMString := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "appendFile" (Support.args #[toJS path_, toJS data, Support.optional options])
+@[macro_inline] def fs.appendFile (path_ : DOMStringOrUint8ArrayOrURLOrDouble) (data : DOMStringOrUint8Array) (options : Option fs.AppendFileOptionsOrDOMString := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.appendFile" do
+  Support.promisified Unit "node:fs" "appendFile" (Internal.args #[toJS path_, toJS data, Internal.optional options])
 
 /-- `fs.chmod(path, mode, callback)` (added in Node.js v0.1.30): `Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.chmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : Async Unit :=
-  Support.promisified Unit "node:fs" "chmod" (Support.args #[toJS path_, toJS mode])
+@[macro_inline] def fs.chmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : Async Unit := Internal.api "Lasm.JS.Node.fs.chmod" do
+  Support.promisified Unit "node:fs" "chmod" (Internal.args #[toJS path_, toJS mode])
 
 /-- `fs.chown(path, uid, gid, callback)` (added in Node.js v0.1.97): `Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.chown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "chown" (Support.args #[toJS path_, toJS uid, toJS gid])
+@[macro_inline] def fs.chown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.chown" do
+  Support.promisified Unit "node:fs" "chown" (Internal.args #[toJS path_, toJS uid, toJS gid])
 
 /-- `fs.close(fd[, callback])` (added in Node.js v0.0.2): `undefined close(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.close (fd : Int) : IO Unit :=
+@[macro_inline] def fs.close (fd : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.close" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.close", module := "node:fs", path := "close", construct := false, arity := 1 }
-    (Support.args #[toJS fd]) (await := false)
+    (Internal.args #[toJS fd]) (await := false)
 
 /-- `fs.copyFile(src, dest[, mode], callback)` (added in Node.js v8.5.0): `Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.copyFile (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "copyFile" (Support.args #[toJS src, toJS dest, Support.optional mode])
+@[macro_inline] def fs.copyFile (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.copyFile" do
+  Support.promisified Unit "node:fs" "copyFile" (Internal.args #[toJS src, toJS dest, Internal.optional mode])
 
 /-- `fs.cp(src, dest[, options], callback)` (added in Node.js v16.7.0): `Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional fs.CpOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.cp (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fs.CpOptions := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "cp" (Support.args #[toJS src, toJS dest, Support.optional options])
+@[macro_inline] def fs.cp (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fs.CpOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.cp" do
+  Support.promisified Unit "node:fs" "cp" (Internal.args #[toJS src, toJS dest, Internal.optional options])
 
 /-- `fs.createReadStream(path[, options])` (added in Node.js v0.1.31): `fs.ReadStream createReadStream((DOMString or Uint8Array or URL) path, optional (DOMString or fs.CreateReadStreamOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.createReadStream (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrCreateReadStreamOptions := none) : IO fs.ReadStream := do
+@[macro_inline] def fs.createReadStream (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrCreateReadStreamOptions := none) : IO fs.ReadStream := Internal.api "Lasm.JS.Node.fs.createReadStream" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.createReadStream", module := "node:fs", path := "createReadStream", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.createWriteStream(path[, options])` (added in Node.js v0.1.31): `fs.WriteStream createWriteStream((DOMString or Uint8Array or URL) path, optional (DOMString or fs.CreateWriteStreamOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.createWriteStream (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrCreateWriteStreamOptions := none) : IO fs.WriteStream := do
+@[macro_inline] def fs.createWriteStream (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrCreateWriteStreamOptions := none) : IO fs.WriteStream := Internal.api "Lasm.JS.Node.fs.createWriteStream" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.createWriteStream", module := "node:fs", path := "createWriteStream", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `fs.exists(path, callback)` (added in Node.js v0.0.2): `undefined exists((DOMString or Uint8Array or URL) path, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.«exists» (path_ : DOMStringOrUint8ArrayOrURL) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.«exists» (path_ : DOMStringOrUint8ArrayOrURL) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.exists" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.exists", module := "node:fs", path := "exists", construct := false, arity := 2 }
-    (Support.args #[toJS path_, toJS callback]) (await := false)
+    (Internal.args #[toJS path_, toJS callback]) (await := false)
 
 /-- `fs.fchmod(fd, mode, callback)` (added in Node.js v0.4.7): `Promise<undefined> fchmod(long long fd, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fchmod (fd : Int) (mode : DOMStringOrLongLong) : Async Unit :=
-  Support.promisified Unit "node:fs" "fchmod" (Support.args #[toJS fd, toJS mode])
+@[macro_inline] def fs.fchmod (fd : Int) (mode : DOMStringOrLongLong) : Async Unit := Internal.api "Lasm.JS.Node.fs.fchmod" do
+  Support.promisified Unit "node:fs" "fchmod" (Internal.args #[toJS fd, toJS mode])
 
 /-- `fs.fchown(fd, uid, gid, callback)` (added in Node.js v0.4.7): `Promise<undefined> fchown(long long fd, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fchown (fd : Int) (uid : Int) (gid : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "fchown" (Support.args #[toJS fd, toJS uid, toJS gid])
+@[macro_inline] def fs.fchown (fd : Int) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.fchown" do
+  Support.promisified Unit "node:fs" "fchown" (Internal.args #[toJS fd, toJS uid, toJS gid])
 
 /-- `fs.fdatasync(fd, callback)` (added in Node.js v0.1.96): `Promise<undefined> fdatasync(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fdatasync (fd : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "fdatasync" (Support.args #[toJS fd])
+@[macro_inline] def fs.fdatasync (fd : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.fdatasync" do
+  Support.promisified Unit "node:fs" "fdatasync" (Internal.args #[toJS fd])
 
 /-- `fs.fstat(fd[, options], callback)` (added in Node.js v0.1.95): `Promise<fs.Stats> fstat(long long fd, optional fs.FstatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fstat (fd : Int) (options : Option fs.FstatOptions := none) : Async fs.Stats := do
-  let r ← Support.promisified Value "node:fs" "fstat" (Support.args #[toJS fd, Support.optional options])
+@[macro_inline] def fs.fstat (fd : Int) (options : Option fs.FstatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.fs.fstat" do
+  let r ← Support.promisified Value "node:fs" "fstat" (Internal.args #[toJS fd, Internal.optional options])
   pure { val := r }
 
 /-- `fs.fsync(fd, callback)` (added in Node.js v0.1.96): `Promise<undefined> fsync(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fsync (fd : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "fsync" (Support.args #[toJS fd])
+@[macro_inline] def fs.fsync (fd : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.fsync" do
+  Support.promisified Unit "node:fs" "fsync" (Internal.args #[toJS fd])
 
 /-- `fs.ftruncate(fd[, len], callback)` (added in Node.js v0.8.6): `Promise<undefined> ftruncate(long long fd, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.ftruncate (fd : Int) (len : Option Int := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "ftruncate" (Support.args #[toJS fd, Support.optional len])
+@[macro_inline] def fs.ftruncate (fd : Int) (len : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.ftruncate" do
+  Support.promisified Unit "node:fs" "ftruncate" (Internal.args #[toJS fd, Internal.optional len])
 
 /-- `fs.futimes(fd, atime, mtime, callback)` (added in Node.js v0.4.2): `Promise<undefined> futimes(long long fd, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.futimes (fd : Int) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
-  Support.promisified Unit "node:fs" "futimes" (Support.args #[toJS fd, toJS atime, toJS mtime])
+@[macro_inline] def fs.futimes (fd : Int) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.fs.futimes" do
+  Support.promisified Unit "node:fs" "futimes" (Internal.args #[toJS fd, toJS atime, toJS mtime])
 
 /-- `fs.glob(pattern[, options], callback)` (added in Node.js v22.0.0): `Promise<undefined> glob((DOMString or sequence<DOMString>) pattern, optional fs.GlobOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.GlobOptions := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "glob" (Support.args #[toJS pattern, Support.optional options])
+@[macro_inline] def fs.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.GlobOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.glob" do
+  Support.promisified Unit "node:fs" "glob" (Internal.args #[toJS pattern, Internal.optional options])
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `fs.lchmod(path, mode, callback)` (added in Node.js v0.5.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "lchmod" (Support.args #[toJS path_, toJS mode])
+@[macro_inline] def fs.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.lchmod" do
+  Support.promisified Unit "node:fs" "lchmod" (Internal.args #[toJS path_, toJS mode])
 
 /-- `fs.lchown(path, uid, gid, callback)`: `Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lchown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
-  Support.promisified Unit "node:fs" "lchown" (Support.args #[toJS path_, toJS uid, toJS gid])
+@[macro_inline] def fs.lchown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit := Internal.api "Lasm.JS.Node.fs.lchown" do
+  Support.promisified Unit "node:fs" "lchown" (Internal.args #[toJS path_, toJS uid, toJS gid])
 
 /-- `fs.lutimes(path, atime, mtime, callback)` (added in Node.js v14.5.0, v12.19.0): `Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lutimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
-  Support.promisified Unit "node:fs" "lutimes" (Support.args #[toJS path_, toJS atime, toJS mtime])
+@[macro_inline] def fs.lutimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.fs.lutimes" do
+  Support.promisified Unit "node:fs" "lutimes" (Internal.args #[toJS path_, toJS atime, toJS mtime])
 
 /-- `fs.link(existingPath, newPath, callback)` (added in Node.js v0.1.31): `Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.link (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
-  Support.promisified Unit "node:fs" "link" (Support.args #[toJS existingPath, toJS newPath])
+@[macro_inline] def fs.link (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fs.link" do
+  Support.promisified Unit "node:fs" "link" (Internal.args #[toJS existingPath, toJS newPath])
 
 /-- `fs.lstat(path[, options], callback)` (added in Node.js v0.1.30): `Promise<fs.Stats> lstat((DOMString or Uint8Array or URL) path, optional fs.LstatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lstat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.LstatOptions := none) : Async fs.Stats := do
-  let r ← Support.promisified Value "node:fs" "lstat" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.lstat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.LstatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.fs.lstat" do
+  let r ← Support.promisified Value "node:fs" "lstat" (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fs.mkdir(path[, options], callback)` (added in Node.js v0.1.8): `Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (fs.MkdirOptions or long long) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.mkdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.MkdirOptionsOrLongLong := none) : Async (Option String) :=
-  Support.promisified (Option String) "node:fs" "mkdir" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.mkdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.MkdirOptionsOrLongLong := none) : Async (Option String) := Internal.api "Lasm.JS.Node.fs.mkdir" do
+  Support.promisified (Option String) "node:fs" "mkdir" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.mkdtemp(prefix[, options], callback)` (added in Node.js v5.10.0): `Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or fs.MkdtempOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.mkdtemp («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempOptions := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "mkdtemp" (Support.args #[toJS «prefix», Support.optional options])
+@[macro_inline] def fs.mkdtemp («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.mkdtemp" do
+  Support.promisified DOMStringOrUint8Array "node:fs" "mkdtemp" (Internal.args #[toJS «prefix», Internal.optional options])
 
 /-- `fs.open(path[, flags[, mode]], callback)` (added in Node.js v0.0.2): `Promise<long long> open((DOMString or Uint8Array or URL) path, optional (DOMString or double) flags, optional (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.«open» (path_ : DOMStringOrUint8ArrayOrURL) (flags : Option DOMStringOrDouble := none) (mode : Option DOMStringOrLongLong := none) : Async Int :=
-  Support.promisified Int "node:fs" "open" (Support.args #[toJS path_, Support.optional flags, Support.optional mode])
+@[macro_inline] def fs.«open» (path_ : DOMStringOrUint8ArrayOrURL) (flags : Option DOMStringOrDouble := none) (mode : Option DOMStringOrLongLong := none) : Async Int := Internal.api "Lasm.JS.Node.fs.open" do
+  Support.promisified Int "node:fs" "open" (Internal.args #[toJS path_, Internal.optional flags, Internal.optional mode])
 
 /-- `fs.openAsBlob(path[, options])` (added in Node.js v19.8.0): `Promise<Blob> openAsBlob((DOMString or Uint8Array or URL) path, optional fs.OpenAsBlobOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.openAsBlob (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpenAsBlobOptions := none) : Async Blob := do
+@[macro_inline] def fs.openAsBlob (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpenAsBlobOptions := none) : Async Blob := Internal.api "Lasm.JS.Node.fs.openAsBlob" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fs.openAsBlob", module := "node:fs", path := "openAsBlob", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options])
+    (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fs.opendir(path[, options], callback)` (added in Node.js v12.12.0): `Promise<fs.Dir> opendir((DOMString or Uint8Array or URL) path, optional fs.OpendirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.opendir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpendirOptions := none) : Async fs.Dir := do
-  let r ← Support.promisified Value "node:fs" "opendir" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.opendir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpendirOptions := none) : Async fs.Dir := Internal.api "Lasm.JS.Node.fs.opendir" do
+  let r ← Support.promisified Value "node:fs" "opendir" (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fs.read(fd, buffer, offset, length, position, callback)` (added in Node.js v0.0.2): `undefined read(long long fd, Uint8Array buffer, long long offset, long long length, (long long or bigint)? position, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.read (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.read (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.read" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.read", module := "node:fs", path := "read", construct := false, arity := 6 }
-    (Support.args #[toJS fd, toJS buffer_, toJS offset, toJS length, toJS position, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS offset, toJS length, toJS position, toJS callback]) (await := false)
 
 /-- `fs.read(fd[, options], callback)` (added in Node.js v13.11.0, v12.17.0): `undefined read(long long fd, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readWithCallback (fd : Int) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readWithCallback (fd : Int) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readWithCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readWithCallback", module := "node:fs", path := "read", construct := false, arity := 2 }
-    (Support.args #[toJS fd, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS callback]) (await := false)
 
 /-- `fs.read(fd[, options], callback)` (added in Node.js v13.11.0, v12.17.0): `undefined read(long long fd, fs.ReadOptions options, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readWithOptions (fd : Int) (options : fs.ReadOptions) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readWithOptions (fd : Int) (options : fs.ReadOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readWithOptions" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readWithOptions", module := "node:fs", path := "read", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS options, toJS callback]) (await := false)
 
 /-- `fs.read(fd, buffer[, options], callback)` (added in Node.js v18.2.0, v16.17.0): `undefined read(long long fd, Uint8Array buffer, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readWithFdBufferCallback (fd : Int) (buffer_ : ByteArray) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readWithFdBufferCallback (fd : Int) (buffer_ : ByteArray) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readWithFdBufferCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readWithFdBufferCallback", module := "node:fs", path := "read", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffer_, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS callback]) (await := false)
 
 /-- `fs.read(fd, buffer[, options], callback)` (added in Node.js v18.2.0, v16.17.0): `undefined read(long long fd, Uint8Array buffer, fs.ReadOptions2 options, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readWithFdBufferOptionsCallback (fd : Int) (buffer_ : ByteArray) (options : fs.ReadOptions2) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readWithFdBufferOptionsCallback (fd : Int) (buffer_ : ByteArray) (options : fs.ReadOptions2) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readWithFdBufferOptionsCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readWithFdBufferOptionsCallback", module := "node:fs", path := "read", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS buffer_, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS options, toJS callback]) (await := false)
 
 /-- `fs.readdir(path[, options], callback)` (added in Node.js v0.1.8): `Promise<(sequence<DOMString> or sequence<Uint8Array> or sequence<fs.Dirent>)> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or fs.ReaddirOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReaddirOptions := none) : Async Data :=
-  Support.promisified Data "node:fs" "readdir" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.readdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReaddirOptions := none) : Async Data := Internal.api "Lasm.JS.Node.fs.readdir" do
+  Support.promisified Data "node:fs" "readdir" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.readFile(path[, options], callback)` (added in Node.js v0.1.29): `Promise<(DOMString or Uint8Array)> readFile((DOMString or Uint8Array or URL or long long) path, optional (fs.ReadFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readFile (path_ : DOMStringOrUint8ArrayOrURLOrLongLong) (options : Option fs.ReadFileOptionsOrDOMString := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "readFile" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.readFile (path_ : DOMStringOrUint8ArrayOrURLOrLongLong) (options : Option fs.ReadFileOptionsOrDOMString := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.readFile" do
+  Support.promisified DOMStringOrUint8Array "node:fs" "readFile" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.readlink(path[, options], callback)` (added in Node.js v0.1.31): `Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or fs.ReadlinkOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readlink (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReadlinkOptions := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "readlink" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.readlink (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReadlinkOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.readlink" do
+  Support.promisified DOMStringOrUint8Array "node:fs" "readlink" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.readv(fd, buffers[, position], callback)` (added in Node.js v13.13.0, v12.17.0): `undefined readv(long long fd, sequence<Uint8Array> buffers, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readv (fd : Int) (buffers : Array ByteArray) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readv (fd : Int) (buffers : Array ByteArray) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readv" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readv", module := "node:fs", path := "readv", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffers, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, toJS callback]) (await := false)
 
 /-- `fs.readv(fd, buffers[, position], callback)` (added in Node.js v13.13.0, v12.17.0): `undefined readv(long long fd, sequence<Uint8Array> buffers, long long? position, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readvWithPosition (fd : Int) (buffers : Array ByteArray) (position : Option Int) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.readvWithPosition (fd : Int) (buffers : Array ByteArray) (position : Option Int) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.readvWithPosition" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.readvWithPosition", module := "node:fs", path := "readv", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS buffers, toJS position, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, toJS position, toJS callback]) (await := false)
 
 /-- `fs.realpath(path[, options], callback)` (added in Node.js v0.1.31): `Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or fs.RealpathOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.realpath (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrRealpathOptions := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "realpath" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.realpath (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrRealpathOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.realpath" do
+  Support.promisified DOMStringOrUint8Array "node:fs" "realpath" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.rename(oldPath, newPath, callback)` (added in Node.js v0.0.2): `Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.rename (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
-  Support.promisified Unit "node:fs" "rename" (Support.args #[toJS oldPath, toJS newPath])
+@[macro_inline] def fs.rename (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fs.rename" do
+  Support.promisified Unit "node:fs" "rename" (Internal.args #[toJS oldPath, toJS newPath])
 
 /-- `fs.rmdir(path[, options], callback)` (added in Node.js v0.0.2): `Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional fs.RmdirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.rmdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmdirOptions := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "rmdir" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.rmdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmdirOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.rmdir" do
+  Support.promisified Unit "node:fs" "rmdir" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.rm(path[, options], callback)` (added in Node.js v14.14.0): `Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional fs.RmOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.rm (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmOptions := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "rm" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.rm (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.rm" do
+  Support.promisified Unit "node:fs" "rm" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.stat(path[, options], callback)` (added in Node.js v0.0.2): `Promise<fs.Stats> stat((DOMString or Uint8Array or URL) path, optional fs.StatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.stat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatOptions := none) : Async fs.Stats := do
-  let r ← Support.promisified Value "node:fs" "stat" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.stat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatOptions := none) : Async fs.Stats := Internal.api "Lasm.JS.Node.fs.stat" do
+  let r ← Support.promisified Value "node:fs" "stat" (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fs.statfs(path[, options], callback)` (added in Node.js v19.6.0, v18.15.0): `Promise<fs.StatFs> statfs((DOMString or Uint8Array or URL) path, optional fs.StatfsOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.statfs (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatfsOptions := none) : Async fs.StatFs := do
-  let r ← Support.promisified Value "node:fs" "statfs" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.statfs (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatfsOptions := none) : Async fs.StatFs := Internal.api "Lasm.JS.Node.fs.statfs" do
+  let r ← Support.promisified Value "node:fs" "statfs" (Internal.args #[toJS path_, Internal.optional options])
   pure { val := r }
 
 /-- `fs.symlink(target, path[, type], callback)` (added in Node.js v0.1.31): `Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.symlink (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "symlink" (Support.args #[toJS target, toJS path_, Support.optional type])
+@[macro_inline] def fs.symlink (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.symlink" do
+  Support.promisified Unit "node:fs" "symlink" (Internal.args #[toJS target, toJS path_, Internal.optional type])
 
 /-- `fs.truncate(path[, len], callback)` (added in Node.js v0.8.6): `Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.truncate (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "truncate" (Support.args #[toJS path_, Support.optional len])
+@[macro_inline] def fs.truncate (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.truncate" do
+  Support.promisified Unit "node:fs" "truncate" (Internal.args #[toJS path_, Internal.optional len])
 
 /-- `fs.unlink(path, callback)` (added in Node.js v0.0.2): `Promise<undefined> unlink((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.unlink (path_ : DOMStringOrUint8ArrayOrURL) : Async Unit :=
-  Support.promisified Unit "node:fs" "unlink" (Support.args #[toJS path_])
+@[macro_inline] def fs.unlink (path_ : DOMStringOrUint8ArrayOrURL) : Async Unit := Internal.api "Lasm.JS.Node.fs.unlink" do
+  Support.promisified Unit "node:fs" "unlink" (Internal.args #[toJS path_])
 
 /-- `fs.unwatchFile(filename[, listener])` (added in Node.js v0.1.31): `undefined unwatchFile((DOMString or Uint8Array or URL) filename, optional Function listener)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.unwatchFile (filename : DOMStringOrUint8ArrayOrURL) (listener : Option JSFunction := none) : IO Unit :=
+@[macro_inline] def fs.unwatchFile (filename : DOMStringOrUint8ArrayOrURL) (listener : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.unwatchFile" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.unwatchFile", module := "node:fs", path := "unwatchFile", construct := false, arity := 2 }
-    (Support.args #[toJS filename, Support.optional listener]) (await := false)
+    (Internal.args #[toJS filename, Internal.optional listener]) (await := false)
 
 /-- `fs.utimes(path, atime, mtime, callback)` (added in Node.js v0.4.2): `Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.utimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
-  Support.promisified Unit "node:fs" "utimes" (Support.args #[toJS path_, toJS atime, toJS mtime])
+@[macro_inline] def fs.utimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit := Internal.api "Lasm.JS.Node.fs.utimes" do
+  Support.promisified Unit "node:fs" "utimes" (Internal.args #[toJS path_, toJS atime, toJS mtime])
 
 /-- `fs.watch(filename[, options][, listener])` (added in Node.js v0.5.10): `fs.FSWatcher watch((DOMString or Uint8Array or URL) filename, optional (DOMString or fs.WatchOptions) options, optional Function listener)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.watch (filename : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrWatchOptions := none) (listener : Option JSFunction := none) : IO fs.FSWatcher := do
+@[macro_inline] def fs.watch (filename : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrWatchOptions := none) (listener : Option JSFunction := none) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.watch" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.watch", module := "node:fs", path := "watch", construct := false, arity := 3 }
-    (Support.args #[toJS filename, Support.optional options, Support.optional listener]) (await := false)
+    (Internal.args #[toJS filename, Internal.optional options, Internal.optional listener]) (await := false)
   pure { val := r }
 
 /-- `fs.watchFile(filename[, options], listener)` (added in Node.js v0.1.31): `fs.StatWatcher watchFile((DOMString or Uint8Array or URL) filename, Function listener)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.watchFile (filename : DOMStringOrUint8ArrayOrURL) (listener : JSFunction) : IO fs.StatWatcher := do
+@[macro_inline] def fs.watchFile (filename : DOMStringOrUint8ArrayOrURL) (listener : JSFunction) : IO fs.StatWatcher := Internal.api "Lasm.JS.Node.fs.watchFile" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.watchFile", module := "node:fs", path := "watchFile", construct := false, arity := 2 }
-    (Support.args #[toJS filename, toJS listener]) (await := false)
+    (Internal.args #[toJS filename, toJS listener]) (await := false)
   pure { val := r }
 
 /-- `fs.watchFile(filename[, options], listener)` (added in Node.js v0.1.31): `fs.StatWatcher watchFile((DOMString or Uint8Array or URL) filename, fs.WatchFileOptions options, Function listener)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.watchFileWithOptions (filename : DOMStringOrUint8ArrayOrURL) (options : fs.WatchFileOptions) (listener : JSFunction) : IO fs.StatWatcher := do
+@[macro_inline] def fs.watchFileWithOptions (filename : DOMStringOrUint8ArrayOrURL) (options : fs.WatchFileOptions) (listener : JSFunction) : IO fs.StatWatcher := Internal.api "Lasm.JS.Node.fs.watchFileWithOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.watchFileWithOptions", module := "node:fs", path := "watchFile", construct := false, arity := 3 }
-    (Support.args #[toJS filename, toJS options, toJS listener]) (await := false)
+    (Internal.args #[toJS filename, toJS options, toJS listener]) (await := false)
   pure { val := r }
 
 /-- `fs.write(fd, buffer, offset[, length[, position]], callback)` (added in Node.js v0.0.2): `undefined write(long long fd, Uint8Array buffer, long long offset, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.write (fd : Int) (buffer_ : ByteArray) (offset : Int) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.write (fd : Int) (buffer_ : ByteArray) (offset : Int) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.write" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.write", module := "node:fs", path := "write", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS buffer_, toJS offset, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS offset, toJS callback]) (await := false)
 
 /-- `fs.write(fd, buffer, offset[, length[, position]], callback)` (added in Node.js v0.0.2): `undefined write(long long fd, Uint8Array buffer, long long offset, long long length, long long? position, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeWithLength (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option Int) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writeWithLength (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option Int) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writeWithLength" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writeWithLength", module := "node:fs", path := "write", construct := false, arity := 6 }
-    (Support.args #[toJS fd, toJS buffer_, toJS offset, toJS length, toJS position, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS offset, toJS length, toJS position, toJS callback]) (await := false)
 
 /-- `fs.write(fd, buffer[, options], callback)` (added in Node.js v18.3.0, v16.17.0): `undefined write(long long fd, Uint8Array buffer, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeWithCallback (fd : Int) (buffer_ : ByteArray) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writeWithCallback (fd : Int) (buffer_ : ByteArray) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writeWithCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writeWithCallback", module := "node:fs", path := "write", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffer_, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS callback]) (await := false)
 
 /-- `fs.write(fd, buffer[, options], callback)` (added in Node.js v18.3.0, v16.17.0): `undefined write(long long fd, Uint8Array buffer, fs.WriteOptions options, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeWithOptions (fd : Int) (buffer_ : ByteArray) (options : fs.WriteOptions) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writeWithOptions (fd : Int) (buffer_ : ByteArray) (options : fs.WriteOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writeWithOptions" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writeWithOptions", module := "node:fs", path := "write", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS buffer_, toJS options, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS options, toJS callback]) (await := false)
 
 /-- `fs.write(fd, string[, position[, encoding]], callback)` (added in Node.js v0.11.5): `undefined write(long long fd, DOMString string, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeWithString (fd : Int) (string : String) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writeWithString (fd : Int) (string : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writeWithString" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writeWithString", module := "node:fs", path := "write", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS string, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS string, toJS callback]) (await := false)
 
 /-- `fs.write(fd, string[, position[, encoding]], callback)` (added in Node.js v0.11.5): `undefined write(long long fd, DOMString string, long long? position, DOMString encoding, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeWithFdStringPositionEncodingCallback (fd : Int) (string : String) (position : Option Int) (encoding : String) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writeWithFdStringPositionEncodingCallback (fd : Int) (string : String) (position : Option Int) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writeWithFdStringPositionEncodingCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writeWithFdStringPositionEncodingCallback", module := "node:fs", path := "write", construct := false, arity := 5 }
-    (Support.args #[toJS fd, toJS string, toJS position, toJS encoding, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS string, toJS position, toJS encoding, toJS callback]) (await := false)
 
 /-- `fs.writeFile(file, data[, options], callback)` (added in Node.js v0.1.29): `Promise<undefined> writeFile((DOMString or Uint8Array or URL or long long) file, (DOMString or Uint8Array) data, optional (fs.WriteFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeFile (file : DOMStringOrUint8ArrayOrURLOrLongLong) (data : DOMStringOrUint8Array) (options : Option fs.WriteFileOptionsOrDOMString := none) : Async Unit :=
-  Support.promisified Unit "node:fs" "writeFile" (Support.args #[toJS file, toJS data, Support.optional options])
+@[macro_inline] def fs.writeFile (file : DOMStringOrUint8ArrayOrURLOrLongLong) (data : DOMStringOrUint8Array) (options : Option fs.WriteFileOptionsOrDOMString := none) : Async Unit := Internal.api "Lasm.JS.Node.fs.writeFile" do
+  Support.promisified Unit "node:fs" "writeFile" (Internal.args #[toJS file, toJS data, Internal.optional options])
 
 /-- `fs.writev(fd, buffers[, position], callback)` (added in Node.js v12.9.0): `undefined writev(long long fd, sequence<Uint8Array> buffers, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writev (fd : Int) (buffers : Array ByteArray) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writev (fd : Int) (buffers : Array ByteArray) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writev" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writev", module := "node:fs", path := "writev", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffers, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, toJS callback]) (await := false)
 
 /-- `fs.writev(fd, buffers[, position], callback)` (added in Node.js v12.9.0): `undefined writev(long long fd, sequence<Uint8Array> buffers, long long? position, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writevWithPosition (fd : Int) (buffers : Array ByteArray) (position : Option Int) (callback : JSFunction) : IO Unit :=
+@[macro_inline] def fs.writevWithPosition (fd : Int) (buffers : Array ByteArray) (position : Option Int) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.fs.writevWithPosition" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.writevWithPosition", module := "node:fs", path := "writev", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS buffers, toJS position, toJS callback]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, toJS position, toJS callback]) (await := false)
 
 /-- `fs.accessSync(path[, mode])` (added in Node.js v0.11.15): `undefined accessSync((DOMString or Uint8Array or URL) path, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.accessSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : IO Unit :=
+@[macro_inline] def fs.accessSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.accessSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.accessSync", module := "node:fs", path := "accessSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional mode]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional mode]) (await := false)
 
 /-- `fs.appendFileSync(path, data[, options])` (added in Node.js v0.6.7): `undefined appendFileSync((DOMString or Uint8Array or URL or double) path, (DOMString or Uint8Array) data, optional (fs.AppendFileSyncOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.appendFileSync (path_ : DOMStringOrUint8ArrayOrURLOrDouble) (data : DOMStringOrUint8Array) (options : Option fs.AppendFileSyncOptionsOrDOMString := none) : IO Unit :=
+@[macro_inline] def fs.appendFileSync (path_ : DOMStringOrUint8ArrayOrURLOrDouble) (data : DOMStringOrUint8Array) (options : Option fs.AppendFileSyncOptionsOrDOMString := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.appendFileSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.appendFileSync", module := "node:fs", path := "appendFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, toJS data, Internal.optional options]) (await := false)
 
 /-- `fs.chmodSync(path, mode)` (added in Node.js v0.6.7): `undefined chmodSync((DOMString or Uint8Array or URL) path, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.chmodSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : IO Unit :=
+@[macro_inline] def fs.chmodSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : IO Unit := Internal.api "Lasm.JS.Node.fs.chmodSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.chmodSync", module := "node:fs", path := "chmodSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, toJS mode]) (await := false)
+    (Internal.args #[toJS path_, toJS mode]) (await := false)
 
 /-- `fs.chownSync(path, uid, gid)` (added in Node.js v0.1.97): `undefined chownSync((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.chownSync (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : IO Unit :=
+@[macro_inline] def fs.chownSync (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.chownSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.chownSync", module := "node:fs", path := "chownSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS uid, toJS gid]) (await := false)
+    (Internal.args #[toJS path_, toJS uid, toJS gid]) (await := false)
 
 /-- `fs.closeSync(fd)` (added in Node.js v0.1.21): `undefined closeSync(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.closeSync (fd : Int) : IO Unit :=
+@[macro_inline] def fs.closeSync (fd : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.closeSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.closeSync", module := "node:fs", path := "closeSync", construct := false, arity := 1 }
-    (Support.args #[toJS fd]) (await := false)
+    (Internal.args #[toJS fd]) (await := false)
 
 /-- `fs.copyFileSync(src, dest[, mode])` (added in Node.js v8.5.0): `undefined copyFileSync((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.copyFileSync (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : IO Unit :=
+@[macro_inline] def fs.copyFileSync (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.copyFileSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.copyFileSync", module := "node:fs", path := "copyFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS src, toJS dest, Support.optional mode]) (await := false)
+    (Internal.args #[toJS src, toJS dest, Internal.optional mode]) (await := false)
 
 /-- `fs.cpSync(src, dest[, options])` (added in Node.js v16.7.0): `undefined cpSync((DOMString or URL) src, (DOMString or URL) dest, optional fs.CpSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.cpSync (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fs.CpSyncOptions := none) : IO Unit :=
+@[macro_inline] def fs.cpSync (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fs.CpSyncOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.cpSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.cpSync", module := "node:fs", path := "cpSync", construct := false, arity := 3 }
-    (Support.args #[toJS src, toJS dest, Support.optional options]) (await := false)
+    (Internal.args #[toJS src, toJS dest, Internal.optional options]) (await := false)
 
 /-- `fs.existsSync(path)` (added in Node.js v0.1.21): `boolean existsSync((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.existsSync (path_ : DOMStringOrUint8ArrayOrURL) : IO Bool :=
+@[macro_inline] def fs.existsSync (path_ : DOMStringOrUint8ArrayOrURL) : IO Bool := Internal.api "Lasm.JS.Node.fs.existsSync" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.fs.existsSync", module := "node:fs", path := "existsSync", construct := false, arity := 1 }
-    (Support.args #[toJS path_]) (await := false)
+    (Internal.args #[toJS path_]) (await := false)
 
 /-- `fs.fchmodSync(fd, mode)` (added in Node.js v0.4.7): `undefined fchmodSync(long long fd, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fchmodSync (fd : Int) (mode : DOMStringOrLongLong) : IO Unit :=
+@[macro_inline] def fs.fchmodSync (fd : Int) (mode : DOMStringOrLongLong) : IO Unit := Internal.api "Lasm.JS.Node.fs.fchmodSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.fchmodSync", module := "node:fs", path := "fchmodSync", construct := false, arity := 2 }
-    (Support.args #[toJS fd, toJS mode]) (await := false)
+    (Internal.args #[toJS fd, toJS mode]) (await := false)
 
 /-- `fs.fchownSync(fd, uid, gid)` (added in Node.js v0.4.7): `undefined fchownSync(long long fd, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fchownSync (fd : Int) (uid : Int) (gid : Int) : IO Unit :=
+@[macro_inline] def fs.fchownSync (fd : Int) (uid : Int) (gid : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.fchownSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.fchownSync", module := "node:fs", path := "fchownSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS uid, toJS gid]) (await := false)
+    (Internal.args #[toJS fd, toJS uid, toJS gid]) (await := false)
 
 /-- `fs.fdatasyncSync(fd)` (added in Node.js v0.1.96): `undefined fdatasyncSync(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fdatasyncSync (fd : Int) : IO Unit :=
+@[macro_inline] def fs.fdatasyncSync (fd : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.fdatasyncSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.fdatasyncSync", module := "node:fs", path := "fdatasyncSync", construct := false, arity := 1 }
-    (Support.args #[toJS fd]) (await := false)
+    (Internal.args #[toJS fd]) (await := false)
 
 /-- `fs.fstatSync(fd[, options])` (added in Node.js v0.1.95): `fs.Stats fstatSync(long long fd, optional fs.FstatSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fstatSync (fd : Int) (options : Option fs.FstatSyncOptions := none) : IO fs.Stats := do
+@[macro_inline] def fs.fstatSync (fd : Int) (options : Option fs.FstatSyncOptions := none) : IO fs.Stats := Internal.api "Lasm.JS.Node.fs.fstatSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.fstatSync", module := "node:fs", path := "fstatSync", construct := false, arity := 2 }
-    (Support.args #[toJS fd, Support.optional options]) (await := false)
+    (Internal.args #[toJS fd, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.fsyncSync(fd)` (added in Node.js v0.1.96): `undefined fsyncSync(long long fd)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.fsyncSync (fd : Int) : IO Unit :=
+@[macro_inline] def fs.fsyncSync (fd : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.fsyncSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.fsyncSync", module := "node:fs", path := "fsyncSync", construct := false, arity := 1 }
-    (Support.args #[toJS fd]) (await := false)
+    (Internal.args #[toJS fd]) (await := false)
 
 /-- `fs.ftruncateSync(fd[, len])` (added in Node.js v0.8.6): `undefined ftruncateSync(long long fd, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.ftruncateSync (fd : Int) (len : Option Int := none) : IO Unit :=
+@[macro_inline] def fs.ftruncateSync (fd : Int) (len : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.ftruncateSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.ftruncateSync", module := "node:fs", path := "ftruncateSync", construct := false, arity := 2 }
-    (Support.args #[toJS fd, Support.optional len]) (await := false)
+    (Internal.args #[toJS fd, Internal.optional len]) (await := false)
 
 /-- `fs.futimesSync(fd, atime, mtime)` (added in Node.js v0.4.2): `undefined futimesSync(long long fd, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.futimesSync (fd : Int) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Unit :=
+@[macro_inline] def fs.futimesSync (fd : Int) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Unit := Internal.api "Lasm.JS.Node.fs.futimesSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.futimesSync", module := "node:fs", path := "futimesSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS atime, toJS mtime]) (await := false)
+    (Internal.args #[toJS fd, toJS atime, toJS mtime]) (await := false)
 
 /-- `fs.globSync(pattern[, options])` (added in Node.js v22.0.0): `sequence<DOMString> globSync((DOMString or sequence<DOMString>) pattern, optional fs.GlobSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.globSync (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.GlobSyncOptions := none) : IO (Array String) :=
+@[macro_inline] def fs.globSync (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.GlobSyncOptions := none) : IO (Array String) := Internal.api "Lasm.JS.Node.fs.globSync" do
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.fs.globSync", module := "node:fs", path := "globSync", construct := false, arity := 2 }
-    (Support.args #[toJS pattern, Support.optional options]) (await := false)
+    (Internal.args #[toJS pattern, Internal.optional options]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `fs.lchmodSync(path, mode)` (added in Node.js v0.5.0): `undefined lchmodSync((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lchmodSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : IO Unit :=
+@[macro_inline] def fs.lchmodSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.lchmodSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.lchmodSync", module := "node:fs", path := "lchmodSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, toJS mode]) (await := false)
+    (Internal.args #[toJS path_, toJS mode]) (await := false)
 
 /-- `fs.lchownSync(path, uid, gid)`: `undefined lchownSync((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lchownSync (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : IO Unit :=
+@[macro_inline] def fs.lchownSync (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : IO Unit := Internal.api "Lasm.JS.Node.fs.lchownSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.lchownSync", module := "node:fs", path := "lchownSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS uid, toJS gid]) (await := false)
+    (Internal.args #[toJS path_, toJS uid, toJS gid]) (await := false)
 
 /-- `fs.lutimesSync(path, atime, mtime)` (added in Node.js v14.5.0, v12.19.0): `undefined lutimesSync((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lutimesSync (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Unit :=
+@[macro_inline] def fs.lutimesSync (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Unit := Internal.api "Lasm.JS.Node.fs.lutimesSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.lutimesSync", module := "node:fs", path := "lutimesSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS atime, toJS mtime]) (await := false)
+    (Internal.args #[toJS path_, toJS atime, toJS mtime]) (await := false)
 
 /-- `fs.linkSync(existingPath, newPath)` (added in Node.js v0.1.31): `undefined linkSync((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.linkSync (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : IO Unit :=
+@[macro_inline] def fs.linkSync (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : IO Unit := Internal.api "Lasm.JS.Node.fs.linkSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.linkSync", module := "node:fs", path := "linkSync", construct := false, arity := 2 }
-    (Support.args #[toJS existingPath, toJS newPath]) (await := false)
+    (Internal.args #[toJS existingPath, toJS newPath]) (await := false)
 
 /-- `fs.lstatSync(path[, options])` (added in Node.js v0.1.30): `fs.Stats lstatSync((DOMString or Uint8Array or URL) path, optional fs.LstatSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.lstatSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.LstatSyncOptions := none) : IO fs.Stats := do
+@[macro_inline] def fs.lstatSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.LstatSyncOptions := none) : IO fs.Stats := Internal.api "Lasm.JS.Node.fs.lstatSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.lstatSync", module := "node:fs", path := "lstatSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.mkdirSync(path[, options])` (added in Node.js v0.1.21): `DOMString? mkdirSync((DOMString or Uint8Array or URL) path, optional (fs.MkdirSyncOptions or long long) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.mkdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.MkdirSyncOptionsOrLongLong := none) : IO (Option String) :=
+@[macro_inline] def fs.mkdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.MkdirSyncOptionsOrLongLong := none) : IO (Option String) := Internal.api "Lasm.JS.Node.fs.mkdirSync" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Node.fs.mkdirSync", module := "node:fs", path := "mkdirSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.mkdtempSync(prefix[, options])` (added in Node.js v5.10.0): `(DOMString or Uint8Array) mkdtempSync((DOMString or Uint8Array or URL) prefix, optional (DOMString or fs.MkdtempSyncOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.mkdtempSync («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempSyncOptions := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def fs.mkdtempSync («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempSyncOptions := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.mkdtempSync" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.mkdtempSync", module := "node:fs", path := "mkdtempSync", construct := false, arity := 2 }
-    (Support.args #[toJS «prefix», Support.optional options]) (await := false)
+    (Internal.args #[toJS «prefix», Internal.optional options]) (await := false)
 
 /-- `fs.mkdtempDisposableSync(prefix[, options])` (added in Node.js v24.4.0): `object mkdtempDisposableSync((DOMString or Uint8Array or URL) prefix, optional (DOMString or fs.MkdtempDisposableSyncOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.mkdtempDisposableSync («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempDisposableSyncOptions := none) : IO Data :=
+@[macro_inline] def fs.mkdtempDisposableSync («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrMkdtempDisposableSyncOptions := none) : IO Data := Internal.api "Lasm.JS.Node.fs.mkdtempDisposableSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fs.mkdtempDisposableSync", module := "node:fs", path := "mkdtempDisposableSync", construct := false, arity := 2 }
-    (Support.args #[toJS «prefix», Support.optional options]) (await := false)
+    (Internal.args #[toJS «prefix», Internal.optional options]) (await := false)
 
 /-- `fs.opendirSync(path[, options])` (added in Node.js v12.12.0): `fs.Dir opendirSync((DOMString or Uint8Array or URL) path, optional fs.OpendirSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.opendirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpendirSyncOptions := none) : IO fs.Dir := do
+@[macro_inline] def fs.opendirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpendirSyncOptions := none) : IO fs.Dir := Internal.api "Lasm.JS.Node.fs.opendirSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.opendirSync", module := "node:fs", path := "opendirSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.openSync(path[, flags[, mode]])` (added in Node.js v0.1.21): `double openSync((DOMString or Uint8Array or URL) path, optional (DOMString or double) flags, optional (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.openSync (path_ : DOMStringOrUint8ArrayOrURL) (flags : Option DOMStringOrDouble := none) (mode : Option DOMStringOrLongLong := none) : IO Float :=
+@[macro_inline] def fs.openSync (path_ : DOMStringOrUint8ArrayOrURL) (flags : Option DOMStringOrDouble := none) (mode : Option DOMStringOrLongLong := none) : IO Float := Internal.api "Lasm.JS.Node.fs.openSync" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.openSync", module := "node:fs", path := "openSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, Support.optional flags, Support.optional mode]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional flags, Internal.optional mode]) (await := false)
 
 /-- `fs.readdirSync(path[, options])` (added in Node.js v0.1.21): `(sequence<DOMString> or sequence<Uint8Array> or sequence<fs.Dirent>) readdirSync((DOMString or Uint8Array or URL) path, optional (DOMString or fs.ReaddirSyncOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReaddirSyncOptions := none) : IO Data :=
+@[macro_inline] def fs.readdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReaddirSyncOptions := none) : IO Data := Internal.api "Lasm.JS.Node.fs.readdirSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fs.readdirSync", module := "node:fs", path := "readdirSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.readFileSync(path[, options])` (added in Node.js v0.1.8): `(DOMString or Uint8Array) readFileSync((DOMString or Uint8Array or URL or long long) path, optional (fs.ReadFileSyncOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readFileSync (path_ : DOMStringOrUint8ArrayOrURLOrLongLong) (options : Option fs.ReadFileSyncOptionsOrDOMString := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def fs.readFileSync (path_ : DOMStringOrUint8ArrayOrURLOrLongLong) (options : Option fs.ReadFileSyncOptionsOrDOMString := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.readFileSync" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.readFileSync", module := "node:fs", path := "readFileSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.readlinkSync(path[, options])` (added in Node.js v0.1.31): `(DOMString or Uint8Array) readlinkSync((DOMString or Uint8Array or URL) path, optional (DOMString or fs.ReadlinkSyncOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readlinkSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReadlinkSyncOptions := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def fs.readlinkSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrReadlinkSyncOptions := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.readlinkSync" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.readlinkSync", module := "node:fs", path := "readlinkSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.readSync(fd, buffer, offset, length[, position])` (added in Node.js v0.1.21): `double readSync(long long fd, Uint8Array buffer, long long offset, long long length, optional (long long or bigint) position)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readSync (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint := none) : IO Float :=
+@[macro_inline] def fs.readSync (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint := none) : IO Float := Internal.api "Lasm.JS.Node.fs.readSync" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.readSync", module := "node:fs", path := "readSync", construct := false, arity := 5 }
-    (Support.args #[toJS fd, toJS buffer_, toJS offset, toJS length, Support.optional position]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS offset, toJS length, Internal.optional position]) (await := false)
 
 /-- `fs.readSync(fd, buffer[, options])` (added in Node.js v13.13.0, v12.17.0): `double readSync(long long fd, Uint8Array buffer, optional fs.ReadSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readSyncWithOptions (fd : Int) (buffer_ : ByteArray) (options : Option fs.ReadSyncOptions := none) : IO Float :=
+@[macro_inline] def fs.readSyncWithOptions (fd : Int) (buffer_ : ByteArray) (options : Option fs.ReadSyncOptions := none) : IO Float := Internal.api "Lasm.JS.Node.fs.readSyncWithOptions" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.readSyncWithOptions", module := "node:fs", path := "readSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffer_, Support.optional options]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, Internal.optional options]) (await := false)
 
 /-- `fs.readvSync(fd, buffers[, position])` (added in Node.js v13.13.0, v12.17.0): `double readvSync(long long fd, sequence<Uint8Array> buffers, optional long long position)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.readvSync (fd : Int) (buffers : Array ByteArray) (position : Option Int := none) : IO Float :=
+@[macro_inline] def fs.readvSync (fd : Int) (buffers : Array ByteArray) (position : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.fs.readvSync" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.readvSync", module := "node:fs", path := "readvSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffers, Support.optional position]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, Internal.optional position]) (await := false)
 
 /-- `fs.realpathSync(path[, options])` (added in Node.js v0.1.31): `(DOMString or Uint8Array) realpathSync((DOMString or Uint8Array or URL) path, optional (DOMString or fs.RealpathSyncOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.realpathSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrRealpathSyncOptions := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def fs.realpathSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.DOMStringOrRealpathSyncOptions := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.realpathSync" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.realpathSync", module := "node:fs", path := "realpathSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.renameSync(oldPath, newPath)` (added in Node.js v0.1.21): `undefined renameSync((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.renameSync (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : IO Unit :=
+@[macro_inline] def fs.renameSync (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : IO Unit := Internal.api "Lasm.JS.Node.fs.renameSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.renameSync", module := "node:fs", path := "renameSync", construct := false, arity := 2 }
-    (Support.args #[toJS oldPath, toJS newPath]) (await := false)
+    (Internal.args #[toJS oldPath, toJS newPath]) (await := false)
 
 /-- `fs.rmdirSync(path[, options])` (added in Node.js v0.1.21): `undefined rmdirSync((DOMString or Uint8Array or URL) path, optional fs.RmdirSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.rmdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmdirSyncOptions := none) : IO Unit :=
+@[macro_inline] def fs.rmdirSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmdirSyncOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.rmdirSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.rmdirSync", module := "node:fs", path := "rmdirSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.rmSync(path[, options])` (added in Node.js v14.14.0): `undefined rmSync((DOMString or Uint8Array or URL) path, optional fs.RmSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.rmSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmSyncOptions := none) : IO Unit :=
+@[macro_inline] def fs.rmSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.RmSyncOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.rmSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.rmSync", module := "node:fs", path := "rmSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- `fs.statSync(path[, options])` (added in Node.js v0.1.21): `fs.Stats statSync((DOMString or Uint8Array or URL) path, optional fs.StatSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.statSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatSyncOptions := none) : IO fs.Stats := do
+@[macro_inline] def fs.statSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatSyncOptions := none) : IO fs.Stats := Internal.api "Lasm.JS.Node.fs.statSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.statSync", module := "node:fs", path := "statSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.statfsSync(path[, options])` (added in Node.js v19.6.0, v18.15.0): `fs.StatFs statfsSync((DOMString or Uint8Array or URL) path, optional fs.StatfsSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.statfsSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatfsSyncOptions := none) : IO fs.StatFs := do
+@[macro_inline] def fs.statfsSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.StatfsSyncOptions := none) : IO fs.StatFs := Internal.api "Lasm.JS.Node.fs.statfsSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.statfsSync", module := "node:fs", path := "statfsSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.symlinkSync(target, path[, type])` (added in Node.js v0.1.31): `any symlinkSync((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.symlinkSync (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : IO Data :=
+@[macro_inline] def fs.symlinkSync (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : IO Data := Internal.api "Lasm.JS.Node.fs.symlinkSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fs.symlinkSync", module := "node:fs", path := "symlinkSync", construct := false, arity := 3 }
-    (Support.args #[toJS target, toJS path_, Support.optional type]) (await := false)
+    (Internal.args #[toJS target, toJS path_, Internal.optional type]) (await := false)
 
 /-- `fs.truncateSync(path[, len])` (added in Node.js v0.8.6): `undefined truncateSync((DOMString or Uint8Array or URL) path, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.truncateSync (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : IO Unit :=
+@[macro_inline] def fs.truncateSync (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : IO Unit := Internal.api "Lasm.JS.Node.fs.truncateSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.truncateSync", module := "node:fs", path := "truncateSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional len]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional len]) (await := false)
 
 /-- `fs.unlinkSync(path)` (added in Node.js v0.1.21): `undefined unlinkSync((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.unlinkSync (path_ : DOMStringOrUint8ArrayOrURL) : IO Unit :=
+@[macro_inline] def fs.unlinkSync (path_ : DOMStringOrUint8ArrayOrURL) : IO Unit := Internal.api "Lasm.JS.Node.fs.unlinkSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.unlinkSync", module := "node:fs", path := "unlinkSync", construct := false, arity := 1 }
-    (Support.args #[toJS path_]) (await := false)
+    (Internal.args #[toJS path_]) (await := false)
 
 /-- `fs.utimesSync(path, atime, mtime)` (added in Node.js v0.4.2): `any utimesSync((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.utimesSync (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Data :=
+@[macro_inline] def fs.utimesSync (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : IO Data := Internal.api "Lasm.JS.Node.fs.utimesSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fs.utimesSync", module := "node:fs", path := "utimesSync", construct := false, arity := 3 }
-    (Support.args #[toJS path_, toJS atime, toJS mtime]) (await := false)
+    (Internal.args #[toJS path_, toJS atime, toJS mtime]) (await := false)
 
 /-- `fs.writeFileSync(file, data[, options])` (added in Node.js v0.1.29): `any writeFileSync((DOMString or Uint8Array or URL or long long) file, (DOMString or Uint8Array) data, optional (fs.WriteFileSyncOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeFileSync (file : DOMStringOrUint8ArrayOrURLOrLongLong) (data : DOMStringOrUint8Array) (options : Option fs.WriteFileSyncOptionsOrDOMString := none) : IO Data :=
+@[macro_inline] def fs.writeFileSync (file : DOMStringOrUint8ArrayOrURLOrLongLong) (data : DOMStringOrUint8Array) (options : Option fs.WriteFileSyncOptionsOrDOMString := none) : IO Data := Internal.api "Lasm.JS.Node.fs.writeFileSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fs.writeFileSync", module := "node:fs", path := "writeFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS file, toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS file, toJS data, Internal.optional options]) (await := false)
 
 /-- `fs.writeSync(fd, buffer, offset[, length[, position]])` (added in Node.js v0.1.21): `double writeSync(long long fd, Uint8Array buffer, long long offset, optional long long length, optional long long position)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeSync (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Option Int := none) (position : Option Int := none) : IO Float :=
+@[macro_inline] def fs.writeSync (fd : Int) (buffer_ : ByteArray) (offset : Int) (length : Option Int := none) (position : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.fs.writeSync" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.writeSync", module := "node:fs", path := "writeSync", construct := false, arity := 5 }
-    (Support.args #[toJS fd, toJS buffer_, toJS offset, Support.optional length, Support.optional position]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, toJS offset, Internal.optional length, Internal.optional position]) (await := false)
 
 /-- `fs.writeSync(fd, buffer[, options])` (added in Node.js v18.3.0, v16.17.0): `double writeSync(long long fd, Uint8Array buffer, optional fs.WriteSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeSyncWithOptions (fd : Int) (buffer_ : ByteArray) (options : Option fs.WriteSyncOptions := none) : IO Float :=
+@[macro_inline] def fs.writeSyncWithOptions (fd : Int) (buffer_ : ByteArray) (options : Option fs.WriteSyncOptions := none) : IO Float := Internal.api "Lasm.JS.Node.fs.writeSyncWithOptions" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.writeSyncWithOptions", module := "node:fs", path := "writeSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffer_, Support.optional options]) (await := false)
+    (Internal.args #[toJS fd, toJS buffer_, Internal.optional options]) (await := false)
 
 /-- `fs.writeSync(fd, string[, position[, encoding]])` (added in Node.js v0.11.5): `double writeSync(long long fd, DOMString string, optional long long position, optional DOMString encoding)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writeSyncWithString (fd : Int) (string : String) (position : Option Int := none) (encoding : Option String := none) : IO Float :=
+@[macro_inline] def fs.writeSyncWithString (fd : Int) (string : String) (position : Option Int := none) (encoding : Option String := none) : IO Float := Internal.api "Lasm.JS.Node.fs.writeSyncWithString" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.writeSyncWithString", module := "node:fs", path := "writeSync", construct := false, arity := 4 }
-    (Support.args #[toJS fd, toJS string, Support.optional position, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS fd, toJS string, Internal.optional position, Internal.optional encoding]) (await := false)
 
 /-- `fs.writevSync(fd, buffers[, position])` (added in Node.js v12.9.0): `double writevSync(long long fd, sequence<Uint8Array> buffers, optional long long position)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.writevSync (fd : Int) (buffers : Array ByteArray) (position : Option Int := none) : IO Float :=
+@[macro_inline] def fs.writevSync (fd : Int) (buffers : Array ByteArray) (position : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.fs.writevSync" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.writevSync", module := "node:fs", path := "writevSync", construct := false, arity := 3 }
-    (Support.args #[toJS fd, toJS buffers, Support.optional position]) (await := false)
+    (Internal.args #[toJS fd, toJS buffers, Internal.optional position]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `fs.openAsBlobSync(path[, options])` (added in Node.js v26.10.0): `Blob openAsBlobSync((DOMString or Uint8Array or URL) path, optional fs.OpenAsBlobSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.openAsBlobSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpenAsBlobSyncOptions := none) : IO Blob := do
+@[macro_inline] def fs.openAsBlobSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpenAsBlobSyncOptions := none) : IO Blob := Internal.api "Lasm.JS.Node.fs.openAsBlobSync" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.openAsBlobSync", module := "node:fs", path := "openAsBlobSync", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `fs.realpath.native(path[, options], callback)` (added in Node.js v9.2.0): `Promise<(DOMString or Uint8Array)> native((DOMString or Uint8Array or URL) path, optional (DOMString or fs.realpath.NativeOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.realpath.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpath.DOMStringOrNativeOptions := none) : Async DOMStringOrUint8Array :=
-  Support.promisified DOMStringOrUint8Array "node:fs" "realpath.native" (Support.args #[toJS path_, Support.optional options])
+@[macro_inline] def fs.realpath.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpath.DOMStringOrNativeOptions := none) : Async DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.realpath.native" do
+  Support.promisified DOMStringOrUint8Array "node:fs" "realpath.native" (Internal.args #[toJS path_, Internal.optional options])
 
 /-- `fs.realpathSync.native(path[, options])` (added in Node.js v9.2.0): `(DOMString or Uint8Array) native((DOMString or Uint8Array or URL) path, optional (DOMString or fs.realpathSync.NativeOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
-def fs.realpathSync.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpathSync.DOMStringOrNativeOptions := none) : IO DOMStringOrUint8Array :=
+@[macro_inline] def fs.realpathSync.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpathSync.DOMStringOrNativeOptions := none) : IO DOMStringOrUint8Array := Internal.api "Lasm.JS.Node.fs.realpathSync.native" do
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.fs.realpathSync.native", module := "node:fs", path := "realpathSync.native", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 end Lasm.JS.Node

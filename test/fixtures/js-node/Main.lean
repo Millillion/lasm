@@ -17,7 +17,13 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 lines for generated members a runtime lacks, and `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer

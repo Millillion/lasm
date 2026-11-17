@@ -8,13 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class InterfaceConstructor extends EventEmitter` of `node:readline` (Node.js 24.22.2 documentation, readline.md): a handle to the JavaScript object. -/
 structure InterfaceConstructor extends EventEmitter
@@ -181,22 +184,22 @@ structure InterfaceConstructor.WriteKey where
   shift : Option Bool := none
   /-- `DOMString name` -/
   name : Option String := none
-instance instToJSInterfaceConstructorWriteKey : ToJS InterfaceConstructor.WriteKey := ⟨fun d => Support.fields #[("ctrl", Support.optional d.ctrl),
-    ("meta", Support.optional d.«meta»),
-    ("shift", Support.optional d.shift),
-    ("name", Support.optional d.name)]⟩
+instance instToJSInterfaceConstructorWriteKey : ToJS InterfaceConstructor.WriteKey := ⟨fun d => Internal.fields #[("ctrl", Internal.optional d.ctrl),
+    ("meta", Internal.optional d.«meta»),
+    ("shift", Internal.optional d.shift),
+    ("name", Internal.optional d.name)]⟩
 
 /-- `dictionary readlinePromises.Interface.QuestionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure readlinePromises.Interface.QuestionOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSReadlinePromisesInterfaceQuestionOptions : ToJS readlinePromises.Interface.QuestionOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSReadlinePromisesInterfaceQuestionOptions : ToJS readlinePromises.Interface.QuestionOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary readline.Interface.QuestionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure readline.Interface.QuestionOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSReadlineInterfaceQuestionOptions : ToJS readline.Interface.QuestionOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSReadlineInterfaceQuestionOptions : ToJS readline.Interface.QuestionOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary readline.CreateInterfaceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure readline.CreateInterfaceOptions where
@@ -224,18 +227,18 @@ structure readline.CreateInterfaceOptions where
   tabSize : Option Int := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSReadlineCreateInterfaceOptions : ToJS readline.CreateInterfaceOptions := ⟨fun d => Support.fields #[("input", Support.optional d.input),
-    ("output", Support.optional d.output),
-    ("completer", Support.optional d.completer),
-    ("terminal", Support.optional d.terminal),
-    ("history", Support.optional d.history),
-    ("historySize", Support.optional d.historySize),
-    ("removeHistoryDuplicates", Support.optional d.removeHistoryDuplicates),
-    ("prompt", Support.optional d.prompt),
-    ("crlfDelay", Support.optional d.crlfDelay),
-    ("escapeCodeTimeout", Support.optional d.escapeCodeTimeout),
-    ("tabSize", Support.optional d.tabSize),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSReadlineCreateInterfaceOptions : ToJS readline.CreateInterfaceOptions := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("output", Internal.optional d.output),
+    ("completer", Internal.optional d.completer),
+    ("terminal", Internal.optional d.terminal),
+    ("history", Internal.optional d.history),
+    ("historySize", Internal.optional d.historySize),
+    ("removeHistoryDuplicates", Internal.optional d.removeHistoryDuplicates),
+    ("prompt", Internal.optional d.prompt),
+    ("crlfDelay", Internal.optional d.crlfDelay),
+    ("escapeCodeTimeout", Internal.optional d.escapeCodeTimeout),
+    ("tabSize", Internal.optional d.tabSize),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary readlinePromises.CreateInterfaceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure readlinePromises.CreateInterfaceOptions where
@@ -263,234 +266,236 @@ structure readlinePromises.CreateInterfaceOptions where
   tabSize : Option Int := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSReadlinePromisesCreateInterfaceOptions : ToJS readlinePromises.CreateInterfaceOptions := ⟨fun d => Support.fields #[("input", Support.optional d.input),
-    ("output", Support.optional d.output),
-    ("completer", Support.optional d.completer),
-    ("terminal", Support.optional d.terminal),
-    ("history", Support.optional d.history),
-    ("historySize", Support.optional d.historySize),
-    ("removeHistoryDuplicates", Support.optional d.removeHistoryDuplicates),
-    ("prompt", Support.optional d.prompt),
-    ("crlfDelay", Support.optional d.crlfDelay),
-    ("escapeCodeTimeout", Support.optional d.escapeCodeTimeout),
-    ("tabSize", Support.optional d.tabSize),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSReadlinePromisesCreateInterfaceOptions : ToJS readlinePromises.CreateInterfaceOptions := ⟨fun d => Internal.fields #[("input", Internal.optional d.input),
+    ("output", Internal.optional d.output),
+    ("completer", Internal.optional d.completer),
+    ("terminal", Internal.optional d.terminal),
+    ("history", Internal.optional d.history),
+    ("historySize", Internal.optional d.historySize),
+    ("removeHistoryDuplicates", Internal.optional d.removeHistoryDuplicates),
+    ("prompt", Internal.optional d.prompt),
+    ("crlfDelay", Internal.optional d.crlfDelay),
+    ("escapeCodeTimeout", Internal.optional d.escapeCodeTimeout),
+    ("tabSize", Internal.optional d.tabSize),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof InterfaceConstructor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InterfaceConstructor`). -/
-def InterfaceConstructor.cast? (v : Value) : IO (Option InterfaceConstructor) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline" ["InterfaceConstructor"] Value) v) then some { val := v } else none
+@[macro_inline] def InterfaceConstructor.cast? (v : Value) : IO (Option InterfaceConstructor) := Internal.api "Lasm.JS.Node.InterfaceConstructor.cast?" do
+  Internal.cast (Support.getExport "node:readline" ["InterfaceConstructor"] Value) (fun x => { val := x }) v
 
 /-- `rl.line` (added in Node.js v0.1.98): `readonly attribute DOMString line` -/
-def InterfaceConstructor.line (self : InterfaceConstructor) : IO String := self.val.get "line" String
+@[macro_inline] def InterfaceConstructor.line (self : InterfaceConstructor) : IO String := Internal.api "Lasm.JS.Node.InterfaceConstructor.line" do
+  self.val.get "line" String
 
 /-- `rl.cursor` (added in Node.js v0.1.98): `readonly attribute double? cursor` -/
-def InterfaceConstructor.cursor (self : InterfaceConstructor) : IO (Option Float) := self.val.get "cursor" (Option Float)
+@[macro_inline] def InterfaceConstructor.cursor (self : InterfaceConstructor) : IO (Option Float) := Internal.api "Lasm.JS.Node.InterfaceConstructor.cursor" do
+  self.val.get "cursor" (Option Float)
 
 /-- `Event: 'close'` (added in Node.js v0.1.98): `InterfaceConstructor onClose(InterfaceConstructor.CloseListener listener)`: calls `on("close", listener)` -/
-def InterfaceConstructor.onClose (self : InterfaceConstructor) (listener : InterfaceConstructor.CloseListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onClose (self : InterfaceConstructor) (listener : InterfaceConstructor.CloseListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.1.98): `InterfaceConstructor onceClose(InterfaceConstructor.CloseListener listener)`: calls `once("close", listener)` -/
-def InterfaceConstructor.onceClose (self : InterfaceConstructor) (listener : InterfaceConstructor.CloseListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceClose (self : InterfaceConstructor) (listener : InterfaceConstructor.CloseListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v16.0.0): `InterfaceConstructor onError(InterfaceConstructor.ErrorListener listener)`: calls `on("error", listener)` -/
-def InterfaceConstructor.onError (self : InterfaceConstructor) (listener : InterfaceConstructor.ErrorListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onError (self : InterfaceConstructor) (listener : InterfaceConstructor.ErrorListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v16.0.0): `InterfaceConstructor onceError(InterfaceConstructor.ErrorListener listener)`: calls `once("error", listener)` -/
-def InterfaceConstructor.onceError (self : InterfaceConstructor) (listener : InterfaceConstructor.ErrorListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceError (self : InterfaceConstructor) (listener : InterfaceConstructor.ErrorListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'line'` (added in Node.js v0.1.98): `InterfaceConstructor onLine(InterfaceConstructor.LineListener listener)`: calls `on("line", listener)` -/
-def InterfaceConstructor.onLine (self : InterfaceConstructor) (listener : InterfaceConstructor.LineListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "line", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onLine (self : InterfaceConstructor) (listener : InterfaceConstructor.LineListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onLine" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "line", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'line'` (added in Node.js v0.1.98): `InterfaceConstructor onceLine(InterfaceConstructor.LineListener listener)`: calls `once("line", listener)` -/
-def InterfaceConstructor.onceLine (self : InterfaceConstructor) (listener : InterfaceConstructor.LineListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "line", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceLine (self : InterfaceConstructor) (listener : InterfaceConstructor.LineListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceLine" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "line", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'history'` (added in Node.js v15.8.0, v14.18.0): `InterfaceConstructor onHistory(InterfaceConstructor.HistoryListener listener)`: calls `on("history", listener)` -/
-def InterfaceConstructor.onHistory (self : InterfaceConstructor) (listener : InterfaceConstructor.HistoryListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "history", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onHistory (self : InterfaceConstructor) (listener : InterfaceConstructor.HistoryListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onHistory" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "history", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'history'` (added in Node.js v15.8.0, v14.18.0): `InterfaceConstructor onceHistory(InterfaceConstructor.HistoryListener listener)`: calls `once("history", listener)` -/
-def InterfaceConstructor.onceHistory (self : InterfaceConstructor) (listener : InterfaceConstructor.HistoryListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "history", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceHistory (self : InterfaceConstructor) (listener : InterfaceConstructor.HistoryListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceHistory" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "history", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pause'` (added in Node.js v0.7.5): `InterfaceConstructor onPause(InterfaceConstructor.PauseListener listener)`: calls `on("pause", listener)` -/
-def InterfaceConstructor.onPause (self : InterfaceConstructor) (listener : InterfaceConstructor.PauseListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "pause", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onPause (self : InterfaceConstructor) (listener : InterfaceConstructor.PauseListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onPause" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "pause", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'pause'` (added in Node.js v0.7.5): `InterfaceConstructor oncePause(InterfaceConstructor.PauseListener listener)`: calls `once("pause", listener)` -/
-def InterfaceConstructor.oncePause (self : InterfaceConstructor) (listener : InterfaceConstructor.PauseListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "pause", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.oncePause (self : InterfaceConstructor) (listener : InterfaceConstructor.PauseListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.oncePause" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "pause", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resume'` (added in Node.js v0.7.5): `InterfaceConstructor onResume(InterfaceConstructor.ResumeListener listener)`: calls `on("resume", listener)` -/
-def InterfaceConstructor.onResume (self : InterfaceConstructor) (listener : InterfaceConstructor.ResumeListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "resume", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onResume (self : InterfaceConstructor) (listener : InterfaceConstructor.ResumeListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onResume" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "resume", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resume'` (added in Node.js v0.7.5): `InterfaceConstructor onceResume(InterfaceConstructor.ResumeListener listener)`: calls `once("resume", listener)` -/
-def InterfaceConstructor.onceResume (self : InterfaceConstructor) (listener : InterfaceConstructor.ResumeListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "resume", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceResume (self : InterfaceConstructor) (listener : InterfaceConstructor.ResumeListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceResume" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "resume", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGCONT'` (added in Node.js v0.7.5): `InterfaceConstructor onSIGCONT(InterfaceConstructor.SIGCONTListener listener)`: calls `on("SIGCONT", listener)` -/
-def InterfaceConstructor.onSIGCONT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGCONTListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "SIGCONT", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onSIGCONT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGCONTListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onSIGCONT" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "SIGCONT", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGCONT'` (added in Node.js v0.7.5): `InterfaceConstructor onceSIGCONT(InterfaceConstructor.SIGCONTListener listener)`: calls `once("SIGCONT", listener)` -/
-def InterfaceConstructor.onceSIGCONT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGCONTListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "SIGCONT", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceSIGCONT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGCONTListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceSIGCONT" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "SIGCONT", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGINT'` (added in Node.js v0.3.0): `InterfaceConstructor onSIGINT(InterfaceConstructor.SIGINTListener listener)`: calls `on("SIGINT", listener)` -/
-def InterfaceConstructor.onSIGINT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGINTListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "SIGINT", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onSIGINT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGINTListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onSIGINT" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "SIGINT", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGINT'` (added in Node.js v0.3.0): `InterfaceConstructor onceSIGINT(InterfaceConstructor.SIGINTListener listener)`: calls `once("SIGINT", listener)` -/
-def InterfaceConstructor.onceSIGINT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGINTListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "SIGINT", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceSIGINT (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGINTListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceSIGINT" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "SIGINT", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGTSTP'` (added in Node.js v0.7.5): `InterfaceConstructor onSIGTSTP(InterfaceConstructor.SIGTSTPListener listener)`: calls `on("SIGTSTP", listener)` -/
-def InterfaceConstructor.onSIGTSTP (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGTSTPListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "SIGTSTP", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onSIGTSTP (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGTSTPListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onSIGTSTP" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "SIGTSTP", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'SIGTSTP'` (added in Node.js v0.7.5): `InterfaceConstructor onceSIGTSTP(InterfaceConstructor.SIGTSTPListener listener)`: calls `once("SIGTSTP", listener)` -/
-def InterfaceConstructor.onceSIGTSTP (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGTSTPListener) : IO InterfaceConstructor := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "SIGTSTP", toJS listener]) Value
+@[macro_inline] def InterfaceConstructor.onceSIGTSTP (self : InterfaceConstructor) (listener : InterfaceConstructor.SIGTSTPListener) : IO InterfaceConstructor := Internal.api "Lasm.JS.Node.InterfaceConstructor.onceSIGTSTP" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "SIGTSTP", toJS listener]) Value
   pure { val := r }
 
 /-- `rl.close()` (added in Node.js v0.1.98): `undefined close()` -/
-def InterfaceConstructor.close (self : InterfaceConstructor) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def InterfaceConstructor.close (self : InterfaceConstructor) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `rl.pause()` (added in Node.js v0.3.4): `undefined pause()` -/
-def InterfaceConstructor.pause (self : InterfaceConstructor) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def InterfaceConstructor.pause (self : InterfaceConstructor) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `rl.prompt([preserveCursor])` (added in Node.js v0.1.98): `undefined prompt(optional boolean preserveCursor)` -/
-def InterfaceConstructor.prompt (self : InterfaceConstructor) (preserveCursor : Option Bool := none) : IO Unit :=
-  self.val.callMethod "prompt" (Support.args #[Support.optional preserveCursor]) Unit
+@[macro_inline] def InterfaceConstructor.prompt (self : InterfaceConstructor) (preserveCursor : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.prompt" do
+  self.val.callMethod "prompt" (Internal.args #[Internal.optional preserveCursor]) Unit
 
 /-- `rl.resume()` (added in Node.js v0.3.4): `undefined resume()` -/
-def InterfaceConstructor.resume (self : InterfaceConstructor) : IO Unit :=
-  self.val.callMethod "resume" (Support.args #[]) Unit
+@[macro_inline] def InterfaceConstructor.resume (self : InterfaceConstructor) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.resume" do
+  self.val.callMethod "resume" (Internal.args #[]) Unit
 
 /-- `rl.setPrompt(prompt)` (added in Node.js v0.1.98): `undefined setPrompt(DOMString prompt)` -/
-def InterfaceConstructor.setPrompt (self : InterfaceConstructor) (prompt : String) : IO Unit :=
-  self.val.callMethod "setPrompt" (Support.args #[toJS prompt]) Unit
+@[macro_inline] def InterfaceConstructor.setPrompt (self : InterfaceConstructor) (prompt : String) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.setPrompt" do
+  self.val.callMethod "setPrompt" (Internal.args #[toJS prompt]) Unit
 
 /-- `rl.getPrompt()` (added in Node.js v15.3.0, v14.17.0): `DOMString getPrompt()` -/
-def InterfaceConstructor.getPrompt (self : InterfaceConstructor) : IO String :=
-  self.val.callMethod "getPrompt" (Support.args #[]) String
+@[macro_inline] def InterfaceConstructor.getPrompt (self : InterfaceConstructor) : IO String := Internal.api "Lasm.JS.Node.InterfaceConstructor.getPrompt" do
+  self.val.callMethod "getPrompt" (Internal.args #[]) String
 
 /-- `rl.write(data[, key])` (added in Node.js v0.1.98): `undefined write(DOMString data, optional InterfaceConstructor.WriteKey key)` -/
-def InterfaceConstructor.write (self : InterfaceConstructor) (data : String) (key : Option InterfaceConstructor.WriteKey := none) : IO Unit :=
-  self.val.callMethod "write" (Support.args #[toJS data, Support.optional key]) Unit
+@[macro_inline] def InterfaceConstructor.write (self : InterfaceConstructor) (data : String) (key : Option InterfaceConstructor.WriteKey := none) : IO Unit := Internal.api "Lasm.JS.Node.InterfaceConstructor.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data, Internal.optional key]) Unit
 
 /-- `rl.getCursorPos()` (added in Node.js v13.5.0, v12.16.0): `object getCursorPos()` -/
-def InterfaceConstructor.getCursorPos (self : InterfaceConstructor) : IO Data :=
-  self.val.callMethod "getCursorPos" (Support.args #[]) Data
+@[macro_inline] def InterfaceConstructor.getCursorPos (self : InterfaceConstructor) : IO Data := Internal.api "Lasm.JS.Node.InterfaceConstructor.getCursorPos" do
+  self.val.callMethod "getCursorPos" (Internal.args #[]) Data
 
 /-- `v instanceof Interface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Interface`). -/
-def readlinePromises.Interface.cast? (v : Value) : IO (Option readlinePromises.Interface) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline/promises" ["Interface"] Value) v) then some { val := v } else none
+@[macro_inline] def readlinePromises.Interface.cast? (v : Value) : IO (Option readlinePromises.Interface) := Internal.api "Lasm.JS.Node.readlinePromises.Interface.cast?" do
+  Internal.cast (Support.getExport "node:readline/promises" ["Interface"] Value) (fun x => { val := x }) v
 
 /-- `rl.question(query[, options])` (added in Node.js v17.0.0): `Promise<any> question(DOMString query, optional readlinePromises.Interface.QuestionOptions options)` -/
-def readlinePromises.Interface.question (self : readlinePromises.Interface) (query : String) (options : Option readlinePromises.Interface.QuestionOptions := none) : Async Data :=
-  self.val.callMethodAwait "question" (Support.args #[toJS query, Support.optional options]) Data
+@[macro_inline] def readlinePromises.Interface.question (self : readlinePromises.Interface) (query : String) (options : Option readlinePromises.Interface.QuestionOptions := none) : Async Data := Internal.api "Lasm.JS.Node.readlinePromises.Interface.question" do
+  self.val.callMethodAwait "question" (Internal.args #[toJS query, Internal.optional options]) Data
 
 /-- `v instanceof Readline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readline`). -/
-def readlinePromises.Readline.cast? (v : Value) : IO (Option readlinePromises.Readline) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline/promises" ["Readline"] Value) v) then some { val := v } else none
+@[macro_inline] def readlinePromises.Readline.cast? (v : Value) : IO (Option readlinePromises.Readline) := Internal.api "Lasm.JS.Node.readlinePromises.Readline.cast?" do
+  Internal.cast (Support.getExport "node:readline/promises" ["Readline"] Value) (fun x => { val := x }) v
 
 /-- `rl.clearLine(dir)` (added in Node.js v17.0.0): `any clearLine(long long dir)` -/
-def readlinePromises.Readline.clearLine (self : readlinePromises.Readline) (dir : Int) : IO Data :=
-  self.val.callMethod "clearLine" (Support.args #[toJS dir]) Data
+@[macro_inline] def readlinePromises.Readline.clearLine (self : readlinePromises.Readline) (dir : Int) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.clearLine" do
+  self.val.callMethod "clearLine" (Internal.args #[toJS dir]) Data
 
 /-- `rl.clearScreenDown()` (added in Node.js v17.0.0): `any clearScreenDown()` -/
-def readlinePromises.Readline.clearScreenDown (self : readlinePromises.Readline) : IO Data :=
-  self.val.callMethod "clearScreenDown" (Support.args #[]) Data
+@[macro_inline] def readlinePromises.Readline.clearScreenDown (self : readlinePromises.Readline) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.clearScreenDown" do
+  self.val.callMethod "clearScreenDown" (Internal.args #[]) Data
 
 /-- `rl.commit()` (added in Node.js v17.0.0): `Promise<any> commit()` -/
-def readlinePromises.Readline.commit (self : readlinePromises.Readline) : Async Data :=
-  self.val.callMethodAwait "commit" (Support.args #[]) Data
+@[macro_inline] def readlinePromises.Readline.commit (self : readlinePromises.Readline) : Async Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.commit" do
+  self.val.callMethodAwait "commit" (Internal.args #[]) Data
 
 /-- `rl.cursorTo(x[, y])` (added in Node.js v17.0.0): `any cursorTo(long long x, optional long long y)` -/
-def readlinePromises.Readline.cursorTo (self : readlinePromises.Readline) (x : Int) (y : Option Int := none) : IO Data :=
-  self.val.callMethod "cursorTo" (Support.args #[toJS x, Support.optional y]) Data
+@[macro_inline] def readlinePromises.Readline.cursorTo (self : readlinePromises.Readline) (x : Int) (y : Option Int := none) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.cursorTo" do
+  self.val.callMethod "cursorTo" (Internal.args #[toJS x, Internal.optional y]) Data
 
 /-- `rl.moveCursor(dx, dy)` (added in Node.js v17.0.0): `any moveCursor(long long dx, long long dy)` -/
-def readlinePromises.Readline.moveCursor (self : readlinePromises.Readline) (dx : Int) (dy : Int) : IO Data :=
-  self.val.callMethod "moveCursor" (Support.args #[toJS dx, toJS dy]) Data
+@[macro_inline] def readlinePromises.Readline.moveCursor (self : readlinePromises.Readline) (dx : Int) (dy : Int) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.moveCursor" do
+  self.val.callMethod "moveCursor" (Internal.args #[toJS dx, toJS dy]) Data
 
 /-- `rl.rollback()` (added in Node.js v17.0.0): `any rollback()` -/
-def readlinePromises.Readline.rollback (self : readlinePromises.Readline) : IO Data :=
-  self.val.callMethod "rollback" (Support.args #[]) Data
+@[macro_inline] def readlinePromises.Readline.rollback (self : readlinePromises.Readline) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.rollback" do
+  self.val.callMethod "rollback" (Internal.args #[]) Data
 
 /-- `v instanceof Interface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Interface`). -/
-def readline.Interface.cast? (v : Value) : IO (Option readline.Interface) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline" ["Interface"] Value) v) then some { val := v } else none
+@[macro_inline] def readline.Interface.cast? (v : Value) : IO (Option readline.Interface) := Internal.api "Lasm.JS.Node.readline.Interface.cast?" do
+  Internal.cast (Support.getExport "node:readline" ["Interface"] Value) (fun x => { val := x }) v
 
 /-- `rl.question(query[, options], callback)` (added in Node.js v0.3.3): `undefined question(DOMString query, Function callback)` -/
-def readline.Interface.question (self : readline.Interface) (query : String) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "question" (Support.args #[toJS query, toJS callback]) Unit
+@[macro_inline] def readline.Interface.question (self : readline.Interface) (query : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.readline.Interface.question" do
+  self.val.callMethod "question" (Internal.args #[toJS query, toJS callback]) Unit
 
 /-- `rl.question(query[, options], callback)` (added in Node.js v0.3.3): `undefined question(DOMString query, readline.Interface.QuestionOptions options, Function callback)` -/
-def readline.Interface.questionWithOptions (self : readline.Interface) (query : String) (options : readline.Interface.QuestionOptions) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "question" (Support.args #[toJS query, toJS options, toJS callback]) Unit
+@[macro_inline] def readline.Interface.questionWithOptions (self : readline.Interface) (query : String) (options : readline.Interface.QuestionOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.readline.Interface.questionWithOptions" do
+  self.val.callMethod "question" (Internal.args #[toJS query, toJS options, toJS callback]) Unit
 
 /-- `readline.emitKeypressEvents(stream[, interface])` (added in Node.js v0.7.7): `undefined emitKeypressEvents(stream.Readable stream, optional InterfaceConstructor interface)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.emitKeypressEvents (stream_ : stream.Readable) (interface : Option InterfaceConstructor := none) : IO Unit :=
+@[macro_inline] def readline.emitKeypressEvents (stream_ : stream.Readable) (interface : Option InterfaceConstructor := none) : IO Unit := Internal.api "Lasm.JS.Node.readline.emitKeypressEvents" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.readline.emitKeypressEvents", module := "node:readline", path := "emitKeypressEvents", construct := false, arity := 2 }
-    (Support.args #[toJS stream_, Support.optional interface]) (await := false)
+    (Internal.args #[toJS stream_, Internal.optional interface]) (await := false)
 
 /-- `readline.clearLine(stream, dir[, callback])` (added in Node.js v0.7.7): `boolean clearLine(stream.Writable stream, double dir)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.clearLine (stream_ : stream.Writable) (dir : Float) : IO Bool :=
+@[macro_inline] def readline.clearLine (stream_ : stream.Writable) (dir : Float) : IO Bool := Internal.api "Lasm.JS.Node.readline.clearLine" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.readline.clearLine", module := "node:readline", path := "clearLine", construct := false, arity := 2 }
-    (Support.args #[toJS stream_, toJS dir]) (await := false)
+    (Internal.args #[toJS stream_, toJS dir]) (await := false)
 
 /-- `readline.clearScreenDown(stream[, callback])` (added in Node.js v0.7.7): `boolean clearScreenDown(stream.Writable stream)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.clearScreenDown (stream_ : stream.Writable) : IO Bool :=
+@[macro_inline] def readline.clearScreenDown (stream_ : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.readline.clearScreenDown" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.readline.clearScreenDown", module := "node:readline", path := "clearScreenDown", construct := false, arity := 1 }
-    (Support.args #[toJS stream_]) (await := false)
+    (Internal.args #[toJS stream_]) (await := false)
 
 /-- `readline.createInterface(options)` (added in Node.js v0.1.98): `readline.Interface createInterface(readline.CreateInterfaceOptions options)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.createInterface (options : readline.CreateInterfaceOptions) : IO readline.Interface := do
+@[macro_inline] def readline.createInterface (options : readline.CreateInterfaceOptions) : IO readline.Interface := Internal.api "Lasm.JS.Node.readline.createInterface" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.readline.createInterface", module := "node:readline", path := "createInterface", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `readline.cursorTo(stream, x[, y][, callback])` (added in Node.js v0.7.7): `boolean cursorTo(stream.Writable stream, double x, optional double y)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.cursorTo (stream_ : stream.Writable) (x : Float) (y : Option Float := none) : IO Bool :=
+@[macro_inline] def readline.cursorTo (stream_ : stream.Writable) (x : Float) (y : Option Float := none) : IO Bool := Internal.api "Lasm.JS.Node.readline.cursorTo" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.readline.cursorTo", module := "node:readline", path := "cursorTo", construct := false, arity := 3 }
-    (Support.args #[toJS stream_, toJS x, Support.optional y]) (await := false)
+    (Internal.args #[toJS stream_, toJS x, Internal.optional y]) (await := false)
 
 /-- `readline.moveCursor(stream, dx, dy[, callback])` (added in Node.js v0.7.7): `boolean moveCursor(stream.Writable stream, double dx, double dy)` (Node.js 24.22.2 documentation, readline.md) -/
-def readline.moveCursor (stream_ : stream.Writable) (dx : Float) (dy : Float) : IO Bool :=
+@[macro_inline] def readline.moveCursor (stream_ : stream.Writable) (dx : Float) (dy : Float) : IO Bool := Internal.api "Lasm.JS.Node.readline.moveCursor" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.readline.moveCursor", module := "node:readline", path := "moveCursor", construct := false, arity := 3 }
-    (Support.args #[toJS stream_, toJS dx, toJS dy]) (await := false)
+    (Internal.args #[toJS stream_, toJS dx, toJS dy]) (await := false)
 
 /-- `readlinePromises.createInterface(options)` (added in Node.js v17.0.0): `readlinePromises.Interface createInterface(readlinePromises.CreateInterfaceOptions options)` (Node.js 24.22.2 documentation, readline.md) -/
-def readlinePromises.createInterface (options : readlinePromises.CreateInterfaceOptions) : IO readlinePromises.Interface := do
+@[macro_inline] def readlinePromises.createInterface (options : readlinePromises.CreateInterfaceOptions) : IO readlinePromises.Interface := Internal.api "Lasm.JS.Node.readlinePromises.createInterface" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.readlinePromises.createInterface", module := "node:readline/promises", path := "createInterface", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

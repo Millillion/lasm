@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class vm.Script` of `node:vm` (Node.js 24.22.2 documentation, vm.md): a handle to the JavaScript object. -/
 structure vm.Script where
@@ -51,9 +54,9 @@ structure vm.Script.RunInContextOptions where
   timeout : Option Int := none
   /-- `boolean breakOnSigint = false` -/
   breakOnSigint : Option Bool := none
-instance instToJSVmScriptRunInContextOptions : ToJS vm.Script.RunInContextOptions := ⟨fun d => Support.fields #[("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint)]⟩
+instance instToJSVmScriptRunInContextOptions : ToJS vm.Script.RunInContextOptions := ⟨fun d => Internal.fields #[("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint)]⟩
 
 /-- `dictionary vm.Script.RunInNewContextOptionsContextCodeGeneration` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.Script.RunInNewContextOptionsContextCodeGeneration where
@@ -61,8 +64,8 @@ structure vm.Script.RunInNewContextOptionsContextCodeGeneration where
   strings : Option Bool := none
   /-- `boolean wasm = true` -/
   wasm : Option Bool := none
-instance instToJSVmScriptRunInNewContextOptionsContextCodeGeneration : ToJS vm.Script.RunInNewContextOptionsContextCodeGeneration := ⟨fun d => Support.fields #[("strings", Support.optional d.strings),
-    ("wasm", Support.optional d.wasm)]⟩
+instance instToJSVmScriptRunInNewContextOptionsContextCodeGeneration : ToJS vm.Script.RunInNewContextOptionsContextCodeGeneration := ⟨fun d => Internal.fields #[("strings", Internal.optional d.strings),
+    ("wasm", Internal.optional d.wasm)]⟩
 
 /-- `dictionary vm.Script.RunInNewContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.Script.RunInNewContextOptions where
@@ -80,13 +83,13 @@ structure vm.Script.RunInNewContextOptions where
   contextCodeGeneration : Option vm.Script.RunInNewContextOptionsContextCodeGeneration := none
   /-- `DOMString microtaskMode` -/
   microtaskMode : Option String := none
-instance instToJSVmScriptRunInNewContextOptions : ToJS vm.Script.RunInNewContextOptions := ⟨fun d => Support.fields #[("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint),
-    ("contextName", Support.optional d.contextName),
-    ("contextOrigin", Support.optional d.contextOrigin),
-    ("contextCodeGeneration", Support.optional d.contextCodeGeneration),
-    ("microtaskMode", Support.optional d.microtaskMode)]⟩
+instance instToJSVmScriptRunInNewContextOptions : ToJS vm.Script.RunInNewContextOptions := ⟨fun d => Internal.fields #[("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint),
+    ("contextName", Internal.optional d.contextName),
+    ("contextOrigin", Internal.optional d.contextOrigin),
+    ("contextCodeGeneration", Internal.optional d.contextCodeGeneration),
+    ("microtaskMode", Internal.optional d.microtaskMode)]⟩
 
 /-- `dictionary vm.Script.RunInThisContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.Script.RunInThisContextOptions where
@@ -96,9 +99,9 @@ structure vm.Script.RunInThisContextOptions where
   timeout : Option Int := none
   /-- `boolean breakOnSigint = false` -/
   breakOnSigint : Option Bool := none
-instance instToJSVmScriptRunInThisContextOptions : ToJS vm.Script.RunInThisContextOptions := ⟨fun d => Support.fields #[("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint)]⟩
+instance instToJSVmScriptRunInThisContextOptions : ToJS vm.Script.RunInThisContextOptions := ⟨fun d => Internal.fields #[("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint)]⟩
 
 /-- `dictionary vm.Module.EvaluateOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.Module.EvaluateOptions where
@@ -106,8 +109,8 @@ structure vm.Module.EvaluateOptions where
   timeout : Option Int := none
   /-- `boolean breakOnSigint = false` -/
   breakOnSigint : Option Bool := none
-instance instToJSVmModuleEvaluateOptions : ToJS vm.Module.EvaluateOptions := ⟨fun d => Support.fields #[("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint)]⟩
+instance instToJSVmModuleEvaluateOptions : ToJS vm.Module.EvaluateOptions := ⟨fun d => Internal.fields #[("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint)]⟩
 
 /-- `dictionary vm.CompileFunctionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.CompileFunctionOptions where
@@ -127,13 +130,13 @@ structure vm.CompileFunctionOptions where
   contextExtensions : Option (Array Data) := none
   /-- `any importModuleDynamically` -/
   importModuleDynamically : Data := .undefined
-instance instToJSVmCompileFunctionOptions : ToJS vm.CompileFunctionOptions := ⟨fun d => Support.fields #[("filename", Support.optional d.filename),
-    ("lineOffset", Support.optional d.lineOffset),
-    ("columnOffset", Support.optional d.columnOffset),
-    ("cachedData", Support.optional d.cachedData),
-    ("produceCachedData", Support.optional d.produceCachedData),
+instance instToJSVmCompileFunctionOptions : ToJS vm.CompileFunctionOptions := ⟨fun d => Internal.fields #[("filename", Internal.optional d.filename),
+    ("lineOffset", Internal.optional d.lineOffset),
+    ("columnOffset", Internal.optional d.columnOffset),
+    ("cachedData", Internal.optional d.cachedData),
+    ("produceCachedData", Internal.optional d.produceCachedData),
     ("parsingContext", d.parsingContext),
-    ("contextExtensions", Support.optional d.contextExtensions),
+    ("contextExtensions", Internal.optional d.contextExtensions),
     ("importModuleDynamically", d.importModuleDynamically)]⟩
 
 /-- `dictionary vm.CreateContextOptionsCodeGeneration` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -142,8 +145,8 @@ structure vm.CreateContextOptionsCodeGeneration where
   strings : Option Bool := none
   /-- `boolean wasm = true` -/
   wasm : Option Bool := none
-instance instToJSVmCreateContextOptionsCodeGeneration : ToJS vm.CreateContextOptionsCodeGeneration := ⟨fun d => Support.fields #[("strings", Support.optional d.strings),
-    ("wasm", Support.optional d.wasm)]⟩
+instance instToJSVmCreateContextOptionsCodeGeneration : ToJS vm.CreateContextOptionsCodeGeneration := ⟨fun d => Internal.fields #[("strings", Internal.optional d.strings),
+    ("wasm", Internal.optional d.wasm)]⟩
 
 /-- `dictionary vm.CreateContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.CreateContextOptions where
@@ -157,10 +160,10 @@ structure vm.CreateContextOptions where
   microtaskMode : Option String := none
   /-- `any importModuleDynamically` -/
   importModuleDynamically : Data := .undefined
-instance instToJSVmCreateContextOptions : ToJS vm.CreateContextOptions := ⟨fun d => Support.fields #[("name", Support.optional d.name),
-    ("origin", Support.optional d.origin),
-    ("codeGeneration", Support.optional d.codeGeneration),
-    ("microtaskMode", Support.optional d.microtaskMode),
+instance instToJSVmCreateContextOptions : ToJS vm.CreateContextOptions := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("origin", Internal.optional d.origin),
+    ("codeGeneration", Internal.optional d.codeGeneration),
+    ("microtaskMode", Internal.optional d.microtaskMode),
     ("importModuleDynamically", d.importModuleDynamically)]⟩
 
 /-- `dictionary vm.RunInContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -181,13 +184,13 @@ structure vm.RunInContextOptions where
   cachedData : Option ByteArray := none
   /-- `any importModuleDynamically` -/
   importModuleDynamically : Data := .undefined
-instance instToJSVmRunInContextOptions : ToJS vm.RunInContextOptions := ⟨fun d => Support.fields #[("filename", Support.optional d.filename),
-    ("lineOffset", Support.optional d.lineOffset),
-    ("columnOffset", Support.optional d.columnOffset),
-    ("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint),
-    ("cachedData", Support.optional d.cachedData),
+instance instToJSVmRunInContextOptions : ToJS vm.RunInContextOptions := ⟨fun d => Internal.fields #[("filename", Internal.optional d.filename),
+    ("lineOffset", Internal.optional d.lineOffset),
+    ("columnOffset", Internal.optional d.columnOffset),
+    ("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint),
+    ("cachedData", Internal.optional d.cachedData),
     ("importModuleDynamically", d.importModuleDynamically)]⟩
 
 /-- `(vm.RunInContextOptions or DOMString)`: one constructor per member type. -/
@@ -208,8 +211,8 @@ structure vm.RunInNewContextOptionsContextCodeGeneration where
   strings : Option Bool := none
   /-- `boolean wasm = true` -/
   wasm : Option Bool := none
-instance instToJSVmRunInNewContextOptionsContextCodeGeneration : ToJS vm.RunInNewContextOptionsContextCodeGeneration := ⟨fun d => Support.fields #[("strings", Support.optional d.strings),
-    ("wasm", Support.optional d.wasm)]⟩
+instance instToJSVmRunInNewContextOptionsContextCodeGeneration : ToJS vm.RunInNewContextOptionsContextCodeGeneration := ⟨fun d => Internal.fields #[("strings", Internal.optional d.strings),
+    ("wasm", Internal.optional d.wasm)]⟩
 
 /-- `dictionary vm.RunInNewContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.RunInNewContextOptions where
@@ -237,18 +240,18 @@ structure vm.RunInNewContextOptions where
   importModuleDynamically : Data := .undefined
   /-- `DOMString microtaskMode` -/
   microtaskMode : Option String := none
-instance instToJSVmRunInNewContextOptions : ToJS vm.RunInNewContextOptions := ⟨fun d => Support.fields #[("filename", Support.optional d.filename),
-    ("lineOffset", Support.optional d.lineOffset),
-    ("columnOffset", Support.optional d.columnOffset),
-    ("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint),
-    ("contextName", Support.optional d.contextName),
-    ("contextOrigin", Support.optional d.contextOrigin),
-    ("contextCodeGeneration", Support.optional d.contextCodeGeneration),
-    ("cachedData", Support.optional d.cachedData),
+instance instToJSVmRunInNewContextOptions : ToJS vm.RunInNewContextOptions := ⟨fun d => Internal.fields #[("filename", Internal.optional d.filename),
+    ("lineOffset", Internal.optional d.lineOffset),
+    ("columnOffset", Internal.optional d.columnOffset),
+    ("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint),
+    ("contextName", Internal.optional d.contextName),
+    ("contextOrigin", Internal.optional d.contextOrigin),
+    ("contextCodeGeneration", Internal.optional d.contextCodeGeneration),
+    ("cachedData", Internal.optional d.cachedData),
     ("importModuleDynamically", d.importModuleDynamically),
-    ("microtaskMode", Support.optional d.microtaskMode)]⟩
+    ("microtaskMode", Internal.optional d.microtaskMode)]⟩
 
 /-- `(vm.RunInNewContextOptions or DOMString)`: one constructor per member type. -/
 inductive vm.RunInNewContextOptionsOrDOMString where
@@ -280,13 +283,13 @@ structure vm.RunInThisContextOptions where
   cachedData : Option ByteArray := none
   /-- `any importModuleDynamically` -/
   importModuleDynamically : Data := .undefined
-instance instToJSVmRunInThisContextOptions : ToJS vm.RunInThisContextOptions := ⟨fun d => Support.fields #[("filename", Support.optional d.filename),
-    ("lineOffset", Support.optional d.lineOffset),
-    ("columnOffset", Support.optional d.columnOffset),
-    ("displayErrors", Support.optional d.displayErrors),
-    ("timeout", Support.optional d.timeout),
-    ("breakOnSigint", Support.optional d.breakOnSigint),
-    ("cachedData", Support.optional d.cachedData),
+instance instToJSVmRunInThisContextOptions : ToJS vm.RunInThisContextOptions := ⟨fun d => Internal.fields #[("filename", Internal.optional d.filename),
+    ("lineOffset", Internal.optional d.lineOffset),
+    ("columnOffset", Internal.optional d.columnOffset),
+    ("displayErrors", Internal.optional d.displayErrors),
+    ("timeout", Internal.optional d.timeout),
+    ("breakOnSigint", Internal.optional d.breakOnSigint),
+    ("cachedData", Internal.optional d.cachedData),
     ("importModuleDynamically", d.importModuleDynamically)]⟩
 
 /-- `(vm.RunInThisContextOptions or DOMString)`: one constructor per member type. -/
@@ -302,135 +305,146 @@ instance instCoeVmRunInThisContextOptionsVmRunInThisContextOptionsOrDOMString : 
 instance instCoeStringVmRunInThisContextOptionsOrDOMString : Coe String vm.RunInThisContextOptionsOrDOMString := ⟨.domString⟩
 
 /-- `v instanceof Script`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Script`). -/
-def vm.Script.cast? (v : Value) : IO (Option vm.Script) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["Script"] Value) v) then some { val := v } else none
+@[macro_inline] def vm.Script.cast? (v : Value) : IO (Option vm.Script) := Internal.api "Lasm.JS.Node.vm.Script.cast?" do
+  Internal.cast (Support.getExport "node:vm" ["Script"] Value) (fun x => { val := x }) v
 
 /-- `script.cachedDataRejected` (added in Node.js v5.7.0): `readonly attribute boolean? cachedDataRejected` -/
-def vm.Script.cachedDataRejected (self : vm.Script) : IO (Option Bool) := self.val.get "cachedDataRejected" (Option Bool)
+@[macro_inline] def vm.Script.cachedDataRejected (self : vm.Script) : IO (Option Bool) := Internal.api "Lasm.JS.Node.vm.Script.cachedDataRejected" do
+  self.val.get "cachedDataRejected" (Option Bool)
 
 /-- `script.sourceMapURL` (added in Node.js v19.1.0, v18.13.0): `readonly attribute DOMString? sourceMapURL` -/
-def vm.Script.sourceMapURL (self : vm.Script) : IO (Option String) := self.val.get "sourceMapURL" (Option String)
+@[macro_inline] def vm.Script.sourceMapURL (self : vm.Script) : IO (Option String) := Internal.api "Lasm.JS.Node.vm.Script.sourceMapURL" do
+  self.val.get "sourceMapURL" (Option String)
 
 /-- `script.createCachedData()` (added in Node.js v10.6.0): `Uint8Array createCachedData()` -/
-def vm.Script.createCachedData (self : vm.Script) : IO ByteArray :=
-  self.val.callMethod "createCachedData" (Support.args #[]) ByteArray
+@[macro_inline] def vm.Script.createCachedData (self : vm.Script) : IO ByteArray := Internal.api "Lasm.JS.Node.vm.Script.createCachedData" do
+  self.val.callMethod "createCachedData" (Internal.args #[]) ByteArray
 
 /-- `script.runInContext(contextifiedObject[, options])` (added in Node.js v0.3.1): `any runInContext(object contextifiedObject, optional vm.Script.RunInContextOptions options)` -/
-def vm.Script.runInContext (self : vm.Script) (contextifiedObject : Data) (options : Option vm.Script.RunInContextOptions := none) : IO Data :=
-  self.val.callMethod "runInContext" (Support.args #[toJS contextifiedObject, Support.optional options]) Data
+@[macro_inline] def vm.Script.runInContext (self : vm.Script) (contextifiedObject : Data) (options : Option vm.Script.RunInContextOptions := none) : IO Data := Internal.api "Lasm.JS.Node.vm.Script.runInContext" do
+  self.val.callMethod "runInContext" (Internal.args #[toJS contextifiedObject, Internal.optional options]) Data
 
 /-- `script.runInNewContext([contextObject[, options]])` (added in Node.js v0.3.1): `any runInNewContext(optional any contextObject, optional vm.Script.RunInNewContextOptions options)` -/
-def vm.Script.runInNewContext (self : vm.Script) (contextObject : Data := .undefined) (options : Option vm.Script.RunInNewContextOptions := none) : IO Data :=
-  self.val.callMethod "runInNewContext" (Support.args #[contextObject, Support.optional options]) Data
+@[macro_inline] def vm.Script.runInNewContext (self : vm.Script) (contextObject : Data := .undefined) (options : Option vm.Script.RunInNewContextOptions := none) : IO Data := Internal.api "Lasm.JS.Node.vm.Script.runInNewContext" do
+  self.val.callMethod "runInNewContext" (Internal.args #[contextObject, Internal.optional options]) Data
 
 /-- `script.runInThisContext([options])` (added in Node.js v0.3.1): `any runInThisContext(optional vm.Script.RunInThisContextOptions options)` -/
-def vm.Script.runInThisContext (self : vm.Script) (options : Option vm.Script.RunInThisContextOptions := none) : IO Data :=
-  self.val.callMethod "runInThisContext" (Support.args #[Support.optional options]) Data
+@[macro_inline] def vm.Script.runInThisContext (self : vm.Script) (options : Option vm.Script.RunInThisContextOptions := none) : IO Data := Internal.api "Lasm.JS.Node.vm.Script.runInThisContext" do
+  self.val.callMethod "runInThisContext" (Internal.args #[Internal.optional options]) Data
 
 /-- `v instanceof Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Module`). -/
-def vm.Module.cast? (v : Value) : IO (Option vm.Module) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["Module"] Value) v) then some { val := v } else none
+@[macro_inline] def vm.Module.cast? (v : Value) : IO (Option vm.Module) := Internal.api "Lasm.JS.Node.vm.Module.cast?" do
+  Internal.cast (Support.getExport "node:vm" ["Module"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.error`: `readonly attribute any error` -/
-def vm.Module.error (self : vm.Module) : IO Data := self.val.get "error" Data
+@[macro_inline] def vm.Module.error (self : vm.Module) : IO Data := Internal.api "Lasm.JS.Node.vm.Module.error" do
+  self.val.get "error" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.identifier`: `readonly attribute DOMString identifier` -/
-def vm.Module.identifier (self : vm.Module) : IO String := self.val.get "identifier" String
+@[macro_inline] def vm.Module.identifier (self : vm.Module) : IO String := Internal.api "Lasm.JS.Node.vm.Module.identifier" do
+  self.val.get "identifier" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.namespace`: `readonly attribute object namespace` -/
-def vm.Module.«namespace» (self : vm.Module) : IO Data := self.val.get "namespace" Data
+@[macro_inline] def vm.Module.«namespace» (self : vm.Module) : IO Data := Internal.api "Lasm.JS.Node.vm.Module.namespace" do
+  self.val.get "namespace" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.status`: `readonly attribute DOMString status` -/
-def vm.Module.status (self : vm.Module) : IO String := self.val.get "status" String
+@[macro_inline] def vm.Module.status (self : vm.Module) : IO String := Internal.api "Lasm.JS.Node.vm.Module.status" do
+  self.val.get "status" String
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.evaluate([options])`: `Promise<undefined> evaluate(optional vm.Module.EvaluateOptions options)` -/
-def vm.Module.evaluate (self : vm.Module) (options : Option vm.Module.EvaluateOptions := none) : Async Unit :=
-  self.val.callMethodAwait "evaluate" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def vm.Module.evaluate (self : vm.Module) (options : Option vm.Module.EvaluateOptions := none) : Async Unit := Internal.api "Lasm.JS.Node.vm.Module.evaluate" do
+  self.val.callMethodAwait "evaluate" (Internal.args #[Internal.optional options]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.link(linker)`: `Promise<any> link(Function linker)` -/
-def vm.Module.link (self : vm.Module) (linker : JSFunction) : Async Data :=
-  self.val.callMethodAwait "link" (Support.args #[toJS linker]) Data
+@[macro_inline] def vm.Module.link (self : vm.Module) (linker : JSFunction) : Async Data := Internal.api "Lasm.JS.Node.vm.Module.link" do
+  self.val.callMethodAwait "link" (Internal.args #[toJS linker]) Data
 
 /-- `v instanceof SourceTextModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceTextModule`). -/
-def vm.SourceTextModule.cast? (v : Value) : IO (Option vm.SourceTextModule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["SourceTextModule"] Value) v) then some { val := v } else none
+@[macro_inline] def vm.SourceTextModule.cast? (v : Value) : IO (Option vm.SourceTextModule) := Internal.api "Lasm.JS.Node.vm.SourceTextModule.cast?" do
+  Internal.cast (Support.getExport "node:vm" ["SourceTextModule"] Value) (fun x => { val := x }) v
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `sourceTextModule.dependencySpecifiers`: `readonly attribute sequence<DOMString> dependencySpecifiers` -/
-def vm.SourceTextModule.dependencySpecifiers (self : vm.SourceTextModule) : IO (Array String) := self.val.get "dependencySpecifiers" (Array String)
+@[macro_inline] def vm.SourceTextModule.dependencySpecifiers (self : vm.SourceTextModule) : IO (Array String) := Internal.api "Lasm.JS.Node.vm.SourceTextModule.dependencySpecifiers" do
+  self.val.get "dependencySpecifiers" (Array String)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.moduleRequests` (added in Node.js v24.4.0): `readonly attribute sequence<object> moduleRequests` -/
-def vm.SourceTextModule.moduleRequests (self : vm.SourceTextModule) : IO (Array Data) := self.val.get "moduleRequests" (Array Data)
+@[macro_inline] def vm.SourceTextModule.moduleRequests (self : vm.SourceTextModule) : IO (Array Data) := Internal.api "Lasm.JS.Node.vm.SourceTextModule.moduleRequests" do
+  self.val.get "moduleRequests" (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.createCachedData()` (added in Node.js v13.7.0, v12.17.0): `Uint8Array createCachedData()` -/
-def vm.SourceTextModule.createCachedData (self : vm.SourceTextModule) : IO ByteArray :=
-  self.val.callMethod "createCachedData" (Support.args #[]) ByteArray
+@[macro_inline] def vm.SourceTextModule.createCachedData (self : vm.SourceTextModule) : IO ByteArray := Internal.api "Lasm.JS.Node.vm.SourceTextModule.createCachedData" do
+  self.val.callMethod "createCachedData" (Internal.args #[]) ByteArray
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.hasAsyncGraph()` (added in Node.js v24.9.0): `boolean hasAsyncGraph()` -/
-def vm.SourceTextModule.hasAsyncGraph (self : vm.SourceTextModule) : IO Bool :=
-  self.val.callMethod "hasAsyncGraph" (Support.args #[]) Bool
+@[macro_inline] def vm.SourceTextModule.hasAsyncGraph (self : vm.SourceTextModule) : IO Bool := Internal.api "Lasm.JS.Node.vm.SourceTextModule.hasAsyncGraph" do
+  self.val.callMethod "hasAsyncGraph" (Internal.args #[]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.hasTopLevelAwait()` (added in Node.js v24.9.0): `boolean hasTopLevelAwait()` -/
-def vm.SourceTextModule.hasTopLevelAwait (self : vm.SourceTextModule) : IO Bool :=
-  self.val.callMethod "hasTopLevelAwait" (Support.args #[]) Bool
+@[macro_inline] def vm.SourceTextModule.hasTopLevelAwait (self : vm.SourceTextModule) : IO Bool := Internal.api "Lasm.JS.Node.vm.SourceTextModule.hasTopLevelAwait" do
+  self.val.callMethod "hasTopLevelAwait" (Internal.args #[]) Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.instantiate()` (added in Node.js v24.8.0): `undefined instantiate()` -/
-def vm.SourceTextModule.instantiate (self : vm.SourceTextModule) : IO Unit :=
-  self.val.callMethod "instantiate" (Support.args #[]) Unit
+@[macro_inline] def vm.SourceTextModule.instantiate (self : vm.SourceTextModule) : IO Unit := Internal.api "Lasm.JS.Node.vm.SourceTextModule.instantiate" do
+  self.val.callMethod "instantiate" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.linkRequests(modules)` (added in Node.js v24.8.0): `undefined linkRequests(sequence<vm.Module> modules)` -/
-def vm.SourceTextModule.linkRequests (self : vm.SourceTextModule) (modules : Array vm.Module) : IO Unit :=
-  self.val.callMethod "linkRequests" (Support.args #[toJS modules]) Unit
+@[macro_inline] def vm.SourceTextModule.linkRequests (self : vm.SourceTextModule) (modules : Array vm.Module) : IO Unit := Internal.api "Lasm.JS.Node.vm.SourceTextModule.linkRequests" do
+  self.val.callMethod "linkRequests" (Internal.args #[toJS modules]) Unit
 
 /-- `v instanceof SyntheticModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyntheticModule`). -/
-def vm.SyntheticModule.cast? (v : Value) : IO (Option vm.SyntheticModule) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["SyntheticModule"] Value) v) then some { val := v } else none
+@[macro_inline] def vm.SyntheticModule.cast? (v : Value) : IO (Option vm.SyntheticModule) := Internal.api "Lasm.JS.Node.vm.SyntheticModule.cast?" do
+  Internal.cast (Support.getExport "node:vm" ["SyntheticModule"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syntheticModule.setExport(name, value)` (added in Node.js v13.0.0, v12.16.0): `undefined setExport(DOMString name, any value)` -/
-def vm.SyntheticModule.setExport (self : vm.SyntheticModule) (name : String) (value : Data) : IO Unit :=
-  self.val.callMethod "setExport" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def vm.SyntheticModule.setExport (self : vm.SyntheticModule) (name : String) (value : Data) : IO Unit := Internal.api "Lasm.JS.Node.vm.SyntheticModule.setExport" do
+  self.val.callMethod "setExport" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `vm.constants` (added in Node.js v21.7.0, v20.12.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.constants : IO Data := Support.getExport "node:vm" ["constants"] Data
+@[macro_inline] def vm.constants : IO Data := Internal.api "Lasm.JS.Node.vm.constants" do
+  Support.getExport "node:vm" ["constants"] Data
 
 /-- `vm.compileFunction(code[, params[, options]])` (added in Node.js v10.10.0): `Function compileFunction(DOMString code, optional sequence<DOMString> params, optional vm.CompileFunctionOptions options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.compileFunction (code : String) (params : Option (Array String) := none) (options : Option vm.CompileFunctionOptions := none) : IO JSFunction :=
+@[macro_inline] def vm.compileFunction (code : String) (params : Option (Array String) := none) (options : Option vm.CompileFunctionOptions := none) : IO JSFunction := Internal.api "Lasm.JS.Node.vm.compileFunction" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.vm.compileFunction", module := "node:vm", path := "compileFunction", construct := false, arity := 3 }
-    (Support.args #[toJS code, Support.optional params, Support.optional options]) (await := false)
+    (Internal.args #[toJS code, Internal.optional params, Internal.optional options]) (await := false)
 
 /-- `vm.createContext([contextObject[, options]])` (added in Node.js v0.3.1): `object createContext(optional any contextObject, optional vm.CreateContextOptions options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.createContext (contextObject : Data := .undefined) (options : Option vm.CreateContextOptions := none) : IO Data :=
+@[macro_inline] def vm.createContext (contextObject : Data := .undefined) (options : Option vm.CreateContextOptions := none) : IO Data := Internal.api "Lasm.JS.Node.vm.createContext" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.vm.createContext", module := "node:vm", path := "createContext", construct := false, arity := 2 }
-    (Support.args #[contextObject, Support.optional options]) (await := false)
+    (Internal.args #[contextObject, Internal.optional options]) (await := false)
 
 /-- `vm.isContext(object)` (added in Node.js v0.11.7): `boolean isContext(object object)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.isContext (object : Data) : IO Bool :=
+@[macro_inline] def vm.isContext (object : Data) : IO Bool := Internal.api "Lasm.JS.Node.vm.isContext" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.vm.isContext", module := "node:vm", path := "isContext", construct := false, arity := 1 }
-    (Support.args #[toJS object]) (await := false)
+    (Internal.args #[toJS object]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `vm.measureMemory([options])` (added in Node.js v13.10.0): `Promise<any> measureMemory(optional any options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.measureMemory (options : Data := .undefined) : Async Data :=
+@[macro_inline] def vm.measureMemory (options : Data := .undefined) : Async Data := Internal.api "Lasm.JS.Node.vm.measureMemory" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.vm.measureMemory", module := "node:vm", path := "measureMemory", construct := false, arity := 1 }
-    (Support.args #[options])
+    (Internal.args #[options])
 
 /-- `vm.runInContext(code, contextifiedObject[, options])` (added in Node.js v0.3.1): `undefined runInContext(DOMString code, object contextifiedObject, optional (vm.RunInContextOptions or DOMString) options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.runInContext (code : String) (contextifiedObject : Data) (options : Option vm.RunInContextOptionsOrDOMString := none) : IO Unit :=
+@[macro_inline] def vm.runInContext (code : String) (contextifiedObject : Data) (options : Option vm.RunInContextOptionsOrDOMString := none) : IO Unit := Internal.api "Lasm.JS.Node.vm.runInContext" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.vm.runInContext", module := "node:vm", path := "runInContext", construct := false, arity := 3 }
-    (Support.args #[toJS code, toJS contextifiedObject, Support.optional options]) (await := false)
+    (Internal.args #[toJS code, toJS contextifiedObject, Internal.optional options]) (await := false)
 
 /-- `vm.runInNewContext(code[, contextObject[, options]])` (added in Node.js v0.3.1): `any runInNewContext(DOMString code, optional any contextObject, optional (vm.RunInNewContextOptions or DOMString) options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.runInNewContext (code : String) (contextObject : Data := .undefined) (options : Option vm.RunInNewContextOptionsOrDOMString := none) : IO Data :=
+@[macro_inline] def vm.runInNewContext (code : String) (contextObject : Data := .undefined) (options : Option vm.RunInNewContextOptionsOrDOMString := none) : IO Data := Internal.api "Lasm.JS.Node.vm.runInNewContext" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.vm.runInNewContext", module := "node:vm", path := "runInNewContext", construct := false, arity := 3 }
-    (Support.args #[toJS code, contextObject, Support.optional options]) (await := false)
+    (Internal.args #[toJS code, contextObject, Internal.optional options]) (await := false)
 
 /-- `vm.runInThisContext(code[, options])` (added in Node.js v0.3.1): `any runInThisContext(DOMString code, optional (vm.RunInThisContextOptions or DOMString) options)` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.runInThisContext (code : String) (options : Option vm.RunInThisContextOptionsOrDOMString := none) : IO Data :=
+@[macro_inline] def vm.runInThisContext (code : String) (options : Option vm.RunInThisContextOptionsOrDOMString := none) : IO Data := Internal.api "Lasm.JS.Node.vm.runInThisContext" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.vm.runInThisContext", module := "node:vm", path := "runInThisContext", construct := false, arity := 2 }
-    (Support.args #[toJS code, Support.optional options]) (await := false)
+    (Internal.args #[toJS code, Internal.optional options]) (await := false)
 
 /-- `vm.constants.DONT_CONTEXTIFY`: `readonly attribute any DONT_CONTEXTIFY` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.constants.DONT_CONTEXTIFY : IO Data := Support.getExport "node:vm" ["constants", "DONT_CONTEXTIFY"] Data
+@[macro_inline] def vm.constants.DONT_CONTEXTIFY : IO Data := Internal.api "Lasm.JS.Node.vm.constants.DONT_CONTEXTIFY" do
+  Support.getExport "node:vm" ["constants", "DONT_CONTEXTIFY"] Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` (added in Node.js v21.7.0, v20.12.0): `readonly attribute any USE_MAIN_CONTEXT_DEFAULT_LOADER` (Node.js 24.22.2 documentation, vm.md) -/
-def vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER : IO Data := Support.getExport "node:vm" ["constants", "USE_MAIN_CONTEXT_DEFAULT_LOADER"] Data
+@[macro_inline] def vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER : IO Data := Internal.api "Lasm.JS.Node.vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER" do
+  Support.getExport "node:vm" ["constants", "USE_MAIN_CONTEXT_DEFAULT_LOADER"] Data
 
 end Lasm.JS.Node

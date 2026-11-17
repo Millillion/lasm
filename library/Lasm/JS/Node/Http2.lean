@@ -8,10 +8,10 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.WebSocket
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
@@ -22,6 +22,9 @@ import Lasm.JS.Node.Http
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class Http2Session extends EventEmitter` of `node:http2` (Node.js 24.22.2 documentation, http2.md): a handle to the JavaScript object. -/
 structure Http2Session extends EventEmitter
@@ -117,10 +120,10 @@ instance instToJSHttp2SessionConnectListener : ToJS Http2Session.ConnectListener
 instance instFromJSHttp2SessionConnectListener : FromJS Http2Session.ConnectListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.ConnectListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.ConnectListener.ofFn (f : Http2Session → net.Socket → Async Unit) : IO Http2Session.ConnectListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Http2Session args 0) (← Support.arg net.Socket args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Http2Session args 0) (← Internal.arg net.Socket args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.ConnectListener.ofSyncFn (f : Http2Session → net.Socket → IO Unit) : IO Http2Session.ConnectListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Http2Session args 0) (← Support.arg net.Socket args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Http2Session args 0) (← Internal.arg net.Socket args 1)) }
 
 /-- `callback Http2Session.ErrorListener = undefined (any error)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.ErrorListener where
@@ -131,10 +134,10 @@ instance instToJSHttp2SessionErrorListener : ToJS Http2Session.ErrorListener := 
 instance instFromJSHttp2SessionErrorListener : FromJS Http2Session.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.ErrorListener.ofFn (f : Data → Async Unit) : IO Http2Session.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO Http2Session.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback Http2Session.FrameErrorListener = undefined (long long type, long long code, long long id)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.FrameErrorListener where
@@ -145,10 +148,10 @@ instance instToJSHttp2SessionFrameErrorListener : ToJS Http2Session.FrameErrorLi
 instance instFromJSHttp2SessionFrameErrorListener : FromJS Http2Session.FrameErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.FrameErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.FrameErrorListener.ofFn (f : Int → Int → Int → Async Unit) : IO Http2Session.FrameErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Int args 0) (← Support.arg Int args 1) (← Support.arg Int args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Int args 0) (← Internal.arg Int args 1) (← Internal.arg Int args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.FrameErrorListener.ofSyncFn (f : Int → Int → Int → IO Unit) : IO Http2Session.FrameErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Int args 0) (← Support.arg Int args 1) (← Support.arg Int args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Int args 0) (← Internal.arg Int args 1) (← Internal.arg Int args 2)) }
 
 /-- `callback Http2Session.GoawayListener = undefined (double errorCode, double lastStreamID, Uint8Array opaqueData)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.GoawayListener where
@@ -159,10 +162,10 @@ instance instToJSHttp2SessionGoawayListener : ToJS Http2Session.GoawayListener :
 instance instFromJSHttp2SessionGoawayListener : FromJS Http2Session.GoawayListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.GoawayListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.GoawayListener.ofFn (f : Float → Float → ByteArray → Async Unit) : IO Http2Session.GoawayListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg Float args 1) (← Support.arg ByteArray args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg Float args 1) (← Internal.arg ByteArray args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.GoawayListener.ofSyncFn (f : Float → Float → ByteArray → IO Unit) : IO Http2Session.GoawayListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Float args 0) (← Support.arg Float args 1) (← Support.arg ByteArray args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Float args 0) (← Internal.arg Float args 1) (← Internal.arg ByteArray args 2)) }
 
 /-- `callback Http2Session.LocalSettingsListener = undefined (object settings)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.LocalSettingsListener where
@@ -173,10 +176,10 @@ instance instToJSHttp2SessionLocalSettingsListener : ToJS Http2Session.LocalSett
 instance instFromJSHttp2SessionLocalSettingsListener : FromJS Http2Session.LocalSettingsListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.LocalSettingsListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.LocalSettingsListener.ofFn (f : Data → Async Unit) : IO Http2Session.LocalSettingsListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.LocalSettingsListener.ofSyncFn (f : Data → IO Unit) : IO Http2Session.LocalSettingsListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback Http2Session.PingListener = undefined (Uint8Array payload)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.PingListener where
@@ -187,10 +190,10 @@ instance instToJSHttp2SessionPingListener : ToJS Http2Session.PingListener := �
 instance instFromJSHttp2SessionPingListener : FromJS Http2Session.PingListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.PingListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.PingListener.ofFn (f : ByteArray → Async Unit) : IO Http2Session.PingListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.PingListener.ofSyncFn (f : ByteArray → IO Unit) : IO Http2Session.PingListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ByteArray args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 
 /-- `callback Http2Session.RemoteSettingsListener = undefined (object settings)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.RemoteSettingsListener where
@@ -201,10 +204,10 @@ instance instToJSHttp2SessionRemoteSettingsListener : ToJS Http2Session.RemoteSe
 instance instFromJSHttp2SessionRemoteSettingsListener : FromJS Http2Session.RemoteSettingsListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.RemoteSettingsListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.RemoteSettingsListener.ofFn (f : Data → Async Unit) : IO Http2Session.RemoteSettingsListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.RemoteSettingsListener.ofSyncFn (f : Data → IO Unit) : IO Http2Session.RemoteSettingsListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback Http2Session.StreamListener = undefined (Http2Stream stream, object headers, double flags, sequence<any> rawHeaders)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.StreamListener where
@@ -215,10 +218,10 @@ instance instToJSHttp2SessionStreamListener : ToJS Http2Session.StreamListener :
 instance instFromJSHttp2SessionStreamListener : FromJS Http2Session.StreamListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Session.StreamListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Session.StreamListener.ofFn (f : Http2Stream → Data → Float → (Array Data) → Async Unit) : IO Http2Session.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Session.StreamListener.ofSyncFn (f : Http2Stream → Data → Float → (Array Data) → IO Unit) : IO Http2Session.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 
 /-- `callback Http2Session.TimeoutListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Session.TimeoutListener where
@@ -277,10 +280,10 @@ instance instToJSClientHttp2SessionAltsvcListener : ToJS ClientHttp2Session.Alts
 instance instFromJSClientHttp2SessionAltsvcListener : FromJS ClientHttp2Session.AltsvcListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ClientHttp2Session.AltsvcListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ClientHttp2Session.AltsvcListener.ofFn (f : String → String → Float → Async Unit) : IO ClientHttp2Session.AltsvcListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg Float args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ClientHttp2Session.AltsvcListener.ofSyncFn (f : String → String → Float → IO Unit) : IO ClientHttp2Session.AltsvcListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg Float args 2)) }
 
 /-- `callback ClientHttp2Session.OriginListener = undefined (sequence<DOMString> origins)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ClientHttp2Session.OriginListener where
@@ -291,10 +294,10 @@ instance instToJSClientHttp2SessionOriginListener : ToJS ClientHttp2Session.Orig
 instance instFromJSClientHttp2SessionOriginListener : FromJS ClientHttp2Session.OriginListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ClientHttp2Session.OriginListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ClientHttp2Session.OriginListener.ofFn (f : (Array String) → Async Unit) : IO ClientHttp2Session.OriginListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array String) args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Array String) args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ClientHttp2Session.OriginListener.ofSyncFn (f : (Array String) → IO Unit) : IO ClientHttp2Session.OriginListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array String) args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Array String) args 0)) }
 
 /-- `dictionary ClientHttp2Session.RequestOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ClientHttp2Session.RequestOptions where
@@ -308,11 +311,11 @@ structure ClientHttp2Session.RequestOptions where
   waitForTrailers : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSClientHttp2SessionRequestOptions : ToJS ClientHttp2Session.RequestOptions := ⟨fun d => Support.fields #[("endStream", Support.optional d.endStream),
-    ("exclusive", Support.optional d.exclusive),
-    ("parent", Support.optional d.parent),
-    ("waitForTrailers", Support.optional d.waitForTrailers),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSClientHttp2SessionRequestOptions : ToJS ClientHttp2Session.RequestOptions := ⟨fun d => Internal.fields #[("endStream", Internal.optional d.endStream),
+    ("exclusive", Internal.optional d.exclusive),
+    ("parent", Internal.optional d.parent),
+    ("waitForTrailers", Internal.optional d.waitForTrailers),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `callback Http2Stream.AbortedListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Stream.AbortedListener where
@@ -351,10 +354,10 @@ instance instToJSHttp2StreamErrorListener : ToJS Http2Stream.ErrorListener := �
 instance instFromJSHttp2StreamErrorListener : FromJS Http2Stream.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Stream.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Stream.ErrorListener.ofFn (f : Data → Async Unit) : IO Http2Stream.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Stream.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO Http2Stream.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback Http2Stream.FrameErrorListener = undefined (long long type, long long code, long long id)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Stream.FrameErrorListener where
@@ -365,10 +368,10 @@ instance instToJSHttp2StreamFrameErrorListener : ToJS Http2Stream.FrameErrorList
 instance instFromJSHttp2StreamFrameErrorListener : FromJS Http2Stream.FrameErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Stream.FrameErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Stream.FrameErrorListener.ofFn (f : Int → Int → Int → Async Unit) : IO Http2Stream.FrameErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Int args 0) (← Support.arg Int args 1) (← Support.arg Int args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Int args 0) (← Internal.arg Int args 1) (← Internal.arg Int args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Stream.FrameErrorListener.ofSyncFn (f : Int → Int → Int → IO Unit) : IO Http2Stream.FrameErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Int args 0) (← Support.arg Int args 1) (← Support.arg Int args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Int args 0) (← Internal.arg Int args 1) (← Internal.arg Int args 2)) }
 
 /-- `callback Http2Stream.ReadyListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Stream.ReadyListener where
@@ -407,10 +410,10 @@ instance instToJSHttp2StreamTrailersListener : ToJS Http2Stream.TrailersListener
 instance instFromJSHttp2StreamTrailersListener : FromJS Http2Stream.TrailersListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Stream.TrailersListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Stream.TrailersListener.ofFn (f : Data → Float → (Array Data) → Async Unit) : IO Http2Stream.TrailersListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Stream.TrailersListener.ofSyncFn (f : Data → Float → (Array Data) → IO Unit) : IO Http2Stream.TrailersListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 
 /-- `callback Http2Stream.WantTrailersListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Stream.WantTrailersListener where
@@ -449,10 +452,10 @@ instance instToJSClientHttp2StreamHeadersListener : ToJS ClientHttp2Stream.Heade
 instance instFromJSClientHttp2StreamHeadersListener : FromJS ClientHttp2Stream.HeadersListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ClientHttp2Stream.HeadersListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ClientHttp2Stream.HeadersListener.ofFn (f : Data → Float → (Array Data) → Async Unit) : IO ClientHttp2Stream.HeadersListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ClientHttp2Stream.HeadersListener.ofSyncFn (f : Data → Float → (Array Data) → IO Unit) : IO ClientHttp2Stream.HeadersListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 
 /-- `callback ClientHttp2Stream.PushListener = undefined (object headers, double flags, sequence<any> rawHeaders)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ClientHttp2Stream.PushListener where
@@ -463,10 +466,10 @@ instance instToJSClientHttp2StreamPushListener : ToJS ClientHttp2Stream.PushList
 instance instFromJSClientHttp2StreamPushListener : FromJS ClientHttp2Stream.PushListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ClientHttp2Stream.PushListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ClientHttp2Stream.PushListener.ofFn (f : Data → Float → (Array Data) → Async Unit) : IO ClientHttp2Stream.PushListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ClientHttp2Stream.PushListener.ofSyncFn (f : Data → Float → (Array Data) → IO Unit) : IO ClientHttp2Stream.PushListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 
 /-- `callback ClientHttp2Stream.ResponseListener = undefined (object headers, double flags, sequence<any> rawHeaders)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ClientHttp2Stream.ResponseListener where
@@ -477,10 +480,10 @@ instance instToJSClientHttp2StreamResponseListener : ToJS ClientHttp2Stream.Resp
 instance instFromJSClientHttp2StreamResponseListener : FromJS ClientHttp2Stream.ResponseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ClientHttp2Stream.ResponseListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ClientHttp2Stream.ResponseListener.ofFn (f : Data → Float → (Array Data) → Async Unit) : IO ClientHttp2Stream.ResponseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ClientHttp2Stream.ResponseListener.ofSyncFn (f : Data → Float → (Array Data) → IO Unit) : IO ClientHttp2Stream.ResponseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Float args 1) (← Support.arg (Array Data) args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Float args 1) (← Internal.arg (Array Data) args 2)) }
 
 /-- `dictionary ServerHttp2Stream.PushStreamOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServerHttp2Stream.PushStreamOptions where
@@ -488,8 +491,8 @@ structure ServerHttp2Stream.PushStreamOptions where
   exclusive : Option Bool := none
   /-- `double parent` -/
   parent : Option Float := none
-instance instToJSServerHttp2StreamPushStreamOptions : ToJS ServerHttp2Stream.PushStreamOptions := ⟨fun d => Support.fields #[("exclusive", Support.optional d.exclusive),
-    ("parent", Support.optional d.parent)]⟩
+instance instToJSServerHttp2StreamPushStreamOptions : ToJS ServerHttp2Stream.PushStreamOptions := ⟨fun d => Internal.fields #[("exclusive", Internal.optional d.exclusive),
+    ("parent", Internal.optional d.parent)]⟩
 
 /-- `dictionary ServerHttp2Stream.RespondOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServerHttp2Stream.RespondOptions where
@@ -497,8 +500,8 @@ structure ServerHttp2Stream.RespondOptions where
   endStream : Option Bool := none
   /-- `boolean waitForTrailers` -/
   waitForTrailers : Option Bool := none
-instance instToJSServerHttp2StreamRespondOptions : ToJS ServerHttp2Stream.RespondOptions := ⟨fun d => Support.fields #[("endStream", Support.optional d.endStream),
-    ("waitForTrailers", Support.optional d.waitForTrailers)]⟩
+instance instToJSServerHttp2StreamRespondOptions : ToJS ServerHttp2Stream.RespondOptions := ⟨fun d => Internal.fields #[("endStream", Internal.optional d.endStream),
+    ("waitForTrailers", Internal.optional d.waitForTrailers)]⟩
 
 /-- `(double or FileHandle)`: one constructor per member type. -/
 inductive DoubleOrFileHandle where
@@ -522,10 +525,10 @@ structure ServerHttp2Stream.RespondWithFDOptions where
   offset : Option Float := none
   /-- `double /* integer: Nat */ length` -/
   length : Option Nat := none
-instance instToJSServerHttp2StreamRespondWithFDOptions : ToJS ServerHttp2Stream.RespondWithFDOptions := ⟨fun d => Support.fields #[("statCheck", Support.optional d.statCheck),
-    ("waitForTrailers", Support.optional d.waitForTrailers),
-    ("offset", Support.optional d.offset),
-    ("length", Support.optional d.length)]⟩
+instance instToJSServerHttp2StreamRespondWithFDOptions : ToJS ServerHttp2Stream.RespondWithFDOptions := ⟨fun d => Internal.fields #[("statCheck", Internal.optional d.statCheck),
+    ("waitForTrailers", Internal.optional d.waitForTrailers),
+    ("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length)]⟩
 
 /-- `dictionary ServerHttp2Stream.RespondWithFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServerHttp2Stream.RespondWithFileOptions where
@@ -539,11 +542,11 @@ structure ServerHttp2Stream.RespondWithFileOptions where
   offset : Option Float := none
   /-- `double /* integer: Nat */ length` -/
   length : Option Nat := none
-instance instToJSServerHttp2StreamRespondWithFileOptions : ToJS ServerHttp2Stream.RespondWithFileOptions := ⟨fun d => Support.fields #[("statCheck", Support.optional d.statCheck),
-    ("onError", Support.optional d.onError),
-    ("waitForTrailers", Support.optional d.waitForTrailers),
-    ("offset", Support.optional d.offset),
-    ("length", Support.optional d.length)]⟩
+instance instToJSServerHttp2StreamRespondWithFileOptions : ToJS ServerHttp2Stream.RespondWithFileOptions := ⟨fun d => Internal.fields #[("statCheck", Internal.optional d.statCheck),
+    ("onError", Internal.optional d.onError),
+    ("waitForTrailers", Internal.optional d.waitForTrailers),
+    ("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length)]⟩
 
 /-- `callback Http2Server.CheckContinueListener = undefined (http2.Http2ServerRequest request, http2.Http2ServerResponse response)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.CheckContinueListener where
@@ -554,10 +557,10 @@ instance instToJSHttp2ServerCheckContinueListener : ToJS Http2Server.CheckContin
 instance instFromJSHttp2ServerCheckContinueListener : FromJS Http2Server.CheckContinueListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.CheckContinueListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.CheckContinueListener.ofFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → Async Unit) : IO Http2Server.CheckContinueListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.CheckContinueListener.ofSyncFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → IO Unit) : IO Http2Server.CheckContinueListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 
 /-- `callback Http2Server.ConnectionListener = undefined (stream.Duplex socket)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.ConnectionListener where
@@ -568,10 +571,10 @@ instance instToJSHttp2ServerConnectionListener : ToJS Http2Server.ConnectionList
 instance instFromJSHttp2ServerConnectionListener : FromJS Http2Server.ConnectionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.ConnectionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.ConnectionListener.ofFn (f : stream.Duplex → Async Unit) : IO Http2Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.ConnectionListener.ofSyncFn (f : stream.Duplex → IO Unit) : IO Http2Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 
 /-- `callback Http2Server.RequestListener = undefined (http2.Http2ServerRequest request, http2.Http2ServerResponse response)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.RequestListener where
@@ -582,10 +585,10 @@ instance instToJSHttp2ServerRequestListener : ToJS Http2Server.RequestListener :
 instance instFromJSHttp2ServerRequestListener : FromJS Http2Server.RequestListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.RequestListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.RequestListener.ofFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → Async Unit) : IO Http2Server.RequestListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.RequestListener.ofSyncFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → IO Unit) : IO Http2Server.RequestListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 
 /-- `callback Http2Server.SessionListener = undefined (ServerHttp2Session session)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.SessionListener where
@@ -596,10 +599,10 @@ instance instToJSHttp2ServerSessionListener : ToJS Http2Server.SessionListener :
 instance instFromJSHttp2ServerSessionListener : FromJS Http2Server.SessionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.SessionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.SessionListener.ofFn (f : ServerHttp2Session → Async Unit) : IO Http2Server.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerHttp2Session args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ServerHttp2Session args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.SessionListener.ofSyncFn (f : ServerHttp2Session → IO Unit) : IO Http2Server.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerHttp2Session args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ServerHttp2Session args 0)) }
 
 /-- `callback Http2Server.SessionErrorListener = undefined (any error, ServerHttp2Session session)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.SessionErrorListener where
@@ -610,10 +613,10 @@ instance instToJSHttp2ServerSessionErrorListener : ToJS Http2Server.SessionError
 instance instFromJSHttp2ServerSessionErrorListener : FromJS Http2Server.SessionErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.SessionErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.SessionErrorListener.ofFn (f : Data → ServerHttp2Session → Async Unit) : IO Http2Server.SessionErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerHttp2Session args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ServerHttp2Session args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.SessionErrorListener.ofSyncFn (f : Data → ServerHttp2Session → IO Unit) : IO Http2Server.SessionErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerHttp2Session args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ServerHttp2Session args 1)) }
 
 /-- `callback Http2Server.StreamListener = undefined (Http2Stream stream, object headers, double flags, sequence<any> rawHeaders)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.StreamListener where
@@ -624,10 +627,10 @@ instance instToJSHttp2ServerStreamListener : ToJS Http2Server.StreamListener := 
 instance instFromJSHttp2ServerStreamListener : FromJS Http2Server.StreamListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2Server.StreamListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2Server.StreamListener.ofFn (f : Http2Stream → Data → Float → (Array Data) → Async Unit) : IO Http2Server.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2Server.StreamListener.ofSyncFn (f : Http2Stream → Data → Float → (Array Data) → IO Unit) : IO Http2Server.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 
 /-- `callback Http2Server.TimeoutListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2Server.TimeoutListener where
@@ -652,10 +655,10 @@ instance instToJSHttp2SecureServerCheckContinueListener : ToJS Http2SecureServer
 instance instFromJSHttp2SecureServerCheckContinueListener : FromJS Http2SecureServer.CheckContinueListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.CheckContinueListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.CheckContinueListener.ofFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → Async Unit) : IO Http2SecureServer.CheckContinueListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.CheckContinueListener.ofSyncFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → IO Unit) : IO Http2SecureServer.CheckContinueListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 
 /-- `callback Http2SecureServer.ConnectionListener = undefined (stream.Duplex socket)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.ConnectionListener where
@@ -666,10 +669,10 @@ instance instToJSHttp2SecureServerConnectionListener : ToJS Http2SecureServer.Co
 instance instFromJSHttp2SecureServerConnectionListener : FromJS Http2SecureServer.ConnectionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.ConnectionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.ConnectionListener.ofFn (f : stream.Duplex → Async Unit) : IO Http2SecureServer.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.ConnectionListener.ofSyncFn (f : stream.Duplex → IO Unit) : IO Http2SecureServer.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 
 /-- `callback Http2SecureServer.RequestListener = undefined (http2.Http2ServerRequest request, http2.Http2ServerResponse response)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.RequestListener where
@@ -680,10 +683,10 @@ instance instToJSHttp2SecureServerRequestListener : ToJS Http2SecureServer.Reque
 instance instFromJSHttp2SecureServerRequestListener : FromJS Http2SecureServer.RequestListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.RequestListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.RequestListener.ofFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → Async Unit) : IO Http2SecureServer.RequestListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.RequestListener.ofSyncFn (f : http2.Http2ServerRequest → http2.Http2ServerResponse → IO Unit) : IO Http2SecureServer.RequestListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg http2.Http2ServerRequest args 0) (← Support.arg http2.Http2ServerResponse args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http2.Http2ServerRequest args 0) (← Internal.arg http2.Http2ServerResponse args 1)) }
 
 /-- `callback Http2SecureServer.SessionListener = undefined (ServerHttp2Session session)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.SessionListener where
@@ -694,10 +697,10 @@ instance instToJSHttp2SecureServerSessionListener : ToJS Http2SecureServer.Sessi
 instance instFromJSHttp2SecureServerSessionListener : FromJS Http2SecureServer.SessionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.SessionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.SessionListener.ofFn (f : ServerHttp2Session → Async Unit) : IO Http2SecureServer.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerHttp2Session args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ServerHttp2Session args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.SessionListener.ofSyncFn (f : ServerHttp2Session → IO Unit) : IO Http2SecureServer.SessionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerHttp2Session args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ServerHttp2Session args 0)) }
 
 /-- `callback Http2SecureServer.SessionErrorListener = undefined (any error, ServerHttp2Session session)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.SessionErrorListener where
@@ -708,10 +711,10 @@ instance instToJSHttp2SecureServerSessionErrorListener : ToJS Http2SecureServer.
 instance instFromJSHttp2SecureServerSessionErrorListener : FromJS Http2SecureServer.SessionErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.SessionErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.SessionErrorListener.ofFn (f : Data → ServerHttp2Session → Async Unit) : IO Http2SecureServer.SessionErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerHttp2Session args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ServerHttp2Session args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.SessionErrorListener.ofSyncFn (f : Data → ServerHttp2Session → IO Unit) : IO Http2SecureServer.SessionErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerHttp2Session args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg ServerHttp2Session args 1)) }
 
 /-- `callback Http2SecureServer.StreamListener = undefined (Http2Stream stream, object headers, double flags, sequence<any> rawHeaders)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.StreamListener where
@@ -722,10 +725,10 @@ instance instToJSHttp2SecureServerStreamListener : ToJS Http2SecureServer.Stream
 instance instFromJSHttp2SecureServerStreamListener : FromJS Http2SecureServer.StreamListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.StreamListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.StreamListener.ofFn (f : Http2Stream → Data → Float → (Array Data) → Async Unit) : IO Http2SecureServer.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.StreamListener.ofSyncFn (f : Http2Stream → Data → Float → (Array Data) → IO Unit) : IO Http2SecureServer.StreamListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Http2Stream args 0) (← Support.arg Data args 1) (← Support.arg Float args 2) (← Support.arg (Array Data) args 3)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Http2Stream args 0) (← Internal.arg Data args 1) (← Internal.arg Float args 2) (← Internal.arg (Array Data) args 3)) }
 
 /-- `callback Http2SecureServer.TimeoutListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure Http2SecureServer.TimeoutListener where
@@ -750,10 +753,10 @@ instance instToJSHttp2SecureServerUnknownProtocolListener : ToJS Http2SecureServ
 instance instFromJSHttp2SecureServerUnknownProtocolListener : FromJS Http2SecureServer.UnknownProtocolListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Http2SecureServer.UnknownProtocolListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def Http2SecureServer.UnknownProtocolListener.ofFn (f : stream.Duplex → Async Unit) : IO Http2SecureServer.UnknownProtocolListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def Http2SecureServer.UnknownProtocolListener.ofSyncFn (f : stream.Duplex → IO Unit) : IO Http2SecureServer.UnknownProtocolListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg stream.Duplex args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Duplex args 0)) }
 
 /-- `callback http2.Http2ServerRequest.AbortedListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure http2.Http2ServerRequest.AbortedListener where
@@ -819,9 +822,9 @@ structure http2.CreateServerOptionsHttp1Options where
   ServerResponse : Option http.ServerResponse := none
   /-- `double keepAliveTimeout = 5000` -/
   keepAliveTimeout : Option Float := none
-instance instToJSHttp2CreateServerOptionsHttp1Options : ToJS http2.CreateServerOptionsHttp1Options := ⟨fun d => Support.fields #[("IncomingMessage", Support.optional d.IncomingMessage),
-    ("ServerResponse", Support.optional d.ServerResponse),
-    ("keepAliveTimeout", Support.optional d.keepAliveTimeout)]⟩
+instance instToJSHttp2CreateServerOptionsHttp1Options : ToJS http2.CreateServerOptionsHttp1Options := ⟨fun d => Internal.fields #[("IncomingMessage", Internal.optional d.IncomingMessage),
+    ("ServerResponse", Internal.optional d.ServerResponse),
+    ("keepAliveTimeout", Internal.optional d.keepAliveTimeout)]⟩
 
 /-- `dictionary http2.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http2.CreateServerOptions where
@@ -867,27 +870,27 @@ structure http2.CreateServerOptions where
   strictFieldWhitespaceValidation : Option Bool := none
   /-- `boolean strictSingleValueFields = true` -/
   strictSingleValueFields : Option Bool := none
-instance instToJSHttp2CreateServerOptions : ToJS http2.CreateServerOptions := ⟨fun d => Support.fields #[("maxDeflateDynamicTableSize", Support.optional d.maxDeflateDynamicTableSize),
-    ("maxSettings", Support.optional d.maxSettings),
-    ("maxSessionMemory", Support.optional d.maxSessionMemory),
-    ("maxHeaderListPairs", Support.optional d.maxHeaderListPairs),
-    ("maxOutstandingPings", Support.optional d.maxOutstandingPings),
-    ("maxSendHeaderBlockLength", Support.optional d.maxSendHeaderBlockLength),
-    ("paddingStrategy", Support.optional d.paddingStrategy),
-    ("peerMaxConcurrentStreams", Support.optional d.peerMaxConcurrentStreams),
-    ("maxSessionInvalidFrames", Support.optional d.maxSessionInvalidFrames),
-    ("maxSessionRejectedStreams", Support.optional d.maxSessionRejectedStreams),
+instance instToJSHttp2CreateServerOptions : ToJS http2.CreateServerOptions := ⟨fun d => Internal.fields #[("maxDeflateDynamicTableSize", Internal.optional d.maxDeflateDynamicTableSize),
+    ("maxSettings", Internal.optional d.maxSettings),
+    ("maxSessionMemory", Internal.optional d.maxSessionMemory),
+    ("maxHeaderListPairs", Internal.optional d.maxHeaderListPairs),
+    ("maxOutstandingPings", Internal.optional d.maxOutstandingPings),
+    ("maxSendHeaderBlockLength", Internal.optional d.maxSendHeaderBlockLength),
+    ("paddingStrategy", Internal.optional d.paddingStrategy),
+    ("peerMaxConcurrentStreams", Internal.optional d.peerMaxConcurrentStreams),
+    ("maxSessionInvalidFrames", Internal.optional d.maxSessionInvalidFrames),
+    ("maxSessionRejectedStreams", Internal.optional d.maxSessionRejectedStreams),
     ("settings", d.settings),
-    ("streamResetBurst", Support.optional d.streamResetBurst),
-    ("remoteCustomSettings", Support.optional d.remoteCustomSettings),
-    ("Http1IncomingMessage", Support.optional d.Http1IncomingMessage),
-    ("Http1ServerResponse", Support.optional d.Http1ServerResponse),
-    ("http1Options", Support.optional d.http1Options),
-    ("Http2ServerRequest", Support.optional d.Http2ServerRequest),
-    ("Http2ServerResponse", Support.optional d.Http2ServerResponse),
-    ("unknownProtocolTimeout", Support.optional d.unknownProtocolTimeout),
-    ("strictFieldWhitespaceValidation", Support.optional d.strictFieldWhitespaceValidation),
-    ("strictSingleValueFields", Support.optional d.strictSingleValueFields)]⟩
+    ("streamResetBurst", Internal.optional d.streamResetBurst),
+    ("remoteCustomSettings", Internal.optional d.remoteCustomSettings),
+    ("Http1IncomingMessage", Internal.optional d.Http1IncomingMessage),
+    ("Http1ServerResponse", Internal.optional d.Http1ServerResponse),
+    ("http1Options", Internal.optional d.http1Options),
+    ("Http2ServerRequest", Internal.optional d.Http2ServerRequest),
+    ("Http2ServerResponse", Internal.optional d.Http2ServerResponse),
+    ("unknownProtocolTimeout", Internal.optional d.unknownProtocolTimeout),
+    ("strictFieldWhitespaceValidation", Internal.optional d.strictFieldWhitespaceValidation),
+    ("strictSingleValueFields", Internal.optional d.strictSingleValueFields)]⟩
 
 /-- `dictionary http2.CreateSecureServerOptionsHttp1Options` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http2.CreateSecureServerOptionsHttp1Options where
@@ -897,9 +900,9 @@ structure http2.CreateSecureServerOptionsHttp1Options where
   ServerResponse : Option http.ServerResponse := none
   /-- `double keepAliveTimeout = 5000` -/
   keepAliveTimeout : Option Float := none
-instance instToJSHttp2CreateSecureServerOptionsHttp1Options : ToJS http2.CreateSecureServerOptionsHttp1Options := ⟨fun d => Support.fields #[("IncomingMessage", Support.optional d.IncomingMessage),
-    ("ServerResponse", Support.optional d.ServerResponse),
-    ("keepAliveTimeout", Support.optional d.keepAliveTimeout)]⟩
+instance instToJSHttp2CreateSecureServerOptionsHttp1Options : ToJS http2.CreateSecureServerOptionsHttp1Options := ⟨fun d => Internal.fields #[("IncomingMessage", Internal.optional d.IncomingMessage),
+    ("ServerResponse", Internal.optional d.ServerResponse),
+    ("keepAliveTimeout", Internal.optional d.keepAliveTimeout)]⟩
 
 /-- `dictionary http2.CreateSecureServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http2.CreateSecureServerOptions where
@@ -941,25 +944,25 @@ structure http2.CreateSecureServerOptions where
   strictSingleValueFields : Option Bool := none
   /-- `Node_http2_CreateSecureServerOptionsHttp1Options http1Options` -/
   http1Options : Option http2.CreateSecureServerOptionsHttp1Options := none
-instance instToJSHttp2CreateSecureServerOptions : ToJS http2.CreateSecureServerOptions := ⟨fun d => Support.fields #[("allowHTTP1", Support.optional d.allowHTTP1),
-    ("maxDeflateDynamicTableSize", Support.optional d.maxDeflateDynamicTableSize),
-    ("maxSettings", Support.optional d.maxSettings),
-    ("maxSessionMemory", Support.optional d.maxSessionMemory),
-    ("maxHeaderListPairs", Support.optional d.maxHeaderListPairs),
-    ("maxOutstandingPings", Support.optional d.maxOutstandingPings),
-    ("maxSendHeaderBlockLength", Support.optional d.maxSendHeaderBlockLength),
-    ("paddingStrategy", Support.optional d.paddingStrategy),
-    ("peerMaxConcurrentStreams", Support.optional d.peerMaxConcurrentStreams),
-    ("maxSessionInvalidFrames", Support.optional d.maxSessionInvalidFrames),
-    ("maxSessionRejectedStreams", Support.optional d.maxSessionRejectedStreams),
+instance instToJSHttp2CreateSecureServerOptions : ToJS http2.CreateSecureServerOptions := ⟨fun d => Internal.fields #[("allowHTTP1", Internal.optional d.allowHTTP1),
+    ("maxDeflateDynamicTableSize", Internal.optional d.maxDeflateDynamicTableSize),
+    ("maxSettings", Internal.optional d.maxSettings),
+    ("maxSessionMemory", Internal.optional d.maxSessionMemory),
+    ("maxHeaderListPairs", Internal.optional d.maxHeaderListPairs),
+    ("maxOutstandingPings", Internal.optional d.maxOutstandingPings),
+    ("maxSendHeaderBlockLength", Internal.optional d.maxSendHeaderBlockLength),
+    ("paddingStrategy", Internal.optional d.paddingStrategy),
+    ("peerMaxConcurrentStreams", Internal.optional d.peerMaxConcurrentStreams),
+    ("maxSessionInvalidFrames", Internal.optional d.maxSessionInvalidFrames),
+    ("maxSessionRejectedStreams", Internal.optional d.maxSessionRejectedStreams),
     ("settings", d.settings),
-    ("streamResetBurst", Support.optional d.streamResetBurst),
-    ("remoteCustomSettings", Support.optional d.remoteCustomSettings),
-    ("origins", Support.optional d.origins),
-    ("unknownProtocolTimeout", Support.optional d.unknownProtocolTimeout),
-    ("strictFieldWhitespaceValidation", Support.optional d.strictFieldWhitespaceValidation),
-    ("strictSingleValueFields", Support.optional d.strictSingleValueFields),
-    ("http1Options", Support.optional d.http1Options)]⟩
+    ("streamResetBurst", Internal.optional d.streamResetBurst),
+    ("remoteCustomSettings", Internal.optional d.remoteCustomSettings),
+    ("origins", Internal.optional d.origins),
+    ("unknownProtocolTimeout", Internal.optional d.unknownProtocolTimeout),
+    ("strictFieldWhitespaceValidation", Internal.optional d.strictFieldWhitespaceValidation),
+    ("strictSingleValueFields", Internal.optional d.strictSingleValueFields),
+    ("http1Options", Internal.optional d.http1Options)]⟩
 
 /-- `dictionary http2.ConnectOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http2.ConnectOptions where
@@ -995,899 +998,950 @@ structure http2.ConnectOptions where
   unknownProtocolTimeout : Option Float := none
   /-- `boolean strictFieldWhitespaceValidation = true` -/
   strictFieldWhitespaceValidation : Option Bool := none
-instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => Support.fields #[("maxDeflateDynamicTableSize", Support.optional d.maxDeflateDynamicTableSize),
-    ("maxSettings", Support.optional d.maxSettings),
-    ("maxSessionMemory", Support.optional d.maxSessionMemory),
-    ("maxHeaderListPairs", Support.optional d.maxHeaderListPairs),
-    ("maxOriginSetSize", Support.optional d.maxOriginSetSize),
-    ("maxOutstandingPings", Support.optional d.maxOutstandingPings),
-    ("maxReservedRemoteStreams", Support.optional d.maxReservedRemoteStreams),
-    ("maxSendHeaderBlockLength", Support.optional d.maxSendHeaderBlockLength),
-    ("paddingStrategy", Support.optional d.paddingStrategy),
-    ("peerMaxConcurrentStreams", Support.optional d.peerMaxConcurrentStreams),
-    ("protocol", Support.optional d.protocol),
+instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => Internal.fields #[("maxDeflateDynamicTableSize", Internal.optional d.maxDeflateDynamicTableSize),
+    ("maxSettings", Internal.optional d.maxSettings),
+    ("maxSessionMemory", Internal.optional d.maxSessionMemory),
+    ("maxHeaderListPairs", Internal.optional d.maxHeaderListPairs),
+    ("maxOriginSetSize", Internal.optional d.maxOriginSetSize),
+    ("maxOutstandingPings", Internal.optional d.maxOutstandingPings),
+    ("maxReservedRemoteStreams", Internal.optional d.maxReservedRemoteStreams),
+    ("maxSendHeaderBlockLength", Internal.optional d.maxSendHeaderBlockLength),
+    ("paddingStrategy", Internal.optional d.paddingStrategy),
+    ("peerMaxConcurrentStreams", Internal.optional d.peerMaxConcurrentStreams),
+    ("protocol", Internal.optional d.protocol),
     ("settings", d.settings),
-    ("remoteCustomSettings", Support.optional d.remoteCustomSettings),
-    ("createConnection", Support.optional d.createConnection),
-    ("unknownProtocolTimeout", Support.optional d.unknownProtocolTimeout),
-    ("strictFieldWhitespaceValidation", Support.optional d.strictFieldWhitespaceValidation)]⟩
+    ("remoteCustomSettings", Internal.optional d.remoteCustomSettings),
+    ("createConnection", Internal.optional d.createConnection),
+    ("unknownProtocolTimeout", Internal.optional d.unknownProtocolTimeout),
+    ("strictFieldWhitespaceValidation", Internal.optional d.strictFieldWhitespaceValidation)]⟩
 
 /-- `v instanceof Http2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Session`). -/
-def Http2Session.cast? (v : Value) : IO (Option Http2Session) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Session"] Value) v) then some { val := v } else none
+@[macro_inline] def Http2Session.cast? (v : Value) : IO (Option Http2Session) := Internal.api "Lasm.JS.Node.Http2Session.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2Session"] Value) (fun x => { val := x }) v
 
 /-- `http2session.alpnProtocol` (added in Node.js v9.4.0): `readonly attribute DOMString? alpnProtocol` -/
-def Http2Session.alpnProtocol (self : Http2Session) : IO (Option String) := self.val.get "alpnProtocol" (Option String)
+@[macro_inline] def Http2Session.alpnProtocol (self : Http2Session) : IO (Option String) := Internal.api "Lasm.JS.Node.Http2Session.alpnProtocol" do
+  self.val.get "alpnProtocol" (Option String)
 
 /-- `http2session.closed` (added in Node.js v9.4.0): `readonly attribute boolean closed` -/
-def Http2Session.closed (self : Http2Session) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def Http2Session.closed (self : Http2Session) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.closed" do
+  self.val.get "closed" Bool
 
 /-- `http2session.connecting` (added in Node.js v10.0.0): `readonly attribute boolean connecting` -/
-def Http2Session.connecting (self : Http2Session) : IO Bool := self.val.get "connecting" Bool
+@[macro_inline] def Http2Session.connecting (self : Http2Session) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.connecting" do
+  self.val.get "connecting" Bool
 
 /-- `http2session.destroyed` (added in Node.js v8.4.0): `readonly attribute boolean destroyed` -/
-def Http2Session.destroyed (self : Http2Session) : IO Bool := self.val.get "destroyed" Bool
+@[macro_inline] def Http2Session.destroyed (self : Http2Session) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.destroyed" do
+  self.val.get "destroyed" Bool
 
 /-- `http2session.encrypted` (added in Node.js v9.4.0): `readonly attribute boolean? encrypted` -/
-def Http2Session.encrypted (self : Http2Session) : IO (Option Bool) := self.val.get "encrypted" (Option Bool)
+@[macro_inline] def Http2Session.encrypted (self : Http2Session) : IO (Option Bool) := Internal.api "Lasm.JS.Node.Http2Session.encrypted" do
+  self.val.get "encrypted" (Option Bool)
 
 /-- `http2session.localSettings` (added in Node.js v8.4.0): `readonly attribute object localSettings` -/
-def Http2Session.localSettings (self : Http2Session) : IO Data := self.val.get "localSettings" Data
+@[macro_inline] def Http2Session.localSettings (self : Http2Session) : IO Data := Internal.api "Lasm.JS.Node.Http2Session.localSettings" do
+  self.val.get "localSettings" Data
 
 /-- `http2session.originSet` (added in Node.js v9.4.0): `readonly attribute sequence<DOMString>? originSet` -/
-def Http2Session.originSet (self : Http2Session) : IO (Option (Array String)) := self.val.get "originSet" (Option (Array String))
+@[macro_inline] def Http2Session.originSet (self : Http2Session) : IO (Option (Array String)) := Internal.api "Lasm.JS.Node.Http2Session.originSet" do
+  self.val.get "originSet" (Option (Array String))
 
 /-- `http2session.pendingSettingsAck` (added in Node.js v8.4.0): `readonly attribute boolean pendingSettingsAck` -/
-def Http2Session.pendingSettingsAck (self : Http2Session) : IO Bool := self.val.get "pendingSettingsAck" Bool
+@[macro_inline] def Http2Session.pendingSettingsAck (self : Http2Session) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.pendingSettingsAck" do
+  self.val.get "pendingSettingsAck" Bool
 
 /-- `http2session.remoteSettings` (added in Node.js v8.4.0): `readonly attribute object remoteSettings` -/
-def Http2Session.remoteSettings (self : Http2Session) : IO Data := self.val.get "remoteSettings" Data
+@[macro_inline] def Http2Session.remoteSettings (self : Http2Session) : IO Data := Internal.api "Lasm.JS.Node.Http2Session.remoteSettings" do
+  self.val.get "remoteSettings" Data
 
 /-- `http2session.socket` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) socket` -/
-def Http2Session.socket (self : Http2Session) : IO Value := self.val.get "socket" Value
+@[macro_inline] def Http2Session.socket (self : Http2Session) : IO Value := Internal.api "Lasm.JS.Node.Http2Session.socket" do
+  self.val.get "socket" Value
 
 /-- `http2session.state` (added in Node.js v8.4.0): `readonly attribute any state` -/
-def Http2Session.state (self : Http2Session) : IO Data := self.val.get "state" Data
+@[macro_inline] def Http2Session.state (self : Http2Session) : IO Data := Internal.api "Lasm.JS.Node.Http2Session.state" do
+  self.val.get "state" Data
 
 /-- `http2session.type` (added in Node.js v8.4.0): `readonly attribute double type` -/
-def Http2Session.type (self : Http2Session) : IO Float := self.val.get "type" Float
+@[macro_inline] def Http2Session.type (self : Http2Session) : IO Float := Internal.api "Lasm.JS.Node.Http2Session.type" do
+  self.val.get "type" Float
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `Http2Session onClose(Http2Session.CloseListener listener)`: calls `on("close", listener)` -/
-def Http2Session.onClose (self : Http2Session) (listener : Http2Session.CloseListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def Http2Session.onClose (self : Http2Session) (listener : Http2Session.CloseListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `Http2Session onceClose(Http2Session.CloseListener listener)`: calls `once("close", listener)` -/
-def Http2Session.onceClose (self : Http2Session) (listener : Http2Session.CloseListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def Http2Session.onceClose (self : Http2Session) (listener : Http2Session.CloseListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v8.4.0): `Http2Session onConnect(Http2Session.ConnectListener listener)`: calls `on("connect", listener)` -/
-def Http2Session.onConnect (self : Http2Session) (listener : Http2Session.ConnectListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def Http2Session.onConnect (self : Http2Session) (listener : Http2Session.ConnectListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onConnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v8.4.0): `Http2Session onceConnect(Http2Session.ConnectListener listener)`: calls `once("connect", listener)` -/
-def Http2Session.onceConnect (self : Http2Session) (listener : Http2Session.ConnectListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def Http2Session.onceConnect (self : Http2Session) (listener : Http2Session.ConnectListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceConnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v8.4.0): `Http2Session onError(Http2Session.ErrorListener listener)`: calls `on("error", listener)` -/
-def Http2Session.onError (self : Http2Session) (listener : Http2Session.ErrorListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def Http2Session.onError (self : Http2Session) (listener : Http2Session.ErrorListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v8.4.0): `Http2Session onceError(Http2Session.ErrorListener listener)`: calls `once("error", listener)` -/
-def Http2Session.onceError (self : Http2Session) (listener : Http2Session.ErrorListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def Http2Session.onceError (self : Http2Session) (listener : Http2Session.ErrorListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'frameError'` (added in Node.js v8.4.0): `Http2Session onFrameError(Http2Session.FrameErrorListener listener)`: calls `on("frameError", listener)` -/
-def Http2Session.onFrameError (self : Http2Session) (listener : Http2Session.FrameErrorListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "frameError", toJS listener]) Value
+@[macro_inline] def Http2Session.onFrameError (self : Http2Session) (listener : Http2Session.FrameErrorListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onFrameError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "frameError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'frameError'` (added in Node.js v8.4.0): `Http2Session onceFrameError(Http2Session.FrameErrorListener listener)`: calls `once("frameError", listener)` -/
-def Http2Session.onceFrameError (self : Http2Session) (listener : Http2Session.FrameErrorListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "frameError", toJS listener]) Value
+@[macro_inline] def Http2Session.onceFrameError (self : Http2Session) (listener : Http2Session.FrameErrorListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceFrameError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "frameError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'goaway'` (added in Node.js v8.4.0): `Http2Session onGoaway(Http2Session.GoawayListener listener)`: calls `on("goaway", listener)` -/
-def Http2Session.onGoaway (self : Http2Session) (listener : Http2Session.GoawayListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "goaway", toJS listener]) Value
+@[macro_inline] def Http2Session.onGoaway (self : Http2Session) (listener : Http2Session.GoawayListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onGoaway" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "goaway", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'goaway'` (added in Node.js v8.4.0): `Http2Session onceGoaway(Http2Session.GoawayListener listener)`: calls `once("goaway", listener)` -/
-def Http2Session.onceGoaway (self : Http2Session) (listener : Http2Session.GoawayListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "goaway", toJS listener]) Value
+@[macro_inline] def Http2Session.onceGoaway (self : Http2Session) (listener : Http2Session.GoawayListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceGoaway" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "goaway", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'localSettings'` (added in Node.js v8.4.0): `Http2Session onLocalSettings(Http2Session.LocalSettingsListener listener)`: calls `on("localSettings", listener)` -/
-def Http2Session.onLocalSettings (self : Http2Session) (listener : Http2Session.LocalSettingsListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "localSettings", toJS listener]) Value
+@[macro_inline] def Http2Session.onLocalSettings (self : Http2Session) (listener : Http2Session.LocalSettingsListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onLocalSettings" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "localSettings", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'localSettings'` (added in Node.js v8.4.0): `Http2Session onceLocalSettings(Http2Session.LocalSettingsListener listener)`: calls `once("localSettings", listener)` -/
-def Http2Session.onceLocalSettings (self : Http2Session) (listener : Http2Session.LocalSettingsListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "localSettings", toJS listener]) Value
+@[macro_inline] def Http2Session.onceLocalSettings (self : Http2Session) (listener : Http2Session.LocalSettingsListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceLocalSettings" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "localSettings", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ping'` (added in Node.js v10.12.0): `Http2Session onPing(Http2Session.PingListener listener)`: calls `on("ping", listener)` -/
-def Http2Session.onPing (self : Http2Session) (listener : Http2Session.PingListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ping", toJS listener]) Value
+@[macro_inline] def Http2Session.onPing (self : Http2Session) (listener : Http2Session.PingListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onPing" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ping", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ping'` (added in Node.js v10.12.0): `Http2Session oncePing(Http2Session.PingListener listener)`: calls `once("ping", listener)` -/
-def Http2Session.oncePing (self : Http2Session) (listener : Http2Session.PingListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ping", toJS listener]) Value
+@[macro_inline] def Http2Session.oncePing (self : Http2Session) (listener : Http2Session.PingListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.oncePing" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ping", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'remoteSettings'` (added in Node.js v8.4.0): `Http2Session onRemoteSettings(Http2Session.RemoteSettingsListener listener)`: calls `on("remoteSettings", listener)` -/
-def Http2Session.onRemoteSettings (self : Http2Session) (listener : Http2Session.RemoteSettingsListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "remoteSettings", toJS listener]) Value
+@[macro_inline] def Http2Session.onRemoteSettings (self : Http2Session) (listener : Http2Session.RemoteSettingsListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onRemoteSettings" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "remoteSettings", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'remoteSettings'` (added in Node.js v8.4.0): `Http2Session onceRemoteSettings(Http2Session.RemoteSettingsListener listener)`: calls `once("remoteSettings", listener)` -/
-def Http2Session.onceRemoteSettings (self : Http2Session) (listener : Http2Session.RemoteSettingsListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "remoteSettings", toJS listener]) Value
+@[macro_inline] def Http2Session.onceRemoteSettings (self : Http2Session) (listener : Http2Session.RemoteSettingsListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceRemoteSettings" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "remoteSettings", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2Session onStream(Http2Session.StreamListener listener)`: calls `on("stream", listener)` -/
-def Http2Session.onStream (self : Http2Session) (listener : Http2Session.StreamListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2Session.onStream (self : Http2Session) (listener : Http2Session.StreamListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onStream" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2Session onceStream(Http2Session.StreamListener listener)`: calls `once("stream", listener)` -/
-def Http2Session.onceStream (self : Http2Session) (listener : Http2Session.StreamListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2Session.onceStream (self : Http2Session) (listener : Http2Session.StreamListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceStream" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Session onTimeout(Http2Session.TimeoutListener listener)`: calls `on("timeout", listener)` -/
-def Http2Session.onTimeout (self : Http2Session) (listener : Http2Session.TimeoutListener) : IO Http2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Session.onTimeout (self : Http2Session) (listener : Http2Session.TimeoutListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Session onceTimeout(Http2Session.TimeoutListener listener)`: calls `once("timeout", listener)` -/
-def Http2Session.onceTimeout (self : Http2Session) (listener : Http2Session.TimeoutListener) : IO Http2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Session.onceTimeout (self : Http2Session) (listener : Http2Session.TimeoutListener) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Session.onceTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `http2session.close([callback])` (added in Node.js v9.4.0): `undefined close()` -/
-def Http2Session.close (self : Http2Session) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Http2Session.close (self : Http2Session) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `http2session.destroy([error][, code])` (added in Node.js v8.4.0): `undefined destroy(optional any error, optional double code)` -/
-def Http2Session.destroy (self : Http2Session) (error : Data := .undefined) (code : Option Float := none) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[error, Support.optional code]) Unit
+@[macro_inline] def Http2Session.destroy (self : Http2Session) (error : Data := .undefined) (code : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[error, Internal.optional code]) Unit
 
 /-- `http2session.goaway([code[, lastStreamID[, opaqueData]]])` (added in Node.js v9.4.0): `undefined goaway(optional double code, optional double lastStreamID, optional Uint8Array opaqueData)` -/
-def Http2Session.goaway (self : Http2Session) (code : Option Float := none) (lastStreamID : Option Float := none) (opaqueData : Option ByteArray := none) : IO Unit :=
-  self.val.callMethod "goaway" (Support.args #[Support.optional code, Support.optional lastStreamID, Support.optional opaqueData]) Unit
+@[macro_inline] def Http2Session.goaway (self : Http2Session) (code : Option Float := none) (lastStreamID : Option Float := none) (opaqueData : Option ByteArray := none) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.goaway" do
+  self.val.callMethod "goaway" (Internal.args #[Internal.optional code, Internal.optional lastStreamID, Internal.optional opaqueData]) Unit
 
 /-- `http2session.ping([payload, ]callback)` (added in Node.js v8.9.3): `boolean ping(Function callback)` -/
-def Http2Session.ping (self : Http2Session) (callback : JSFunction) : IO Bool :=
-  self.val.callMethod "ping" (Support.args #[toJS callback]) Bool
+@[macro_inline] def Http2Session.ping (self : Http2Session) (callback : JSFunction) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.ping" do
+  self.val.callMethod "ping" (Internal.args #[toJS callback]) Bool
 
 /-- `http2session.ping([payload, ]callback)` (added in Node.js v8.9.3): `boolean ping(Uint8Array payload, Function callback)` -/
-def Http2Session.pingWithPayload (self : Http2Session) (payload : ByteArray) (callback : JSFunction) : IO Bool :=
-  self.val.callMethod "ping" (Support.args #[toJS payload, toJS callback]) Bool
+@[macro_inline] def Http2Session.pingWithPayload (self : Http2Session) (payload : ByteArray) (callback : JSFunction) : IO Bool := Internal.api "Lasm.JS.Node.Http2Session.pingWithPayload" do
+  self.val.callMethod "ping" (Internal.args #[toJS payload, toJS callback]) Bool
 
 /-- `http2session.ref()` (added in Node.js v9.4.0): `undefined ref()` -/
-def Http2Session.ref (self : Http2Session) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Http2Session.ref (self : Http2Session) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `http2session.setLocalWindowSize(windowSize)` (added in Node.js v15.3.0, v14.18.0): `undefined setLocalWindowSize(double windowSize)` -/
-def Http2Session.setLocalWindowSize (self : Http2Session) (windowSize : Float) : IO Unit :=
-  self.val.callMethod "setLocalWindowSize" (Support.args #[toJS windowSize]) Unit
+@[macro_inline] def Http2Session.setLocalWindowSize (self : Http2Session) (windowSize : Float) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.setLocalWindowSize" do
+  self.val.callMethod "setLocalWindowSize" (Internal.args #[toJS windowSize]) Unit
 
 /-- `http2session.setTimeout(msecs, callback)` (added in Node.js v8.4.0): `undefined setTimeout(double msecs, Function callback)` -/
-def Http2Session.setTimeout (self : Http2Session) (msecs : Float) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "setTimeout" (Support.args #[toJS msecs, toJS callback]) Unit
+@[macro_inline] def Http2Session.setTimeout (self : Http2Session) (msecs : Float) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.setTimeout" do
+  self.val.callMethod "setTimeout" (Internal.args #[toJS msecs, toJS callback]) Unit
 
 /-- `http2session.settings([settings][, callback])` (added in Node.js v8.4.0): `undefined settings(optional object settings)` -/
-def Http2Session.settings (self : Http2Session) (settings : Data := .undefined) : IO Unit :=
-  self.val.callMethod "settings" (Support.args #[settings]) Unit
+@[macro_inline] def Http2Session.settings (self : Http2Session) (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.settings" do
+  self.val.callMethod "settings" (Internal.args #[settings]) Unit
 
 /-- `http2session.unref()` (added in Node.js v9.4.0): `undefined unref()` -/
-def Http2Session.unref (self : Http2Session) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Http2Session.unref (self : Http2Session) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `v instanceof ServerHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Session`). -/
-def ServerHttp2Session.cast? (v : Value) : IO (Option ServerHttp2Session) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ServerHttp2Session"] Value) v) then some { val := v } else none
+@[macro_inline] def ServerHttp2Session.cast? (v : Value) : IO (Option ServerHttp2Session) := Internal.api "Lasm.JS.Node.ServerHttp2Session.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["ServerHttp2Session"] Value) (fun x => { val := x }) v
 
 /-- `serverhttp2session.altsvc(alt, originOrStream)` (added in Node.js v9.4.0): `undefined altsvc(DOMString alt, (double or DOMString or URL or object) originOrStream)` -/
-def ServerHttp2Session.altsvc (self : ServerHttp2Session) (alt : String) (originOrStream : DoubleOrDOMStringOrURLOrObject) : IO Unit :=
-  self.val.callMethod "altsvc" (Support.args #[toJS alt, toJS originOrStream]) Unit
+@[macro_inline] def ServerHttp2Session.altsvc (self : ServerHttp2Session) (alt : String) (originOrStream : DoubleOrDOMStringOrURLOrObject) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Session.altsvc" do
+  self.val.callMethod "altsvc" (Internal.args #[toJS alt, toJS originOrStream]) Unit
 
 /-- `serverhttp2session.origin(...origins)` (added in Node.js v10.12.0): `undefined origin((DOMString or URL or object)... origins)` -/
-def ServerHttp2Session.origin (self : ServerHttp2Session) (origins : Array DOMStringOrURLOrObject := #[]) : IO Unit :=
-  self.val.callMethod "origin" (Support.argsWith #[] (origins.map toJS)) Unit
+@[macro_inline] def ServerHttp2Session.origin (self : ServerHttp2Session) (origins : Array DOMStringOrURLOrObject := #[]) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Session.origin" do
+  self.val.callMethod "origin" (Internal.argsWith #[] (origins.map toJS)) Unit
 
 /-- `v instanceof ClientHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Session`). -/
-def ClientHttp2Session.cast? (v : Value) : IO (Option ClientHttp2Session) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ClientHttp2Session"] Value) v) then some { val := v } else none
+@[macro_inline] def ClientHttp2Session.cast? (v : Value) : IO (Option ClientHttp2Session) := Internal.api "Lasm.JS.Node.ClientHttp2Session.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["ClientHttp2Session"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'altsvc'` (added in Node.js v9.4.0): `ClientHttp2Session onAltsvc(ClientHttp2Session.AltsvcListener listener)`: calls `on("altsvc", listener)` -/
-def ClientHttp2Session.onAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "altsvc", toJS listener]) Value
+@[macro_inline] def ClientHttp2Session.onAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.ClientHttp2Session.onAltsvc" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "altsvc", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'altsvc'` (added in Node.js v9.4.0): `ClientHttp2Session onceAltsvc(ClientHttp2Session.AltsvcListener listener)`: calls `once("altsvc", listener)` -/
-def ClientHttp2Session.onceAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "altsvc", toJS listener]) Value
+@[macro_inline] def ClientHttp2Session.onceAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.ClientHttp2Session.onceAltsvc" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "altsvc", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'origin'` (added in Node.js v10.12.0): `ClientHttp2Session onOrigin(ClientHttp2Session.OriginListener listener)`: calls `on("origin", listener)` -/
-def ClientHttp2Session.onOrigin (self : ClientHttp2Session) (listener : ClientHttp2Session.OriginListener) : IO ClientHttp2Session := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "origin", toJS listener]) Value
+@[macro_inline] def ClientHttp2Session.onOrigin (self : ClientHttp2Session) (listener : ClientHttp2Session.OriginListener) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.ClientHttp2Session.onOrigin" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "origin", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'origin'` (added in Node.js v10.12.0): `ClientHttp2Session onceOrigin(ClientHttp2Session.OriginListener listener)`: calls `once("origin", listener)` -/
-def ClientHttp2Session.onceOrigin (self : ClientHttp2Session) (listener : ClientHttp2Session.OriginListener) : IO ClientHttp2Session := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "origin", toJS listener]) Value
+@[macro_inline] def ClientHttp2Session.onceOrigin (self : ClientHttp2Session) (listener : ClientHttp2Session.OriginListener) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.ClientHttp2Session.onceOrigin" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "origin", toJS listener]) Value
   pure { val := r }
 
 /-- `clienthttp2session.request(headers[, options])` (added in Node.js v8.4.0): `ClientHttp2Stream request((object or sequence<any>) headers, optional ClientHttp2Session.RequestOptions options)` -/
-def ClientHttp2Session.request (self : ClientHttp2Session) (headers : ObjectOrSequenceOfAny) (options : Option ClientHttp2Session.RequestOptions := none) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "request" (Support.args #[toJS headers, Support.optional options]) Value
+@[macro_inline] def ClientHttp2Session.request (self : ClientHttp2Session) (headers : ObjectOrSequenceOfAny) (options : Option ClientHttp2Session.RequestOptions := none) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Session.request" do
+  let r ← self.val.callMethod "request" (Internal.args #[toJS headers, Internal.optional options]) Value
   pure { val := r }
 
 /-- `v instanceof Http2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Stream`). -/
-def Http2Stream.cast? (v : Value) : IO (Option Http2Stream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Stream"] Value) v) then some { val := v } else none
+@[macro_inline] def Http2Stream.cast? (v : Value) : IO (Option Http2Stream) := Internal.api "Lasm.JS.Node.Http2Stream.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2Stream"] Value) (fun x => { val := x }) v
 
 /-- `http2stream.aborted` (added in Node.js v8.4.0): `readonly attribute boolean aborted` -/
-def Http2Stream.aborted (self : Http2Stream) : IO Bool := self.val.get "aborted" Bool
+@[macro_inline] def Http2Stream.aborted (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.aborted" do
+  self.val.get "aborted" Bool
 
 /-- `http2stream.bufferSize` (added in Node.js v11.2.0, v10.16.0): `readonly attribute double bufferSize` -/
-def Http2Stream.bufferSize (self : Http2Stream) : IO Float := self.val.get "bufferSize" Float
+@[macro_inline] def Http2Stream.bufferSize (self : Http2Stream) : IO Float := Internal.api "Lasm.JS.Node.Http2Stream.bufferSize" do
+  self.val.get "bufferSize" Float
 
 /-- `http2stream.closed` (added in Node.js v9.4.0): `readonly attribute boolean closed` -/
-def Http2Stream.closed (self : Http2Stream) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def Http2Stream.closed (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.closed" do
+  self.val.get "closed" Bool
 
 /-- `http2stream.destroyed` (added in Node.js v8.4.0): `readonly attribute boolean destroyed` -/
-def Http2Stream.destroyed (self : Http2Stream) : IO Bool := self.val.get "destroyed" Bool
+@[macro_inline] def Http2Stream.destroyed (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.destroyed" do
+  self.val.get "destroyed" Bool
 
 /-- `http2stream.endAfterHeaders` (added in Node.js v10.11.0): `readonly attribute boolean endAfterHeaders` -/
-def Http2Stream.endAfterHeaders (self : Http2Stream) : IO Bool := self.val.get "endAfterHeaders" Bool
+@[macro_inline] def Http2Stream.endAfterHeaders (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.endAfterHeaders" do
+  self.val.get "endAfterHeaders" Bool
 
 /-- `http2stream.id` (added in Node.js v8.4.0): `readonly attribute double? id` -/
-def Http2Stream.id (self : Http2Stream) : IO (Option Float) := self.val.get "id" (Option Float)
+@[macro_inline] def Http2Stream.id (self : Http2Stream) : IO (Option Float) := Internal.api "Lasm.JS.Node.Http2Stream.id" do
+  self.val.get "id" (Option Float)
 
 /-- `http2stream.pending` (added in Node.js v9.4.0): `readonly attribute boolean pending` -/
-def Http2Stream.pending (self : Http2Stream) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def Http2Stream.pending (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.pending" do
+  self.val.get "pending" Bool
 
 /-- `http2stream.rstCode` (added in Node.js v8.4.0): `readonly attribute double rstCode` -/
-def Http2Stream.rstCode (self : Http2Stream) : IO Float := self.val.get "rstCode" Float
+@[macro_inline] def Http2Stream.rstCode (self : Http2Stream) : IO Float := Internal.api "Lasm.JS.Node.Http2Stream.rstCode" do
+  self.val.get "rstCode" Float
 
 /-- `http2stream.sentHeaders` (added in Node.js v9.5.0): `readonly attribute object sentHeaders` -/
-def Http2Stream.sentHeaders (self : Http2Stream) : IO Data := self.val.get "sentHeaders" Data
+@[macro_inline] def Http2Stream.sentHeaders (self : Http2Stream) : IO Data := Internal.api "Lasm.JS.Node.Http2Stream.sentHeaders" do
+  self.val.get "sentHeaders" Data
 
 /-- `http2stream.sentInfoHeaders` (added in Node.js v9.5.0): `readonly attribute sequence<object> sentInfoHeaders` -/
-def Http2Stream.sentInfoHeaders (self : Http2Stream) : IO (Array Data) := self.val.get "sentInfoHeaders" (Array Data)
+@[macro_inline] def Http2Stream.sentInfoHeaders (self : Http2Stream) : IO (Array Data) := Internal.api "Lasm.JS.Node.Http2Stream.sentInfoHeaders" do
+  self.val.get "sentInfoHeaders" (Array Data)
 
 /-- `http2stream.sentTrailers` (added in Node.js v9.5.0): `readonly attribute object sentTrailers` -/
-def Http2Stream.sentTrailers (self : Http2Stream) : IO Data := self.val.get "sentTrailers" Data
+@[macro_inline] def Http2Stream.sentTrailers (self : Http2Stream) : IO Data := Internal.api "Lasm.JS.Node.Http2Stream.sentTrailers" do
+  self.val.get "sentTrailers" Data
 
 /-- `http2stream.session` (added in Node.js v8.4.0): `readonly attribute Http2Session session` -/
-def Http2Stream.session (self : Http2Stream) : IO Http2Session := do
+@[macro_inline] def Http2Stream.session (self : Http2Stream) : IO Http2Session := Internal.api "Lasm.JS.Node.Http2Stream.session" do
   let r ← self.val.get "session" Value
   pure { val := r }
 
 /-- `http2stream.state` (added in Node.js v8.4.0): `readonly attribute any state` -/
-def Http2Stream.state (self : Http2Stream) : IO Data := self.val.get "state" Data
+@[macro_inline] def Http2Stream.state (self : Http2Stream) : IO Data := Internal.api "Lasm.JS.Node.Http2Stream.state" do
+  self.val.get "state" Data
 
 /-- `Event: 'aborted'` (added in Node.js v8.4.0): `Http2Stream onAborted(Http2Stream.AbortedListener listener)`: calls `on("aborted", listener)` -/
-def Http2Stream.onAborted (self : Http2Stream) (listener : Http2Stream.AbortedListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "aborted", toJS listener]) Value
+@[macro_inline] def Http2Stream.onAborted (self : Http2Stream) (listener : Http2Stream.AbortedListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onAborted" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'aborted'` (added in Node.js v8.4.0): `Http2Stream onceAborted(Http2Stream.AbortedListener listener)`: calls `once("aborted", listener)` -/
-def Http2Stream.onceAborted (self : Http2Stream) (listener : Http2Stream.AbortedListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "aborted", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceAborted (self : Http2Stream) (listener : Http2Stream.AbortedListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceAborted" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `Http2Stream onClose(Http2Stream.CloseListener listener)`: calls `on("close", listener)` -/
-def Http2Stream.onClose (self : Http2Stream) (listener : Http2Stream.CloseListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def Http2Stream.onClose (self : Http2Stream) (listener : Http2Stream.CloseListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `Http2Stream onceClose(Http2Stream.CloseListener listener)`: calls `once("close", listener)` -/
-def Http2Stream.onceClose (self : Http2Stream) (listener : Http2Stream.CloseListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceClose (self : Http2Stream) (listener : Http2Stream.CloseListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v8.4.0): `Http2Stream onError(Http2Stream.ErrorListener listener)`: calls `on("error", listener)` -/
-def Http2Stream.onError (self : Http2Stream) (listener : Http2Stream.ErrorListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def Http2Stream.onError (self : Http2Stream) (listener : Http2Stream.ErrorListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v8.4.0): `Http2Stream onceError(Http2Stream.ErrorListener listener)`: calls `once("error", listener)` -/
-def Http2Stream.onceError (self : Http2Stream) (listener : Http2Stream.ErrorListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceError (self : Http2Stream) (listener : Http2Stream.ErrorListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'frameError'` (added in Node.js v8.4.0): `Http2Stream onFrameError(Http2Stream.FrameErrorListener listener)`: calls `on("frameError", listener)` -/
-def Http2Stream.onFrameError (self : Http2Stream) (listener : Http2Stream.FrameErrorListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "frameError", toJS listener]) Value
+@[macro_inline] def Http2Stream.onFrameError (self : Http2Stream) (listener : Http2Stream.FrameErrorListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onFrameError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "frameError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'frameError'` (added in Node.js v8.4.0): `Http2Stream onceFrameError(Http2Stream.FrameErrorListener listener)`: calls `once("frameError", listener)` -/
-def Http2Stream.onceFrameError (self : Http2Stream) (listener : Http2Stream.FrameErrorListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "frameError", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceFrameError (self : Http2Stream) (listener : Http2Stream.FrameErrorListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceFrameError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "frameError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v8.4.0): `Http2Stream onReady(Http2Stream.ReadyListener listener)`: calls `on("ready", listener)` -/
-def Http2Stream.onReady (self : Http2Stream) (listener : Http2Stream.ReadyListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def Http2Stream.onReady (self : Http2Stream) (listener : Http2Stream.ReadyListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onReady" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v8.4.0): `Http2Stream onceReady(Http2Stream.ReadyListener listener)`: calls `once("ready", listener)` -/
-def Http2Stream.onceReady (self : Http2Stream) (listener : Http2Stream.ReadyListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceReady (self : Http2Stream) (listener : Http2Stream.ReadyListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceReady" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Stream onTimeout(Http2Stream.TimeoutListener listener)`: calls `on("timeout", listener)` -/
-def Http2Stream.onTimeout (self : Http2Stream) (listener : Http2Stream.TimeoutListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Stream.onTimeout (self : Http2Stream) (listener : Http2Stream.TimeoutListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Stream onceTimeout(Http2Stream.TimeoutListener listener)`: calls `once("timeout", listener)` -/
-def Http2Stream.onceTimeout (self : Http2Stream) (listener : Http2Stream.TimeoutListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceTimeout (self : Http2Stream) (listener : Http2Stream.TimeoutListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'trailers'` (added in Node.js v8.4.0): `Http2Stream onTrailers(Http2Stream.TrailersListener listener)`: calls `on("trailers", listener)` -/
-def Http2Stream.onTrailers (self : Http2Stream) (listener : Http2Stream.TrailersListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "trailers", toJS listener]) Value
+@[macro_inline] def Http2Stream.onTrailers (self : Http2Stream) (listener : Http2Stream.TrailersListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onTrailers" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "trailers", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'trailers'` (added in Node.js v8.4.0): `Http2Stream onceTrailers(Http2Stream.TrailersListener listener)`: calls `once("trailers", listener)` -/
-def Http2Stream.onceTrailers (self : Http2Stream) (listener : Http2Stream.TrailersListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "trailers", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceTrailers (self : Http2Stream) (listener : Http2Stream.TrailersListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceTrailers" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "trailers", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'wantTrailers'` (added in Node.js v10.0.0): `Http2Stream onWantTrailers(Http2Stream.WantTrailersListener listener)`: calls `on("wantTrailers", listener)` -/
-def Http2Stream.onWantTrailers (self : Http2Stream) (listener : Http2Stream.WantTrailersListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "wantTrailers", toJS listener]) Value
+@[macro_inline] def Http2Stream.onWantTrailers (self : Http2Stream) (listener : Http2Stream.WantTrailersListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onWantTrailers" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "wantTrailers", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'wantTrailers'` (added in Node.js v10.0.0): `Http2Stream onceWantTrailers(Http2Stream.WantTrailersListener listener)`: calls `once("wantTrailers", listener)` -/
-def Http2Stream.onceWantTrailers (self : Http2Stream) (listener : Http2Stream.WantTrailersListener) : IO Http2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "wantTrailers", toJS listener]) Value
+@[macro_inline] def Http2Stream.onceWantTrailers (self : Http2Stream) (listener : Http2Stream.WantTrailersListener) : IO Http2Stream := Internal.api "Lasm.JS.Node.Http2Stream.onceWantTrailers" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "wantTrailers", toJS listener]) Value
   pure { val := r }
 
 /-- `http2stream.close(code[, callback])` (added in Node.js v8.4.0): `undefined close(double code)` -/
-def Http2Stream.close (self : Http2Stream) (code : Float) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[toJS code]) Unit
+@[macro_inline] def Http2Stream.close (self : Http2Stream) (code : Float) : IO Unit := Internal.api "Lasm.JS.Node.Http2Stream.close" do
+  self.val.callMethod "close" (Internal.args #[toJS code]) Unit
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `http2stream.priority(options)` (added in Node.js v8.4.0): `undefined priority(any options)` -/
-def Http2Stream.priority (self : Http2Stream) (options : Data) : IO Unit :=
-  self.val.callMethod "priority" (Support.args #[toJS options]) Unit
+@[macro_inline] def Http2Stream.priority (self : Http2Stream) (options : Data) : IO Unit := Internal.api "Lasm.JS.Node.Http2Stream.priority" do
+  self.val.callMethod "priority" (Internal.args #[toJS options]) Unit
 
 /-- `http2stream.setTimeout(msecs, callback)` (added in Node.js v8.4.0): `undefined setTimeout(double msecs, Function callback)` -/
-def Http2Stream.setTimeout (self : Http2Stream) (msecs : Float) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "setTimeout" (Support.args #[toJS msecs, toJS callback]) Unit
+@[macro_inline] def Http2Stream.setTimeout (self : Http2Stream) (msecs : Float) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.Http2Stream.setTimeout" do
+  self.val.callMethod "setTimeout" (Internal.args #[toJS msecs, toJS callback]) Unit
 
 /-- `http2stream.sendTrailers(headers)` (added in Node.js v10.0.0): `undefined sendTrailers(object headers)` -/
-def Http2Stream.sendTrailers (self : Http2Stream) (headers : Data) : IO Unit :=
-  self.val.callMethod "sendTrailers" (Support.args #[toJS headers]) Unit
+@[macro_inline] def Http2Stream.sendTrailers (self : Http2Stream) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.Http2Stream.sendTrailers" do
+  self.val.callMethod "sendTrailers" (Internal.args #[toJS headers]) Unit
 
 /-- `v instanceof ClientHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Stream`). -/
-def ClientHttp2Stream.cast? (v : Value) : IO (Option ClientHttp2Stream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ClientHttp2Stream"] Value) v) then some { val := v } else none
+@[macro_inline] def ClientHttp2Stream.cast? (v : Value) : IO (Option ClientHttp2Stream) := Internal.api "Lasm.JS.Node.ClientHttp2Stream.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["ClientHttp2Stream"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'continue'` (added in Node.js v8.5.0): `ClientHttp2Stream onContinue(ClientHttp2Stream.ContinueListener listener)`: calls `on("continue", listener)` -/
-def ClientHttp2Stream.onContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "continue", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onContinue" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "continue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'continue'` (added in Node.js v8.5.0): `ClientHttp2Stream onceContinue(ClientHttp2Stream.ContinueListener listener)`: calls `once("continue", listener)` -/
-def ClientHttp2Stream.onceContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "continue", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onceContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onceContinue" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "continue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'headers'` (added in Node.js v8.4.0): `ClientHttp2Stream onHeaders(ClientHttp2Stream.HeadersListener listener)`: calls `on("headers", listener)` -/
-def ClientHttp2Stream.onHeaders (self : ClientHttp2Stream) (listener : ClientHttp2Stream.HeadersListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "headers", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onHeaders (self : ClientHttp2Stream) (listener : ClientHttp2Stream.HeadersListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onHeaders" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "headers", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'headers'` (added in Node.js v8.4.0): `ClientHttp2Stream onceHeaders(ClientHttp2Stream.HeadersListener listener)`: calls `once("headers", listener)` -/
-def ClientHttp2Stream.onceHeaders (self : ClientHttp2Stream) (listener : ClientHttp2Stream.HeadersListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "headers", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onceHeaders (self : ClientHttp2Stream) (listener : ClientHttp2Stream.HeadersListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onceHeaders" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "headers", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'push'` (added in Node.js v8.4.0): `ClientHttp2Stream onPush(ClientHttp2Stream.PushListener listener)`: calls `on("push", listener)` -/
-def ClientHttp2Stream.onPush (self : ClientHttp2Stream) (listener : ClientHttp2Stream.PushListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "push", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onPush (self : ClientHttp2Stream) (listener : ClientHttp2Stream.PushListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onPush" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "push", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'push'` (added in Node.js v8.4.0): `ClientHttp2Stream oncePush(ClientHttp2Stream.PushListener listener)`: calls `once("push", listener)` -/
-def ClientHttp2Stream.oncePush (self : ClientHttp2Stream) (listener : ClientHttp2Stream.PushListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "push", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.oncePush (self : ClientHttp2Stream) (listener : ClientHttp2Stream.PushListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.oncePush" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "push", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'response'` (added in Node.js v8.4.0): `ClientHttp2Stream onResponse(ClientHttp2Stream.ResponseListener listener)`: calls `on("response", listener)` -/
-def ClientHttp2Stream.onResponse (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ResponseListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "response", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onResponse (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ResponseListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onResponse" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "response", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'response'` (added in Node.js v8.4.0): `ClientHttp2Stream onceResponse(ClientHttp2Stream.ResponseListener listener)`: calls `once("response", listener)` -/
-def ClientHttp2Stream.onceResponse (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ResponseListener) : IO ClientHttp2Stream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "response", toJS listener]) Value
+@[macro_inline] def ClientHttp2Stream.onceResponse (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ResponseListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onceResponse" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "response", toJS listener]) Value
   pure { val := r }
 
 /-- `v instanceof ServerHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Stream`). -/
-def ServerHttp2Stream.cast? (v : Value) : IO (Option ServerHttp2Stream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ServerHttp2Stream"] Value) v) then some { val := v } else none
+@[macro_inline] def ServerHttp2Stream.cast? (v : Value) : IO (Option ServerHttp2Stream) := Internal.api "Lasm.JS.Node.ServerHttp2Stream.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["ServerHttp2Stream"] Value) (fun x => { val := x }) v
 
 /-- `http2stream.headersSent` (added in Node.js v8.4.0): `readonly attribute boolean headersSent` -/
-def ServerHttp2Stream.headersSent (self : ServerHttp2Stream) : IO Bool := self.val.get "headersSent" Bool
+@[macro_inline] def ServerHttp2Stream.headersSent (self : ServerHttp2Stream) : IO Bool := Internal.api "Lasm.JS.Node.ServerHttp2Stream.headersSent" do
+  self.val.get "headersSent" Bool
 
 /-- `http2stream.pushAllowed` (added in Node.js v8.4.0): `readonly attribute boolean pushAllowed` -/
-def ServerHttp2Stream.pushAllowed (self : ServerHttp2Stream) : IO Bool := self.val.get "pushAllowed" Bool
+@[macro_inline] def ServerHttp2Stream.pushAllowed (self : ServerHttp2Stream) : IO Bool := Internal.api "Lasm.JS.Node.ServerHttp2Stream.pushAllowed" do
+  self.val.get "pushAllowed" Bool
 
 /-- `http2stream.additionalHeaders(headers)` (added in Node.js v8.4.0): `undefined additionalHeaders(object headers)` -/
-def ServerHttp2Stream.additionalHeaders (self : ServerHttp2Stream) (headers : Data) : IO Unit :=
-  self.val.callMethod "additionalHeaders" (Support.args #[toJS headers]) Unit
+@[macro_inline] def ServerHttp2Stream.additionalHeaders (self : ServerHttp2Stream) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.additionalHeaders" do
+  self.val.callMethod "additionalHeaders" (Internal.args #[toJS headers]) Unit
 
 /-- `http2stream.pushStream(headers[, options], callback)` (added in Node.js v8.4.0): `undefined pushStream(object headers, Function callback)` -/
-def ServerHttp2Stream.pushStream (self : ServerHttp2Stream) (headers : Data) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "pushStream" (Support.args #[toJS headers, toJS callback]) Unit
+@[macro_inline] def ServerHttp2Stream.pushStream (self : ServerHttp2Stream) (headers : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.pushStream" do
+  self.val.callMethod "pushStream" (Internal.args #[toJS headers, toJS callback]) Unit
 
 /-- `http2stream.pushStream(headers[, options], callback)` (added in Node.js v8.4.0): `undefined pushStream(object headers, ServerHttp2Stream.PushStreamOptions options, Function callback)` -/
-def ServerHttp2Stream.pushStreamWithOptions (self : ServerHttp2Stream) (headers : Data) (options : ServerHttp2Stream.PushStreamOptions) (callback : JSFunction) : IO Unit :=
-  self.val.callMethod "pushStream" (Support.args #[toJS headers, toJS options, toJS callback]) Unit
+@[macro_inline] def ServerHttp2Stream.pushStreamWithOptions (self : ServerHttp2Stream) (headers : Data) (options : ServerHttp2Stream.PushStreamOptions) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.pushStreamWithOptions" do
+  self.val.callMethod "pushStream" (Internal.args #[toJS headers, toJS options, toJS callback]) Unit
 
 /-- `http2stream.respond([headers[, options]])` (added in Node.js v8.4.0): `undefined respond(optional (object or sequence<any>) headers, optional ServerHttp2Stream.RespondOptions options)` -/
-def ServerHttp2Stream.respond (self : ServerHttp2Stream) (headers : Option ObjectOrSequenceOfAny := none) (options : Option ServerHttp2Stream.RespondOptions := none) : IO Unit :=
-  self.val.callMethod "respond" (Support.args #[Support.optional headers, Support.optional options]) Unit
+@[macro_inline] def ServerHttp2Stream.respond (self : ServerHttp2Stream) (headers : Option ObjectOrSequenceOfAny := none) (options : Option ServerHttp2Stream.RespondOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.respond" do
+  self.val.callMethod "respond" (Internal.args #[Internal.optional headers, Internal.optional options]) Unit
 
 /-- `http2stream.respondWithFD(fd[, headers[, options]])` (added in Node.js v8.4.0): `undefined respondWithFD((double or FileHandle) fd, optional object headers, optional ServerHttp2Stream.RespondWithFDOptions options)` -/
-def ServerHttp2Stream.respondWithFD (self : ServerHttp2Stream) (fd : DoubleOrFileHandle) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFDOptions := none) : IO Unit :=
-  self.val.callMethod "respondWithFD" (Support.args #[toJS fd, headers, Support.optional options]) Unit
+@[macro_inline] def ServerHttp2Stream.respondWithFD (self : ServerHttp2Stream) (fd : DoubleOrFileHandle) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFDOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.respondWithFD" do
+  self.val.callMethod "respondWithFD" (Internal.args #[toJS fd, headers, Internal.optional options]) Unit
 
 /-- `http2stream.respondWithFile(path[, headers[, options]])` (added in Node.js v8.4.0): `undefined respondWithFile((DOMString or Uint8Array or URL) path, optional object headers, optional ServerHttp2Stream.RespondWithFileOptions options)` -/
-def ServerHttp2Stream.respondWithFile (self : ServerHttp2Stream) (path_ : DOMStringOrUint8ArrayOrURL) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFileOptions := none) : IO Unit :=
-  self.val.callMethod "respondWithFile" (Support.args #[toJS path_, headers, Support.optional options]) Unit
+@[macro_inline] def ServerHttp2Stream.respondWithFile (self : ServerHttp2Stream) (path_ : DOMStringOrUint8ArrayOrURL) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFileOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.respondWithFile" do
+  self.val.callMethod "respondWithFile" (Internal.args #[toJS path_, headers, Internal.optional options]) Unit
 
 /-- `v instanceof Http2Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Server`). -/
-def Http2Server.cast? (v : Value) : IO (Option Http2Server) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Server"] Value) v) then some { val := v } else none
+@[macro_inline] def Http2Server.cast? (v : Value) : IO (Option Http2Server) := Internal.api "Lasm.JS.Node.Http2Server.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2Server"] Value) (fun x => { val := x }) v
 
 /-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
-def Http2Server.timeout (self : Http2Server) : IO Nat := self.val.get "timeout" Nat
+@[macro_inline] def Http2Server.timeout (self : Http2Server) : IO Nat := Internal.api "Lasm.JS.Node.Http2Server.timeout" do
+  self.val.get "timeout" Nat
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2Server onCheckContinue(Http2Server.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
-def Http2Server.onCheckContinue (self : Http2Server) (listener : Http2Server.CheckContinueListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "checkContinue", toJS listener]) Value
+@[macro_inline] def Http2Server.onCheckContinue (self : Http2Server) (listener : Http2Server.CheckContinueListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onCheckContinue" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "checkContinue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2Server onceCheckContinue(Http2Server.CheckContinueListener listener)`: calls `once("checkContinue", listener)` -/
-def Http2Server.onceCheckContinue (self : Http2Server) (listener : Http2Server.CheckContinueListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "checkContinue", toJS listener]) Value
+@[macro_inline] def Http2Server.onceCheckContinue (self : Http2Server) (listener : Http2Server.CheckContinueListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceCheckContinue" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "checkContinue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v8.4.0): `Http2Server onConnection(Http2Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
-def Http2Server.onConnection (self : Http2Server) (listener : Http2Server.ConnectionListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def Http2Server.onConnection (self : Http2Server) (listener : Http2Server.ConnectionListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onConnection" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v8.4.0): `Http2Server onceConnection(Http2Server.ConnectionListener listener)`: calls `once("connection", listener)` -/
-def Http2Server.onceConnection (self : Http2Server) (listener : Http2Server.ConnectionListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def Http2Server.onceConnection (self : Http2Server) (listener : Http2Server.ConnectionListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceConnection" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'request'` (added in Node.js v8.4.0): `Http2Server onRequest(Http2Server.RequestListener listener)`: calls `on("request", listener)` -/
-def Http2Server.onRequest (self : Http2Server) (listener : Http2Server.RequestListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "request", toJS listener]) Value
+@[macro_inline] def Http2Server.onRequest (self : Http2Server) (listener : Http2Server.RequestListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onRequest" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "request", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'request'` (added in Node.js v8.4.0): `Http2Server onceRequest(Http2Server.RequestListener listener)`: calls `once("request", listener)` -/
-def Http2Server.onceRequest (self : Http2Server) (listener : Http2Server.RequestListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "request", toJS listener]) Value
+@[macro_inline] def Http2Server.onceRequest (self : Http2Server) (listener : Http2Server.RequestListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceRequest" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "request", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v8.4.0): `Http2Server onSession(Http2Server.SessionListener listener)`: calls `on("session", listener)` -/
-def Http2Server.onSession (self : Http2Server) (listener : Http2Server.SessionListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def Http2Server.onSession (self : Http2Server) (listener : Http2Server.SessionListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onSession" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v8.4.0): `Http2Server onceSession(Http2Server.SessionListener listener)`: calls `once("session", listener)` -/
-def Http2Server.onceSession (self : Http2Server) (listener : Http2Server.SessionListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def Http2Server.onceSession (self : Http2Server) (listener : Http2Server.SessionListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceSession" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'sessionError'` (added in Node.js v8.4.0): `Http2Server onSessionError(Http2Server.SessionErrorListener listener)`: calls `on("sessionError", listener)` -/
-def Http2Server.onSessionError (self : Http2Server) (listener : Http2Server.SessionErrorListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "sessionError", toJS listener]) Value
+@[macro_inline] def Http2Server.onSessionError (self : Http2Server) (listener : Http2Server.SessionErrorListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onSessionError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "sessionError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'sessionError'` (added in Node.js v8.4.0): `Http2Server onceSessionError(Http2Server.SessionErrorListener listener)`: calls `once("sessionError", listener)` -/
-def Http2Server.onceSessionError (self : Http2Server) (listener : Http2Server.SessionErrorListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "sessionError", toJS listener]) Value
+@[macro_inline] def Http2Server.onceSessionError (self : Http2Server) (listener : Http2Server.SessionErrorListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceSessionError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "sessionError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2Server onStream(Http2Server.StreamListener listener)`: calls `on("stream", listener)` -/
-def Http2Server.onStream (self : Http2Server) (listener : Http2Server.StreamListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2Server.onStream (self : Http2Server) (listener : Http2Server.StreamListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onStream" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2Server onceStream(Http2Server.StreamListener listener)`: calls `once("stream", listener)` -/
-def Http2Server.onceStream (self : Http2Server) (listener : Http2Server.StreamListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2Server.onceStream (self : Http2Server) (listener : Http2Server.StreamListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceStream" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Server onTimeout(Http2Server.TimeoutListener listener)`: calls `on("timeout", listener)` -/
-def Http2Server.onTimeout (self : Http2Server) (listener : Http2Server.TimeoutListener) : IO Http2Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Server.onTimeout (self : Http2Server) (listener : Http2Server.TimeoutListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2Server onceTimeout(Http2Server.TimeoutListener listener)`: calls `once("timeout", listener)` -/
-def Http2Server.onceTimeout (self : Http2Server) (listener : Http2Server.TimeoutListener) : IO Http2Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2Server.onceTimeout (self : Http2Server) (listener : Http2Server.TimeoutListener) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.onceTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `server.close([callback])` (added in Node.js v8.4.0): `undefined close()` -/
-def Http2Server.close (self : Http2Server) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Http2Server.close (self : Http2Server) : IO Unit := Internal.api "Lasm.JS.Node.Http2Server.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v8.4.0): `Http2Server setTimeout(optional double msecs)` -/
-def Http2Server.setTimeout (self : Http2Server) (msecs : Option Float := none) : IO Http2Server := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
+@[macro_inline] def Http2Server.setTimeout (self : Http2Server) (msecs : Option Float := none) : IO Http2Server := Internal.api "Lasm.JS.Node.Http2Server.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[Internal.optional msecs]) Value
   pure { val := r }
 
 /-- `server.updateSettings([settings])` (added in Node.js v15.1.0, v14.17.0): `undefined updateSettings(optional object settings)` -/
-def Http2Server.updateSettings (self : Http2Server) (settings : Data := .undefined) : IO Unit :=
-  self.val.callMethod "updateSettings" (Support.args #[settings]) Unit
+@[macro_inline] def Http2Server.updateSettings (self : Http2Server) (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.Http2Server.updateSettings" do
+  self.val.callMethod "updateSettings" (Internal.args #[settings]) Unit
 
 /-- `v instanceof Http2SecureServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2SecureServer`). -/
-def Http2SecureServer.cast? (v : Value) : IO (Option Http2SecureServer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2SecureServer"] Value) v) then some { val := v } else none
+@[macro_inline] def Http2SecureServer.cast? (v : Value) : IO (Option Http2SecureServer) := Internal.api "Lasm.JS.Node.Http2SecureServer.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2SecureServer"] Value) (fun x => { val := x }) v
 
 /-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
-def Http2SecureServer.timeout (self : Http2SecureServer) : IO Nat := self.val.get "timeout" Nat
+@[macro_inline] def Http2SecureServer.timeout (self : Http2SecureServer) : IO Nat := Internal.api "Lasm.JS.Node.Http2SecureServer.timeout" do
+  self.val.get "timeout" Nat
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2SecureServer onCheckContinue(Http2SecureServer.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
-def Http2SecureServer.onCheckContinue (self : Http2SecureServer) (listener : Http2SecureServer.CheckContinueListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "checkContinue", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onCheckContinue (self : Http2SecureServer) (listener : Http2SecureServer.CheckContinueListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onCheckContinue" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "checkContinue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2SecureServer onceCheckContinue(Http2SecureServer.CheckContinueListener listener)`: calls `once("checkContinue", listener)` -/
-def Http2SecureServer.onceCheckContinue (self : Http2SecureServer) (listener : Http2SecureServer.CheckContinueListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "checkContinue", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceCheckContinue (self : Http2SecureServer) (listener : Http2SecureServer.CheckContinueListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceCheckContinue" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "checkContinue", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v8.4.0): `Http2SecureServer onConnection(Http2SecureServer.ConnectionListener listener)`: calls `on("connection", listener)` -/
-def Http2SecureServer.onConnection (self : Http2SecureServer) (listener : Http2SecureServer.ConnectionListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onConnection (self : Http2SecureServer) (listener : Http2SecureServer.ConnectionListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onConnection" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v8.4.0): `Http2SecureServer onceConnection(Http2SecureServer.ConnectionListener listener)`: calls `once("connection", listener)` -/
-def Http2SecureServer.onceConnection (self : Http2SecureServer) (listener : Http2SecureServer.ConnectionListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceConnection (self : Http2SecureServer) (listener : Http2SecureServer.ConnectionListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceConnection" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'request'` (added in Node.js v8.4.0): `Http2SecureServer onRequest(Http2SecureServer.RequestListener listener)`: calls `on("request", listener)` -/
-def Http2SecureServer.onRequest (self : Http2SecureServer) (listener : Http2SecureServer.RequestListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "request", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onRequest (self : Http2SecureServer) (listener : Http2SecureServer.RequestListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onRequest" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "request", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'request'` (added in Node.js v8.4.0): `Http2SecureServer onceRequest(Http2SecureServer.RequestListener listener)`: calls `once("request", listener)` -/
-def Http2SecureServer.onceRequest (self : Http2SecureServer) (listener : Http2SecureServer.RequestListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "request", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceRequest (self : Http2SecureServer) (listener : Http2SecureServer.RequestListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceRequest" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "request", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v8.4.0): `Http2SecureServer onSession(Http2SecureServer.SessionListener listener)`: calls `on("session", listener)` -/
-def Http2SecureServer.onSession (self : Http2SecureServer) (listener : Http2SecureServer.SessionListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onSession (self : Http2SecureServer) (listener : Http2SecureServer.SessionListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onSession" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'session'` (added in Node.js v8.4.0): `Http2SecureServer onceSession(Http2SecureServer.SessionListener listener)`: calls `once("session", listener)` -/
-def Http2SecureServer.onceSession (self : Http2SecureServer) (listener : Http2SecureServer.SessionListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "session", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceSession (self : Http2SecureServer) (listener : Http2SecureServer.SessionListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceSession" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "session", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'sessionError'` (added in Node.js v8.4.0): `Http2SecureServer onSessionError(Http2SecureServer.SessionErrorListener listener)`: calls `on("sessionError", listener)` -/
-def Http2SecureServer.onSessionError (self : Http2SecureServer) (listener : Http2SecureServer.SessionErrorListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "sessionError", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onSessionError (self : Http2SecureServer) (listener : Http2SecureServer.SessionErrorListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onSessionError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "sessionError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'sessionError'` (added in Node.js v8.4.0): `Http2SecureServer onceSessionError(Http2SecureServer.SessionErrorListener listener)`: calls `once("sessionError", listener)` -/
-def Http2SecureServer.onceSessionError (self : Http2SecureServer) (listener : Http2SecureServer.SessionErrorListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "sessionError", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceSessionError (self : Http2SecureServer) (listener : Http2SecureServer.SessionErrorListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceSessionError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "sessionError", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2SecureServer onStream(Http2SecureServer.StreamListener listener)`: calls `on("stream", listener)` -/
-def Http2SecureServer.onStream (self : Http2SecureServer) (listener : Http2SecureServer.StreamListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onStream (self : Http2SecureServer) (listener : Http2SecureServer.StreamListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onStream" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'stream'` (added in Node.js v8.4.0): `Http2SecureServer onceStream(Http2SecureServer.StreamListener listener)`: calls `once("stream", listener)` -/
-def Http2SecureServer.onceStream (self : Http2SecureServer) (listener : Http2SecureServer.StreamListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "stream", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceStream (self : Http2SecureServer) (listener : Http2SecureServer.StreamListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceStream" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "stream", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2SecureServer onTimeout(Http2SecureServer.TimeoutListener listener)`: calls `on("timeout", listener)` -/
-def Http2SecureServer.onTimeout (self : Http2SecureServer) (listener : Http2SecureServer.TimeoutListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onTimeout (self : Http2SecureServer) (listener : Http2SecureServer.TimeoutListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v8.4.0): `Http2SecureServer onceTimeout(Http2SecureServer.TimeoutListener listener)`: calls `once("timeout", listener)` -/
-def Http2SecureServer.onceTimeout (self : Http2SecureServer) (listener : Http2SecureServer.TimeoutListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceTimeout (self : Http2SecureServer) (listener : Http2SecureServer.TimeoutListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'unknownProtocol'` (added in Node.js v8.4.0): `Http2SecureServer onUnknownProtocol(Http2SecureServer.UnknownProtocolListener listener)`: calls `on("unknownProtocol", listener)` -/
-def Http2SecureServer.onUnknownProtocol (self : Http2SecureServer) (listener : Http2SecureServer.UnknownProtocolListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "unknownProtocol", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onUnknownProtocol (self : Http2SecureServer) (listener : Http2SecureServer.UnknownProtocolListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onUnknownProtocol" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "unknownProtocol", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'unknownProtocol'` (added in Node.js v8.4.0): `Http2SecureServer onceUnknownProtocol(Http2SecureServer.UnknownProtocolListener listener)`: calls `once("unknownProtocol", listener)` -/
-def Http2SecureServer.onceUnknownProtocol (self : Http2SecureServer) (listener : Http2SecureServer.UnknownProtocolListener) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "unknownProtocol", toJS listener]) Value
+@[macro_inline] def Http2SecureServer.onceUnknownProtocol (self : Http2SecureServer) (listener : Http2SecureServer.UnknownProtocolListener) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.onceUnknownProtocol" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "unknownProtocol", toJS listener]) Value
   pure { val := r }
 
 /-- `server.close([callback])` (added in Node.js v8.4.0): `undefined close()` -/
-def Http2SecureServer.close (self : Http2SecureServer) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Http2SecureServer.close (self : Http2SecureServer) : IO Unit := Internal.api "Lasm.JS.Node.Http2SecureServer.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v8.4.0): `Http2SecureServer setTimeout(optional double msecs)` -/
-def Http2SecureServer.setTimeout (self : Http2SecureServer) (msecs : Option Float := none) : IO Http2SecureServer := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
+@[macro_inline] def Http2SecureServer.setTimeout (self : Http2SecureServer) (msecs : Option Float := none) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.Http2SecureServer.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[Internal.optional msecs]) Value
   pure { val := r }
 
 /-- `server.updateSettings([settings])` (added in Node.js v15.1.0, v14.17.0): `undefined updateSettings(optional object settings)` -/
-def Http2SecureServer.updateSettings (self : Http2SecureServer) (settings : Data := .undefined) : IO Unit :=
-  self.val.callMethod "updateSettings" (Support.args #[settings]) Unit
+@[macro_inline] def Http2SecureServer.updateSettings (self : Http2SecureServer) (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.Http2SecureServer.updateSettings" do
+  self.val.callMethod "updateSettings" (Internal.args #[settings]) Unit
 
 /-- `v instanceof Http2ServerRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2ServerRequest`). -/
-def http2.Http2ServerRequest.cast? (v : Value) : IO (Option http2.Http2ServerRequest) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2ServerRequest"] Value) v) then some { val := v } else none
+@[macro_inline] def http2.Http2ServerRequest.cast? (v : Value) : IO (Option http2.Http2ServerRequest) := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2ServerRequest"] Value) (fun x => { val := x }) v
 
 /-- `request.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
-def http2.Http2ServerRequest.aborted (self : http2.Http2ServerRequest) : IO Bool := self.val.get "aborted" Bool
+@[macro_inline] def http2.Http2ServerRequest.aborted (self : http2.Http2ServerRequest) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.aborted" do
+  self.val.get "aborted" Bool
 
 /-- `request.authority` (added in Node.js v8.4.0): `readonly attribute DOMString authority` -/
-def http2.Http2ServerRequest.authority (self : http2.Http2ServerRequest) : IO String := self.val.get "authority" String
+@[macro_inline] def http2.Http2ServerRequest.authority (self : http2.Http2ServerRequest) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.authority" do
+  self.val.get "authority" String
 
 /-- `request.complete` (added in Node.js v12.10.0): `readonly attribute boolean complete` -/
-def http2.Http2ServerRequest.complete (self : http2.Http2ServerRequest) : IO Bool := self.val.get "complete" Bool
+@[macro_inline] def http2.Http2ServerRequest.complete (self : http2.Http2ServerRequest) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.complete" do
+  self.val.get "complete" Bool
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `request.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
-def http2.Http2ServerRequest.connection (self : http2.Http2ServerRequest) : IO Value := self.val.get "connection" Value
+@[macro_inline] def http2.Http2ServerRequest.connection (self : http2.Http2ServerRequest) : IO Value := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.connection" do
+  self.val.get "connection" Value
 
 /-- `request.headers` (added in Node.js v8.4.0): `readonly attribute object headers` -/
-def http2.Http2ServerRequest.headers (self : http2.Http2ServerRequest) : IO Data := self.val.get "headers" Data
+@[macro_inline] def http2.Http2ServerRequest.headers (self : http2.Http2ServerRequest) : IO Data := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.headers" do
+  self.val.get "headers" Data
 
 /-- `request.httpVersion` (added in Node.js v8.4.0): `readonly attribute DOMString httpVersion` -/
-def http2.Http2ServerRequest.httpVersion (self : http2.Http2ServerRequest) : IO String := self.val.get "httpVersion" String
+@[macro_inline] def http2.Http2ServerRequest.httpVersion (self : http2.Http2ServerRequest) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.httpVersion" do
+  self.val.get "httpVersion" String
 
 /-- `request.method` (added in Node.js v8.4.0): `readonly attribute DOMString method` -/
-def http2.Http2ServerRequest.method (self : http2.Http2ServerRequest) : IO String := self.val.get "method" String
+@[macro_inline] def http2.Http2ServerRequest.method (self : http2.Http2ServerRequest) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.method" do
+  self.val.get "method" String
 
 /-- `request.rawHeaders` (added in Node.js v8.4.0): `readonly attribute sequence<any> rawHeaders` -/
-def http2.Http2ServerRequest.rawHeaders (self : http2.Http2ServerRequest) : IO (Array Data) := self.val.get "rawHeaders" (Array Data)
+@[macro_inline] def http2.Http2ServerRequest.rawHeaders (self : http2.Http2ServerRequest) : IO (Array Data) := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.rawHeaders" do
+  self.val.get "rawHeaders" (Array Data)
 
 /-- `request.rawTrailers` (added in Node.js v8.4.0): `readonly attribute sequence<DOMString> rawTrailers` -/
-def http2.Http2ServerRequest.rawTrailers (self : http2.Http2ServerRequest) : IO (Array String) := self.val.get "rawTrailers" (Array String)
+@[macro_inline] def http2.Http2ServerRequest.rawTrailers (self : http2.Http2ServerRequest) : IO (Array String) := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.rawTrailers" do
+  self.val.get "rawTrailers" (Array String)
 
 /-- `request.scheme` (added in Node.js v8.4.0): `readonly attribute DOMString scheme` -/
-def http2.Http2ServerRequest.scheme (self : http2.Http2ServerRequest) : IO String := self.val.get "scheme" String
+@[macro_inline] def http2.Http2ServerRequest.scheme (self : http2.Http2ServerRequest) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.scheme" do
+  self.val.get "scheme" String
 
 /-- `request.socket` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) socket` -/
-def http2.Http2ServerRequest.socket (self : http2.Http2ServerRequest) : IO Value := self.val.get "socket" Value
+@[macro_inline] def http2.Http2ServerRequest.socket (self : http2.Http2ServerRequest) : IO Value := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.socket" do
+  self.val.get "socket" Value
 
 /-- `request.stream` (added in Node.js v8.4.0): `readonly attribute Http2Stream stream` -/
-def http2.Http2ServerRequest.stream (self : http2.Http2ServerRequest) : IO Http2Stream := do
+@[macro_inline] def http2.Http2ServerRequest.stream (self : http2.Http2ServerRequest) : IO Http2Stream := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.stream" do
   let r ← self.val.get "stream" Value
   pure { val := r }
 
 /-- `request.trailers` (added in Node.js v8.4.0): `readonly attribute object trailers` -/
-def http2.Http2ServerRequest.trailers (self : http2.Http2ServerRequest) : IO Data := self.val.get "trailers" Data
+@[macro_inline] def http2.Http2ServerRequest.trailers (self : http2.Http2ServerRequest) : IO Data := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.trailers" do
+  self.val.get "trailers" Data
 
 /-- `request.url` (added in Node.js v8.4.0): `readonly attribute DOMString url` -/
-def http2.Http2ServerRequest.url (self : http2.Http2ServerRequest) : IO String := self.val.get "url" String
+@[macro_inline] def http2.Http2ServerRequest.url (self : http2.Http2ServerRequest) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.url" do
+  self.val.get "url" String
 
 /-- `Event: 'aborted'` (added in Node.js v8.4.0): `http2.Http2ServerRequest onAborted(http2.Http2ServerRequest.AbortedListener listener)`: calls `on("aborted", listener)` -/
-def http2.Http2ServerRequest.onAborted (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.AbortedListener) : IO http2.Http2ServerRequest := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "aborted", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerRequest.onAborted (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.AbortedListener) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.onAborted" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'aborted'` (added in Node.js v8.4.0): `http2.Http2ServerRequest onceAborted(http2.Http2ServerRequest.AbortedListener listener)`: calls `once("aborted", listener)` -/
-def http2.Http2ServerRequest.onceAborted (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.AbortedListener) : IO http2.Http2ServerRequest := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "aborted", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerRequest.onceAborted (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.AbortedListener) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.onceAborted" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `http2.Http2ServerRequest onClose(http2.Http2ServerRequest.CloseListener listener)`: calls `on("close", listener)` -/
-def http2.Http2ServerRequest.onClose (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.CloseListener) : IO http2.Http2ServerRequest := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerRequest.onClose (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.CloseListener) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `http2.Http2ServerRequest onceClose(http2.Http2ServerRequest.CloseListener listener)`: calls `once("close", listener)` -/
-def http2.Http2ServerRequest.onceClose (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.CloseListener) : IO http2.Http2ServerRequest := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerRequest.onceClose (self : http2.Http2ServerRequest) (listener : http2.Http2ServerRequest.CloseListener) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `request.destroy([error])` (added in Node.js v8.4.0): `undefined destroy(optional any error)` -/
-def http2.Http2ServerRequest.destroy (self : http2.Http2ServerRequest) (error : Data := .undefined) : IO Unit :=
-  self.val.callMethod "destroy" (Support.args #[error]) Unit
+@[macro_inline] def http2.Http2ServerRequest.destroy (self : http2.Http2ServerRequest) (error : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.destroy" do
+  self.val.callMethod "destroy" (Internal.args #[error]) Unit
 
 /-- `request.setTimeout(msecs, callback)` (added in Node.js v8.4.0): `http2.Http2ServerRequest setTimeout(double msecs, Function callback)` -/
-def http2.Http2ServerRequest.setTimeout (self : http2.Http2ServerRequest) (msecs : Float) (callback : JSFunction) : IO http2.Http2ServerRequest := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs, toJS callback]) Value
+@[macro_inline] def http2.Http2ServerRequest.setTimeout (self : http2.Http2ServerRequest) (msecs : Float) (callback : JSFunction) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerRequest.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs, toJS callback]) Value
   pure { val := r }
 
 /-- `v instanceof Http2ServerResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2ServerResponse`). -/
-def http2.Http2ServerResponse.cast? (v : Value) : IO (Option http2.Http2ServerResponse) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2ServerResponse"] Value) v) then some { val := v } else none
+@[macro_inline] def http2.Http2ServerResponse.cast? (v : Value) : IO (Option http2.Http2ServerResponse) := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.cast?" do
+  Internal.cast (Support.getExport "node:http2" ["Http2ServerResponse"] Value) (fun x => { val := x }) v
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `response.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
-def http2.Http2ServerResponse.connection (self : http2.Http2ServerResponse) : IO Value := self.val.get "connection" Value
+@[macro_inline] def http2.Http2ServerResponse.connection (self : http2.Http2ServerResponse) : IO Value := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.connection" do
+  self.val.get "connection" Value
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `response.finished` (added in Node.js v8.4.0): `readonly attribute boolean finished` -/
-def http2.Http2ServerResponse.finished (self : http2.Http2ServerResponse) : IO Bool := self.val.get "finished" Bool
+@[macro_inline] def http2.Http2ServerResponse.finished (self : http2.Http2ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.finished" do
+  self.val.get "finished" Bool
 
 /-- `response.headersSent` (added in Node.js v8.4.0): `readonly attribute boolean headersSent` -/
-def http2.Http2ServerResponse.headersSent (self : http2.Http2ServerResponse) : IO Bool := self.val.get "headersSent" Bool
+@[macro_inline] def http2.Http2ServerResponse.headersSent (self : http2.Http2ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.headersSent" do
+  self.val.get "headersSent" Bool
 
 /-- `response.req` (added in Node.js v15.7.0): `readonly attribute http2.Http2ServerRequest req` -/
-def http2.Http2ServerResponse.req (self : http2.Http2ServerResponse) : IO http2.Http2ServerRequest := do
+@[macro_inline] def http2.Http2ServerResponse.req (self : http2.Http2ServerResponse) : IO http2.Http2ServerRequest := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.req" do
   let r ← self.val.get "req" Value
   pure { val := r }
 
 /-- `response.sendDate` (added in Node.js v8.4.0): `readonly attribute boolean sendDate` -/
-def http2.Http2ServerResponse.sendDate (self : http2.Http2ServerResponse) : IO Bool := self.val.get "sendDate" Bool
+@[macro_inline] def http2.Http2ServerResponse.sendDate (self : http2.Http2ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.sendDate" do
+  self.val.get "sendDate" Bool
 
 /-- `response.socket` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) socket` -/
-def http2.Http2ServerResponse.socket (self : http2.Http2ServerResponse) : IO Value := self.val.get "socket" Value
+@[macro_inline] def http2.Http2ServerResponse.socket (self : http2.Http2ServerResponse) : IO Value := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.socket" do
+  self.val.get "socket" Value
 
 /-- `response.statusCode` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ statusCode` -/
-def http2.Http2ServerResponse.statusCode (self : http2.Http2ServerResponse) : IO Nat := self.val.get "statusCode" Nat
+@[macro_inline] def http2.Http2ServerResponse.statusCode (self : http2.Http2ServerResponse) : IO Nat := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.statusCode" do
+  self.val.get "statusCode" Nat
 
 /-- `response.statusMessage` (added in Node.js v8.4.0): `readonly attribute DOMString statusMessage` -/
-def http2.Http2ServerResponse.statusMessage (self : http2.Http2ServerResponse) : IO String := self.val.get "statusMessage" String
+@[macro_inline] def http2.Http2ServerResponse.statusMessage (self : http2.Http2ServerResponse) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.statusMessage" do
+  self.val.get "statusMessage" String
 
 /-- `response.stream` (added in Node.js v8.4.0): `readonly attribute Http2Stream stream` -/
-def http2.Http2ServerResponse.stream (self : http2.Http2ServerResponse) : IO Http2Stream := do
+@[macro_inline] def http2.Http2ServerResponse.stream (self : http2.Http2ServerResponse) : IO Http2Stream := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.stream" do
   let r ← self.val.get "stream" Value
   pure { val := r }
 
 /-- `response.writableEnded` (added in Node.js v12.9.0): `readonly attribute boolean writableEnded` -/
-def http2.Http2ServerResponse.writableEnded (self : http2.Http2ServerResponse) : IO Bool := self.val.get "writableEnded" Bool
+@[macro_inline] def http2.Http2ServerResponse.writableEnded (self : http2.Http2ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.writableEnded" do
+  self.val.get "writableEnded" Bool
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `http2.Http2ServerResponse onClose(http2.Http2ServerResponse.CloseListener listener)`: calls `on("close", listener)` -/
-def http2.Http2ServerResponse.onClose (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.CloseListener) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerResponse.onClose (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.CloseListener) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v8.4.0): `http2.Http2ServerResponse onceClose(http2.Http2ServerResponse.CloseListener listener)`: calls `once("close", listener)` -/
-def http2.Http2ServerResponse.onceClose (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.CloseListener) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerResponse.onceClose (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.CloseListener) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'finish'` (added in Node.js v8.4.0): `http2.Http2ServerResponse onFinish(http2.Http2ServerResponse.FinishListener listener)`: calls `on("finish", listener)` -/
-def http2.Http2ServerResponse.onFinish (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.FinishListener) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerResponse.onFinish (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.FinishListener) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.onFinish" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'finish'` (added in Node.js v8.4.0): `http2.Http2ServerResponse onceFinish(http2.Http2ServerResponse.FinishListener listener)`: calls `once("finish", listener)` -/
-def http2.Http2ServerResponse.onceFinish (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.FinishListener) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "finish", toJS listener]) Value
+@[macro_inline] def http2.Http2ServerResponse.onceFinish (self : http2.Http2ServerResponse) (listener : http2.Http2ServerResponse.FinishListener) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.onceFinish" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
 /-- `response.addTrailers(headers)` (added in Node.js v8.4.0): `undefined addTrailers(object headers)` -/
-def http2.Http2ServerResponse.addTrailers (self : http2.Http2ServerResponse) (headers : Data) : IO Unit :=
-  self.val.callMethod "addTrailers" (Support.args #[toJS headers]) Unit
+@[macro_inline] def http2.Http2ServerResponse.addTrailers (self : http2.Http2ServerResponse) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.addTrailers" do
+  self.val.callMethod "addTrailers" (Internal.args #[toJS headers]) Unit
 
 /-- `response.appendHeader(name, value)` (added in Node.js v21.7.0, v20.12.0): `undefined appendHeader(DOMString name, (DOMString or sequence<DOMString>) value)` -/
-def http2.Http2ServerResponse.appendHeader (self : http2.Http2ServerResponse) (name : String) (value : DOMStringOrSequenceOfDOMString) : IO Unit :=
-  self.val.callMethod "appendHeader" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def http2.Http2ServerResponse.appendHeader (self : http2.Http2ServerResponse) (name : String) (value : DOMStringOrSequenceOfDOMString) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.appendHeader" do
+  self.val.callMethod "appendHeader" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `response.createPushResponse(headers, callback)` (added in Node.js v8.4.0): `Promise<http2.Http2ServerResponse> createPushResponse(object headers)` -/
-def http2.Http2ServerResponse.createPushResponse (self : http2.Http2ServerResponse) (headers : Data) : Async http2.Http2ServerResponse := do
-  let r ← Support.promisifiedMethod Value self.val "createPushResponse" (Support.args #[toJS headers])
+@[macro_inline] def http2.Http2ServerResponse.createPushResponse (self : http2.Http2ServerResponse) (headers : Data) : Async http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.createPushResponse" do
+  let r ← Support.promisifiedMethod Value self.val "createPushResponse" (Internal.args #[toJS headers])
   pure { val := r }
 
 /-- `response.end([data[, encoding]][, callback])` (added in Node.js v8.4.0): `http2.Http2ServerResponse end(optional (DOMString or Uint8Array) data, optional DOMString encoding)` -/
-def http2.Http2ServerResponse.«end» (self : http2.Http2ServerResponse) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional encoding]) Value
+@[macro_inline] def http2.Http2ServerResponse.«end» (self : http2.Http2ServerResponse) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.end" do
+  let r ← self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional encoding]) Value
   pure { val := r }
 
 /-- `response.getHeader(name)` (added in Node.js v8.4.0): `DOMString getHeader(DOMString name)` -/
-def http2.Http2ServerResponse.getHeader (self : http2.Http2ServerResponse) (name : String) : IO String :=
-  self.val.callMethod "getHeader" (Support.args #[toJS name]) String
+@[macro_inline] def http2.Http2ServerResponse.getHeader (self : http2.Http2ServerResponse) (name : String) : IO String := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.getHeader" do
+  self.val.callMethod "getHeader" (Internal.args #[toJS name]) String
 
 /-- `response.getHeaderNames()` (added in Node.js v8.4.0): `sequence<DOMString> getHeaderNames()` -/
-def http2.Http2ServerResponse.getHeaderNames (self : http2.Http2ServerResponse) : IO (Array String) :=
-  self.val.callMethod "getHeaderNames" (Support.args #[]) (Array String)
+@[macro_inline] def http2.Http2ServerResponse.getHeaderNames (self : http2.Http2ServerResponse) : IO (Array String) := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.getHeaderNames" do
+  self.val.callMethod "getHeaderNames" (Internal.args #[]) (Array String)
 
 /-- `response.getHeaders()` (added in Node.js v8.4.0): `object getHeaders()` -/
-def http2.Http2ServerResponse.getHeaders (self : http2.Http2ServerResponse) : IO Data :=
-  self.val.callMethod "getHeaders" (Support.args #[]) Data
+@[macro_inline] def http2.Http2ServerResponse.getHeaders (self : http2.Http2ServerResponse) : IO Data := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.getHeaders" do
+  self.val.callMethod "getHeaders" (Internal.args #[]) Data
 
 /-- `response.hasHeader(name)` (added in Node.js v8.4.0): `boolean hasHeader(DOMString name)` -/
-def http2.Http2ServerResponse.hasHeader (self : http2.Http2ServerResponse) (name : String) : IO Bool :=
-  self.val.callMethod "hasHeader" (Support.args #[toJS name]) Bool
+@[macro_inline] def http2.Http2ServerResponse.hasHeader (self : http2.Http2ServerResponse) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.hasHeader" do
+  self.val.callMethod "hasHeader" (Internal.args #[toJS name]) Bool
 
 /-- `response.removeHeader(name)` (added in Node.js v8.4.0): `undefined removeHeader(DOMString name)` -/
-def http2.Http2ServerResponse.removeHeader (self : http2.Http2ServerResponse) (name : String) : IO Unit :=
-  self.val.callMethod "removeHeader" (Support.args #[toJS name]) Unit
+@[macro_inline] def http2.Http2ServerResponse.removeHeader (self : http2.Http2ServerResponse) (name : String) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.removeHeader" do
+  self.val.callMethod "removeHeader" (Internal.args #[toJS name]) Unit
 
 /-- `response.setHeader(name, value)` (added in Node.js v8.4.0): `undefined setHeader(DOMString name, (DOMString or sequence<DOMString>) value)` -/
-def http2.Http2ServerResponse.setHeader (self : http2.Http2ServerResponse) (name : String) (value : DOMStringOrSequenceOfDOMString) : IO Unit :=
-  self.val.callMethod "setHeader" (Support.args #[toJS name, toJS value]) Unit
+@[macro_inline] def http2.Http2ServerResponse.setHeader (self : http2.Http2ServerResponse) (name : String) (value : DOMStringOrSequenceOfDOMString) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.setHeader" do
+  self.val.callMethod "setHeader" (Internal.args #[toJS name, toJS value]) Unit
 
 /-- `response.setTimeout(msecs[, callback])` (added in Node.js v8.4.0): `http2.Http2ServerResponse setTimeout(double msecs)` -/
-def http2.Http2ServerResponse.setTimeout (self : http2.Http2ServerResponse) (msecs : Float) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs]) Value
+@[macro_inline] def http2.Http2ServerResponse.setTimeout (self : http2.Http2ServerResponse) (msecs : Float) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs]) Value
   pure { val := r }
 
 /-- `response.write(chunk[, encoding][, callback])` (added in Node.js v8.4.0): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
-def http2.Http2ServerResponse.write (self : http2.Http2ServerResponse) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
-  self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+@[macro_inline] def http2.Http2ServerResponse.write (self : http2.Http2ServerResponse) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.write" do
+  self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
 
 /-- `response.writeContinue()` (added in Node.js v8.4.0): `undefined writeContinue()` -/
-def http2.Http2ServerResponse.writeContinue (self : http2.Http2ServerResponse) : IO Unit :=
-  self.val.callMethod "writeContinue" (Support.args #[]) Unit
+@[macro_inline] def http2.Http2ServerResponse.writeContinue (self : http2.Http2ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.writeContinue" do
+  self.val.callMethod "writeContinue" (Internal.args #[]) Unit
 
 /-- `response.writeEarlyHints(hints)` (added in Node.js v18.11.0): `undefined writeEarlyHints(object hints)` -/
-def http2.Http2ServerResponse.writeEarlyHints (self : http2.Http2ServerResponse) (hints : Data) : IO Unit :=
-  self.val.callMethod "writeEarlyHints" (Support.args #[toJS hints]) Unit
+@[macro_inline] def http2.Http2ServerResponse.writeEarlyHints (self : http2.Http2ServerResponse) (hints : Data) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.writeEarlyHints" do
+  self.val.callMethod "writeEarlyHints" (Internal.args #[toJS hints]) Unit
 
 /-- `response.writeInformation(statusCode[, headers])` (added in Node.js v24.18.0): `undefined writeInformation(double /* integer: Nat */ statusCode, optional object headers)` -/
-def http2.Http2ServerResponse.writeInformation (self : http2.Http2ServerResponse) (statusCode : Nat) (headers : Data := .undefined) : IO Unit :=
-  self.val.callMethod "writeInformation" (Support.args #[toJS statusCode, headers]) Unit
+@[macro_inline] def http2.Http2ServerResponse.writeInformation (self : http2.Http2ServerResponse) (statusCode : Nat) (headers : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.writeInformation" do
+  self.val.callMethod "writeInformation" (Internal.args #[toJS statusCode, headers]) Unit
 
 /-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v8.4.0): `http2.Http2ServerResponse writeHead(double /* integer: Nat */ statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
-def http2.Http2ServerResponse.writeHead (self : http2.Http2ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http2.Http2ServerResponse := do
-  let r ← self.val.callMethod "writeHead" (Support.args #[toJS statusCode, Support.optional statusMessage, Support.optional headers]) Value
+@[macro_inline] def http2.Http2ServerResponse.writeHead (self : http2.Http2ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http2.Http2ServerResponse := Internal.api "Lasm.JS.Node.http2.Http2ServerResponse.writeHead" do
+  let r ← self.val.callMethod "writeHead" (Internal.args #[toJS statusCode, Internal.optional statusMessage, Internal.optional headers]) Value
   pure { val := r }
 
 /-- `http2.constants` (added in Node.js v8.4.0): `readonly attribute any constants` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.constants : IO Data := Support.getExport "node:http2" ["constants"] Data
+@[macro_inline] def http2.constants : IO Data := Internal.api "Lasm.JS.Node.http2.constants" do
+  Support.getExport "node:http2" ["constants"] Data
 
 /-- `http2.sensitiveHeaders` (added in Node.js v15.0.0, v14.18.0): `readonly attribute symbol sensitiveHeaders` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.sensitiveHeaders : IO Value := Support.getExport "node:http2" ["sensitiveHeaders"] Value
+@[macro_inline] def http2.sensitiveHeaders : IO Value := Internal.api "Lasm.JS.Node.http2.sensitiveHeaders" do
+  Support.getExport "node:http2" ["sensitiveHeaders"] Value
 
 /-- `http2.createServer([options][, onRequestHandler])` (added in Node.js v8.4.0): `Http2Server createServer(optional http2.CreateServerOptions options, optional Function onRequestHandler)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.createServer (options : Option http2.CreateServerOptions := none) (onRequestHandler : Option JSFunction := none) : IO Http2Server := do
+@[macro_inline] def http2.createServer (options : Option http2.CreateServerOptions := none) (onRequestHandler : Option JSFunction := none) : IO Http2Server := Internal.api "Lasm.JS.Node.http2.createServer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http2.createServer", module := "node:http2", path := "createServer", construct := false, arity := 2 }
-    (Support.args #[Support.optional options, Support.optional onRequestHandler]) (await := false)
+    (Internal.args #[Internal.optional options, Internal.optional onRequestHandler]) (await := false)
   pure { val := r }
 
 /-- `http2.createSecureServer(options[, onRequestHandler])` (added in Node.js v8.4.0): `Http2SecureServer createSecureServer(http2.CreateSecureServerOptions options, optional Function onRequestHandler)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.createSecureServer (options : http2.CreateSecureServerOptions) (onRequestHandler : Option JSFunction := none) : IO Http2SecureServer := do
+@[macro_inline] def http2.createSecureServer (options : http2.CreateSecureServerOptions) (onRequestHandler : Option JSFunction := none) : IO Http2SecureServer := Internal.api "Lasm.JS.Node.http2.createSecureServer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http2.createSecureServer", module := "node:http2", path := "createSecureServer", construct := false, arity := 2 }
-    (Support.args #[toJS options, Support.optional onRequestHandler]) (await := false)
+    (Internal.args #[toJS options, Internal.optional onRequestHandler]) (await := false)
   pure { val := r }
 
 /-- `http2.connect(authority[, options][, listener])` (added in Node.js v8.4.0): `ClientHttp2Session connect((DOMString or URL) authority, optional http2.ConnectOptions options, optional Function listener)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.connect (authority : DOMStringOrURL) (options : Option http2.ConnectOptions := none) (listener : Option JSFunction := none) : IO ClientHttp2Session := do
+@[macro_inline] def http2.connect (authority : DOMStringOrURL) (options : Option http2.ConnectOptions := none) (listener : Option JSFunction := none) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.http2.connect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http2.connect", module := "node:http2", path := "connect", construct := false, arity := 3 }
-    (Support.args #[toJS authority, Support.optional options, Support.optional listener]) (await := false)
+    (Internal.args #[toJS authority, Internal.optional options, Internal.optional listener]) (await := false)
   pure { val := r }
 
 /-- `http2.getDefaultSettings()` (added in Node.js v8.4.0): `object getDefaultSettings()` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.getDefaultSettings : IO Data :=
+@[macro_inline] def http2.getDefaultSettings : IO Data := Internal.api "Lasm.JS.Node.http2.getDefaultSettings" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.http2.getDefaultSettings", module := "node:http2", path := "getDefaultSettings", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `http2.getPackedSettings([settings])` (added in Node.js v8.4.0): `Uint8Array getPackedSettings(optional object settings)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.getPackedSettings (settings : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def http2.getPackedSettings (settings : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.http2.getPackedSettings" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.http2.getPackedSettings", module := "node:http2", path := "getPackedSettings", construct := false, arity := 1 }
-    (Support.args #[settings]) (await := false)
+    (Internal.args #[settings]) (await := false)
 
 /-- `http2.getUnpackedSettings(buf)` (added in Node.js v8.4.0): `object getUnpackedSettings(Uint8Array buf)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.getUnpackedSettings (buf : ByteArray) : IO Data :=
+@[macro_inline] def http2.getUnpackedSettings (buf : ByteArray) : IO Data := Internal.api "Lasm.JS.Node.http2.getUnpackedSettings" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.http2.getUnpackedSettings", module := "node:http2", path := "getUnpackedSettings", construct := false, arity := 1 }
-    (Support.args #[toJS buf]) (await := false)
+    (Internal.args #[toJS buf]) (await := false)
 
 /-- `http2.performServerHandshake(socket[, options])` (added in Node.js v21.7.0, v20.12.0): `ServerHttp2Session performServerHandshake(stream.Duplex socket, optional object options)` (Node.js 24.22.2 documentation, http2.md) -/
-def http2.performServerHandshake (socket : stream.Duplex) (options : Data := .undefined) : IO ServerHttp2Session := do
+@[macro_inline] def http2.performServerHandshake (socket : stream.Duplex) (options : Data := .undefined) : IO ServerHttp2Session := Internal.api "Lasm.JS.Node.http2.performServerHandshake" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http2.performServerHandshake", module := "node:http2", path := "performServerHandshake", construct := false, arity := 2 }
-    (Support.args #[toJS socket, options]) (await := false)
+    (Internal.args #[toJS socket, options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

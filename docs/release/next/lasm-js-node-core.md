@@ -15,7 +15,7 @@
   - `import Lasm.JS.Node` is gone: import the modules you use
     (`import Lasm.JS.Node.Fs`, `import Lasm.JS.Node.Http`, …).
   - `crypto.randomUUID` (and `getRandomValues`, `subtle`) moved to
-    `Lasm.JS.Web`: `(← Lasm.JS.Web.crypto).randomUUID`.
+    `Lasm.JS.Web`: `import Lasm.JS.Web.Webcrypto`, then `(← Lasm.JS.Web.crypto).randomUUID`.
   - `Buffer.from s (some "hex")` is `Buffer.fromWithString s (some "hex")`
     (`Buffer.from` has four documented forms: `fromWithString`,
     `fromWithArrayBuffer`, `fromWithBuffer`, `fromWithObject`).

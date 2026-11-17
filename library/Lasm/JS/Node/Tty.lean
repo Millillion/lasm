@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
+import Lasm.JS.Web.MediacaptureStreams
 import Lasm.JS.Node.Net
-import Lasm.JS.Node.Process
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class tty.ReadStream extends net.Socket` of `node:tty` (Node.js 24.22.2 documentation, tty.md): a handle to the JavaScript object. -/
 structure tty.ReadStream extends net.Socket
@@ -43,77 +46,83 @@ def tty.WriteStream.ResizeListener.ofSyncFn (f : IO Unit) : IO tty.WriteStream.R
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `v instanceof ReadStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadStream`). -/
-def tty.ReadStream.cast? (v : Value) : IO (Option tty.ReadStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tty" ["ReadStream"] Value) v) then some { val := v } else none
+@[macro_inline] def tty.ReadStream.cast? (v : Value) : IO (Option tty.ReadStream) := Internal.api "Lasm.JS.Node.tty.ReadStream.cast?" do
+  Internal.cast (Support.getExport "node:tty" ["ReadStream"] Value) (fun x => { val := x }) v
 
 /-- `readStream.isRaw` (added in Node.js v0.7.7): `readonly attribute any isRaw` -/
-def tty.ReadStream.isRaw (self : tty.ReadStream) : IO Data := self.val.get "isRaw" Data
+@[macro_inline] def tty.ReadStream.isRaw (self : tty.ReadStream) : IO Data := Internal.api "Lasm.JS.Node.tty.ReadStream.isRaw" do
+  self.val.get "isRaw" Data
 
 /-- `readStream.isTTY` (added in Node.js v0.5.8): `readonly attribute any isTTY` -/
-def tty.ReadStream.isTTY (self : tty.ReadStream) : IO Data := self.val.get "isTTY" Data
+@[macro_inline] def tty.ReadStream.isTTY (self : tty.ReadStream) : IO Data := Internal.api "Lasm.JS.Node.tty.ReadStream.isTTY" do
+  self.val.get "isTTY" Data
 
 /-- `readStream.rawMode` (added in Node.js v24.21.0): `readonly attribute (boolean or DOMString) rawMode` -/
-def tty.ReadStream.rawMode (self : tty.ReadStream) : IO BooleanOrDOMString := self.val.get "rawMode" BooleanOrDOMString
+@[macro_inline] def tty.ReadStream.rawMode (self : tty.ReadStream) : IO BooleanOrDOMString := Internal.api "Lasm.JS.Node.tty.ReadStream.rawMode" do
+  self.val.get "rawMode" BooleanOrDOMString
 
 /-- `readStream.setRawMode(mode)` (added in Node.js v0.7.7): `tty.ReadStream setRawMode((boolean or DOMString) mode)` -/
-def tty.ReadStream.setRawMode (self : tty.ReadStream) (mode : BooleanOrDOMString) : IO tty.ReadStream := do
-  let r ← self.val.callMethod "setRawMode" (Support.args #[toJS mode]) Value
+@[macro_inline] def tty.ReadStream.setRawMode (self : tty.ReadStream) (mode : BooleanOrDOMString) : IO tty.ReadStream := Internal.api "Lasm.JS.Node.tty.ReadStream.setRawMode" do
+  let r ← self.val.callMethod "setRawMode" (Internal.args #[toJS mode]) Value
   pure { val := r }
 
 /-- `v instanceof WriteStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WriteStream`). -/
-def tty.WriteStream.cast? (v : Value) : IO (Option tty.WriteStream) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tty" ["WriteStream"] Value) v) then some { val := v } else none
+@[macro_inline] def tty.WriteStream.cast? (v : Value) : IO (Option tty.WriteStream) := Internal.api "Lasm.JS.Node.tty.WriteStream.cast?" do
+  Internal.cast (Support.getExport "node:tty" ["WriteStream"] Value) (fun x => { val := x }) v
 
 /-- `writeStream.columns` (added in Node.js v0.7.7): `readonly attribute any columns` -/
-def tty.WriteStream.columns (self : tty.WriteStream) : IO Data := self.val.get "columns" Data
+@[macro_inline] def tty.WriteStream.columns (self : tty.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.tty.WriteStream.columns" do
+  self.val.get "columns" Data
 
 /-- `writeStream.isTTY` (added in Node.js v0.5.8): `readonly attribute any isTTY` -/
-def tty.WriteStream.isTTY (self : tty.WriteStream) : IO Data := self.val.get "isTTY" Data
+@[macro_inline] def tty.WriteStream.isTTY (self : tty.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.tty.WriteStream.isTTY" do
+  self.val.get "isTTY" Data
 
 /-- `writeStream.rows` (added in Node.js v0.7.7): `readonly attribute any rows` -/
-def tty.WriteStream.rows (self : tty.WriteStream) : IO Data := self.val.get "rows" Data
+@[macro_inline] def tty.WriteStream.rows (self : tty.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.tty.WriteStream.rows" do
+  self.val.get "rows" Data
 
 /-- `Event: 'resize'` (added in Node.js v0.7.7): `tty.WriteStream onResize(tty.WriteStream.ResizeListener listener)`: calls `on("resize", listener)` -/
-def tty.WriteStream.onResize (self : tty.WriteStream) (listener : tty.WriteStream.ResizeListener) : IO tty.WriteStream := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "resize", toJS listener]) Value
+@[macro_inline] def tty.WriteStream.onResize (self : tty.WriteStream) (listener : tty.WriteStream.ResizeListener) : IO tty.WriteStream := Internal.api "Lasm.JS.Node.tty.WriteStream.onResize" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "resize", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'resize'` (added in Node.js v0.7.7): `tty.WriteStream onceResize(tty.WriteStream.ResizeListener listener)`: calls `once("resize", listener)` -/
-def tty.WriteStream.onceResize (self : tty.WriteStream) (listener : tty.WriteStream.ResizeListener) : IO tty.WriteStream := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "resize", toJS listener]) Value
+@[macro_inline] def tty.WriteStream.onceResize (self : tty.WriteStream) (listener : tty.WriteStream.ResizeListener) : IO tty.WriteStream := Internal.api "Lasm.JS.Node.tty.WriteStream.onceResize" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "resize", toJS listener]) Value
   pure { val := r }
 
 /-- `writeStream.clearLine(dir[, callback])` (added in Node.js v0.7.7): `boolean clearLine(double dir)` -/
-def tty.WriteStream.clearLine (self : tty.WriteStream) (dir : Float) : IO Bool :=
-  self.val.callMethod "clearLine" (Support.args #[toJS dir]) Bool
+@[macro_inline] def tty.WriteStream.clearLine (self : tty.WriteStream) (dir : Float) : IO Bool := Internal.api "Lasm.JS.Node.tty.WriteStream.clearLine" do
+  self.val.callMethod "clearLine" (Internal.args #[toJS dir]) Bool
 
 /-- `writeStream.clearScreenDown([callback])` (added in Node.js v0.7.7): `boolean clearScreenDown()` -/
-def tty.WriteStream.clearScreenDown (self : tty.WriteStream) : IO Bool :=
-  self.val.callMethod "clearScreenDown" (Support.args #[]) Bool
+@[macro_inline] def tty.WriteStream.clearScreenDown (self : tty.WriteStream) : IO Bool := Internal.api "Lasm.JS.Node.tty.WriteStream.clearScreenDown" do
+  self.val.callMethod "clearScreenDown" (Internal.args #[]) Bool
 
 /-- `writeStream.cursorTo(x[, y][, callback])` (added in Node.js v0.7.7): `boolean cursorTo(double x, optional double y)` -/
-def tty.WriteStream.cursorTo (self : tty.WriteStream) (x : Float) (y : Option Float := none) : IO Bool :=
-  self.val.callMethod "cursorTo" (Support.args #[toJS x, Support.optional y]) Bool
+@[macro_inline] def tty.WriteStream.cursorTo (self : tty.WriteStream) (x : Float) (y : Option Float := none) : IO Bool := Internal.api "Lasm.JS.Node.tty.WriteStream.cursorTo" do
+  self.val.callMethod "cursorTo" (Internal.args #[toJS x, Internal.optional y]) Bool
 
 /-- `writeStream.getColorDepth([env])` (added in Node.js v9.9.0): `double getColorDepth(optional object env)` -/
-def tty.WriteStream.getColorDepth (self : tty.WriteStream) (env : Data := .undefined) : IO Float :=
-  self.val.callMethod "getColorDepth" (Support.args #[env]) Float
+@[macro_inline] def tty.WriteStream.getColorDepth (self : tty.WriteStream) (env : Data := .undefined) : IO Float := Internal.api "Lasm.JS.Node.tty.WriteStream.getColorDepth" do
+  self.val.callMethod "getColorDepth" (Internal.args #[env]) Float
 
 /-- `writeStream.getWindowSize()` (added in Node.js v0.7.7): `sequence<double> getWindowSize()` -/
-def tty.WriteStream.getWindowSize (self : tty.WriteStream) : IO (Array Float) :=
-  self.val.callMethod "getWindowSize" (Support.args #[]) (Array Float)
+@[macro_inline] def tty.WriteStream.getWindowSize (self : tty.WriteStream) : IO (Array Float) := Internal.api "Lasm.JS.Node.tty.WriteStream.getWindowSize" do
+  self.val.callMethod "getWindowSize" (Internal.args #[]) (Array Float)
 
 /-- `writeStream.hasColors([count][, env])` (added in Node.js v11.13.0, v10.16.0): `boolean hasColors(optional long long count, optional object env)` -/
-def tty.WriteStream.hasColors (self : tty.WriteStream) (count : Option Int := none) (env : Data := .undefined) : IO Bool :=
-  self.val.callMethod "hasColors" (Support.args #[Support.optional count, env]) Bool
+@[macro_inline] def tty.WriteStream.hasColors (self : tty.WriteStream) (count : Option Int := none) (env : Data := .undefined) : IO Bool := Internal.api "Lasm.JS.Node.tty.WriteStream.hasColors" do
+  self.val.callMethod "hasColors" (Internal.args #[Internal.optional count, env]) Bool
 
 /-- `writeStream.moveCursor(dx, dy[, callback])` (added in Node.js v0.7.7): `boolean moveCursor(double dx, double dy)` -/
-def tty.WriteStream.moveCursor (self : tty.WriteStream) (dx : Float) (dy : Float) : IO Bool :=
-  self.val.callMethod "moveCursor" (Support.args #[toJS dx, toJS dy]) Bool
+@[macro_inline] def tty.WriteStream.moveCursor (self : tty.WriteStream) (dx : Float) (dy : Float) : IO Bool := Internal.api "Lasm.JS.Node.tty.WriteStream.moveCursor" do
+  self.val.callMethod "moveCursor" (Internal.args #[toJS dx, toJS dy]) Bool
 
 /-- `tty.isatty(fd)` (added in Node.js v0.5.8): `boolean isatty(double /* integer: Nat */ fd)` (Node.js 24.22.2 documentation, tty.md) -/
-def tty.isatty (fd : Nat) : IO Bool :=
+@[macro_inline] def tty.isatty (fd : Nat) : IO Bool := Internal.api "Lasm.JS.Node.tty.isatty" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.tty.isatty", module := "node:tty", path := "isatty", construct := false, arity := 1 }
-    (Support.args #[toJS fd]) (await := false)
+    (Internal.args #[toJS fd]) (await := false)
 
 end Lasm.JS.Node

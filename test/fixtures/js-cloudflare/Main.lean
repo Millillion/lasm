@@ -23,7 +23,11 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Webcrypto
 import Lasm.JS.Cloudflare
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare

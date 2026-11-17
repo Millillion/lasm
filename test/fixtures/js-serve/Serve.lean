@@ -13,7 +13,10 @@ request for `/shutdown`; then it closes the server, waits for open requests, pri
 runtime and requests it from outside the process (docs/TESTING.md).
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Url
 import Lasm.JS.Deno
 import Lasm.JS.Bun
 import Lasm.JS.Node.Serve

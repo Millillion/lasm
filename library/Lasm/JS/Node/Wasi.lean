@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Wasm
+import Lasm.JS.Web.Types.WasmJsApi
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class WASI` of `node:wasi` (Node.js 24.22.2 documentation, wasi.md): a handle to the JavaScript object. -/
 structure WASI where
@@ -25,29 +28,30 @@ instance : FromJS WASI := ⟨fun | .ref v _ => .ok { val := v } | _ => .error ""
 structure WASI.FinalizeBindingsOptions where
   /-- `Memory memory` -/
   memory : Option WebAssembly.Memory := none
-instance instToJSWASIFinalizeBindingsOptions : ToJS WASI.FinalizeBindingsOptions := ⟨fun d => Support.fields #[("memory", Support.optional d.memory)]⟩
+instance instToJSWASIFinalizeBindingsOptions : ToJS WASI.FinalizeBindingsOptions := ⟨fun d => Internal.fields #[("memory", Internal.optional d.memory)]⟩
 
 /-- `v instanceof WASI`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WASI`). -/
-def WASI.cast? (v : Value) : IO (Option WASI) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:wasi" ["WASI"] Value) v) then some { val := v } else none
+@[macro_inline] def WASI.cast? (v : Value) : IO (Option WASI) := Internal.api "Lasm.JS.Node.WASI.cast?" do
+  Internal.cast (Support.getExport "node:wasi" ["WASI"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.wasiImport` (added in Node.js v13.3.0, v12.16.0): `readonly attribute object wasiImport` -/
-def WASI.wasiImport (self : WASI) : IO Data := self.val.get "wasiImport" Data
+@[macro_inline] def WASI.wasiImport (self : WASI) : IO Data := Internal.api "Lasm.JS.Node.WASI.wasiImport" do
+  self.val.get "wasiImport" Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.getImportObject()` (added in Node.js v19.8.0): `undefined getImportObject()` -/
-def WASI.getImportObject (self : WASI) : IO Unit :=
-  self.val.callMethod "getImportObject" (Support.args #[]) Unit
+@[macro_inline] def WASI.getImportObject (self : WASI) : IO Unit := Internal.api "Lasm.JS.Node.WASI.getImportObject" do
+  self.val.callMethod "getImportObject" (Internal.args #[]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.start(instance)` (added in Node.js v13.3.0, v12.16.0): `undefined start(Instance instance)` -/
-def WASI.start (self : WASI) («instance» : WebAssembly.Instance) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[toJS «instance»]) Unit
+@[macro_inline] def WASI.start (self : WASI) («instance» : WebAssembly.Instance) : IO Unit := Internal.api "Lasm.JS.Node.WASI.start" do
+  self.val.callMethod "start" (Internal.args #[toJS «instance»]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.initialize(instance)` (added in Node.js v14.6.0, v12.19.0): `undefined initialize(Instance instance)` -/
-def WASI.«initialize» (self : WASI) («instance» : WebAssembly.Instance) : IO Unit :=
-  self.val.callMethod "initialize" (Support.args #[toJS «instance»]) Unit
+@[macro_inline] def WASI.«initialize» (self : WASI) («instance» : WebAssembly.Instance) : IO Unit := Internal.api "Lasm.JS.Node.WASI.initialize" do
+  self.val.callMethod "initialize" (Internal.args #[toJS «instance»]) Unit
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.finalizeBindings(instance[, options])` (added in Node.js v24.4.0): `undefined finalizeBindings(Instance instance, optional WASI.FinalizeBindingsOptions options)` -/
-def WASI.finalizeBindings (self : WASI) («instance» : WebAssembly.Instance) (options : Option WASI.FinalizeBindingsOptions := none) : IO Unit :=
-  self.val.callMethod "finalizeBindings" (Support.args #[toJS «instance», Support.optional options]) Unit
+@[macro_inline] def WASI.finalizeBindings (self : WASI) («instance» : WebAssembly.Instance) (options : Option WASI.FinalizeBindingsOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.WASI.finalizeBindings" do
+  self.val.callMethod "finalizeBindings" (Internal.args #[toJS «instance», Internal.optional options]) Unit
 
 end Lasm.JS.Node

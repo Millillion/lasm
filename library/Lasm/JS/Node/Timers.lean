@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Types.Dom
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class Immediate` of `node:timers` (Node.js 24.22.2 documentation, timers.md): a handle to the JavaScript object. -/
 structure Immediate where
@@ -35,8 +38,8 @@ structure timersPromises.SetTimeoutOptions where
   ref : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSTimersPromisesSetTimeoutOptions : ToJS timersPromises.SetTimeoutOptions := ⟨fun d => Support.fields #[("ref", Support.optional d.ref),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSTimersPromisesSetTimeoutOptions : ToJS timersPromises.SetTimeoutOptions := ⟨fun d => Internal.fields #[("ref", Internal.optional d.ref),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary timersPromises.SetImmediateOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure timersPromises.SetImmediateOptions where
@@ -44,8 +47,8 @@ structure timersPromises.SetImmediateOptions where
   ref : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSTimersPromisesSetImmediateOptions : ToJS timersPromises.SetImmediateOptions := ⟨fun d => Support.fields #[("ref", Support.optional d.ref),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSTimersPromisesSetImmediateOptions : ToJS timersPromises.SetImmediateOptions := ⟨fun d => Internal.fields #[("ref", Internal.optional d.ref),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary timersPromises.scheduler.WaitOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure timersPromises.scheduler.WaitOptions where
@@ -53,78 +56,78 @@ structure timersPromises.scheduler.WaitOptions where
   ref : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSTimersPromisesSchedulerWaitOptions : ToJS timersPromises.scheduler.WaitOptions := ⟨fun d => Support.fields #[("ref", Support.optional d.ref),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSTimersPromisesSchedulerWaitOptions : ToJS timersPromises.scheduler.WaitOptions := ⟨fun d => Internal.fields #[("ref", Internal.optional d.ref),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof Immediate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Immediate`). -/
-def Immediate.cast? (v : Value) : IO (Option Immediate) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:timers" ["Immediate"] Value) v) then some { val := v } else none
+@[macro_inline] def Immediate.cast? (v : Value) : IO (Option Immediate) := Internal.api "Lasm.JS.Node.Immediate.cast?" do
+  Internal.cast (Support.getExport "node:timers" ["Immediate"] Value) (fun x => { val := x }) v
 
 /-- `immediate.hasRef()` (added in Node.js v11.0.0): `boolean hasRef()` -/
-def Immediate.hasRef (self : Immediate) : IO Bool :=
-  self.val.callMethod "hasRef" (Support.args #[]) Bool
+@[macro_inline] def Immediate.hasRef (self : Immediate) : IO Bool := Internal.api "Lasm.JS.Node.Immediate.hasRef" do
+  self.val.callMethod "hasRef" (Internal.args #[]) Bool
 
 /-- `immediate.ref()` (added in Node.js v9.7.0): `Immediate ref()` -/
-def Immediate.ref (self : Immediate) : IO Immediate := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def Immediate.ref (self : Immediate) : IO Immediate := Internal.api "Lasm.JS.Node.Immediate.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `immediate.unref()` (added in Node.js v9.7.0): `Immediate unref()` -/
-def Immediate.unref (self : Immediate) : IO Immediate := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def Immediate.unref (self : Immediate) : IO Immediate := Internal.api "Lasm.JS.Node.Immediate.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof Timeout`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Timeout`). -/
-def Timeout.cast? (v : Value) : IO (Option Timeout) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:timers" ["Timeout"] Value) v) then some { val := v } else none
+@[macro_inline] def Timeout.cast? (v : Value) : IO (Option Timeout) := Internal.api "Lasm.JS.Node.Timeout.cast?" do
+  Internal.cast (Support.getExport "node:timers" ["Timeout"] Value) (fun x => { val := x }) v
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `timeout.close()` (added in Node.js v0.9.1): `Timeout close()` -/
-def Timeout.close (self : Timeout) : IO Timeout := do
-  let r ← self.val.callMethod "close" (Support.args #[]) Value
+@[macro_inline] def Timeout.close (self : Timeout) : IO Timeout := Internal.api "Lasm.JS.Node.Timeout.close" do
+  let r ← self.val.callMethod "close" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `timeout.hasRef()` (added in Node.js v11.0.0): `boolean hasRef()` -/
-def Timeout.hasRef (self : Timeout) : IO Bool :=
-  self.val.callMethod "hasRef" (Support.args #[]) Bool
+@[macro_inline] def Timeout.hasRef (self : Timeout) : IO Bool := Internal.api "Lasm.JS.Node.Timeout.hasRef" do
+  self.val.callMethod "hasRef" (Internal.args #[]) Bool
 
 /-- `timeout.ref()` (added in Node.js v0.9.1): `Timeout ref()` -/
-def Timeout.ref (self : Timeout) : IO Timeout := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def Timeout.ref (self : Timeout) : IO Timeout := Internal.api "Lasm.JS.Node.Timeout.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `timeout.refresh()` (added in Node.js v10.2.0): `Timeout refresh()` -/
-def Timeout.refresh (self : Timeout) : IO Timeout := do
-  let r ← self.val.callMethod "refresh" (Support.args #[]) Value
+@[macro_inline] def Timeout.refresh (self : Timeout) : IO Timeout := Internal.api "Lasm.JS.Node.Timeout.refresh" do
+  let r ← self.val.callMethod "refresh" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `timeout.unref()` (added in Node.js v0.9.1): `Timeout unref()` -/
-def Timeout.unref (self : Timeout) : IO Timeout := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def Timeout.unref (self : Timeout) : IO Timeout := Internal.api "Lasm.JS.Node.Timeout.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `timersPromises.setTimeout([delay[, value[, options]]])` (added in Node.js v15.0.0): `undefined setTimeout(optional double delay, optional any value, optional timersPromises.SetTimeoutOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
-def timersPromises.setTimeout (delay : Option Float := none) (value : Data := .undefined) (options : Option timersPromises.SetTimeoutOptions := none) : IO Unit :=
+@[macro_inline] def timersPromises.setTimeout (delay : Option Float := none) (value : Data := .undefined) (options : Option timersPromises.SetTimeoutOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.timersPromises.setTimeout" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.timersPromises.setTimeout", module := "node:timers/promises", path := "setTimeout", construct := false, arity := 3 }
-    (Support.args #[Support.optional delay, value, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional delay, value, Internal.optional options]) (await := false)
 
 /-- `timersPromises.setImmediate([value[, options]])` (added in Node.js v15.0.0): `undefined setImmediate(optional any value, optional timersPromises.SetImmediateOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
-def timersPromises.setImmediate (value : Data := .undefined) (options : Option timersPromises.SetImmediateOptions := none) : IO Unit :=
+@[macro_inline] def timersPromises.setImmediate (value : Data := .undefined) (options : Option timersPromises.SetImmediateOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.timersPromises.setImmediate" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.timersPromises.setImmediate", module := "node:timers/promises", path := "setImmediate", construct := false, arity := 2 }
-    (Support.args #[value, Support.optional options]) (await := false)
+    (Internal.args #[value, Internal.optional options]) (await := false)
 
 /-- `timersPromises.setInterval([delay[, value[, options]]])` (added in Node.js v15.9.0): `undefined setInterval(optional any delay, optional any value, optional any options)` (Node.js 24.22.2 documentation, timers.md) -/
-def timersPromises.setInterval (delay : Data := .undefined) (value : Data := .undefined) (options : Data := .undefined) : IO Unit :=
+@[macro_inline] def timersPromises.setInterval (delay : Data := .undefined) (value : Data := .undefined) (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.timersPromises.setInterval" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.timersPromises.setInterval", module := "node:timers/promises", path := "setInterval", construct := false, arity := 3 }
-    (Support.args #[delay, value, options]) (await := false)
+    (Internal.args #[delay, value, options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.wait(delay[, options])` (added in Node.js v17.3.0, v16.14.0): `Promise<any> wait(double delay, optional timersPromises.scheduler.WaitOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
-def timersPromises.scheduler.wait (delay : Float) (options : Option timersPromises.scheduler.WaitOptions := none) : Async Data :=
+@[macro_inline] def timersPromises.scheduler.wait (delay : Float) (options : Option timersPromises.scheduler.WaitOptions := none) : Async Data := Internal.api "Lasm.JS.Node.timersPromises.scheduler.wait" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.wait", module := "node:timers", path := "timersPromises.scheduler.wait", construct := false, arity := 2 }
-    (Support.args #[toJS delay, Support.optional options])
+    (Internal.args #[toJS delay, Internal.optional options])
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.yield()` (added in Node.js v17.3.0, v16.14.0): `Promise<any> yield()` (Node.js 24.22.2 documentation, timers.md) -/
-def timersPromises.scheduler.yield : Async Data :=
+@[macro_inline] def timersPromises.scheduler.yield : Async Data := Internal.api "Lasm.JS.Node.timersPromises.scheduler.yield" do
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.yield", module := "node:timers", path := "timersPromises.scheduler.yield", construct := false, arity := 0 }
-    (Support.args #[])
+    (Internal.args #[])
 
 end Lasm.JS.Node

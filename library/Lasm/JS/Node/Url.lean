@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Url
+import Lasm.JS.Web.Types.Url
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class url.UrlObject` of `node:url` (Node.js 24.22.2 documentation, url.md): a handle to the JavaScript object. -/
 structure url.UrlObject where
@@ -37,7 +40,7 @@ instance : Coe String URLOrDOMString := ⟨.domString⟩
 structure url.FileURLToPathOptions where
   /-- `boolean? windows` -/
   windows : Option Bool := none
-instance instToJSUrlFileURLToPathOptions : ToJS url.FileURLToPathOptions := ⟨fun d => Support.fields #[("windows", Support.optional d.windows)]⟩
+instance instToJSUrlFileURLToPathOptions : ToJS url.FileURLToPathOptions := ⟨fun d => Internal.fields #[("windows", Internal.optional d.windows)]⟩
 
 /-- `dictionary url.FormatOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure url.FormatOptions where
@@ -49,111 +52,123 @@ structure url.FormatOptions where
   search : Option Bool := none
   /-- `boolean unicode = false` -/
   unicode : Option Bool := none
-instance instToJSUrlFormatOptions : ToJS url.FormatOptions := ⟨fun d => Support.fields #[("auth", Support.optional d.auth),
-    ("fragment", Support.optional d.fragment),
-    ("search", Support.optional d.search),
-    ("unicode", Support.optional d.unicode)]⟩
+instance instToJSUrlFormatOptions : ToJS url.FormatOptions := ⟨fun d => Internal.fields #[("auth", Internal.optional d.auth),
+    ("fragment", Internal.optional d.fragment),
+    ("search", Internal.optional d.search),
+    ("unicode", Internal.optional d.unicode)]⟩
 
 /-- `dictionary url.PathToFileURLOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure url.PathToFileURLOptions where
   /-- `boolean? windows` -/
   windows : Option Bool := none
-instance instToJSUrlPathToFileURLOptions : ToJS url.PathToFileURLOptions := ⟨fun d => Support.fields #[("windows", Support.optional d.windows)]⟩
+instance instToJSUrlPathToFileURLOptions : ToJS url.PathToFileURLOptions := ⟨fun d => Internal.fields #[("windows", Internal.optional d.windows)]⟩
 
 /-- `v instanceof UrlObject`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `UrlObject`). -/
-def url.UrlObject.cast? (v : Value) : IO (Option url.UrlObject) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:url" ["UrlObject"] Value) v) then some { val := v } else none
+@[macro_inline] def url.UrlObject.cast? (v : Value) : IO (Option url.UrlObject) := Internal.api "Lasm.JS.Node.url.UrlObject.cast?" do
+  Internal.cast (Support.getExport "node:url" ["UrlObject"] Value) (fun x => { val := x }) v
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.auth`: `readonly attribute any auth` -/
-def url.UrlObject.auth (self : url.UrlObject) : IO Data := self.val.get "auth" Data
+@[macro_inline] def url.UrlObject.auth (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.auth" do
+  self.val.get "auth" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.hash`: `readonly attribute any hash` -/
-def url.UrlObject.hash (self : url.UrlObject) : IO Data := self.val.get "hash" Data
+@[macro_inline] def url.UrlObject.hash (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.hash" do
+  self.val.get "hash" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.host`: `readonly attribute any host` -/
-def url.UrlObject.host (self : url.UrlObject) : IO Data := self.val.get "host" Data
+@[macro_inline] def url.UrlObject.host (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.host" do
+  self.val.get "host" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.hostname`: `readonly attribute any hostname` -/
-def url.UrlObject.hostname (self : url.UrlObject) : IO Data := self.val.get "hostname" Data
+@[macro_inline] def url.UrlObject.hostname (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.hostname" do
+  self.val.get "hostname" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.href`: `readonly attribute any href` -/
-def url.UrlObject.href (self : url.UrlObject) : IO Data := self.val.get "href" Data
+@[macro_inline] def url.UrlObject.href (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.href" do
+  self.val.get "href" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.path`: `readonly attribute any path` -/
-def url.UrlObject.path (self : url.UrlObject) : IO Data := self.val.get "path" Data
+@[macro_inline] def url.UrlObject.path (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.path" do
+  self.val.get "path" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.pathname`: `readonly attribute any pathname` -/
-def url.UrlObject.pathname (self : url.UrlObject) : IO Data := self.val.get "pathname" Data
+@[macro_inline] def url.UrlObject.pathname (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.pathname" do
+  self.val.get "pathname" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.port`: `readonly attribute any port` -/
-def url.UrlObject.port (self : url.UrlObject) : IO Data := self.val.get "port" Data
+@[macro_inline] def url.UrlObject.port (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.port" do
+  self.val.get "port" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.protocol`: `readonly attribute any protocol` -/
-def url.UrlObject.protocol (self : url.UrlObject) : IO Data := self.val.get "protocol" Data
+@[macro_inline] def url.UrlObject.protocol (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.protocol" do
+  self.val.get "protocol" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.query`: `readonly attribute any query` -/
-def url.UrlObject.query (self : url.UrlObject) : IO Data := self.val.get "query" Data
+@[macro_inline] def url.UrlObject.query (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.query" do
+  self.val.get "query" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.search`: `readonly attribute any search` -/
-def url.UrlObject.search (self : url.UrlObject) : IO Data := self.val.get "search" Data
+@[macro_inline] def url.UrlObject.search (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.search" do
+  self.val.get "search" Data
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.slashes`: `readonly attribute any slashes` -/
-def url.UrlObject.slashes (self : url.UrlObject) : IO Data := self.val.get "slashes" Data
+@[macro_inline] def url.UrlObject.slashes (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.slashes" do
+  self.val.get "slashes" Data
 
 /-- `url.domainToASCII(domain)` (added in Node.js v7.4.0, v6.13.0): `DOMString domainToASCII(DOMString domain)` (Node.js 24.22.2 documentation, url.md) -/
-def url.domainToASCII (domain_ : String) : IO String :=
+@[macro_inline] def url.domainToASCII (domain_ : String) : IO String := Internal.api "Lasm.JS.Node.url.domainToASCII" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.domainToASCII", module := "node:url", path := "domainToASCII", construct := false, arity := 1 }
-    (Support.args #[toJS domain_]) (await := false)
+    (Internal.args #[toJS domain_]) (await := false)
 
 /-- `url.domainToUnicode(domain)` (added in Node.js v7.4.0, v6.13.0): `DOMString domainToUnicode(DOMString domain)` (Node.js 24.22.2 documentation, url.md) -/
-def url.domainToUnicode (domain_ : String) : IO String :=
+@[macro_inline] def url.domainToUnicode (domain_ : String) : IO String := Internal.api "Lasm.JS.Node.url.domainToUnicode" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.domainToUnicode", module := "node:url", path := "domainToUnicode", construct := false, arity := 1 }
-    (Support.args #[toJS domain_]) (await := false)
+    (Internal.args #[toJS domain_]) (await := false)
 
 /-- `url.fileURLToPath(url[, options])` (added in Node.js v10.12.0): `DOMString fileURLToPath((URL or DOMString) url, optional url.FileURLToPathOptions options)` (Node.js 24.22.2 documentation, url.md) -/
-def url.fileURLToPath (url_ : URLOrDOMString) (options : Option url.FileURLToPathOptions := none) : IO String :=
+@[macro_inline] def url.fileURLToPath (url_ : URLOrDOMString) (options : Option url.FileURLToPathOptions := none) : IO String := Internal.api "Lasm.JS.Node.url.fileURLToPath" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.fileURLToPath", module := "node:url", path := "fileURLToPath", construct := false, arity := 2 }
-    (Support.args #[toJS url_, Support.optional options]) (await := false)
+    (Internal.args #[toJS url_, Internal.optional options]) (await := false)
 
 /-- `url.fileURLToPathBuffer(url[, options])`: `Uint8Array fileURLToPathBuffer(any url, optional any options)` (Node.js 24.22.2 documentation, url.md) -/
-def url.fileURLToPathBuffer (url_ : Data) (options : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def url.fileURLToPathBuffer (url_ : Data) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.url.fileURLToPathBuffer" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.url.fileURLToPathBuffer", module := "node:url", path := "fileURLToPathBuffer", construct := false, arity := 2 }
-    (Support.args #[toJS url_, options]) (await := false)
+    (Internal.args #[toJS url_, options]) (await := false)
 
 /-- `url.format(URL[, options])` (added in Node.js v7.6.0): `DOMString format(URL URL, optional url.FormatOptions options)` (Node.js 24.22.2 documentation, url.md) -/
-def url.format (URL : URL) (options : Option url.FormatOptions := none) : IO String :=
+@[macro_inline] def url.format (URL : URL) (options : Option url.FormatOptions := none) : IO String := Internal.api "Lasm.JS.Node.url.format" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.format", module := "node:url", path := "format", construct := false, arity := 2 }
-    (Support.args #[toJS URL, Support.optional options]) (await := false)
+    (Internal.args #[toJS URL, Internal.optional options]) (await := false)
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `url.format(urlObject)` (added in Node.js v0.1.25): `DOMString format(object urlObject)` (Node.js 24.22.2 documentation, url.md) -/
-def url.formatWithUrlObject (urlObject : Data) : IO String :=
+@[macro_inline] def url.formatWithUrlObject (urlObject : Data) : IO String := Internal.api "Lasm.JS.Node.url.formatWithUrlObject" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.formatWithUrlObject", module := "node:url", path := "format", construct := false, arity := 1 }
-    (Support.args #[toJS urlObject]) (await := false)
+    (Internal.args #[toJS urlObject]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `url.format(urlString)` (added in Node.js v0.1.25): `DOMString format(DOMString urlString)` (Node.js 24.22.2 documentation, url.md) -/
-def url.formatWithUrlString (urlString : String) : IO String :=
+@[macro_inline] def url.formatWithUrlString (urlString : String) : IO String := Internal.api "Lasm.JS.Node.url.formatWithUrlString" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.formatWithUrlString", module := "node:url", path := "format", construct := false, arity := 1 }
-    (Support.args #[toJS urlString]) (await := false)
+    (Internal.args #[toJS urlString]) (await := false)
 
 /-- `url.pathToFileURL(path[, options])` (added in Node.js v10.12.0): `URL pathToFileURL(DOMString path, optional url.PathToFileURLOptions options)` (Node.js 24.22.2 documentation, url.md) -/
-def url.pathToFileURL (path_ : String) (options : Option url.PathToFileURLOptions := none) : IO URL := do
+@[macro_inline] def url.pathToFileURL (path_ : String) (options : Option url.PathToFileURLOptions := none) : IO URL := Internal.api "Lasm.JS.Node.url.pathToFileURL" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.url.pathToFileURL", module := "node:url", path := "pathToFileURL", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional options]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `url.urlToHttpOptions(url)` (added in Node.js v15.7.0, v14.18.0): `object urlToHttpOptions(URL url)` (Node.js 24.22.2 documentation, url.md) -/
-def url.urlToHttpOptions (url_ : URL) : IO Data :=
+@[macro_inline] def url.urlToHttpOptions (url_ : URL) : IO Data := Internal.api "Lasm.JS.Node.url.urlToHttpOptions" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.url.urlToHttpOptions", module := "node:url", path := "urlToHttpOptions", construct := false, arity := 1 }
-    (Support.args #[toJS url_]) (await := false)
+    (Internal.args #[toJS url_]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `url.parse(urlString[, parseQueryString[, slashesDenoteHost]])` (added in Node.js v0.1.25): `undefined parse(DOMString urlString, optional boolean parseQueryString, optional boolean slashesDenoteHost)` (Node.js 24.22.2 documentation, url.md) -/
-def url.parse (urlString : String) (parseQueryString : Option Bool := none) (slashesDenoteHost : Option Bool := none) : IO Unit :=
+@[macro_inline] def url.parse (urlString : String) (parseQueryString : Option Bool := none) (slashesDenoteHost : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Node.url.parse" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.url.parse", module := "node:url", path := "parse", construct := false, arity := 3 }
-    (Support.args #[toJS urlString, Support.optional parseQueryString, Support.optional slashesDenoteHost]) (await := false)
+    (Internal.args #[toJS urlString, Internal.optional parseQueryString, Internal.optional slashesDenoteHost]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `url.resolve(from, to)` (added in Node.js v0.1.25): `undefined resolve(DOMString from, DOMString to)` (Node.js 24.22.2 documentation, url.md) -/
-def url.resolve («from» : String) (to : String) : IO Unit :=
+@[macro_inline] def url.resolve («from» : String) (to : String) : IO Unit := Internal.api "Lasm.JS.Node.url.resolve" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.url.resolve", module := "node:url", path := "resolve", construct := false, arity := 2 }
-    (Support.args #[toJS «from», toJS to]) (await := false)
+    (Internal.args #[toJS «from», toJS to]) (await := false)
 
 end Lasm.JS.Node

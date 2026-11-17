@@ -131,8 +131,9 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   buildOptions = nodeOptions;
   // A dev build only links the Node program for its inputs: nobody runs its Node output.
   const linkOnly = buildOptions.profile === 'dev';
-  // The binding check runs on Node: globals of the target runtime that Node lacks only warn.
-  buildOptions = { ...buildOptions, bindingTarget: target };
+  // The target's web APIs are checked by the build (src/web-availability.mjs); the binding check runs on Node:
+  // globals of the target runtime that Node lacks only warn.
+  buildOptions = { ...buildOptions, webTarget: target, bindingTarget: target };
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
   const found = await findEdgeProgram({ result, nodeRuntime, suspend });
   let program = found.cached;
@@ -282,7 +283,7 @@ export async function runApplicationCli(argv) {
   // made from stays in its cache entry, as for every target but node.
   const functionPlatform = target !== undefined && target !== 'node';
   const { output, ...cachedOptions } = buildOptions;
-  const result = await buildApplicationWithProgress(options.input, functionPlatform ? cachedOptions : buildOptions);
+  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target ?? 'node' });
   await editor();
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {

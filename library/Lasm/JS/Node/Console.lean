@@ -11,6 +11,9 @@ import Lasm.JS.Node.Support
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class Console` of `node:console` (Node.js 24.22.2 documentation, console.md): a handle to the JavaScript object. -/
 structure Console where
@@ -28,88 +31,88 @@ structure Console.DirOptions where
   depth : Option Float := none
   /-- `boolean colors = false` -/
   colors : Option Bool := none
-instance instToJSConsoleDirOptions : ToJS Console.DirOptions := ⟨fun d => Support.fields #[("showHidden", Support.optional d.showHidden),
-    ("depth", Support.optional d.depth),
-    ("colors", Support.optional d.colors)]⟩
+instance instToJSConsoleDirOptions : ToJS Console.DirOptions := ⟨fun d => Internal.fields #[("showHidden", Internal.optional d.showHidden),
+    ("depth", Internal.optional d.depth),
+    ("colors", Internal.optional d.colors)]⟩
 
 /-- `v instanceof Console`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Console`). -/
-def Console.cast? (v : Value) : IO (Option Console) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:console" ["Console"] Value) v) then some { val := v } else none
+@[macro_inline] def Console.cast? (v : Value) : IO (Option Console) := Internal.api "Lasm.JS.Node.Console.cast?" do
+  Internal.cast (Support.getExport "node:console" ["Console"] Value) (fun x => { val := x }) v
 
 /-- `console.assert(value[, ...message])` (added in Node.js v0.1.101): `undefined assert(any value, any... message)` -/
-def Console.assert (self : Console) (value : Data) (message : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "assert" (Support.argsWith #[toJS value] (message.map toJS)) Unit
+@[macro_inline] def Console.assert (self : Console) (value : Data) (message : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.assert" do
+  self.val.callMethod "assert" (Internal.argsWith #[toJS value] (message.map toJS)) Unit
 
 /-- `console.clear()` (added in Node.js v8.3.0): `undefined clear()` -/
-def Console.clear (self : Console) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def Console.clear (self : Console) : IO Unit := Internal.api "Lasm.JS.Node.Console.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `console.count([label])` (added in Node.js v8.3.0): `undefined count(optional DOMString label)` -/
-def Console.count (self : Console) (label : Option String := none) : IO Unit :=
-  self.val.callMethod "count" (Support.args #[Support.optional label]) Unit
+@[macro_inline] def Console.count (self : Console) (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.count" do
+  self.val.callMethod "count" (Internal.args #[Internal.optional label]) Unit
 
 /-- `console.countReset([label])` (added in Node.js v8.3.0): `undefined countReset(optional DOMString label)` -/
-def Console.countReset (self : Console) (label : Option String := none) : IO Unit :=
-  self.val.callMethod "countReset" (Support.args #[Support.optional label]) Unit
+@[macro_inline] def Console.countReset (self : Console) (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.countReset" do
+  self.val.callMethod "countReset" (Internal.args #[Internal.optional label]) Unit
 
 /-- `console.debug(data[, ...args])` (added in Node.js v8.0.0): `undefined debug(any data, any... args)` -/
-def Console.debug (self : Console) (data : Data) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "debug" (Support.argsWith #[toJS data] (args.map toJS)) Unit
+@[macro_inline] def Console.debug (self : Console) (data : Data) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.debug" do
+  self.val.callMethod "debug" (Internal.argsWith #[toJS data] (args.map toJS)) Unit
 
 /-- `console.dir(obj[, options])` (added in Node.js v0.1.101): `undefined dir(any obj, optional Console.DirOptions options)` -/
-def Console.dir (self : Console) (obj : Data) (options : Option Console.DirOptions := none) : IO Unit :=
-  self.val.callMethod "dir" (Support.args #[toJS obj, Support.optional options]) Unit
+@[macro_inline] def Console.dir (self : Console) (obj : Data) (options : Option Console.DirOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.dir" do
+  self.val.callMethod "dir" (Internal.args #[toJS obj, Internal.optional options]) Unit
 
 /-- `console.dirxml(...data)` (added in Node.js v8.0.0): `undefined dirxml(any... data)` -/
-def Console.dirxml (self : Console) (data : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "dirxml" (Support.argsWith #[] (data.map toJS)) Unit
+@[macro_inline] def Console.dirxml (self : Console) (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.dirxml" do
+  self.val.callMethod "dirxml" (Internal.argsWith #[] (data.map toJS)) Unit
 
 /-- `console.error([data][, ...args])` (added in Node.js v0.1.100): `undefined error(optional any data, any... args)` -/
-def Console.error (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "error" (Support.argsWith #[data] (args.map toJS)) Unit
+@[macro_inline] def Console.error (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.error" do
+  self.val.callMethod "error" (Internal.argsWith #[data] (args.map toJS)) Unit
 
 /-- `console.group([...label])` (added in Node.js v8.5.0): `undefined group(any... label)` -/
-def Console.group (self : Console) (label : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "group" (Support.argsWith #[] (label.map toJS)) Unit
+@[macro_inline] def Console.group (self : Console) (label : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.group" do
+  self.val.callMethod "group" (Internal.argsWith #[] (label.map toJS)) Unit
 
 /-- `console.groupCollapsed()` (added in Node.js v8.5.0): `undefined groupCollapsed()` -/
-def Console.groupCollapsed (self : Console) : IO Unit :=
-  self.val.callMethod "groupCollapsed" (Support.args #[]) Unit
+@[macro_inline] def Console.groupCollapsed (self : Console) : IO Unit := Internal.api "Lasm.JS.Node.Console.groupCollapsed" do
+  self.val.callMethod "groupCollapsed" (Internal.args #[]) Unit
 
 /-- `console.groupEnd()` (added in Node.js v8.5.0): `undefined groupEnd()` -/
-def Console.groupEnd (self : Console) : IO Unit :=
-  self.val.callMethod "groupEnd" (Support.args #[]) Unit
+@[macro_inline] def Console.groupEnd (self : Console) : IO Unit := Internal.api "Lasm.JS.Node.Console.groupEnd" do
+  self.val.callMethod "groupEnd" (Internal.args #[]) Unit
 
 /-- `console.info([data][, ...args])` (added in Node.js v0.1.100): `undefined info(optional any data, any... args)` -/
-def Console.info (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "info" (Support.argsWith #[data] (args.map toJS)) Unit
+@[macro_inline] def Console.info (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.info" do
+  self.val.callMethod "info" (Internal.argsWith #[data] (args.map toJS)) Unit
 
 /-- `console.log([data][, ...args])` (added in Node.js v0.1.100): `undefined log(optional any data, any... args)` -/
-def Console.log (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "log" (Support.argsWith #[data] (args.map toJS)) Unit
+@[macro_inline] def Console.log (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.log" do
+  self.val.callMethod "log" (Internal.argsWith #[data] (args.map toJS)) Unit
 
 /-- `console.table(tabularData[, properties])` (added in Node.js v10.0.0): `undefined table(any tabularData, optional sequence<DOMString> properties)` -/
-def Console.table (self : Console) (tabularData : Data) (properties : Option (Array String) := none) : IO Unit :=
-  self.val.callMethod "table" (Support.args #[toJS tabularData, Support.optional properties]) Unit
+@[macro_inline] def Console.table (self : Console) (tabularData : Data) (properties : Option (Array String) := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.table" do
+  self.val.callMethod "table" (Internal.args #[toJS tabularData, Internal.optional properties]) Unit
 
 /-- `console.time([label])` (added in Node.js v0.1.104): `undefined time(optional DOMString label)` -/
-def Console.time (self : Console) (label : Option String := none) : IO Unit :=
-  self.val.callMethod "time" (Support.args #[Support.optional label]) Unit
+@[macro_inline] def Console.time (self : Console) (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.time" do
+  self.val.callMethod "time" (Internal.args #[Internal.optional label]) Unit
 
 /-- `console.timeEnd([label])` (added in Node.js v0.1.104): `undefined timeEnd(optional DOMString label)` -/
-def Console.timeEnd (self : Console) (label : Option String := none) : IO Unit :=
-  self.val.callMethod "timeEnd" (Support.args #[Support.optional label]) Unit
+@[macro_inline] def Console.timeEnd (self : Console) (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.Console.timeEnd" do
+  self.val.callMethod "timeEnd" (Internal.args #[Internal.optional label]) Unit
 
 /-- `console.timeLog([label][, ...data])` (added in Node.js v10.7.0): `undefined timeLog(optional DOMString label, any... data)` -/
-def Console.timeLog (self : Console) (label : Option String := none) (data : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "timeLog" (Support.argsWith #[Support.optional label] (data.map toJS)) Unit
+@[macro_inline] def Console.timeLog (self : Console) (label : Option String := none) (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.timeLog" do
+  self.val.callMethod "timeLog" (Internal.argsWith #[Internal.optional label] (data.map toJS)) Unit
 
 /-- `console.trace([message][, ...args])` (added in Node.js v0.1.104): `undefined trace(optional any message, any... args)` -/
-def Console.trace (self : Console) (message : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "trace" (Support.argsWith #[message] (args.map toJS)) Unit
+@[macro_inline] def Console.trace (self : Console) (message : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.trace" do
+  self.val.callMethod "trace" (Internal.argsWith #[message] (args.map toJS)) Unit
 
 /-- `console.warn([data][, ...args])` (added in Node.js v0.1.100): `undefined warn(optional any data, any... args)` -/
-def Console.warn (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
-  self.val.callMethod "warn" (Support.argsWith #[data] (args.map toJS)) Unit
+@[macro_inline] def Console.warn (self : Console) (data : Data := .undefined) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.Console.warn" do
+  self.val.callMethod "warn" (Internal.argsWith #[data] (args.map toJS)) Unit
 
 end Lasm.JS.Node

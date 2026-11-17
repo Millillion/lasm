@@ -8,13 +8,16 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Net
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class dgram.Socket extends EventEmitter` of `node:dgram` (Node.js 24.22.2 documentation, dgram.md): a handle to the JavaScript object. -/
 structure dgram.Socket extends EventEmitter
@@ -60,10 +63,10 @@ instance instToJSDgramSocketErrorListener : ToJS dgram.Socket.ErrorListener := �
 instance instFromJSDgramSocketErrorListener : FromJS dgram.Socket.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.dgram.Socket.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def dgram.Socket.ErrorListener.ofFn (f : Data → Async Unit) : IO dgram.Socket.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def dgram.Socket.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO dgram.Socket.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback dgram.Socket.ListeningListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure dgram.Socket.ListeningListener where
@@ -103,10 +106,10 @@ structure dgram.Socket.BindOptions where
   exclusive : Option Bool := none
   /-- `long long fd` -/
   fd : Option Int := none
-instance instToJSDgramSocketBindOptions : ToJS dgram.Socket.BindOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
-    ("address", Support.optional d.address),
-    ("exclusive", Support.optional d.exclusive),
-    ("fd", Support.optional d.fd)]⟩
+instance instToJSDgramSocketBindOptions : ToJS dgram.Socket.BindOptions := ⟨fun d => Internal.fields #[("port", Internal.optional d.port),
+    ("address", Internal.optional d.address),
+    ("exclusive", Internal.optional d.exclusive),
+    ("fd", Internal.optional d.fd)]⟩
 
 /-- `dictionary dgram.Socket.BindSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure dgram.Socket.BindSyncOptions where
@@ -114,8 +117,8 @@ structure dgram.Socket.BindSyncOptions where
   port : Option Int := none
   /-- `DOMString address` -/
   address : Option String := none
-instance instToJSDgramSocketBindSyncOptions : ToJS dgram.Socket.BindSyncOptions := ⟨fun d => Support.fields #[("port", Support.optional d.port),
-    ("address", Support.optional d.address)]⟩
+instance instToJSDgramSocketBindSyncOptions : ToJS dgram.Socket.BindSyncOptions := ⟨fun d => Internal.fields #[("port", Internal.optional d.port),
+    ("address", Internal.optional d.address)]⟩
 
 /-- `(Uint8Array or DOMString or sequence<any>)`: one constructor per member type. -/
 inductive Uint8ArrayOrDOMStringOrSequenceOfAny where
@@ -155,191 +158,191 @@ structure dgram.CreateSocketOptions where
   receiveBlockList : Option net.BlockList := none
   /-- `Node_net_BlockList sendBlockList` -/
   sendBlockList : Option net.BlockList := none
-instance instToJSDgramCreateSocketOptions : ToJS dgram.CreateSocketOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type),
-    ("reuseAddr", Support.optional d.reuseAddr),
-    ("reusePort", Support.optional d.reusePort),
-    ("ipv6Only", Support.optional d.ipv6Only),
-    ("recvBufferSize", Support.optional d.recvBufferSize),
-    ("sendBufferSize", Support.optional d.sendBufferSize),
-    ("lookup", Support.optional d.lookup),
-    ("signal", Support.optional d.signal),
-    ("receiveBlockList", Support.optional d.receiveBlockList),
-    ("sendBlockList", Support.optional d.sendBlockList)]⟩
+instance instToJSDgramCreateSocketOptions : ToJS dgram.CreateSocketOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("reuseAddr", Internal.optional d.reuseAddr),
+    ("reusePort", Internal.optional d.reusePort),
+    ("ipv6Only", Internal.optional d.ipv6Only),
+    ("recvBufferSize", Internal.optional d.recvBufferSize),
+    ("sendBufferSize", Internal.optional d.sendBufferSize),
+    ("lookup", Internal.optional d.lookup),
+    ("signal", Internal.optional d.signal),
+    ("receiveBlockList", Internal.optional d.receiveBlockList),
+    ("sendBlockList", Internal.optional d.sendBlockList)]⟩
 
 /-- `v instanceof Socket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Socket`). -/
-def dgram.Socket.cast? (v : Value) : IO (Option dgram.Socket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dgram" ["Socket"] Value) v) then some { val := v } else none
+@[macro_inline] def dgram.Socket.cast? (v : Value) : IO (Option dgram.Socket) := Internal.api "Lasm.JS.Node.dgram.Socket.cast?" do
+  Internal.cast (Support.getExport "node:dgram" ["Socket"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'close'` (added in Node.js v0.1.99): `dgram.Socket onClose(dgram.Socket.CloseListener listener)`: calls `on("close", listener)` -/
-def dgram.Socket.onClose (self : dgram.Socket) (listener : dgram.Socket.CloseListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onClose (self : dgram.Socket) (listener : dgram.Socket.CloseListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.1.99): `dgram.Socket onceClose(dgram.Socket.CloseListener listener)`: calls `once("close", listener)` -/
-def dgram.Socket.onceClose (self : dgram.Socket) (listener : dgram.Socket.CloseListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onceClose (self : dgram.Socket) (listener : dgram.Socket.CloseListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v12.0.0): `dgram.Socket onConnect(dgram.Socket.ConnectListener listener)`: calls `on("connect", listener)` -/
-def dgram.Socket.onConnect (self : dgram.Socket) (listener : dgram.Socket.ConnectListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onConnect (self : dgram.Socket) (listener : dgram.Socket.ConnectListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onConnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v12.0.0): `dgram.Socket onceConnect(dgram.Socket.ConnectListener listener)`: calls `once("connect", listener)` -/
-def dgram.Socket.onceConnect (self : dgram.Socket) (listener : dgram.Socket.ConnectListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onceConnect (self : dgram.Socket) (listener : dgram.Socket.ConnectListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onceConnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.99): `dgram.Socket onError(dgram.Socket.ErrorListener listener)`: calls `on("error", listener)` -/
-def dgram.Socket.onError (self : dgram.Socket) (listener : dgram.Socket.ErrorListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onError (self : dgram.Socket) (listener : dgram.Socket.ErrorListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.99): `dgram.Socket onceError(dgram.Socket.ErrorListener listener)`: calls `once("error", listener)` -/
-def dgram.Socket.onceError (self : dgram.Socket) (listener : dgram.Socket.ErrorListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onceError (self : dgram.Socket) (listener : dgram.Socket.ErrorListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.1.99): `dgram.Socket onListening(dgram.Socket.ListeningListener listener)`: calls `on("listening", listener)` -/
-def dgram.Socket.onListening (self : dgram.Socket) (listener : dgram.Socket.ListeningListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onListening (self : dgram.Socket) (listener : dgram.Socket.ListeningListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onListening" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.1.99): `dgram.Socket onceListening(dgram.Socket.ListeningListener listener)`: calls `once("listening", listener)` -/
-def dgram.Socket.onceListening (self : dgram.Socket) (listener : dgram.Socket.ListeningListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onceListening (self : dgram.Socket) (listener : dgram.Socket.ListeningListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onceListening" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.1.99): `dgram.Socket onMessage(dgram.Socket.MessageListener listener)`: calls `on("message", listener)` -/
-def dgram.Socket.onMessage (self : dgram.Socket) (listener : dgram.Socket.MessageListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onMessage (self : dgram.Socket) (listener : dgram.Socket.MessageListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onMessage" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.1.99): `dgram.Socket onceMessage(dgram.Socket.MessageListener listener)`: calls `once("message", listener)` -/
-def dgram.Socket.onceMessage (self : dgram.Socket) (listener : dgram.Socket.MessageListener) : IO dgram.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def dgram.Socket.onceMessage (self : dgram.Socket) (listener : dgram.Socket.MessageListener) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.onceMessage" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `socket.addMembership(multicastAddress[, multicastInterface])` (added in Node.js v0.6.9): `undefined addMembership(DOMString multicastAddress, optional DOMString multicastInterface)` -/
-def dgram.Socket.addMembership (self : dgram.Socket) (multicastAddress : String) (multicastInterface : Option String := none) : IO Unit :=
-  self.val.callMethod "addMembership" (Support.args #[toJS multicastAddress, Support.optional multicastInterface]) Unit
+@[macro_inline] def dgram.Socket.addMembership (self : dgram.Socket) (multicastAddress : String) (multicastInterface : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.addMembership" do
+  self.val.callMethod "addMembership" (Internal.args #[toJS multicastAddress, Internal.optional multicastInterface]) Unit
 
 /-- `socket.addSourceSpecificMembership(sourceAddress, groupAddress[, multicastInterface])` (added in Node.js v13.1.0, v12.16.0): `undefined addSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString multicastInterface)` -/
-def dgram.Socket.addSourceSpecificMembership (self : dgram.Socket) (sourceAddress : String) (groupAddress : String) (multicastInterface : Option String := none) : IO Unit :=
-  self.val.callMethod "addSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional multicastInterface]) Unit
+@[macro_inline] def dgram.Socket.addSourceSpecificMembership (self : dgram.Socket) (sourceAddress : String) (groupAddress : String) (multicastInterface : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.addSourceSpecificMembership" do
+  self.val.callMethod "addSourceSpecificMembership" (Internal.args #[toJS sourceAddress, toJS groupAddress, Internal.optional multicastInterface]) Unit
 
 /-- `socket.address()` (added in Node.js v0.1.99): `object address()` -/
-def dgram.Socket.address (self : dgram.Socket) : IO Data :=
-  self.val.callMethod "address" (Support.args #[]) Data
+@[macro_inline] def dgram.Socket.address (self : dgram.Socket) : IO Data := Internal.api "Lasm.JS.Node.dgram.Socket.address" do
+  self.val.callMethod "address" (Internal.args #[]) Data
 
 /-- `socket.bind([port][, address][, callback])` (added in Node.js v0.1.99): `undefined bind(optional long long port, optional DOMString address)` -/
-def dgram.Socket.bind (self : dgram.Socket) (port : Option Int := none) (address : Option String := none) : IO Unit :=
-  self.val.callMethod "bind" (Support.args #[Support.optional port, Support.optional address]) Unit
+@[macro_inline] def dgram.Socket.bind (self : dgram.Socket) (port : Option Int := none) (address : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.bind" do
+  self.val.callMethod "bind" (Internal.args #[Internal.optional port, Internal.optional address]) Unit
 
 /-- `socket.bind(options[, callback])` (added in Node.js v0.11.14): `undefined bind(dgram.Socket.BindOptions options)` -/
-def dgram.Socket.bindWithOptions (self : dgram.Socket) (options : dgram.Socket.BindOptions) : IO Unit :=
-  self.val.callMethod "bind" (Support.args #[toJS options]) Unit
+@[macro_inline] def dgram.Socket.bindWithOptions (self : dgram.Socket) (options : dgram.Socket.BindOptions) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.bindWithOptions" do
+  self.val.callMethod "bind" (Internal.args #[toJS options]) Unit
 
 /-- `socket.bindSync([options])` (added in Node.js v24.19.0): `object bindSync(optional dgram.Socket.BindSyncOptions options)` -/
-def dgram.Socket.bindSync (self : dgram.Socket) (options : Option dgram.Socket.BindSyncOptions := none) : IO Data :=
-  self.val.callMethod "bindSync" (Support.args #[Support.optional options]) Data
+@[macro_inline] def dgram.Socket.bindSync (self : dgram.Socket) (options : Option dgram.Socket.BindSyncOptions := none) : IO Data := Internal.api "Lasm.JS.Node.dgram.Socket.bindSync" do
+  self.val.callMethod "bindSync" (Internal.args #[Internal.optional options]) Data
 
 /-- `socket.close([callback])` (added in Node.js v0.1.99): `undefined close()` -/
-def dgram.Socket.close (self : dgram.Socket) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def dgram.Socket.close (self : dgram.Socket) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `socket.connect(port[, address][, callback])` (added in Node.js v12.0.0): `undefined connect(long long port, optional DOMString address)` -/
-def dgram.Socket.connect (self : dgram.Socket) (port : Int) (address : Option String := none) : IO Unit :=
-  self.val.callMethod "connect" (Support.args #[toJS port, Support.optional address]) Unit
+@[macro_inline] def dgram.Socket.connect (self : dgram.Socket) (port : Int) (address : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.connect" do
+  self.val.callMethod "connect" (Internal.args #[toJS port, Internal.optional address]) Unit
 
 /-- `socket.connectSync(port[, address])` (added in Node.js v24.19.0): `undefined connectSync(long long port, optional DOMString address)` -/
-def dgram.Socket.connectSync (self : dgram.Socket) (port : Int) (address : Option String := none) : IO Unit :=
-  self.val.callMethod "connectSync" (Support.args #[toJS port, Support.optional address]) Unit
+@[macro_inline] def dgram.Socket.connectSync (self : dgram.Socket) (port : Int) (address : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.connectSync" do
+  self.val.callMethod "connectSync" (Internal.args #[toJS port, Internal.optional address]) Unit
 
 /-- `socket.disconnect()` (added in Node.js v12.0.0): `undefined disconnect()` -/
-def dgram.Socket.disconnect (self : dgram.Socket) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def dgram.Socket.disconnect (self : dgram.Socket) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `socket.dropMembership(multicastAddress[, multicastInterface])` (added in Node.js v0.6.9): `undefined dropMembership(DOMString multicastAddress, optional DOMString multicastInterface)` -/
-def dgram.Socket.dropMembership (self : dgram.Socket) (multicastAddress : String) (multicastInterface : Option String := none) : IO Unit :=
-  self.val.callMethod "dropMembership" (Support.args #[toJS multicastAddress, Support.optional multicastInterface]) Unit
+@[macro_inline] def dgram.Socket.dropMembership (self : dgram.Socket) (multicastAddress : String) (multicastInterface : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.dropMembership" do
+  self.val.callMethod "dropMembership" (Internal.args #[toJS multicastAddress, Internal.optional multicastInterface]) Unit
 
 /-- `socket.dropSourceSpecificMembership(sourceAddress, groupAddress[, multicastInterface])` (added in Node.js v13.1.0, v12.16.0): `undefined dropSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString multicastInterface)` -/
-def dgram.Socket.dropSourceSpecificMembership (self : dgram.Socket) (sourceAddress : String) (groupAddress : String) (multicastInterface : Option String := none) : IO Unit :=
-  self.val.callMethod "dropSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional multicastInterface]) Unit
+@[macro_inline] def dgram.Socket.dropSourceSpecificMembership (self : dgram.Socket) (sourceAddress : String) (groupAddress : String) (multicastInterface : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.dropSourceSpecificMembership" do
+  self.val.callMethod "dropSourceSpecificMembership" (Internal.args #[toJS sourceAddress, toJS groupAddress, Internal.optional multicastInterface]) Unit
 
 /-- `socket.getRecvBufferSize()` (added in Node.js v8.7.0): `double getRecvBufferSize()` -/
-def dgram.Socket.getRecvBufferSize (self : dgram.Socket) : IO Float :=
-  self.val.callMethod "getRecvBufferSize" (Support.args #[]) Float
+@[macro_inline] def dgram.Socket.getRecvBufferSize (self : dgram.Socket) : IO Float := Internal.api "Lasm.JS.Node.dgram.Socket.getRecvBufferSize" do
+  self.val.callMethod "getRecvBufferSize" (Internal.args #[]) Float
 
 /-- `socket.getSendBufferSize()` (added in Node.js v8.7.0): `double getSendBufferSize()` -/
-def dgram.Socket.getSendBufferSize (self : dgram.Socket) : IO Float :=
-  self.val.callMethod "getSendBufferSize" (Support.args #[]) Float
+@[macro_inline] def dgram.Socket.getSendBufferSize (self : dgram.Socket) : IO Float := Internal.api "Lasm.JS.Node.dgram.Socket.getSendBufferSize" do
+  self.val.callMethod "getSendBufferSize" (Internal.args #[]) Float
 
 /-- `socket.getSendQueueSize()` (added in Node.js v18.8.0, v16.19.0): `double getSendQueueSize()` -/
-def dgram.Socket.getSendQueueSize (self : dgram.Socket) : IO Float :=
-  self.val.callMethod "getSendQueueSize" (Support.args #[]) Float
+@[macro_inline] def dgram.Socket.getSendQueueSize (self : dgram.Socket) : IO Float := Internal.api "Lasm.JS.Node.dgram.Socket.getSendQueueSize" do
+  self.val.callMethod "getSendQueueSize" (Internal.args #[]) Float
 
 /-- `socket.getSendQueueCount()` (added in Node.js v18.8.0, v16.19.0): `double getSendQueueCount()` -/
-def dgram.Socket.getSendQueueCount (self : dgram.Socket) : IO Float :=
-  self.val.callMethod "getSendQueueCount" (Support.args #[]) Float
+@[macro_inline] def dgram.Socket.getSendQueueCount (self : dgram.Socket) : IO Float := Internal.api "Lasm.JS.Node.dgram.Socket.getSendQueueCount" do
+  self.val.callMethod "getSendQueueCount" (Internal.args #[]) Float
 
 /-- `socket.ref()` (added in Node.js v0.9.1): `dgram.Socket ref()` -/
-def dgram.Socket.ref (self : dgram.Socket) : IO dgram.Socket := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def dgram.Socket.ref (self : dgram.Socket) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.remoteAddress()` (added in Node.js v12.0.0): `object remoteAddress()` -/
-def dgram.Socket.remoteAddress (self : dgram.Socket) : IO Data :=
-  self.val.callMethod "remoteAddress" (Support.args #[]) Data
+@[macro_inline] def dgram.Socket.remoteAddress (self : dgram.Socket) : IO Data := Internal.api "Lasm.JS.Node.dgram.Socket.remoteAddress" do
+  self.val.callMethod "remoteAddress" (Internal.args #[]) Data
 
 /-- `socket.send(msg[, offset, length][, port][, address][, callback])` (added in Node.js v0.1.99): `undefined send((Uint8Array or DOMString or sequence<any>) msg, optional long long offset, optional long long length, optional long long port, optional DOMString address)` -/
-def dgram.Socket.send (self : dgram.Socket) (msg : Uint8ArrayOrDOMStringOrSequenceOfAny) (offset : Option Int := none) (length : Option Int := none) (port : Option Int := none) (address : Option String := none) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS msg, Support.optional offset, Support.optional length, Support.optional port, Support.optional address]) Unit
+@[macro_inline] def dgram.Socket.send (self : dgram.Socket) (msg : Uint8ArrayOrDOMStringOrSequenceOfAny) (offset : Option Int := none) (length : Option Int := none) (port : Option Int := none) (address : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.send" do
+  self.val.callMethod "send" (Internal.args #[toJS msg, Internal.optional offset, Internal.optional length, Internal.optional port, Internal.optional address]) Unit
 
 /-- `socket.setBroadcast(flag)` (added in Node.js v0.6.9): `undefined setBroadcast(boolean flag)` -/
-def dgram.Socket.setBroadcast (self : dgram.Socket) (flag : Bool) : IO Unit :=
-  self.val.callMethod "setBroadcast" (Support.args #[toJS flag]) Unit
+@[macro_inline] def dgram.Socket.setBroadcast (self : dgram.Socket) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setBroadcast" do
+  self.val.callMethod "setBroadcast" (Internal.args #[toJS flag]) Unit
 
 /-- `socket.setMulticastInterface(multicastInterface)` (added in Node.js v8.6.0): `undefined setMulticastInterface(DOMString multicastInterface)` -/
-def dgram.Socket.setMulticastInterface (self : dgram.Socket) (multicastInterface : String) : IO Unit :=
-  self.val.callMethod "setMulticastInterface" (Support.args #[toJS multicastInterface]) Unit
+@[macro_inline] def dgram.Socket.setMulticastInterface (self : dgram.Socket) (multicastInterface : String) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setMulticastInterface" do
+  self.val.callMethod "setMulticastInterface" (Internal.args #[toJS multicastInterface]) Unit
 
 /-- `socket.setMulticastLoopback(flag)` (added in Node.js v0.3.8): `undefined setMulticastLoopback(boolean flag)` -/
-def dgram.Socket.setMulticastLoopback (self : dgram.Socket) (flag : Bool) : IO Unit :=
-  self.val.callMethod "setMulticastLoopback" (Support.args #[toJS flag]) Unit
+@[macro_inline] def dgram.Socket.setMulticastLoopback (self : dgram.Socket) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setMulticastLoopback" do
+  self.val.callMethod "setMulticastLoopback" (Internal.args #[toJS flag]) Unit
 
 /-- `socket.setMulticastTTL(ttl)` (added in Node.js v0.3.8): `undefined setMulticastTTL(long long ttl)` -/
-def dgram.Socket.setMulticastTTL (self : dgram.Socket) (ttl : Int) : IO Unit :=
-  self.val.callMethod "setMulticastTTL" (Support.args #[toJS ttl]) Unit
+@[macro_inline] def dgram.Socket.setMulticastTTL (self : dgram.Socket) (ttl : Int) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setMulticastTTL" do
+  self.val.callMethod "setMulticastTTL" (Internal.args #[toJS ttl]) Unit
 
 /-- `socket.setRecvBufferSize(size)` (added in Node.js v8.7.0): `undefined setRecvBufferSize(long long size)` -/
-def dgram.Socket.setRecvBufferSize (self : dgram.Socket) (size : Int) : IO Unit :=
-  self.val.callMethod "setRecvBufferSize" (Support.args #[toJS size]) Unit
+@[macro_inline] def dgram.Socket.setRecvBufferSize (self : dgram.Socket) (size : Int) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setRecvBufferSize" do
+  self.val.callMethod "setRecvBufferSize" (Internal.args #[toJS size]) Unit
 
 /-- `socket.setSendBufferSize(size)` (added in Node.js v8.7.0): `undefined setSendBufferSize(long long size)` -/
-def dgram.Socket.setSendBufferSize (self : dgram.Socket) (size : Int) : IO Unit :=
-  self.val.callMethod "setSendBufferSize" (Support.args #[toJS size]) Unit
+@[macro_inline] def dgram.Socket.setSendBufferSize (self : dgram.Socket) (size : Int) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setSendBufferSize" do
+  self.val.callMethod "setSendBufferSize" (Internal.args #[toJS size]) Unit
 
 /-- `socket.setTTL(ttl)` (added in Node.js v0.1.101): `undefined setTTL(long long ttl)` -/
-def dgram.Socket.setTTL (self : dgram.Socket) (ttl : Int) : IO Unit :=
-  self.val.callMethod "setTTL" (Support.args #[toJS ttl]) Unit
+@[macro_inline] def dgram.Socket.setTTL (self : dgram.Socket) (ttl : Int) : IO Unit := Internal.api "Lasm.JS.Node.dgram.Socket.setTTL" do
+  self.val.callMethod "setTTL" (Internal.args #[toJS ttl]) Unit
 
 /-- `socket.unref()` (added in Node.js v0.9.1): `dgram.Socket unref()` -/
-def dgram.Socket.unref (self : dgram.Socket) : IO dgram.Socket := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def dgram.Socket.unref (self : dgram.Socket) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.Socket.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `dgram.createSocket(options[, callback])` (added in Node.js v0.11.13): `dgram.Socket createSocket(dgram.CreateSocketOptions options)` (Node.js 24.22.2 documentation, dgram.md) -/
-def dgram.createSocket (options : dgram.CreateSocketOptions) : IO dgram.Socket := do
+@[macro_inline] def dgram.createSocket (options : dgram.CreateSocketOptions) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.createSocket" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.dgram.createSocket", module := "node:dgram", path := "createSocket", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `dgram.createSocket(type[, callback])` (added in Node.js v0.1.99): `dgram.Socket createSocket(DOMString type)` (Node.js 24.22.2 documentation, dgram.md) -/
-def dgram.createSocketWithType (type : String) : IO dgram.Socket := do
+@[macro_inline] def dgram.createSocketWithType (type : String) : IO dgram.Socket := Internal.api "Lasm.JS.Node.dgram.createSocketWithType" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.dgram.createSocketWithType", module := "node:dgram", path := "createSocket", construct := false, arity := 1 }
-    (Support.args #[toJS type]) (await := false)
+    (Internal.args #[toJS type]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node
