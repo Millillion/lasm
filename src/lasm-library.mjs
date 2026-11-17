@@ -204,14 +204,17 @@ export function importsLibrary(sources) {
 
 /** The generated C (from the prefix) of the library modules the program links,
  * and the C glue, for the link; `modules` are those modules, `oleans` their
- * module data (for the binding check: library bindings name their JS modules). */
-export function librarySources(lean, programSources) {
+ * module data (for the binding check: library bindings name their JS modules). `supplied`: library modules
+ * the program's own sources already compile (Lake built them, src/lake-library.mjs), linked from there only. */
+export function librarySources(lean, programSources, { supplied = [] } = {}) {
   const missing = module => !existsSync(libraryC(lean, module));
   if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
   const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
   // The prefix's library: the modules compiled with it, then those compiled on first import.
-  const modules = linkedLibraryModules(programSources, { libraryText, modules: [...libraryModules, ...compiledLazyModules(lean.prefix, libraryModules)] });
+  const theirs = new Set(supplied);
+  const modules = linkedLibraryModules(programSources, { libraryText,
+    modules: [...libraryModules, ...compiledLazyModules(lean.prefix, libraryModules)].filter(module => !theirs.has(module)) });
   const sources = [], inputs = [];
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
 import { packageTargets } from './package.mjs';
 import { targetHintAmong } from './cli-arguments.mjs';
+import { lakeRequireToml } from './lake-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -157,8 +158,18 @@ export function lakeName(name) {
   return /^[A-Za-z]/.test(id) ? id : 'app' + (id ? '_' + id : '');
 }
 
+// Lasm's library as a Lake package (src/lake-library.mjs, decision 0.3-7), for projects that import it.
+const lasmRequire = `
+# Lasm's library (Lasm.JS, Lasm.UI, …) as a Lake package. Every lasm command
+# links .lake/lasm-library to it, so Lake and the Lean editor build its
+# modules on first import. On a fresh clone, run any lasm command once
+# (npm run dev, npx lasm editor) before a plain \`lake build\`.
+${lakeRequireToml}`;
+
 function lakefile(name, template) {
   const handler = templates[template].handler;
+  // The templates that use Lasm's library require it as a Lake package.
+  const library = !!(templates[template].browser || templates[template].interop || templates[template].library);
   return `name = "${lakeName(name)}"
 version = "0.1.0"
 defaultTargets = ["app"]
@@ -175,7 +186,7 @@ name = "${handler}"
 [[lean_exe]]
 name = "app"
 root = "Main"
-`;
+${library ? lasmRequire : ''}`;
 }
 
 function browserPackageJson(name, template) {
@@ -253,6 +264,9 @@ Files:
 \`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
 \`Lasm.UI\`, which ships with Lasm: \`npx lasm editor\` (also run by \`npm run dev\`) makes the Lean
 editor resolve it ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+\`lakefile.toml\` requires Lasm's library as a Lake package at \`.lake/lasm-library\`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`npx lasm editor\`); a plain
+\`lake build\` needs it.
 
 ## Deploy
 
@@ -502,7 +516,10 @@ file and line while the last good server keeps running.`;
     ? `\`App.lean\` is pure Lean: \`lake build App\` checks it natively. \`Main.lean\` imports
 \`${t.library ?? 'Lasm.JS'}\`, which ships with Lasm, so it builds and runs only with Lasm. \`npx lasm editor\`
 (also run by \`npm run dev\`) makes the Lean editor resolve it
-([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).`
+([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+\`lakefile.toml\` requires Lasm's library as a Lake package at \`.lake/lasm-library\`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`npx lasm editor\`); a plain
+\`lake build\` needs it.`
     : `This is an ordinary Lake project: \`lake build\` also builds it natively.`;
   return `# ${name}
 
@@ -730,6 +747,8 @@ export function initProject({ directory, template, deploy = [] }) {
 
 function writeFiles(target, name, files) {
   mkdirSync(target, { recursive: true });
+  // .lake/ (git-ignored) holds the link to Lasm's Lake package that lasm commands make.
+  if (/^name = "lasm"$/m.test(files['lakefile.toml'] ?? '')) mkdirSync(join(target, '.lake'), { recursive: true });
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });
     writeFileSync(join(target, file), text, { flag: 'wx' });
@@ -761,7 +780,7 @@ name = "View"
 
 # Server.lean and Client.lean are the two programs: lasm builds them
 # (npm run build). They are not Lake targets.
-`,
+${lasmRequire}`,
     'package.json': JSON.stringify({
       name, version: '0.1.0', private: true, type: 'module',
       description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
@@ -863,6 +882,9 @@ npm start          # serves the release build on http://localhost:3000 (PORT, HO
 The Lean editor resolves \`import Lasm.*\` once \`npx lasm editor\` (also run by \`npm run dev\`)
 has linked Lasm's Lean for this directory; restart the Lean server in your editor afterwards
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+\`lakefile.toml\` requires Lasm's library as a Lake package at \`.lake/lasm-library\`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`npx lasm editor\`); a plain
+\`lake build\` needs it.
 
 ## Deploy
 
@@ -893,8 +915,11 @@ export async function runInit(options) {
 
 Next:
 ${cd}${nextSteps(options.template, jsRuntime)}`);
-  // Editor support up front when Lasm's Lean is already on this machine (no download here).
-  await (await import('./editor.mjs')).autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true });
+  // Editor support up front when Lasm's Lean is already on this machine (no download here); Lasm's Lake
+  // package link (.lake/lasm-library, 0.3-7) too, also when the editor setup is off (CI, LASM_EDITOR=0).
+  const editor = await import('./editor.mjs');
+  if (await editor.autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true }) === undefined)
+    await editor.linkProjectLibrary(result.directory, { cachedOnly: true });
   return 0;
 }
 
