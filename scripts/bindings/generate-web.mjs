@@ -1725,16 +1725,8 @@ files.set(join(outDir, 'modules.json'), JSON.stringify({
 
 // Lasm.JS.Cloudflare has no umbrella module (API_DECISIONS 0.5-16): a program imports the modules of
 // the areas it uses (Lasm.JS.Cloudflare.Kv, .D1, .Workers, …), which compile on first import.
-for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
-${h.auto ? `Lasm.JS.${h.name}: ${h.title} as declared for ${h.name} ${h.version} (every function, constant and class, with
-the types they use), on Lasm.JS.Web's types. The same mapping as Lasm.JS.Web: classes and the objects the runtime
-keeps are handle types, Promise results are \`Async\`, plain objects structures, callbacks made from Lean functions
-(docs/JS_BINDINGS.md, "Lasm.JS.${h.name}").` : `Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
-Request and Response as the handler's types. The same mapping as Lasm.JS.Web: the server is a handle type,
-Promise results are \`Async\`, options dictionaries, the handler a callback made from a Lean function
-(docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun").`}
-${hostGeneratedBy(h)}
--/`, ...order.filter(n => n.startsWith(`Lasm.JS.${h.name}.`)).map(n => `import ${n}`), ''].join('\n'));
+// Lasm.JS.Deno and Lasm.JS.Bun have no umbrella module (docs/api/decisions/0.4.md, 0.4-21): their modules compile
+// on first import, so a program imports the modules it uses (`import Lasm.JS.Deno.Kv`), never the whole namespace.
 
 // The generated surface, for the availability probes (test/fixtures/js-web on the server runtimes,
 // test/browser/platform on the engines): reported, never a failure.
@@ -1925,6 +1917,8 @@ if (check) {
     }
     if (name !== 'Support.lean' && !handWritten.has(rel) && !known.has(rel)) stale.push(rel + ' (not generated)');
   }
+  for (const h of serveTier.hosts) if (existsSync(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`)))
+    stale.push(join('library', 'Lasm', 'JS', `${h.name}.lean`) + ' (no umbrella module: 0.4-21)');
   if (stale.length) {
     console.error(`The standard bindings are stale: ${stale.join(', ')}. Run node scripts/bindings/generate-web.mjs and commit the result.`);
     process.exit(1);
