@@ -45,4 +45,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def Element.pseudo (self : Element) (type : String) : IO (Option CSSPseudoElement) := Internal.api "Lasm.JS.Web.Element.pseudo" do
   self.val.callMethod "pseudo" (Internal.args #[toJS type]) (Option CSSPseudoElement)
 
+/-- `CSSPseudoElement? pseudo(CSSOMString type)` where the platform has it (`'pseudo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.pseudo? (self' : Element) (type : String) : IO (Option (Option CSSPseudoElement)) := Internal.api "Lasm.JS.Web.Element.pseudo?" do
+  let self := self'
+  if !(← Internal.has self.val "pseudo") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "pseudo" (Internal.args #[toJS type]) (Option CSSPseudoElement)
+  return some lasmGuarded
+
 end Lasm.JS.Web

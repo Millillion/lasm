@@ -143,9 +143,25 @@ instance : FromJS WebAssemblyInstantiatedSource where
   Lasm.JS.Binding.invoke WebAssembly.Exception { name := "Lasm.JS.Web.WebAssembly.Exception.new", module := "globalThis", path := "WebAssembly.Exception", construct := true, arity := 3 }
     (Internal.args #[toJS exceptionTag, toJS payload, Internal.optional options]) (await := false)
 
+/-- `constructor(Tag exceptionTag, sequence<any> payload, optional ExceptionOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Exception.new? (exceptionTag : WebAssembly.Tag) (payload : Array Data) (options : Option ExceptionOptions := none) : IO (Option WebAssembly.Exception) := Internal.api "Lasm.JS.Web.WebAssembly.Exception.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Exception"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Exception { name := "Lasm.JS.Web.WebAssembly.Exception.new?", module := "globalThis", path := "WebAssembly.Exception", construct := true, arity := 3 }
+      (Internal.args #[toJS exceptionTag, toJS payload, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute (DOMString or undefined) stack` -/
 @[macro_inline] def WebAssembly.Exception.stack (self : WebAssembly.Exception) : IO (Option String) := Internal.api "Lasm.JS.Web.WebAssembly.Exception.stack" do
   self.val.get "stack" (Option String)
+
+/-- `readonly attribute (DOMString or undefined) stack` where the platform has it (`'stack' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Exception.stack? (self' : WebAssembly.Exception) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.WebAssembly.Exception.stack?" do
+  let self := self'
+  if !(← Internal.has self.val "stack") then return none
+  let lasmGuarded ← do
+    self.val.get "stack" (Option String)
+  return some lasmGuarded
 
 /-- `any getArg(Tag exceptionTag, unsigned long index)` -/
 @[macro_inline] def WebAssembly.Exception.getArg (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) (index : Nat) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Exception.getArg" do
@@ -163,6 +179,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
 @[macro_inline] def WebAssembly.Global.new (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO WebAssembly.Global := Internal.api "Lasm.JS.Web.WebAssembly.Global.new" do
   Lasm.JS.Binding.invoke WebAssembly.Global { name := "Lasm.JS.Web.WebAssembly.Global.new", module := "globalThis", path := "WebAssembly.Global", construct := true, arity := 2 }
     (Internal.args #[toJS descriptor, v]) (await := false)
+
+/-- `constructor(GlobalDescriptor descriptor, optional any v)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Global.new? (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO (Option WebAssembly.Global) := Internal.api "Lasm.JS.Web.WebAssembly.Global.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Global"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Global { name := "Lasm.JS.Web.WebAssembly.Global.new?", module := "globalThis", path := "WebAssembly.Global", construct := true, arity := 2 }
+      (Internal.args #[toJS descriptor, v]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute any value` -/
 @[macro_inline] def WebAssembly.Global.value (self : WebAssembly.Global) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Global.value" do
@@ -185,6 +209,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
   Lasm.JS.Binding.invoke WebAssembly.Instance { name := "Lasm.JS.Web.WebAssembly.Instance.new", module := "globalThis", path := "WebAssembly.Instance", construct := true, arity := 2 }
     (Internal.args #[toJS «module», importObject]) (await := false)
 
+/-- `constructor(Module module, optional object importObject)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Instance.new? («module» : WebAssembly.Module) (importObject : Data := .undefined) : IO (Option WebAssembly.Instance) := Internal.api "Lasm.JS.Web.WebAssembly.Instance.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Instance"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Instance { name := "Lasm.JS.Web.WebAssembly.Instance.new?", module := "globalThis", path := "WebAssembly.Instance", construct := true, arity := 2 }
+      (Internal.args #[toJS «module», importObject]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute object exports` -/
 @[macro_inline] def WebAssembly.Instance.exports (self : WebAssembly.Instance) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Instance.exports" do
   self.val.get "exports" Data
@@ -197,6 +229,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
 @[macro_inline] def WebAssembly.LinkError.new (message : Option String := none) : IO WebAssembly.LinkError := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.new" do
   Lasm.JS.Binding.invoke WebAssembly.LinkError { name := "Lasm.JS.Web.WebAssembly.LinkError.new", module := "globalThis", path := "WebAssembly.LinkError", construct := true, arity := 1 }
     (Internal.args #[Internal.optional message]) (await := false)
+
+/-- `constructor(optional DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.LinkError.new? (message : Option String := none) : IO (Option WebAssembly.LinkError) := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "LinkError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.LinkError { name := "Lasm.JS.Web.WebAssembly.LinkError.new?", module := "globalThis", path := "WebAssembly.LinkError", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional message]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def WebAssembly.LinkError.name (self : WebAssembly.LinkError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.LinkError.name" do
@@ -215,6 +255,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
   Lasm.JS.Binding.invoke WebAssembly.Memory { name := "Lasm.JS.Web.WebAssembly.Memory.new", module := "globalThis", path := "WebAssembly.Memory", construct := true, arity := 1 }
     (Internal.args #[toJS descriptor]) (await := false)
 
+/-- `constructor(MemoryDescriptor descriptor)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Memory.new? (descriptor : MemoryDescriptor) : IO (Option WebAssembly.Memory) := Internal.api "Lasm.JS.Web.WebAssembly.Memory.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Memory"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Memory { name := "Lasm.JS.Web.WebAssembly.Memory.new?", module := "globalThis", path := "WebAssembly.Memory", construct := true, arity := 1 }
+      (Internal.args #[toJS descriptor]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ArrayBuffer buffer` -/
 @[macro_inline] def WebAssembly.Memory.buffer (self : WebAssembly.Memory) : IO ByteArray := Internal.api "Lasm.JS.Web.WebAssembly.Memory.buffer" do
   let r ← self.val.get "buffer" Value
@@ -229,10 +277,28 @@ instance : FromJS WebAssemblyInstantiatedSource where
   let r ← self.val.callMethod "toFixedLengthBuffer" (Internal.args #[]) Value
   Internal.arrayBufferBytes r
 
+/-- `ArrayBuffer toFixedLengthBuffer()` where the platform has it (`'toFixedLengthBuffer' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Memory.toFixedLengthBuffer? (self' : WebAssembly.Memory) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.WebAssembly.Memory.toFixedLengthBuffer?" do
+  let self := self'
+  if !(← Internal.has self.val "toFixedLengthBuffer") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "toFixedLengthBuffer" (Internal.args #[]) Value
+    Internal.arrayBufferBytes r
+  return some lasmGuarded
+
 /-- `ArrayBuffer toResizableBuffer()` -/
 @[macro_inline] def WebAssembly.Memory.toResizableBuffer (self : WebAssembly.Memory) : IO ByteArray := Internal.api "Lasm.JS.Web.WebAssembly.Memory.toResizableBuffer" do
   let r ← self.val.callMethod "toResizableBuffer" (Internal.args #[]) Value
   Internal.arrayBufferBytes r
+
+/-- `ArrayBuffer toResizableBuffer()` where the platform has it (`'toResizableBuffer' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Memory.toResizableBuffer? (self' : WebAssembly.Memory) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.WebAssembly.Memory.toResizableBuffer?" do
+  let self := self'
+  if !(← Internal.has self.val "toResizableBuffer") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "toResizableBuffer" (Internal.args #[]) Value
+    Internal.arrayBufferBytes r
+  return some lasmGuarded
 
 /-- `v instanceof WebAssembly.Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Module`). -/
 @[macro_inline] def WebAssembly.Module.cast? (v : Value) : IO (Option WebAssembly.Module) := Internal.api "Lasm.JS.Web.WebAssembly.Module.cast?" do
@@ -242,6 +308,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
 @[macro_inline] def WebAssembly.Module.new (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO WebAssembly.Module := Internal.api "Lasm.JS.Web.WebAssembly.Module.new" do
   Lasm.JS.Binding.invoke WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.Module.new", module := "globalThis", path := "WebAssembly.Module", construct := true, arity := 2 }
     (Internal.args #[toJS bytes, Internal.optional options]) (await := false)
+
+/-- `constructor(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Module.new? (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO (Option WebAssembly.Module) := Internal.api "Lasm.JS.Web.WebAssembly.Module.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Module"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.Module.new?", module := "globalThis", path := "WebAssembly.Module", construct := true, arity := 2 }
+      (Internal.args #[toJS bytes, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `static sequence<ModuleExportDescriptor> exports(Module moduleObject)` -/
 @[macro_inline] def WebAssembly.Module.exports (moduleObject : WebAssembly.Module) : IO (Array ModuleExportDescriptor) := Internal.api "Lasm.JS.Web.WebAssembly.Module.exports" do
@@ -268,6 +342,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
   Lasm.JS.Binding.invoke WebAssembly.RuntimeError { name := "Lasm.JS.Web.WebAssembly.RuntimeError.new", module := "globalThis", path := "WebAssembly.RuntimeError", construct := true, arity := 1 }
     (Internal.args #[Internal.optional message]) (await := false)
 
+/-- `constructor(optional DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.RuntimeError.new? (message : Option String := none) : IO (Option WebAssembly.RuntimeError) := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "RuntimeError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.RuntimeError { name := "Lasm.JS.Web.WebAssembly.RuntimeError.new?", module := "globalThis", path := "WebAssembly.RuntimeError", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional message]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def WebAssembly.RuntimeError.name (self : WebAssembly.RuntimeError) : IO String := Internal.api "Lasm.JS.Web.WebAssembly.RuntimeError.name" do
   self.val.get "name" String
@@ -284,6 +366,14 @@ instance : FromJS WebAssemblyInstantiatedSource where
 @[macro_inline] def WebAssembly.Table.new (descriptor : TableDescriptor) (value : Data := .undefined) : IO WebAssembly.Table := Internal.api "Lasm.JS.Web.WebAssembly.Table.new" do
   Lasm.JS.Binding.invoke WebAssembly.Table { name := "Lasm.JS.Web.WebAssembly.Table.new", module := "globalThis", path := "WebAssembly.Table", construct := true, arity := 2 }
     (Internal.args #[toJS descriptor, value]) (await := false)
+
+/-- `constructor(TableDescriptor descriptor, optional any value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Table.new? (descriptor : TableDescriptor) (value : Data := .undefined) : IO (Option WebAssembly.Table) := Internal.api "Lasm.JS.Web.WebAssembly.Table.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Table"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Table { name := "Lasm.JS.Web.WebAssembly.Table.new?", module := "globalThis", path := "WebAssembly.Table", construct := true, arity := 2 }
+      (Internal.args #[toJS descriptor, value]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute AddressValue length` -/
 @[macro_inline] def WebAssembly.Table.length (self : WebAssembly.Table) : IO Data := Internal.api "Lasm.JS.Web.WebAssembly.Table.length" do
@@ -310,10 +400,26 @@ instance : FromJS WebAssemblyInstantiatedSource where
   Lasm.JS.Binding.invoke WebAssembly.Tag { name := "Lasm.JS.Web.WebAssembly.Tag.new", module := "globalThis", path := "WebAssembly.Tag", construct := true, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
 
+/-- `constructor(TagType type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.Tag.new? (type : TagType) : IO (Option WebAssembly.Tag) := Internal.api "Lasm.JS.Web.WebAssembly.Tag.new?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "Tag"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebAssembly.Tag { name := "Lasm.JS.Web.WebAssembly.Tag.new?", module := "globalThis", path := "WebAssembly.Tag", construct := true, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Tag JSTag` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
 @[macro_inline] def WebAssembly.JSTag : IO WebAssembly.Tag := Internal.api "Lasm.JS.Web.WebAssembly.JSTag" do
   let r ← Internal.getGlobal ["WebAssembly", "JSTag"] Value
   pure { val := r }
+
+/-- `readonly attribute Tag JSTag` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.JSTag? : IO (Option WebAssembly.Tag) := Internal.api "Lasm.JS.Web.WebAssembly.JSTag?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "JSTag"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["WebAssembly", "JSTag"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `boolean validate(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
 @[macro_inline] def WebAssembly.validate (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO Bool := Internal.api "Lasm.JS.Web.WebAssembly.validate" do

@@ -19,4 +19,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.sendBeacon (self : Navigator) (url : String) (data : Option BodyInit := none) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.sendBeacon" do
   self.val.callMethod "sendBeacon" (Internal.args #[toJS url, Internal.optional data]) Bool
 
+/-- `boolean sendBeacon(USVString url, optional BodyInit? data)` where the platform has it (`'sendBeacon' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.sendBeacon? (self' : Navigator) (url : String) (data : Option BodyInit := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.sendBeacon?" do
+  let self := self'
+  if !(← Internal.has self.val "sendBeacon") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "sendBeacon" (Internal.args #[toJS url, Internal.optional data]) Bool
+  return some lasmGuarded
+
 end Lasm.JS.Web

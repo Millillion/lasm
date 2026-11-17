@@ -71,6 +71,14 @@ instance : ToJS ViewTimelineOptions := ⟨fun d => Internal.fields #[("subject",
   Lasm.JS.Binding.invoke ScrollTimeline { name := "Lasm.JS.Web.ScrollTimeline.new", module := "globalThis", path := "ScrollTimeline", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional ScrollTimelineOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ScrollTimeline.new? (options : Option ScrollTimelineOptions := none) : IO (Option ScrollTimeline) := Internal.api "Lasm.JS.Web.ScrollTimeline.new?" do
+  if !(← Internal.hasGlobal ["ScrollTimeline"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ScrollTimeline { name := "Lasm.JS.Web.ScrollTimeline.new?", module := "globalThis", path := "ScrollTimeline", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Element? source` -/
 @[macro_inline] def ScrollTimeline.source (self : ScrollTimeline) : IO (Option Element) := Internal.api "Lasm.JS.Web.ScrollTimeline.source" do
   self.val.get "source" (Option Element)
@@ -87,6 +95,14 @@ instance : ToJS ViewTimelineOptions := ⟨fun d => Internal.fields #[("subject",
 @[macro_inline] def ViewTimeline.new (options : ViewTimelineOptions) : IO ViewTimeline := Internal.api "Lasm.JS.Web.ViewTimeline.new" do
   Lasm.JS.Binding.invoke ViewTimeline { name := "Lasm.JS.Web.ViewTimeline.new", module := "globalThis", path := "ViewTimeline", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
+
+/-- `constructor(ViewTimelineOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ViewTimeline.new? (options : ViewTimelineOptions) : IO (Option ViewTimeline) := Internal.api "Lasm.JS.Web.ViewTimeline.new?" do
+  if !(← Internal.hasGlobal ["ViewTimeline"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ViewTimeline { name := "Lasm.JS.Web.ViewTimeline.new?", module := "globalThis", path := "ViewTimeline", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute Element subject` -/
 @[macro_inline] def ViewTimeline.subject (self : ViewTimeline) : IO Element := Internal.api "Lasm.JS.Web.ViewTimeline.subject" do

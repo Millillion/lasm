@@ -5,8 +5,8 @@ name: Fullstack
 # and wasi-http, each embedding the browser app), then tested end to end
 # (scripts/fullstack/fullstack-ci.mjs: server-side rendering, hydration, the
 # shared validation on both sides, the REST API) in headless Playwright
-# against every host, plus HTTP checks of the embedded assets and of Lasm.KV
-# persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
+# against every host, plus HTTP checks of the embedded assets and of the
+# store's persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
 # Workers under `wrangler dev` with a local KV namespace, Bun, Deno with Deno KV,
 # Fastly under Viceroy with a local KV Store, and wasmtime serve. `npm run dev`
 # (one URL, live reload, edit-to-reload time) is timed by
@@ -19,8 +19,9 @@ on:
     inputs:
       release-check: { type: boolean, default: false }
   # A pull request that changes the template or the library compiled on first import (and its Lake package)
-  # builds the app and serves it on Node; the other hosts and npm run dev wait for release-checks (#331's import
-  # of the removed Lasm.JS.Web umbrella reached main unseen, 2026-11-17).
+  # builds the app and serves it on every host, with the stores' persistence across restarts (kv-across-restart);
+  # npm run dev waits for release-checks (#331's import of the removed Lasm.JS.Web umbrella, and its Workers KV
+  # falling back to memory, reached main unseen, 2026-11-17).
   pull_request:
     paths:
       - 'templates/fullstack/**'
@@ -189,7 +190,6 @@ jobs:
           retention-days: 14
   workers:
     needs: build
-    if: github.event_name != 'pull_request'
     name: Workers (wrangler dev, local workerd and KV), chromium
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -217,11 +217,10 @@ jobs:
         with:
           name: fullstack-app
           path: .work/app
-      - name: wrangler dev (local) with a local TODOS KV namespace, the end-to-end checks, then a restart (Lasm.KV kept the data)
+      - name: wrangler dev (local) with a local TODOS KV namespace, the end-to-end checks, then a restart (Workers KV kept the data)
         run: |
           cd .work/app
-          # The commented-out binding of the template's wrangler.toml, with a placeholder id: wrangler dev keeps a local copy.
-          printf '\n[[kv_namespaces]]\nbinding = "TODOS"\nid = "local-todos"\n' >> wrangler.toml
+          # The template's wrangler.toml binds TODOS (Workers.lean's typed Env); wrangler dev keeps a local copy.
           ../tools/node_modules/.bin/wrangler dev --port 8787 --ip 127.0.0.1 > wrangler.log 2>&1 &
           echo $! > wrangler.pid
           cd ../..
@@ -241,7 +240,6 @@ jobs:
           retention-days: 14
   bun-deno:
     needs: build
-    if: github.event_name != 'pull_request'
     name: Bun, and Deno with Deno KV, chromium
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -300,7 +298,6 @@ jobs:
           retention-days: 14
   wasm-hosts:
     needs: build
-    if: github.event_name != 'pull_request'
     name: Fastly (Viceroy, local KV Store) and wasmtime serve
     runs-on: ubuntu-24.04
     timeout-minutes: 60

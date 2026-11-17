@@ -39,4 +39,13 @@ set_option compiler.extract_closed false
   let r ← self.val.callMethod "captureStream" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `MediaStream captureStream()` where the platform has it (`'captureStream' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.captureStream? (self' : HTMLMediaElement) : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.HTMLMediaElement.captureStream?" do
+  let self := self'
+  if !(← Internal.has self.val "captureStream") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "captureStream" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

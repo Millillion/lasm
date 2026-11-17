@@ -1,6 +1,7 @@
 [
   ".gitignore",
   "Client.lean",
+  "Deno.lean",
   "Embed.lean",
   "Export.lean",
   "Fastly.lean",
@@ -11,6 +12,7 @@
   "Shared.lean",
   "Site.lean",
   "View.lean",
+  "Workers.lean",
   "fastly.toml",
   "lakefile.toml",
   "lean-toolchain",

@@ -37,6 +37,14 @@ instance : FromJS PromptResponseObject where
   Lasm.JS.Binding.invoke BeforeInstallPromptEvent { name := "Lasm.JS.Web.BeforeInstallPromptEvent.new", module := "globalThis", path := "BeforeInstallPromptEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional EventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BeforeInstallPromptEvent.new? (type : String) (eventInitDict : Option EventInit := none) : IO (Option BeforeInstallPromptEvent) := Internal.api "Lasm.JS.Web.BeforeInstallPromptEvent.new?" do
+  if !(← Internal.hasGlobal ["BeforeInstallPromptEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BeforeInstallPromptEvent { name := "Lasm.JS.Web.BeforeInstallPromptEvent.new?", module := "globalThis", path := "BeforeInstallPromptEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<PromptResponseObject> prompt()` -/
 @[macro_inline] def BeforeInstallPromptEvent.prompt (self : BeforeInstallPromptEvent) : Async PromptResponseObject := Internal.api "Lasm.JS.Web.BeforeInstallPromptEvent.prompt" do
   self.val.callMethodAwait "prompt" (Internal.args #[]) PromptResponseObject
@@ -44,6 +52,14 @@ instance : FromJS PromptResponseObject where
 /-- `attribute EventHandler onappinstalled` -/
 @[macro_inline] def Window.onappinstalled (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onappinstalled" do
   self.val.get "onappinstalled" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onappinstalled` where the platform has it (`'onappinstalled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onappinstalled? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onappinstalled?" do
+  let self := self'
+  if !(← Internal.has self.val "onappinstalled") then return none
+  let lasmGuarded ← do
+    self.val.get "onappinstalled" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onappinstalled`: `attribute EventHandler onappinstalled` -/
 @[macro_inline] def Window.setOnappinstalled (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnappinstalled" do
@@ -53,6 +69,14 @@ instance : FromJS PromptResponseObject where
 @[macro_inline] def Window.onbeforeinstallprompt (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onbeforeinstallprompt" do
   self.val.get "onbeforeinstallprompt" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbeforeinstallprompt` where the platform has it (`'onbeforeinstallprompt' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onbeforeinstallprompt? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onbeforeinstallprompt?" do
+  let self := self'
+  if !(← Internal.has self.val "onbeforeinstallprompt") then return none
+  let lasmGuarded ← do
+    self.val.get "onbeforeinstallprompt" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onbeforeinstallprompt`: `attribute EventHandler onbeforeinstallprompt` -/
 @[macro_inline] def Window.setOnbeforeinstallprompt (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnbeforeinstallprompt" do
   self.val.set "onbeforeinstallprompt" (toJS value)
@@ -61,8 +85,22 @@ instance : FromJS PromptResponseObject where
 @[macro_inline] def onappinstalled : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onappinstalled" do
   Internal.getGlobal ["onappinstalled"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onappinstalled` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onappinstalled? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onappinstalled?" do
+  if !(← Internal.hasGlobal ["onappinstalled"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onappinstalled"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onbeforeinstallprompt` (Manifest Incubations (https://wicg.github.io/manifest-incubations/)) -/
 @[macro_inline] def onbeforeinstallprompt : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforeinstallprompt" do
   Internal.getGlobal ["onbeforeinstallprompt"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbeforeinstallprompt` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforeinstallprompt? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforeinstallprompt?" do
+  if !(← Internal.hasGlobal ["onbeforeinstallprompt"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforeinstallprompt"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

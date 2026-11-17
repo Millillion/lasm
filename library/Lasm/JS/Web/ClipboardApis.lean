@@ -107,6 +107,14 @@ instance : ToJS ClipboardPermissionDescriptor := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke ClipboardChangeEvent { name := "Lasm.JS.Web.ClipboardChangeEvent.new", module := "globalThis", path := "ClipboardChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ClipboardChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ClipboardChangeEvent.new? (type : String) (eventInitDict : Option ClipboardChangeEventInit := none) : IO (Option ClipboardChangeEvent) := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["ClipboardChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ClipboardChangeEvent { name := "Lasm.JS.Web.ClipboardChangeEvent.new?", module := "globalThis", path := "ClipboardChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<DOMString> types` -/
 @[macro_inline] def ClipboardChangeEvent.types (self : ClipboardChangeEvent) : IO (Array String) := Internal.api "Lasm.JS.Web.ClipboardChangeEvent.types" do
   self.val.get "types" (Array String)
@@ -124,6 +132,14 @@ instance : ToJS ClipboardPermissionDescriptor := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke ClipboardEvent { name := "Lasm.JS.Web.ClipboardEvent.new", module := "globalThis", path := "ClipboardEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ClipboardEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ClipboardEvent.new? (type : String) (eventInitDict : Option ClipboardEventInit := none) : IO (Option ClipboardEvent) := Internal.api "Lasm.JS.Web.ClipboardEvent.new?" do
+  if !(← Internal.hasGlobal ["ClipboardEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ClipboardEvent { name := "Lasm.JS.Web.ClipboardEvent.new?", module := "globalThis", path := "ClipboardEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DataTransfer? clipboardData` -/
 @[macro_inline] def ClipboardEvent.clipboardData (self : ClipboardEvent) : IO (Option DataTransfer) := Internal.api "Lasm.JS.Web.ClipboardEvent.clipboardData" do
   self.val.get "clipboardData" (Option DataTransfer)
@@ -137,9 +153,25 @@ instance : ToJS ClipboardPermissionDescriptor := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke ClipboardItem { name := "Lasm.JS.Web.ClipboardItem.new", module := "globalThis", path := "ClipboardItem", construct := true, arity := 2 }
     (Internal.args #[toJS items, Internal.optional options]) (await := false)
 
+/-- `constructor(record<DOMString, ClipboardItemData> items, optional ClipboardItemOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ClipboardItem.new? (items : Record Value) (options : Option ClipboardItemOptions := none) : IO (Option ClipboardItem) := Internal.api "Lasm.JS.Web.ClipboardItem.new?" do
+  if !(← Internal.hasGlobal ["ClipboardItem"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ClipboardItem { name := "Lasm.JS.Web.ClipboardItem.new?", module := "globalThis", path := "ClipboardItem", construct := true, arity := 2 }
+      (Internal.args #[toJS items, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute PresentationStyle presentationStyle` -/
 @[macro_inline] def ClipboardItem.presentationStyle (self : ClipboardItem) : IO PresentationStyle := Internal.api "Lasm.JS.Web.ClipboardItem.presentationStyle" do
   self.val.get "presentationStyle" PresentationStyle
+
+/-- `readonly attribute PresentationStyle presentationStyle` where the platform has it (`'presentationStyle' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ClipboardItem.presentationStyle? (self' : ClipboardItem) : IO (Option PresentationStyle) := Internal.api "Lasm.JS.Web.ClipboardItem.presentationStyle?" do
+  let self := self'
+  if !(← Internal.has self.val "presentationStyle") then return none
+  let lasmGuarded ← do
+    self.val.get "presentationStyle" PresentationStyle
+  return some lasmGuarded
 
 /-- `readonly attribute FrozenArray<DOMString> types` -/
 @[macro_inline] def ClipboardItem.types (self : ClipboardItem) : IO (Array String) := Internal.api "Lasm.JS.Web.ClipboardItem.types" do
@@ -155,9 +187,26 @@ instance : ToJS ClipboardPermissionDescriptor := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.ClipboardItem.supports", module := "globalThis", path := "ClipboardItem.supports", construct := false, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
 
+/-- `static boolean supports(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ClipboardItem.supports? (type : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.ClipboardItem.supports?" do
+  if !(← Internal.hasGlobal ["ClipboardItem", "supports"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.ClipboardItem.supports?", module := "globalThis", path := "ClipboardItem.supports", construct := false, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Clipboard clipboard` -/
 @[macro_inline] def Navigator.clipboard (self : Navigator) : IO Clipboard := Internal.api "Lasm.JS.Web.Navigator.clipboard" do
   let r ← self.val.get "clipboard" Value
   pure { val := r }
+
+/-- `readonly attribute Clipboard clipboard` where the platform has it (`'clipboard' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.clipboard? (self' : Navigator) : IO (Option Clipboard) := Internal.api "Lasm.JS.Web.Navigator.clipboard?" do
+  let self := self'
+  if !(← Internal.has self.val "clipboard") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "clipboard" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -11,7 +11,7 @@ open Lasm.JS
 namespace JsSite
 
 /-- The site's answer to a web `Request`, as a web `Response`. -/
-def handle (kv : Lasm.KV.Store) (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
+def handle (kv : Site.Kv) (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
   let method ← request.method
   let url ← request.url
   let headers ← (← request.headers).entries

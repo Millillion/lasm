@@ -369,6 +369,14 @@ instance : ToJS WheelEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
   Lasm.JS.Binding.invoke MouseEvent { name := "Lasm.JS.Web.MouseEvent.new", module := "globalThis", path := "MouseEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional MouseEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MouseEvent.new? (type : String) (eventInitDict : Option MouseEventInit := none) : IO (Option MouseEvent) := Internal.api "Lasm.JS.Web.MouseEvent.new?" do
+  if !(← Internal.hasGlobal ["MouseEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MouseEvent { name := "Lasm.JS.Web.MouseEvent.new?", module := "globalThis", path := "MouseEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute long screenX` -/
 @[macro_inline] def MouseEvent.screenX (self : MouseEvent) : IO Int := Internal.api "Lasm.JS.Web.MouseEvent.screenX" do
   self.val.get "screenX" Int
@@ -438,6 +446,14 @@ instance : ToJS WheelEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
   Lasm.JS.Binding.invoke PointerEvent { name := "Lasm.JS.Web.PointerEvent.new", module := "globalThis", path := "PointerEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional PointerEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PointerEvent.new? (type : String) (eventInitDict : Option PointerEventInit := none) : IO (Option PointerEvent) := Internal.api "Lasm.JS.Web.PointerEvent.new?" do
+  if !(← Internal.hasGlobal ["PointerEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PointerEvent { name := "Lasm.JS.Web.PointerEvent.new?", module := "globalThis", path := "PointerEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute long pointerId` -/
 @[macro_inline] def PointerEvent.pointerId (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.pointerId" do
   self.val.get "pointerId" Int
@@ -490,6 +506,14 @@ instance : ToJS WheelEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
 @[macro_inline] def PointerEvent.persistentDeviceId (self : PointerEvent) : IO Int := Internal.api "Lasm.JS.Web.PointerEvent.persistentDeviceId" do
   self.val.get "persistentDeviceId" Int
 
+/-- `readonly attribute long persistentDeviceId` where the platform has it (`'persistentDeviceId' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PointerEvent.persistentDeviceId? (self' : PointerEvent) : IO (Option Int) := Internal.api "Lasm.JS.Web.PointerEvent.persistentDeviceId?" do
+  let self := self'
+  if !(← Internal.has self.val "persistentDeviceId") then return none
+  let lasmGuarded ← do
+    self.val.get "persistentDeviceId" Int
+  return some lasmGuarded
+
 /-- `sequence<PointerEvent> getCoalescedEvents()` -/
 @[macro_inline] def PointerEvent.getCoalescedEvents (self : PointerEvent) : IO (Array PointerEvent) := Internal.api "Lasm.JS.Web.PointerEvent.getCoalescedEvents" do
   self.val.callMethod "getCoalescedEvents" (Internal.args #[]) (Array PointerEvent)
@@ -506,6 +530,14 @@ instance : ToJS WheelEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
 @[macro_inline] def WheelEvent.new (type : String) (eventInitDict : Option WheelEventInit := none) : IO WheelEvent := Internal.api "Lasm.JS.Web.WheelEvent.new" do
   Lasm.JS.Binding.invoke WheelEvent { name := "Lasm.JS.Web.WheelEvent.new", module := "globalThis", path := "WheelEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional WheelEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WheelEvent.new? (type : String) (eventInitDict : Option WheelEventInit := none) : IO (Option WheelEvent) := Internal.api "Lasm.JS.Web.WheelEvent.new?" do
+  if !(← Internal.hasGlobal ["WheelEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WheelEvent { name := "Lasm.JS.Web.WheelEvent.new?", module := "globalThis", path := "WheelEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned long DOM_DELTA_PIXEL = 0x00` -/
 def WheelEvent.DOM_DELTA_PIXEL : Nat := 0x00
@@ -535,6 +567,14 @@ def WheelEvent.DOM_DELTA_PAGE : Nat := 0x02
 /-- `readonly attribute boolean momentum` -/
 @[macro_inline] def WheelEvent.momentum (self : WheelEvent) : IO Bool := Internal.api "Lasm.JS.Web.WheelEvent.momentum" do
   self.val.get "momentum" Bool
+
+/-- `readonly attribute boolean momentum` where the platform has it (`'momentum' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WheelEvent.momentum? (self' : WheelEvent) : IO (Option Bool) := Internal.api "Lasm.JS.Web.WheelEvent.momentum?" do
+  let self := self'
+  if !(← Internal.has self.val "momentum") then return none
+  let lasmGuarded ← do
+    self.val.get "momentum" Bool
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpointerover` -/
 @[macro_inline] def Document.onpointerover (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onpointerover" do
@@ -816,6 +856,14 @@ def WheelEvent.DOM_DELTA_PAGE : Nat := 0x02
 @[macro_inline] def Navigator.maxTouchPoints (self : Navigator) : IO Int := Internal.api "Lasm.JS.Web.Navigator.maxTouchPoints" do
   self.val.get "maxTouchPoints" Int
 
+/-- `readonly attribute long maxTouchPoints` where the platform has it (`'maxTouchPoints' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.maxTouchPoints? (self' : Navigator) : IO (Option Int) := Internal.api "Lasm.JS.Web.Navigator.maxTouchPoints?" do
+  let self := self'
+  if !(← Internal.has self.val "maxTouchPoints") then return none
+  let lasmGuarded ← do
+    self.val.get "maxTouchPoints" Int
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpointerover` -/
 @[macro_inline] def SVGElement.onpointerover (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onpointerover" do
   self.val.get "onpointerover" (Option EventHandlerNonNull)
@@ -996,44 +1044,121 @@ def WheelEvent.DOM_DELTA_PAGE : Nat := 0x02
 @[macro_inline] def onpointerover : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerover" do
   Internal.getGlobal ["onpointerover"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpointerover` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerover? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerover?" do
+  if !(← Internal.hasGlobal ["onpointerover"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerover"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpointerenter` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerenter : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerenter" do
   Internal.getGlobal ["onpointerenter"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpointerenter` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerenter? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerenter?" do
+  if !(← Internal.hasGlobal ["onpointerenter"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerenter"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpointerdown` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerdown : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerdown" do
   Internal.getGlobal ["onpointerdown"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpointerdown` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerdown? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerdown?" do
+  if !(← Internal.hasGlobal ["onpointerdown"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerdown"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpointermove` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointermove : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointermove" do
   Internal.getGlobal ["onpointermove"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpointermove` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointermove? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointermove?" do
+  if !(← Internal.hasGlobal ["onpointermove"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointermove"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpointerrawupdate` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerrawupdate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerrawupdate" do
   Internal.getGlobal ["onpointerrawupdate"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpointerrawupdate` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerrawupdate? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerrawupdate?" do
+  if !(← Internal.hasGlobal ["onpointerrawupdate"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerrawupdate"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpointerup` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerup : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerup" do
   Internal.getGlobal ["onpointerup"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpointerup` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerup? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerup?" do
+  if !(← Internal.hasGlobal ["onpointerup"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerup"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpointercancel` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointercancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointercancel" do
   Internal.getGlobal ["onpointercancel"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpointercancel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointercancel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointercancel?" do
+  if !(← Internal.hasGlobal ["onpointercancel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointercancel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpointerout` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerout : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerout" do
   Internal.getGlobal ["onpointerout"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpointerout` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerout? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerout?" do
+  if !(← Internal.hasGlobal ["onpointerout"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerout"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpointerleave` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onpointerleave : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpointerleave" do
   Internal.getGlobal ["onpointerleave"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpointerleave` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpointerleave? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpointerleave?" do
+  if !(← Internal.hasGlobal ["onpointerleave"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpointerleave"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ongotpointercapture` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def ongotpointercapture : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ongotpointercapture" do
   Internal.getGlobal ["ongotpointercapture"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ongotpointercapture` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ongotpointercapture? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ongotpointercapture?" do
+  if !(← Internal.hasGlobal ["ongotpointercapture"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ongotpointercapture"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onlostpointercapture` (Pointer Events (https://w3c.github.io/pointerevents/)) -/
 @[macro_inline] def onlostpointercapture : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onlostpointercapture" do
   Internal.getGlobal ["onlostpointercapture"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onlostpointercapture` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onlostpointercapture? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onlostpointercapture?" do
+  if !(← Internal.hasGlobal ["onlostpointercapture"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onlostpointercapture"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

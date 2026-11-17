@@ -428,6 +428,14 @@ def CSSRule.NAMESPACE_RULE : Nat := 10
   Lasm.JS.Binding.invoke CSSStyleSheet { name := "Lasm.JS.Web.CSSStyleSheet.new", module := "globalThis", path := "CSSStyleSheet", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional CSSStyleSheetInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSStyleSheet.new? (options : Option CSSStyleSheetInit := none) : IO (Option CSSStyleSheet) := Internal.api "Lasm.JS.Web.CSSStyleSheet.new?" do
+  if !(← Internal.hasGlobal ["CSSStyleSheet"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSStyleSheet { name := "Lasm.JS.Web.CSSStyleSheet.new?", module := "globalThis", path := "CSSStyleSheet", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSRule? ownerRule` -/
 @[macro_inline] def CSSStyleSheet.ownerRule (self : CSSStyleSheet) : IO (Option CSSRule) := Internal.api "Lasm.JS.Web.CSSStyleSheet.ownerRule" do
   self.val.get "ownerRule" (Option CSSRule)
@@ -551,15 +559,41 @@ def CSSRule.NAMESPACE_RULE : Nat := 10
   let r ← self.val.callMethod "getComputedStyle" (Internal.args #[toJS elt, Internal.optional pseudoElt]) Value
   pure { val := r }
 
+/-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` where the platform has it (`'getComputedStyle' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.getComputedStyle? (self' : Window) (elt : Element) (pseudoElt : Option String := none) : IO (Option CSSStyleProperties) := Internal.api "Lasm.JS.Web.Window.getComputedStyle?" do
+  let self := self'
+  if !(← Internal.has self.val "getComputedStyle") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "getComputedStyle" (Internal.args #[toJS elt, Internal.optional pseudoElt]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` (CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)) -/
 @[macro_inline] def getComputedStyle (elt : Element) (pseudoElt : Option String := none) : IO CSSStyleProperties := Internal.api "Lasm.JS.Web.getComputedStyle" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.getComputedStyle", module := "globalThis", path := "getComputedStyle", construct := false, arity := 2 }
     (Internal.args #[toJS elt, Internal.optional pseudoElt]) (await := false)
   pure { val := r }
 
+/-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def getComputedStyle? (elt : Element) (pseudoElt : Option String := none) : IO (Option CSSStyleProperties) := Internal.api "Lasm.JS.Web.getComputedStyle?" do
+  if !(← Internal.hasGlobal ["getComputedStyle"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.getComputedStyle?", module := "globalThis", path := "getComputedStyle", construct := false, arity := 2 }
+      (Internal.args #[toJS elt, Internal.optional pseudoElt]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSOMString escape(CSSOMString ident)` (CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)) -/
 @[macro_inline] def CSS.escape (ident : String) : IO String := Internal.api "Lasm.JS.Web.CSS.escape" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.CSS.escape", module := "globalThis", path := "CSS.escape", construct := false, arity := 1 }
     (Internal.args #[toJS ident]) (await := false)
+
+/-- `CSSOMString escape(CSSOMString ident)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.escape? (ident : String) : IO (Option String) := Internal.api "Lasm.JS.Web.CSS.escape?" do
+  if !(← Internal.hasGlobal ["CSS", "escape"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.CSS.escape?", module := "globalThis", path := "CSS.escape", construct := false, arity := 1 }
+      (Internal.args #[toJS ident]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

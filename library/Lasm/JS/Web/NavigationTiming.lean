@@ -93,14 +93,39 @@ def PerformanceNavigation.TYPE_RESERVED : Nat := 255
 @[macro_inline] def PerformanceNavigationTiming.criticalCHRestart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.criticalCHRestart" do
   self.val.get "criticalCHRestart" Float
 
+/-- `readonly attribute DOMHighResTimeStamp criticalCHRestart` where the platform has it (`'criticalCHRestart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceNavigationTiming.criticalCHRestart? (self' : PerformanceNavigationTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.criticalCHRestart?" do
+  let self := self'
+  if !(← Internal.has self.val "criticalCHRestart") then return none
+  let lasmGuarded ← do
+    self.val.get "criticalCHRestart" Float
+  return some lasmGuarded
+
 /-- `readonly attribute NotRestoredReasons? notRestoredReasons` -/
 @[macro_inline] def PerformanceNavigationTiming.notRestoredReasons (self : PerformanceNavigationTiming) : IO (Option NotRestoredReasons) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.notRestoredReasons" do
   self.val.get "notRestoredReasons" (Option NotRestoredReasons)
+
+/-- `readonly attribute NotRestoredReasons? notRestoredReasons` where the platform has it (`'notRestoredReasons' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceNavigationTiming.notRestoredReasons? (self' : PerformanceNavigationTiming) : IO (Option (Option NotRestoredReasons)) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.notRestoredReasons?" do
+  let self := self'
+  if !(← Internal.has self.val "notRestoredReasons") then return none
+  let lasmGuarded ← do
+    self.val.get "notRestoredReasons" (Option NotRestoredReasons)
+  return some lasmGuarded
 
 /-- `readonly attribute PerformanceTimingConfidence confidence` -/
 @[macro_inline] def PerformanceNavigationTiming.confidence (self : PerformanceNavigationTiming) : IO PerformanceTimingConfidence := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.confidence" do
   let r ← self.val.get "confidence" Value
   pure { val := r }
+
+/-- `readonly attribute PerformanceTimingConfidence confidence` where the platform has it (`'confidence' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceNavigationTiming.confidence? (self' : PerformanceNavigationTiming) : IO (Option PerformanceTimingConfidence) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.confidence?" do
+  let self := self'
+  if !(← Internal.has self.val "confidence") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "confidence" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `object toJSON()` -/
 @[macro_inline] def PerformanceNavigationTiming.toJSON (self : PerformanceNavigationTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.toJSON" do
@@ -219,9 +244,27 @@ def PerformanceNavigation.TYPE_RESERVED : Nat := 255
   let r ← self.val.get "timing" Value
   pure { val := r }
 
+/-- `readonly attribute PerformanceTiming timing` where the platform has it (`'timing' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.timing? (self' : Performance) : IO (Option PerformanceTiming) := Internal.api "Lasm.JS.Web.Performance.timing?" do
+  let self := self'
+  if !(← Internal.has self.val "timing") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "timing" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute PerformanceNavigation navigation` -/
 @[macro_inline] def Performance.navigation (self : Performance) : IO PerformanceNavigation := Internal.api "Lasm.JS.Web.Performance.navigation" do
   let r ← self.val.get "navigation" Value
   pure { val := r }
+
+/-- `readonly attribute PerformanceNavigation navigation` where the platform has it (`'navigation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.navigation? (self' : Performance) : IO (Option PerformanceNavigation) := Internal.api "Lasm.JS.Web.Performance.navigation?" do
+  let self := self'
+  if !(← Internal.has self.val "navigation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "navigation" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

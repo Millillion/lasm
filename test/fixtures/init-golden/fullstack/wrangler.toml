@@ -8,12 +8,12 @@ compatibility_date = "2026-10-01"
 [assets]
 directory = "./dist/public"
 
-# Lasm.KV keeps the todos in this KV namespace when it is bound (create one with
-# npx wrangler kv namespace create TODOS and put its id here); without it they
-# live in the isolate's memory. wrangler dev keeps a local copy.
-# [[kv_namespaces]]
-# binding = "TODOS"
-# id = "…"
+# The todos live in this KV namespace (Workers.lean's Env.TODOS). wrangler dev
+# keeps a local copy under this id; to deploy, create one with
+# npx wrangler kv namespace create TODOS and put its id here.
+[[kv_namespaces]]
+binding = "TODOS"
+id = "TODOS"
 
 # Lasm's program.wasm is imported as a precompiled module.
 [[rules]]

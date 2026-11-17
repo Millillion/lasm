@@ -110,6 +110,15 @@ instance : FromJS LockManagerSnapshot where
   let r ← self.val.get "locks" Value
   pure { val := r }
 
+/-- `readonly attribute LockManager locks` where the platform has it (`'locks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.locks? (self' : Navigator) : IO (Option LockManager) := Internal.api "Lasm.JS.Web.Navigator.locks?" do
+  let self := self'
+  if !(← Internal.has self.val "locks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "locks" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute LockManager locks` -/
 @[macro_inline] def WorkerNavigator.locks (self : WorkerNavigator) : IO LockManager := Internal.api "Lasm.JS.Web.WorkerNavigator.locks" do
   let r ← self.val.get "locks" Value

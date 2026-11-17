@@ -108,6 +108,14 @@ instance : ToJS CSPViolationReportBody := ⟨fun d => Internal.fields #[("docume
   Lasm.JS.Binding.invoke SecurityPolicyViolationEvent { name := "Lasm.JS.Web.SecurityPolicyViolationEvent.new", module := "globalThis", path := "SecurityPolicyViolationEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional SecurityPolicyViolationEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SecurityPolicyViolationEvent.new? (type : String) (eventInitDict : Option SecurityPolicyViolationEventInit := none) : IO (Option SecurityPolicyViolationEvent) := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.new?" do
+  if !(← Internal.hasGlobal ["SecurityPolicyViolationEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SecurityPolicyViolationEvent { name := "Lasm.JS.Web.SecurityPolicyViolationEvent.new?", module := "globalThis", path := "SecurityPolicyViolationEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString documentURI` -/
 @[macro_inline] def SecurityPolicyViolationEvent.documentURI (self : SecurityPolicyViolationEvent) : IO String := Internal.api "Lasm.JS.Web.SecurityPolicyViolationEvent.documentURI" do
   self.val.get "documentURI" String

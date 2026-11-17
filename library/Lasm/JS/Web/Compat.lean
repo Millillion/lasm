@@ -19,6 +19,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLBodyElement.onorientationchange (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLBodyElement.onorientationchange" do
   self.val.get "onorientationchange" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onorientationchange` where the platform has it (`'onorientationchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLBodyElement.onorientationchange? (self' : HTMLBodyElement) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.HTMLBodyElement.onorientationchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onorientationchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onorientationchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onorientationchange`: `attribute EventHandler onorientationchange` -/
 @[macro_inline] def HTMLBodyElement.setOnorientationchange (self : HTMLBodyElement) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.HTMLBodyElement.setOnorientationchange" do
   self.val.set "onorientationchange" (toJS value)
@@ -27,9 +35,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def Window.orientation (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.orientation" do
   self.val.get "orientation" Int
 
+/-- `readonly attribute short orientation` where the platform has it (`'orientation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.orientation? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.orientation?" do
+  let self := self'
+  if !(← Internal.has self.val "orientation") then return none
+  let lasmGuarded ← do
+    self.val.get "orientation" Int
+  return some lasmGuarded
+
 /-- `attribute EventHandler onorientationchange` -/
 @[macro_inline] def Window.onorientationchange (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onorientationchange" do
   self.val.get "onorientationchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onorientationchange` where the platform has it (`'onorientationchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onorientationchange? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onorientationchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onorientationchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onorientationchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onorientationchange`: `attribute EventHandler onorientationchange` -/
 @[macro_inline] def Window.setOnorientationchange (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnorientationchange" do
@@ -39,8 +63,22 @@ set_option compiler.extract_closed false
 @[macro_inline] def orientation : IO Int := Internal.api "Lasm.JS.Web.orientation" do
   Internal.getGlobal ["orientation"] Int
 
+/-- `readonly attribute short orientation` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def orientation? : IO (Option Int) := Internal.api "Lasm.JS.Web.orientation?" do
+  if !(← Internal.hasGlobal ["orientation"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["orientation"] Int
+  return some lasmGuarded
+
 /-- `attribute EventHandler onorientationchange` (Compatibility Standard (https://compat.spec.whatwg.org/)) -/
 @[macro_inline] def onorientationchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onorientationchange" do
   Internal.getGlobal ["onorientationchange"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onorientationchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onorientationchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onorientationchange?" do
+  if !(← Internal.hasGlobal ["onorientationchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onorientationchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

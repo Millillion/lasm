@@ -67,6 +67,14 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
   Lasm.JS.Binding.invoke CSSParserAtRule { name := "Lasm.JS.Web.CSSParserAtRule.new", module := "globalThis", path := "CSSParserAtRule", construct := true, arity := 3 }
     (Internal.args #[toJS name, toJS prelude, Internal.optional body]) (await := false)
 
+/-- `constructor(DOMString name, sequence<CSSToken> prelude, optional sequence<CSSParserRule>? body)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSParserAtRule.new? (name : String) (prelude : Array CSSToken) (body : Option (Array CSSParserRule) := none) : IO (Option CSSParserAtRule) := Internal.api "Lasm.JS.Web.CSSParserAtRule.new?" do
+  if !(← Internal.hasGlobal ["CSSParserAtRule"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSParserAtRule { name := "Lasm.JS.Web.CSSParserAtRule.new?", module := "globalThis", path := "CSSParserAtRule", construct := true, arity := 3 }
+      (Internal.args #[toJS name, toJS prelude, Internal.optional body]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def CSSParserAtRule.name (self : CSSParserAtRule) : IO String := Internal.api "Lasm.JS.Web.CSSParserAtRule.name" do
   self.val.get "name" String
@@ -92,6 +100,14 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
   Lasm.JS.Binding.invoke CSSParserBlock { name := "Lasm.JS.Web.CSSParserBlock.new", module := "globalThis", path := "CSSParserBlock", construct := true, arity := 2 }
     (Internal.args #[toJS name, toJS body]) (await := false)
 
+/-- `constructor(DOMString name, sequence<CSSParserValue> body)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSParserBlock.new? (name : String) (body : Array CSSParserValue) : IO (Option CSSParserBlock) := Internal.api "Lasm.JS.Web.CSSParserBlock.new?" do
+  if !(← Internal.hasGlobal ["CSSParserBlock"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSParserBlock { name := "Lasm.JS.Web.CSSParserBlock.new?", module := "globalThis", path := "CSSParserBlock", construct := true, arity := 2 }
+      (Internal.args #[toJS name, toJS body]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def CSSParserBlock.name (self : CSSParserBlock) : IO String := Internal.api "Lasm.JS.Web.CSSParserBlock.name" do
   self.val.get "name" String
@@ -112,6 +128,14 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
 @[macro_inline] def CSSParserDeclaration.new (name : String) (body : Option (Array CSSParserRule) := none) : IO CSSParserDeclaration := Internal.api "Lasm.JS.Web.CSSParserDeclaration.new" do
   Lasm.JS.Binding.invoke CSSParserDeclaration { name := "Lasm.JS.Web.CSSParserDeclaration.new", module := "globalThis", path := "CSSParserDeclaration", construct := true, arity := 2 }
     (Internal.args #[toJS name, Internal.optional body]) (await := false)
+
+/-- `constructor(DOMString name, optional sequence<CSSParserRule> body)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSParserDeclaration.new? (name : String) (body : Option (Array CSSParserRule) := none) : IO (Option CSSParserDeclaration) := Internal.api "Lasm.JS.Web.CSSParserDeclaration.new?" do
+  if !(← Internal.hasGlobal ["CSSParserDeclaration"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSParserDeclaration { name := "Lasm.JS.Web.CSSParserDeclaration.new?", module := "globalThis", path := "CSSParserDeclaration", construct := true, arity := 2 }
+      (Internal.args #[toJS name, Internal.optional body]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def CSSParserDeclaration.name (self : CSSParserDeclaration) : IO String := Internal.api "Lasm.JS.Web.CSSParserDeclaration.name" do
@@ -134,6 +158,14 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
   Lasm.JS.Binding.invoke CSSParserFunction { name := "Lasm.JS.Web.CSSParserFunction.new", module := "globalThis", path := "CSSParserFunction", construct := true, arity := 2 }
     (Internal.args #[toJS name, toJS args]) (await := false)
 
+/-- `constructor(DOMString name, sequence<sequence<CSSParserValue>> args)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSParserFunction.new? (name : String) (args : Array (Array CSSParserValue)) : IO (Option CSSParserFunction) := Internal.api "Lasm.JS.Web.CSSParserFunction.new?" do
+  if !(← Internal.hasGlobal ["CSSParserFunction"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSParserFunction { name := "Lasm.JS.Web.CSSParserFunction.new?", module := "globalThis", path := "CSSParserFunction", construct := true, arity := 2 }
+      (Internal.args #[toJS name, toJS args]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def CSSParserFunction.name (self : CSSParserFunction) : IO String := Internal.api "Lasm.JS.Web.CSSParserFunction.name" do
   self.val.get "name" String
@@ -155,6 +187,14 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
   Lasm.JS.Binding.invoke CSSParserQualifiedRule { name := "Lasm.JS.Web.CSSParserQualifiedRule.new", module := "globalThis", path := "CSSParserQualifiedRule", construct := true, arity := 2 }
     (Internal.args #[toJS prelude, Internal.optional body]) (await := false)
 
+/-- `constructor(sequence<CSSToken> prelude, optional sequence<CSSParserRule>? body)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSParserQualifiedRule.new? (prelude : Array CSSToken) (body : Option (Array CSSParserRule) := none) : IO (Option CSSParserQualifiedRule) := Internal.api "Lasm.JS.Web.CSSParserQualifiedRule.new?" do
+  if !(← Internal.hasGlobal ["CSSParserQualifiedRule"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSParserQualifiedRule { name := "Lasm.JS.Web.CSSParserQualifiedRule.new?", module := "globalThis", path := "CSSParserQualifiedRule", construct := true, arity := 2 }
+      (Internal.args #[toJS prelude, Internal.optional body]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<CSSParserValue> prelude` -/
 @[macro_inline] def CSSParserQualifiedRule.prelude (self : CSSParserQualifiedRule) : IO (Array CSSParserValue) := Internal.api "Lasm.JS.Web.CSSParserQualifiedRule.prelude" do
   self.val.get "prelude" (Array CSSParserValue)
@@ -172,10 +212,26 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
   Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseStylesheet", module := "globalThis", path := "CSS.parseStylesheet", construct := false, arity := 2 }
     (Internal.args #[toJS css, Internal.optional options])
 
+/-- `Promise<sequence<CSSParserRule>> parseStylesheet(CSSStringSource css, optional CSSParserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseStylesheet? (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Option (Array CSSParserRule)) := Internal.api "Lasm.JS.Web.CSS.parseStylesheet?" do
+  if !(← Internal.hasGlobal ["CSS", "parseStylesheet"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseStylesheet?", module := "globalThis", path := "CSS.parseStylesheet", construct := false, arity := 2 }
+      (Internal.args #[toJS css, Internal.optional options])
+  return some lasmGuarded
+
 /-- `Promise<sequence<CSSParserRule>> parseRuleList(CSSStringSource css, optional CSSParserOptions options)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseRuleList (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Array CSSParserRule) := Internal.api "Lasm.JS.Web.CSS.parseRuleList" do
   Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseRuleList", module := "globalThis", path := "CSS.parseRuleList", construct := false, arity := 2 }
     (Internal.args #[toJS css, Internal.optional options])
+
+/-- `Promise<sequence<CSSParserRule>> parseRuleList(CSSStringSource css, optional CSSParserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseRuleList? (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Option (Array CSSParserRule)) := Internal.api "Lasm.JS.Web.CSS.parseRuleList?" do
+  if !(← Internal.hasGlobal ["CSS", "parseRuleList"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseRuleList?", module := "globalThis", path := "CSS.parseRuleList", construct := false, arity := 2 }
+      (Internal.args #[toJS css, Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<CSSParserRule> parseRule(CSSStringSource css, optional CSSParserOptions options)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseRule (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async CSSParserRule := Internal.api "Lasm.JS.Web.CSS.parseRule" do
@@ -183,10 +239,27 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
     (Internal.args #[toJS css, Internal.optional options])
   pure { val := r }
 
+/-- `Promise<CSSParserRule> parseRule(CSSStringSource css, optional CSSParserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseRule? (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Option CSSParserRule) := Internal.api "Lasm.JS.Web.CSS.parseRule?" do
+  if !(← Internal.hasGlobal ["CSS", "parseRule"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.CSS.parseRule?", module := "globalThis", path := "CSS.parseRule", construct := false, arity := 2 }
+      (Internal.args #[toJS css, Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<sequence<CSSParserRule>> parseDeclarationList(CSSStringSource css, optional CSSParserOptions options)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseDeclarationList (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Array CSSParserRule) := Internal.api "Lasm.JS.Web.CSS.parseDeclarationList" do
   Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseDeclarationList", module := "globalThis", path := "CSS.parseDeclarationList", construct := false, arity := 2 }
     (Internal.args #[toJS css, Internal.optional options])
+
+/-- `Promise<sequence<CSSParserRule>> parseDeclarationList(CSSStringSource css, optional CSSParserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseDeclarationList? (css : CSSStringSource) (options : Option CSSParserOptions := none) : Async (Option (Array CSSParserRule)) := Internal.api "Lasm.JS.Web.CSS.parseDeclarationList?" do
+  if !(← Internal.hasGlobal ["CSS", "parseDeclarationList"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array CSSParserRule) { name := "Lasm.JS.Web.CSS.parseDeclarationList?", module := "globalThis", path := "CSS.parseDeclarationList", construct := false, arity := 2 }
+      (Internal.args #[toJS css, Internal.optional options])
+  return some lasmGuarded
 
 /-- `CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseDeclaration (css : String) (options : Option CSSParserOptions := none) : IO CSSParserDeclaration := Internal.api "Lasm.JS.Web.CSS.parseDeclaration" do
@@ -194,19 +267,52 @@ instance : ToJS CSSParserOptions := ⟨fun d => Internal.fields #[("atRules", d.
     (Internal.args #[toJS css, Internal.optional options]) (await := false)
   pure { val := r }
 
+/-- `CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseDeclaration? (css : String) (options : Option CSSParserOptions := none) : IO (Option CSSParserDeclaration) := Internal.api "Lasm.JS.Web.CSS.parseDeclaration?" do
+  if !(← Internal.hasGlobal ["CSS", "parseDeclaration"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.parseDeclaration?", module := "globalThis", path := "CSS.parseDeclaration", construct := false, arity := 2 }
+      (Internal.args #[toJS css, Internal.optional options]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSToken parseValue(DOMString css)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseValue (css : String) : IO Data := Internal.api "Lasm.JS.Web.CSS.parseValue" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.CSS.parseValue", module := "globalThis", path := "CSS.parseValue", construct := false, arity := 1 }
     (Internal.args #[toJS css]) (await := false)
+
+/-- `CSSToken parseValue(DOMString css)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseValue? (css : String) : IO (Option Data) := Internal.api "Lasm.JS.Web.CSS.parseValue?" do
+  if !(← Internal.hasGlobal ["CSS", "parseValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.CSS.parseValue?", module := "globalThis", path := "CSS.parseValue", construct := false, arity := 1 }
+      (Internal.args #[toJS css]) (await := false)
+  return some lasmGuarded
 
 /-- `sequence<CSSToken> parseValueList(DOMString css)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseValueList (css : String) : IO (Array Data) := Internal.api "Lasm.JS.Web.CSS.parseValueList" do
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Web.CSS.parseValueList", module := "globalThis", path := "CSS.parseValueList", construct := false, arity := 1 }
     (Internal.args #[toJS css]) (await := false)
 
+/-- `sequence<CSSToken> parseValueList(DOMString css)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseValueList? (css : String) : IO (Option (Array Data)) := Internal.api "Lasm.JS.Web.CSS.parseValueList?" do
+  if !(← Internal.hasGlobal ["CSS", "parseValueList"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Web.CSS.parseValueList?", module := "globalThis", path := "CSS.parseValueList", construct := false, arity := 1 }
+      (Internal.args #[toJS css]) (await := false)
+  return some lasmGuarded
+
 /-- `sequence<sequence<CSSToken>> parseCommaValueList(DOMString css)` (CSS Parser API (https://wicg.github.io/css-parser-api/)) -/
 @[macro_inline] def CSS.parseCommaValueList (css : String) : IO (Array (Array Data)) := Internal.api "Lasm.JS.Web.CSS.parseCommaValueList" do
   Lasm.JS.Binding.invoke (Array (Array Data)) { name := "Lasm.JS.Web.CSS.parseCommaValueList", module := "globalThis", path := "CSS.parseCommaValueList", construct := false, arity := 1 }
     (Internal.args #[toJS css]) (await := false)
+
+/-- `sequence<sequence<CSSToken>> parseCommaValueList(DOMString css)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.parseCommaValueList? (css : String) : IO (Option (Array (Array Data))) := Internal.api "Lasm.JS.Web.CSS.parseCommaValueList?" do
+  if !(← Internal.hasGlobal ["CSS", "parseCommaValueList"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Array (Array Data)) { name := "Lasm.JS.Web.CSS.parseCommaValueList?", module := "globalThis", path := "CSS.parseCommaValueList", construct := false, arity := 1 }
+      (Internal.args #[toJS css]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

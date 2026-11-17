@@ -23,6 +23,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.clear", module := "globalThis", path := "console.clear", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `undefined clear()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.clear? : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.clear?" do
+  if !(← Internal.hasGlobal ["console", "clear"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.clear?", module := "globalThis", path := "console.clear", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined debug(any... data)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.debug (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Web.console.debug" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.debug", module := "globalThis", path := "console.debug", construct := false, arity := 1 }
@@ -48,6 +56,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.table", module := "globalThis", path := "console.table", construct := false, arity := 2 }
     (Internal.args #[tabularData, Internal.optional properties]) (await := false)
 
+/-- `undefined table(optional any tabularData, optional sequence<DOMString> properties)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.table? (tabularData : Data := .undefined) (properties : Option (Array String) := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.table?" do
+  if !(← Internal.hasGlobal ["console", "table"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.table?", module := "globalThis", path := "console.table", construct := false, arity := 2 }
+      (Internal.args #[tabularData, Internal.optional properties]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined trace(any... data)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.trace (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Web.console.trace" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.trace", module := "globalThis", path := "console.trace", construct := false, arity := 1 }
@@ -68,6 +84,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.dirxml", module := "globalThis", path := "console.dirxml", construct := false, arity := 1 }
     (Internal.argsWith #[] (data.map toJS)) (await := false)
 
+/-- `undefined dirxml(any... data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.dirxml? (data : Array Data := #[]) : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.dirxml?" do
+  if !(← Internal.hasGlobal ["console", "dirxml"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.dirxml?", module := "globalThis", path := "console.dirxml", construct := false, arity := 1 }
+      (Internal.argsWith #[] (data.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `undefined count(optional DOMString label)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.count (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.console.count" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.count", module := "globalThis", path := "console.count", construct := false, arity := 1 }
@@ -78,20 +102,52 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.countReset", module := "globalThis", path := "console.countReset", construct := false, arity := 1 }
     (Internal.args #[Internal.optional label]) (await := false)
 
+/-- `undefined countReset(optional DOMString label)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.countReset? (label : Option String := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.countReset?" do
+  if !(← Internal.hasGlobal ["console", "countReset"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.countReset?", module := "globalThis", path := "console.countReset", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional label]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined group(any... data)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.group (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Web.console.group" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.group", module := "globalThis", path := "console.group", construct := false, arity := 1 }
     (Internal.argsWith #[] (data.map toJS)) (await := false)
+
+/-- `undefined group(any... data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.group? (data : Array Data := #[]) : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.group?" do
+  if !(← Internal.hasGlobal ["console", "group"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.group?", module := "globalThis", path := "console.group", construct := false, arity := 1 }
+      (Internal.argsWith #[] (data.map toJS)) (await := false)
+  return some lasmGuarded
 
 /-- `undefined groupCollapsed(any... data)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.groupCollapsed (data : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Web.console.groupCollapsed" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.groupCollapsed", module := "globalThis", path := "console.groupCollapsed", construct := false, arity := 1 }
     (Internal.argsWith #[] (data.map toJS)) (await := false)
 
+/-- `undefined groupCollapsed(any... data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.groupCollapsed? (data : Array Data := #[]) : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.groupCollapsed?" do
+  if !(← Internal.hasGlobal ["console", "groupCollapsed"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.groupCollapsed?", module := "globalThis", path := "console.groupCollapsed", construct := false, arity := 1 }
+      (Internal.argsWith #[] (data.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `undefined groupEnd()` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.groupEnd : IO Unit := Internal.api "Lasm.JS.Web.console.groupEnd" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.groupEnd", module := "globalThis", path := "console.groupEnd", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined groupEnd()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def console.groupEnd? : IO (Option Unit) := Internal.api "Lasm.JS.Web.console.groupEnd?" do
+  if !(← Internal.hasGlobal ["console", "groupEnd"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.console.groupEnd?", module := "globalThis", path := "console.groupEnd", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined time(optional DOMString label)` (Console Standard (https://console.spec.whatwg.org/)) -/
 @[macro_inline] def console.time (label : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.console.time" do

@@ -292,6 +292,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
   Lasm.JS.Binding.invoke KeyFrameRequestEvent { name := "Lasm.JS.Web.KeyFrameRequestEvent.new", module := "globalThis", path := "KeyFrameRequestEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional rid]) (await := false)
 
+/-- `constructor(DOMString type, optional DOMString rid)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def KeyFrameRequestEvent.new? (type : String) (rid : Option String := none) : IO (Option KeyFrameRequestEvent) := Internal.api "Lasm.JS.Web.KeyFrameRequestEvent.new?" do
+  if !(← Internal.hasGlobal ["KeyFrameRequestEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke KeyFrameRequestEvent { name := "Lasm.JS.Web.KeyFrameRequestEvent.new?", module := "globalThis", path := "KeyFrameRequestEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional rid]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString? rid` -/
 @[macro_inline] def KeyFrameRequestEvent.rid (self : KeyFrameRequestEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.KeyFrameRequestEvent.rid" do
   self.val.get "rid" (Option String)
@@ -304,6 +312,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 @[macro_inline] def RTCEncodedAudioFrame.new (originalFrame : RTCEncodedAudioFrame) (options : Option RTCEncodedAudioFrameOptions := none) : IO RTCEncodedAudioFrame := Internal.api "Lasm.JS.Web.RTCEncodedAudioFrame.new" do
   Lasm.JS.Binding.invoke RTCEncodedAudioFrame { name := "Lasm.JS.Web.RTCEncodedAudioFrame.new", module := "globalThis", path := "RTCEncodedAudioFrame", construct := true, arity := 2 }
     (Internal.args #[toJS originalFrame, Internal.optional options]) (await := false)
+
+/-- `constructor(RTCEncodedAudioFrame originalFrame, optional RTCEncodedAudioFrameOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCEncodedAudioFrame.new? (originalFrame : RTCEncodedAudioFrame) (options : Option RTCEncodedAudioFrameOptions := none) : IO (Option RTCEncodedAudioFrame) := Internal.api "Lasm.JS.Web.RTCEncodedAudioFrame.new?" do
+  if !(← Internal.hasGlobal ["RTCEncodedAudioFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCEncodedAudioFrame { name := "Lasm.JS.Web.RTCEncodedAudioFrame.new?", module := "globalThis", path := "RTCEncodedAudioFrame", construct := true, arity := 2 }
+      (Internal.args #[toJS originalFrame, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute ArrayBuffer data` -/
 @[macro_inline] def RTCEncodedAudioFrame.data (self : RTCEncodedAudioFrame) : IO ByteArray := Internal.api "Lasm.JS.Web.RTCEncodedAudioFrame.data" do
@@ -326,6 +342,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 @[macro_inline] def RTCEncodedVideoFrame.new (originalFrame : RTCEncodedVideoFrame) (options : Option RTCEncodedVideoFrameOptions := none) : IO RTCEncodedVideoFrame := Internal.api "Lasm.JS.Web.RTCEncodedVideoFrame.new" do
   Lasm.JS.Binding.invoke RTCEncodedVideoFrame { name := "Lasm.JS.Web.RTCEncodedVideoFrame.new", module := "globalThis", path := "RTCEncodedVideoFrame", construct := true, arity := 2 }
     (Internal.args #[toJS originalFrame, Internal.optional options]) (await := false)
+
+/-- `constructor(RTCEncodedVideoFrame originalFrame, optional RTCEncodedVideoFrameOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCEncodedVideoFrame.new? (originalFrame : RTCEncodedVideoFrame) (options : Option RTCEncodedVideoFrameOptions := none) : IO (Option RTCEncodedVideoFrame) := Internal.api "Lasm.JS.Web.RTCEncodedVideoFrame.new?" do
+  if !(← Internal.hasGlobal ["RTCEncodedVideoFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCEncodedVideoFrame { name := "Lasm.JS.Web.RTCEncodedVideoFrame.new?", module := "globalThis", path := "RTCEncodedVideoFrame", construct := true, arity := 2 }
+      (Internal.args #[toJS originalFrame, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute EncodedVideoChunkType type` -/
 @[macro_inline] def RTCEncodedVideoFrame.type (self : RTCEncodedVideoFrame) : IO EncodedVideoChunkType := Internal.api "Lasm.JS.Web.RTCEncodedVideoFrame.type" do
@@ -353,6 +377,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
   Lasm.JS.Binding.invoke RTCRtpSFrameDecryptor { name := "Lasm.JS.Web.RTCRtpSFrameDecryptor.new", module := "globalThis", path := "RTCRtpSFrameDecryptor", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `constructor(SFrameTransformOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpSFrameDecryptor.new? (options : SFrameTransformOptions) : IO (Option RTCRtpSFrameDecryptor) := Internal.api "Lasm.JS.Web.RTCRtpSFrameDecryptor.new?" do
+  if !(← Internal.hasGlobal ["RTCRtpSFrameDecryptor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCRtpSFrameDecryptor { name := "Lasm.JS.Web.RTCRtpSFrameDecryptor.new?", module := "globalThis", path := "RTCRtpSFrameDecryptor", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onerror` -/
 @[macro_inline] def RTCRtpSFrameDecryptor.onerror (self : RTCRtpSFrameDecryptor) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCRtpSFrameDecryptor.onerror" do
   self.val.get "onerror" (Option EventHandlerNonNull)
@@ -378,6 +410,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
   Lasm.JS.Binding.invoke RTCRtpSFrameEncryptor { name := "Lasm.JS.Web.RTCRtpSFrameEncryptor.new", module := "globalThis", path := "RTCRtpSFrameEncryptor", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `constructor(RTCRtpSFrameEncryptorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpSFrameEncryptor.new? (options : RTCRtpSFrameEncryptorOptions) : IO (Option RTCRtpSFrameEncryptor) := Internal.api "Lasm.JS.Web.RTCRtpSFrameEncryptor.new?" do
+  if !(← Internal.hasGlobal ["RTCRtpSFrameEncryptor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCRtpSFrameEncryptor { name := "Lasm.JS.Web.RTCRtpSFrameEncryptor.new?", module := "globalThis", path := "RTCRtpSFrameEncryptor", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<undefined> setEncryptionKey(CryptoKey key, CryptoKeyID keyId)` -/
 @[macro_inline] def RTCRtpSFrameEncryptor.setEncryptionKey (self : RTCRtpSFrameEncryptor) (key : CryptoKey) (keyId : CryptoKeyID) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpSFrameEncryptor.setEncryptionKey" do
   self.val.callMethodAwait "setEncryptionKey" (Internal.args #[toJS key, toJS keyId]) Unit
@@ -390,6 +430,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 @[macro_inline] def RTCRtpScriptTransform.new (workerOrWorkerAndParameters : WorkerOrWorkerAndParameters) (options : Data := .undefined) (transfer : Option (Array Data) := none) : IO RTCRtpScriptTransform := Internal.api "Lasm.JS.Web.RTCRtpScriptTransform.new" do
   Lasm.JS.Binding.invoke RTCRtpScriptTransform { name := "Lasm.JS.Web.RTCRtpScriptTransform.new", module := "globalThis", path := "RTCRtpScriptTransform", construct := true, arity := 3 }
     (Internal.args #[toJS workerOrWorkerAndParameters, options, Internal.optional transfer]) (await := false)
+
+/-- `constructor(WorkerOrWorkerAndParameters workerOrWorkerAndParameters, optional any options, optional sequence<object> transfer)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpScriptTransform.new? (workerOrWorkerAndParameters : WorkerOrWorkerAndParameters) (options : Data := .undefined) (transfer : Option (Array Data) := none) : IO (Option RTCRtpScriptTransform) := Internal.api "Lasm.JS.Web.RTCRtpScriptTransform.new?" do
+  if !(← Internal.hasGlobal ["RTCRtpScriptTransform"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCRtpScriptTransform { name := "Lasm.JS.Web.RTCRtpScriptTransform.new?", module := "globalThis", path := "RTCRtpScriptTransform", construct := true, arity := 3 }
+      (Internal.args #[toJS workerOrWorkerAndParameters, options, Internal.optional transfer]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof RTCRtpScriptTransformer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCRtpScriptTransformer`). -/
 @[macro_inline] def RTCRtpScriptTransformer.cast? (v : Value) : IO (Option RTCRtpScriptTransformer) := Internal.api "Lasm.JS.Web.RTCRtpScriptTransformer.cast?" do
@@ -421,6 +469,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 @[macro_inline] def RTCRtpScriptTransformer.generateKeyFrame (self : RTCRtpScriptTransformer) (rid : Option String := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpScriptTransformer.generateKeyFrame" do
   self.val.callMethodAwait "generateKeyFrame" (Internal.args #[Internal.optional rid]) Unit
 
+/-- `Promise<undefined> generateKeyFrame(optional DOMString rid)` where the platform has it (`'generateKeyFrame' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpScriptTransformer.generateKeyFrame? (self' : RTCRtpScriptTransformer) (rid : Option String := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.RTCRtpScriptTransformer.generateKeyFrame?" do
+  let self := self'
+  if !(← Internal.has self.val "generateKeyFrame") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "generateKeyFrame" (Internal.args #[Internal.optional rid]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> sendKeyFrameRequest()` -/
 @[macro_inline] def RTCRtpScriptTransformer.sendKeyFrameRequest (self : RTCRtpScriptTransformer) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpScriptTransformer.sendKeyFrameRequest" do
   self.val.callMethodAwait "sendKeyFrameRequest" (Internal.args #[]) Unit
@@ -442,6 +498,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 @[macro_inline] def SFrameDecryptorStream.new (options : SFrameTransformOptions) : IO SFrameDecryptorStream := Internal.api "Lasm.JS.Web.SFrameDecryptorStream.new" do
   Lasm.JS.Binding.invoke SFrameDecryptorStream { name := "Lasm.JS.Web.SFrameDecryptorStream.new", module := "globalThis", path := "SFrameDecryptorStream", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
+
+/-- `constructor(SFrameTransformOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SFrameDecryptorStream.new? (options : SFrameTransformOptions) : IO (Option SFrameDecryptorStream) := Internal.api "Lasm.JS.Web.SFrameDecryptorStream.new?" do
+  if !(← Internal.hasGlobal ["SFrameDecryptorStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SFrameDecryptorStream { name := "Lasm.JS.Web.SFrameDecryptorStream.new?", module := "globalThis", path := "SFrameDecryptorStream", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def SFrameDecryptorStream.readable (self : SFrameDecryptorStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.SFrameDecryptorStream.readable" do
@@ -478,6 +542,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
   Lasm.JS.Binding.invoke SFrameEncryptorStream { name := "Lasm.JS.Web.SFrameEncryptorStream.new", module := "globalThis", path := "SFrameEncryptorStream", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `constructor(SFrameTransformOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SFrameEncryptorStream.new? (options : SFrameTransformOptions) : IO (Option SFrameEncryptorStream) := Internal.api "Lasm.JS.Web.SFrameEncryptorStream.new?" do
+  if !(← Internal.hasGlobal ["SFrameEncryptorStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SFrameEncryptorStream { name := "Lasm.JS.Web.SFrameEncryptorStream.new?", module := "globalThis", path := "SFrameEncryptorStream", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def SFrameEncryptorStream.readable (self : SFrameEncryptorStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.SFrameEncryptorStream.readable" do
   let r ← self.val.get "readable" Value
@@ -501,6 +573,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
   Lasm.JS.Binding.invoke SFrameTransformErrorEvent { name := "Lasm.JS.Web.SFrameTransformErrorEvent.new", module := "globalThis", path := "SFrameTransformErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, SFrameTransformErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SFrameTransformErrorEvent.new? (type : String) (eventInitDict : SFrameTransformErrorEventInit) : IO (Option SFrameTransformErrorEvent) := Internal.api "Lasm.JS.Web.SFrameTransformErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["SFrameTransformErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SFrameTransformErrorEvent { name := "Lasm.JS.Web.SFrameTransformErrorEvent.new?", module := "globalThis", path := "SFrameTransformErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute SFrameTransformErrorEventType errorType` -/
 @[macro_inline] def SFrameTransformErrorEvent.errorType (self : SFrameTransformErrorEvent) : IO SFrameTransformErrorEventType := Internal.api "Lasm.JS.Web.SFrameTransformErrorEvent.errorType" do
   self.val.get "errorType" SFrameTransformErrorEventType
@@ -516,6 +596,14 @@ instance : ToJS RTCEncodedFrameMetadata := ⟨fun d => Internal.fields #[("synch
 /-- `attribute EventHandler onrtctransform` -/
 @[macro_inline] def DedicatedWorkerGlobalScope.onrtctransform (self : DedicatedWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.onrtctransform" do
   self.val.get "onrtctransform" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onrtctransform` where the platform has it (`'onrtctransform' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def DedicatedWorkerGlobalScope.onrtctransform? (self' : DedicatedWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.onrtctransform?" do
+  let self := self'
+  if !(← Internal.has self.val "onrtctransform") then return none
+  let lasmGuarded ← do
+    self.val.get "onrtctransform" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onrtctransform`: `attribute EventHandler onrtctransform` -/
 @[macro_inline] def DedicatedWorkerGlobalScope.setOnrtctransform (self : DedicatedWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.setOnrtctransform" do

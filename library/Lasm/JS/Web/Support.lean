@@ -114,6 +114,20 @@ def getGlobal (path : List String) (α : Type) [FromJS α] : IO α := do
     | k :: ks => do go (← o.get k Value) ks
   go (← global) path
 
+/-- `key in o` (JavaScript's `in`: own or inherited), `false` where `o` is not an object. The generated
+availability guards (`X?`, docs/api/decisions/0.3.md 0.3-11). -/
+def has (o : Value) (key : String) : IO Bool := do
+  try
+    Binding.invoke Bool { name := "Lasm.JS.Web.Internal.has", module := "globalThis", path := "Reflect.has", construct := false, arity := 2 } #[.ref o "", toJS key] (await := false)
+  catch _ => return false
+
+/-- Whether `globalThis.a.b…` exists: each key `in` the object before it (`'gpu' in navigator`). -/
+def hasGlobal (path : List String) : IO Bool := do
+  let rec go (o : Value) : List String → IO Bool
+    | [] => pure true
+    | k :: ks => do if (← has o k) then go (← o.get k Value) ks else pure false
+  go (← global) path
+
 /-- `v instanceof C`, for the constructor `ctor` reads (`C.prototype.isPrototypeOf(v)`, which is
 `instanceof` for the platform's classes): `false` when `ctor` fails or is not a constructor (a
 runtime without `C`). The generated `I.cast?` (docs/BINDING_RULES.md, rule A12). -/

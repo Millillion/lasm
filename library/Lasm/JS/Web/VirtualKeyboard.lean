@@ -55,6 +55,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLElement.virtualKeyboardPolicy (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.virtualKeyboardPolicy" do
   self.val.get "virtualKeyboardPolicy" String
 
+/-- `attribute DOMString virtualKeyboardPolicy` where the platform has it (`'virtualKeyboardPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.virtualKeyboardPolicy? (self' : HTMLElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLElement.virtualKeyboardPolicy?" do
+  let self := self'
+  if !(← Internal.has self.val "virtualKeyboardPolicy") then return none
+  let lasmGuarded ← do
+    self.val.get "virtualKeyboardPolicy" String
+  return some lasmGuarded
+
 /-- Sets `virtualKeyboardPolicy`: `attribute DOMString virtualKeyboardPolicy` -/
 @[macro_inline] def HTMLElement.setVirtualKeyboardPolicy (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setVirtualKeyboardPolicy" do
   self.val.set "virtualKeyboardPolicy" (toJS value)
@@ -63,5 +71,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.virtualKeyboard (self : Navigator) : IO VirtualKeyboard := Internal.api "Lasm.JS.Web.Navigator.virtualKeyboard" do
   let r ← self.val.get "virtualKeyboard" Value
   pure { val := r }
+
+/-- `readonly attribute VirtualKeyboard virtualKeyboard` where the platform has it (`'virtualKeyboard' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.virtualKeyboard? (self' : Navigator) : IO (Option VirtualKeyboard) := Internal.api "Lasm.JS.Web.Navigator.virtualKeyboard?" do
+  let self := self'
+  if !(← Internal.has self.val "virtualKeyboard") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "virtualKeyboard" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

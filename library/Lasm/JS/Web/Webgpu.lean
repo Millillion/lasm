@@ -1135,9 +1135,25 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUAdapterInfo.subgroupMinSize (self : GPUAdapterInfo) : IO Nat := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMinSize" do
   self.val.get "subgroupMinSize" Nat
 
+/-- `readonly attribute unsigned long subgroupMinSize` where the platform has it (`'subgroupMinSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUAdapterInfo.subgroupMinSize? (self' : GPUAdapterInfo) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMinSize?" do
+  let self := self'
+  if !(← Internal.has self.val "subgroupMinSize") then return none
+  let lasmGuarded ← do
+    self.val.get "subgroupMinSize" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long subgroupMaxSize` -/
 @[macro_inline] def GPUAdapterInfo.subgroupMaxSize (self : GPUAdapterInfo) : IO Nat := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMaxSize" do
   self.val.get "subgroupMaxSize" Nat
+
+/-- `readonly attribute unsigned long subgroupMaxSize` where the platform has it (`'subgroupMaxSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUAdapterInfo.subgroupMaxSize? (self' : GPUAdapterInfo) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUAdapterInfo.subgroupMaxSize?" do
+  let self := self'
+  if !(← Internal.has self.val "subgroupMaxSize") then return none
+  let lasmGuarded ← do
+    self.val.get "subgroupMaxSize" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute boolean isFallbackAdapter` -/
 @[macro_inline] def GPUAdapterInfo.isFallbackAdapter (self : GPUAdapterInfo) : IO Bool := Internal.api "Lasm.JS.Web.GPUAdapterInfo.isFallbackAdapter" do
@@ -1320,6 +1336,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUCompilationInfo.messages (self : GPUCompilationInfo) : IO (Array GPUCompilationMessage) := Internal.api "Lasm.JS.Web.GPUCompilationInfo.messages" do
   self.val.get "messages" (Array GPUCompilationMessage)
 
+/-- `readonly attribute FrozenArray<GPUCompilationMessage> messages` where the platform has it (`'messages' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationInfo.messages? (self' : GPUCompilationInfo) : IO (Option (Array GPUCompilationMessage)) := Internal.api "Lasm.JS.Web.GPUCompilationInfo.messages?" do
+  let self := self'
+  if !(← Internal.has self.val "messages") then return none
+  let lasmGuarded ← do
+    self.val.get "messages" (Array GPUCompilationMessage)
+  return some lasmGuarded
+
 /-- `v instanceof GPUCompilationMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUCompilationMessage`). -/
 @[macro_inline] def GPUCompilationMessage.cast? (v : Value) : IO (Option GPUCompilationMessage) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.cast?" do
   Internal.cast (Internal.getGlobal ["GPUCompilationMessage"] Value) (fun x => { val := x }) v
@@ -1328,25 +1352,73 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUCompilationMessage.message (self : GPUCompilationMessage) : IO String := Internal.api "Lasm.JS.Web.GPUCompilationMessage.message" do
   self.val.get "message" String
 
+/-- `readonly attribute DOMString message` where the platform has it (`'message' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.message? (self' : GPUCompilationMessage) : IO (Option String) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.message?" do
+  let self := self'
+  if !(← Internal.has self.val "message") then return none
+  let lasmGuarded ← do
+    self.val.get "message" String
+  return some lasmGuarded
+
 /-- `readonly attribute GPUCompilationMessageType type` -/
 @[macro_inline] def GPUCompilationMessage.type (self : GPUCompilationMessage) : IO GPUCompilationMessageType := Internal.api "Lasm.JS.Web.GPUCompilationMessage.type" do
   self.val.get "type" GPUCompilationMessageType
+
+/-- `readonly attribute GPUCompilationMessageType type` where the platform has it (`'type' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.type? (self' : GPUCompilationMessage) : IO (Option GPUCompilationMessageType) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.type?" do
+  let self := self'
+  if !(← Internal.has self.val "type") then return none
+  let lasmGuarded ← do
+    self.val.get "type" GPUCompilationMessageType
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long long lineNum` -/
 @[macro_inline] def GPUCompilationMessage.lineNum (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.lineNum" do
   self.val.get "lineNum" Nat
 
+/-- `readonly attribute unsigned long long lineNum` where the platform has it (`'lineNum' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.lineNum? (self' : GPUCompilationMessage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.lineNum?" do
+  let self := self'
+  if !(← Internal.has self.val "lineNum") then return none
+  let lasmGuarded ← do
+    self.val.get "lineNum" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long long linePos` -/
 @[macro_inline] def GPUCompilationMessage.linePos (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.linePos" do
   self.val.get "linePos" Nat
+
+/-- `readonly attribute unsigned long long linePos` where the platform has it (`'linePos' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.linePos? (self' : GPUCompilationMessage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.linePos?" do
+  let self := self'
+  if !(← Internal.has self.val "linePos") then return none
+  let lasmGuarded ← do
+    self.val.get "linePos" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long long offset` -/
 @[macro_inline] def GPUCompilationMessage.offset (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.offset" do
   self.val.get "offset" Nat
 
+/-- `readonly attribute unsigned long long offset` where the platform has it (`'offset' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.offset? (self' : GPUCompilationMessage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.offset?" do
+  let self := self'
+  if !(← Internal.has self.val "offset") then return none
+  let lasmGuarded ← do
+    self.val.get "offset" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long long length` -/
 @[macro_inline] def GPUCompilationMessage.length (self : GPUCompilationMessage) : IO Nat := Internal.api "Lasm.JS.Web.GPUCompilationMessage.length" do
   self.val.get "length" Nat
+
+/-- `readonly attribute unsigned long long length` where the platform has it (`'length' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUCompilationMessage.length? (self' : GPUCompilationMessage) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUCompilationMessage.length?" do
+  let self := self'
+  if !(← Internal.has self.val "length") then return none
+  let lasmGuarded ← do
+    self.val.get "length" Nat
+  return some lasmGuarded
 
 /-- `v instanceof GPUComputePassEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUComputePassEncoder`). -/
 @[macro_inline] def GPUComputePassEncoder.cast? (v : Value) : IO (Option GPUComputePassEncoder) := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.cast?" do
@@ -1401,6 +1473,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUComputePassEncoder.setImmediates (self : GPUComputePassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setImmediates" do
   self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
 
+/-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` where the platform has it (`'setImmediates' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUComputePassEncoder.setImmediates? (self' : GPUComputePassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.GPUComputePassEncoder.setImmediates?" do
+  let self := self'
+  if !(← Internal.has self.val "setImmediates") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
+  return some lasmGuarded
+
 /-- `v instanceof GPUComputePipeline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUComputePipeline`). -/
 @[macro_inline] def GPUComputePipeline.cast? (v : Value) : IO (Option GPUComputePipeline) := Internal.api "Lasm.JS.Web.GPUComputePipeline.cast?" do
   Internal.cast (Internal.getGlobal ["GPUComputePipeline"] Value) (fun x => { val := x }) v
@@ -1451,6 +1531,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 /-- `attribute EventHandler onuncapturederror` -/
 @[macro_inline] def GPUDevice.onuncapturederror (self : GPUDevice) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.GPUDevice.onuncapturederror" do
   self.val.get "onuncapturederror" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onuncapturederror` where the platform has it (`'onuncapturederror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUDevice.onuncapturederror? (self' : GPUDevice) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.GPUDevice.onuncapturederror?" do
+  let self := self'
+  if !(← Internal.has self.val "onuncapturederror") then return none
+  let lasmGuarded ← do
+    self.val.get "onuncapturederror" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onuncapturederror`: `attribute EventHandler onuncapturederror` -/
 @[macro_inline] def GPUDevice.setOnuncapturederror (self : GPUDevice) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.GPUDevice.setOnuncapturederror" do
@@ -1592,6 +1680,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
   Lasm.JS.Binding.invoke GPUPipelineError { name := "Lasm.JS.Web.GPUPipelineError.new", module := "globalThis", path := "GPUPipelineError", construct := true, arity := 2 }
     (Internal.args #[Internal.optional message, toJS options]) (await := false)
 
+/-- `constructor(optional DOMString message, GPUPipelineErrorInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUPipelineError.new? (message : Option String := none) (options : GPUPipelineErrorInit) : IO (Option GPUPipelineError) := Internal.api "Lasm.JS.Web.GPUPipelineError.new?" do
+  if !(← Internal.hasGlobal ["GPUPipelineError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GPUPipelineError { name := "Lasm.JS.Web.GPUPipelineError.new?", module := "globalThis", path := "GPUPipelineError", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional message, toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute GPUPipelineErrorReason reason` -/
 @[macro_inline] def GPUPipelineError.reason (self : GPUPipelineError) : IO GPUPipelineErrorReason := Internal.api "Lasm.JS.Web.GPUPipelineError.reason" do
   self.val.get "reason" GPUPipelineErrorReason
@@ -1718,6 +1814,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPURenderBundleEncoder.setImmediates (self : GPURenderBundleEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setImmediates" do
   self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
 
+/-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` where the platform has it (`'setImmediates' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPURenderBundleEncoder.setImmediates? (self' : GPURenderBundleEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setImmediates?" do
+  let self := self'
+  if !(← Internal.has self.val "setImmediates") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
+  return some lasmGuarded
+
 /-- `undefined setPipeline(GPURenderPipeline pipeline)` -/
 @[macro_inline] def GPURenderBundleEncoder.setPipeline (self : GPURenderBundleEncoder) (pipeline : GPURenderPipeline) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderBundleEncoder.setPipeline" do
   self.val.callMethod "setPipeline" (Internal.args #[toJS pipeline]) Unit
@@ -1814,6 +1918,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 /-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` -/
 @[macro_inline] def GPURenderPassEncoder.setImmediates (self : GPURenderPassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setImmediates" do
   self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
+
+/-- `undefined setImmediates(GPUSize32 rangeOffset, AllowSharedBufferSource data, optional GPUSize64 dataOffset, optional GPUSize64 dataSize)` where the platform has it (`'setImmediates' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPURenderPassEncoder.setImmediates? (self' : GPURenderPassEncoder) (rangeOffset : Nat) (data : ByteArray) (dataOffset : Option Nat := none) (dataSize : Option Nat := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setImmediates?" do
+  let self := self'
+  if !(← Internal.has self.val "setImmediates") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setImmediates" (Internal.args #[toJS rangeOffset, toJS data, Internal.optional dataOffset, Internal.optional dataSize]) Unit
+  return some lasmGuarded
 
 /-- `undefined setPipeline(GPURenderPipeline pipeline)` -/
 @[macro_inline] def GPURenderPassEncoder.setPipeline (self : GPURenderPassEncoder) (pipeline : GPURenderPipeline) : IO Unit := Internal.api "Lasm.JS.Web.GPURenderPassEncoder.setPipeline" do
@@ -1925,6 +2037,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUSupportedLimits.maxImmediateSize (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxImmediateSize" do
   self.val.get "maxImmediateSize" Nat
 
+/-- `readonly attribute unsigned long maxImmediateSize` where the platform has it (`'maxImmediateSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUSupportedLimits.maxImmediateSize? (self' : GPUSupportedLimits) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxImmediateSize?" do
+  let self := self'
+  if !(← Internal.has self.val "maxImmediateSize") then return none
+  let lasmGuarded ← do
+    self.val.get "maxImmediateSize" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long maxBindingsPerBindGroup` -/
 @[macro_inline] def GPUSupportedLimits.maxBindingsPerBindGroup (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxBindingsPerBindGroup" do
   self.val.get "maxBindingsPerBindGroup" Nat
@@ -1953,9 +2073,25 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUSupportedLimits.maxStorageBuffersInVertexStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInVertexStage" do
   self.val.get "maxStorageBuffersInVertexStage" Nat
 
+/-- `readonly attribute unsigned long maxStorageBuffersInVertexStage` where the platform has it (`'maxStorageBuffersInVertexStage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUSupportedLimits.maxStorageBuffersInVertexStage? (self' : GPUSupportedLimits) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInVertexStage?" do
+  let self := self'
+  if !(← Internal.has self.val "maxStorageBuffersInVertexStage") then return none
+  let lasmGuarded ← do
+    self.val.get "maxStorageBuffersInVertexStage" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long maxStorageBuffersInFragmentStage` -/
 @[macro_inline] def GPUSupportedLimits.maxStorageBuffersInFragmentStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInFragmentStage" do
   self.val.get "maxStorageBuffersInFragmentStage" Nat
+
+/-- `readonly attribute unsigned long maxStorageBuffersInFragmentStage` where the platform has it (`'maxStorageBuffersInFragmentStage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUSupportedLimits.maxStorageBuffersInFragmentStage? (self' : GPUSupportedLimits) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageBuffersInFragmentStage?" do
+  let self := self'
+  if !(← Internal.has self.val "maxStorageBuffersInFragmentStage") then return none
+  let lasmGuarded ← do
+    self.val.get "maxStorageBuffersInFragmentStage" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long maxStorageTexturesPerShaderStage` -/
 @[macro_inline] def GPUSupportedLimits.maxStorageTexturesPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesPerShaderStage" do
@@ -1965,9 +2101,25 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUSupportedLimits.maxStorageTexturesInVertexStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInVertexStage" do
   self.val.get "maxStorageTexturesInVertexStage" Nat
 
+/-- `readonly attribute unsigned long maxStorageTexturesInVertexStage` where the platform has it (`'maxStorageTexturesInVertexStage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUSupportedLimits.maxStorageTexturesInVertexStage? (self' : GPUSupportedLimits) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInVertexStage?" do
+  let self := self'
+  if !(← Internal.has self.val "maxStorageTexturesInVertexStage") then return none
+  let lasmGuarded ← do
+    self.val.get "maxStorageTexturesInVertexStage" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long maxStorageTexturesInFragmentStage` -/
 @[macro_inline] def GPUSupportedLimits.maxStorageTexturesInFragmentStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInFragmentStage" do
   self.val.get "maxStorageTexturesInFragmentStage" Nat
+
+/-- `readonly attribute unsigned long maxStorageTexturesInFragmentStage` where the platform has it (`'maxStorageTexturesInFragmentStage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUSupportedLimits.maxStorageTexturesInFragmentStage? (self' : GPUSupportedLimits) : IO (Option Nat) := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxStorageTexturesInFragmentStage?" do
+  let self := self'
+  if !(← Internal.has self.val "maxStorageTexturesInFragmentStage") then return none
+  let lasmGuarded ← do
+    self.val.get "maxStorageTexturesInFragmentStage" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long maxUniformBuffersPerShaderStage` -/
 @[macro_inline] def GPUSupportedLimits.maxUniformBuffersPerShaderStage (self : GPUSupportedLimits) : IO Nat := Internal.api "Lasm.JS.Web.GPUSupportedLimits.maxUniformBuffersPerShaderStage" do
@@ -2081,6 +2233,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUTexture.textureBindingViewDimension (self : GPUTexture) : IO (Option GPUTextureViewDimension) := Internal.api "Lasm.JS.Web.GPUTexture.textureBindingViewDimension" do
   self.val.get "textureBindingViewDimension" (Option GPUTextureViewDimension)
 
+/-- `readonly attribute (GPUTextureViewDimension or undefined) textureBindingViewDimension` where the platform has it (`'textureBindingViewDimension' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUTexture.textureBindingViewDimension? (self' : GPUTexture) : IO (Option (Option GPUTextureViewDimension)) := Internal.api "Lasm.JS.Web.GPUTexture.textureBindingViewDimension?" do
+  let self := self'
+  if !(← Internal.has self.val "textureBindingViewDimension") then return none
+  let lasmGuarded ← do
+    self.val.get "textureBindingViewDimension" (Option GPUTextureViewDimension)
+  return some lasmGuarded
+
 /-- `attribute USVString label` -/
 @[macro_inline] def GPUTexture.label (self : GPUTexture) : IO String := Internal.api "Lasm.JS.Web.GPUTexture.label" do
   self.val.get "label" String
@@ -2119,6 +2279,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
   Lasm.JS.Binding.invoke GPUUncapturedErrorEvent { name := "Lasm.JS.Web.GPUUncapturedErrorEvent.new", module := "globalThis", path := "GPUUncapturedErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS gpuUncapturedErrorEventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, GPUUncapturedErrorEventInit gpuUncapturedErrorEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUUncapturedErrorEvent.new? (type : String) (gpuUncapturedErrorEventInitDict : GPUUncapturedErrorEventInit) : IO (Option GPUUncapturedErrorEvent) := Internal.api "Lasm.JS.Web.GPUUncapturedErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["GPUUncapturedErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GPUUncapturedErrorEvent { name := "Lasm.JS.Web.GPUUncapturedErrorEvent.new?", module := "globalThis", path := "GPUUncapturedErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS gpuUncapturedErrorEventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute GPUError error` -/
 @[macro_inline] def GPUUncapturedErrorEvent.error (self : GPUUncapturedErrorEvent) : IO GPUError := Internal.api "Lasm.JS.Web.GPUUncapturedErrorEvent.error" do
   let r ← self.val.get "error" Value
@@ -2137,6 +2305,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
   Lasm.JS.Binding.invoke GPUInternalError { name := "Lasm.JS.Web.GPUInternalError.new", module := "globalThis", path := "GPUInternalError", construct := true, arity := 1 }
     (Internal.args #[toJS message]) (await := false)
 
+/-- `constructor(DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUInternalError.new? (message : String) : IO (Option GPUInternalError) := Internal.api "Lasm.JS.Web.GPUInternalError.new?" do
+  if !(← Internal.hasGlobal ["GPUInternalError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GPUInternalError { name := "Lasm.JS.Web.GPUInternalError.new?", module := "globalThis", path := "GPUInternalError", construct := true, arity := 1 }
+      (Internal.args #[toJS message]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof GPUOutOfMemoryError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUOutOfMemoryError`). -/
 @[macro_inline] def GPUOutOfMemoryError.cast? (v : Value) : IO (Option GPUOutOfMemoryError) := Internal.api "Lasm.JS.Web.GPUOutOfMemoryError.cast?" do
   Internal.cast (Internal.getGlobal ["GPUOutOfMemoryError"] Value) (fun x => { val := x }) v
@@ -2145,6 +2321,14 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
 @[macro_inline] def GPUOutOfMemoryError.new (message : String) : IO GPUOutOfMemoryError := Internal.api "Lasm.JS.Web.GPUOutOfMemoryError.new" do
   Lasm.JS.Binding.invoke GPUOutOfMemoryError { name := "Lasm.JS.Web.GPUOutOfMemoryError.new", module := "globalThis", path := "GPUOutOfMemoryError", construct := true, arity := 1 }
     (Internal.args #[toJS message]) (await := false)
+
+/-- `constructor(DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUOutOfMemoryError.new? (message : String) : IO (Option GPUOutOfMemoryError) := Internal.api "Lasm.JS.Web.GPUOutOfMemoryError.new?" do
+  if !(← Internal.hasGlobal ["GPUOutOfMemoryError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GPUOutOfMemoryError { name := "Lasm.JS.Web.GPUOutOfMemoryError.new?", module := "globalThis", path := "GPUOutOfMemoryError", construct := true, arity := 1 }
+      (Internal.args #[toJS message]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof GPUValidationError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GPUValidationError`). -/
 @[macro_inline] def GPUValidationError.cast? (v : Value) : IO (Option GPUValidationError) := Internal.api "Lasm.JS.Web.GPUValidationError.cast?" do
@@ -2155,15 +2339,41 @@ instance : ToJS GPURenderPassLayout := ⟨fun d => Internal.fields #[("label", I
   Lasm.JS.Binding.invoke GPUValidationError { name := "Lasm.JS.Web.GPUValidationError.new", module := "globalThis", path := "GPUValidationError", construct := true, arity := 1 }
     (Internal.args #[toJS message]) (await := false)
 
+/-- `constructor(DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GPUValidationError.new? (message : String) : IO (Option GPUValidationError) := Internal.api "Lasm.JS.Web.GPUValidationError.new?" do
+  if !(← Internal.hasGlobal ["GPUValidationError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GPUValidationError { name := "Lasm.JS.Web.GPUValidationError.new?", module := "globalThis", path := "GPUValidationError", construct := true, arity := 1 }
+      (Internal.args #[toJS message]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute GPU gpu` -/
 @[macro_inline] def Navigator.gpu (self : Navigator) : IO GPU := Internal.api "Lasm.JS.Web.Navigator.gpu" do
   let r ← self.val.get "gpu" Value
   pure { val := r }
 
+/-- `readonly attribute GPU gpu` where the platform has it (`'gpu' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.gpu? (self' : Navigator) : IO (Option GPU) := Internal.api "Lasm.JS.Web.Navigator.gpu?" do
+  let self := self'
+  if !(← Internal.has self.val "gpu") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "gpu" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute GPU gpu` -/
 @[macro_inline] def WorkerNavigator.gpu (self : WorkerNavigator) : IO GPU := Internal.api "Lasm.JS.Web.WorkerNavigator.gpu" do
   let r ← self.val.get "gpu" Value
   pure { val := r }
+
+/-- `readonly attribute GPU gpu` where the platform has it (`'gpu' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.gpu? (self' : WorkerNavigator) : IO (Option GPU) := Internal.api "Lasm.JS.Web.WorkerNavigator.gpu?" do
+  let self := self'
+  if !(← Internal.has self.val "gpu") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "gpu" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `const GPUFlagsConstant MAP_READ = 0x0001` (WebGPU (https://gpuweb.github.io/gpuweb/)) -/
 def GPUBufferUsage.MAP_READ : Nat := 0x0001

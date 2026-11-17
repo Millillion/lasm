@@ -706,6 +706,15 @@ def SVGFEGaussianBlurElement.SVG_EDGEMODE_NONE : Nat := 3
   let r ← self.val.get "edgeMode" Value
   pure { val := r }
 
+/-- `readonly attribute SVGAnimatedEnumeration edgeMode` where the platform has it (`'edgeMode' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGFEGaussianBlurElement.edgeMode? (self' : SVGFEGaussianBlurElement) : IO (Option SVGAnimatedEnumeration) := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.edgeMode?" do
+  let self := self'
+  if !(← Internal.has self.val "edgeMode") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "edgeMode" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute SVGAnimatedLength x` -/
 @[macro_inline] def SVGFEGaussianBlurElement.x (self : SVGFEGaussianBlurElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEGaussianBlurElement.x" do
   let r ← self.val.get "x" Value
@@ -748,6 +757,15 @@ def SVGFEGaussianBlurElement.SVG_EDGEMODE_NONE : Nat := 3
 @[macro_inline] def SVGFEImageElement.crossOrigin (self : SVGFEImageElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGFEImageElement.crossOrigin" do
   let r ← self.val.get "crossOrigin" Value
   pure { val := r }
+
+/-- `readonly attribute SVGAnimatedString crossOrigin` where the platform has it (`'crossOrigin' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGFEImageElement.crossOrigin? (self' : SVGFEImageElement) : IO (Option SVGAnimatedString) := Internal.api "Lasm.JS.Web.SVGFEImageElement.crossOrigin?" do
+  let self := self'
+  if !(← Internal.has self.val "crossOrigin") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "crossOrigin" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute SVGAnimatedLength x` -/
 @[macro_inline] def SVGFEImageElement.x (self : SVGFEImageElement) : IO SVGAnimatedLength := Internal.api "Lasm.JS.Web.SVGFEImageElement.x" do

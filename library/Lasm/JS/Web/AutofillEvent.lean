@@ -56,6 +56,14 @@ def RefillCallback.ofSyncFn (f : IO Unit) : IO RefillCallback := do
   Lasm.JS.Binding.invoke AutofillEvent { name := "Lasm.JS.Web.AutofillEvent.new", module := "globalThis", path := "AutofillEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional AutofillEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AutofillEvent.new? (type : String) (eventInitDict : Option AutofillEventInit := none) : IO (Option AutofillEvent) := Internal.api "Lasm.JS.Web.AutofillEvent.new?" do
+  if !(← Internal.hasGlobal ["AutofillEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AutofillEvent { name := "Lasm.JS.Web.AutofillEvent.new?", module := "globalThis", path := "AutofillEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<AutofillValueEntry> autofillValues` -/
 @[macro_inline] def AutofillEvent.autofillValues (self : AutofillEvent) : IO (Array (Array Data)) := Internal.api "Lasm.JS.Web.AutofillEvent.autofillValues" do
   self.val.get "autofillValues" (Array (Array Data))

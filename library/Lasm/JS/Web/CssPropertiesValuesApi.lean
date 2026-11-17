@@ -55,4 +55,12 @@ instance : ToJS PropertyDefinition := ⟨fun d => Internal.fields #[("name", toJ
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.CSS.registerProperty", module := "globalThis", path := "CSS.registerProperty", construct := false, arity := 1 }
     (Internal.args #[toJS definition]) (await := false)
 
+/-- `undefined registerProperty(PropertyDefinition definition)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.registerProperty? (definition : PropertyDefinition) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CSS.registerProperty?" do
+  if !(← Internal.hasGlobal ["CSS", "registerProperty"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.CSS.registerProperty?", module := "globalThis", path := "CSS.registerProperty", construct := false, arity := 1 }
+      (Internal.args #[toJS definition]) (await := false)
+  return some lasmGuarded
+
 end Lasm.JS.Web

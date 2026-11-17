@@ -103,6 +103,14 @@ instance : ToJS TaskSignalAnyInit := ⟨fun d => Internal.fields #[("priority", 
   Lasm.JS.Binding.invoke TaskController { name := "Lasm.JS.Web.TaskController.new", module := "globalThis", path := "TaskController", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional TaskControllerInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TaskController.new? (init : Option TaskControllerInit := none) : IO (Option TaskController) := Internal.api "Lasm.JS.Web.TaskController.new?" do
+  if !(← Internal.hasGlobal ["TaskController"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TaskController { name := "Lasm.JS.Web.TaskController.new?", module := "globalThis", path := "TaskController", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined setPriority(TaskPriority priority)` -/
 @[macro_inline] def TaskController.setPriority (self : TaskController) (priority : TaskPriority) : IO Unit := Internal.api "Lasm.JS.Web.TaskController.setPriority" do
   self.val.callMethod "setPriority" (Internal.args #[toJS priority]) Unit
@@ -115,6 +123,14 @@ instance : ToJS TaskSignalAnyInit := ⟨fun d => Internal.fields #[("priority", 
 @[macro_inline] def TaskPriorityChangeEvent.new (type : String) (priorityChangeEventInitDict : TaskPriorityChangeEventInit) : IO TaskPriorityChangeEvent := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.new" do
   Lasm.JS.Binding.invoke TaskPriorityChangeEvent { name := "Lasm.JS.Web.TaskPriorityChangeEvent.new", module := "globalThis", path := "TaskPriorityChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS priorityChangeEventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, TaskPriorityChangeEventInit priorityChangeEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TaskPriorityChangeEvent.new? (type : String) (priorityChangeEventInitDict : TaskPriorityChangeEventInit) : IO (Option TaskPriorityChangeEvent) := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["TaskPriorityChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TaskPriorityChangeEvent { name := "Lasm.JS.Web.TaskPriorityChangeEvent.new?", module := "globalThis", path := "TaskPriorityChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS priorityChangeEventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute TaskPriority previousPriority` -/
 @[macro_inline] def TaskPriorityChangeEvent.previousPriority (self : TaskPriorityChangeEvent) : IO TaskPriority := Internal.api "Lasm.JS.Web.TaskPriorityChangeEvent.previousPriority" do
@@ -142,6 +158,15 @@ instance : ToJS TaskSignalAnyInit := ⟨fun d => Internal.fields #[("priority", 
     (Internal.args #[toJS signals, Internal.optional init]) (await := false)
   pure { val := r }
 
+/-- `static TaskSignal any(sequence<AbortSignal> signals, optional TaskSignalAnyInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TaskSignal.any? (signals : Array AbortSignal) (init : Option TaskSignalAnyInit := none) : IO (Option TaskSignal) := Internal.api "Lasm.JS.Web.TaskSignal.any?" do
+  if !(← Internal.hasGlobal ["TaskSignal", "any"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.TaskSignal.any?", module := "globalThis", path := "TaskSignal.any", construct := false, arity := 2 }
+      (Internal.args #[toJS signals, Internal.optional init]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Scheduler scheduler` -/
 @[macro_inline] def Window.scheduler (self : Window) : IO Scheduler := Internal.api "Lasm.JS.Web.Window.scheduler" do
   let r ← self.val.get "scheduler" Value
@@ -156,5 +181,13 @@ instance : ToJS TaskSignalAnyInit := ⟨fun d => Internal.fields #[("priority", 
 @[macro_inline] def scheduler : IO Scheduler := Internal.api "Lasm.JS.Web.scheduler" do
   let r ← Internal.getGlobal ["scheduler"] Value
   pure { val := r }
+
+/-- `readonly attribute Scheduler scheduler` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scheduler? : IO (Option Scheduler) := Internal.api "Lasm.JS.Web.scheduler?" do
+  if !(← Internal.hasGlobal ["scheduler"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["scheduler"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -1494,6 +1494,14 @@ instance : ToJS MLTriangularOptions := ⟨fun d => Internal.fields #[("label", I
   Lasm.JS.Binding.invoke MLGraphBuilder { name := "Lasm.JS.Web.MLGraphBuilder.new", module := "globalThis", path := "MLGraphBuilder", construct := true, arity := 1 }
     (Internal.args #[toJS context]) (await := false)
 
+/-- `constructor(MLContext context)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MLGraphBuilder.new? (context : MLContext) : IO (Option MLGraphBuilder) := Internal.api "Lasm.JS.Web.MLGraphBuilder.new?" do
+  if !(← Internal.hasGlobal ["MLGraphBuilder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MLGraphBuilder { name := "Lasm.JS.Web.MLGraphBuilder.new?", module := "globalThis", path := "MLGraphBuilder", construct := true, arity := 1 }
+      (Internal.args #[toJS context]) (await := false)
+  return some lasmGuarded
+
 /-- `MLOperand input(USVString name, MLOperandDescriptor descriptor)` -/
 @[macro_inline] def MLGraphBuilder.input (self : MLGraphBuilder) (name : String) (descriptor : MLOperandDescriptor) : IO MLOperand := Internal.api "Lasm.JS.Web.MLGraphBuilder.input" do
   let r ← self.val.callMethod "input" (Internal.args #[toJS name, toJS descriptor]) Value
@@ -2035,9 +2043,27 @@ instance : ToJS MLTriangularOptions := ⟨fun d => Internal.fields #[("label", I
   let r ← self.val.get "ml" Value
   pure { val := r }
 
+/-- `readonly attribute ML ml` where the platform has it (`'ml' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.ml? (self' : Navigator) : IO (Option ML) := Internal.api "Lasm.JS.Web.Navigator.ml?" do
+  let self := self'
+  if !(← Internal.has self.val "ml") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "ml" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute ML ml` -/
 @[macro_inline] def WorkerNavigator.ml (self : WorkerNavigator) : IO ML := Internal.api "Lasm.JS.Web.WorkerNavigator.ml" do
   let r ← self.val.get "ml" Value
   pure { val := r }
+
+/-- `readonly attribute ML ml` where the platform has it (`'ml' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.ml? (self' : WorkerNavigator) : IO (Option ML) := Internal.api "Lasm.JS.Web.WorkerNavigator.ml?" do
+  let self := self'
+  if !(← Internal.has self.val "ml") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "ml" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

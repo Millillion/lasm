@@ -41,6 +41,14 @@ instance : ToJS CaptureActionEventInit := ⟨fun d => Internal.fields #[("bubble
   Lasm.JS.Binding.invoke CaptureActionEvent { name := "Lasm.JS.Web.CaptureActionEvent.new", module := "globalThis", path := "CaptureActionEvent", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional CaptureActionEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CaptureActionEvent.new? (init : Option CaptureActionEventInit := none) : IO (Option CaptureActionEvent) := Internal.api "Lasm.JS.Web.CaptureActionEvent.new?" do
+  if !(← Internal.hasGlobal ["CaptureActionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CaptureActionEvent { name := "Lasm.JS.Web.CaptureActionEvent.new?", module := "globalThis", path := "CaptureActionEvent", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CaptureAction action` -/
 @[macro_inline] def CaptureActionEvent.action (self : CaptureActionEvent) : IO CaptureAction := Internal.api "Lasm.JS.Web.CaptureActionEvent.action" do
   self.val.get "action" CaptureAction

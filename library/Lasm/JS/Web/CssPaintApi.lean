@@ -362,4 +362,12 @@ instance : ToJS PaintRenderingContext2DSettings := ⟨fun d => Internal.fields #
   let r ← Internal.getGlobal ["CSS", "paintWorklet"] Value
   pure { val := r }
 
+/-- `readonly attribute Worklet paintWorklet` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.paintWorklet? : IO (Option Worklet) := Internal.api "Lasm.JS.Web.CSS.paintWorklet?" do
+  if !(← Internal.hasGlobal ["CSS", "paintWorklet"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["CSS", "paintWorklet"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

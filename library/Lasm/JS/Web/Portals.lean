@@ -95,6 +95,14 @@ instance : ToJS PortalActivateEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke PortalActivateEvent { name := "Lasm.JS.Web.PortalActivateEvent.new", module := "globalThis", path := "PortalActivateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional PortalActivateEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PortalActivateEvent.new? (type : String) (eventInitDict : Option PortalActivateEventInit := none) : IO (Option PortalActivateEvent) := Internal.api "Lasm.JS.Web.PortalActivateEvent.new?" do
+  if !(← Internal.hasGlobal ["PortalActivateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PortalActivateEvent { name := "Lasm.JS.Web.PortalActivateEvent.new?", module := "globalThis", path := "PortalActivateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any data` -/
 @[macro_inline] def PortalActivateEvent.data (self : PortalActivateEvent) : IO Data := Internal.api "Lasm.JS.Web.PortalActivateEvent.data" do
   self.val.get "data" Data
@@ -168,8 +176,22 @@ instance : ToJS PortalActivateEventInit := ⟨fun d => Internal.fields #[("bubbl
 @[macro_inline] def portalHost : IO (Option PortalHost) := Internal.api "Lasm.JS.Web.portalHost" do
   Internal.getGlobal ["portalHost"] (Option PortalHost)
 
+/-- `readonly attribute PortalHost? portalHost` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def portalHost? : IO (Option (Option PortalHost)) := Internal.api "Lasm.JS.Web.portalHost?" do
+  if !(← Internal.hasGlobal ["portalHost"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["portalHost"] (Option PortalHost)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onportalactivate` (Portals (https://wicg.github.io/portals/)) -/
 @[macro_inline] def onportalactivate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onportalactivate" do
   Internal.getGlobal ["onportalactivate"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onportalactivate` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onportalactivate? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onportalactivate?" do
+  if !(← Internal.hasGlobal ["onportalactivate"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onportalactivate"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

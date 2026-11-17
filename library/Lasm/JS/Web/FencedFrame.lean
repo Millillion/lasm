@@ -97,6 +97,14 @@ instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
   Lasm.JS.Binding.invoke FencedFrameConfig { name := "Lasm.JS.Web.FencedFrameConfig.new", module := "globalThis", path := "FencedFrameConfig", construct := true, arity := 1 }
     (Internal.args #[toJS url]) (await := false)
 
+/-- `constructor(USVString url)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FencedFrameConfig.new? (url : String) : IO (Option FencedFrameConfig) := Internal.api "Lasm.JS.Web.FencedFrameConfig.new?" do
+  if !(← Internal.hasGlobal ["FencedFrameConfig"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FencedFrameConfig { name := "Lasm.JS.Web.FencedFrameConfig.new?", module := "globalThis", path := "FencedFrameConfig", construct := true, arity := 1 }
+      (Internal.args #[toJS url]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined setSharedStorageContext(DOMString contextString)` -/
 @[macro_inline] def FencedFrameConfig.setSharedStorageContext (self : FencedFrameConfig) (contextString : String) : IO Unit := Internal.api "Lasm.JS.Web.FencedFrameConfig.setSharedStorageContext" do
   self.val.callMethod "setSharedStorageContext" (Internal.args #[toJS contextString]) Unit
@@ -170,6 +178,14 @@ instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
 @[macro_inline] def Navigator.deprecatedReplaceInURN (self : Navigator) (urnOrConfig : UrnOrConfig) (replacements : Record String) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.deprecatedReplaceInURN" do
   self.val.callMethodAwait "deprecatedReplaceInURN" (Internal.args #[toJS urnOrConfig, toJS replacements]) Unit
 
+/-- `Promise<undefined> deprecatedReplaceInURN(UrnOrConfig urnOrConfig, record<USVString, USVString> replacements)` where the platform has it (`'deprecatedReplaceInURN' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.deprecatedReplaceInURN? (self' : Navigator) (urnOrConfig : UrnOrConfig) (replacements : Record String) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.deprecatedReplaceInURN?" do
+  let self := self'
+  if !(← Internal.has self.val "deprecatedReplaceInURN") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "deprecatedReplaceInURN" (Internal.args #[toJS urnOrConfig, toJS replacements]) Unit
+  return some lasmGuarded
+
 /-- `Promise<USVString> deprecatedURNtoURL(UrnOrConfig urnOrConfig, optional boolean send_reports)` -/
 @[macro_inline] def Navigator.deprecatedURNtoURL (self : Navigator) (urnOrConfig : UrnOrConfig) (send_reports : Option Bool := none) : Async String := Internal.api "Lasm.JS.Web.Navigator.deprecatedURNtoURL" do
   self.val.callMethodAwait "deprecatedURNtoURL" (Internal.args #[toJS urnOrConfig, Internal.optional send_reports]) String
@@ -177,6 +193,14 @@ instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
 /-- `sequence<USVString> adAuctionComponents(unsigned short numAdComponents)` -/
 @[macro_inline] def Navigator.adAuctionComponents (self : Navigator) (numAdComponents : Nat) : IO (Array String) := Internal.api "Lasm.JS.Web.Navigator.adAuctionComponents" do
   self.val.callMethod "adAuctionComponents" (Internal.args #[toJS numAdComponents]) (Array String)
+
+/-- `sequence<USVString> adAuctionComponents(unsigned short numAdComponents)` where the platform has it (`'adAuctionComponents' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.adAuctionComponents? (self' : Navigator) (numAdComponents : Nat) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Navigator.adAuctionComponents?" do
+  let self := self'
+  if !(← Internal.has self.val "adAuctionComponents") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "adAuctionComponents" (Internal.args #[toJS numAdComponents]) (Array String)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onfencedtreeclick` -/
 @[macro_inline] def SVGElement.onfencedtreeclick (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.onfencedtreeclick" do
@@ -190,6 +214,14 @@ instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
 @[macro_inline] def Window.fence (self : Window) : IO (Option Fence) := Internal.api "Lasm.JS.Web.Window.fence" do
   self.val.get "fence" (Option Fence)
 
+/-- `readonly attribute Fence? fence` where the platform has it (`'fence' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.fence? (self' : Window) : IO (Option (Option Fence)) := Internal.api "Lasm.JS.Web.Window.fence?" do
+  let self := self'
+  if !(← Internal.has self.val "fence") then return none
+  let lasmGuarded ← do
+    self.val.get "fence" (Option Fence)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onfencedtreeclick` -/
 @[macro_inline] def Window.onfencedtreeclick (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onfencedtreeclick" do
   self.val.get "onfencedtreeclick" (Option EventHandlerNonNull)
@@ -202,8 +234,22 @@ instance : Coe FencedFrameConfig UrnOrConfig := ⟨.fencedFrameConfig⟩
 @[macro_inline] def fence : IO (Option Fence) := Internal.api "Lasm.JS.Web.fence" do
   Internal.getGlobal ["fence"] (Option Fence)
 
+/-- `readonly attribute Fence? fence` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def fence? : IO (Option (Option Fence)) := Internal.api "Lasm.JS.Web.fence?" do
+  if !(← Internal.hasGlobal ["fence"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["fence"] (Option Fence)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onfencedtreeclick` (Fenced Frame (https://wicg.github.io/fenced-frame/)) -/
 @[macro_inline] def onfencedtreeclick : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onfencedtreeclick" do
   Internal.getGlobal ["onfencedtreeclick"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onfencedtreeclick` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onfencedtreeclick? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onfencedtreeclick?" do
+  if !(← Internal.hasGlobal ["onfencedtreeclick"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onfencedtreeclick"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

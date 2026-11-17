@@ -125,10 +125,27 @@ instance : FromJS ProofreadResult where
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<Proofreader> create(optional ProofreaderCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Proofreader.create? (options : Option ProofreaderCreateOptions := none) : Async (Option Proofreader) := Internal.api "Lasm.JS.Web.Proofreader.create?" do
+  if !(← Internal.hasGlobal ["Proofreader", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Proofreader.create?", module := "globalThis", path := "Proofreader.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional ProofreaderCreateCoreOptions options)` -/
 @[macro_inline] def Proofreader.availability (options : Option ProofreaderCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Proofreader.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Proofreader.availability", module := "globalThis", path := "Proofreader.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `static Promise<Availability> availability(optional ProofreaderCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Proofreader.availability? (options : Option ProofreaderCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.Proofreader.availability?" do
+  if !(← Internal.hasGlobal ["Proofreader", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Proofreader.availability?", module := "globalThis", path := "Proofreader.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<ProofreadResult> proofread(DOMString input, optional ProofreaderProofreadOptions options)` -/
 @[macro_inline] def Proofreader.proofread (self : Proofreader) (input : String) (options : Option ProofreaderProofreadOptions := none) : Async ProofreadResult := Internal.api "Lasm.JS.Web.Proofreader.proofread" do

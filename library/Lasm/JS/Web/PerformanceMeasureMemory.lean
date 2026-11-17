@@ -82,4 +82,12 @@ instance : FromJS MemoryMeasurement where
 @[macro_inline] def Performance.measureUserAgentSpecificMemory (self : Performance) : Async MemoryMeasurement := Internal.api "Lasm.JS.Web.Performance.measureUserAgentSpecificMemory" do
   self.val.callMethodAwait "measureUserAgentSpecificMemory" (Internal.args #[]) MemoryMeasurement
 
+/-- `Promise<MemoryMeasurement> measureUserAgentSpecificMemory()` where the platform has it (`'measureUserAgentSpecificMemory' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.measureUserAgentSpecificMemory? (self' : Performance) : Async (Option MemoryMeasurement) := Internal.api "Lasm.JS.Web.Performance.measureUserAgentSpecificMemory?" do
+  let self := self'
+  if !(← Internal.has self.val "measureUserAgentSpecificMemory") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "measureUserAgentSpecificMemory" (Internal.args #[]) MemoryMeasurement
+  return some lasmGuarded
+
 end Lasm.JS.Web

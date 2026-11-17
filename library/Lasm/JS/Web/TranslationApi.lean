@@ -104,10 +104,27 @@ instance : ToJS TranslatorTranslateOptions := ⟨fun d => Internal.fields #[("si
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<LanguageDetector> create(optional LanguageDetectorCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageDetector.create? (options : Option LanguageDetectorCreateOptions := none) : Async (Option LanguageDetector) := Internal.api "Lasm.JS.Web.LanguageDetector.create?" do
+  if !(← Internal.hasGlobal ["LanguageDetector", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.LanguageDetector.create?", module := "globalThis", path := "LanguageDetector.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional LanguageDetectorCreateCoreOptions options)` -/
 @[macro_inline] def LanguageDetector.availability (options : Option LanguageDetectorCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.LanguageDetector.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageDetector.availability", module := "globalThis", path := "LanguageDetector.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `static Promise<Availability> availability(optional LanguageDetectorCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageDetector.availability? (options : Option LanguageDetectorCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.LanguageDetector.availability?" do
+  if !(← Internal.hasGlobal ["LanguageDetector", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageDetector.availability?", module := "globalThis", path := "LanguageDetector.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<sequence<LanguageDetectionResult>> detect(DOMString input, optional LanguageDetectorDetectOptions options)` -/
 @[macro_inline] def LanguageDetector.detect (self : LanguageDetector) (input : String) (options : Option LanguageDetectorDetectOptions := none) : Async (Array LanguageDetectionResult) := Internal.api "Lasm.JS.Web.LanguageDetector.detect" do
@@ -143,10 +160,27 @@ instance : ToJS TranslatorTranslateOptions := ⟨fun d => Internal.fields #[("si
     (Internal.args #[toJS options])
   pure { val := r }
 
+/-- `static Promise<Translator> create(TranslatorCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Translator.create? (options : TranslatorCreateOptions) : Async (Option Translator) := Internal.api "Lasm.JS.Web.Translator.create?" do
+  if !(← Internal.hasGlobal ["Translator", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Translator.create?", module := "globalThis", path := "Translator.create", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(TranslatorCreateCoreOptions options)` -/
 @[macro_inline] def Translator.availability (options : TranslatorCreateCoreOptions) : Async Availability := Internal.api "Lasm.JS.Web.Translator.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Translator.availability", module := "globalThis", path := "Translator.availability", construct := false, arity := 1 }
     (Internal.args #[toJS options])
+
+/-- `static Promise<Availability> availability(TranslatorCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Translator.availability? (options : TranslatorCreateCoreOptions) : Async (Option Availability) := Internal.api "Lasm.JS.Web.Translator.availability?" do
+  if !(← Internal.hasGlobal ["Translator", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Translator.availability?", module := "globalThis", path := "Translator.availability", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
 
 /-- `Promise<DOMString> translate(DOMString input, optional TranslatorTranslateOptions options)` -/
 @[macro_inline] def Translator.translate (self : Translator) (input : String) (options : Option TranslatorTranslateOptions := none) : Async String := Internal.api "Lasm.JS.Web.Translator.translate" do

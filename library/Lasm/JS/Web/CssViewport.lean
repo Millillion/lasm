@@ -29,9 +29,26 @@ set_option compiler.extract_closed false
   let r ← self.val.get "viewport" Value
   pure { val := r }
 
+/-- `readonly attribute Viewport viewport` where the platform has it (`'viewport' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.viewport? (self' : Window) : IO (Option Viewport) := Internal.api "Lasm.JS.Web.Window.viewport?" do
+  let self := self'
+  if !(← Internal.has self.val "viewport") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "viewport" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Viewport viewport` (CSS Viewport Module Level 1 (https://drafts.csswg.org/css-viewport/)) -/
 @[macro_inline] def viewport : IO Viewport := Internal.api "Lasm.JS.Web.viewport" do
   let r ← Internal.getGlobal ["viewport"] Value
   pure { val := r }
+
+/-- `readonly attribute Viewport viewport` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def viewport? : IO (Option Viewport) := Internal.api "Lasm.JS.Web.viewport?" do
+  if !(← Internal.hasGlobal ["viewport"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["viewport"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

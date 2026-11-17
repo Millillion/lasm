@@ -66,6 +66,14 @@ instance : ToJS WindowControlsOverlayGeometryChangeEventInit := ⟨fun d => Inte
   Lasm.JS.Binding.invoke WindowControlsOverlayGeometryChangeEvent { name := "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.new", module := "globalThis", path := "WindowControlsOverlayGeometryChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, WindowControlsOverlayGeometryChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WindowControlsOverlayGeometryChangeEvent.new? (type : String) (eventInitDict : WindowControlsOverlayGeometryChangeEventInit) : IO (Option WindowControlsOverlayGeometryChangeEvent) := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["WindowControlsOverlayGeometryChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WindowControlsOverlayGeometryChangeEvent { name := "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.new?", module := "globalThis", path := "WindowControlsOverlayGeometryChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMRect titlebarAreaRect` -/
 @[macro_inline] def WindowControlsOverlayGeometryChangeEvent.titlebarAreaRect (self : WindowControlsOverlayGeometryChangeEvent) : IO DOMRect := Internal.api "Lasm.JS.Web.WindowControlsOverlayGeometryChangeEvent.titlebarAreaRect" do
   let r ← self.val.get "titlebarAreaRect" Value
@@ -79,5 +87,14 @@ instance : ToJS WindowControlsOverlayGeometryChangeEventInit := ⟨fun d => Inte
 @[macro_inline] def Navigator.windowControlsOverlay (self : Navigator) : IO WindowControlsOverlay := Internal.api "Lasm.JS.Web.Navigator.windowControlsOverlay" do
   let r ← self.val.get "windowControlsOverlay" Value
   pure { val := r }
+
+/-- `readonly attribute WindowControlsOverlay windowControlsOverlay` where the platform has it (`'windowControlsOverlay' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.windowControlsOverlay? (self' : Navigator) : IO (Option WindowControlsOverlay) := Internal.api "Lasm.JS.Web.Navigator.windowControlsOverlay?" do
+  let self := self'
+  if !(← Internal.has self.val "windowControlsOverlay") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "windowControlsOverlay" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

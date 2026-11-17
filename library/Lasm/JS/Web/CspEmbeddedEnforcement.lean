@@ -18,6 +18,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLIFrameElement.csp (self : HTMLIFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLIFrameElement.csp" do
   self.val.get "csp" String
 
+/-- `attribute DOMString csp` where the platform has it (`'csp' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLIFrameElement.csp? (self' : HTMLIFrameElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLIFrameElement.csp?" do
+  let self := self'
+  if !(← Internal.has self.val "csp") then return none
+  let lasmGuarded ← do
+    self.val.get "csp" String
+  return some lasmGuarded
+
 /-- Sets `csp`: `attribute DOMString csp` -/
 @[macro_inline] def HTMLIFrameElement.setCsp (self : HTMLIFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setCsp" do
   self.val.set "csp" (toJS value)

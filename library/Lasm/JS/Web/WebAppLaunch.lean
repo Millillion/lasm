@@ -55,9 +55,26 @@ def LaunchConsumer.ofSyncFn (f : LaunchParams → IO Data) : IO LaunchConsumer :
   let r ← self.val.get "launchQueue" Value
   pure { val := r }
 
+/-- `readonly attribute LaunchQueue launchQueue` where the platform has it (`'launchQueue' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.launchQueue? (self' : Window) : IO (Option LaunchQueue) := Internal.api "Lasm.JS.Web.Window.launchQueue?" do
+  let self := self'
+  if !(← Internal.has self.val "launchQueue") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "launchQueue" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute LaunchQueue launchQueue` (Web App Launch Handler API (https://wicg.github.io/web-app-launch/)) -/
 @[macro_inline] def launchQueue : IO LaunchQueue := Internal.api "Lasm.JS.Web.launchQueue" do
   let r ← Internal.getGlobal ["launchQueue"] Value
   pure { val := r }
+
+/-- `readonly attribute LaunchQueue launchQueue` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def launchQueue? : IO (Option LaunchQueue) := Internal.api "Lasm.JS.Web.launchQueue?" do
+  if !(← Internal.hasGlobal ["launchQueue"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["launchQueue"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

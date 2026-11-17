@@ -18,8 +18,24 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.globalPrivacyControl (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.globalPrivacyControl" do
   self.val.get "globalPrivacyControl" Bool
 
+/-- `readonly attribute boolean globalPrivacyControl` where the platform has it (`'globalPrivacyControl' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.globalPrivacyControl? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.globalPrivacyControl?" do
+  let self := self'
+  if !(← Internal.has self.val "globalPrivacyControl") then return none
+  let lasmGuarded ← do
+    self.val.get "globalPrivacyControl" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute boolean globalPrivacyControl` -/
 @[macro_inline] def WorkerNavigator.globalPrivacyControl (self : WorkerNavigator) : IO Bool := Internal.api "Lasm.JS.Web.WorkerNavigator.globalPrivacyControl" do
   self.val.get "globalPrivacyControl" Bool
+
+/-- `readonly attribute boolean globalPrivacyControl` where the platform has it (`'globalPrivacyControl' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.globalPrivacyControl? (self' : WorkerNavigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.WorkerNavigator.globalPrivacyControl?" do
+  let self := self'
+  if !(← Internal.has self.val "globalPrivacyControl") then return none
+  let lasmGuarded ← do
+    self.val.get "globalPrivacyControl" Bool
+  return some lasmGuarded
 
 end Lasm.JS.Web
