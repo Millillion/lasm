@@ -47,6 +47,14 @@ on:
       - 'examples/ui/**'
       - 'bench/ui/**'
       - 'runtime/edge.cpp'
+  # A pull request that changes the browser suites or their runner (WebKit on macOS
+  # stays for release-checks). #319's availability probe broke WebKit on Linux unseen
+  # (2026-11-17).
+  pull_request:
+    paths:
+      - '.github/workflows/browser.yml'
+      - 'test/browser/**'
+      - 'scripts/browser/**'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
   contents: write
@@ -189,7 +197,7 @@ jobs:
         id: gate
         shell: bash
         run: |
-          if [ "${{ matrix.macos }}" = "true" ] && [ "${{ inputs.macos }}" = "false" ]; then echo "run=false" >> "$GITHUB_OUTPUT"; else echo "run=true" >> "$GITHUB_OUTPUT"; fi
+          if [ "${{ matrix.macos }}" = "true" ] && { [ "${{ inputs.macos }}" = "false" ] || [ "${{ github.event_name }}" = "pull_request" ]; }; then echo "run=false" >> "$GITHUB_OUTPUT"; else echo "run=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: steps.gate.outputs.run == 'true'
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
