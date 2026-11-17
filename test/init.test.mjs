@@ -194,6 +194,9 @@ test('templates that use Lasm\'s library require it as a Lake package and get .l
       assert.match(readFileSync(join(directory, '.gitignore'), 'utf8'), /^\.lake\/?$/m, template);
       if (uses) assert.match(readFileSync(join(directory, 'README.md'), 'utf8'), /on a fresh clone, run any lasm command once/, template);
     }
+    // A target several levels down: its directories are made, then .lake/ in it.
+    const nested = initProject({ directory: join(root, 'a', 'b', 'web'), template: 'web' }).directory;
+    assert.ok(existsSync(join(nested, '.lake')));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

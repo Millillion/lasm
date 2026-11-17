@@ -747,8 +747,8 @@ export function initProject({ directory, template, deploy = [] }) {
 
 function writeFiles(target, name, files) {
   mkdirSync(target, { recursive: true });
-  // .lake/ (git-ignored) holds the link to Lasm's Lake package that lasm commands make.
-  if (/^name = "lasm"$/m.test(files['lakefile.toml'] ?? '')) mkdirSync(join(target, '.lake'), { recursive: true });
+  // .lake/ (git-ignored) holds the link to Lasm's Lake package that lasm commands make (target exists: no recursion).
+  if (files['lakefile.toml'].includes(lakeRequireToml)) mkdirSync(join(target, '.lake'));
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(dirname(join(target, file)), { recursive: true });
     writeFileSync(join(target, file), text, { flag: 'wx' });
