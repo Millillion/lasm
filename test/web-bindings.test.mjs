@@ -17,7 +17,7 @@ import { lowerAuto } from '../scripts/bindings/ts-auto.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
 import { lazyModules } from '../src/lazy-library.mjs';
 import { join } from 'node:path';
-import { referencedWebApis, targetRuntime, webAvailabilityErrors } from '../src/web-availability.mjs';
+import { guardedInterfaces, referencedWebApis, targetRuntime, webAvailabilityErrors } from '../src/web-availability.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const webDir = new URL('../library/Lasm/JS/Web/', import.meta.url);
@@ -618,4 +618,31 @@ test('serve-api fails on what a rich selection does not decide', () => {
   assert.throws(() => lowerRich(richHost(), richSource.replace('Map<string, M>', 'Map<number, M>')), /a Map keyed by number/);
   // A type neither selected, named nor declared.
   assert.throws(() => lowerRich(richHost(), richSource.replace('labels: Record<string, string>', 'labels: Bogus')), /neither selected nor in/);
+});
+
+test('availability guards (0.3-11): X? where some runtime lacks X, and lasm build allows what only a guard gives', () => {
+  const webgpu = moduleSource('Lasm.JS.Web.Webgpu');
+  // `'gpu' in navigator`, then the binding; `none` where the platform lacks it.
+  assert.match(webgpu, /^@\[macro_inline\] def Navigator\.gpu\? \(self' : Navigator\) : IO \(Option GPU\) := Internal\.api "Lasm\.JS\.Web\.Navigator\.gpu\?" do\n  let self := self'\n  if !\(← Internal\.has self\.val "gpu"\) then return none\n/m);
+  // A static member, a constructor and a global check their global path.
+  assert.match(moduleSource('Lasm.JS.Web.Url'), /def URL\.parse\? [^\n]*\n  if !\(← Internal\.hasGlobal \["URL", "parse"\]\) then return none/);
+  assert.match(moduleSource('Lasm.JS.Web.Fetch'), /def fetchLater\? [^\n]*\n  if !\(← Internal\.hasGlobal \["fetchLater"\]\) then return none/);
+  // Not for what every runtime has (fetch), nor for the members of an interface its runtimes all have (GPU's: a GPU
+  // exists only where Navigator.gpu? gave one).
+  assert.doesNotMatch(moduleSource('Lasm.JS.Web.Fetch'), /def fetch\? /);
+  assert.doesNotMatch(webgpu, /def GPU\.requestAdapter\? /);
+  // A guard's C never holds the unguarded name (its binding records are renamed too).
+  for (const m of webModules) for (const [, name, body] of moduleSource(m).matchAll(/def \S+ [^\n]*:= Internal\.api "(Lasm\.JS\.Web\.[^"]+)\?" do\n((?:  [^\n]*\n)+)/g))
+    assert.ok(!body.includes(`"${name}"`), `${name}? names ${name}`);
+  // The check: on Node (no WebGPU), the guard and what it gives pass; the same calls unguarded do not.
+  const guarded = referencedWebApis(['lean_mk_string_unchecked("Lasm.JS.Web.Navigator.gpu\\?: ", 1, 1); lean_mk_string_unchecked("Lasm.JS.Web.GPU.requestAdapter: ", 1, 1); lean_mk_string_unchecked("Lasm.JS.Web.GPUAdapter.requestDevice: ", 1, 1)']);
+  assert.deepEqual(guarded, ['Lasm.JS.Web.GPU.requestAdapter', 'Lasm.JS.Web.GPUAdapter.requestDevice', 'Lasm.JS.Web.Navigator.gpu?']);
+  assert.deepEqual(webAvailabilityErrors(guarded, 'node'), []);
+  const unguarded = referencedWebApis(['"Lasm.JS.Web.Navigator.gpu: " "Lasm.JS.Web.GPU.requestAdapter: "']);
+  assert.deepEqual(webAvailabilityErrors(unguarded, 'node').map(e => e.split(' (')[0]), ['Lasm.JS.Web.GPU.requestAdapter', 'Lasm.JS.Web.Navigator.gpu']);
+  // A guard covers only interfaces the target lacks: Element's members are not allowed through one.
+  assert.ok(!guardedInterfaces(['Lasm.JS.Web.Navigator.gpu?'], 'node').has('Element'));
+  assert.ok(guardedInterfaces(['Lasm.JS.Web.Navigator.gpu?'], 'node').has('GPUDevice'));
+  // On a target with WebGPU (browsers), nothing to allow: GPU's members are available anyway.
+  assert.deepEqual([...guardedInterfaces(['Lasm.JS.Web.Navigator.gpu?'], 'browser')], []);
 });
