@@ -35,15 +35,15 @@ instance : FromJS RunAt where
 
 /-- `enum ExecutionWorld` (Web Extensions (https://w3c.github.io/webextensions/specification/)): "ISOLATED", "MAIN". -/
 structure ExecutionWorld where
-  /-- A value from its string, unchecked: the generated values (`.iSOLATED`) are the normal way to make one. -/
+  /-- A value from its string, unchecked: the generated values (`.isolated`) are the normal way to make one. -/
   unsafeOfString ::
   /-- The string. -/
   val : String
   deriving BEq, Repr, Inhabited
 /-- "ISOLATED" -/
-@[match_pattern] abbrev ExecutionWorld.iSOLATED : ExecutionWorld := .unsafeOfString "ISOLATED"
+@[match_pattern] abbrev ExecutionWorld.isolated : ExecutionWorld := .unsafeOfString "ISOLATED"
 /-- "MAIN" -/
-@[match_pattern] abbrev ExecutionWorld.mAIN : ExecutionWorld := .unsafeOfString "MAIN"
+@[match_pattern] abbrev ExecutionWorld.main : ExecutionWorld := .unsafeOfString "MAIN"
 instance : ToJS ExecutionWorld := ⟨fun x => .string x.val⟩
 instance : FromJS ExecutionWorld where
   fromJS

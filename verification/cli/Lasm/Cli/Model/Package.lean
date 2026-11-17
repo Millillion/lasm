@@ -37,9 +37,10 @@ def packageTargets : List String := packageTable.map (·.name)
 
 def packageUsage : String := "Usage: lasm package [dist] --target " ++ "|".intercalate packageTargets ++ " [--output PATH] [--allow-dev]
 
-Packages a built Lasm HTTP server (lasm build output, default dist/) for a
-function platform. The server must listen on $HOST and $PORT (every lasm init
-server template does). Writes, by target:
+Packages a built Lasm program (lasm build output, default dist/) for a
+function platform. Its main publishes a fetch handler with
+Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
+calls directly. Writes, by target:
 " ++ "\n".intercalate (packageTable.map fun t => "  " ++ padEnd t.name 12 ++ " " ++ padEnd t.output 23 ++ " " ++ t.summary) ++ "
   " ++ padEnd "browser" 12 ++ " " ++ padEnd "(in place)" 23 ++ " a browser build (lasm build --target browser): checked against its manifest, _headers added
 

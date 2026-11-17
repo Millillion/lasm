@@ -358,9 +358,9 @@ structure VideoPixelFormat where
 /-- "I420A" -/
 @[match_pattern] abbrev VideoPixelFormat.i420A : VideoPixelFormat := .unsafeOfString "I420A"
 /-- "I420AP10" -/
-@[match_pattern] abbrev VideoPixelFormat.i420AP10 : VideoPixelFormat := .unsafeOfString "I420AP10"
+@[match_pattern] abbrev VideoPixelFormat.i420ap10 : VideoPixelFormat := .unsafeOfString "I420AP10"
 /-- "I420AP12" -/
-@[match_pattern] abbrev VideoPixelFormat.i420AP12 : VideoPixelFormat := .unsafeOfString "I420AP12"
+@[match_pattern] abbrev VideoPixelFormat.i420ap12 : VideoPixelFormat := .unsafeOfString "I420AP12"
 /-- "I422" -/
 @[match_pattern] abbrev VideoPixelFormat.i422 : VideoPixelFormat := .unsafeOfString "I422"
 /-- "I422P10" -/
@@ -370,9 +370,9 @@ structure VideoPixelFormat where
 /-- "I422A" -/
 @[match_pattern] abbrev VideoPixelFormat.i422A : VideoPixelFormat := .unsafeOfString "I422A"
 /-- "I422AP10" -/
-@[match_pattern] abbrev VideoPixelFormat.i422AP10 : VideoPixelFormat := .unsafeOfString "I422AP10"
+@[match_pattern] abbrev VideoPixelFormat.i422ap10 : VideoPixelFormat := .unsafeOfString "I422AP10"
 /-- "I422AP12" -/
-@[match_pattern] abbrev VideoPixelFormat.i422AP12 : VideoPixelFormat := .unsafeOfString "I422AP12"
+@[match_pattern] abbrev VideoPixelFormat.i422ap12 : VideoPixelFormat := .unsafeOfString "I422AP12"
 /-- "I444" -/
 @[match_pattern] abbrev VideoPixelFormat.i444 : VideoPixelFormat := .unsafeOfString "I444"
 /-- "I444P10" -/
@@ -382,19 +382,19 @@ structure VideoPixelFormat where
 /-- "I444A" -/
 @[match_pattern] abbrev VideoPixelFormat.i444A : VideoPixelFormat := .unsafeOfString "I444A"
 /-- "I444AP10" -/
-@[match_pattern] abbrev VideoPixelFormat.i444AP10 : VideoPixelFormat := .unsafeOfString "I444AP10"
+@[match_pattern] abbrev VideoPixelFormat.i444ap10 : VideoPixelFormat := .unsafeOfString "I444AP10"
 /-- "I444AP12" -/
-@[match_pattern] abbrev VideoPixelFormat.i444AP12 : VideoPixelFormat := .unsafeOfString "I444AP12"
+@[match_pattern] abbrev VideoPixelFormat.i444ap12 : VideoPixelFormat := .unsafeOfString "I444AP12"
 /-- "NV12" -/
-@[match_pattern] abbrev VideoPixelFormat.nV12 : VideoPixelFormat := .unsafeOfString "NV12"
+@[match_pattern] abbrev VideoPixelFormat.nv12 : VideoPixelFormat := .unsafeOfString "NV12"
 /-- "RGBA" -/
-@[match_pattern] abbrev VideoPixelFormat.rGBA : VideoPixelFormat := .unsafeOfString "RGBA"
+@[match_pattern] abbrev VideoPixelFormat.rgba : VideoPixelFormat := .unsafeOfString "RGBA"
 /-- "RGBX" -/
-@[match_pattern] abbrev VideoPixelFormat.rGBX : VideoPixelFormat := .unsafeOfString "RGBX"
+@[match_pattern] abbrev VideoPixelFormat.rgbx : VideoPixelFormat := .unsafeOfString "RGBX"
 /-- "BGRA" -/
-@[match_pattern] abbrev VideoPixelFormat.bGRA : VideoPixelFormat := .unsafeOfString "BGRA"
+@[match_pattern] abbrev VideoPixelFormat.bgra : VideoPixelFormat := .unsafeOfString "BGRA"
 /-- "BGRX" -/
-@[match_pattern] abbrev VideoPixelFormat.bGRX : VideoPixelFormat := .unsafeOfString "BGRX"
+@[match_pattern] abbrev VideoPixelFormat.bgrx : VideoPixelFormat := .unsafeOfString "BGRX"
 instance : ToJS VideoPixelFormat := ⟨fun x => .string x.val⟩
 instance : FromJS VideoPixelFormat where
   fromJS

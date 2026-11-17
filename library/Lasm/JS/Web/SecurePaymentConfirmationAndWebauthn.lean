@@ -908,8 +908,8 @@ instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.
 
 /-- `readonly attribute ArrayBuffer? userHandle` -/
 @[macro_inline] def AuthenticatorAssertionResponse.userHandle (self : AuthenticatorAssertionResponse) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.userHandle" do
-  let r ← self.val.get "userHandle" (Option Value)
-  (fun x => x.mapM Internal.arrayBufferBytes) r
+  let r ← self.val.get "userHandle" Data
+  Internal.nullableArrayBufferBytes r
 
 /-- `v instanceof AuthenticatorAttestationResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AuthenticatorAttestationResponse`). -/
 @[macro_inline] def AuthenticatorAttestationResponse.cast? (v : Value) : IO (Option AuthenticatorAttestationResponse) := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.cast?" do
@@ -931,8 +931,8 @@ instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.
 
 /-- `ArrayBuffer? getPublicKey()` -/
 @[macro_inline] def AuthenticatorAttestationResponse.getPublicKey (self : AuthenticatorAttestationResponse) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getPublicKey" do
-  let r ← self.val.callMethod "getPublicKey" (Internal.args #[]) (Option Value)
-  (fun x => x.mapM Internal.arrayBufferBytes) r
+  let r ← self.val.callMethod "getPublicKey" (Internal.args #[]) Data
+  Internal.nullableArrayBufferBytes r
 
 /-- `COSEAlgorithmIdentifier getPublicKeyAlgorithm()` -/
 @[macro_inline] def AuthenticatorAttestationResponse.getPublicKeyAlgorithm (self : AuthenticatorAttestationResponse) : IO Int := Internal.api "Lasm.JS.Web.AuthenticatorAttestationResponse.getPublicKeyAlgorithm" do

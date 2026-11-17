@@ -11,9 +11,6 @@ import Lasm.JS.Node.Support
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
-set_option genInjectivity false
-set_option genSizeOfSpec false
-set_option compiler.extract_closed false
 
 /-- `dictionary path.PathObject` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure path.PathObject where
@@ -27,12 +24,12 @@ structure path.PathObject where
   name : Option String := none
   /-- `DOMString ext` -/
   ext : Option String := none
-instance : ToJS path.PathObject := ⟨fun d => Internal.fields #[("dir", Internal.optional d.dir),
-    ("root", Internal.optional d.root),
-    ("base", Internal.optional d.base),
-    ("name", Internal.optional d.name),
-    ("ext", Internal.optional d.ext)]⟩
-instance : FromJS path.PathObject where
+instance instToJSPathPathObject : ToJS path.PathObject := ⟨fun d => Support.fields #[("dir", Support.optional d.dir),
+    ("root", Support.optional d.root),
+    ("base", Support.optional d.base),
+    ("name", Support.optional d.name),
+    ("ext", Support.optional d.ext)]⟩
+instance instFromJSPathPathObject : FromJS path.PathObject where
   fromJS d := do return {
     dir := ← Lasm.JS.readField (Option String) d "dir",
     root := ← Lasm.JS.readField (Option String) d "root",
@@ -42,71 +39,69 @@ instance : FromJS path.PathObject where
   typeName := "Lasm.JS.Node.path.PathObject"
 
 /-- `path.delimiter` (added in Node.js v0.9.3): `readonly attribute DOMString delimiter` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.delimiter : IO String := Internal.api "Lasm.JS.Node.path.delimiter" do
-  Support.getExport "node:path" ["delimiter"] String
+def path.delimiter : IO String := Support.getExport "node:path" ["delimiter"] String
 
 /-- `path.sep` (added in Node.js v0.7.9): `readonly attribute DOMString sep` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.sep : IO String := Internal.api "Lasm.JS.Node.path.sep" do
-  Support.getExport "node:path" ["sep"] String
+def path.sep : IO String := Support.getExport "node:path" ["sep"] String
 
 /-- `path.basename(path[, suffix])` (added in Node.js v0.1.25): `DOMString basename(DOMString path, optional DOMString suffix)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.basename (path_ : String) (suffix : Option String := none) : IO String := Internal.api "Lasm.JS.Node.path.basename" do
+def path.basename (path_ : String) (suffix : Option String := none) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.basename", module := "node:path", path := "basename", construct := false, arity := 2 }
-    (Internal.args #[toJS path_, Internal.optional suffix]) (await := false)
+    (Support.args #[toJS path_, Support.optional suffix]) (await := false)
 
 /-- `path.dirname(path)` (added in Node.js v0.1.16): `DOMString dirname(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.dirname (path_ : String) : IO String := Internal.api "Lasm.JS.Node.path.dirname" do
+def path.dirname (path_ : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.dirname", module := "node:path", path := "dirname", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 /-- `path.extname(path)` (added in Node.js v0.1.25): `DOMString extname(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.extname (path_ : String) : IO String := Internal.api "Lasm.JS.Node.path.extname" do
+def path.extname (path_ : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.extname", module := "node:path", path := "extname", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 /-- `path.format(pathObject)` (added in Node.js v0.11.15): `DOMString format(path.PathObject pathObject)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.format (pathObject : path.PathObject) : IO String := Internal.api "Lasm.JS.Node.path.format" do
+def path.format (pathObject : path.PathObject) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.format", module := "node:path", path := "format", construct := false, arity := 1 }
-    (Internal.args #[toJS pathObject]) (await := false)
+    (Support.args #[toJS pathObject]) (await := false)
 
 /-- `path.matchesGlob(path, pattern)` (added in Node.js v22.5.0, v20.17.0): `boolean matchesGlob(DOMString path, DOMString pattern)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.matchesGlob (path_ : String) (pattern : String) : IO Bool := Internal.api "Lasm.JS.Node.path.matchesGlob" do
+def path.matchesGlob (path_ : String) (pattern : String) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.path.matchesGlob", module := "node:path", path := "matchesGlob", construct := false, arity := 2 }
-    (Internal.args #[toJS path_, toJS pattern]) (await := false)
+    (Support.args #[toJS path_, toJS pattern]) (await := false)
 
 /-- `path.isAbsolute(path)` (added in Node.js v0.11.2): `boolean isAbsolute(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.isAbsolute (path_ : String) : IO Bool := Internal.api "Lasm.JS.Node.path.isAbsolute" do
+def path.isAbsolute (path_ : String) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.path.isAbsolute", module := "node:path", path := "isAbsolute", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 /-- `path.join([...paths])` (added in Node.js v0.1.16): `DOMString join(DOMString... paths)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.join (paths : Array String := #[]) : IO String := Internal.api "Lasm.JS.Node.path.join" do
+def path.join (paths : Array String := #[]) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.join", module := "node:path", path := "join", construct := false, arity := 1 }
-    (Internal.argsWith #[] (paths.map toJS)) (await := false)
+    (Support.argsWith #[] (paths.map toJS)) (await := false)
 
 /-- `path.normalize(path)` (added in Node.js v0.1.23): `DOMString normalize(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.normalize (path_ : String) : IO String := Internal.api "Lasm.JS.Node.path.normalize" do
+def path.normalize (path_ : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.normalize", module := "node:path", path := "normalize", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 /-- `path.parse(path)` (added in Node.js v0.11.15): `path.PathObject parse(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.parse (path_ : String) : IO path.PathObject := Internal.api "Lasm.JS.Node.path.parse" do
+def path.parse (path_ : String) : IO path.PathObject :=
   Lasm.JS.Binding.invoke path.PathObject { name := "Lasm.JS.Node.path.parse", module := "node:path", path := "parse", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 /-- `path.relative(from, to)` (added in Node.js v0.5.0): `DOMString relative(DOMString from, DOMString to)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.relative («from» : String) (to : String) : IO String := Internal.api "Lasm.JS.Node.path.relative" do
+def path.relative («from» : String) (to : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.relative", module := "node:path", path := "relative", construct := false, arity := 2 }
-    (Internal.args #[toJS «from», toJS to]) (await := false)
+    (Support.args #[toJS «from», toJS to]) (await := false)
 
 /-- `path.resolve([...paths])` (added in Node.js v0.3.4): `DOMString resolve(DOMString... paths)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.resolve (paths : Array String := #[]) : IO String := Internal.api "Lasm.JS.Node.path.resolve" do
+def path.resolve (paths : Array String := #[]) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.resolve", module := "node:path", path := "resolve", construct := false, arity := 1 }
-    (Internal.argsWith #[] (paths.map toJS)) (await := false)
+    (Support.argsWith #[] (paths.map toJS)) (await := false)
 
 /-- `path.toNamespacedPath(path)` (added in Node.js v9.0.0): `DOMString toNamespacedPath(DOMString path)` (Node.js 24.22.2 documentation, path.md) -/
-@[macro_inline] def path.toNamespacedPath (path_ : String) : IO String := Internal.api "Lasm.JS.Node.path.toNamespacedPath" do
+def path.toNamespacedPath (path_ : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.path.toNamespacedPath", module := "node:path", path := "toNamespacedPath", construct := false, arity := 1 }
-    (Internal.args #[toJS path_]) (await := false)
+    (Support.args #[toJS path_]) (await := false)
 
 end Lasm.JS.Node

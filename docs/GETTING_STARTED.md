@@ -248,7 +248,7 @@ on the architecture you deploy to; for amd64-only platforms on an ARM Mac, use
 
 Recipes for each launch platform: [deployment guides](deploy/README.md)
 (Docker and Kubernetes, Google Cloud Run, Fly.io, Railway, Render, Heroku, and
-AWS Lambda as a container image: create the project with `--deploy lambda` to
+AWS Lambda as a container image: create the project with `--deploy lambda-container` to
 get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 
 ## 5. Build for a function platform
@@ -257,13 +257,13 @@ get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 (the default target, `node`, writes only `dist/`):
 
 ```sh
-npx lasm build Main.lean --target lambda       # dist/ and lambda.zip (handler lasm-lambda.handler)
-npx lasm build Main.lean --target vercel       # dist/ and .vercel/output
-npx lasm build Main.lean --target netlify      # dist/ and netlify/functions/lasm
+npx lasm build Main.lean --target lambda       # lambda.zip (handler lasm-lambda.handler)
+npx lasm build Main.lean --target vercel       # .vercel/output
+npx lasm build Main.lean --target netlify      # netlify/functions/lasm
 ```
 
 The other targets are `lambda-edge`, `azure` and `gcf`. `lasm init my-app
---template hono --deploy lambda-zip` (or `vercel`, `netlify`, `lambda-edge`,
+--template hono --deploy lambda` (or `vercel`, `netlify`, `lambda-edge`,
 `azure`, `gcf`) adds the platform files and a `npm run build:<target>` script.
 Lasm builds for the platform; it never installs or starts the platform's own
 tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,

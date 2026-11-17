@@ -109,7 +109,7 @@ the final APIs; no hand-written binding remains where a generated one exists.
   WebSockets, Bun's routes). **Deno is under deliberation, leaning yes**
   (Jordan, 2026-11-16: people use it now, and nobody knows what Cloudflare's
   acquisition will mean); A1–A3, A17, A18, A24, A25.
-- [ ] **0.5 Cloudflare, and the apps off hand-written bindings.**
+- [~] **0.5 Cloudflare, and the apps off hand-written bindings.**
   `Lasm.JS.Cloudflare` from Cloudflare's workers-types (KV, D1, R2, Durable
   Objects, env bindings; held PR #216); Porter and Ledger move off their
   hand-written D1 bindings, and Tandem's WebSocket client moves from
@@ -134,7 +134,8 @@ measured by CI on the [evidence page](content/learn/test-evidence.md).
 time on the evidence page, target equivalence covers Ledger, Porter and
 Tandem, the differential-fuzzing generator covers the remaining features of
 §2's "Next gap", and the performance baselines and their ratchet are in CI
-(1.6). Item 4, the streak of clean nightly campaigns, is
+(1.6), and pull requests run selective tests under the guardrails of 1.7.
+Item 4, the streak of clean nightly campaigns, is
 observed and reported only: it never blocks this stage or anything else
 (Jordan, 2026-11-16).
 
@@ -165,6 +166,22 @@ observed and reported only: it never blocks this stage or anything else
   CI per platform and on the five apps, on the evidence page, with a
   no-regression ratchet that every later stage must hold or record a trade-off
   against.
+- [ ] **1.7 Selective testing on pull requests** (Jordan, 2026-11-16). A pull
+  request runs only the tests its changes can affect (test impact analysis),
+  and mutation testing mutates only the changed modules (Stryker's incremental
+  mode), so a push costs a fraction of today's CI. Done when all of these hold:
+  - **A conservative map, checked in and tested:** each workflow and job
+    declares the paths that affect it; a change to the compiler, the library
+    or prebuilt, the toolchain and runtime pins, CI configuration or the
+    selection map itself runs everything; anything unmapped runs everything.
+  - **A full backstop:** every merge to `main` and every nightly runs the full
+    suite, so anything selection skipped is caught within hours and pinned to
+    its merge.
+  - **Releases never select:** `release-checks` keeps running the complete
+    matrix for the exact release commit.
+  - **Measured:** the evidence page reports CI time per pull request before
+    and after, and how often the backstop catches a failure selection
+    skipped. A catch is treated as a bug in the map and fixed there.
 - **Observed, not required:** the campaign streak (item 4). It broke on
   2026-11-14 with a `fuzz.yml` failure, to be looked into as a bug.
 

@@ -98,27 +98,27 @@ instance : Coe SFrameTransformErrorEvent Event := ⟨SFrameTransformErrorEvent.t
 
 /-- `enum SFrameCipherSuite` (WebRTC Encoded Transform (https://w3c.github.io/webrtc-encoded-transform/)): "AES_128_CTR_HMAC_SHA256_80", "AES_128_CTR_HMAC_SHA256_64", "AES_128_CTR_HMAC_SHA256_32", "AES_128_GCM_SHA256_128", "AES_256_GCM_SHA512_128", "AES_256_CTR_HMAC_SHA512_80", "AES_256_CTR_HMAC_SHA512_64", "AES_256_CTR_HMAC_SHA512_32". -/
 structure SFrameCipherSuite where
-  /-- A value from its string, unchecked: the generated values (`.aES128CTRHMACSHA25680`) are the normal way to make one. -/
+  /-- A value from its string, unchecked: the generated values (`.aes128CtrHmacSha25680`) are the normal way to make one. -/
   unsafeOfString ::
   /-- The string. -/
   val : String
   deriving BEq, Repr, Inhabited
 /-- "AES_128_CTR_HMAC_SHA256_80" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES128CTRHMACSHA25680 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_80"
+@[match_pattern] abbrev SFrameCipherSuite.aes128CtrHmacSha25680 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_80"
 /-- "AES_128_CTR_HMAC_SHA256_64" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES128CTRHMACSHA25664 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_64"
+@[match_pattern] abbrev SFrameCipherSuite.aes128CtrHmacSha25664 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_64"
 /-- "AES_128_CTR_HMAC_SHA256_32" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES128CTRHMACSHA25632 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_32"
+@[match_pattern] abbrev SFrameCipherSuite.aes128CtrHmacSha25632 : SFrameCipherSuite := .unsafeOfString "AES_128_CTR_HMAC_SHA256_32"
 /-- "AES_128_GCM_SHA256_128" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES128GCMSHA256128 : SFrameCipherSuite := .unsafeOfString "AES_128_GCM_SHA256_128"
+@[match_pattern] abbrev SFrameCipherSuite.aes128GcmSha256128 : SFrameCipherSuite := .unsafeOfString "AES_128_GCM_SHA256_128"
 /-- "AES_256_GCM_SHA512_128" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES256GCMSHA512128 : SFrameCipherSuite := .unsafeOfString "AES_256_GCM_SHA512_128"
+@[match_pattern] abbrev SFrameCipherSuite.aes256GcmSha512128 : SFrameCipherSuite := .unsafeOfString "AES_256_GCM_SHA512_128"
 /-- "AES_256_CTR_HMAC_SHA512_80" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES256CTRHMACSHA51280 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_80"
+@[match_pattern] abbrev SFrameCipherSuite.aes256CtrHmacSha51280 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_80"
 /-- "AES_256_CTR_HMAC_SHA512_64" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES256CTRHMACSHA51264 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_64"
+@[match_pattern] abbrev SFrameCipherSuite.aes256CtrHmacSha51264 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_64"
 /-- "AES_256_CTR_HMAC_SHA512_32" -/
-@[match_pattern] abbrev SFrameCipherSuite.aES256CTRHMACSHA51232 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_32"
+@[match_pattern] abbrev SFrameCipherSuite.aes256CtrHmacSha51232 : SFrameCipherSuite := .unsafeOfString "AES_256_CTR_HMAC_SHA512_32"
 instance : ToJS SFrameCipherSuite := ⟨fun x => .string x.val⟩
 instance : FromJS SFrameCipherSuite where
   fromJS

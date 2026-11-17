@@ -126,8 +126,8 @@ instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersio
 
 /-- `readonly attribute ArrayBuffer? initData` -/
 @[macro_inline] def MediaEncryptedEvent.initData (self : MediaEncryptedEvent) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.initData" do
-  let r ← self.val.get "initData" (Option Value)
-  (fun x => x.mapM Internal.arrayBufferBytes) r
+  let r ← self.val.get "initData" Data
+  Internal.nullableArrayBufferBytes r
 
 /-- `v instanceof MediaKeyMessageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaKeyMessageEvent`). -/
 @[macro_inline] def MediaKeyMessageEvent.cast? (v : Value) : IO (Option MediaKeyMessageEvent) := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.cast?" do

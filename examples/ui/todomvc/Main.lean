@@ -1,11 +1,13 @@
 /-
 TodoMVC (https://todomvc.com) in Lean with Lasm.UI. The state and update are
 in Todo.lean, with proofs that every reachable model is valid; this file is the
-view, storage and routing. Build: lasm build Main.lean --target browser.
+view, the interpreter of its effects, and routing. Build: lasm build Main.lean --target browser.
 -/
 import Lean.Data.Json.Parser
 import Lean.Data.Json.Printer
 import Lasm.UI
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Html
 import Todo
 open Lasm.UI Todo
 
@@ -23,6 +25,21 @@ def fromJson (s : String) : List Item :=
       let completed ← (j.getObjValAs? Bool "completed").toOption
       return { id, title, completed }
   | _ => []
+
+/-! Effects: Todo.Effect performed with the browser's own APIs. -/
+
+/-- Focuses the element with this `id` once the frame that may add it is on screen. -/
+def focus (id : String) : Cmd Msg := Cmd.ofEffect (.task fun _ => do
+  afterFrame
+  if let some el ← (← Lasm.JS.Web.document).getElementById id then
+    ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus)
+
+def perform : Todo.Effect → Cmd Msg
+  | .save key json => Cmd.ofEffect (.task fun _ => do (← Lasm.JS.Web.localStorage).setItem key json)
+
+/-- The saved todos, read once at start. -/
+def load : Cmd Msg := Cmd.task do
+  return .loaded (fromJson (((← (← Lasm.JS.Web.localStorage).getItem storageKey)).getD "[]"))
 
 /-! Routing: `#/`, `#/active`, `#/completed`. -/
 
@@ -92,12 +109,12 @@ def view (m : Model) : Html Msg :=
 /-! The app -/
 
 def app : App Unit Model Msg where
-  init _ url := ({ filter := filterOf url },
-    Cmd.batch [Cmd.storageGet storageKey fun s => .loaded (fromJson (s.getD "[]")), Cmd.focus "new-todo"])
+  init _ url := ({ filter := filterOf url }, Cmd.batch [load, focus "new-todo"])
   update msg m :=
-    let (m', cmd) := Todo.update toJson msg m
+    let (m', effects) := Todo.update toJson msg m
+    let cmd := Cmd.batch (effects.map perform)
     match msg with
-    | .startEdit id => (m', cmd ++ Cmd.focus (editId id))
+    | .startEdit id => (m', cmd ++ focus (editId id))
     | _ => (m', cmd)
   view := view
   onUrlChange := some fun u => .setFilter (filterOf u)

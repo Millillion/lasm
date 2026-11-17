@@ -603,24 +603,34 @@ private def registerReply (f : Array Data → Async Function.Reply) : IO UInt32 
     let id := r.next
     (id, { r with asyncFns := r.asyncFns.insert id f, next := id + 1 })
 
+/-- Op 210's argument: the kind (1 asynchronous, 2 synchronous) in the low
+byte, the JavaScript function's `length` above it. -/
+private def kindAndLength (kind : UInt64) (length : Nat) : UInt64 := kind + length.toUInt64 * 256
+
 /-- A JavaScript function that calls `f` and returns a promise of its result.
 Each call runs as a Lean task; while `f` awaits JavaScript (`callMethodAwait`,
 `Value.await`, an `Async` binding) it holds no Lean thread, so any number of
 calls can wait at once. `IO` actions run inside `f` unchanged. A Lean error
-rejects the promise with an `Error`. -/
-def ofFn (f : Array Data → Async Data) : IO Value := do
+rejects the promise with an `Error`.
+
+`length` is the function's `length` in JavaScript, the number of parameters
+it declares. Some callers read it: `Deno.serve` passes a handler of length 0
+no request, and Express treats a handler of length 4 as an error handler.
+`ofFn1` and `ofFn2` set 1 and 2. -/
+def ofFn (f : Array Data → Async Data) (length : Nat := 0) : IO Value := do
   ensureStarted
   let id ← registerReply fun args => Function.Reply.value <$> f args
-  decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id 1 .empty))
+  decodeAs Value "Function.ofFn" (← Wire.decode (← hostCall 210 id (kindAndLength 1 length) .empty))
 
 /-- `ofFn` whose result may be a method call made by the host as part of the
 reply (`Function.Reply.callMethod res "json" #[body]`), one host round trip fewer than
 calling the method and then returning. The JavaScript promise resolves with the
-method's result (awaited if it is a promise); if the method throws, it rejects. -/
-def ofFnReply (f : Array Data → Async Function.Reply) : IO Value := do
+method's result (awaited if it is a promise); if the method throws, it rejects.
+`length` as for `ofFn`. -/
+def ofFnReply (f : Array Data → Async Function.Reply) (length : Nat := 0) : IO Value := do
   ensureStarted
   let id ← registerReply f
-  decodeAs Value "Function.ofFnReply" (← Wire.decode (← hostCall 210 id 1 .empty))
+  decodeAs Value "Function.ofFnReply" (← Wire.decode (← hostCall 210 id (kindAndLength 1 length) .empty))
 
 /-- A JavaScript function that calls `f` synchronously and returns its result.
 Node's main thread waits while `f` runs (about 20 µs per call plus `f`), so the
@@ -632,27 +642,40 @@ JavaScript promise, Lean file IO, a Lean task that makes host calls (including
 `Async` run with `.block`), or a timer, DNS lookup or socket read started in `f`.
 A promise wait (`Value.await`, the `…Await` forms) fails as an error `f` can
 catch; a failed wait for a Lean task ends `f` itself. `f` cannot call another
-synchronous callback (docs/JS_BINDINGS.md). -/
-def ofSyncFn (f : Array Data → IO Data) : IO Value := do
+synchronous callback (docs/JS_BINDINGS.md). `length` as for `ofFn`. -/
+def ofSyncFn (f : Array Data → IO Data) (length : Nat := 0) : IO Value := do
   ensureStarted
   startSync syncDispatch
   let id ← register true f
-  decodeAs Value "Function.ofSyncFn" (← Wire.decode (← hostCall 210 id 2 .empty))
+  decodeAs Value "Function.ofSyncFn" (← Wire.decode (← hostCall 210 id (kindAndLength 2 length) .empty))
 
 private def argument (α : Type) [FromJS α] (args : Array Data) (i : Nat) : IO α :=
   decodeAs α s!"callback argument {i + 1}" (args[i]?.getD .undefined)
 
-/-- `ofFn` for a one-argument function with typed conversions. -/
+/-- `ofFn` for a one-argument function with typed conversions; its `length` is 1. -/
 def ofFn1 [FromJS α] [ToJS β] (f : α → Async β) : IO Value :=
-  ofFn fun args => do return toJS (← f (← argument α args 0))
-/-- `ofFn` for a two-argument function with typed conversions. -/
+  ofFn (length := 1) fun args => do return toJS (← f (← argument α args 0))
+/-- `ofFn` for a two-argument function with typed conversions; its `length` is 2. -/
 def ofFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → Async γ) : IO Value :=
-  ofFn fun args => do return toJS (← f (← argument α args 0) (← argument β args 1))
-/-- `ofSyncFn` for a two-argument function with typed conversions. -/
+  ofFn (length := 2) fun args => do return toJS (← f (← argument α args 0) (← argument β args 1))
+/-- `ofSyncFn` for a two-argument function with typed conversions; its `length` is 2. -/
 def ofSyncFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO Value :=
-  ofSyncFn fun args => do return toJS (← f (← argument α args 0) (← argument β args 1))
+  ofSyncFn (length := 2) fun args => do return toJS (← f (← argument α args 0) (← argument β args 1))
 
 end Function
+
+namespace Async
+
+/-- A JavaScript promise of `act`'s result, for APIs that take a promise of work still
+running: Workers' `ctx.waitUntil (← Async.toPromise (kv.put "k" v))`. `act` starts at
+once as a Lean task (as a call of a `Function.ofFn` function does) and holds no Lean
+thread while it awaits; the promise resolves with `toJS` of its result, or rejects
+with an `Error` if it throws. -/
+def toPromise [ToJS α] (act : Async α) : IO Value := do
+  let f ← Function.ofFn fun _ => do return toJS (← act)
+  f.call #[]
+
+end Async
 
 /-! Typed bindings: `@[js "module" "export"] opaque f : A → B → Async C` (macro in
 Lasm.JS.Meta) defines `f` with `Bindable.bind`; the glue comes from the type. -/
@@ -719,13 +742,6 @@ def onEdge : IO Bool := do
   let reply ← hostCall 200 0 0 .empty
   return reply.size ≥ 8 && reply.get! 4 == 1
 
-/-- Publishes `v` as the program's default export. In an edge build
-(`lasm build --target workers`) the Worker's requests go to it: a Hono app (or
-any object with a `fetch` method), or a function `(request, env, ctx) => Response`.
-On Node it only records the value (`globalThis.__lasmDefaultExport`). -/
-def exportDefault (v : Value) : IO Unit := do
-  (← global).set "__lasmDefaultExport" v
-
 /-- Blocks the calling thread forever, for servers whose work happens in
 JavaScript callbacks (stop them with `IO.Process.exit` from a callback, or a signal).
 In an edge build it returns at once: the platform owns the isolate's lifetime,
@@ -741,6 +757,49 @@ def waitForever : IO Unit := do
   let r ← IO.mkRef (some p)
   discard <| IO.wait p.result?
   discard <| r.get
+
+/-- What `exportDefault` publishes: any value with `ToJS` as JavaScript sees it
+(a `Value` such as a Hono app, or a structure of handlers such as
+`Lasm.JS.Cloudflare.ExportedHandler`), or a Lean function `α → Async β` (a
+fetch handler `Request → Async Response`) as a JavaScript function made with
+`Function.ofFn1`. -/
+class DefaultExport (α : Type) where
+  /-- The JavaScript value published for `x`. -/
+  toDefaultExport : α → IO Data
+
+instance (priority := low) [ToJS α] : DefaultExport α := ⟨fun x => pure (toJS x)⟩
+instance [FromJS α] [ToJS β] : DefaultExport (α → Async β) := ⟨fun f => do return toJS (← Function.ofFn1 f)⟩
+
+/-- Publishes `x` as the program's default export, as `export default` would in
+a JavaScript module: a fetch handler `Request → Async Response` (Lasm.JS.Web's
+types, `exportDefault handle`), or any value with `ToJS`: an object with a
+`fetch` method such as a Hono app, a function `(request, env, ctx) => Response`,
+or a structure of handlers. On Workers, the object's `scheduled` and `queue`
+methods also receive the cron triggers and queue batches
+(`Lasm.JS.Cloudflare.ExportedHandler` is such an object).
+
+- Edge builds (`lasm build --target workers`, Bun, Deno and the other edge
+  targets): the platform's requests go to it, after `main` returns.
+- Function platforms on Node (`lasm package` / `lasm build --target netlify`,
+  `vercel`, `lambda`, `lambda-edge`, `azure`, `gcf`): the platform's handler calls
+  it directly (no HTTP server, no port). `exportDefault` then does not return:
+  the Lean runtime ends with `main`, so `main` stays here and serves the calls.
+- Elsewhere on Node (`lasm run`, `node dist/main.mjs`) it only records the value
+  (`globalThis.__lasmDefaultExport`) and returns; to serve HTTP on Node, use
+  `Lasm.JS.Node.serve` (`import Lasm.JS.Node.Serve`). -/
+def exportDefault [DefaultExport α] (x : α) : IO Unit := do
+  let v ← DefaultExport.toDefaultExport x
+  let g ← global
+  g.set "__lasmDefaultExport" v
+  if ← onEdge then return
+  -- The function platforms' entry (src/serverless/lasm-function.mjs) sets
+  -- `globalThis.__lasmFunctionHost`, a function that receives the handler, and
+  -- takes requests once it has it.
+  match ← g.get "__lasmFunctionHost" Data with
+  | .ref publish _ =>
+    let _ : Data ← publish.call #[v] Data
+    waitForever
+  | _ => pure ()
 
 /-- Host statistics (handles held, pending callbacks, …), for tests. -/
 def stats : IO String := do return String.fromUTF8! (← hostCall 213 0 0 .empty)

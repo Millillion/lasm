@@ -121,6 +121,14 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.equal(link.sharedCache, join(cache, 'objects'));
   assert.equal(link.analysisCache, join(cache, 'analysis'));
   assert.equal(link.initializationSeed, join(work, 'initialization-seed.json'));
+  // The tools get the cache, the log and the progress; a Lean without tiers adds no tier to the identity.
+  const [, toolOptions] = named('provisionLinkToolchain')[0];
+  assert.equal(toolOptions.cache, cache);
+  assert.equal(typeof toolOptions.log, 'function');
+  assert.equal(typeof toolOptions.progress, 'function');
+  assert.equal('nativeLeanTier' in result, false);
+  // The cached output itself is a valid --output.
+  assert.equal((await run({ output: result.cached })).output, result.cached);
   assert.equal(link.dist, join(link.work, 'dist'));
   assert.match(relative(work, link.work), /^\.build-[0-9a-f-]{36}$/);
   assert.deepEqual(link.nativeCompilations, []);
@@ -268,6 +276,54 @@ test('a failed link removes its staging, keeps the delivered build and reports a
   assert.ok(named('linkApplication').length >= 1);
 });
 
+test('Lasm.JS programs with project files: shipped under host/project-modules, part of the identity, checked from their paths; one the scan missed fails', async t => {
+  const { directory, source, run } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  put(join(directory, 'ffi/x.mjs'), "import { y } from './y.mjs';\nexport const f = () => y;\n");
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 1;\n');
+  const binding = { name: 'Main.f', module: './ffi/x.mjs', path: 'f', arity: 0, relative: './ffi/x.mjs', file: 'Main.lean' };
+  const checks = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = async () => [binding];
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async (...args) => { checks.push(args); return args[1]; };
+  // The source does not declare it (a binding the scan could not see): an internal error, before anything ships.
+  await assert.rejects(run(), { message: 'A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]' });
+  writeFileSync(source, '@[js "./ffi/x.mjs" "f"] opaque f : IO Nat\ndef main : IO Unit := pure ()');
+  const result = await run();
+  assert.deepEqual(result.projectModules.map(f => f.name), ['ffi/x.mjs', 'ffi/y.mjs']);
+  assert.equal(readFileSync(join(result.cached, 'host/project-modules/ffi/y.mjs'), 'utf8'), 'export const y = 1;\n');
+  const [, checked, options] = checks.at(-1);
+  assert.equal(checked[0].projectFile, join(directory, 'ffi/x.mjs'));
+  assert.equal(checked[0].file, join(directory, 'Main.lean'));
+  assert.equal(options.identity, `none ${result.projectModules.map(f => f.sha256).join(',')}`);
+  // Editing a project file changes the build's identity.
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 2;\n');
+  assert.notEqual((await run()).signature, result.signature);
+});
+
+test('Lasm.JS programs without project files link while their bindings are read; the target decides about missing globals; no progress callback is needed', async t => {
+  const { run, named } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  // The read finishes only once linking has started (or after a second, which would mean the build waited).
+  const order = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = () => new Promise(resolve => {
+    const done = why => { order.push(why); resolve([{ name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1 }]); };
+    stubs.readStarted = done;
+    setTimeout(() => done('timer'), 1000).unref();
+  });
+  const link = stubs['application-link.mjs:linkApplication'];
+  stubs['application-link.mjs:linkApplication'] = async options => { stubs.readStarted?.('link'); return link(options); };
+  const missing = { name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1, error: 'globalThis export "Deno.serve" is missing', missingGlobal: true };
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async () => [missing];
+  await assert.rejects(run(), { code: 'ERR_LASM_JS_BINDING' });
+  assert.equal(order[0], 'link');
+  const result = await run({ bindingTarget: 'deno' });
+  assert.ok(named('log').some(call => call[1] === 'Lasm.JS binding warning: G: globalThis export "Deno.serve" is missing where Lasm checks bindings; it must exist on deno'));
+  // Reused from the cache, with no progress callback either.
+  assert.equal((await run({ bindingTarget: 'deno' })).signature, result.signature);
+});
+
 test('Lasm.JS programs: the library is linked and the bindings are checked against the deployed packages', async t => {
   const { directory, root, run, named, lean } = setup(t);
   put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));
@@ -406,9 +462,14 @@ test('a maintainer link driver uses the full SDK and records its identity', asyn
   const { run, named } = setup(t);
   const { sdkCatalog } = await import(new URL('../src/managed-sdk.mjs', import.meta.url).href);
   stubs['application-link.mjs:selectedLinkDriver'] = () => 'emcc';
-  stubs['managed-sdk.mjs:provisionSdk'] = async () => ({ identity: 'sdk-identity', driverIdentity: 'driver-identity' });
+  let sdkOptions;
+  stubs['managed-sdk.mjs:provisionSdk'] = async options => { sdkOptions = options; return { identity: 'sdk-identity', driverIdentity: 'driver-identity' }; };
   stubs['application-runtime.mjs:applicationRuntime'] = async (lean, options) => ({ directory: options.directory, identity: 'rt', manifest: { name: 'rt', emscripten: sdkCatalog.version } });
-  const result = await run();
+  const progress = () => {};
+  const result = await run({ progress });
+  assert.equal(typeof sdkOptions.cache, 'string');
+  assert.equal(typeof sdkOptions.log, 'function');
+  assert.equal(sdkOptions.progress, progress);
   assert.equal(result.linkDriver, 'emcc');
   assert.equal(result.emscripten, sdkCatalog.version);
   assert.equal(result.sdkCatalogIdentity, sha(JSON.stringify(sdkCatalog)));
@@ -491,7 +552,7 @@ test('a Lake project that requires Lasm\'s package: Lake builds the library modu
   const { directory, root, run, named } = setup(t, { project: true });
   stubs['lake-library.mjs:ensureLakeLibrary'] = (...args) => { stubs.lakeArgs = args; return { required: true, directory: join(root, 'lake-package') }; };
   stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS_Web_IndexedDB(builtin); }\n';
-  stubs.generated = { inputs: [{ module: 'Main', source: join(directory, 'Main.lean') }, { module: '+Lasm.JS.Web.IndexedDB', source: '/library/Lasm/JS/Web/IndexedDB.lean' }] };
+  stubs.generated = { inputs: [{ module: 'Main', source: join(directory, 'Main.lean') }, { module: '+Lasm.JS.Web.IndexedDB', source: put(join(root, 'library/Lasm/JS/Web/IndexedDB.lean'), 'import Lasm.JS.Web.Types.IndexedDB\n') }] };
   stubs['lasm-library.mjs:librarySources'] = (...args) => { stubs.librarySourcesArgs = args; return { sources: [], inputs: [], modules: [], oleans: [] }; };
   stubs['lasm-library.mjs:importsLibrary'] = () => true;
   await run();

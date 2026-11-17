@@ -6,6 +6,10 @@ defaultTargets = ["app"]
 [[lean_lib]]
 name = "App"
 
+# The Hono app (Routes.lean), shared by Main.lean (Node) and Export.lean.
+[[lean_lib]]
+name = "Routes"
+
 # The program: Main.lean. Lasm builds it with `lasm build Main.lean`.
 [[lean_exe]]
 name = "app"
