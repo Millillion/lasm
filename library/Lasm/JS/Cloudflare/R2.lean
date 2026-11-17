@@ -159,6 +159,25 @@ instance : ToJS R2GetOptions := ⟨fun d => Internal.fields #[("onlyIf", Interna
     ("range", Internal.optional d.range),
     ("ssecKey", Internal.optional d.ssecKey)]⟩
 
+/-- `dictionary R2BucketGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketGetOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2RangeOrHeaders range` -/
+  range : Option R2RangeOrHeaders := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketGetOptions := ⟨fun d => Internal.fields #[("onlyIf", toJS d.onlyIf),
+    ("range", Internal.optional d.range),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
+
+/-- `typedef R2ObjectBody or R2Object R2ObjectBodyOrR2Object`: one constructor per member type. -/
+inductive R2ObjectBodyOrR2Object where
+  /-- `R2ObjectBody` -/
+  | r2ObjectBody (value : R2ObjectBody)
+  /-- `R2Object` -/
+  | r2Object (value : R2Object)
+
 /-- `typedef ReadableStream or DOMString or Blob or BufferSource ReadableStreamOrDOMStringOrBlobOrBufferSource`: one constructor per member type. -/
 inductive ReadableStreamOrDOMStringOrBlobOrBufferSource where
   /-- `ReadableStream` -/
@@ -266,6 +285,39 @@ instance : ToJS R2PutOptions := ⟨fun d => Internal.fields #[("onlyIf", Interna
     ("storageClass", Internal.optional d.storageClass),
     ("ssecKey", Internal.optional d.ssecKey)]⟩
 
+/-- `dictionary R2BucketPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketPutOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2HTTPMetadataOrHeaders httpMetadata` -/
+  httpMetadata : Option R2HTTPMetadataOrHeaders := none
+  /-- `record<DOMString, DOMString> customMetadata` -/
+  customMetadata : Option (Record String) := none
+  /-- `DOMStringOrBufferSource md5` -/
+  md5 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha1` -/
+  sha1 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha256` -/
+  sha256 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha384` -/
+  sha384 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha512` -/
+  sha512 : Option DOMStringOrBufferSource := none
+  /-- `DOMString storageClass` -/
+  storageClass : Option String := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketPutOptions := ⟨fun d => Internal.fields #[("onlyIf", toJS d.onlyIf),
+    ("httpMetadata", Internal.optional d.httpMetadata),
+    ("customMetadata", Internal.optional d.customMetadata),
+    ("md5", Internal.optional d.md5),
+    ("sha1", Internal.optional d.sha1),
+    ("sha256", Internal.optional d.sha256),
+    ("sha384", Internal.optional d.sha384),
+    ("sha512", Internal.optional d.sha512),
+    ("storageClass", Internal.optional d.storageClass),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
+
 /-- `dictionary R2MultipartOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2MultipartOptions where
   /-- `R2HTTPMetadataOrHeaders httpMetadata` -/
@@ -292,6 +344,12 @@ instance : ToJS DOMStringOrSequenceOfDOMString := ⟨fun
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfDOMString := ⟨.domString⟩
 instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
+instance : FromJS DOMStringOrSequenceOfDOMString where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array String)).map .sequence
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrSequenceOfDOMString"
 
 /-- `dictionary R2ListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2ListOptions where
@@ -381,10 +439,19 @@ instance : FromJS R2UploadedPart where
 @[macro_inline] def R2Bucket.get (self : R2Bucket) (key : String) (options : Option R2GetOptions := none) : Async (Option R2ObjectBody) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.get" do
   self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) (Option R2ObjectBody)
 
+/-- `get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>`: `Promise<R2ObjectBodyOrR2Object?> get(DOMString key, R2BucketGetOptions options)` -/
+@[macro_inline] def R2Bucket.getWithOnlyIf (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.getWithOnlyIf" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS options]) Data
+  Internal.optionalValue r
+
 /-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>`: `Promise<R2Object> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2PutOptions options)` -/
 @[macro_inline] def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2PutOptions := none) : Async R2Object := Internal.api "Lasm.JS.Cloudflare.R2Bucket.put" do
   let r ← self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) Value
   pure { val := r }
+
+/-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>`: `Promise<R2Object?> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2BucketPutOptions options)` -/
+@[macro_inline] def R2Bucket.putWithOnlyIf (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.putWithOnlyIf" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) (Option R2Object)
 
 /-- `createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>`: `Promise<R2MultipartUpload> createMultipartUpload(DOMString key, optional R2MultipartOptions options)` -/
 @[macro_inline] def R2Bucket.createMultipartUpload (self : R2Bucket) (key : String) (options : Option R2MultipartOptions := none) : Async R2MultipartUpload := Internal.api "Lasm.JS.Cloudflare.R2Bucket.createMultipartUpload" do

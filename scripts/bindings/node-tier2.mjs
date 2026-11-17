@@ -1,157 +1,198 @@
-// Tier 2 of the standard bindings, first part: Lasm.JS.Node, the server-essential
-// Node.js modules that Lasm.JS.Web (tier 1) does not cover. The source is Node's
-// own API documentation in its machine-readable form (doc/api/<module>.json, as
-// published at https://nodejs.org/dist/v<version>/docs/api/; MIT, the Node.js
-// license), pinned below with SHA-256 hashes in node-api.lock.json.
-// scripts/bindings/node-api.mjs lowers the members selected here to WebIDL
-// (scripts/bindings/node.idl), which scripts/bindings/generate-web.mjs turns into
-// library/Lasm/JS/Node/*.lean with the same mapping rules as Lasm.JS.Web
-// (docs/JS_BINDINGS.md, "Lasm.JS.Node"). DECISIONS.md says why these docs and not
-// @types/node.
+// Lasm.JS.Node: every Node.js core module, generated from Node's own API
+// documentation in its machine-readable form (doc/api/<module>.json, as published
+// at https://nodejs.org/dist/v<version>/docs/api/; MIT, the Node.js license),
+// pinned below with SHA-256 hashes in node-api.lock.json, as it is (Jordan,
+// 2026-11-16). scripts/bindings/node-api.mjs lowers each documentation file listed
+// in `modules` to WebIDL (scripts/bindings/node.idl), finding its classes and
+// namespaces itself, and scripts/bindings/generate-web.mjs turns that into
+// library/Lasm/JS/Node/*.lean with the mapping rules of Lasm.JS.Web
+// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; docs/api/decisions/0.4.md A17, 0.4-33 to 0.4-38).
 //
-// Selection. Each `containers` entry names a section of a module's docs by its
-// heading (`Promises API`, `Class: \`FileHandle\``) and takes every member of it
-// whose stability is 2 (Stable), minus `exclude` (each with the reason), or only
-// the members in `only`. Members marked Experimental (1), Deprecated (0) or Legacy
-// (3) are never taken. A member's types are the docs' own (`{string|Buffer|URL}`);
-// where the docs give a result only in prose (`Fulfills with the contents of the
-// file.`), `prose` states it in WebIDL and quotes the sentence it encodes: the
-// lowering fails if that sentence is no longer in the member's documentation.
+// This file holds only what the docs do not say in their structure: the JavaScript
+// module of a name (`jsModules`), what a class's heading or prose says about it
+// (`classes`), objects described without a `Class:` heading (`instances`), Node
+// classes that share a web standard's name (`notWeb`), the docs' type names
+// (`typeNames`), types stated in prose with the sentence quoted (`prose`,
+// `proseIdl`, `eventProse`: the lowering fails if the sentence is gone),
+// corrections of the docs against Node, and the members that cannot work from Wasm
+// (`exclude`, each with its reason). Every member is generated whatever its
+// stability; node-coverage.json lists everything not taken exactly as documented.
 
 /** The Node.js version whose docs the bindings reflect (the oldest supported Node,
  * Node 24 LTS), and the newer LTS the lowering compares it with (node-api-26.json). */
 export const version = '24.22.2';
 export const compareVersion = '26.13.0';
 
-/** The doc/api files read. */
-export const docs = ['fs', 'path', 'os', 'process', 'buffer', 'crypto', 'child_process', 'events', 'stream', 'net', 'http', 'https'];
-
 /**
- * Lean modules (Lasm.JS.Node.<name>), in import order. A container is
- *   { doc, heading, kind: 'namespace' | 'class', name (the IDL/Lean name: `fsPromises`,
- *     `fs.Stats`), jsModule (the `node:` module it is loaded from), path (the export,
- *     for classes), prefix (how the docs name members: `fsPromises.`, `filehandle.`),
- *     extends, statics: { heading, prefix } (static methods documented elsewhere),
- *     only | exclude }.
+ * Lean modules (Lasm.JS.Node.<name>), one per documentation file, each the whole
+ * of what that file documents (Jordan, 2026-11-16: the source as it is). node-api.mjs
+ * finds the containers itself: every `Class:` section is a class, and every
+ * documented member owned by a module-level name (`fs.readFile`, `fsPromises.open`,
+ * `dnsPromises.lookup`) belongs to that name's namespace. Classes that are web
+ * standards (`URL`, `EventTarget`, `Blob`, `MessagePort`, …: interfaces of the
+ * pinned @webref/idl) are Lasm.JS.Web's and are not generated again. The order
+ * here is only the starting order: node-api.mjs orders the modules so that each
+ * comes after the modules whose types it uses (node-modules.json).
  */
 export const modules = [
-  { name: 'Events', title: 'event emitters', doc: 'events', containers: [
-    { kind: 'namespace', heading: 'Events', name: 'events', jsModule: 'node:events', prefix: 'events.', only: ['once'] },
-    { kind: 'class', heading: 'Class: `EventEmitter`', name: 'EventEmitter', jsModule: 'node:events', path: 'EventEmitter', prefix: 'emitter.',
-      only: ['emit', 'eventNames', 'listenerCount', 'off', 'on', 'once', 'removeAllListeners'] },
-  ] },
-  { name: 'Stream', title: 'Node streams, as handles converted to and from web streams', doc: 'stream', containers: [
-    // The stream classes' events (`'data'`, `'end'`) are the docs' `Class: stream.Readable`'s; every stream is an
-    // EventEmitter ("All streams are instances of EventEmitter", stream.md: extendsQuote).
-    { kind: 'class', heading: 'Class: `stream.Readable`', name: 'stream.Readable', jsModule: 'node:stream', path: 'Readable', prefix: 'readable.',
-      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
-      statics: { heading: 'Stream', prefix: 'stream.Readable.' }, only: ['toWeb', 'fromWeb', 'pause', 'resume', 'isPaused', 'destroy', 'setEncoding'] },
-    { kind: 'class', heading: 'Class: `stream.Writable`', name: 'stream.Writable', jsModule: 'node:stream', path: 'Writable', prefix: 'writable.',
-      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
-      statics: { heading: 'Stream', prefix: 'stream.Writable.' }, only: ['toWeb', 'fromWeb', 'write', 'end', 'destroy'] },
-    // A Duplex is both; a Lean structure has one parent, its Readable side (stream.Readable.toWeb takes it).
-    { kind: 'class', heading: 'Class: `stream.Duplex`', name: 'stream.Duplex', jsModule: 'node:stream', path: 'Duplex', prefix: 'duplex.',
-      extends: 'stream.Readable', extendsQuote: { doc: 'stream', quote: 'Duplex streams are streams that implement both the Readable and Writable interfaces.' },
-      statics: { heading: 'Stream', prefix: 'stream.Duplex.' }, only: ['toWeb', 'fromWeb'] },
-  ] },
-  { name: 'Buffer', title: 'character encodings of bytes', doc: 'buffer', containers: [
-    // A Buffer is a ByteArray in Lean (a copy, as every Uint8Array): the static
-    // methods that make or measure bytes, and the instance methods as functions of
-    // the bytes (`Buffer.toString bytes (some "hex")`; the docs: "All methods on the
-    // Buffer prototype are callable with a Uint8Array instance").
-    { kind: 'bytes', heading: 'Class: `Buffer`', name: 'Buffer', jsModule: 'node:buffer', path: 'Buffer', prefix: 'buf.',
-      only: ['alloc', 'byteLength', 'compare', 'concat', 'from(string[, encoding])', 'isEncoding', 'toString', 'equals'] },
-    { kind: 'namespace', heading: '`node:buffer` module APIs', name: 'buffer', jsModule: 'node:buffer', prefix: 'buffer.',
-      exclude: { atob: 'Legacy (Lasm.JS.Web has atob)', btoa: 'Legacy (Lasm.JS.Web has btoa)',
-        resolveObjectURL: 'returns a Blob registered by URL.createObjectURL; the File API binding is Lasm.JS.Web.File',
-        INSPECT_MAX_BYTES: 'a setting of util.inspect (settable), not a property of bytes' } },
-  ] },
-  { name: 'Path', title: 'file paths', doc: 'path', containers: [
-    { kind: 'namespace', heading: 'Path', name: 'path', jsModule: 'node:path', prefix: 'path.',
-      exclude: { posix: 'the same functions with POSIX rules on every platform: deferred (a second namespace of the same members)',
-        win32: 'the same functions with Windows rules on every platform: deferred (a second namespace of the same members)' } },
-  ] },
-  { name: 'Os', title: 'the operating system', doc: 'os', containers: [
-    { kind: 'namespace', heading: 'OS', name: 'os', jsModule: 'node:os', prefix: 'os.', exclude: {} },
-  ] },
-  { name: 'Process', title: 'the current process', doc: 'process', containers: [
-    { kind: 'namespace', heading: 'Process', name: 'process', jsModule: 'node:process', prefix: 'process.',
-      only: ['arch', 'argv', 'chdir', 'cwd', 'env', 'execArgv', 'execPath', 'exit', 'exitCode', 'kill', 'memoryUsage', 'pid', 'platform',
-        'ppid', 'title', 'uptime', 'version', 'versions'] },
-  ] },
-  { name: 'Fs', title: 'the file system (promises API)', doc: 'fs', containers: [
-    { kind: 'class', heading: 'Class: `fs.Stats`', name: 'fs.Stats', jsModule: 'node:fs', path: 'Stats', prefix: 'stats.', exclude: {} },
-    { kind: 'class', heading: 'Class: `fs.Dirent`', name: 'fs.Dirent', jsModule: 'node:fs', path: 'Dirent', prefix: 'dirent.', exclude: {} },
-    { kind: 'class', heading: 'Class: `FileHandle`', name: 'FileHandle', jsModule: 'node:fs/promises', path: null, prefix: 'filehandle.',
-      exclude: { createReadStream: 'returns an fs.ReadStream (a Node stream class outside this cut); readableWebStream gives a web ReadableStream',
-        createWriteStream: 'returns an fs.WriteStream (a Node stream class outside this cut)',
-        readLines: 'returns a readline.Interface (outside this cut)',
-        readv: 'reads into the caller\'s buffers in place; Lean bytes are copies (use read)',
-        writev: 'writes an array of buffers; use write' } },
-    { kind: 'namespace', heading: 'Promises API', name: 'fsPromises', jsModule: 'node:fs/promises', prefix: 'fsPromises.',
-      exclude: { glob: 'returns an AsyncIterator: async iteration is not mapped (as in Lasm.JS.Web)',
-        watch: 'returns an AsyncIterator: async iteration is not mapped (as in Lasm.JS.Web)',
-        opendir: 'returns an fs.Dir, iterated asynchronously: async iteration is not mapped (readdir lists a directory)',
-        statfs: 'returns an fs.StatFs (outside this cut)',
-        mkdtempDisposable: 'returns an async-disposable object (explicit resource management, await using); use mkdtemp and rm' } },
-  ] },
-  { name: 'Crypto', title: 'hashes, HMACs, random values and key derivation', doc: 'crypto', containers: [
-    { kind: 'class', heading: 'Class: `Hash`', name: 'Hash', jsModule: 'node:crypto', path: 'Hash', prefix: 'hash.', exclude: {} },
-    { kind: 'class', heading: 'Class: `Hmac`', name: 'Hmac', jsModule: 'node:crypto', path: 'Hmac', prefix: 'hmac.', exclude: {} },
-    { kind: 'namespace', heading: '`node:crypto` module methods and properties', name: 'crypto', jsModule: 'node:crypto', prefix: 'crypto.',
-      only: ['createHash', 'createHmac', 'getHashes', 'hash', 'hkdf', 'pbkdf2', 'randomBytes', 'randomInt', 'randomUUID', 'scrypt', 'timingSafeEqual'] },
-  ] },
-  { name: 'ChildProcess', title: 'child processes', doc: 'child_process', containers: [
-    { kind: 'class', heading: 'Class: `ChildProcess`', name: 'ChildProcess', jsModule: 'node:child_process', path: 'ChildProcess', prefix: 'subprocess.',
-      extends: 'EventEmitter', only: ['exitCode', 'kill', 'killed', 'pid', 'signalCode', 'stderr', 'stdin', 'stdout'] },
-    { kind: 'namespace', heading: 'Asynchronous process creation', name: 'child_process', jsModule: 'node:child_process', prefix: 'child_process.',
-      only: ['execFile', 'spawn'] },
-  ] },
-  // node:net, node:http and node:https (added 2026-11-11; DECISIONS.md). Servers, sockets and requests are event
-  // emitters: their documented events are typed listeners (`server.onRequest`, docs/JS_BINDINGS.md "Events").
-  // A constructor the docs show only as a heading (`new net.Socket([options])`, lost in the JSON) is stated in `ctor`
-  // and checked against the class's documented parameters.
-  { name: 'Net', title: 'TCP servers and sockets', doc: 'net', containers: [
-    { kind: 'class', heading: 'Class: `net.SocketAddress`', name: 'net.SocketAddress', jsModule: 'node:net', path: 'SocketAddress', prefix: 'socketaddress.',
-      ctor: 'new net.SocketAddress([options])', exclude: {} },
-    { kind: 'class', heading: 'Class: `net.BlockList`', name: 'net.BlockList', jsModule: 'node:net', path: 'BlockList', prefix: 'blockList.',
-      ctor: 'new net.BlockList()', exclude: {} },
-    { kind: 'class', heading: 'Class: `net.BoundSocket`', name: 'net.BoundSocket', jsModule: 'node:net', path: 'BoundSocket', prefix: 'boundSocket.',
-      ctor: 'new net.BoundSocket([options])', exclude: {} },
-    { kind: 'class', heading: 'Class: `net.Server`', name: 'net.Server', jsModule: 'node:net', path: 'Server', prefix: 'server.', extends: 'EventEmitter',
-      ctor: 'new net.Server([options][, connectionListener])',
-      exclude: { 'listen(handle[, backlog][, callback])': 'listens on a libuv handle or file descriptor object ({Object}): the options, path and port forms cover TCP and IPC' } },
-    { kind: 'class', heading: 'Class: `net.Socket`', name: 'net.Socket', jsModule: 'node:net', path: 'Socket', prefix: 'socket.', extends: 'stream.Duplex',
-      ctor: 'new net.Socket([options])', exclude: {} },
-    { kind: 'namespace', heading: 'Net', name: 'net', jsModule: 'node:net', prefix: 'net.', exclude: {} },
-  ] },
-  { name: 'Http', title: 'HTTP servers and clients', doc: 'http', containers: [
-    { kind: 'class', heading: 'Class: `http.Agent`', name: 'http.Agent', jsModule: 'node:http', path: 'Agent', prefix: 'agent.', ctor: 'new Agent([options])', exclude: {} },
-    // OutgoingMessage extends the legacy Stream (outside this cut), an EventEmitter; it is not a stream.Writable.
-    { kind: 'class', heading: 'Class: `http.OutgoingMessage`', name: 'http.OutgoingMessage', jsModule: 'node:http', path: 'OutgoingMessage', prefix: 'outgoingMessage.',
-      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
-      exclude: { pipe: 'documented to throw (an OutgoingMessage is write-only)' } },
-    { kind: 'class', heading: 'Class: `http.ClientRequest`', name: 'http.ClientRequest', jsModule: 'node:http', path: 'ClientRequest', prefix: 'request.',
-      extends: 'http.OutgoingMessage', exclude: {} },
-    { kind: 'class', heading: 'Class: `http.ServerResponse`', name: 'http.ServerResponse', jsModule: 'node:http', path: 'ServerResponse', prefix: 'response.',
-      extends: 'http.OutgoingMessage', exclude: {} },
-    { kind: 'class', heading: 'Class: `http.IncomingMessage`', name: 'http.IncomingMessage', jsModule: 'node:http', path: 'IncomingMessage', prefix: 'message.',
-      extends: 'stream.Readable', exclude: {} },
-    { kind: 'class', heading: 'Class: `http.Server`', name: 'http.Server', jsModule: 'node:http', path: 'Server', prefix: 'server.', extends: 'net.Server',
-      exclude: { listen: 'documented as identical to net.Server\'s server.listen(), whose typed forms http.Server inherits' } },
-    { kind: 'namespace', heading: 'HTTP', name: 'http', jsModule: 'node:http', prefix: 'http.', exclude: {} },
-  ] },
-  { name: 'Https', title: 'HTTPS servers and clients', doc: 'https', containers: [
-    { kind: 'class', heading: 'Class: `https.Agent`', name: 'https.Agent', jsModule: 'node:https', path: 'Agent', prefix: 'agent.', ctor: 'new Agent([options])',
-      extends: 'http.Agent', extendsQuote: { doc: 'https', quote: 'An Agent object for HTTPS similar to http.Agent.' }, exclude: {} },
-    // https.Server extends tls.Server (outside this cut), which extends net.Server; the docs give it http.Server's API
-    // ("See http.Server for more information"): its parent here is http.Server, so it has the request events.
-    { kind: 'class', heading: 'Class: `https.Server`', name: 'https.Server', jsModule: 'node:https', path: 'Server', prefix: 'server.',
-      extends: 'http.Server', extendsQuote: { doc: 'https', quote: 'See http.Server for more information.' },
-      exclude: { listen: 'documented as the same as http.Server\'s server.listen(), net.Server\'s typed forms, inherited' } },
-    { kind: 'namespace', heading: 'HTTPS', name: 'https', jsModule: 'node:https', prefix: 'https.', exclude: {} },
-  ] },
+  { name: 'Events', doc: 'events', title: 'event emitters' },
+  { name: 'Stream', doc: 'stream', title: 'Node streams' },
+  { name: 'Buffer', doc: 'buffer', title: 'Buffer and binary data' },
+  { name: 'StringDecoder', doc: 'string_decoder', title: 'decoding bytes to strings' },
+  { name: 'Path', doc: 'path', title: 'file paths' },
+  { name: 'Os', doc: 'os', title: 'the operating system' },
+  { name: 'Process', doc: 'process', title: 'the current process' },
+  { name: 'Fs', doc: 'fs', title: 'the file system' },
+  { name: 'Crypto', doc: 'crypto', title: 'cryptography' },
+  { name: 'Dns', doc: 'dns', title: 'name resolution' },
+  { name: 'Net', doc: 'net', title: 'TCP and IPC servers and sockets' },
+  { name: 'Tls', doc: 'tls', title: 'TLS servers and sockets' },
+  { name: 'Dgram', doc: 'dgram', title: 'UDP sockets' },
+  { name: 'Http', doc: 'http', title: 'HTTP servers and clients' },
+  { name: 'Https', doc: 'https', title: 'HTTPS servers and clients' },
+  { name: 'Http2', doc: 'http2', title: 'HTTP/2' },
+  { name: 'ChildProcess', doc: 'child_process', title: 'child processes' },
+  { name: 'Cluster', doc: 'cluster', title: 'process clusters' },
+  { name: 'WorkerThreads', doc: 'worker_threads', title: 'worker threads' },
+  { name: 'Zlib', doc: 'zlib', title: 'compression' },
+  { name: 'Util', doc: 'util', title: 'utilities' },
+  { name: 'Url', doc: 'url', title: 'URL utilities (the legacy API and Node\'s helpers)' },
+  { name: 'Querystring', doc: 'querystring', title: 'query strings' },
+  { name: 'Punycode', doc: 'punycode', title: 'Punycode' },
+  { name: 'Timers', doc: 'timers', title: 'timers' },
+  { name: 'Readline', doc: 'readline', title: 'line input' },
+  { name: 'Repl', doc: 'repl', title: 'read-eval-print loops' },
+  { name: 'Tty', doc: 'tty', title: 'terminals' },
+  { name: 'Console', doc: 'console', title: 'the console' },
+  { name: 'Assert', doc: 'assert', title: 'assertions' },
+  { name: 'AsyncHooks', doc: 'async_hooks', title: 'async hooks' },
+  { name: 'AsyncContext', doc: 'async_context', title: 'asynchronous context tracking' },
+  { name: 'DiagnosticsChannel', doc: 'diagnostics_channel', title: 'diagnostics channels' },
+  { name: 'Domain', doc: 'domain', title: 'domains' },
+  { name: 'PerfHooks', doc: 'perf_hooks', title: 'performance measurement (Node\'s own APIs)' },
+  { name: 'TraceEvents', doc: 'tracing', title: 'trace events' },
+  { name: 'Inspector', doc: 'inspector', title: 'the inspector' },
+  { name: 'Module', doc: 'module', title: 'the module system' },
+  { name: 'V8', doc: 'v8', title: 'the V8 engine' },
+  { name: 'Vm', doc: 'vm', title: 'JavaScript contexts' },
+  { name: 'Wasi', doc: 'wasi', title: 'WASI' },
+  { name: 'Sqlite', doc: 'sqlite', title: 'SQLite' },
+  { name: 'Test', doc: 'test', title: 'the test runner' },
+  { name: 'Sea', doc: 'single-executable-applications', title: 'single executable applications' },
+  { name: 'StreamIter', doc: 'stream_iter', title: 'iterable streams' },
 ];
+
+/**
+ * The Lean modules that ship compiled in library/prebuilt (with the modules they import: node-modules.json `core`),
+ * what the templates, examples and fixtures use. Every other module is compiled on
+ * first import (src/lazy-library.mjs; docs/api/decisions/0.4.md 0.4-39).
+ */
+export const core = ['Events', 'Stream', 'Buffer', 'Path', 'Os', 'Process', 'Fs', 'Crypto', 'ChildProcess'];
+
+/** The doc/api files read. */
+export const docs = modules.map(m => m.doc);
+
+/**
+ * The JavaScript module of a namespace or class (by the owner name the docs use),
+ * where it is not the documentation file's own `node:<doc>`.
+ */
+export const jsModules = {
+  docs: { async_context: 'node:async_hooks', tracing: 'node:trace_events', 'single-executable-applications': 'node:sea',
+    stream_iter: 'node:stream/iter', test: 'node:test', perf_hooks: 'node:perf_hooks' },
+  owners: { fsPromises: 'node:fs/promises', dnsPromises: 'node:dns/promises', readlinePromises: 'node:readline/promises',
+    timersPromises: 'node:timers/promises', streamPromises: 'node:stream/promises', assert: 'node:assert', 'assert.strict': 'node:assert/strict' },
+};
+
+/**
+ * What the docs give only in a heading or in prose about a class: its constructor
+ * signature (`ctor`, checked against the documented parameters), a stated parent
+ * with the sentence that gives it (`extends`, `extendsQuote`), and static members
+ * documented in another section (`statics`).
+ */
+export const classes = {
+  'stream.Readable': { extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' } },
+  'stream.Writable': { extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' } },
+  // A Duplex is both; a Lean structure has one parent, its Readable side (stream.Readable.toWeb takes it).
+  'stream.Duplex': { extends: 'stream.Readable', extendsQuote: { doc: 'stream', quote: 'Duplex streams are streams that implement both the Readable and Writable interfaces.' } },
+  'net.SocketAddress': { ctor: 'new net.SocketAddress([options])' },
+  'net.BlockList': { ctor: 'new net.BlockList()' },
+  'net.BoundSocket': { ctor: 'new net.BoundSocket([options])' },
+  'net.Server': { extends: 'EventEmitter', ctor: 'new net.Server([options][, connectionListener])' },
+  'net.Socket': { extends: 'stream.Duplex', ctor: 'new net.Socket([options])' },
+  'http.Agent': { ctor: 'new Agent([options])' },
+  // OutgoingMessage extends the legacy Stream, an EventEmitter; it is not a stream.Writable.
+  'http.OutgoingMessage': { extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' } },
+  'https.Agent': { ctor: 'new Agent([options])', extends: 'http.Agent', extendsQuote: { doc: 'https', quote: 'An Agent object for HTTPS similar to http.Agent.' } },
+  // https.Server extends tls.Server, which extends net.Server; the docs give it http.Server's API ("See http.Server for
+  // more information"): its parent here is http.Server, so it has the request events.
+  'https.Server': { extends: 'http.Server', extendsQuote: { doc: 'https', quote: 'See http.Server for more information.' } },
+  ChildProcess: { extends: 'EventEmitter' },
+  // A Buffer is a ByteArray in Lean (a copy, as every Uint8Array): the static methods that make or measure bytes, and the
+  // instance methods as functions of the bytes (`Buffer.toString bytes (some "hex")`; the docs: "All methods on the Buffer
+  // prototype are callable with a Uint8Array instance").
+  Buffer: { kind: 'bytes' },
+  // Not exported by node:fs/promises (made by fsPromises.open).
+  FileHandle: { path: null },
+  // stream_iter's Broadcast is exported (Broadcast.from).
+  Broadcast: { path: 'Broadcast' },
+};
+
+/**
+ * Classes the docs document that their module does not export: handle types for objects Node makes and hands out
+ * (`fs.watch` returns an fs.FSWatcher, `crypto.createMac` a Mac, `setTimeout` a Timeout), or option objects the docs
+ * write as classes. They are generated without an export (no constructor or static calls through the module); the
+ * availability probe checks them on the objects the conformance program makes, not on the module.
+ * (docs/api/decisions/0.4.md 0.4-40.)
+ */
+export const notExported = {
+  AsyncHook: 'made by async_hooks.createHook', NodeEventTarget: 'Node\'s EventTarget subclass, not exported', InterfaceConstructor: 'the base of readline.Interface and readlinePromises.Interface, not exported',
+  'fs.FSWatcher': 'returned by fs.watch', 'fs.StatWatcher': 'returned by fs.watchFile', 'fs.StatFs': 'returned by fs.statfs', Mac: 'made by crypto.createMac',
+  Http2Session: 'made by http2.connect and a server\'s \'session\' event', ServerHttp2Session: 'a server\'s session', ClientHttp2Session: 'returned by http2.connect',
+  Http2Stream: 'a session\'s stream', ClientHttp2Stream: 'returned by clienthttp2session.request', ServerHttp2Stream: 'a server\'s \'stream\' event', Http2Server: 'returned by http2.createServer',
+  Http2SecureServer: 'returned by http2.createSecureServer', 'zlib.ZlibBase': 'the base of the zlib classes, not exported', Options: 'an options object (zlib)', BrotliOptions: 'an options object (zlib)',
+  ZstdOptions: 'an options object (zlib)', Immediate: 'returned by setImmediate', Timeout: 'returned by setTimeout and setInterval', RunScope: 'returned by asyncLocalStorage.withScope',
+  TracingChannel: 'made by diagnostics_channel.tracingChannel', PerformanceNodeEntry: 'an entry of performance.getEntries', PerformanceNodeTiming: 'performance.nodeTiming',
+  Histogram: 'the base of the histograms', ELDHistogram: 'returned by perf_hooks.monitorEventLoopDelay', RecordableHistogram: 'returned by perf_hooks.createHistogram',
+  SlidingWindowHistogram: 'a histogram Node makes', SyncCPUProfileHandle: 'returned by v8 profiling', CPUProfileHandle: 'returned by v8 profiling', HeapProfileHandle: 'returned by v8 profiling',
+  SyncHeapProfileHandle: 'returned by v8 profiling', SQLTagStore: 'returned by database.createTagStore', MockFunctionContext: 'a mock\'s context', MockModuleContext: 'returned by mock.module',
+  MockPropertyContext: 'returned by mock.property', MockTracker: 'the test context\'s mock', MockTimers: 'mock.timers', TestsStream: 'returned by run', TestContext: 'passed to a test function',
+  SuiteContext: 'passed to a suite function',
+};
+for (const [name, why] of Object.entries(notExported)) classes[name] = { ...(classes[name] ?? {}), path: null, why };
+
+/**
+ * Members that Node defines only in some processes or on some objects: generated (real API), and expected to be
+ * missing where the condition does not hold (the availability probe accepts them; docs/api/decisions/0.4.md 0.4-41).
+ * Keyed by the probe's name (`<module> <path>`).
+ */
+export const conditional = {
+  'node:process disconnect': 'only in a process started with an IPC channel', 'node:process send': 'only in a process started with an IPC channel',
+  'node:process channel': 'only in a process started with an IPC channel', 'node:process connected': 'only in a process started with an IPC channel',
+  'node:child_process ChildProcess.prototype.disconnect': 'set on a ChildProcess that has an IPC channel, not on the prototype',
+  'node:child_process ChildProcess.prototype.send': 'set on a ChildProcess that has an IPC channel, not on the prototype',
+  'node:cluster worker': 'only in a cluster worker', 'node:process permission': 'only with --permission',
+  'node:process noDeprecation': 'only with --no-deprecation', 'node:process throwDeprecation': 'only with --throw-deprecation',
+  'node:process traceDeprecation': 'only with --trace-deprecation', 'node:process traceProcessWarnings': 'only with --trace-warnings',
+  'node:process mainModule': 'only in a CommonJS entry point (Deprecated)',
+  'node:crypto KeyObject.prototype.export': 'defined on the KeyObject subclasses Node returns (secret, public and private keys), not on KeyObject.prototype',
+};
+
+/**
+ * Members not generated, each with why it cannot work from Lean compiled to Wasm
+ * (an entry of docs/api/decisions/0.4.md). Keyed by the documented name
+ * (`fs.readSync`, `filehandle.readv`) or with its parameters
+ * (`fs.read(fd, buffer, offset, length, position, callback)`).
+ */
+export const exclude = {
+  // Implementer hooks: a subclass defines them and Node calls them; Node never provides them (docs/api/decisions/0.4.md 0.4-42).
+  'writable._construct': 'implemented by subclasses (called by Node), not provided by Node',
+  'writable._final': 'implemented by subclasses (called by Node), not provided by Node',
+  'readable._construct': 'implemented by subclasses (called by Node), not provided by Node',
+  'transform._flush': 'implemented by subclasses (called by Node), not provided by Node',
+  'serializer._writeHostObject': 'implemented by subclasses (called by Node), not provided by Node',
+  'serializer._getSharedArrayBufferId': 'implemented by subclasses (called by Node), not provided by Node',
+  'deserializer._readHostObject': 'implemented by subclasses (called by Node), not provided by Node',
+};
 
 /**
  * The docs' type names, as WebIDL. Node classes of this cut are interfaces;
@@ -162,16 +203,48 @@ export const modules = [
 export const typeNames = {
   string: 'DOMString', integer: 'long long', number: 'double', boolean: 'boolean', bigint: 'bigint', any: 'any', symbol: 'symbol',
   Buffer: 'bytes', TypedArray: 'bytes', DataView: 'bytes', Uint8Array: 'bytes', SharedArrayBuffer: 'bytes', ArrayBuffer: 'ArrayBuffer',
-  Function: 'Function', URL: 'URL', AbortSignal: 'AbortSignal', ReadableStream: 'ReadableStream', WritableStream: 'WritableStream',
-  CryptoKey: 'CryptoKey', Blob: 'Blob', Headers: 'Headers', Map: 'object',
-  FileHandle: 'FileHandle', 'fs.Stats': 'fs.Stats', 'fs.Dirent': 'fs.Dirent', Hash: 'Hash', Hmac: 'Hmac', ChildProcess: 'ChildProcess',
-  EventEmitter: 'EventEmitter', 'stream.Readable': 'stream.Readable', 'stream.Writable': 'stream.Writable', 'stream.Duplex': 'stream.Duplex',
-  'net.Server': 'net.Server', 'net.Socket': 'net.Socket', 'net.BlockList': 'net.BlockList', 'net.SocketAddress': 'net.SocketAddress', 'net.BoundSocket': 'net.BoundSocket',
-  'http.Agent': 'http.Agent', 'http.ClientRequest': 'http.ClientRequest', 'http.IncomingMessage': 'http.IncomingMessage',
-  'http.OutgoingMessage': 'http.OutgoingMessage', 'http.ServerResponse': 'http.ServerResponse', 'http.Server': 'http.Server',
-  'https.Agent': 'https.Agent', 'https.Server': 'https.Server', Handle: 'object', 'tls.Server': 'object', 'tls.TLSSocket': 'object',
-  Object: 'object', Array: 'sequence<any>', Error: 'any', Date: 'object', RegExp: 'object', Iterable: 'object', AsyncIterable: 'object',
-  KeyObject: 'object', Stream: 'object', 'fs.ReadStream': 'object', 'fs.WriteStream': 'object', 'fs.Dir': 'object', 'fs.StatFs': 'object',
+  ArrayBufferView: 'bytes', Function: 'Function', Map: 'object', Set: 'object', Object: 'object', Array: 'sequence<any>', Error: 'any',
+  Date: 'object', RegExp: 'object', Iterable: 'object', AsyncIterable: 'object', Iterator: 'object', AsyncIterator: 'object',
+  Promise: 'Promise<any>', null: 'any', undefined: 'undefined', Handle: 'object', Stream: 'EventEmitter',
+  // The docs' names for kinds of values, not classes: functions, plain objects and constants.
+  AsyncFunction: 'Function', AsyncGeneratorFunction: 'Function', EventListener: 'Function', Proxy: 'object', Disposable: 'object',
+  'HTTP/2 Headers Object': 'object', 'HTTP/2 Settings Object': 'object', 'HTTP/2 Raw Headers': 'sequence<any>',
+  'zlib options': 'object', 'brotli options': 'object', 'zstd options': 'object', 'tls.SecureContext': 'object',
+  'vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER': 'any', 'vm.constants.DONT_CONTEXTIFY': 'any', 'crypto.constants': 'object',
+  'os.constants.dlopen': 'object', ModuleRequest: 'object', require: 'Function',
+};
+
+/**
+ * Properties the docs' JSON lists bare under another object's section, because it loses their heading
+ * (`process.features.cached_builtins` is written `cached_builtins` beside `process.arch`): the namespace they belong
+ * to, with a sentence of each one's documentation that says so (the lowering fails without it).
+ */
+export const reparent = {
+  'process.features': { from: 'process', quote: /if the current Node\.js build|if Node\.js is run with --experimental-transform-types/,
+    names: ['cached_builtins', 'debug', 'inspector', 'ipv6', 'require_module', 'tls', 'tls_alpn', 'tls_ocsp', 'tls_sni', 'typescript', 'uv'] },
+};
+
+/**
+ * Objects the docs describe by their members without a `Class:` heading, keyed
+ * `<doc>:<owner>` (`tracing.enable()`): the Lean name of their type (generated as a
+ * class without an export), or null where the owner is not an object at all.
+ */
+export const instances = {
+  'tracing:tracing': 'Tracing', 'stream_iter:writer': 'Writer', 'stream_iter:broadcast': 'Broadcast', 'url:urlObject': 'url.UrlObject',
+  'child_process:options': null,
+};
+export const instancesWhy = {
+  'child_process:options': 'two of child_process.spawn\'s options (`options.detached`, `options.stdio`) documented under their own headings: they are members of child_process.SpawnOptions',
+};
+
+/**
+ * Classes whose name is also a web standard's but which are Node's own, not that standard
+ * (keyed `<doc>:<documented name>`): generated in Lasm.JS.Node.
+ */
+export const notWeb = {
+  'cluster:Worker': 'a cluster worker process (cluster.Worker), not the HTML Worker',
+  'worker_threads:Worker': 'Node\'s worker thread (node:worker_threads), not the HTML Worker',
+  'vm:vm.Module': 'a vm module record, not WebAssembly.Module',
 };
 
 /**
@@ -214,15 +287,15 @@ export const prose = {
   'https.createServer': { params: { requestListener: 'http.Server.RequestListener' }, quote: 'A listener to be added to the \'request\' event.' },
   'net.createServer': { params: { connectionListener: 'net.Server.ConnectionListener' }, quote: 'Automatically set as a listener for the [\'connection\'][] event.' },
   'net.Server.constructor': { params: { connectionListener: 'net.Server.ConnectionListener' }, quote: 'Automatically set as a listener for the [\'connection\'][] event.' },
-  'socket.connect': { params: { connectListener: 'net.Socket.ConnectListener' }, quote: 'will be added as a listener for the \'connect\' event once.' },
+  'socket.connect': { in: 'net.Socket', params: { connectListener: 'net.Socket.ConnectListener' }, quote: 'will be added as a listener for the \'connect\' event once.' },
   'net.createConnection': { params: { connectListener: 'net.Socket.ConnectListener' }, quote: 'will be added as a listener for the \'connect\' event once.' },
   'net.connect': { params: { connectListener: 'net.Socket.ConnectListener' }, quoteDoc: true,
     quote: 'If supplied, will be added as a listener for the [\'connect\'][] event on the returned socket once.' },
-  'server.address': { returns: '(net.AddressInfo or DOMString)?', quote: 'Returns the bound address, the address family name, and port of the server' },
-  'socket.address': { returns: 'net.AddressInfo', quote: 'Returns the bound address, the address family name and port of the socket' },
+  'server.address': { in: 'net.Server', returns: '(net.AddressInfo or DOMString)?', quote: 'Returns the bound address, the address family name, and port of the server' },
+  'socket.address': { in: 'net.Socket', returns: 'net.AddressInfo', quote: 'Returns the bound address, the address family name and port of the socket' },
   'BlockList.isBlockList': { returns: 'boolean', quote: 'Returns true if the value is a net.BlockList.' },
   'https.globalAgent': { returns: 'https.Agent', quote: 'Global instance of https.Agent for all HTTPS client requests.' },
-  'server.getConnections': { returns: 'Promise<long long>', quote: 'Callback should take two arguments err and count.' },
+  'server.getConnections': { in: 'net.Server', returns: 'Promise<long long>', quote: 'Callback should take two arguments err and count.' },
   'child_process.spawn': { params: { 'options.env': 'record<DOMString, DOMString>' }, quote: 'Environment key-value pairs.' },
 };
 /**
@@ -269,3 +342,9 @@ export const eventProse = {
   'net.Socket#lookup': { args: [{ type: 'any', name: 'err' }, { type: 'DOMString', name: 'address' }, { type: 'double?', name: 'family' }, { type: 'DOMString', name: 'host' }],
     quote: 'Emitted after resolving the host name but before connecting.' },
 };
+
+/** zlib's convenience methods: the docs give their results once for all, in the section's prose. */
+for (const n of ['brotliCompress', 'brotliDecompress', 'deflate', 'deflateRaw', 'gunzip', 'gzip', 'inflate', 'inflateRaw', 'unzip', 'zstdCompress', 'zstdDecompress']) {
+  prose[`zlib.${n}`] = { promisify: true, returns: 'Promise<bytes>', quote: 'will call the supplied callback with callback(error, result).' };
+  prose[`zlib.${n}Sync`] = { returns: 'bytes', quote: 'Every method has a *Sync counterpart, which accept the same arguments, but without a callback.' };
+}

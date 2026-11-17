@@ -45,9 +45,17 @@ instance instFromJSPathPathObject : FromJS path.PathObject where
 @[macro_inline] def path.delimiter : IO String := Internal.api "Lasm.JS.Node.path.delimiter" do
   Support.getExport "node:path" ["delimiter"] String
 
+/-- `path.posix` (added in Node.js v0.11.15): `readonly attribute object posix` (Node.js 24.22.2 documentation, path.md) -/
+@[macro_inline] def path.posix : IO Data := Internal.api "Lasm.JS.Node.path.posix" do
+  Support.getExport "node:path" ["posix"] Data
+
 /-- `path.sep` (added in Node.js v0.7.9): `readonly attribute DOMString sep` (Node.js 24.22.2 documentation, path.md) -/
 @[macro_inline] def path.sep : IO String := Internal.api "Lasm.JS.Node.path.sep" do
   Support.getExport "node:path" ["sep"] String
+
+/-- `path.win32` (added in Node.js v0.11.15): `readonly attribute object win32` (Node.js 24.22.2 documentation, path.md) -/
+@[macro_inline] def path.win32 : IO Data := Internal.api "Lasm.JS.Node.path.win32" do
+  Support.getExport "node:path" ["win32"] Data
 
 /-- `path.basename(path[, suffix])` (added in Node.js v0.1.25): `DOMString basename(DOMString path, optional DOMString suffix)` (Node.js 24.22.2 documentation, path.md) -/
 @[macro_inline] def path.basename (path_ : String) (suffix : Option String := none) : IO String := Internal.api "Lasm.JS.Node.path.basename" do

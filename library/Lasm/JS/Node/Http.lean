@@ -15,8 +15,8 @@ import Lasm.JS.Web.WebAnimationsAndWebAnimations2
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
-import Lasm.JS.Node.Fs
 import Lasm.JS.Node.Net
+import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
@@ -46,6 +46,13 @@ instance instToJSHttpClientRequest : ToJS http.ClientRequest := ⟨fun x => .ref
 instance instFromJSHttpClientRequest : FromJS http.ClientRequest := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ClientRequest", .data⟩
 instance instCoeHttpClientRequestHttpOutgoingMessage : Coe http.ClientRequest http.OutgoingMessage := ⟨http.ClientRequest.toOutgoingMessage⟩
 
+/-- `class http.Server extends net.Server` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
+structure http.Server extends net.Server
+instance instNonemptyHttpServer : Nonempty http.Server := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServer : ToJS http.Server := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServer : FromJS http.Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.Server", .data⟩
+instance instCoeHttpServerNetServer : Coe http.Server net.Server := ⟨http.Server.toServer⟩
+
 /-- `class http.ServerResponse extends http.OutgoingMessage` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
 structure http.ServerResponse extends http.OutgoingMessage
 instance instNonemptyHttpServerResponse : Nonempty http.ServerResponse := ⟨{ val := Classical.ofNonempty }⟩
@@ -59,13 +66,6 @@ instance instNonemptyHttpIncomingMessage : Nonempty http.IncomingMessage := ⟨{
 instance instToJSHttpIncomingMessage : ToJS http.IncomingMessage := ⟨fun x => .ref x.val ""⟩
 instance instFromJSHttpIncomingMessage : FromJS http.IncomingMessage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage", .data⟩
 instance instCoeHttpIncomingMessageStreamReadable : Coe http.IncomingMessage stream.Readable := ⟨http.IncomingMessage.toReadable⟩
-
-/-- `class http.Server extends net.Server` of `node:http` (Node.js 24.22.2 documentation, http.md): a handle to the JavaScript object. -/
-structure http.Server extends net.Server
-instance instNonemptyHttpServer : Nonempty http.Server := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServer : ToJS http.Server := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServer : FromJS http.Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.Server", .data⟩
-instance instCoeHttpServerNetServer : Coe http.Server net.Server := ⟨http.Server.toServer⟩
 
 /-- `dictionary http.Agent.NewOptionsProxyEnv` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http.Agent.NewOptionsProxyEnv where
@@ -214,6 +214,20 @@ instance : ToJS HeadersOrObject := ⟨fun
   | .headers v => toJS v
   | .object v => toJS v⟩
 instance : Coe Headers HeadersOrObject := ⟨.headers⟩
+
+/-- `callback http.ClientRequest.AbortListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ClientRequest.AbortListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpClientRequestAbortListener : Nonempty http.ClientRequest.AbortListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpClientRequestAbortListener : ToJS http.ClientRequest.AbortListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpClientRequestAbortListener : FromJS http.ClientRequest.AbortListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ClientRequest.AbortListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ClientRequest.AbortListener.ofFn (f : Async Unit) : IO http.ClientRequest.AbortListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ClientRequest.AbortListener.ofSyncFn (f : IO Unit) : IO http.ClientRequest.AbortListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
 /-- `callback http.ClientRequest.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure http.ClientRequest.CloseListener where
@@ -368,59 +382,6 @@ def http.ClientRequest.UpgradeListener.ofFn (f : http.IncomingMessage → stream
 def http.ClientRequest.UpgradeListener.ofSyncFn (f : http.IncomingMessage → stream.Duplex → ByteArray → IO Unit) : IO http.ClientRequest.UpgradeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http.IncomingMessage args 0) (← Internal.arg stream.Duplex args 1) (← Internal.arg ByteArray args 2)) }
 
-/-- `callback http.ServerResponse.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.ServerResponse.CloseListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpServerResponseCloseListener : Nonempty http.ServerResponse.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServerResponseCloseListener : ToJS http.ServerResponse.CloseListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServerResponseCloseListener : FromJS http.ServerResponse.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.CloseListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.ServerResponse.CloseListener.ofFn (f : Async Unit) : IO http.ServerResponse.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.ServerResponse.CloseListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
-/-- `callback http.ServerResponse.FinishListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.ServerResponse.FinishListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpServerResponseFinishListener : Nonempty http.ServerResponse.FinishListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpServerResponseFinishListener : ToJS http.ServerResponse.FinishListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpServerResponseFinishListener : FromJS http.ServerResponse.FinishListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.FinishListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.ServerResponse.FinishListener.ofFn (f : Async Unit) : IO http.ServerResponse.FinishListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.ServerResponse.FinishListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.FinishListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
-/-- `(object or sequence<any>)`: one constructor per member type. -/
-inductive ObjectOrSequenceOfAny where
-  /-- `object` -/
-  | object (value : Data)
-  /-- `sequence<any>` -/
-  | sequence (value : Array Data)
-instance : ToJS ObjectOrSequenceOfAny := ⟨fun
-  | .object v => toJS v
-  | .sequence v => toJS v⟩
-instance : Coe (Array Data) ObjectOrSequenceOfAny := ⟨.sequence⟩
-
-/-- `callback http.IncomingMessage.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure http.IncomingMessage.CloseListener where
-  /-- The JavaScript function. -/
-  val : Value
-instance instNonemptyHttpIncomingMessageCloseListener : Nonempty http.IncomingMessage.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
-instance instToJSHttpIncomingMessageCloseListener : ToJS http.IncomingMessage.CloseListener := ⟨fun x => .ref x.val ""⟩
-instance instFromJSHttpIncomingMessageCloseListener : FromJS http.IncomingMessage.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.CloseListener", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def http.IncomingMessage.CloseListener.ofFn (f : Async Unit) : IO http.IncomingMessage.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def http.IncomingMessage.CloseListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
-
 /-- `callback http.Server.CheckContinueListener = undefined (http.IncomingMessage request, http.ServerResponse response)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure http.Server.CheckContinueListener where
   /-- The JavaScript function. -/
@@ -547,12 +508,79 @@ def http.Server.UpgradeListener.ofFn (f : http.IncomingMessage → stream.Duplex
 def http.Server.UpgradeListener.ofSyncFn (f : http.IncomingMessage → stream.Duplex → ByteArray → IO Unit) : IO http.Server.UpgradeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg http.IncomingMessage args 0) (← Internal.arg stream.Duplex args 1) (← Internal.arg ByteArray args 2)) }
 
+/-- `callback http.ServerResponse.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ServerResponse.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpServerResponseCloseListener : Nonempty http.ServerResponse.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServerResponseCloseListener : ToJS http.ServerResponse.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServerResponseCloseListener : FromJS http.ServerResponse.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ServerResponse.CloseListener.ofFn (f : Async Unit) : IO http.ServerResponse.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ServerResponse.CloseListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback http.ServerResponse.FinishListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.ServerResponse.FinishListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpServerResponseFinishListener : Nonempty http.ServerResponse.FinishListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpServerResponseFinishListener : ToJS http.ServerResponse.FinishListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpServerResponseFinishListener : FromJS http.ServerResponse.FinishListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.ServerResponse.FinishListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.ServerResponse.FinishListener.ofFn (f : Async Unit) : IO http.ServerResponse.FinishListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.ServerResponse.FinishListener.ofSyncFn (f : IO Unit) : IO http.ServerResponse.FinishListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `(object or sequence<any>)`: one constructor per member type. -/
+inductive ObjectOrSequenceOfAny where
+  /-- `object` -/
+  | object (value : Data)
+  /-- `sequence<any>` -/
+  | sequence (value : Array Data)
+instance : ToJS ObjectOrSequenceOfAny := ⟨fun
+  | .object v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe (Array Data) ObjectOrSequenceOfAny := ⟨.sequence⟩
+
+/-- `callback http.IncomingMessage.AbortedListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.IncomingMessage.AbortedListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpIncomingMessageAbortedListener : Nonempty http.IncomingMessage.AbortedListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpIncomingMessageAbortedListener : ToJS http.IncomingMessage.AbortedListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpIncomingMessageAbortedListener : FromJS http.IncomingMessage.AbortedListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.AbortedListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.IncomingMessage.AbortedListener.ofFn (f : Async Unit) : IO http.IncomingMessage.AbortedListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.IncomingMessage.AbortedListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.AbortedListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback http.IncomingMessage.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure http.IncomingMessage.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyHttpIncomingMessageCloseListener : Nonempty http.IncomingMessage.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSHttpIncomingMessageCloseListener : ToJS http.IncomingMessage.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSHttpIncomingMessageCloseListener : FromJS http.IncomingMessage.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.http.IncomingMessage.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def http.IncomingMessage.CloseListener.ofFn (f : Async Unit) : IO http.IncomingMessage.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def http.IncomingMessage.CloseListener.ofSyncFn (f : IO Unit) : IO http.IncomingMessage.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
 /-- `dictionary http.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http.CreateServerOptions where
-  /-- `undefined connectionsCheckingInterval = 30000` -/
-  connectionsCheckingInterval : Option Unit := none
-  /-- `undefined headersTimeout = 60000` -/
-  headersTimeout : Option Unit := none
+  /-- `any connectionsCheckingInterval = 30000` -/
+  connectionsCheckingInterval : Data := .undefined
+  /-- `any headersTimeout = 60000` -/
+  headersTimeout : Data := .undefined
   /-- `double /* integer: Nat */ highWaterMark` -/
   highWaterMark : Option Nat := none
   /-- `DOMString httpValidation` -/
@@ -567,14 +595,14 @@ structure http.CreateServerOptions where
   keepAlive : Option Bool := none
   /-- `double keepAliveInitialDelay = 0` -/
   keepAliveInitialDelay : Option Float := none
-  /-- `undefined keepAliveTimeout = 65000` -/
-  keepAliveTimeout : Option Unit := none
+  /-- `any keepAliveTimeout = 65000` -/
+  keepAliveTimeout : Data := .undefined
   /-- `double maxHeaderSize` -/
   maxHeaderSize : Option Float := none
   /-- `boolean noDelay = true` -/
   noDelay : Option Bool := none
-  /-- `undefined requestTimeout = 300000` -/
-  requestTimeout : Option Unit := none
+  /-- `any requestTimeout = 300000` -/
+  requestTimeout : Data := .undefined
   /-- `boolean requireHostHeader = true` -/
   requireHostHeader : Option Bool := none
   /-- `Node_http_ServerResponse ServerResponse` -/
@@ -585,8 +613,8 @@ structure http.CreateServerOptions where
   rejectNonStandardBodyWrites : Option Bool := none
   /-- `boolean optimizeEmptyRequests = false` -/
   optimizeEmptyRequests : Option Bool := none
-instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨fun d => Internal.fields #[("connectionsCheckingInterval", Internal.optional d.connectionsCheckingInterval),
-    ("headersTimeout", Internal.optional d.headersTimeout),
+instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨fun d => Internal.fields #[("connectionsCheckingInterval", d.connectionsCheckingInterval),
+    ("headersTimeout", d.headersTimeout),
     ("highWaterMark", Internal.optional d.highWaterMark),
     ("httpValidation", Internal.optional d.httpValidation),
     ("insecureHTTPParser", Internal.optional d.insecureHTTPParser),
@@ -594,10 +622,10 @@ instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨f
     ("joinDuplicateHeaders", Internal.optional d.joinDuplicateHeaders),
     ("keepAlive", Internal.optional d.keepAlive),
     ("keepAliveInitialDelay", Internal.optional d.keepAliveInitialDelay),
-    ("keepAliveTimeout", Internal.optional d.keepAliveTimeout),
+    ("keepAliveTimeout", d.keepAliveTimeout),
     ("maxHeaderSize", Internal.optional d.maxHeaderSize),
     ("noDelay", Internal.optional d.noDelay),
-    ("requestTimeout", Internal.optional d.requestTimeout),
+    ("requestTimeout", d.requestTimeout),
     ("requireHostHeader", Internal.optional d.requireHostHeader),
     ("ServerResponse", Internal.optional d.ServerResponse),
     ("uniqueHeaders", Internal.optional d.uniqueHeaders),
@@ -697,6 +725,12 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
     ("timeout", Internal.optional d.timeout),
     ("uniqueHeaders", Internal.optional d.uniqueHeaders)]⟩
 
+/-- `dictionary http.IsValidHeaderValueOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure http.IsValidHeaderValueOptions where
+  /-- `DOMString httpValidation = "strict"` -/
+  httpValidation : Option String := none
+instance instToJSHttpIsValidHeaderValueOptions : ToJS http.IsValidHeaderValueOptions := ⟨fun d => Internal.fields #[("httpValidation", Internal.optional d.httpValidation)]⟩
+
 /-- `v instanceof Agent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Agent`). -/
 @[macro_inline] def http.Agent.cast? (v : Value) : IO (Option http.Agent) := Internal.api "Lasm.JS.Node.http.Agent.cast?" do
   Internal.cast (Support.getExport "node:http" ["Agent"] Value) (fun x => { val := x }) v
@@ -754,6 +788,10 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 /-- `v instanceof OutgoingMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OutgoingMessage`). -/
 @[macro_inline] def http.OutgoingMessage.cast? (v : Value) : IO (Option http.OutgoingMessage) := Internal.api "Lasm.JS.Node.http.OutgoingMessage.cast?" do
   Internal.cast (Support.getExport "node:http" ["OutgoingMessage"] Value) (fun x => { val := x }) v
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `outgoingMessage.connection` (added in Node.js v0.3.0): `readonly attribute any connection` -/
+@[macro_inline] def http.OutgoingMessage.connection (self : http.OutgoingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.OutgoingMessage.connection" do
+  self.val.get "connection" Data
 
 /-- `outgoingMessage.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
 @[macro_inline] def http.OutgoingMessage.headersSent (self : http.OutgoingMessage) : IO Bool := Internal.api "Lasm.JS.Node.http.OutgoingMessage.headersSent" do
@@ -861,6 +899,10 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 @[macro_inline] def http.OutgoingMessage.hasHeader (self : http.OutgoingMessage) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.http.OutgoingMessage.hasHeader" do
   self.val.callMethod "hasHeader" (Internal.args #[toJS name]) Bool
 
+/-- `outgoingMessage.pipe()` (added in Node.js v9.0.0): `undefined pipe()` -/
+@[macro_inline] def http.OutgoingMessage.pipe (self : http.OutgoingMessage) : IO Unit := Internal.api "Lasm.JS.Node.http.OutgoingMessage.pipe" do
+  self.val.callMethod "pipe" (Internal.args #[]) Unit
+
 /-- `outgoingMessage.removeHeader(name)` (added in Node.js v0.4.0): `undefined removeHeader(DOMString name)` -/
 @[macro_inline] def http.OutgoingMessage.removeHeader (self : http.OutgoingMessage) (name : String) : IO Unit := Internal.api "Lasm.JS.Node.http.OutgoingMessage.removeHeader" do
   self.val.callMethod "removeHeader" (Internal.args #[toJS name]) Unit
@@ -891,6 +933,19 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 /-- `v instanceof ClientRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientRequest`). -/
 @[macro_inline] def http.ClientRequest.cast? (v : Value) : IO (Option http.ClientRequest) := Internal.api "Lasm.JS.Node.http.ClientRequest.cast?" do
   Internal.cast (Support.getExport "node:http" ["ClientRequest"] Value) (fun x => { val := x }) v
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.aborted` (added in Node.js v0.11.14): `readonly attribute boolean aborted` -/
+@[macro_inline] def http.ClientRequest.aborted (self : http.ClientRequest) : IO Bool := Internal.api "Lasm.JS.Node.http.ClientRequest.aborted" do
+  self.val.get "aborted" Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+@[macro_inline] def http.ClientRequest.connection (self : http.ClientRequest) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.ClientRequest.connection" do
+  let r ← self.val.get "connection" Value
+  pure { val := r }
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.finished` (added in Node.js v0.0.1): `readonly attribute boolean finished` -/
+@[macro_inline] def http.ClientRequest.finished (self : http.ClientRequest) : IO Bool := Internal.api "Lasm.JS.Node.http.ClientRequest.finished" do
+  self.val.get "finished" Bool
 
 /-- `request.maxHeadersCount`: `readonly attribute double maxHeadersCount` -/
 @[macro_inline] def http.ClientRequest.maxHeadersCount (self : http.ClientRequest) : IO Float := Internal.api "Lasm.JS.Node.http.ClientRequest.maxHeadersCount" do
@@ -928,6 +983,16 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 /-- `request.writableFinished` (added in Node.js v12.7.0): `readonly attribute boolean writableFinished` -/
 @[macro_inline] def http.ClientRequest.writableFinished (self : http.ClientRequest) : IO Bool := Internal.api "Lasm.JS.Node.http.ClientRequest.writableFinished" do
   self.val.get "writableFinished" Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onAbort(http.ClientRequest.AbortListener listener)`: calls `on("abort", listener)` -/
+@[macro_inline] def http.ClientRequest.onAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.ClientRequest.onAbort" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "abort", toJS listener]) Value
+  pure { val := r }
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onceAbort(http.ClientRequest.AbortListener listener)`: calls `once("abort", listener)` -/
+@[macro_inline] def http.ClientRequest.onceAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.ClientRequest.onceAbort" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "abort", toJS listener]) Value
+  pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.5.4): `http.ClientRequest onClose(http.ClientRequest.CloseListener listener)`: calls `on("close", listener)` -/
 @[macro_inline] def http.ClientRequest.onClose (self : http.ClientRequest) (listener : http.ClientRequest.CloseListener) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.ClientRequest.onClose" do
@@ -1019,6 +1084,10 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
   let r ← self.val.callMethod "once" (Internal.args #[toJS "upgrade", toJS listener]) Value
   pure { val := r }
 
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.abort()` (added in Node.js v0.3.8): `undefined abort()` -/
+@[macro_inline] def http.ClientRequest.abort (self : http.ClientRequest) : IO Unit := Internal.api "Lasm.JS.Node.http.ClientRequest.abort" do
+  self.val.callMethod "abort" (Internal.args #[]) Unit
+
 /-- `request.cork()` (added in Node.js v13.2.0, v12.16.0): `undefined cork()` -/
 @[macro_inline] def http.ClientRequest.cork (self : http.ClientRequest) : IO Unit := Internal.api "Lasm.JS.Node.http.ClientRequest.cork" do
   self.val.callMethod "cork" (Internal.args #[]) Unit
@@ -1085,226 +1154,6 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 /-- `request.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
 @[macro_inline] def http.ClientRequest.write (self : http.ClientRequest) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.http.ClientRequest.write" do
   self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
-
-/-- `v instanceof ServerResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerResponse`). -/
-@[macro_inline] def http.ServerResponse.cast? (v : Value) : IO (Option http.ServerResponse) := Internal.api "Lasm.JS.Node.http.ServerResponse.cast?" do
-  Internal.cast (Support.getExport "node:http" ["ServerResponse"] Value) (fun x => { val := x }) v
-
-/-- `response.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
-@[macro_inline] def http.ServerResponse.headersSent (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.headersSent" do
-  self.val.get "headersSent" Bool
-
-/-- `response.req` (added in Node.js v15.7.0): `readonly attribute http.IncomingMessage req` -/
-@[macro_inline] def http.ServerResponse.req (self : http.ServerResponse) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.ServerResponse.req" do
-  let r ← self.val.get "req" Value
-  pure { val := r }
-
-/-- `response.sendDate` (added in Node.js v0.7.5): `readonly attribute boolean sendDate` -/
-@[macro_inline] def http.ServerResponse.sendDate (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.sendDate" do
-  self.val.get "sendDate" Bool
-
-/-- `response.socket` (added in Node.js v0.3.0): `readonly attribute stream.Duplex socket` -/
-@[macro_inline] def http.ServerResponse.socket (self : http.ServerResponse) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.ServerResponse.socket" do
-  let r ← self.val.get "socket" Value
-  pure { val := r }
-
-/-- `response.statusCode` (added in Node.js v0.4.0): `readonly attribute double /* integer: Nat */ statusCode` -/
-@[macro_inline] def http.ServerResponse.statusCode (self : http.ServerResponse) : IO Nat := Internal.api "Lasm.JS.Node.http.ServerResponse.statusCode" do
-  self.val.get "statusCode" Nat
-
-/-- `response.statusMessage` (added in Node.js v0.11.8): `readonly attribute DOMString statusMessage` -/
-@[macro_inline] def http.ServerResponse.statusMessage (self : http.ServerResponse) : IO String := Internal.api "Lasm.JS.Node.http.ServerResponse.statusMessage" do
-  self.val.get "statusMessage" String
-
-/-- `response.strictContentLength` (added in Node.js v18.10.0, v16.18.0): `readonly attribute boolean strictContentLength` -/
-@[macro_inline] def http.ServerResponse.strictContentLength (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.strictContentLength" do
-  self.val.get "strictContentLength" Bool
-
-/-- `response.writableEnded` (added in Node.js v12.9.0): `readonly attribute boolean writableEnded` -/
-@[macro_inline] def http.ServerResponse.writableEnded (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.writableEnded" do
-  self.val.get "writableEnded" Bool
-
-/-- `response.writableFinished` (added in Node.js v12.7.0): `readonly attribute boolean writableFinished` -/
-@[macro_inline] def http.ServerResponse.writableFinished (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.writableFinished" do
-  self.val.get "writableFinished" Bool
-
-/-- `Event: 'close'` (added in Node.js v0.6.7): `http.ServerResponse onClose(http.ServerResponse.CloseListener listener)`: calls `on("close", listener)` -/
-@[macro_inline] def http.ServerResponse.onClose (self : http.ServerResponse) (listener : http.ServerResponse.CloseListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onClose" do
-  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'close'` (added in Node.js v0.6.7): `http.ServerResponse onceClose(http.ServerResponse.CloseListener listener)`: calls `once("close", listener)` -/
-@[macro_inline] def http.ServerResponse.onceClose (self : http.ServerResponse) (listener : http.ServerResponse.CloseListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onceClose" do
-  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'finish'` (added in Node.js v0.3.6): `http.ServerResponse onFinish(http.ServerResponse.FinishListener listener)`: calls `on("finish", listener)` -/
-@[macro_inline] def http.ServerResponse.onFinish (self : http.ServerResponse) (listener : http.ServerResponse.FinishListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onFinish" do
-  let r ← self.val.callMethod "on" (Internal.args #[toJS "finish", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'finish'` (added in Node.js v0.3.6): `http.ServerResponse onceFinish(http.ServerResponse.FinishListener listener)`: calls `once("finish", listener)` -/
-@[macro_inline] def http.ServerResponse.onceFinish (self : http.ServerResponse) (listener : http.ServerResponse.FinishListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onceFinish" do
-  let r ← self.val.callMethod "once" (Internal.args #[toJS "finish", toJS listener]) Value
-  pure { val := r }
-
-/-- `response.addTrailers(headers)` (added in Node.js v0.3.0): `undefined addTrailers(object headers)` -/
-@[macro_inline] def http.ServerResponse.addTrailers (self : http.ServerResponse) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.addTrailers" do
-  self.val.callMethod "addTrailers" (Internal.args #[toJS headers]) Unit
-
-/-- `response.cork()` (added in Node.js v13.2.0, v12.16.0): `undefined cork()` -/
-@[macro_inline] def http.ServerResponse.cork (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.cork" do
-  self.val.callMethod "cork" (Internal.args #[]) Unit
-
-/-- `response.end([data[, encoding]][, callback])` (added in Node.js v0.1.90): `http.ServerResponse end(optional (DOMString or Uint8Array) data, optional DOMString encoding)` -/
-@[macro_inline] def http.ServerResponse.«end» (self : http.ServerResponse) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.end" do
-  let r ← self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional encoding]) Value
-  pure { val := r }
-
-/-- `response.flushHeaders()` (added in Node.js v1.6.0): `undefined flushHeaders()` -/
-@[macro_inline] def http.ServerResponse.flushHeaders (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.flushHeaders" do
-  self.val.callMethod "flushHeaders" (Internal.args #[]) Unit
-
-/-- `response.getHeader(name)` (added in Node.js v0.4.0): `(double or DOMString or sequence<DOMString>)? getHeader(DOMString name)` -/
-@[macro_inline] def http.ServerResponse.getHeader (self : http.ServerResponse) (name : String) : IO (Option DoubleOrDOMStringOrSequenceOfDOMString) := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeader" do
-  self.val.callMethod "getHeader" (Internal.args #[toJS name]) (Option DoubleOrDOMStringOrSequenceOfDOMString)
-
-/-- `response.getHeaderNames()` (added in Node.js v7.7.0): `sequence<DOMString> getHeaderNames()` -/
-@[macro_inline] def http.ServerResponse.getHeaderNames (self : http.ServerResponse) : IO (Array String) := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeaderNames" do
-  self.val.callMethod "getHeaderNames" (Internal.args #[]) (Array String)
-
-/-- `response.getHeaders()` (added in Node.js v7.7.0): `object getHeaders()` -/
-@[macro_inline] def http.ServerResponse.getHeaders (self : http.ServerResponse) : IO Data := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeaders" do
-  self.val.callMethod "getHeaders" (Internal.args #[]) Data
-
-/-- `response.hasHeader(name)` (added in Node.js v7.7.0): `boolean hasHeader(DOMString name)` -/
-@[macro_inline] def http.ServerResponse.hasHeader (self : http.ServerResponse) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.hasHeader" do
-  self.val.callMethod "hasHeader" (Internal.args #[toJS name]) Bool
-
-/-- `response.removeHeader(name)` (added in Node.js v0.4.0): `undefined removeHeader(DOMString name)` -/
-@[macro_inline] def http.ServerResponse.removeHeader (self : http.ServerResponse) (name : String) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.removeHeader" do
-  self.val.callMethod "removeHeader" (Internal.args #[toJS name]) Unit
-
-/-- `response.setHeader(name, value)` (added in Node.js v0.4.0): `http.ServerResponse setHeader(DOMString name, (double or DOMString or sequence<DOMString>) value)` -/
-@[macro_inline] def http.ServerResponse.setHeader (self : http.ServerResponse) (name : String) (value : DoubleOrDOMStringOrSequenceOfDOMString) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.setHeader" do
-  let r ← self.val.callMethod "setHeader" (Internal.args #[toJS name, toJS value]) Value
-  pure { val := r }
-
-/-- `response.setTimeout(msecs[, callback])` (added in Node.js v0.9.12): `http.ServerResponse setTimeout(double msecs)` -/
-@[macro_inline] def http.ServerResponse.setTimeout (self : http.ServerResponse) (msecs : Float) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.setTimeout" do
-  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs]) Value
-  pure { val := r }
-
-/-- `response.uncork()` (added in Node.js v13.2.0, v12.16.0): `undefined uncork()` -/
-@[macro_inline] def http.ServerResponse.uncork (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.uncork" do
-  self.val.callMethod "uncork" (Internal.args #[]) Unit
-
-/-- `response.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
-@[macro_inline] def http.ServerResponse.write (self : http.ServerResponse) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.write" do
-  self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
-
-/-- `response.writeContinue()` (added in Node.js v0.3.0): `undefined writeContinue()` -/
-@[macro_inline] def http.ServerResponse.writeContinue (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeContinue" do
-  self.val.callMethod "writeContinue" (Internal.args #[]) Unit
-
-/-- `response.writeEarlyHints(hints[, callback])` (added in Node.js v18.11.0): `undefined writeEarlyHints(object hints)` -/
-@[macro_inline] def http.ServerResponse.writeEarlyHints (self : http.ServerResponse) (hints : Data) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeEarlyHints" do
-  self.val.callMethod "writeEarlyHints" (Internal.args #[toJS hints]) Unit
-
-/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v0.1.30): `http.ServerResponse writeHead(double /* integer: Nat */ statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
-@[macro_inline] def http.ServerResponse.writeHead (self : http.ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.writeHead" do
-  let r ← self.val.callMethod "writeHead" (Internal.args #[toJS statusCode, Internal.optional statusMessage, Internal.optional headers]) Value
-  pure { val := r }
-
-/-- `response.writeInformation(statusCode[, headers][, callback])` (added in Node.js v24.18.0): `undefined writeInformation(double /* integer: Nat */ statusCode, optional (object or sequence<any>) headers)` -/
-@[macro_inline] def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCode : Nat) (headers : Option ObjectOrSequenceOfAny := none) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeInformation" do
-  self.val.callMethod "writeInformation" (Internal.args #[toJS statusCode, Internal.optional headers]) Unit
-
-/-- `response.writeProcessing()` (added in Node.js v10.0.0): `undefined writeProcessing()` -/
-@[macro_inline] def http.ServerResponse.writeProcessing (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeProcessing" do
-  self.val.callMethod "writeProcessing" (Internal.args #[]) Unit
-
-/-- `v instanceof IncomingMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IncomingMessage`). -/
-@[macro_inline] def http.IncomingMessage.cast? (v : Value) : IO (Option http.IncomingMessage) := Internal.api "Lasm.JS.Node.http.IncomingMessage.cast?" do
-  Internal.cast (Support.getExport "node:http" ["IncomingMessage"] Value) (fun x => { val := x }) v
-
-/-- `message.complete` (added in Node.js v0.3.0): `readonly attribute boolean complete` -/
-@[macro_inline] def http.IncomingMessage.complete (self : http.IncomingMessage) : IO Bool := Internal.api "Lasm.JS.Node.http.IncomingMessage.complete" do
-  self.val.get "complete" Bool
-
-/-- `message.headers` (added in Node.js v0.1.5): `readonly attribute object headers` -/
-@[macro_inline] def http.IncomingMessage.headers (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.headers" do
-  self.val.get "headers" Data
-
-/-- `message.headersDistinct` (added in Node.js v18.3.0, v16.17.0): `readonly attribute object headersDistinct` -/
-@[macro_inline] def http.IncomingMessage.headersDistinct (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.headersDistinct" do
-  self.val.get "headersDistinct" Data
-
-/-- `message.httpVersion` (added in Node.js v0.1.1): `readonly attribute DOMString httpVersion` -/
-@[macro_inline] def http.IncomingMessage.httpVersion (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.httpVersion" do
-  self.val.get "httpVersion" String
-
-/-- `message.method` (added in Node.js v0.1.1): `readonly attribute DOMString method` -/
-@[macro_inline] def http.IncomingMessage.method (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.method" do
-  self.val.get "method" String
-
-/-- `message.rawHeaders` (added in Node.js v0.11.6): `readonly attribute sequence<DOMString> rawHeaders` -/
-@[macro_inline] def http.IncomingMessage.rawHeaders (self : http.IncomingMessage) : IO (Array String) := Internal.api "Lasm.JS.Node.http.IncomingMessage.rawHeaders" do
-  self.val.get "rawHeaders" (Array String)
-
-/-- `message.rawTrailers` (added in Node.js v0.11.6): `readonly attribute sequence<DOMString> rawTrailers` -/
-@[macro_inline] def http.IncomingMessage.rawTrailers (self : http.IncomingMessage) : IO (Array String) := Internal.api "Lasm.JS.Node.http.IncomingMessage.rawTrailers" do
-  self.val.get "rawTrailers" (Array String)
-
-/-- `message.signal` (added in Node.js v24.16.0): `readonly attribute AbortSignal signal` -/
-@[macro_inline] def http.IncomingMessage.signal (self : http.IncomingMessage) : IO AbortSignal := Internal.api "Lasm.JS.Node.http.IncomingMessage.signal" do
-  let r ← self.val.get "signal" Value
-  pure { val := r }
-
-/-- `message.socket` (added in Node.js v0.3.0): `readonly attribute stream.Duplex socket` -/
-@[macro_inline] def http.IncomingMessage.socket (self : http.IncomingMessage) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.IncomingMessage.socket" do
-  let r ← self.val.get "socket" Value
-  pure { val := r }
-
-/-- `message.statusCode` (added in Node.js v0.1.1): `readonly attribute double /* integer: Nat */ statusCode` -/
-@[macro_inline] def http.IncomingMessage.statusCode (self : http.IncomingMessage) : IO Nat := Internal.api "Lasm.JS.Node.http.IncomingMessage.statusCode" do
-  self.val.get "statusCode" Nat
-
-/-- `message.statusMessage` (added in Node.js v0.11.10): `readonly attribute DOMString statusMessage` -/
-@[macro_inline] def http.IncomingMessage.statusMessage (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.statusMessage" do
-  self.val.get "statusMessage" String
-
-/-- `message.trailers` (added in Node.js v0.3.0): `readonly attribute object trailers` -/
-@[macro_inline] def http.IncomingMessage.trailers (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.trailers" do
-  self.val.get "trailers" Data
-
-/-- `message.trailersDistinct` (added in Node.js v18.3.0, v16.17.0): `readonly attribute object trailersDistinct` -/
-@[macro_inline] def http.IncomingMessage.trailersDistinct (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.trailersDistinct" do
-  self.val.get "trailersDistinct" Data
-
-/-- `message.url` (added in Node.js v0.1.90): `readonly attribute DOMString url` -/
-@[macro_inline] def http.IncomingMessage.url (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.url" do
-  self.val.get "url" String
-
-/-- `Event: 'close'` (added in Node.js v0.4.2): `http.IncomingMessage onClose(http.IncomingMessage.CloseListener listener)`: calls `on("close", listener)` -/
-@[macro_inline] def http.IncomingMessage.onClose (self : http.IncomingMessage) (listener : http.IncomingMessage.CloseListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onClose" do
-  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `Event: 'close'` (added in Node.js v0.4.2): `http.IncomingMessage onceClose(http.IncomingMessage.CloseListener listener)`: calls `once("close", listener)` -/
-@[macro_inline] def http.IncomingMessage.onceClose (self : http.IncomingMessage) (listener : http.IncomingMessage.CloseListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onceClose" do
-  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
-  pure { val := r }
-
-/-- `message.destroy([error])` (added in Node.js v0.3.0): `http.IncomingMessage destroy(optional any error)` -/
-@[macro_inline] def http.IncomingMessage.destroy (self : http.IncomingMessage) (error : Data := .undefined) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.destroy" do
-  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
-  pure { val := r }
-
-/-- `message.setTimeout(msecs[, callback])` (added in Node.js v0.5.9): `http.IncomingMessage setTimeout(double msecs)` -/
-@[macro_inline] def http.IncomingMessage.setTimeout (self : http.IncomingMessage) (msecs : Float) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.setTimeout" do
-  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs]) Value
-  pure { val := r }
 
 /-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
 @[macro_inline] def http.Server.cast? (v : Value) : IO (Option http.Server) := Internal.api "Lasm.JS.Node.http.Server.cast?" do
@@ -1444,9 +1293,260 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 @[macro_inline] def http.Server.closeIdleConnections (self : http.Server) : IO Unit := Internal.api "Lasm.JS.Node.http.Server.closeIdleConnections" do
   self.val.callMethod "closeIdleConnections" (Internal.args #[]) Unit
 
+/-- `server.listen()`: `undefined listen()` -/
+@[macro_inline] def http.Server.listen (self : http.Server) : IO Unit := Internal.api "Lasm.JS.Node.http.Server.listen" do
+  self.val.callMethod "listen" (Internal.args #[]) Unit
+
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.9.12): `http.Server setTimeout(optional double msecs)` -/
 @[macro_inline] def http.Server.setTimeout (self : http.Server) (msecs : Option Float := none) : IO http.Server := Internal.api "Lasm.JS.Node.http.Server.setTimeout" do
   let r ← self.val.callMethod "setTimeout" (Internal.args #[Internal.optional msecs]) Value
+  pure { val := r }
+
+/-- `v instanceof ServerResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerResponse`). -/
+@[macro_inline] def http.ServerResponse.cast? (v : Value) : IO (Option http.ServerResponse) := Internal.api "Lasm.JS.Node.http.ServerResponse.cast?" do
+  Internal.cast (Support.getExport "node:http" ["ServerResponse"] Value) (fun x => { val := x }) v
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+@[macro_inline] def http.ServerResponse.connection (self : http.ServerResponse) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.ServerResponse.connection" do
+  let r ← self.val.get "connection" Value
+  pure { val := r }
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.finished` (added in Node.js v0.0.2): `readonly attribute boolean finished` -/
+@[macro_inline] def http.ServerResponse.finished (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.finished" do
+  self.val.get "finished" Bool
+
+/-- `response.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
+@[macro_inline] def http.ServerResponse.headersSent (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.headersSent" do
+  self.val.get "headersSent" Bool
+
+/-- `response.req` (added in Node.js v15.7.0): `readonly attribute http.IncomingMessage req` -/
+@[macro_inline] def http.ServerResponse.req (self : http.ServerResponse) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.ServerResponse.req" do
+  let r ← self.val.get "req" Value
+  pure { val := r }
+
+/-- `response.sendDate` (added in Node.js v0.7.5): `readonly attribute boolean sendDate` -/
+@[macro_inline] def http.ServerResponse.sendDate (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.sendDate" do
+  self.val.get "sendDate" Bool
+
+/-- `response.socket` (added in Node.js v0.3.0): `readonly attribute stream.Duplex socket` -/
+@[macro_inline] def http.ServerResponse.socket (self : http.ServerResponse) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.ServerResponse.socket" do
+  let r ← self.val.get "socket" Value
+  pure { val := r }
+
+/-- `response.statusCode` (added in Node.js v0.4.0): `readonly attribute double /* integer: Nat */ statusCode` -/
+@[macro_inline] def http.ServerResponse.statusCode (self : http.ServerResponse) : IO Nat := Internal.api "Lasm.JS.Node.http.ServerResponse.statusCode" do
+  self.val.get "statusCode" Nat
+
+/-- `response.statusMessage` (added in Node.js v0.11.8): `readonly attribute DOMString statusMessage` -/
+@[macro_inline] def http.ServerResponse.statusMessage (self : http.ServerResponse) : IO String := Internal.api "Lasm.JS.Node.http.ServerResponse.statusMessage" do
+  self.val.get "statusMessage" String
+
+/-- `response.strictContentLength` (added in Node.js v18.10.0, v16.18.0): `readonly attribute boolean strictContentLength` -/
+@[macro_inline] def http.ServerResponse.strictContentLength (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.strictContentLength" do
+  self.val.get "strictContentLength" Bool
+
+/-- `response.writableEnded` (added in Node.js v12.9.0): `readonly attribute boolean writableEnded` -/
+@[macro_inline] def http.ServerResponse.writableEnded (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.writableEnded" do
+  self.val.get "writableEnded" Bool
+
+/-- `response.writableFinished` (added in Node.js v12.7.0): `readonly attribute boolean writableFinished` -/
+@[macro_inline] def http.ServerResponse.writableFinished (self : http.ServerResponse) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.writableFinished" do
+  self.val.get "writableFinished" Bool
+
+/-- `Event: 'close'` (added in Node.js v0.6.7): `http.ServerResponse onClose(http.ServerResponse.CloseListener listener)`: calls `on("close", listener)` -/
+@[macro_inline] def http.ServerResponse.onClose (self : http.ServerResponse) (listener : http.ServerResponse.CloseListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.6.7): `http.ServerResponse onceClose(http.ServerResponse.CloseListener listener)`: calls `once("close", listener)` -/
+@[macro_inline] def http.ServerResponse.onceClose (self : http.ServerResponse) (listener : http.ServerResponse.CloseListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'finish'` (added in Node.js v0.3.6): `http.ServerResponse onFinish(http.ServerResponse.FinishListener listener)`: calls `on("finish", listener)` -/
+@[macro_inline] def http.ServerResponse.onFinish (self : http.ServerResponse) (listener : http.ServerResponse.FinishListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onFinish" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "finish", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'finish'` (added in Node.js v0.3.6): `http.ServerResponse onceFinish(http.ServerResponse.FinishListener listener)`: calls `once("finish", listener)` -/
+@[macro_inline] def http.ServerResponse.onceFinish (self : http.ServerResponse) (listener : http.ServerResponse.FinishListener) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.onceFinish" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "finish", toJS listener]) Value
+  pure { val := r }
+
+/-- `response.addTrailers(headers)` (added in Node.js v0.3.0): `undefined addTrailers(object headers)` -/
+@[macro_inline] def http.ServerResponse.addTrailers (self : http.ServerResponse) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.addTrailers" do
+  self.val.callMethod "addTrailers" (Internal.args #[toJS headers]) Unit
+
+/-- `response.cork()` (added in Node.js v13.2.0, v12.16.0): `undefined cork()` -/
+@[macro_inline] def http.ServerResponse.cork (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.cork" do
+  self.val.callMethod "cork" (Internal.args #[]) Unit
+
+/-- `response.end([data[, encoding]][, callback])` (added in Node.js v0.1.90): `http.ServerResponse end(optional (DOMString or Uint8Array) data, optional DOMString encoding)` -/
+@[macro_inline] def http.ServerResponse.«end» (self : http.ServerResponse) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.end" do
+  let r ← self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional encoding]) Value
+  pure { val := r }
+
+/-- `response.flushHeaders()` (added in Node.js v1.6.0): `undefined flushHeaders()` -/
+@[macro_inline] def http.ServerResponse.flushHeaders (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.flushHeaders" do
+  self.val.callMethod "flushHeaders" (Internal.args #[]) Unit
+
+/-- `response.getHeader(name)` (added in Node.js v0.4.0): `(double or DOMString or sequence<DOMString>)? getHeader(DOMString name)` -/
+@[macro_inline] def http.ServerResponse.getHeader (self : http.ServerResponse) (name : String) : IO (Option DoubleOrDOMStringOrSequenceOfDOMString) := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeader" do
+  self.val.callMethod "getHeader" (Internal.args #[toJS name]) (Option DoubleOrDOMStringOrSequenceOfDOMString)
+
+/-- `response.getHeaderNames()` (added in Node.js v7.7.0): `sequence<DOMString> getHeaderNames()` -/
+@[macro_inline] def http.ServerResponse.getHeaderNames (self : http.ServerResponse) : IO (Array String) := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeaderNames" do
+  self.val.callMethod "getHeaderNames" (Internal.args #[]) (Array String)
+
+/-- `response.getHeaders()` (added in Node.js v7.7.0): `object getHeaders()` -/
+@[macro_inline] def http.ServerResponse.getHeaders (self : http.ServerResponse) : IO Data := Internal.api "Lasm.JS.Node.http.ServerResponse.getHeaders" do
+  self.val.callMethod "getHeaders" (Internal.args #[]) Data
+
+/-- `response.hasHeader(name)` (added in Node.js v7.7.0): `boolean hasHeader(DOMString name)` -/
+@[macro_inline] def http.ServerResponse.hasHeader (self : http.ServerResponse) (name : String) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.hasHeader" do
+  self.val.callMethod "hasHeader" (Internal.args #[toJS name]) Bool
+
+/-- `response.removeHeader(name)` (added in Node.js v0.4.0): `undefined removeHeader(DOMString name)` -/
+@[macro_inline] def http.ServerResponse.removeHeader (self : http.ServerResponse) (name : String) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.removeHeader" do
+  self.val.callMethod "removeHeader" (Internal.args #[toJS name]) Unit
+
+/-- `response.setHeader(name, value)` (added in Node.js v0.4.0): `http.ServerResponse setHeader(DOMString name, (double or DOMString or sequence<DOMString>) value)` -/
+@[macro_inline] def http.ServerResponse.setHeader (self : http.ServerResponse) (name : String) (value : DoubleOrDOMStringOrSequenceOfDOMString) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.setHeader" do
+  let r ← self.val.callMethod "setHeader" (Internal.args #[toJS name, toJS value]) Value
+  pure { val := r }
+
+/-- `response.setTimeout(msecs[, callback])` (added in Node.js v0.9.12): `http.ServerResponse setTimeout(double msecs)` -/
+@[macro_inline] def http.ServerResponse.setTimeout (self : http.ServerResponse) (msecs : Float) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs]) Value
+  pure { val := r }
+
+/-- `response.uncork()` (added in Node.js v13.2.0, v12.16.0): `undefined uncork()` -/
+@[macro_inline] def http.ServerResponse.uncork (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.uncork" do
+  self.val.callMethod "uncork" (Internal.args #[]) Unit
+
+/-- `response.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
+@[macro_inline] def http.ServerResponse.write (self : http.ServerResponse) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.http.ServerResponse.write" do
+  self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
+
+/-- `response.writeContinue()` (added in Node.js v0.3.0): `undefined writeContinue()` -/
+@[macro_inline] def http.ServerResponse.writeContinue (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeContinue" do
+  self.val.callMethod "writeContinue" (Internal.args #[]) Unit
+
+/-- `response.writeEarlyHints(hints[, callback])` (added in Node.js v18.11.0): `undefined writeEarlyHints(object hints)` -/
+@[macro_inline] def http.ServerResponse.writeEarlyHints (self : http.ServerResponse) (hints : Data) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeEarlyHints" do
+  self.val.callMethod "writeEarlyHints" (Internal.args #[toJS hints]) Unit
+
+/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v0.1.30): `http.ServerResponse writeHead(double /* integer: Nat */ statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
+@[macro_inline] def http.ServerResponse.writeHead (self : http.ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http.ServerResponse := Internal.api "Lasm.JS.Node.http.ServerResponse.writeHead" do
+  let r ← self.val.callMethod "writeHead" (Internal.args #[toJS statusCode, Internal.optional statusMessage, Internal.optional headers]) Value
+  pure { val := r }
+
+/-- `response.writeInformation(statusCode[, headers][, callback])` (added in Node.js v24.18.0): `undefined writeInformation(double /* integer: Nat */ statusCode, optional (object or sequence<any>) headers)` -/
+@[macro_inline] def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCode : Nat) (headers : Option ObjectOrSequenceOfAny := none) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeInformation" do
+  self.val.callMethod "writeInformation" (Internal.args #[toJS statusCode, Internal.optional headers]) Unit
+
+/-- `response.writeProcessing()` (added in Node.js v10.0.0): `undefined writeProcessing()` -/
+@[macro_inline] def http.ServerResponse.writeProcessing (self : http.ServerResponse) : IO Unit := Internal.api "Lasm.JS.Node.http.ServerResponse.writeProcessing" do
+  self.val.callMethod "writeProcessing" (Internal.args #[]) Unit
+
+/-- `v instanceof IncomingMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IncomingMessage`). -/
+@[macro_inline] def http.IncomingMessage.cast? (v : Value) : IO (Option http.IncomingMessage) := Internal.api "Lasm.JS.Node.http.IncomingMessage.cast?" do
+  Internal.cast (Support.getExport "node:http" ["IncomingMessage"] Value) (fun x => { val := x }) v
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `message.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
+@[macro_inline] def http.IncomingMessage.aborted (self : http.IncomingMessage) : IO Bool := Internal.api "Lasm.JS.Node.http.IncomingMessage.aborted" do
+  self.val.get "aborted" Bool
+
+/-- `message.complete` (added in Node.js v0.3.0): `readonly attribute boolean complete` -/
+@[macro_inline] def http.IncomingMessage.complete (self : http.IncomingMessage) : IO Bool := Internal.api "Lasm.JS.Node.http.IncomingMessage.complete" do
+  self.val.get "complete" Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `message.connection` (added in Node.js v0.1.90): `readonly attribute any connection` -/
+@[macro_inline] def http.IncomingMessage.connection (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.connection" do
+  self.val.get "connection" Data
+
+/-- `message.headers` (added in Node.js v0.1.5): `readonly attribute object headers` -/
+@[macro_inline] def http.IncomingMessage.headers (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.headers" do
+  self.val.get "headers" Data
+
+/-- `message.headersDistinct` (added in Node.js v18.3.0, v16.17.0): `readonly attribute object headersDistinct` -/
+@[macro_inline] def http.IncomingMessage.headersDistinct (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.headersDistinct" do
+  self.val.get "headersDistinct" Data
+
+/-- `message.httpVersion` (added in Node.js v0.1.1): `readonly attribute DOMString httpVersion` -/
+@[macro_inline] def http.IncomingMessage.httpVersion (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.httpVersion" do
+  self.val.get "httpVersion" String
+
+/-- `message.method` (added in Node.js v0.1.1): `readonly attribute DOMString method` -/
+@[macro_inline] def http.IncomingMessage.method (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.method" do
+  self.val.get "method" String
+
+/-- `message.rawHeaders` (added in Node.js v0.11.6): `readonly attribute sequence<DOMString> rawHeaders` -/
+@[macro_inline] def http.IncomingMessage.rawHeaders (self : http.IncomingMessage) : IO (Array String) := Internal.api "Lasm.JS.Node.http.IncomingMessage.rawHeaders" do
+  self.val.get "rawHeaders" (Array String)
+
+/-- `message.rawTrailers` (added in Node.js v0.11.6): `readonly attribute sequence<DOMString> rawTrailers` -/
+@[macro_inline] def http.IncomingMessage.rawTrailers (self : http.IncomingMessage) : IO (Array String) := Internal.api "Lasm.JS.Node.http.IncomingMessage.rawTrailers" do
+  self.val.get "rawTrailers" (Array String)
+
+/-- `message.signal` (added in Node.js v24.16.0): `readonly attribute AbortSignal signal` -/
+@[macro_inline] def http.IncomingMessage.signal (self : http.IncomingMessage) : IO AbortSignal := Internal.api "Lasm.JS.Node.http.IncomingMessage.signal" do
+  let r ← self.val.get "signal" Value
+  pure { val := r }
+
+/-- `message.socket` (added in Node.js v0.3.0): `readonly attribute stream.Duplex socket` -/
+@[macro_inline] def http.IncomingMessage.socket (self : http.IncomingMessage) : IO stream.Duplex := Internal.api "Lasm.JS.Node.http.IncomingMessage.socket" do
+  let r ← self.val.get "socket" Value
+  pure { val := r }
+
+/-- `message.statusCode` (added in Node.js v0.1.1): `readonly attribute double /* integer: Nat */ statusCode` -/
+@[macro_inline] def http.IncomingMessage.statusCode (self : http.IncomingMessage) : IO Nat := Internal.api "Lasm.JS.Node.http.IncomingMessage.statusCode" do
+  self.val.get "statusCode" Nat
+
+/-- `message.statusMessage` (added in Node.js v0.11.10): `readonly attribute DOMString statusMessage` -/
+@[macro_inline] def http.IncomingMessage.statusMessage (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.statusMessage" do
+  self.val.get "statusMessage" String
+
+/-- `message.trailers` (added in Node.js v0.3.0): `readonly attribute object trailers` -/
+@[macro_inline] def http.IncomingMessage.trailers (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.trailers" do
+  self.val.get "trailers" Data
+
+/-- `message.trailersDistinct` (added in Node.js v18.3.0, v16.17.0): `readonly attribute object trailersDistinct` -/
+@[macro_inline] def http.IncomingMessage.trailersDistinct (self : http.IncomingMessage) : IO Data := Internal.api "Lasm.JS.Node.http.IncomingMessage.trailersDistinct" do
+  self.val.get "trailersDistinct" Data
+
+/-- `message.url` (added in Node.js v0.1.90): `readonly attribute DOMString url` -/
+@[macro_inline] def http.IncomingMessage.url (self : http.IncomingMessage) : IO String := Internal.api "Lasm.JS.Node.http.IncomingMessage.url" do
+  self.val.get "url" String
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onAborted(http.IncomingMessage.AbortedListener listener)`: calls `on("aborted", listener)` -/
+@[macro_inline] def http.IncomingMessage.onAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onAborted" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "aborted", toJS listener]) Value
+  pure { val := r }
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onceAborted(http.IncomingMessage.AbortedListener listener)`: calls `once("aborted", listener)` -/
+@[macro_inline] def http.IncomingMessage.onceAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onceAborted" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "aborted", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.4.2): `http.IncomingMessage onClose(http.IncomingMessage.CloseListener listener)`: calls `on("close", listener)` -/
+@[macro_inline] def http.IncomingMessage.onClose (self : http.IncomingMessage) (listener : http.IncomingMessage.CloseListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.4.2): `http.IncomingMessage onceClose(http.IncomingMessage.CloseListener listener)`: calls `once("close", listener)` -/
+@[macro_inline] def http.IncomingMessage.onceClose (self : http.IncomingMessage) (listener : http.IncomingMessage.CloseListener) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `message.destroy([error])` (added in Node.js v0.3.0): `http.IncomingMessage destroy(optional any error)` -/
+@[macro_inline] def http.IncomingMessage.destroy (self : http.IncomingMessage) (error : Data := .undefined) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.destroy" do
+  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
+  pure { val := r }
+
+/-- `message.setTimeout(msecs[, callback])` (added in Node.js v0.5.9): `http.IncomingMessage setTimeout(double msecs)` -/
+@[macro_inline] def http.IncomingMessage.setTimeout (self : http.IncomingMessage) (msecs : Float) : IO http.IncomingMessage := Internal.api "Lasm.JS.Node.http.IncomingMessage.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS msecs]) Value
   pure { val := r }
 
 /-- `http.METHODS` (added in Node.js v0.11.8): `readonly attribute sequence<DOMString> METHODS` (Node.js 24.22.2 documentation, http.md) -/
@@ -1479,9 +1579,9 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
   pure { val := r }
 
 /-- `http.get(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((DOMString or URL) url, optional object options)` (Node.js 24.22.2 documentation, http.md) -/
-@[macro_inline] def http.getWithUrl (url : DOMStringOrURL) (options : Data := .undefined) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.getWithUrl" do
+@[macro_inline] def http.getWithUrl (url_ : DOMStringOrURL) (options : Data := .undefined) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.getWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http.getWithUrl", module := "node:http", path := "get", construct := false, arity := 2 }
-    (Internal.args #[toJS url, options]) (await := false)
+    (Internal.args #[toJS url_, options]) (await := false)
   pure { val := r }
 
 /-- `http.request(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest request(http.RequestOptions options)` (Node.js 24.22.2 documentation, http.md) -/
@@ -1491,9 +1591,9 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
   pure { val := r }
 
 /-- `http.request(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((DOMString or URL) url, optional http.RequestOptions options)` (Node.js 24.22.2 documentation, http.md) -/
-@[macro_inline] def http.requestWithUrl (url : DOMStringOrURL) (options : Option http.RequestOptions := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.requestWithUrl" do
+@[macro_inline] def http.requestWithUrl (url_ : DOMStringOrURL) (options : Option http.RequestOptions := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.http.requestWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.http.requestWithUrl", module := "node:http", path := "request", construct := false, arity := 2 }
-    (Internal.args #[toJS url, Internal.optional options]) (await := false)
+    (Internal.args #[toJS url_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `http.validateHeaderName(name[, label])` (added in Node.js v14.3.0): `undefined validateHeaderName(DOMString name, optional DOMString label)` (Node.js 24.22.2 documentation, http.md) -/
@@ -1515,5 +1615,25 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => In
 @[macro_inline] def http.setGlobalProxyFromEnv (proxyEnv : Data := .undefined) : IO JSFunction := Internal.api "Lasm.JS.Node.http.setGlobalProxyFromEnv" do
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.http.setGlobalProxyFromEnv", module := "node:http", path := "setGlobalProxyFromEnv", construct := false, arity := 1 }
     (Internal.args #[proxyEnv]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.isValidHeaderName(name)` (added in Node.js v26.11.0): `boolean isValidHeaderName(any name)` (Node.js 24.22.2 documentation, http.md) -/
+@[macro_inline] def http.isValidHeaderName (name : Data) : IO Bool := Internal.api "Lasm.JS.Node.http.isValidHeaderName" do
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.http.isValidHeaderName", module := "node:http", path := "isValidHeaderName", construct := false, arity := 1 }
+    (Internal.args #[toJS name]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.isValidHeaderValue(value[, options])` (added in Node.js v26.11.0): `boolean isValidHeaderValue(any value, optional http.IsValidHeaderValueOptions options)` (Node.js 24.22.2 documentation, http.md) -/
+@[macro_inline] def http.isValidHeaderValue (value : Data) (options : Option http.IsValidHeaderValueOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.http.isValidHeaderValue" do
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.http.isValidHeaderValue", module := "node:http", path := "isValidHeaderValue", construct := false, arity := 2 }
+    (Internal.args #[toJS value, Internal.optional options]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.websocketMask(source, mask, output, offset, length)` (added in Node.js v26.12.0): `undefined websocketMask(Uint8Array source, Uint8Array mask, Uint8Array output, long long offset, long long length)` (Node.js 24.22.2 documentation, http.md) -/
+@[macro_inline] def http.websocketMask (source : ByteArray) (mask : ByteArray) (output : ByteArray) (offset : Int) (length : Int) : IO Unit := Internal.api "Lasm.JS.Node.http.websocketMask" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.http.websocketMask", module := "node:http", path := "websocketMask", construct := false, arity := 5 }
+    (Internal.args #[toJS source, toJS mask, toJS output, toJS offset, toJS length]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.websocketUnmask(buffer, mask)` (added in Node.js v26.12.0): `undefined websocketUnmask(Uint8Array buffer, Uint8Array mask)` (Node.js 24.22.2 documentation, http.md) -/
+@[macro_inline] def http.websocketUnmask (buffer_ : ByteArray) (mask : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.http.websocketUnmask" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.http.websocketUnmask", module := "node:http", path := "websocketUnmask", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, toJS mask]) (await := false)
 
 end Lasm.JS.Node

@@ -101,6 +101,34 @@ that module imports (read from the sources themselves), into the prefix
 
 Decision 0.3-6.
 
+**In a Lake project, Lake builds them.** A Lake project's lakefile requires
+Lasm's library as a Lake package (`lasm init` writes it in the templates that use the library; `lasm editor` adds it):
+
+```toml
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"
+```
+
+`.lake/lasm-library` is a link (a junction on Windows) that every lasm command
+(`init`, `build`, `dev`, `editor`) makes or repairs. It points to one package
+per Lean prefix in Lasm's cache ([src/lake-library.mjs](../src/lake-library.mjs)):
+a lakefile whose one library has as roots the modules compiled on first import,
+from the installed library's sources. Lake then builds those modules on demand,
+like any dependency, in `lake build` and in the editor (`lake setup-file`), so
+an editor opening `import Lasm.JS.Web.IndexedDB` builds it.
+- **One `Lasm` root:** Lean takes the package `Lasm` from the first `LEAN_PATH`
+  directory that has `Lasm/`, which is this package's build directory. So the
+  modules that ship compiled are linked into it (hard links, or copies), and
+  Lake never builds them. A receipt records what was linked, for which prefix
+  and library; a missing, changed or stale file is replaced.
+- **Linked once:** `lasm build` takes those modules' C from Lake, like the
+  project's own, and neither compiles nor links its own copy.
+- **Fresh clones:** the link is not in git (`.lake/` is ignored), so run any
+  lasm command once before a plain `lake build`.
+
+Decision 0.3-7.
+
 **From source to C.** [src/application-sources.mjs](../src/application-sources.mjs)
 (`applicationSources`) handles two kinds of input:
 

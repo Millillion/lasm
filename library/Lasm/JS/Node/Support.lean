@@ -4,6 +4,10 @@ Lasm.JS.Node.Support: the definitions the generated Node bindings
 Lasm.JS.Web.Internal: properties of Node modules, functions that take a final
 `(err, value)` callback, and Buffer methods called on bytes. Hand-written; the
 mapping is in docs/JS_BINDINGS.md ("Lasm.JS.Node").
+
+Internal: not part of Lasm's API (docs/api/decisions/0.4.md 0.4-2). Programs call the
+generated functions, or `Lasm.JS`'s `require`, `Value.get` and `callMethod`;
+these helpers may change in any release.
 -/
 import Lasm.JS.Web.Support
 

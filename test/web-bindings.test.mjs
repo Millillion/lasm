@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
 import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
@@ -41,17 +41,38 @@ test('Lasm.JS.Web is every spec of @webref/idl: each spec with an interface has 
   assert.ok(!libraryModules.includes('Lasm.JS.Web'));
 });
 
-test('every Lasm.JS.Node container is generated in its module, with the members node-tier2.mjs names', () => {
+test('every Lasm.JS.Node module is generated, with what its documentation file documents, minus the recorded exclusions', () => {
   const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-surface.json', import.meta.url), 'utf8'));
-  for (const m of nodeTier.modules) for (const c of m.containers) {
-    const entry = surface.find(e => e.lean === c.name);
-    assert.ok(entry, `${c.name} is missing from the generated surface`);
-    assert.equal(entry.leanModule, m.name);
-    assert.equal(entry.module, c.jsModule);
-    const members = [...entry.namespace ?? [], ...entry.static ?? [], ...entry.prototype ?? [], ...entry.instance ?? []];
-    for (const o of c.only ?? []) assert.ok(members.includes(o.replace(/\(.*$/, '')), `${c.name}.${o} is not generated`);
-    for (const e of Object.keys(c.exclude ?? {})) assert.ok(!members.includes(e), `${c.name}.${e} is excluded but generated`);
+  const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+  assert.deepEqual(modules.map(m => m.name).sort(), nodeTier.modules.map(m => m.name).sort());
+  for (const m of modules) assert.ok(existsSync(new URL(`../library/Lasm/JS/Node/${m.name}.lean`, import.meta.url)), `Lasm.JS.Node.${m.name} is not generated`);
+  // The classes and namespaces of the modules this tier started with, by their documented names.
+  for (const name of ['fsPromises', 'fs', 'FileHandle', 'fs.Stats', 'path', 'os', 'process', 'crypto', 'Hash', 'child_process', 'ChildProcess',
+    'EventEmitter', 'stream.Readable', 'net.Server', 'net.Socket', 'http.Server', 'https.Agent', 'zlib', 'worker_threads.Worker', 'dns', 'util'])
+    assert.ok(surface.some(e => e.lean === name), `${name} is missing from the generated surface`);
+  const all = new Set(surface.flatMap(e => [...e.namespace ?? [], ...e.static ?? [], ...e.prototype ?? [], ...e.instance ?? []].map(x => `${e.lean}.${x}`)));
+  for (const key of Object.keys(nodeTier.exclude)) assert.ok(![...all].some(x => x.endsWith('.' + key.replace(/\(.*$/, '').split('.').at(-1)) && x.startsWith(key.split('.')[0])),
+    `${key} is excluded but generated`);
+});
+
+
+// Lasm.JS.Cloudflare (API_DECISIONS 0.5-16): no umbrella; Support, Kv, D1 and Workers ship compiled, in import
+// order and closed under imports; every other module is compiled on first import (src/lazy-library.mjs).
+test('Lasm.JS.Cloudflare: a compiled core closed under imports, the rest compiled on first import', async () => {
+  const { lazyModules } = await import('../src/lazy-library.mjs');
+  const core = ['Support', 'Kv', 'D1', 'Workers'].map(n => `Lasm.JS.Cloudflare.${n}`);
+  assert.deepEqual(libraryModules.filter(m => m.startsWith('Lasm.JS.Cloudflare')), core);
+  assert.ok(!existsSync(new URL('../library/Lasm/JS/Cloudflare.lean', import.meta.url)), 'no umbrella module');
+  for (const m of core) {
+    const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
+    for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) {
+      assert.ok(libraryModules.includes(imported), `${m} imports ${imported}, which is not compiled with it`);
+      assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+    }
   }
+  const generated = readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url)).map(f => `Lasm.JS.Cloudflare.${f.replace(/\.lean$/, '')}`);
+  const lazy = lazyModules(libraryModules);
+  for (const m of generated) assert.ok(core.includes(m) || lazy.includes(m), `${m} is neither compiled nor compiled on first import`);
 });
 
 test('Lasm.JS.Node events: each documented event is a typed listener with on<Event> and once<Event>', () => {
@@ -87,11 +108,22 @@ test('Lasm.JS.Node names: a parent projection or instance never repeats an ances
 });
 
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Node', 'Cloudflare']) {
+  for (const tier of ['Node']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
-    for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
-    for (const m of generated) for (const imported of importsOf(m))
+    // Lasm.JS.Node ships a compiled core set and no umbrella (0.4-39); its other modules are compiled on first import.
+    const eager = tier === 'Node' ? generated.filter(m => libraryModules.includes(m)) : generated;
+    for (const m of [...eager, ...(tier === 'Node' ? [] : [`Lasm.JS.${tier}`])]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
+    for (const m of eager) for (const imported of importsOf(m)) {
+      assert.ok(libraryModules.includes(imported), `${m} (prebuilt) imports ${imported} (compiled on first import)`);
       assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+    }
+    if (tier === 'Node') {
+      const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+      assert.ok(!existsSync(new URL('../library/Lasm/JS/Node.lean', import.meta.url)), 'no Lasm.JS.Node umbrella module (0.4-39)');
+      assert.deepEqual(eager.filter(m => m !== 'Lasm.JS.Node.Support' && m !== 'Lasm.JS.Node.Serve').sort(),  // Support and Node.serve are hand-written
+        modules.filter(m => m.core).map(m => `Lasm.JS.Node.${m.name}`).sort(), 'the compiled Node modules are node-modules.json\'s core');
+      for (const m of generated) assert.ok(eager.includes(m) || lazyModules(libraryModules).includes(m), `${m} is neither compiled nor compiled on first import`);
+    }
   }
   const order = JSON.parse(readFileSync(new URL('modules.json', webDir), 'utf8')).modules;
   for (const m of webModules) {
@@ -130,11 +162,15 @@ const denoBunCore = [];
 test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core; every other one compiles on first import', () => {
   const lazy = lazyModules(libraryModules);
   for (const tier of ['Deno', 'Bun']) {
-    const shipped = [`Lasm.JS.${tier}`, ...readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
-      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`)];
+    // No umbrella module (0.4-21): a program imports the modules it uses.
+    assert.ok(!existsSync(new URL(`../library/Lasm/JS/${tier}.lean`, import.meta.url)), `library/Lasm/JS/${tier}.lean: no umbrella module (0.4-21)`);
+    const shipped = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
+      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of libraryModules.filter(m => m === `Lasm.JS.${tier}` || m.startsWith(`Lasm.JS.${tier}.`)))
       assert.ok(denoBunCore.includes(m), `${m} is prebuilt (src/lasm-library.mjs libraryModules) but not in the declared core`);
     for (const m of shipped) assert.ok(denoBunCore.includes(m) || lazy.includes(m), `${m} is neither prebuilt nor compiled on first import`);
+    for (const dir of ['examples', 'test/fixtures']) for (const f of readdirSync(new URL(`../${dir}/`, import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean') && !/\.lake|node_modules/.test(String(f))))
+      assert.ok(!new RegExp(`^import Lasm\\.JS\\.${tier}\\s*$`, 'm').test(readFileSync(new URL(`../${dir}/${f}`, import.meta.url), 'utf8')), `${dir}/${f} imports the removed umbrella module Lasm.JS.${tier}`);
     for (const t of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean')))
       assert.ok(!/^import Lasm\.JS\.(Deno|Bun)\b/m.test(readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8')),
         `templates/${t} imports Lasm.JS.Deno or Lasm.JS.Bun: its modules belong in the prebuilt core`);
@@ -288,7 +324,9 @@ test('serve-api reads declarations: namespaces, interfaces, type aliases and fun
   assert.match(d[0].doc, /A handler/);
   assert.equal(typeText(parseType('"a" | (string & {}) | Promise<Response[]> | ((x: number) => void)')),
     '"a" | string & {} | Promise<Response[]> | ((x: number) => void)');
-  assert.throws(() => parseType('T extends U ? A : B'), /conditional types are not lowered/);
+  // Conditional types parse (the rich lowering reads them as any).
+  assert.equal(parseType('T extends U ? A : B').k, 'cond');
+  assert.equal(typeText(parseType('A[K]["inputs"]')), 'A[K]["inputs"]');
 });
 
 test('serve-api lowers by its rules', () => {
@@ -447,7 +485,7 @@ test('ts-auto fails on what it cannot lower, and on stale tier entries', () => {
   // without the names entry, the mechanical name: With and the parameter type that differs
   assert.match(auto(autoHost({ names: {} })).idl, /LasmLeanName="connectWithPathStringTransportUnix"/);
   assert.throws(() => auto(autoHost({ exclude: { 'Nothing.here': 'stale' } })), /exclude Nothing\.here matches nothing/);
-  assert.throws(() => lowerAuto(autoHost(), [{ file: 'rt.d.ts', text: autoSource.replace('export const pid: number;', 'export const pid: keyof Foo;') }]), /keyof types are not lowered/);
+  assert.throws(() => lowerAuto(autoHost(), [{ file: 'rt.d.ts', text: autoSource.replace('export const pid: number;', 'export const pid: keyof Foo;') }]), /keyof (types are not lowered|Foo is not lowered)/);
 });
 
 // Lasm.JS.Cloudflare (scripts/bindings/cloudflare-api.mjs lowers @cloudflare/workers-types with
@@ -463,7 +501,10 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
     for (const e of Object.keys(d.exclude ?? {})) assert.ok(!members.includes(e), `${d.name}.${e} is excluded but generated`);
   }
   // Every dictionary, callback and enum is generated, also those no member names (ExportedHandler).
-  const workers = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Workers.lean', import.meta.url), 'utf8');
+  // Every module's text: the handlers live with their events' modules (Queues, Tail, Email),
+  // ExportedHandler in Handlers.
+  const workers = readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))
+    .map(f => readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8')).join('\n');
   for (const n of ['structure ExportedHandler where', 'def ExportedHandlerFetchHandler.ofFn', 'def ExportedHandlerScheduledHandler.ofFn',
     'def ExportedHandlerQueueHandler.ofFn', 'def env {Env : Type} [FromJS Env] : IO Env']) assert.ok(workers.includes(n), n);
   // Workers' Env (API_DECISIONS A26): the program declares it; every handler takes it as a type
@@ -476,7 +517,7 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
   for (const f of readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))) {
     const text = readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8');
     for (const [, imported] of text.matchAll(/^import (Lasm\.\S+)$/gm))
-      assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.((Types\.)?(Dom|Streams|FileAPI|Url|Fetch)|Support)$)/, `${f} imports ${imported}`);
+      assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.((Types\.)?(Dom|Streams|FileAPI|Url|Fetch|Websockets|Webcrypto)|Support)$)/, `${f} imports ${imported}`);
   }
   // Nullable record and ArrayBuffer results (D1's first() of no row, KV's get of a missing
   // key: null) are read as data: Option Value would be a reference to null, never none.

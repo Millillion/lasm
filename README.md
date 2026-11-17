@@ -327,9 +327,10 @@ own modules are `import Lasm.JS.Node`: `fsPromises.readFile`, `path.join`,
 `os.tmpdir`, `process.argv`, `crypto.scrypt`, `child_process.spawn` and more, as
 Node 24's docs define them, on Node and where Bun and Deno implement them
 ([Lasm.JS.Node](docs/JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
-Cloudflare Workers' runtime APIs are `import Lasm.JS.Cloudflare` (source, not
-yet released): Workers KV, D1, R2, Durable Objects, Queues, the `scheduled` and
-`queue` handlers, `ctx.waitUntil`, the Cache API and `connect`, generated from
+Cloudflare Workers' runtime APIs are `Lasm.JS.Cloudflare.*` (source, not yet
+released), one module per area, imported by name: `import Lasm.JS.Cloudflare.Kv`,
+`.D1`, `.Workers` (handlers, `ctx.waitUntil`), and R2, Durable Objects, Queues,
+Workers AI and every other API of Cloudflare's own, generated from
 `@cloudflare/workers-types`
 ([Lasm.JS.Cloudflare](docs/JS_BINDINGS.md#cloudflare-workers-lasmjscloudflare)).
 

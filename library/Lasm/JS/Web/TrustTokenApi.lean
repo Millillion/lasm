@@ -31,6 +31,13 @@ instance : ToJS PrivateToken := ⟨fun d => Internal.fields #[("version", toJS d
     ("operation", toJS d.operation),
     ("refreshPolicy", Internal.optional d.refreshPolicy),
     ("issuers", Internal.optional d.issuers)]⟩
+instance : FromJS PrivateToken where
+  fromJS d := do return {
+    version := ← Lasm.JS.readField TokenVersion d "version",
+    operation := ← Lasm.JS.readField OperationType d "operation",
+    refreshPolicy := ← Lasm.JS.readField (Option RefreshPolicy) d "refreshPolicy",
+    issuers := ← Lasm.JS.readField (Option (Array String)) d "issuers" }
+  typeName := "Lasm.JS.Web.PrivateToken"
 
 /-- `Promise<boolean> hasPrivateToken(USVString issuer)` -/
 @[macro_inline] def Document.hasPrivateToken (self : Document) (issuer : String) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasPrivateToken" do

@@ -8,7 +8,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileLibrary, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryIdentity, libraryLeanVersions,
+import { compileLibrary, eagerWebModules, lazyArray, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryIdentity, libraryLeanVersions,
   libraryModules, libraryOutputs, librarySources, linkedLibraryModules, prebuiltLibrary } from '../src/lasm-library.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 
@@ -122,7 +122,80 @@ test('the library sources a program links come from the prefix, with the glue, a
     { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
     { module: 'lasm_async.c', source: asyncGlueSource }]);
   assert.deepEqual(result.oleans, [join(prefix, 'lib', 'lean', 'Lasm', 'JS', 'Core.olean'), join(prefix, 'lib', 'lean', 'Lasm', 'JS.olean')]);
+  // A module the program's sources already compile (Lake built it from Lasm's Lake package, 0.3-7) is not linked again;
+  // what it imports still is.
+  const lakeC = join(prefix, 'IndexedDB.c');
+  put(lakeC, call('Lasm.JS'));
+  put(program, call('Lasm.JS.Web.IndexedDB'));
+  put(c('Lasm.JS.Web.IndexedDB'), call('Lasm.JS'));
+  put(join(prefix, 'lib', 'lasm', 'lazy', 'Lasm.JS.Web.IndexedDB.json'), '{}');
+  assert.deepEqual(librarySources(lean, [program, lakeC], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] }).modules, ['Lasm.JS.Core', 'Lasm.JS']);
   rmSync(c('Lasm.RPC'));
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });
 
+
+test('importing src/lasm-library.mjs reads no file: the module list is computed on first use (mutation sandboxes have no library/)', async () => {
+  const { spawnSync } = await import('node:child_process');
+  // A fresh process whose fs reads are counted from the moment the module is imported.
+  const script = `
+    import fs from 'node:fs';
+    import { syncBuiltinESMExports } from 'node:module';
+    let reads = 0;
+    for (const name of ['readFileSync', 'readdirSync', 'existsSync', 'statSync', 'openSync']) {
+      const original = fs[name];
+      // Library files only: Node's module loader reads the modules' own sources through fs too.
+      fs[name] = (...args) => { if (/[\\\\/]library[\\\\/]/.test(String(args[0]))) reads++; return original(...args); };
+    }
+    // Named imports (import { readFileSync } from 'node:fs') see the counting functions too.
+    syncBuiltinESMExports();
+    const m = await import(${JSON.stringify(new URL('../src/lasm-library.mjs', import.meta.url).href)});
+    const atImport = reads;
+    const n = m.libraryModules.length;
+    console.log(JSON.stringify({ atImport, afterUse: reads, n, isArray: Array.isArray(m.libraryModules), spread: [...m.libraryModules].length, includes: m.libraryModules.includes('Lasm.JS') }));`;
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  const { atImport, afterUse, n, isArray, spread, includes } = JSON.parse(r.stdout.trim().split('\n').at(-1));
+  assert.equal(atImport, 0, 'no file is read when the module is imported');
+  assert.ok(afterUse > 0, 'the list is read on first use');
+  assert.ok(n > 50 && isArray && spread === n && includes);
+});
+
+test('the prebuilt web modules: the closure of the roots and of the host modules\' imports, in the module list\'s order', t => {
+  const library = scratch(t);
+  const web = name => join(library, 'Lasm', 'JS', 'Web', ...name.split('.')) + '.lean';
+  const modules = ['Types.Dom', 'Dom', 'Types.Fetch', 'Fetch', 'Html', 'Url', 'Websockets', 'Streams', 'Webgpu', 'IndexedDB'].map(m => `Lasm.JS.Web.${m}`);
+  put(join(library, 'Lasm', 'JS', 'Web', 'modules.json'), JSON.stringify({ modules }));
+  put(web('Types.Dom'), '');
+  put(web('Dom'), 'import Lasm.JS.Web.Types.Dom\n');
+  put(web('Types.Fetch'), 'import Lasm.JS.Web.Types.Dom\n');
+  // Lasm.JS.Web.Support is not in the module list: not followed.
+  put(web('Fetch'), 'import Lasm.JS.Web.Support\nimport Lasm.JS.Web.Types.Fetch\n');
+  put(web('Html'), 'import Lasm.JS.Web.Dom\n');
+  for (const m of ['Url', 'Websockets', 'Streams', 'Webgpu', 'IndexedDB']) put(web(m), '');
+  // A host module (Lasm/JS/Node/Http.lean) and an umbrella module (Lasm/JS/Deno.lean) bring in what they import; Bun has none.
+  put(join(library, 'Lasm', 'JS', 'Node', 'Http.lean'), 'import Lasm.JS.Web.Streams\n');
+  put(join(library, 'Lasm', 'JS', 'Node', 'notes.txt'), 'import Lasm.JS.Web.Webgpu\n');
+  put(join(library, 'Lasm', 'JS', 'Deno.lean'), 'import Lasm.JS.Web.IndexedDB\n');
+  assert.deepEqual(eagerWebModules(library), ['Types.Dom', 'Dom', 'Types.Fetch', 'Fetch', 'Html', 'Url', 'Websockets', 'Streams', 'IndexedDB'].map(m => `Lasm.JS.Web.${m}`));
+});
+
+test('lazyArray: computed once, on first use, and an array for every use', () => {
+  let computed = 0;
+  const list = lazyArray(() => { computed++; return ['a', 'b', 'c']; });
+  assert.equal(computed, 0);
+  assert.ok(Array.isArray(list));
+  assert.equal(computed, 0, 'Array.isArray reads the target, not the list');
+  assert.equal(list.length, 3);
+  assert.ok(list.includes('b'));
+  assert.equal(list.indexOf('c'), 2);
+  assert.deepEqual([...list], ['a', 'b', 'c']);
+  assert.deepEqual(list.filter(x => x !== 'a'), ['b', 'c']);
+  assert.ok(1 in list);
+  assert.ok(!(5 in list));
+  assert.deepEqual(Object.keys(list), ['0', '1', '2']);
+  assert.deepEqual(Object.getOwnPropertyDescriptor(list, '1'), { value: 'b', writable: true, enumerable: true, configurable: true });
+  assert.equal(JSON.stringify(list), '["a","b","c"]');
+  // (Deep comparison and util.inspect read a Proxy's target, the empty array: compare [...list].)
+  assert.equal(computed, 1);
+});

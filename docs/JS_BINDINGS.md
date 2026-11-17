@@ -490,8 +490,10 @@ you import, never the names you write. The later tiers are `Lasm.JS.Node`,
 templates and examples use: DOM, HTML, Fetch, URL, WebSockets and what they
 import). Every other module ships as source, and the first build that imports
 it compiles it once into Lasm's cache: `[lasm] Compiling
-Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). For that reason there
-is no umbrella `import Lasm.JS.Web`: it would compile every spec (0.3-18).
+Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). In a Lake project,
+Lake builds it, in the editor too ([GETTING_STARTED.md](GETTING_STARTED.md#editor),
+decision 0.3-7). For that reason there is no umbrella `import Lasm.JS.Web`: it
+would compile every spec (0.3-18).
 
 ```lean
 import Lasm.JS.Web.Fetch
@@ -821,13 +823,24 @@ COST_PLACEHOLDER
 
 ## Standard bindings for Node: `Lasm.JS.Node`
 
-`import Lasm.JS.Node` gives typed bindings of Node's server-essential modules
-that the web APIs do not cover, as documented for **Node.js 24.22.2** (Node 24
-LTS, the oldest Node Lasm supports). Status: **current source, not yet
-released** (tier 2 of the standard bindings, first part).
+`Lasm.JS.Node` gives typed bindings of **every Node core module**, one Lean module each
+(`import Lasm.JS.Node.Fs`, `import Lasm.JS.Node.Http`), generated
+from Node's own documentation as it is (Jordan, 2026-11-16): the 45 documentation
+files of Node's modules at **Node.js 24.22.2** (Node 24 LTS, the oldest Node Lasm
+supports), plus what only the **Node.js 26.13.0** docs document, marked "Node.js 26
+and later". Web standard APIs that Node also provides (`URL`, `EventTarget`, `Blob`,
+`MessagePort`, `TextEncoder`, `crypto.subtle`, `performance.now`, …) are
+`Lasm.JS.Web`'s and are not generated again. Status: **current source, not yet
+released**.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Fs
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Os
+import Lasm.JS.Node.Crypto
+import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.ChildProcess
+import Lasm.JS.Node.Zlib     -- outside the compiled core set: compiled on first import
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def run : Async Unit := do
@@ -836,6 +849,8 @@ def run : Async Unit := do
   match ← fsPromises.readFile file (some "utf8") with
   | .domString text => IO.println text                        -- hi
   | .uint8Array _ => pure ()
+  let gz ← zlib.gzipSync (.domString "hi")                     -- the synchronous forms are generated too
+  IO.println (← zlib.gunzip (.uint8Array gz)).size              -- and the callback forms as Async
   let key ← crypto.scrypt "password" "salt" 32
   IO.println (← Buffer.toString key (some "hex"))
   let out ← child_process.execFile "git" (some #["--version"])
@@ -845,49 +860,121 @@ def main : IO Unit := run.block
 ```
 
 Names are Node's own, as its docs write them: `fsPromises.readFile`,
-`path.join`, `os.cpus`, `process.cwd`, `crypto.createHash`,
-`child_process.spawn`, `buffer.isUtf8`, `Buffer.from`; classes are handle
-types (`FileHandle`, `fs.Stats`, `fs.Dirent`, `Hash`, `Hmac`, `ChildProcess`,
-`EventEmitter`, `stream.Readable`, `stream.Writable`), and options objects are
-structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
-Documented events are typed listeners: `server.onRequest`, `socket.onData`,
-`child.onceExit` ([Events](#events-typed-listeners)).
+`fs.readFileSync`, `path.join`, `os.cpus`, `process.cwd`, `crypto.createHash`,
+`child_process.spawn`, `zlib.gzip`, `dns.lookup`, `dnsPromises.resolve4`,
+`worker_threads.isMainThread`, `util.format`, `v8.getHeapStatistics`; classes are
+handle types (`FileHandle`, `fs.Stats`, `Hash`, `ChildProcess`, `EventEmitter`,
+`stream.Readable`, `net.Socket`, `http.Server`, `tls.TLSSocket`, `Http2Session`,
+`DatabaseSync`, `vm.Script`, `WASI`), and options objects are structures
+(`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`). Documented events are
+typed listeners: `server.onRequest`, `socket.onData`, `child.onceExit`
+([Events](#events-typed-listeners)). A complete program:
+[examples/node-core](../examples/node-core).
 
 ### What is covered
 
-| Module | Members | Node module |
-| --- | --- | --- |
-| `Lasm.JS.Node.Fs` | every stable member of the promises API (`fsPromises.*`: `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `mkdtemp`, `stat`, `lstat`, `rm`, `rename`, `copyFile`, `cp`, `symlink`, `readlink`, `realpath`, `open`, …), `FileHandle`, `fs.Stats`, `fs.Dirent` | `node:fs/promises`, `node:fs` |
-| `Lasm.JS.Node.Path` | every member of `path` | `node:path` |
-| `Lasm.JS.Node.Os` | every member of `os` | `node:os` |
-| `Lasm.JS.Node.Process` | `process.argv`, `env`, `exit`, `exitCode`, `cwd`, `chdir`, `platform`, `arch`, `pid`, `ppid`, `version`, `versions`, `execPath`, `execArgv`, `title`, `uptime`, `memoryUsage`, `kill` | `node:process` |
-| `Lasm.JS.Node.Buffer` | `Buffer.from` (string and encoding), `alloc`, `byteLength`, `compare`, `concat`, `isEncoding`, and as functions of bytes `Buffer.toString`, `equals`, `compare`; `buffer.isUtf8`, `isAscii`, `transcode`, `kMaxLength` | `node:buffer` |
-| `Lasm.JS.Node.Crypto` | `crypto.createHash`, `createHmac`, `hash`, `randomBytes`, `randomInt`, `randomUUID`, `timingSafeEqual`, `getHashes`, and `scrypt`, `pbkdf2`, `hkdf` as `Async` (through `util.promisify`); `Hash`, `Hmac` | `node:crypto` |
-| `Lasm.JS.Node.ChildProcess` | `child_process.spawn`, `child_process.execFile` (as `Async`, its documented promisified form: `{stdout, stderr}`), `ChildProcess` (`pid`, `exitCode`, `signalCode`, `killed`, `kill`, `stdin`, `stdout`, `stderr`) | `node:child_process` |
-| `Lasm.JS.Node.Events` | `EventEmitter` (`on`, `once`, `off`, `emit`, `listenerCount`, `eventNames`, `removeAllListeners`), `events.once` (`Async`) | `node:events` |
-| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`, `stream.Duplex.toWeb`, `fromWeb`: a child's `stdout` or a request body becomes a web `ReadableStream` (read with Lasm.JS.Web); `readable.pause`, `resume`, `isPaused`, `setEncoding`, `destroy`, `writable.write`, `end`, `destroy`; the streams' events (`'data'`, `'end'`, `'error'`, `'drain'`, `'finish'`, …) | `node:stream` |
-| `Lasm.JS.Node.Net` | every stable member of `net` (`net.createServer`, `connect` and `createConnection` in their options, path and port forms, `isIP`, the autoselection defaults), `net.Server` (`listen` with options, a path or a port; `address`, `close`, `getConnections` as `Async`, `ref`, `unref`, events `'connection'`, `'listening'`, `'close'`, `'error'`, `'drop'`), `net.Socket` (constructor, `connect`, `write`, `end`, `destroy`, `setEncoding`, `setKeepAlive`, `setNoDelay`, `setTimeout`, addresses and counters, twelve events), `net.BlockList`, `net.SocketAddress`, `net.BoundSocket` | `node:net` |
-| `Lasm.JS.Node.Http` | every stable member of `http` (`http.createServer`, `request` and `get` with options or a URL, `METHODS`, `STATUS_CODES`, `globalAgent`, `validateHeaderName`, …), `http.Server`, `http.IncomingMessage`, `http.ServerResponse`, `http.ClientRequest`, `http.OutgoingMessage`, `http.Agent`, with their stable events | `node:http` |
-| `Lasm.JS.Node.Https` | `https.createServer`, `request`, `get`, `globalAgent`, `https.Server` (with `http.Server`'s members and events), `https.Agent` | `node:https` |
+One Lean module per documentation file, each with everything that file documents.
 
-Not generated, with the reason (each listed in
-[`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
+**Imports.** A program imports each module it uses (`import Lasm.JS.Node.Fs`,
+`import Lasm.JS.Node.Http`); there is no umbrella module, as for every generated host
+(0.4-39). The core set ships compiled: `Events`, `Stream`, `Buffer`, `Path`, `Os`,
+`Process`, `Fs`, `Crypto`, `ChildProcess`, and the modules they use (`AsyncHooks`,
+`Net`, `Readline`). Every other module is compiled into Lasm's tool cache the first time
+a program imports it ([lazy library](HOW_LASM_WORKS.md)). Measured on 2026-11-16 (Linux x64, one
+core, `lean -c`, with the `@[macro_inline]` emitter of 0.3), the first import costs 0.3
+to 3.5 s per module: `Http2` 3.5 s, `Http` 2.6 s, `Test` 2.3 s, the others under 1.5 s;
+all 33 lazy modules together 26.1 s (16.3 MB of `.olean`, 3.5 MB of C). Later builds
+reuse the compiled modules. The compiled core set is 14 modules (with the hand-written
+`Support` and `Serve`): 17.4 s, 13.7 MB of `.olean` and 2.8 MB of C in `library/prebuilt`.
+[`node-modules.json`](../scripts/bindings/node-modules.json) lists them in import
+order and [`node-surface.json`](../scripts/bindings/node-surface.json) every
+generated class, namespace and member.
 
-- `net.Server`'s `listen(handle)` form (a libuv handle or file descriptor
-  object; the options, path and port forms are generated); `http.Server`'s and
-  `https.Server`'s own `listen()` entries, which the docs give as identical to
-  `net.Server`'s (inherited); `outgoingMessage.pipe()` (documented to throw);
-  the `[Symbol.asyncDispose]` methods (`await using`: `close`); `http`'s
-  `WebSocket` class (the global, `Lasm.JS.Web.WebSocket`); the `tls` module
-  (`https.createServer` takes TLS options as `Data`).
-- `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
-  `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
-  `createReadStream`, `createWriteStream` (Node stream classes: use
-  `readableWebStream`), `readLines`, `readv` and `writev` (in-place buffers).
-- `path.posix`, `path.win32` (the same functions again).
-- Members marked Experimental, Deprecated or Legacy in the docs
-  (`filehandle.pull`, `fsPromises.lchmod`, `buffer.atob`), and the callback and
-  synchronous forms of what has a promise form (`fs.readFile`, `fs.readFileSync`).
+| Lean module | Node module | Lean module | Node module |
+| --- | --- | --- | --- |
+| `Lasm.JS.Node.Assert` | `node:assert` | `Lasm.JS.Node.PerfHooks` | `node:perf_hooks` (Node's own: histograms, `monitorEventLoopDelay`, `performance.timerify`, …) |
+| `Lasm.JS.Node.AsyncHooks`, `.AsyncContext` | `node:async_hooks` | `Lasm.JS.Node.Process` | `node:process` |
+| `Lasm.JS.Node.Buffer` | `node:buffer` | `Lasm.JS.Node.Punycode` | `node:punycode` (Deprecated) |
+| `Lasm.JS.Node.ChildProcess` | `node:child_process` | `Lasm.JS.Node.Querystring` | `node:querystring` |
+| `Lasm.JS.Node.Cluster` | `node:cluster` | `Lasm.JS.Node.Readline` | `node:readline`, `node:readline/promises` |
+| `Lasm.JS.Node.Console` | `node:console` (the `Console` class) | `Lasm.JS.Node.Repl` | `node:repl` |
+| `Lasm.JS.Node.Crypto` | `node:crypto` | `Lasm.JS.Node.Sea` | `node:sea` |
+| `Lasm.JS.Node.Dgram` | `node:dgram` | `Lasm.JS.Node.Sqlite` | `node:sqlite` |
+| `Lasm.JS.Node.DiagnosticsChannel` | `node:diagnostics_channel` | `Lasm.JS.Node.Stream` | `node:stream` |
+| `Lasm.JS.Node.Dns` | `node:dns`, `node:dns/promises` | `Lasm.JS.Node.StreamIter` | `node:stream/iter` (Experimental) |
+| `Lasm.JS.Node.Domain` | `node:domain` (Deprecated) | `Lasm.JS.Node.StringDecoder` | `node:string_decoder` |
+| `Lasm.JS.Node.Events` | `node:events` | `Lasm.JS.Node.Test` | `node:test` |
+| `Lasm.JS.Node.Fs` | `node:fs`, `node:fs/promises` (the promises, callback and synchronous APIs) | `Lasm.JS.Node.Timers` | `node:timers/promises`, `Timeout`, `Immediate` |
+| `Lasm.JS.Node.Http` | `node:http` | `Lasm.JS.Node.Tls` | `node:tls` |
+| `Lasm.JS.Node.Http2` | `node:http2` | `Lasm.JS.Node.TraceEvents` | `node:trace_events` |
+| `Lasm.JS.Node.Https` | `node:https` | `Lasm.JS.Node.Tty` | `node:tty` |
+| `Lasm.JS.Node.Inspector` | `node:inspector` | `Lasm.JS.Node.Url` | `node:url` (the legacy API and Node's helpers: `fileURLToPath`, `pathToFileURL`, …) |
+| `Lasm.JS.Node.Module` | `node:module` | `Lasm.JS.Node.Util` | `node:util` |
+| `Lasm.JS.Node.Net` | `node:net` | `Lasm.JS.Node.V8` | `node:v8` |
+| `Lasm.JS.Node.Os` | `node:os` | `Lasm.JS.Node.Vm` | `node:vm` |
+| `Lasm.JS.Node.Path` | `node:path` | `Lasm.JS.Node.Wasi` | `node:wasi` |
+| `Lasm.JS.Node.WorkerThreads` | `node:worker_threads` | `Lasm.JS.Node.Zlib` | `node:zlib` |
+
+**How the containers are found.** Every `Class:` section of a documentation file is a
+class (`Class: fs.Stats` is `fs.Stats`), with the members its docs give it, wherever
+they are documented (`stream.Readable` for consumers and for implementers is one
+class). Every documented member owned by a module-level name is in that name's
+namespace (`fs.readFile` in `fs`, `fsPromises.open` in `fsPromises`, `dnsPromises.lookup`
+in `dnsPromises`); a namespace that is an export of its module is called through it
+(`performance.timerify` of `node:perf_hooks`, `fs.realpath.native`). An object the docs
+describe without a `Class:` heading (`tracing.enable()` of a `Tracing` object) is a class
+named in `node-tier2.mjs` `instances`. Two classes of the same name in different modules
+are named with their module (`cluster.Worker`, `worker_threads.Worker`).
+
+**Web standards are Lasm.JS.Web's.** A class whose name is a web standard interface
+of the pinned `@webref/idl` (`URL`, `URLSearchParams`, `URLPattern`, `EventTarget`,
+`Event`, `CustomEvent`, `Blob`, `File`, `WebSocket`, `MessageChannel`,
+`MessagePort`, `BroadcastChannel`, `Lock`, `LockManager`, `TextEncoder`,
+`TextDecoder`, `PerformanceEntry`, `PerformanceMark`, `PerformanceMeasure`,
+`PerformanceObserver`, `PerformanceObserverEntryList`, `PerformanceResourceTiming`),
+a web standard namespace (`console`), and the members of Node's objects that a web
+interface defines (`crypto.randomUUID`, `crypto.getRandomValues`, `crypto.subtle` of
+`Crypto`; `performance.now`, `mark`, `measure`, … of `Performance`) are not generated
+again: use `Lasm.JS.Web`'s. Node's own classes that share a web name are listed in
+`node-tier2.mjs` `notWeb` (`cluster.Worker`, `worker_threads.Worker`, `vm.Module`).
+Node classes that extend a web class (`NodeEventTarget`, `PerformanceNodeTiming`)
+are generated without that parent.
+
+**Stability.** Every member is generated whatever its stability in the docs; the doc
+comment of a member marked Deprecated (0), Experimental (1) or Legacy (3) says so
+(`**Experimental** in the Node.js 24.22.2 docs`). Experimental members can need a
+Node flag or be missing.
+
+**Node 24 and Node 26.** The bindings are the Node 24.22.2 docs; a member, class or
+namespace that only the Node 26.13.0 docs document is added, with `**Node.js 26 and
+later**` in its doc comment (`buffer.isLatin1`, `Buffer.stringLength`,
+`fs.openAsBlobSync`, …). Where the two document the same member differently, the
+bindings follow Node 24; [`node-api-26.json`](../scripts/bindings/node-api-26.json)
+lists every difference.
+
+**What the docs give only in prose.** A type the docs write only in prose (215
+members on 2026-11-16) is `any` (`Data` in Lean) unless `node-tier2.mjs` `prose`
+states it, quoting the sentence (the lowering fails if the sentence is gone); a type
+name that no generated class or web standard defines is `any` too.
+[`node-coverage.json`](../scripts/bindings/node-coverage.json) lists all of them,
+with the web classes left to Lasm.JS.Web, the parents dropped and the name clashes.
+
+**Not generated** (each with its reason, `node-coverage.json` `excluded` and
+`computedKeys`; docs/api/decisions/0.4.md 0.4-38):
+
+- `Buffer`'s instance properties (`buf.length`, `buf.buffer`, `buf.byteOffset`,
+  `buf.parent`, `buf.poolSize`) and the methods that write into the buffer in place
+  and do not return it (`buf.write`, `buf.writeUInt32BE` and the other `write…`
+  methods): a `Buffer` is a `ByteArray` in Lean, a copy, so the property describes a
+  view of memory Lean does not have and the write would be lost (`ByteArray.size`
+  is the length; `Buffer.fromWithString`, `Buffer.alloc`, `buf.fill` work).
+- Members with a computed key (`buf[index]`, `[Symbol.asyncDispose]()`,
+  `[Symbol.asyncIterator]()`): not named members (use `Value.get` with the key).
+- `inspector.Session`'s `'<inspector-protocol-method>'` event: a placeholder for every
+  protocol event (use `session.onInspectorNotification`).
+- `options.detached` and `options.stdio` of `child_process.md`: two of
+  `child_process.spawn`'s options, documented under their own headings; they are
+  members of `child_process.SpawnOptions`.
 
 ### How Node's docs become Lean
 
@@ -902,13 +989,19 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u`, or the value itself through Lasm.JS.Web's `Coe` instances (`fsPromises.readFile "a.txt"`) |
 | `{null}`, `{undefined}` in a type | nullable | `Option` |
 | `{Object}` with documented members (`options`) | `dictionary` | a structure, named after the method and parameter (`fsPromises.ReadFileOptions`) |
-| `{Object}` without them, and classes outside this cut (`KeyObject`, `Date`, `fs.ReadStream`) | `object` | `Data` |
+| `{Object}` without them, `{Date}`, `{Map}`, `{RegExp}` | `object` | `Data` |
+| a Node class (`{KeyObject}`, `{fs.ReadStream}`), named with or without its module (`{Socket}` for `net.Socket`) | the class | its handle type |
+| a web standard class (`{URL}`, `{Blob}`, `{MessagePort}`) | the web interface | `Lasm.JS.Web`'s type |
 | `{Function}` | `Function` | `JSFunction` (`ofFn`, `ofSyncFn`) |
 | a class (`Class: FileHandle`) | `interface` | a handle type; `Extends: EventEmitter` gives `structure ChildProcess extends EventEmitter` |
 | `Returns: {Promise} Fulfills with undefined upon success.` | `Promise<undefined>` | `Async Unit` |
 | `Fulfills with the {fs.Stats} object` | `Promise<fs.Stats>` | `Async fs.Stats` |
 | an optional trailing `callback` (`randomBytes(size[, callback])`) | left out | the synchronous form: `crypto.randomBytes 32 : IO ByteArray` |
 | a required trailing `callback(err, value)` (`scrypt(…, callback)`) | `Promise<value>` | `Async ByteArray`, called through `util.promisify` |
+| a required trailing callback with more values (`fs.read(fd, …, callback)`: `(err, bytesRead, buffer)`) or arguments the docs do not list | `Function` | a `JSFunction` argument, as documented (`Function.ofFn`) |
+| a type given only in prose, or a type name nothing defines (`{Tracing}` aside) | `any` | `Data` (listed in `node-coverage.json`) |
+| a member marked Deprecated, Experimental or Legacy | the member, `LasmStability` | generated, its doc comment says so |
+| a member only the Node 26 docs document | the member, `LasmSince="26.13.0"` | generated, its doc comment says **Node.js 26 and later** |
 | `[min, ]max` (an optional parameter before a required one) | two overloads | `crypto.randomInt max`, `crypto.randomIntWithMin min max` |
 | `buf.toString([encoding])` (a Buffer method) | an operation on bytes | `Buffer.toString (bytes) (encoding := none)`, called with the bytes as `this` |
 | a `Buffer` result | `Uint8Array` | `ByteArray` |
@@ -953,7 +1046,7 @@ and `signal` as `Option`s, since the docs say each is `null` in one case). The
 untyped `EventEmitter.on (name) (JSFunction)` stays for anything else.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Net
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def main : IO Unit := do
@@ -1002,9 +1095,12 @@ which gives the bytes written where the docs give the string.
 - **Build time: about 4 to 9 seconds more** for a new project with warm tools:
   Node 13.0 → 16.8 s and 18.2 → 24.6 s, the edge runtime 8.8 → 13.9 s and
   12.9 → 21.7 s (two CI runs).
-- **Package size:** the compiled library (`library/prebuilt`) grows from 61.0
-  to 70.8 MB (7.0 MB of `.olean` files), 2.2 MB compressed. Nothing is
-  compiled on the user's machine.
+- **Package size:** `library/prebuilt` holds only the core set (13.7 MB of
+  `.olean` files and 2.8 MB of C, before compression); the other 33 modules ship
+  as Lean source and are compiled on first import (see [Imports](#what-is-covered-1)).
+  All of Lasm.JS.Node compiled is 30.0 MB of `.olean` and 6.3 MB of C with the
+  `@[macro_inline]` emitter, against 52.3 MB and 19.6 MB with the previous one
+  (2026-11-16).
 
 ### Pinned version and drift
 
@@ -1057,15 +1153,15 @@ A server on a JavaScript runtime is one Lean function from a web `Request` to a
 | --- | --- | --- |
 | Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault handle` |
 | Function platforms on Node (Netlify, Vercel, AWS Lambda and Lambda@Edge, Azure Functions, Google Cloud Functions) | the platform's handler export | `Lasm.JS.exportDefault handle` ([below](#function-platforms-exportdefault)) |
-| Deno | `Deno.serve` | `import Lasm.JS.Deno` (generated, below) |
-| Bun | `Bun.serve` | `import Lasm.JS.Bun` (generated, below) |
+| Deno | `Deno.serve` | `import Lasm.JS.Deno.Serve` (generated, below) |
+| Bun | `Bun.serve` | `import Lasm.JS.Bun.Serve` (generated, below) |
 | Node | none of its own takes a `Request`: Lasm provides `Node.serve`, shaped like `Bun.serve` | `import Lasm.JS.Node.Serve` ([Node](#serving-http-on-node-nodeserve)) |
 
 Outbound HTTP is Lasm.JS.Web's `fetch` everywhere. Status: **current source, not
 yet released** (tier 2 of the standard bindings, second part).
 
 ```lean
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Serve
 open Lasm.JS Lasm.JS.Web
 
 def handle (request : Request) : Async Response := do
@@ -1078,7 +1174,7 @@ def main : IO Unit := do
 ```
 
 ```lean
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Serve
 open Lasm.JS Lasm.JS.Web
 
 def main : IO Unit := do
@@ -1105,8 +1201,9 @@ path resolves.
 | `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); on a Unix socket, `serveWithUnixOptions` (`ServeUnixOptions`: `path`; `HttpServerUnixAddr`, `ServeHandlerUnixAddr`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`; in `Lasm.JS.Deno.Net`). The rest of the namespace: [Lasm.JS.Deno](#standard-bindings-for-deno-lasmjsdeno) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
 | `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); the structure `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
 
-`import Lasm.JS.Deno` and `import Lasm.JS.Bun` import their module (and the
-Lasm.JS.Web modules it uses: `Dom`, `Fetch`, `Url`).
+`import Lasm.JS.Deno.Serve` and `import Lasm.JS.Bun.Serve` import the server
+modules (and the modules they use). Neither namespace has an umbrella module
+(docs/api/decisions/0.4.md, 0.4-21): import the modules whose members you call.
 
 Not generated, with the reason (each listed in
 [`serve-tier2.mjs`](../scripts/bindings/serve-tier2.mjs) and at the top of
@@ -1161,7 +1258,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | overloads of one function | Lasm.JS.Web's overload naming: the first keeps the name, the others add their first differing argument | `serve`, `serveWithOptions`, `serveWithTlsOptions` |
 
 The generated functions look the runtime's global up when called, so a program
-that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
+that imports `Lasm.JS.Deno.Serve` still builds (and runs its other code) on Node. A
 hand-written `@[js "globalThis" "Deno.serve"]` binding builds for `--target deno`
 (the binding check, which runs on Node, only warns there) but not for Node.
 
@@ -1331,17 +1428,20 @@ review the diff of the IDL files.
 
 ## Standard bindings for Deno: `Lasm.JS.Deno`
 
-`import Lasm.JS.Deno` gives **the whole `Deno` namespace** of Deno 2.9.6, generated
+`Lasm.JS.Deno` is **the whole `Deno` namespace** of Deno 2.9.6, generated
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
 every function, constant and class, and every type they use. Status: **current
 source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
 0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
-Its modules ship as source and compile on the first build that imports them
-(0.4-20); import only the modules you use (`import Lasm.JS.Deno.Kv`) to compile less.
+A program imports the modules whose members it calls (`import Lasm.JS.Deno.Kv`);
+there is no `import Lasm.JS.Deno` (0.4-21). The modules ship as source and compile
+on the first build that imports them (0.4-20).
 
 ```lean
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Subprocess
+import Lasm.JS.Deno.Kv
 open Lasm.JS Lasm.JS.Web
 
 def run : Async Unit := do
@@ -1471,19 +1571,22 @@ three declaration files.
 
 ## Standard bindings for Bun: `Lasm.JS.Bun`
 
-`import Lasm.JS.Bun` gives **the whole `Bun` namespace and `bun:sqlite`** of Bun
+`Lasm.JS.Bun` is **the whole `Bun` namespace and `bun:sqlite`** of Bun
 1.4.4, generated from Bun's own TypeScript declarations (`packages/bun-types` at
 `bun-v1.4.4`: `bun.d.ts`, `serve.d.ts`, `sqlite.d.ts`, `sql.d.ts`, `redis.d.ts`,
 `s3.d.ts`, `shell.d.ts`, `security.d.ts`, `fetch.d.ts`, `wasm.d.ts`) by the same
 generator and rules as [Lasm.JS.Deno](#how-denos-declarations-become-lean). Web
 types Bun declares again (`Request`, `Response`, `WebSocket`, `Blob`, streams) are
 Lasm.JS.Web's. Status: **current source, not yet released** (Stage 0, milestone
-0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). Its modules
-ship as source and compile on the first build that imports them (0.4-20); import
-only the modules you use (`import Lasm.JS.Bun.Sqlite`) to compile less.
+0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). A program
+imports the modules whose members it calls (`import Lasm.JS.Bun.Sqlite`); there is
+no `import Lasm.JS.Bun` (0.4-21). The modules ship as source and compile on the
+first build that imports them (0.4-20).
 
 ```lean
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Core
+import Lasm.JS.Bun.Serve
+import Lasm.JS.Bun.Sqlite
 open Lasm.JS Lasm.JS.Web
 
 def main : IO Unit := do
@@ -1548,8 +1651,9 @@ objects. [examples/bun-sqlite](../examples/bun-sqlite) is a todo API on
 
 ## Cloudflare Workers: `Lasm.JS.Cloudflare`
 
-`import Lasm.JS.Cloudflare` gives typed bindings of the runtime APIs of
-Cloudflare Workers, **generated from Cloudflare's own TypeScript declarations**
+`Lasm.JS.Cloudflare.*` (`import Lasm.JS.Cloudflare.Kv`, `.D1`, `.Workers`, …,
+one module per area) gives typed bindings of the runtime APIs of Cloudflare
+Workers, **generated from Cloudflare's own TypeScript declarations**
 (`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
 CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
 3 of the standard bindings). It covers what a Worker's `env` holds and what its
@@ -1565,7 +1669,10 @@ Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
 
 ```lean
 import Lasm.JS              -- deriving FromJS
-import Lasm.JS.Cloudflare
+import Lasm.JS.Cloudflare.Kv
+import Lasm.JS.Cloudflare.D1
+import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.Handlers
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
 /-- The Worker's bindings and variables, as wrangler.toml declares them. -/
@@ -1609,37 +1716,54 @@ starts the computation at once and returns its promise.
 
 ### What is covered
 
-| Module | Members | Declared in |
-| --- | --- | --- |
-| `Lasm.JS.Cloudflare.Kv` | `KVNamespace`: `get` (text), `getJson`, `getArrayBuffer`, `getStream`, `getWithMetadata`, `put` (string, bytes or stream; `expiration`, `expirationTtl`, `metadata`), `list` (`prefix`, `limit`, `cursor`; `KVNamespaceListResult`), `delete` | `@cloudflare/workers-types` 5.20261019.1, `index.d.ts` |
-| `Lasm.JS.Cloudflare.D1` | `D1Database` (`prepare`, `batch`, `exec`, `withSession`), `D1DatabaseSession`, `D1PreparedStatement` (`bind`, `first`, `first0`, `run`, `all`, `raw`), `D1Result` with `D1Meta`, `D1ExecResult` | same |
-| `Lasm.JS.Cloudflare.R2` | `R2Bucket` (`head`, `get` with ranges and conditions, `put` with HTTP and custom metadata and checksums, `list`, `delete`, multipart uploads), `R2Object`, `R2ObjectBody` (`body`, `bytes`, `text`, `json`, `blob`, `arrayBuffer`), `R2Checksums`, `R2MultipartUpload` and every options dictionary | same |
-| `Lasm.JS.Cloudflare.Queues` | `Queue` (`send`, `sendBatch`, `metrics`), `MessageBatch` (`messages`, `queue`, `metadata`, `ackAll`, `retryAll`), `Message` (`id`, `timestamp`, `body`, `attempts`, `ack`, `retry`) | same |
-| `Lasm.JS.Cloudflare.Cache` | `caches` (`CacheStorage`: `default`, `open`), `Cache` (`match`, `put`, `delete`) | same |
-| `Lasm.JS.Cloudflare.Sockets` | `connect` (of `cloudflare:sockets`), `Socket` (`readable`, `writable`, `opened`, `closed`, `close`, `startTls`, `secureTransport`, `upgraded`) | same |
-| `Lasm.JS.Cloudflare.DurableObjects` | `DurableObjectNamespace` (`idFromName`, `idFromString`, `newUniqueId`, `get`, `getByName`, `jurisdiction`), `DurableObjectId`, `DurableObjectStub` (`fetch`, `connect`, `id`, `name`), `DurableObjectState` (`storage`, `id`, `waitUntil`, `blockConcurrencyWhile`, `abort`, `props`), `DurableObjectStorage` and `DurableObjectTransaction` (`get`, `put`, `delete`, `list`, `deleteAll`, `transaction`, alarms, `sync`, bookmarks) | same |
-| `Lasm.JS.Cloudflare.Workers` | `ExportedHandler` (`fetch`, `scheduled`, `queue`) and its handler types `ExportedHandlerFetchHandler`, `ExportedHandlerScheduledHandler`, `ExportedHandlerQueueHandler`; `ExecutionContext` (`waitUntil`, `passThroughOnException`, `abort`, `props`, `cache`), `CacheContext`, `ScheduledController` (`cron`, `scheduledTime`, `noRetry`); `env` (of `cloudflare:workers`) | same |
+**Every declaration of Cloudflare's own in `@cloudflare/workers-types`** (838 of
+them; API_DECISIONS 0.5-11). [`cloudflare-classify.mjs`](../scripts/bindings/cloudflare-classify.mjs)
+tells them apart from the web platform's, which are Lasm.JS.Web's (`Request`,
+streams, `WebSocket`), and Node's. Each declaration goes to the module of its
+area, listed in [`cloudflare-modules.json`](../scripts/bindings/cloudflare-modules.json)
+in import order:
 
-Not generated, with the reason (each listed in
-[`cloudflare-tier3.mjs`](../scripts/bindings/cloudflare-tier3.mjs) and at the
-top of [`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+| Module | Area |
+| --- | --- |
+| `Lasm.JS.Cloudflare.Kv`, `.D1`, `.R2`, `.Queues` | Workers KV, D1, R2, Queues (with the queue handler) |
+| `Lasm.JS.Cloudflare.Workers` | the fetch and scheduled handlers, `ExecutionContext`, `env` of `cloudflare:workers` |
+| `Lasm.JS.Cloudflare.Handlers` | `ExportedHandler`, every handler together |
+| `Lasm.JS.Cloudflare.Cache`, `.Sockets` | the Cache API (until Lasm.JS.Web has it), `connect` of `cloudflare:sockets` |
+| `Lasm.JS.Cloudflare.DurableObjects`, `.Containers` | Durable Objects (storage, SQLite, alarms, facets, WebSocket hibernation), Containers |
+| `Lasm.JS.Cloudflare.Tail`, `.Email` | Tail Workers, trace events, `TailStream`, tracing; Email Workers and sending email |
+| `Lasm.JS.Cloudflare.Ai` | Workers AI and every model's inputs and outputs, AI Gateway, AI Search, AutoRAG, Agent memory, Markdown conversion |
+| `Lasm.JS.Cloudflare.Stream`, `.Services` | Cloudflare Stream; rate limiting, Secrets Store, Artifacts, Flagship, Pipelines and the other bindings |
+| `Lasm.JS.Cloudflare.Vectorize`, `.Hyperdrive`, `.Images`, `.Workflows`, `.Rpc`, `.BrowserRun`, `.Analytics`, `.HtmlRewriter`, `.Cf` | Vectorize, Hyperdrive, Images and Media, Workflows, service bindings, RPC, Worker loaders and dispatch namespaces, Browser Rendering, Analytics Engine, HTMLRewriter, the `cf` properties of requests |
 
-- **Overloads another overload already covers:** KV's `get(key, "text")` (that
-  is `get`), the `get(key, options)` forms that pair a type with `cacheTtl`
-  (`get` takes `cacheTtl`), and R2's `get` and `put` forms with `onlyIf`
-  required (the options have `onlyIf`).
-- **Not expressible yet:** KV's batch reads (an `Array<Key>` key: the same
-  parameter names as the one-key overloads, so the overload naming cannot tell
-  them apart), `getWithMetadata` of JSON, bytes or a stream (a second
-  instantiation of `KVNamespaceGetWithMetadataResult`), D1's
-  `raw({columnNames: true})` (a tuple result).
-- **Outside this tier:** the RPC methods of a Durable Object stub (they are the
-  class's own: call them with `Value.callMethodAwait`), WebSocket hibernation
-  (WebSocket is the browser tier's), SQLite storage (`storage.sql`, `kv`,
-  `transactionSync`), containers and facets, `ctx.exports`, Access identity,
-  tracing, and the `connect`, `tail`, `trace`, `tailStream`, `test` and
-  `email` handlers.
-- **Deprecated:** `D1Database.dump`.
+**Import the modules of the areas the Worker uses** (API_DECISIONS 0.5-16:
+there is no umbrella `Lasm.JS.Cloudflare`). A Worker links the modules it
+imports. `Lasm.JS.Cloudflare.Support`, `.Kv`, `.D1` and `.Workers` ship
+compiled; every other module compiles the first time a program imports it
+(docs/HOW_LASM_WORKS.md, "Lasm's library"). Workers AI's catalog takes about
+25 seconds then. A Worker that uses KV and D1 imports `Lasm.JS.Cloudflare.Kv`,
+`.D1` and `.Workers`, which import no other Cloudflare module. Its smallest form
+publishes the fetch function itself (`exportDefault fetch`), because
+`ExportedHandler` names every handler and so imports their modules.
+
+Not generated, by class (API_DECISIONS 0.5-12; each listed at the top of
+[`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+
+- **Symbol-keyed members** (`[Symbol.iterator]()`, `[Symbol.dispose]()`): use
+  `Lasm.JS.Value.get` with the Symbol.
+- **Keys that are not identifiers** (`AiModels`' `"@cf/…"` model names, a map
+  that exists only in the types): read through `Data`.
+- **Private and protected class members**, and **constructors of abstract
+  classes** (`WorkerEntrypoint`, `DurableObject` of `cloudflare:workers`: they
+  are subclassed, A28).
+- **Index signatures beside named members**: the named members are generated,
+  and other keys go through `Data`.
+- **Type-level helpers** (`Rpc.Stub<T>`, conditional and mapped types, and
+  `AiModelList[Name]["inputs"]` for a generic `Name`) are read as `Data` where
+  they are used. `Ai.run model inputs` therefore takes and returns `Data`, and each
+  model's typed inputs and outputs (`Ai_Cf_Openai_Whisper_Input`, …) convert to and
+  from it with `toJS` and `FromJS`.
+- **Deprecated** declarations (the declaration says `@deprecated`,
+  `@experimental` or `UNSTABLE`).
 
 ### How the declarations become Lean
 
@@ -1675,6 +1799,16 @@ or the lowering fails.
 | `...values: unknown[]` | `any... values` | `(values : Array Data := #[])` |
 | `toString()`, `toJSON()` | `toString_` with `[LasmName]` | `DurableObjectId.toString` |
 | `declare const caches`, `export const env` (of `cloudflare:workers`), `connect` (of `cloudflare:sockets`) | a namespace per module (`[LasmModule]`) | `Lasm.JS.Cloudflare.caches`, `env`, `connect` |
+| `[a, b]` (a tuple) | `sequence<T>` (one element type), else `sequence<any>` | `Array T` |
+| a template literal type, `keyof T` | `DOMString` | `String` |
+| `typeof C`, a conditional type, `List[Name]["f"]` for a generic `Name` | `any` | `Data` |
+| `T["f"]` (a member's type) | that member's type | — |
+| `Omit<T, K>`, `Pick<T, K>`, `Partial<T>`, `Required<T>`, `A & B` of object types | a dictionary of the resulting members, named after its owner and member | a structure |
+| `string & NonNullable<unknown>` (a branded string) | `DOMString` | `String` |
+| a class's `constructor(…)`, `static` members | `constructor(…)`, `static` | `X.new`, `X.member` |
+| a member holding a class (`Span: typeof Span`) | `[LasmLeanName="SpanClass"]` | `Tracing.SpanClass` |
+| a destructured parameter (`{ type, payload }: {…}`) | an argument named `options` | `(options : …)` |
+| two dictionaries or enums of one module with the same members | the later a `[LasmAlias] typedef` of the first | `abbrev Later := First` |
 
 Numbers are `Float`, as workers-types declares them, except the members that
 the shared integer table names (A11.1, `scripts/bindings/overrides.json`: `size`,
@@ -1721,7 +1855,7 @@ takes a promise (`Async.toPromise`).
 ### Where it runs, tests and cost
 
 Only on Workers (`--target workers`): the bindings are looked up on the objects
-the runtime hands over, so a program that imports `Lasm.JS.Cloudflare` builds
+the runtime hands over, so a program that imports `Lasm.JS.Cloudflare.*` builds
 for any target, but the calls work only in a Worker.
 
 [`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare) is one Worker

@@ -15,10 +15,11 @@ import { linkToolchainCatalog } from '../src/managed-link-toolchain.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 import { applicationPolicy } from '../src/application-policy.mjs';
 import { withApplicationLock } from '../src/application-lock.mjs';
+import { libraryRoot } from '../src/lazy-library.mjs';
 
 const build = new URL('../src/application-build.mjs', import.meta.url).href;
 const stubbed = ['managed-lean.mjs', 'managed-link-toolchain.mjs', 'system-git.mjs', 'application-runtime.mjs', 'application-sources.mjs',
-  'lasm-library.mjs', 'lazy-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
+  'lasm-library.mjs', 'lazy-library.mjs', 'lake-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
 const stubDirectory = mkdtempSync(join(tmpdir(), 'lasm-build-stubs-'));
 const stubs = globalThis.lasmBuildStubs = {};
 const isClass = value => typeof value === 'function' && /^class\b/.test(Function.prototype.toString.call(value));
@@ -61,6 +62,7 @@ function setup(t, { project = false } = {}) {
     'managed-link-toolchain.mjs:provisionLinkToolchain': record('provisionLinkToolchain', async () => ({ identity: 'toolchain-identity', toolchain: { version: linkToolchainCatalog.version } })),
     'system-git.mjs:checkSystemGit': record('checkSystemGit'),
     'lazy-library.mjs:ensureProgramLibrary': record('ensureProgramLibrary', async () => ({ compiled: [], ms: 0 })),
+    'lake-library.mjs:ensureLakeLibrary': record('ensureLakeLibrary', () => ({ required: false, directory: join(root, 'lake-package') })),
     'application-runtime.mjs:applicationRuntime': record('applicationRuntime', async () => ({ directory: runtime, identity: 'runtime-identity',
       manifest: { name: 'rt', emscripten: linkToolchainCatalog.version } })),
     'application-sources.mjs:applicationSources': record('applicationSources', (file, _lean, work, options) => {
@@ -337,6 +339,7 @@ test('Lasm.JS programs: the library is linked and the bindings are checked again
   const stages = [];
   const result = await run({ progress: ({ stage }) => stages.push(stage) });
   assert.deepEqual(stubs.librarySourcesArgs[0], { ...lean });
+  assert.deepEqual(stubs.librarySourcesArgs[2], { supplied: ['Main'] });
   assert.equal(result.lasmJs, true);
   assert.deepEqual(result.jsBindings, [{ name: 'Main.left', module: 'left', warning: 'arity' }]);
   assert.deepEqual(named('linkApplication')[0][1].sources.slice(-1), [library]);
@@ -395,6 +398,9 @@ test('Lake projects: system Git, dependency licences, the C tier and native obje
     assert.equal(options.lock, withApplicationLock);
     assert.equal(typeof options.log, 'function');
   }
+  // Lasm's library as a Lake package (0.3-7): the link made or repaired for each prefix, before Lasm compiles anything.
+  assert.deepEqual(named('ensureLakeLibrary').map(([, project, prefix, options]) => [project, prefix, options.cache, options.eager.includes('Lasm.JS.Core')]),
+    [[directory, join(root, 'lean'), join(root, 'cache'), true], [directory, join(root, 'lean'), join(root, 'cache'), true]]);
   assert.deepEqual(stubs.secondLean.cCompiler, {});
   assert.equal(stubs.secondOptions.afterImports, undefined);
   assert.equal(stubs.licenceArgs[0], directory);
@@ -522,7 +528,7 @@ test('the program must define main; the C tier without progress; licences of nat
   assert.deepEqual(stubs.nativeOptions.leanPrefix, [lean.prefix, undefined]);
   assert.ok(stubs.nativeOptions.runtimeInclude.endsWith(join('runtime', 'include')));
   assert.deepEqual(stubs.licenceArgs[1], [join(directory, 'Main.lean'), nativeSource]);
-  assert.deepEqual(stubs.licenceArgs[2], { exclude: [lean.prefix, undefined] });
+  assert.deepEqual(stubs.licenceArgs[2], { exclude: [lean.prefix, undefined, libraryRoot] });
   assert.deepEqual(result.nativeObjects, [{ object: '/o/native.o', identity: 'native-identity', sourceSha256: sha('int x;'), args: ['-DX'] }]);
   assert.deepEqual(named('linkApplication').at(-1)[1].nativeCompilations.map(item => item.object), ['/o/native.o']);
 });
@@ -540,4 +546,24 @@ test('a tiered Lean records its tier and components; a link-only build copies no
   const linkOnly = await run({ profile: 'dev', keepLinkWork: true, linkOnly: true });
   assert.equal(existsSync(join(linkOnly.cached, 'node_modules')), false);
   assert.ok(existsSync(join(result.cached, 'node_modules/left/package.json')));
+});
+
+test('a Lake project that requires Lasm\'s package: Lake builds the library modules, Lasm compiles and links them only once', async t => {
+  const { directory, root, run, named } = setup(t, { project: true });
+  stubs['lake-library.mjs:ensureLakeLibrary'] = (...args) => { stubs.lakeArgs = args; return { required: true, directory: join(root, 'lake-package') }; };
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS_Web_IndexedDB(builtin); }\n';
+  stubs.generated = { inputs: [{ module: 'Main', source: join(directory, 'Main.lean') }, { module: '+Lasm.JS.Web.IndexedDB', source: put(join(root, 'library/Lasm/JS/Web/IndexedDB.lean'), 'import Lasm.JS.Web.Types.IndexedDB\n') }] };
+  stubs['lasm-library.mjs:librarySources'] = (...args) => { stubs.librarySourcesArgs = args; return { sources: [], inputs: [], modules: [], oleans: [] }; };
+  stubs['lasm-library.mjs:importsLibrary'] = () => true;
+  await run();
+  assert.equal(stubs.lakeArgs[0], directory);
+  assert.deepEqual(named('ensureProgramLibrary'), [], 'Lake builds them');
+  assert.deepEqual(stubs.librarySourcesArgs[2], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] });
+});
+
+test('a standalone source (no Lake project) has no Lake package: Lasm compiles its library imports', async t => {
+  const { run, named } = setup(t);
+  await run();
+  assert.deepEqual(named('ensureLakeLibrary'), []);
+  assert.equal(named('ensureProgramLibrary').length, 1);
 });
