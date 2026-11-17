@@ -178,9 +178,10 @@ test('lasm cache repair prints the summary and fails while cleanup is pending', 
   assert.match(lines.error.at(-1), /1 temporary directories cleaned, 0 unrelated entries untouched, 2 cleanup operations pending\. Cache: \/d$/);
 });
 
-test('the retired binding configurations are refused', async () => {
+test('the retired binding configurations are refused before anything runs', async () => {
   await assert.rejects(cli(['build', 'bindings.json']),
-    { message: 'This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.' });
+    { message: 'Expected a Lean source file (Main.lean), not bindings.json' });
+  assert.deepEqual(calls, []);
 });
 
 test('dev builds for deployment targets are refused before building unless --allow-dev', async () => {
