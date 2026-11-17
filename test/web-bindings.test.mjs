@@ -104,8 +104,11 @@ test('the generated modules are shipped library modules, in import order', () =>
       if (libraryModules.includes(m)) assert.ok(libraryModules.includes(imported), `${m} (prebuilt) imports ${imported} (compiled on first import)`);
     }
   }
-  // The templates and the example apps need only prebuilt web modules.
-  const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => ['node_modules', '.lake', 'dist'].includes(e.name) ? []
+  // The templates and the example apps need only prebuilt web modules. An example pinned to a published
+  // @lasm/cli (Tandem, Folio, …) builds with that release's library, so its imports are that release's.
+  const pinned = dir => { try { const p = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')); const v = { ...p.dependencies, ...p.devDependencies }['@lasm/cli'];
+    return typeof v === 'string' && /^\d/.test(v); } catch { return false; } };
+  const walk = dir => pinned(dir) ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(e => ['node_modules', '.lake', 'dist'].includes(e.name) ? []
     : e.isDirectory() ? walk(join(dir, e.name)) : e.name.endsWith('.lean') ? [join(dir, e.name)] : []);
   for (const file of [...walk(`${root}templates`), ...walk(`${root}examples`)])
     for (const [, m] of readFileSync(file, 'utf8').matchAll(/^import (Lasm\.JS\.Web\.\S+)$/gm))

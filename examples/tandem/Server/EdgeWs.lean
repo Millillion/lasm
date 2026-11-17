@@ -17,7 +17,7 @@ through Lasm.JS's dynamic calls. Cloudflare Workers has no WebSockets here
 long-poll.
 -/
 import Lasm.JS
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web
 import Lasm.JS.Deno
 import Lasm.JS.Bun
 import Server.App
