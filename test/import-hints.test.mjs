@@ -77,8 +77,9 @@ test('lasm build and lasm dev print the hint under the error (formatLeanDiagnost
 
 test('the shipped index is small and covers every generated namespace', () => {
   const file = new URL('../library/Lasm/JS/import-index.json', import.meta.url);
-  // Measured 2026-11-16: 346 KB (80 KB compressed in the npm package) for about 20,000 names.
-  assert.ok(statSync(file).size < 450 * 1024, `${statSync(file).size} bytes`);
+  // Measured 2026-11-17 after the whole Node and Cloudflare surfaces (Train B): 494 KB (105 KB compressed in the npm
+  // package) for about 24,000 names; it grows with the generated bindings, not with programs.
+  assert.ok(statSync(file).size < 600 * 1024, `${statSync(file).size} bytes`);
   const modules = Object.keys(JSON.parse(readFileSync(file, 'utf8')).modules);
   for (const host of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) assert.ok(modules.some(m => m.startsWith(`Lasm.JS.${host}.`)), host);
   assert.ok(!modules.some(m => m.includes('.Types.')), 'types modules are indexed under their spec');
