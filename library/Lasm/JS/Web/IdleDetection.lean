@@ -35,6 +35,14 @@ instance : ToJS IdleOptions := ⟨fun d => Internal.fields #[("threshold", Inter
   Lasm.JS.Binding.invoke IdleDetector { name := "Lasm.JS.Web.IdleDetector.new", module := "globalThis", path := "IdleDetector", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdleDetector.new? : IO (Option IdleDetector) := Internal.api "Lasm.JS.Web.IdleDetector.new?" do
+  if !(← Internal.hasGlobal ["IdleDetector"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IdleDetector { name := "Lasm.JS.Web.IdleDetector.new?", module := "globalThis", path := "IdleDetector", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute UserIdleState? userState` -/
 @[macro_inline] def IdleDetector.userState (self : IdleDetector) : IO (Option UserIdleState) := Internal.api "Lasm.JS.Web.IdleDetector.userState" do
   self.val.get "userState" (Option UserIdleState)
@@ -55,6 +63,14 @@ instance : ToJS IdleOptions := ⟨fun d => Internal.fields #[("threshold", Inter
 @[macro_inline] def IdleDetector.requestPermission : Async PermissionState := Internal.api "Lasm.JS.Web.IdleDetector.requestPermission" do
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.IdleDetector.requestPermission", module := "globalThis", path := "IdleDetector.requestPermission", construct := false, arity := 0 }
     (Internal.args #[])
+
+/-- `static Promise<PermissionState> requestPermission()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdleDetector.requestPermission? : Async (Option PermissionState) := Internal.api "Lasm.JS.Web.IdleDetector.requestPermission?" do
+  if !(← Internal.hasGlobal ["IdleDetector", "requestPermission"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.IdleDetector.requestPermission?", module := "globalThis", path := "IdleDetector.requestPermission", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
 
 /-- `Promise<undefined> start(optional IdleOptions options)` -/
 @[macro_inline] def IdleDetector.start (self : IdleDetector) (options : Option IdleOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.IdleDetector.start" do

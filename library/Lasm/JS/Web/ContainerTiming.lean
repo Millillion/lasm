@@ -62,6 +62,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLElement.containerTiming (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.containerTiming" do
   self.val.get "containerTiming" String
 
+/-- `attribute DOMString containerTiming` where the platform has it (`'containerTiming' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.containerTiming? (self' : HTMLElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLElement.containerTiming?" do
+  let self := self'
+  if !(← Internal.has self.val "containerTiming") then return none
+  let lasmGuarded ← do
+    self.val.get "containerTiming" String
+  return some lasmGuarded
+
 /-- Sets `containerTiming`: `attribute DOMString containerTiming` -/
 @[macro_inline] def HTMLElement.setContainerTiming (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setContainerTiming" do
   self.val.set "containerTiming" (toJS value)
@@ -69,6 +77,14 @@ set_option compiler.extract_closed false
 /-- `attribute boolean containerTimingIgnore` -/
 @[macro_inline] def HTMLElement.containerTimingIgnore (self : HTMLElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLElement.containerTimingIgnore" do
   self.val.get "containerTimingIgnore" Bool
+
+/-- `attribute boolean containerTimingIgnore` where the platform has it (`'containerTimingIgnore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.containerTimingIgnore? (self' : HTMLElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLElement.containerTimingIgnore?" do
+  let self := self'
+  if !(← Internal.has self.val "containerTimingIgnore") then return none
+  let lasmGuarded ← do
+    self.val.get "containerTimingIgnore" Bool
+  return some lasmGuarded
 
 /-- Sets `containerTimingIgnore`: `attribute boolean containerTimingIgnore` -/
 @[macro_inline] def HTMLElement.setContainerTimingIgnore (self : HTMLElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setContainerTimingIgnore" do

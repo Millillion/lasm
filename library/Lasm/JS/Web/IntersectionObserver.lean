@@ -112,6 +112,14 @@ instance : ToJS IntersectionObserverEntryInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke IntersectionObserver { name := "Lasm.JS.Web.IntersectionObserver.new", module := "globalThis", path := "IntersectionObserver", construct := true, arity := 2 }
     (Internal.args #[toJS callback, Internal.optional options]) (await := false)
 
+/-- `constructor(IntersectionObserverCallback callback, optional IntersectionObserverInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IntersectionObserver.new? (callback : IntersectionObserverCallback) (options : Option IntersectionObserverInit := none) : IO (Option IntersectionObserver) := Internal.api "Lasm.JS.Web.IntersectionObserver.new?" do
+  if !(← Internal.hasGlobal ["IntersectionObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IntersectionObserver { name := "Lasm.JS.Web.IntersectionObserver.new?", module := "globalThis", path := "IntersectionObserver", construct := true, arity := 2 }
+      (Internal.args #[toJS callback, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute (Element or Document)? root` -/
 @[macro_inline] def IntersectionObserver.root (self : IntersectionObserver) : IO (Option Value) := Internal.api "Lasm.JS.Web.IntersectionObserver.root" do
   let r ← self.val.get "root" Data
@@ -133,9 +141,25 @@ instance : ToJS IntersectionObserverEntryInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def IntersectionObserver.delay (self : IntersectionObserver) : IO Int := Internal.api "Lasm.JS.Web.IntersectionObserver.delay" do
   self.val.get "delay" Int
 
+/-- `readonly attribute long delay` where the platform has it (`'delay' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def IntersectionObserver.delay? (self' : IntersectionObserver) : IO (Option Int) := Internal.api "Lasm.JS.Web.IntersectionObserver.delay?" do
+  let self := self'
+  if !(← Internal.has self.val "delay") then return none
+  let lasmGuarded ← do
+    self.val.get "delay" Int
+  return some lasmGuarded
+
 /-- `readonly attribute boolean trackVisibility` -/
 @[macro_inline] def IntersectionObserver.trackVisibility (self : IntersectionObserver) : IO Bool := Internal.api "Lasm.JS.Web.IntersectionObserver.trackVisibility" do
   self.val.get "trackVisibility" Bool
+
+/-- `readonly attribute boolean trackVisibility` where the platform has it (`'trackVisibility' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def IntersectionObserver.trackVisibility? (self' : IntersectionObserver) : IO (Option Bool) := Internal.api "Lasm.JS.Web.IntersectionObserver.trackVisibility?" do
+  let self := self'
+  if !(← Internal.has self.val "trackVisibility") then return none
+  let lasmGuarded ← do
+    self.val.get "trackVisibility" Bool
+  return some lasmGuarded
 
 /-- `undefined observe(Element target)` -/
 @[macro_inline] def IntersectionObserver.observe (self : IntersectionObserver) (target : Element) : IO Unit := Internal.api "Lasm.JS.Web.IntersectionObserver.observe" do
@@ -162,6 +186,14 @@ instance : ToJS IntersectionObserverEntryInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke IntersectionObserverEntry { name := "Lasm.JS.Web.IntersectionObserverEntry.new", module := "globalThis", path := "IntersectionObserverEntry", construct := true, arity := 1 }
     (Internal.args #[toJS intersectionObserverEntryInit]) (await := false)
 
+/-- `constructor(IntersectionObserverEntryInit intersectionObserverEntryInit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IntersectionObserverEntry.new? (intersectionObserverEntryInit : IntersectionObserverEntryInit) : IO (Option IntersectionObserverEntry) := Internal.api "Lasm.JS.Web.IntersectionObserverEntry.new?" do
+  if !(← Internal.hasGlobal ["IntersectionObserverEntry"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IntersectionObserverEntry { name := "Lasm.JS.Web.IntersectionObserverEntry.new?", module := "globalThis", path := "IntersectionObserverEntry", construct := true, arity := 1 }
+      (Internal.args #[toJS intersectionObserverEntryInit]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMHighResTimeStamp time` -/
 @[macro_inline] def IntersectionObserverEntry.time (self : IntersectionObserverEntry) : IO Float := Internal.api "Lasm.JS.Web.IntersectionObserverEntry.time" do
   self.val.get "time" Float
@@ -187,6 +219,14 @@ instance : ToJS IntersectionObserverEntryInit := ⟨fun d => Internal.fields #[(
 /-- `readonly attribute boolean isVisible` -/
 @[macro_inline] def IntersectionObserverEntry.isVisible (self : IntersectionObserverEntry) : IO Bool := Internal.api "Lasm.JS.Web.IntersectionObserverEntry.isVisible" do
   self.val.get "isVisible" Bool
+
+/-- `readonly attribute boolean isVisible` where the platform has it (`'isVisible' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def IntersectionObserverEntry.isVisible? (self' : IntersectionObserverEntry) : IO (Option Bool) := Internal.api "Lasm.JS.Web.IntersectionObserverEntry.isVisible?" do
+  let self := self'
+  if !(← Internal.has self.val "isVisible") then return none
+  let lasmGuarded ← do
+    self.val.get "isVisible" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute double intersectionRatio` -/
 @[macro_inline] def IntersectionObserverEntry.intersectionRatio (self : IntersectionObserverEntry) : IO Float := Internal.api "Lasm.JS.Web.IntersectionObserverEntry.intersectionRatio" do

@@ -80,9 +80,26 @@ def RemotePlaybackAvailabilityCallback.ofSyncFn (f : Bool → IO Unit) : IO Remo
   let r ← self.val.get "remote" Value
   pure { val := r }
 
+/-- `readonly attribute RemotePlayback remote` where the platform has it (`'remote' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.remote? (self' : HTMLMediaElement) : IO (Option RemotePlayback) := Internal.api "Lasm.JS.Web.HTMLMediaElement.remote?" do
+  let self := self'
+  if !(← Internal.has self.val "remote") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "remote" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute boolean disableRemotePlayback` -/
 @[macro_inline] def HTMLMediaElement.disableRemotePlayback (self : HTMLMediaElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLMediaElement.disableRemotePlayback" do
   self.val.get "disableRemotePlayback" Bool
+
+/-- `attribute boolean disableRemotePlayback` where the platform has it (`'disableRemotePlayback' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.disableRemotePlayback? (self' : HTMLMediaElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLMediaElement.disableRemotePlayback?" do
+  let self := self'
+  if !(← Internal.has self.val "disableRemotePlayback") then return none
+  let lasmGuarded ← do
+    self.val.get "disableRemotePlayback" Bool
+  return some lasmGuarded
 
 /-- Sets `disableRemotePlayback`: `attribute boolean disableRemotePlayback` -/
 @[macro_inline] def HTMLMediaElement.setDisableRemotePlayback (self : HTMLMediaElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setDisableRemotePlayback" do

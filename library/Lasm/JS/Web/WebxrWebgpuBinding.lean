@@ -232,6 +232,14 @@ instance : ToJS XRGPULayerInit := ⟨fun d => Internal.fields #[("colorFormat", 
   Lasm.JS.Binding.invoke XRGPUBinding { name := "Lasm.JS.Web.XRGPUBinding.new", module := "globalThis", path := "XRGPUBinding", construct := true, arity := 2 }
     (Internal.args #[toJS session, toJS device]) (await := false)
 
+/-- `constructor(XRSession session, GPUDevice device)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRGPUBinding.new? (session : XRSession) (device : GPUDevice) : IO (Option XRGPUBinding) := Internal.api "Lasm.JS.Web.XRGPUBinding.new?" do
+  if !(← Internal.hasGlobal ["XRGPUBinding"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRGPUBinding { name := "Lasm.JS.Web.XRGPUBinding.new?", module := "globalThis", path := "XRGPUBinding", construct := true, arity := 2 }
+      (Internal.args #[toJS session, toJS device]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double nativeProjectionScaleFactor` -/
 @[macro_inline] def XRGPUBinding.nativeProjectionScaleFactor (self : XRGPUBinding) : IO Float := Internal.api "Lasm.JS.Web.XRGPUBinding.nativeProjectionScaleFactor" do
   self.val.get "nativeProjectionScaleFactor" Float

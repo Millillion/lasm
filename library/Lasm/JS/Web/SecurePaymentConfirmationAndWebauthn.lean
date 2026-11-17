@@ -852,6 +852,14 @@ instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isConditionalMediationAvailable", module := "globalThis", path := "PublicKeyCredential.isConditionalMediationAvailable", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `static Promise<boolean> isConditionalMediationAvailable()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.isConditionalMediationAvailable? : Async (Option Bool) := Internal.api "Lasm.JS.Web.PublicKeyCredential.isConditionalMediationAvailable?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "isConditionalMediationAvailable"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isConditionalMediationAvailable?", module := "globalThis", path := "PublicKeyCredential.isConditionalMediationAvailable", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `PublicKeyCredentialJSON toJSON()` -/
 @[macro_inline] def PublicKeyCredential.toJSON (self : PublicKeyCredential) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.toJSON" do
   self.val.callMethod "toJSON" (Internal.args #[]) Data
@@ -861,36 +869,93 @@ instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable", module := "globalThis", path := "PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `static Promise<boolean> isUserVerifyingPlatformAuthenticatorAvailable()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable? : Async (Option Bool) := Internal.api "Lasm.JS.Web.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "isUserVerifyingPlatformAuthenticatorAvailable"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable?", module := "globalThis", path := "PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `static Promise<PublicKeyCredentialClientCapabilities> getClientCapabilities()` -/
 @[macro_inline] def PublicKeyCredential.getClientCapabilities : Async (Record Bool) := Internal.api "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities", module := "globalThis", path := "PublicKeyCredential.getClientCapabilities", construct := false, arity := 0 }
     (Internal.args #[])
   Internal.recordOf Bool r
 
+/-- `static Promise<PublicKeyCredentialClientCapabilities> getClientCapabilities()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.getClientCapabilities? : Async (Option (Record Bool)) := Internal.api "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "getClientCapabilities"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PublicKeyCredential.getClientCapabilities?", module := "globalThis", path := "PublicKeyCredential.getClientCapabilities", construct := false, arity := 0 }
+      (Internal.args #[])
+    Internal.recordOf Bool r
+  return some lasmGuarded
+
 /-- `static PublicKeyCredentialCreationOptions parseCreationOptionsFromJSON(PublicKeyCredentialCreationOptionsJSON options)` -/
 @[macro_inline] def PublicKeyCredential.parseCreationOptionsFromJSON (options : PublicKeyCredentialCreationOptionsJSON) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON", module := "globalThis", path := "PublicKeyCredential.parseCreationOptionsFromJSON", construct := false, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
+
+/-- `static PublicKeyCredentialCreationOptions parseCreationOptionsFromJSON(PublicKeyCredentialCreationOptionsJSON options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.parseCreationOptionsFromJSON? (options : PublicKeyCredentialCreationOptionsJSON) : IO (Option Data) := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "parseCreationOptionsFromJSON"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseCreationOptionsFromJSON?", module := "globalThis", path := "PublicKeyCredential.parseCreationOptionsFromJSON", construct := false, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
 
 /-- `static PublicKeyCredentialRequestOptions parseRequestOptionsFromJSON(PublicKeyCredentialRequestOptionsJSON options)` -/
 @[macro_inline] def PublicKeyCredential.parseRequestOptionsFromJSON (options : PublicKeyCredentialRequestOptionsJSON) : IO Data := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON", module := "globalThis", path := "PublicKeyCredential.parseRequestOptionsFromJSON", construct := false, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `static PublicKeyCredentialRequestOptions parseRequestOptionsFromJSON(PublicKeyCredentialRequestOptionsJSON options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.parseRequestOptionsFromJSON? (options : PublicKeyCredentialRequestOptionsJSON) : IO (Option Data) := Internal.api "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "parseRequestOptionsFromJSON"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Web.PublicKeyCredential.parseRequestOptionsFromJSON?", module := "globalThis", path := "PublicKeyCredential.parseRequestOptionsFromJSON", construct := false, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `static Promise<undefined> signalUnknownCredential(UnknownCredentialOptions options)` -/
 @[macro_inline] def PublicKeyCredential.signalUnknownCredential (options : UnknownCredentialOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential", module := "globalThis", path := "PublicKeyCredential.signalUnknownCredential", construct := false, arity := 1 }
     (Internal.args #[toJS options])
+
+/-- `static Promise<undefined> signalUnknownCredential(UnknownCredentialOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.signalUnknownCredential? (options : UnknownCredentialOptions) : Async (Option Unit) := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "signalUnknownCredential"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalUnknownCredential?", module := "globalThis", path := "PublicKeyCredential.signalUnknownCredential", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
 
 /-- `static Promise<undefined> signalAllAcceptedCredentials(AllAcceptedCredentialsOptions options)` -/
 @[macro_inline] def PublicKeyCredential.signalAllAcceptedCredentials (options : AllAcceptedCredentialsOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials", module := "globalThis", path := "PublicKeyCredential.signalAllAcceptedCredentials", construct := false, arity := 1 }
     (Internal.args #[toJS options])
 
+/-- `static Promise<undefined> signalAllAcceptedCredentials(AllAcceptedCredentialsOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.signalAllAcceptedCredentials? (options : AllAcceptedCredentialsOptions) : Async (Option Unit) := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "signalAllAcceptedCredentials"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalAllAcceptedCredentials?", module := "globalThis", path := "PublicKeyCredential.signalAllAcceptedCredentials", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
+
 /-- `static Promise<undefined> signalCurrentUserDetails(CurrentUserDetailsOptions options)` -/
 @[macro_inline] def PublicKeyCredential.signalCurrentUserDetails (options : CurrentUserDetailsOptions) : Async Unit := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails", module := "globalThis", path := "PublicKeyCredential.signalCurrentUserDetails", construct := false, arity := 1 }
     (Internal.args #[toJS options])
+
+/-- `static Promise<undefined> signalCurrentUserDetails(CurrentUserDetailsOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PublicKeyCredential.signalCurrentUserDetails? (options : CurrentUserDetailsOptions) : Async (Option Unit) := Internal.api "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails?" do
+  if !(← Internal.hasGlobal ["PublicKeyCredential", "signalCurrentUserDetails"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.PublicKeyCredential.signalCurrentUserDetails?", module := "globalThis", path := "PublicKeyCredential.signalCurrentUserDetails", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
 
 /-- `v instanceof AuthenticatorAssertionResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AuthenticatorAssertionResponse`). -/
 @[macro_inline] def AuthenticatorAssertionResponse.cast? (v : Value) : IO (Option AuthenticatorAssertionResponse) := Internal.api "Lasm.JS.Web.AuthenticatorAssertionResponse.cast?" do
@@ -943,10 +1008,27 @@ instance : ToJS TokenBinding := ⟨fun d => Internal.fields #[("status", toJS d.
   Lasm.JS.Binding.invokeAsync SecurePaymentConfirmationAvailability { name := "Lasm.JS.Web.PaymentRequest.securePaymentConfirmationAvailability", module := "globalThis", path := "PaymentRequest.securePaymentConfirmationAvailability", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `static Promise<SecurePaymentConfirmationAvailability> securePaymentConfirmationAvailability()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentRequest.securePaymentConfirmationAvailability? : Async (Option SecurePaymentConfirmationAvailability) := Internal.api "Lasm.JS.Web.PaymentRequest.securePaymentConfirmationAvailability?" do
+  if !(← Internal.hasGlobal ["PaymentRequest", "securePaymentConfirmationAvailability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync SecurePaymentConfirmationAvailability { name := "Lasm.JS.Web.PaymentRequest.securePaymentConfirmationAvailability?", module := "globalThis", path := "PaymentRequest.securePaymentConfirmationAvailability", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `static Promise<SecurePaymentConfirmationCapabilities> getSecurePaymentConfirmationCapabilities()` -/
 @[macro_inline] def PaymentRequest.getSecurePaymentConfirmationCapabilities : Async (Record Bool) := Internal.api "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities", module := "globalThis", path := "PaymentRequest.getSecurePaymentConfirmationCapabilities", construct := false, arity := 0 }
     (Internal.args #[])
   Internal.recordOf Bool r
+
+/-- `static Promise<SecurePaymentConfirmationCapabilities> getSecurePaymentConfirmationCapabilities()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentRequest.getSecurePaymentConfirmationCapabilities? : Async (Option (Record Bool)) := Internal.api "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities?" do
+  if !(← Internal.hasGlobal ["PaymentRequest", "getSecurePaymentConfirmationCapabilities"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.PaymentRequest.getSecurePaymentConfirmationCapabilities?", module := "globalThis", path := "PaymentRequest.getSecurePaymentConfirmationCapabilities", construct := false, arity := 0 }
+      (Internal.args #[])
+    Internal.recordOf Bool r
+  return some lasmGuarded
 
 end Lasm.JS.Web

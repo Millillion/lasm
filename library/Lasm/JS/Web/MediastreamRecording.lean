@@ -69,6 +69,14 @@ instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType
   Lasm.JS.Binding.invoke BlobEvent { name := "Lasm.JS.Web.BlobEvent.new", module := "globalThis", path := "BlobEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, BlobEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BlobEvent.new? (type : String) (eventInitDict : BlobEventInit) : IO (Option BlobEvent) := Internal.api "Lasm.JS.Web.BlobEvent.new?" do
+  if !(← Internal.hasGlobal ["BlobEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BlobEvent { name := "Lasm.JS.Web.BlobEvent.new?", module := "globalThis", path := "BlobEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Blob data` -/
 @[macro_inline] def BlobEvent.data (self : BlobEvent) : IO Blob := Internal.api "Lasm.JS.Web.BlobEvent.data" do
   let r ← self.val.get "data" Value
@@ -78,6 +86,14 @@ instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType
 @[macro_inline] def BlobEvent.timecode (self : BlobEvent) : IO Float := Internal.api "Lasm.JS.Web.BlobEvent.timecode" do
   self.val.get "timecode" Float
 
+/-- `readonly attribute DOMHighResTimeStamp timecode` where the platform has it (`'timecode' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def BlobEvent.timecode? (self' : BlobEvent) : IO (Option Float) := Internal.api "Lasm.JS.Web.BlobEvent.timecode?" do
+  let self := self'
+  if !(← Internal.has self.val "timecode") then return none
+  let lasmGuarded ← do
+    self.val.get "timecode" Float
+  return some lasmGuarded
+
 /-- `v instanceof MediaRecorder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaRecorder`). -/
 @[macro_inline] def MediaRecorder.cast? (v : Value) : IO (Option MediaRecorder) := Internal.api "Lasm.JS.Web.MediaRecorder.cast?" do
   Internal.cast (Internal.getGlobal ["MediaRecorder"] Value) (fun x => { val := x }) v
@@ -86,6 +102,14 @@ instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType
 @[macro_inline] def MediaRecorder.new (stream : MediaStream) (options : Option MediaRecorderOptions := none) : IO MediaRecorder := Internal.api "Lasm.JS.Web.MediaRecorder.new" do
   Lasm.JS.Binding.invoke MediaRecorder { name := "Lasm.JS.Web.MediaRecorder.new", module := "globalThis", path := "MediaRecorder", construct := true, arity := 2 }
     (Internal.args #[toJS stream, Internal.optional options]) (await := false)
+
+/-- `constructor(MediaStream stream, optional MediaRecorderOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaRecorder.new? (stream : MediaStream) (options : Option MediaRecorderOptions := none) : IO (Option MediaRecorder) := Internal.api "Lasm.JS.Web.MediaRecorder.new?" do
+  if !(← Internal.hasGlobal ["MediaRecorder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaRecorder { name := "Lasm.JS.Web.MediaRecorder.new?", module := "globalThis", path := "MediaRecorder", construct := true, arity := 2 }
+      (Internal.args #[toJS stream, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute MediaStream stream` -/
 @[macro_inline] def MediaRecorder.stream (self : MediaRecorder) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaRecorder.stream" do
@@ -160,6 +184,14 @@ instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType
 @[macro_inline] def MediaRecorder.audioBitrateMode (self : MediaRecorder) : IO BitrateMode := Internal.api "Lasm.JS.Web.MediaRecorder.audioBitrateMode" do
   self.val.get "audioBitrateMode" BitrateMode
 
+/-- `readonly attribute BitrateMode audioBitrateMode` where the platform has it (`'audioBitrateMode' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaRecorder.audioBitrateMode? (self' : MediaRecorder) : IO (Option BitrateMode) := Internal.api "Lasm.JS.Web.MediaRecorder.audioBitrateMode?" do
+  let self := self'
+  if !(← Internal.has self.val "audioBitrateMode") then return none
+  let lasmGuarded ← do
+    self.val.get "audioBitrateMode" BitrateMode
+  return some lasmGuarded
+
 /-- `undefined start(optional unsigned long timeslice)` -/
 @[macro_inline] def MediaRecorder.start (self : MediaRecorder) (timeslice : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaRecorder.start" do
   self.val.callMethod "start" (Internal.args #[Internal.optional timeslice]) Unit
@@ -184,5 +216,13 @@ instance : ToJS MediaRecorderOptions := ⟨fun d => Internal.fields #[("mimeType
 @[macro_inline] def MediaRecorder.isTypeSupported (type : String) : IO Bool := Internal.api "Lasm.JS.Web.MediaRecorder.isTypeSupported" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaRecorder.isTypeSupported", module := "globalThis", path := "MediaRecorder.isTypeSupported", construct := false, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
+
+/-- `static boolean isTypeSupported(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaRecorder.isTypeSupported? (type : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.MediaRecorder.isTypeSupported?" do
+  if !(← Internal.hasGlobal ["MediaRecorder", "isTypeSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaRecorder.isTypeSupported?", module := "globalThis", path := "MediaRecorder.isTypeSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

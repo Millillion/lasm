@@ -33,4 +33,13 @@ set_option compiler.extract_closed false
   let r ← self.val.get "keyboard" Value
   pure { val := r }
 
+/-- `readonly attribute Keyboard keyboard` where the platform has it (`'keyboard' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.keyboard? (self' : Navigator) : IO (Option Keyboard) := Internal.api "Lasm.JS.Web.Navigator.keyboard?" do
+  let self := self'
+  if !(← Internal.has self.val "keyboard") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "keyboard" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

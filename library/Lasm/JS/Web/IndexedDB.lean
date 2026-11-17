@@ -277,6 +277,15 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
   let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
+/-- `IDBRequest getAllRecords(optional IDBGetAllOptions options)` where the platform has it (`'getAllRecords' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBIndex.getAllRecords? (self' : IDBIndex) (options : Option IDBGetAllOptions := none) : IO (Option IDBRequest) := Internal.api "Lasm.JS.Web.IDBIndex.getAllRecords?" do
+  let self := self'
+  if !(← Internal.has self.val "getAllRecords") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `IDBRequest count(optional any query)` -/
 @[macro_inline] def IDBIndex.count (self : IDBIndex) (query : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBIndex.count" do
   let r ← self.val.callMethod "count" (Internal.args #[query]) Value
@@ -318,11 +327,29 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `static IDBKeyRange only(any value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBKeyRange.only? (value : Data) : IO (Option IDBKeyRange) := Internal.api "Lasm.JS.Web.IDBKeyRange.only?" do
+  if !(← Internal.hasGlobal ["IDBKeyRange", "only"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.only?", module := "globalThis", path := "IDBKeyRange.only", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static IDBKeyRange lowerBound(any lower, optional boolean open)` -/
 @[macro_inline] def IDBKeyRange.lowerBound (lower : Data) («open» : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.lowerBound" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.lowerBound", module := "globalThis", path := "IDBKeyRange.lowerBound", construct := false, arity := 2 }
     (Internal.args #[toJS lower, Internal.optional «open»]) (await := false)
   pure { val := r }
+
+/-- `static IDBKeyRange lowerBound(any lower, optional boolean open)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBKeyRange.lowerBound? (lower : Data) («open» : Option Bool := none) : IO (Option IDBKeyRange) := Internal.api "Lasm.JS.Web.IDBKeyRange.lowerBound?" do
+  if !(← Internal.hasGlobal ["IDBKeyRange", "lowerBound"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.lowerBound?", module := "globalThis", path := "IDBKeyRange.lowerBound", construct := false, arity := 2 }
+      (Internal.args #[toJS lower, Internal.optional «open»]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `static IDBKeyRange upperBound(any upper, optional boolean open)` -/
 @[macro_inline] def IDBKeyRange.upperBound (upper : Data) («open» : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.upperBound" do
@@ -330,11 +357,29 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
     (Internal.args #[toJS upper, Internal.optional «open»]) (await := false)
   pure { val := r }
 
+/-- `static IDBKeyRange upperBound(any upper, optional boolean open)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBKeyRange.upperBound? (upper : Data) («open» : Option Bool := none) : IO (Option IDBKeyRange) := Internal.api "Lasm.JS.Web.IDBKeyRange.upperBound?" do
+  if !(← Internal.hasGlobal ["IDBKeyRange", "upperBound"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.upperBound?", module := "globalThis", path := "IDBKeyRange.upperBound", construct := false, arity := 2 }
+      (Internal.args #[toJS upper, Internal.optional «open»]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static IDBKeyRange bound(any lower, any upper, optional boolean lowerOpen, optional boolean upperOpen)` -/
 @[macro_inline] def IDBKeyRange.bound (lower : Data) (upper : Data) (lowerOpen : Option Bool := none) (upperOpen : Option Bool := none) : IO IDBKeyRange := Internal.api "Lasm.JS.Web.IDBKeyRange.bound" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.bound", module := "globalThis", path := "IDBKeyRange.bound", construct := false, arity := 4 }
     (Internal.args #[toJS lower, toJS upper, Internal.optional lowerOpen, Internal.optional upperOpen]) (await := false)
   pure { val := r }
+
+/-- `static IDBKeyRange bound(any lower, any upper, optional boolean lowerOpen, optional boolean upperOpen)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBKeyRange.bound? (lower : Data) (upper : Data) (lowerOpen : Option Bool := none) (upperOpen : Option Bool := none) : IO (Option IDBKeyRange) := Internal.api "Lasm.JS.Web.IDBKeyRange.bound?" do
+  if !(← Internal.hasGlobal ["IDBKeyRange", "bound"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.IDBKeyRange.bound?", module := "globalThis", path := "IDBKeyRange.bound", construct := false, arity := 4 }
+      (Internal.args #[toJS lower, toJS upper, Internal.optional lowerOpen, Internal.optional upperOpen]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `boolean includes(any key)` -/
 @[macro_inline] def IDBKeyRange.includes (self : IDBKeyRange) (key : Data) : IO Bool := Internal.api "Lasm.JS.Web.IDBKeyRange.includes" do
@@ -414,6 +459,15 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
 @[macro_inline] def IDBObjectStore.getAllRecords (self : IDBObjectStore) (options : Option IDBGetAllOptions := none) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.getAllRecords" do
   let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
+
+/-- `IDBRequest getAllRecords(optional IDBGetAllOptions options)` where the platform has it (`'getAllRecords' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBObjectStore.getAllRecords? (self' : IDBObjectStore) (options : Option IDBGetAllOptions := none) : IO (Option IDBRequest) := Internal.api "Lasm.JS.Web.IDBObjectStore.getAllRecords?" do
+  let self := self'
+  if !(← Internal.has self.val "getAllRecords") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "getAllRecords" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `IDBRequest count(optional any query)` -/
 @[macro_inline] def IDBObjectStore.count (self : IDBObjectStore) (query : Data := .undefined) : IO IDBRequest := Internal.api "Lasm.JS.Web.IDBObjectStore.count" do
@@ -573,6 +627,14 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
   Lasm.JS.Binding.invoke IDBVersionChangeEvent { name := "Lasm.JS.Web.IDBVersionChangeEvent.new", module := "globalThis", path := "IDBVersionChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional IDBVersionChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IDBVersionChangeEvent.new? (type : String) (eventInitDict : Option IDBVersionChangeEventInit := none) : IO (Option IDBVersionChangeEvent) := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["IDBVersionChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IDBVersionChangeEvent { name := "Lasm.JS.Web.IDBVersionChangeEvent.new?", module := "globalThis", path := "IDBVersionChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long long oldVersion` -/
 @[macro_inline] def IDBVersionChangeEvent.oldVersion (self : IDBVersionChangeEvent) : IO Nat := Internal.api "Lasm.JS.Web.IDBVersionChangeEvent.oldVersion" do
   self.val.get "oldVersion" Nat
@@ -623,5 +685,13 @@ instance : ToJS IDBVersionChangeEventInit := ⟨fun d => Internal.fields #[("bub
 @[macro_inline] def indexedDB : IO IDBFactory := Internal.api "Lasm.JS.Web.indexedDB" do
   let r ← Internal.getGlobal ["indexedDB"] Value
   pure { val := r }
+
+/-- `readonly attribute IDBFactory indexedDB` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def indexedDB? : IO (Option IDBFactory) := Internal.api "Lasm.JS.Web.indexedDB?" do
+  if !(← Internal.hasGlobal ["indexedDB"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["indexedDB"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

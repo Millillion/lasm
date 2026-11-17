@@ -60,6 +60,14 @@ instance : Coe (Array AnimationEffect) AnimationEffectOrSequenceOfAnimationEffec
   Lasm.JS.Binding.invoke WorkletAnimation { name := "Lasm.JS.Web.WorkletAnimation.new", module := "globalThis", path := "WorkletAnimation", construct := true, arity := 4 }
     (Internal.args #[toJS animatorName, Internal.optional effects, Internal.optional timeline, options]) (await := false)
 
+/-- `constructor(DOMString animatorName, optional (AnimationEffect or sequence<AnimationEffect>)? effects, optional AnimationTimeline? timeline, optional any options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkletAnimation.new? (animatorName : String) (effects : Option AnimationEffectOrSequenceOfAnimationEffect := none) (timeline : Option AnimationTimeline := none) (options : Data := .undefined) : IO (Option WorkletAnimation) := Internal.api "Lasm.JS.Web.WorkletAnimation.new?" do
+  if !(← Internal.hasGlobal ["WorkletAnimation"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WorkletAnimation { name := "Lasm.JS.Web.WorkletAnimation.new?", module := "globalThis", path := "WorkletAnimation", construct := true, arity := 4 }
+      (Internal.args #[toJS animatorName, Internal.optional effects, Internal.optional timeline, options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString animatorName` -/
 @[macro_inline] def WorkletAnimation.animatorName (self : WorkletAnimation) : IO String := Internal.api "Lasm.JS.Web.WorkletAnimation.animatorName" do
   self.val.get "animatorName" String
@@ -96,5 +104,13 @@ instance : Coe (Array AnimationEffect) AnimationEffectOrSequenceOfAnimationEffec
 @[macro_inline] def CSS.animationWorklet : IO Worklet := Internal.api "Lasm.JS.Web.CSS.animationWorklet" do
   let r ← Internal.getGlobal ["CSS", "animationWorklet"] Value
   pure { val := r }
+
+/-- `readonly attribute Worklet animationWorklet` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.animationWorklet? : IO (Option Worklet) := Internal.api "Lasm.JS.Web.CSS.animationWorklet?" do
+  if !(← Internal.hasGlobal ["CSS", "animationWorklet"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["CSS", "animationWorklet"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

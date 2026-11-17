@@ -52,30 +52,84 @@ instance : Coe (Array Nat) UnsignedLongOrSequenceOfUnsignedLong := ⟨.sequence�
   let r ← self.val.get "annotation" Value
   pure { val := r }
 
+/-- `readonly attribute CSSFontFeatureValuesMap annotation` where the platform has it (`'annotation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.annotation? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.annotation?" do
+  let self := self'
+  if !(← Internal.has self.val "annotation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "annotation" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CSSFontFeatureValuesMap ornaments` -/
 @[macro_inline] def CSSFontFeatureValuesRule.ornaments (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.ornaments" do
   let r ← self.val.get "ornaments" Value
   pure { val := r }
+
+/-- `readonly attribute CSSFontFeatureValuesMap ornaments` where the platform has it (`'ornaments' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.ornaments? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.ornaments?" do
+  let self := self'
+  if !(← Internal.has self.val "ornaments") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "ornaments" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute CSSFontFeatureValuesMap stylistic` -/
 @[macro_inline] def CSSFontFeatureValuesRule.stylistic (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.stylistic" do
   let r ← self.val.get "stylistic" Value
   pure { val := r }
 
+/-- `readonly attribute CSSFontFeatureValuesMap stylistic` where the platform has it (`'stylistic' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.stylistic? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.stylistic?" do
+  let self := self'
+  if !(← Internal.has self.val "stylistic") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "stylistic" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CSSFontFeatureValuesMap swash` -/
 @[macro_inline] def CSSFontFeatureValuesRule.swash (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.swash" do
   let r ← self.val.get "swash" Value
   pure { val := r }
+
+/-- `readonly attribute CSSFontFeatureValuesMap swash` where the platform has it (`'swash' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.swash? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.swash?" do
+  let self := self'
+  if !(← Internal.has self.val "swash") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "swash" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute CSSFontFeatureValuesMap characterVariant` -/
 @[macro_inline] def CSSFontFeatureValuesRule.characterVariant (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.characterVariant" do
   let r ← self.val.get "characterVariant" Value
   pure { val := r }
 
+/-- `readonly attribute CSSFontFeatureValuesMap characterVariant` where the platform has it (`'characterVariant' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.characterVariant? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.characterVariant?" do
+  let self := self'
+  if !(← Internal.has self.val "characterVariant") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "characterVariant" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CSSFontFeatureValuesMap styleset` -/
 @[macro_inline] def CSSFontFeatureValuesRule.styleset (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.styleset" do
   let r ← self.val.get "styleset" Value
   pure { val := r }
+
+/-- `readonly attribute CSSFontFeatureValuesMap styleset` where the platform has it (`'styleset' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSFontFeatureValuesRule.styleset? (self' : CSSFontFeatureValuesRule) : IO (Option CSSFontFeatureValuesMap) := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.styleset?" do
+  let self := self'
+  if !(← Internal.has self.val "styleset") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "styleset" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute CSSFontFeatureValuesMap historicalForms` -/
 @[macro_inline] def CSSFontFeatureValuesRule.historicalForms (self : CSSFontFeatureValuesRule) : IO CSSFontFeatureValuesMap := Internal.api "Lasm.JS.Web.CSSFontFeatureValuesRule.historicalForms" do

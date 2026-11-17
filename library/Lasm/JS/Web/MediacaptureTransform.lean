@@ -46,6 +46,14 @@ instance : ToJS MediaStreamTrackProcessorInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke MediaStreamTrackHandle { name := "Lasm.JS.Web.MediaStreamTrackHandle.new", module := "globalThis", path := "MediaStreamTrackHandle", construct := true, arity := 1 }
     (Internal.args #[toJS track]) (await := false)
 
+/-- `constructor(MediaStreamTrack track)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrackHandle.new? (track : MediaStreamTrack) : IO (Option MediaStreamTrackHandle) := Internal.api "Lasm.JS.Web.MediaStreamTrackHandle.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamTrackHandle"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamTrackHandle { name := "Lasm.JS.Web.MediaStreamTrackHandle.new?", module := "globalThis", path := "MediaStreamTrackHandle", construct := true, arity := 1 }
+      (Internal.args #[toJS track]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof MediaStreamTrackProcessor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaStreamTrackProcessor`). -/
 @[macro_inline] def MediaStreamTrackProcessor.cast? (v : Value) : IO (Option MediaStreamTrackProcessor) := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.cast?" do
   Internal.cast (Internal.getGlobal ["MediaStreamTrackProcessor"] Value) (fun x => { val := x }) v
@@ -54,6 +62,14 @@ instance : ToJS MediaStreamTrackProcessorInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def MediaStreamTrackProcessor.new (init : MediaStreamTrackProcessorInit) : IO MediaStreamTrackProcessor := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.new" do
   Lasm.JS.Binding.invoke MediaStreamTrackProcessor { name := "Lasm.JS.Web.MediaStreamTrackProcessor.new", module := "globalThis", path := "MediaStreamTrackProcessor", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(MediaStreamTrackProcessorInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrackProcessor.new? (init : MediaStreamTrackProcessorInit) : IO (Option MediaStreamTrackProcessor) := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamTrackProcessor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamTrackProcessor { name := "Lasm.JS.Web.MediaStreamTrackProcessor.new?", module := "globalThis", path := "MediaStreamTrackProcessor", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def MediaStreamTrackProcessor.readable (self : MediaStreamTrackProcessor) : IO ReadableStream := Internal.api "Lasm.JS.Web.MediaStreamTrackProcessor.readable" do
@@ -76,6 +92,14 @@ instance : ToJS MediaStreamTrackProcessorInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def VideoTrackGenerator.new : IO VideoTrackGenerator := Internal.api "Lasm.JS.Web.VideoTrackGenerator.new" do
   Lasm.JS.Binding.invoke VideoTrackGenerator { name := "Lasm.JS.Web.VideoTrackGenerator.new", module := "globalThis", path := "VideoTrackGenerator", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoTrackGenerator.new? : IO (Option VideoTrackGenerator) := Internal.api "Lasm.JS.Web.VideoTrackGenerator.new?" do
+  if !(← Internal.hasGlobal ["VideoTrackGenerator"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoTrackGenerator { name := "Lasm.JS.Web.VideoTrackGenerator.new?", module := "globalThis", path := "VideoTrackGenerator", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute WritableStream writable` -/
 @[macro_inline] def VideoTrackGenerator.writable (self : VideoTrackGenerator) : IO WritableStream := Internal.api "Lasm.JS.Web.VideoTrackGenerator.writable" do

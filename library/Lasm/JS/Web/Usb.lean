@@ -161,6 +161,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBAlternateInterface { name := "Lasm.JS.Web.USBAlternateInterface.new", module := "globalThis", path := "USBAlternateInterface", construct := true, arity := 2 }
     (Internal.args #[toJS deviceInterface, toJS alternateSetting]) (await := false)
 
+/-- `constructor(USBInterface deviceInterface, octet alternateSetting)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBAlternateInterface.new? (deviceInterface : USBInterface) (alternateSetting : Nat) : IO (Option USBAlternateInterface) := Internal.api "Lasm.JS.Web.USBAlternateInterface.new?" do
+  if !(← Internal.hasGlobal ["USBAlternateInterface"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBAlternateInterface { name := "Lasm.JS.Web.USBAlternateInterface.new?", module := "globalThis", path := "USBAlternateInterface", construct := true, arity := 2 }
+      (Internal.args #[toJS deviceInterface, toJS alternateSetting]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute octet alternateSetting` -/
 @[macro_inline] def USBAlternateInterface.alternateSetting (self : USBAlternateInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBAlternateInterface.alternateSetting" do
   self.val.get "alternateSetting" Nat
@@ -194,6 +202,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBConfiguration { name := "Lasm.JS.Web.USBConfiguration.new", module := "globalThis", path := "USBConfiguration", construct := true, arity := 2 }
     (Internal.args #[toJS device, toJS configurationValue]) (await := false)
 
+/-- `constructor(USBDevice device, octet configurationValue)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBConfiguration.new? (device : USBDevice) (configurationValue : Nat) : IO (Option USBConfiguration) := Internal.api "Lasm.JS.Web.USBConfiguration.new?" do
+  if !(← Internal.hasGlobal ["USBConfiguration"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBConfiguration { name := "Lasm.JS.Web.USBConfiguration.new?", module := "globalThis", path := "USBConfiguration", construct := true, arity := 2 }
+      (Internal.args #[toJS device, toJS configurationValue]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute octet configurationValue` -/
 @[macro_inline] def USBConfiguration.configurationValue (self : USBConfiguration) : IO Nat := Internal.api "Lasm.JS.Web.USBConfiguration.configurationValue" do
   self.val.get "configurationValue" Nat
@@ -214,6 +230,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
 @[macro_inline] def USBConnectionEvent.new (type : String) (eventInitDict : USBConnectionEventInit) : IO USBConnectionEvent := Internal.api "Lasm.JS.Web.USBConnectionEvent.new" do
   Lasm.JS.Binding.invoke USBConnectionEvent { name := "Lasm.JS.Web.USBConnectionEvent.new", module := "globalThis", path := "USBConnectionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, USBConnectionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBConnectionEvent.new? (type : String) (eventInitDict : USBConnectionEventInit) : IO (Option USBConnectionEvent) := Internal.api "Lasm.JS.Web.USBConnectionEvent.new?" do
+  if !(← Internal.hasGlobal ["USBConnectionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBConnectionEvent { name := "Lasm.JS.Web.USBConnectionEvent.new?", module := "globalThis", path := "USBConnectionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USBDevice device` -/
 @[macro_inline] def USBConnectionEvent.device (self : USBConnectionEvent) : IO USBDevice := Internal.api "Lasm.JS.Web.USBConnectionEvent.device" do
@@ -367,6 +391,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBEndpoint { name := "Lasm.JS.Web.USBEndpoint.new", module := "globalThis", path := "USBEndpoint", construct := true, arity := 3 }
     (Internal.args #[toJS alternate, toJS endpointNumber, toJS direction]) (await := false)
 
+/-- `constructor(USBAlternateInterface alternate, octet endpointNumber, USBDirection direction)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBEndpoint.new? (alternate : USBAlternateInterface) (endpointNumber : Nat) (direction : USBDirection) : IO (Option USBEndpoint) := Internal.api "Lasm.JS.Web.USBEndpoint.new?" do
+  if !(← Internal.hasGlobal ["USBEndpoint"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBEndpoint { name := "Lasm.JS.Web.USBEndpoint.new?", module := "globalThis", path := "USBEndpoint", construct := true, arity := 3 }
+      (Internal.args #[toJS alternate, toJS endpointNumber, toJS direction]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute octet endpointNumber` -/
 @[macro_inline] def USBEndpoint.endpointNumber (self : USBEndpoint) : IO Nat := Internal.api "Lasm.JS.Web.USBEndpoint.endpointNumber" do
   self.val.get "endpointNumber" Nat
@@ -392,6 +424,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBInTransferResult { name := "Lasm.JS.Web.USBInTransferResult.new", module := "globalThis", path := "USBInTransferResult", construct := true, arity := 2 }
     (Internal.args #[toJS status, Internal.optional data]) (await := false)
 
+/-- `constructor(USBTransferStatus status, optional DataView? data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBInTransferResult.new? (status : USBTransferStatus) (data : Option ByteArray := none) : IO (Option USBInTransferResult) := Internal.api "Lasm.JS.Web.USBInTransferResult.new?" do
+  if !(← Internal.hasGlobal ["USBInTransferResult"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBInTransferResult { name := "Lasm.JS.Web.USBInTransferResult.new?", module := "globalThis", path := "USBInTransferResult", construct := true, arity := 2 }
+      (Internal.args #[toJS status, Internal.optional data]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DataView? data` -/
 @[macro_inline] def USBInTransferResult.data (self : USBInTransferResult) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBInTransferResult.data" do
   let r ← self.val.get "data" (Option Data)
@@ -409,6 +449,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
 @[macro_inline] def USBInterface.new (configuration : USBConfiguration) (interfaceNumber : Nat) : IO USBInterface := Internal.api "Lasm.JS.Web.USBInterface.new" do
   Lasm.JS.Binding.invoke USBInterface { name := "Lasm.JS.Web.USBInterface.new", module := "globalThis", path := "USBInterface", construct := true, arity := 2 }
     (Internal.args #[toJS configuration, toJS interfaceNumber]) (await := false)
+
+/-- `constructor(USBConfiguration configuration, octet interfaceNumber)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBInterface.new? (configuration : USBConfiguration) (interfaceNumber : Nat) : IO (Option USBInterface) := Internal.api "Lasm.JS.Web.USBInterface.new?" do
+  if !(← Internal.hasGlobal ["USBInterface"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBInterface { name := "Lasm.JS.Web.USBInterface.new?", module := "globalThis", path := "USBInterface", construct := true, arity := 2 }
+      (Internal.args #[toJS configuration, toJS interfaceNumber]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute octet interfaceNumber` -/
 @[macro_inline] def USBInterface.interfaceNumber (self : USBInterface) : IO Nat := Internal.api "Lasm.JS.Web.USBInterface.interfaceNumber" do
@@ -436,6 +484,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBIsochronousInTransferPacket { name := "Lasm.JS.Web.USBIsochronousInTransferPacket.new", module := "globalThis", path := "USBIsochronousInTransferPacket", construct := true, arity := 2 }
     (Internal.args #[toJS status, Internal.optional data]) (await := false)
 
+/-- `constructor(USBTransferStatus status, optional DataView? data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBIsochronousInTransferPacket.new? (status : USBTransferStatus) (data : Option ByteArray := none) : IO (Option USBIsochronousInTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.new?" do
+  if !(← Internal.hasGlobal ["USBIsochronousInTransferPacket"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBIsochronousInTransferPacket { name := "Lasm.JS.Web.USBIsochronousInTransferPacket.new?", module := "globalThis", path := "USBIsochronousInTransferPacket", construct := true, arity := 2 }
+      (Internal.args #[toJS status, Internal.optional data]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DataView? data` -/
 @[macro_inline] def USBIsochronousInTransferPacket.data (self : USBIsochronousInTransferPacket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferPacket.data" do
   let r ← self.val.get "data" (Option Data)
@@ -453,6 +509,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
 @[macro_inline] def USBIsochronousInTransferResult.new (packets : Array USBIsochronousInTransferPacket) (data : Option ByteArray := none) : IO USBIsochronousInTransferResult := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.new" do
   Lasm.JS.Binding.invoke USBIsochronousInTransferResult { name := "Lasm.JS.Web.USBIsochronousInTransferResult.new", module := "globalThis", path := "USBIsochronousInTransferResult", construct := true, arity := 2 }
     (Internal.args #[toJS packets, Internal.optional data]) (await := false)
+
+/-- `constructor(sequence<USBIsochronousInTransferPacket> packets, optional DataView? data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBIsochronousInTransferResult.new? (packets : Array USBIsochronousInTransferPacket) (data : Option ByteArray := none) : IO (Option USBIsochronousInTransferResult) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.new?" do
+  if !(← Internal.hasGlobal ["USBIsochronousInTransferResult"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBIsochronousInTransferResult { name := "Lasm.JS.Web.USBIsochronousInTransferResult.new?", module := "globalThis", path := "USBIsochronousInTransferResult", construct := true, arity := 2 }
+      (Internal.args #[toJS packets, Internal.optional data]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DataView? data` -/
 @[macro_inline] def USBIsochronousInTransferResult.data (self : USBIsochronousInTransferResult) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.USBIsochronousInTransferResult.data" do
@@ -472,6 +536,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBIsochronousOutTransferPacket { name := "Lasm.JS.Web.USBIsochronousOutTransferPacket.new", module := "globalThis", path := "USBIsochronousOutTransferPacket", construct := true, arity := 2 }
     (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
 
+/-- `constructor(USBTransferStatus status, optional unsigned long bytesWritten)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBIsochronousOutTransferPacket.new? (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO (Option USBIsochronousOutTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.new?" do
+  if !(← Internal.hasGlobal ["USBIsochronousOutTransferPacket"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBIsochronousOutTransferPacket { name := "Lasm.JS.Web.USBIsochronousOutTransferPacket.new?", module := "globalThis", path := "USBIsochronousOutTransferPacket", construct := true, arity := 2 }
+      (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long bytesWritten` -/
 @[macro_inline] def USBIsochronousOutTransferPacket.bytesWritten (self : USBIsochronousOutTransferPacket) : IO Nat := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferPacket.bytesWritten" do
   self.val.get "bytesWritten" Nat
@@ -489,6 +561,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   Lasm.JS.Binding.invoke USBIsochronousOutTransferResult { name := "Lasm.JS.Web.USBIsochronousOutTransferResult.new", module := "globalThis", path := "USBIsochronousOutTransferResult", construct := true, arity := 1 }
     (Internal.args #[toJS packets]) (await := false)
 
+/-- `constructor(sequence<USBIsochronousOutTransferPacket> packets)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBIsochronousOutTransferResult.new? (packets : Array USBIsochronousOutTransferPacket) : IO (Option USBIsochronousOutTransferResult) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferResult.new?" do
+  if !(← Internal.hasGlobal ["USBIsochronousOutTransferResult"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBIsochronousOutTransferResult { name := "Lasm.JS.Web.USBIsochronousOutTransferResult.new?", module := "globalThis", path := "USBIsochronousOutTransferResult", construct := true, arity := 1 }
+      (Internal.args #[toJS packets]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<USBIsochronousOutTransferPacket> packets` -/
 @[macro_inline] def USBIsochronousOutTransferResult.packets (self : USBIsochronousOutTransferResult) : IO (Array USBIsochronousOutTransferPacket) := Internal.api "Lasm.JS.Web.USBIsochronousOutTransferResult.packets" do
   self.val.get "packets" (Array USBIsochronousOutTransferPacket)
@@ -501,6 +581,14 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
 @[macro_inline] def USBOutTransferResult.new (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO USBOutTransferResult := Internal.api "Lasm.JS.Web.USBOutTransferResult.new" do
   Lasm.JS.Binding.invoke USBOutTransferResult { name := "Lasm.JS.Web.USBOutTransferResult.new", module := "globalThis", path := "USBOutTransferResult", construct := true, arity := 2 }
     (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
+
+/-- `constructor(USBTransferStatus status, optional unsigned long bytesWritten)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def USBOutTransferResult.new? (status : USBTransferStatus) (bytesWritten : Option Nat := none) : IO (Option USBOutTransferResult) := Internal.api "Lasm.JS.Web.USBOutTransferResult.new?" do
+  if !(← Internal.hasGlobal ["USBOutTransferResult"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke USBOutTransferResult { name := "Lasm.JS.Web.USBOutTransferResult.new?", module := "globalThis", path := "USBOutTransferResult", construct := true, arity := 2 }
+      (Internal.args #[toJS status, Internal.optional bytesWritten]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long bytesWritten` -/
 @[macro_inline] def USBOutTransferResult.bytesWritten (self : USBOutTransferResult) : IO Nat := Internal.api "Lasm.JS.Web.USBOutTransferResult.bytesWritten" do
@@ -527,9 +615,27 @@ instance : ToJS USBPermissionStorage := ⟨fun d => Internal.fields #[("allowedD
   let r ← self.val.get "usb" Value
   pure { val := r }
 
+/-- `readonly attribute USB usb` where the platform has it (`'usb' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.usb? (self' : Navigator) : IO (Option USB) := Internal.api "Lasm.JS.Web.Navigator.usb?" do
+  let self := self'
+  if !(← Internal.has self.val "usb") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "usb" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute USB usb` -/
 @[macro_inline] def WorkerNavigator.usb (self : WorkerNavigator) : IO USB := Internal.api "Lasm.JS.Web.WorkerNavigator.usb" do
   let r ← self.val.get "usb" Value
   pure { val := r }
+
+/-- `readonly attribute USB usb` where the platform has it (`'usb' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.usb? (self' : WorkerNavigator) : IO (Option USB) := Internal.api "Lasm.JS.Web.WorkerNavigator.usb?" do
+  let self := self'
+  if !(← Internal.has self.val "usb") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "usb" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

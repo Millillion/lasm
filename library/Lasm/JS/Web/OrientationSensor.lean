@@ -60,6 +60,14 @@ instance : ToJS OrientationSensorOptions := ⟨fun d => Internal.fields #[("freq
   Lasm.JS.Binding.invoke AbsoluteOrientationSensor { name := "Lasm.JS.Web.AbsoluteOrientationSensor.new", module := "globalThis", path := "AbsoluteOrientationSensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
+/-- `constructor(optional OrientationSensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AbsoluteOrientationSensor.new? (sensorOptions : Option OrientationSensorOptions := none) : IO (Option AbsoluteOrientationSensor) := Internal.api "Lasm.JS.Web.AbsoluteOrientationSensor.new?" do
+  if !(← Internal.hasGlobal ["AbsoluteOrientationSensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AbsoluteOrientationSensor { name := "Lasm.JS.Web.AbsoluteOrientationSensor.new?", module := "globalThis", path := "AbsoluteOrientationSensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof RelativeOrientationSensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RelativeOrientationSensor`). -/
 @[macro_inline] def RelativeOrientationSensor.cast? (v : Value) : IO (Option RelativeOrientationSensor) := Internal.api "Lasm.JS.Web.RelativeOrientationSensor.cast?" do
   Internal.cast (Internal.getGlobal ["RelativeOrientationSensor"] Value) (fun x => { val := x }) v
@@ -68,5 +76,13 @@ instance : ToJS OrientationSensorOptions := ⟨fun d => Internal.fields #[("freq
 @[macro_inline] def RelativeOrientationSensor.new (sensorOptions : Option OrientationSensorOptions := none) : IO RelativeOrientationSensor := Internal.api "Lasm.JS.Web.RelativeOrientationSensor.new" do
   Lasm.JS.Binding.invoke RelativeOrientationSensor { name := "Lasm.JS.Web.RelativeOrientationSensor.new", module := "globalThis", path := "RelativeOrientationSensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
+
+/-- `constructor(optional OrientationSensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RelativeOrientationSensor.new? (sensorOptions : Option OrientationSensorOptions := none) : IO (Option RelativeOrientationSensor) := Internal.api "Lasm.JS.Web.RelativeOrientationSensor.new?" do
+  if !(← Internal.hasGlobal ["RelativeOrientationSensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RelativeOrientationSensor { name := "Lasm.JS.Web.RelativeOrientationSensor.new?", module := "globalThis", path := "RelativeOrientationSensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

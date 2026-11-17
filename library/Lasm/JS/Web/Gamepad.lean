@@ -118,6 +118,15 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
   let r ← self.val.get "vibrationActuator" Value
   pure { val := r }
 
+/-- `readonly attribute GamepadHapticActuator vibrationActuator` where the platform has it (`'vibrationActuator' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Gamepad.vibrationActuator? (self' : Gamepad) : IO (Option GamepadHapticActuator) := Internal.api "Lasm.JS.Web.Gamepad.vibrationActuator?" do
+  let self := self'
+  if !(← Internal.has self.val "vibrationActuator") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "vibrationActuator" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof GamepadButton`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GamepadButton`). -/
 @[macro_inline] def GamepadButton.cast? (v : Value) : IO (Option GamepadButton) := Internal.api "Lasm.JS.Web.GamepadButton.cast?" do
   Internal.cast (Internal.getGlobal ["GamepadButton"] Value) (fun x => { val := x }) v
@@ -129,6 +138,14 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 /-- `readonly attribute boolean touched` -/
 @[macro_inline] def GamepadButton.touched (self : GamepadButton) : IO Bool := Internal.api "Lasm.JS.Web.GamepadButton.touched" do
   self.val.get "touched" Bool
+
+/-- `readonly attribute boolean touched` where the platform has it (`'touched' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadButton.touched? (self' : GamepadButton) : IO (Option Bool) := Internal.api "Lasm.JS.Web.GamepadButton.touched?" do
+  let self := self'
+  if !(← Internal.has self.val "touched") then return none
+  let lasmGuarded ← do
+    self.val.get "touched" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute double value` -/
 @[macro_inline] def GamepadButton.value (self : GamepadButton) : IO Float := Internal.api "Lasm.JS.Web.GamepadButton.value" do
@@ -143,6 +160,14 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
   Lasm.JS.Binding.invoke GamepadEvent { name := "Lasm.JS.Web.GamepadEvent.new", module := "globalThis", path := "GamepadEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional GamepadEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadEvent.new? (type : String) (eventInitDict : Option GamepadEventInit := none) : IO (Option GamepadEvent) := Internal.api "Lasm.JS.Web.GamepadEvent.new?" do
+  if !(← Internal.hasGlobal ["GamepadEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GamepadEvent { name := "Lasm.JS.Web.GamepadEvent.new?", module := "globalThis", path := "GamepadEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Gamepad gamepad` -/
 @[macro_inline] def GamepadEvent.gamepad (self : GamepadEvent) : IO Gamepad := Internal.api "Lasm.JS.Web.GamepadEvent.gamepad" do
   let r ← self.val.get "gamepad" Value
@@ -156,13 +181,37 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def GamepadHapticActuator.effects (self : GamepadHapticActuator) : IO (Array GamepadHapticEffectType) := Internal.api "Lasm.JS.Web.GamepadHapticActuator.effects" do
   self.val.get "effects" (Array GamepadHapticEffectType)
 
+/-- `readonly attribute FrozenArray<GamepadHapticEffectType> effects` where the platform has it (`'effects' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadHapticActuator.effects? (self' : GamepadHapticActuator) : IO (Option (Array GamepadHapticEffectType)) := Internal.api "Lasm.JS.Web.GamepadHapticActuator.effects?" do
+  let self := self'
+  if !(← Internal.has self.val "effects") then return none
+  let lasmGuarded ← do
+    self.val.get "effects" (Array GamepadHapticEffectType)
+  return some lasmGuarded
+
 /-- `Promise<GamepadHapticsResult> playEffect(GamepadHapticEffectType type, optional GamepadEffectParameters params)` -/
 @[macro_inline] def GamepadHapticActuator.playEffect (self : GamepadHapticActuator) (type : GamepadHapticEffectType) (params : Option GamepadEffectParameters := none) : Async GamepadHapticsResult := Internal.api "Lasm.JS.Web.GamepadHapticActuator.playEffect" do
   self.val.callMethodAwait "playEffect" (Internal.args #[toJS type, Internal.optional params]) GamepadHapticsResult
 
+/-- `Promise<GamepadHapticsResult> playEffect(GamepadHapticEffectType type, optional GamepadEffectParameters params)` where the platform has it (`'playEffect' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadHapticActuator.playEffect? (self' : GamepadHapticActuator) (type : GamepadHapticEffectType) (params : Option GamepadEffectParameters := none) : Async (Option GamepadHapticsResult) := Internal.api "Lasm.JS.Web.GamepadHapticActuator.playEffect?" do
+  let self := self'
+  if !(← Internal.has self.val "playEffect") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "playEffect" (Internal.args #[toJS type, Internal.optional params]) GamepadHapticsResult
+  return some lasmGuarded
+
 /-- `Promise<GamepadHapticsResult> reset()` -/
 @[macro_inline] def GamepadHapticActuator.reset (self : GamepadHapticActuator) : Async GamepadHapticsResult := Internal.api "Lasm.JS.Web.GamepadHapticActuator.reset" do
   self.val.callMethodAwait "reset" (Internal.args #[]) GamepadHapticsResult
+
+/-- `Promise<GamepadHapticsResult> reset()` where the platform has it (`'reset' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadHapticActuator.reset? (self' : GamepadHapticActuator) : Async (Option GamepadHapticsResult) := Internal.api "Lasm.JS.Web.GamepadHapticActuator.reset?" do
+  let self := self'
+  if !(← Internal.has self.val "reset") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "reset" (Internal.args #[]) GamepadHapticsResult
+  return some lasmGuarded
 
 /-- `attribute EventHandler ongamepadconnected` -/
 @[macro_inline] def HTMLBodyElement.ongamepadconnected (self : HTMLBodyElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.HTMLBodyElement.ongamepadconnected" do
@@ -200,6 +249,14 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def Navigator.getGamepads (self : Navigator) : IO (Array (Option Gamepad)) := Internal.api "Lasm.JS.Web.Navigator.getGamepads" do
   self.val.callMethod "getGamepads" (Internal.args #[]) (Array (Option Gamepad))
 
+/-- `sequence<Gamepad?> getGamepads()` where the platform has it (`'getGamepads' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getGamepads? (self' : Navigator) : IO (Option (Array (Option Gamepad))) := Internal.api "Lasm.JS.Web.Navigator.getGamepads?" do
+  let self := self'
+  if !(← Internal.has self.val "getGamepads") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getGamepads" (Internal.args #[]) (Array (Option Gamepad))
+  return some lasmGuarded
+
 /-- `attribute EventHandler ongamepadconnected` -/
 @[macro_inline] def SVGSVGElement.ongamepadconnected (self : SVGSVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGSVGElement.ongamepadconnected" do
   self.val.get "ongamepadconnected" (Option EventHandlerNonNull)
@@ -220,6 +277,14 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def Window.ongamepadconnected (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ongamepadconnected" do
   self.val.get "ongamepadconnected" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ongamepadconnected` where the platform has it (`'ongamepadconnected' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ongamepadconnected? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ongamepadconnected?" do
+  let self := self'
+  if !(← Internal.has self.val "ongamepadconnected") then return none
+  let lasmGuarded ← do
+    self.val.get "ongamepadconnected" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `ongamepadconnected`: `attribute EventHandler ongamepadconnected` -/
 @[macro_inline] def Window.setOngamepadconnected (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOngamepadconnected" do
   self.val.set "ongamepadconnected" (toJS value)
@@ -227,6 +292,14 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 /-- `attribute EventHandler ongamepaddisconnected` -/
 @[macro_inline] def Window.ongamepaddisconnected (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ongamepaddisconnected" do
   self.val.get "ongamepaddisconnected" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ongamepaddisconnected` where the platform has it (`'ongamepaddisconnected' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ongamepaddisconnected? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ongamepaddisconnected?" do
+  let self := self'
+  if !(← Internal.has self.val "ongamepaddisconnected") then return none
+  let lasmGuarded ← do
+    self.val.get "ongamepaddisconnected" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `ongamepaddisconnected`: `attribute EventHandler ongamepaddisconnected` -/
 @[macro_inline] def Window.setOngamepaddisconnected (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOngamepaddisconnected" do
@@ -236,8 +309,22 @@ instance : ToJS GamepadEffectParameters := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def ongamepadconnected : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ongamepadconnected" do
   Internal.getGlobal ["ongamepadconnected"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ongamepadconnected` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ongamepadconnected? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ongamepadconnected?" do
+  if !(← Internal.hasGlobal ["ongamepadconnected"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ongamepadconnected"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ongamepaddisconnected` (Gamepad (https://w3c.github.io/gamepad/)) -/
 @[macro_inline] def ongamepaddisconnected : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ongamepaddisconnected" do
   Internal.getGlobal ["ongamepaddisconnected"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ongamepaddisconnected` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ongamepaddisconnected? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ongamepaddisconnected?" do
+  if !(← Internal.hasGlobal ["ongamepaddisconnected"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ongamepaddisconnected"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

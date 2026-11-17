@@ -78,6 +78,14 @@ instance : ToJS DocumentPictureInPictureEventInit := ⟨fun d => Internal.fields
   Lasm.JS.Binding.invoke DocumentPictureInPictureEvent { name := "Lasm.JS.Web.DocumentPictureInPictureEvent.new", module := "globalThis", path := "DocumentPictureInPictureEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, DocumentPictureInPictureEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DocumentPictureInPictureEvent.new? (type : String) (eventInitDict : DocumentPictureInPictureEventInit) : IO (Option DocumentPictureInPictureEvent) := Internal.api "Lasm.JS.Web.DocumentPictureInPictureEvent.new?" do
+  if !(← Internal.hasGlobal ["DocumentPictureInPictureEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DocumentPictureInPictureEvent { name := "Lasm.JS.Web.DocumentPictureInPictureEvent.new?", module := "globalThis", path := "DocumentPictureInPictureEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Window window` -/
 @[macro_inline] def DocumentPictureInPictureEvent.window (self : DocumentPictureInPictureEvent) : IO Window := Internal.api "Lasm.JS.Web.DocumentPictureInPictureEvent.window" do
   let r ← self.val.get "window" Value
@@ -88,9 +96,26 @@ instance : ToJS DocumentPictureInPictureEventInit := ⟨fun d => Internal.fields
   let r ← self.val.get "documentPictureInPicture" Value
   pure { val := r }
 
+/-- `readonly attribute DocumentPictureInPicture documentPictureInPicture` where the platform has it (`'documentPictureInPicture' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.documentPictureInPicture? (self' : Window) : IO (Option DocumentPictureInPicture) := Internal.api "Lasm.JS.Web.Window.documentPictureInPicture?" do
+  let self := self'
+  if !(← Internal.has self.val "documentPictureInPicture") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "documentPictureInPicture" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute DocumentPictureInPicture documentPictureInPicture` (Document Picture-in-Picture Specification (https://wicg.github.io/document-picture-in-picture/)) -/
 @[macro_inline] def documentPictureInPicture : IO DocumentPictureInPicture := Internal.api "Lasm.JS.Web.documentPictureInPicture" do
   let r ← Internal.getGlobal ["documentPictureInPicture"] Value
   pure { val := r }
+
+/-- `readonly attribute DocumentPictureInPicture documentPictureInPicture` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def documentPictureInPicture? : IO (Option DocumentPictureInPicture) := Internal.api "Lasm.JS.Web.documentPictureInPicture?" do
+  if !(← Internal.hasGlobal ["documentPictureInPicture"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["documentPictureInPicture"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

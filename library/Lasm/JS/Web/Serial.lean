@@ -203,9 +203,27 @@ instance : FromJS SerialInputSignals where
   let r ← self.val.get "serial" Value
   pure { val := r }
 
+/-- `readonly attribute Serial serial` where the platform has it (`'serial' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.serial? (self' : Navigator) : IO (Option Serial) := Internal.api "Lasm.JS.Web.Navigator.serial?" do
+  let self := self'
+  if !(← Internal.has self.val "serial") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "serial" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Serial serial` -/
 @[macro_inline] def WorkerNavigator.serial (self : WorkerNavigator) : IO Serial := Internal.api "Lasm.JS.Web.WorkerNavigator.serial" do
   let r ← self.val.get "serial" Value
   pure { val := r }
+
+/-- `readonly attribute Serial serial` where the platform has it (`'serial' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.serial? (self' : WorkerNavigator) : IO (Option Serial) := Internal.api "Lasm.JS.Web.WorkerNavigator.serial?" do
+  let self := self'
+  if !(← Internal.has self.val "serial") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "serial" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

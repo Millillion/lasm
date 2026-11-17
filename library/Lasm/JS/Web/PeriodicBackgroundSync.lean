@@ -46,6 +46,14 @@ instance : ToJS BackgroundSyncOptions := ⟨fun d => Internal.fields #[("minInte
   Lasm.JS.Binding.invoke PeriodicSyncEvent { name := "Lasm.JS.Web.PeriodicSyncEvent.new", module := "globalThis", path := "PeriodicSyncEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, PeriodicSyncEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PeriodicSyncEvent.new? (type : String) (init : PeriodicSyncEventInit) : IO (Option PeriodicSyncEvent) := Internal.api "Lasm.JS.Web.PeriodicSyncEvent.new?" do
+  if !(← Internal.hasGlobal ["PeriodicSyncEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PeriodicSyncEvent { name := "Lasm.JS.Web.PeriodicSyncEvent.new?", module := "globalThis", path := "PeriodicSyncEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString tag` -/
 @[macro_inline] def PeriodicSyncEvent.tag (self : PeriodicSyncEvent) : IO String := Internal.api "Lasm.JS.Web.PeriodicSyncEvent.tag" do
   self.val.get "tag" String
@@ -70,6 +78,14 @@ instance : ToJS BackgroundSyncOptions := ⟨fun d => Internal.fields #[("minInte
 @[macro_inline] def ServiceWorkerGlobalScope.onperiodicsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onperiodicsync" do
   self.val.get "onperiodicsync" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onperiodicsync` where the platform has it (`'onperiodicsync' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onperiodicsync? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onperiodicsync?" do
+  let self := self'
+  if !(← Internal.has self.val "onperiodicsync") then return none
+  let lasmGuarded ← do
+    self.val.get "onperiodicsync" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onperiodicsync`: `attribute EventHandler onperiodicsync` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnperiodicsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnperiodicsync" do
   self.val.set "onperiodicsync" (toJS value)
@@ -78,5 +94,14 @@ instance : ToJS BackgroundSyncOptions := ⟨fun d => Internal.fields #[("minInte
 @[macro_inline] def ServiceWorkerRegistration.periodicSync (self : ServiceWorkerRegistration) : IO PeriodicSyncManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.periodicSync" do
   let r ← self.val.get "periodicSync" Value
   pure { val := r }
+
+/-- `readonly attribute PeriodicSyncManager periodicSync` where the platform has it (`'periodicSync' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.periodicSync? (self' : ServiceWorkerRegistration) : IO (Option PeriodicSyncManager) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.periodicSync?" do
+  let self := self'
+  if !(← Internal.has self.val "periodicSync") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "periodicSync" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

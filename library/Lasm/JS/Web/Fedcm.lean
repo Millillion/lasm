@@ -263,6 +263,14 @@ instance : ToJS IdentityProviderClientMetadata := ⟨fun d => Internal.fields #[
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityCredential.disconnect", module := "globalThis", path := "IdentityCredential.disconnect", construct := false, arity := 1 }
     (Internal.args #[toJS options])
 
+/-- `static Promise<undefined> disconnect(IdentityCredentialDisconnectOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdentityCredential.disconnect? (options : IdentityCredentialDisconnectOptions) : Async (Option Unit) := Internal.api "Lasm.JS.Web.IdentityCredential.disconnect?" do
+  if !(← Internal.hasGlobal ["IdentityCredential", "disconnect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityCredential.disconnect?", module := "globalThis", path := "IdentityCredential.disconnect", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
+
 /-- `v instanceof IdentityCredentialError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IdentityCredentialError`). -/
 @[macro_inline] def IdentityCredentialError.cast? (v : Value) : IO (Option IdentityCredentialError) := Internal.api "Lasm.JS.Web.IdentityCredentialError.cast?" do
   Internal.cast (Internal.getGlobal ["IdentityCredentialError"] Value) (fun x => { val := x }) v
@@ -271,6 +279,14 @@ instance : ToJS IdentityProviderClientMetadata := ⟨fun d => Internal.fields #[
 @[macro_inline] def IdentityCredentialError.new (message : Option String := none) (options : Option IdentityCredentialErrorInit := none) : IO IdentityCredentialError := Internal.api "Lasm.JS.Web.IdentityCredentialError.new" do
   Lasm.JS.Binding.invoke IdentityCredentialError { name := "Lasm.JS.Web.IdentityCredentialError.new", module := "globalThis", path := "IdentityCredentialError", construct := true, arity := 2 }
     (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
+
+/-- `constructor(optional DOMString message, optional IdentityCredentialErrorInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdentityCredentialError.new? (message : Option String := none) (options : Option IdentityCredentialErrorInit := none) : IO (Option IdentityCredentialError) := Internal.api "Lasm.JS.Web.IdentityCredentialError.new?" do
+  if !(← Internal.hasGlobal ["IdentityCredentialError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IdentityCredentialError { name := "Lasm.JS.Web.IdentityCredentialError.new?", module := "globalThis", path := "IdentityCredentialError", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString error` -/
 @[macro_inline] def IdentityCredentialError.error (self : IdentityCredentialError) : IO String := Internal.api "Lasm.JS.Web.IdentityCredentialError.error" do
@@ -289,14 +305,38 @@ instance : ToJS IdentityProviderClientMetadata := ⟨fun d => Internal.fields #[
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.IdentityProvider.close", module := "globalThis", path := "IdentityProvider.close", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `static undefined close()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdentityProvider.close? : IO (Option Unit) := Internal.api "Lasm.JS.Web.IdentityProvider.close?" do
+  if !(← Internal.hasGlobal ["IdentityProvider", "close"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.IdentityProvider.close?", module := "globalThis", path := "IdentityProvider.close", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `static Promise<undefined> resolve(any token, optional IdentityResolveOptions options)` -/
 @[macro_inline] def IdentityProvider.resolve (token : Data) (options : Option IdentityResolveOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.IdentityProvider.resolve" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityProvider.resolve", module := "globalThis", path := "IdentityProvider.resolve", construct := false, arity := 2 }
     (Internal.args #[toJS token, Internal.optional options])
 
+/-- `static Promise<undefined> resolve(any token, optional IdentityResolveOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdentityProvider.resolve? (token : Data) (options : Option IdentityResolveOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.IdentityProvider.resolve?" do
+  if !(← Internal.hasGlobal ["IdentityProvider", "resolve"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.IdentityProvider.resolve?", module := "globalThis", path := "IdentityProvider.resolve", construct := false, arity := 2 }
+      (Internal.args #[toJS token, Internal.optional options])
+  return some lasmGuarded
+
 /-- `static Promise<sequence<IdentityUserInfo>> getUserInfo(IdentityProviderConfig config)` -/
 @[macro_inline] def IdentityProvider.getUserInfo (config : IdentityProviderConfig) : Async (Array IdentityUserInfo) := Internal.api "Lasm.JS.Web.IdentityProvider.getUserInfo" do
   Lasm.JS.Binding.invokeAsync (Array IdentityUserInfo) { name := "Lasm.JS.Web.IdentityProvider.getUserInfo", module := "globalThis", path := "IdentityProvider.getUserInfo", construct := false, arity := 1 }
     (Internal.args #[toJS config])
+
+/-- `static Promise<sequence<IdentityUserInfo>> getUserInfo(IdentityProviderConfig config)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IdentityProvider.getUserInfo? (config : IdentityProviderConfig) : Async (Option (Array IdentityUserInfo)) := Internal.api "Lasm.JS.Web.IdentityProvider.getUserInfo?" do
+  if !(← Internal.hasGlobal ["IdentityProvider", "getUserInfo"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array IdentityUserInfo) { name := "Lasm.JS.Web.IdentityProvider.getUserInfo?", module := "globalThis", path := "IdentityProvider.getUserInfo", construct := false, arity := 1 }
+      (Internal.args #[toJS config])
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -56,6 +56,14 @@ instance : ToJS DisplayMediaStreamOptions := ⟨fun d => Internal.fields #[("vid
   Lasm.JS.Binding.invoke CaptureController { name := "Lasm.JS.Web.CaptureController.new", module := "globalThis", path := "CaptureController", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CaptureController.new? : IO (Option CaptureController) := Internal.api "Lasm.JS.Web.CaptureController.new?" do
+  if !(← Internal.hasGlobal ["CaptureController"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CaptureController { name := "Lasm.JS.Web.CaptureController.new?", module := "globalThis", path := "CaptureController", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined setFocusBehavior(CaptureStartFocusBehavior focusBehavior)` -/
 @[macro_inline] def CaptureController.setFocusBehavior (self : CaptureController) (focusBehavior : CaptureStartFocusBehavior) : IO Unit := Internal.api "Lasm.JS.Web.CaptureController.setFocusBehavior" do
   self.val.callMethod "setFocusBehavior" (Internal.args #[toJS focusBehavior]) Unit

@@ -44,6 +44,14 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke BufferedChangeEvent { name := "Lasm.JS.Web.BufferedChangeEvent.new", module := "globalThis", path := "BufferedChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional BufferedChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BufferedChangeEvent.new? (type : String) (eventInitDict : Option BufferedChangeEventInit := none) : IO (Option BufferedChangeEvent) := Internal.api "Lasm.JS.Web.BufferedChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["BufferedChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BufferedChangeEvent { name := "Lasm.JS.Web.BufferedChangeEvent.new?", module := "globalThis", path := "BufferedChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute TimeRanges addedRanges` -/
 @[macro_inline] def BufferedChangeEvent.addedRanges (self : BufferedChangeEvent) : IO TimeRanges := Internal.api "Lasm.JS.Web.BufferedChangeEvent.addedRanges" do
   let r ← self.val.get "addedRanges" Value
@@ -63,10 +71,27 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke MediaSource { name := "Lasm.JS.Web.MediaSource.new", module := "globalThis", path := "MediaSource", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSource.new? : IO (Option MediaSource) := Internal.api "Lasm.JS.Web.MediaSource.new?" do
+  if !(← Internal.hasGlobal ["MediaSource"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaSource { name := "Lasm.JS.Web.MediaSource.new?", module := "globalThis", path := "MediaSource", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MediaSourceHandle handle` -/
 @[macro_inline] def MediaSource.handle (self : MediaSource) : IO MediaSourceHandle := Internal.api "Lasm.JS.Web.MediaSource.handle" do
   let r ← self.val.get "handle" Value
   pure { val := r }
+
+/-- `readonly attribute MediaSourceHandle handle` where the platform has it (`'handle' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSource.handle? (self' : MediaSource) : IO (Option MediaSourceHandle) := Internal.api "Lasm.JS.Web.MediaSource.handle?" do
+  let self := self'
+  if !(← Internal.has self.val "handle") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "handle" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute SourceBufferList sourceBuffers` -/
 @[macro_inline] def MediaSource.sourceBuffers (self : MediaSource) : IO SourceBufferList := Internal.api "Lasm.JS.Web.MediaSource.sourceBuffers" do
@@ -118,6 +143,13 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
 @[macro_inline] def MediaSource.canConstructInDedicatedWorker : IO Bool := Internal.api "Lasm.JS.Web.MediaSource.canConstructInDedicatedWorker" do
   Internal.getGlobal ["MediaSource", "canConstructInDedicatedWorker"] Bool
 
+/-- `static readonly attribute boolean canConstructInDedicatedWorker` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSource.canConstructInDedicatedWorker? : IO (Option Bool) := Internal.api "Lasm.JS.Web.MediaSource.canConstructInDedicatedWorker?" do
+  if !(← Internal.hasGlobal ["MediaSource", "canConstructInDedicatedWorker"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["MediaSource", "canConstructInDedicatedWorker"] Bool
+  return some lasmGuarded
+
 /-- `SourceBuffer addSourceBuffer(DOMString type)` -/
 @[macro_inline] def MediaSource.addSourceBuffer (self : MediaSource) (type : String) : IO SourceBuffer := Internal.api "Lasm.JS.Web.MediaSource.addSourceBuffer" do
   let r ← self.val.callMethod "addSourceBuffer" (Internal.args #[toJS type]) Value
@@ -143,6 +175,14 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
 @[macro_inline] def MediaSource.isTypeSupported (type : String) : IO Bool := Internal.api "Lasm.JS.Web.MediaSource.isTypeSupported" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaSource.isTypeSupported", module := "globalThis", path := "MediaSource.isTypeSupported", construct := false, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
+
+/-- `static boolean isTypeSupported(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSource.isTypeSupported? (type : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.MediaSource.isTypeSupported?" do
+  if !(← Internal.hasGlobal ["MediaSource", "isTypeSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.MediaSource.isTypeSupported?", module := "globalThis", path := "MediaSource.isTypeSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof MediaSourceHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaSourceHandle`). -/
 @[macro_inline] def MediaSourceHandle.cast? (v : Value) : IO (Option MediaSourceHandle) := Internal.api "Lasm.JS.Web.MediaSourceHandle.cast?" do
@@ -182,15 +222,42 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
   let r ← self.val.get "audioTracks" Value
   pure { val := r }
 
+/-- `readonly attribute AudioTrackList audioTracks` where the platform has it (`'audioTracks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SourceBuffer.audioTracks? (self' : SourceBuffer) : IO (Option AudioTrackList) := Internal.api "Lasm.JS.Web.SourceBuffer.audioTracks?" do
+  let self := self'
+  if !(← Internal.has self.val "audioTracks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "audioTracks" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute VideoTrackList videoTracks` -/
 @[macro_inline] def SourceBuffer.videoTracks (self : SourceBuffer) : IO VideoTrackList := Internal.api "Lasm.JS.Web.SourceBuffer.videoTracks" do
   let r ← self.val.get "videoTracks" Value
   pure { val := r }
 
+/-- `readonly attribute VideoTrackList videoTracks` where the platform has it (`'videoTracks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SourceBuffer.videoTracks? (self' : SourceBuffer) : IO (Option VideoTrackList) := Internal.api "Lasm.JS.Web.SourceBuffer.videoTracks?" do
+  let self := self'
+  if !(← Internal.has self.val "videoTracks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "videoTracks" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute TextTrackList textTracks` -/
 @[macro_inline] def SourceBuffer.textTracks (self : SourceBuffer) : IO TextTrackList := Internal.api "Lasm.JS.Web.SourceBuffer.textTracks" do
   let r ← self.val.get "textTracks" Value
   pure { val := r }
+
+/-- `readonly attribute TextTrackList textTracks` where the platform has it (`'textTracks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SourceBuffer.textTracks? (self' : SourceBuffer) : IO (Option TextTrackList) := Internal.api "Lasm.JS.Web.SourceBuffer.textTracks?" do
+  let self := self'
+  if !(← Internal.has self.val "textTracks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "textTracks" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `attribute double appendWindowStart` -/
 @[macro_inline] def SourceBuffer.appendWindowStart (self : SourceBuffer) : IO Float := Internal.api "Lasm.JS.Web.SourceBuffer.appendWindowStart" do
@@ -297,6 +364,14 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke ManagedMediaSource { name := "Lasm.JS.Web.ManagedMediaSource.new", module := "globalThis", path := "ManagedMediaSource", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ManagedMediaSource.new? : IO (Option ManagedMediaSource) := Internal.api "Lasm.JS.Web.ManagedMediaSource.new?" do
+  if !(← Internal.hasGlobal ["ManagedMediaSource"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ManagedMediaSource { name := "Lasm.JS.Web.ManagedMediaSource.new?", module := "globalThis", path := "ManagedMediaSource", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean streaming` -/
 @[macro_inline] def ManagedMediaSource.streaming (self : ManagedMediaSource) : IO Bool := Internal.api "Lasm.JS.Web.ManagedMediaSource.streaming" do
   self.val.get "streaming" Bool
@@ -336,6 +411,14 @@ instance : ToJS BufferedChangeEventInit := ⟨fun d => Internal.fields #[("bubbl
 /-- `readonly attribute SourceBuffer? sourceBuffer` -/
 @[macro_inline] def TextTrack.sourceBuffer (self : TextTrack) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.TextTrack.sourceBuffer" do
   self.val.get "sourceBuffer" (Option SourceBuffer)
+
+/-- `readonly attribute SourceBuffer? sourceBuffer` where the platform has it (`'sourceBuffer' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextTrack.sourceBuffer? (self' : TextTrack) : IO (Option (Option SourceBuffer)) := Internal.api "Lasm.JS.Web.TextTrack.sourceBuffer?" do
+  let self := self'
+  if !(← Internal.has self.val "sourceBuffer") then return none
+  let lasmGuarded ← do
+    self.val.get "sourceBuffer" (Option SourceBuffer)
+  return some lasmGuarded
 
 /-- `readonly attribute SourceBuffer? sourceBuffer` -/
 @[macro_inline] def VideoTrack.sourceBuffer (self : VideoTrack) : IO (Option SourceBuffer) := Internal.api "Lasm.JS.Web.VideoTrack.sourceBuffer" do

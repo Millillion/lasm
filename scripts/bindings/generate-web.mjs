@@ -1104,8 +1104,36 @@ const constructorName = 'new';
 // ---------- the web APIs a program references (for `lasm build --target`'s availability check) ----------
 // Every generated function of Lasm.JS.Web that calls the platform is `@[noinline]`, so a program's generated C
 // names it, and is recorded with the compatibility-data paths that say where it exists (0.3-10).
-/** { lean: full Lean name, paths: [[root, …keys]] in order of preference }. */
+/** { lean: full Lean name, paths: [[root, …keys]] in order of preference, result: the Lean interface type it returns }. */
 const apiDecls = [];
+// Compatibility data (web-availability.mjs) with Lasm's reviewed corrections (availability-overrides.json).
+const rcd = await compat.loadRuntimeCompat();
+const { overrides: availabilityOverrides } = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'availability-overrides.json'), 'utf8'));
+const usedAvailabilityOverrides = new Set();
+/** Where a binding is available: { path, missing: [runtime] }. */
+function whereAvailable(lean, paths) {
+  const where = compat.availability(paths, rcd);
+  const path = Object.values(where).find(w => w.path)?.path ?? paths[0].join('.');
+  for (const o of availabilityOverrides) if (o.api === lean || o.api === path) {
+    usedAvailabilityOverrides.add(o.api);
+    for (const r of o.runtimes) { if (!where[r]) fail(`availability-overrides.json: unknown runtime ${r}`); where[r].ok = o.available; }
+  }
+  return { path, missing: Object.keys(where).filter(r => !where[r].ok) };
+}
+/** The Lean interface type a member returns (`Navigator.gpu` → `GPU`), through Promise and nullable, if any. */
+function resultInterface(member) {
+  if (member.type === 'constructor') return leanTypeName(apiOwner.name);
+  if (!member.idlType || member.type === 'cast') return undefined;
+  let r = resolve(member.idlType);
+  while (r && (r.k === 'promise' || r.k === 'nullable')) r = r.inner;
+  return r?.k === 'iface' ? leanTypeName(r.name) : undefined;
+}
+/** Where an interface itself is available (its compatibility path), for the guards of its members. */
+const interfaceMissing = new Map();
+const missingOfInterface = name => {
+  if (!interfaceMissing.has(name)) interfaceMissing.set(name, whereAvailable(`${NS}.${leanTypeName(name)}`, [compatBase(name)]).missing);
+  return interfaceMissing.get(name);
+};
 let apiOwner = null; // { kind: 'interface', name } | { kind: 'global' } | { kind: 'namespace', name }
 /** The compatibility-data root and key of an interface or namespace: WebAssembly's are under `webassembly.api`. */
 const compatBase = name => {
@@ -1132,8 +1160,60 @@ function api(member, text) {
         [...base, key], base];
     }
   }
-  apiDecls.push({ lean: `${NS}.${lean}`, paths });
-  return macroInline(text, `${NS}.${lean}`);
+  apiDecls.push({ lean: `${NS}.${lean}`, paths, result: resultInterface(member) });
+  const plain = macroInline(text, `${NS}.${lean}`);
+  const guard = guardOf(member, key, text, lean, paths);
+  return guard ? `${plain}\n\n${guard}` : plain;
+}
+/**
+ * Rule 0.3-11, the availability guard: `X?` runs binding X where the platform has it (`'gpu' in navigator`) and
+ * returns `none` where it does not. Generated for every binding some supported runtime lacks that a program can
+ * reach without a guard of its own: a global, a namespace member, a static member, a constructor, or an instance
+ * member its interface's runtimes do not all have (`Response.bytes` on an older Node). The members of an
+ * interface that only a guard gives (GPU's, behind `Navigator.gpu?`) need none: `lasm build --target` allows them
+ * where the guard's result is the only way to them (src/web-availability.mjs).
+ */
+function guardOf(member, key, text, lean, paths) {
+  if (!['attribute', 'operation', 'constructor'].includes(member.type)) return null;
+  const { missing } = whereAvailable(`${NS}.${lean}`, paths);
+  if (!missing.length) return null;
+  const at = text.indexOf('\ndef ');
+  const lineEnd = text.indexOf('\n', at + 1) < 0 ? text.length : text.indexOf('\n', at + 1);
+  const header = text.slice(at + 1, lineEnd);
+  // A setter has nothing to give back; the getter's guard covers the attribute.
+  if (member.type === 'attribute' && / : IO Unit :=/.test(header) && /\(value : /.test(header)) return null;
+  const isStatic = member.special === 'static';
+  const instance = apiOwner.kind === 'interface' && member.type !== 'constructor' && !isStatic;
+  let check;
+  if (apiOwner.kind === 'global') check = `Internal.hasGlobal [${JSON.stringify(key)}]`;
+  else if (apiOwner.kind === 'namespace') check = `Internal.hasGlobal [${[...apiOwner.name.split('.'), key].map(k => JSON.stringify(k)).join(', ')}]`;
+  else if (member.type === 'constructor') check = `Internal.hasGlobal [${jsPath(apiOwner.name).split('.').map(k => JSON.stringify(k)).join(', ')}]`;
+  else if (isStatic) check = `Internal.hasGlobal [${[...jsPath(apiOwner.name).split('.'), key].map(k => JSON.stringify(k)).join(', ')}]`;
+  else {
+    // An instance member its interface's runtimes all have needs no guard of its own.
+    const ownerMissing = missingOfInterface(apiOwner.name);
+    if (missing.every(r => ownerMissing.includes(r))) return null;
+    if (!/\(self : [^)]+\)/.test(header)) return null;
+    check = `Internal.has self.val ${JSON.stringify(key)}`;
+  }
+  const typeAt = Math.max(header.lastIndexOf(' : IO '), header.lastIndexOf(' : Async '));
+  const defineAt = header.indexOf(':=', typeAt);
+  const monad = header.slice(typeAt + 3, defineAt).trim().split(' ')[0];
+  const result = header.slice(typeAt + 3 + monad.length + 1, defineAt).trim();
+  const name = /^def (\S+)/.exec(header)[1];
+  // `X?`; a quoted name keeps its quotes around the whole (`CSS.«in?»`).
+  let signature = header.slice(0, typeAt).replace(/^def (\S+)/, `def ${name.endsWith('»') ? name.slice(0, -1) + '?»' : name + '?'}`);
+  if (instance) signature = signature.replace(/\(self : /, "(self' : ");
+  let body = text.slice(at + 1 + defineAt + 2);
+  // The binding records inside name the guard too: the program's C must not hold the unguarded name (0.3-10).
+  body = body.replaceAll(JSON.stringify(`${NS}.${lean}`), JSON.stringify(`${NS}.${lean}?`));
+  const lines = body.startsWith(' do\n') ? body.slice(4).split('\n') : body.startsWith('\n') ? body.slice(1).split('\n') : ['  ' + body.trim()];
+  const idl = /`([^`]+)`/.exec(text.slice(0, at))?.[1] ?? lean;
+  const guarded = `/-- \`${idl}\` where the platform has it (${instance ? `\`'${key}' in self\`` : 'its global'}), else \`none\` (rule 0.3-11). -/\n`
+    + `${signature} : ${monad} (Option ${paren(result)}) := do\n`
+    + (instance ? `  let self := self'\n` : '')
+    + `  if !(← ${check}) then return none\n  let lasmGuarded ← do\n${lines.map(l => '  ' + l).join('\n')}\n  return some lasmGuarded`;
+  return macroInline(guarded, `${NS}.${lean}?`);
 }
 /**
  * A web binding as data (0.3-12): `@[macro_inline]`, so it has no code of its own and a program's call site gets
@@ -1644,25 +1724,23 @@ const webPlan = plan.filter(m => m.ns === NS);
 // No umbrella module (0.3-18): with modules compiled on first import, `import Lasm.JS.Web` would compile every spec.
 // Where each web API is available (scripts/bindings/web-availability.mjs), for `lasm build --target`.
 {
-  const rcd = await compat.loadRuntimeCompat();
-  const { overrides } = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'availability-overrides.json'), 'utf8'));
-  const used = new Set();
   const apis = {};
   for (const a of apiDecls) {
-    const where = compat.availability(a.paths, rcd);
-    const path = Object.values(where).find(w => w.path)?.path ?? a.paths[0].join('.');
-    for (const o of overrides) if (o.api === a.lean || o.api === path) {
-      used.add(o.api);
-      for (const r of o.runtimes) { if (!where[r]) fail(`availability-overrides.json: unknown runtime ${r}`); where[r].ok = o.available; }
-    }
-    const missing = Object.keys(where).filter(r => !where[r].ok);
-    if (missing.length) apis[a.lean] = [path, missing.join(' ')];
+    const { path, missing } = whereAvailable(a.lean, a.paths);
+    // [compatibility path, the runtimes that lack it, the interface it returns (for guarded uses, 0.3-11)].
+    if (missing.length) apis[a.lean] = a.result ? [path, missing.join(' '), a.result] : [path, missing.join(' ')];
   }
-  for (const o of overrides) if (!used.has(o.api)) fail(`availability-overrides.json: ${o.api} matches no generated API`);
+  // The interfaces some runtime lacks: a guarded program's values of these exist only where the guard said so.
+  const interfaces = {};
+  for (const [name, home] of [...selectedInterfaces].sort(([a], [b]) => a < b ? -1 : 1)) if (nsOf(home) === NS) {
+    const missing = missingOfInterface(name);
+    if (missing.length) interfaces[leanTypeName(name)] = missing.join(' ');
+  }
+  for (const o of availabilityOverrides) if (!usedAvailabilityOverrides.has(o.api)) fail(`availability-overrides.json: ${o.api} matches no generated API`);
   files.set(join(outDir, 'availability.json'), JSON.stringify({
     generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion}, @mdn/browser-compat-data ${compat.bcd.__meta.version}, ${compat.runtimeCompat.repo} ${compat.runtimeCompat.commit.slice(0, 12)})`,
     runtimes: Object.fromEntries(Object.entries(compat.runtimes).map(([id, r]) => [id, r.label])),
-    apis }) + '\n');
+    apis, interfaces }) + '\n');
 }
 files.set(join(outDir, 'modules.json'), JSON.stringify({
   generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, modules: webPlan.map(m => m.key) }, null, 2) + '\n');

@@ -107,6 +107,14 @@ instance : ToJS NDEFReadingEventInit := ⟨fun d => Internal.fields #[("bubbles"
   Lasm.JS.Binding.invoke NDEFMessage { name := "Lasm.JS.Web.NDEFMessage.new", module := "globalThis", path := "NDEFMessage", construct := true, arity := 1 }
     (Internal.args #[toJS messageInit]) (await := false)
 
+/-- `constructor(NDEFMessageInit messageInit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NDEFMessage.new? (messageInit : NDEFMessageInit) : IO (Option NDEFMessage) := Internal.api "Lasm.JS.Web.NDEFMessage.new?" do
+  if !(← Internal.hasGlobal ["NDEFMessage"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NDEFMessage { name := "Lasm.JS.Web.NDEFMessage.new?", module := "globalThis", path := "NDEFMessage", construct := true, arity := 1 }
+      (Internal.args #[toJS messageInit]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<NDEFRecord> records` -/
 @[macro_inline] def NDEFMessage.records (self : NDEFMessage) : IO (Array NDEFRecord) := Internal.api "Lasm.JS.Web.NDEFMessage.records" do
   self.val.get "records" (Array NDEFRecord)
@@ -119,6 +127,14 @@ instance : ToJS NDEFReadingEventInit := ⟨fun d => Internal.fields #[("bubbles"
 @[macro_inline] def NDEFReader.new : IO NDEFReader := Internal.api "Lasm.JS.Web.NDEFReader.new" do
   Lasm.JS.Binding.invoke NDEFReader { name := "Lasm.JS.Web.NDEFReader.new", module := "globalThis", path := "NDEFReader", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NDEFReader.new? : IO (Option NDEFReader) := Internal.api "Lasm.JS.Web.NDEFReader.new?" do
+  if !(← Internal.hasGlobal ["NDEFReader"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NDEFReader { name := "Lasm.JS.Web.NDEFReader.new?", module := "globalThis", path := "NDEFReader", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onreading` -/
 @[macro_inline] def NDEFReader.onreading (self : NDEFReader) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.NDEFReader.onreading" do
@@ -157,6 +173,14 @@ instance : ToJS NDEFReadingEventInit := ⟨fun d => Internal.fields #[("bubbles"
   Lasm.JS.Binding.invoke NDEFReadingEvent { name := "Lasm.JS.Web.NDEFReadingEvent.new", module := "globalThis", path := "NDEFReadingEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS readingEventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, NDEFReadingEventInit readingEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NDEFReadingEvent.new? (type : String) (readingEventInitDict : NDEFReadingEventInit) : IO (Option NDEFReadingEvent) := Internal.api "Lasm.JS.Web.NDEFReadingEvent.new?" do
+  if !(← Internal.hasGlobal ["NDEFReadingEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NDEFReadingEvent { name := "Lasm.JS.Web.NDEFReadingEvent.new?", module := "globalThis", path := "NDEFReadingEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS readingEventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString serialNumber` -/
 @[macro_inline] def NDEFReadingEvent.serialNumber (self : NDEFReadingEvent) : IO String := Internal.api "Lasm.JS.Web.NDEFReadingEvent.serialNumber" do
   self.val.get "serialNumber" String
@@ -174,6 +198,14 @@ instance : ToJS NDEFReadingEventInit := ⟨fun d => Internal.fields #[("bubbles"
 @[macro_inline] def NDEFRecord.new (recordInit : NDEFRecordInit) : IO NDEFRecord := Internal.api "Lasm.JS.Web.NDEFRecord.new" do
   Lasm.JS.Binding.invoke NDEFRecord { name := "Lasm.JS.Web.NDEFRecord.new", module := "globalThis", path := "NDEFRecord", construct := true, arity := 1 }
     (Internal.args #[toJS recordInit]) (await := false)
+
+/-- `constructor(NDEFRecordInit recordInit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NDEFRecord.new? (recordInit : NDEFRecordInit) : IO (Option NDEFRecord) := Internal.api "Lasm.JS.Web.NDEFRecord.new?" do
+  if !(← Internal.hasGlobal ["NDEFRecord"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NDEFRecord { name := "Lasm.JS.Web.NDEFRecord.new?", module := "globalThis", path := "NDEFRecord", construct := true, arity := 1 }
+      (Internal.args #[toJS recordInit]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USVString recordType` -/
 @[macro_inline] def NDEFRecord.recordType (self : NDEFRecord) : IO String := Internal.api "Lasm.JS.Web.NDEFRecord.recordType" do

@@ -45,6 +45,14 @@ instance : ToJS ResizeObserverOptions := ⟨fun d => Internal.fields #[("box", I
   Lasm.JS.Binding.invoke ResizeObserver { name := "Lasm.JS.Web.ResizeObserver.new", module := "globalThis", path := "ResizeObserver", construct := true, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
 
+/-- `constructor(ResizeObserverCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ResizeObserver.new? (callback : ResizeObserverCallback) : IO (Option ResizeObserver) := Internal.api "Lasm.JS.Web.ResizeObserver.new?" do
+  if !(← Internal.hasGlobal ["ResizeObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ResizeObserver { name := "Lasm.JS.Web.ResizeObserver.new?", module := "globalThis", path := "ResizeObserver", construct := true, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined observe(Element target, optional ResizeObserverOptions options)` -/
 @[macro_inline] def ResizeObserver.observe (self : ResizeObserver) (target : Element) (options : Option ResizeObserverOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ResizeObserver.observe" do
   self.val.callMethod "observe" (Internal.args #[toJS target, Internal.optional options]) Unit
@@ -82,6 +90,14 @@ instance : ToJS ResizeObserverOptions := ⟨fun d => Internal.fields #[("box", I
 /-- `readonly attribute FrozenArray<ResizeObserverSize> devicePixelContentBoxSize` -/
 @[macro_inline] def ResizeObserverEntry.devicePixelContentBoxSize (self : ResizeObserverEntry) : IO (Array ResizeObserverSize) := Internal.api "Lasm.JS.Web.ResizeObserverEntry.devicePixelContentBoxSize" do
   self.val.get "devicePixelContentBoxSize" (Array ResizeObserverSize)
+
+/-- `readonly attribute FrozenArray<ResizeObserverSize> devicePixelContentBoxSize` where the platform has it (`'devicePixelContentBoxSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ResizeObserverEntry.devicePixelContentBoxSize? (self' : ResizeObserverEntry) : IO (Option (Array ResizeObserverSize)) := Internal.api "Lasm.JS.Web.ResizeObserverEntry.devicePixelContentBoxSize?" do
+  let self := self'
+  if !(← Internal.has self.val "devicePixelContentBoxSize") then return none
+  let lasmGuarded ← do
+    self.val.get "devicePixelContentBoxSize" (Array ResizeObserverSize)
+  return some lasmGuarded
 
 /-- `v instanceof ResizeObserverSize`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ResizeObserverSize`). -/
 @[macro_inline] def ResizeObserverSize.cast? (v : Value) : IO (Option ResizeObserverSize) := Internal.api "Lasm.JS.Web.ResizeObserverSize.cast?" do

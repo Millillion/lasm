@@ -160,6 +160,14 @@ instance : Coe (Array Int) Int32List := ⟨.sequence⟩
   Lasm.JS.Binding.invoke WebGLContextEvent { name := "Lasm.JS.Web.WebGLContextEvent.new", module := "globalThis", path := "WebGLContextEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInit]) (await := false)
 
+/-- `constructor(DOMString type, optional WebGLContextEventInit eventInit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGLContextEvent.new? (type : String) (eventInit : Option WebGLContextEventInit := none) : IO (Option WebGLContextEvent) := Internal.api "Lasm.JS.Web.WebGLContextEvent.new?" do
+  if !(← Internal.hasGlobal ["WebGLContextEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebGLContextEvent { name := "Lasm.JS.Web.WebGLContextEvent.new?", module := "globalThis", path := "WebGLContextEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInit]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString statusMessage` -/
 @[macro_inline] def WebGLContextEvent.statusMessage (self : WebGLContextEvent) : IO String := Internal.api "Lasm.JS.Web.WebGLContextEvent.statusMessage" do
   self.val.get "statusMessage" String
@@ -1087,6 +1095,14 @@ def WebGLRenderingContext.BROWSER_DEFAULT_WEBGL : Nat := 0x9244
 @[macro_inline] def WebGLRenderingContext.drawingBufferFormat (self : WebGLRenderingContext) : IO Nat := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferFormat" do
   self.val.get "drawingBufferFormat" Nat
 
+/-- `readonly attribute GLenum drawingBufferFormat` where the platform has it (`'drawingBufferFormat' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGLRenderingContext.drawingBufferFormat? (self' : WebGLRenderingContext) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferFormat?" do
+  let self := self'
+  if !(← Internal.has self.val "drawingBufferFormat") then return none
+  let lasmGuarded ← do
+    self.val.get "drawingBufferFormat" Nat
+  return some lasmGuarded
+
 /-- `attribute PredefinedColorSpace drawingBufferColorSpace` -/
 @[macro_inline] def WebGLRenderingContext.drawingBufferColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferColorSpace" do
   self.val.get "drawingBufferColorSpace" PredefinedColorSpace
@@ -1098,6 +1114,14 @@ def WebGLRenderingContext.BROWSER_DEFAULT_WEBGL : Nat := 0x9244
 /-- `attribute PredefinedColorSpace unpackColorSpace` -/
 @[macro_inline] def WebGLRenderingContext.unpackColorSpace (self : WebGLRenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGLRenderingContext.unpackColorSpace" do
   self.val.get "unpackColorSpace" PredefinedColorSpace
+
+/-- `attribute PredefinedColorSpace unpackColorSpace` where the platform has it (`'unpackColorSpace' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGLRenderingContext.unpackColorSpace? (self' : WebGLRenderingContext) : IO (Option PredefinedColorSpace) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.unpackColorSpace?" do
+  let self := self'
+  if !(← Internal.has self.val "unpackColorSpace") then return none
+  let lasmGuarded ← do
+    self.val.get "unpackColorSpace" PredefinedColorSpace
+  return some lasmGuarded
 
 /-- Sets `unpackColorSpace`: `attribute PredefinedColorSpace unpackColorSpace` -/
 @[macro_inline] def WebGLRenderingContext.setUnpackColorSpace (self : WebGLRenderingContext) (value : PredefinedColorSpace) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.setUnpackColorSpace" do
@@ -1122,6 +1146,14 @@ def WebGLRenderingContext.BROWSER_DEFAULT_WEBGL : Nat := 0x9244
 /-- `undefined drawingBufferStorage(GLenum sizedFormat, unsigned long width, unsigned long height)` -/
 @[macro_inline] def WebGLRenderingContext.drawingBufferStorage (self : WebGLRenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferStorage" do
   self.val.callMethod "drawingBufferStorage" (Internal.args #[toJS sizedFormat, toJS width, toJS height]) Unit
+
+/-- `undefined drawingBufferStorage(GLenum sizedFormat, unsigned long width, unsigned long height)` where the platform has it (`'drawingBufferStorage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGLRenderingContext.drawingBufferStorage? (self' : WebGLRenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.drawingBufferStorage?" do
+  let self := self'
+  if !(← Internal.has self.val "drawingBufferStorage") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "drawingBufferStorage" (Internal.args #[toJS sizedFormat, toJS width, toJS height]) Unit
+  return some lasmGuarded
 
 /-- `undefined activeTexture(GLenum texture)` -/
 @[macro_inline] def WebGLRenderingContext.activeTexture (self : WebGLRenderingContext) (texture : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.activeTexture" do

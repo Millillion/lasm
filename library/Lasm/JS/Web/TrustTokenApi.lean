@@ -36,13 +36,37 @@ instance : ToJS PrivateToken := ⟨fun d => Internal.fields #[("version", toJS d
 @[macro_inline] def Document.hasPrivateToken (self : Document) (issuer : String) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasPrivateToken" do
   self.val.callMethodAwait "hasPrivateToken" (Internal.args #[toJS issuer]) Bool
 
+/-- `Promise<boolean> hasPrivateToken(USVString issuer)` where the platform has it (`'hasPrivateToken' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.hasPrivateToken? (self' : Document) (issuer : String) : Async (Option Bool) := Internal.api "Lasm.JS.Web.Document.hasPrivateToken?" do
+  let self := self'
+  if !(← Internal.has self.val "hasPrivateToken") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "hasPrivateToken" (Internal.args #[toJS issuer]) Bool
+  return some lasmGuarded
+
 /-- `Promise<boolean> hasRedemptionRecord(USVString issuer)` -/
 @[macro_inline] def Document.hasRedemptionRecord (self : Document) (issuer : String) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasRedemptionRecord" do
   self.val.callMethodAwait "hasRedemptionRecord" (Internal.args #[toJS issuer]) Bool
 
+/-- `Promise<boolean> hasRedemptionRecord(USVString issuer)` where the platform has it (`'hasRedemptionRecord' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.hasRedemptionRecord? (self' : Document) (issuer : String) : Async (Option Bool) := Internal.api "Lasm.JS.Web.Document.hasRedemptionRecord?" do
+  let self := self'
+  if !(← Internal.has self.val "hasRedemptionRecord") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "hasRedemptionRecord" (Internal.args #[toJS issuer]) Bool
+  return some lasmGuarded
+
 /-- `attribute DOMString privateToken` -/
 @[macro_inline] def HTMLIFrameElement.privateToken (self : HTMLIFrameElement) : IO String := Internal.api "Lasm.JS.Web.HTMLIFrameElement.privateToken" do
   self.val.get "privateToken" String
+
+/-- `attribute DOMString privateToken` where the platform has it (`'privateToken' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLIFrameElement.privateToken? (self' : HTMLIFrameElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLIFrameElement.privateToken?" do
+  let self := self'
+  if !(← Internal.has self.val "privateToken") then return none
+  let lasmGuarded ← do
+    self.val.get "privateToken" String
+  return some lasmGuarded
 
 /-- Sets `privateToken`: `attribute DOMString privateToken` -/
 @[macro_inline] def HTMLIFrameElement.setPrivateToken (self : HTMLIFrameElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setPrivateToken" do
@@ -51,5 +75,13 @@ instance : ToJS PrivateToken := ⟨fun d => Internal.fields #[("version", toJS d
 /-- `undefined setPrivateToken(PrivateToken privateToken)` -/
 @[macro_inline] def XMLHttpRequest.setPrivateToken (self : XMLHttpRequest) (privateToken : PrivateToken) : IO Unit := Internal.api "Lasm.JS.Web.XMLHttpRequest.setPrivateToken" do
   self.val.callMethod "setPrivateToken" (Internal.args #[toJS privateToken]) Unit
+
+/-- `undefined setPrivateToken(PrivateToken privateToken)` where the platform has it (`'setPrivateToken' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def XMLHttpRequest.setPrivateToken? (self' : XMLHttpRequest) (privateToken : PrivateToken) : IO (Option Unit) := Internal.api "Lasm.JS.Web.XMLHttpRequest.setPrivateToken?" do
+  let self := self'
+  if !(← Internal.has self.val "setPrivateToken") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setPrivateToken" (Internal.args #[toJS privateToken]) Unit
+  return some lasmGuarded
 
 end Lasm.JS.Web

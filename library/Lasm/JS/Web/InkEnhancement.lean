@@ -58,4 +58,13 @@ instance : ToJS InkPresenterParam := ⟨fun d => Internal.fields #[("presentatio
   let r ← self.val.get "ink" Value
   pure { val := r }
 
+/-- `readonly attribute Ink ink` where the platform has it (`'ink' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.ink? (self' : Navigator) : IO (Option Ink) := Internal.api "Lasm.JS.Web.Navigator.ink?" do
+  let self := self'
+  if !(← Internal.has self.val "ink") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "ink" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

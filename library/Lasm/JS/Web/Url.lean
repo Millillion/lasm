@@ -39,6 +39,14 @@ instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVStrin
   Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new", module := "globalThis", path := "URL", construct := true, arity := 2 }
     (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
+/-- `constructor(USVString url, optional USVString base)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def URL.new? (url : String) (base : Option String := none) : IO (Option URL) := Internal.api "Lasm.JS.Web.URL.new?" do
+  if !(← Internal.hasGlobal ["URL"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new?", module := "globalThis", path := "URL", construct := true, arity := 2 }
+      (Internal.args #[toJS url, Internal.optional base]) (await := false)
+  return some lasmGuarded
+
 /-- `stringifier attribute USVString href` -/
 @[macro_inline] def URL.href (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.href" do
   self.val.get "href" String
@@ -137,6 +145,14 @@ instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVStrin
   Lasm.JS.Binding.invoke (Option URL) { name := "Lasm.JS.Web.URL.parse", module := "globalThis", path := "URL.parse", construct := false, arity := 2 }
     (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
+/-- `static URL? parse(USVString url, optional USVString base)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def URL.parse? (url : String) (base : Option String := none) : IO (Option (Option URL)) := Internal.api "Lasm.JS.Web.URL.parse?" do
+  if !(← Internal.hasGlobal ["URL", "parse"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option URL) { name := "Lasm.JS.Web.URL.parse?", module := "globalThis", path := "URL.parse", construct := false, arity := 2 }
+      (Internal.args #[toJS url, Internal.optional base]) (await := false)
+  return some lasmGuarded
+
 /-- `static boolean canParse(USVString url, optional USVString base)` -/
 @[macro_inline] def URL.canParse (url : String) (base : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.URL.canParse" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.URL.canParse", module := "globalThis", path := "URL.canParse", construct := false, arity := 2 }
@@ -154,6 +170,14 @@ instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVStrin
 @[macro_inline] def URLSearchParams.new (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO URLSearchParams := Internal.api "Lasm.JS.Web.URLSearchParams.new" do
   Lasm.JS.Binding.invoke URLSearchParams { name := "Lasm.JS.Web.URLSearchParams.new", module := "globalThis", path := "URLSearchParams", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
+
+/-- `constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def URLSearchParams.new? (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO (Option URLSearchParams) := Internal.api "Lasm.JS.Web.URLSearchParams.new?" do
+  if !(← Internal.hasGlobal ["URLSearchParams"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke URLSearchParams { name := "Lasm.JS.Web.URLSearchParams.new?", module := "globalThis", path := "URLSearchParams", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long size` -/
 @[macro_inline] def URLSearchParams.size (self : URLSearchParams) : IO Nat := Internal.api "Lasm.JS.Web.URLSearchParams.size" do

@@ -129,6 +129,14 @@ instance : ToJS IntrinsicSizesResultOptions := ⟨fun d => Internal.fields #[("m
   Lasm.JS.Binding.invoke FragmentResult { name := "Lasm.JS.Web.FragmentResult.new", module := "globalThis", path := "FragmentResult", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional FragmentResultOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FragmentResult.new? (options : Option FragmentResultOptions := none) : IO (Option FragmentResult) := Internal.api "Lasm.JS.Web.FragmentResult.new?" do
+  if !(← Internal.hasGlobal ["FragmentResult"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FragmentResult { name := "Lasm.JS.Web.FragmentResult.new?", module := "globalThis", path := "FragmentResult", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double inlineSize` -/
 @[macro_inline] def FragmentResult.inlineSize (self : FragmentResult) : IO Float := Internal.api "Lasm.JS.Web.FragmentResult.inlineSize" do
   self.val.get "inlineSize" Float
@@ -284,5 +292,13 @@ instance : ToJS IntrinsicSizesResultOptions := ⟨fun d => Internal.fields #[("m
 @[macro_inline] def CSS.layoutWorklet : IO Worklet := Internal.api "Lasm.JS.Web.CSS.layoutWorklet" do
   let r ← Internal.getGlobal ["CSS", "layoutWorklet"] Value
   pure { val := r }
+
+/-- `readonly attribute Worklet layoutWorklet` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.layoutWorklet? : IO (Option Worklet) := Internal.api "Lasm.JS.Web.CSS.layoutWorklet?" do
+  if !(← Internal.hasGlobal ["CSS", "layoutWorklet"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["CSS", "layoutWorklet"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

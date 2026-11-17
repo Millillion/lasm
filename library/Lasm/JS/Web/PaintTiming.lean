@@ -23,9 +23,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformancePaintTiming.paintTime (self : PerformancePaintTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformancePaintTiming.paintTime" do
   self.val.get "paintTime" Float
 
+/-- `readonly attribute DOMHighResTimeStamp paintTime` where the platform has it (`'paintTime' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformancePaintTiming.paintTime? (self' : PerformancePaintTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformancePaintTiming.paintTime?" do
+  let self := self'
+  if !(← Internal.has self.val "paintTime") then return none
+  let lasmGuarded ← do
+    self.val.get "paintTime" Float
+  return some lasmGuarded
+
 /-- `readonly attribute DOMHighResTimeStamp? presentationTime` -/
 @[macro_inline] def PerformancePaintTiming.presentationTime (self : PerformancePaintTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformancePaintTiming.presentationTime" do
   self.val.get "presentationTime" (Option Float)
+
+/-- `readonly attribute DOMHighResTimeStamp? presentationTime` where the platform has it (`'presentationTime' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformancePaintTiming.presentationTime? (self' : PerformancePaintTiming) : IO (Option (Option Float)) := Internal.api "Lasm.JS.Web.PerformancePaintTiming.presentationTime?" do
+  let self := self'
+  if !(← Internal.has self.val "presentationTime") then return none
+  let lasmGuarded ← do
+    self.val.get "presentationTime" (Option Float)
+  return some lasmGuarded
 
 /-- `object toJSON()` -/
 @[macro_inline] def PerformancePaintTiming.toJSON (self : PerformancePaintTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformancePaintTiming.toJSON" do

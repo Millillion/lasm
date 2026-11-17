@@ -161,10 +161,26 @@ instance : Coe URLPattern URLPatternCompatible := ⟨.urlPattern⟩
   Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.new", module := "globalThis", path := "URLPattern", construct := true, arity := 3 }
     (Internal.args #[toJS input, toJS baseURL, Internal.optional options]) (await := false)
 
+/-- `constructor(URLPatternInput input, USVString baseURL, optional URLPatternOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def URLPattern.new? (input : URLPatternInput) (baseURL : String) (options : Option URLPatternOptions := none) : IO (Option URLPattern) := Internal.api "Lasm.JS.Web.URLPattern.new?" do
+  if !(← Internal.hasGlobal ["URLPattern"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.new?", module := "globalThis", path := "URLPattern", construct := true, arity := 3 }
+      (Internal.args #[toJS input, toJS baseURL, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(optional URLPatternInput input, optional URLPatternOptions options)` -/
 @[macro_inline] def URLPattern.newWithOptions (input : Option URLPatternInput := none) (options : Option URLPatternOptions := none) : IO URLPattern := Internal.api "Lasm.JS.Web.URLPattern.newWithOptions" do
   Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.newWithOptions", module := "globalThis", path := "URLPattern", construct := true, arity := 2 }
     (Internal.args #[Internal.optional input, Internal.optional options]) (await := false)
+
+/-- `constructor(optional URLPatternInput input, optional URLPatternOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def URLPattern.newWithOptions? (input : Option URLPatternInput := none) (options : Option URLPatternOptions := none) : IO (Option URLPattern) := Internal.api "Lasm.JS.Web.URLPattern.newWithOptions?" do
+  if !(← Internal.hasGlobal ["URLPattern"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke URLPattern { name := "Lasm.JS.Web.URLPattern.newWithOptions?", module := "globalThis", path := "URLPattern", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional input, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USVString protocol` -/
 @[macro_inline] def URLPattern.protocol (self : URLPattern) : IO String := Internal.api "Lasm.JS.Web.URLPattern.protocol" do
@@ -201,6 +217,14 @@ instance : Coe URLPattern URLPatternCompatible := ⟨.urlPattern⟩
 /-- `readonly attribute boolean hasRegExpGroups` -/
 @[macro_inline] def URLPattern.hasRegExpGroups (self : URLPattern) : IO Bool := Internal.api "Lasm.JS.Web.URLPattern.hasRegExpGroups" do
   self.val.get "hasRegExpGroups" Bool
+
+/-- `readonly attribute boolean hasRegExpGroups` where the platform has it (`'hasRegExpGroups' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def URLPattern.hasRegExpGroups? (self' : URLPattern) : IO (Option Bool) := Internal.api "Lasm.JS.Web.URLPattern.hasRegExpGroups?" do
+  let self := self'
+  if !(← Internal.has self.val "hasRegExpGroups") then return none
+  let lasmGuarded ← do
+    self.val.get "hasRegExpGroups" Bool
+  return some lasmGuarded
 
 /-- `boolean test(optional URLPatternInput input, optional USVString baseURL)` -/
 @[macro_inline] def URLPattern.test (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.URLPattern.test" do

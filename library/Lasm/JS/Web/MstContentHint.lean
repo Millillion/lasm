@@ -18,6 +18,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def MediaStreamTrack.contentHint (self : MediaStreamTrack) : IO String := Internal.api "Lasm.JS.Web.MediaStreamTrack.contentHint" do
   self.val.get "contentHint" String
 
+/-- `attribute DOMString contentHint` where the platform has it (`'contentHint' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrack.contentHint? (self' : MediaStreamTrack) : IO (Option String) := Internal.api "Lasm.JS.Web.MediaStreamTrack.contentHint?" do
+  let self := self'
+  if !(← Internal.has self.val "contentHint") then return none
+  let lasmGuarded ← do
+    self.val.get "contentHint" String
+  return some lasmGuarded
+
 /-- Sets `contentHint`: `attribute DOMString contentHint` -/
 @[macro_inline] def MediaStreamTrack.setContentHint (self : MediaStreamTrack) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setContentHint" do
   self.val.set "contentHint" (toJS value)

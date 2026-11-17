@@ -34,4 +34,13 @@ instance : ToJS AudioOutputOptions := ⟨fun d => Internal.fields #[("deviceId",
   let r ← self.val.callMethodAwait "selectAudioOutput" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
+/-- `Promise<MediaDeviceInfo> selectAudioOutput(optional AudioOutputOptions options)` where the platform has it (`'selectAudioOutput' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaDevices.selectAudioOutput? (self' : MediaDevices) (options : Option AudioOutputOptions := none) : Async (Option MediaDeviceInfo) := Internal.api "Lasm.JS.Web.MediaDevices.selectAudioOutput?" do
+  let self := self'
+  if !(← Internal.has self.val "selectAudioOutput") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "selectAudioOutput" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

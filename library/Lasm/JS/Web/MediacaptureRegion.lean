@@ -39,4 +39,13 @@ set_option compiler.extract_closed false
     (Internal.args #[toJS element])
   pure { val := r }
 
+/-- `static Promise<CropTarget> fromElement(Element element)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CropTarget.fromElement? (element : Element) : Async (Option CropTarget) := Internal.api "Lasm.JS.Web.CropTarget.fromElement?" do
+  if !(← Internal.hasGlobal ["CropTarget", "fromElement"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.CropTarget.fromElement?", module := "globalThis", path := "CropTarget.fromElement", construct := false, arity := 1 }
+      (Internal.args #[toJS element])
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

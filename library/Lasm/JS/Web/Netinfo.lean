@@ -54,9 +54,27 @@ set_option compiler.extract_closed false
   let r ← self.val.get "connection" Value
   pure { val := r }
 
+/-- `readonly attribute NetworkInformation connection` where the platform has it (`'connection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.connection? (self' : Navigator) : IO (Option NetworkInformation) := Internal.api "Lasm.JS.Web.Navigator.connection?" do
+  let self := self'
+  if !(← Internal.has self.val "connection") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "connection" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute NetworkInformation connection` -/
 @[macro_inline] def WorkerNavigator.connection (self : WorkerNavigator) : IO NetworkInformation := Internal.api "Lasm.JS.Web.WorkerNavigator.connection" do
   let r ← self.val.get "connection" Value
   pure { val := r }
+
+/-- `readonly attribute NetworkInformation connection` where the platform has it (`'connection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.connection? (self' : WorkerNavigator) : IO (Option NetworkInformation) := Internal.api "Lasm.JS.Web.WorkerNavigator.connection?" do
+  let self := self'
+  if !(← Internal.has self.val "connection") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "connection" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

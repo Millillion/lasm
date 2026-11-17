@@ -113,4 +113,13 @@ instance : FromJS ContactInfo where
   let r ← self.val.get "contacts" Value
   pure { val := r }
 
+/-- `readonly attribute ContactsManager contacts` where the platform has it (`'contacts' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.contacts? (self' : Navigator) : IO (Option ContactsManager) := Internal.api "Lasm.JS.Web.Navigator.contacts?" do
+  let self := self'
+  if !(← Internal.has self.val "contacts") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "contacts" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web
