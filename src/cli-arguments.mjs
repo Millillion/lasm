@@ -15,12 +15,11 @@ export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun'
 export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
 export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
-// Platform targets write a deployable directory of their own: --output names
-// it (default: the platform's directory in the project, such as workers/ or
-// wasi/), and the Node build they relink stays in the build cache
-// (.lake/lasm/applications/). node and the function platforms write the Node
-// build to --output (default dist/), which `lasm package` reads.
-export const platformBuildTargets = [...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
+// Every target but node writes what is deployed: --output names it (default:
+// the platform's own place in the project, such as workers/, wasi/ or
+// lambda.zip), and the Node build it is made from stays in the build cache
+// (.lake/lasm/applications/). node writes the Node build to --output (default
+// dist/), which `lasm package` reads.
 // Targets whose layout the platform fixes (api/ for Vercel, netlify/ for
 // Netlify): the entry module imports the program by a fixed relative path.
 export const fixedLayoutTargets = ['vercel-edge', 'netlify-edge'];
@@ -30,25 +29,42 @@ export const suspendModes = ['none', 'jspi'];
 // Names people try for a target, and the target they mean.
 const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
-  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
+  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify', 'lambda-zip': 'lambda' };
 export function targetHint(value) {
   const alias = asciiLower(value);
   const guess = (Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined) ?? closest(value, buildTargets);
   return guess ? ` (did you mean --target ${guess}?)` : '';
 }
+/** The same hint among `candidates` only (lasm dev's targets, lasm package's,
+ * lasm init's --deploy targets): an alias that names one of them, else the
+ * closest of them. */
+export function targetHintAmong(value, candidates, option = '--target') {
+  const alias = asciiLower(value);
+  const named = Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined;
+  const guess = named !== undefined && candidates.includes(named) ? named : closest(value, candidates);
+  return guess ? ` (did you mean ${option} ${guess}?)` : '';
+}
 
 export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
-       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
-       lasm build <Main.lean> [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
-       lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser
+       lasm run <Main.lean> [--release] [-- arguments…]
+       lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
+       lasm build <Main.lean> [--target ${buildTargets.join('|')}] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
+       lasm init <directory> [--template NAME] [--deploy TARGET]…
+       lasm package [dist] --target ${[...Object.keys(packageTargets), 'browser'].join('|')} [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 
-Options: --rebuild, --verbose, --help, --version
+Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help,
+lasm dev --help and lasm package --help show their own options and targets.
+--output: with --target node (the default under Node) the Node build (default
+dist/); with every other target what is deployed (default: the platform's own
+place, such as workers/, wasi/ or lambda.zip). The Node build those are made
+from stays in the build cache.
 Profiles: lasm build makes release builds (optimized, byte-reproducible, for
 deployment); --dev skips the size optimizations for a faster build. lasm run
-(lasm Main.lean) makes dev builds; --release runs a release build.
+(lasm Main.lean) and lasm dev make dev builds; --release makes a release build.
+lasm dev watches the sources, rebuilds and restarts the program after each change.
+lasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).
 Application arguments must follow --.`;
 
 export const commandNames = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache'];
@@ -88,7 +104,7 @@ export function closest(word, candidates) {
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {
   const tokens = [...argv];
-  if (tokens.length === 1 && ['--version', '-v', 'version'].includes(tokens[0])) return { command: 'version' };
+  if (tokens.length === 1 && ['--version', '-v'].includes(tokens[0])) return { command: 'version' };
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
@@ -158,26 +174,24 @@ export function parseLasmArguments(argv) {
     throw new Error(`Unknown command "${positional[0]}"${guess ? ` (did you mean lasm ${guess}?)` : ''}. Commands: ${commandNames.join(', ')}; or run a program with lasm Main.lean.`);
   }
   result.input = positional.shift();
-  if (result.command === 'build' && positional.length === 1 && result.output === undefined) result.output = positional.shift();
-  if (positional.length) throw new Error('Unexpected positional arguments. Put application arguments after --.');
+  if (positional.length) throw new Error(result.command === 'build'
+    ? `Unexpected argument "${positional[0]}": lasm build takes one Lean source. Name the output with --output.`
+    : 'Unexpected positional arguments. Put application arguments after --.');
   if (result.command === 'run' && result.output !== undefined) throw new Error('--output is available only with lasm build');
-  if (!(result.input.endsWith('.lean') || result.command === 'build' && result.input.endsWith('.json')))
-    throw new Error('Expected a Lean source file, or a binding configuration for lasm build');
-  if (result.input.endsWith('.json') && result.profile !== undefined) throw new Error('--dev and --release apply to Lean applications');
+  if (!result.input.endsWith('.lean')) throw new Error(`Expected a Lean source file (Main.lean), not ${result.input}`);
   // lasm build defaults to the release profile, lasm run to the dev profile.
-  if (result.input.endsWith('.lean')) result.profile ??= result.command === 'build' ? 'release' : 'dev';
+  result.profile ??= result.command === 'build' ? 'release' : 'dev';
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
   if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {
     // The default target is the runtime the CLI runs on: node, bun or deno.
-    result.target ??= jsRuntime === 'node' || result.input.endsWith('.json') ? 'node' : jsRuntime;
-    if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
+    result.target ??= jsRuntime;
     if (fixedLayoutTargets.includes(result.target) && result.output !== undefined)
       throw new Error(`--output does not apply to --target ${result.target}: the platform fixes its layout (${result.target === 'vercel-edge' ? 'api/lasm.mjs and api/_lasm/' : 'netlify/edge-functions/lasm.mjs and netlify/lasm/'})`);
-    // Platform targets default to their own directory (the target's writer knows it).
-    if (!platformBuildTargets.includes(result.target)) result.output ??= 'dist';
+    // Only node defaults here; every other target's writer knows its own place.
+    if (result.target === 'node') result.output ??= 'dist';
   }
   return result;
 }

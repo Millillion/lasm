@@ -40,12 +40,20 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as tier from './serve-tier2.mjs';
+import { lowerAuto } from './ts-auto.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const lockFile = join(root, 'scripts', 'bindings', 'serve-api.lock.json');
 const cacheDir = join(root, '.work', 'serve-api');
 const check = process.argv.includes('--check');
 const updateLock = process.argv.includes('--update-lock');
+// WebIDL's keywords, escaped with a leading underscore where they name a member (WebIDL drops it).
+const idlKeywords = new Set(['any', 'object', 'symbol', 'attribute', 'callback', 'const', 'constructor', 'deleter', 'dictionary', 'enum', 'getter',
+  'includes', 'inherit', 'interface', 'iterable', 'maplike', 'mixin', 'namespace', 'partial', 'required', 'setlike', 'setter', 'static', 'stringifier',
+  'typedef', 'unrestricted', 'async', 'readonly', 'record', 'sequence', 'Promise', 'boolean', 'byte', 'octet', 'short', 'long', 'float', 'double',
+  'unsigned', 'undefined', 'null', 'true', 'false', 'Infinity', 'NaN', 'optional', 'or', 'bigint', 'DOMString', 'ByteString', 'USVString', 'ArrayBuffer',
+  'FrozenArray', 'ObservableArray', 'async_iterable', 'async_sequence', 'Infinity', '-Infinity', 'toJSON', 'prototype']);
+export const idlId = n => idlKeywords.has(n) ? `_${n}` : n;
 export const fail = message => { throw new Error(`serve-api: ${message}`); };
 
 // ---------- the declaration files, pinned ----------
@@ -100,7 +108,7 @@ export function blank(text) {
 
 const opens = { '(': ')', '[': ']', '{': '}' };
 /** The index of the bracket closing the one at `at` (in a `shape`). */
-function matchClose(shape, at) {
+export function matchClose(shape, at) {
   let depth = 0;
   for (let i = at; i < shape.length; i++) {
     const c = shape[i];
@@ -110,7 +118,7 @@ function matchClose(shape, at) {
   fail(`unbalanced ${shape[at]} at ${at}`);
 }
 /** The index of the first `ch` at bracket depth 0 (angle brackets included, `=>` excepted) from `from`, or -1. */
-function findTop(shape, from, to, chars, angles = true) {
+export function findTop(shape, from, to, chars, angles = true) {
   let depth = 0;
   for (let i = from; i < to; i++) {
     const c = shape[i];
@@ -120,15 +128,15 @@ function findTop(shape, from, to, chars, angles = true) {
   }
   return -1;
 }
-const docBefore = (src, pos) => {
+export const docBefore = (src, pos) => {
   let best = null;
   for (const d of src.docs) if (d.end <= pos && src.code.slice(d.end, pos).trim() === '') best = d;
   return best ? best.text : '';
 };
-const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
+export const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
 
 /** Every interface, type alias and function of a file, by qualified name (`Deno.HttpServer`, `Bun.Serve.Options`). */
-export function declarations(text, file) {
+export function declarations(text, file, { classes = false, auto = false } = {}) {
   const src = { ...blank(text), file };
   const out = [];
   const head = /^(?:export\s+)?(?:declare\s+)?/;
@@ -160,6 +168,35 @@ export function declarations(text, file) {
           doc: docBefore(src, i) });
         i = close + 1; continue;
       }
+      // A class (workers-types' `declare abstract class D1Database`) is read as an interface
+      // when the host asks for classes (its constructor and static members are not lowered).
+      if (classes && (m = /^(abstract\s+)?class\s+([\w$]+)/.exec(body))) {
+        const open = findTop(src.shape, i + lead + m[0].length, end, '{');
+        const close = matchClose(src.shape, open);
+        out.push({ kind: 'interface', class: true, abstract: !!m[1], name: qual(m[2]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
+          doc: docBefore(src, i) });
+        i = close + 1; continue;
+      }
+      // ts-auto.mjs (Lasm.JS.Deno, Lasm.JS.Bun): classes, enums and constants as they are declared.
+      if (auto && (m = /^(?:abstract\s+)?(class|enum)\s+([\w$]+)/.exec(body))) {
+        const open = findTop(src.shape, i + lead + m[0].length, end, '{');
+        const close = open < 0 ? end - 1 : matchClose(src.shape, open);
+        if (open >= 0) out.push({ kind: m[1], name: qual(m[2]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
+          doc: docBefore(src, i) });
+        i = close + 1; continue;
+      }
+      // `export import SpawnOptions = Spawn;`: another name of a namespace.
+      if (auto && (m = /^import\s+([\w$]+)\s*=\s*([\w$.]+)\s*;/.exec(body))) {
+        out.push({ kind: 'nsalias', name: qual(m[1]), target: m[2], src, doc: '' });
+        i = i + lead + m[0].length; continue;
+      }
+      if (auto && (m = /^(const|let|var)\s+([\w$]+)\s*:/.exec(body))) {
+        const stop = findTop(src.shape, i, end, ';', false);
+        const e = stop < 0 ? end : stop;
+        out.push({ kind: 'const', name: qual(m[2]), mutable: m[1] !== 'const', type: squash(src.code.slice(i + lead + m[0].length, e)), src,
+          at: i + lead + m[0].length, doc: docBefore(src, i) });
+        i = e + 1; continue;
+      }
       if ((m = /^(?:abstract\s+)?(?:class|enum)\s/.exec(body))) {
         const open = findTop(src.shape, i, end, '{', false);
         i = open < 0 ? end : matchClose(src.shape, open) + 1; continue;
@@ -168,6 +205,7 @@ export function declarations(text, file) {
       const e = stop < 0 ? end : stop;
       if ((m = /^type\s+([\w$]+)/.exec(body))) out.push({ kind: 'type', name: qual(m[1]), text: src.code.slice(i + lead, e), src, at: i, doc: docBefore(src, i) });
       else if ((m = /^function\s+([\w$]+)/.exec(body))) out.push({ kind: 'function', name: qual(m[1]), text: src.code.slice(i + lead, e), src, at: i, doc: docBefore(src, i) });
+      else if (classes && (m = /^(?:const|let|var)\s+([\w$]+)\s*:/.exec(body))) out.push({ kind: 'const', name: qual(m[1]), text: squash(src.code.slice(i + lead, e)), type: squash(src.code.slice(i + lead + m[0].length, e)), src, at: i, doc: docBefore(src, i) });
       i = e + 1;
     }
   })(0, text.length, []);
@@ -190,29 +228,54 @@ export function membersOf(src, from, to) {
   }
   return out;
 }
-function parseMember(text, shape) {
+export function parseMember(text, shape) {
+  // A call or construct signature (`(name: string): string`, `<T>(…): R`, `new (…): T`): the object is a function.
+  if (/^(new\s*)?[(<]/.test(text)) return { name: '()', kind: 'call', optional: false, readonly: false, type: squash(text) };
   let s = 0;
   const ws = () => { while (/\s/.test(text[s])) s++; };
   let readonly = false;
-  if (/^readonly\s/.test(text)) { readonly = true; s = 8; ws(); }
+  // Class modifiers (workers-types' classes): `static`, an access modifier (`private` and
+  // `protected` members are not public API), `abstract`, `override`, `declare`.
+  const mods = new Set();
+  for (let m; (m = /^(static|public|private|protected|abstract|override|declare|readonly)\s+/.exec(text.slice(s)));) { mods.add(m[1]); s += m[0].length; }
+  if (mods.has('readonly')) readonly = true;
+  const flags = { static: mods.has('static') || undefined, hidden: mods.has('private') || mods.has('protected') || undefined };
+  const constructor = /^constructor\s*\(/.exec(text.slice(s));
+  if (constructor) {
+    const open = s + constructor[0].length - 1, close = matchClose(shape, open);
+    return { name: 'constructor', kind: 'constructor', ...flags, params: splitParams(text.slice(open + 1, close), shape.slice(open + 1, close)) };
+  }
+  // A setter (`set value(v: T)`) pairs with its getter: the property is not readonly.
+  const setter = /^set\s+([\w$]+)\s*\(/.exec(text.slice(s));
+  if (setter) return { name: setter[1], kind: 'setter', ...flags };
+  // A getter (`get body(): ReadableStream`) is a readonly property.
+  const getter = /^get\s+[\w$]+\s*\(\s*\)/.exec(text.slice(s));
+  if (getter) {
+    const m = /^get\s+([\w$]+)\s*\(\s*\)\s*:/.exec(text.slice(s));
+    if (!m) fail(`cannot read the getter ${text.slice(0, 80)}`);
+    return { name: m[1], kind: 'property', optional: false, readonly: true, getter: true, ...flags, type: squash(text.slice(s + m[0].length)) };
+  }
   let name;
   if (text[s] === '[') { const close = matchClose(shape, s); name = text.slice(s, close + 1); s = close + 1; }
   else { const m = /^[\w$]+|^"[^"]*"/.exec(text.slice(s)); if (!m) fail(`cannot read the member ${text.slice(0, 80)}`); name = m[0]; s += m[0].length; }
   ws();
   let optional = false;
   if (text[s] === '?') { optional = true; s++; ws(); }
-  if (text[s] === '<') { const close = findTop(shape, s + 1, shape.length, '>'); s = close + 1; ws(); }
+  let generics = '';
+  if (text[s] === '<') { const close = findTop(shape, s + 1, shape.length, '>'); generics = text.slice(s + 1, close); s = close + 1; ws(); }
   if (text[s] === '(') {
     const close = matchClose(shape, s);
     const params = splitParams(text.slice(s + 1, close), shape.slice(s + 1, close));
     let r = close + 1; while (/\s/.test(text[r])) r++;
     if (text[r] !== ':') fail(`no result type: ${text.slice(0, 80)}`);
-    return { name, kind: 'method', optional, readonly, params, type: squash(text.slice(r + 1)) };
+    return { name, kind: 'method', optional, readonly, ...flags, params, type: squash(text.slice(r + 1)), generics };
   }
   if (text[s] === ':') {
     if (name.startsWith('[') && name.includes(':')) return { name, kind: 'index', optional, readonly, type: squash(text.slice(s + 1)) };
-    return { name, kind: 'property', optional, readonly, type: squash(text.slice(s + 1)) };
+    return { name, kind: 'property', optional, readonly, ...flags, type: squash(text.slice(s + 1)) };
   }
+  // A property without a type (`declare readonly x;` cannot occur in .d.ts); a method without a
+  // result type is a class's method whose result is inferred: neither is in declarations.
   fail(`cannot read the member ${text.slice(0, 80)}`);
 }
 /** `a: A, b?: B, ...c: C[]` → [{ name, optional, rest, type }]. */
@@ -225,38 +288,95 @@ export function splitParams(text, shape) {
     const p = text.slice(i, e).trim();
     if (p) {
       const m = /^(\.\.\.)?([\w$]+)(\?)?\s*:\s*([\s\S]*)$/.exec(p);
-      if (!m) fail(`cannot read the parameter ${p}`);
-      out.push({ name: m[2], rest: !!m[1], optional: !!m[3], type: squash(m[4]) });
+      if (m) out.push({ name: m[2], rest: !!m[1], optional: !!m[3], type: squash(m[4]) });
+      else {
+        // A destructured parameter (`{ type, payload }: { … }`) is one object: named `options`
+        // (`arg<n>` if taken), its type the annotation.
+        const ps = blank(p).shape, close = p[0] === '{' || p[0] === '[' ? matchClose(ps, 0) : -1;
+        const rest = close < 0 ? null : /^(\?)?\s*:\s*([\s\S]*)$/.exec(p.slice(close + 1).trim());
+        if (!rest) fail(`cannot read the parameter ${p}`);
+        const name = out.some(x => x.name === 'options') ? `arg${out.length}` : 'options';
+        out.push({ name, rest: false, optional: !!rest[1], type: squash(rest[2]), destructured: true });
+      }
     }
     i = e + 1;
   }
   return out;
 }
 /** The overloads of a function declaration's text: [{ params, type }]. */
-function functionSignature(text) {
-  const { shape } = blank(text);
+export function functionSignature(text) {
+  const { code, shape } = blank(text);
+  text = code; // doc comments inside the parameter list are blanked
   const m = /function\s+[\w$]+\s*/.exec(shape);
-  let at = m.index + m[0].length;
-  if (shape[at] === '<') at = findTop(shape, at + 1, shape.length, '>') + 1;
+  let at = m.index + m[0].length, generics = '';
+  if (shape[at] === '<') { const close = findTop(shape, at + 1, shape.length, '>'); generics = text.slice(at + 1, close); at = close + 1; }
   const paren = shape.indexOf('(', at);
   const close = matchClose(shape, paren);
   const params = splitParams(text.slice(paren + 1, close), shape.slice(paren + 1, close));
   const r = text.indexOf(':', close);
-  return { params, type: squash(text.slice(r + 1)) };
+  return { params, type: squash(text.slice(r + 1)), generics };
 }
 /** The right-hand side of a type alias (after the `=` that follows its generic parameters). */
-function aliasBody(d) {
+export function aliasBody(d) {
   const { shape } = blank(d.text);
   const m = /type\s+[\w$]+\s*/.exec(shape);
   const eq = findTop(shape, m.index + m[0].length, shape.length, '=');
   return d.text.slice(eq + 1);
 }
+/** A generic parameter list (`Key extends string = string, T = unknown`) → { name: default type text }
+ * (`unknown` when there is no default). */
+export function genericDefaults(text) {
+  const out = {};
+  if (!text || !text.trim()) return out;
+  const { shape } = blank(text);
+  for (let i = 0; i < text.length;) {
+    let e = findTop(shape, i, text.length, ',');
+    if (e < 0) e = text.length;
+    const p = text.slice(i, e).trim();
+    if (p) {
+      const m = /^([\w$]+)/.exec(p);
+      if (!m) fail(`cannot read the generic parameter ${p}`);
+      const ps = blank(p).shape;
+      const eq = findTop(ps, m[0].length, p.length, '=');
+      out[m[1]] = eq < 0 ? 'unknown' : squash(p.slice(eq + 1));
+    }
+    i = e + 1;
+  }
+  return out;
+}
+/** A declaration's own generic parameters: an interface's or class's header, a type alias's name. */
+function declGenerics(d) {
+  if (d.kind === 'interface') return d.header.startsWith('<') ? genericDefaults(d.header.slice(1, findTop(blank(d.header).shape, 1, d.header.length, '>'))) : {};
+  if (d.kind === 'type') {
+    const { shape } = blank(d.text);
+    const m = /type\s+[\w$]+\s*/.exec(shape);
+    const at = m.index + m[0].length;
+    return shape[at] === '<' ? genericDefaults(d.text.slice(at + 1, findTop(shape, at + 1, shape.length, '>'))) : {};
+  }
+  return {};
+}
+/** The object literal parts (`{ … }` at the top level) of a type alias's body, as member lists. */
+function objectParts(d) {
+  const body = aliasBody(d);
+  const src = { ...blank(body), file: d.src.file };
+  const parts = [];
+  let depth = 0;
+  for (let i = 0; i < body.length; i++) {
+    const c = src.shape[i];
+    if (c === '{' && depth === 0) { const close = matchClose(src.shape, i); parts.push(membersOf(src, i + 1, close)); i = close; continue; }
+    if (c in opens || c === '<') depth++;
+    else if (c === ')' || c === ']' || c === '}' || (c === '>' && src.shape[i - 1] !== '=')) depth--;
+  }
+  return parts;
+}
 const paramKey = params => params.map(p => `${p.rest ? '...' : ''}${p.name}${p.optional ? '?' : ''}: ${p.type.replace(/^[&|]\s*/, '')}`).join(', ');
 
 // ---------- types ----------
 
-const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|\d+|[|&()<>[\]{},:?;=])/y;
+const tokenRe = /\s*(=>|\.\.\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`|[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*|-?\d+(?:\.\d+)?|[|&()<>[\]{},:?;=-])/y;
 function tokenize(text) {
+  // A type of another module (`import("node:tls").PeerCertificate`, `typeof import("util").inspect.custom`): an object.
+  text = text.replace(/(?:typeof\s+)?import\(\s*"[^"]*"\s*\)(?:\.[\w$]+)*/g, 'object');
   const out = [];
   tokenRe.lastIndex = 0;
   let m;
@@ -285,13 +405,24 @@ export function parseType(text) {
   }
   function postfix() {
     let t = primary();
-    while (peek() === '[' && toks[p + 1]?.t === ']') { p += 2; t = { k: 'array', inner: t }; }
-    if (peek() === 'extends') fail(`conditional types are not lowered: ${text}`);
+    for (;;) {
+      if (peek() === '[' && toks[p + 1]?.t === ']') { p += 2; t = { k: 'array', inner: t }; continue; }
+      // An indexed access type (`AiModels[Name]["inputs"]`).
+      if (peek() === '[') { next(); const key = union(); expect(']'); t = { k: 'index', obj: t, key }; continue; }
+      break;
+    }
+    // A conditional type (`T extends U ? X : Y`).
+    if (peek() === 'extends') {
+      next(); const ext = union(); expect('?'); const yes = union(); expect(':'); const no = union();
+      return { k: 'cond', check: t, ext, yes, no };
+    }
     return t;
   }
   function primary() {
     const t = peek();
     if (t === undefined) fail(`unexpected end of the type ${text}`);
+    // A constructor type (`new (...args: any[]) => T`): a JavaScript class, a function type here.
+    if (t === 'new' && toks[p + 1]?.t === '(') { next(); const f = primary(); return f.k === 'fn' ? { ...f, construct: true } : f; }
     if (t === '(') {
       const close = closeOf(p);
       if (toks[close + 1]?.t === '=>') {
@@ -308,9 +439,32 @@ export function parseType(text) {
       p = close + 1;
       return { k: 'obj', body };
     }
-    if (/^["'`]/.test(t)) { next(); if (t[0] === '`') fail(`template literal types are not lowered: ${text}`); return { k: 'lit', value: JSON.parse(t[0] === "'" ? `"${t.slice(1, -1)}"` : t) }; }
-    if (/^\d/.test(t)) { next(); return { k: 'num', value: +t }; }
-    if (['keyof', 'typeof', 'infer', 'unique'].includes(t)) fail(`${t} types are not lowered: ${text}`);
+
+    if (/^["'`]/.test(t)) { next(); if (t[0] === '`') return { k: 'template', text: t }; return { k: 'lit', value: JSON.parse(t[0] === "'" ? `"${t.slice(1, -1)}"` : t) }; }
+    if (/^-?\d/.test(t)) { next(); return { k: 'num', value: +t }; }
+    if (t === '-' && /^\d/.test(toks[p + 1]?.t ?? '')) { next(); return { k: 'num', value: -next() }; }
+    if (t === 'typeof') { next(); return { k: 'typeof', name: next() }; }
+    if (t === 'keyof') { next(); return { k: 'keyof', inner: postfix() }; }
+    if (t === 'unique') { next(); return primary(); }
+    // `infer V` inside a conditional type: a name (the conditional is lowered as any).
+    if (t === 'infer') { next(); return { k: 'name', name: next(), args: [] }; }
+    // A tuple `[a: A, b: B]`: its element types (labels dropped).
+    if (t === '[') {
+      next();
+      const elems = [];
+      while (peek() !== ']') {
+        if (peek() === '...') next();
+        if (toks[p + 1]?.t === ':' || (toks[p + 1]?.t === '?' && toks[p + 2]?.t === ':')) { next(); if (peek() === '?') next(); next(); }
+        if (peek() === '...') next();
+        elems.push(union());
+        if (peek() === '?') next();
+        if (peek() === ',') next();
+      }
+      expect(']');
+      return { k: 'tuple', elems };
+    }
+    // `readonly T[]`: the array (Lean arrays are values).
+    if (t === 'readonly' && toks[p + 1] && /^[A-Za-z_$(]/.test(toks[p + 1].t)) { next(); return postfix(); }
     next();
     const n = { k: 'name', name: t, args: [] };
     if (peek() === '<') {
@@ -335,6 +489,13 @@ export const typeText = t => {
   case 'array': return `${typeText(t.inner)}[]`;
   case 'fn': return `(${t.params.map(x => `${x.name}${x.optional ? '?' : ''}: ${x.type}`).join(', ')}) => ${typeText(t.ret)}`;
   case 'obj': return `{${squash(t.body)}}`;
+
+  case 'tuple': return `[${t.elems.map(typeText).join(', ')}]`;
+  case 'template': return t.text;
+  case 'typeof': return `typeof ${t.name}`;
+  case 'keyof': return `keyof ${typeText(t.inner)}`;
+  case 'index': return `${typeText(t.obj)}[${typeText(t.key)}]`;
+  case 'cond': return `${typeText(t.check)} extends ${typeText(t.ext)} ? ${typeText(t.yes)} : ${typeText(t.no)}`;
   default: return '?';
   }
 };
@@ -346,12 +507,17 @@ const unstable = doc => /@experimental|\bUNSTABLE\b|@deprecated/.exec(doc)?.[0];
 const quoteAttr = s => JSON.stringify(s.replace(/"/g, "'"));
 
 export function lowerHost(host, files) {
-  const decls = files.flatMap(({ file, text }) => declarations(text, file));
-  const strip = n => n.startsWith(host.global + '.') ? n.slice(host.global.length + 1) : n;
+  // host.rich: the lowering rules for richer declarations (workers-types: classes, constants,
+  // generics with defaults, method overloads, Map, Record, Partial, object literal types, type
+  // aliases expanded where used). Deno's and Bun's declarations do not need them.
+  const rich = !!host.rich;
+  const decls = files.flatMap(({ file, text }) => declarations(text, file, { classes: rich }));
+  const strip = n => host.global && n.startsWith(host.global + '.') ? n.slice(host.global.length + 1) : n;
   const byName = new Map();
   for (const d of decls) {
     const n = strip(d.name);
     if (d.kind === 'function') { if (!byName.has('fn:' + n)) byName.set('fn:' + n, []); byName.get('fn:' + n).push(d); }
+    else if (d.kind === 'const') { if (!byName.has('const:' + n)) byName.set('const:' + n, d); }
     else if (!byName.has(n)) byName.set(n, d);
   }
   const find = n => byName.get(n) ?? fail(`${host.name}: ${n} is not declared in ${host.files.join(', ')}`);
@@ -360,6 +526,9 @@ export function lowerHost(host, files) {
   const idlName = lean => `${host.name}_${lean}`;
   const defs = [];          // IDL text blocks, in order
   const extra = new Map();  // generated enums and callbacks: IDL name → text
+  const suffixes = new Map(); // rich: numbered names of generated types (nextSuffix)
+  const objectNames = new Map(); // rich: owner|member|object type → its dictionary's name
+  const directions = new Map();  // rich: a selected type → the ways it flows (lowerIndex)
   const excluded = [];      // [what, reason]
   const integersUsed = new Set();
   const fileOf = d => d.src.file.split('/').at(-1);
@@ -373,7 +542,9 @@ export function lowerHost(host, files) {
   function refName(n, args, where) {
     const s = selected.get(n) ?? [...selected.values()].find(x => x.lean === n);
     if (!s) return null;
-    for (const a of args) {
+    // rich: a generic declaration is lowered once, with its parameters' defaults (or the tier's
+    // typeArgs); the arguments of a use are not checked.
+    if (!rich) for (const a of args) {
       const at = typeText(a).replace(new RegExp(`^${host.global}\\.`), '');
       if (!(at in host.instantiate) && !Object.values(host.instantiate).includes(at))
         fail(`${where}: ${n}<${args.map(typeText).join(', ')}> is a second instantiation (serve-tier2.mjs instantiates ${JSON.stringify(host.instantiate)})`);
@@ -383,7 +554,9 @@ export function lowerHost(host, files) {
   const isNullish = t => t.k === 'name' && (t.name === 'null' || t.name === 'undefined');
   const isVoid = t => t.k === 'name' && t.name === 'void';
   const isPromise = t => t.k === 'name' && t.name === 'Promise';
-  const anyString = t => t.k === 'inter' && t.parts.length === 2 && t.parts[0].k === 'name' && t.parts[0].name === 'string' && t.parts[1].k === 'obj' && !t.parts[1].body.trim();
+  // `string & {}`, and (rich) any string with a brand (`string & NonNullable<unknown>`): a string.
+  const anyString = t => t.k === 'inter' && t.parts.length === 2 && t.parts[0].k === 'name' && t.parts[0].name === 'string'
+    && ((t.parts[1].k === 'obj' && !t.parts[1].body.trim()) || (rich && t.parts[1].k === 'name' && ['NonNullable', 'Record'].includes(t.parts[1].name)));
   const flat = t => t.k === 'union' ? t.alts.flatMap(flat)
     : t.k === 'name' && t.name === 'MaybePromise' ? [t.args[0], { k: 'name', name: 'Promise', args: [t.args[0]] }] : [t];
 
@@ -395,19 +568,59 @@ export function lowerHost(host, files) {
     case 'name': return lowerName(t, ctx);
     case 'array': return `sequence<${lower(t.inner, { ...ctx, intKey: null })}>`;
     case 'fn': return lowerCallback(t, ctx);
+    case 'obj': if (rich) return lowerObject(t, ctx); break;
+    // rich: the types of the full Cloudflare surface (A9's mechanical rules for TypeScript's
+    // type operators; docs/JS_BINDINGS.md, "How the declarations become Lean").
+    case 'num': if (rich) return 'double'; break;
+    case 'template': if (rich) return 'DOMString'; break;
+    case 'keyof': if (rich) return 'DOMString'; break;
+    // A class's constructor (`Cursor: typeof SqlStorageCursor`), and a conditional type (Rpc's
+    // stub types, `T extends Rpc.EntrypointBranded ? Rpc.Provider<T> : unknown`): a JavaScript
+    // value, read as any (Data).
+    case 'typeof': case 'cond': if (rich) return 'any'; break;
+    case 'tuple': if (rich) {
+      const items = [...new Set(t.elems.map(x => lower(x, { ...ctx, intKey: null })))];
+      return `sequence<${items.length === 1 ? items[0] : 'any'}>`;
+    } break;
+    case 'index': if (rich) return lowerIndex(t, ctx); break;
     case 'inter': {
       const key = t.parts.map(typeText).join(' & ');
       const name = host.intersections[key];
       if (anyString(t)) return 'DOMString';
+      // `D1Meta & Record<string, unknown>`: the declared part (the other keys are not read).
+      if (rich) {
+        const parts = t.parts.filter(x => !(x.k === 'name' && x.name === 'Record' && typeText(x.args[1] ?? { k: 'name', name: '', args: [] }) === 'unknown'));
+        if (parts.length === 1) return lower(parts[0], ctx);
+        // Arrays together (`A[] & B[]`): an array of both.
+        if (parts.every(x => x.k === 'array')) return `sequence<${lower({ k: 'inter', parts: parts.map(x => x.inner) }, { ...ctx, intKey: null })}>`;
+        // A primitive with a brand (`string & NonNullable<unknown>`): the primitive.
+        const prim = parts.find(x => x.k === 'name' && ['string', 'number', 'boolean'].includes(x.name));
+        if (prim) return lower(prim, ctx);
+        // Object types together (`Omit<A, "x"> & { y: B }`, `T & Without<U, T>`): one dictionary of
+        // their members, named after its owner and member.
+        if (!name) return lowerMembers(objectMembers(t, ctx), t, ctx);
+      }
       if (!name) fail(`${ctx.where}: the intersection ${key} is not named in serve-tier2.mjs intersections`);
       return idlName(name);
     }
-    default: fail(`${ctx.where}: the type ${typeText(t)} is not lowered`);
+    default: break;
     }
+    // Without the rich rules, the type operators are not lowered (Deno's and Bun's tiers).
+    const op = { keyof: 'keyof', typeof: 'typeof', cond: 'conditional', template: 'template literal', index: 'indexed access', tuple: 'tuple' }[t.k];
+    if (op) fail(`${ctx.where}: ${op} types are not lowered: ${typeText(t)}`);
+    fail(`${ctx.where}: the type ${typeText(t)} is not lowered`);
   }
   function lowerUnion(alts, ctx) {
+    // An alternative spliced from a namespace's alias is read in that namespace.
+    const lowerAlt = (a, c) => lower(a, a.from ? { ...c, decl: a.from } : c);
     let nullable = false;
     let rest = [];
+    // rich: alternatives that are unselected type aliases are spliced in (`D1SessionBookmark | D1SessionConstraint`).
+    if (rich) alts = alts.flatMap(function expand(a) {
+      if (a.k === 'name') a = { ...a, name: qualify(a.name, ctx) };
+      const d = a.k === 'name' && !a.args.length && !selected.has(a.name) && !(a.name in host.typeNames) && !(ctx.generics && Object.hasOwn(ctx.generics, a.name)) && byName.get(a.name);
+      return d && d.kind === 'type' ? flat(parseType(aliasBody(d))).map(x => d.name.includes('.') ? { ...x, from: d } : x).flatMap(expand) : [a];
+    });
     for (const a of alts) {
       if (isNullish(a)) { if (!(ctx.optional && a.name === 'undefined')) nullable = true; continue; }
       rest.push(a);
@@ -415,7 +628,9 @@ export function lowerHost(host, files) {
     const note = [];
     // T | Promise<T>: a promise (Lean's handler is asynchronous).
     if (rest.some(isPromise)) {
-      let inner = rest.map(a => isPromise(a) ? a.args[0] : a);
+      let inner = rest.flatMap(a => isPromise(a) ? (rich ? flat(a.args[0]) : [a.args[0]]) : [a]);
+      // rich: `X | undefined | Promise<X | undefined>`: a promise of X or nothing.
+      if (rich && inner.some(isNullish)) { nullable = true; inner = inner.filter(a => !isNullish(a)); }
       if (ctx.role === 'cbResult' && inner.some(a => !isVoid(a))) {
         if (inner.some(isVoid)) note.push('void alternatives dropped');
         inner = inner.filter(a => !isVoid(a));
@@ -426,19 +641,63 @@ export function lowerHost(host, files) {
       return `Promise<${innerType}${nullable ? '?' : ''}>`;
     }
     if (ctx.role === 'cbResult' && rest.some(isVoid) && rest.some(a => !isVoid(a))) { ctx.notes?.push('void alternatives dropped'); rest = rest.filter(a => !isVoid(a)); }
+    if (rich) {
+      // `true | false` (merged object alternatives) is boolean; string literals beside `string` are a string.
+      const isBool = a => a.k === 'name' && (a.name === 'true' || a.name === 'false' || a.name === 'boolean');
+      if (rest.filter(isBool).length > 1) rest = [...rest.filter(a => !isBool(a)), { k: 'name', name: 'boolean', args: [] }];
+      if (rest.some(a => a.k === 'name' && a.name === 'string') && rest.every(a => a.k === 'lit' || (a.k === 'name' && a.name === 'string') || anyString(a)))
+        return nullable ? 'DOMString?' : 'DOMString';
+      if (rest.length > 1 && !rest.some(a => a.k === 'lit')) {
+        let lowered = [...new Set(rest.map(a => lowerAlt(a, ctx)))];
+        // `unknown` (and what is read as any: Date) absorbs the other alternatives.
+        if (lowered.includes('any')) return 'any';
+        // Enumerations beside `string` (`"user" | "assistant" | string`, spliced from aliases): a string.
+        if (lowered.includes('DOMString') && lowered.every(x => x === 'DOMString' || /^enum /m.test((extra.get(x) ?? '').split('\n').at(-1)))) return nullable ? 'DOMString?' : 'DOMString';
+        if (lowered.includes('ArrayBuffer') && lowered.includes('ArrayBufferView')) lowered = [...lowered.filter(x => x !== 'ArrayBuffer' && x !== 'ArrayBufferView'), 'BufferSource'];
+        const base = lowered.length === 1 ? lowered[0] : unionTypedef(lowered, ctx);
+        return nullable ? `${base}?` : base;
+      }
+    }
     const lits = rest.filter(a => a.k === 'lit');
     let base;
     if (lits.length && lits.length === rest.length) base = enumOf(lits.map(l => l.value), ctx);
     else if (lits.length && rest.every(a => a.k === 'lit' || anyString(a))) base = 'DOMString';
-    else if (rest.length === 1) base = lower(rest[0], ctx);
-    else base = `(${rest.map(a => lower(a, ctx)).join(' or ')})`;
+    else if (rest.length === 1) base = lowerAlt(rest[0], ctx);
+    else if (rich) base = unionTypedef(rest.map(a => lowerAlt(a, ctx)), ctx);
+    else base = `(${rest.map(a => lowerAlt(a, ctx)).join(' or ')})`;
+    // WebIDL's any is never nullable (it holds null).
+    if (rich && base === 'any') return 'any';
     return nullable ? `${base}?` : base;
   }
+  /** rich: a union as a typedef of the host (`typedef (DOMString or sequence<DOMString>) Cloudflare_DOMStringOrSequenceOfDOMString`),
+   * so that its Lean type is the host's, not one a web or Node module defines for the same union. */
+  function unionTypedef(alts, ctx) {
+    // `any` absorbs the other alternatives; one alternative left is itself.
+    if (alts.includes('any')) return 'any';
+    alts = [...new Set(alts)];
+    if (alts.length === 1) return alts[0];
+    const keyName = idl => {
+      let m;
+      if ((m = /^sequence<(.*)>$/.exec(idl))) return 'SequenceOf' + keyName(m[1]);
+      if ((m = /^record<DOMString, (.*)>$/.exec(idl))) return 'RecordOf' + keyName(m[1]);
+      return idl.replace(/\?$/, '').replace(new RegExp(`^${host.name}_`), '').split(' ').map(capital).join('');
+    };
+    const lean = alts.map(keyName).join('Or');
+    const name = idlName(lean);
+    const text = `${attrs(null, { module: ctx.module, LasmName: lean })}\ntypedef (${alts.join(' or ')}) ${name};`;
+    if (extra.has(name) && extra.get(name).split('\n')[1] !== text.split('\n')[1]) fail(`${ctx.where}: two unions named ${lean}`);
+    if (!extra.has(name)) extra.set(name, text);
+    return name;
+  }
   function enumOf(values, ctx) {
-    const lean = `${ctx.owner}${capital(ctx.member)}`;
+    // An enum is named after its type alias (QueueContentType), else after its member.
+    const lean = ctx.alias ?? `${ctx.owner}${capital(ctx.member)}`;
     const name = idlName(lean);
     const text = `${attrs(null, { module: ctx.module, LasmName: lean })}\nenum ${name} { ${values.map(v => JSON.stringify(v)).join(', ')} };`;
-    if (extra.has(name) && extra.get(name) !== text) fail(`${ctx.where}: two enums named ${lean}`);
+    if (extra.has(name) && extra.get(name) !== text) {
+      if (!rich) fail(`${ctx.where}: two enums named ${lean}`);
+      return enumOf(values, { ...ctx, alias: `${lean}${nextSuffix(lean)}` });
+    }
     extra.set(name, text);
     return name;
   }
@@ -460,6 +719,68 @@ export function lowerHost(host, files) {
     case 'Promise': return `Promise<${t.args.length ? lower(t.args[0], { ...ctx, role: 'promised', intKey: null }) : 'undefined'}>`;
     }
     if (n in host.instantiate) return lower(parseType(host.instantiate[n]), ctx);
+    if (rich) {
+      // A type the program declares (Workers' `Env`): the tier's typeParameters name it, as a
+      // generic parameter or a declared name. It lowers to a typedef of any marked
+      // LasmTypeParameter, which generate-web.mjs makes a Lean type parameter with FromJS.
+      const param = host.typeParameters && Object.hasOwn(host.typeParameters, n)
+        && (n.includes('.') || (ctx.generics && Object.hasOwn(ctx.generics, n))) && host.typeParameters[n];
+      if (param) {
+        const name = idlName(param);
+        extra.set(name, `${attrs(null, { LasmName: param, LasmTypeParameter: param })}\ntypedef any ${name};`);
+        return name;
+      }
+      // A generic parameter of the declaration or method being lowered: its default (or the
+      // tier's typeArgs), `unknown` when it has none.
+      if (ctx.generics && Object.hasOwn(ctx.generics, n)) {
+        const g = { ...ctx.generics }; delete g[n];
+        return lower(parseType(ctx.generics[n]), { ...ctx, generics: g });
+      }
+      const arg = i => t.args[i] ?? fail(`${ctx.where}: ${typeText(t)} needs ${i + 1} type arguments`);
+      switch (n) {
+      case 'never': return 'never';
+      case 'true': case 'false': return 'boolean';
+      case 'Array': case 'ReadonlyArray': case 'Iterable': return `sequence<${lower(arg(0), { ...ctx, intKey: null, alias: null })}>`;
+      case 'Record':
+        // The full surface: a Record keyed by string literals or a string-like parameter is keyed by strings.
+        if (typeText(arg(0)) !== 'string' && !(host.allOverloads && stringKeyed(arg(0), ctx))) fail(`${ctx.where}: a Record keyed by ${typeText(arg(0))}`);
+        return `record<DOMString, ${lower(arg(1), { ...ctx, intKey: null, alias: null })}>`;
+      // A Map is read as a record (Lasm.JS.Cloudflare.Support.mapOf); the member is marked LasmMap.
+      case 'Map':
+        if (typeText(arg(0)) !== 'string') fail(`${ctx.where}: a Map keyed by ${typeText(arg(0))}`);
+        ctx.flags?.add('map');
+        return `record<DOMString, ${lower(arg(1), { ...ctx, intKey: null, alias: null })}>`;
+      // Partial<D> of a dictionary whose members are all optional already (or undefined: left out).
+      case 'Partial': {
+        const inner = arg(0);
+        if (host.allOverloads && !(inner.k === 'name' && selected.get(inner.name)?.partial)) return lowerMembers(objectMembers(t, ctx), t, ctx);
+        const s = inner.k === 'name' && (selected.get(inner.name) ?? fail(`${ctx.where}: Partial<${typeText(inner)}> of an unselected type`));
+        if (s.as !== 'dictionary') fail(`${ctx.where}: Partial<${typeText(inner)}> of a ${s.as}`);
+        if (!s.partial) fail(`${ctx.where}: Partial<${typeText(inner)}>: the tier does not say its members are all optional (partial)`);
+        return lower(inner, ctx);
+      }
+      }
+    }
+    if (rich) {
+      const arg = i => t.args[i] ?? fail(`${ctx.where}: ${typeText(t)} needs ${i + 1} type arguments`);
+      switch (n) {
+      // `object` (any object), and a polymorphic `this` (a fluent method's own type).
+      case 'object': return 'any';
+      case 'this': return ctx.owner ? idlName(ctx.owner) : 'any';
+      case 'NonNullable': case 'Readonly': case 'Awaited': return lower(arg(0), ctx);
+      // Exclude<U, X> and Extract<U, X> of a union: its alternatives without (or only) X's.
+      case 'Exclude': case 'Extract': {
+        const drop = new Set(flat(arg(1)).map(typeText));
+        const keep = flat(arg(0)).filter(a => drop.has(typeText(a)) === (n === 'Extract'));
+        return keep.length ? lower(keep.length === 1 ? keep[0] : { k: 'union', alts: keep }, ctx) : 'any';
+      }
+      // Omit, Pick, Without (the members of an object type, filtered) and Partial of an
+      // unselected type: a dictionary named after its owner and member.
+      case 'Omit': case 'Pick': case 'Without': case 'Partial': case 'Required':
+        if (n !== 'Partial' || !(arg(0).k === 'name' && selected.has(arg(0).name))) return lowerMembers(objectMembers(t, ctx), t, ctx);
+        break;
+      }
+    }
     const ref = refName(n, t.args, ctx.where);
     if (ref) return ref;
     if (n in host.typeNames) {
@@ -467,10 +788,179 @@ export function lowerHost(host, files) {
       const r = refName(mapped, t.args, ctx.where);
       return r ?? mapped;
     }
-    fail(`${ctx.where}: the type ${typeText(t)} is neither selected nor in serve-tier2.mjs typeNames`);
+    // rich: a name inside a namespace (`TailStream.Onset`'s `Attribute`) is first looked up there.
+    if (rich && ctx.decl?.name?.includes('.') && !n.includes('.')) {
+      const ns = ctx.decl.name.split('.').slice(0, -1);
+      for (let i = ns.length; i > 0; i--) {
+        const q = [...ns.slice(0, i), n].join('.');
+        if (selected.has(q) || byName.has(q)) return lowerName({ ...t, name: q }, ctx);
+      }
+    }
+    // A type alias that is not selected stands for its definition (`D1SessionBookmark` = string);
+    // a union of string literals is then an enum named after it. A recursive alias (JSON values)
+    // is any where it recurs.
+    if (rich && byName.has(n) && byName.get(n).kind === 'type') {
+      const d = byName.get(n);
+      if (ctx.expanding?.includes(n)) return 'any';
+      return lower(parseType(aliasBody(d)), { ...ctx, alias: n.split('.').at(-1), generics: { ...ctx.generics, ...declGenerics(d) }, expanding: [...(ctx.expanding ?? []), n], decl: n.includes('.') ? d : ctx.decl });
+    }
+    // rich: a type of the web platform or JavaScript that Lasm.JS.Web does not declare
+    // (the tier's typeNames list those it does): a JavaScript value.
+    if (rich && host.otherTypes?.includes(n)) return 'any';
+    fail(`${ctx.where}: the type ${typeText(t)} is neither selected nor in ${host.tierFile ?? 'serve-tier2.mjs'} typeNames`);
+  }
+  /** The members of an object type expression (an object literal, a declared interface, an
+   * intersection of them, Omit/Pick/Without/Partial/Required of one), for lowerMembers. */
+  function objectMembers(t, ctx) {
+    switch (t.k) {
+    case 'obj': return membersOf({ ...blank(t.body), file: '' }, 0, t.body.length);
+    case 'inter': {
+      const all = t.parts.flatMap(x => objectMembers(x, ctx));
+      // A later part's member replaces an earlier one's of the same name.
+      return [...new Map(all.map(m => [m.name, m])).values()];
+    }
+    case 'name': {
+      const keysOf = k => new Set(flat(k).filter(a => a.k === 'lit').map(a => a.value));
+      if (t.name === 'Omit' || t.name === 'Without') {
+        const ms = objectMembers(t.args[0], ctx);
+        const drop = t.name === 'Omit' ? keysOf(t.args[1]) : new Set(objectMembers(t.args[1], ctx).map(m => m.name));
+        return ms.filter(m => !drop.has(m.name));
+      }
+      if (t.name === 'Pick') { const keep = keysOf(t.args[1]); return objectMembers(t.args[0], ctx).filter(m => keep.has(m.name)); }
+      if (t.name === 'Partial') return objectMembers(t.args[0], ctx).map(m => ({ ...m, optional: true }));
+      if (t.name === 'Required') return objectMembers(t.args[0], ctx).map(m => ({ ...m, optional: false }));
+      if (t.name === 'Record' && typeText(t.args[1] ?? { k: 'name', name: '', args: [] }) === 'unknown') return [];
+      if (ctx.generics && Object.hasOwn(ctx.generics, t.name)) return objectMembers(parseType(ctx.generics[t.name]), ctx);
+      let d = byName.get(t.name);
+      // A name inside a namespace, relative to the declaration being read.
+      if (!d && ctx.decl?.name?.includes('.')) {
+        const ns = ctx.decl.name.split('.').slice(0, -1);
+        for (let i = ns.length; i > 0 && !d; i--) d = byName.get([...ns.slice(0, i), t.name].join('.'));
+      }
+      if (d) ctx = { ...ctx, decl: d.name.includes('.') ? d : ctx.decl };
+      if (d?.kind === 'interface') return [...heritage(d).flatMap(h => objectMembers(h, ctx)), ...membersOf(d.src, d.body[0], d.body[1])];
+      if (d?.kind === 'type') return objectMembers(parseType(aliasBody(d)), { ...ctx, generics: { ...ctx.generics, ...declGenerics(d) } });
+      // A type of the web platform or JavaScript (Error, ExtendableEvent): its members are Lasm.JS.Web's.
+      if (!d && host.allOverloads) return [];
+      if (['unknown', 'object', 'any', 'NonNullable'].includes(t.name)) return t.name === 'NonNullable' ? objectMembers(t.args[0], ctx) : [];
+      if (['Readonly', 'Awaited'].includes(t.name)) return objectMembers(t.args[0], ctx);
+      if (t.name === 'Exclude' || t.name === 'Extract') {
+        const drop = new Set(flat(t.args[1]).map(typeText));
+        return objectMembers({ k: 'union', alts: flat(t.args[0]).filter(a => drop.has(typeText(a)) === (t.name === 'Extract')) }, ctx);
+      }
+      fail(`${ctx.where}: ${typeText(t)} is not an object type`);
+    }
+    case 'union': return mergeAlternatives(t.alts.filter(a => !isNullish(a)).map(a => objectMembers(a, ctx)));
+    // A conditional type (Rpc's providers) has no members Lasm can read.
+    case 'cond': return [];
+    case 'index': {
+      // `R["chunks"][number]`: the member's type, then an array's element.
+      if (t.key.k === 'name' && t.key.name === 'number') {
+        const inner = t.obj;
+        if (inner.k === 'index' && inner.key.k === 'lit') {
+          const m = objectMembers(inner.obj, ctx).find(x => x.name === inner.key.value);
+          const mt = m && parseType(m.type);
+          if (mt?.k === 'array') return objectMembers(mt.inner, ctx);
+        }
+        return [];
+      }
+      if (t.key.k !== 'lit') return [];
+      const m = objectMembers(t.obj, ctx).find(x => x.name === t.key.value);
+      return m ? objectMembers(parseType(m.type), ctx) : [];
+    }
+    default: fail(`${ctx.where}: ${typeText(t)} is not an object type`);
+    }
+  }
+  /** A name inside a namespace, relative to the declaration being read (`TailStream.Onset`'s
+   * `Attribute` is `TailStream.Attribute`); the name itself otherwise. */
+  function qualify(n, ctx) {
+    if (!rich || n.includes('.') || !ctx.decl?.name?.includes('.') || selected.has(n) || byName.has(n)) return n;
+    const ns = ctx.decl.name.split('.').slice(0, -1);
+    for (let i = ns.length; i > 0; i--) { const q = [...ns.slice(0, i), n].join('.'); if (selected.has(q) || byName.has(q)) return q; }
+    return n;
+  }
+  /** Whether a Record's key type is a string (string literals, a generic parameter, keyof). */
+  function stringKeyed(k, ctx) {
+    try { const l = lower(k, { ...ctx, intKey: null }); return l === 'DOMString' || l === 'any' || l.startsWith(host.name + '_'); } catch { return false; }
+  }
+  /** Members as a dictionary named after its owner, member and parameter (as an object literal type). */
+  function lowerMembers(members, t, ctx) {
+    const body = members.map(m => m.text.endsWith(';') ? m.text : m.text + ';').join(' ');
+    return lowerObject({ k: 'obj', body, members }, ctx);
+  }
+  /** `T[K]`: the type of member K of the object type T (`AiModels[Name]["inputs"]` with Name a
+   * generic parameter is any). */
+  function lowerIndex(t, ctx) {
+    // `List[Name]["inputs"]` with Name a generic parameter over List's keys (Workers AI's
+    // `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]["inputs"])`): any,
+    // and each of List's entries' member types flows the way this use does (into JavaScript as an
+    // argument, out of it as a result), which decides the instances generated for them.
+    if (rich && t.key.k === 'lit' && t.obj.k === 'index' && t.obj.key.k === 'name' && ctx.generics && Object.hasOwn(ctx.generics, t.obj.key.name)) {
+      const way = ['result', 'promised', 'attr', 'cbArg'].includes(ctx.role) ? 'from' : 'to';
+      let entries = [];
+      try { entries = objectMembers(t.obj.obj, ctx); } catch { entries = []; }
+      for (const e of entries) {
+        let ms = [];
+        try { ms = objectMembers(parseType(e.type), ctx); } catch { continue; }
+        const m = ms.find(x => x.name === t.key.value);
+        for (const n of new Set((m?.type ?? '').match(/[A-Za-z_$][\w$]*/g) ?? [])) if (selected.has(n)) (directions.get(n) ?? directions.set(n, new Set()).get(n)).add(way);
+      }
+      return 'any';
+    }
+    if (t.key.k !== 'lit') return 'any';
+    let ms;
+    try { ms = objectMembers(t.obj, ctx); } catch { return 'any'; }
+    const m = ms.find(x => x.name === t.key.value);
+    return m && m.kind === 'property' ? lower(parseType(m.type), ctx) : 'any';
+  }
+  /** An object literal type (`{ columnNames?: false }`, D1Meta's `timings`): a dictionary named after its owner and member. */
+  function lowerObject(t, ctx) {
+    const lean = `${ctx.owner}${capital(ctx.member)}${ctx.param ? capital(ctx.param) : ''}`;
+    const name = idlName(lean);
+    // rich: the same object type at the same place is one dictionary; one inside itself (a
+    // recursive type: Workflows' step callbacks) is any where it recurs.
+    // A generated name that a declaration already has (BrowserRunLiveView's `options` beside the
+    // declared BrowserRunLiveViewOptions): numbered.
+    if (rich && !t.renamed && (selected.has(lean) || [...selected.values()].some(x => leanOf(x) === lean)))
+      return lowerObject({ ...t, renamed: true }, { ...ctx, param: `${ctx.param ?? ''}${nextSuffix(lean)}` });
+    const key = `${ctx.owner}|${ctx.member}|${typeText(t)}`;
+    if (rich && objectNames.has(key)) return objectNames.get(key);
+    if (rich && ctx.objects?.includes(typeText(t))) return 'any';
+    if (rich) ctx = { ...ctx, objects: [...(ctx.objects ?? []), typeText(t)] };
+    const src = { ...blank(t.body), file: ctx.decl ? ctx.decl.src.file : '' };
+    const lines = [];
+    // A member named twice (an intersection's parts) is the last one's.
+    const ms = [...new Map((t.members ?? membersOf(src, 0, t.body.length)).map(m => [m.name, m])).values()];
+    // An index signature (`{ [k: string]: V }`), and a mapped type (`{ [Op in K]?: V }`), alone: a record.
+    if (ms.length === 1 && (ms[0].kind === 'index' || /^\[\s*[\w$]+\s+in\s/.test(ms[0].name)))
+      return `record<DOMString, ${lower(parseType(ms[0].type), { ...ctx, intKey: null, alias: null })}>`;
+    for (const m of ms) {
+      // Index signatures beside named members: the named members (the others are not read); keys
+      // that are not identifiers, and Symbol keys, likewise.
+      if (m.kind === 'index' || /^\[\s*[\w$]+\s+in\s/.test(m.name) || /^["'\[]/.test(m.name)) continue;
+      if (m.kind === 'method') {
+        const cb = lowerCallback({ k: 'fn', params: m.params, ret: parseType(m.type) }, { ...ctx, owner: lean, member: m.name, param: null });
+        lines.push(`  // ${m.text}\n  ${m.optional ? '' : 'required '}${cb} ${idlId(m.name)};`);
+        continue;
+      }
+      if (m.kind !== 'property') fail(`${ctx.where}: the object type ${typeText(t)} has a ${m.kind}`);
+      const ft = lower(parseType(m.type), { ...ctx, owner: lean, member: m.name, param: null, role: 'field', intKey: null, optional: m.optional, alias: null });
+      if (ft === 'never' || ft === 'undefined') continue;
+      lines.push(`  // ${m.text}\n  ${m.optional ? '' : 'required '}${ft} ${idlId(m.name)};`);
+    }
+    const text = `// ${typeText(t)}\n${attrs(null, { module: ctx.module, LasmName: lean })}\ndictionary ${name} {\n${lines.join('\n')}\n};`;
+    if (rich) objectNames.set(key, name);
+    if (extra.has(name) && extra.get(name) !== text) {
+      if (!rich) fail(`${ctx.where}: two object types named ${lean}`);
+      objectNames.delete(key);
+      // rich: another object type at the same place (an overload's, a union alternative's): numbered.
+      return lowerObject(t, { ...ctx, member: `${ctx.member}${ctx.param ? '' : ''}`, param: `${ctx.param ?? ''}${nextSuffix(lean)}` });
+    }
+    extra.set(name, text);
+    return name;
   }
   function lowerCallback(fn, ctx) {
-    const lean = ctx.callbackName ?? `${ctx.owner}${capital(ctx.member)}`;
+    const lean = ctx.callbackName ?? `${ctx.owner}${capital(ctx.member)}${ctx.param ? capital(ctx.param) : ''}`;
     const name = idlName(lean);
     const notes = [];
     const params = fn.params.filter(p => p.name !== 'this').map(p =>
@@ -478,24 +968,85 @@ export function lowerHost(host, files) {
     const ret = lower(fn.ret, { ...ctx, role: 'cbResult', intKey: null, notes, optional: false });
     const comment = `// ${ctx.signature ?? typeText(fn)}${notes.length ? ` (${[...new Set(notes)].join('; ')})` : ''}`;
     const text = `${comment}\n${attrs(ctx.decl, { module: ctx.module, LasmName: lean, LasmSignature: ctx.signature ?? typeText(fn) })}\ncallback ${name} = ${ret} (${params.join(', ')});`;
-    if (extra.has(name) && extra.get(name) !== text) fail(`${ctx.where}: two callbacks named ${lean}`);
+    if (extra.has(name) && extra.get(name) !== text) {
+      if (!rich) fail(`${ctx.where}: two callbacks named ${lean}`);
+      // A selected callback type met again with other generic arguments: the declared one.
+      if (ctx.callbackName) return name;
+      return lowerCallback(fn, { ...ctx, param: `${ctx.param ?? ''}${nextSuffix(lean)}` });
+    }
     extra.set(name, text);
     return name;
   }
+  /** A number to tell apart two generated types that would get the same name: 2, 3, … per name. */
+  function nextSuffix(lean) { const k = (suffixes.get(lean) ?? 1) + 1; suffixes.set(lean, k); return String(k); }
 
   /** The members of a selected object type, with the ones not taken recorded. */
   function takeMembers(s, members, owner, only = null) {
     const ex = s.exclude ?? {};
     const taken = [];
+    // Overloads (a method declared more than once): each is lowered or excluded in the tier's
+    // `overloads`, by its parameter list.
+    const count = new Map();
+    for (const m of members) count.set(m.name, (count.get(m.name) ?? 0) + 1);
+    const seenOverloads = new Set();
     for (const m of members) {
       const tag = unstable(m.doc);
-      if (tag) { excluded.push([`${owner}.${m.name}`, `${tag} in its declaration`]); continue; }
-      if (m.name in ex) { excluded.push([`${owner}.${m.name}`, ex[m.name]]); continue; }
+      const key = m.kind === 'method' ? paramKey(m.params) : null;
+      const label = count.get(m.name) > 1 ? `${owner}.${m.name}(${key})` : `${owner}.${m.name}`;
+      const decided = s.overloads && Object.hasOwn(s.overloads, m.name) && Object.hasOwn(s.overloads[m.name], key) ? s.overloads[m.name][key] : null;
+      if (tag) { excluded.push([label, `${tag} in its declaration`]); if (decided) fail(`${label} is ${tag}, but the tier decides it`); continue; }
+      if (Object.hasOwn(ex, m.name)) { excluded.push([`${owner}.${m.name}`, ex[m.name]]); continue; }
+      if (count.get(m.name) > 1) {
+        const sel = decided ?? (host.allOverloads ? { lower: true } : fail(`${host.name} ${label}: an overload the tier neither lowers nor excludes`));
+        seenOverloads.add(`${m.name}(${key})`);
+        if (sel.exclude) { excluded.push([label, sel.exclude]); continue; }
+      }
+      // rich: a class's private and protected members are not its API; a setter pairs with its getter.
+      if (rich && (m.hidden || m.kind === 'setter')) continue;
       if (only && !only.includes(m.name)) fail(`${host.name} ${owner}.${m.name}: not in \`only\` and not excluded (serve-tier2.mjs)`);
+      // A member whose key is not an identifier (AiModels' `"@cf/meta/llama-3-8b-instruct"`: a
+      // type-level map of model names): read through Data.
+      if (host.allOverloads && /^["']/.test(m.name)) { excluded.push([`${owner}.${m.name}`, 'its key is not an identifier: read it through Data (Lasm.JS.Value.get)']); continue; }
+      // A Symbol-keyed member (`[Symbol.iterator]()`, `[Symbol.dispose]()`): the JavaScript protocols
+      // (iteration, disposal), reached through Lasm.JS's Symbol keys (A47), not generated.
+      if (host.allOverloads && /^\[/.test(m.name) && m.kind !== 'index') { excluded.push([`${owner}.${m.name}`, 'a Symbol-keyed member (a JavaScript protocol): Lasm.JS.Value.get with the Symbol reaches it']); continue; }
+      if (m.kind === 'index' && host.allOverloads) { excluded.push([`${owner}[${m.name.slice(1, -1)}]`, 'an index signature: the named members are generated; other keys are read and written through Data']); continue; }
       if (m.kind === 'index') fail(`${host.name} ${owner}: an index signature is not lowered`);
       taken.push(m);
     }
+    for (const [name, os] of Object.entries(s.overloads ?? {})) for (const key of Object.keys(os))
+      if (members.some(m => m.name === name) && !seenOverloads.has(`${name}(${key})`) && !members.some(m => m.name === name && unstable(m.doc) && paramKey(m.params) === key))
+        fail(`${host.name} ${owner}.${name}(${key}) is decided in the tier but not declared`);
     return taken;
+  }
+  /** The alternatives of a type of object types, each a member list (rich: `merge`). */
+  function objectAlternatives(t, where) {
+    switch (t.k) {
+    case 'union': return t.alts.flatMap(a => objectAlternatives(a, where));
+    case 'inter': return t.parts.reduce((acc, p) => acc.flatMap(x => objectAlternatives(p, where).map(y => [...x, ...y])), [[]]);
+    case 'obj': { const src = { ...blank(t.body), file: '' }; return [membersOf(src, 0, t.body.length)]; }
+    case 'name': {
+      if (t.name === 'Record' && typeText(t.args[1]) === 'unknown') return [[]];
+      const d = find(t.name);
+      if (d.kind !== 'interface') fail(`${where}: ${t.name} is not an object type`);
+      return [membersOf(d.src, d.body[0], d.body[1])];
+    }
+    default: fail(`${where}: ${typeText(t)} is not an object type`);
+    }
+  }
+  function mergeAlternatives(alts) {
+    const names = [...new Set(alts.flatMap(a => a.map(m => m.name)))];
+    return names.map(n => {
+      const found = alts.map(a => a.find(m => m.name === n));
+      const present = found.filter(Boolean);
+      // rich (the full surface): a method or index signature in several alternatives is the first's.
+      if (host.allOverloads && present.some(m => m.kind !== 'property')) return { ...present[0], optional: found.some(m => !m || m.optional) };
+      if (present.some(m => m.kind !== 'property')) fail(`merged member ${n} is not a property`);
+      const types = [...new Set(present.map(m => m.type))];
+      const optional = found.some(m => !m || m.optional);
+      const type = types.length === 1 ? types[0] : types.map(x => `(${x})`).join(' | ');
+      return { ...present[0], optional, type, text: `${n}${optional ? '?' : ''}: ${type}` };
+    });
   }
   function heritage(d) {
     let h = d.header;
@@ -515,7 +1066,7 @@ export function lowerHost(host, files) {
 
   // The functions of the global object (Deno.serve, Bun.serve).
   const nsMembers = [];
-  for (const [fname, f] of Object.entries(host.functions)) {
+  for (const [fname, f] of Object.entries(host.functions ?? {})) {
     const overloads = byName.get('fn:' + fname) ?? fail(`${host.name}.${fname} is not declared`);
     const seen = new Set();
     for (const o of overloads) {
@@ -547,76 +1098,186 @@ export function lowerHost(host, files) {
     }
     for (const key of Object.keys(f.overloads)) if (!seen.has(key)) fail(`${host.name}.${fname}(${key}) is selected but not declared`);
   }
-  defs.push(`// The global ${host.global}\n${attrs(null, { module: host.functions[Object.keys(host.functions)[0]].module, LasmPath: host.global })}\nnamespace ${host.global} {\n${nsMembers.join('\n')}\n};`);
-
-  for (const s of host.declarations) {
-    const lean = leanOf(s);
-    const name = idlName(lean);
-    const ctxOf = (m, d) => ({ owner: lean, member: m.name, module: s.module, doc: m.doc, decl: d, where: `${host.name} ${s.name}.${m.name}`,
-      signature: `${s.name}.${m.text}` });
-    if (s.as === 'callback') {
-      const d = find(s.name);
-      if (d.kind !== 'type') fail(`${s.name} is not a type alias`);
-      const rhs = aliasBody(d);
-      const t = parseType(rhs);
-      if (t.k !== 'fn') fail(`${s.name} is not a function type`);
-      lowerCallback(t, { owner: lean, member: '', module: s.module, doc: d.doc, decl: d, where: `${host.name} ${s.name}`, callbackName: lean,
-        signature: squash(d.text.replace(/^export\s+/, '')) });
-      continue;
-    }
-    // The members, from the declaration or composed from several.
-    const sources = s.compose ?? [{ from: s.name }];
-    let members = [];
-    let parent = null;
-    let first = null;
-    for (const c of sources) {
-      const d = find(c.from);
-      first ??= d;
-      let ms;
-      if (d.kind === 'interface') {
-        ms = membersOf(d.src, d.body[0], d.body[1]);
-        if (!s.compose) for (const h of heritage(d)) {
-          const hn = typeText(h).replace(/<.*$/, '').replace(new RegExp(`^${host.global}\\.`), '');
-          const ref = refName(hn, h.args ?? [], `${s.name} extends`);
-          if (ref) { if (parent) fail(`${s.name}: two selected bases`); parent = ref; }
-          else if (!(hn in host.notSelected)) fail(`${s.name} extends ${hn}, which is neither selected nor in serve-tier2.mjs notSelected`);
-        }
-        else for (const h of heritage(d)) {
-          // A composed dictionary takes its sources' bases' members by listing them as sources.
-          const hn = typeText(h).replace(/<.*$/, '');
-          if (!sources.some(x => x.from === hn || x.from === `Serve.${hn}`)) fail(`${s.name}: ${c.from} extends ${hn}, which is not a source`);
-        }
-      } else if (d.kind === 'type' && c.alternative !== undefined) {
-        const t = parseType(aliasBody(d));
-        const alt = flat(t)[c.alternative];
-        if (alt?.k !== 'obj') fail(`${c.from} alternative ${c.alternative} is not an object type`);
-        // Members of an object literal: their doc comments and text are the alternative's.
-        const altSrc = { ...blank(alt.body), file: d.src.file };
-        ms = membersOf(altSrc, 0, alt.body.length);
-      } else fail(`${c.from} is not an interface`);
-      members.push(...takeMembers(s, ms, s.name, c.only ?? null).map(m => ({ ...m, d })));
-    }
-    for (const k of Object.keys(s.exclude ?? {})) if (!excluded.some(([w]) => w === `${s.name}.${k}`)) fail(`${s.name}.${k} is excluded but not a member`);
+  if (host.functions) defs.push(`// The global ${host.global}\n${attrs(null, { module: host.functions[Object.keys(host.functions)[0]].module, LasmPath: host.global })}\nnamespace ${host.global} {\n${nsMembers.join('\n')}\n};`);
+  // rich: the globals and module exports the tier selects (`caches`; `connect` of
+  // cloudflare:sockets), one namespace per Lean module and JavaScript module.
+  for (const g of host.globals ?? []) {
     const lines = [];
-    for (const m of members) {
-      const ctx = ctxOf(m, m.d);
-      lines.push(`  // ${m.text}`);
-      const intKey = `${s.name}.${m.name}`;
-      if (s.as === 'interface') {
-        if (m.kind === 'property') lines.push(`  ${attrs(m.d, { LasmSignature: m.text })} readonly attribute ${lower(parseType(m.type), { ...ctx, role: 'attr', intKey })} ${m.name};`);
-        else {
-          const args = m.params.filter(p => p.name !== 'this').map(p => `${p.optional ? 'optional ' : ''}${lower(parseType(p.type), { ...ctx, role: 'arg', intKey: `${intKey}.${p.name}`, optional: p.optional, where: `${ctx.where} (${p.name})` })}${p.rest ? '...' : ''} ${p.name}`);
-          lines.push(`  ${attrs(m.d, { LasmSignature: m.text })} ${lower(parseType(m.type), { ...ctx, role: 'result', intKey })} ${m.name}(${args.join(', ')});`);
-        }
+    for (const e of g.members) {
+      const d = e.const ? byName.get('const:' + e.const) ?? fail(`${host.name}: const ${e.const} is not declared`)
+        : (byName.get('fn:' + e.function) ?? fail(`${host.name}: function ${e.function} is not declared`))[0];
+      const tag = unstable(d.doc);
+      if (tag) fail(`${host.name} ${e.name} is ${tag}`);
+      const ctx = { owner: '', member: e.name, module: g.module, decl: d, doc: d.doc, generics: {}, where: `${host.name} ${e.const ?? e.function}` };
+      if (e.const) {
+        const signature = d.text.replace(/^(?:export\s+)?(?:declare\s+)?/, '');
+        lines.push(`  // ${signature}\n  ${attrs(d, { LasmSignature: signature })} readonly attribute ${lower(parseType(d.type), { ...ctx, role: 'attr' })} ${e.name};`);
       } else {
-        const t = m.kind === 'method' ? lowerCallback({ k: 'fn', params: m.params, ret: parseType(m.type) }, ctx)
-          : lower(parseType(m.type), { ...ctx, role: 'field', intKey, optional: m.optional });
-        lines.push(`  ${m.optional ? '' : 'required '}${t} ${m.name};`);
+        const fns = byName.get('fn:' + e.function);
+        if (fns.length !== 1) fail(`${host.name}: ${e.function} has overloads`);
+        const sig = functionSignature(d.text);
+        const signature = `${e.name}(${paramKey(sig.params)}): ${sig.type}`;
+        const c = { ...ctx, generics: genericDefaults(sig.generics), signature };
+        const args = sig.params.map(p => `${p.optional ? 'optional ' : ''}${lower(parseType(p.type), { ...c, role: 'arg', param: p.name, optional: p.optional, where: `${c.where} (${p.name})` })}${p.rest ? '...' : ''} ${p.name}`);
+        lines.push(`  // ${signature}\n  ${attrs(d, { LasmSignature: signature })} ${lower(parseType(sig.type), { ...c, role: 'result' })} ${e.name}(${args.join(', ')});`);
       }
     }
-    const path = `${host.global}.${s.name}`;
-    const head = attrs(first, { module: s.module, LasmName: lean, LasmPath: path });
-    defs.push(`// ${s.as === 'interface' ? 'interface' : 'options'} ${path}\n${head}\n${s.as === 'interface' ? 'interface' : 'dictionary'} ${name}${parent ? ' : ' + parent : ''} {\n${lines.join('\n')}\n};`);
+    defs.push(`// ${g.jsModule === 'globalThis' ? 'Globals' : `The exports of ${g.jsModule}`}\n${attrs(null, { module: g.module, LasmModule: g.jsModule === 'globalThis' ? undefined : g.jsModule, LasmPath: '' })}\nnamespace ${idlName(g.idl)} {\n${lines.join('\n')}\n};`);
+  }
+
+  for (const s of host.declarations) {
+    // host.failures (a survey of a whole declaration file): a declaration that does not lower is
+    // recorded and left out instead of failing the lowering.
+    try {
+      const lean = leanOf(s);
+      const name = idlName(lean);
+      const genericsOf = (d, m) => rich ? { ...declGenerics(d), ...(s.typeArgs ?? {}), ...genericDefaults(m?.generics) } : undefined;
+      const ctxOf = (m, d) => ({ owner: lean, member: m.name, module: s.module, doc: m.doc, decl: d, where: `${host.name} ${s.name}.${m.name}`,
+        signature: `${s.name}.${m.text}`, generics: genericsOf(d, m) });
+      if (s.as === 'callback') {
+        const d = find(s.name);
+        if (d.kind !== 'type') fail(`${s.name} is not a type alias`);
+        const rhs = aliasBody(d);
+        const t = parseType(rhs);
+        if (t.k !== 'fn') fail(`${s.name} is not a function type`);
+        lowerCallback(t, { owner: lean, member: '', module: s.module, doc: d.doc, decl: d, where: `${host.name} ${s.name}`, callbackName: lean,
+          signature: squash(d.text.replace(/^export\s+/, '')), generics: genericsOf(d) });
+        continue;
+      }
+      // The members, from the declaration or composed from several.
+      const sources = s.compose ?? [{ from: s.name }];
+      let members = [];
+      let parent = null;
+      let first = null;
+      for (const c of sources) {
+        const d = find(c.from);
+        first ??= d;
+        let ms;
+        if (s.merge) {
+          // rich: a type alias of object types (`{…} | {…}`, `A & ({…} | {…})`) as one dictionary: a member
+          // in every alternative keeps its optionality, the others are optional; differing types are a union.
+          if (d.kind !== 'type') fail(`${s.name}: merge needs a type alias`);
+          ms = host.allOverloads ? objectMembers(parseType(aliasBody(d)), { where: s.name, generics: declGenerics(d), decl: d })
+            : mergeAlternatives(objectAlternatives(parseType(aliasBody(d)), s.name));
+        } else if (d.kind === 'type' && c.objectPart !== undefined) {
+          ms = objectParts(d)[c.objectPart] ?? fail(`${c.from} has no object part ${c.objectPart}`);
+        } else if (d.kind === 'interface') {
+          ms = membersOf(d.src, d.body[0], d.body[1]);
+          if (!s.compose) for (const h of heritage(d)) {
+            const hn = typeText(h).replace(/<.*$/, '').replace(new RegExp(`^${host.global}\\.`), '');
+            const ref = refName(hn, h.args ?? [], `${s.name} extends`);
+            // The full surface: a dictionary takes its base's members (a member it redeclares
+            // replaces the base's), rather than inheriting.
+            if (ref && host.allOverloads && s.as === 'dictionary') { const own = new Set(ms.map(x => x.name)); ms = [...objectMembers(h, { where: s.name, generics: {}, decl: d }).filter(x => !own.has(x.name)), ...ms]; }
+            else if (ref) { if (parent) fail(`${s.name}: two selected bases`); parent = ref; }
+            // rich: a base declared here but not selected (a type alias of an object type) gives its
+            // members; a base of the web platform or JavaScript (Error, ExtendableEvent, Record) is
+            // not repeated: its members are Lasm.JS.Web's.
+            else if (rich && host.allOverloads && byName.get(hn)?.kind) { const own = new Set(ms.map(x => x.name)); ms = [...objectMembers(h, { where: s.name, generics: {}, decl: d }).filter(x => !own.has(x.name)), ...ms]; }
+            else if (rich && host.allOverloads) continue;
+            else if (!(hn in host.notSelected)) fail(`${s.name} extends ${hn}, which is neither selected nor in ${host.tierFile ?? 'serve-tier2.mjs'} notSelected`);
+          }
+          else for (const h of heritage(d)) {
+            // A composed dictionary takes its sources' bases' members by listing them as sources.
+            const hn = typeText(h).replace(/<.*$/, '');
+            if (!sources.some(x => x.from === hn || x.from === `Serve.${hn}`)) fail(`${s.name}: ${c.from} extends ${hn}, which is not a source`);
+          }
+        } else if (d.kind === 'type' && c.alternative !== undefined) {
+          const t = parseType(aliasBody(d));
+          const alt = flat(t)[c.alternative];
+          if (alt?.k !== 'obj') fail(`${c.from} alternative ${c.alternative} is not an object type`);
+          // Members of an object literal: their doc comments and text are the alternative's.
+          const altSrc = { ...blank(alt.body), file: d.src.file };
+          ms = membersOf(altSrc, 0, alt.body.length);
+        } else fail(`${c.from} is not an interface`);
+        members.push(...takeMembers(s, ms, s.name, c.only ?? null).map(m => ({ ...m, d })));
+      }
+      for (const k of Object.keys(s.exclude ?? {})) if (!excluded.some(([w]) => w === `${s.name}.${k}`)) fail(`${s.name}.${k} is excluded but not a member`);
+      const lines = [];
+      const usedOverloadNames = new Set();
+      // The full surface: of a method's overloads with the same parameter names, the one with the fewest required arguments keeps
+      // the method's name (R2Bucket.get(key, options?) rather than get(key, options & { onlyIf })),
+      // the others are named by the overload rules; then the shortest declaration (the least
+      // constrained: put(key, value, options?: R2PutOptions) before the one with onlyIf required).
+      if (host.allOverloads) {
+        const required = m => m.kind === 'method' ? m.params.filter(p => !p.optional && !p.rest).length : 0;
+        const firstAt = new Map(); members.forEach((m, i) => { if (!firstAt.has(m.name)) firstAt.set(m.name, i); });
+        const names = m => m.kind === 'method' ? m.params.map(p => p.name).join(',') : '';
+        // Only overloads of the same parameter names are reordered (DurableObjectStorage's
+        // put(key, value) stays before put(entries)).
+        const firstOfNames = new Map(); members.forEach((m, i) => { const k = `${m.name}(${names(m)})`; if (!firstOfNames.has(k)) firstOfNames.set(k, i); });
+        members = members.map((m, i) => ({ m, i })).sort((a, b) => a.m.name !== b.m.name ? firstAt.get(a.m.name) - firstAt.get(b.m.name) || a.i - b.i
+          : names(a.m) !== names(b.m) ? firstOfNames.get(`${a.m.name}(${names(a.m)})`) - firstOfNames.get(`${b.m.name}(${names(b.m)})`)
+          : required(a.m) - required(b.m) || a.m.text.length - b.m.text.length || a.i - b.i).map(x => x.m);
+      }
+      for (const m of members) {
+        const ctx = ctxOf(m, m.d);
+        const intKey = `${s.name}.${m.name}`;
+        // WebIDL reserves a few identifiers (`toString`): such a member is written `toString_`, named by LasmName.
+        const reserved = rich && ['toString', 'constructor', 'toJSON', 'prototype'].includes(m.name);
+        // A member holding a class (`Span: typeof Span`) is named `SpanClass`: its name is the
+        // class's type's in Lean.
+        const classRef = rich && m.kind === 'property' && /^typeof\s/.test(m.type ?? '');
+        const idlMember = reserved ? `${m.name}_` : idlId(m.name);
+        const more = reserved ? { LasmName: m.name } : classRef ? { LasmLeanName: `${m.name}Class` } : {};
+        if (s.as === 'interface') {
+          const flags = new Set();
+          const stat = m.static ? 'static ' : '';
+          // An abstract class (WorkerEntrypoint, DurableObject of cloudflare:workers) is not constructed.
+          if (m.kind === 'constructor' && m.d.abstract) { excluded.push([`${s.name}.constructor`, 'an abstract class: a program defines a subclass (A28)']); continue; }
+          if (m.kind === 'constructor') {
+            const args = m.params.map(p => `${p.optional ? 'optional ' : ''}${lower(parseType(p.type), { ...ctx, role: 'arg', intKey: null, optional: p.optional, where: `${ctx.where} (${p.name})`, param: p.name })}${p.rest ? '...' : ''} ${p.name}`);
+            lines.push(`  // ${m.text}`);
+            lines.push(`  ${attrs(m.d, { LasmSignature: m.text })} constructor(${args.join(', ')});`);
+            continue;
+          }
+          if (m.kind === 'property') {
+            let t = lower(parseType(m.type), { ...ctx, role: 'attr', intKey, flags });
+            if (rich && (t === 'never' || t === 'undefined')) { excluded.push([`${s.name}.${m.name}`, `its type is ${m.type}: it is never present`]); continue; }
+            // rich: an optional property (`httpMetadata?: R2HTTPMetadata`) may be absent: nullable.
+            if (rich && m.optional && t !== 'any' && !t.endsWith('?')) t += '?';
+            lines.push(`  // ${m.text}`);
+            lines.push(`  ${attrs(m.d, { LasmSignature: m.text, ...more, LasmMap: flags.has('map') || undefined })} ${stat}readonly attribute ${t} ${idlMember};`);
+          } else {
+            // rich: a parameter of one string literal type (`type: "json"`) is passed as that string, and
+            // the overload is named with it (`get(key, type: "json")` → getJson).
+            const constants = rich ? m.params.filter(p => parseType(p.type).k === 'lit') : [];
+            let overloadName = constants.length ? m.name + constants.map(p => capital(parseType(p.type).value.replace(/[^A-Za-z0-9]+(.)?/g, (_, c) => c ? c.toUpperCase() : ''))).join('') : undefined;
+          // Two overloads named by the same constants (get(key, "text"), get(keys, "text")): the
+          // later adds its other arguments' types (`getTextOfKeyArray`).
+          if (overloadName && usedOverloadNames.has(overloadName)) {
+            const typesOf = m.params.filter(p => !constants.includes(p)).map(p => capital(typeText(parseType(p.type)).replace(/<.*>/, '').replace(/\[\]/g, 'Array').replace(/[^A-Za-z0-9]/g, '')));
+            overloadName = `${overloadName}Of${typesOf.join('And')}`;
+            while (usedOverloadNames.has(overloadName)) overloadName += '_';
+          }
+          if (overloadName) usedOverloadNames.add(overloadName);
+            // A rest parameter (`...values: unknown[]`) is variadic in its element type.
+            const restType = p => { const t = parseType(p.type); return p.rest && rich && t.k === 'array' ? t.inner : t; };
+            const args = m.params.filter(p => p.name !== 'this').map(p => constants.includes(p)
+              ? `[LasmConstant=${quoteAttr(parseType(p.type).value)}] DOMString ${p.name}`
+              : `${p.optional ? 'optional ' : ''}${lower(restType(p), { ...ctx, role: 'arg', intKey: `${intKey}.${p.name}`, optional: p.optional, where: `${ctx.where} (${p.name})`, param: rich ? p.name : undefined })}${p.rest ? '...' : ''} ${p.name}`);
+            const ret = lower(parseType(m.type), { ...ctx, role: 'result', intKey, flags });
+            lines.push(`  // ${m.text}`);
+            lines.push(`  ${attrs(m.d, { LasmSignature: m.text, ...more, LasmOverloadName: overloadName, LasmMap: flags.has('map') || undefined })} ${stat}${ret} ${idlMember}(${args.join(', ')});`);
+          }
+        } else {
+          // rich: a member of a dictionary's own type (a tree's children) is any where it recurs:
+        // a Lean structure cannot hold itself.
+        const recurs = rich && host.allOverloads && new RegExp(`(^|[^\\w$.])${s.name.split('.').at(-1)}([^\\w$]|$)`).test(m.type ?? '');
+        const t = recurs ? 'any' : m.kind === 'method' ? lowerCallback({ k: 'fn', params: m.params, ret: parseType(m.type) }, ctx)
+            : lower(parseType(m.type), { ...ctx, role: 'field', intKey, optional: m.optional });
+          if (rich && (t === 'never' || t === 'undefined')) { excluded.push([`${s.name}.${m.name}`, `its type is ${m.type}: it is never present`]); continue; }
+          lines.push(`  // ${m.text}`);
+          lines.push(`  ${m.optional ? '' : 'required '}${t} ${idlId(m.name)};`);
+        }
+      }
+      const path = host.global ? `${host.global}.${s.name}` : s.name;
+      const head = attrs(first, { module: s.module, LasmName: lean, LasmPath: path });
+      defs.push(`// ${s.as === 'interface' ? 'interface' : 'options'} ${path}\n${head}\n${s.as === 'interface' ? 'interface' : 'dictionary'} ${name}${parent ? ' : ' + parent : ''} {\n${lines.join('\n')}\n};`);
+      } catch (e) {
+      if (!host.failures) throw e;
+      host.failures.push([s.name, e.message]);
+    }
   }
   // Intersections: a dictionary inheriting the first part, with the others' members.
   for (const [key, lean] of Object.entries(host.intersections)) {
@@ -634,7 +1295,14 @@ export function lowerHost(host, files) {
     defs.push(`// options ${key}\n${attrs(null, { module: selected.get(a).module, LasmName: lean, LasmPath: `${host.global}.${key}` })}\ndictionary ${idlName(lean)} : ${base} {\n${lines.join('\n')}\n};`);
   }
   for (const k of Object.keys(host.integers)) if (!integersUsed.has(k)) fail(`${host.name}: integers[${k}] is not used`);
-  return { idl: [...defs, ...extra.values()].join('\n\n'), excluded };
+  // rich: the ways a type flows where the lowering found them (LasmDirection: to, from), for a
+  // type no member names (generate-web.mjs generates its instances by them).
+  const marked = defs.map(d => {
+    const m = /LasmName="([^"]+)"[^\]]*\]\n(?:dictionary|interface|enum) /.exec(d);
+    const ways = m && [...selected.values()].filter(x => leanOf(x) === m[1]).flatMap(x => [...(directions.get(x.name) ?? [])]);
+    return ways?.length ? d.replace(/\]\n(dictionary|interface|enum) /, `, LasmDirection="${[...new Set(ways)].sort().join(' ')}"]\n$1 `) : d;
+  });
+  return { idl: [...marked, ...extra.values()].join('\n\n'), excluded };
 }
 
 // ---------- writing ----------
@@ -644,15 +1312,15 @@ export async function lowerAll() {
   for (const host of tier.hosts) {
     const files = [];
     for (const file of host.files) files.push({ file, text: await loadFile(host, file) });
-    const { idl, excluded } = lowerHost(host, files);
+    const { idl, excluded } = host.auto ? lowerAuto(host, files) : lowerHost(host, files);
     const header = `// GENERATED by scripts/bindings/serve-api.mjs from the ${host.name} ${host.version} TypeScript declarations
 // (${host.files.map(f => `https://github.com/${host.repo}/blob/${host.tag}/${f}`).join(',\n//  ')};
-// ${host.license}), for what serve-tier2.mjs selects; do not edit. Comments quote each
+// ${host.license}), for what ${host.auto ? `${host.name.toLowerCase()}-tier2.mjs excludes (ts-auto.mjs's rules)` : 'serve-tier2.mjs selects'}; do not edit. Comments quote each
 // member's declaration. generate-web.mjs turns this into Lasm.JS.${host.name}.
 //
-// Not lowered (serve-tier2.mjs; the declarations' own @experimental and UNSTABLE tags):
+// Not lowered (${host.auto ? `${host.name.toLowerCase()}-tier2.mjs` : 'serve-tier2.mjs'}; the declarations' own @experimental and UNSTABLE tags):
 ${excluded.map(([w, r]) => `//   - ${w}: ${r}`).join('\n')}
-${Object.entries(host.notSelected).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
+${Object.entries(host.notSelected ?? {}).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
 `;
     results.push({ file: join(root, 'scripts', 'bindings', `${host.name.toLowerCase()}.idl`), text: `${header}\n${idl}\n` });
   }

@@ -20,7 +20,7 @@ export async function openApp(dist, { url = 'https://app.test/', html = '<div id
   const nodeFetch = globalThis.fetch;
   const fetchFile = async (input, init) => {
     const target = new URL(typeof input === 'string' ? input : String(input.url ?? input), url);
-    // Requests for a running server (full-stack apps: /rpc/…) go to it.
+    // Requests for a running server (full-stack apps: /api/…) go to it.
     if (server && !target.pathname.match(/\/app\.[0-9a-f]+\.(js|wasm)$/)) return nodeFetch(new URL(target.pathname + target.search, server), init);
     const file = join(dist, decodeURIComponent(target.pathname.split('/').at(-1)));
     const ext = file.slice(file.lastIndexOf('.'));

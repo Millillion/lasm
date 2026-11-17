@@ -1,6 +1,6 @@
 # fetch-app
 
-An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled ahead of time to WebAssembly by
+An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces, compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
@@ -24,7 +24,7 @@ npm run build               # write dist/
 PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is needed
 ```
 
-The server listens on `$HOST` (default `0.0.0.0`) and `$PORT` (default 3000) and
+The server listens on `$PORT` (default 3000), on every IPv4 address, and
 exits cleanly on SIGTERM or SIGINT. `npm run dev` (`lasm dev`) watches the Lean files, rebuilds
 in about 2 s after an ordinary edit and restarts the server; a build error is shown with its
 file and line while the last good server keeps running.
@@ -33,8 +33,10 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program. |
-| `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Main.lean` | The program on Node: the handler on `Node.serve` (`Lasm.JS.Node.Serve`). |
+| `Handler.lean` | The HTTP handler, on the web's `Request` and `Response` (`Lasm.JS.Web`). |
+| `Export.lean` | The handler as the program's default export (`exportDefault`), for Bun, Deno, the edge and the function platforms. |
+| `App.lean` | Pure Lean logic used by `Handler.lean`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
 | `package.json` | npm scripts and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
@@ -43,12 +45,15 @@ Files:
 `Lasm.JS.Web`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+`lakefile.toml` requires Lasm's library as a Lake package at `.lake/lasm-library`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (`npm run dev`, `npx lasm editor`); a plain
+`lake build` needs it.
 
 ## Bun and Deno
 
-The same `Main.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
+`Export.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
 runs single-threaded there, with no files, sockets or processes, and the handler is
-served with `Bun.serve` or `Deno.serve`:
+served as the module's default export, as `bun` and `deno serve` serve one:
 
 ```sh
 bun install && bun run dev:bun          # Lasm itself runs on Bun

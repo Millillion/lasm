@@ -6,7 +6,27 @@ SVG, a keyed list, ports and messages from JavaScript, and server-side
 rendering of a component that a second instance hydrates.
 -/
 import Lasm.UI
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 open Lasm.UI
+
+/-- `fetch(path)`: the status and the body, or the error (Lasm.JS.Web). -/
+def get (path : String) : Lasm.JS.Async (Except String String) := do
+  try
+    let r ← Lasm.JS.Web.fetch (.usvString path)
+    return .ok s!"{← r.status} {← r.text}"
+  catch e => return .error (toString e)
+
+/-- Focuses the element with this `id` once the frame that may add it is on screen. -/
+def focus {Msg : Type} (id : String) : Cmd Msg := Cmd.ofEffect (.task fun _ => do
+  afterFrame
+  if let some el ← (← Lasm.JS.Web.document).getElementById id then
+    ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus)
+
+/-- Sends `value` out through the port `name` (`app.ports[name].subscribe` in JavaScript). -/
+def toPort {Msg : Type} (name : String) (value : Lasm.JS.Data) : Cmd Msg :=
+  Cmd.ofEffect (.task fun _ => do (← Mount.port name).send value)
 
 inductive Page where
   | home
@@ -44,7 +64,7 @@ inductive Msg where
   | urlChanged (u : Url)
   | goItem
   | fetch (path : String)
-  | fetched (r : Except Http.Error String)
+  | fetched (r : Except String String)
   | startDelay
   | delayDone
   | toggleTicks
@@ -125,9 +145,7 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
   match msg with
   | .urlChanged u => ({ m with page := route u }, .none)
   | .goItem => (m, Cmd.pushUrl (Url.build ["demo", "items", "7"] [("tab", "info")]))
-  | .fetch path => (m, Http.request { url := path } fun
-      | .ok r => .fetched (.ok s!"{r.status} {r.body}")
-      | .error e => .fetched (.error e))
+  | .fetch path => (m, Cmd.task do return .fetched (← get path))
   | .fetched (.ok s) => ({ m with http := s }, .none)
   | .fetched (.error e) => ({ m with http := s!"error {e}" }, .none)
   | .startDelay => ({ m with delayed := "waiting" }, Cmd.delay 100 .delayDone)
@@ -135,12 +153,12 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
   | .toggleTicks => ({ m with ticking := !m.ticking }, .none)
   | .tick _ => ({ m with ticks := m.ticks + 1 }, .none)
   | .key k => ({ m with lastKey := k }, .none)
-  | .focusName => (m, Cmd.focus "name")
+  | .focusName => (m, focus "name")
   | .setName s => ({ m with name := s }, .none)
   | .reverse => ({ m with letters := m.letters.reverse }, .none)
-  | .portIn n => (m, Cmd.port "out" (Lasm.JS.toJS (2 * n)))
+  | .portIn n => (m, toPort "out" (Lasm.JS.toJS (2 * n)))
   | .received s => ({ m with received := s }, .none)
-  | .renderSsr => (m, Cmd.port "ssr" (.string (render (counterView 0))))
+  | .renderSsr => (m, toPort "ssr" (.string (render (counterView 0))))
   | .inc => ({ m with count := m.count + 1 }, .none)
   | .linkClicked => ({ m with linkClicks := m.linkClicks + 1 }, .none)
 

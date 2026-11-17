@@ -27,7 +27,7 @@
 import assert from 'node:assert/strict';
 import { parseArgs } from 'node:util';
 import { spawnSync, spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync, appendFileSync, statSync, cpSync } from 'node:fs';
+import { lstatSync, unlinkSync, mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync, appendFileSync, statSync, cpSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -147,6 +147,22 @@ if (args.scenario === 'installed' || args.scenario === 'lake') {
     const result = npxRun('npx lasm (Lake project)', ['lasm', 'Main.lean'], { cwd: lake });
     assert.match(result.stdout, /Lean module: 42/);
     report.build = result.seconds;
+    // Lasm's library as a Lake package (0.3-7): the project requires it at .lake/lasm-library, a link (a junction on
+    // Windows) that lasm makes; Lake builds a module compiled on first import (IndexedDB), and Lasm links it once.
+    const library = join(directory, 'lake library app');
+    mkdirSync(library);
+    writeFileSync(join(library, 'lakefile.toml'), 'name = "uses_lasm"\nversion = "0.1.0"\n\n[[require]]\nname = "lasm"\npath = ".lake/lasm-library"\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n');
+    writeFileSync(join(library, 'Main.lean'), 'import Lasm.JS.Web.IndexedDB\nopen Lasm.JS.Web in\ndef main : IO Unit := IO.println s!"IDBTransactionMode: {(IDBTransactionMode.readwrite).val}"\n');
+    const libraryResult = npxRun('npx lasm (Lake project requiring Lasm\'s package)', ['lasm', 'Main.lean'], { cwd: library });
+    assert.match(libraryResult.stdout, /IDBTransactionMode: readwrite/);
+    const link = join(library, '.lake', 'lasm-library');
+    assert.ok(lstatSync(link).isSymbolicLink(), 'the project links Lasm\'s package (a symbolic link, or a junction on Windows)');
+    assert.ok(existsSync(join(link, '.lake', 'build', 'lib', 'lean', 'Lasm', 'JS', 'Web', 'IndexedDB.olean')), 'Lake built the module into the package');
+    // The link is repaired: removed, the next lasm command makes it again.
+    unlinkSync(link); // the link only
+    assert.match(npxRun('npx lasm (Lake project, link repaired)', ['lasm', 'Main.lean'], { cwd: library }).stdout, /IDBTransactionMode: readwrite/);
+    assert.ok(lstatSync(link).isSymbolicLink());
+    report.lakeLibrary = libraryResult.seconds;
   }
   report.receipts = receipts();
   const kinds = new Set(report.receipts.map(r => r.source?.kind));
@@ -263,11 +279,11 @@ if (args.scenario.startsWith('launch-')) {
   }
   // The fetch template: Node, then the WASI targets, then the editor support.
   if (part === 'fetch') {
-  const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http', 'wasi']);
+  const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http']);
   npmRun('npm run build (fetch)', ['run', 'build'], { cwd: fetchApp });
   await serve('fetch', fetchApp, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean!');
-  // Each WASI target has its own program (Cgi.lean, Fastly.lean, WasiHttp.lean; src/init.mjs entryFile).
-  for (const [target, entry, output] of [['wasi', 'Cgi.lean', 'wasi/main.wasm'], ['fastly', 'Fastly.lean', 'bin/main.wasm'], ['wasi-http', 'WasiHttp.lean', 'wasi-http/main.wasm']]) {
+  // Fastly and wasi:http each have their own program (Fastly.lean, WasiHttp.lean; src/init.mjs entryFile).
+  for (const [target, entry, output] of [['fastly', 'Fastly.lean', 'bin/main.wasm'], ['wasi-http', 'WasiHttp.lean', 'wasi-http/main.wasm']]) {
     npxRun(`npx lasm build ${entry} --target ${target}`, ['lasm', 'build', entry, '--target', target], { cwd: fetchApp });
     assert.ok(existsSync(join(fetchApp, output)), `--target ${target} wrote no ${output}`);
   }

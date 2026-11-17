@@ -40,7 +40,7 @@ def runtimeTargets : List String := ["node", "bun", "deno"]
 def edgeOnlyTargets : List String := ["workers", "vercel-edge", "netlify-edge", "deno-deploy", "supabase-edge"]
 def devTargets : List String := runtimeTargets ++ edgeOnlyTargets ++ ["browser"]
 
-def devUsage : String := "Usage: lasm dev [Main.lean] [--target " ++ "|".intercalate devTargets ++ "] [--release] [--no-run] [-- arguments…]
+def devUsage : String := "Usage: lasm dev [Main.lean] [--target " ++ "|".intercalate devTargets ++ "] [--release] [--no-run] [--verbose] [-- arguments…]
        lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173] [--host 127.0.0.1] [--output DIR]
 
 Watches the project's Lean sources and Lake/npm configuration, rebuilds after
@@ -48,7 +48,7 @@ each change (dev profile: about 2 s for an ordinary edit once the first build
 is done) and restarts the program. Arguments after -- are passed to main.
   node, bun, deno   run the program with that runtime (default: the runtime
                     running Lasm); a build error keeps the last good program running
-  workers, vercel-edge, netlify-edge, deno-deploy
+  workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge
                     rebuild the edge output only; run the platform's own local
                     server yourself (for example npx wrangler dev). Lasm never
                     starts platform tools.
@@ -58,7 +58,8 @@ is done) and restarts the program. Arguments after -- are passed to main.
 Several outputs of one project rebuild together: --target node,browser, or
 with their own sources --target node=Server.lean,browser=Client.lean (one
 program runs; the browser output is served with live reload).
---release builds the release profile instead; --no-run only rebuilds.
+--release builds the release profile instead (--dev, the default, the dev
+profile); --no-run only rebuilds; --verbose shows compiler and linker details.
 Type rs and Enter to rebuild and restart; Ctrl+C stops."
 
 /-- `/^--(target|port|host|output)(?:=(.*))?$/s.exec(token)`: the option's
@@ -73,7 +74,7 @@ def devOutput (item : String) : Except String (String × Option String) :=
   let parts := item.splitOn "="
   let target := parts.headD ""
   let input := parts[1]?
-  if target ∉ devTargets then .error ("lasm dev --target accepts " ++ ", ".intercalate devTargets ++ ", not \"" ++ target ++ "\"")
+  if target ∉ devTargets then .error ("lasm dev --target accepts " ++ ", ".intercalate devTargets ++ ", not \"" ++ target ++ "\"" ++ targetHintAmong target devTargets)
   else if input.any (fun i => !i.endsWith ".lean") then .error ("--target " ++ item ++ ": the source must be a .lean file")
   else .ok (target, input.filter (· ≠ ""))
 
@@ -82,11 +83,13 @@ def devPort (value : String) : Option Nat :=
   if 1 ≤ value.length ∧ value.length ≤ 5 ∧ value.all Char.isDigit ∧ value.toNat! ≤ 65535 then some value.toNat! else none
 
 /-- The loop's state besides the result: the outputs as the loop leaves them
-(each with its source when the item named one). -/
+(each with its source when the item named one), and `supplied`: the
+profile and the valued options given so far. -/
 structure DevState where
   result : Parsed
   outputs : Option (List (String × Option String)) := none
   positional : List String := []
+  supplied : List String := []
 
 /-- A valued option with its value: the checks of its branch of the loop. -/
 def devSetValued (st : DevState) (name : String) (value : Option String) : Except String DevState :=
@@ -94,7 +97,10 @@ def devSetValued (st : DevState) (name : String) (value : Option String) : Excep
   | none => .error ("--" ++ name ++ " requires a value\n\n" ++ devUsage)
   | some v =>
     if v = "" ∨ v.startsWith "--" then .error ("--" ++ name ++ " requires a value\n\n" ++ devUsage)
-    else if name = "target" then
+    else if name ∈ st.supplied then .error ("Specify --" ++ name ++ " only once")
+    else
+    let st := { st with supplied := st.supplied ++ [name] }
+    if name = "target" then
       match (v.splitOn ",").mapM devOutput with
       | .error e => .error e
       | .ok outputs =>
@@ -113,8 +119,10 @@ def devLoop (st : DevState) : List String → Except String (Option DevState)
   | token :: rest =>
     if token = "--" then .ok (some { st with result := { st.result with args? := some rest } })
     else if token = "--help" ∨ token = "-h" then .ok none
-    else if token = "--release" then devLoop { st with result := { st.result with profile? := some "release" } } rest
-    else if token = "--dev" then devLoop { st with result := { st.result with profile? := some "dev" } } rest
+    else if token = "--release" ∨ token = "--dev" then
+      let profile := (token.drop 2).toString
+      if "profile" ∈ st.supplied ∧ st.result.profile? ≠ some profile then .error "Choose one of --dev and --release"
+      else devLoop { st with supplied := st.supplied ++ ["profile"], result := { st.result with profile? := some profile } } rest
     else if token = "--no-run" then devLoop { st with result := { st.result with run? := some false } } rest
     else if token = "--verbose" then devLoop { st with result := { st.result with verbose? := some true } } rest
     else if token = "--no-watch" then devLoop { st with result := { st.result with watch? := some false } } rest

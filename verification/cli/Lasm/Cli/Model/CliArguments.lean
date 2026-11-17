@@ -8,8 +8,8 @@ Lasm.Cli.Theorems proves its propositions.
 
 | JavaScript (src/cli-arguments.mjs) | Lean |
 | --- | --- |
-| `buildTargets`, `suspendModes`, `fixedLayoutTargets`, `platformBuildTargets`, `commandNames`, `cliUsage` | the definitions of the same names |
-| `targetAliases`, `targetHint(value)` | `targetAliases`, `targetHint` |
+| `buildTargets`, `suspendModes`, `fixedLayoutTargets`, `commandNames`, `cliUsage` | the definitions of the same names |
+| `targetAliases`, `targetHint(value)`, `targetHintAmong(value, candidates, option)` | `targetAliases`, `targetHint`, `targetHintAmong` |
 | `asciiLower(text)` | `asciiLower` |
 | `editDistance(a, b)` | `editDistance` (the row, `nextCells`) |
 | `closest(word, candidates)` | `closest` |
@@ -77,7 +77,6 @@ def wasiBuildTargets : List String := ["wasi", "fastly", "wasi-http"]
 the keys of src/package.mjs `packageTargets` are written out. -/
 def buildTargets : List String :=
   ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure", "gcf"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
-def platformBuildTargets : List String := edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
 def fixedLayoutTargets : List String := ["vercel-edge", "netlify-edge"]
 def suspendModes : List String := ["none", "jspi"]
 def commandNames : List String := ["build", "run", "dev", "init", "package", "editor", "cache"]
@@ -86,22 +85,30 @@ def targetAliases : List (String × String) :=
   [("cloudflare", "workers"), ("cloudflare-workers", "workers"), ("worker", "workers"), ("aws", "lambda"), ("aws-lambda", "lambda"),
    ("cloudfront", "lambda-edge"), ("supabase", "supabase-edge"), ("deno-deploy-edge", "deno-deploy"), ("spin", "wasi-http"),
    ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure-functions", "azure"), ("google-cloud-functions", "gcf"),
-   ("cloud-functions", "gcf"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify")]
+   ("cloud-functions", "gcf"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
 
 /-- The usage text: one literal in the JavaScript, two pieces here, so that a
 proof sees its first word without decoding the whole text. -/
 def cliUsage : String := "Usage:" ++ " lasm <Main.lean> [--release] [-- arguments…]
-       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
-       lasm build <Main.lean> [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
-       lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser
+       lasm run <Main.lean> [--release] [-- arguments…]
+       lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
+       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
+       lasm init <directory> [--template NAME] [--deploy TARGET]…
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 
-Options: --rebuild, --verbose, --help, --version
+Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help,
+lasm dev --help and lasm package --help show their own options and targets.
+--output: with --target node (the default under Node) the Node build (default
+dist/); with every other target what is deployed (default: the platform's own
+place, such as workers/, wasi/ or lambda.zip). The Node build those are made
+from stays in the build cache.
 Profiles: lasm build makes release builds (optimized, byte-reproducible, for
 deployment); --dev skips the size optimizations for a faster build. lasm run
-(lasm Main.lean) makes dev builds; --release runs a release build.
+(lasm Main.lean) and lasm dev make dev builds; --release makes a release build.
+lasm dev watches the sources, rebuilds and restarts the program after each change.
+lasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).
 Application arguments must follow --."
 
 /-- `text.replace(/[A-Z]/g, c => c.toLowerCase())`. -/
@@ -150,6 +157,14 @@ def closest (word : String) (candidates : List String) : Option String :=
 def targetHint (value : String) : String :=
   match (targetAliases.lookup (asciiLower value)).or (closest value buildTargets) with
   | some guess => " (did you mean --target " ++ guess ++ "?)"
+  | none => ""
+
+/-- `targetHintAmong(value, candidates, option)`: an alias that names one of
+`candidates`, else the closest of them. -/
+def targetHintAmong (value : String) (candidates : List String) (option : String := "--target") : String :=
+  let named := (targetAliases.lookup (asciiLower value)).filter (· ∈ candidates)
+  match named.or (closest value candidates) with
+  | some guess => " (did you mean " ++ option ++ " " ++ guess ++ "?)"
   | none => ""
 
 /-! ## The parser -/
@@ -241,33 +256,24 @@ termination_by tokens => tokens.length
 /-- `/[./\\]/.test(word)`. -/
 def pathLike (word : String) : Bool := word.toList.any fun c => c = '.' || c = '/' || c = '\\'
 
-/-- `if (positional.length === 2 && command === 'build' && parsed.output === undefined)`:
-a second positional word of `lasm build` is its output directory. Returns the
-parse and the words left over. -/
-def placeOutput (r : Parsed) (more : List String) : Parsed × List String :=
-  match more with
-  | [o] => if r.command = "build" ∧ r.output? = none then ({ r with output? := some o }, []) else (r, more)
-  | _ => (r, more)
-
 /-- The default profile of a Lean source: release for `lasm build`, dev for
 running it. -/
-def defaultProfile (r : Parsed) (first : String) : Parsed :=
-  if first.endsWith ".lean" ∧ r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
+def defaultProfile (r : Parsed) (_first : String) : Parsed :=
+  if r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
 
 /-- The checks after the profile is set, and `lasm build`'s target and output. -/
-def checkOptions (env : ArgumentsEnv) (r : Parsed) (first : String) : Except String Parsed :=
+def checkOptions (env : ArgumentsEnv) (r : Parsed) (_first : String) : Except String Parsed :=
   if r.allowDev? = some true ∧ !(r.command = "build" ∧ r.target?.any (· ≠ "node")) then
     .error "--allow-dev applies to lasm build --target <platform> and lasm package"
   else if r.suspend?.isSome ∧ r.target? ≠ some "browser" then .error "--suspend applies to lasm build --target browser"
   else if r.bundler? = some true ∧ r.target? ≠ some "browser" then .error "--bundler applies to lasm build --target browser"
   else if r.command = "build" then
-    let target := r.target?.getD (if env.jsRuntime = "node" ∨ first.endsWith ".json" then "node" else env.jsRuntime)
+    let target := r.target?.getD env.jsRuntime
     let r := { r with target? := some target }
-    if target ≠ "node" ∧ first.endsWith ".json" then .error "--target applies to Lean applications, not binding configurations"
-    else if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
+    if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
       .error ("--output does not apply to --target " ++ target ++ ": the platform fixes its layout (" ++
         (if target = "vercel-edge" then "api/lasm.mjs and api/_lasm/" else "netlify/edge-functions/lasm.mjs and netlify/lasm/") ++ ")")
-    else .ok (if target ∉ platformBuildTargets ∧ r.output? = none then { r with output? := some "dist" } else r)
+    else .ok (if target = "node" ∧ r.output? = none then { r with output? := some "dist" } else r)
   else .ok r
 
 /-- After the loop: the checks from `if (!positional.length)` on. -/
@@ -280,18 +286,18 @@ def finish (env : ArgumentsEnv) (r : Parsed) (positional : List String) : Except
       .error ("Unknown command \"" ++ first ++ "\"" ++ (match guess with | some g => " (did you mean lasm " ++ g ++ "?)" | none => "") ++
         ". Commands: " ++ ", ".intercalate commandNames ++ "; or run a program with lasm Main.lean.")
     else
-      let (r, more) := placeOutput { r with input? := some first } more
-      if more ≠ [] then .error "Unexpected positional arguments. Put application arguments after --."
+      let r := { r with input? := some first }
+      if let extra :: _ := more then
+        .error (if r.command = "build" then "Unexpected argument \"" ++ extra ++ "\": lasm build takes one Lean source. Name the output with --output."
+          else "Unexpected positional arguments. Put application arguments after --.")
       else if r.command = "run" ∧ r.output?.isSome then .error "--output is available only with lasm build"
-      else if !(first.endsWith ".lean" || r.command = "build" && first.endsWith ".json") then
-        .error "Expected a Lean source file, or a binding configuration for lasm build"
-      else if first.endsWith ".json" ∧ r.profile?.isSome then .error "--dev and --release apply to Lean applications"
+      else if !first.endsWith ".lean" then .error ("Expected a Lean source file (Main.lean), not " ++ first)
       else checkOptions env (defaultProfile r first) first
 
 /-- `parseLasmArguments(argv)`, with the module's imports `env`. -/
 def parseLasmArgumentsWith (env : ArgumentsEnv) (argv : List String) : Except String Parsed :=
   match argv with
-  | [t] => if t ∈ ["--version", "-v", "version"] then .ok { command := "version" } else rest argv
+  | [t] => if t ∈ ["--version", "-v"] then .ok { command := "version" } else rest argv
   | _ => rest argv
 where
   rest (tokens : List String) : Except String Parsed :=

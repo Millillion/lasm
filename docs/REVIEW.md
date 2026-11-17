@@ -116,9 +116,41 @@ decisions themselves are logged with their reasoning in
   - **Numbers follow the docs**: `{number}` is `Float` (`crypto.randomBytes 32`,
     `FileHandle.fd`), `{integer}` is `Int`; `os.uptime` is corrected to `Float`
     because Node returns fractions.
-  - **Not generated**: `node:http`/`node:net` (Node serving goes through an
-    npm adapter, per your 2026-11-10 direction), and async iteration (`glob`,
-    `watch`, `opendir`).
+  - **Not generated**: async iteration (`glob`, `watch`, `opendir`).
+    `node:http`, `node:https` and `node:net` are generated since 2026-11-11
+    (your confirmation that Lasm.JS.Node should be complete; how Lean servers
+    run on Node is decided separately). Their shape choices:
+    - **Events are typed listeners**: each stable documented event becomes a
+      callback type of its documented arguments named after it
+      (`http.Server.RequestListener : http.IncomingMessage →
+      http.ServerResponse → Async Unit`) and `onRequest` / `onceRequest`
+      methods. The alternative was the untyped `EventEmitter.on "request"
+      (JSFunction)` only (still there), or promises for one-shot events
+      (`events.once`, still there, untyped).
+    - **Listener parameters take the event's type**: `http.createServer`'s
+      `requestListener`, `net.createServer`'s `connectionListener`, `connect`'s
+      `connectListener` (the docs say each is added to that event).
+      `http.request`'s optional `callback` is left out by the existing rule
+      (optional trailing callbacks): `req.onceResponse` does the same.
+    - **Methods returning `{this}` return the object** (`res.writeHead`,
+      `res.«end»`, `sock.write`'s siblings), as `emitter.on` already did, so
+      calls in `do` blocks need `discard <|`. Alternative: `Unit` for every
+      `{this}` result (no chaining in Lean anyway).
+    - **Overload names**: `server.listen options`, `listenWithPath`,
+      `listenWithPort`; `net.connect options`, `connectWithPath`,
+      `connectWithPort`; `http.request options`, `requestWithUrl`.
+    - **Parents for Lean's single inheritance**: `net.Socket` extends
+      `stream.Duplex` extends `stream.Readable` (so `stream.Readable.toWeb sock`
+      works; its writable side is `write`/`end`); `http.OutgoingMessage`
+      extends `EventEmitter` (the docs say legacy `Stream`, which is not a
+      `stream.Writable`); `https.Server` extends `http.Server` (the docs say
+      `tls.Server`, outside the cut, and "See http.Server"), so it has the
+      request events; that parent's projection is `toHttpServer`.
+    - **Numbers stay the docs' `{number}`**: status codes and ports are
+      `Float` (`res.writeHead 404`, `listenWithPort (some 0)`), `{integer}`
+      (`socket.localPort`) is `Int`.
+    - **Header objects are `Data`** (`req.headers`, `writeHead`'s headers):
+      the docs type them `{Object}`.
 
 - [ ] **`Lasm.JS.Deno` and `Lasm.JS.Bun` (tier 2, second part; 2026-11-10) are
   generated from the runtimes' own TypeScript declarations** (Deno 2.9.6's
@@ -157,9 +189,63 @@ decisions themselves are logged with their reasoning in
   - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
     without the `server` argument, so a generated handler rejects there
     (`known.json`).
-  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
-    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
-    CI. A user-facing helper (or a template change) is yours to decide.
+  - **Node**: superseded 2026-11-11 by `Node.serve` (Lasm provides it; see
+    "Node.serve and function-platform handlers" below). `@hono/node-server`
+    through `@[js]` still works and stays exercised in CI.
+
+### Node.serve and function-platform handlers (decided by Jordan 2026-11-11)
+- [ ] **The shapes are recorded for sign-off** in
+  [API_DECISIONS.md, milestone 0.2](api/decisions/0.2.md#milestone-02-decisions-in-detail)
+  (A7, A19–A23, 0.2-1), with the code, the reasons and the alternatives.
+  [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve) is the guide.
+
+- [ ] **`Lasm.JS.Cloudflare` (tier 3; 2026-11-11) is generated from
+  `@cloudflare/workers-types` 5.20261019.1** (the declarations of the workerd
+  that CI's wrangler 4.152.0 runs), pinned by hash, through Lasm.JS.Deno's
+  lowering with new rules for richer declarations ([DECISIONS.md](DECISIONS.md),
+  2026-11-11; [JS_BINDINGS.md](JS_BINDINGS.md#cloudflare-workers-lasmjscloudflare)).
+  Covered: KV, D1, R2, Durable Objects, Queues, `ExecutionContext`, the
+  `scheduled` and `queue` handlers, the Cache API, `connect`, `env`. Naming and
+  shape questions, all left as the declarations give them:
+  - **`env` is `Data`**, because the handler types declare `Env = unknown` (each
+    program declares its own `Env`). A binding is read with
+    `IO.ofExcept (readField KVNamespace env "KV")`. A generated
+    `Env`-style accessor (`env.kv "KV"`) or a structure the program declares
+    would read better; either is a Lasm API, so yours.
+  - **Overloads distinguished by a string literal** become one function each,
+    named with the literal: `get(key, type: "json")` is `KVNamespace.getJson`,
+    likewise `getArrayBuffer` and `getStream`; `get(key)` stays `get` (text).
+  - **Overloads with the same parameter names** follow Lasm.JS.Web's rule, which
+    gives `D1PreparedStatement.first colName` and **`first0`** (the declaration's
+    `first()`, which comes second), and `DurableObjectStorage.getWithKeys`,
+    `putWithEntries`, `deleteWithKeys`. `first0` reads badly (`firstRow`?).
+  - **Not generated for that reason**: KV's batch reads (`get(keys: Array<Key>)`
+    has the same parameter names as `get(key)`), and `getWithMetadata` of JSON,
+    bytes or streams (a second instantiation of the result's generic). Both are
+    lowering limits, not choices; a naming rule for them is yours.
+  - **Numbers are `Float`** (`limit`, `expirationTtl`, `size`, `partNumber`,
+    `D1Meta.changes`): the declarations have no doc comments that say "integer",
+    which Lasm.JS.Deno's `Nat` narrowing quotes. A hand list of integer members
+    would read better but is not in the source.
+  - **`Date` is `Data`** (`R2Object.uploaded`, `Message.timestamp`,
+    `setAlarm`'s time); Lasm.JS.Web has no `Date`.
+  - **Unions are the host's own types**, named by their members
+    (`DOMStringOrSequenceOfDOMString` for R2's `delete`), with `Coe` from each
+    member, so `bucket.delete (.domString k)` or `kv.put k (.domString v)`.
+  - **Durable Object classes are JavaScript** (a few lines in the project's
+    `index.mjs` calling Lean functions on `globalThis`), as Lasm.JS's "no classes
+    defined in Lean" limit says; the RPC methods of a stub are untyped
+    (`Value.callMethodAwait`).
+  - **Two Lasm changes outside the generated code**: `Lasm.JS.exportDefault` now
+    takes any `ToJS` value (it took a `Value`), so an `ExportedHandler` can be
+    published; and the Workers entry (`worker.mjs`) now exports `scheduled` and
+    `queue`, forwarding to the published object, and imports `cloudflare:workers`
+    and `cloudflare:sockets` for the bindings.
+  - **Tested only locally** (wrangler dev: workerd and Miniflare), never against
+    real Cloudflare, per the no-real-accounts rule: deviations of the local
+    emulation are listed in `test/fixtures/js-cloudflare/known.json`.
+  - **Replacing Porter's and Ledger's hand D1 bindings** with `Lasm.JS.Cloudflare.D1`
+    is a follow-up (they pin the published `@lasm/cli`, so after a release).
 
 ### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
 - [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
@@ -603,13 +689,13 @@ docstrings, the propositions and the names.
   - [Url](../library/Lasm/UI/Url.lean)
   - propositions: [UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - guide: [docs/UI.md](UI.md)
-- [ ] `Lasm.JS.Web` and its browser tier (generated): the surface and its naming
+- [ ] `Lasm.JS.Web` (generated, the whole web platform since milestone 0.3): the surface and its naming
   ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb),
-  [scripts/bindings/web-tier1.mjs](../scripts/bindings/web-tier1.mjs),
-  [scripts/bindings/web-browser.mjs](../scripts/bindings/web-browser.mjs)).
+  [scripts/bindings/web-rules.mjs](../scripts/bindings/web-rules.mjs),
+  [BINDING_RULES.md](BINDING_RULES.md)).
   `Lasm.Web` was removed on 2026-11-10.
 - [ ] `Lasm.Fastly` (generated): [Fastly/](../library/Lasm/Fastly), the generator [generate-fastly.mjs](../scripts/bindings/generate-fastly.mjs), the mapping rules [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md), the conformance checks [Conformance.lean](../test/fixtures/fastly-abi/Fixture/Conformance.lean), the example [examples/fastly](../examples/fastly/Main.lean)
-- [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
+- [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean).
 
 ### Example apps: code and propositions
 - [ ] Conduit:

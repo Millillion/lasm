@@ -1,0 +1,98 @@
+[
+ {
+  "name": "Kv",
+  "title": "Workers KV (KVNamespace)"
+ },
+ {
+  "name": "D1",
+  "title": "D1, SQLite databases (D1Database)"
+ },
+ {
+  "name": "R2",
+  "title": "R2 object storage (R2Bucket)"
+ },
+ {
+  "name": "Workers",
+  "title": "the fetch and scheduled handlers and their ExecutionContext (env of cloudflare:workers)"
+ },
+ {
+  "name": "Queues",
+  "title": "Queues (Queue, MessageBatch)"
+ },
+ {
+  "name": "Cache",
+  "title": "the Cache API (caches)"
+ },
+ {
+  "name": "Sockets",
+  "title": "TCP sockets (connect of cloudflare:sockets)"
+ },
+ {
+  "name": "Containers",
+  "title": "Containers (Container)"
+ },
+ {
+  "name": "DurableObjects",
+  "title": "Durable Objects (DurableObjectNamespace, DurableObjectState)"
+ },
+ {
+  "name": "Tail",
+  "title": "Tail Workers, trace events and tracing (TraceItem, TailStream, Tracing)"
+ },
+ {
+  "name": "Email",
+  "title": "Email Workers and sending email (ForwardableEmailMessage, SendEmail)"
+ },
+ {
+  "name": "Handlers",
+  "title": "ExportedHandler, every handler of a Worker together (fetch, scheduled, queue, email, tail, trace, tailStream, connect, test)"
+ },
+ {
+  "name": "Stream",
+  "title": "Cloudflare Stream (StreamBinding)"
+ },
+ {
+  "name": "HtmlRewriter",
+  "title": "HTMLRewriter, a streaming HTML parser"
+ },
+ {
+  "name": "Images",
+  "title": "Images and Media transformations (ImagesBinding, MediaBinding)"
+ },
+ {
+  "name": "Services",
+  "title": "the other bindings: rate limiting, Secrets Store, Artifacts, Flagship, Pipelines, Markdown conversion"
+ },
+ {
+  "name": "Vectorize",
+  "title": "Vectorize, vector indexes (VectorizeIndex)"
+ },
+ {
+  "name": "Ai",
+  "title": "Workers AI, AI Gateway, AI Search and AutoRAG, Agent memory (Ai, AiGateway, AiSearchNamespace)"
+ },
+ {
+  "name": "Hyperdrive",
+  "title": "Hyperdrive, database connection pooling (Hyperdrive)"
+ },
+ {
+  "name": "Workflows",
+  "title": "Workflows (Workflow, WorkflowStep)"
+ },
+ {
+  "name": "Rpc",
+  "title": "service bindings, RPC, dynamic dispatch and Worker loaders (Fetcher, WorkerStub, DispatchNamespace)"
+ },
+ {
+  "name": "BrowserRun",
+  "title": "Browser Rendering (BrowserRun)"
+ },
+ {
+  "name": "Analytics",
+  "title": "Workers Analytics Engine (AnalyticsEngineDataset)"
+ },
+ {
+  "name": "Cf",
+  "title": "the cf properties of requests (IncomingRequestCfProperties, RequestInitCfProperties)"
+ }
+]

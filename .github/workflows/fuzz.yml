@@ -4,7 +4,7 @@ name: Fuzz
 # Lean's own header parser), the Lasm.UI patch decoder, the
 # function platforms' HTTP mapping and the Lasm.JS value codec (JavaScript,
 # under V8 block coverage; the last two checked against Lean: the model
-# library/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
+# verification/cli/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
 # Lasm.UI applier's reading against Lean's reference decoder (ui-decode), Lasm's
 # tar reader against Python's tarfile (tar), and
 # Lasm.Fetch's request parsing, the WASI C host's CGI

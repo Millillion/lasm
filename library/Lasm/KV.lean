@@ -9,7 +9,7 @@ over the platform's own stores:
 | Fastly Compute with a KV Store `name` (Viceroy: `fastly.toml`'s `[local_server.kv_stores]`) | Fastly KV |
 | anywhere else (Node, Bun, WASI, wasi-http; or no such store) | memory: one copy per process, isolate or instance |
 
-Values are strings (JSON, for structured data). Guide: docs/RPC.md.
+Values are strings (JSON, for structured data).
 
     let kv ← Lasm.KV.open "TODOS"
     kv.put "state" json

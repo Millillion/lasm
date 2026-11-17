@@ -107,7 +107,7 @@ so that proving it later is a mechanical step:
   - [library/Lasm/RPC/Spec.lean](../library/Lasm/RPC/Spec.lean)
   - [library/Lasm/UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - [library/Lasm/JS/Spec.lean](../library/Lasm/JS/Spec.lean)
-  - [library/Lasm/Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean)
+  - [verification/cli/Lasm/Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean)
   - each app's `Proofs/Spec.lean`, for example [examples/ledger/Proofs/Spec.lean](../examples/ledger/Proofs/Spec.lean)
 - **Tested propositions** go in a sibling file, `Candidates.lean`, in the same
   namespace and with the same form. The doc comment adds one line,
@@ -144,7 +144,7 @@ so that proving it later is a mechanical step:
   - the Lean statement, verbatim.
 
   The Lean side holds a model of the JavaScript, function for function, as
-  [library/Lasm/Serverless/Proofs/Model.lean](../library/Lasm/Serverless/Proofs/Model.lean)
+  [verification/cli/Lasm/Serverless/Proofs/Model.lean](../verification/cli/Lasm/Serverless/Proofs/Model.lean)
   does for `src/serverless/`. The proposition is about the model, and is
   proved there.
 - The test checks two things on every input:
@@ -268,8 +268,9 @@ observed and reported only, and never blocks a stage or anything else
 (Jordan, 2026-11-16). Each item is measured by CI and shown on the evidence
 page.
 
-1. **Platforms:** every platform is at evidence level L2 or higher, and Node,
-   Workers and the browser are at L3.
+1. **Platforms:** every platform is at evidence level L3 (Jordan, 2026-11-16;
+   it was L2 or higher, with L3 for Node, Workers and the browser only). L3 is
+   runtime evidence in CI, not production evidence.
 2. **Mutation:** every module in `scripts/mutation/` is at or above 80 %, with
    the ratchet never lowered, and every JavaScript file under `src/` is in a
    module (the CLI argument and init modules, `src/serverless/` and the WASI

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseLasmArguments, platformBuildTargets, fixedLayoutTargets, edgeBuildTargets, wasiBuildTargets } from '../src/cli-arguments.mjs';
+import { parseLasmArguments, buildTargets, fixedLayoutTargets } from '../src/cli-arguments.mjs';
 
 test('ordinary Lean files default to run on Node, and preserve arguments after --', () => {
   assert.deepEqual(parseLasmArguments(['Main.lean', '--', 'hello', '--target', 'user-option']), {
@@ -19,10 +19,11 @@ test('options work on either side of the filename', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean']).output, 'dist');
 });
 
-test('build retains explicit output directories and existing binding configuration inputs', () => {
+test('build retains explicit output directories; binding configurations are not sources', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output', 'out dir']).output, 'out dir');
-  assert.equal(parseLasmArguments(['build', 'Main.lean', 'out']).output, 'out');
-  assert.equal(parseLasmArguments(['build', 'bindings.json', 'dist']).input, 'bindings.json');
+  assert.throws(() => parseLasmArguments(['build', 'bindings.json']), { message: 'Expected a Lean source file (Main.lean), not bindings.json' });
+  // No positional output: --output names it (0.7-2).
+  assert.throws(() => parseLasmArguments(['build', 'Main.lean', 'out']), { message: 'Unexpected argument "out": lasm build takes one Lean source. Name the output with --output.' });
 });
 
 test('build targets: node by default, or a function platform packaged after the build', () => {
@@ -35,24 +36,20 @@ test('build targets: node by default, or a function platform packaged after the 
     { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, profile: 'release', args: [] });
 });
 
-test('--output: the Node build for node and function targets, the deployable directory for platform targets (0.5.0)', () => {
-  // node and the function platforms: the Node build, default dist/ (lasm package reads it).
-  for (const target of ['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
-    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, 'dist', target);
-  // Platform targets: no default here; each target's writer uses its own directory
-  // in the project (workers/, wasi/, bin/, dist/ for the browser, …).
-  for (const target of platformBuildTargets) {
-    if (fixedLayoutTargets.includes(target)) continue;
+test('--output: the Node build for node, what is deployed for every other target (0.7-5)', () => {
+  // node: the Node build, default dist/ (lasm package reads it).
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', 'node']).output, 'dist');
+  // Every other target: no default here; each target's writer uses its own place
+  // in the project (lambda.zip, .vercel/output, workers/, wasi/, bin/, dist/ for the browser, …).
+  for (const target of buildTargets) {
+    if (target === 'node' || fixedLayoutTargets.includes(target)) continue;
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, undefined, target);
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'out']).output, 'out', target);
-    assert.equal(parseLasmArguments(['build', 'Main.lean', 'out', '--target', target]).output, 'out', target);
   }
-  assert.deepEqual(platformBuildTargets, [...edgeBuildTargets, ...wasiBuildTargets, 'browser']);
   // Vercel Edge and Netlify Edge: the platform fixes the layout, so --output is refused.
   for (const target of fixedLayoutTargets) {
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, undefined, target);
     assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'out']), /--output does not apply to --target .*fixes its layout/);
-    assert.throws(() => parseLasmArguments(['build', 'Main.lean', 'out', '--target', target]), /--output does not apply/);
   }
 });
 
@@ -63,7 +60,6 @@ test('profiles: lasm build is release, lasm run is dev; --dev and --release choo
   assert.equal(parseLasmArguments(['run', 'Main.lean', '--release']).profile, 'release');
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--dev']).profile, 'dev');
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--dev', '--release']), /Choose one of --dev and --release/);
-  assert.throws(() => parseLasmArguments(['build', 'bindings.json', '--dev']), /apply to Lean applications/);
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--target', 'lambda', '--allow-dev']).allowDev, true);
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--allow-dev']), /--allow-dev applies to/);
   assert.throws(() => parseLasmArguments(['Main.lean', '--allow-dev']), /--allow-dev applies to/);
@@ -83,14 +79,13 @@ for (const [args, error] of [
   [['build', 'Main.lean', '--target', 'pages'], /Unknown build target "pages"/],
   [['build', 'Main.lean', '--target'], /--target requires a value/],
   [['build', 'Main.lean', '--target', 'lambda', '--target=vercel'], /Specify --target only once/],
-  [['build', 'bindings.json', '--target', 'lambda'], /applies to Lean applications/],
   [['Main.lean', '--output', 'one', '--output', 'two'], /only once/],
   [['build', 'Main.lean', '--output'], /requires a value/],
   [['Main.lean', '--node-version', '26'], /Unknown Lasm option/],
   [['Main.lean', 'hello'], /after --/], [['Main.lean', '--output', 'dist'], /only with lasm build/],
   [['build', 'Main.lean', '--', 'hello'], /not lasm build/],
-  [['build', 'Main.lean', 'one', 'two'], /Unexpected positional/],
-  [['build', 'Main.lean', '--output', 'one', 'two'], /Unexpected positional/],
+  [['build', 'Main.lean', 'one', 'two'], /Unexpected argument "one": lasm build takes one Lean source/],
+  [['build', 'Main.lean', '--output', 'one', 'two'], /Unexpected argument "two": lasm build takes one Lean source/],
   [['run', 'config.json'], /Expected a Lean source/],
 ]) test(`invalid CLI input fails before compilation: ${JSON.stringify(args)}`, () => {
   assert.throws(() => parseLasmArguments(args), error);

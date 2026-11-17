@@ -38,11 +38,12 @@ structure DeployTarget where
   cli : Bool := false
   conflicts : List String := []
 
-def functionTemplates : List String := ["express", "hono", "fastify", "std-http", "fetch"]
+/-- The templates that publish a handler (`Export.lean`): the function platforms and the Lambda image call it. -/
+def functionTemplates : List String := ["hono", "fetch"]
 
 def deployTable : List DeployTarget := [
-  { name := "lambda", summary := "AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)", templates := functionTemplates },
-  { name := "lambda-zip", summary := "AWS Lambda .zip for nodejs24.x (npm run build:lambda)", templates := functionTemplates },
+  { name := "lambda", summary := "AWS Lambda .zip for nodejs24.x (npm run build:lambda)", templates := functionTemplates },
+  { name := "lambda-container", summary := "AWS Lambda container image (Dockerfile.lambda: Lambda's Node 24 image calling the default export)", templates := functionTemplates },
   { name := "lambda-edge", summary := "Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)", templates := functionTemplates },
   { name := "vercel", summary := "Vercel Function (vercel.json; Vercel runs the build)", templates := functionTemplates },
   { name := "netlify", summary := "Netlify Function (netlify.toml; Netlify runs the build)", templates := functionTemplates },
@@ -54,7 +55,7 @@ def deployTable : List DeployTarget := [
   { name := "deno-deploy", summary := "Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)", templates := ["hono", "fetch", "fullstack"] },
   { name := "supabase-edge", summary := "Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)", templates := ["hono"] },
   { name := "fastly", summary := "Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)", templates := ["fetch", "fullstack"] },
-  { name := "wasi", summary := "a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)", templates := ["fetch", "plain"], cli := true },
+  { name := "wasi", summary := "a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)", templates := ["plain"], cli := true },
   { name := "wasi-http", summary := "a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)", templates := ["fetch", "fullstack"] },
   { name := "spin", summary := "Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)", templates := ["fetch", "fullstack"] }]
 
@@ -71,8 +72,8 @@ def templateTable : List Template := [
   ⟨"fastify", "Fastify 5 with Lean route handlers (Lasm.JS)", true⟩,
   ⟨"std-http", "an HTTP server in pure Lean (Std.Http)", true⟩,
   ⟨"web", "a browser app in Lean (Lasm.UI): a counter", false⟩,
-  ⟨"fetch", "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces", true⟩,
-  ⟨"fullstack", "a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target", true⟩]
+  ⟨"fetch", "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces", true⟩,
+  ⟨"fullstack", "a full-stack Lean app: shared types and validation, a REST server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target", true⟩]
 
 def deployTargets : List String := deployTable.map (·.name)
 def templates : List String := templateTable.map (·.name)
@@ -88,7 +89,7 @@ The directory must be new or empty. The default template is plain.
 --deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
-" ++ "\n".intercalate (deployTable.map fun t => "  " ++ padEnd t.name 12 ++ " " ++ t.summary) ++ "
+" ++ "\n".intercalate (deployTable.map fun t => "  " ++ padEnd t.name 16 ++ " " ++ t.summary) ++ "
 
 Templates:
 " ++ "\n".intercalate (templateTable.map fun t => "  " ++ padEnd t.name 9 ++ " " ++ t.summary) ++ "
@@ -102,12 +103,13 @@ def templateOption (token : String) : Option (Option String) :=
   else if token.startsWith "-t=" then some (some (token.drop 3).toString)
   else none
 
-/-- The loop's state: the template, the deploy targets (each once, in order)
-and the positional words. -/
+/-- The loop's state: the template (and whether one was given), the deploy
+targets (each once, in order) and the positional words. -/
 structure InitState where
   template : String := "plain"
   deploy : List String := []
   positional : List String := []
+  templateGiven : Bool := false
 
 /-- The `for` loop: `.ok none` is the early `return { command: 'init-help' }`. -/
 def initLoop (st : InitState) : List String → Except String (Option InitState)
@@ -119,14 +121,18 @@ def initLoop (st : InitState) : List String → Except String (Option InitState)
         let next := takeValue inline rest
         have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
         match next.1 with
-        | some v => if v = "" ∨ v.startsWith "-" then .error ("--template requires a value\n\n" ++ initUsage) else initLoop { st with template := v } next.2
+        | some v =>
+          if v = "" ∨ v.startsWith "-" then .error ("--template requires a value\n\n" ++ initUsage)
+          else if st.templateGiven then .error "Specify --template only once"
+          else initLoop { st with template := v, templateGiven := true } next.2
         | none => .error ("--template requires a value\n\n" ++ initUsage)
       | none => match valuedOption "deploy" token with
         | some inline =>
           let next := takeValue inline rest
           have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
           let v := next.1.getD ""
-          if v ∉ deployTargets then .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ "\n\n" ++ initUsage)
+          if v ∉ deployTargets then
+            .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ (if v = "" then "" else targetHintAmong v deployTargets "--deploy") ++ "\n\n" ++ initUsage)
           else initLoop { st with deploy := if v ∈ st.deploy then st.deploy else st.deploy ++ [v] } next.2
         | none =>
           if token.startsWith "-" then .error ("Unknown lasm init option: " ++ token ++ "\n\n" ++ initUsage)
@@ -138,14 +144,19 @@ def templateList (names : List String) : String :=
   if names.length = 1 then "the " ++ names.headD "" ++ " template"
   else "the " ++ ", ".intercalate names.dropLast ++ " and " ++ names.getLastD "" ++ " templates"
 
+/-- The end of a refusal: the targets the template supports, or that it has none. -/
+def supportedText (template : String) (supported : List String) : String :=
+  if supported = [] then "The " ++ template ++ " template has no --deploy targets: it runs wherever its Dockerfile runs"
+  else "The " ++ template ++ " template supports --deploy " ++ ", ".intercalate supported
+
 /-- The `for (const target of result.deploy)` loop. -/
 def deployChecks (template : String) (deploy : List String) : List DeployTarget → Except String Unit
   | [] => .ok ()
   | t :: rest =>
     if template ∉ t.templates then
       let supported := (deployTable.filter fun d => template ∈ d.templates).map (·.name)
-      .error ("--deploy " ++ t.name ++ " supports " ++ templateList t.templates ++ ", not " ++ template ++ ". The " ++ template ++
-        " template supports --deploy " ++ ", ".intercalate supported)
+      .error ("--deploy " ++ t.name ++ " supports " ++ templateList t.templates ++ ", not " ++ template ++ ". " ++
+        supportedText template supported)
     else match t.conflicts.find? (· ∈ deploy) with
       | some other => .error ("--deploy " ++ t.name ++ " and --deploy " ++ other ++ " both configure the same platform; choose one")
       | none => deployChecks template deploy rest
@@ -154,7 +165,7 @@ def deployChecks (template : String) (deploy : List String) : List DeployTarget 
 def initFinish (st : InitState) : Except String Parsed :=
   if st.positional.length ≠ 1 then .error initUsage
   else match templateTable.find? (·.name == st.template) with
-    | none => .error ("Unknown template \"" ++ st.template ++ "\". Choose one of: " ++ ", ".intercalate templates)
+    | none => .error ("Unknown template \"" ++ st.template ++ "\"" ++ targetHintAmong st.template templates "--template" ++ ". Choose one of: " ++ ", ".intercalate templates)
     | some t =>
       let chosen := st.deploy.filterMap fun d => deployTable.find? (·.name == d)
       match chosen.find? (!·.cli) with

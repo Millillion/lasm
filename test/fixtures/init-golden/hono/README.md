@@ -33,8 +33,10 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program: routes and Lean request handlers. |
-| `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Main.lean` | The program on Node: the Hono app on `@hono/node-server`. |
+| `Routes.lean` | The Hono app: routes and Lean request handlers. |
+| `Export.lean` | The app as the program's default export (`exportDefault`), for Bun, Deno, the edge and the function platforms. |
+| `App.lean` | Pure Lean logic used by `Routes.lean`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
 | `package.json` | npm scripts, the npm packages Lean calls and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
@@ -43,12 +45,15 @@ Files:
 `Lasm.JS`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+`lakefile.toml` requires Lasm's library as a Lake package at `.lake/lasm-library`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (`npm run dev`, `npx lasm editor`); a plain
+`lake build` needs it.
 
 ## Bun and Deno
 
-The same `Main.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
+`Export.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
 runs single-threaded there, with no files, sockets or processes, and the Hono app is
-served with `Bun.serve` or `Deno.serve`:
+served as the module's default export, as `bun` and `deno serve` serve one:
 
 ```sh
 bun install && bun run dev:bun          # Lasm itself runs on Bun

@@ -8,7 +8,7 @@ sources:
   - https://github.com/Millillion/lasm/blob/main/README.md
   - https://github.com/Millillion/lasm/blob/main/docs/EDGE.md
   - https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md
-  - https://github.com/Millillion/lasm/blob/main/templates/fetch/Main.lean
+  - https://github.com/Millillion/lasm/blob/main/templates/fetch/Handler.lean
   - https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml
 aiGenerated: true
 ---
@@ -38,27 +38,30 @@ cd hello-workers
 
 - `--template fetch` picks a handler written in Lean on the web's own
   `Request` and `Response` (`Lasm.JS.Web`). The same handler serves Node,
-  Cloudflare Workers and the other edge platforms, Bun and Deno.
+  Cloudflare Workers and the other edge platforms, Bun, Deno and the function
+  platforms.
 - `--deploy workers` adds `wrangler.toml` and a `build:workers` script.
 
-This is `Main.lean`, the program:
+The handler is in `Handler.lean`:
 
 ```lean
 /-
-An HTTP handler in Lean on the web's own `Request` and `Response`
-(Lasm.JS.Web): the same Main.lean serves Bun, Deno, Cloudflare Workers and the
-other edge targets, and Node (through Lasm.Fetch's Node server, for now).
+The app's HTTP handler, on the web's own `Request` and `Response`
+(Lasm.JS.Web). Main.lean serves it on Node (`Node.serve`); Export.lean
+publishes it as the program's default export for Bun, Deno, Cloudflare Workers,
+the other edge targets and the function platforms.
   GET  /             {"message": "Hello from Lean!"}
   GET  /hello/NAME   {"message": "Hello, NAME, from Lean!"}
   POST /echo         the request body, with its content type
   GET  /health       {"ok": true}
-On Node it listens on $HOST (default 0.0.0.0) and $PORT (default 3000).
 -/
 import App
-import Lasm.JS.Web
-import Lasm.Fetch
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lean.Data.Json
 open Lasm.JS Lasm.JS.Web Lean
+
+namespace Handler
 
 /-- Decodes `%XX` escapes; text that is not valid UTF-8 afterwards is kept as it was. -/
 def percentDecode (s : String) : String := Id.run do
@@ -99,29 +102,47 @@ def handle (request : Request) : Async Response := do
   | "GET", ["health"] => json [("ok", true)]
   | _, _ => reply 404 "text/plain; charset=utf-8" "Not Found\n".toUTF8
 
-/-- Node: `handle` on Lasm.Fetch's Node server ($HOST:$PORT, SIGTERM closes it),
-until Lasm's own Node server (`Node.serve`) ships: the program's one use of
-Lasm.Fetch. Each request and response is converted to and from the web's own. -/
-def serveNode : IO Unit := Lasm.Fetch.serveNode fun req => do
-  let headers : HeadersInit := .sequence (req.headers.map fun (k, v) => #[k, v])
-  let body : Option BodyInit := if req.body.isEmpty then none else some (.bufferSource req.body)
-  let r ← handle (← Request.new (.usvString req.url) (some { method := some req.method, headers := some headers, body }))
-  return { status := (← r.status).toUInt16, headers := ← (← r.headers).entries, body := ← r.arrayBuffer }
-
-def main : IO Unit := do
-  -- Bun, Deno, Cloudflare Workers and the other edge targets serve the
-  -- program's default export (Workers' `export default {fetch}`).
-  if ← onEdge then
-    exportDefault (← Function.ofFn1 handle)
-  else serveNode
+end Handler
 ```
 
 `handle` takes the web's `Request` and returns a `Response`, the types
 `fetch` uses (their names and methods are the standards', so MDN documents
-them). It matches on the method and the path's segments. On Workers and the
-other edge platforms, `main` publishes it as the program's default export,
-which the platform calls for each request; on Node, `serveNode` runs it on a
-server listening on port 3000.
+them). It matches on the method and the path's segments.
+
+Two small programs serve it. `Main.lean` serves it on Node with `Node.serve`,
+a server Lasm provides, shaped like Bun's `Bun.serve`:
+
+```lean
+/-
+The app on Node: `Node.serve` (Lasm.JS.Node.Serve) serves the handler
+(Handler.lean) on $PORT (default 3000), on every IPv4 address, and stops
+cleanly on SIGTERM or SIGINT.
+-/
+import Handler
+import Lasm.JS.Node.Serve
+open Lasm.JS
+
+def main : IO Unit := Node.serve { fetch := Handler.handle }
+```
+
+`Export.lean` publishes it as the program's default export, as
+`export default` does in JavaScript. Cloudflare Workers, the other edge
+platforms, Bun and Deno call it for each request:
+
+```lean
+/-
+The app as the program's default export (`export default` in JavaScript):
+Bun, Deno, Cloudflare Workers, the other edge targets and the function
+platforms (Vercel, Netlify, AWS Lambda, Azure Functions, Google Cloud
+Functions) call the handler (Handler.lean) for every request. Their
+`build:<target>` scripts build this file.
+-/
+import Handler
+import Lasm.JS
+open Lasm.JS
+
+def main : IO Unit := exportDefault Handler.handle
+```
 
 The pure logic lives in `App.lean`. It has no JavaScript in it, so Lean can
 also check it natively:
@@ -186,7 +207,7 @@ Build the Worker:
 npm run build:workers
 ```
 
-This runs `lasm build Main.lean --target workers`, which writes `workers/`.
+This runs `lasm build Export.lean --target workers`, which writes `workers/`.
 That directory holds the Worker entry (`workers/worker.mjs`), the Lean program
 as `program.wasm`, and its host. `wrangler.toml` points at the entry.
 
@@ -214,7 +235,7 @@ curl http://localhost:8787/health
 {"ok":true}
 ```
 
-These are the same answers as on Node, from the same `Main.lean`.
+These are the same answers as on Node, from the same handler.
 
 CI runs this step with wrangler 4.152.0, the version Lasm's other workflows
 pin. It uses local workerd only, with no account and no deployment. To deploy,
@@ -225,7 +246,7 @@ test deployments; Cloudflare's wrangler documentation covers that step.
 
 - Add a route: add a case to `handle`, such as
   `| "GET", ["time"] => …`, and rebuild.
-- The same `Main.lean` builds for the other edge platforms with
+- The same `Export.lean` builds for the other edge platforms with
   `npm create @lasm@latest … -- --template fetch --deploy vercel-edge` (or
   `netlify-edge`, `deno-deploy`). `--deploy fastly`, `wasi-http` and `spin`
   add a program with the same routes on that platform's own interface

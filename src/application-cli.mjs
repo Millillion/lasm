@@ -125,12 +125,15 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   const source = resolve(input), projectDirectory = findApplicationProject(source) ?? dirname(source);
   const selection = await selectLeanVersion(source);
   const nodeRuntime = await applicationRuntime({ ...selection, commit: toolchainCatalog.lean[selection.version].commit });
-  // --output names the platform directory (src/cli-arguments.mjs
-  // platformBuildTargets); the Node build it relinks stays in its cache entry.
+  // --output names the platform directory (src/cli-arguments.mjs); the Node
+  // build it relinks stays in its cache entry.
   const { output, ...nodeOptions } = buildOptions;
   buildOptions = nodeOptions;
   // A dev build only links the Node program for its inputs: nobody runs its Node output.
   const linkOnly = buildOptions.profile === 'dev';
+  // The target's web APIs are checked by the build (src/web-availability.mjs); the binding check runs on Node:
+  // globals of the target runtime that Node lacks only warn.
+  buildOptions = { ...buildOptions, webTarget: target, bindingTarget: target };
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
   const found = await findEdgeProgram({ result, nodeRuntime, suspend });
   let program = found.cached;
@@ -218,10 +221,9 @@ export function assertSourceExists(input) {
 /** Shared by the primary CLI and the source-checkout launcher. */
 export async function runApplicationCli(argv) {
   const options = parseLasmArguments(argv);
-  const support = applicationSupport();
   if (options.command === 'version') { console.log(await versionText()); return 0; }
   if (options.command === 'help') {
-    console.log(support ? 'Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [--release] [-- arguments…]\n       lasm build Main.lean [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]\n       lasm init my-app [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--allow-dev]\n       lasm editor [project-directory]\n       lasm cache repair\n\nOptions: --rebuild, --verbose, --help, --version\n--output: the Node build for node and function targets (default dist/); the\ndeployable directory for edge, WASI and browser targets (default workers/,\nwasi/, dist/, …).\nProfiles: lasm build is release (optimized, reproducible, for deployment); --dev\nbuilds faster without size optimization. lasm Main.lean runs a dev build; --release\nruns a release build.\nlasm dev watches the sources, rebuilds and restarts the program after each change.\nlasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).' : cliUsage);
+    console.log(cliUsage);
     return 0;
   }
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
@@ -245,9 +247,6 @@ export async function runApplicationCli(argv) {
       return result.pending.length ? 1 : 0;
     } finally { progress.finish(); }
   }
-  // The retired lasm.json library pipeline (removed 2026-11-03, docs/DECISIONS.md).
-  if (options.input.endsWith('.json'))
-    throw new Error('This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.');
   const { buildApplicationWithProgress } = await import('./application-build-client.mjs');
   // After a good build of a Lake project: the Lean editor resolves Lasm.* (src/editor.mjs).
   const editor = async () => (await import('./editor.mjs')).autoSetupEditor(options.input);
@@ -277,13 +276,17 @@ export async function runApplicationCli(argv) {
     return runApplicationChild(runtimeExecutable, [...scriptPrefix(), join(output, 'main.mjs'), ...options.args],
       `Could not start ${target === 'bun' ? 'Bun' : 'Deno'} to run the application.`);
   }
-  const result = await buildApplicationWithProgress(options.input, buildOptions);
+  // A function platform: --output names the package; the Node build it is
+  // made from stays in its cache entry, as for every target but node.
+  // (The arguments always name a target: node by default under Node, src/cli-arguments.mjs.)
+  const functionPlatform = target !== 'node';
+  const { output, ...cachedOptions } = buildOptions;
+  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target });
   await editor();
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node${profileNote}: ${result.output}`);
-    // A function platform: package dist/ where `lasm package` writes it.
-    if (target && target !== 'node') return (await import('./package.mjs')).runPackage({ input: result.output, target, allowDev });
+    if (functionPlatform) return (await import('./package.mjs')).runPackage({ input: result.output, target, allowDev, ...(output === undefined ? {} : { output }) });
     return 0;
   }
   console.error('[lasm] Running ' + options.input + (result.profile === 'dev' ? ' (dev build)' : ' (release build)') + '…');

@@ -6,7 +6,7 @@ function on every route of an Azure Functions app (Node.js 22 or 24 on Linux).
 ```sh
 npx lasm init my-app --template hono --deploy azure   # adds @azure/functions to package.json
 cd my-app && npm install
-npm run build:azure                                   # lasm build --target azure: dist/ and azure-functions/
+npm run build:azure                                   # lasm build --target azure: azure-functions/
 cd azure-functions && func start                      # local, with Azure's own Core Tools
 func azure functionapp publish APP_NAME --no-build    # deploy, as built
 ```
@@ -35,7 +35,7 @@ starts the Lean server while the worker loads the app.
   reach the server as one header joined with `; `.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Azure
-account): for every server template, Azure Functions Core Tools 4.16.0 (npm
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), Azure Functions Core Tools 4.16.0 (npm
 `azure-functions-core-tools`) runs `func start` on the packaged app, and the
 templates' HTTP checks pass through the Functions host and the Node.js worker.
 Azure itself (plans, scaling, storage) is not emulated.

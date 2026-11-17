@@ -148,10 +148,15 @@ test('frames are batched on animation frames and subscriptions fire', async () =
   await new Promise(r => window.requestAnimationFrame(r));
   assert.equal(window.location.href, 'https://app.test/posts/3?x=1');
   assert.equal(frames, 2);
-  ui.module.storageSet('local', 'k', 'v');
-  assert.equal(ui.module.storageGet('local', 'k'), 'v');
-  ui.module.storageRemove('local', 'k');
-  assert.equal(ui.module.storageGet('local', 'k'), null);
+  // Lasm.UI.afterFrame: the callback runs after the next frame is applied, once.
+  const after = [];
+  ui.module.afterFrame(() => after.push(frames));
+  assert.deepEqual(after, []);
+  await new Promise(r => window.requestAnimationFrame(r));
+  await new Promise(r => window.requestAnimationFrame(r));
+  assert.deepEqual(after, [3]);
+  await new Promise(r => window.requestAnimationFrame(r));
+  assert.deepEqual(after, [3]);
   ui.unmount();
   await window.happyDOM.close();
 });

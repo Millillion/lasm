@@ -1,0 +1,150 @@
+{
+  "$comment": "Corrections to the compatibility data that scripts/bindings/web-availability.mjs reads, for `lasm build --target`'s check (docs/JS_BINDINGS.md, \"Availability per target\"). Each entry: the API's compatibility path (api.Window.navigator) or Lean name, the runtimes it corrects, `available`, why, a link (the upstream report, or Lasm's evidence), and its decision in docs/api/decisions/0.3.md.",
+  "overrides": [
+    {
+      "api": "api.Window.navigator",
+      "runtimes": [
+        "node",
+        "bun",
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "the global navigator: the data records it under api.Navigator for these runtimes (BCD: Node 21; runtime-compat: Bun, workerd), not under Window; js-web conformance reads navigator.userAgent on each",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.File.File",
+      "runtimes": [
+        "bun"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Bun 1.4.4 (Lasm's pinned Bun) constructs File; the data describes Bun 1.3.3",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.CompressionStream.CompressionStream",
+      "runtimes": [
+        "bun"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Bun 1.4.4 constructs CompressionStream (the data lists the interface on Bun but not its constructor)",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.DecompressionStream.DecompressionStream",
+      "runtimes": [
+        "bun"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Bun 1.4.4 constructs DecompressionStream (the data lists the interface on Bun but not its constructor)",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.MessageChannel.*",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "workerd has MessageChannel and its ports; js-web conformance posts a structured clone through one on workerd (the data lists the interface, not its constructor or members)",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.MessagePort.*",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "the ports of workerd's MessageChannel: js-web conformance posts, receives through onmessage and closes them on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.MessageEvent.*",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "the messages workerd's MessagePort delivers: js-web conformance reads their data, origin and ports on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.Performance.toJSON",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "js-web conformance calls performance.toJSON() on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.TransformStreamDefaultController.enqueue",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "workerd's TransformStream: js-web conformance enqueues through its controller on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.URLPattern.hasRegExpGroups",
+      "runtimes": [
+        "workerd"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "js-web conformance reads URLPattern.hasRegExpGroups on workerd",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "api.URLPattern.*",
+      "runtimes": [
+        "bun"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Bun 1.4.4 (Lasm's pinned Bun) has URLPattern; the data describes Bun 1.3.3. js-web conformance constructs one and calls test and exec and reads its components on Bun",
+      "link": "https://github.com/Millillion/lasm/blob/main/test/fixtures/js-web/Main.lean"
+    },
+    {
+      "api": "webassembly.api.CompileError.*",
+      "runtimes": [
+        "bun",
+        "workerd",
+        "edge-light",
+        "netlify"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "WebAssembly.CompileError (and its message and name, an Error's) is part of every engine's WebAssembly; runtime-compat lists no WebAssembly error classes",
+      "link": "https://webassembly.github.io/spec/js-api/#error-objects"
+    },
+    {
+      "api": "api.Response.Response",
+      "runtimes": [
+        "edge-light"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Vercel Edge constructs Response (the data lists the interface on edge-light but not its constructor); the fetch template answers with new Response on Vercel Edge",
+      "link": "https://github.com/Millillion/lasm/blob/main/templates/fetch/Handler.lean"
+    },
+    {
+      "api": "api.URL.URL",
+      "runtimes": [
+        "edge-light"
+      ],
+      "available": true,
+      "decision": "0.3-19",
+      "why": "Vercel Edge constructs URL (the data lists the interface on edge-light but not its constructor); the fetch template parses the request URL with new URL on Vercel Edge",
+      "link": "https://github.com/Millillion/lasm/blob/main/templates/fetch/Handler.lean"
+    }
+  ]
+}

@@ -18,13 +18,13 @@ structure Model where
 inductive Msg where
   | setDraft (s : String)
   | add
-  | added (r : Except Lasm.RPC.Error Todo)
+  | added (r : Except String Todo)
   | toggle (id : Nat)
-  | toggled (r : Except Lasm.RPC.Error Todo)
+  | toggled (r : Except String Todo)
   | delete (id : Nat)
-  | deleted (r : Except Lasm.RPC.Error TodoRef)
+  | deleted (id : Nat) (r : Except String Unit)
   | refresh
-  | loaded (r : Except Lasm.RPC.Error (Array Todo))
+  | loaded (r : Except String (Array Todo))
 
 def viewTodo (t : Todo) : Html Msg :=
   html! <li key={t.id} class={if t.done then "done" else ""}>

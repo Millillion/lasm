@@ -3,7 +3,7 @@
 // themselves are checked by .github/workflows/wasi.yml (scripts/wasi/wasi-ci.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { lowerAtomics, moduleImports } from '../src/wasi/lower-atomics.mjs';
@@ -105,20 +105,24 @@ test('fastly.toml', () => {
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
+test('lasm init --template fetch --deploy fastly|spin|workers', () => {
   const parent = mkdtempSync(join(tmpdir(), 'lasm-init-wasi-'));
   try {
-    const options = parseInitArguments([join(parent, 'app'), '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'wasi', '--deploy', 'spin', '--deploy', 'workers']);
+    const options = parseInitArguments([join(parent, 'app'), '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'spin', '--deploy', 'workers']);
     const result = initProject(options);
-    for (const file of ['fastly.toml', 'spin.toml', 'wrangler.toml', 'Main.lean', 'Fastly.lean', 'Cgi.lean', 'WasiHttp.lean']) assert.ok(result.files.includes(file), file);
+    for (const file of ['fastly.toml', 'spin.toml', 'wrangler.toml', 'Main.lean', 'Handler.lean', 'Export.lean', 'Fastly.lean', 'WasiHttp.lean']) assert.ok(result.files.includes(file), file);
     const pkg = JSON.parse(readFileSync(join(parent, 'app/package.json'), 'utf8'));
-    // Fastly, WASI (CGI) and wasi:http each have their own program; the other targets build Main.lean.
+    // Fastly and wasi:http each have their own program; Workers builds the default export (Export.lean).
     assert.equal(pkg.scripts['build:fastly'], 'lasm build Fastly.lean --target fastly');
-    assert.equal(pkg.scripts['build:wasi'], 'lasm build Cgi.lean --target wasi');
-    assert.equal(pkg.scripts['build:workers'], 'lasm build Main.lean --target workers');
+    assert.equal(pkg.scripts['build:wasi'], undefined);
+    assert.equal(pkg.scripts['build:workers'], 'lasm build Export.lean --target workers');
     assert.equal(pkg.scripts['start:spin'], 'spin up');
     assert.equal(pkg.dependencies, undefined);
-    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import Lasm\.JS\.Web/);
+    assert.match(readFileSync(join(parent, 'app/Handler.lean'), 'utf8'), /import Lasm\.JS\.Web/);
+    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /Node\.serve/);
+    assert.match(readFileSync(join(parent, 'app/Export.lean'), 'utf8'), /exportDefault Handler\.handle/);
+    // The WASI CGI server mode is gone: --deploy wasi is for command-line programs (plain).
+    assert.throws(() => parseInitArguments(['x', '--template', 'fetch', '--deploy', 'wasi']), /supports the plain template, not fetch/);
     assert.match(readFileSync(join(parent, 'app/Fastly.lean'), 'utf8'), /import Lasm\.Fastly/);
     assert.match(readFileSync(join(parent, 'app/WasiHttp.lean'), 'utf8'), /import Lasm\.WASI\.Http/);
     assert.match(readFileSync(join(parent, 'app/spin.toml'), 'utf8'), /source = "wasi-http\/main.wasm"/);
@@ -136,7 +140,9 @@ test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
   assert.ok(deployTargets.workers.templates.includes('fetch'));
 });
 
-test('Lasm.Fetch is part of Lasm\'s Lean library', () => {
+// It reads the real library: where library/ is absent (the init mutation module's sandbox, which this test does not
+// serve), it is skipped; every unit run has it.
+test('Lasm.Fetch is part of Lasm\'s Lean library', { skip: !existsSync(new URL('../library/Lasm/JS/Web/modules.json', import.meta.url)) && 'no library/ here' }, () => {
   assert.ok(libraryModules.includes('Lasm.Fetch'));
   assert.ok(libraryOutputs().includes('lib/lasm/c/Lasm/Fetch.c'));
   const directory = mkdtempSync(join(tmpdir(), 'lasm-fetch-import-'));

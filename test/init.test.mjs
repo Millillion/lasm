@@ -4,15 +4,17 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
-import { initProject, lakeName, packageName, supabaseFunctionNameOf, templates } from '../src/init.mjs';
+import { deployTargets, entryFile, initProject, lakeName, packageName, parseInitArguments, supabaseFunctionNameOf, templates } from '../src/init.mjs';
 
 test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', deploy: [], directory: 'my-app' });
   assert.deepEqual(parseLasmArguments(['init', 'my-app', '--template', 'hono']), { command: 'init', template: 'hono', deploy: [], directory: 'my-app' });
-  assert.deepEqual(parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), { command: 'init', template: 'std-http', deploy: ['lambda'], directory: 'x' });
+  assert.deepEqual(parseLasmArguments(['init', '-t=fetch', 'x', '--deploy', 'lambda']), { command: 'init', template: 'fetch', deploy: ['lambda'], directory: 'x' });
+  // The Lambda image calls a published handler: not for a template that brings its own server.
+  assert.throws(() => parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), /has no --deploy targets/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
-  assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
+  assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-container', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-container']);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-container, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono, fetch and fullstack templates, not express/);
@@ -40,8 +42,10 @@ test('every template creates a complete project', () => {
     for (const template of Object.keys(templates).filter(name => !templates[name].browser && !templates[name].fullstack)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
+      // The fetch and hono templates also have their handler and its default export (Export.lean).
+      const handler = templates[template].handler ? [`${templates[template].handler}.lean`, 'Export.lean'] : [];
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
-        'lakefile.toml', 'lean-toolchain', 'package.json']);
+        'lakefile.toml', 'lean-toolchain', 'package.json', ...handler].sort());
       const read = file => readFileSync(join(directory, file), 'utf8');
       assert.match(read('lean-toolchain'), /^leanprover\/lean4:v4\.\d+\.\d+\n$/);
       assert.match(read('lakefile.toml'), /root = "Main"/);
@@ -57,24 +61,26 @@ test('every template creates a complete project', () => {
       assert.match(dockerfile, /npx lasm build Main\.lean --output dist/);
       assert.equal(/PORT=8080/.test(dockerfile), templates[template].server);
       // Interop templates bind npm packages (import Lasm.JS); the fetch template uses Lasm.JS.Web only.
-      assert.equal(/^import Lasm\.JS$/m.test(read('Main.lean')), templates[template].interop);
+      assert.equal(/^import Lasm\.JS$/m.test(read(templates[template].handler ? `${templates[template].handler}.lean` : 'Main.lean')), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
-    assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda'] }).files.includes('Dockerfile.lambda'));
+    assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda-container'] }).files.includes('Dockerfile.lambda'));
     const recipe = readFileSync(join(lambda, 'Dockerfile.lambda'), 'utf8');
     assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
-    assert.match(recipe, /AWS_LWA_READINESS_CHECK_PATH=\/health/);
-    assert.match(recipe, /printf '#!\/bin\/sh\\nexec node "\$LAMBDA_TASK_ROOT\/main\.mjs"\\n'/);
+    // The handler on Lambda's own image: no Web Adapter, no server inside.
+    assert.match(recipe, /npx lasm build Export\.lean --target lambda/);
+    assert.match(recipe, /^CMD \["lasm-lambda\.handler"\]$/m);
+    assert.doesNotMatch(recipe, /lambda-adapter|AWS_LWA/);
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
-    // Function platforms: npm scripts that run lasm package, platform files and packages.
+    // Function platforms: npm scripts that build the default export (Export.lean) with lasm package, platform files and packages.
     const functions = join(root, 'functions');
-    const created = initProject({ directory: functions, template: 'std-http', deploy: ['lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
+    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
     for (const file of ['vercel.json', 'netlify.toml', 'public/.gitkeep']) assert.ok(created.includes(file), file);
     assert.ok(!created.includes('Dockerfile.lambda'));
     const pkg = JSON.parse(readFileSync(join(functions, 'package.json'), 'utf8'));
     for (const target of ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
-      assert.equal(pkg.scripts[`build:${target}`], `lasm build Main.lean --target ${target}`);
+      assert.equal(pkg.scripts[`build:${target}`], `lasm build Export.lean --target ${target}`);
     // Platform CLIs are the user's: never dependencies of a generated project.
     for (const cli of ['vercel', 'netlify-cli', 'aws-sam-cli', 'azure-functions-core-tools', '@google-cloud/functions-framework-cli'])
       assert.ok(!pkg.dependencies?.[cli] && !pkg.devDependencies?.[cli], cli);
@@ -91,14 +97,14 @@ test('every template creates a complete project', () => {
     for (const file of ['wrangler.toml', 'vercel.json', 'netlify.toml', 'public/lasm.txt']) assert.ok(edgeFiles.includes(file), file);
     const edgePkg = JSON.parse(readFileSync(join(edge, 'package.json'), 'utf8'));
     for (const target of ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
-      assert.equal(edgePkg.scripts[`build:${target}`], `lasm build Main.lean --target ${target}`);
+      assert.equal(edgePkg.scripts[`build:${target}`], `lasm build Export.lean --target ${target}`);
     assert.equal(edgePkg.scripts['start:deno'], 'deno run -A deno/main.mjs');
     assert.deepEqual(edgePkg.lasm, { edge: { exclude: ['@hono/node-server'] } });
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^deno\/$/m);
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /entrypoint to `deno\/main\.mjs`/);
     // Bun and Deno scripts (portable templates: plain and hono only).
     assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm dev Main.lean');
-    assert.equal(edgePkg.scripts['build:deno'], 'lasm build Main.lean --target deno');
+    assert.equal(edgePkg.scripts['build:deno'], 'lasm build Export.lean --target deno');
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);
     assert.equal(readFileSync(join(edge, '.gitignore'), 'utf8').match(/^deno\/$/gm).length, 1);
@@ -108,7 +114,7 @@ test('every template creates a complete project', () => {
     assert.ok(supabaseFiles.includes('supabase/config.toml'));
     const supabaseConfig = readFileSync(join(supabase, 'supabase/config.toml'), 'utf8');
     assert.match(supabaseConfig, /^\[functions\.supa-app\]\nverify_jwt = true\nimport_map = "\.\/functions\/supa-app\/deno\.json"$/m);
-    assert.equal(JSON.parse(readFileSync(join(supabase, 'package.json'), 'utf8')).scripts['build:supabase-edge'], 'lasm build Main.lean --target supabase-edge');
+    assert.equal(JSON.parse(readFileSync(join(supabase, 'package.json'), 'utf8')).scripts['build:supabase-edge'], 'lasm build Export.lean --target supabase-edge');
     assert.match(readFileSync(join(supabase, '.gitignore'), 'utf8'), /^supabase\/functions\/supa-app\/$/m);
     assert.match(readFileSync(join(supabase, 'README.md'), 'utf8'), /npx supabase functions deploy supa-app --project-ref PROJECT_REF/);
     assert.equal(supabaseFunctionNameOf('supa-app'), 'supa-app');
@@ -151,27 +157,107 @@ test('the fullstack template: shared, server and client modules; Node and Worker
   try {
     const directory = join(root, 'todos');
     const result = initProject({ directory, template: 'fullstack' });
-    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'README.md', 'Server.lean', 'Shared.lean', 'View.lean', 'lakefile.toml',
-      'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'Embed.lean', 'Export.lean', 'Http.lean', 'JsSite.lean', 'README.md', 'Server.lean',
+      'Shared.lean', 'Site.lean', 'View.lean', 'lakefile.toml', 'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
     const read = file => readFileSync(join(directory, file), 'utf8');
     const pkg = JSON.parse(read('package.json'));
     assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
     assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
     assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
     // A platform target writes its own directory (workers/); only the Node server goes to dist/server.
-    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers$/);
+    assert.match(pkg.scripts["build:workers"], /lasm build Export\.lean --target workers$/);
     assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
-    assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
-    assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
+    // Plain REST (no Lasm.RPC, no Lasm.Fetch): Node.serve on Node, fetch in the browser.
+    assert.match(read('Server.lean'), /Node\.serve \{ fetch := JsSite\.handle kv \}/);
+    assert.match(read('Export.lean'), /exportDefault \(JsSite\.handle kv\)/);
+    assert.match(read('Client.lean'), /Lasm\.JS\.Web\.fetch/);
+    for (const file of result.files.filter(f => f.endsWith('.lean'))) assert.doesNotMatch(read(file), /^import Lasm\.(RPC|Fetch)/m, file);
     assert.match(read('lakefile.toml'), /name = "Shared"/);
-    // Every Lasm.Fetch target: the browser app is embedded in the server program.
+    // Every other target: the browser app is embedded in the server program (Site.lean).
     const all = initProject({ directory: join(root, 'all'), template: 'fullstack', deploy: ['fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'spin'] });
-    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml'].every(f => all.files.includes(f)), all.files.join(' '));
+    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml', 'Fastly.lean', 'WasiHttp.lean'].every(f => all.files.includes(f)), all.files.join(' '));
     const scripts = JSON.parse(readFileSync(join(root, 'all', 'package.json'), 'utf8')).scripts;
-    for (const t of ['workers', 'bun', 'deno', 'fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
-      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t}`, t);
+    for (const t of ['workers', 'bun', 'deno', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
+      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Export.lean --target ${t}`, t);
+    assert.equal(scripts['build:fastly'], 'npm run build:client && lasm build Fastly.lean --target fastly');
+    assert.equal(scripts['build:wasi-http'], 'npm run build:client && lasm build WasiHttp.lean --target wasi-http');
     assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
-    assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
+    assert.match(read('Site.lean'), /embed_dir! "dist\/public"/);
     assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('templates that use Lasm\'s library require it as a Lake package and get .lake/ for its link (0.3-7); the others stay plain Lake projects', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-lake-'));
+  try {
+    for (const template of Object.keys(templates)) {
+      const { directory } = initProject({ directory: join(root, template), template });
+      const lakefile = readFileSync(join(directory, 'lakefile.toml'), 'utf8');
+      const uses = !!(templates[template].interop || templates[template].library || templates[template].fullstack || templates[template].browser);
+      assert.equal(/^\[\[require\]\]\nname = "lasm"\npath = "\.lake\/lasm-library"$/m.test(lakefile), uses, template);
+      assert.equal(existsSync(join(directory, '.lake')), uses, template);
+      assert.match(readFileSync(join(directory, '.gitignore'), 'utf8'), /^\.lake\/?$/m, template);
+      if (uses) assert.match(readFileSync(join(directory, 'README.md'), 'utf8'), /on a fresh clone, run any lasm command once/, template);
+    }
+    // A target several levels down: its directories are made, then .lake/ in it.
+    const nested = initProject({ directory: join(root, 'a', 'b', 'web'), template: 'web' }).directory;
+    assert.ok(existsSync(join(nested, '.lake')));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// The program each target builds (entryFile): Main.lean on Node, the default
+// export (Export.lean) for the templates that publish a handler, and the fetch
+// template's own programs for Fastly and wasi:http.
+test('entryFile: Main.lean on Node, Export.lean for the default export, Fastly.lean and WasiHttp.lean', () => {
+  for (const template of ['fetch', 'hono']) {
+    assert.equal(entryFile(template, 'node'), 'Main.lean', template);
+    assert.equal(entryFile(template, undefined), 'Main.lean', template);
+    for (const platform of ['bun', 'deno', 'workers', 'vercel-edge', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+      assert.equal(entryFile(template, platform), 'Export.lean', `${template} ${platform}`);
+  }
+  assert.equal(entryFile('fetch', 'fastly'), 'Fastly.lean');
+  assert.equal(entryFile('fetch', 'wasi-http'), 'WasiHttp.lean');
+  // Only the fetch template has its own Fastly and wasi:http programs.
+  assert.equal(entryFile('hono', 'fastly'), 'Export.lean');
+  assert.equal(entryFile('hono', 'wasi-http'), 'Export.lean');
+  // Templates without a handler module build Main.lean everywhere, as does an unknown name.
+  for (const template of ['plain', 'express', 'fastify', 'std-http', 'web', 'fullstack', 'koa'])
+    for (const platform of ['node', 'bun', 'deno', 'workers', 'lambda', 'fastly', 'wasi-http'])
+      assert.equal(entryFile(template, platform), 'Main.lean', `${template} ${platform}`);
+});
+
+// Which templates the function platforms take (API decisions 0.2-10, 0.2-11).
+test('the function platforms and the Lambda image take only the templates with a handler', () => {
+  const functionTargets = ['lambda', 'lambda-container', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'];
+  for (const target of functionTargets) {
+    assert.deepEqual(deployTargets[target].templates, ['hono', 'fetch'], target);
+    for (const template of ['hono', 'fetch'])
+      assert.deepEqual(parseInitArguments(['x', '-t', template, '--deploy', target]).deploy, [target], `${template} ${target}`);
+    for (const template of ['express', 'fastify', 'std-http'])
+      assert.throws(() => parseInitArguments(['x', '-t', template, '--deploy', target]),
+        { message: `--deploy ${target} supports the hono and fetch templates, not ${template}. The ${template} template has no --deploy targets: it runs wherever its Dockerfile runs` });
+  }
+  // express, fastify and std-http accept no --deploy target at all.
+  for (const template of ['express', 'fastify', 'std-http'])
+    for (const target of Object.keys(deployTargets))
+      assert.throws(() => parseInitArguments(['x', '-t', template, '--deploy', target]), /--deploy /, `${template} ${target}`);
+  // The container image is the handler on Lambda's own image (no Web Adapter).
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-lambda-'));
+  try {
+    for (const template of ['fetch', 'hono']) {
+      const app = join(root, template);
+      const files = initProject({ directory: app, template, deploy: ['lambda-container', 'lambda'] }).files;
+      assert.ok(files.includes('Dockerfile.lambda') && files.includes('Export.lean'), template);
+      const recipe = readFileSync(join(app, 'Dockerfile.lambda'), 'utf8');
+      assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
+      assert.match(recipe, /npx lasm build Export\.lean --target lambda/);
+      assert.match(recipe, /^CMD \["lasm-lambda\.handler"\]$/m);
+      assert.doesNotMatch(recipe, /adapter|AWS_LWA/i);
+      const pkg = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
+      assert.equal(pkg.scripts['build:lambda'], 'lasm build Export.lean --target lambda');
+      assert.equal(pkg.scripts.build, 'lasm build Main.lean');
+      assert.equal(pkg.scripts['build:bun'], 'bun x --bun lasm build Export.lean --target bun');
+      assert.match(readFileSync(join(app, 'lakefile.toml'), 'utf8'), new RegExp(`\\[\\[lean_lib\\]\\]\\nname = "${template === 'hono' ? 'Routes' : 'Handler'}"`));
+    }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

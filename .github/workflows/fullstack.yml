@@ -1,10 +1,10 @@
 name: Fullstack
-# The whole stack in Lean (docs/RPC.md): `lasm init --template fullstack`
+# The whole stack in Lean (the fullstack template): `lasm init --template fullstack`
 # built as a user builds it (scripts/fullstack/build-app.mjs: the Lasm.UI
 # browser app, and the Lasm.Fetch server for Node, Workers, Bun, Deno, Fastly
 # and wasi-http, each embedding the browser app), then tested end to end
 # (scripts/fullstack/fullstack-ci.mjs: server-side rendering, hydration, the
-# shared validation on both sides, the RPC endpoints) in headless Playwright
+# shared validation on both sides, the REST API) in headless Playwright
 # against every host, plus HTTP checks of the embedded assets and of Lasm.KV
 # persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
 # Workers under `wrangler dev` with a local KV namespace, Bun, Deno with Deno KV,

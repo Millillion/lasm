@@ -1,54 +1,17 @@
 /-
-A Hono app on Node (@hono/node-server) whose request handlers are Lean functions.
-  GET  /             {"message": "Hello from Lean on Hono!"}
-  GET  /hello/:name  {"message": "Hello, NAME, from Lean!"}
-  POST /echo         {"echo": <the JSON request body>}
-  GET  /health       {"ok": true}
-Listens on $HOST (default 0.0.0.0) and $PORT (default 3000). Built with
-`--target workers`, the same app runs on Cloudflare Workers.
+The Hono app (Routes.lean) on Node, with Hono's Node adapter
+(@hono/node-server). Listens on $HOST (default 0.0.0.0) and $PORT (default
+3000), and stops on SIGTERM or SIGINT.
 -/
-import App
+import Routes
 import Lasm.JS
 open Lasm.JS
 
-/-- `new Hono()` -/
-@[js "hono" "new Hono"] opaque newHono : IO Value
 /-- `serve(options, listening)` from @hono/node-server; returns the Node server. -/
 @[js "@hono/node-server" "serve"] opaque serve : Data → Value → IO Value
 
-/-- A Hono handler `(c) => Response` written in Lean. Handlers run in `Async`:
-awaiting JavaScript in them (`callMethodAwait`, an `Async` binding such as a
-database query) holds no Lean thread, so any number of requests can wait at
-once. `IO` actions work in `Async` unchanged. -/
-def handler (f : Value → Async Function.Reply) : IO Value :=
-  Function.ofFnReply fun args => do
-    let .ref c _ := args[0]! | throw (IO.userError "expected a Hono context")
-    f c
-
-/-- `c.json(body)`: the `Response` the handler returns, made by the host as the
-reply (one host round trip fewer than calling it from Lean). -/
-def json (c : Value) (body : Data) : Async Function.Reply :=
-  return .callMethod c "json" #[body]
-
 def main : IO Unit := do
-  let app ← newHono
-  let route (method path : String) (f : Value → Async Function.Reply) : IO Unit := do
-    let _ : Value ← app.callMethod method #[toJS path, toJS (← handler f)]
-  route "get" "/" fun c => json c (obj [("message", toJS "Hello from Lean on Hono!")])
-  route "get" "/hello/:name" fun c => do
-    let name ← (← c.get "req").callMethod "param" #[toJS "name"] String
-    json c (obj [("message", toJS (App.greet name))])
-  route "post" "/echo" fun c => do
-    let body ← (← c.get "req").callMethodAwait "json" #[] Data
-    json c (obj [("echo", body)])
-  route "get" "/health" fun c => json c (obj [("ok", toJS true)])
-
-  -- Cloudflare Workers (`lasm build Main.lean --target workers`):
-  -- the Worker serves the app; the platform owns the process.
-  if ← onEdge then
-    exportDefault app
-    return
-
+  let app ← Routes.app
   let host := (← IO.getEnv "HOST").getD "0.0.0.0"
   let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000
   let listening ← Function.ofFn fun _ => do

@@ -85,7 +85,9 @@ the final APIs; no hand-written binding remains where a generated one exists.
   [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) and the API items
   of REVIEW.md. Also inventories the API proposals in
   [Jordan's checklist](#jordans-checklist) (Ledger's, Folio's, Porter's and
-  Tandem's).
+  Tandem's). Listed on 2026-11-16 (74 entries, `0.1-1` to `0.7-22`, beside
+  A1–A56); `scripts/api/inventory.mjs` fails the unit job when a public
+  surface is missing. Awaiting Jordan's sign-off.
 - [ ] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
   `Lasm.JS.Node.Serve`, shaped like `Bun.serve`); function platforms call
   `exportDefault`, and the generated platform file calls the handler directly
@@ -107,7 +109,7 @@ the final APIs; no hand-written binding remains where a generated one exists.
   WebSockets, Bun's routes). **Deno is under deliberation, leaning yes**
   (Jordan, 2026-11-16: people use it now, and nobody knows what Cloudflare's
   acquisition will mean); A1–A3, A17, A18, A24, A25.
-- [ ] **0.5 Cloudflare, and the apps off hand-written bindings.**
+- [~] **0.5 Cloudflare, and the apps off hand-written bindings.**
   `Lasm.JS.Cloudflare` from Cloudflare's workers-types (KV, D1, R2, Durable
   Objects, env bindings; held PR #216); Porter and Ledger move off their
   hand-written D1 bindings, and Tandem's WebSocket client moves from
@@ -132,12 +134,18 @@ measured by CI on the [evidence page](content/learn/test-evidence.md).
 time on the evidence page, target equivalence covers Ledger, Porter and
 Tandem, the differential-fuzzing generator covers the remaining features of
 §2's "Next gap", and the performance baselines and their ratchet are in CI
-(1.6). Item 4, the streak of clean nightly campaigns, is
+(1.6), and pull requests run selective tests under the guardrails of 1.7.
+Item 4, the streak of clean nightly campaigns, is
 observed and reported only: it never blocks this stage or anything else
 (Jordan, 2026-11-16).
 
-- [ ] **1.1 Platforms (item 1).** Every platform at L2 or higher, and Node,
-  Workers and the browser at L3. The page of 2026-11-16 reads 6 of 13 at L2
+- [ ] **1.1 Platforms (item 1).** **Every** platform at L3 (Jordan, 2026-11-16;
+  it was L2 everywhere and L3 only for Node, Workers and the browser). For each
+  platform that means a flagship app passing its outside oracle, fuzzing and
+  deterministic simulation, all on that platform's own runtime, emulator or
+  base image in CI. Stage 2's backend then has per-platform oracles on every
+  platform. L3 is runtime evidence, not production evidence: no live
+  deployments (no real accounts). The page of 2026-11-16 reads 6 of 13 at L2
   and 0 of 3 at L3, mostly "no main-branch run has this job", which 0.8.0's
   release checks on `main` may already have changed: re-measure first.
 - [ ] **1.2 Propositions (item 7).** Every library candidate in
@@ -158,6 +166,22 @@ observed and reported only: it never blocks this stage or anything else
   CI per platform and on the five apps, on the evidence page, with a
   no-regression ratchet that every later stage must hold or record a trade-off
   against.
+- [ ] **1.7 Selective testing on pull requests** (Jordan, 2026-11-16). A pull
+  request runs only the tests its changes can affect (test impact analysis),
+  and mutation testing mutates only the changed modules (Stryker's incremental
+  mode), so a push costs a fraction of today's CI. Done when all of these hold:
+  - **A conservative map, checked in and tested:** each workflow and job
+    declares the paths that affect it; a change to the compiler, the library
+    or prebuilt, the toolchain and runtime pins, CI configuration or the
+    selection map itself runs everything; anything unmapped runs everything.
+  - **A full backstop:** every merge to `main` and every nightly runs the full
+    suite, so anything selection skipped is caught within hours and pinned to
+    its merge.
+  - **Releases never select:** `release-checks` keeps running the complete
+    matrix for the exact release commit.
+  - **Measured:** the evidence page reports CI time per pull request before
+    and after, and how often the backstop catches a failure selection
+    skipped. A catch is treated as a bug in the map and fixed there.
 - **Observed, not required:** the campaign streak (item 4). It broke on
   2026-11-14 with a `fuzz.yml` failure, to be looked into as a bug.
 

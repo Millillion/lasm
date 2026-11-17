@@ -1,9 +1,13 @@
 /-
 Lasm.JS.Node.Support: the definitions the generated Node bindings
 (library/Lasm/JS/Node/*.lean, scripts/bindings/generate-web.mjs) need beyond
-Lasm.JS.Web.Support: properties of Node modules, functions that take a final
+Lasm.JS.Web.Internal: properties of Node modules, functions that take a final
 `(err, value)` callback, and Buffer methods called on bytes. Hand-written; the
 mapping is in docs/JS_BINDINGS.md ("Lasm.JS.Node").
+
+Internal: not part of Lasm's API (docs/api/decisions/0.4.md 0.4-2). Programs call the
+generated functions, or `Lasm.JS`'s `require`, `Value.get` and `callMethod`;
+these helpers may change in any release.
 -/
 import Lasm.JS.Web.Support
 
@@ -31,19 +35,22 @@ def promisified (α : Type) [FromJS α] (module path : String) (args : Array Dat
     #[.ref f ""] (await := false)
   p.callAwait args α
 
+/-- `util.promisify(self[name].bind(self))(...args)`, awaited without holding a Lean
+thread: a method whose last parameter is a callback `(err, value)`
+(`server.getConnections`), as a promise of its value. -/
+def promisifiedMethod (α : Type) [FromJS α] (self : Value) (name : String) (args : Array Data) : Async α := do
+  let m ← self.get name Value
+  let f ← m.callMethod "bind" #[.ref self ""] Value
+  let p ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.Support.promisifiedMethod", module := "node:util", path := "promisify", construct := false, arity := 1 }
+    #[.ref f ""] (await := false)
+  p.callAwait args α
+
 /-- `require(module)[path].call(bytes, ...args)`, read as `α`: a method of a prototype
 called with a `Uint8Array` of `self` as `this` (the Node docs: "All methods on the
 Buffer prototype are callable with a Uint8Array instance"). -/
 def callOnBytes (module path : String) (self : ByteArray) (args : Array Data) (α : Type) [FromJS α] : IO α := do
   let f ← getExport module (path.splitOn ".") Value
   f.call args α (this := .bytes self)
-
-/-- `Object.entries(v)`, read as a record of `α`: a record result whose object is not plain
-(Node's `process.env`; Deno's is a Proxy, which `structuredClone` rejects). -/
-def recordOf (α : Type) [FromJS α] (v : Value) : IO (Lasm.JS.Web.Record α) := do
-  let entries ← Lasm.JS.Binding.invoke (Array (String × α)) { name := "Lasm.JS.Node.Support.recordOf", module := "globalThis", path := "Object.entries", construct := false, arity := 1 }
-    #[.ref v ""] (await := false)
-  return ⟨entries⟩
 
 end Support
 end Lasm.JS.Node

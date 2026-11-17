@@ -112,6 +112,23 @@ VS Code extension; without elan, `lasm` prints how to get it. `LASM_EDITOR=0`
 stops `lasm init`, `lasm dev` and `lasm build` from doing this automatically (they never do it
 on CI).
 
+Most of `Lasm.JS.Web`, `Lasm.JS.Node` and the other generated bindings ship as
+source and are compiled the first time a program imports them. In the editor,
+Lake builds them: the project's `lakefile.toml` requires Lasm's library as a
+Lake package (`lasm init` writes this in the templates that use it, `lasm editor` adds it to an existing
+project):
+
+```toml
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"
+```
+
+`.lake/lasm-library` is a link that every lasm command (`lasm init`, `lasm dev`,
+`lasm build`, `lasm editor`) makes or repairs; `.lake/` is not in git. **On a
+fresh clone, run any lasm command once** (`npm run dev`, `npx lasm editor`): a
+plain `lake build` needs the link.
+
 ## 3. Call an npm package from Lean
 
 Add [marked](https://www.npmjs.com/package/marked), a Markdown renderer:
@@ -231,7 +248,7 @@ on the architecture you deploy to; for amd64-only platforms on an ARM Mac, use
 
 Recipes for each launch platform: [deployment guides](deploy/README.md)
 (Docker and Kubernetes, Google Cloud Run, Fly.io, Railway, Render, Heroku, and
-AWS Lambda as a container image: create the project with `--deploy lambda` to
+AWS Lambda as a container image: create the project with `--deploy lambda-container` to
 get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 
 ## 5. Build for a function platform
@@ -240,13 +257,13 @@ get a `Dockerfile.lambda`, see [lambda.md](deploy/lambda.md)).
 (the default target, `node`, writes only `dist/`):
 
 ```sh
-npx lasm build Main.lean --target lambda       # dist/ and lambda.zip (handler lasm-lambda.handler)
-npx lasm build Main.lean --target vercel       # dist/ and .vercel/output
-npx lasm build Main.lean --target netlify      # dist/ and netlify/functions/lasm
+npx lasm build Main.lean --target lambda       # lambda.zip (handler lasm-lambda.handler)
+npx lasm build Main.lean --target vercel       # .vercel/output
+npx lasm build Main.lean --target netlify      # netlify/functions/lasm
 ```
 
 The other targets are `lambda-edge`, `azure` and `gcf`. `lasm init my-app
---template hono --deploy lambda-zip` (or `vercel`, `netlify`, `lambda-edge`,
+--template hono --deploy lambda` (or `vercel`, `netlify`, `lambda-edge`,
 `azure`, `gcf`) adds the platform files and a `npm run build:<target>` script.
 Lasm builds for the platform; it never installs or starts the platform's own
 tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
@@ -276,7 +293,7 @@ trips). Details: [Std.Http performance](SERVER_MVP.md#launch-position-2026-10-23
 | An HTTP handler in pure Lean for Node, the edge, Fastly, WASI and Spin (**0.3.0**) | `--template fetch` | [FETCH.md](FETCH.md) |
 | An edge function (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase) | `--template hono --deploy workers` (or another edge target) | [EDGE.md](EDGE.md), [deploy/](deploy/README.md) |
 | A browser app (**0.3.0**) | `--template web` | [UI.md](UI.md), [BROWSER.md](BROWSER.md) |
-| A full-stack app with a verified API (**0.3.0**) | `--template fullstack` | [RPC.md](RPC.md) |
+| A full-stack app with a verified API (**0.3.0**) | `--template fullstack` | [templates/fullstack](../templates/fullstack) |
 | Bun or Deno | `bun create @lasm my-app --template hono` | [BUN_DENO.md](BUN_DENO.md) |
 
 All documentation: [docs/README.md](README.md).

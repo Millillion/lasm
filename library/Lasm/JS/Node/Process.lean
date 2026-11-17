@@ -8,27 +8,33 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Web.MediacaptureStreams
+import Lasm.JS.Node.Events
+import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.Net
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
-/-- `(long long or DOMString)`: one constructor per member type. -/
-inductive LongLongOrDOMString where
-  /-- `long long` -/
-  | longLong (value : Int)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS LongLongOrDOMString := ⟨fun
-  | .longLong v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe Int LongLongOrDOMString := ⟨.longLong⟩
-instance : Coe String LongLongOrDOMString := ⟨.domString⟩
-instance : FromJS LongLongOrDOMString where
-  fromJS
-    | d@(.number _) => (FromJS.fromJS d : Except String Int).map .longLong
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | _ => .error ""
-  typeName := "Lasm.JS.Node.LongLongOrDOMString"
+/-- `dictionary process.EmitWarningOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure process.EmitWarningOptions where
+  /-- `DOMString type = "Warning"` -/
+  type : Option String := none
+  /-- `DOMString code` -/
+  code : Option String := none
+  /-- `Function ctor` -/
+  ctor : Option JSFunction := none
+  /-- `DOMString detail` -/
+  detail : Option String := none
+instance instToJSProcessEmitWarningOptions : ToJS process.EmitWarningOptions := ⟨fun d => Internal.fields #[("type", Internal.optional d.type),
+    ("code", Internal.optional d.code),
+    ("ctor", Internal.optional d.ctor),
+    ("detail", Internal.optional d.detail)]⟩
 
 /-- `(DOMString or double)`: one constructor per member type. -/
 inductive DOMStringOrDouble where
@@ -42,74 +48,495 @@ instance : ToJS DOMStringOrDouble := ⟨fun
 instance : Coe String DOMStringOrDouble := ⟨.domString⟩
 instance : Coe Float DOMStringOrDouble := ⟨.double⟩
 
+/-- `(DOMString or URL or Uint8Array)`: one constructor per member type. -/
+inductive DOMStringOrURLOrUint8Array where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `URL` -/
+  | url (value : URL)
+  /-- `Uint8Array` -/
+  | uint8Array (value : ByteArray)
+instance : ToJS DOMStringOrURLOrUint8Array := ⟨fun
+  | .domString v => toJS v
+  | .url v => toJS v
+  | .uint8Array v => toJS v⟩
+instance : Coe String DOMStringOrURLOrUint8Array := ⟨.domString⟩
+instance : Coe URL DOMStringOrURLOrUint8Array := ⟨.url⟩
+instance : Coe ByteArray DOMStringOrURLOrUint8Array := ⟨.uint8Array⟩
+
+/-- `(net.Server or net.Socket)`: one constructor per member type. -/
+inductive net.ServerOrSocket where
+  /-- `net.Server` -/
+  | server (value : net.Server)
+  /-- `net.Socket` -/
+  | socket (value : net.Socket)
+instance instToJSNetServerOrSocket : ToJS net.ServerOrSocket := ⟨fun
+  | .server v => toJS v
+  | .socket v => toJS v⟩
+instance instCoeNetServerNetServerOrSocket : Coe net.Server net.ServerOrSocket := ⟨.server⟩
+instance instCoeNetSocketNetServerOrSocket : Coe net.Socket net.ServerOrSocket := ⟨.socket⟩
+
+/-- `dictionary process.SendOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure process.SendOptions where
+  /-- `boolean keepOpen = false` -/
+  keepOpen : Option Bool := none
+instance instToJSProcessSendOptions : ToJS process.SendOptions := ⟨fun d => Internal.fields #[("keepOpen", Internal.optional d.keepOpen)]⟩
+
+/-- `(DOMString or long long)`: one constructor per member type. -/
+inductive DOMStringOrLongLong where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `long long` -/
+  | longLong (value : Int)
+instance : ToJS DOMStringOrLongLong := ⟨fun
+  | .domString v => toJS v
+  | .longLong v => toJS v⟩
+instance : Coe String DOMStringOrLongLong := ⟨.domString⟩
+instance : Coe Int DOMStringOrLongLong := ⟨.longLong⟩
+
+/-- `(object or Function)`: one constructor per member type. -/
+inductive ObjectOrJSFunction where
+  /-- `object` -/
+  | object (value : Data)
+  /-- `Function` -/
+  | jsFunction (value : JSFunction)
+instance : ToJS ObjectOrJSFunction := ⟨fun
+  | .object v => toJS v
+  | .jsFunction v => toJS v⟩
+instance : Coe JSFunction ObjectOrJSFunction := ⟨.jsFunction⟩
+
+/-- `process.allowedNodeEnvironmentFlags` (added in Node.js v10.10.0): `readonly attribute object allowedNodeEnvironmentFlags` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.allowedNodeEnvironmentFlags : IO Data := Internal.api "Lasm.JS.Node.process.allowedNodeEnvironmentFlags" do
+  Support.getExport "node:process" ["allowedNodeEnvironmentFlags"] Data
+
 /-- `process.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
-def process.arch : IO String := Support.getExport "node:process" ["arch"] String
+@[macro_inline] def process.arch : IO String := Internal.api "Lasm.JS.Node.process.arch" do
+  Support.getExport "node:process" ["arch"] String
 
 /-- `process.argv` (added in Node.js v0.1.27): `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
-def process.argv : IO (Array String) := Support.getExport "node:process" ["argv"] (Array String)
+@[macro_inline] def process.argv : IO (Array String) := Internal.api "Lasm.JS.Node.process.argv" do
+  Support.getExport "node:process" ["argv"] (Array String)
+
+/-- `process.argv0` (added in Node.js v6.4.0): `readonly attribute DOMString argv0` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.argv0 : IO String := Internal.api "Lasm.JS.Node.process.argv0" do
+  Support.getExport "node:process" ["argv0"] String
+
+/-- `process.channel` (added in Node.js v7.1.0): `readonly attribute object channel` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.channel : IO Data := Internal.api "Lasm.JS.Node.process.channel" do
+  Support.getExport "node:process" ["channel"] Data
+
+/-- `process.config` (added in Node.js v0.7.7): `readonly attribute object config` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.config : IO Data := Internal.api "Lasm.JS.Node.process.config" do
+  Support.getExport "node:process" ["config"] Data
+
+/-- `process.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.connected : IO Bool := Internal.api "Lasm.JS.Node.process.connected" do
+  Support.getExport "node:process" ["connected"] Bool
+
+/-- `process.debugPort` (added in Node.js v0.7.2): `readonly attribute double debugPort` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.debugPort : IO Float := Internal.api "Lasm.JS.Node.process.debugPort" do
+  Support.getExport "node:process" ["debugPort"] Float
 
 /-- `process.env` (added in Node.js v0.1.27): `readonly attribute record<DOMString, DOMString> env` (Node.js 24.22.2 documentation, process.md) -/
-def process.env : IO (Record String) := do
+@[macro_inline] def process.env : IO (Record String) := Internal.api "Lasm.JS.Node.process.env" do
   let r ← Support.getExport "node:process" ["env"] Value
-  Support.recordOf String r
+  Internal.recordOf String r
 
 /-- `process.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
-def process.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
+@[macro_inline] def process.execArgv : IO (Array String) := Internal.api "Lasm.JS.Node.process.execArgv" do
+  Support.getExport "node:process" ["execArgv"] (Array String)
 
 /-- `process.execPath` (added in Node.js v0.1.100): `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
-def process.execPath : IO String := Support.getExport "node:process" ["execPath"] String
+@[macro_inline] def process.execPath : IO String := Internal.api "Lasm.JS.Node.process.execPath" do
+  Support.getExport "node:process" ["execPath"] String
 
 /-- `process.exitCode` (added in Node.js v0.11.8): `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
-def process.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
+@[macro_inline] def process.exitCode : IO (Option LongLongOrDOMString) := Internal.api "Lasm.JS.Node.process.exitCode" do
+  Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.mainModule` (added in Node.js v0.1.17): `readonly attribute object mainModule` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.mainModule : IO Data := Internal.api "Lasm.JS.Node.process.mainModule" do
+  Support.getExport "node:process" ["mainModule"] Data
+
+/-- `process.noDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean noDeprecation` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.noDeprecation : IO Bool := Internal.api "Lasm.JS.Node.process.noDeprecation" do
+  Support.getExport "node:process" ["noDeprecation"] Bool
+
+/-- `process.permission` (added in Node.js v20.0.0): `readonly attribute object permission` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.permission : IO Data := Internal.api "Lasm.JS.Node.process.permission" do
+  Support.getExport "node:process" ["permission"] Data
 
 /-- `process.pid` (added in Node.js v0.1.15): `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
-def process.pid : IO Int := Support.getExport "node:process" ["pid"] Int
+@[macro_inline] def process.pid : IO Int := Internal.api "Lasm.JS.Node.process.pid" do
+  Support.getExport "node:process" ["pid"] Int
 
 /-- `process.platform` (added in Node.js v0.1.16): `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
-def process.platform : IO String := Support.getExport "node:process" ["platform"] String
+@[macro_inline] def process.platform : IO String := Internal.api "Lasm.JS.Node.process.platform" do
+  Support.getExport "node:process" ["platform"] String
 
 /-- `process.ppid` (added in Node.js v9.2.0, v8.10.0, v6.13.0): `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
-def process.ppid : IO Int := Support.getExport "node:process" ["ppid"] Int
+@[macro_inline] def process.ppid : IO Int := Internal.api "Lasm.JS.Node.process.ppid" do
+  Support.getExport "node:process" ["ppid"] Int
+
+/-- `process.release` (added in Node.js v3.0.0): `readonly attribute object release` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.release : IO Data := Internal.api "Lasm.JS.Node.process.release" do
+  Support.getExport "node:process" ["release"] Data
+
+/-- `process.report` (added in Node.js v11.8.0): `readonly attribute object report` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.report : IO Data := Internal.api "Lasm.JS.Node.process.report" do
+  Support.getExport "node:process" ["report"] Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.sourceMapsEnabled` (added in Node.js v20.7.0, v18.19.0): `readonly attribute boolean sourceMapsEnabled` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.sourceMapsEnabled : IO Bool := Internal.api "Lasm.JS.Node.process.sourceMapsEnabled" do
+  Support.getExport "node:process" ["sourceMapsEnabled"] Bool
+
+/-- `process.stderr`: `readonly attribute EventEmitter stderr` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.stderr : IO EventEmitter := Internal.api "Lasm.JS.Node.process.stderr" do
+  let r ← Support.getExport "node:process" ["stderr"] Value
+  pure { val := r }
+
+/-- `process.stdin`: `readonly attribute EventEmitter stdin` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.stdin : IO EventEmitter := Internal.api "Lasm.JS.Node.process.stdin" do
+  let r ← Support.getExport "node:process" ["stdin"] Value
+  pure { val := r }
+
+/-- `process.stdout`: `readonly attribute EventEmitter stdout` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.stdout : IO EventEmitter := Internal.api "Lasm.JS.Node.process.stdout" do
+  let r ← Support.getExport "node:process" ["stdout"] Value
+  pure { val := r }
+
+/-- `process.throwDeprecation` (added in Node.js v0.9.12): `readonly attribute boolean throwDeprecation` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.throwDeprecation : IO Bool := Internal.api "Lasm.JS.Node.process.throwDeprecation" do
+  Support.getExport "node:process" ["throwDeprecation"] Bool
 
 /-- `process.title` (added in Node.js v0.1.104): `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
-def process.title : IO String := Support.getExport "node:process" ["title"] String
+@[macro_inline] def process.title : IO String := Internal.api "Lasm.JS.Node.process.title" do
+  Support.getExport "node:process" ["title"] String
+
+/-- `process.traceDeprecation` (added in Node.js v0.8.0): `readonly attribute boolean traceDeprecation` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.traceDeprecation : IO Bool := Internal.api "Lasm.JS.Node.process.traceDeprecation" do
+  Support.getExport "node:process" ["traceDeprecation"] Bool
+
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `process.traceProcessWarnings` (added in Node.js v6.10.0): `readonly attribute boolean traceProcessWarnings` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.traceProcessWarnings : IO Bool := Internal.api "Lasm.JS.Node.process.traceProcessWarnings" do
+  Support.getExport "node:process" ["traceProcessWarnings"] Bool
 
 /-- `process.version` (added in Node.js v0.1.3): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
-def process.version : IO String := Support.getExport "node:process" ["version"] String
+@[macro_inline] def process.version : IO String := Internal.api "Lasm.JS.Node.process.version" do
+  Support.getExport "node:process" ["version"] String
 
 /-- `process.versions` (added in Node.js v0.2.0): `readonly attribute record<DOMString, DOMString> versions` (Node.js 24.22.2 documentation, process.md) -/
-def process.versions : IO (Record String) := do
+@[macro_inline] def process.versions : IO (Record String) := Internal.api "Lasm.JS.Node.process.versions" do
   let r ← Support.getExport "node:process" ["versions"] Value
-  Support.recordOf String r
+  Internal.recordOf String r
+
+/-- `process.abort()` (added in Node.js v0.7.0): `undefined abort()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.abort : IO Unit := Internal.api "Lasm.JS.Node.process.abort" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.abort", module := "node:process", path := "abort", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.availableMemory()` (added in Node.js v22.0.0, v20.13.0): `double availableMemory()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.availableMemory : IO Float := Internal.api "Lasm.JS.Node.process.availableMemory" do
+  Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.process.availableMemory", module := "node:process", path := "availableMemory", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
 
 /-- `process.chdir(directory)` (added in Node.js v0.1.17): `undefined chdir(DOMString directory)` (Node.js 24.22.2 documentation, process.md) -/
-def process.chdir (directory : String) : IO Unit :=
+@[macro_inline] def process.chdir (directory : String) : IO Unit := Internal.api "Lasm.JS.Node.process.chdir" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.chdir", module := "node:process", path := "chdir", construct := false, arity := 1 }
-    (Support.args #[toJS directory]) (await := false)
+    (Internal.args #[toJS directory]) (await := false)
+
+/-- `process.constrainedMemory()` (added in Node.js v19.6.0, v18.15.0): `double constrainedMemory()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.constrainedMemory : IO Float := Internal.api "Lasm.JS.Node.process.constrainedMemory" do
+  Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.process.constrainedMemory", module := "node:process", path := "constrainedMemory", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.cpuUsage([previousValue])` (added in Node.js v6.1.0): `object cpuUsage(optional object previousValue)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.cpuUsage (previousValue : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.process.cpuUsage" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.cpuUsage", module := "node:process", path := "cpuUsage", construct := false, arity := 1 }
+    (Internal.args #[previousValue]) (await := false)
 
 /-- `process.cwd()` (added in Node.js v0.1.8): `DOMString cwd()` (Node.js 24.22.2 documentation, process.md) -/
-def process.cwd : IO String :=
+@[macro_inline] def process.cwd : IO String := Internal.api "Lasm.JS.Node.process.cwd" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.process.cwd", module := "node:process", path := "cwd", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
+
+/-- `process.disconnect()` (added in Node.js v0.7.2): `undefined disconnect()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.disconnect : IO Unit := Internal.api "Lasm.JS.Node.process.disconnect" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.disconnect", module := "node:process", path := "disconnect", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.dlopen(module, filename[, flags])` (added in Node.js v0.1.16): `undefined dlopen(object module, DOMString filename, optional object flags)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.dlopen (module_ : Data) (filename : String) (flags : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.process.dlopen" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.dlopen", module := "node:process", path := "dlopen", construct := false, arity := 3 }
+    (Internal.args #[toJS module_, toJS filename, flags]) (await := false)
+
+/-- `process.emitWarning(warning[, options])` (added in Node.js v8.0.0): `undefined emitWarning(any warning, optional process.EmitWarningOptions options)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.emitWarning (warning : Data) (options : Option process.EmitWarningOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.process.emitWarning" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.emitWarning", module := "node:process", path := "emitWarning", construct := false, arity := 2 }
+    (Internal.args #[toJS warning, Internal.optional options]) (await := false)
+
+/-- `process.emitWarning(warning[, type[, code]][, ctor])` (added in Node.js v6.0.0): `undefined emitWarning(any warning, optional DOMString type, optional DOMString code, optional Function ctor)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.emitWarningWithType (warning : Data) (type : Option String := none) (code : Option String := none) (ctor : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.process.emitWarningWithType" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.emitWarningWithType", module := "node:process", path := "emitWarning", construct := false, arity := 4 }
+    (Internal.args #[toJS warning, Internal.optional type, Internal.optional code, Internal.optional ctor]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.execve(file[, args[, env]])` (added in Node.js v23.11.0, v22.15.0): `undefined execve(DOMString file, optional sequence<DOMString> args, optional object env)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.execve (file : String) (args : Option (Array String) := none) (env : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.process.execve" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.execve", module := "node:process", path := "execve", construct := false, arity := 3 }
+    (Internal.args #[toJS file, Internal.optional args, env]) (await := false)
 
 /-- `process.exit([code])` (added in Node.js v0.1.13): `undefined exit(optional (long long or DOMString) code)` (Node.js 24.22.2 documentation, process.md) -/
-def process.exit (code : Option LongLongOrDOMString := none) : IO Unit :=
+@[macro_inline] def process.exit (code : Option LongLongOrDOMString := none) : IO Unit := Internal.api "Lasm.JS.Node.process.exit" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.exit", module := "node:process", path := "exit", construct := false, arity := 1 }
-    (Support.args #[Support.optional code]) (await := false)
+    (Internal.args #[Internal.optional code]) (await := false)
 
-/-- `process.kill(pid[, signal])` (added in Node.js v0.0.6): `undefined kill(double pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
-def process.kill (pid : Float) (signal : Option DOMStringOrDouble := none) : IO Unit :=
+/-- `process.getActiveResourcesInfo()` (added in Node.js v17.3.0, v16.14.0): `sequence<DOMString> getActiveResourcesInfo()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getActiveResourcesInfo : IO (Array String) := Internal.api "Lasm.JS.Node.process.getActiveResourcesInfo" do
+  Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.process.getActiveResourcesInfo", module := "node:process", path := "getActiveResourcesInfo", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.getBuiltinModule(id)` (added in Node.js v22.3.0, v20.16.0): `object? getBuiltinModule(DOMString id)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getBuiltinModule (id : String) : IO (Option Data) := Internal.api "Lasm.JS.Node.process.getBuiltinModule" do
+  Lasm.JS.Binding.invoke (Option Data) { name := "Lasm.JS.Node.process.getBuiltinModule", module := "node:process", path := "getBuiltinModule", construct := false, arity := 1 }
+    (Internal.args #[toJS id]) (await := false)
+
+/-- `process.getegid()` (added in Node.js v2.0.0): `undefined getegid()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getegid : IO Unit := Internal.api "Lasm.JS.Node.process.getegid" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.getegid", module := "node:process", path := "getegid", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.geteuid()` (added in Node.js v2.0.0): `object geteuid()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.geteuid : IO Data := Internal.api "Lasm.JS.Node.process.geteuid" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.geteuid", module := "node:process", path := "geteuid", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.getgid()` (added in Node.js v0.1.31): `object getgid()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getgid : IO Data := Internal.api "Lasm.JS.Node.process.getgid" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.getgid", module := "node:process", path := "getgid", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.getgroups()` (added in Node.js v0.9.4): `sequence<long long> getgroups()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getgroups : IO (Array Int) := Internal.api "Lasm.JS.Node.process.getgroups" do
+  Lasm.JS.Binding.invoke (Array Int) { name := "Lasm.JS.Node.process.getgroups", module := "node:process", path := "getgroups", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.getuid()` (added in Node.js v0.1.28): `long long getuid()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.getuid : IO Int := Internal.api "Lasm.JS.Node.process.getuid" do
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.getuid", module := "node:process", path := "getuid", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.hasUncaughtExceptionCaptureCallback()` (added in Node.js v9.3.0): `boolean hasUncaughtExceptionCaptureCallback()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.hasUncaughtExceptionCaptureCallback : IO Bool := Internal.api "Lasm.JS.Node.process.hasUncaughtExceptionCaptureCallback" do
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.process.hasUncaughtExceptionCaptureCallback", module := "node:process", path := "hasUncaughtExceptionCaptureCallback", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- **Legacy** in the Node.js 24.22.2 docs. `process.hrtime([time])` (added in Node.js v0.7.6): `sequence<long long> hrtime(optional sequence<long long> time)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.hrtime (time : Option (Array Int) := none) : IO (Array Int) := Internal.api "Lasm.JS.Node.process.hrtime" do
+  Lasm.JS.Binding.invoke (Array Int) { name := "Lasm.JS.Node.process.hrtime", module := "node:process", path := "hrtime", construct := false, arity := 1 }
+    (Internal.args #[Internal.optional time]) (await := false)
+
+/-- `process.initgroups(user, extraGroup)` (added in Node.js v0.9.4): `undefined initgroups((DOMString or double) user, (DOMString or double) extraGroup)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.initgroups (user : DOMStringOrDouble) (extraGroup : DOMStringOrDouble) : IO Unit := Internal.api "Lasm.JS.Node.process.initgroups" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.initgroups", module := "node:process", path := "initgroups", construct := false, arity := 2 }
+    (Internal.args #[toJS user, toJS extraGroup]) (await := false)
+
+/-- `process.kill(pid[, signal])` (added in Node.js v0.0.6): `undefined kill(double /* integer: Int */ pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.kill (pid : Int) (signal : Option DOMStringOrDouble := none) : IO Unit := Internal.api "Lasm.JS.Node.process.kill" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.kill", module := "node:process", path := "kill", construct := false, arity := 2 }
-    (Support.args #[toJS pid, Support.optional signal]) (await := false)
+    (Internal.args #[toJS pid, Internal.optional signal]) (await := false)
+
+/-- `process.loadEnvFile(path)` (added in Node.js v21.7.0, v20.12.0): `undefined loadEnvFile((DOMString or URL or Uint8Array)? path)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.loadEnvFile (path_ : Option DOMStringOrURLOrUint8Array) : IO Unit := Internal.api "Lasm.JS.Node.process.loadEnvFile" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.loadEnvFile", module := "node:process", path := "loadEnvFile", construct := false, arity := 1 }
+    (Internal.args #[toJS path_]) (await := false)
 
 /-- `process.memoryUsage()` (added in Node.js v0.1.16): `object memoryUsage()` (Node.js 24.22.2 documentation, process.md) -/
-def process.memoryUsage : IO Data :=
+@[macro_inline] def process.memoryUsage : IO Data := Internal.api "Lasm.JS.Node.process.memoryUsage" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.memoryUsage", module := "node:process", path := "memoryUsage", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
+
+/-- **Legacy** in the Node.js 24.22.2 docs. `process.nextTick(callback[, ...args])` (added in Node.js v0.1.26): `undefined nextTick(Function callback, any... args)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.nextTick (callback : JSFunction) (args : Array Data := #[]) : IO Unit := Internal.api "Lasm.JS.Node.process.nextTick" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.nextTick", module := "node:process", path := "nextTick", construct := false, arity := 2 }
+    (Internal.argsWith #[toJS callback] (args.map toJS)) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.ref(maybeRefable)` (added in Node.js v23.6.0, v22.14.0): `undefined ref(any maybeRefable)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.ref (maybeRefable : Data) : IO Unit := Internal.api "Lasm.JS.Node.process.ref" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.ref", module := "node:process", path := "ref", construct := false, arity := 1 }
+    (Internal.args #[toJS maybeRefable]) (await := false)
+
+/-- `process.resourceUsage()` (added in Node.js v12.6.0): `object resourceUsage()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.resourceUsage : IO Data := Internal.api "Lasm.JS.Node.process.resourceUsage" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.resourceUsage", module := "node:process", path := "resourceUsage", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.send(message[, sendHandle[, options]][, callback])` (added in Node.js v0.5.9): `boolean send(object message, optional (net.Server or net.Socket) sendHandle, optional process.SendOptions options)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.send (message : Data) (sendHandle : Option net.ServerOrSocket := none) (options : Option process.SendOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.process.send" do
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.process.send", module := "node:process", path := "send", construct := false, arity := 3 }
+    (Internal.args #[toJS message, Internal.optional sendHandle, Internal.optional options]) (await := false)
+
+/-- `process.setegid(id)` (added in Node.js v2.0.0): `undefined setegid((DOMString or double) id)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setegid (id : DOMStringOrDouble) : IO Unit := Internal.api "Lasm.JS.Node.process.setegid" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setegid", module := "node:process", path := "setegid", construct := false, arity := 1 }
+    (Internal.args #[toJS id]) (await := false)
+
+/-- `process.seteuid(id)` (added in Node.js v2.0.0): `undefined seteuid((DOMString or double) id)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.seteuid (id : DOMStringOrDouble) : IO Unit := Internal.api "Lasm.JS.Node.process.seteuid" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.seteuid", module := "node:process", path := "seteuid", construct := false, arity := 1 }
+    (Internal.args #[toJS id]) (await := false)
+
+/-- `process.setgid(id)` (added in Node.js v0.1.31): `undefined setgid((DOMString or double) id)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setgid (id : DOMStringOrDouble) : IO Unit := Internal.api "Lasm.JS.Node.process.setgid" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setgid", module := "node:process", path := "setgid", construct := false, arity := 1 }
+    (Internal.args #[toJS id]) (await := false)
+
+/-- `process.setgroups(groups)` (added in Node.js v0.9.4): `undefined setgroups(sequence<long long> groups)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setgroups (groups : Array Int) : IO Unit := Internal.api "Lasm.JS.Node.process.setgroups" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setgroups", module := "node:process", path := "setgroups", construct := false, arity := 1 }
+    (Internal.args #[toJS groups]) (await := false)
+
+/-- `process.setuid(id)` (added in Node.js v0.1.28): `undefined setuid((long long or DOMString) id)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setuid (id : LongLongOrDOMString) : IO Unit := Internal.api "Lasm.JS.Node.process.setuid" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setuid", module := "node:process", path := "setuid", construct := false, arity := 1 }
+    (Internal.args #[toJS id]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.setSourceMapsEnabled(val)` (added in Node.js v16.6.0, v14.18.0): `undefined setSourceMapsEnabled(boolean val)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setSourceMapsEnabled (val : Bool) : IO Unit := Internal.api "Lasm.JS.Node.process.setSourceMapsEnabled" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setSourceMapsEnabled", module := "node:process", path := "setSourceMapsEnabled", construct := false, arity := 1 }
+    (Internal.args #[toJS val]) (await := false)
+
+/-- `process.setUncaughtExceptionCaptureCallback(fn)` (added in Node.js v9.3.0): `undefined setUncaughtExceptionCaptureCallback(Function? fn)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.setUncaughtExceptionCaptureCallback (fn : Option JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.process.setUncaughtExceptionCaptureCallback" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.setUncaughtExceptionCaptureCallback", module := "node:process", path := "setUncaughtExceptionCaptureCallback", construct := false, arity := 1 }
+    (Internal.args #[toJS fn]) (await := false)
+
+/-- `process.threadCpuUsage([previousValue])` (added in Node.js v23.9.0): `object threadCpuUsage(optional object previousValue)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.threadCpuUsage (previousValue : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.process.threadCpuUsage" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.threadCpuUsage", module := "node:process", path := "threadCpuUsage", construct := false, arity := 1 }
+    (Internal.args #[previousValue]) (await := false)
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.umask()` (added in Node.js v0.1.19): `undefined umask()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.umask : IO Unit := Internal.api "Lasm.JS.Node.process.umask" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.umask", module := "node:process", path := "umask", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.umask(mask)` (added in Node.js v0.1.19): `undefined umask((DOMString or long long) mask)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.umaskWithMask (mask : DOMStringOrLongLong) : IO Unit := Internal.api "Lasm.JS.Node.process.umaskWithMask" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.umaskWithMask", module := "node:process", path := "umask", construct := false, arity := 1 }
+    (Internal.args #[toJS mask]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.unref(maybeRefable)` (added in Node.js v23.6.0, v22.14.0): `undefined unref(any maybeRefable)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.unref (maybeRefable : Data) : IO Unit := Internal.api "Lasm.JS.Node.process.unref" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.unref", module := "node:process", path := "unref", construct := false, arity := 1 }
+    (Internal.args #[toJS maybeRefable]) (await := false)
 
 /-- `process.uptime()` (added in Node.js v0.5.0): `double uptime()` (Node.js 24.22.2 documentation, process.md) -/
-def process.uptime : IO Float :=
+@[macro_inline] def process.uptime : IO Float := Internal.api "Lasm.JS.Node.process.uptime" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.process.uptime", module := "node:process", path := "uptime", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `process.addUncaughtExceptionCaptureCallback(fn)` (added in Node.js v25.9.0): `undefined addUncaughtExceptionCaptureCallback(Function fn)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.addUncaughtExceptionCaptureCallback (fn : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.process.addUncaughtExceptionCaptureCallback" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.addUncaughtExceptionCaptureCallback", module := "node:process", path := "addUncaughtExceptionCaptureCallback", construct := false, arity := 1 }
+    (Internal.args #[toJS fn]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.register(ref, callback)` (added in Node.js v22.5.0): `undefined register((object or Function) ref, Function callback)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.finalization.register (ref : ObjectOrJSFunction) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.process.finalization.register" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.register", module := "node:process", path := "finalization.register", construct := false, arity := 2 }
+    (Internal.args #[toJS ref, toJS callback]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.registerBeforeExit(ref, callback)` (added in Node.js v22.5.0): `undefined registerBeforeExit((object or Function) ref, Function callback)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.finalization.registerBeforeExit (ref : ObjectOrJSFunction) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.process.finalization.registerBeforeExit" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.registerBeforeExit", module := "node:process", path := "finalization.registerBeforeExit", construct := false, arity := 2 }
+    (Internal.args #[toJS ref, toJS callback]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.finalization.unregister(ref)` (added in Node.js v22.5.0): `undefined unregister((object or Function) ref)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.finalization.unregister (ref : ObjectOrJSFunction) : IO Unit := Internal.api "Lasm.JS.Node.process.finalization.unregister" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.finalization.unregister", module := "node:process", path := "finalization.unregister", construct := false, arity := 1 }
+    (Internal.args #[toJS ref]) (await := false)
+
+/-- `process.hrtime.bigint()` (added in Node.js v10.7.0): `bigint bigint()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.hrtime.bigint : IO Int := Internal.api "Lasm.JS.Node.process.hrtime.bigint" do
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.hrtime.bigint", module := "node:process", path := "hrtime.bigint", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.memoryUsage.rss()` (added in Node.js v15.6.0, v14.18.0): `long long rss()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.memoryUsage.rss : IO Int := Internal.api "Lasm.JS.Node.process.memoryUsage.rss" do
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.process.memoryUsage.rss", module := "node:process", path := "memoryUsage.rss", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.channel.ref()` (added in Node.js v7.1.0): `undefined ref()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.channel.ref : IO Unit := Internal.api "Lasm.JS.Node.process.channel.ref" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.ref", module := "node:process", path := "channel.ref", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.channel.unref()` (added in Node.js v7.1.0): `undefined unref()` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.channel.unref : IO Unit := Internal.api "Lasm.JS.Node.process.channel.unref" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.channel.unref", module := "node:process", path := "channel.unref", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `process.permission.has(scope[, reference])` (added in Node.js v20.0.0): `boolean has(DOMString scope, optional DOMString reference)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.permission.has (scope : String) (reference : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.process.permission.has" do
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.process.permission.has", module := "node:process", path := "permission.has", construct := false, arity := 2 }
+    (Internal.args #[toJS scope, Internal.optional reference]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.permission.drop(scope[, reference])` (added in Node.js v24.20.0): `undefined drop(DOMString scope, optional DOMString reference)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.permission.drop (scope : String) (reference : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.process.permission.drop" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.permission.drop", module := "node:process", path := "permission.drop", construct := false, arity := 2 }
+    (Internal.args #[toJS scope, Internal.optional reference]) (await := false)
+
+/-- `process.report.getReport([err])` (added in Node.js v11.8.0): `object getReport(optional any err)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.report.getReport (err : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.process.report.getReport" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.report.getReport", module := "node:process", path := "report.getReport", construct := false, arity := 1 }
+    (Internal.args #[err]) (await := false)
+
+/-- `process.report.writeReport([filename][, err])` (added in Node.js v11.8.0): `DOMString writeReport(optional DOMString filename, optional any err)` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.report.writeReport (filename : Option String := none) (err : Data := .undefined) : IO String := Internal.api "Lasm.JS.Node.process.report.writeReport" do
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.process.report.writeReport", module := "node:process", path := "report.writeReport", construct := false, arity := 2 }
+    (Internal.args #[Internal.optional filename, err]) (await := false)
+
+/-- `process.features.cached_builtins` (added in Node.js v12.0.0): `readonly attribute boolean cached_builtins` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.cached_builtins : IO Bool := Internal.api "Lasm.JS.Node.process.features.cached_builtins" do
+  Support.getExport "node:process" ["features", "cached_builtins"] Bool
+
+/-- `process.features.debug` (added in Node.js v0.5.5): `readonly attribute boolean debug` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.debug : IO Bool := Internal.api "Lasm.JS.Node.process.features.debug" do
+  Support.getExport "node:process" ["features", "debug"] Bool
+
+/-- `process.features.inspector` (added in Node.js v11.10.0): `readonly attribute boolean inspector` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.inspector : IO Bool := Internal.api "Lasm.JS.Node.process.features.inspector" do
+  Support.getExport "node:process" ["features", "inspector"] Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.features.ipv6` (added in Node.js v0.5.3): `readonly attribute boolean ipv6` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.ipv6 : IO Bool := Internal.api "Lasm.JS.Node.process.features.ipv6" do
+  Support.getExport "node:process" ["features", "ipv6"] Bool
+
+/-- `process.features.require_module` (added in Node.js v23.0.0, v22.10.0, v20.19.0): `readonly attribute boolean require_module` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.require_module : IO Bool := Internal.api "Lasm.JS.Node.process.features.require_module" do
+  Support.getExport "node:process" ["features", "require_module"] Bool
+
+/-- `process.features.tls` (added in Node.js v0.5.3): `readonly attribute boolean tls` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.tls : IO Bool := Internal.api "Lasm.JS.Node.process.features.tls" do
+  Support.getExport "node:process" ["features", "tls"] Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.features.tls_alpn` (added in Node.js v4.8.0): `readonly attribute boolean tls_alpn` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.tls_alpn : IO Bool := Internal.api "Lasm.JS.Node.process.features.tls_alpn" do
+  Support.getExport "node:process" ["features", "tls_alpn"] Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.features.tls_ocsp` (added in Node.js v0.11.13): `readonly attribute boolean tls_ocsp` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.tls_ocsp : IO Bool := Internal.api "Lasm.JS.Node.process.features.tls_ocsp" do
+  Support.getExport "node:process" ["features", "tls_ocsp"] Bool
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.features.tls_sni` (added in Node.js v0.5.3): `readonly attribute boolean tls_sni` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.tls_sni : IO Bool := Internal.api "Lasm.JS.Node.process.features.tls_sni" do
+  Support.getExport "node:process" ["features", "tls_sni"] Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `process.features.typescript` (added in Node.js v23.0.0, v22.10.0): `readonly attribute (boolean or DOMString) typescript` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.typescript : IO BooleanOrDOMString := Internal.api "Lasm.JS.Node.process.features.typescript" do
+  Support.getExport "node:process" ["features", "typescript"] BooleanOrDOMString
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `process.features.uv` (added in Node.js v0.5.3): `readonly attribute boolean uv` (Node.js 24.22.2 documentation, process.md) -/
+@[macro_inline] def process.features.uv : IO Bool := Internal.api "Lasm.JS.Node.process.features.uv" do
+  Support.getExport "node:process" ["features", "uv"] Bool
 
 end Lasm.JS.Node

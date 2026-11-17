@@ -17,8 +17,25 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 lines for generated members a runtime lacks, and `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
-import Lasm.JS.Node
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webidl
+import Lasm.JS.Node.Events
+import Lasm.JS.Node.Stream
+import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Os
+import Lasm.JS.Node.Process
+import Lasm.JS.Node.Fs
+import Lasm.JS.Node.Crypto
+import Lasm.JS.Node.ChildProcess
+import Lasm.JS.Node.Net
+import Lasm.JS.Node.Http
+import Lasm.JS.Node.Https
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
@@ -158,6 +175,9 @@ def extOf (name : String) : String :=
 
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
+/-- `Reflect.has`, false for a value that is not an object (Bun gives some of Node's exports as primitives or undefined,
+where Reflect.has throws). -/
+def probeHas (v : Value) (k : String) : IO Bool := try reflectHas v k catch _ => pure false
 
 def str : Data → String
   | .string s => s
@@ -291,7 +311,7 @@ def currentProcess (r : Checks) : Async Unit := do
   expect r "uptime" ((← process.uptime) > 0) ""
   expect r "memoryUsage" ((← process.memoryUsage).field "rss" matches .number _) ""
   -- kill pid 0 tests that the process exists (signal 0) without signalling it
-  process.kill pid.toNat.toFloat (some (.double 0))
+  process.kill (pid.toNat : Int) (some (.double 0))
   expect r "kill with signal 0" true ""
   -- title is a string
   discard process.title
@@ -303,13 +323,13 @@ def buffers (r : Checks) : Async Unit := do
   let mut g : Rng := ⟨0xb0ff⟩
   for i in [0:300] do
     let (b, g1) := g.bytes 64; let (c, g2) := g1.bytes 64; g := g2
-    -- Buffer.toString b "hex" = hex b ∧ Buffer.from (hex b) "hex" = b
-    expect r s!"hex {i}" ((← Buffer.toString b (some "hex")) == hex b && bytesEq (← Buffer.from (hex b) (some "hex")) b) (hex b)
+    -- Buffer.toString b "hex" = hex b ∧ Buffer.fromWithString (hex b) "hex" = b
+    expect r s!"hex {i}" ((← Buffer.toString b (some "hex")) == hex b && bytesEq (← Buffer.fromWithString (hex b) (some "hex")) b) (hex b)
     -- base64 (RFC 4648 §4) and base64url (§5, unpadded) both ways
-    expect r s!"base64 {i}" ((← Buffer.toString b (some "base64")) == base64 b && bytesEq (← Buffer.from (base64 b) (some "base64")) b) (hex b)
-    expect r s!"base64url {i}" ((← Buffer.toString b (some "base64url")) == base64 b true && bytesEq (← Buffer.from (base64 b true) (some "base64url")) b) (hex b)
+    expect r s!"base64 {i}" ((← Buffer.toString b (some "base64")) == base64 b && bytesEq (← Buffer.fromWithString (base64 b) (some "base64")) b) (hex b)
+    expect r s!"base64url {i}" ((← Buffer.toString b (some "base64url")) == base64 b true && bytesEq (← Buffer.fromWithString (base64 b true) (some "base64url")) b) (hex b)
     -- latin1: one character per byte, both ways
-    expect r s!"latin1 {i}" ((← Buffer.toString b (some "latin1")) == latin1 b && bytesEq (← Buffer.from (latin1 b) (some "latin1")) b) (hex b)
+    expect r s!"latin1 {i}" ((← Buffer.toString b (some "latin1")) == latin1 b && bytesEq (← Buffer.fromWithString (latin1 b) (some "latin1")) b) (hex b)
     -- isUtf8 b = ByteArray.validateUTF8 b ∧ isAscii b = ∀ x ∈ b, x < 128
     expect r s!"isUtf8 {i}" ((← buffer.isUtf8 b) == ByteArray.validateUTF8 b) (hex b)
     expect r s!"isAscii {i}" ((← buffer.isAscii b) == b.toList.all (· < 128)) (hex b)
@@ -322,8 +342,8 @@ def buffers (r : Checks) : Async Unit := do
     expect r s!"toString slice {i}" ((← Buffer.toString b (some "hex") (some k) (some b.size)) == hex (b.extract k b.size)) ""
   for i in [0:200] do
     let (s, g1) := g.string 40; g := g1
-    -- Buffer.from s "utf8" = String.toUTF8 s ∧ byteLength s = utf8ByteSize s ∧ toString (toUTF8 s) = s
-    expect r s!"utf8 {i}" (bytesEq (← Buffer.from s (some "utf8")) s.toUTF8 && (← Buffer.byteLength (.domString s)) == s.utf8ByteSize
+    -- Buffer.fromWithString s "utf8" = String.toUTF8 s ∧ byteLength s = utf8ByteSize s ∧ toString (toUTF8 s) = s
+    expect r s!"utf8 {i}" (bytesEq (← Buffer.fromWithString s (some "utf8")) s.toUTF8 && (← Buffer.byteLength (.domString s)) == s.utf8ByteSize
       && (← Buffer.toString s.toUTF8) == s) (repr s).pretty
     -- transcode utf8 → utf16le → utf8 is the identity, and utf16le has 2 bytes per UTF-16 code unit
     let u16 ← buffer.transcode s.toUTF8 "utf8" "utf16le"
@@ -400,7 +420,7 @@ def cryptography (r : Checks) : Async Unit := do
     let y ← crypto.randomInt 3
     inRange := inRange && -5 ≤ x && x < 7 && 0 ≤ y && y < 3
   expect r "randomInt" inRange ""
-  let u ← crypto.randomUUID
+  let u ← (← Lasm.JS.Web.crypto).randomUUID
   let cs := u.toList
   expect r "randomUUID" (cs.length == 36 && cs[14]! == '4' && ['8', '9', 'a', 'b'].contains cs[19]! && cs[8]! == '-' && cs[13]! == '-') u
   -- getHashes lists sha256
@@ -578,6 +598,185 @@ def childProcesses (r : Checks) : Async Unit := do
     let node ← stream.Readable.fromWeb web
     expect r s!"stream round trip {i}" (bytesEq (← streamBytes (← stream.Readable.toWeb node)) b) ""
 
+/-! node:net, node:http and node:https: servers and clients on 127.0.0.1 -/
+
+/-- The TCP port a listening server is bound to (`server.address()` of an IP socket). -/
+def portOf (s : net.Server) : IO Nat := do
+  match ← s.address with
+  | some (.addressInfo a) => pure a.port.toNat
+  | _ => throw (IO.userError "server.address() is not an IP address")
+
+/-- Listens on 127.0.0.1 at a port the system assigns, and waits for `'listening'`. -/
+def listenLocal (s : net.Server) : Async Nat := do
+  let ready ← IO.Promise.new
+  discard <| s.onceListening (← net.Server.ListeningListener.ofSyncFn (do ready.resolve ()))
+  discard <| s.listenWithPort (some 0) (some "127.0.0.1")
+  Std.Async.await ready
+  portOf s
+
+/-- Closes a server and waits for `'close'` (after its connections end). -/
+def closeServer (s : net.Server) : Async Unit := do
+  let closed ← IO.Promise.new
+  discard <| s.onceClose (← net.Server.CloseListener.ofSyncFn (do closed.resolve ()))
+  discard <| s.close
+  Std.Async.await closed
+
+/-- All bytes of an IncomingMessage (a Node Readable), through its web stream. -/
+def bodyOf (m : http.IncomingMessage) : Async ByteArray := do
+  streamBytes (← stream.Readable.toWeb m)
+
+def bytesOfChunk : Uint8ArrayOrDOMString → ByteArray
+  | .uint8Array b => b
+  | .domString s => s.toUTF8
+
+/-- One request with http.request: status, headers and body of the response. -/
+def httpRequest (port : Nat) (method target : String) (headers : List (String × String)) (body : ByteArray) :
+    Async (Nat × Data × ByteArray) := do
+  let options : http.RequestOptions := {
+    host := some "127.0.0.1", port := some port, method := some method, «path» := some target,
+    headers := some (.object (obj (headers.map fun (k, v) => (k, toJS v)))) }
+  let req ← http.request options
+  let got ← IO.Promise.new
+  discard <| req.onceResponse (← http.ClientRequest.ResponseListener.ofSyncFn fun res => do got.resolve res)
+  discard <| req.«end» (some body)
+  let res ← Std.Async.await got
+  let status := (← res.statusCode).toUInt64.toNat
+  let hs ← res.headers
+  return (status, hs, ← bodyOf res)
+
+def httpChecks (r : Checks) : Async Unit := do
+  -- An echo server: the response carries the request's method, URL and x-lasm header, and its body.
+  let echo ← http.Server.RequestListener.ofFn fun req res => do
+    let body ← bodyOf req
+    let url ← req.url
+    if url.startsWith "/missing" then
+      discard <| res.writeHead 404 (some "Not Here")
+      discard <| res.«end»
+    else
+      discard <| res.setHeader "x-method" (← req.method)
+      discard <| res.setHeader "x-url" url
+      discard <| res.setHeader "x-echo" (str ((← req.headers).field "x-lasm"))
+      discard <| res.setHeader "content-length" (toString body.size)
+      discard <| res.writeHead 200
+      discard <| res.«end» (some body)
+  let server ← http.createServer none (some echo)
+  let port ← listenLocal server
+  expect r "http listening" ((← server.listening) && port > 0) s!"{port}"
+  -- For generated bodies (0 to 200 kB), methods, paths and header values: the response echoes each of them.
+  let mut g : Rng := ⟨0x47f1⟩
+  for i in [0:12] do
+    let (b, g1) := g.bytes (if i % 4 == 0 then 200000 else 3000); g := g1
+    let (n, g2) := g.name; g := g2
+    let method := #["POST", "PUT", "PATCH"][i % 3]!
+    let path := s!"/echo/{n}?i={i}"
+    let (status, hs, back) ← httpRequest port method path [("x-lasm", s!"v{n}")] b
+    let echoedUrl := str (hs.field "x-url")
+    expect r s!"http echo {i}" (status == 200 && bytesEq back b && str (hs.field "x-method") == method
+      && echoedUrl == path && str (hs.field "x-echo") == s!"v{n}") s!"{status} {back.size}/{b.size} {echoedUrl}"
+  -- A status and reason phrase from writeHead.
+  let (status, _, _) ← httpRequest port "GET" "/missing" [] .empty
+  expect r "http 404" (status == 404) s!"{status}"
+  -- Concurrency: 10 requests at once each get their own body back.
+  let tasks ← (List.range 10).mapM fun i => (httpRequest port "POST" s!"/c/{i}" [] s!"body {i}".toUTF8).asTask
+  let replies ← tasks.mapM fun t => Std.Async.await t
+  expect r "http concurrent" ((replies.zip (List.range 10)).all fun ((s, _, b), i) => s == 200 && String.fromUTF8! b == s!"body {i}") ""
+  -- http.get: a GET without a body, the response through the same events.
+  let got ← IO.Promise.new
+  let req ← http.getWithUrl (.domString s!"http://127.0.0.1:{port}/get")
+  discard <| req.onceResponse (← http.ClientRequest.ResponseListener.ofSyncFn fun res => do got.resolve res)
+  let res ← Std.Async.await got
+  expect r "http.get" ((← res.statusCode) == 200 && str ((← res.headers).field "x-method") == "GET" && (← bodyOf res).size == 0) ""
+  -- METHODS and STATUS_CODES are Node's tables.
+  expect r "http.METHODS" ((← http.METHODS).contains "PATCH") ""
+  expect r "http.STATUS_CODES" (str ((← http.STATUS_CODES).field "404") == "Not Found") ""
+  -- A web Request built from an IncomingMessage and a web Response written to a ServerResponse
+  -- carry the same method, URL, headers and body (Lasm.JS.Web's types over node:http).
+  let toWeb ← http.Server.RequestListener.ofFn fun req res => do
+    let headers ← Headers.new
+    let raw ← req.rawHeaders
+    for j in [0:raw.size / 2] do headers.append raw[2 * j]! raw[2 * j + 1]!
+    let method ← req.method
+    let body : Option BodyInit ← if method == "GET" || method == "HEAD" then pure none else do
+      pure (some (.readableStream (← stream.Readable.toWeb req)))
+    let host := str ((← req.headers).field "host")
+    let request ← Request.new (.usvString s!"http://{host}{← req.url}")
+      (some { method := some method, headers := some (.sequence ((← headers.entries).map fun (k, v) => #[k, v])), body,
+                duplex := body.map fun _ => .half })
+    let text ← request.text
+    let pathname ← (← URL.new (← request.url)).pathname
+    let response ← Response.new (some (.usvString s!"{← request.method} {pathname} {text.length}"))
+      (some { status := some 201, headers := some (.sequence #[#["x-from", "web"]]) })
+    for (k, v) in ← (← response.headers).entries do discard <| res.setHeader k v
+    discard <| res.writeHead (← response.status)
+    match ← response.body with
+    | some s => discard <| res.«end» (some (← streamBytes s))
+    | none => discard <| res.«end»
+  let webServer ← http.createServer none (some toWeb)
+  let webPort ← listenLocal webServer
+  let reply ← fetch (.usvString s!"http://127.0.0.1:{webPort}/web/path?q=1") (some { method := some "POST", body := some (.usvString "héllo") })
+  let text ← reply.text
+  expect r "Request and Response over node:http" ((← reply.status) == 201 && text == "POST /web/path 5"
+    && (← (← reply.headers).get "x-from") == some "web") s!"{← reply.status} {text}"
+  closeServer webServer
+  closeServer server
+  expect r "http closed" (!(← server.listening)) ""
+  -- https: the classes and global agent exist (serving needs a certificate: test/fixtures/js-serve covers TLS).
+  let agent ← https.Agent.new (some { maxCachedSessions := some 10 })
+  let ga ← https.globalAgent
+  expect r "https.Agent" ((← reflectHas agent.val "getName") && (← reflectHas ga.val "getName")) ""
+
+def netChecks (r : Checks) : Async Unit := do
+  -- An echo server: each socket writes back what it reads, in order (synchronous listeners), and ends when the client does.
+  let onConnection ← net.Server.ConnectionListener.ofSyncFn fun sock => do
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => do discard <| sock.write (bytesOfChunk d))
+    discard <| sock.onEnd (← net.Socket.EndListener.ofSyncFn (do discard <| sock.«end»))
+  let server ← net.createServer none (some onConnection)
+  let port ← listenLocal server
+  -- For generated sequences of chunks (up to 6 of up to 64 kB): the bytes received are the bytes sent, concatenated.
+  let mut g : Rng := ⟨0x7cb1⟩
+  for i in [0:10] do
+    let (count, g1) := g.below 7; g := g1
+    let mut chunks : Array ByteArray := #[]
+    for _ in [0:count] do
+      let (b, g2) := g.bytes 65536; g := g2
+      chunks := chunks.push b
+    let connected ← IO.Promise.new
+    let sock ← net.connectWithPort port (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+    let received ← IO.mkRef ByteArray.empty
+    let closed ← IO.Promise.new
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => received.modify (· ++ bytesOfChunk d))
+    discard <| sock.onceClose (← net.Socket.CloseListener.ofSyncFn fun hadError => do closed.resolve hadError)
+    Std.Async.await connected
+    if i == 0 then
+      let a ← sock.address
+      expect r "socket addresses" ((← sock.remotePort) == port && a.address == "127.0.0.1" && a.family == "IPv4"
+        && (← sock.remoteAddress) == "127.0.0.1") s!"{a.address} {a.family}"
+      expect r "getConnections" ((← server.getConnections) ≥ 1) ""
+    for c in chunks do discard <| sock.write c
+    discard <| sock.«end»
+    let hadError ← Std.Async.await closed
+    let sent := chunks.foldl (· ++ ·) ByteArray.empty
+    expect r s!"net echo {i}" (!hadError && bytesEq (← received.get) sent && (← sock.bytesWritten) == sent.size)
+      s!"{(← received.get).size}/{sent.size}"
+  -- a socket's text: setEncoding makes 'data' strings
+  let connected ← IO.Promise.new
+  let sock ← net.connectWithPort port (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+  discard <| sock.setEncoding (some "utf8")
+  let text : IO.Promise String ← IO.Promise.new
+  discard <| sock.onceData (← net.Socket.DataListener.ofSyncFn fun d => do
+    text.resolve (match d with | .domString s => s | .uint8Array _ => "<bytes>"))
+  Std.Async.await connected
+  discard <| sock.write "ünïcode"
+  let first ← Std.Async.await text
+  expect r "socket setEncoding" ("ünïcode".startsWith first && first.length > 0) first
+  discard <| sock.destroy
+  -- net.isIP and BlockList
+  expect r "net.isIP" ((← net.isIP "127.0.0.1") == 4 && (← net.isIP "::1") == 6 && (← net.isIP "nope") == 0) ""
+  let bl ← net.BlockList.new
+  bl.addSubnet "10.0.0.0" 8 (some "ipv4")
+  expect r "BlockList" ((← bl.check "10.1.2.3" (some "ipv4")) && !(← bl.check "11.0.0.1" (some "ipv4"))) ""
+  closeServer server
+
 /-! Availability: which generated members this runtime lacks (reported, never a failure) -/
 
 def availability (r : Checks) : Async Unit := do
@@ -590,16 +789,26 @@ def availability (r : Checks) : Async Unit := do
     match loaded, info.field "path" with
     | none, _ => missing := missing.push module
     | some m, .string "" =>
-      for n in names "namespace" do
-        unless ← reflectHas m n do missing := missing.push s!"{module} {n}"
+      -- A namespace that is an export of the module (`performance` of node:perf_hooks, `realpath` of node:fs).
+      let exportPath := match info.field "export" with | .string e => some e | _ => none
+      let mut target := m
+      let mut ok := true
+      for part in (exportPath.map (·.splitOn ".")).getD [] do
+        if ok then
+          if ← probeHas target part then target ← target.get part Value
+          else ok := false
+      unless ok do missing := missing.push s!"{module} {exportPath.getD ""}"
+      if ok then
+        for n in names "namespace" do
+          unless ← probeHas target n do missing := missing.push s!"{module} {match exportPath with | some e => e ++ "." | none => ""}{n}"
     | some m, .string p =>
-      if ← reflectHas m p then
+      if ← probeHas m p then
         let c ← m.get p Value
         for n in names "static" do
-          unless ← reflectHas c n do missing := missing.push s!"{module} {p}.{n}"
+          unless ← probeHas c n do missing := missing.push s!"{module} {p}.{n}"
         let proto ← c.get "prototype" Value
         for n in names "prototype" do
-          unless ← reflectHas proto n do missing := missing.push s!"{module} {p}.prototype.{n}"
+          unless ← probeHas proto n do missing := missing.push s!"{module} {p}.prototype.{n}"
       else missing := missing.push s!"{module} {p}"
     | some _, _ => pure ()  -- no export (FileHandle): its members are exercised above
   r.modify fun s => { s with lines := (s.lines ++ missing.map (s!"missing {·}")).push s!"availability: {missing.size} generated members missing" }
@@ -609,7 +818,7 @@ def availability (r : Checks) : Async Unit := do
 def checks : Async (String × Nat) := do
   let r ← IO.mkRef ({} : Report)
   for (name, body) in [("path", paths r), ("os", operatingSystem r), ("process", currentProcess r), ("buffer", buffers r),
-      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("availability", availability r)] do
+      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("net", netChecks r), ("http", httpChecks r), ("availability", availability r)] do
     runSection r name body
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)

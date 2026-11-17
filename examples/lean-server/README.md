@@ -28,7 +28,7 @@ With the compiler package installed in your project:
 
 ```sh
 npx lasm run Main.lean
-npx lasm build Main.lean dist
+npx lasm build Main.lean --output dist
 node dist/main.mjs 3000 ./data
 ```
 

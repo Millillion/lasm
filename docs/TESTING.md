@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic, Porter's OpenID traffic and Tandem's protocol traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun and Lasm.JS.Cloudflare are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's, Lasm.JS.Bun's and Lasm.JS.Cloudflare's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP, and Workers' KV, D1, R2, Durable Objects, Queues, cron, Cache API and sockets under wrangler dev's local emulation | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `test/fixtures/js-cloudflare/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -452,7 +452,7 @@ five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
 loader, bundle and host (output streams, uncaught errors, panics), and engine
 behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
 with a real web host. *Cannot catch:* the exact non-zero exit status in a
-browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web.Browser`
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web`
 (browser.yml's suites cover those).
 
 ### Target equivalence
@@ -630,7 +630,7 @@ behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
 Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
 which run).
 
-**The browser tier** (`Lasm.JS.Web.Browser`, 2026-11-10).
+**The browser checks** (`Lasm.JS.Web`'s DOM, HTML, CSSOM and canvas modules; first written for the browser tier of 2026-11-10).
 [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
 runs inside the browser platform suite (`browser.yml`) on Chromium, Firefox and
 WebKit, each check reported as `bindings.<name>` and failing the engine's job.
@@ -687,6 +687,38 @@ synthetic declaration file. **What it cannot catch:** members the programs do no
 call, TLS on Bun (not generated), Deno's and Bun's behaviour on other operating
 systems (Linux only), and declarations that misstate their runtime where no check
 looks.
+
+**Lasm.JS.Cloudflare** ([`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare)).
+Claim: ∀ check *c* of the program, *c* holds on Workers as `wrangler dev` emulates
+them locally (workerd, and Miniflare's KV, D1, R2, Durable Objects and Queues; no
+Cloudflare account), unless the local emulation itself deviates
+([`known.json`](../test/fixtures/js-cloudflare/known.json), with the reason). The
+fixture is one Worker: Lasm's entry and a Durable Object class (`index.mjs`, whose
+methods call Lean), and every binding in its `wrangler.toml`. The runner triggers
+the cron handler (`/__scheduled`, `--test-scheduled`), starts a TCP echo server
+(its port is the variable `ECHO_PORT`), then requests `/`. Oracles, over seeded
+inputs: the input itself for store round trips (∀ generated *k*, *v*: KV `get` after
+`put` = *v*, as text, JSON, bytes and a stream; R2 `get` = the bytes, `get` with a
+range (*o*, *l*) = `bytes[o, o+l)`; a Durable Object's `get` after `put` = the
+value's JSON; a TCP echo = the bytes written); sorted inputs for listings (KV
+`list` pages through exactly the keys under a prefix in key order, Durable Object
+`list` the same); SQLite for D1 (rows read back by `all`, `first` and `raw` as
+inserted, a failing `batch` rolled back); the runtime's own MD5 for R2's checksum;
+counting for Durable Objects (n requests to one object count 1 to n, through
+`getByName` and `get(idFromName)`); delivery for Queues (every message sent, one
+at a time and in a batch, reaches the queue handler once; a retried one comes back
+with `attempts` 2); and what the declarations say of the cron controller,
+`waitUntil`, the Cache API, transactions, alarms and `env` of `cloudflare:workers`.
+Every generated member is looked up on the live objects (handlers' arguments and
+the Durable Object's state are probed where they live). Run by `test-web.mjs
+--fixture js-cloudflare` (`cloudflare-conformance` in `web-bindings.yml`, with
+`--sizes` over `test/fixtures/js-cloudflare-size`). Unit tests hold the rich
+lowering rules (classes, getters, generic defaults, decided overloads, literal
+parameters, `Map`, `Partial`, object literal types, merged unions) and their
+refusals on a synthetic declaration file, and the Workers entry's `scheduled` and
+`queue` forwarding (`test/edge-entries.test.mjs`). **What it cannot catch:** the
+real Cloudflare platform (consistency, limits, jurisdictions, replicas), which the
+local emulation simplifies, and members the program does not call.
 
 ### Scenario matrix
 
@@ -842,7 +874,7 @@ where they are; these cover the libraries and hosts every app shares.
 | Target | Boundary | Engine | Oracle (besides no crash and no hang) |
 | --- | --- | --- | --- |
 | `cli-arguments` | `src/cli-arguments.mjs` and the `init`, `dev`, `package` parsers | JavaScript | a parse names only targets, templates and deploy targets Lasm has (own keys, never `constructor`); every refusal is a plain `Error` with a readable message |
-| `serverless-http` | `src/serverless/lasm-lambda.mjs` (API Gateway REST and HTTP API, function URLs, ALB, CloudFront events) and `lasm-server.mjs`'s helpers (`outgoingHeaders`, cookies, `isTextual`, `azureReply`, `webReply`) | JavaScript | every well-formed event is answered; the forwarded target is one http.request accepts and starts with `/`, one Cookie and one plain Host header, query values as the platform gave them, the body round-trips byte for byte, each Set-Cookie once; and the request, the response, the Azure and Netlify replies and the parsed cookies are exactly what the Lean model says (`library/Lasm/Serverless/Proofs/Model.lean`, whose theorems are in [library/PROOFS.md](../library/PROOFS.md); run with `lean --run` by `test/fuzz/support/serverless-model.mjs`, required in CI) |
+| `serverless-http` | `src/serverless/lasm-lambda.mjs` (API Gateway REST and HTTP API, function URLs, ALB, CloudFront events) and `lasm-function.mjs`'s helpers (`outgoingHeaders`, `eventRequest`, cookies, `isTextual`, `azureReply`, `webResponse`) | JavaScript | every well-formed event is answered; the forwarded target is one http.request accepts and starts with `/`, one Cookie and one plain Host header, query values as the platform gave them, the body round-trips byte for byte, each Set-Cookie once; and the request, the response, the Azure and Netlify replies and the parsed cookies are exactly what the Lean model says (`verification/cli/Lasm/Serverless/Proofs/Model.lean`, whose theorems are in [library/PROOFS.md](../library/PROOFS.md); run with `lean --run` by `test/fuzz/support/serverless-model.mjs`, required in CI) |
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
 | `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
 | `lasm-js-wire` | the Lasm.JS value codec's JavaScript half (`src/node-js.mjs`'s writer and reader), against Lean's half (`Wire` in `library/Lasm/JS/Core.lean`, whose round trip is proved: `Lasm.JS.Spec.decode_encode`) | JavaScript | on any bytes, JavaScript's reader and Lean's (`Wire.decodeWith`) both refuse, or both read the same value; on any value, JavaScript writes exactly Lean's bytes (`Wire.encode`) and reads them back as the value. Lean's half runs with `lean --run` (`test/fuzz/support/js-wire-model.mjs`, required in CI). Normalizations, JavaScript's own semantics: lone surrogates are written as U+FFFD, a repeated key keeps its last value, NaN payloads are not compared (Lean's `Float.ofBits` keeps none) |
@@ -922,12 +954,12 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   URL absolute now, and a Host that is not a plain `host[:port]` is replaced
   by `localhost` (`Lasm.Fetch.nodeRequestUrl`);
 - a 90-byte RPC request (`"priority":3E26191701`) hung the server: Lean's
-  JSON parser computes `10 ^ exponent`. `Lasm.RPC.parseJson` refuses
-  exponents of more than four digits, and `decodeRequest` and
-  `decodeResponse` use it;
+  JSON parser computes `10 ^ exponent`. `parseJson` (then in Lasm.RPC; now in the
+  fullstack template's Shared.lean and the examples' SafeJson) refuses
+  exponents of more than four digits;
 - Lean prints a zero with more than ten decimal places (`0e-11`) as `0.e-N`,
   which is not JSON: an upstream bug, tracked in [#135](https://github.com/Millillion/lasm/issues/135) with the example apps that still call `Json.parse` on request bodies, and excused by the
-  RPC target's property.
+  JSON round-trip property (then the `lean-rpc` fuzz target's).
 - checked against its Lean model, the function-platform shim (src/serverless/)
   disagreed in five places, each a shim bug: a decoded path or unencoded
   query with a space, a non-ASCII character, `?` or `#` made http.request
@@ -1749,7 +1781,7 @@ run 41749603692); the fourteen others, which cover the rest of `src/`, were adde
 that added them) or from each group's first run where that run could not score
 them, and *now* from the nightly mutation.yml run 43024598393 on `main` (2026-11-11), which measured all 20 modules together (Node 26, Linux x64; 1 to 72 minutes a module, `dev` the longest); before that, run 42615928074 on #165 measured the 21 modules of 2026-11-09. The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
 the tests that existed before mutation testing; *now*: with the tests written to
-kill survivors (CI's measurement on Node 26 is the recorded floor).
+kill survivors (CI's measurement on Node 26 is the recorded floor). `node-serve` (`Node.serve`, 2026-11-12) was first measured by mutation.yml run 43236872547 on its branch: 80.6 % of 392 mutants, written with its tests, so *initial* and *now* are the same.
 
 | Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
@@ -1772,7 +1804,9 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
 | `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
 | `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **88.5 %** | 88 % |
-| `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
+| `project-files` | `project-modules.mjs`, `lasm-modules/class.mjs` | 100 % | **100 %** | 100 % |
+| `serverless` | `serverless/lasm-function.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
+| `node-serve` | `lasm-modules/node-serve.mjs` | 80.6 % | **80.6 %** | 80 % |
 
 `edge-build` and `wasi-build` were measured 2026-11-09 (run 42581537537; initial scores in runs
 42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not

@@ -34,7 +34,8 @@ const scripts = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8')).scri
 const run = script => lasm(scripts[script].replace(/^lasm /, '').split(' '));
 const record = { schema: 1, platform: `${process.platform}-${process.arch}`, seconds: {} };
 record.seconds.client = run('build:client');
-// The platform builds (each `npm run build:client && lasm build Server.lean --target T`),
+// The platform builds (each `npm run build:client && lasm build Export.lean --target T`,
+// Fastly.lean and WasiHttp.lean for fastly and wasi-http),
 // then the Node server: dist/server is its output (platform targets keep their
 // Node build in the build cache).
 for (const target of ['workers', 'bun', 'deno', 'fastly', 'wasi-http'])

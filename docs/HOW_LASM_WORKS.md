@@ -77,6 +77,58 @@ prefix, so `import Lasm.JS` resolves like a standard library module
 ([src/lasm-library.mjs](../src/lasm-library.mjs); prebuilt in
 [library/prebuilt/](../library/prebuilt)).
 
+**Generated binding modules are compiled on first import.** This covers
+`Lasm.JS.Web.*`, `Lasm.JS.Node.*`, `Lasm.JS.Deno.*`, `Lasm.JS.Bun.*` and
+`Lasm.JS.Cloudflare.*`. A small core set of them ships compiled, in
+`libraryModules`. Every other module of these namespaces ships as Lean source
+only. Before Lean elaborates a program, the build reads the `import Lasm.*`
+lines of the program's files, and `lasm editor` reads those of the project's.
+It then compiles each module they need that the prefix lacks, with the modules
+that module imports (read from the sources themselves), into the prefix
+([src/lazy-library.mjs](../src/lazy-library.mjs)).
+- **Progress:** `[lasm] Compiling Lasm.JS.Web.IndexedDB (first use)…`, then the
+  total time.
+- **Parallel:** modules that do not depend on each other compile at once, up
+  to half the cores and one per 3 GB of memory.
+- **Atomic:** each output is written to a temporary file and renamed into
+  place, so an interrupted compile leaves nothing half-written.
+- **Recompiled only when needed:** a stamp records the hash of the module's
+  source and of its dependencies, so a new Lasm version recompiles only what
+  changed.
+- **Verified:** the stamp also records each output's hash. The tool cache's
+  integrity check accepts the outputs against it, and refuses them if they
+  changed.
+
+Decision 0.3-6.
+
+**In a Lake project, Lake builds them.** A Lake project's lakefile requires
+Lasm's library as a Lake package (`lasm init` writes it in the templates that use the library; `lasm editor` adds it):
+
+```toml
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"
+```
+
+`.lake/lasm-library` is a link (a junction on Windows) that every lasm command
+(`init`, `build`, `dev`, `editor`) makes or repairs. It points to one package
+per Lean prefix in Lasm's cache ([src/lake-library.mjs](../src/lake-library.mjs)):
+a lakefile whose one library has as roots the modules compiled on first import,
+from the installed library's sources. Lake then builds those modules on demand,
+like any dependency, in `lake build` and in the editor (`lake setup-file`), so
+an editor opening `import Lasm.JS.Web.IndexedDB` builds it.
+- **One `Lasm` root:** Lean takes the package `Lasm` from the first `LEAN_PATH`
+  directory that has `Lasm/`, which is this package's build directory. So the
+  modules that ship compiled are linked into it (hard links, or copies), and
+  Lake never builds them. A receipt records what was linked, for which prefix
+  and library; a missing, changed or stale file is replaced.
+- **Linked once:** `lasm build` takes those modules' C from Lake, like the
+  project's own, and neither compiles nor links its own copy.
+- **Fresh clones:** the link is not in git (`.lake/` is ignored), so run any
+  lasm command once before a plain `lake build`.
+
+Decision 0.3-7.
+
 **From source to C.** [src/application-sources.mjs](../src/application-sources.mjs)
 (`applicationSources`) handles two kinds of input:
 
@@ -274,7 +326,7 @@ checks that the real code's traces conform to it ([TESTING.md](TESTING.md)).
 | Target | How the program is wrapped | Files |
 | --- | --- | --- |
 | `node` (default) | The Node build above: threads, files, processes, sockets | [src/application-build.mjs](../src/application-build.mjs) |
-| `lambda`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` | The Node build plus a shim. `lasm-server.mjs` starts `dist/main.mjs` once per cold start on a free loopback port and forwards each platform event to it as an HTTP request. The shim maps the platform's event and response shapes. `lasm package` zips it | [src/serverless/](../src/serverless), [src/package.mjs](../src/package.mjs) |
+| `lambda`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` | The Node build plus a shim. `lasm-function.mjs` starts `dist/main.mjs` once per cold start. `main` publishes a fetch handler with `Lasm.JS.exportDefault`, and the shim calls it directly for each platform event, as a web `Request`. The shim maps the platform's event and response shapes. `lasm package` zips it | [src/serverless/](../src/serverless), [src/package.mjs](../src/package.mjs) |
 | `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`, `supabase-edge`, `bun`, `deno` | The **edge relink**. The same objects are linked again without threads, as an ES module: lowered memory64 (`-sMEMORY64=2`), 4 MiB initial memory, a 1 MiB C stack, the single-threaded runtime archives, and a pure-JavaScript host that uses only web-standard APIs. Blocking waits suspend with JSPI. Supabase has no JSPI, so it gets Binaryen's Asyncify instead. Each platform gets its own generated entry module | [src/edge/edge-link.mjs](../src/edge/edge-link.mjs), [edge-host.mjs](../src/edge/edge-host.mjs), [edge-start.mjs](../src/edge/edge-start.mjs), [runtime/edge.cpp](../runtime/edge.cpp), [EDGE.md](EDGE.md), [BUN_DENO.md](BUN_DENO.md) |
 | `wasi`, `fastly`, `wasi-http` | The **WASI relink**: a standard `wasi_snapshot_preview1` command module with no JavaScript. Lasm's C host replaces the JavaScript host. Atomics from the shared archives are lowered to plain memory instructions, and `wasm-opt` strips exception handling and lowers memory to 32 bits. `fastly` adds Fastly's host calls and package layout. `wasi-http` splices the module into a prebuilt component template, so no `wasm-tools` is needed | [src/wasi/wasi-link.mjs](../src/wasi/wasi-link.mjs), [lower-atomics.mjs](../src/wasi/lower-atomics.mjs), [wasi-component.mjs](../src/wasi/wasi-component.mjs), [lasm_wasi.c](../src/wasi/lasm_wasi.c), [WASI.md](WASI.md) |
 | `browser` | The edge program as a static site: a loader bundled with the glue, the host and the builtin modules, the hashed `.wasm`, brotli and gzip copies, and `index.html`. `mount()` starts one Lean instance per element. Blocking waits suspend only with `--suspend jspi`; the default is `none` | [src/browser/](../src/browser), [BROWSER.md](BROWSER.md) |
@@ -333,9 +385,8 @@ linked only into programs that import them.
 | --- | --- | --- |
 | `Lasm.JS` ([JS.lean](../library/Lasm/JS.lean), [JS_BINDINGS.md](JS_BINDINGS.md)) | Calls JavaScript and npm from Lean: one `@[js "module" "export"]` declaration per function, `Async` for promises, callbacks both ways | Node (threads, [lasm_js.c](../library/c/lasm_js.c), [src/node-js.mjs](../src/node-js.mjs)); edge, Bun/Deno and browser (the same operations without threads: [src/edge/edge-js.mjs](../src/edge/edge-js.mjs), [lasm_js_edge.c](../src/edge/lasm_js_edge.c)). On WASI and Fastly every call fails with a clear error ([src/wasi/lasm_wasi.c](../src/wasi/lasm_wasi.c)) |
 | `Lasm.Fetch` ([Fetch.lean](../library/Lasm/Fetch.lean), [FETCH.md](FETCH.md)) | One `Request → Async Response` handler | Node: a `node:http` server, through `Lasm.JS`. Edge, Bun, Deno: the platform's fetch handler. Fastly: its host calls. WASI: one CGI (WAGI) request on stdin/stdout ([lasm_fetch_wasi.c](../src/wasi/lasm_fetch_wasi.c)). wasi-http: the component's handler |
-| `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the web standards generated from their WebIDL: the APIs every JavaScript target has, and in browsers (`Lasm.JS.Web.Browser`) the DOM, the window, events, canvas 2D and WebSocket | Every JavaScript target; the browser tier in browsers |
+| `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the whole web platform, generated from the WebIDL of every spec (one module per spec); `lasm build --target` refuses an API the target lacks | Every JavaScript target, per API |
 | `Lasm.UI` ([UI.lean](../library/Lasm/UI.lean), [UI.md](UI.md)) | The Elm architecture, `html!`, routing, SSR and hydration. The diff runs in Lean and is proved correct ([UI/Proofs.lean](../library/Lasm/UI/Proofs.lean)) | Browser; rendering to HTML also on the server |
-| `Lasm.RPC` ([RPC.lean](../library/Lasm/RPC.lean), [RPC.md](RPC.md)) | Typed endpoints shared by a server and a browser app | `RPC.Server` with `Lasm.Fetch`, `RPC.Client` with `Lasm.UI` |
 | `Lasm.KV` ([KV.lean](../library/Lasm/KV.lean)) | A small key-value store | Workers KV, Deno KV or Fastly KV where the binding exists; otherwise in memory, one copy per process, isolate or instance |
 | `Lasm.Fastly` ([Fastly/](../library/Lasm/Fastly), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | Fastly Compute's host ABI, generated from its witx: requests, responses, bodies, backends, stores, cache, geolocation, rate limiting | `--target fastly` (generated C glue, [lasm_fastly.c](../library/c/lasm_fastly.c)); elsewhere every call fails with `FastlyStatus.unsupported` |
 | `Lasm.WASI.Http` ([WASI/](../library/Lasm/WASI), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | The wasi:http proxy world, generated from the WASI 0.2.12 WIT: incoming and outgoing requests and responses, fields, streams, poll, the monotonic clock, the incoming-handler export | `--target wasi-http` (generated canonical ABI glue, [lasm_wasi_http_bindings.c](../library/c/lasm_wasi_http_bindings.c)); elsewhere every call fails |

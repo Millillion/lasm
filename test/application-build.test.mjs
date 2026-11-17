@@ -15,10 +15,11 @@ import { linkToolchainCatalog } from '../src/managed-link-toolchain.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 import { applicationPolicy } from '../src/application-policy.mjs';
 import { withApplicationLock } from '../src/application-lock.mjs';
+import { libraryRoot } from '../src/lazy-library.mjs';
 
 const build = new URL('../src/application-build.mjs', import.meta.url).href;
 const stubbed = ['managed-lean.mjs', 'managed-link-toolchain.mjs', 'system-git.mjs', 'application-runtime.mjs', 'application-sources.mjs',
-  'lasm-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
+  'lasm-library.mjs', 'lazy-library.mjs', 'lake-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
 const stubDirectory = mkdtempSync(join(tmpdir(), 'lasm-build-stubs-'));
 const stubs = globalThis.lasmBuildStubs = {};
 const isClass = value => typeof value === 'function' && /^class\b/.test(Function.prototype.toString.call(value));
@@ -60,6 +61,8 @@ function setup(t, { project = false } = {}) {
     'managed-lean.mjs:provisionLean': record('provisionLean', async (_, options) => ({ ...lean, ...(options.native ? { cCompiler: {} } : {}) })),
     'managed-link-toolchain.mjs:provisionLinkToolchain': record('provisionLinkToolchain', async () => ({ identity: 'toolchain-identity', toolchain: { version: linkToolchainCatalog.version } })),
     'system-git.mjs:checkSystemGit': record('checkSystemGit'),
+    'lazy-library.mjs:ensureProgramLibrary': record('ensureProgramLibrary', async () => ({ compiled: [], ms: 0 })),
+    'lake-library.mjs:ensureLakeLibrary': record('ensureLakeLibrary', () => ({ required: false, directory: join(root, 'lake-package') })),
     'application-runtime.mjs:applicationRuntime': record('applicationRuntime', async () => ({ directory: runtime, identity: 'runtime-identity',
       manifest: { name: 'rt', emscripten: linkToolchainCatalog.version } })),
     'application-sources.mjs:applicationSources': record('applicationSources', (file, _lean, work, options) => {
@@ -97,7 +100,7 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.match(result.signature, /^[0-9a-f]{64}$/);
   assert.deepEqual(stages, ['Checking Lean 4.35.0 runtime', 'Checking Lean sources and imports', 'Checking application inputs and cached build',
     'Packaging the application and runtime support', 'Verifying and writing application output']);
-  assert.deepEqual(calls.map(call => call[0]).filter(name => name !== 'log'), ['selectLeanVersion', 'applicationRuntime', 'provisionLean', 'applicationSources',
+  assert.deepEqual(calls.map(call => call[0]).filter(name => name !== 'log'), ['selectLeanVersion', 'applicationRuntime', 'provisionLean', 'ensureProgramLibrary', 'applicationSources',
     'provisionLinkToolchain', 'linkApplication', 'copyApplicationHost']);
   const [, runtimeLean, runtimeOptions] = named('applicationRuntime')[0];
   assert.deepEqual(runtimeLean, { version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit });
@@ -118,6 +121,14 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.equal(link.sharedCache, join(cache, 'objects'));
   assert.equal(link.analysisCache, join(cache, 'analysis'));
   assert.equal(link.initializationSeed, join(work, 'initialization-seed.json'));
+  // The tools get the cache, the log and the progress; a Lean without tiers adds no tier to the identity.
+  const [, toolOptions] = named('provisionLinkToolchain')[0];
+  assert.equal(toolOptions.cache, cache);
+  assert.equal(typeof toolOptions.log, 'function');
+  assert.equal(typeof toolOptions.progress, 'function');
+  assert.equal('nativeLeanTier' in result, false);
+  // The cached output itself is a valid --output.
+  assert.equal((await run({ output: result.cached })).output, result.cached);
   assert.equal(link.dist, join(link.work, 'dist'));
   assert.match(relative(work, link.work), /^\.build-[0-9a-f-]{36}$/);
   assert.deepEqual(link.nativeCompilations, []);
@@ -265,6 +276,54 @@ test('a failed link removes its staging, keeps the delivered build and reports a
   assert.ok(named('linkApplication').length >= 1);
 });
 
+test('Lasm.JS programs with project files: shipped under host/project-modules, part of the identity, checked from their paths; one the scan missed fails', async t => {
+  const { directory, source, run } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  put(join(directory, 'ffi/x.mjs'), "import { y } from './y.mjs';\nexport const f = () => y;\n");
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 1;\n');
+  const binding = { name: 'Main.f', module: './ffi/x.mjs', path: 'f', arity: 0, relative: './ffi/x.mjs', file: 'Main.lean' };
+  const checks = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = async () => [binding];
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async (...args) => { checks.push(args); return args[1]; };
+  // The source does not declare it (a binding the scan could not see): an internal error, before anything ships.
+  await assert.rejects(run(), { message: 'A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]' });
+  writeFileSync(source, '@[js "./ffi/x.mjs" "f"] opaque f : IO Nat\ndef main : IO Unit := pure ()');
+  const result = await run();
+  assert.deepEqual(result.projectModules.map(f => f.name), ['ffi/x.mjs', 'ffi/y.mjs']);
+  assert.equal(readFileSync(join(result.cached, 'host/project-modules/ffi/y.mjs'), 'utf8'), 'export const y = 1;\n');
+  const [, checked, options] = checks.at(-1);
+  assert.equal(checked[0].projectFile, join(directory, 'ffi/x.mjs'));
+  assert.equal(checked[0].file, join(directory, 'Main.lean'));
+  assert.equal(options.identity, `none ${result.projectModules.map(f => f.sha256).join(',')}`);
+  // Editing a project file changes the build's identity.
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 2;\n');
+  assert.notEqual((await run()).signature, result.signature);
+});
+
+test('Lasm.JS programs without project files link while their bindings are read; the target decides about missing globals; no progress callback is needed', async t => {
+  const { run, named } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  // The read finishes only once linking has started (or after a second, which would mean the build waited).
+  const order = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = () => new Promise(resolve => {
+    const done = why => { order.push(why); resolve([{ name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1 }]); };
+    stubs.readStarted = done;
+    setTimeout(() => done('timer'), 1000).unref();
+  });
+  const link = stubs['application-link.mjs:linkApplication'];
+  stubs['application-link.mjs:linkApplication'] = async options => { stubs.readStarted?.('link'); return link(options); };
+  const missing = { name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1, error: 'globalThis export "Deno.serve" is missing', missingGlobal: true };
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async () => [missing];
+  await assert.rejects(run(), { code: 'ERR_LASM_JS_BINDING' });
+  assert.equal(order[0], 'link');
+  const result = await run({ bindingTarget: 'deno' });
+  assert.ok(named('log').some(call => call[1] === 'Lasm.JS binding warning: G: globalThis export "Deno.serve" is missing where Lasm checks bindings; it must exist on deno'));
+  // Reused from the cache, with no progress callback either.
+  assert.equal((await run({ bindingTarget: 'deno' })).signature, result.signature);
+});
+
 test('Lasm.JS programs: the library is linked and the bindings are checked against the deployed packages', async t => {
   const { directory, root, run, named, lean } = setup(t);
   put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));
@@ -280,6 +339,7 @@ test('Lasm.JS programs: the library is linked and the bindings are checked again
   const stages = [];
   const result = await run({ progress: ({ stage }) => stages.push(stage) });
   assert.deepEqual(stubs.librarySourcesArgs[0], { ...lean });
+  assert.deepEqual(stubs.librarySourcesArgs[2], { supplied: ['Main'] });
   assert.equal(result.lasmJs, true);
   assert.deepEqual(result.jsBindings, [{ name: 'Main.left', module: 'left', warning: 'arity' }]);
   assert.deepEqual(named('linkApplication')[0][1].sources.slice(-1), [library]);
@@ -326,6 +386,21 @@ test('Lake projects: system Git, dependency licences, the C tier and native obje
   assert.equal(stages[2], 'Packages with C code (sqlite, zlib) need Lean\'s C compiler and headers');
   assert.equal(named('provisionLean').length, 2);
   assert.equal(named('provisionLean')[1][2].native, true);
+  // The Lasm library modules this project imports, compiled on first import, before each pass over the sources.
+  const ensured = named('ensureProgramLibrary');
+  assert.equal(ensured.length, 2);
+  for (const [, prefix, dir, options] of ensured) {
+    assert.equal(prefix, join(root, 'lean'));
+    assert.equal(dir, directory);
+    assert.ok(options.eager.includes('Lasm.JS.Core'));
+    assert.equal(options.progress, ensured[0][3].progress);
+    assert.equal(typeof options.progress, 'function');
+    assert.equal(options.lock, withApplicationLock);
+    assert.equal(typeof options.log, 'function');
+  }
+  // Lasm's library as a Lake package (0.3-7): the link made or repaired for each prefix, before Lasm compiles anything.
+  assert.deepEqual(named('ensureLakeLibrary').map(([, project, prefix, options]) => [project, prefix, options.cache, options.eager.includes('Lasm.JS.Core')]),
+    [[directory, join(root, 'lean'), join(root, 'cache'), true], [directory, join(root, 'lean'), join(root, 'cache'), true]]);
   assert.deepEqual(stubs.secondLean.cCompiler, {});
   assert.equal(stubs.secondOptions.afterImports, undefined);
   assert.equal(stubs.licenceArgs[0], directory);
@@ -387,9 +462,14 @@ test('a maintainer link driver uses the full SDK and records its identity', asyn
   const { run, named } = setup(t);
   const { sdkCatalog } = await import(new URL('../src/managed-sdk.mjs', import.meta.url).href);
   stubs['application-link.mjs:selectedLinkDriver'] = () => 'emcc';
-  stubs['managed-sdk.mjs:provisionSdk'] = async () => ({ identity: 'sdk-identity', driverIdentity: 'driver-identity' });
+  let sdkOptions;
+  stubs['managed-sdk.mjs:provisionSdk'] = async options => { sdkOptions = options; return { identity: 'sdk-identity', driverIdentity: 'driver-identity' }; };
   stubs['application-runtime.mjs:applicationRuntime'] = async (lean, options) => ({ directory: options.directory, identity: 'rt', manifest: { name: 'rt', emscripten: sdkCatalog.version } });
-  const result = await run();
+  const progress = () => {};
+  const result = await run({ progress });
+  assert.equal(typeof sdkOptions.cache, 'string');
+  assert.equal(typeof sdkOptions.log, 'function');
+  assert.equal(sdkOptions.progress, progress);
   assert.equal(result.linkDriver, 'emcc');
   assert.equal(result.emscripten, sdkCatalog.version);
   assert.equal(result.sdkCatalogIdentity, sha(JSON.stringify(sdkCatalog)));
@@ -448,7 +528,7 @@ test('the program must define main; the C tier without progress; licences of nat
   assert.deepEqual(stubs.nativeOptions.leanPrefix, [lean.prefix, undefined]);
   assert.ok(stubs.nativeOptions.runtimeInclude.endsWith(join('runtime', 'include')));
   assert.deepEqual(stubs.licenceArgs[1], [join(directory, 'Main.lean'), nativeSource]);
-  assert.deepEqual(stubs.licenceArgs[2], { exclude: [lean.prefix, undefined] });
+  assert.deepEqual(stubs.licenceArgs[2], { exclude: [lean.prefix, undefined, libraryRoot] });
   assert.deepEqual(result.nativeObjects, [{ object: '/o/native.o', identity: 'native-identity', sourceSha256: sha('int x;'), args: ['-DX'] }]);
   assert.deepEqual(named('linkApplication').at(-1)[1].nativeCompilations.map(item => item.object), ['/o/native.o']);
 });
@@ -466,4 +546,24 @@ test('a tiered Lean records its tier and components; a link-only build copies no
   const linkOnly = await run({ profile: 'dev', keepLinkWork: true, linkOnly: true });
   assert.equal(existsSync(join(linkOnly.cached, 'node_modules')), false);
   assert.ok(existsSync(join(result.cached, 'node_modules/left/package.json')));
+});
+
+test('a Lake project that requires Lasm\'s package: Lake builds the library modules, Lasm compiles and links them only once', async t => {
+  const { directory, root, run, named } = setup(t, { project: true });
+  stubs['lake-library.mjs:ensureLakeLibrary'] = (...args) => { stubs.lakeArgs = args; return { required: true, directory: join(root, 'lake-package') }; };
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS_Web_IndexedDB(builtin); }\n';
+  stubs.generated = { inputs: [{ module: 'Main', source: join(directory, 'Main.lean') }, { module: '+Lasm.JS.Web.IndexedDB', source: put(join(root, 'library/Lasm/JS/Web/IndexedDB.lean'), 'import Lasm.JS.Web.Types.IndexedDB\n') }] };
+  stubs['lasm-library.mjs:librarySources'] = (...args) => { stubs.librarySourcesArgs = args; return { sources: [], inputs: [], modules: [], oleans: [] }; };
+  stubs['lasm-library.mjs:importsLibrary'] = () => true;
+  await run();
+  assert.equal(stubs.lakeArgs[0], directory);
+  assert.deepEqual(named('ensureProgramLibrary'), [], 'Lake builds them');
+  assert.deepEqual(stubs.librarySourcesArgs[2], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] });
+});
+
+test('a standalone source (no Lake project) has no Lake package: Lasm compiles its library imports', async t => {
+  const { run, named } = setup(t);
+  await run();
+  assert.deepEqual(named('ensureLakeLibrary'), []);
+  assert.equal(named('ensureProgramLibrary').length, 1);
 });

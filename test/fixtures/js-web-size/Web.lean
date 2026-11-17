@@ -1,5 +1,5 @@
 /- The same program through Lasm.JS.Web (all of it imported), for scripts/bindings/test-web.mjs --sizes. -/
-import Lasm.JS.Web
+import Lasm.JS.Web.Url
 open Lasm.JS.Web
 
 def main : IO Unit := do

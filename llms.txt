@@ -6,7 +6,7 @@ Key commands:
 
 - New project: `npm create @lasm@latest my-app -- --template <plain|express|hono|fastify|std-http|web|fetch|fullstack> [--deploy <target>]…`
 - Develop: `npm run dev` (= `lasm dev`: rebuild about 2 s after each save, restart, keep the last good build on errors)
-- Run a file: `npx @lasm/cli Main.lean [-- args]`; build: `npx @lasm/cli build Main.lean [--target <target>] [--output DIR]`
+- Run a file: `npx @lasm/cli Main.lean [-- args]`; build: `npx @lasm/cli build Main.lean [--target <target>] [--output PATH]` (`--output` names what is deployed: `dist/` for `node`, the platform's own place, such as `lambda.zip` or `workers/`, for other targets)
 - Targets: node (default), lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
 - Editor support for `import Lasm.*`: `npx lasm editor`; version for bug reports: `npx lasm --version`
 
@@ -32,7 +32,7 @@ Key commands:
 - [Lasm.JS](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md): `@[js]` declarations, type conversions, `Async`, callbacks, errors, a checklist for agents
 - [Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md): one `Request → Async Response` handler for every server target, outbound `fetch`, streaming
 - [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md): browser apps (Elm architecture, `html!`, commands, subscriptions, routing, SSR, hydration, what is proved)
-- [Lasm.RPC and Lasm.KV](https://github.com/Millillion/lasm/blob/main/docs/RPC.md): typed endpoints shared by server and browser, validation proved once; a key-value store over each platform's own
+- [Full stack](https://github.com/Millillion/lasm/tree/main/templates/fullstack): `lasm init --template fullstack`, a server with plain REST routes and a `Lasm.UI` app that calls them with `Cmd.task` and `Lasm.JS.Web.fetch`, sharing Lean types
 - [Browser apps](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): the browser loader and mount API (`Lasm.UI.Mount`), the Vite plugin; DOM and web APIs through the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md))
 - [Library sources](https://github.com/Millillion/lasm/tree/main/library/Lasm): the Lean code of every library, including Lasm.Fastly (Fastly Compute's host ABI, generated from its witx) and Lasm.WASI.Http (the wasi:http proxy world, generated from the WASI WIT): docs/WASI_FASTLY_BINDINGS.md
 

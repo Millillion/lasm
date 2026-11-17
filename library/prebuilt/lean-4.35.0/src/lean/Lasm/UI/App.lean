@@ -53,24 +53,16 @@ namespace Runtime
 
 -- The exports of `lasm:ui-dom` (src/lasm-modules/ui-dom.mjs), per mounted app.
 namespace Dom
-@[js "lasm:ui-dom" "options"] opaque options : IO Data
-@[js "lasm:ui-dom" "connect"] opaque connect : Data → IO Unit
-@[js "lasm:ui-dom" "apply"] opaque apply : ByteArray → IO Unit
-@[js "lasm:ui-dom" "schedule"] opaque schedule : IO Unit
-@[js "lasm:ui-dom" "error"] opaque error : String → IO Unit
-@[js "lasm:ui-dom" "sub"] opaque sub : Nat → Data → IO Unit
-@[js "lasm:ui-dom" "unsub"] opaque unsub : Nat → IO Unit
-@[js "lasm:ui-dom" "timeout"] opaque timeout : Nat → Value → IO Unit
-@[js "lasm:ui-dom" "http"] opaque http : String → String → Data → Option String → String → Value → IO Unit
-@[js "lasm:ui-dom" "now"] opaque now : IO Float
-@[js "lasm:ui-dom" "navigate"] opaque navigate : String → Bool → IO Unit
-@[js "lasm:ui-dom" "go"] opaque go : Int → IO Unit
-@[js "lasm:ui-dom" "load"] opaque load : String → IO Unit
-@[js "lasm:ui-dom" "storageSet"] opaque storageSet : String → String → String → IO Unit
-@[js "lasm:ui-dom" "storageRemove"] opaque storageRemove : String → String → IO Unit
-@[js "lasm:ui-dom" "storageGet"] opaque storageGet : String → String → IO (Option String)
-@[js "lasm:ui-dom" "focus"] opaque focus : String → Bool → IO Unit
-@[js "lasm:ui-dom" "title"] opaque title : String → IO Unit
+@[js "lasm:ui-dom" "options"] private opaque options : IO Data
+@[js "lasm:ui-dom" "connect"] private opaque connect : Data → IO Unit
+@[js "lasm:ui-dom" "apply"] private opaque apply : ByteArray → IO Unit
+@[js "lasm:ui-dom" "schedule"] private opaque schedule : IO Unit
+@[js "lasm:ui-dom" "error"] private opaque error : String → IO Unit
+@[js "lasm:ui-dom" "sub"] private opaque sub : Nat → Data → IO Unit
+@[js "lasm:ui-dom" "unsub"] private opaque unsub : Nat → IO Unit
+@[js "lasm:ui-dom" "timeout"] private opaque timeout : Nat → Value → IO Unit
+@[js "lasm:ui-dom" "navigate"] private opaque navigate : String → Bool → IO Unit
+@[js "lasm:ui-dom" "afterFrame"] private opaque afterFrame : Value → IO Unit
 end Dom
 
 structure State (Model Msg : Type) where
@@ -166,10 +158,6 @@ frame, bit 2 for `preventDefault()`, bit 4 for `stopPropagation()`. -/
 def answer (frame preventDefault stopPropagation : Bool) : Data :=
   toJS ((if frame then 1 else 0) + (if preventDefault then 2 else 0) + (if stopPropagation then 4 else 0) : Nat)
 
-def storageName : Storage → String
-  | .local => "local"
-  | .session => "session"
-
 /-- What the runtime's functions share. -/
 structure Ctx (Flags Model Msg : Type) where
   app : App Flags Model Msg
@@ -247,29 +235,16 @@ partial def perform (c : Ctx Flags Model Msg) (e : Effect Msg) : IO Unit := do
   | .delay ms m =>
     let f ← Function.ofSyncFn fun _ => do deliver c m; return .bool (← takeFrame c)
     Dom.timeout ms f
-  | .http r h =>
-    let f ← Function.ofSyncFn fun args => do
-      let res : Except String Http.Response := match args with
-        | #[.bool true, status, .string statusText, .array hs, .string body] =>
-          .ok { status := (match status with | .number n => n.toUInt64.toNat | _ => 0), statusText, body,
-                headers := hs.toList.filterMap fun | .array #[.string k, .string v] => some (k, v) | _ => none }
-        | #[.bool false, .string message] => .error message
-        | _ => .error "malformed response"
-      deliver c (h res)
-      return .bool (← takeFrame c)
-    Dom.http r.method r.url (toJS (r.headers.map fun (k, v) => #[k, v]).toArray) r.body r.credentials f
-  | .randomBytes n h => deliver c (h (← IO.getRandomBytes n.toUSize))
-  | .now h => deliver c (h (← Dom.now))
   | .navigate u replace => Dom.navigate u replace
-  | .go n => Dom.go n
-  | .load u => Dom.load u
-  | .storageSet st k v => Dom.storageSet (storageName st) k v
-  | .storageRemove st k => Dom.storageRemove (storageName st) k
-  | .storageGet st k h => deliver c (h (← Dom.storageGet (storageName st) k))
-  | .focus i blur => Dom.focus i blur
-  | .port name v => (← Lasm.UI.Mount.port name).send v
-  | .title t => Dom.title t
-  | .io run => run fun m => do deliver c m; requestFrame c
+  | .task run =>
+    -- Started now; it continues when what it awaits settles, holding no thread.
+    -- A message it delivers is queued if an update is running (deliver), and its frame requested.
+    let action : Std.Async.Async Unit :=
+      try run fun m => do deliver c m; requestFrame c
+      catch err => report "a command failed" err
+    match ← Std.Async.BaseAsync.toRawBaseIO action with
+    | .pure _ => pure ()
+    | .ofTask t => discard <| BaseIO.mapTask (fun _ => pure ()) t
 
 /-- Delivers the values JavaScript sends through port `name` (`app.ports[name].send`)
 to the current `Subs.port` handlers. -/
@@ -348,6 +323,23 @@ class HotModel (Model : Type) where
 instance (priority := low) : HotModel Model := ⟨none, none⟩
 instance [ToJS Model] [FromJS Model] : HotModel Model :=
   ⟨some toJS, some fun d => match FromJS.fromJS d with | .ok m => some m | .error _ => none⟩
+
+open Lasm.UI.Runtime in
+/-- Waits until the app's next frame is on screen, for a `Cmd.task` that
+needs an element the update just added to the view:
+
+    | .startEdit id, m => ({ m with editing := some id }, Cmd.ofEffect (.task fun _ => do
+        afterFrame
+        if let some el ← (← document).getElementById s!"edit-{id}" then
+          ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus))
+
+Only in a running app (`App.run`). -/
+def afterFrame : Std.Async.Async Unit := do
+  let p : IO.Promise Unit ← IO.Promise.new
+  -- Keep `p` alive until it is resolved: a dropped promise resolves with `none`.
+  let f ← Function.ofSyncFn fun _ => do p.resolve (); return .undefined
+  Dom.afterFrame f
+  Std.Async.await p
 
 open Lasm.UI.Runtime in
 /-- Runs `app` in the element it was mounted on. This is the program's `main`
