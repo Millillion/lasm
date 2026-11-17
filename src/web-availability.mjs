@@ -19,8 +19,13 @@ export function targetRuntime(target) {
  * availability guards (`Lasm.JS.Web.Navigator.gpu?`, 0.3-11) they call. */
 export function referencedWebApis(texts, apis = loadTable().apis) {
   const found = new Set();
-  for (const text of texts) for (const [, name] of text.matchAll(/"(Lasm\.JS\.Web\.[^"\\]+)"/g))
-    if (apis[name] || name.endsWith('?') && apis[name.slice(0, -1)]) found.add(name);
+  // Lean's C has the name as `Internal.api` uses it, joined with its error's separator at compile time
+  // ("Lasm.JS.Web.Navigator.userAgent: "), and, for a global, static or constructor, as the binding record's name too;
+  // a guard's `?` is escaped (`\?`) in C.
+  for (const text of texts) for (const [, name, guard] of text.matchAll(/"(Lasm\.JS\.Web\.[A-Za-z0-9_.']+)(\\?\?)?(?:: )?"/g)) {
+    const lean = guard ? name + '?' : name;
+    if (apis[lean] || guard && apis[name]) found.add(lean);
+  }
   return [...found].sort();
 }
 

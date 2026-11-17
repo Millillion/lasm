@@ -1114,7 +1114,9 @@ const usedAvailabilityOverrides = new Set();
 function whereAvailable(lean, paths) {
   const where = compat.availability(paths, rcd);
   const path = Object.values(where).find(w => w.path)?.path ?? paths[0].join('.');
-  for (const o of availabilityOverrides) if (o.api === lean || o.api === path) {
+  // An entry names a binding (its Lean name), a compatibility path, or a path and everything under it (`api.URLPattern.*`).
+  const matches = o => o.api === lean || o.api === path || o.api.endsWith('.*') && (path === o.api.slice(0, -2) || path.startsWith(o.api.slice(0, -1)));
+  for (const o of availabilityOverrides) if (matches(o)) {
     usedAvailabilityOverrides.add(o.api);
     for (const r of o.runtimes) { if (!where[r]) fail(`availability-overrides.json: unknown runtime ${r}`); where[r].ok = o.available; }
   }

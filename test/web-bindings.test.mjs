@@ -170,6 +170,8 @@ test('lasm build --target refuses a web API the target lacks (src/web-availabili
   assert.equal(targetRuntime('supabase-edge'), 'deno');
   // fetch is everywhere: not in the table of APIs missing somewhere.
   assert.deepEqual(referencedWebApis(['"Lasm.JS.Web.fetch"']), []);
+  // Lean's C has an instance member's name as Internal.api's error prefix, joined at compile time ("…: ").
+  assert.deepEqual(referencedWebApis(['lean_mk_string_unchecked("Lasm.JS.Web.Navigator.gpu: ", 30, 30)']), ['Lasm.JS.Web.Navigator.gpu']);
 });
 
 test('every web binding is macro_inline data: each parameter occurs exactly once in its body', () => {

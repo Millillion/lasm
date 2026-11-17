@@ -39,14 +39,6 @@ instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVStrin
   Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new", module := "globalThis", path := "URL", construct := true, arity := 2 }
     (Internal.args #[toJS url, Internal.optional base]) (await := false)
 
-/-- `constructor(USVString url, optional USVString base)` where the platform has it (its global), else `none` (rule 0.3-11). -/
-@[macro_inline] def URL.new? (url : String) (base : Option String := none) : IO (Option URL) := Internal.api "Lasm.JS.Web.URL.new?" do
-  if !(← Internal.hasGlobal ["URL"]) then return none
-  let lasmGuarded ← do
-    Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new?", module := "globalThis", path := "URL", construct := true, arity := 2 }
-      (Internal.args #[toJS url, Internal.optional base]) (await := false)
-  return some lasmGuarded
-
 /-- `stringifier attribute USVString href` -/
 @[macro_inline] def URL.href (self : URL) : IO String := Internal.api "Lasm.JS.Web.URL.href" do
   self.val.get "href" String

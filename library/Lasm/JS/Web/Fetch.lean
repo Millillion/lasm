@@ -509,14 +509,6 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
   Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.new", module := "globalThis", path := "Response", construct := true, arity := 2 }
     (Internal.args #[Internal.optional body, Internal.optional init]) (await := false)
 
-/-- `constructor(optional BodyInit? body, optional ResponseInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
-@[macro_inline] def Response.new? (body : Option BodyInit := none) (init : Option ResponseInit := none) : IO (Option Response) := Internal.api "Lasm.JS.Web.Response.new?" do
-  if !(← Internal.hasGlobal ["Response"]) then return none
-  let lasmGuarded ← do
-    Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.new?", module := "globalThis", path := "Response", construct := true, arity := 2 }
-      (Internal.args #[Internal.optional body, Internal.optional init]) (await := false)
-  return some lasmGuarded
-
 /-- `readonly attribute ResponseType type` -/
 @[macro_inline] def Response.type (self : Response) : IO ResponseType := Internal.api "Lasm.JS.Web.Response.type" do
   self.val.get "type" ResponseType
