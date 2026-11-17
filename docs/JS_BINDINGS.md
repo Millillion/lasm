@@ -469,7 +469,7 @@ def notFound : IO Value := do
 `Lasm.JS.Web` is the **whole web platform**: every interface, namespace,
 dictionary and member of the WebIDL in the pinned `@webref/idl` (w3c/webref's
 curated IDL of every web spec). It is generated as it is, with no list of
-APIs, from more than 300 specs and about 1,150 interfaces. Status: **current source, not yet released**
+APIs, from more than 300 specs and about 1,150 interfaces. Status: **released in 0.9.0**
 (decision 0.3-1, Jordan, 2026-11-16).
 
 There is **one module per spec**, named from the spec's shortname by the
@@ -1439,8 +1439,8 @@ review the diff of the IDL files.
 `Lasm.JS.Deno` is **the whole `Deno` namespace** of Deno 2.9.6, generated
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
-every function, constant and class, and every type they use. Status: **current
-source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
+every function, constant and class, and every type they use. Status: **released
+in 0.9.0** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
 0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
 A program imports the modules whose members it calls (`import Lasm.JS.Deno.Kv`);
 there is no `import Lasm.JS.Deno` (0.4-21). The modules ship as source and compile
@@ -1585,7 +1585,7 @@ three declaration files.
 `s3.d.ts`, `shell.d.ts`, `security.d.ts`, `fetch.d.ts`, `wasm.d.ts`) by the same
 generator and rules as [Lasm.JS.Deno](#how-denos-declarations-become-lean). Web
 types Bun declares again (`Request`, `Response`, `WebSocket`, `Blob`, streams) are
-Lasm.JS.Web's. Status: **current source, not yet released** (Stage 0, milestone
+Lasm.JS.Web's. Status: **released in 0.9.0** (Stage 0, milestone
 0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). A program
 imports the modules whose members it calls (`import Lasm.JS.Bun.Sqlite`); there is
 no `import Lasm.JS.Bun` (0.4-21). The modules ship as source and compile on the
@@ -1663,7 +1663,7 @@ objects. [examples/bun-sqlite](../examples/bun-sqlite) is a todo API on
 one module per area) gives typed bindings of the runtime APIs of Cloudflare
 Workers, **generated from Cloudflare's own TypeScript declarations**
 (`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
-CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
+CI's wrangler 4.152.0 runs). Status: **released in 0.9.0** (tier
 3 of the standard bindings). It covers what a Worker's `env` holds and what its
 handlers receive:
 
