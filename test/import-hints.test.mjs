@@ -83,3 +83,15 @@ test('the shipped index is small and covers every generated namespace', () => {
   for (const host of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) assert.ok(modules.some(m => m.startsWith(`Lasm.JS.${host}.`)), host);
   assert.ok(!modules.some(m => m.includes('.Types.')), 'types modules are indexed under their spec');
 });
+
+test('lasm build\'s error report (reportCliError) carries the hint, as lasm dev\'s does', async () => {
+  const { reportCliError } = await import('../src/application-cli.mjs');
+  const printed = [], saved = console.error;
+  console.error = (...a) => printed.push(a.join(' '));
+  try {
+    reportCliError(Object.assign(new Error('Command failed: lake build'), { stderr: 'Main.lean:4:12: error(lean.unknownIdentifier): Unknown identifier `fetch`\nerror: build failed\n' }));
+  } finally { console.error = saved; }
+  const text = printed.join('\n').replace(/\x1b\[[0-9;]*m/g, '');
+  assert.match(text, /Main\.lean:4:12: error: Unknown identifier `fetch`\nhint: fetch is defined in Lasm\.JS\.Web\.Fetch; add: import Lasm\.JS\.Web\.Fetch/);
+  assert.match(text, /\[lasm\] Build failed\. Fix the error above/);
+});
