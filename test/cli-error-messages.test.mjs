@@ -97,9 +97,9 @@ test('a program without main is refused with that reason', t => {
   assert.doesNotThrow(() => assertDefinesMain(inputs.slice(0, 1), [join(directory, 'Helper.c')], source));
 });
 
-// The lasm.json library pipeline was removed (docs/DECISIONS.md, 2026-11-03):
-// a source checkout now refuses it with the published CLI's message.
-test('lasm build <config>.json is refused with the published message, also from a source checkout', async () => {
+// The lasm.json library pipeline was removed (docs/DECISIONS.md, 2026-11-03),
+// and a .json input is no source at all (0.7-15).
+test('lasm build <config>.json is refused as not a Lean source', async () => {
   await assert.rejects(runApplicationCli(['build', 'lasm.json']),
-    { message: 'This Lasm candidate builds ordinary .lean applications for Node. Use lasm Main.lean or lasm build Main.lean.' });
+    { message: 'Expected a Lean source file (Main.lean), not lasm.json' });
 });

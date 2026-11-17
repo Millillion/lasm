@@ -113,10 +113,8 @@ export const cases = [
   { id: 'output-twice', kind: 'parse', args: ['build', 'Main.lean', '--output', 'a', '--output', 'b'], files: { 'Main.lean': main }, expect: /Specify --output only once/ },
   { id: 'suspend-twice', kind: 'parse', args: ['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi', '--suspend', 'none'], files: { 'Main.lean': main }, expect: /Specify --suspend only once/ },
   { id: 'output-for-vercel-edge', kind: 'parse', args: ['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'x'], files: { 'Main.lean': main }, expect: /--output does not apply to --target vercel-edge: the platform fixes its layout/ },
-  // Binding configurations (.json), which the CLI no longer builds.
-  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /This Lasm candidate builds ordinary \.lean applications for Node/ },
-  { id: 'binding-configuration-dev', kind: 'parse', args: ['build', 'lasm.json', '--dev'], files: { 'lasm.json': '{}\n' }, expect: /--dev and --release apply to Lean applications/ },
-  { id: 'binding-configuration-target', kind: 'parse', args: ['build', 'lasm.json', '--target', 'wasi'], files: { 'lasm.json': '{}\n' }, expect: /--target applies to Lean applications, not binding configurations/ },
+  // Binding configurations (.json), which the CLI no longer builds: not a source (0.7-15).
+  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /Expected a Lean source file \(Main\.lean\), not lasm\.json/, fixedIn: '0.9.0' },
   // Lasm's environment settings.
   { id: 'download-idle-too-small', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'https', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), LASM_DOWNLOAD_IDLE_MS: '5' }), expect: /LASM_DOWNLOAD_IDLE_MS must be an integer from 1000 to 1800000/ },

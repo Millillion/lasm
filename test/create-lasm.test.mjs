@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'node:stream';
 import { fileURLToPath } from 'node:url';
-import { hasDirectory, hasTemplate, main, prompt, usage } from '../packages/create-lasm/create.mjs';
-import { parseInitArguments } from '../src/init.mjs';
+import { hasDirectory, hasTemplate, main, prompt, templateNames, usage } from '../packages/create-lasm/create.mjs';
+import { parseInitArguments, templates } from '../src/init.mjs';
 
 const cli = { directory: fileURLToPath(new URL('..', import.meta.url)), bin: '/nowhere/lasm.mjs', version: '0.1.0' };
 
@@ -72,4 +72,8 @@ test('bin.mjs runs the pinned CLI with the arguments and forwards its exit statu
     assert.match(missing.stderr, /@lasm\/cli/);
     assert.doesNotMatch(missing.stderr, /^\s+at /m);
   } finally { rmSync(modules, { recursive: true, force: true }); }
+});
+
+test('the prompt offers exactly the templates of lasm init (0.7-20)', () => {
+  assert.deepEqual(templateNames, Object.keys(templates));
 });

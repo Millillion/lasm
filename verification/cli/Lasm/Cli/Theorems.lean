@@ -2025,15 +2025,13 @@ theorem checkOptions_spec (r : Parsed) (first : String) (hc : r.command = "run" 
     (hf : first.endsWith ".lean" = true ∨ first.endsWith ".json" = true) :
     FinishOK (checkOptions ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r first) := by
   have hin : (r.input?.getD "").endsWith ".lean" = true ∨ (r.input?.getD "").endsWith ".json" = true := by simpa [hi] using hf
-  have hdef : (r.target?.getD (if jsRuntime = "node" ∨ first.endsWith ".json" = true then "node" else jsRuntime)) ∈ buildTargets := by
+  have hdef : (r.target?.getD jsRuntime) ∈ buildTargets := by
     cases hrt : r.target? with
     | some t => exact ht t hrt
-    | none => simp only [Option.getD]; split
-              · simp [buildTargets]
-              · exact jsRuntime_build
+    | none => exact jsRuntime_build
   unfold checkOptions
   dsimp only
-  generalize r.target?.getD (if jsRuntime = "node" ∨ first.endsWith ".json" = true then "node" else jsRuntime) = T at hdef ⊢
+  generalize r.target?.getD jsRuntime = T at hdef ⊢
   repeat' split
   all_goals first
     | (show NB _; nb)
@@ -2055,20 +2053,16 @@ theorem finish_spec (r : Parsed) (pos : List String) (h : ProgInv r) :
         · show NB _; nb
         · split
           · show NB _; nb
-          · split
-            · show NB _; nb
-            · rename_i hx _
-              obtain ⟨d1, d2, d3⟩ := defaultProfile_fields { r with input? := some first } first
-              apply checkOptions_spec
-              · rw [d1]; exact h.1
-              · rw [d2]; exact h.2
-              · rw [d3]
-              · simp only [Bool.not_eq_true', Bool.or_eq_false_iff] at hx
-                cases hl : first.endsWith ".lean"
-                · cases hj : first.endsWith ".json"
-                  · simp_all
-                  · exact Or.inr rfl
-                · exact Or.inl rfl
+          · rename_i hx
+            obtain ⟨d1, d2, d3⟩ := defaultProfile_fields { r with input? := some first } first
+            apply checkOptions_spec
+            · rw [d1]; exact h.1
+            · rw [d2]; exact h.2
+            · rw [d3]
+            · simp only [Bool.not_eq_true'] at hx
+              cases hl : first.endsWith ".lean"
+              · simp_all
+              · exact Or.inl rfl
 
 theorem all_whitespace_of_trimAscii (s : String) (h : s.trimAscii.toString = "") : s.toList.all Char.isWhitespace = true := by
   have h1 : (s.toSlice.dropWhile Char.isWhitespace |>.dropEndWhile Char.isWhitespace).isEmpty = true := by

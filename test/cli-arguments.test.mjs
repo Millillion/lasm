@@ -19,9 +19,9 @@ test('options work on either side of the filename', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean']).output, 'dist');
 });
 
-test('build retains explicit output directories and existing binding configuration inputs', () => {
+test('build retains explicit output directories; binding configurations are not sources', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output', 'out dir']).output, 'out dir');
-  assert.equal(parseLasmArguments(['build', 'bindings.json']).input, 'bindings.json');
+  assert.throws(() => parseLasmArguments(['build', 'bindings.json']), { message: 'Expected a Lean source file (Main.lean), not bindings.json' });
   // No positional output: --output names it (0.7-2).
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', 'out']), { message: 'Unexpected argument "out": lasm build takes one Lean source. Name the output with --output.' });
 });
@@ -60,7 +60,6 @@ test('profiles: lasm build is release, lasm run is dev; --dev and --release choo
   assert.equal(parseLasmArguments(['run', 'Main.lean', '--release']).profile, 'release');
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--dev']).profile, 'dev');
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--dev', '--release']), /Choose one of --dev and --release/);
-  assert.throws(() => parseLasmArguments(['build', 'bindings.json', '--dev']), /apply to Lean applications/);
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--dev', '--target', 'lambda', '--allow-dev']).allowDev, true);
   assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--allow-dev']), /--allow-dev applies to/);
   assert.throws(() => parseLasmArguments(['Main.lean', '--allow-dev']), /--allow-dev applies to/);
@@ -80,7 +79,6 @@ for (const [args, error] of [
   [['build', 'Main.lean', '--target', 'pages'], /Unknown build target "pages"/],
   [['build', 'Main.lean', '--target'], /--target requires a value/],
   [['build', 'Main.lean', '--target', 'lambda', '--target=vercel'], /Specify --target only once/],
-  [['build', 'bindings.json', '--target', 'lambda'], /applies to Lean applications/],
   [['Main.lean', '--output', 'one', '--output', 'two'], /only once/],
   [['build', 'Main.lean', '--output'], /requires a value/],
   [['Main.lean', '--node-version', '26'], /Unknown Lasm option/],

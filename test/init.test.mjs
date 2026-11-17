@@ -157,27 +157,32 @@ test('the fullstack template: shared, server and client modules; Node and Worker
   try {
     const directory = join(root, 'todos');
     const result = initProject({ directory, template: 'fullstack' });
-    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'README.md', 'Server.lean', 'Shared.lean', 'View.lean', 'lakefile.toml',
-      'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'Embed.lean', 'Export.lean', 'Http.lean', 'JsSite.lean', 'README.md', 'Server.lean',
+      'Shared.lean', 'Site.lean', 'View.lean', 'lakefile.toml', 'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
     const read = file => readFileSync(join(directory, file), 'utf8');
     const pkg = JSON.parse(read('package.json'));
     assert.equal(pkg.scripts.dev, 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client');
     assert.equal(pkg.scripts['build:client'], 'lasm build Client.lean --target browser --output dist/public/client');
     assert.equal(pkg.scripts.start, 'node dist/server/main.mjs');
     // A platform target writes its own directory (workers/); only the Node server goes to dist/server.
-    assert.match(pkg.scripts["build:workers"], /lasm build Server\.lean --target workers$/);
+    assert.match(pkg.scripts["build:workers"], /lasm build Export\.lean --target workers$/);
     assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
-    assert.match(read('Server.lean'), /^import Lasm\.RPC\.Server$/m);
-    assert.match(read('Client.lean'), /^import Lasm\.RPC\.Client$/m);
+    // Plain REST (no Lasm.RPC, no Lasm.Fetch): Node.serve on Node, fetch in the browser.
+    assert.match(read('Server.lean'), /Node\.serve \{ fetch := JsSite\.handle kv \}/);
+    assert.match(read('Export.lean'), /exportDefault \(JsSite\.handle kv\)/);
+    assert.match(read('Client.lean'), /Lasm\.JS\.Web\.fetch/);
+    for (const file of result.files.filter(f => f.endsWith('.lean'))) assert.doesNotMatch(read(file), /^import Lasm\.(RPC|Fetch)/m, file);
     assert.match(read('lakefile.toml'), /name = "Shared"/);
-    // Every Lasm.Fetch target: the browser app is embedded in the server program.
+    // Every other target: the browser app is embedded in the server program (Site.lean).
     const all = initProject({ directory: join(root, 'all'), template: 'fullstack', deploy: ['fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'spin'] });
-    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml'].every(f => all.files.includes(f)), all.files.join(' '));
+    assert.ok(['fastly.toml', 'spin.toml', 'vercel.json', 'netlify.toml', 'Fastly.lean', 'WasiHttp.lean'].every(f => all.files.includes(f)), all.files.join(' '));
     const scripts = JSON.parse(readFileSync(join(root, 'all', 'package.json'), 'utf8')).scripts;
-    for (const t of ['workers', 'bun', 'deno', 'fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
-      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Server.lean --target ${t}`, t);
+    for (const t of ['workers', 'bun', 'deno', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
+      assert.equal(scripts[`build:${t}`], `npm run build:client && lasm build Export.lean --target ${t}`, t);
+    assert.equal(scripts['build:fastly'], 'npm run build:client && lasm build Fastly.lean --target fastly');
+    assert.equal(scripts['build:wasi-http'], 'npm run build:client && lasm build WasiHttp.lean --target wasi-http');
     assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
-    assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
+    assert.match(read('Site.lean'), /embed_dir! "dist\/public"/);
     assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

@@ -220,9 +220,10 @@ npm run build && npm start                    # Node; also build:workers, build:
 
 ## The whole stack in Lean, verified
 
-The `fullstack` template is one Lean project with a server (`Lasm.Fetch`), a
-browser app (`Lasm.UI`) and the API between them (`Lasm.RPC`). The rule a request
-must satisfy is written and proved once, in `Shared.lean`, which both sides import
+The `fullstack` template is one Lean project with a server (`Node.serve` on Node,
+the default export elsewhere), a browser app (`Lasm.UI`) and a plain REST API
+between them (`/api/todos`). The rule a request must satisfy is written and
+proved once, in `Shared.lean`, which both sides import
 ([templates/fullstack](templates/fullstack)):
 
 ```lean
@@ -243,27 +244,31 @@ theorem checkTitle_ok {title : String} (h : checkTitle title = .ok ()) :
     · simp [h0, h1] at h
     · omega
 
-def addTodo : Endpoint NewTodo Todo := { name := "addTodo", validate := fun r => checkTitle r.title }
+/-- A title that passed `checkTitle`, with the proof. -/
+abbrev ValidTitle := { title : String // checkTitle title = .ok () }
 ```
 
 ```lean
--- Server.lean: storing a todo demands the proof that its title passed the check,
--- and `addTodo.serve` hands the handler that proof (`ok`) after re-validating.
-def Store.add (s : Store) (title : String) (_ : checkTitle title = .ok ()) : Store × Todo :=
-  let t := { id := s.next, title := clean title, done := false }
+-- Site.lean: storing a todo demands a ValidTitle (the title and the proof that
+-- it passed the check); POST /api/todos re-validates the body to get one.
+def Store.add (s : Store) (title : ValidTitle) : Store × Todo :=
+  let t := { id := s.next, title := clean title.val, done := false }
   ({ todos := s.todos.push t, next := s.next + 1 }, t)
 
-  addTodo.serve fun req ok => do
-    let (s, t) := (← load kv).add req.title ok
-    save kv s
-    return .ok t
+  | "POST", ["api", "todos"] => some do
+    match decodeJson (α := NewTodo) req.text >>= fun r => ValidTitle.check r.title with
+    | .error e => return failure 400 e
+    | .ok title =>
+      let (s, t) := (← load kv).add title
+      save kv s
+      return json t 201
 ```
 
 ```lean
 -- Client.lean: a theorem about the browser app: it never sends an invalid title.
 theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e) :
-    (update .add m).2.effects = [.msg (.added (.error (.invalid e)))] :=
-  addTodo.call_invalid { title := m.draft } Msg.added "" e h
+    (update .add m).2.effects = [.msg (.added (.error e))] := by
+  simp [update, h, Cmd.send, Cmd.ofEffect]
 ```
 
 **Where proofs live and how they are checked.**
@@ -271,7 +276,6 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 | Proof | Where | Checked by |
 | --- | --- | --- |
 | Your theorems (like `checkTitle_ok`, `add_invalid`) | your `.lean` files | every `lasm build`/`lasm dev` (Lean elaborates them; a broken proof is a build error); pure modules also with `lake build` |
-| `Lasm.RPC`: the handler only runs on requests that pass `validate` (`Endpoint.decodeRequest_valid`); the client never sends one that fails it (`Endpoint.call_invalid`) | [library/Lasm/RPC](library/Lasm/RPC) | compiled into Lasm's library on every build |
 | `Lasm.UI`: the DOM diff is correct against a DOM model, keyed moves included (`diff_correct`, `mount_correct`, `session_correct`) | [library/Lasm/UI/Proofs](library/Lasm/UI/Proofs) (about 1,260 lines, no `sorry`, standard axioms only) | `node scripts/ui/lean-tests.mjs` in a checkout (CI: `ui.yml`) |
 | Conduit: 52 proved propositions (307 theorems) about authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips and Markdown link safety | [examples/conduit/Proofs](examples/conduit/Proofs), listed in [PROOFS.md](examples/conduit/PROOFS.md) | `npm run proofs` in `examples/conduit` (no `sorry`, standard axioms only; CI `conduit.yml`) |
 | TodoMVC: every reachable model is valid | [examples/ui/todomvc/Todo.lean](examples/ui/todomvc/Todo.lean) | `lasm build`; CI `ui.yml` |
@@ -486,6 +490,7 @@ refuse a dev build unless you pass `--allow-dev`.
 | `LASM_EDITOR` | `LASM_EDITOR=0 npx lasm build Main.lean` | `0`: `lasm init`, `lasm dev` and `lasm build` leave the editor setup alone ([editor setup](docs/GETTING_STARTED.md#editor)). |
 | `LASM_THREAD_POOL` (built apps; 0.3.0) | `LASM_THREAD_POOL=0 node dist/main.mjs` | Lean thread Workers started before `main` (0–64, default 1). [Measurements](docs/BENCHMARKS.md#cold-start-on-a-fraction-of-a-cpu). |
 | `LASM_VM_STACK_MB` (built apps on Node) | `LASM_VM_STACK_MB=256 node dist/main.mjs` | Each Lean thread's engine stack in MiB (default 1 GiB, capped at a quarter of the memory; [recursion depth](FUNDAMENTAL_LIMITATIONS.md#recursion-depth)). |
+| `LASM_DEV_SERVER` (set by `lasm dev`) | `if (← IO.getEnv "LASM_DEV_SERVER") == some "1" then …` | `1` in the program `lasm dev` runs: an app can read its files from disk instead of embedding them. |
 | `LASM_ARTIFACT_SOURCE` | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
 | `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |
 | `NODE_USE_ENV_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS` (Node's own) | `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy:8080 npx lasm Main.lean` | Proxies and private CAs ([corporate networks](docs/INSTALLATION_HARDENING.md#corporate-networks)). |
