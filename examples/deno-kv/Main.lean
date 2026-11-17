@@ -11,7 +11,9 @@ in KV, taken with an atomic check-and-set, so concurrent requests never share an
 Environment: PORT (default 8000), KV_PATH (a local database file; Deno Deploy's KV when unset).
 -/
 import Lasm.JS.Web
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Runtime
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Deno.Kv
 open Lasm.JS Lasm.JS.Web
 
 def respond (body : String) (status : Nat := 200) : IO Response :=

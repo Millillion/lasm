@@ -1071,15 +1071,15 @@ A server on a JavaScript runtime is one Lean function from a web `Request` to a
 | --- | --- | --- |
 | Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault handle` |
 | Function platforms on Node (Netlify, Vercel, AWS Lambda and Lambda@Edge, Azure Functions, Google Cloud Functions) | the platform's handler export | `Lasm.JS.exportDefault handle` ([below](#function-platforms-exportdefault)) |
-| Deno | `Deno.serve` | `import Lasm.JS.Deno` (generated, below) |
-| Bun | `Bun.serve` | `import Lasm.JS.Bun` (generated, below) |
+| Deno | `Deno.serve` | `import Lasm.JS.Deno.Serve` (generated, below) |
+| Bun | `Bun.serve` | `import Lasm.JS.Bun.Serve` (generated, below) |
 | Node | none of its own takes a `Request`: Lasm provides `Node.serve`, shaped like `Bun.serve` | `import Lasm.JS.Node.Serve` ([Node](#serving-http-on-node-nodeserve)) |
 
 Outbound HTTP is Lasm.JS.Web's `fetch` everywhere. Status: **current source, not
 yet released** (tier 2 of the standard bindings, second part).
 
 ```lean
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Serve
 open Lasm.JS Lasm.JS.Web
 
 def handle (request : Request) : Async Response := do
@@ -1092,7 +1092,7 @@ def main : IO Unit := do
 ```
 
 ```lean
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Serve
 open Lasm.JS Lasm.JS.Web
 
 def main : IO Unit := do
@@ -1119,8 +1119,9 @@ path resolves.
 | `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); on a Unix socket, `serveWithUnixOptions` (`ServeUnixOptions`: `path`; `HttpServerUnixAddr`, `ServeHandlerUnixAddr`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`; in `Lasm.JS.Deno.Net`). The rest of the namespace: [Lasm.JS.Deno](#standard-bindings-for-deno-lasmjsdeno) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
 | `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); the structure `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
 
-`import Lasm.JS.Deno` and `import Lasm.JS.Bun` import their module (and the
-Lasm.JS.Web modules it uses: `Dom`, `Fetch`, `Url`).
+`import Lasm.JS.Deno.Serve` and `import Lasm.JS.Bun.Serve` import the server
+modules (and the modules they use). Neither namespace has an umbrella module
+(docs/api/decisions/0.4.md, 0.4-21): import the modules whose members you call.
 
 Not generated, with the reason (each listed in
 [`serve-tier2.mjs`](../scripts/bindings/serve-tier2.mjs) and at the top of
@@ -1175,7 +1176,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | overloads of one function | Lasm.JS.Web's overload naming: the first keeps the name, the others add their first differing argument | `serve`, `serveWithOptions`, `serveWithTlsOptions` |
 
 The generated functions look the runtime's global up when called, so a program
-that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
+that imports `Lasm.JS.Deno.Serve` still builds (and runs its other code) on Node. A
 hand-written `@[js "globalThis" "Deno.serve"]` binding builds for `--target deno`
 (the binding check, which runs on Node, only warns there) but not for Node.
 
@@ -1345,17 +1346,20 @@ review the diff of the IDL files.
 
 ## Standard bindings for Deno: `Lasm.JS.Deno`
 
-`import Lasm.JS.Deno` gives **the whole `Deno` namespace** of Deno 2.9.6, generated
+`Lasm.JS.Deno` is **the whole `Deno` namespace** of Deno 2.9.6, generated
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
 every function, constant and class, and every type they use. Status: **current
 source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
 0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
-Its modules ship as source and compile on the first build that imports them
-(0.4-20); import only the modules you use (`import Lasm.JS.Deno.Kv`) to compile less.
+A program imports the modules whose members it calls (`import Lasm.JS.Deno.Kv`);
+there is no `import Lasm.JS.Deno` (0.4-21). The modules ship as source and compile
+on the first build that imports them (0.4-20).
 
 ```lean
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Subprocess
+import Lasm.JS.Deno.Kv
 open Lasm.JS Lasm.JS.Web
 
 def run : Async Unit := do
@@ -1485,19 +1489,22 @@ three declaration files.
 
 ## Standard bindings for Bun: `Lasm.JS.Bun`
 
-`import Lasm.JS.Bun` gives **the whole `Bun` namespace and `bun:sqlite`** of Bun
+`Lasm.JS.Bun` is **the whole `Bun` namespace and `bun:sqlite`** of Bun
 1.4.4, generated from Bun's own TypeScript declarations (`packages/bun-types` at
 `bun-v1.4.4`: `bun.d.ts`, `serve.d.ts`, `sqlite.d.ts`, `sql.d.ts`, `redis.d.ts`,
 `s3.d.ts`, `shell.d.ts`, `security.d.ts`, `fetch.d.ts`, `wasm.d.ts`) by the same
 generator and rules as [Lasm.JS.Deno](#how-denos-declarations-become-lean). Web
 types Bun declares again (`Request`, `Response`, `WebSocket`, `Blob`, streams) are
 Lasm.JS.Web's. Status: **current source, not yet released** (Stage 0, milestone
-0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). Its modules
-ship as source and compile on the first build that imports them (0.4-20); import
-only the modules you use (`import Lasm.JS.Bun.Sqlite`) to compile less.
+0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). A program
+imports the modules whose members it calls (`import Lasm.JS.Bun.Sqlite`); there is
+no `import Lasm.JS.Bun` (0.4-21). The modules ship as source and compile on the
+first build that imports them (0.4-20).
 
 ```lean
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Core
+import Lasm.JS.Bun.Serve
+import Lasm.JS.Bun.Sqlite
 open Lasm.JS Lasm.JS.Web
 
 def main : IO Unit := do

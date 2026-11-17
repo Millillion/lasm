@@ -14,8 +14,8 @@ runtime and requests it from outside the process (docs/TESTING.md).
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Deno
-import Lasm.JS.Bun
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Bun.Serve
 import Lasm.JS.Node.Serve
 import App
 open Lasm.JS Lasm.JS.Web
