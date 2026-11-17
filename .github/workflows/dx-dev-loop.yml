@@ -8,6 +8,17 @@ on:
   workflow_dispatch:
   # release-checks.yml gates releases on it.
   workflow_call:
+  # A pull request that changes the editor's setup (Lasm's Lake package, lasm editor, lasm init) runs the
+  # editor job alone (with the candidate it needs): Train B's CI never ran it, and #332 broke it (2026-11-17).
+  pull_request:
+    paths:
+      - 'src/lake-library.mjs'
+      - 'src/editor.mjs'
+      - 'src/init.mjs'
+      - 'src/lazy-library.mjs'
+      - 'scripts/templates/editor-templates.mjs'
+      - 'scripts/templates/editor-check.mjs'
+      - '.github/workflows/dx-dev-loop.yml'
 permissions:
   contents: read
 concurrency:
@@ -50,6 +61,7 @@ jobs:
           if-no-files-found: error
   templates:
     needs: pack
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -119,6 +131,7 @@ jobs:
           if-no-files-found: ignore
   cold-start:
     needs: pack
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:

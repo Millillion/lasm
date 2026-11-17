@@ -258,20 +258,19 @@ def pathLike (word : String) : Bool := word.toList.any fun c => c = '.' || c = '
 
 /-- The default profile of a Lean source: release for `lasm build`, dev for
 running it. -/
-def defaultProfile (r : Parsed) (first : String) : Parsed :=
-  if first.endsWith ".lean" ∧ r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
+def defaultProfile (r : Parsed) (_first : String) : Parsed :=
+  if r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
 
 /-- The checks after the profile is set, and `lasm build`'s target and output. -/
-def checkOptions (env : ArgumentsEnv) (r : Parsed) (first : String) : Except String Parsed :=
+def checkOptions (env : ArgumentsEnv) (r : Parsed) (_first : String) : Except String Parsed :=
   if r.allowDev? = some true ∧ !(r.command = "build" ∧ r.target?.any (· ≠ "node")) then
     .error "--allow-dev applies to lasm build --target <platform> and lasm package"
   else if r.suspend?.isSome ∧ r.target? ≠ some "browser" then .error "--suspend applies to lasm build --target browser"
   else if r.bundler? = some true ∧ r.target? ≠ some "browser" then .error "--bundler applies to lasm build --target browser"
   else if r.command = "build" then
-    let target := r.target?.getD (if env.jsRuntime = "node" ∨ first.endsWith ".json" then "node" else env.jsRuntime)
+    let target := r.target?.getD env.jsRuntime
     let r := { r with target? := some target }
-    if target ≠ "node" ∧ first.endsWith ".json" then .error "--target applies to Lean applications, not binding configurations"
-    else if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
+    if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
       .error ("--output does not apply to --target " ++ target ++ ": the platform fixes its layout (" ++
         (if target = "vercel-edge" then "api/lasm.mjs and api/_lasm/" else "netlify/edge-functions/lasm.mjs and netlify/lasm/") ++ ")")
     else .ok (if target = "node" ∧ r.output? = none then { r with output? := some "dist" } else r)
@@ -292,9 +291,7 @@ def finish (env : ArgumentsEnv) (r : Parsed) (positional : List String) : Except
         .error (if r.command = "build" then "Unexpected argument \"" ++ extra ++ "\": lasm build takes one Lean source. Name the output with --output."
           else "Unexpected positional arguments. Put application arguments after --.")
       else if r.command = "run" ∧ r.output?.isSome then .error "--output is available only with lasm build"
-      else if !(first.endsWith ".lean" || r.command = "build" && first.endsWith ".json") then
-        .error "Expected a Lean source file, or a binding configuration for lasm build"
-      else if first.endsWith ".json" ∧ r.profile?.isSome then .error "--dev and --release apply to Lean applications"
+      else if !first.endsWith ".lean" then .error ("Expected a Lean source file (Main.lean), not " ++ first)
       else checkOptions env (defaultProfile r first) first
 
 /-- `parseLasmArguments(argv)`, with the module's imports `env`. -/

@@ -178,19 +178,16 @@ export function parseLasmArguments(argv) {
     ? `Unexpected argument "${positional[0]}": lasm build takes one Lean source. Name the output with --output.`
     : 'Unexpected positional arguments. Put application arguments after --.');
   if (result.command === 'run' && result.output !== undefined) throw new Error('--output is available only with lasm build');
-  if (!(result.input.endsWith('.lean') || result.command === 'build' && result.input.endsWith('.json')))
-    throw new Error('Expected a Lean source file, or a binding configuration for lasm build');
-  if (result.input.endsWith('.json') && result.profile !== undefined) throw new Error('--dev and --release apply to Lean applications');
+  if (!result.input.endsWith('.lean')) throw new Error(`Expected a Lean source file (Main.lean), not ${result.input}`);
   // lasm build defaults to the release profile, lasm run to the dev profile.
-  if (result.input.endsWith('.lean')) result.profile ??= result.command === 'build' ? 'release' : 'dev';
+  result.profile ??= result.command === 'build' ? 'release' : 'dev';
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
     throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
   if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
   if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {
     // The default target is the runtime the CLI runs on: node, bun or deno.
-    result.target ??= jsRuntime === 'node' || result.input.endsWith('.json') ? 'node' : jsRuntime;
-    if (result.target !== 'node' && result.input.endsWith('.json')) throw new Error('--target applies to Lean applications, not binding configurations');
+    result.target ??= jsRuntime;
     if (fixedLayoutTargets.includes(result.target) && result.output !== undefined)
       throw new Error(`--output does not apply to --target ${result.target}: the platform fixes its layout (${result.target === 'vercel-edge' ? 'api/lasm.mjs and api/_lasm/' : 'netlify/edge-functions/lasm.mjs and netlify/lasm/'})`);
     // Only node defaults here; every other target's writer knows its own place.
