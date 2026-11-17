@@ -1,26 +1,33 @@
 /-
 The site on Deno and Deno Deploy (`npm run build:deno`, `build:deno-deploy`):
 the program's default export, which Deno serves. The todos are kept in Deno KV
-(`Deno.openKv()`: built into Deno Deploy, `deno run --unstable-kv` locally),
-under the keys `["TODOS", key]`. Without Deno KV the program fails at start
-with an error saying so, rather than keeping the todos in memory.
+(`Deno.openKv()`, Lasm.JS.Deno.Kv: built into Deno Deploy, `deno run
+--unstable-kv` locally), under the keys `["TODOS", key]`. Without Deno KV the
+program fails at start with an error saying so, rather than keeping the todos
+in memory.
 -/
 import JsSite
-open Lasm.JS
+import Lasm.JS.Deno.Kv
+open Lasm.JS Lasm.JS.Deno
 
-/-- Deno KV (`Deno.openKv()`) as the site's store. -/
+/-- Deno KV as the site's store, opened on the first request. -/
 def denoKv : IO Site.Kv := do
-  let deno ← (← global).get "Deno"
-  unless (← deno.get "openKv" Data) matches .ref .. do
+  -- A missing Deno KV is an error at start, not a store in memory.
+  unless (← (← (← global).get "Deno").get "openKv" Data) matches .ref .. do
     throw (IO.userError "Deno KV is not available: run with deno run --unstable-kv (Deno Deploy has it built in)")
-  let kv : Value ← deno.callMethodAwait "openKv" #[] Value
+  let opened ← IO.mkRef (none : Option Kv)
+  let db : Async Kv := do
+    if let some kv ← opened.get then return kv
+    let kv ← openKv
+    opened.set (some kv)
+    return kv
+  let key (k : String) : Array KvKeyPart := #[.domString "TODOS", .domString k]
   return {
-    get := fun key => do
-      match ← (← kv.callMethodAwait "get" #[.array #[.string "TODOS", .string key]] Value).get "value" Data with
+    get := fun k => do
+      match (← (← db).get (key k)).value with
       | .string s => return some s
       | _ => return none
-    put := fun key value => do
-      let _ : Data ← kv.callMethodAwait "set" #[.array #[.string "TODOS", .string key], .string value] }
+    put := fun k v => do discard <| (← db).set (key k) (.string v) }
 
 def main : IO Unit := do
   exportDefault (JsSite.handle (← denoKv))
