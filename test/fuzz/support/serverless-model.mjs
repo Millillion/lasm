@@ -1,5 +1,5 @@
 // The Lean model of the function platforms' HTTP mapping
-// (library/Lasm/Serverless/Proofs/Model.lean) as a process the serverless-http
+// (verification/cli/Lasm/Serverless/Proofs/Model.lean) as a process the serverless-http
 // fuzz target asks about each input (test/fuzz/support/ServerlessModel.lean).
 //
 //   node test/fuzz/support/serverless-model.mjs [--out DIR]
@@ -39,7 +39,7 @@ export async function prepare(out = defaultDirectory) {
     const olean = join(out, ...module) + '.olean';
     mkdirSync(join(out, ...module.slice(0, -1)), { recursive: true });
     const env = environment();
-    execFileSync(lean.lean, ['-R', join(root, 'library'), '-o', olean, join(root, 'library', ...module) + '.lean'],
+    execFileSync(lean.lean, ['-R', join(root, 'verification/cli'), '-o', olean, join(root, 'verification/cli', ...module) + '.lean'],
       { env, stdio: ['ignore', 'inherit', 'inherit'], timeout: 600_000 });
     const config = { lean: lean.lean, leanPath: [out, join(lean.prefix, 'lib', 'lean')], runner };
     writeFileSync(join(out, 'model.json'), JSON.stringify(config, null, 2) + '\n');

@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.Url
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface CacheStorage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure CacheStorage where
@@ -50,33 +53,33 @@ instance : Coe URL RequestInfoOrURL := ⟨.url⟩
 structure CacheQueryOptions where
   /-- `boolean ignoreMethod` -/
   ignoreMethod : Option Bool := none
-instance : ToJS CacheQueryOptions := ⟨fun d => Support.fields #[("ignoreMethod", Support.optional d.ignoreMethod)]⟩
+instance : ToJS CacheQueryOptions := ⟨fun d => Internal.fields #[("ignoreMethod", Internal.optional d.ignoreMethod)]⟩
 
 /-- `readonly default: Cache`: `readonly attribute Cache default` -/
-def CacheStorage.default (self : CacheStorage) : IO Cache := do
+@[macro_inline] def CacheStorage.default (self : CacheStorage) : IO Cache := Internal.api "Lasm.JS.Cloudflare.CacheStorage.default" do
   let r ← self.val.get "default" Value
   pure { val := r }
 
 /-- `open(cacheName: string): Promise<Cache>`: `Promise<Cache> open(DOMString cacheName)` -/
-def CacheStorage.«open» (self : CacheStorage) (cacheName : String) : Async Cache := do
-  let r ← self.val.callMethodAwait "open" (Support.args #[toJS cacheName]) Value
+@[macro_inline] def CacheStorage.«open» (self : CacheStorage) (cacheName : String) : Async Cache := Internal.api "Lasm.JS.Cloudflare.CacheStorage.open" do
+  let r ← self.val.callMethodAwait "open" (Internal.args #[toJS cacheName]) Value
   pure { val := r }
 
 /-- `delete(request: RequestInfo | URL, options?: CacheQueryOptions): Promise<boolean>`: `Promise<boolean> delete(RequestInfoOrURL request, optional CacheQueryOptions options)` -/
-def Cache.delete (self : Cache) (request : RequestInfoOrURL) (options : Option CacheQueryOptions := none) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS request, Support.optional options]) Bool
+@[macro_inline] def Cache.delete (self : Cache) (request : RequestInfoOrURL) (options : Option CacheQueryOptions := none) : Async Bool := Internal.api "Lasm.JS.Cloudflare.Cache.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS request, Internal.optional options]) Bool
 
 /-- `match(request: RequestInfo | URL, options?: CacheQueryOptions): Promise<Response | undefined>`: `Promise<Response?> match(RequestInfoOrURL request, optional CacheQueryOptions options)` -/
-def Cache.«match» (self : Cache) (request : RequestInfoOrURL) (options : Option CacheQueryOptions := none) : Async (Option Response) :=
-  self.val.callMethodAwait "match" (Support.args #[toJS request, Support.optional options]) (Option Response)
+@[macro_inline] def Cache.«match» (self : Cache) (request : RequestInfoOrURL) (options : Option CacheQueryOptions := none) : Async (Option Response) := Internal.api "Lasm.JS.Cloudflare.Cache.match" do
+  self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) (Option Response)
 
 /-- `put(request: RequestInfo | URL, response: Response): Promise<void>`: `Promise<undefined> put(RequestInfoOrURL request, Response response)` -/
-def Cache.put (self : Cache) (request : RequestInfoOrURL) (response : Response) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS request, toJS response]) Unit
+@[macro_inline] def Cache.put (self : Cache) (request : RequestInfoOrURL) (response : Response) : Async Unit := Internal.api "Lasm.JS.Cloudflare.Cache.put" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS request, toJS response]) Unit
 
 /-- `const caches: CacheStorage`: `readonly attribute CacheStorage caches` (@cloudflare/workers-types 5.20261019.1 type declarations) -/
-def caches : IO CacheStorage := do
-  let r ← Support.getGlobal ["caches"] Value
+@[macro_inline] def caches : IO CacheStorage := Internal.api "Lasm.JS.Cloudflare.caches" do
+  let r ← Internal.getGlobal ["caches"] Value
   pure { val := r }
 
 end Lasm.JS.Cloudflare

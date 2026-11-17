@@ -331,8 +331,8 @@ export function workersEntry(allModules) {
 // Lean starts once per isolate in the global scope: its initializers and main
 // run here, outside any request's CPU time. main publishes the request handler
 // with Lasm.JS.exportDefault (a Hono app, an object with fetch, or a function);
-// an object's scheduled and queue methods receive cron triggers and queue
-// batches (Lasm.JS.Cloudflare.ExportedHandler). If the Lean instance stops (for
+// an object's other handler methods (scheduled, queue, email, tail, trace,
+// tailStream, connect, test) receive those events (Lasm.JS.Cloudflare.ExportedHandler). If the Lean instance stops (for
 // example on stack exhaustion), the next request starts a fresh one. The
 // runtime's own modules are in the module map for Lasm.JS.Cloudflare's bindings
 // (env of cloudflare:workers, connect of cloudflare:sockets).
@@ -359,7 +359,7 @@ const ready = async () => {
   return current.handler;
 };
 
-/** A handler method other than fetch (scheduled, queue): the published object's, if it has one. */
+/** A handler method other than fetch (scheduled, queue, email, …): the published object's, if it has one. */
 const forward = name => async (event, env, ctx) => {
   const handler = await ready();
   if (typeof handler?.[name] !== 'function') throw new Error('The handler of the Lean program (Lasm.JS.exportDefault) has no ' + name + ' method');
@@ -373,6 +373,12 @@ export default {
   },
   scheduled: forward('scheduled'),
   queue: forward('queue'),
+  email: forward('email'),
+  tail: forward('tail'),
+  trace: forward('trace'),
+  tailStream: forward('tailStream'),
+  connect: forward('connect'),
+  test: forward('test'),
 };
 `;
 }

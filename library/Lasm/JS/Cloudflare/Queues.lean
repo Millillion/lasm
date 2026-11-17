@@ -8,9 +8,15 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Dom
+import Lasm.JS.Cloudflare.Workers
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Queue` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure Queue where
@@ -36,54 +42,35 @@ instance : Nonempty MessageBatch := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS MessageBatch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MessageBatch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.MessageBatch", .data⟩
 
+/-- `interface QueueEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure QueueEvent where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty QueueEvent := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS QueueEvent := ⟨fun x => .ref x.val ""⟩
+instance : FromJS QueueEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.QueueEvent", .data⟩
+
 /-- `enum QueueContentType` (@cloudflare/workers-types 5.20261019.1 type declarations): "text", "bytes", "json", "v8". -/
-inductive QueueContentType where
-  /-- "text" -/
-  | text
-  /-- "bytes" -/
-  | bytes
-  /-- "json" -/
-  | json
-  /-- "v8" -/
-  | v8
+structure QueueContentType where
+  /-- A value from its string, unchecked: the generated values (`.text`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS QueueContentType := ⟨fun
-  | .text => .string "text"
-  | .bytes => .string "bytes"
-  | .json => .string "json"
-  | .v8 => .string "v8"⟩
+/-- "text" -/
+@[match_pattern] abbrev QueueContentType.text : QueueContentType := .unsafeOfString "text"
+/-- "bytes" -/
+@[match_pattern] abbrev QueueContentType.bytes : QueueContentType := .unsafeOfString "bytes"
+/-- "json" -/
+@[match_pattern] abbrev QueueContentType.json : QueueContentType := .unsafeOfString "json"
+/-- "v8" -/
+@[match_pattern] abbrev QueueContentType.v8 : QueueContentType := .unsafeOfString "v8"
+instance : ToJS QueueContentType := ⟨fun x => .string x.val⟩
 instance : FromJS QueueContentType where
   fromJS
-    | .string "text" => .ok .text
-    | .string "bytes" => .ok .bytes
-    | .string "json" => .ok .json
-    | .string "v8" => .ok .v8
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.QueueContentType"
-
-/-- `dictionary QueueMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueMetrics where
-  /-- `required double backlogCount` -/
-  backlogCount : Float
-  /-- `required double backlogBytes` -/
-  backlogBytes : Float
-  /-- `any oldestMessageTimestamp` -/
-  oldestMessageTimestamp : Data := .undefined
-instance : FromJS QueueMetrics where
-  fromJS d := do return {
-    backlogCount := ← Lasm.JS.readField Float d "backlogCount",
-    backlogBytes := ← Lasm.JS.readField Float d "backlogBytes",
-    oldestMessageTimestamp := ← Lasm.JS.readField Data d "oldestMessageTimestamp" }
-  typeName := "Lasm.JS.Cloudflare.QueueMetrics"
-
-/-- `dictionary QueueSendOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueSendOptions where
-  /-- `QueueContentType contentType` -/
-  contentType : Option QueueContentType := none
-  /-- `double delaySeconds` -/
-  delaySeconds : Option Float := none
-instance : ToJS QueueSendOptions := ⟨fun d => Support.fields #[("contentType", Support.optional d.contentType),
-    ("delaySeconds", Support.optional d.delaySeconds)]⟩
 
 /-- `dictionary QueueSendMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueueSendMetrics where
@@ -99,6 +86,15 @@ instance : FromJS QueueSendMetrics where
     backlogBytes := ← Lasm.JS.readField Float d "backlogBytes",
     oldestMessageTimestamp := ← Lasm.JS.readField Data d "oldestMessageTimestamp" }
   typeName := "Lasm.JS.Cloudflare.QueueSendMetrics"
+
+/-- `dictionary QueueSendOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure QueueSendOptions where
+  /-- `QueueContentType contentType` -/
+  contentType : Option QueueContentType := none
+  /-- `double delaySeconds` -/
+  delaySeconds : Option Float := none
+instance : ToJS QueueSendOptions := ⟨fun d => Internal.fields #[("contentType", Internal.optional d.contentType),
+    ("delaySeconds", Internal.optional d.delaySeconds)]⟩
 
 /-- `dictionary QueueSendMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueueSendMetadata where
@@ -126,126 +122,212 @@ structure MessageSendRequest where
   contentType : Option QueueContentType := none
   /-- `double delaySeconds` -/
   delaySeconds : Option Float := none
-instance : ToJS MessageSendRequest := ⟨fun d => Support.fields #[("body", toJS d.body),
-    ("contentType", Support.optional d.contentType),
-    ("delaySeconds", Support.optional d.delaySeconds)]⟩
+instance : ToJS MessageSendRequest := ⟨fun d => Internal.fields #[("body", toJS d.body),
+    ("contentType", Internal.optional d.contentType),
+    ("delaySeconds", Internal.optional d.delaySeconds)]⟩
 
 /-- `dictionary QueueSendBatchOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure QueueSendBatchOptions where
   /-- `double delaySeconds` -/
   delaySeconds : Option Float := none
-instance : ToJS QueueSendBatchOptions := ⟨fun d => Support.fields #[("delaySeconds", Support.optional d.delaySeconds)]⟩
+instance : ToJS QueueSendBatchOptions := ⟨fun d => Internal.fields #[("delaySeconds", Internal.optional d.delaySeconds)]⟩
 
-/-- `dictionary QueueSendBatchMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueSendBatchMetrics where
-  /-- `required double backlogCount` -/
-  backlogCount : Float
-  /-- `required double backlogBytes` -/
-  backlogBytes : Float
-  /-- `any oldestMessageTimestamp` -/
-  oldestMessageTimestamp : Data := .undefined
-instance : FromJS QueueSendBatchMetrics where
-  fromJS d := do return {
-    backlogCount := ← Lasm.JS.readField Float d "backlogCount",
-    backlogBytes := ← Lasm.JS.readField Float d "backlogBytes",
-    oldestMessageTimestamp := ← Lasm.JS.readField Data d "oldestMessageTimestamp" }
-  typeName := "Lasm.JS.Cloudflare.QueueSendBatchMetrics"
+/-- `callback ExportedHandlerQueueHandler = Promise<undefined> (MessageBatch batch, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerQueueHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerQueueHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerQueueHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerQueueHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerQueueHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerQueueHandler.ofFn {Env : Type} [FromJS Env] (f : MessageBatch → Env → ExecutionContext → Async Unit) : IO ExportedHandlerQueueHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg MessageBatch args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerQueueHandler.ofSyncFn {Env : Type} [FromJS Env] (f : MessageBatch → Env → ExecutionContext → IO Unit) : IO ExportedHandlerQueueHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg MessageBatch args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
 
-/-- `dictionary QueueSendBatchMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueSendBatchMetadata where
-  /-- `required QueueSendBatchMetrics metrics` -/
-  metrics : QueueSendBatchMetrics
-instance : FromJS QueueSendBatchMetadata where
-  fromJS d := do return {
-    metrics := ← Lasm.JS.readField QueueSendBatchMetrics d "metrics" }
-  typeName := "Lasm.JS.Cloudflare.QueueSendBatchMetadata"
+/-- `QueueRetryOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendBatchOptions`. -/
+abbrev QueueRetryOptions := QueueSendBatchOptions
 
-/-- `dictionary QueueSendBatchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueSendBatchResponse where
-  /-- `required QueueSendBatchMetadata metadata` -/
-  metadata : QueueSendBatchMetadata
-instance : FromJS QueueSendBatchResponse where
-  fromJS d := do return {
-    metadata := ← Lasm.JS.readField QueueSendBatchMetadata d "metadata" }
-  typeName := "Lasm.JS.Cloudflare.QueueSendBatchResponse"
+/-- `QueueSendBatchResponse` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendResponse`. -/
+abbrev QueueSendBatchResponse := QueueSendResponse
 
-/-- `dictionary QueueRetryOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure QueueRetryOptions where
-  /-- `double delaySeconds` -/
-  delaySeconds : Option Float := none
-instance : ToJS QueueRetryOptions := ⟨fun d => Support.fields #[("delaySeconds", Support.optional d.delaySeconds)]⟩
+/-- `QueueSendBatchMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendMetadata`. -/
+abbrev QueueSendBatchMetadata := QueueSendMetadata
 
-/-- `dictionary MessageBatchMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure MessageBatchMetrics where
-  /-- `required double backlogCount` -/
-  backlogCount : Float
-  /-- `required double backlogBytes` -/
-  backlogBytes : Float
-  /-- `any oldestMessageTimestamp` -/
-  oldestMessageTimestamp : Data := .undefined
-instance : FromJS MessageBatchMetrics where
-  fromJS d := do return {
-    backlogCount := ← Lasm.JS.readField Float d "backlogCount",
-    backlogBytes := ← Lasm.JS.readField Float d "backlogBytes",
-    oldestMessageTimestamp := ← Lasm.JS.readField Data d "oldestMessageTimestamp" }
-  typeName := "Lasm.JS.Cloudflare.MessageBatchMetrics"
+/-- `QueueSendBatchMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendMetrics`. -/
+abbrev QueueSendBatchMetrics := QueueSendMetrics
 
-/-- `dictionary MessageBatchMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure MessageBatchMetadata where
-  /-- `required MessageBatchMetrics metrics` -/
-  metrics : MessageBatchMetrics
-instance : FromJS MessageBatchMetadata where
-  fromJS d := do return {
-    metrics := ← Lasm.JS.readField MessageBatchMetrics d "metrics" }
-  typeName := "Lasm.JS.Cloudflare.MessageBatchMetadata"
+/-- `QueueMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendMetrics`. -/
+abbrev QueueMetrics := QueueSendMetrics
 
-/-- `metrics(): Promise<QueueMetrics>`: `Promise<QueueMetrics> metrics()` -/
-def Queue.metrics (self : Queue) : Async QueueMetrics :=
-  self.val.callMethodAwait "metrics" (Support.args #[]) QueueMetrics
+/-- `MessageBatchMetadata` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendMetadata`. -/
+abbrev MessageBatchMetadata := QueueSendMetadata
+
+/-- `MessageBatchMetrics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `QueueSendMetrics`. -/
+abbrev MessageBatchMetrics := QueueSendMetrics
+
+/-- `metrics(): Promise<QueueMetrics>`: `Promise<QueueSendMetrics> metrics()` -/
+@[macro_inline] def Queue.metrics (self : Queue) : Async QueueSendMetrics := Internal.api "Lasm.JS.Cloudflare.Queue.metrics" do
+  self.val.callMethodAwait "metrics" (Internal.args #[]) QueueSendMetrics
 
 /-- `send(message: Body, options?: QueueSendOptions): Promise<QueueSendResponse>`: `Promise<QueueSendResponse> send(any message, optional QueueSendOptions options)` -/
-def Queue.send (self : Queue) (message : Data) (options : Option QueueSendOptions := none) : Async QueueSendResponse :=
-  self.val.callMethodAwait "send" (Support.args #[toJS message, Support.optional options]) QueueSendResponse
+@[macro_inline] def Queue.send (self : Queue) (message : Data) (options : Option QueueSendOptions := none) : Async QueueSendResponse := Internal.api "Lasm.JS.Cloudflare.Queue.send" do
+  self.val.callMethodAwait "send" (Internal.args #[toJS message, Internal.optional options]) QueueSendResponse
 
-/-- `sendBatch(messages: Iterable<MessageSendRequest<Body>>, options?: QueueSendBatchOptions): Promise<QueueSendBatchResponse>`: `Promise<QueueSendBatchResponse> sendBatch(sequence<MessageSendRequest> messages, optional QueueSendBatchOptions options)` -/
-def Queue.sendBatch (self : Queue) (messages : Array MessageSendRequest) (options : Option QueueSendBatchOptions := none) : Async QueueSendBatchResponse :=
-  self.val.callMethodAwait "sendBatch" (Support.args #[toJS messages, Support.optional options]) QueueSendBatchResponse
+/-- `sendBatch(messages: Iterable<MessageSendRequest<Body>>, options?: QueueSendBatchOptions): Promise<QueueSendBatchResponse>`: `Promise<QueueSendResponse> sendBatch(sequence<MessageSendRequest> messages, optional QueueSendBatchOptions options)` -/
+@[macro_inline] def Queue.sendBatch (self : Queue) (messages : Array MessageSendRequest) (options : Option QueueSendBatchOptions := none) : Async QueueSendResponse := Internal.api "Lasm.JS.Cloudflare.Queue.sendBatch" do
+  self.val.callMethodAwait "sendBatch" (Internal.args #[toJS messages, Internal.optional options]) QueueSendResponse
 
 /-- `readonly id: string`: `readonly attribute DOMString id` -/
-def Message.id (self : Message) : IO String := self.val.get "id" String
+@[macro_inline] def Message.id (self : Message) : IO String := Internal.api "Lasm.JS.Cloudflare.Message.id" do
+  self.val.get "id" String
 
 /-- `readonly timestamp: Date`: `readonly attribute any timestamp` -/
-def Message.timestamp (self : Message) : IO Data := self.val.get "timestamp" Data
+@[macro_inline] def Message.timestamp (self : Message) : IO Data := Internal.api "Lasm.JS.Cloudflare.Message.timestamp" do
+  self.val.get "timestamp" Data
 
 /-- `readonly body: Body`: `readonly attribute any body` -/
-def Message.body (self : Message) : IO Data := self.val.get "body" Data
+@[macro_inline] def Message.body (self : Message) : IO Data := Internal.api "Lasm.JS.Cloudflare.Message.body" do
+  self.val.get "body" Data
 
 /-- `readonly attempts: number`: `readonly attribute double attempts` -/
-def Message.attempts (self : Message) : IO Float := self.val.get "attempts" Float
+@[macro_inline] def Message.attempts (self : Message) : IO Float := Internal.api "Lasm.JS.Cloudflare.Message.attempts" do
+  self.val.get "attempts" Float
 
-/-- `retry(options?: QueueRetryOptions): void`: `undefined retry(optional QueueRetryOptions options)` -/
-def Message.retry (self : Message) (options : Option QueueRetryOptions := none) : IO Unit :=
-  self.val.callMethod "retry" (Support.args #[Support.optional options]) Unit
+/-- `retry(options?: QueueRetryOptions): void`: `undefined retry(optional QueueSendBatchOptions options)` -/
+@[macro_inline] def Message.retry (self : Message) (options : Option QueueSendBatchOptions := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.Message.retry" do
+  self.val.callMethod "retry" (Internal.args #[Internal.optional options]) Unit
 
 /-- `ack(): void`: `undefined ack()` -/
-def Message.ack (self : Message) : IO Unit :=
-  self.val.callMethod "ack" (Support.args #[]) Unit
+@[macro_inline] def Message.ack (self : Message) : IO Unit := Internal.api "Lasm.JS.Cloudflare.Message.ack" do
+  self.val.callMethod "ack" (Internal.args #[]) Unit
 
 /-- `readonly messages: readonly Message<Body>[]`: `readonly attribute sequence<Message> messages` -/
-def MessageBatch.messages (self : MessageBatch) : IO (Array Message) := self.val.get "messages" (Array Message)
+@[macro_inline] def MessageBatch.messages (self : MessageBatch) : IO (Array Message) := Internal.api "Lasm.JS.Cloudflare.MessageBatch.messages" do
+  self.val.get "messages" (Array Message)
 
 /-- `readonly queue: string`: `readonly attribute DOMString queue` -/
-def MessageBatch.queue (self : MessageBatch) : IO String := self.val.get "queue" String
+@[macro_inline] def MessageBatch.queue (self : MessageBatch) : IO String := Internal.api "Lasm.JS.Cloudflare.MessageBatch.queue" do
+  self.val.get "queue" String
 
-/-- `readonly metadata: MessageBatchMetadata`: `readonly attribute MessageBatchMetadata metadata` -/
-def MessageBatch.metadata (self : MessageBatch) : IO MessageBatchMetadata := self.val.get "metadata" MessageBatchMetadata
+/-- `readonly metadata: MessageBatchMetadata`: `readonly attribute QueueSendMetadata metadata` -/
+@[macro_inline] def MessageBatch.metadata (self : MessageBatch) : IO QueueSendMetadata := Internal.api "Lasm.JS.Cloudflare.MessageBatch.metadata" do
+  self.val.get "metadata" QueueSendMetadata
 
-/-- `retryAll(options?: QueueRetryOptions): void`: `undefined retryAll(optional QueueRetryOptions options)` -/
-def MessageBatch.retryAll (self : MessageBatch) (options : Option QueueRetryOptions := none) : IO Unit :=
-  self.val.callMethod "retryAll" (Support.args #[Support.optional options]) Unit
+/-- `retryAll(options?: QueueRetryOptions): void`: `undefined retryAll(optional QueueSendBatchOptions options)` -/
+@[macro_inline] def MessageBatch.retryAll (self : MessageBatch) (options : Option QueueSendBatchOptions := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.MessageBatch.retryAll" do
+  self.val.callMethod "retryAll" (Internal.args #[Internal.optional options]) Unit
 
 /-- `ackAll(): void`: `undefined ackAll()` -/
-def MessageBatch.ackAll (self : MessageBatch) : IO Unit :=
-  self.val.callMethod "ackAll" (Support.args #[]) Unit
+@[macro_inline] def MessageBatch.ackAll (self : MessageBatch) : IO Unit := Internal.api "Lasm.JS.Cloudflare.MessageBatch.ackAll" do
+  self.val.callMethod "ackAll" (Internal.args #[]) Unit
+
+/-- `constructor(type: string, init?: EventInit)`: `constructor(DOMString type, optional EventInit init)` -/
+@[macro_inline] def QueueEvent.new (type : String) (init : Option EventInit := none) : IO QueueEvent := Internal.api "Lasm.JS.Cloudflare.QueueEvent.new" do
+  Lasm.JS.Binding.invoke QueueEvent { name := "Lasm.JS.Cloudflare.QueueEvent.new", module := "globalThis", path := "QueueEvent", construct := true, arity := 2 }
+    (Internal.args #[toJS type, Internal.optional init]) (await := false)
+
+/-- `get type(): string`: `readonly attribute DOMString type` -/
+@[macro_inline] def QueueEvent.type (self : QueueEvent) : IO String := Internal.api "Lasm.JS.Cloudflare.QueueEvent.type" do
+  self.val.get "type" String
+
+/-- `get eventPhase(): number`: `readonly attribute double eventPhase` -/
+@[macro_inline] def QueueEvent.eventPhase (self : QueueEvent) : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.eventPhase" do
+  self.val.get "eventPhase" Float
+
+/-- `get composed(): boolean`: `readonly attribute boolean composed` -/
+@[macro_inline] def QueueEvent.composed (self : QueueEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.QueueEvent.composed" do
+  self.val.get "composed" Bool
+
+/-- `get bubbles(): boolean`: `readonly attribute boolean bubbles` -/
+@[macro_inline] def QueueEvent.bubbles (self : QueueEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.QueueEvent.bubbles" do
+  self.val.get "bubbles" Bool
+
+/-- `get cancelable(): boolean`: `readonly attribute boolean cancelable` -/
+@[macro_inline] def QueueEvent.cancelable (self : QueueEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.QueueEvent.cancelable" do
+  self.val.get "cancelable" Bool
+
+/-- `get defaultPrevented(): boolean`: `readonly attribute boolean defaultPrevented` -/
+@[macro_inline] def QueueEvent.defaultPrevented (self : QueueEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.QueueEvent.defaultPrevented" do
+  self.val.get "defaultPrevented" Bool
+
+/-- `get currentTarget(): EventTarget | undefined`: `readonly attribute EventTarget? currentTarget` -/
+@[macro_inline] def QueueEvent.currentTarget (self : QueueEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Cloudflare.QueueEvent.currentTarget" do
+  self.val.get "currentTarget" (Option EventTarget)
+
+/-- `get target(): EventTarget | undefined`: `readonly attribute EventTarget? target` -/
+@[macro_inline] def QueueEvent.target (self : QueueEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Cloudflare.QueueEvent.target" do
+  self.val.get "target" (Option EventTarget)
+
+/-- `get timeStamp(): number`: `readonly attribute double timeStamp` -/
+@[macro_inline] def QueueEvent.timeStamp (self : QueueEvent) : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.timeStamp" do
+  self.val.get "timeStamp" Float
+
+/-- `get isTrusted(): boolean`: `readonly attribute boolean isTrusted` -/
+@[macro_inline] def QueueEvent.isTrusted (self : QueueEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.QueueEvent.isTrusted" do
+  self.val.get "isTrusted" Bool
+
+/-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
+@[macro_inline] def QueueEvent.NONE : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.NONE" do
+  Internal.getGlobal ["QueueEvent", "NONE"] Float
+
+/-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
+@[macro_inline] def QueueEvent.CAPTURING_PHASE : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.CAPTURING_PHASE" do
+  Internal.getGlobal ["QueueEvent", "CAPTURING_PHASE"] Float
+
+/-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
+@[macro_inline] def QueueEvent.AT_TARGET : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.AT_TARGET" do
+  Internal.getGlobal ["QueueEvent", "AT_TARGET"] Float
+
+/-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
+@[macro_inline] def QueueEvent.BUBBLING_PHASE : IO Float := Internal.api "Lasm.JS.Cloudflare.QueueEvent.BUBBLING_PHASE" do
+  Internal.getGlobal ["QueueEvent", "BUBBLING_PHASE"] Float
+
+/-- `readonly messages: readonly Message<Body>[]`: `readonly attribute sequence<Message> messages` -/
+@[macro_inline] def QueueEvent.messages (self : QueueEvent) : IO (Array Message) := Internal.api "Lasm.JS.Cloudflare.QueueEvent.messages" do
+  self.val.get "messages" (Array Message)
+
+/-- `readonly queue: string`: `readonly attribute DOMString queue` -/
+@[macro_inline] def QueueEvent.queue (self : QueueEvent) : IO String := Internal.api "Lasm.JS.Cloudflare.QueueEvent.queue" do
+  self.val.get "queue" String
+
+/-- `readonly metadata: MessageBatchMetadata`: `readonly attribute QueueSendMetadata metadata` -/
+@[macro_inline] def QueueEvent.metadata (self : QueueEvent) : IO QueueSendMetadata := Internal.api "Lasm.JS.Cloudflare.QueueEvent.metadata" do
+  self.val.get "metadata" QueueSendMetadata
+
+/-- `stopImmediatePropagation(): void`: `undefined stopImmediatePropagation()` -/
+@[macro_inline] def QueueEvent.stopImmediatePropagation (self : QueueEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.stopImmediatePropagation" do
+  self.val.callMethod "stopImmediatePropagation" (Internal.args #[]) Unit
+
+/-- `preventDefault(): void`: `undefined preventDefault()` -/
+@[macro_inline] def QueueEvent.preventDefault (self : QueueEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.preventDefault" do
+  self.val.callMethod "preventDefault" (Internal.args #[]) Unit
+
+/-- `stopPropagation(): void`: `undefined stopPropagation()` -/
+@[macro_inline] def QueueEvent.stopPropagation (self : QueueEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.stopPropagation" do
+  self.val.callMethod "stopPropagation" (Internal.args #[]) Unit
+
+/-- `composedPath(): EventTarget[]`: `sequence<EventTarget> composedPath()` -/
+@[macro_inline] def QueueEvent.composedPath (self : QueueEvent) : IO (Array EventTarget) := Internal.api "Lasm.JS.Cloudflare.QueueEvent.composedPath" do
+  self.val.callMethod "composedPath" (Internal.args #[]) (Array EventTarget)
+
+/-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
+@[macro_inline] def QueueEvent.waitUntil (self : QueueEvent) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
+
+/-- `retryAll(options?: QueueRetryOptions): void`: `undefined retryAll(optional QueueSendBatchOptions options)` -/
+@[macro_inline] def QueueEvent.retryAll (self : QueueEvent) (options : Option QueueSendBatchOptions := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.retryAll" do
+  self.val.callMethod "retryAll" (Internal.args #[Internal.optional options]) Unit
+
+/-- `ackAll(): void`: `undefined ackAll()` -/
+@[macro_inline] def QueueEvent.ackAll (self : QueueEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.QueueEvent.ackAll" do
+  self.val.callMethod "ackAll" (Internal.args #[]) Unit
 
 end Lasm.JS.Cloudflare

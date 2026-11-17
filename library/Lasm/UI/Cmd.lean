@@ -3,7 +3,7 @@ Commands: what an `update` asks the runtime to do besides changing the model.
 The app loop's own effects are data (a message, a timer, a navigation within
 the app). Everything else the browser does is one generic command,
 `Cmd.task`, which runs any `Async` action, typically through the generated
-browser bindings (Lasm.JS.Web.Browser: `fetch`, `localStorage`, `document`,
+browser bindings (Lasm.JS.Web: `fetch`, `localStorage`, `document`,
 `crypto`, …), and delivers the message it returns.
 
 Apps that want to inspect their effects in tests and proofs declare their own

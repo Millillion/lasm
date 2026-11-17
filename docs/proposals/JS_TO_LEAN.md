@@ -183,10 +183,10 @@ breaks if it is wrong, how much of it is pure) against what it costs.
   and a marshalled call per request, to replace about 200 lines of
   JavaScript.
 - **What was done instead: a model, its theorems, and the fuzzer checking the
-  JavaScript against it.** [library/Lasm/Serverless/Proofs/Model.lean](../../library/Lasm/Serverless/Proofs/Model.lean)
+  JavaScript against it.** [verification/cli/Lasm/Serverless/Proofs/Model.lean](../../verification/cli/Lasm/Serverless/Proofs/Model.lean)
   is the mapping in Lean, function for function lasm-lambda.mjs and
   lasm-server.mjs (its header maps each Lean function to its JavaScript one).
-  [Lasm/Serverless/Spec.lean](../../library/Lasm/Serverless/Spec.lean) states
+  [Lasm/Serverless/Spec.lean](../../verification/cli/Lasm/Serverless/Spec.lean) states
   20 propositions, proved in Lasm.Serverless.Proofs.Mapping (87 theorems,
   only the standard axioms; [library/PROOFS.md](../../library/PROOFS.md)):
   every forwarded target is one http.request accepts; the path a server sees

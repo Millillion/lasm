@@ -17,7 +17,7 @@
 //     Host field, and a web Request holds it, its URL under that Host; query values decoded by the
 //     platform arrive with the same values; the response body round-trips
 //     (text or base64), and each Set-Cookie arrives once;
-//   - the Lean model (library/Lasm/Serverless/Proofs/Model.lean, whose
+//   - the Lean model (verification/cli/Lasm/Serverless/Proofs/Model.lean, whose
 //     theorems are in library/PROOFS.md) gives the same request, response,
 //     Azure reply, parsed cookies and Netlify body for the input, when it is
 //     prepared (node test/fuzz/support/serverless-model.mjs; required in CI).

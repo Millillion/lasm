@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.KvListIterator` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts): a handle to the JavaScript object. -/
 structure KvListIterator where
@@ -47,49 +50,45 @@ instance : ToJS Kv := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Kv := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.Kv", .data⟩
 
 /-- `enum KvMutationType` (Deno 2.9.6 type declarations): "set", "delete", "sum", "max", "min". -/
-inductive KvMutationType where
-  /-- "set" -/
-  | set
-  /-- "delete" -/
-  | delete
-  /-- "sum" -/
-  | sum
-  /-- "max" -/
-  | max
-  /-- "min" -/
-  | min
+structure KvMutationType where
+  /-- A value from its string, unchecked: the generated values (`.set`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS KvMutationType := ⟨fun
-  | .set => .string "set"
-  | .delete => .string "delete"
-  | .sum => .string "sum"
-  | .max => .string "max"
-  | .min => .string "min"⟩
+/-- "set" -/
+@[match_pattern] abbrev KvMutationType.set : KvMutationType := .unsafeOfString "set"
+/-- "delete" -/
+@[match_pattern] abbrev KvMutationType.delete : KvMutationType := .unsafeOfString "delete"
+/-- "sum" -/
+@[match_pattern] abbrev KvMutationType.sum : KvMutationType := .unsafeOfString "sum"
+/-- "max" -/
+@[match_pattern] abbrev KvMutationType.max : KvMutationType := .unsafeOfString "max"
+/-- "min" -/
+@[match_pattern] abbrev KvMutationType.min : KvMutationType := .unsafeOfString "min"
+instance : ToJS KvMutationType := ⟨fun x => .string x.val⟩
 instance : FromJS KvMutationType where
   fromJS
-    | .string "set" => .ok .set
-    | .string "delete" => .ok .delete
-    | .string "sum" => .ok .sum
-    | .string "max" => .ok .max
-    | .string "min" => .ok .min
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.KvMutationType"
 
 /-- `enum KvConsistencyLevel` (Deno 2.9.6 type declarations): "strong", "eventual". -/
-inductive KvConsistencyLevel where
-  /-- "strong" -/
-  | strong
-  /-- "eventual" -/
-  | eventual
+structure KvConsistencyLevel where
+  /-- A value from its string, unchecked: the generated values (`.strong`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS KvConsistencyLevel := ⟨fun
-  | .strong => .string "strong"
-  | .eventual => .string "eventual"⟩
+/-- "strong" -/
+@[match_pattern] abbrev KvConsistencyLevel.strong : KvConsistencyLevel := .unsafeOfString "strong"
+/-- "eventual" -/
+@[match_pattern] abbrev KvConsistencyLevel.eventual : KvConsistencyLevel := .unsafeOfString "eventual"
+instance : ToJS KvConsistencyLevel := ⟨fun x => .string x.val⟩
 instance : FromJS KvConsistencyLevel where
   fromJS
-    | .string "strong" => .ok .strong
-    | .string "eventual" => .ok .eventual
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.KvConsistencyLevel"
 
 /-- `typedef Uint8Array or DOMString or double or bigint or boolean KvKeyPart`: one constructor per member type. -/
@@ -146,7 +145,7 @@ structure AtomicCheck where
   key : Array KvKeyPart
   /-- `required DOMString? versionstamp` -/
   versionstamp : Option String
-instance : ToJS AtomicCheck := ⟨fun d => Support.fields #[("key", toJS d.key),
+instance : ToJS AtomicCheck := ⟨fun d => Internal.fields #[("key", toJS d.key),
     ("versionstamp", toJS d.versionstamp)]⟩
 
 /-- `dictionary KvMutation` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -159,16 +158,16 @@ structure KvMutation where
   value : Data := .undefined
   /-- `double expireIn` -/
   expireIn : Option Float := none
-instance : ToJS KvMutation := ⟨fun d => Support.fields #[("key", toJS d.key),
+instance : ToJS KvMutation := ⟨fun d => Internal.fields #[("key", toJS d.key),
     ("type", toJS d.type),
     ("value", d.value),
-    ("expireIn", Support.optional d.expireIn)]⟩
+    ("expireIn", Internal.optional d.expireIn)]⟩
 
 /-- `dictionary AtomicOperationSetOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AtomicOperationSetOptions where
   /-- `double expireIn` -/
   expireIn : Option Float := none
-instance : ToJS AtomicOperationSetOptions := ⟨fun d => Support.fields #[("expireIn", Support.optional d.expireIn)]⟩
+instance : ToJS AtomicOperationSetOptions := ⟨fun d => Internal.fields #[("expireIn", Internal.optional d.expireIn)]⟩
 
 /-- `dictionary AtomicOperationEnqueueOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AtomicOperationEnqueueOptions where
@@ -178,9 +177,9 @@ structure AtomicOperationEnqueueOptions where
   keysIfUndelivered : Option (Array (Array KvKeyPart)) := none
   /-- `sequence<double> backoffSchedule` -/
   backoffSchedule : Option (Array Float) := none
-instance : ToJS AtomicOperationEnqueueOptions := ⟨fun d => Support.fields #[("delay", Support.optional d.delay),
-    ("keysIfUndelivered", Support.optional d.keysIfUndelivered),
-    ("backoffSchedule", Support.optional d.backoffSchedule)]⟩
+instance : ToJS AtomicOperationEnqueueOptions := ⟨fun d => Internal.fields #[("delay", Internal.optional d.delay),
+    ("keysIfUndelivered", Internal.optional d.keysIfUndelivered),
+    ("backoffSchedule", Internal.optional d.backoffSchedule)]⟩
 
 /-- `dictionary AtomicOperationCommit` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AtomicOperationCommit where
@@ -198,7 +197,7 @@ instance : FromJS AtomicOperationCommit where
 structure KvGetOptions where
   /-- `KvConsistencyLevel consistency` -/
   consistency : Option KvConsistencyLevel := none
-instance : ToJS KvGetOptions := ⟨fun d => Support.fields #[("consistency", Support.optional d.consistency)]⟩
+instance : ToJS KvGetOptions := ⟨fun d => Internal.fields #[("consistency", Internal.optional d.consistency)]⟩
 
 /-- `dictionary KvEntryMaybe` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvEntryMaybe where
@@ -219,13 +218,13 @@ instance : FromJS KvEntryMaybe where
 structure KvGetManyOptions where
   /-- `KvConsistencyLevel consistency` -/
   consistency : Option KvConsistencyLevel := none
-instance : ToJS KvGetManyOptions := ⟨fun d => Support.fields #[("consistency", Support.optional d.consistency)]⟩
+instance : ToJS KvGetManyOptions := ⟨fun d => Internal.fields #[("consistency", Internal.optional d.consistency)]⟩
 
 /-- `dictionary KvSetOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvSetOptions where
   /-- `double expireIn` -/
   expireIn : Option Float := none
-instance : ToJS KvSetOptions := ⟨fun d => Support.fields #[("expireIn", Support.optional d.expireIn)]⟩
+instance : ToJS KvSetOptions := ⟨fun d => Internal.fields #[("expireIn", Internal.optional d.expireIn)]⟩
 
 /-- `dictionary KvCommitResult` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvCommitResult where
@@ -247,9 +246,9 @@ structure KvListSelector where
   start : Option (Array KvKeyPart) := none
   /-- `sequence<KvKeyPart> end` -/
   «end» : Option (Array KvKeyPart) := none
-instance : ToJS KvListSelector := ⟨fun d => Support.fields #[("prefix", Support.optional d.«prefix»),
-    ("start", Support.optional d.start),
-    ("end", Support.optional d.«end»)]⟩
+instance : ToJS KvListSelector := ⟨fun d => Internal.fields #[("prefix", Internal.optional d.«prefix»),
+    ("start", Internal.optional d.start),
+    ("end", Internal.optional d.«end»)]⟩
 
 /-- `dictionary KvListOptions` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvListOptions where
@@ -263,11 +262,11 @@ structure KvListOptions where
   consistency : Option KvConsistencyLevel := none
   /-- `double batchSize` -/
   batchSize : Option Float := none
-instance : ToJS KvListOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
-    ("cursor", Support.optional d.cursor),
-    ("reverse", Support.optional d.reverse),
-    ("consistency", Support.optional d.consistency),
-    ("batchSize", Support.optional d.batchSize)]⟩
+instance : ToJS KvListOptions := ⟨fun d => Internal.fields #[("limit", Internal.optional d.limit),
+    ("cursor", Internal.optional d.cursor),
+    ("reverse", Internal.optional d.reverse),
+    ("consistency", Internal.optional d.consistency),
+    ("batchSize", Internal.optional d.batchSize)]⟩
 
 /-- `dictionary KvEnqueueOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvEnqueueOptions where
@@ -277,9 +276,9 @@ structure KvEnqueueOptions where
   keysIfUndelivered : Option (Array (Array KvKeyPart)) := none
   /-- `sequence<double> backoffSchedule` -/
   backoffSchedule : Option (Array Float) := none
-instance : ToJS KvEnqueueOptions := ⟨fun d => Support.fields #[("delay", Support.optional d.delay),
-    ("keysIfUndelivered", Support.optional d.keysIfUndelivered),
-    ("backoffSchedule", Support.optional d.backoffSchedule)]⟩
+instance : ToJS KvEnqueueOptions := ⟨fun d => Internal.fields #[("delay", Internal.optional d.delay),
+    ("keysIfUndelivered", Internal.optional d.keysIfUndelivered),
+    ("backoffSchedule", Internal.optional d.backoffSchedule)]⟩
 
 /-- `callback KvListenQueueHandler = Promise<undefined> (any value)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure KvListenQueueHandler where
@@ -290,13 +289,13 @@ instance : ToJS KvListenQueueHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS KvListenQueueHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.KvListenQueueHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def KvListenQueueHandler.ofFn (f : Data → Async Unit) : IO KvListenQueueHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def KvListenQueueHandler.ofSyncFn (f : Data → IO Unit) : IO KvListenQueueHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -305,7 +304,7 @@ def KvListenQueueHandler.ofSyncFn (f : Data → IO Unit) : IO KvListenQueueHandl
 structure KvWatchOptions where
   /-- `boolean raw` -/
   raw : Option Bool := none
-instance : ToJS KvWatchOptions := ⟨fun d => Support.fields #[("raw", Support.optional d.raw)]⟩
+instance : ToJS KvWatchOptions := ⟨fun d => Internal.fields #[("raw", Internal.optional d.raw)]⟩
 
 /-- `typedef double or sequence<double> DoubleOrSequenceOfDouble`: one constructor per member type. -/
 inductive DoubleOrSequenceOfDouble where
@@ -323,7 +322,7 @@ instance : Coe (Array Float) DoubleOrSequenceOfDouble := ⟨.sequence⟩
 structure CronScheduleExpression where
   /-- `required DoubleOrSequenceOfDouble exact` -/
   exact : DoubleOrSequenceOfDouble
-instance : ToJS CronScheduleExpression := ⟨fun d => Support.fields #[("exact", toJS d.exact)]⟩
+instance : ToJS CronScheduleExpression := ⟨fun d => Internal.fields #[("exact", toJS d.exact)]⟩
 
 /-- `typedef double or CronScheduleExpression CronScheduleExpressionUnion`: one constructor per member type. -/
 inductive CronScheduleExpressionUnion where
@@ -349,11 +348,11 @@ structure CronSchedule where
   month : Option CronScheduleExpressionUnion := none
   /-- `CronScheduleExpressionUnion dayOfWeek` -/
   dayOfWeek : Option CronScheduleExpressionUnion := none
-instance : ToJS CronSchedule := ⟨fun d => Support.fields #[("minute", Support.optional d.minute),
-    ("hour", Support.optional d.hour),
-    ("dayOfMonth", Support.optional d.dayOfMonth),
-    ("month", Support.optional d.month),
-    ("dayOfWeek", Support.optional d.dayOfWeek)]⟩
+instance : ToJS CronSchedule := ⟨fun d => Internal.fields #[("minute", Internal.optional d.minute),
+    ("hour", Internal.optional d.hour),
+    ("dayOfMonth", Internal.optional d.dayOfMonth),
+    ("month", Internal.optional d.month),
+    ("dayOfWeek", Internal.optional d.dayOfWeek)]⟩
 
 /-- `typedef DOMString or CronSchedule DOMStringOrCronSchedule`: one constructor per member type. -/
 inductive DOMStringOrCronSchedule where
@@ -393,8 +392,8 @@ structure CronWithOptionsOptions where
   backoffSchedule : Option (Array Float) := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS CronWithOptionsOptions := ⟨fun d => Support.fields #[("backoffSchedule", Support.optional d.backoffSchedule),
-    ("signal", Support.optional d.signal)]⟩
+instance : ToJS CronWithOptionsOptions := ⟨fun d => Internal.fields #[("backoffSchedule", Internal.optional d.backoffSchedule),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `callback CronWithOptionsHandler = Promise<undefined> ()` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure CronWithOptionsHandler where
@@ -417,7 +416,8 @@ def CronWithOptionsHandler.ofSyncFn (f : IO Unit) : IO CronWithOptionsHandler :=
   return { val := fn }
 
 /-- `get cursor(): string`: `readonly attribute DOMString cursor` -/
-def KvListIterator.cursor (self : KvListIterator) : IO String := self.val.get "cursor" String
+@[macro_inline] def KvListIterator.cursor (self : KvListIterator) : IO String := Internal.api "Lasm.JS.Deno.KvListIterator.cursor" do
+  self.val.get "cursor" String
 
 /-- An iterator of `async iterable<KvEntry>` (the object's `[Symbol.asyncIterator]()`). -/
 structure KvListIterator.Iterator where
@@ -446,114 +446,115 @@ partial def KvListIterator.values (self : KvListIterator) : Async (Array KvEntry
   loop #[]
 
 /-- `constructor(value: bigint)`: `constructor(bigint value)` -/
-def KvU64.new (value : Int) : IO KvU64 :=
+@[macro_inline] def KvU64.new (value : Int) : IO KvU64 := Internal.api "Lasm.JS.Deno.KvU64.new" do
   Lasm.JS.Binding.invoke KvU64 { name := "Lasm.JS.Deno.KvU64.new", module := "globalThis", path := "Deno.KvU64", construct := true, arity := 1 }
-    (Support.args #[(Data.bigint value)]) (await := false)
+    (Internal.args #[(Data.bigint value)]) (await := false)
 
 /-- `readonly value: bigint`: `readonly attribute bigint value` -/
-def KvU64.value (self : KvU64) : IO Int := self.val.get "value" Int
+@[macro_inline] def KvU64.value (self : KvU64) : IO Int := Internal.api "Lasm.JS.Deno.KvU64.value" do
+  self.val.get "value" Int
 
 /-- `check(...checks: AtomicCheck[]): this`: `AtomicOperation check(AtomicCheck... checks)` -/
-def AtomicOperation.check (self : AtomicOperation) (checks : Array AtomicCheck := #[]) : IO AtomicOperation := do
-  let r ← self.val.callMethod "check" (Support.argsWith #[] (checks.map toJS)) Value
+@[macro_inline] def AtomicOperation.check (self : AtomicOperation) (checks : Array AtomicCheck := #[]) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.check" do
+  let r ← self.val.callMethod "check" (Internal.argsWith #[] (checks.map toJS)) Value
   pure { val := r }
 
 /-- `mutate(...mutations: KvMutation[]): this`: `AtomicOperation mutate(KvMutation... mutations)` -/
-def AtomicOperation.mutate (self : AtomicOperation) (mutations : Array KvMutation := #[]) : IO AtomicOperation := do
-  let r ← self.val.callMethod "mutate" (Support.argsWith #[] (mutations.map toJS)) Value
+@[macro_inline] def AtomicOperation.mutate (self : AtomicOperation) (mutations : Array KvMutation := #[]) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.mutate" do
+  let r ← self.val.callMethod "mutate" (Internal.argsWith #[] (mutations.map toJS)) Value
   pure { val := r }
 
 /-- `sum(key: KvKey, n: bigint): this`: `AtomicOperation sum(sequence<KvKeyPart> key, bigint n)` -/
-def AtomicOperation.sum (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "sum" (Support.args #[toJS key, (Data.bigint n)]) Value
+@[macro_inline] def AtomicOperation.sum (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.sum" do
+  let r ← self.val.callMethod "sum" (Internal.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `min(key: KvKey, n: bigint): this`: `AtomicOperation min(sequence<KvKeyPart> key, bigint n)` -/
-def AtomicOperation.min (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "min" (Support.args #[toJS key, (Data.bigint n)]) Value
+@[macro_inline] def AtomicOperation.min (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.min" do
+  let r ← self.val.callMethod "min" (Internal.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `max(key: KvKey, n: bigint): this`: `AtomicOperation max(sequence<KvKeyPart> key, bigint n)` -/
-def AtomicOperation.max (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "max" (Support.args #[toJS key, (Data.bigint n)]) Value
+@[macro_inline] def AtomicOperation.max (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.max" do
+  let r ← self.val.callMethod "max" (Internal.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `set(key: KvKey, value: unknown, options?: { expireIn?: number }): this`: `AtomicOperation set(sequence<KvKeyPart> key, any value, optional AtomicOperationSetOptions options)` -/
-def AtomicOperation.set (self : AtomicOperation) (key : Array KvKeyPart) (value : Data) (options : Option AtomicOperationSetOptions := none) : IO AtomicOperation := do
-  let r ← self.val.callMethod "set" (Support.args #[toJS key, toJS value, Support.optional options]) Value
+@[macro_inline] def AtomicOperation.set (self : AtomicOperation) (key : Array KvKeyPart) (value : Data) (options : Option AtomicOperationSetOptions := none) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.set" do
+  let r ← self.val.callMethod "set" (Internal.args #[toJS key, toJS value, Internal.optional options]) Value
   pure { val := r }
 
 /-- `delete(key: KvKey): this`: `AtomicOperation delete(sequence<KvKeyPart> key)` -/
-def AtomicOperation.delete (self : AtomicOperation) (key : Array KvKeyPart) : IO AtomicOperation := do
-  let r ← self.val.callMethod "delete" (Support.args #[toJS key]) Value
+@[macro_inline] def AtomicOperation.delete (self : AtomicOperation) (key : Array KvKeyPart) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.delete" do
+  let r ← self.val.callMethod "delete" (Internal.args #[toJS key]) Value
   pure { val := r }
 
 /-- `enqueue(value: unknown, options?: { delay?: number; keysIfUndelivered?: KvKey[]; backoffSchedule?: number[]; }): this`: `AtomicOperation enqueue(any value, optional AtomicOperationEnqueueOptions options)` -/
-def AtomicOperation.enqueue (self : AtomicOperation) (value : Data) (options : Option AtomicOperationEnqueueOptions := none) : IO AtomicOperation := do
-  let r ← self.val.callMethod "enqueue" (Support.args #[toJS value, Support.optional options]) Value
+@[macro_inline] def AtomicOperation.enqueue (self : AtomicOperation) (value : Data) (options : Option AtomicOperationEnqueueOptions := none) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.AtomicOperation.enqueue" do
+  let r ← self.val.callMethod "enqueue" (Internal.args #[toJS value, Internal.optional options]) Value
   pure { val := r }
 
 /-- `commit(): Promise<KvCommitResult | KvCommitError>`: `Promise<AtomicOperationCommit> commit()` -/
-def AtomicOperation.commit (self : AtomicOperation) : Async AtomicOperationCommit :=
-  self.val.callMethodAwait "commit" (Support.args #[]) AtomicOperationCommit
+@[macro_inline] def AtomicOperation.commit (self : AtomicOperation) : Async AtomicOperationCommit := Internal.api "Lasm.JS.Deno.AtomicOperation.commit" do
+  self.val.callMethodAwait "commit" (Internal.args #[]) AtomicOperationCommit
 
 /-- `get<T = unknown>(key: KvKey, options?: { consistency?: KvConsistencyLevel }): Promise<KvEntryMaybe<T>>`: `Promise<KvEntryMaybe> get(sequence<KvKeyPart> key, optional KvGetOptions options)` -/
-def Kv.get (self : Kv) (key : Array KvKeyPart) (options : Option KvGetOptions := none) : Async KvEntryMaybe :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) KvEntryMaybe
+@[macro_inline] def Kv.get (self : Kv) (key : Array KvKeyPart) (options : Option KvGetOptions := none) : Async KvEntryMaybe := Internal.api "Lasm.JS.Deno.Kv.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) KvEntryMaybe
 
 /-- `getMany<T extends readonly unknown[]>(keys: readonly [...{ [K in keyof T]: KvKey }], options?: { consistency?: KvConsistencyLevel }): Promise<{ [K in keyof T]: KvEntryMaybe<T[K]> }> (read as Promise<KvEntryMaybe<unknown>[]> {'keys':'KvKey[]'}: the declared type maps a tuple of keys to a tuple of entries (a mapped type); an array of keys gives an array of entries in order)`: `Promise<sequence<KvEntryMaybe>> getMany(sequence<sequence<KvKeyPart>> keys, optional KvGetManyOptions options)` -/
-def Kv.getMany (self : Kv) (keys : Array (Array KvKeyPart)) (options : Option KvGetManyOptions := none) : Async (Array KvEntryMaybe) :=
-  self.val.callMethodAwait "getMany" (Support.args #[toJS keys, Support.optional options]) (Array KvEntryMaybe)
+@[macro_inline] def Kv.getMany (self : Kv) (keys : Array (Array KvKeyPart)) (options : Option KvGetManyOptions := none) : Async (Array KvEntryMaybe) := Internal.api "Lasm.JS.Deno.Kv.getMany" do
+  self.val.callMethodAwait "getMany" (Internal.args #[toJS keys, Internal.optional options]) (Array KvEntryMaybe)
 
 /-- `set(key: KvKey, value: unknown, options?: { expireIn?: number }): Promise<KvCommitResult>`: `Promise<KvCommitResult> set(sequence<KvKeyPart> key, any value, optional KvSetOptions options)` -/
-def Kv.set (self : Kv) (key : Array KvKeyPart) (value : Data) (options : Option KvSetOptions := none) : Async KvCommitResult :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, Support.optional options]) KvCommitResult
+@[macro_inline] def Kv.set (self : Kv) (key : Array KvKeyPart) (value : Data) (options : Option KvSetOptions := none) : Async KvCommitResult := Internal.api "Lasm.JS.Deno.Kv.set" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, Internal.optional options]) KvCommitResult
 
 /-- `delete(key: KvKey): Promise<void>`: `Promise<undefined> delete(sequence<KvKeyPart> key)` -/
-def Kv.delete (self : Kv) (key : Array KvKeyPart) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS key]) Unit
+@[macro_inline] def Kv.delete (self : Kv) (key : Array KvKeyPart) : Async Unit := Internal.api "Lasm.JS.Deno.Kv.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS key]) Unit
 
 /-- `list<T = unknown>(selector: KvListSelector, options?: KvListOptions): KvListIterator<T>`: `KvListIterator list(KvListSelector selector, optional KvListOptions options)` -/
-def Kv.list (self : Kv) (selector : KvListSelector) (options : Option KvListOptions := none) : IO KvListIterator := do
-  let r ← self.val.callMethod "list" (Support.args #[toJS selector, Support.optional options]) Value
+@[macro_inline] def Kv.list (self : Kv) (selector : KvListSelector) (options : Option KvListOptions := none) : IO KvListIterator := Internal.api "Lasm.JS.Deno.Kv.list" do
+  let r ← self.val.callMethod "list" (Internal.args #[toJS selector, Internal.optional options]) Value
   pure { val := r }
 
 /-- `enqueue(value: unknown, options?: { delay?: number; keysIfUndelivered?: KvKey[]; backoffSchedule?: number[]; }): Promise<KvCommitResult>`: `Promise<KvCommitResult> enqueue(any value, optional KvEnqueueOptions options)` -/
-def Kv.enqueue (self : Kv) (value : Data) (options : Option KvEnqueueOptions := none) : Async KvCommitResult :=
-  self.val.callMethodAwait "enqueue" (Support.args #[toJS value, Support.optional options]) KvCommitResult
+@[macro_inline] def Kv.enqueue (self : Kv) (value : Data) (options : Option KvEnqueueOptions := none) : Async KvCommitResult := Internal.api "Lasm.JS.Deno.Kv.enqueue" do
+  self.val.callMethodAwait "enqueue" (Internal.args #[toJS value, Internal.optional options]) KvCommitResult
 
 /-- `listenQueue(handler: (value: any) => Promise<void> | void): Promise<void>`: `Promise<undefined> listenQueue(KvListenQueueHandler handler)` -/
-def Kv.listenQueue (self : Kv) (handler : KvListenQueueHandler) : Async Unit :=
-  self.val.callMethodAwait "listenQueue" (Support.args #[toJS handler]) Unit
+@[macro_inline] def Kv.listenQueue (self : Kv) (handler : KvListenQueueHandler) : Async Unit := Internal.api "Lasm.JS.Deno.Kv.listenQueue" do
+  self.val.callMethodAwait "listenQueue" (Internal.args #[toJS handler]) Unit
 
 /-- `atomic(): AtomicOperation`: `AtomicOperation atomic()` -/
-def Kv.atomic (self : Kv) : IO AtomicOperation := do
-  let r ← self.val.callMethod "atomic" (Support.args #[]) Value
+@[macro_inline] def Kv.atomic (self : Kv) : IO AtomicOperation := Internal.api "Lasm.JS.Deno.Kv.atomic" do
+  let r ← self.val.callMethod "atomic" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `watch<T extends readonly unknown[]>(keys: readonly [...{ [K in keyof T]: KvKey }], options?: { raw?: boolean }): ReadableStream<{ [K in keyof T]: KvEntryMaybe<T[K]> }> (read as ReadableStream<KvEntryMaybe<unknown>[]> {'keys':'KvKey[]'}: as getMany: a stream of arrays of entries, one per key)`: `ReadableStream watch(sequence<sequence<KvKeyPart>> keys, optional KvWatchOptions options)` -/
-def Kv.watch (self : Kv) (keys : Array (Array KvKeyPart)) (options : Option KvWatchOptions := none) : IO ReadableStream := do
-  let r ← self.val.callMethod "watch" (Support.args #[toJS keys, Support.optional options]) Value
+@[macro_inline] def Kv.watch (self : Kv) (keys : Array (Array KvKeyPart)) (options : Option KvWatchOptions := none) : IO ReadableStream := Internal.api "Lasm.JS.Deno.Kv.watch" do
+  let r ← self.val.callMethod "watch" (Internal.args #[toJS keys, Internal.optional options]) Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def Kv.close (self : Kv) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Kv.close (self : Kv) : IO Unit := Internal.api "Lasm.JS.Deno.Kv.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `Deno.openKv(path?: string): Promise<Kv>`: `Promise<Kv> openKv(optional DOMString path)` (Deno 2.9.6 type declarations) -/
-def openKv (path : Option String := none) : Async Kv := do
+@[macro_inline] def openKv (path : Option String := none) : Async Kv := Internal.api "Lasm.JS.Deno.openKv" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Deno.openKv", module := "globalThis", path := "Deno.openKv", construct := false, arity := 1 }
-    (Support.args #[Support.optional path])
+    (Internal.args #[Internal.optional path])
   pure { val := r }
 
 /-- `Deno.cron(name: string, schedule: string | CronSchedule, handler: () => Promise<void> | void): Promise<void>`: `Promise<undefined> cron(DOMString name, DOMStringOrCronSchedule schedule, CronHandler handler)` (Deno 2.9.6 type declarations) -/
-def cron (name : String) (schedule : DOMStringOrCronSchedule) (handler : CronHandler) : Async Unit :=
+@[macro_inline] def cron (name : String) (schedule : DOMStringOrCronSchedule) (handler : CronHandler) : Async Unit := Internal.api "Lasm.JS.Deno.cron" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.cron", module := "globalThis", path := "Deno.cron", construct := false, arity := 3 }
-    (Support.args #[toJS name, toJS schedule, toJS handler])
+    (Internal.args #[toJS name, toJS schedule, toJS handler])
 
 /-- `Deno.cron(name: string, schedule: string | CronSchedule, options: { backoffSchedule?: number[]; signal?: AbortSignal }, handler: () => Promise<void> | void): Promise<void>`: `Promise<undefined> cron(DOMString name, DOMStringOrCronSchedule schedule, CronWithOptionsOptions options, CronWithOptionsHandler handler)` (Deno 2.9.6 type declarations) -/
-def cronWithOptions (name : String) (schedule : DOMStringOrCronSchedule) (options : CronWithOptionsOptions) (handler : CronWithOptionsHandler) : Async Unit :=
+@[macro_inline] def cronWithOptions (name : String) (schedule : DOMStringOrCronSchedule) (options : CronWithOptionsOptions) (handler : CronWithOptionsHandler) : Async Unit := Internal.api "Lasm.JS.Deno.cronWithOptions" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.cronWithOptions", module := "globalThis", path := "Deno.cron", construct := false, arity := 4 }
-    (Support.args #[toJS name, toJS schedule, toJS options, toJS handler])
+    (Internal.args #[toJS name, toJS schedule, toJS options, toJS handler])
 
 end Lasm.JS.Deno

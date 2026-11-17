@@ -15,9 +15,21 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 `section <name>: <passed> passed, <failed> failed` per section, and `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
-import Lasm.JS.Deno
-import Lasm.JS.Web.WebSocket
+import Lasm.JS.Web.Console
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Websockets
+import Lasm.JS.Deno.Fetch
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Io
+import Lasm.JS.Deno.Kv
+import Lasm.JS.Deno.Net
+import Lasm.JS.Deno.Permissions
+import Lasm.JS.Deno.Runtime
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Deno.Subprocess
+import Lasm.JS.Deno.WebSockets
 import Surface
 import Tls
 open Lasm.JS Lasm.JS.Web
@@ -411,7 +423,7 @@ def netChecks (r : Checks) (live : Live) : Async Unit := do
     -- A WebSocket server (Deno.serve + Deno.upgradeWebSocket) echoes every message; Lasm.JS.Web's WebSocket is the client.
     let handler ← Deno.ServeHandler.ofFn fun req _ => do
       let up ← Deno.upgradeWebSocket req none
-      let socket : WebSocket := { val := up.socket }
+      let socket : WebSocket := up.socket
       let onMessage ← Function.ofSyncFn fun args => do
         match (args[0]?.getD .undefined : Data) with
         | .ref e _ => do let d ← e.get "data" Data; let _ : Value ← socket.val.callMethod "send" #[d]; return .undefined

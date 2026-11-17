@@ -70,13 +70,24 @@ test('lasm:app instances: root, flags, target, messages, ports, hot state, unmou
   assert.deepEqual(Object.keys(context.app.ports), ['count', '42']);
   assert.deepEqual(Object.getOwnPropertyDescriptor(context.app.ports, 'count'), { enumerable: true, configurable: true, value: context.app.ports.count, writable: false });
   assert.equal(Object.getOwnPropertyDescriptor(context.app.ports, 'nope'), undefined);
-  // Unmount: handlers in reverse order, an error reported; then ports and messages refuse.
+  // Unmount: the signal aborts first, then the handlers run in reverse order, an error reported;
+  // then ports and messages refuse.
   const unmounted = [];
+  const signal = instance.signal();
+  assert.equal(signal, instance.signal(), 'one signal per app');
+  assert.equal(signal.aborted, false);
+  const target = new EventTarget();
+  target.addEventListener('ping', () => unmounted.push('listener'), { signal });
+  signal.addEventListener('abort', () => unmounted.push('abort'));
   instance.onUnmount(() => unmounted.push(1));
   instance.onUnmount(() => { throw new Error('unmount failed'); });
   instance.onUnmount(() => unmounted.push(3));
+  target.dispatchEvent(new Event('ping'));
   for (const dispose of disposers) dispose();
-  assert.deepEqual(unmounted, [3, 1]);
+  target.dispatchEvent(new Event('ping'));
+  assert.deepEqual(unmounted, ['listener', 'abort', 3, 1]);
+  assert.equal(signal.aborted, true);
+  assert.equal(signal.reason.name, 'AbortError');
   assert.equal(reports.at(-1).message, 'unmount failed');
   assert.throws(() => context.app.ports.count.send(1), { message: 'Lasm app port count: the app is unmounted' });
   await assert.rejects(context.app.deliver('late'), { message: 'The Lasm app is unmounted' });
@@ -95,6 +106,7 @@ test('lasm:app instances: root, flags, target, messages, ports, hot state, unmou
 test('lasm:app: exact stand-in messages, a queued send is a promise, errors without a report function', async () => {
   assert.throws(() => app.onMessage(), { message: 'Lasm.UI.Mount: messages is only available in an app mounted by the browser loader (lasm build --target browser)' });
   assert.throws(() => app.onUnmount(), { message: 'Lasm.UI.Mount: onUnmount is only available in an app mounted by the browser loader (lasm build --target browser)' });
+  assert.equal(app.signal().aborted, false, 'outside a mounted app the signal never aborts');
   const disposers = [];
   const context = { onDispose: fn => disposers.push(fn) };
   const instance = app.lasmInstance(context);
