@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Types.Dom
 import Lasm.JS.Deno.Runtime
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.PermissionStatus` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure PermissionStatus extends EventTarget
@@ -30,138 +33,99 @@ instance : ToJS Permissions := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Permissions := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.Permissions", .data⟩
 
 /-- `enum PermissionState` (Deno 2.9.6 type declarations): "granted", "denied", "prompt". -/
-inductive PermissionState where
-  /-- "granted" -/
-  | granted
-  /-- "denied" -/
-  | denied
-  /-- "prompt" -/
-  | prompt
+structure PermissionState where
+  /-- A value from its string, unchecked: the generated values (`.granted`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PermissionState := ⟨fun
-  | .granted => .string "granted"
-  | .denied => .string "denied"
-  | .prompt => .string "prompt"⟩
+/-- "granted" -/
+@[match_pattern] abbrev PermissionState.granted : PermissionState := .unsafeOfString "granted"
+/-- "denied" -/
+@[match_pattern] abbrev PermissionState.denied : PermissionState := .unsafeOfString "denied"
+/-- "prompt" -/
+@[match_pattern] abbrev PermissionState.prompt : PermissionState := .unsafeOfString "prompt"
+instance : ToJS PermissionState := ⟨fun x => .string x.val⟩
 instance : FromJS PermissionState where
   fromJS
-    | .string "granted" => .ok .granted
-    | .string "denied" => .ok .denied
-    | .string "prompt" => .ok .prompt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.PermissionState"
 
 /-- `enum PermissionDescriptorName` (Deno 2.9.6 type declarations): "run", "read", "write", "net", "env", "sys", "ffi", "import". -/
-inductive PermissionDescriptorName where
-  /-- "run" -/
-  | run
-  /-- "read" -/
-  | read
-  /-- "write" -/
-  | write
-  /-- "net" -/
-  | net
-  /-- "env" -/
-  | env
-  /-- "sys" -/
-  | sys
-  /-- "ffi" -/
-  | ffi
-  /-- "import" -/
-  | «import»
+structure PermissionDescriptorName where
+  /-- A value from its string, unchecked: the generated values (`.run`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PermissionDescriptorName := ⟨fun
-  | .run => .string "run"
-  | .read => .string "read"
-  | .write => .string "write"
-  | .net => .string "net"
-  | .env => .string "env"
-  | .sys => .string "sys"
-  | .ffi => .string "ffi"
-  | .«import» => .string "import"⟩
+/-- "run" -/
+@[match_pattern] abbrev PermissionDescriptorName.run : PermissionDescriptorName := .unsafeOfString "run"
+/-- "read" -/
+@[match_pattern] abbrev PermissionDescriptorName.read : PermissionDescriptorName := .unsafeOfString "read"
+/-- "write" -/
+@[match_pattern] abbrev PermissionDescriptorName.write : PermissionDescriptorName := .unsafeOfString "write"
+/-- "net" -/
+@[match_pattern] abbrev PermissionDescriptorName.net : PermissionDescriptorName := .unsafeOfString "net"
+/-- "env" -/
+@[match_pattern] abbrev PermissionDescriptorName.env : PermissionDescriptorName := .unsafeOfString "env"
+/-- "sys" -/
+@[match_pattern] abbrev PermissionDescriptorName.sys : PermissionDescriptorName := .unsafeOfString "sys"
+/-- "ffi" -/
+@[match_pattern] abbrev PermissionDescriptorName.ffi : PermissionDescriptorName := .unsafeOfString "ffi"
+/-- "import" -/
+@[match_pattern] abbrev PermissionDescriptorName.«import» : PermissionDescriptorName := .unsafeOfString "import"
+instance : ToJS PermissionDescriptorName := ⟨fun x => .string x.val⟩
 instance : FromJS PermissionDescriptorName where
   fromJS
-    | .string "run" => .ok .run
-    | .string "read" => .ok .read
-    | .string "write" => .ok .write
-    | .string "net" => .ok .net
-    | .string "env" => .ok .env
-    | .string "sys" => .ok .sys
-    | .string "ffi" => .ok .ffi
-    | .string "import" => .ok .«import»
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.PermissionDescriptorName"
 
 /-- `enum PermissionDescriptorKind` (Deno 2.9.6 type declarations): "loadavg", "hostname", "systemMemoryInfo", "networkInterfaces", "osRelease", "osUptime", "uid", "gid", "username", "cpus", "homedir", "statfs", "getPriority", "setPriority", "ca", "umask". -/
-inductive PermissionDescriptorKind where
-  /-- "loadavg" -/
-  | loadavg
-  /-- "hostname" -/
-  | hostname
-  /-- "systemMemoryInfo" -/
-  | systemMemoryInfo
-  /-- "networkInterfaces" -/
-  | networkInterfaces
-  /-- "osRelease" -/
-  | osRelease
-  /-- "osUptime" -/
-  | osUptime
-  /-- "uid" -/
-  | uid
-  /-- "gid" -/
-  | gid
-  /-- "username" -/
-  | username
-  /-- "cpus" -/
-  | cpus
-  /-- "homedir" -/
-  | homedir
-  /-- "statfs" -/
-  | statfs
-  /-- "getPriority" -/
-  | getPriority
-  /-- "setPriority" -/
-  | setPriority
-  /-- "ca" -/
-  | ca
-  /-- "umask" -/
-  | umask
+structure PermissionDescriptorKind where
+  /-- A value from its string, unchecked: the generated values (`.loadavg`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PermissionDescriptorKind := ⟨fun
-  | .loadavg => .string "loadavg"
-  | .hostname => .string "hostname"
-  | .systemMemoryInfo => .string "systemMemoryInfo"
-  | .networkInterfaces => .string "networkInterfaces"
-  | .osRelease => .string "osRelease"
-  | .osUptime => .string "osUptime"
-  | .uid => .string "uid"
-  | .gid => .string "gid"
-  | .username => .string "username"
-  | .cpus => .string "cpus"
-  | .homedir => .string "homedir"
-  | .statfs => .string "statfs"
-  | .getPriority => .string "getPriority"
-  | .setPriority => .string "setPriority"
-  | .ca => .string "ca"
-  | .umask => .string "umask"⟩
+/-- "loadavg" -/
+@[match_pattern] abbrev PermissionDescriptorKind.loadavg : PermissionDescriptorKind := .unsafeOfString "loadavg"
+/-- "hostname" -/
+@[match_pattern] abbrev PermissionDescriptorKind.hostname : PermissionDescriptorKind := .unsafeOfString "hostname"
+/-- "systemMemoryInfo" -/
+@[match_pattern] abbrev PermissionDescriptorKind.systemMemoryInfo : PermissionDescriptorKind := .unsafeOfString "systemMemoryInfo"
+/-- "networkInterfaces" -/
+@[match_pattern] abbrev PermissionDescriptorKind.networkInterfaces : PermissionDescriptorKind := .unsafeOfString "networkInterfaces"
+/-- "osRelease" -/
+@[match_pattern] abbrev PermissionDescriptorKind.osRelease : PermissionDescriptorKind := .unsafeOfString "osRelease"
+/-- "osUptime" -/
+@[match_pattern] abbrev PermissionDescriptorKind.osUptime : PermissionDescriptorKind := .unsafeOfString "osUptime"
+/-- "uid" -/
+@[match_pattern] abbrev PermissionDescriptorKind.uid : PermissionDescriptorKind := .unsafeOfString "uid"
+/-- "gid" -/
+@[match_pattern] abbrev PermissionDescriptorKind.gid : PermissionDescriptorKind := .unsafeOfString "gid"
+/-- "username" -/
+@[match_pattern] abbrev PermissionDescriptorKind.username : PermissionDescriptorKind := .unsafeOfString "username"
+/-- "cpus" -/
+@[match_pattern] abbrev PermissionDescriptorKind.cpus : PermissionDescriptorKind := .unsafeOfString "cpus"
+/-- "homedir" -/
+@[match_pattern] abbrev PermissionDescriptorKind.homedir : PermissionDescriptorKind := .unsafeOfString "homedir"
+/-- "statfs" -/
+@[match_pattern] abbrev PermissionDescriptorKind.statfs : PermissionDescriptorKind := .unsafeOfString "statfs"
+/-- "getPriority" -/
+@[match_pattern] abbrev PermissionDescriptorKind.getPriority : PermissionDescriptorKind := .unsafeOfString "getPriority"
+/-- "setPriority" -/
+@[match_pattern] abbrev PermissionDescriptorKind.setPriority : PermissionDescriptorKind := .unsafeOfString "setPriority"
+/-- "ca" -/
+@[match_pattern] abbrev PermissionDescriptorKind.ca : PermissionDescriptorKind := .unsafeOfString "ca"
+/-- "umask" -/
+@[match_pattern] abbrev PermissionDescriptorKind.umask : PermissionDescriptorKind := .unsafeOfString "umask"
+instance : ToJS PermissionDescriptorKind := ⟨fun x => .string x.val⟩
 instance : FromJS PermissionDescriptorKind where
   fromJS
-    | .string "loadavg" => .ok .loadavg
-    | .string "hostname" => .ok .hostname
-    | .string "systemMemoryInfo" => .ok .systemMemoryInfo
-    | .string "networkInterfaces" => .ok .networkInterfaces
-    | .string "osRelease" => .ok .osRelease
-    | .string "osUptime" => .ok .osUptime
-    | .string "uid" => .ok .uid
-    | .string "gid" => .ok .gid
-    | .string "username" => .ok .username
-    | .string "cpus" => .ok .cpus
-    | .string "homedir" => .ok .homedir
-    | .string "statfs" => .ok .statfs
-    | .string "getPriority" => .ok .getPriority
-    | .string "setPriority" => .ok .setPriority
-    | .string "ca" => .ok .ca
-    | .string "umask" => .ok .umask
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.PermissionDescriptorKind"
 
 /-- `callback PermissionStatusOnchange = any (Event ev)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -173,13 +137,13 @@ instance : ToJS PermissionStatusOnchange := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PermissionStatusOnchange := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.PermissionStatusOnchange", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PermissionStatusOnchange.ofFn (f : Event → Async Data) : IO PermissionStatusOnchange := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Event args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Event args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PermissionStatusOnchange.ofSyncFn (f : Event → IO Data) : IO PermissionStatusOnchange := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Event args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Event args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -198,59 +162,62 @@ structure PermissionDescriptor where
   «variable» : Option String := none
   /-- `PermissionDescriptorKind kind` -/
   kind : Option PermissionDescriptorKind := none
-instance : ToJS PermissionDescriptor := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("command", Support.optional d.command),
-    ("path", Support.optional d.path),
-    ("host", Support.optional d.host),
-    ("variable", Support.optional d.«variable»),
-    ("kind", Support.optional d.kind)]⟩
+instance : ToJS PermissionDescriptor := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("command", Internal.optional d.command),
+    ("path", Internal.optional d.path),
+    ("host", Internal.optional d.host),
+    ("variable", Internal.optional d.«variable»),
+    ("kind", Internal.optional d.kind)]⟩
 
 /-- `onchange: ((this: PermissionStatus, ev: Event) => any) | null`: `attribute PermissionStatusOnchange? onchange` -/
-def PermissionStatus.onchange (self : PermissionStatus) : IO (Option PermissionStatusOnchange) := self.val.get "onchange" (Option PermissionStatusOnchange)
+@[macro_inline] def PermissionStatus.onchange (self : PermissionStatus) : IO (Option PermissionStatusOnchange) := Internal.api "Lasm.JS.Deno.PermissionStatus.onchange" do
+  self.val.get "onchange" (Option PermissionStatusOnchange)
 
 /-- Sets `onchange`: `attribute PermissionStatusOnchange? onchange` -/
-def PermissionStatus.setOnchange (self : PermissionStatus) (value : Option PermissionStatusOnchange) : IO Unit :=
+@[macro_inline] def PermissionStatus.setOnchange (self : PermissionStatus) (value : Option PermissionStatusOnchange) : IO Unit := Internal.api "Lasm.JS.Deno.PermissionStatus.setOnchange" do
   self.val.set "onchange" (toJS value)
 
 /-- `readonly state: PermissionState`: `readonly attribute PermissionState state` -/
-def PermissionStatus.state (self : PermissionStatus) : IO PermissionState := self.val.get "state" PermissionState
+@[macro_inline] def PermissionStatus.state (self : PermissionStatus) : IO PermissionState := Internal.api "Lasm.JS.Deno.PermissionStatus.state" do
+  self.val.get "state" PermissionState
 
 /-- `readonly partial: boolean`: `readonly attribute boolean partial` -/
-def PermissionStatus.«partial» (self : PermissionStatus) : IO Bool := self.val.get "partial" Bool
+@[macro_inline] def PermissionStatus.«partial» (self : PermissionStatus) : IO Bool := Internal.api "Lasm.JS.Deno.PermissionStatus.partial" do
+  self.val.get "partial" Bool
 
 /-- `query(desc: PermissionDescriptor): Promise<PermissionStatus>`: `Promise<PermissionStatus> query(PermissionDescriptor desc)` -/
-def Permissions.query (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := do
-  let r ← self.val.callMethodAwait "query" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.query (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.query" do
+  let r ← self.val.callMethodAwait "query" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `querySync(desc: PermissionDescriptor): PermissionStatus`: `PermissionStatus querySync(PermissionDescriptor desc)` -/
-def Permissions.querySync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := do
-  let r ← self.val.callMethod "querySync" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.querySync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.querySync" do
+  let r ← self.val.callMethod "querySync" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `revoke(desc: PermissionDescriptor): Promise<PermissionStatus>`: `Promise<PermissionStatus> revoke(PermissionDescriptor desc)` -/
-def Permissions.revoke (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := do
-  let r ← self.val.callMethodAwait "revoke" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.revoke (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.revoke" do
+  let r ← self.val.callMethodAwait "revoke" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `revokeSync(desc: PermissionDescriptor): PermissionStatus`: `PermissionStatus revokeSync(PermissionDescriptor desc)` -/
-def Permissions.revokeSync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := do
-  let r ← self.val.callMethod "revokeSync" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.revokeSync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.revokeSync" do
+  let r ← self.val.callMethod "revokeSync" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `request(desc: PermissionDescriptor): Promise<PermissionStatus>`: `Promise<PermissionStatus> request(PermissionDescriptor desc)` -/
-def Permissions.request (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := do
-  let r ← self.val.callMethodAwait "request" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.request (self : Permissions) (desc : PermissionDescriptor) : Async PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.request" do
+  let r ← self.val.callMethodAwait "request" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `requestSync(desc: PermissionDescriptor): PermissionStatus`: `PermissionStatus requestSync(PermissionDescriptor desc)` -/
-def Permissions.requestSync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := do
-  let r ← self.val.callMethod "requestSync" (Support.args #[toJS desc]) Value
+@[macro_inline] def Permissions.requestSync (self : Permissions) (desc : PermissionDescriptor) : IO PermissionStatus := Internal.api "Lasm.JS.Deno.Permissions.requestSync" do
+  let r ← self.val.callMethod "requestSync" (Internal.args #[toJS desc]) Value
   pure { val := r }
 
 /-- `const Deno.permissions: Permissions`: `readonly attribute Permissions permissions` (Deno 2.9.6 type declarations) -/
-def permissions : IO Permissions := do
-  let r ← Support.getGlobal ["Deno", "permissions"] Value
+@[macro_inline] def permissions : IO Permissions := Internal.api "Lasm.JS.Deno.permissions" do
+  let r ← Internal.getGlobal ["Deno", "permissions"] Value
   pure { val := r }
 
 end Lasm.JS.Deno

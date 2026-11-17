@@ -14,3 +14,11 @@ name = "Handler"
 [[lean_exe]]
 name = "app"
 root = "Main"
+
+# Lasm's library (Lasm.JS, Lasm.UI, …) as a Lake package. Every lasm command
+# links .lake/lasm-library to it, so Lake and the Lean editor build its
+# modules on first import. On a fresh clone, run any lasm command once
+# (npm run dev, npx lasm editor) before a plain `lake build`.
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"

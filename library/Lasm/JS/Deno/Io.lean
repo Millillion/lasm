@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.stdin` (Deno 2.9.6 type declarations): a handle to the JavaScript object. -/
 structure Stdin where
@@ -41,7 +44,7 @@ instance : FromJS Stderr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error 
 structure SetRawOptions where
   /-- `required boolean cbreak` -/
   cbreak : Bool
-instance : ToJS SetRawOptions := ⟨fun d => Support.fields #[("cbreak", toJS d.cbreak)]⟩
+instance : ToJS SetRawOptions := ⟨fun d => Internal.fields #[("cbreak", toJS d.cbreak)]⟩
 
 /-- `dictionary ConsoleSizeResult` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConsoleSizeResult where
@@ -81,85 +84,85 @@ structure InspectOptions where
   showHidden : Option Bool := none
   /-- `double strAbbreviateSize` -/
   strAbbreviateSize : Option Float := none
-instance : ToJS InspectOptions := ⟨fun d => Support.fields #[("colors", Support.optional d.colors),
-    ("compact", Support.optional d.compact),
-    ("depth", Support.optional d.depth),
-    ("breakLength", Support.optional d.breakLength),
-    ("escapeSequences", Support.optional d.escapeSequences),
-    ("iterableLimit", Support.optional d.iterableLimit),
-    ("showProxy", Support.optional d.showProxy),
-    ("sorted", Support.optional d.sorted),
-    ("trailingComma", Support.optional d.trailingComma),
-    ("getters", Support.optional d.getters),
-    ("showHidden", Support.optional d.showHidden),
-    ("strAbbreviateSize", Support.optional d.strAbbreviateSize)]⟩
+instance : ToJS InspectOptions := ⟨fun d => Internal.fields #[("colors", Internal.optional d.colors),
+    ("compact", Internal.optional d.compact),
+    ("depth", Internal.optional d.depth),
+    ("breakLength", Internal.optional d.breakLength),
+    ("escapeSequences", Internal.optional d.escapeSequences),
+    ("iterableLimit", Internal.optional d.iterableLimit),
+    ("showProxy", Internal.optional d.showProxy),
+    ("sorted", Internal.optional d.sorted),
+    ("trailingComma", Internal.optional d.trailingComma),
+    ("getters", Internal.optional d.getters),
+    ("showHidden", Internal.optional d.showHidden),
+    ("strAbbreviateSize", Internal.optional d.strAbbreviateSize)]⟩
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def Stdin.readable (self : Stdin) : IO ReadableStream := do
+@[macro_inline] def Stdin.readable (self : Stdin) : IO ReadableStream := Internal.api "Lasm.JS.Deno.Stdin.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def Stdin.close (self : Stdin) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Stdin.close (self : Stdin) : IO Unit := Internal.api "Lasm.JS.Deno.Stdin.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `setRaw(mode: boolean, options?: SetRawOptions): void`: `undefined setRaw(boolean mode, optional SetRawOptions options)` -/
-def Stdin.setRaw (self : Stdin) (mode : Bool) (options : Option SetRawOptions := none) : IO Unit :=
-  self.val.callMethod "setRaw" (Support.args #[toJS mode, Support.optional options]) Unit
+@[macro_inline] def Stdin.setRaw (self : Stdin) (mode : Bool) (options : Option SetRawOptions := none) : IO Unit := Internal.api "Lasm.JS.Deno.Stdin.setRaw" do
+  self.val.callMethod "setRaw" (Internal.args #[toJS mode, Internal.optional options]) Unit
 
 /-- `isTerminal(): boolean`: `boolean isTerminal()` -/
-def Stdin.isTerminal (self : Stdin) : IO Bool :=
-  self.val.callMethod "isTerminal" (Support.args #[]) Bool
+@[macro_inline] def Stdin.isTerminal (self : Stdin) : IO Bool := Internal.api "Lasm.JS.Deno.Stdin.isTerminal" do
+  self.val.callMethod "isTerminal" (Internal.args #[]) Bool
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def Stdout.writable (self : Stdout) : IO WritableStream := do
+@[macro_inline] def Stdout.writable (self : Stdout) : IO WritableStream := Internal.api "Lasm.JS.Deno.Stdout.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def Stdout.close (self : Stdout) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Stdout.close (self : Stdout) : IO Unit := Internal.api "Lasm.JS.Deno.Stdout.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `isTerminal(): boolean`: `boolean isTerminal()` -/
-def Stdout.isTerminal (self : Stdout) : IO Bool :=
-  self.val.callMethod "isTerminal" (Support.args #[]) Bool
+@[macro_inline] def Stdout.isTerminal (self : Stdout) : IO Bool := Internal.api "Lasm.JS.Deno.Stdout.isTerminal" do
+  self.val.callMethod "isTerminal" (Internal.args #[]) Bool
 
 /-- `readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream writable` -/
-def Stderr.writable (self : Stderr) : IO WritableStream := do
+@[macro_inline] def Stderr.writable (self : Stderr) : IO WritableStream := Internal.api "Lasm.JS.Deno.Stderr.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `close(): void`: `undefined close()` -/
-def Stderr.close (self : Stderr) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Stderr.close (self : Stderr) : IO Unit := Internal.api "Lasm.JS.Deno.Stderr.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `isTerminal(): boolean`: `boolean isTerminal()` -/
-def Stderr.isTerminal (self : Stderr) : IO Bool :=
-  self.val.callMethod "isTerminal" (Support.args #[]) Bool
+@[macro_inline] def Stderr.isTerminal (self : Stderr) : IO Bool := Internal.api "Lasm.JS.Deno.Stderr.isTerminal" do
+  self.val.callMethod "isTerminal" (Internal.args #[]) Bool
 
 /-- `const Deno.stdin: { read(p: Uint8Array): Promise<number | null>; readSync(p: Uint8Array): number | null; close(): void; readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>; setRaw(mode: boolean, options?: SetRawOptions): void; isTerminal(): boolean; }`: `readonly attribute Stdin stdin` (Deno 2.9.6 type declarations) -/
-def stdin : IO Stdin := do
-  let r ← Support.getGlobal ["Deno", "stdin"] Value
+@[macro_inline] def stdin : IO Stdin := Internal.api "Lasm.JS.Deno.stdin" do
+  let r ← Internal.getGlobal ["Deno", "stdin"] Value
   pure { val := r }
 
 /-- `const Deno.stdout: { write(p: Uint8Array): Promise<number>; writeSync(p: Uint8Array): number; close(): void; readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>; isTerminal(): boolean; }`: `readonly attribute Stdout stdout` (Deno 2.9.6 type declarations) -/
-def stdout : IO Stdout := do
-  let r ← Support.getGlobal ["Deno", "stdout"] Value
+@[macro_inline] def stdout : IO Stdout := Internal.api "Lasm.JS.Deno.stdout" do
+  let r ← Internal.getGlobal ["Deno", "stdout"] Value
   pure { val := r }
 
 /-- `const Deno.stderr: { write(p: Uint8Array): Promise<number>; writeSync(p: Uint8Array): number; close(): void; readonly writable: WritableStream<Uint8Array<ArrayBufferLike>>; isTerminal(): boolean; }`: `readonly attribute Stderr stderr` (Deno 2.9.6 type declarations) -/
-def stderr : IO Stderr := do
-  let r ← Support.getGlobal ["Deno", "stderr"] Value
+@[macro_inline] def stderr : IO Stderr := Internal.api "Lasm.JS.Deno.stderr" do
+  let r ← Internal.getGlobal ["Deno", "stderr"] Value
   pure { val := r }
 
 /-- `Deno.consoleSize(): { columns: number; rows: number; }`: `ConsoleSizeResult consoleSize()` (Deno 2.9.6 type declarations) -/
-def consoleSize : IO ConsoleSizeResult :=
+@[macro_inline] def consoleSize : IO ConsoleSizeResult := Internal.api "Lasm.JS.Deno.consoleSize" do
   Lasm.JS.Binding.invoke ConsoleSizeResult { name := "Lasm.JS.Deno.consoleSize", module := "globalThis", path := "Deno.consoleSize", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.inspect(value: unknown, options?: InspectOptions): string`: `DOMString inspect(any value, optional InspectOptions options)` (Deno 2.9.6 type declarations) -/
-def inspect (value : Data) (options : Option InspectOptions := none) : IO String :=
+@[macro_inline] def inspect (value : Data) (options : Option InspectOptions := none) : IO String := Internal.api "Lasm.JS.Deno.inspect" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.inspect", module := "globalThis", path := "Deno.inspect", construct := false, arity := 2 }
-    (Support.args #[toJS value, Support.optional options]) (await := false)
+    (Internal.args #[toJS value, Internal.optional options]) (await := false)
 
 end Lasm.JS.Deno

@@ -6,7 +6,8 @@ view, the interpreter of its effects, and routing. Build: lasm build Main.lean -
 import Lean.Data.Json.Parser
 import Lean.Data.Json.Printer
 import Lasm.UI
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Html
 import Todo
 open Lasm.UI Todo
 

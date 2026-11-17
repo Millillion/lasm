@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface KVNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure KVNamespace where
@@ -25,7 +28,7 @@ instance : FromJS KVNamespace := ⟨fun | .ref v _ => .ok { val := v } | _ => .e
 structure KVNamespaceGetOptions where
   /-- `double /* integer: Nat */ cacheTtl` -/
   cacheTtl : Option Nat := none
-instance : ToJS KVNamespaceGetOptions := ⟨fun d => Support.fields #[("cacheTtl", Support.optional d.cacheTtl)]⟩
+instance : ToJS KVNamespaceGetOptions := ⟨fun d => Internal.fields #[("cacheTtl", Internal.optional d.cacheTtl)]⟩
 
 /-- `dictionary KVNamespaceListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceListOptions where
@@ -35,9 +38,9 @@ structure KVNamespaceListOptions where
   «prefix» : Option String := none
   /-- `DOMString? cursor` -/
   cursor : Option String := none
-instance : ToJS KVNamespaceListOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
-    ("prefix", Support.optional d.«prefix»),
-    ("cursor", Support.optional d.cursor)]⟩
+instance : ToJS KVNamespaceListOptions := ⟨fun d => Internal.fields #[("limit", Internal.optional d.limit),
+    ("prefix", Internal.optional d.«prefix»),
+    ("cursor", Internal.optional d.cursor)]⟩
 
 /-- `dictionary KVNamespaceListKey` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceListKey where
@@ -96,8 +99,8 @@ structure KVNamespacePutOptions where
   expirationTtl : Option Nat := none
   /-- `any metadata` -/
   metadata : Data := .undefined
-instance : ToJS KVNamespacePutOptions := ⟨fun d => Support.fields #[("expiration", Support.optional d.expiration),
-    ("expirationTtl", Support.optional d.expirationTtl),
+instance : ToJS KVNamespacePutOptions := ⟨fun d => Internal.fields #[("expiration", Internal.optional d.expiration),
+    ("expirationTtl", Internal.optional d.expirationTtl),
     ("metadata", d.metadata)]⟩
 
 /-- `dictionary KVNamespaceGetWithMetadataResult` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -115,37 +118,87 @@ instance : FromJS KVNamespaceGetWithMetadataResult where
     cacheStatus := ← Lasm.JS.readField (Option String) d "cacheStatus" }
   typeName := "Lasm.JS.Cloudflare.KVNamespaceGetWithMetadataResult"
 
-/-- `get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
-def KVNamespace.get (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option String) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option String)
+/-- `get(key: Key, options?: KVNamespaceGetOptions<'text'>): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+@[macro_inline] def KVNamespace.get (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option String) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) (Option String)
 
-/-- `get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>`: `Promise<any> get(DOMString key, DOMString type)` -/
-def KVNamespace.getJson (self : KVNamespace) (key : String) : Async Data :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "json"]) Data
+/-- `get(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, string | null>>`: `Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+@[macro_inline] def KVNamespace.getWithSequenceOfDOMStringKVNamespaceGetOptions (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record (Option String)) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithSequenceOfDOMStringKVNamespaceGetOptions" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) Value
+  Support.mapOf (Option String) r
 
-/-- `get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>`: `Promise<ArrayBuffer?> get(DOMString key, DOMString type)` -/
-def KVNamespace.getArrayBuffer (self : KVNamespace) (key : String) : Async (Option ByteArray) := do
-  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "arrayBuffer"]) Data
-  Support.nullableArrayBufferBytes r
+/-- `get(key: Key, type: 'text'): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getText (self : KVNamespace) (key : String) : Async (Option String) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getText" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "text"]) (Option String)
 
 /-- `get(key: Key, type: 'stream'): Promise<ReadableStream | null>`: `Promise<ReadableStream?> get(DOMString key, DOMString type)` -/
-def KVNamespace.getStream (self : KVNamespace) (key : String) : Async (Option ReadableStream) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "stream"]) (Option ReadableStream)
+@[macro_inline] def KVNamespace.getStream (self : KVNamespace) (key : String) : Async (Option ReadableStream) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getStream" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "stream"]) (Option ReadableStream)
+
+/-- `get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>`: `Promise<ArrayBuffer?> get(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getArrayBuffer (self : KVNamespace) (key : String) : Async (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getArrayBuffer" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "arrayBuffer"]) Data
+  Internal.nullableArrayBufferBytes r
+
+/-- `get(key: Array<Key>, type: 'text'): Promise<Map<string, string | null>>`: `Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getTextOfArray (self : KVNamespace) (key : Array String) : Async (Record (Option String)) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getTextOfArray" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "text"]) Value
+  Support.mapOf (Option String) r
+
+/-- `get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>`: `Promise<any> get(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getJson (self : KVNamespace) (key : String) : Async Data := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getJson" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "json"]) Data
+
+/-- `get<ExpectedValue = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, ExpectedValue | null>>`: `Promise<record<DOMString, any>> get(sequence<DOMString> key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getJsonOfArray (self : KVNamespace) (key : Array String) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getJsonOfArray" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS "json"]) Value
+  Support.mapOf Data r
 
 /-- `list<Metadata = unknown>(options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>`: `Promise<KVNamespaceListResult> list(optional KVNamespaceListOptions options)` -/
-def KVNamespace.list (self : KVNamespace) (options : Option KVNamespaceListOptions := none) : Async KVNamespaceListResult :=
-  self.val.callMethodAwait "list" (Support.args #[Support.optional options]) KVNamespaceListResult
+@[macro_inline] def KVNamespace.list (self : KVNamespace) (options : Option KVNamespaceListOptions := none) : Async KVNamespaceListResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.list" do
+  self.val.callMethodAwait "list" (Internal.args #[Internal.optional options]) KVNamespaceListResult
 
 /-- `put(key: Key, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: KVNamespacePutOptions): Promise<void>`: `Promise<undefined> put(DOMString key, DOMStringOrReadableStreamOrBufferSource value, optional KVNamespacePutOptions options)` -/
-def KVNamespace.put (self : KVNamespace) (key : String) (value : DOMStringOrReadableStreamOrBufferSource) (options : Option KVNamespacePutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) Unit
+@[macro_inline] def KVNamespace.put (self : KVNamespace) (key : String) (value : DOMStringOrReadableStreamOrBufferSource) (options : Option KVNamespacePutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.KVNamespace.put" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) Unit
 
 /-- `getWithMetadata<Metadata = unknown>(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, optional KVNamespaceGetOptions options)` -/
-def KVNamespace.getWithMetadata (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async KVNamespaceGetWithMetadataResult :=
-  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, Support.optional options]) KVNamespaceGetWithMetadataResult
+@[macro_inline] def KVNamespace.getWithMetadata (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async KVNamespaceGetWithMetadataResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadata" do
+  self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, Internal.optional options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+@[macro_inline] def KVNamespace.getWithMetadataWithSequenceOfDOMStringKVNamespaceGetOptions (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record KVNamespaceGetWithMetadataResult) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataWithSequenceOfDOMStringKVNamespaceGetOptions" do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, Internal.optional options]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'text'): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataText (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataText" do
+  self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "text"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'stream'): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataStream (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataStream" do
+  self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "stream"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'arrayBuffer'): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataArrayBuffer (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataArrayBuffer" do
+  self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "arrayBuffer"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Array<Key>, type: 'text'): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataTextOfArray (self : KVNamespace) (key : Array String) : Async (Record KVNamespaceGetWithMetadataResult) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataTextOfArray" do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "text"]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: 'json'): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataJson (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataJson" do
+  self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "json"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, DOMString type)` -/
+@[macro_inline] def KVNamespace.getWithMetadataJsonOfArray (self : KVNamespace) (key : Array String) : Async (Record KVNamespaceGetWithMetadataResult) := Internal.api "Lasm.JS.Cloudflare.KVNamespace.getWithMetadataJsonOfArray" do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Internal.args #[toJS key, toJS "json"]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
 
 /-- `delete(key: Key): Promise<void>`: `Promise<undefined> delete(DOMString key)` -/
-def KVNamespace.delete (self : KVNamespace) (key : String) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS key]) Unit
+@[macro_inline] def KVNamespace.delete (self : KVNamespace) (key : String) : Async Unit := Internal.api "Lasm.JS.Cloudflare.KVNamespace.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS key]) Unit
 
 end Lasm.JS.Cloudflare

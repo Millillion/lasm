@@ -18,8 +18,8 @@ long-poll.
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Deno
-import Lasm.JS.Bun
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Bun.Serve
 import Server.App
 import Server.JsServe
 open Lasm.JS Std.Async

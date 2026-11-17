@@ -11,6 +11,9 @@ import Lasm.JS.Cloudflare.Support
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface D1Database` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure D1Database where
@@ -118,63 +121,67 @@ instance : FromJS D1ExecResult where
 structure D1PreparedStatementRawOptions where
   /-- `boolean columnNames` -/
   columnNames : Option Bool := none
-instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Support.fields #[("columnNames", Support.optional d.columnNames)]⟩
+instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Internal.fields #[("columnNames", Internal.optional d.columnNames)]⟩
 
 /-- `prepare(query: string): D1PreparedStatement`: `D1PreparedStatement prepare(DOMString query)` -/
-def D1Database.prepare (self : D1Database) (query : String) : IO D1PreparedStatement := do
-  let r ← self.val.callMethod "prepare" (Support.args #[toJS query]) Value
+@[macro_inline] def D1Database.prepare (self : D1Database) (query : String) : IO D1PreparedStatement := Internal.api "Lasm.JS.Cloudflare.D1Database.prepare" do
+  let r ← self.val.callMethod "prepare" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>`: `Promise<sequence<D1Result>> batch(sequence<D1PreparedStatement> statements)` -/
-def D1Database.batch (self : D1Database) (statements : Array D1PreparedStatement) : Async (Array D1Result) :=
-  self.val.callMethodAwait "batch" (Support.args #[toJS statements]) (Array D1Result)
+@[macro_inline] def D1Database.batch (self : D1Database) (statements : Array D1PreparedStatement) : Async (Array D1Result) := Internal.api "Lasm.JS.Cloudflare.D1Database.batch" do
+  self.val.callMethodAwait "batch" (Internal.args #[toJS statements]) (Array D1Result)
 
 /-- `exec(query: string): Promise<D1ExecResult>`: `Promise<D1ExecResult> exec(DOMString query)` -/
-def D1Database.exec (self : D1Database) (query : String) : Async D1ExecResult :=
-  self.val.callMethodAwait "exec" (Support.args #[toJS query]) D1ExecResult
+@[macro_inline] def D1Database.exec (self : D1Database) (query : String) : Async D1ExecResult := Internal.api "Lasm.JS.Cloudflare.D1Database.exec" do
+  self.val.callMethodAwait "exec" (Internal.args #[toJS query]) D1ExecResult
 
 /-- `withSession(constraintOrBookmark?: D1SessionBookmark | D1SessionConstraint): D1DatabaseSession`: `D1DatabaseSession withSession(optional DOMString constraintOrBookmark)` -/
-def D1Database.withSession (self : D1Database) (constraintOrBookmark : Option String := none) : IO D1DatabaseSession := do
-  let r ← self.val.callMethod "withSession" (Support.args #[Support.optional constraintOrBookmark]) Value
+@[macro_inline] def D1Database.withSession (self : D1Database) (constraintOrBookmark : Option String := none) : IO D1DatabaseSession := Internal.api "Lasm.JS.Cloudflare.D1Database.withSession" do
+  let r ← self.val.callMethod "withSession" (Internal.args #[Internal.optional constraintOrBookmark]) Value
   pure { val := r }
 
 /-- `prepare(query: string): D1PreparedStatement`: `D1PreparedStatement prepare(DOMString query)` -/
-def D1DatabaseSession.prepare (self : D1DatabaseSession) (query : String) : IO D1PreparedStatement := do
-  let r ← self.val.callMethod "prepare" (Support.args #[toJS query]) Value
+@[macro_inline] def D1DatabaseSession.prepare (self : D1DatabaseSession) (query : String) : IO D1PreparedStatement := Internal.api "Lasm.JS.Cloudflare.D1DatabaseSession.prepare" do
+  let r ← self.val.callMethod "prepare" (Internal.args #[toJS query]) Value
   pure { val := r }
 
 /-- `batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>`: `Promise<sequence<D1Result>> batch(sequence<D1PreparedStatement> statements)` -/
-def D1DatabaseSession.batch (self : D1DatabaseSession) (statements : Array D1PreparedStatement) : Async (Array D1Result) :=
-  self.val.callMethodAwait "batch" (Support.args #[toJS statements]) (Array D1Result)
+@[macro_inline] def D1DatabaseSession.batch (self : D1DatabaseSession) (statements : Array D1PreparedStatement) : Async (Array D1Result) := Internal.api "Lasm.JS.Cloudflare.D1DatabaseSession.batch" do
+  self.val.callMethodAwait "batch" (Internal.args #[toJS statements]) (Array D1Result)
 
 /-- `getBookmark(): D1SessionBookmark | null`: `DOMString? getBookmark()` -/
-def D1DatabaseSession.getBookmark (self : D1DatabaseSession) : IO (Option String) :=
-  self.val.callMethod "getBookmark" (Support.args #[]) (Option String)
+@[macro_inline] def D1DatabaseSession.getBookmark (self : D1DatabaseSession) : IO (Option String) := Internal.api "Lasm.JS.Cloudflare.D1DatabaseSession.getBookmark" do
+  self.val.callMethod "getBookmark" (Internal.args #[]) (Option String)
 
 /-- `bind(...values: unknown[]): D1PreparedStatement`: `D1PreparedStatement bind(any... values)` -/
-def D1PreparedStatement.bind (self : D1PreparedStatement) (values : Array Data := #[]) : IO D1PreparedStatement := do
-  let r ← self.val.callMethod "bind" (Support.argsWith #[] (values.map toJS)) Value
+@[macro_inline] def D1PreparedStatement.bind (self : D1PreparedStatement) (values : Array Data := #[]) : IO D1PreparedStatement := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.bind" do
+  let r ← self.val.callMethod "bind" (Internal.argsWith #[] (values.map toJS)) Value
   pure { val := r }
 
 /-- `first<T = unknown>(colName: string): Promise<T | null>`: `Promise<any> first(DOMString colName)` -/
-def D1PreparedStatement.first (self : D1PreparedStatement) (colName : String) : Async Data :=
-  self.val.callMethodAwait "first" (Support.args #[toJS colName]) Data
+@[macro_inline] def D1PreparedStatement.first (self : D1PreparedStatement) (colName : String) : Async Data := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.first" do
+  self.val.callMethodAwait "first" (Internal.args #[toJS colName]) Data
 
 /-- `first<T = Record<string, unknown>>(): Promise<T | null>`: `Promise<record<DOMString, any>?> first()` -/
-def D1PreparedStatement.first0 (self : D1PreparedStatement) : Async (Option (Record Data)) := do
-  let r ← self.val.callMethodAwait "first" (Support.args #[]) Data
+@[macro_inline] def D1PreparedStatement.first0 (self : D1PreparedStatement) : Async (Option (Record Data)) := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.first0" do
+  let r ← self.val.callMethodAwait "first" (Internal.args #[]) Data
   Support.optionalRecordOf Data r
 
 /-- `run<T = Record<string, unknown>>(): Promise<D1Result<T>>`: `Promise<D1Result> run()` -/
-def D1PreparedStatement.run (self : D1PreparedStatement) : Async D1Result :=
-  self.val.callMethodAwait "run" (Support.args #[]) D1Result
+@[macro_inline] def D1PreparedStatement.run (self : D1PreparedStatement) : Async D1Result := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.run" do
+  self.val.callMethodAwait "run" (Internal.args #[]) D1Result
 
 /-- `all<T = Record<string, unknown>>(): Promise<D1Result<T>>`: `Promise<D1Result> all()` -/
-def D1PreparedStatement.all (self : D1PreparedStatement) : Async D1Result :=
-  self.val.callMethodAwait "all" (Support.args #[]) D1Result
+@[macro_inline] def D1PreparedStatement.all (self : D1PreparedStatement) : Async D1Result := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.all" do
+  self.val.callMethodAwait "all" (Internal.args #[]) D1Result
 
 /-- `raw<T = unknown[]>(options?: { columnNames?: false }): Promise<T[]>`: `Promise<sequence<sequence<any>>> raw(optional D1PreparedStatementRawOptions options)` -/
-def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1PreparedStatementRawOptions := none) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "raw" (Support.args #[Support.optional options]) (Array (Array Data))
+@[macro_inline] def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1PreparedStatementRawOptions := none) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.raw" do
+  self.val.callMethodAwait "raw" (Internal.args #[Internal.optional options]) (Array (Array Data))
+
+/-- `raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>`: `Promise<sequence<any>> raw(any options)` -/
+@[macro_inline] def D1PreparedStatement.rawWithColumnNames (self : D1PreparedStatement) (options : Data) : Async (Array Data) := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.rawWithColumnNames" do
+  self.val.callMethodAwait "raw" (Internal.args #[toJS options]) (Array Data)
 
 end Lasm.JS.Cloudflare

@@ -101,6 +101,34 @@ that module imports (read from the sources themselves), into the prefix
 
 Decision 0.3-6.
 
+**In a Lake project, Lake builds them.** A Lake project's lakefile requires
+Lasm's library as a Lake package (`lasm init` writes it in the templates that use the library; `lasm editor` adds it):
+
+```toml
+[[require]]
+name = "lasm"
+path = ".lake/lasm-library"
+```
+
+`.lake/lasm-library` is a link (a junction on Windows) that every lasm command
+(`init`, `build`, `dev`, `editor`) makes or repairs. It points to one package
+per Lean prefix in Lasm's cache ([src/lake-library.mjs](../src/lake-library.mjs)):
+a lakefile whose one library has as roots the modules compiled on first import,
+from the installed library's sources. Lake then builds those modules on demand,
+like any dependency, in `lake build` and in the editor (`lake setup-file`), so
+an editor opening `import Lasm.JS.Web.IndexedDB` builds it.
+- **One `Lasm` root:** Lean takes the package `Lasm` from the first `LEAN_PATH`
+  directory that has `Lasm/`, which is this package's build directory. So the
+  modules that ship compiled are linked into it (hard links, or copies), and
+  Lake never builds them. A receipt records what was linked, for which prefix
+  and library; a missing, changed or stale file is replaced.
+- **Linked once:** `lasm build` takes those modules' C from Lake, like the
+  project's own, and neither compiles nor links its own copy.
+- **Fresh clones:** the link is not in git (`.lake/` is ignored), so run any
+  lasm command once before a plain `lake build`.
+
+Decision 0.3-7.
+
 **From source to C.** [src/application-sources.mjs](../src/application-sources.mjs)
 (`applicationSources`) handles two kinds of input:
 
@@ -357,7 +385,7 @@ linked only into programs that import them.
 | --- | --- | --- |
 | `Lasm.JS` ([JS.lean](../library/Lasm/JS.lean), [JS_BINDINGS.md](JS_BINDINGS.md)) | Calls JavaScript and npm from Lean: one `@[js "module" "export"]` declaration per function, `Async` for promises, callbacks both ways | Node (threads, [lasm_js.c](../library/c/lasm_js.c), [src/node-js.mjs](../src/node-js.mjs)); edge, Bun/Deno and browser (the same operations without threads: [src/edge/edge-js.mjs](../src/edge/edge-js.mjs), [lasm_js_edge.c](../src/edge/lasm_js_edge.c)). On WASI and Fastly every call fails with a clear error ([src/wasi/lasm_wasi.c](../src/wasi/lasm_wasi.c)) |
 | `Lasm.Fetch` ([Fetch.lean](../library/Lasm/Fetch.lean), [FETCH.md](FETCH.md)) | One `Request → Async Response` handler | Node: a `node:http` server, through `Lasm.JS`. Edge, Bun, Deno: the platform's fetch handler. Fastly: its host calls. WASI: one CGI (WAGI) request on stdin/stdout ([lasm_fetch_wasi.c](../src/wasi/lasm_fetch_wasi.c)). wasi-http: the component's handler |
-| `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the web standards generated from their WebIDL: the APIs every JavaScript target has, and in browsers (`Lasm.JS.Web.Browser`) the DOM, the window, events, canvas 2D and WebSocket | Every JavaScript target; the browser tier in browsers |
+| `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the whole web platform, generated from the WebIDL of every spec (one module per spec); `lasm build --target` refuses an API the target lacks | Every JavaScript target, per API |
 | `Lasm.UI` ([UI.lean](../library/Lasm/UI.lean), [UI.md](UI.md)) | The Elm architecture, `html!`, routing, SSR and hydration. The diff runs in Lean and is proved correct ([UI/Proofs.lean](../library/Lasm/UI/Proofs.lean)) | Browser; rendering to HTML also on the server |
 | `Lasm.RPC` ([RPC.lean](../library/Lasm/RPC.lean), [RPC.md](RPC.md)) | Typed endpoints shared by a server and a browser app | `RPC.Server` with `Lasm.Fetch`, `RPC.Client` with `Lasm.UI` |
 | `Lasm.KV` ([KV.lean](../library/Lasm/KV.lean)) | A small key-value store | Workers KV, Deno KV or Fastly KV where the binding exists; otherwise in memory, one copy per process, isolate or instance |

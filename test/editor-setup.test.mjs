@@ -10,6 +10,9 @@ import { delimiter, join } from 'node:path';
 
 const stubs = {
   './managed-lean.mjs': 'export const provisionLean = (...a) => globalThis.editorStandIns.provisionLean(...a);',
+  // Lasm's Lake package (0.3-7): recorded, so these tests never write to the tool cache.
+  './lake-library.mjs': 'export const addLakeRequire = (...a) => globalThis.editorStandIns.addLakeRequire(...a);\nexport const lakefileOf = () => "lakefile.toml";\n'
+    + 'export const ensureLakeLibrary = (...a) => globalThis.editorStandIns.ensureLakeLibrary(...a);',
   './application-sources.mjs': 'export const findApplicationProject = (...a) => globalThis.editorStandIns.findApplicationProject(...a);\nexport const lakeNativePackages = (...a) => globalThis.editorStandIns.lakeNativePackages(...a);',
 };
 registerHooks({
@@ -39,6 +42,9 @@ beforeEach(() => {
     provisionLean: async () => lean,
     findApplicationProject: () => undefined,
     lakeNativePackages: () => [],
+    lakeCalls: [],
+    addLakeRequire: project => { globalThis.editorStandIns.lakeCalls.push(['addLakeRequire', project]); return true; },
+    ensureLakeLibrary: (project, prefix) => { globalThis.editorStandIns.lakeCalls.push(['ensureLakeLibrary', project, prefix]); return { required: true }; },
   };
 });
 
@@ -205,6 +211,9 @@ test('lasm editor: the directory with a lakefile, or the project around it; its 
         "[lasm] Editor: could not check this project's Lake packages for C code (no workspace); linking Lasm's Lean without its C compiler and headers."],
         'notes are printed after the progress lines');
       assert.match(printed.at(-1), /could not set up elan toolchain/);
+      // Lasm's Lake package: required in the lakefile (with one line saying so), linked, and left to Lake.
+      assert.ok(printed.includes(`[lasm] Editor: added Lasm's library to lakefile.toml ([[require]] "lasm", path .lake/lasm-library), so Lake builds its modules on first import, in the editor too.`));
+      assert.deepEqual(globalThis.editorStandIns.lakeCalls.slice(-2), [['addLakeRequire', project], ['ensureLakeLibrary', project, undefined]]);
     }
     // A project found from a subdirectory; a toolchain already linked: lasm editor exits 0.
     globalThis.editorStandIns.provisionLean = async () => lean;
