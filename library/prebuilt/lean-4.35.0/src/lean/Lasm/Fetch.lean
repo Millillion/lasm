@@ -413,7 +413,7 @@ private def jsResponse (method : String) (r : Response) : Async Value := do
 
 /-- The platform's per-handler environment on edge isolates (Cloudflare
 Workers' `env`: KV namespaces, D1, secrets), as the last request brought it;
-`.undefined` elsewhere. Lasm.KV reads its bindings from it. -/
+`.undefined` elsewhere. -/
 initialize platformEnv : IO.Ref Lasm.JS.Data ← IO.mkRef .undefined
 
 open Lasm.JS in
