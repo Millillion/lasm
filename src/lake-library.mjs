@@ -151,8 +151,8 @@ export function addLakeRequire(project) {
  * Every lasm command's step for a Lake project: the package for `prefix`, and the project's link to it.
  * Returns { required, directory } (required: the lakefile requires the package, so Lake builds those modules).
  */
-export function ensureLakeLibrary(project, prefix, { eager, cache } = {}) {
-  const directory = ensureLakePackage(prefix, { eager, cache });
+export function ensureLakeLibrary(project, prefix, { eager, cache, root } = {}) {
+  const directory = ensureLakePackage(prefix, { eager, cache, root });
   ensureProjectLink(project, directory);
   return { required: requiresLakePackage(project), directory };
 }
